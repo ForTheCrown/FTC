@@ -1,0 +1,19 @@
+main: ftc.staffchat.Main
+name: StaffChatFTC
+version: 1.0
+api-version: 1.16
+authors:
+  - BotulToxin
+  - Wout
+
+commands:
+  staffchat:
+    description: "The command to use the Staff Chat"
+    permission: ftc.staffchat.use
+    permission-message: "You do not have permission!"
+    aliases: sc
+  staffchattoggle:
+    description: "Enable/disable all messages being sent into StaffChat"
+    permission: ftc.staffchat.use
+    permission-message: "You do not have permission!"
+    aliases: sct

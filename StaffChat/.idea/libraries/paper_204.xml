@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="paper-204">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dependencies/paper-204.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
