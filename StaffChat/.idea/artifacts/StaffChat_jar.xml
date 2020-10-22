@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="StaffChat.jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/StaffChat.jar</output-path>
+    <output-path>$PROJECT_DIR$/../../../Testserver.cuck/plugins</output-path>
     <root id="archive" name="StaffChat.jar">
       <element id="module-output" name="StaffChat" />
     </root>

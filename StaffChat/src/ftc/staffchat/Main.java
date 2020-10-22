@@ -6,7 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
 
-    Main plugin;
+    public static Main plugin; //idk, I need this to call the config file in other classes
 
     @Override
     public void onEnable(){
@@ -17,6 +17,7 @@ public class Main extends JavaPlugin {
 
         getCommand("staffchat").setExecutor(new StaffChatCommand());
         getCommand("staffchattoggle").setExecutor(new StaffChatToggleCommand());
+        getCommand("staffchat").setTabCompleter(new SCTabCompleter());
     }
 
 }
