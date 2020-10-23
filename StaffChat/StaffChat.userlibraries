@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="paper-204">
+    <archive path="C:/Users/ander/Desktop/ThePitOfTrash/FTC/StaffChat/dependencies/paper-204.jar" />
+  </library>
+  <library name="spigot-1.16.3">
+    <archive path="C:/Users/ander/Desktop/ThePitOfTrash/FTC/StaffChat/dependencies/spigot-1.16.3.jar" />
+  </library>
+</eclipse-userlibraries>
+

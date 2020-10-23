@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/paper-204"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/spigot-1.16.3"/>
+	<classpathentry kind="lib" path="dependencies/paper-204.jar"/>
+	<classpathentry kind="lib" path="dependencies/spigot-1.16.3.jar"/>
+	<classpathentry kind="output" path="out/production/StaffChat"/>
+</classpath>
