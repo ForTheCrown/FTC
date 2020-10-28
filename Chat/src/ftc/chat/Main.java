@@ -107,9 +107,6 @@ public class Main extends JavaPlugin implements Listener {
 		return ChatColor.translateAlternateColorCodes('&', getConfig().getString("Discord"));
 	}
 	
-	public String getPatreon() {
-		return ChatColor.translateAlternateColorCodes('&', getConfig().getString("Patreon"));
-	}
 	
 	public Long getDelay() {
 		return getConfig().getLong("DelayBetweenAnnouncements");
