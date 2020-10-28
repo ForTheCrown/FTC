@@ -23,7 +23,7 @@ public class SCTabCompleter implements TabCompleter { //Since you said you've ne
         emojiList.add(":tableflip:");
         emojiList.add(":tableput:");
         emojiList.add(":pretty:");
-        emojiList.add(":sparkle:");
+        emojiList.add(":sparkle:"); 
         emojiList.add(":blush:");
         emojiList.add(":sad:");
         return StringUtil.copyPartialMatches(args[argN], emojiList, new ArrayList<>()); //argN is used here to refer to the argument being typed out, partial matches narrows it down

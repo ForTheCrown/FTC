@@ -30,6 +30,7 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) 
 	{
+		/*
 		// Emoji stuff.
 		if (event.getPlayer().hasPermission("ftc.donator3"))
 		{
@@ -48,8 +49,9 @@ public class Main extends JavaPlugin implements Listener {
 			message = message.replaceAll(":blush:", "(▰˘◡˘▰)");
 			message = message.replaceAll(":sad:", "(._. )");
 			event.setMessage(message);
-			return;
+			return; // <-- should be in comment?
 		}
+		*/
 		
 		// The sender is in the special world.
 		if (event.getPlayer().getWorld().getName().contains(getConfig().getString("SenateWorld")))

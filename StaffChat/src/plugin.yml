@@ -2,7 +2,7 @@ main: ftc.staffchat.Main
 name: StaffChatFTC
 version: 1.0
 api-version: 1.16
-author: BotulToxin
+author: BotulToxin, Wout
 
 commands:
   staffchat:
