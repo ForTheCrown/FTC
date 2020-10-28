@@ -1,9 +1,0 @@
-name: Senate
-version: 1.0
-author: Wout
-main: me.wout.Senate.Main
-description: Plugin that does the senate stuff.
-api-version: 1.16
-commands:
-  rlsenate:
-    description: Reloads the config.
