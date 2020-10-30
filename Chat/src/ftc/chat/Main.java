@@ -143,17 +143,18 @@ public class Main extends JavaPlugin implements Listener {
 		if (player.hasPermission("ftc.donator3")) {
 			message = message.replaceAll(":shrug:", "¯\\\\_(ツ)_/¯");
 			message = message.replaceAll(":ughcry:", "(ಥ�?ಥ)");
-			message = message.replaceAll(":gimme:", "༼ �?� ◕_◕ ༽�?�");
-			message = message.replaceAll(":gimmecry:", "༼ �?� ಥ_ಥ ༽�?�");
+			message = message.replaceAll(":gimme:", "༼ つ ◕_◕ ༽つ");
+			message = message.replaceAll(":gimmecry:", "༼ つ ಥ_ಥ ༽つ");
 			message = message.replaceAll(":bear:", "ʕ• ᴥ •ʔ");
 			message = message.replaceAll(":smooch:", "( ^ 3^) ♥");
 			message = message.replaceAll(":why:", "ლ(ಠ益ಠლ)");
-			message = message.replaceAll(":tableflip:", "(ノಠ益ಠ)ノ彡┻�?┻");
+			message = message.replaceAll(":tableflip:", "(ノಠ益ಠ)ノ彡┻━┻");
 			message = message.replaceAll(":tableput:", " ┬──┬ ノ( ゜-゜ノ)");
 			message = message.replaceAll(":pretty:", "(◕‿◕ ✿)");
 			message = message.replaceAll(":sparkle:", "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧");
 			message = message.replaceAll(":blush:", "(▰˘◡˘▰)");
 			message = message.replaceAll(":sad:", "(._. )");
+			message = message.replaceAll(":pleased:", "(ᵔᴥᵔ)");
 			event.setMessage(message);
 		}
 		

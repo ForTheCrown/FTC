@@ -36,6 +36,7 @@ public class EmoteTabCompleter implements TabCompleter {
         emojiList.add(":sparkle:"); 
         emojiList.add(":blush:");
         emojiList.add(":sad:");
+        emojiList.add(":pleased:");
         
         //argN is used here to refer to the argument being typed out, partial matches narrows it down
         //so it doesn't give you all the arguments if you typed in some random stuff lol
