@@ -1,4 +1,5 @@
-package ftc.raceevent;
+
+
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,9 +32,6 @@ public class EventTimer {
             }
         }, 0, 100);
     }
-    public void stopTimer(){
-       timer.cancel();
-       timer.purge();
-    }
+
 
 }

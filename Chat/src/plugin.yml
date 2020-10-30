@@ -38,6 +38,8 @@ commands:
     description: Poke someone.
   bonk:
     description: Bonk someone.
+  scare:
+    description: Scare someone.
   toggleemotes:
     description: Toggles emotes.
   sc:

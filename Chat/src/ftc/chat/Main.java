@@ -23,6 +23,7 @@ import ftc.chat.commands.Mwah;
 import ftc.chat.commands.Poke;
 import ftc.chat.commands.Posthelp;
 import ftc.chat.commands.ReloadConfig;
+import ftc.chat.commands.Scare;
 import ftc.chat.commands.Spawn;
 import ftc.chat.commands.ToggleEmotes;
 import ftc.chat.commands.Tpa;
@@ -55,6 +56,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginCommand("bonk").setExecutor(new Bonk());
 		getServer().getPluginCommand("mwah").setExecutor(new Mwah());
 		getServer().getPluginCommand("poke").setExecutor(new Poke());
+		getServer().getPluginCommand("scare").setExecutor(new Scare());
 		
 		
 		getServer().getPluginCommand("discord").setExecutor(new Discord());
