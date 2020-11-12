@@ -1,0 +1,7 @@
+name: ftcTrapDoorFlag
+version: 1.0
+main: ftc.trapdoorflag.Main
+depend:
+  - WorldGuard
+  - WorldEdit
+api-version: 1.16

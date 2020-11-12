@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/ander/Desktop/Testserver.cuck/plugins/worldedit-bukkit-7.2.0-dist.jar"/>
+	<classpathentry kind="lib" path="C:/Users/ander/Desktop/Testserver.cuck/plugins/worldguard-bukkit-7.0.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/ander/Desktop/Testserver.cuck/paper-268.jar"/>
+	<classpathentry kind="lib" path="C:/Users/ander/Desktop/Testserver.cuck/spigot-1.16.4.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
