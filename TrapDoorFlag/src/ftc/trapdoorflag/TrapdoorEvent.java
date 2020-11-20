@@ -5,7 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.LocalPlayer;
@@ -22,9 +24,13 @@ public class TrapdoorEvent implements Listener {
 
 	@EventHandler
 	public void onTrapdoorUse(PlayerInteractEvent event) {
+		if (event.getHand() != EquipmentSlot.HAND) return;
+		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if (event.getClickedBlock() == null) return;
 		
-		Player plr = event.getPlayer();
+		Player player = event.getPlayer();
 		Material mat = event.getClickedBlock().getType();
+		
 		if(!(mat == Material.OAK_TRAPDOOR ||
 				mat == Material.DARK_OAK_TRAPDOOR ||
 				mat == Material.SPRUCE_TRAPDOOR ||
@@ -35,7 +41,7 @@ public class TrapdoorEvent implements Listener {
 				mat == Material.WARPED_TRAPDOOR
 		)) return; //checks the mats, if they're not a trapdoor, ends the code
 
-		LocalPlayer localPlayer  = WorldGuardPlugin.inst().wrapPlayer(plr); //WorldGuard stuff, this wraps the player into a thingy WorldGuard can use
+		LocalPlayer localPlayer  = WorldGuardPlugin.inst().wrapPlayer(player); //WorldGuard stuff, this wraps the player into a thingy WorldGuard can use
 		boolean canBypass = WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld()); //This checks if the player can bypass the flag(s)
 		Location loc = localPlayer.getLocation(); //WorldGuard has its own Location thingy o.O
 		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer(); //What is this???????????
@@ -51,7 +57,7 @@ public class TrapdoorEvent implements Listener {
 
 		if (!query.testState(loc, localPlayer , Main.TRAPDOOR_USE) && !canBypass && !canUseEvent) { //This actually tests the flag, to see if you should be able to use it or not, along with the other stuffs
 			event.setCancelled(true);
-			plr.sendMessage( ChatColor.RED + "" + ChatColor.BOLD + "Hey! " + ChatColor.GRAY + "Sorry, but you can't use that here.");
+			player.sendMessage( ChatColor.RED + "" + ChatColor.BOLD + "Hey! " + ChatColor.GRAY + "Sorry, but you can't use that here.");
 		}
 
 	}
