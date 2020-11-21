@@ -1,9 +1,20 @@
 package ftc.chat.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import ftc.chat.Main;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +43,6 @@ public class Scare implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
     	
-    	sender.sendMessage(ChatColor.GRAY + "This command is disabled :(");
-    	return false;
-    	/*
-    	
     	// Sender must be player:
         if (!(sender instanceof Player)) 
         {
@@ -53,7 +60,12 @@ public class Scare implements CommandExecutor {
         
         Player player = (Player) sender;
         
-        // Command no args: // TODO
+        if (!Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getStringList("players." + player.getUniqueId().toString() + ".EmotesAvailable").contains("SCARE")) {
+        	player.sendMessage(ChatColor.GRAY + "You haven't unlocked this emote yet.");
+        	return false;
+        }
+        
+        // Command no args:
         if (args.length < 1 || args[0].equalsIgnoreCase(sender.getName()))
         {
             scare(player);
@@ -82,7 +94,6 @@ public class Scare implements CommandExecutor {
         }
 
         // Actual scaring:
-
         player.sendMessage("You scared " + ChatColor.YELLOW + target.getName() + ChatColor.RESET + "!");
         target.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RESET + " scared you!");
 
@@ -97,10 +108,10 @@ public class Scare implements CommandExecutor {
             }
         }.runTaskLater(Main.plugin, 20 * 20);
 
-        return true;*/
+        return true;
     }
     
-    /*private void scare(Player player) {
+    private void scare(Player player) {
     	Location loc = player.getLocation();
     	player.spawnParticle(Particle.MOB_APPEARANCE, loc.getX(), loc.getY(), loc.getZ(), 1);
     	Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
@@ -120,5 +131,5 @@ public class Scare implements CommandExecutor {
 		    	 }
 		    }
 		}, 3L);
-    }*/
+    }
 }
