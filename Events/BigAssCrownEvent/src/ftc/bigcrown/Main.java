@@ -3,6 +3,9 @@ package ftc.bigcrown;
 import ftc.bigcrown.commands.BigBootyEventCommand;
 import ftc.bigcrown.commands.BigBootyTabCompleter;
 import ftc.bigcrown.events.Events;
+
+import java.util.*;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -13,9 +16,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.*;
 
 public class Main extends JavaPlugin {
 	
@@ -28,10 +28,10 @@ public class Main extends JavaPlugin {
 			"{SkullOwner:{Id:[I;2112825111,-414429584,-2029219499,-1043660854],Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWQ5N2Y0ZjQ0ZTc5NmY3OWNhNDMwOTdmYWE3YjRmZTkxYzQ0NWM3NmU1YzI2YTVhZDc5NGY1ZTQ3OTgzNyJ9fX0=\"}]}}}",
 			"{SkullOwner:{Id:[I;-1365545979,1889357537,-1100829119,-1307254765],Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM2YWY2YWQxOGUxM2YyNWE1Yjc0NDcyNTJiNWU5YWI4MTgwYzA1ZGU1OTg1ZmJhZjdiNGZjNGUxZDI0MTY2In19fQ==\"}]}}}"
 	);
-
-	public List<Integer> lastLocIDs = new ArrayList<>();
-	public int delay = 30; //in minutes
-	private Timer timer = new Timer();
+	public List<Integer> locsInUse = new ArrayList<>();
+	
+	public int delay = 3; //in minutes
+	public boolean runLoop = false;
 
 	public void onEnable() {
 		plugin = this;
@@ -46,51 +46,70 @@ public class Main extends JavaPlugin {
 		// Commands
 		getServer().getPluginCommand("BigBootyEvent").setExecutor(new BigBootyEventCommand());
 		getServer().getPluginCommand("BigBootyEvent").setTabCompleter(new BigBootyTabCompleter());
-		
-		// start repeating function to spawn presents
 	}
 
 
-	//present spawning and loop
-	public void startLoop(){
-		timer.schedule(new TimerTask() {
+	// Present spawning and loop
+	public void loop() {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
-				lastLocIDs.clear();
-				for(int i = 0; i < 10 ; i++){
-					presentSpawn();
+				if (!runLoop) return;
+				else {
+					locsInUse.clear();
+					spawnPresent();
+					loop();
 				}
 			}
-		}, 0, delay*20*60);
+		}, /*delay*20*60*/ 60);
 	}
+	
 	public void stopLoop(){
-		timer.cancel();
-		timer.purge();
+		this.runLoop = false;
 	}
 
-	public void presentSpawn(){
+	// Gets the list of Present Locations from the config.
+	@SuppressWarnings("unchecked")
+	public List<Location> getLocationList() {
+		return (List<Location>) getConfig().getList("PresentList");
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Location> getChallengeList() {
+		return (List<Location>) getConfig().getList("ChallengeList");
+	}
+	
+	// Checks if a location is suited for spawning
+	private boolean canSpawnPresent(int id) {
+		if (this.locsInUse.contains(id) || getLocationList().get(id).getBlock().getType() != Material.AIR) return false;
+		else return true;
+	}
+	
 
-		//location finding
-		List<Location> locList = (List<Location>) getConfig().getList("PresentList");
-		int locId = (int) (Math.random() * (locList.size() -1));
-
-		if(lastLocIDs.contains(locId)){ //if a present is already in a location, find new location
-			presentSpawn();
-			return;
+	public void spawnPresent(){
+		List<Location> locList = getLocationList();
+		
+		// Pick random number, if it's already in use,
+		// pick a new random number (added saveGuard just in case of endless loop).
+		int saveGuard = 300;
+		int locId = getRandomNumberInRange(0, locList.size() - 1);
+		
+		while ((!canSpawnPresent(locId)) && saveGuard > 0) {
+			locId = getRandomNumberInRange(0, locList.size() - 1);
+			saveGuard--;
 		}
+		if (saveGuard <= 0) { Bukkit.getConsoleSender().sendMessage("Endless loop :("); return; }
+		else locsInUse.add(locId);
 
-		Location spawnLoc = locList.get(locId);
-		if(spawnLoc.getBlock().getType() != Material.AIR){
-			presentSpawn();
-			return;
-		}
-		lastLocIDs.add(locId);
-
-		//actual spawning part
-
+		
+		// Actual spawning part
 		int rotation = (int) (Math.random() * 15);
+		Location spawnLoc = getLocationList().get(locId);
 		Location loc = new Location(spawnLoc.getWorld(), spawnLoc.getBlockX()+.5, spawnLoc.getBlockY(), spawnLoc.getBlockZ()+.5, (float) (rotation*22.5), 0);
 		Slime slime = (Slime) loc.getWorld().spawnEntity(loc, EntityType.SLIME);
+		slime.setInvisible(true);
+		slime.setSilent(true);
+		slime.setPersistent(true);
 		slime.setSize(1);
 		slime.setInvulnerable(true);
 		slime.setAI(false);
@@ -100,15 +119,27 @@ public class Main extends JavaPlugin {
 		String headCommand = "minecraft:setblock " +  loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " minecraft:player_head[rotation=" + rotation + "]" + presentNBTs.get((int) (Math.random()*presentNBTs.size()-1)) + " replace";
 		getServer().dispatchCommand(Bukkit.getConsoleSender(), headCommand);
 
-		new BukkitRunnable() {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
 				slime.remove();
 				spawnLoc.getBlock().setType(Material.AIR);
 			}
-		}.runTaskLater(this, delay*20*60); //it should get removed after 30 mins
+		}, /*30*20*60*/ 585l); // It should get removed after 30 mins
+	}
+	
+
+	
+	// Gives a random int within a specified range. Min and max are possible results.
+	public int getRandomNumberInRange(int min, int max) {
+		if (min >= max) {
+			return 0;
+		}
+		Random r = new Random();
+		return r.nextInt((max - min) + 1) + min;
 	}
 
+	// Creates an item.
 	public ItemStack makeItem(Material material, int amount, String name, String... loreStrings) {
 		ItemStack result = new ItemStack(material, amount);
 		ItemMeta meta = result.getItemMeta();

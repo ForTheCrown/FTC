@@ -201,11 +201,8 @@ public class Main extends JavaPlugin implements Listener {
 		}	
 	}
 	
-	
-	
 	@EventHandler
 	public void onPlayerClickItemInInv(InventoryClickEvent event) {
-		
 		if (event.getInventory().getHolder() == holder) {
 			event.setCancelled(true);
 			if (event.getClickedInventory() instanceof PlayerInventory) return;
