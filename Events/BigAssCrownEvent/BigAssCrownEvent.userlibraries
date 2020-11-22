@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="paper-288">
+    <archive path="C:/Users/ander/Desktop/ThePitOfTrash/FTC/Events/BigAssCrownEvent/depends/paper-288.jar" />
+  </library>
+  <library name="spigot-1.16.4">
+    <archive path="C:/Users/ander/Desktop/ThePitOfTrash/FTC/Events/BigAssCrownEvent/depends/spigot-1.16.4.jar" />
+  </library>
+</eclipse-userlibraries>
+
