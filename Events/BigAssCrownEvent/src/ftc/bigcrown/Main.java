@@ -74,11 +74,6 @@ public class Main extends JavaPlugin {
 		return (List<Location>) getConfig().getList("PresentList");
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<Location> getChallengeList() {
-		return (List<Location>) getConfig().getList("ChallengeList");
-	}
-	
 	// Checks if a location is suited for spawning
 	private boolean canSpawnPresent(int id) {
 		if (this.locsInUse.contains(id) || getLocationList().get(id).getBlock().getType() != Material.AIR) return false;
@@ -125,7 +120,7 @@ public class Main extends JavaPlugin {
 				slime.remove();
 				spawnLoc.getBlock().setType(Material.AIR);
 			}
-		}, /*30*20*60*/ 585l); // It should get removed after 30 mins
+		}, /*30*20*60*/ 585L); // It should get removed after 30 mins
 	}
 	
 

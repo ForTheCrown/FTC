@@ -15,12 +15,23 @@ public class BigBootyTabCompleter implements TabCompleter {
         if(args.length == 1){
             List<String> argsList = new ArrayList<>();
             argsList.add("setloc");
-            argsList.add("spawnpresent");
             argsList.add("reload");
-            argsList.add("setchallenge");
             argsList.add("usechallenge");
             argsList.add("stoploop");
             argsList.add("startloop");
+            return StringUtil.copyPartialMatches(args[argN], argsList, new ArrayList<>());
+        }
+        if(args[0].contains("usechallenge") && args.length == 2){
+            List<String> argsList = new ArrayList<>();
+            argsList.add("RACE");
+            argsList.add("HALLOWEEN");
+            argsList.add("NETHER");
+            argsList.add("MAGMALOVANIA");
+            argsList.add("PROTECT_HAROLD");
+            argsList.add("PVE_ARENA");
+            argsList.add("PINATA");
+            argsList.add("HUNT_BATS");
+            argsList.add("ENDERMEN");
             return StringUtil.copyPartialMatches(args[argN], argsList, new ArrayList<>());
         }
         return null;

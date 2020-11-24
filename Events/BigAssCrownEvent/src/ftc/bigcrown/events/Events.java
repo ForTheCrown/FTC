@@ -1,6 +1,7 @@
 package ftc.bigcrown.events;
 
 import ftc.bigcrown.Main;
+import ftc.bigcrown.challenges.ChallengeClass;
 import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
@@ -8,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
@@ -17,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +30,7 @@ public class Events implements Listener {
     public void onPresentUse(PlayerInteractEntityEvent event) {
     	// Biggest checks first -> lowest amount of code to execute each time event gets called
     	if (event.getHand() == EquipmentSlot.OFF_HAND) return;
-    	if (event.getRightClicked() == null || (!event.getRightClicked().isInvulnerable())) return;
+		if (!event.getRightClicked().isInvulnerable()) return;
     	
     	// Only look for Present slime interactions
         if (!(event.getRightClicked() instanceof Slime)) return;
@@ -35,17 +38,13 @@ public class Events implements Listener {
         if (slime.getCustomName() == null || (!slime.getCustomName().contains(ChatColor.GOLD + "Present"))) return;
 
         Player player = event.getPlayer();
-        
+
 
         double initialChance = Math.random();
         if (initialChance <= 0.25){ //Challange
-            
+
         	player.sendMessage("Challenge!");
-        	
-        	List<Location> locList = Main.plugin.getChallengeList();
-            if(!(locList == null || locList.size() <= 0)) {
-            	 //new ChallengeClass(player);
-            }
+        	new ChallengeClass(player).randomChallenge();
         } 
         else {
             String color = ChatColor.of("#c2fffe") + "";

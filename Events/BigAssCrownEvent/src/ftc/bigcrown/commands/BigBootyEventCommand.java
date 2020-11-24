@@ -1,12 +1,15 @@
 package ftc.bigcrown.commands;
 
 import ftc.bigcrown.Main;
-import net.md_5.bungee.api.ChatColor;
 
+import ftc.bigcrown.challenges.Challenge;
+import ftc.bigcrown.challenges.ChallengeClass;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -25,8 +28,8 @@ public class BigBootyEventCommand implements CommandExecutor {
      *
      * Valid usages of command:
      * - /bbe setloc (sets the possible location of a present to where the player is standing)
+     * - /bbe usechallenge <challange name>
      * - /bbe reload
-     * - /bbe setchallenge <challengeName>
      * - /bbe stoploop
      * - /bbe startloop
      *
@@ -54,11 +57,12 @@ public class BigBootyEventCommand implements CommandExecutor {
         	// Adds location to present list.
             case "setloc":
                 List<Location> locationList;
-                if(Main.plugin.getLocationList() != null) {
+                try {
                     locationList = Main.plugin.getLocationList();
-                } else{
+                } catch (Exception e){
                     locationList = new ArrayList<>();
                 }
+
                 Location playerLoc = player.getLocation();
                 Location locToAdd = new Location(playerLoc.getWorld(), playerLoc.getBlockX(), playerLoc.getBlockY(), playerLoc.getBlockZ());
                 for (Location previouslyDefinedLoc : locationList) {
@@ -76,38 +80,19 @@ public class BigBootyEventCommand implements CommandExecutor {
                 Main.plugin.saveConfig();
                 return true;
 
-            // Saves a name and the current location as a challenge.
-            case "setchallenge":
-            	    if(args.length < 2) {
-                    player.sendMessage(ChatColor.GRAY + "/bbe setchallenge <challengeName>");
-                    return false;
-                }
-            	// Add name to challenge list
-                String challangeName = args[1].toUpperCase();
-                List<String> challenges = Main.plugin.getConfig().getStringList("ChallengeList");
-                challenges.add(challangeName);
-                Main.plugin.getConfig().set("ChallengeList", challenges);
-                
-                // Add location to new challenge
-                Main.plugin.getConfig().getConfigurationSection("ChallengeList." + challangeName).set("Location", player.getLocation());
-                
-                Main.plugin.saveConfig();
-                return true;
+                //no set challenge anymore lol, they're gonna be hardcoded in
 
-            //
             case "usechallenge":
                 if(args.length < 2 || args[1] == null){
                     player.sendMessage(ChatColor.GRAY + "/bbe usechallenge <challengeName>");
                     return false;
                 }
+                String challengeID = args[1].toUpperCase();
+                if(!enumContains(challengeID)){ player.sendMessage("Not an existing challenge"); return false; }
 
-                if(!Main.plugin.getConfig().getStringList("ChallengeList").contains(args[1])){
-                    player.sendMessage(ChatColor.GRAY + "That entry doesn't exist");
-                    return false;
-                }
-                Location loc = (Location) Main.plugin.getConfig().getConfigurationSection("ChallengeList." + args[1] + ".Location");
-                player.teleport(loc);
-                break;
+                new ChallengeClass(player, Challenge.valueOf(challengeID)).randomChallenge();
+
+                return true;
             
             case "startloop":
             	Main.plugin.runLoop = true;
@@ -123,10 +108,13 @@ public class BigBootyEventCommand implements CommandExecutor {
             case "reload":
                 Main.plugin.reloadConfig();
                 player.sendMessage(ChatColor.GRAY + "Plugin's config has been reloaded");
-                break;
+                return true;
              default:
-            	 break;
+            	 return true;
         }
-        return false;
+    }
+
+    public static boolean enumContains(String test) {
+        return EnumUtils.isValidEnum(Challenge.class, test);
     }
 }
