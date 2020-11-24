@@ -2,7 +2,7 @@ package ftc.bigcrown.commands;
 
 import ftc.bigcrown.Main;
 
-import ftc.bigcrown.challenges.Challenge;
+import ftc.bigcrown.challenges.ChallengeType;
 import ftc.bigcrown.challenges.ChallengeClass;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -90,7 +90,8 @@ public class BigBootyEventCommand implements CommandExecutor {
                 String challengeID = args[1].toUpperCase();
                 if(!enumContains(challengeID)){ player.sendMessage("Not an existing challenge"); return false; }
 
-                new ChallengeClass(player, Challenge.valueOf(challengeID)).randomChallenge();
+                new ChallengeClass(player, ChallengeType.valueOf(challengeID));
+                
 
                 return true;
             
@@ -115,6 +116,6 @@ public class BigBootyEventCommand implements CommandExecutor {
     }
 
     public static boolean enumContains(String test) {
-        return EnumUtils.isValidEnum(Challenge.class, test);
+        return EnumUtils.isValidEnum(ChallengeType.class, test);
     }
 }

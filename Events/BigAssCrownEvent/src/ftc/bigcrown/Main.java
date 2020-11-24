@@ -1,5 +1,8 @@
 package ftc.bigcrown;
 
+import ftc.bigcrown.challenges.ChallengeClass;
+import ftc.bigcrown.challenges.ChallengeType;
+import ftc.bigcrown.challenges.KillBatChallenge;
 import ftc.bigcrown.commands.BigBootyEventCommand;
 import ftc.bigcrown.commands.BigBootyTabCompleter;
 import ftc.bigcrown.events.Events;
@@ -29,7 +32,16 @@ public class Main extends JavaPlugin {
 			"{SkullOwner:{Id:[I;-1365545979,1889357537,-1100829119,-1307254765],Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM2YWY2YWQxOGUxM2YyNWE1Yjc0NDcyNTJiNWU5YWI4MTgwYzA1ZGU1OTg1ZmJhZjdiNGZjNGUxZDI0MTY2In19fQ==\"}]}}}"
 	);
 	public List<Integer> locsInUse = new ArrayList<>();
-	
+    public Set<String> playersThatQuitDuringChallenge = new HashSet<String>();
+    public Map<ChallengeType, Boolean> challengeIsFree = createMap();
+    public Map<ChallengeType, Boolean> createMap() {
+    	Map<ChallengeType, Boolean> map = new HashMap<>();
+    	for (ChallengeType type : ChallengeType.values()) {
+    		map.put(type, false);
+    	}
+		return map;
+	}
+    
 	public int delay = 3; //in minutes
 	public boolean runLoop = false;
 
@@ -47,6 +59,9 @@ public class Main extends JavaPlugin {
 		getServer().getPluginCommand("BigBootyEvent").setExecutor(new BigBootyEventCommand());
 		getServer().getPluginCommand("BigBootyEvent").setTabCompleter(new BigBootyTabCompleter());
 	}
+
+
+	
 
 
 	// Present spawning and loop
@@ -105,6 +120,7 @@ public class Main extends JavaPlugin {
 		slime.setInvisible(true);
 		slime.setSilent(true);
 		slime.setPersistent(true);
+		slime.setRemoveWhenFarAway(false);
 		slime.setSize(1);
 		slime.setInvulnerable(true);
 		slime.setAI(false);

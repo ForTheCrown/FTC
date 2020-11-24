@@ -9,17 +9,16 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import org.fusesource.jansi.AnsiConsole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +36,7 @@ public class Events implements Listener {
         Slime slime = (Slime) event.getRightClicked();
         if (slime.getCustomName() == null || (!slime.getCustomName().contains(ChatColor.GOLD + "Present"))) return;
 
+        event.setCancelled(true);
         Player player = event.getPlayer();
 
 
@@ -104,7 +104,7 @@ public class Events implements Listener {
             	if (itemToGive.getType() == Material.ACACIA_BOAT) {
 	            	int amountOfGems = 100;
 	            	Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "addgems " + player.getName() + " " + amountOfGems);
-	            	player.sendMessage("You've received " + amountOfGems + " Gems!");
+	            	player.sendMessage(ChatColor.YELLOW + "You've received " + amountOfGems + " Gems!");
 	            }
 	            else {
 	            	Item item = player.getLocation().getWorld().dropItemNaturally(slime.getLocation(), itemToGive);
@@ -116,4 +116,19 @@ public class Events implements Listener {
         slime.getLocation().getBlock().setType(Material.AIR);
         slime.remove();
     }
+    
+	@EventHandler
+	public void onLoginAfterLeavingChallenge(PlayerJoinEvent event) {
+		if (Main.plugin.playersThatQuitDuringChallenge.contains(event.getPlayer().getName())) {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+		        @Override
+		        public void run() {
+		        	event.getPlayer().sendMessage(ChatColor.RED + "[FTC]" + ChatColor.GRAY + " Your challenge got interrupted :(");
+		        	Main.plugin.playersThatQuitDuringChallenge.remove(event.getPlayer().getName());
+		    		event.getPlayer().teleport(new Location(Bukkit.getWorld("world"), 200, 70, 1000));
+		        }
+    		}, 20L);
+		}
+		
+	}
 }
