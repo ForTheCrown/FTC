@@ -38,28 +38,27 @@ public class KillBatChallenge implements Challenge, Listener {
 		// Score before challenge
 		Score score = this.getScoreboardObjective().getScore(this.getPlayer().getName());
 		this.startScore = score.getScore();
-		
+
 		// Location saving + teleport to challenge;
 		setReturnLocation(this.getPlayer().getLocation());
-		
+
 		startLocation = player.getLocation(); // TODO
-		startLocation.add(0, 2, 0); 
-		
+		startLocation.add(0, 2, 0);
+
 		this.startChallenge();
 	}
-
 
 	public void startChallenge() {
 		// Teleport player to challenge:
 		this.getPlayer().teleport(getStartLocation());
 		this.getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-		
+
 		// TODO: spawn bats
 		// spawnBats();
-		
+
 		// Send instruction on what to do:
 		this.sendTitle();
-		
+
 		// No countdown, so start timer immediately after title:
 		KillBatChallenge kbc = this;
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
@@ -69,14 +68,14 @@ public class KillBatChallenge implements Challenge, Listener {
 	        }
 	    }, 70L);
 	}
-	
+
 	public void endChallenge() {
 		// TODO: remove all bats
-		
+
 		// Timer stopped:
 		this.timer = null;
 		this.getPlayer().playSound(this.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
-		
+
 		// Amount of bats caught:
 		int score = calculateScore();
 		if (score != 1) this.getPlayer().sendMessage(ChatColor.YELLOW + "You've caught " + score + " bats!");
@@ -85,7 +84,7 @@ public class KillBatChallenge implements Challenge, Listener {
     	Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
     	Score crownScore = mainScoreboard.getObjective("crown").getScore(getPlayer().getName());
     	crownScore.setScore(crownScore.getScore() + score);
-    	
+
 		// Teleport to where player opened present:
 	    Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 	        @Override
@@ -96,8 +95,8 @@ public class KillBatChallenge implements Challenge, Listener {
 	        }
 		}, 60L);
 	}
-	
-	
+
+
 	private int calculateScore() {
 		Score score = this.getScoreboardObjective().getScore(this.getPlayer().getName());
 		return score.getScore() - this.startScore;
@@ -106,7 +105,7 @@ public class KillBatChallenge implements Challenge, Listener {
 
 	@EventHandler
 	public void onLogoutWhileInChallenge(PlayerQuitEvent event) {
-		if (this.getPlayer() == null) return;
+		if (getPlayer() == null) return;
 		if (event.getPlayer().getName() == this.getPlayer().getName()) {
 			if (this.timer != null) {
 				this.timer.stopTimer(true);
@@ -117,13 +116,13 @@ public class KillBatChallenge implements Challenge, Listener {
 			setChallengeInUse(false);
 		    Main.plugin.playersThatQuitDuringChallenge.add(this.getPlayer().getName());
 		}
-		
+
 	}
-	
+
 	@EventHandler
-	public void onEntityDeath(EntityDeathEvent event) {       
+	public void onEntityDeath(EntityDeathEvent event) {
 		if (event.getEntity().getType() != EntityType.BAT || event.getEntity().getKiller() != this.getPlayer()) return;
-		
+
 		event.getEntity().setCustomNameVisible(true);
 		event.getEntity().setCustomName(ChatColor.LIGHT_PURPLE + "+1");
 	}

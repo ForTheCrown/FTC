@@ -1,14 +1,9 @@
 package ftc.bigcrown;
 
-import ftc.bigcrown.challenges.ChallengeClass;
 import ftc.bigcrown.challenges.ChallengeType;
-import ftc.bigcrown.challenges.KillBatChallenge;
 import ftc.bigcrown.commands.BigBootyEventCommand;
 import ftc.bigcrown.commands.BigBootyTabCompleter;
 import ftc.bigcrown.events.Events;
-
-import java.util.*;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -19,6 +14,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.*;
 
 public class Main extends JavaPlugin {
 	
@@ -32,7 +29,7 @@ public class Main extends JavaPlugin {
 			"{SkullOwner:{Id:[I;-1365545979,1889357537,-1100829119,-1307254765],Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM2YWY2YWQxOGUxM2YyNWE1Yjc0NDcyNTJiNWU5YWI4MTgwYzA1ZGU1OTg1ZmJhZjdiNGZjNGUxZDI0MTY2In19fQ==\"}]}}}"
 	);
 	public List<Integer> locsInUse = new ArrayList<>();
-    public Set<String> playersThatQuitDuringChallenge = new HashSet<String>();
+    public Set<String> playersThatQuitDuringChallenge = new HashSet<>();
     public Map<ChallengeType, Boolean> challengeIsFree = createMap();
     public Map<ChallengeType, Boolean> createMap() {
     	Map<ChallengeType, Boolean> map = new HashMap<>();
@@ -41,8 +38,7 @@ public class Main extends JavaPlugin {
     	}
 		return map;
 	}
-    
-	public int delay = 3; //in minutes
+
 	public boolean runLoop = false;
 
 	public void onEnable() {
@@ -66,15 +62,12 @@ public class Main extends JavaPlugin {
 
 	// Present spawning and loop
 	public void loop() {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			@Override
-			public void run() {
-				if (!runLoop) return;
-				else {
-					locsInUse.clear();
-					spawnPresent();
-					loop();
-				}
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+			if (!runLoop) return;
+			else {
+				locsInUse.clear();
+				spawnPresent();
+				loop();
 			}
 		}, /*delay*20*60*/ 60);
 	}
@@ -91,8 +84,7 @@ public class Main extends JavaPlugin {
 	
 	// Checks if a location is suited for spawning
 	private boolean canSpawnPresent(int id) {
-		if (this.locsInUse.contains(id) || getLocationList().get(id).getBlock().getType() != Material.AIR) return false;
-		else return true;
+		return !this.locsInUse.contains(id) && getLocationList().get(id).getBlock().getType() == Material.AIR;
 	}
 	
 
@@ -130,12 +122,9 @@ public class Main extends JavaPlugin {
 		String headCommand = "minecraft:setblock " +  loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " minecraft:player_head[rotation=" + rotation + "]" + presentNBTs.get((int) (Math.random()*presentNBTs.size()-1)) + " replace";
 		getServer().dispatchCommand(Bukkit.getConsoleSender(), headCommand);
 
-		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			@Override
-			public void run() {
-				slime.remove();
-				spawnLoc.getBlock().setType(Material.AIR);
-			}
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+			slime.remove();
+			spawnLoc.getBlock().setType(Material.AIR);
 		}, /*30*20*60*/ 585L); // It should get removed after 30 mins
 	}
 	
@@ -158,8 +147,7 @@ public class Main extends JavaPlugin {
 		if (name != null) meta.setDisplayName(name);
 		if (loreStrings != null) {
 			List<String> lore = new ArrayList<>();
-			for (String string : loreStrings)
-				lore.add(string);
+			Collections.addAll(lore, loreStrings);
 			meta.setLore(lore);
 		}
 		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);

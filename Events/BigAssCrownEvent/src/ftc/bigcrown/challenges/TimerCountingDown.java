@@ -38,49 +38,33 @@ public class TimerCountingDown {
 	}
 	
 	private void countDownStart(Player player, int count) {
-    	Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-	        @Override
-	        public void run() {
-	        	switch (count) {
-	        		case 0:
-        				player.sendTitle(ChatColor.YELLOW + "" + ChatColor.BOLD + "GO!!", "", 5, 20, 5);
-        				
-        				startExtras(player);
-		        		timer = new Timer();
-		        		doTiming(player);
-		        		
-		        		break;
-	        		case 1:
-	        			player.sendTitle(ChatColor.of("#FFFFA1") + "" + ChatColor.BOLD + count, "", 5, 20, 5);
-	        			player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.8f);
-	        			countDownStart(player, count-1);
-	        			break;
-	        		case 2:
-	        			player.sendTitle(ChatColor.of("#FFFFA1") + "" + ChatColor.BOLD + count, "", 5, 20, 5);
-	        			player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.8f);
-	        			countDownStart(player, count-1);
-	        			break;
-	        		case 3:
-	        			player.sendTitle(ChatColor.of("#FFFFA1")+ "" + ChatColor.BOLD + count, "", 5, 20, 5);
-	        			player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.8f);
-	        			countDownStart(player, count-1);
-	        			break;
-	        		default:
-	        			break;
-	        	}
-	        }
-	    }, 20L);
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
+			switch (count) {
+				case 0:
+					player.sendTitle(ChatColor.YELLOW + "" + ChatColor.BOLD + "GO!!", "", 5, 20, 5);
+
+					startExtras(player);
+					timer = new Timer();
+					doTiming(player);
+
+					break;
+				case 1:
+				case 2:
+				case 3:
+					player.sendTitle(ChatColor.of("#FFFFA1") + "" + ChatColor.BOLD + count, "", 5, 20, 5);
+					player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.8f);
+					countDownStart(player, count-1);
+					break;
+				default:
+					break;
+			}
+		}, 20L);
     	
     }
     
     private void startSound(Player player) {
     	for (int i = 0; i < 3; i++) {
-    		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-		        @Override
-		        public void run() {
-			        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 2f);
-		        }
-    		}, i* 3L);
+    		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 2f), i* 3L);
     	}
     }
     
@@ -98,7 +82,7 @@ public class TimerCountingDown {
     
     
     
-	private String timerMessage = ChatColor.YELLOW + "Timer: " + ChatColor.of("#FFFFA1") + "%02d:%02d:%d";
+	private final String timerMessage = ChatColor.YELLOW + "Timer: " + ChatColor.of("#FFFFA1") + "%02d:%02d:%d";
 
     private void doTiming(Player player) {
         this.timer.schedule(new TimerTask() {
@@ -126,12 +110,7 @@ public class TimerCountingDown {
 	    
 	    if (!timerWasInterrupted) {
 	    	// Async to sync >:|
-		    Bukkit.getServer().getScheduler().runTask(Main.plugin, new Runnable() {
-				@Override
-				public void run() {
-					challenge.endChallenge();
-				}
-			});
+		    Bukkit.getServer().getScheduler().runTask(Main.plugin, () -> challenge.endChallenge());
 	    }
 	    
 	    

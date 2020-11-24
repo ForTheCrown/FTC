@@ -1,7 +1,6 @@
 package ftc.bigcrown.challenges;
 
 import ftc.bigcrown.Main;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -31,41 +30,9 @@ public class ChallengeClass implements Listener {
         	if (!entry.getValue()) chalList.add(entry.getKey());
         }
         int randomChal = Main.plugin.getRandomNumberInRange(0, chalList.size()-1);
-        ChallengeType actualChal = chalList.get(randomChal);
-        
-        switch (actualChal){ //switch statements calling a challenge's class. Those classes should be in their own packages and should have some requred fields like the player they're using
-            case RACE:
-                new RaceChallenge(player);
-                break;
-            case NETHER:
-                player.sendMessage("NETHER");
-                break;
-            case PINATA:
-                player.sendMessage("PINATA");
-                break;
-            case ENDERMEN:
-                player.sendMessage("ENDERMEN");
-                break;
-            case HALLOWEEN:
-                player.sendMessage("HALLOWEEN");
-                break;
-            case HUNT_BATS:
-                player.sendMessage("HUNT_BATS");
-                new KillBatChallenge(player);
-                break;
-            case PVE_ARENA:
-                player.sendMessage("PVE_ARENA");
-                break;
-            case MAGMALOVANIA:
-                player.sendMessage("MAGMALOVANIA");
-                break;
-            case PROTECT_HAROLD:
-                player.sendMessage("PROTECT_HAROLD");
-                break;
-            default:
-                player.sendMessage("How have you managed this");
-                break;
-        }
+        challenge = chalList.get(randomChal);
+
+        enterChallenge();
     }
 
     //used by /bbe usechallenge to test them

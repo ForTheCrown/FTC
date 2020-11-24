@@ -120,14 +120,11 @@ public class Events implements Listener {
 	@EventHandler
 	public void onLoginAfterLeavingChallenge(PlayerJoinEvent event) {
 		if (Main.plugin.playersThatQuitDuringChallenge.contains(event.getPlayer().getName())) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-		        @Override
-		        public void run() {
-		        	event.getPlayer().sendMessage(ChatColor.RED + "[FTC]" + ChatColor.GRAY + " Your challenge got interrupted :(");
-		        	Main.plugin.playersThatQuitDuringChallenge.remove(event.getPlayer().getName());
-		    		event.getPlayer().teleport(new Location(Bukkit.getWorld("world"), 200, 70, 1000));
-		        }
-    		}, 20L);
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
+				event.getPlayer().sendMessage(ChatColor.RED + "[FTC]" + ChatColor.GRAY + " Your challenge got interrupted :(");
+				Main.plugin.playersThatQuitDuringChallenge.remove(event.getPlayer().getName());
+				event.getPlayer().teleport(new Location(Bukkit.getWorld("world"), 200, 70, 1000));
+			}, 20L);
 		}
 		
 	}

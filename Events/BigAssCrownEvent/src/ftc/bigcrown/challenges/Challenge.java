@@ -7,21 +7,21 @@ import org.bukkit.scoreboard.Objective;
 
 public interface Challenge {
 	
-	public Player getPlayer();
-	public Objective getScoreboardObjective();
+	 Player getPlayer();
+	 Objective getScoreboardObjective();
 	
 	
-	public Location getStartLocation();
+	 Location getStartLocation();
 	
-	public Location getReturnLocation();
-	public void setReturnLocation(Location location);
+	 Location getReturnLocation();
+	 void setReturnLocation(Location location);
 
-	public void onLogoutWhileInChallenge(PlayerQuitEvent event);
+	 void onLogoutWhileInChallenge(PlayerQuitEvent event);
 	
-	public void startChallenge();
-	public void endChallenge();
+	 void startChallenge();
+	 void endChallenge();
 	
-	public void sendTitle();
-	
-	public void setChallengeInUse(boolean bool);
+	 void sendTitle();
+
+	 void setChallengeInUse(boolean bool);
 }
