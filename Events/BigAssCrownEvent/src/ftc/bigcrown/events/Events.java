@@ -123,7 +123,7 @@ public class Events implements Listener {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
 				event.getPlayer().sendMessage(ChatColor.RED + "[FTC]" + ChatColor.GRAY + " Your challenge got interrupted :(");
 				Main.plugin.playersThatQuitDuringChallenge.remove(event.getPlayer().getName());
-				event.getPlayer().teleport(new Location(Bukkit.getWorld("world"), 200, 70, 1000));
+				event.getPlayer().teleport(new Location(Bukkit.getWorld("world"), 200.5, 70, 1000.5));
 			}, 20L);
 		}
 		

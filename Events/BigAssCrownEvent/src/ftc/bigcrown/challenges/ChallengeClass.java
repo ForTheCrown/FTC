@@ -48,7 +48,8 @@ public class ChallengeClass implements Listener {
             player.sendMessage("PINATA");
             break;
         case ENDERMEN:
-            player.sendMessage("ENDERMEN");
+            KillEndermenChallenge kbe = new KillEndermenChallenge(player);
+            Main.plugin.getServer().getPluginManager().registerEvents(kbe, Main.plugin); //TODO registering events needs to change, now it's registering per player -> no bueno
             break;
         case HALLOWEEN:
             player.sendMessage("HALLOWEEN");
@@ -58,7 +59,8 @@ public class ChallengeClass implements Listener {
             Main.plugin.getServer().getPluginManager().registerEvents(kbc, Main.plugin);
             break;
         case PVE_ARENA:
-            player.sendMessage("PVE_ARENA");
+        	CastleRaidChallenge crc = new CastleRaidChallenge(player);
+            Main.plugin.getServer().getPluginManager().registerEvents(crc, Main.plugin);
             break;
         case MAGMALOVANIA:
             player.sendMessage("MAGMALOVANIA");

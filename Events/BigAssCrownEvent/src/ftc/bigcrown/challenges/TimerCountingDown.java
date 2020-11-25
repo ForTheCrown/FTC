@@ -38,6 +38,7 @@ public class TimerCountingDown {
 	}
 	
 	private void countDownStart(Player player, int count) {
+		if (challenge.isChallengeCancelled()) return;
     	Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
 			switch (count) {
 				case 0:
@@ -105,9 +106,11 @@ public class TimerCountingDown {
     }
     
     public void stopTimer(boolean timerWasInterrupted) {
-    	timer.cancel();
-	    timer.purge();
-	    
+    	if (timer != null) {
+    		timer.cancel();
+    	    timer.purge();
+    	}
+    
 	    if (!timerWasInterrupted) {
 	    	// Async to sync >:|
 		    Bukkit.getServer().getScheduler().runTask(Main.plugin, () -> challenge.endChallenge());

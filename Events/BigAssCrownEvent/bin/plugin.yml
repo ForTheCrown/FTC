@@ -13,3 +13,6 @@ commands:
       - bigbootyevent
     permission: bbe.admin
     permission-message: "You do not have permission to use this command"
+  capturepoint:
+    description: "This was such a mess to make jesus"
+    permission: bbe.admin

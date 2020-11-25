@@ -18,7 +18,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import ftc.bigcrown.Main;
 import net.md_5.bungee.api.ChatColor;
 
-public class KillBatChallenge implements Challenge, Listener {
+public class KillEndermenChallenge implements Challenge, Listener {
 	
 	private Player player;
 	
@@ -29,9 +29,9 @@ public class KillBatChallenge implements Challenge, Listener {
 	
 	private TimerCountingDown timer;
 	
-	public boolean challengeCancelled = false;
+	private boolean challengeCancelled = false;
 	
-	public KillBatChallenge(Player player) {
+	public KillEndermenChallenge(Player player) {
 		if (player == null || this.getChallengeInUse()) return;
 		this.setChallengeInUse(true);
 		this.player = player;
@@ -54,33 +54,28 @@ public class KillBatChallenge implements Challenge, Listener {
 		this.getPlayer().teleport(getStartLocation());
 		this.getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
-		// TODO: spawn bats
-		// spawnBats();
-
 		// Send instruction on what to do:
 		this.sendTitle();
 
-		// No countdown, so start timer immediately after title:
-		KillBatChallenge kbc = this;
+		// Countdown, so start timer immediately after title:
+		KillEndermenChallenge kec = this;
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 	        @Override
 	        public void run() {
-	        	if (!challengeCancelled) timer = new TimerCountingDown(kbc, 30, false);
+	        	if (!challengeCancelled) timer = new TimerCountingDown(kec, 60, true);
 	        }
-	    }, 70L);
+	    }, 50L);
 	}
 
 	public void endChallenge() {
-		// TODO: remove all bats
-
 		// Timer stopped:
 		this.timer = null;
 		this.getPlayer().playSound(this.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
 
-		// Amount of bats caught:
+		// Amount of endermen killed:
 		int score = calculateScore();
-		if (score != 1) this.getPlayer().sendMessage(ChatColor.YELLOW + "You've caught " + score + " bats!");
-		else this.getPlayer().sendMessage(ChatColor.YELLOW + "You've caught 1 bat!");
+		if (score != 1) this.getPlayer().sendMessage(ChatColor.YELLOW + "You've killed " + score + " endermen!");
+		else this.getPlayer().sendMessage(ChatColor.YELLOW + "You've killed 1 enderman!");
 		// Add to crown scoreboard:
     	Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
     	Score crownScore = mainScoreboard.getObjective("crown").getScore(getPlayer().getName());
@@ -112,7 +107,6 @@ public class KillBatChallenge implements Challenge, Listener {
 				this.timer.stopTimer(true);
 				this.timer = null;
 			}
-			// TODO: remove all bats
 			this.challengeCancelled = true;
 			setChallengeInUse(false);
 		    Main.plugin.playersThatQuitDuringChallenge.add(this.getPlayer().getName());
@@ -123,7 +117,7 @@ public class KillBatChallenge implements Challenge, Listener {
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		if (event.getEntity().getKiller() == null || this.getPlayer() == null) return;
-		if (event.getEntity().getType() != EntityType.BAT || event.getEntity().getKiller().getName() != this.getPlayer().getName()) return;
+		if (event.getEntity().getType() != EntityType.ENDERMAN || event.getEntity().getKiller().getName() != this.getPlayer().getName()) return;
 
 		event.getEntity().setCustomNameVisible(true);
 		event.getEntity().setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + "+1");
@@ -151,7 +145,7 @@ public class KillBatChallenge implements Challenge, Listener {
 
 	public Objective getScoreboardObjective() {
 		Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
-		return mainScoreboard.getObjective("batsKilled");
+		return mainScoreboard.getObjective("endermenKilled");
 	}
 
 
@@ -170,7 +164,7 @@ public class KillBatChallenge implements Challenge, Listener {
 	}
 
 	public void sendTitle() {
-		this.getPlayer().sendTitle(ChatColor.YELLOW + "Kill Bats!", ChatColor.GOLD + "January Event", 5, 60, 5);
+		this.getPlayer().sendTitle(ChatColor.YELLOW + "Kill Endermen!", ChatColor.GOLD + "January, March, May", 5, 60, 5);
 	}
 
 
@@ -183,11 +177,12 @@ public class KillBatChallenge implements Challenge, Listener {
 	}
 	
 	public ChallengeType getChallengeType() {
-		return ChallengeType.HUNT_BATS;
+		return ChallengeType.ENDERMEN;
 	}
 	
 	public boolean isChallengeCancelled() {
 		return this.challengeCancelled;
 	}
+	
 
 }
