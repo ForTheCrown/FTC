@@ -1,9 +1,7 @@
 package ftc.bigcrown.challenges;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
+import ftc.bigcrown.Main;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,9 +11,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-
-import ftc.bigcrown.Main;
-import net.md_5.bungee.api.ChatColor;
 
 public class KillBatChallenge implements Challenge, Listener {
 	
@@ -86,13 +81,10 @@ public class KillBatChallenge implements Challenge, Listener {
     	crownScore.setScore(crownScore.getScore() + score);
 
 		// Teleport to where player opened present:
-	    Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-	        @Override
-	        public void run() {
-	        	getPlayer().teleport(getReturnLocation().add(0, 1, 0));
-	        	getPlayer().playSound(getReturnLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-	        	setChallengeInUse(false);
-	        }
+	    Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
+			getPlayer().teleport(getReturnLocation().add(0, 1, 0));
+			getPlayer().playSound(getReturnLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+			setChallengeInUse(false);
 		}, 60L);
 	}
 
@@ -170,6 +162,8 @@ public class KillBatChallenge implements Challenge, Listener {
 		return ChallengeType.HUNT_BATS;
 	}
 
-	
-
+	@Override
+	public boolean isChallengeCancelled() {
+		return challengeCancelled;
+	}
 }

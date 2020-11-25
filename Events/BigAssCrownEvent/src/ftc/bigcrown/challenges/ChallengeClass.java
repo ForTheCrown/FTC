@@ -45,8 +45,8 @@ public class ChallengeClass implements Listener {
             player.sendMessage("NETHER");
             break;
         case PINATA:
-            player.sendMessage("PINATA");
-            break;
+            PinataChallenge pC = new PinataChallenge(player);
+            Main.plugin.getServer().getPluginManager().registerEvents(pC, Main.plugin);
         case ENDERMEN:
             player.sendMessage("ENDERMEN");
             break;

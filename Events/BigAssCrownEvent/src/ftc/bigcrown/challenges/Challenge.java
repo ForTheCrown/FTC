@@ -10,7 +10,6 @@ public interface Challenge {
 	 Player getPlayer();
 	 Objective getScoreboardObjective();
 	
-	
 	 Location getStartLocation();
 	
 	 Location getReturnLocation();
@@ -20,8 +19,6 @@ public interface Challenge {
 	
 	 void startChallenge();
 	 void endChallenge();
-	
-	 void sendTitle();
 
 	 void setChallengeInUse(boolean bool);
 	 boolean getChallengeInUse();
