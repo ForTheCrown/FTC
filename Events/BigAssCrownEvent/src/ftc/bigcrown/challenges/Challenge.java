@@ -24,4 +24,9 @@ public interface Challenge {
 	 void sendTitle();
 
 	 void setChallengeInUse(boolean bool);
+	 boolean getChallengeInUse();
+	 
+	 ChallengeType getChallengeType();
+
+	 boolean isChallengeCancelled();
 }
