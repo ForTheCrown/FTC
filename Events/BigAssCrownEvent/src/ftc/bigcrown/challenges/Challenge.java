@@ -10,23 +10,17 @@ public interface Challenge {
 	 Player getPlayer();
 	 Objective getScoreboardObjective();
 	
-	
 	 Location getStartLocation();
-	
 	 Location getReturnLocation();
 	 void setReturnLocation(Location location);
 
-	 void onLogoutWhileInChallenge(PlayerQuitEvent event);
-	
+	 ChallengeType getChallengeType();
+	 boolean isChallengeCancelled();
+	 
 	 void startChallenge();
 	 void endChallenge();
-	
-	 void sendTitle();
-
-	 void setChallengeInUse(boolean bool);
-	 boolean getChallengeInUse();
 	 
-	 ChallengeType getChallengeType();
-
-	 boolean isChallengeCancelled();
+	 void sendTitle();
+	 
+	 void onLogoutWhileInChallenge(PlayerQuitEvent event);
 }

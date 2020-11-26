@@ -9,58 +9,42 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
-public class KillBatChallenge implements Challenge, Listener {
+public class KillBatChallenge extends GenericChallenge implements Challenge, Listener {
 	
-	private Player player;
-	
-	private Location returnLocation;
-	private Location startLocation/* = new Location(null, 0, 0, 0)*/; // TODO
-	
-	private int startScore;
-	
+	private Location startLocation = new Location(Bukkit.getWorld("world"), -4.5, 5, 37.5); // TODO
 	private TimerCountingDown timer;
 	
-	public boolean challengeCancelled = false;
-	
 	public KillBatChallenge(Player player) {
-		if (player == null || this.getChallengeInUse()) return;
-		this.setChallengeInUse(true);
-		this.player = player;
-		
-		// Score before challenge
-		Score score = this.getScoreboardObjective().getScore(this.getPlayer().getName());
-		this.startScore = score.getScore();
+		super(player, ChallengeType.HUNT_BATS);
+		if (getPlayer() == null || Main.plugin.getChallengeInUse(getChallengeType())) return;
 
-		// Location saving + teleport to challenge;
+		// All needed setters from super class:
+		setObjectiveName("batsKilled");
 		setReturnLocation(this.getPlayer().getLocation());
+		setStartLocation(this.startLocation);
+		setStartScore();
 
-		startLocation = player.getLocation(); // TODO
-		startLocation.add(0, 2, 0);
-
-		this.startChallenge();
+		startChallenge();
 	}
 
 	public void startChallenge() {
 		// Teleport player to challenge:
-		this.getPlayer().teleport(getStartLocation());
-		this.getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+		getPlayer().teleport(getStartLocation());
+		getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
 		// TODO: spawn bats
 		// spawnBats();
 
-		// Send instruction on what to do:
-		this.sendTitle();
-
+		sendTitle();
 		// No countdown, so start timer immediately after title:
 		KillBatChallenge kbc = this;
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 	        @Override
 	        public void run() {
-	        	if (!challengeCancelled) timer = new TimerCountingDown(kbc, 30, false);
+	        	if (!isChallengeCancelled()) timer = new TimerCountingDown(kbc, 30, false);
 	        }
 	    }, 70L);
 	}
@@ -70,29 +54,22 @@ public class KillBatChallenge implements Challenge, Listener {
 
 		// Timer stopped:
 		this.timer = null;
-		this.getPlayer().playSound(this.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
+		getPlayer().playSound(getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
 
 		// Amount of bats caught:
 		int score = calculateScore();
-		if (score != 1) this.getPlayer().sendMessage(ChatColor.YELLOW + "You've caught " + score + " bats!");
-		else this.getPlayer().sendMessage(ChatColor.YELLOW + "You've caught 1 bat!");
+		if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've caught " + score + " bats!");
+		else getPlayer().sendMessage(ChatColor.YELLOW + "You've caught 1 bat!");
 		// Add to crown scoreboard:
     	Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
     	Score crownScore = mainScoreboard.getObjective("crown").getScore(getPlayer().getName());
     	crownScore.setScore(crownScore.getScore() + score);
 
-		// Teleport to where player opened present:
-	    Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
-			getPlayer().teleport(getReturnLocation().add(0, 1, 0));
-			getPlayer().playSound(getReturnLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-			setChallengeInUse(false);
-		}, 60L);
+    	teleportBack();
 	}
-
-
-	private int calculateScore() {
-		Score score = this.getScoreboardObjective().getScore(this.getPlayer().getName());
-		return score.getScore() - this.startScore;
+	
+	public void sendTitle() {
+		this.getPlayer().sendTitle(ChatColor.YELLOW + "Kill Bats!", ChatColor.GOLD + "January Event", 5, 60, 5);
 	}
 
 
@@ -105,9 +82,6 @@ public class KillBatChallenge implements Challenge, Listener {
 				this.timer = null;
 			}
 			// TODO: remove all bats
-			this.challengeCancelled = true;
-			setChallengeInUse(false);
-		    Main.plugin.playersThatQuitDuringChallenge.add(this.getPlayer().getName());
 		}
 
 	}
@@ -129,65 +103,10 @@ public class KillBatChallenge implements Challenge, Listener {
 				this.timer.stopTimer(true);
 				this.timer = null;
 			}
-			this.challengeCancelled = true;
-			setChallengeInUse(false);
+			setChallengeCancelled(true);
+            Main.plugin.setChallengeInUse(getChallengeType(), false);
+            Main.plugin.playersThatQuitDuringChallenge.add(getPlayer().getName());
 			this.getPlayer().sendMessage(ChatColor.GRAY + "Challenge failed! No points earned.");
 		}
 	}
-
-
-	public Player getPlayer() {
-		return this.player;
-	}
-
-
-	public Objective getScoreboardObjective() {
-		Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
-		return mainScoreboard.getObjective("batsKilled");
-	}
-
-
-	public Location getStartLocation() {
-		return this.startLocation;
-	}
-
-
-	public Location getReturnLocation() {
-		return this.returnLocation;
-	}
-
-
-	public void setReturnLocation(Location location) {
-		this.returnLocation = location;
-	}
-
-	public void sendTitle() {
-		this.getPlayer().sendTitle(ChatColor.YELLOW + "Kill Bats!", ChatColor.GOLD + "January Event", 5, 60, 5);
-	}
-
-
-	public void setChallengeInUse(boolean bool) {
-		Main.plugin.challengeIsFree.replace(getChallengeType(), bool);
-	}
-	
-	public boolean getChallengeInUse() {
-		return Main.plugin.challengeIsFree.get(getChallengeType());
-	}
-	
-	public ChallengeType getChallengeType() {
-		return ChallengeType.HUNT_BATS;
-	}
-<<<<<<< HEAD
-	
-	public boolean isChallengeCancelled() {
-		return this.challengeCancelled;
-	}
-
-=======
-
-	@Override
-	public boolean isChallengeCancelled() {
-		return challengeCancelled;
-	}
->>>>>>> 04abef271327034979828173a189dd45348efa6d
 }

@@ -6,7 +6,6 @@ import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ChallengeClass implements Listener {
 
@@ -26,8 +25,8 @@ public class ChallengeClass implements Listener {
     //gets a random challenge to use
     public void randomChallenge(){
         List<ChallengeType> chalList = new ArrayList<>();
-        for (Map.Entry<ChallengeType, Boolean> entry : Main.plugin.challengeIsFree.entrySet()) {
-        	if (!entry.getValue()) chalList.add(entry.getKey());
+        for (ChallengeType type : Main.plugin.challengeIsFree.keySet()) {
+        	if (!Main.plugin.getChallengeInUse(type)) chalList.add(type);
         }
         int randomChal = Main.plugin.getRandomNumberInRange(0, chalList.size()-1);
         challenge = chalList.get(randomChal);
@@ -45,8 +44,8 @@ public class ChallengeClass implements Listener {
             player.sendMessage("NETHER");
             break;
         case PINATA:
-            player.sendMessage("PINATA");
-            break;
+        	PinataChallenge pC = new PinataChallenge(player);
+            Main.plugin.getServer().getPluginManager().registerEvents(pC, Main.plugin);
         case ENDERMEN:
             KillEndermenChallenge kbe = new KillEndermenChallenge(player);
             Main.plugin.getServer().getPluginManager().registerEvents(kbe, Main.plugin); //TODO registering events needs to change, now it's registering per player -> no bueno

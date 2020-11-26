@@ -1,140 +1,143 @@
 package ftc.bigcrown.challenges;
 
 import ftc.bigcrown.Main;
+
+import javax.annotation.Nonnull;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
-public class GenericChallenge implements Challenge, Listener {
+public class GenericChallenge implements Listener {
+	
+	/*
+	 * This class is used to store all common code (functions and vars) between all challenges.
+	 * Functions like startChallenge are different for each challenge, so we'll define them there and not here.
+	 * 
+	 * Because of this, only challenge-subclasses need to implement the interface. If a function is not found in their class, 
+	 * they look in here. That's why it doesn't want getPlayer() in each subclass for example, it finds it here.
+	 * 
+	 * There are only set-functions for vars that don't get a value by default or in the constructor, 
+	 * so each subclass can set the value on their own in their constructor.
+	 * 
+	 * Use "extends GenericChallenge" in each subclass and "super(player, ChallengeType);" in their constructor.
+	 */
 
-    public Player player;
+	private Player player;
+	private String objectiveName;
+	private Location startLocation;
+	private Location returnLocation;
+	private ChallengeType challengeType;
+	private boolean challengeCancelled = false;
+	private int startScore;
 
-    public Location returnLocation;
-    public Location startLocation/* = new Location(null, 0, 0, 0)*/; // TODO
-
-    public TimerCountingDown timer;
-
-    public boolean challengeCancelled = false;
-
-    public ChallengeType challengeType;
-
-    public String objectiveName;
-    
-    public GenericChallenge(Player player, ChallengeType challengeType, String objectiveName){
+    public GenericChallenge(@Nonnull Player player, @Nonnull ChallengeType challengeType) {
+    	Main.plugin.setChallengeInUse(getChallengeType(), true);
         this.player = player;
         this.challengeType = challengeType;
-        this.objectiveName = objectiveName;
-
-        startChallenge();
     }
-    @Override
+    
+    // Getters & Setters:
+    
     public Player getPlayer() {
-        return player;
+        return this.player;
+    }
+    
+    public ChallengeType getChallengeType() {
+        return this.challengeType;
+    }
+    
+    public int getStartScore() {
+    	return this.startScore;
+    }
+   
+    public String getObjectiveName() {
+    	return this.objectiveName;
+    }
+    
+    public void setObjectiveName(String name) {
+    	this.objectiveName = name;
     }
 
-    @Override
+    public Location getStartLocation() {
+        return this.startLocation;
+    }
+    
+    public void setStartLocation(Location loc) {
+    	this.startLocation = loc;
+    }
+
+    public Location getReturnLocation() {
+        return this.returnLocation;
+    }
+    
+    public void setReturnLocation(Location location) {
+        this.returnLocation = location;
+    }
+
+    public boolean isChallengeCancelled() {
+        return this.challengeCancelled;
+    }
+    
+    public void setChallengeCancelled(boolean cancel) {
+		this.challengeCancelled = cancel;
+	}
+    
+    
+    
+    // Other functions all classes have in common:
+    
+    
+    // Returns an Objective object, based on the objective name.
     public Objective getScoreboardObjective() {
         Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
-        return mainScoreboard.getObjective(objectiveName);
+        return mainScoreboard.getObjective(getObjectiveName());
     }
-
-    @Override
-    public Location getStartLocation() {
-        return startLocation;
+    
+    // Returns the difference in score between the start & end of a challenge,
+    // used to display how much points they earned.
+	public int calculateScore() {
+		Score score = getScoreboardObjective().getScore(getPlayer().getName());
+		return score.getScore() - getStartScore();
+	}
+	
+	// Teleport to where player opened present:
+    public void teleportBack() {
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
+			getPlayer().teleport(getReturnLocation().add(0, 1, 0));
+			getPlayer().playSound(getReturnLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+			Main.plugin.setChallengeInUse(getChallengeType(), false);
+		}, 60L);
     }
+    
+    // Score before challenge, used to show how many points they earned:
+	public void setStartScore() {
+		Score score = this.getScoreboardObjective().getScore(this.getPlayer().getName());
+		this.startScore = score.getScore();
+	}
+	
+	
+	// Events
 
-    @Override
-    public Location getReturnLocation() {
-        return returnLocation;
-    }
-
-    @Override
-    public void setReturnLocation(Location location) {
-        returnLocation = location;
-    }
-
-    @Override
+    // This is something that should always happen, no matter what challenge.
+    // But in the challenge subclasses, we still need to properly clean challenges, such as kill bats.
+    // (Put a delay on it to make sure other events get executed first)
     @EventHandler
     public void onLogoutWhileInChallenge(PlayerQuitEvent event) {
         if (getPlayer() == null) return;
-        if (event.getPlayer().getName() == getPlayer().getName()) {
-            if (timer != null) {
-                timer.stopTimer(true);
-                timer = null;
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
+        	if (event.getPlayer().getName() == getPlayer().getName()) {
+                setChallengeCancelled(true);
+                Main.plugin.setChallengeInUse(getChallengeType(), false);
+                Main.plugin.playersThatQuitDuringChallenge.add(getPlayer().getName());
             }
-            // TODO: remove all bats
-            challengeCancelled = true;
-            setChallengeInUse(false);
-            Main.plugin.playersThatQuitDuringChallenge.add(getPlayer().getName());
-        }
-    }
-
-    @Override
-    public void startChallenge() {
-        // Teleport player to challenge:
-        getPlayer().teleport(getStartLocation());
-        getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-
-        // No countdown, so start timer immediately after title:
-        GenericChallenge kbc = this;
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
-            if (!challengeCancelled) timer = new TimerCountingDown(kbc, 30, false);
-        }, 70L);
-    }
-
-    @Override
-    public void endChallenge() {
-        // TODO: remove all bats
-
-        // Timer stopped:
-        this.timer = null;
-        getPlayer().playSound(getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
-
-        /* // Amount of bats caught:
-        int score = calculateScore();
-        if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've caught " + score + " bats!");
-        else getPlayer().sendMessage(ChatColor.YELLOW + "You've caught 1 bat!");
-
-        // Add to crown scoreboard:
-        Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
-        Score crownScore = mainScoreboard.getObjective("crown").getScore(getPlayer().getName());
-        crownScore.setScore(crownScore.getScore() + score);
-        */
-
-        //Honestly, I just have no idea what to do with this bit lol
-
-        // Teleport to where player opened present:
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
-            getPlayer().teleport(getReturnLocation().add(0, 1, 0));
-            getPlayer().playSound(getReturnLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-            setChallengeInUse(false);
-        }, 60L);
-    }
-
-    @Override
-    public void setChallengeInUse(boolean bool) {
-        Main.plugin.challengeIsFree.replace(getChallengeType(), bool);
-    }
-
-    @Override
-    public boolean getChallengeInUse() {
-        return Main.plugin.challengeIsFree.get(getChallengeType());
-    }
-
-    @Override
-    public ChallengeType getChallengeType() {
-        return challengeType;
-    }
-
-    @Override
-    public boolean isChallengeCancelled() {
-        return challengeCancelled;
+        }, 5);
     }
 }

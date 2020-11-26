@@ -58,8 +58,14 @@ public class Main extends JavaPlugin {
 	}
 
 
-	
-
+    
+    public boolean getChallengeInUse(ChallengeType type) {
+        return challengeIsFree.get(type);
+    }
+    public void setChallengeInUse(ChallengeType type, boolean bool) {
+        challengeIsFree.replace(type, bool);
+    }
+    
 
 	// Present spawning and loop
 	public void loop() {

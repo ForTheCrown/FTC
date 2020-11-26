@@ -37,29 +37,22 @@ import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import ftc.bigcrown.Main;
 import net.md_5.bungee.api.ChatColor;
 
-public class CastleRaidChallenge implements Challenge, Listener {
+public class CastleRaidChallenge extends GenericChallenge implements Challenge, Listener {
 	
-	private Player player;
-	
-	private Location returnLocation;
+
 	private Location startLocation = new Location(Bukkit.getWorld("world"), -4.5, 5, 37.5); // TODO
 	
-	private int startScore;
-	private boolean challengeCancelled = false;
 	private boolean raidHappening = false;
 	private boolean startedRaid = false;
-	
+	private boolean completed = false;
 	public BossBar capturePointBossBar;
 	public int state = 0; 
-	
 	private Set<LivingEntity> raidwave = new HashSet<LivingEntity>();
 	private Set<LivingEntity> raidwave2 = new HashSet<LivingEntity>();
 	private Set<LivingEntity> raidwave3 = new HashSet<LivingEntity>();
@@ -72,16 +65,14 @@ public class CastleRaidChallenge implements Challenge, Listener {
 	};
 	
 	public CastleRaidChallenge(Player player) {
-		if (player == null || getChallengeInUse()) return;
-		setChallengeInUse(true);
-		this.player = player;
-
-		// Score before challenge
-		Score score = getScoreboardObjective().getScore(getPlayer().getName());
-		startScore = score.getScore();
+		super(player, ChallengeType.PVE_ARENA);
+		if (player == null || Main.plugin.getChallengeInUse(getChallengeType())) return;
 		
-		// Location saving + teleport to challenge;
+		// All needed setters from super class:
+		setObjectiveName("crown");
 		setReturnLocation(getPlayer().getLocation());
+		setStartLocation(this.startLocation);
+		setStartScore();
 
 		startChallenge();
 	}
@@ -115,40 +106,44 @@ public class CastleRaidChallenge implements Challenge, Listener {
 		capturePointBossBar.setVisible(false);
 		capturePointBossBar.removeAll();
 		
-		resetAllValues();
+		resetAll();
 		getPlayer().playSound(getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
 
 		// Amount of raiders killed:
 		int score = calculateScore();
+		if (completed) {
+			score -= 50;
+			completed = false;
+		}
 		if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've killed " + score + " raiders!");
 		else getPlayer().sendMessage(ChatColor.YELLOW + "You've killed 1 raider!");
 
-		// Teleport to where player opened present:
-	    Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-	        @Override
-	        public void run() {
-	        	getPlayer().teleport(getReturnLocation().add(0, 1, 0));
-	        	getPlayer().playSound(getReturnLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-	        	setChallengeInUse(false);
-	        }
-		}, 60L);
+		teleportBack();
 	}
 
 
-	private int calculateScore() {
-		Score score = getScoreboardObjective().getScore(getPlayer().getName());
-		return score.getScore() - startScore;
+	public void sendTitle() {
+		getPlayer().sendTitle(ChatColor.YELLOW + "Protect the Capture point!", ChatColor.GOLD + "April Event", 5, 60, 5);
 	}
-
+	
+	private void sendInfoViaChat() {
+		String prefix = ChatColor.GRAY + "" + ChatColor.BOLD  + "> ";
+		getPlayer().sendMessage(ChatColor.YELLOW + "Event Info:");
+		getPlayer().sendMessage(prefix + ChatColor.WHITE + "Earn points by killing raiders.");
+		getPlayer().sendMessage(prefix + ChatColor.WHITE + "You slowly lose the capture point while you're not standing on it.");
+		getPlayer().sendMessage(prefix + ChatColor.WHITE + "The challenge ends when you lose the capture point or if you die.");
+		
+	}
 
 	@EventHandler
 	public void onLogoutWhileInChallenge(PlayerQuitEvent event) {
 		if (getPlayer() == null) return;
 		if (event.getPlayer().getName() == getPlayer().getName()) {
-
-			challengeCancelled = true;
-			setChallengeInUse(false);
-		    Main.plugin.playersThatQuitDuringChallenge.add(getPlayer().getName());
+			if (capturePointBossBar != null) {
+				capturePointBossBar.setVisible(false);
+				capturePointBossBar.removeAll();
+			}
+			resetAll();
 		}
 
 	}
@@ -170,75 +165,18 @@ public class CastleRaidChallenge implements Challenge, Listener {
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		if (getPlayer() == null) return;
 		if (event.getEntity().getName() == getPlayer().getName()) {
-			challengeCancelled = true;
-			setChallengeInUse(false);
+			setChallengeCancelled(true);
+			Main.plugin.setChallengeInUse(getChallengeType(), false);
 			if (capturePointBossBar != null) {
 				capturePointBossBar.setVisible(false);
 				capturePointBossBar.removeAll();
 			}
-			resetAllValues();
+			resetAll();
 		}
 	}
 
-
-	public Player getPlayer() {
-		return player;
-	}
-
-
-	public Objective getScoreboardObjective() {
-		Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
-		return mainScoreboard.getObjective("crown");
-	}
-
-
-	public Location getStartLocation() {
-		return startLocation;
-	}
-
-
-	public Location getReturnLocation() {
-		return returnLocation;
-	}
-
-
-	public void setReturnLocation(Location location) {
-		returnLocation = location;
-	}
-
-	public void sendTitle() {
-		getPlayer().sendTitle(ChatColor.YELLOW + "Protect the Capture point!", ChatColor.GOLD + "April Event", 5, 60, 5);
-	}
-	
-
-	private void sendInfoViaChat() {
-		String prefix = ChatColor.GRAY + "" + ChatColor.BOLD  + "> ";
-		getPlayer().sendMessage(ChatColor.YELLOW + "Event Info:");
-		getPlayer().sendMessage(prefix + ChatColor.WHITE + "Earn points by killing raiders.");
-		getPlayer().sendMessage(prefix + ChatColor.WHITE + "You slowly lose the capture point while you're not standing on it.");
-		getPlayer().sendMessage(prefix + ChatColor.WHITE + "The challenge ends when you lose the capture point or if you die.");
-		
-	}
-
-
-	public void setChallengeInUse(boolean bool) {
-		Main.plugin.challengeIsFree.replace(getChallengeType(), bool);
-	}
-	
-	public boolean getChallengeInUse() {
-		return Main.plugin.challengeIsFree.get(getChallengeType());
-	}
-	
-	public ChallengeType getChallengeType() {
-		return ChallengeType.PVE_ARENA;
-	}
-	
-	public boolean isChallengeCancelled() {
-		return challengeCancelled;
-	}
 	
 	// --------------------------------------------------------------------------------- //
-	
 	
 
 	public void capturePointLoop() {
@@ -246,7 +184,7 @@ public class CastleRaidChallenge implements Challenge, Listener {
 	        @Override
 	        public void run() {
 	        	if (!raidHappening) {
-	    			resetAllValues();
+	    			resetAll();
 	    			return;
 	    		}
 	        	
@@ -281,7 +219,7 @@ public class CastleRaidChallenge implements Challenge, Listener {
     				loseHealth(capturePointBossBar, 0.006);
 	    			break;
     			default:
-    				resetAllValues();
+    				resetAll();
     				return;
 	    		}
 	    		
@@ -468,8 +406,6 @@ public class CastleRaidChallenge implements Challenge, Listener {
 		
 	}
 	
-	
-	
 	private void addCustomStuffToVindicator(Vindicator vindi) {
 		if (vindi == null) return;
 		
@@ -506,6 +442,7 @@ public class CastleRaidChallenge implements Challenge, Listener {
 		pillager.setHealth(30);
 	}
 	
+	
 	@EventHandler
 	public void playerKillRaidMob(EntityDeathEvent event) {
 		if (raidwave.contains(event.getEntity())) {	
@@ -538,15 +475,12 @@ public class CastleRaidChallenge implements Challenge, Listener {
 				raidwave2.clear();
 				raidwave3.clear();
 				
-				
+				completed = true;
 				endChallenge();
 			}
 		}
 	}
 	
-
-	
-
 	private void doStuff(EntityDeathEvent event, Set<LivingEntity> raidwave) {
 		// Drops
 		event.getDrops().clear();
@@ -580,6 +514,7 @@ public class CastleRaidChallenge implements Challenge, Listener {
 	}
 
 
+	
 	private int count = 6;
 	public void loseHealth(BossBar bar, Double d) {
 		if (bar == null) return;
@@ -607,11 +542,13 @@ public class CastleRaidChallenge implements Challenge, Listener {
 		}
 	}
 	
-	public void resetAllValues() {
+	
+	
+	public void resetAll() {
 		capturePointBossBar = null;
-		player = null;
 		raidHappening = false;
 		startedRaid = false;
+		completed = false;
 		count = 6;
 		state = 0;
 		

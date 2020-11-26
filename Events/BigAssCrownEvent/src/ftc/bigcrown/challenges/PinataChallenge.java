@@ -1,6 +1,8 @@
 package ftc.bigcrown.challenges;
 
 import ftc.bigcrown.Main;
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.*;
 import org.bukkit.entity.Husk;
 import org.bukkit.entity.Item;
@@ -14,20 +16,59 @@ import org.bukkit.util.Vector;
 public class PinataChallenge extends GenericChallenge {
 
     public boolean canDrop;
+    private Location startLocation = new Location(Bukkit.getWorld("world"), -4.5, 5, 37.5); // TODO
 
     public PinataChallenge(Player player) {
-        super(player, ChallengeType.PINATA, "pinata");
-        //startLocation = new Location();
+        super(player, ChallengeType.PINATA);
+        if (player == null || Main.plugin.getChallengeInUse(getChallengeType())) return;
+        
+        // All needed setters from super class:
+ 		setObjectiveName("crown");
+ 		setReturnLocation(getPlayer().getLocation());
+ 		setStartLocation(this.startLocation);
+ 		setStartScore();
 
-        sendTitle();
+        startChallenge();
     }
 
+    public void startChallenge() {
+    	// Teleport player to challenge:
+    	getPlayer().teleport(getStartLocation());
+    	getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+    	
+    	sendTitle();
+    	
+    	// TODO: Timer
+    }
+    
+    public void endChallenge() {
+		getPlayer().playSound(getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
+
+		// Amount of raiders killed:
+		int score = calculateScore();
+		if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've hit the Pinata " + score + " times!");
+		else getPlayer().sendMessage(ChatColor.YELLOW + "You've hit the Pinata 1 time!");
+
+		teleportBack();
+	}
+    
+
+    public void sendTitle() {
+        this.getPlayer().sendTitle(ChatColor.YELLOW + "Punch the Pinata!", ChatColor.GOLD + "March Event", 5, 60, 5);
+    }
+    
+    // TODO : logout
+    // TODO : how to make pinata lol, it was a custom entity from the Citizens plugin, back when Hazel's guards were alive ._.
+    
+    
     @EventHandler
     public void onPlayerHitPinata(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Husk && event.getDamager() instanceof Player)) return;
-        Husk husk = (Husk) event.getEntity();
+        
         Player player = (Player) event.getDamager();
-
+        if (player.getName() != getPlayer().getName()) return;
+        
+        Husk husk = (Husk) event.getEntity();
         if (husk.getCustomName() == null && husk.getCustomName().contains(ChatColor.YELLOW + "$$$")) return;
 
         Score score = getScoreboardObjective().getScore(player.getName());
@@ -49,7 +90,4 @@ public class PinataChallenge extends GenericChallenge {
         Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> canDrop = true, 100L);
     }
 
-    public void sendTitle() {
-        this.getPlayer().sendTitle(ChatColor.YELLOW + "Punch the Pinata!", ChatColor.GOLD + "March Event", 5, 60, 5);
-    }
 }

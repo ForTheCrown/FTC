@@ -11,40 +11,26 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
 import ftc.bigcrown.Main;
 import net.md_5.bungee.api.ChatColor;
 
-public class KillEndermenChallenge implements Challenge, Listener {
-	
-	private Player player;
-	
-	private Location returnLocation;
-	private Location startLocation/* = new Location(null, 0, 0, 0)*/; // TODO
-	
-	private int startScore;
+public class KillEndermenChallenge extends GenericChallenge implements Challenge, Listener {
 	
 	private TimerCountingDown timer;
-	
-	private boolean challengeCancelled = false;
+	private Location startLocation = new Location(Bukkit.getWorld("world"), -4.5, 5, 37.5); // TODO
 	
 	public KillEndermenChallenge(Player player) {
-		if (player == null || this.getChallengeInUse()) return;
-		this.setChallengeInUse(true);
-		this.player = player;
-		
-		// Score before challenge
-		Score score = this.getScoreboardObjective().getScore(this.getPlayer().getName());
-		this.startScore = score.getScore();
+		super(player, ChallengeType.ENDERMEN);
+		if (player == null || Main.plugin.getChallengeInUse(getChallengeType())) return;
 
-		// Location saving + teleport to challenge;
-		setReturnLocation(this.getPlayer().getLocation());
-
-		startLocation = player.getLocation(); // TODO
-		startLocation.add(0, 2, 0);
+		// All needed setters from super class:
+ 		setObjectiveName("endermenKilled");
+ 		setReturnLocation(getPlayer().getLocation());
+ 		setStartLocation(this.startLocation);
+ 		setStartScore();
 
 		this.startChallenge();
 	}
@@ -62,7 +48,7 @@ public class KillEndermenChallenge implements Challenge, Listener {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 	        @Override
 	        public void run() {
-	        	if (!challengeCancelled) timer = new TimerCountingDown(kec, 60, true);
+	        	if (!isChallengeCancelled()) timer = new TimerCountingDown(kec, 60, true);
 	        }
 	    }, 50L);
 	}
@@ -70,7 +56,7 @@ public class KillEndermenChallenge implements Challenge, Listener {
 	public void endChallenge() {
 		// Timer stopped:
 		this.timer = null;
-		this.getPlayer().playSound(this.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
+		getPlayer().playSound(this.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
 
 		// Amount of endermen killed:
 		int score = calculateScore();
@@ -81,23 +67,12 @@ public class KillEndermenChallenge implements Challenge, Listener {
     	Score crownScore = mainScoreboard.getObjective("crown").getScore(getPlayer().getName());
     	crownScore.setScore(crownScore.getScore() + score);
 
-		// Teleport to where player opened present:
-	    Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-	        @Override
-	        public void run() {
-	        	getPlayer().teleport(getReturnLocation().add(0, 1, 0));
-	        	getPlayer().playSound(getReturnLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-	        	setChallengeInUse(false);
-	        }
-		}, 60L);
+		teleportBack();
 	}
 
-
-	private int calculateScore() {
-		Score score = this.getScoreboardObjective().getScore(this.getPlayer().getName());
-		return score.getScore() - this.startScore;
+	public void sendTitle() {
+		getPlayer().sendTitle(ChatColor.YELLOW + "Kill Endermen!", ChatColor.GOLD + "January February May", 5, 60, 5);
 	}
-
 
 	@EventHandler
 	public void onLogoutWhileInChallenge(PlayerQuitEvent event) {
@@ -107,8 +82,6 @@ public class KillEndermenChallenge implements Challenge, Listener {
 				this.timer.stopTimer(true);
 				this.timer = null;
 			}
-			this.challengeCancelled = true;
-			setChallengeInUse(false);
 		    Main.plugin.playersThatQuitDuringChallenge.add(this.getPlayer().getName());
 		}
 
@@ -125,64 +98,18 @@ public class KillEndermenChallenge implements Challenge, Listener {
 	
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
-		if (this.getPlayer() == null) return;
-		if (event.getEntity().getName() == this.getPlayer().getName()) {
+		if (getPlayer() == null) return;
+		if (event.getEntity().getName() == getPlayer().getName()) {
 			if (this.timer != null) {
 				this.timer.stopTimer(true);
 				this.timer = null;
 			}
-			this.challengeCancelled = true;
-			setChallengeInUse(false);
-			this.getPlayer().sendMessage(ChatColor.GRAY + "Challenge failed! No points earned.");
+			setChallengeCancelled(true);
+			Main.plugin.setChallengeInUse(getChallengeType(), false);
+			getPlayer().sendMessage(ChatColor.GRAY + "Challenge failed! No points earned.");
 		}
 	}
 
-
-	public Player getPlayer() {
-		return this.player;
-	}
-
-
-	public Objective getScoreboardObjective() {
-		Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
-		return mainScoreboard.getObjective("endermenKilled");
-	}
-
-
-	public Location getStartLocation() {
-		return this.startLocation;
-	}
-
-
-	public Location getReturnLocation() {
-		return this.returnLocation;
-	}
-
-
-	public void setReturnLocation(Location location) {
-		this.returnLocation = location;
-	}
-
-	public void sendTitle() {
-		this.getPlayer().sendTitle(ChatColor.YELLOW + "Kill Endermen!", ChatColor.GOLD + "January, March, May", 5, 60, 5);
-	}
-
-
-	public void setChallengeInUse(boolean bool) {
-		Main.plugin.challengeIsFree.replace(getChallengeType(), bool);
-	}
-	
-	public boolean getChallengeInUse() {
-		return Main.plugin.challengeIsFree.get(getChallengeType());
-	}
-	
-	public ChallengeType getChallengeType() {
-		return ChallengeType.ENDERMEN;
-	}
-	
-	public boolean isChallengeCancelled() {
-		return this.challengeCancelled;
-	}
 	
 
 }
