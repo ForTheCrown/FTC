@@ -1,7 +1,9 @@
-package ftc.chat.commands;
+package ftc.chat.emotes;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,22 +14,20 @@ import org.bukkit.scheduler.BukkitRunnable;
 import ftc.chat.Main;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class Poke implements CommandExecutor {
-
+public class Bonk implements CommandExecutor {
+	
 	/*
 	 * ----------------------------------------
 	 * 			Command description:
 	 * ----------------------------------------
-	 * Command that allows players to poke another player.
+	 * Command that allows players to bonk another player.
 	 * Only works if they both have emotes enabled.
 	 * 
-	 * 
 	 * Valid usages of command:
-	 * - /poke
-	 * - /poke [player]
+	 * - /bonk
+	 * - /bonk [target]
 	 * 
 	 * Referenced other classes:
 	 * - Main: Main.plugin
@@ -35,29 +35,35 @@ public class Poke implements CommandExecutor {
 	 * Main Author: Botul
 	 * Edit by: Wout
 	 */
-	
+
     List<String> onCooldown = new ArrayList<>();
-    List<String> pokeOwies = Arrays.asList("stomach", "back", "arm", "butt", "cheek", "neck");
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-    	// Sender must be a player:
+    	// Sender must be player:
         if (!(sender instanceof Player)) 
-        {  
-        	sender.sendMessage("Only players may execute this command."); 
+        {
+        	sender.sendMessage("Only players can use this command"); 
         	return false;
         }
         
         // Sender can't be on cooldown:
         if (onCooldown.contains(sender.getName())) 
         {
-        	sender.sendMessage(ChatColor.GRAY + "You poke people too often."); 
+        	sender.sendMessage(ChatColor.GRAY + "You bonk people too often lol");
         	return false;
         }
-
-        Player player = (Player) sender;
         
-        // Sender should have emotes enabled:
+        // Command no args:
+        if (args.length < 1 || args[0].equalsIgnoreCase(sender.getName()))
+        {
+        	sender.sendMessage("Don't hurt yourself ♥");
+        	return true;
+        }
+
+        
+        // Both sender and target should have emotes enabled:
+        Player player = (Player) sender;
         if (Main.plugin.getConfig().getStringList("NoEmotes").contains(player.getUniqueId().toString())) {
         	player.sendMessage(ChatColor.GRAY + "You've emotes turned off.");
         	player.sendMessage(ChatColor.GRAY + "Do " + ChatColor.RESET + "/toggleemotes" + ChatColor.GRAY + " to enable them.");
@@ -65,18 +71,10 @@ public class Poke implements CommandExecutor {
         	return false;
         }
         
-        // Command no args or target = sender:
-        if (args.length < 1 || args[0].equalsIgnoreCase(player.getName())) {
-            player.sendMessage("You poked yourself! Weirdo"); //Damn, some people really be weird, pokin themselves, couldn't be me ( ._.)
-            player.getWorld().playSound(player.getLocation(), Sound.ENCHANT_THORNS_HIT, 3.0F, 1.8F);
-            return true;
-        }
-        
-        
-        // Target should have emotes enabled:
-        Player target = Bukkit.getPlayer(args[0]);
-        if(target == null) {
-        	player.sendMessage(args[0] + ChatColor.GRAY + " isn't online at the moment."); 
+        Player target = Bukkit.getServer().getPlayer(args[0]);
+        if (target == null) 
+        {
+        	player.sendMessage(args[0] + " isn't a currently online player");
         	return false;
         }
         if (Main.plugin.getConfig().getStringList("NoEmotes").contains(target.getUniqueId().toString())) {
@@ -85,15 +83,17 @@ public class Poke implements CommandExecutor {
         	return false;
         }
 
-        // Actual poking:
-        int pokeOwieInt = (int)(Math.random()*pokeOwies.size()); //The random int that determines what body part they'll poke lol
-        player.sendMessage("You poked " + ChatColor.YELLOW + target.getName() + "'s " + ChatColor.RESET + pokeOwies.get(pokeOwieInt));
+        // Actual bonking:
+        Location loc = target.getLocation();
+        loc.setPitch(loc.getPitch() + 20F);
 
-        target.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RESET + " poked your " + pokeOwies.get(pokeOwieInt));
-        target.getWorld().playSound(target.getLocation(), Sound.ENCHANT_THORNS_HIT, 3.0F, 1.8F);
-        target.setVelocity(target.getVelocity().add(target.getLocation().getDirection().normalize().multiply(-0.3).setY(.1)));
+        player.sendMessage("You bonked " + ChatColor.YELLOW + target.getName() + ChatColor.RESET + "!");
+        target.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RESET + " bonked you!");
 
-        
+        target.teleport(loc);
+        target.getWorld().playSound(loc, Sound.ENTITY_SHULKER_HURT_CLOSED, 2.0F, 0.8F);
+        target.getWorld().spawnParticle(Particle.CRIT, loc.getX(), loc.getY()+1, loc.getZ(), 5, 0.5, 0.5, 0.5);
+
         // Put sender on cooldown:
         if(!player.isOp()){
             onCooldown.add(player.getName());
@@ -107,5 +107,4 @@ public class Poke implements CommandExecutor {
 
         return true;
     }
-
 }

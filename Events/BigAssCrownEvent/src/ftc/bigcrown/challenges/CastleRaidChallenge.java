@@ -106,7 +106,6 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		capturePointBossBar.setVisible(false);
 		capturePointBossBar.removeAll();
 		
-		resetAll();
 		getPlayer().playSound(getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
 
 		// Amount of raiders killed:
@@ -118,6 +117,7 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've killed " + score + " raiders!");
 		else getPlayer().sendMessage(ChatColor.YELLOW + "You've killed 1 raider!");
 
+		resetAll();
 		teleportBack();
 	}
 

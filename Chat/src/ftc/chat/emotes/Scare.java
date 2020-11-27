@@ -1,4 +1,4 @@
-package ftc.chat.commands;
+package ftc.chat.emotes;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

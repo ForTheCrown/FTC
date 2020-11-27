@@ -1,10 +1,8 @@
-package ftc.chat.commands;
+package ftc.chat.emotes;
 
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,22 +12,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 import ftc.chat.Main;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class Mwah implements CommandExecutor {
+public class Poke implements CommandExecutor {
 
 	/*
 	 * ----------------------------------------
 	 * 			Command description:
 	 * ----------------------------------------
-	 * Command that allows players to send a kiss to another player.
+	 * Command that allows players to poke another player.
 	 * Only works if they both have emotes enabled.
 	 * 
 	 * 
 	 * Valid usages of command:
-	 * - [kiss, mwah, smooch]
-	 * - /mwah
-	 * - /mwah [player]
+	 * - /poke
+	 * - /poke [player]
 	 * 
 	 * Referenced other classes:
 	 * - Main: Main.plugin
@@ -39,47 +37,45 @@ public class Mwah implements CommandExecutor {
 	 */
 	
     List<String> onCooldown = new ArrayList<>();
+    List<String> pokeOwies = Arrays.asList("stomach", "back", "arm", "butt", "cheek", "neck");
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        // Sender must be a player:
-    	if (!(sender instanceof Player)) 
-        {
+    	// Sender must be a player:
+        if (!(sender instanceof Player)) 
+        {  
         	sender.sendMessage("Only players may execute this command."); 
         	return false;
         }
         
-    	// Sender can't be on cooldown:
+        // Sender can't be on cooldown:
         if (onCooldown.contains(sender.getName())) 
         {
-        	sender.sendMessage(ChatColor.GRAY + "You kiss too often :D"); 
+        	sender.sendMessage(ChatColor.GRAY + "You poke people too often."); 
         	return false;
         }
 
-		Player player = (Player) sender;
-        Location loc = player.getLocation();
-
+        Player player = (Player) sender;
+        
         // Sender should have emotes enabled:
-		if (Main.plugin.getConfig().getStringList("NoEmotes").contains(player.getUniqueId().toString())) 
-		{
+        if (Main.plugin.getConfig().getStringList("NoEmotes").contains(player.getUniqueId().toString())) {
         	player.sendMessage(ChatColor.GRAY + "You've emotes turned off.");
         	player.sendMessage(ChatColor.GRAY + "Do " + ChatColor.RESET + "/toggleemotes" + ChatColor.GRAY + " to enable them.");
         	
         	return false;
         }
-		
-		 // Command no args or target = sender:
+        
+        // Command no args or target = sender:
         if (args.length < 1 || args[0].equalsIgnoreCase(player.getName())) {
-            player.sendMessage(ChatColor.YELLOW + "Love yourself!" + ChatColor.RESET + " ( ^ 3^) ♥");
-            player.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_UP, 3.0F, 2F);
-            player.spawnParticle(Particle.HEART, loc.getX(), loc.getY()+1, loc.getZ(), 5, 0.5, 0.5, 0.5);
+            player.sendMessage("You poked yourself! Weirdo"); //Damn, some people really be weird, pokin themselves, couldn't be me ( ._.)
+            player.getWorld().playSound(player.getLocation(), Sound.ENCHANT_THORNS_HIT, 3.0F, 1.8F);
             return true;
         }
-		
+        
+        
         // Target should have emotes enabled:
         Player target = Bukkit.getPlayer(args[0]);
-        if (target == null) 
-        {
+        if(target == null) {
         	player.sendMessage(args[0] + ChatColor.GRAY + " isn't online at the moment."); 
         	return false;
         }
@@ -89,21 +85,15 @@ public class Mwah implements CommandExecutor {
         	return false;
         }
 
-        // Actual smooching:
-        player.sendMessage(ChatColor.RED + "♥" + ChatColor.RESET + " You smooched " + target.getName() + ChatColor.RED + " ♥");
+        // Actual poking:
+        int pokeOwieInt = (int)(Math.random()*pokeOwies.size()); //The random int that determines what body part they'll poke lol
+        player.sendMessage("You poked " + ChatColor.YELLOW + target.getName() + "'s " + ChatColor.RESET + pokeOwies.get(pokeOwieInt));
 
-        TextComponent mwahBack = new TextComponent(ChatColor.translateAlternateColorCodes('&', "&c♥ &e" + player.getName() + " &rsmooched you! &r( ^ 3^) &c♥"));
-        mwahBack.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mwah " + player.getName()));
-        mwahBack.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to smooch them back")));
-        target.spigot().sendMessage(mwahBack);
+        target.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RESET + " poked your " + pokeOwies.get(pokeOwieInt));
+        target.getWorld().playSound(target.getLocation(), Sound.ENCHANT_THORNS_HIT, 3.0F, 1.8F);
+        target.setVelocity(target.getVelocity().add(target.getLocation().getDirection().normalize().multiply(-0.3).setY(.1)));
 
-        Location targetLoc = target.getLocation();
-        target.getWorld().playSound(targetLoc, Sound.ENTITY_PUFFER_FISH_BLOW_UP, 3.0F, 2F);
-        target.getWorld().spawnParticle(Particle.HEART, targetLoc.getX(), targetLoc.getY()+1, targetLoc.getZ(), 5, 0.5, 0.5, 0.5);
-
-        loc.getWorld().spawnParticle(Particle.HEART, loc.getX(), loc.getY()+1, loc.getZ(), 5, 0.5, 0.5, 0.5);
-        loc.getWorld().playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_UP, 3.0F, 2F);
-
+        
         // Put sender on cooldown:
         if(!player.isOp()){
             onCooldown.add(player.getName());
@@ -117,4 +107,5 @@ public class Mwah implements CommandExecutor {
 
         return true;
     }
+
 }

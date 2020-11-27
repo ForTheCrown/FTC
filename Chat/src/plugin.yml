@@ -40,6 +40,8 @@ commands:
     description: Bonk someone.
   scare:
     description: Scare someone.
+  jingle:
+    description: Jingle Bells beat B)
   toggleemotes:
     description: Toggles emotes.
   sc:

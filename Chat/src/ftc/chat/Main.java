@@ -14,20 +14,21 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.*;
 
-import ftc.chat.commands.Bonk;
 import ftc.chat.commands.Broadcast;
 import ftc.chat.commands.Discord;
 import ftc.chat.commands.Findpost;
 import ftc.chat.commands.Help;
-import ftc.chat.commands.Mwah;
-import ftc.chat.commands.Poke;
 import ftc.chat.commands.Posthelp;
 import ftc.chat.commands.ReloadConfig;
-import ftc.chat.commands.Scare;
 import ftc.chat.commands.Spawn;
 import ftc.chat.commands.ToggleEmotes;
 import ftc.chat.commands.Tpa;
 import ftc.chat.commands.Tpahere;
+import ftc.chat.emotes.Bonk;
+import ftc.chat.emotes.Jingle;
+import ftc.chat.emotes.Mwah;
+import ftc.chat.emotes.Poke;
+import ftc.chat.emotes.Scare;
 import ftc.chat.commands.EmoteTabCompleter;
 import ftc.chat.commands.StaffChat;
 import ftc.chat.commands.StaffChatToggle;
@@ -57,6 +58,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginCommand("mwah").setExecutor(new Mwah());
 		getServer().getPluginCommand("poke").setExecutor(new Poke());
 		getServer().getPluginCommand("scare").setExecutor(new Scare());
+		getServer().getPluginCommand("jingle").setExecutor(new Jingle());
 		
 		
 		getServer().getPluginCommand("discord").setExecutor(new Discord());

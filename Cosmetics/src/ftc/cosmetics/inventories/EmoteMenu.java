@@ -47,14 +47,16 @@ public class EmoteMenu implements Listener {
 		ItemStack poke = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "/poke", ChatColor.GRAY + "Poking someone makes them jump back a bit.");
 		
 		ItemStack scare = Main.plugin.makeItem(Material.GRAY_DYE, 1, ChatColor.YELLOW + "/scare", ChatColor.GRAY + "Can be earned around Halloween.");
+		ItemStack jingle = Main.plugin.makeItem(Material.GRAY_DYE, 1, ChatColor.YELLOW + "/jingle", ChatColor.GRAY + "Can be earned around Christmas.");
 		if (emotes.contains("SCARE")) scare = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "/scare", ChatColor.GRAY + "Can be earned around Halloween.");
-		
+		if (emotes.contains("JINGLE")) jingle = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "/jingle", ChatColor.GRAY + "Can be earned around Christmas.");
 		
 		result.setItem(12, bonk);
 		result.setItem(13, mwah);
 		result.setItem(14, poke);
 		
 		result.setItem(19, scare);
+		result.setItem(20, jingle);
 		
 		result.setItem(31, noEmote);
 		

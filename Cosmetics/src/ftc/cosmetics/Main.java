@@ -556,7 +556,7 @@ public class Main extends JavaPlugin implements Listener {
 	
 	public Set<String> getAcceptedEmotes() {
 		return new HashSet<>(
-				Arrays.asList("SCARE"));
+				Arrays.asList("SCARE", "JINGLE"));
 	}
 	
 	private Boolean deniesRiding(String uuid) {
