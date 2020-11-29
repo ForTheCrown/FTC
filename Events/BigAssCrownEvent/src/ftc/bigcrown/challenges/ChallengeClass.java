@@ -1,8 +1,14 @@
 package ftc.bigcrown.challenges;
 
 import ftc.bigcrown.Main;
+import net.md_5.bungee.api.ChatColor;
+
+import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,20 +44,23 @@ public class ChallengeClass implements Listener {
     public void enterChallenge() {
     	switch (challenge) { 
         case RACE:
-            new RaceChallenge(player);
-            break;
-        case NETHER:
-            player.sendMessage("NETHER");
+        	player.sendMessage(ChatColor.GRAY + "You've found a race ticket!");
+    		
+    		ItemStack ticket = Main.plugin.makeItem(Material.MOJANG_BANNER_PATTERN, 1, ChatColor.YELLOW + "Race Ticket", 
+    				ChatColor.GOLD + "Hold this in your hand and click the Start!",
+    				ChatColor.GOLD + "villager to start a Race!",
+    				ChatColor.GRAY + "You can do /race to go there, Good luck!");
+    		
+    		Item ticketItem = player.getLocation().getWorld().dropItem(player.getLocation(), ticket);
+    		ticketItem.setVelocity(new Vector(0, 0.2, 0));
             break;
         case PINATA:
         	PinataChallenge pC = new PinataChallenge(player);
             Main.plugin.getServer().getPluginManager().registerEvents(pC, Main.plugin);
+            break;
         case ENDERMEN:
             KillEndermenChallenge kbe = new KillEndermenChallenge(player);
             Main.plugin.getServer().getPluginManager().registerEvents(kbe, Main.plugin); //TODO registering events needs to change, now it's registering per player -> no bueno
-            break;
-        case HALLOWEEN:
-            player.sendMessage("HALLOWEEN");
             break;
         case HUNT_BATS:
             KillBatChallenge kbc = new KillBatChallenge(player);
@@ -61,11 +70,9 @@ public class ChallengeClass implements Listener {
         	CastleRaidChallenge crc = new CastleRaidChallenge(player);
             Main.plugin.getServer().getPluginManager().registerEvents(crc, Main.plugin);
             break;
-        case MAGMALOVANIA:
-            player.sendMessage("MAGMALOVANIA");
-            break;
         case PROTECT_HAROLD:
-            player.sendMessage("PROTECT_HAROLD");
+        	ProtectHaroldChallenge phc = new ProtectHaroldChallenge(player);
+            Main.plugin.getServer().getPluginManager().registerEvents(phc, Main.plugin);
             break;
         default:
             player.sendMessage("How have you managed this");

@@ -68,6 +68,10 @@ public class KillEndermenChallenge extends GenericChallenge implements Challenge
     	crownScore.setScore(crownScore.getScore() + score);
 
 		teleportBack();
+		
+		PlayerQuitEvent.getHandlerList().unregister(this);
+		EntityDeathEvent.getHandlerList().unregister(this);
+		PlayerDeathEvent.getHandlerList().unregister(this);
 	}
 
 	public void sendTitle() {
@@ -82,7 +86,6 @@ public class KillEndermenChallenge extends GenericChallenge implements Challenge
 				this.timer.stopTimer(true);
 				this.timer = null;
 			}
-		    Main.plugin.playersThatQuitDuringChallenge.add(this.getPlayer().getName());
 		}
 
 	}

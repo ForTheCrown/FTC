@@ -66,6 +66,10 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
     	crownScore.setScore(crownScore.getScore() + score);
 
     	teleportBack();
+    	
+		PlayerQuitEvent.getHandlerList().unregister(this);
+		EntityDeathEvent.getHandlerList().unregister(this);
+		PlayerDeathEvent.getHandlerList().unregister(this);
 	}
 	
 	public void sendTitle() {

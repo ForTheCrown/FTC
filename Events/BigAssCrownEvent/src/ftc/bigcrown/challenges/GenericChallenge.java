@@ -2,15 +2,23 @@ package ftc.bigcrown.challenges;
 
 import ftc.bigcrown.Main;
 
+import java.util.Collection;
+import java.util.Random;
+
 import javax.annotation.Nonnull;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.loot.LootContext;
+import org.bukkit.loot.LootTable;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
@@ -37,6 +45,11 @@ public class GenericChallenge implements Listener {
 	private ChallengeType challengeType;
 	private boolean challengeCancelled = false;
 	private int startScore;
+	public LootTable loot = new LootTable() {
+		@Override public NamespacedKey getKey() {return new NamespacedKey(Main.plugin, "woutvoid");}
+		@Override public Collection<ItemStack> populateLoot(Random arg0, LootContext arg1) {return null;}
+		@Override public void fillInventory(Inventory arg0, Random arg1, LootContext arg2) {return;}
+	};
 
     public GenericChallenge(@Nonnull Player player, @Nonnull ChallengeType challengeType) {
     	Main.plugin.setChallengeInUse(getChallengeType(), true);

@@ -1,14 +1,11 @@
 package ftc.bigcrown.challenges;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attributable;
@@ -31,10 +28,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootTable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
@@ -56,13 +50,6 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 	private Set<LivingEntity> raidwave = new HashSet<LivingEntity>();
 	private Set<LivingEntity> raidwave2 = new HashSet<LivingEntity>();
 	private Set<LivingEntity> raidwave3 = new HashSet<LivingEntity>();
-
-	
-	LootTable loot = new LootTable() {
-		@Override public NamespacedKey getKey() {return new NamespacedKey(Main.plugin, "woutvoid");}
-		@Override public Collection<ItemStack> populateLoot(Random arg0, LootContext arg1) {return null;}
-		@Override public void fillInventory(Inventory arg0, Random arg1, LootContext arg2) {return;}
-	};
 	
 	public CastleRaidChallenge(Player player) {
 		super(player, ChallengeType.PVE_ARENA);
@@ -119,6 +106,10 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 
 		resetAll();
 		teleportBack();
+		
+		PlayerQuitEvent.getHandlerList().unregister(this);
+		EntityDeathEvent.getHandlerList().unregister(this);
+		PlayerDeathEvent.getHandlerList().unregister(this);
 	}
 
 
@@ -146,19 +137,6 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 			resetAll();
 		}
 
-	}
-
-	@EventHandler
-	public void onEntityDeath(EntityDeathEvent event) {
-		if (event.getEntity().getKiller() == null || getPlayer() == null) return;
-		if (event.getEntity().getKiller().getName() != getPlayer().getName() 
-				|| event.getEntity().getType() != EntityType.PILLAGER 
-				|| event.getEntity().getType() != EntityType.VINDICATOR
-				|| event.getEntity().getType() != EntityType.RAVAGER
-				|| event.getEntity().getType() != EntityType.EVOKER ) return;
-
-		event.getEntity().setCustomNameVisible(true);
-		event.getEntity().setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + "+1");
 	}
 	
 	@EventHandler
@@ -485,6 +463,10 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		// Drops
 		event.getDrops().clear();
 		tryDropEmerald(event.getEntity().getLocation());
+		
+		// Add name:
+		event.getEntity().setCustomNameVisible(true);
+		event.getEntity().setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + "+1");
 		
 		raidwave.remove(event.getEntity());
 		// Make last 3 remaining raiders glow:

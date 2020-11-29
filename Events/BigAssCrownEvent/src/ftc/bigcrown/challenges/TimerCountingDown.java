@@ -77,11 +77,7 @@ public class TimerCountingDown {
 		for (PotionEffect effect : player.getActivePotionEffects()) player.removePotionEffect(effect.getType());
     }
     
-    
-    
-    
-    
-    
+
     
 	private final String timerMessage = ChatColor.YELLOW + "Timer: " + ChatColor.of("#FFFFA1") + "%02d:%02d:%d";
 
