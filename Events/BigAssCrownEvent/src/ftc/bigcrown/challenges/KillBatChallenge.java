@@ -2,19 +2,21 @@ package ftc.bigcrown.challenges;
 
 import ftc.bigcrown.Main;
 import org.bukkit.*;
+import org.bukkit.entity.Bat;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.util.BoundingBox;
 
 public class KillBatChallenge extends GenericChallenge implements Challenge, Listener {
 	
-	private Location startLocation = new Location(Bukkit.getWorld("world"), -4.5, 5, 37.5); // TODO
+	private Location startLocation = new Location(Bukkit.getWorld("world_void"), 377.5, 152, -368.5);
 	private TimerCountingDown timer;
 	
 	public KillBatChallenge(Player player) {
@@ -35,22 +37,23 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 		getPlayer().teleport(getStartLocation());
 		getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
-		// TODO: spawn bats
-		// spawnBats();
-
 		sendTitle();
 		// No countdown, so start timer immediately after title:
 		KillBatChallenge kbc = this;
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 	        @Override
 	        public void run() {
-	        	if (!isChallengeCancelled()) timer = new TimerCountingDown(kbc, 30, false);
+	        	if (!isChallengeCancelled()) {
+	        		timer = new TimerCountingDown(kbc, 30, false);
+	        		spawnBats();
+	        	}
 	        }
 	    }, 70L);
 	}
 
+
 	public void endChallenge() {
-		// TODO: remove all bats
+		killBats();
 
 		// Timer stopped:
 		this.timer = null;
@@ -69,13 +72,34 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
     	
 		PlayerQuitEvent.getHandlerList().unregister(this);
 		EntityDeathEvent.getHandlerList().unregister(this);
-		PlayerDeathEvent.getHandlerList().unregister(this);
 	}
-	
+
 	public void sendTitle() {
 		this.getPlayer().sendTitle(ChatColor.YELLOW + "Kill Bats!", ChatColor.GOLD + "January Event", 5, 60, 5);
 	}
-
+	
+	
+	private void spawnBats() {
+		for (int i = -12; i < 13; i++) {
+			Location loc = getStartLocation().clone();
+			loc.setX(loc.getX() + (0.1*i));
+			loc.setY(loc.getY() + 2.5);
+			loc.setZ(loc.getZ() + (0.1*i));
+			
+			Bat bat = loc.getWorld().spawn(loc, Bat.class);
+			bat.setHealth(1);
+		}
+	}
+	
+	private void killBats() {
+		BoundingBox box = new BoundingBox(371, 150, -375, 384, 162, -363);
+		for (Entity ent : getStartLocation().getWorld().getNearbyEntities(box)) {
+			if (ent instanceof Bat) {
+				ent.teleport(ent.getLocation().add(0, -300, 0));
+			}
+		}
+		
+	}
 
 	@EventHandler
 	public void onLogoutWhileInChallenge(PlayerQuitEvent event) {
@@ -85,9 +109,8 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 				this.timer.stopTimer(true);
 				this.timer = null;
 			}
-			// TODO: remove all bats
+			killBats();
 		}
-
 	}
 
 	@EventHandler
@@ -97,20 +120,5 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 
 		event.getEntity().setCustomNameVisible(true);
 		event.getEntity().setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + "+1");
-	}
-	
-	@EventHandler
-	public void onPlayerDeath(PlayerDeathEvent event) {
-		if (this.getPlayer() == null) return;
-		if (event.getEntity().getName() == this.getPlayer().getName()) {
-			if (this.timer != null) {
-				this.timer.stopTimer(true);
-				this.timer = null;
-			}
-			setChallengeCancelled(true);
-            Main.plugin.setChallengeInUse(getChallengeType(), false);
-            Main.plugin.playersThatQuitDuringChallenge.add(getPlayer().getName());
-			this.getPlayer().sendMessage(ChatColor.GRAY + "Challenge failed! No points earned.");
-		}
 	}
 }

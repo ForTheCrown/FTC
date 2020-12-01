@@ -96,11 +96,16 @@ public class BigBootyEventCommand implements CommandExecutor {
                 return true;
             
             case "startloop":
-            	Main.plugin.runLoop = true;
-                Main.plugin.loop();
-                player.sendMessage(ChatColor.GRAY + "Present spawning loop has been started");
-                return true;
-
+            	if (Main.plugin.runLoop == true) {
+            		player.sendMessage(ChatColor.GRAY + "Loop is already running");
+            		return false;
+            	}
+            	else {
+            		Main.plugin.runLoop = true;
+                    Main.plugin.loop();
+                    player.sendMessage(ChatColor.GRAY + "Present spawning loop has been started");
+                    return true;
+            	}
             case "stoploop":
                 Main.plugin.stopLoop();
                 player.sendMessage(ChatColor.GRAY + "Present spawning loop has been stopped");

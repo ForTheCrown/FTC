@@ -4,8 +4,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Users/Wout/Desktop/Server/paper-274.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Wout/Desktop/Server/spigot-1.16.4.jar"/>
-	<classpathentry kind="lib" path="depends/paper-288.jar"/>
-	<classpathentry kind="lib" path="depends/spigot-1.16.4.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/paper-288"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/spigot-1.16.4"/>
 	<classpathentry kind="output" path="bin"/>

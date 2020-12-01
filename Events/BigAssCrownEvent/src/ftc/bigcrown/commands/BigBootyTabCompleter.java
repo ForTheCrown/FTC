@@ -24,9 +24,6 @@ public class BigBootyTabCompleter implements TabCompleter {
         if(args[0].contains("usechallenge") && args.length == 2){
             List<String> argsList = new ArrayList<>();
             argsList.add("RACE");
-            argsList.add("HALLOWEEN");
-            argsList.add("NETHER");
-            argsList.add("MAGMALOVANIA");
             argsList.add("PROTECT_HAROLD");
             argsList.add("PVE_ARENA");
             argsList.add("PINATA");

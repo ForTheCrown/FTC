@@ -55,6 +55,9 @@ public class Main extends JavaPlugin {
 		// Commands
 		getServer().getPluginCommand("BigBootyEvent").setExecutor(new BigBootyEventCommand());
 		getServer().getPluginCommand("BigBootyEvent").setTabCompleter(new BigBootyTabCompleter());
+		
+		runLoop = true;
+		loop();
 	}
 
 
@@ -76,7 +79,7 @@ public class Main extends JavaPlugin {
 				spawnPresent();
 				loop();
 			}
-		}, /*delay*20*60*/ 60);
+		}, 1*20*60); // Spawn one every 1 minute
 	}
 	
 	public void stopLoop(){
@@ -132,7 +135,7 @@ public class Main extends JavaPlugin {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
 			slime.remove();
 			spawnLoc.getBlock().setType(Material.AIR);
-		}, /*30*20*60*/ 585L); // It should get removed after 30 mins
+		}, 15*20*60); // It should get removed after 60 mins
 	}
 	
 
@@ -147,7 +150,7 @@ public class Main extends JavaPlugin {
 	}
 
 	// Creates an item.
-	public ItemStack makeItem(Material material, int amount, String name, String... loreStrings) {
+	public ItemStack makeItem(Material material, int amount, boolean hideFlags, String name, String... loreStrings) {
 		ItemStack result = new ItemStack(material, amount);
 		ItemMeta meta = result.getItemMeta();
 
@@ -157,8 +160,10 @@ public class Main extends JavaPlugin {
 			Collections.addAll(lore, loreStrings);
 			meta.setLore(lore);
 		}
-		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+		if (hideFlags) {
+			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+		}
 
 		result.setItemMeta(meta);
 		return result;

@@ -14,6 +14,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Zombie;
@@ -23,6 +24,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.BoundingBox;
 
 public class ProtectHaroldChallenge extends GenericChallenge {
@@ -62,7 +65,6 @@ public class ProtectHaroldChallenge extends GenericChallenge {
     }
 
 	public void endChallenge() {
-		setChallengeCancelled(true);
 		clearMobs();
 		
 		getPlayer().playSound(getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
@@ -72,6 +74,11 @@ public class ProtectHaroldChallenge extends GenericChallenge {
 		if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've protected Harold from " + score + " zombies!");
 		else getPlayer().sendMessage(ChatColor.YELLOW + "You've protected Harold from 1 zombie!");
 
+		// Add to crown scoreboard:
+    	Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
+    	Score crownScore = mainScoreboard.getObjective("crown").getScore(getPlayer().getName());
+    	crownScore.setScore(crownScore.getScore() + score);
+		
 		teleportBack();
 		
 		PlayerQuitEvent.getHandlerList().unregister(this);
@@ -111,7 +118,7 @@ public class ProtectHaroldChallenge extends GenericChallenge {
 
 	private void spawnZombies() {
 		for (Location loc : getZombieSpawnLocations()) {
-			Zombie zombie = Bukkit.getWorld("world").spawn(loc, Zombie.class);
+			Zombie zombie = getStartLocation().getWorld().spawn(loc, Zombie.class);
 			zombie.setLootTable(loot);
 			zombie.setPersistent(true);
 			zombie.setRemoveWhenFarAway(false);
@@ -136,15 +143,22 @@ public class ProtectHaroldChallenge extends GenericChallenge {
     
     
 	private Location[] getZombieSpawnLocations() {
+		World world = getStartLocation().getWorld();
 		Location[] locs = {
-				new Location(Bukkit.getWorld("world"), -46.5, 66, 879.5)
-				
+				new Location(world, -46.5, 66, 879.5),
+				new Location(world, -42.5, 66, 875.5),
+				new Location(world, -46.5, 66, 890.5),
+				new Location(world, -42.5, 66, 894.5),
+				new Location(world, -57.5, 66, 890.5),
+				new Location(world, -61.5, 66, 894.5),
+				new Location(world, -57.5, 66, 879.5),
+				new Location(world, -61.5, 66, 875.5)
 		};
 		return locs;
 	}
 
 	private void spawnHarold() {
-		Villager harold = Bukkit.getWorld("world").spawn(new Location(Bukkit.getWorld("world"), -51.5, 66, 881.5, -180, 0), Villager.class);
+		Villager harold = getStartLocation().getWorld().spawn(new Location(getStartLocation().getWorld(), -51.5, 66, 881.5, -180, 0), Villager.class);
 		harold.setGlowing(true);
 		harold.setLootTable(loot);
 		harold.setCustomName(ChatColor.YELLOW + "Harold");
@@ -155,12 +169,13 @@ public class ProtectHaroldChallenge extends GenericChallenge {
 
 	private void clearMobs() {
 		for (UUID uuid : zombies) {
+			((LivingEntity) Bukkit.getEntity(uuid)).setHealth(1);
 			Bukkit.getEntity(uuid).teleport(Bukkit.getEntity(uuid).getLocation().add(0, -300, 0));
 		}
 		
-		for (Entity entity : Bukkit.getWorld("world").getNearbyEntities(getArena())) {
+		for (Entity entity : getStartLocation().getWorld().getNearbyEntities(getArena())) {
 			if (entity.getType() == EntityType.ZOMBIE || entity.getType() == EntityType.ZOMBIE_VILLAGER || entity.getType() == EntityType.VILLAGER) {
-				entity.teleport(entity.getLocation().add(0, -300, 0));
+				entity.remove();
 			}
 		}
 		
@@ -187,8 +202,8 @@ public class ProtectHaroldChallenge extends GenericChallenge {
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		if (getPlayer() == null) return;
 		if (event.getEntity().getName() == getPlayer().getName()) {
-			event.setKeepLevel(true);
-			event.setKeepInventory(true);
+			//event.setKeepLevel(true);
+			//event.setKeepInventory(true);
 			event.setDeathMessage(getPlayer().getName() + " died trying to protect Harold.");
 			Main.plugin.setChallengeInUse(getChallengeType(), false);
 			endChallenge();
@@ -200,7 +215,6 @@ public class ProtectHaroldChallenge extends GenericChallenge {
     public void onLogoutWhileInChallenge(PlayerQuitEvent event) {
         if (getPlayer() == null) return;
     	if (event.getPlayer().getName() == getPlayer().getName()) {
-    		setChallengeCancelled(true);
     		endChallenge();
         }
     }

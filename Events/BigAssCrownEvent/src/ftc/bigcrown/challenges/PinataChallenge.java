@@ -19,7 +19,7 @@ public class PinataChallenge extends GenericChallenge implements Challenge, List
 
 	private TimerCountingDown timer;
     public boolean canDrop = true;
-    private Location startLocation = new Location(Bukkit.getWorld("world"), -4.5, 5, 37.5); // TODO
+    private Location startLocation = new Location(Bukkit.getWorld("world_void"), 349.5, 162, -289.5, -45, 0);
 
     public PinataChallenge(Player player) {
         super(player, ChallengeType.PINATA);
@@ -55,8 +55,17 @@ public class PinataChallenge extends GenericChallenge implements Challenge, List
 
 		// Amount of pinata hits:
 		int score = calculateScore();
-		if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've hit the Pinata " + score + " times!");
+		if (score == 0) {
+			getPlayer().sendMessage(ChatColor.GRAY + "You've hit the Pinata 0 times!");
+			getPlayer().sendMessage(ChatColor.YELLOW + "Who could hurt such a cutie??");
+			Score playerScore = getScoreboardObjective().getScore(getPlayer().getName());
+			playerScore.setScore(playerScore.getScore() + 10);
+			getPlayer().sendMessage(ChatColor.YELLOW + "You've earned 10 points for not hurting the Pinata.");
+		}
+		else if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've hit the Pinata " + score + " times!");
 		else getPlayer().sendMessage(ChatColor.YELLOW + "You've hit the Pinata 1 time!");
+		
+		
 
 		teleportBack();
 		EntityDamageByEntityEvent.getHandlerList().unregister(this);

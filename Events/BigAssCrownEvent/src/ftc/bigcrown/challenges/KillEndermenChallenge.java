@@ -20,7 +20,7 @@ import net.md_5.bungee.api.ChatColor;
 public class KillEndermenChallenge extends GenericChallenge implements Challenge, Listener {
 	
 	private TimerCountingDown timer;
-	private Location startLocation = new Location(Bukkit.getWorld("world"), -4.5, 5, 37.5); // TODO
+	private Location startLocation = new Location(Bukkit.getWorld("world_the_end"), 0.5, 62, -8.5, 0, 0);
 	
 	public KillEndermenChallenge(Player player) {
 		super(player, ChallengeType.ENDERMEN);
@@ -75,6 +75,7 @@ public class KillEndermenChallenge extends GenericChallenge implements Challenge
 	}
 
 	public void sendTitle() {
+		getPlayer().sendMessage(ChatColor.GRAY + "The score gets added at the end of the challenge, unless you died!");
 		getPlayer().sendTitle(ChatColor.YELLOW + "Kill Endermen!", ChatColor.GOLD + "January February May", 5, 60, 5);
 	}
 
@@ -109,7 +110,9 @@ public class KillEndermenChallenge extends GenericChallenge implements Challenge
 			}
 			setChallengeCancelled(true);
 			Main.plugin.setChallengeInUse(getChallengeType(), false);
-			getPlayer().sendMessage(ChatColor.GRAY + "Challenge failed! No points earned.");
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
+				getPlayer().sendMessage(ChatColor.GRAY + "Challenge failed! No points earned.");
+			}, 20);
 		}
 	}
 

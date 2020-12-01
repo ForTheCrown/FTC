@@ -18,6 +18,8 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -57,12 +59,12 @@ public class Events implements Listener {
             	List<ItemStack> items = new ArrayList<ItemStack>();
             	items.add(null);
             	
-            	items.add(Main.plugin.makeItem(Material.EMERALD, randomAmount, null));
-            	items.add(Main.plugin.makeItem(Material.SWEET_BERRIES, 1, null));
-            	items.add(Main.plugin.makeItem(Material.GOLD_NUGGET, randomAmount, null));
-            	items.add(Main.plugin.makeItem(Material.COOKED_CHICKEN, randomAmount, null));
-            	items.add(Main.plugin.makeItem(Material.SNOWBALL, 5, null));
-            	items.add(Main.plugin.makeItem(Material.SPRUCE_BOAT, 1, color + "Sleigh", archive));
+            	items.add(Main.plugin.makeItem(Material.EMERALD, randomAmount, false, null));
+            	items.add(Main.plugin.makeItem(Material.SWEET_BERRIES, 1, false, null));
+            	items.add(Main.plugin.makeItem(Material.GOLD_NUGGET, randomAmount, false, null));
+            	items.add(Main.plugin.makeItem(Material.COOKED_CHICKEN, randomAmount, false, null));
+            	items.add(Main.plugin.makeItem(Material.SNOWBALL, 5, false, null));
+            	items.add(Main.plugin.makeItem(Material.SPRUCE_BOAT, 1, false, color + "Sleigh", archive));
             	
             	itemToGive = items.get(Main.plugin.getRandomNumberInRange(0, items.size()-1));
             } 
@@ -71,11 +73,11 @@ public class Events implements Listener {
             else if (initialChance > 0.75 && initialChance <= 0.95) { 
             	List<ItemStack> items = new ArrayList<ItemStack>();
 
-            	items.add(Main.plugin.makeItem(Material.GOLD_INGOT, randomAmount, null));
-            	items.add(Main.plugin.makeItem(Material.GOLD_NUGGET, 1, ChatColor.YELLOW + "Rhines", ChatColor.GOLD + "Worth 1000 rhines", ChatColor.DARK_GRAY + "Right click to add to your balance.")); // Rhines
-            	items.add(Main.plugin.makeItem(Material.DIAMOND, 1, null));
-            	items.add(Main.plugin.makeItem(Material.BELL, 1, color + "Jingle Bell", archive));
-            	items.add(Main.plugin.makeItem(Material.TOTEM_OF_UNDYING, 1, color + "Baby Jesus", archive));
+            	items.add(Main.plugin.makeItem(Material.GOLD_INGOT, randomAmount, false, null));
+            	items.add(Main.plugin.makeItem(Material.GOLD_NUGGET, 1, false, ChatColor.YELLOW + "Rhines", ChatColor.GOLD + "Worth 1000 rhines", ChatColor.DARK_GRAY + "Right click to add to your balance.")); // Rhines
+            	items.add(Main.plugin.makeItem(Material.DIAMOND, 1, false, null));
+            	items.add(Main.plugin.makeItem(Material.BELL, 1, false, color + "Jingle Bell", archive));
+            	items.add(Main.plugin.makeItem(Material.TOTEM_OF_UNDYING, 1, false, color + "Baby Jesus", archive));
             	
             	itemToGive = items.get(Main.plugin.getRandomNumberInRange(0, items.size()-1));
             }
@@ -84,10 +86,10 @@ public class Events implements Listener {
             else { 
             	List<ItemStack> items = new ArrayList<ItemStack>();
             	
-            	items.add(Main.plugin.makeItem(Material.CHARCOAL, 1, color + "Great grandmother who couldn't be here", archive));
-            	items.add(Main.plugin.makeItem(Material.SPRUCE_SAPLING, 1, color + "Christmas Tree", archive));
+            	items.add(Main.plugin.makeItem(Material.CHARCOAL, 1, false, color + "Great grandmother who couldn't be here", archive));
+            	items.add(Main.plugin.makeItem(Material.SPRUCE_SAPLING, 1, false, color + "Christmas Tree", archive));
             	
-            	items.add(Main.plugin.makeItem(Material.ACACIA_BOAT, 1, null)); // Gems
+            	items.add(Main.plugin.makeItem(Material.ACACIA_BOAT, 1, false, null)); // Gems
             	itemToGive = items.get(Main.plugin.getRandomNumberInRange(0, items.size()-1));
             }
 
@@ -115,6 +117,10 @@ public class Events implements Listener {
 
         slime.getLocation().getBlock().setType(Material.AIR);
         slime.remove();
+        
+    	Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
+    	Score crownScore = mainScoreboard.getObjective("crown").getScore(player.getName());
+    	crownScore.setScore(crownScore.getScore() + 1);
     }
     
 	@EventHandler

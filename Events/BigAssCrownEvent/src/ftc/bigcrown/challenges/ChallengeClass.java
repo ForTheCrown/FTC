@@ -38,21 +38,23 @@ public class ChallengeClass implements Listener {
         challenge = chalList.get(randomChal);
 
         enterChallenge();
+        Main.plugin.setChallengeInUse(challenge, true);
     }
 
     //used by /bbe usechallenge to test them
     public void enterChallenge() {
     	switch (challenge) { 
         case RACE:
-        	player.sendMessage(ChatColor.GRAY + "You've found a race ticket!");
+        	player.sendMessage(ChatColor.GRAY + "You've found a " + ChatColor.YELLOW + "/race" + ChatColor.GRAY + " ticket!");
     		
-    		ItemStack ticket = Main.plugin.makeItem(Material.MOJANG_BANNER_PATTERN, 1, ChatColor.YELLOW + "Race Ticket", 
+    		ItemStack ticket = Main.plugin.makeItem(Material.MOJANG_BANNER_PATTERN, 1, false, ChatColor.YELLOW + "Race Ticket", 
     				ChatColor.GOLD + "Hold this in your hand and click the Start!",
     				ChatColor.GOLD + "villager to start a Race!",
     				ChatColor.GRAY + "You can do /race to go there, Good luck!");
     		
     		Item ticketItem = player.getLocation().getWorld().dropItem(player.getLocation(), ticket);
     		ticketItem.setVelocity(new Vector(0, 0.2, 0));
+    		Main.plugin.setChallengeInUse(challenge, false);
             break;
         case PINATA:
         	PinataChallenge pC = new PinataChallenge(player);
@@ -60,7 +62,7 @@ public class ChallengeClass implements Listener {
             break;
         case ENDERMEN:
             KillEndermenChallenge kbe = new KillEndermenChallenge(player);
-            Main.plugin.getServer().getPluginManager().registerEvents(kbe, Main.plugin); //TODO registering events needs to change, now it's registering per player -> no bueno
+            Main.plugin.getServer().getPluginManager().registerEvents(kbe, Main.plugin); 
             break;
         case HUNT_BATS:
             KillBatChallenge kbc = new KillBatChallenge(player);

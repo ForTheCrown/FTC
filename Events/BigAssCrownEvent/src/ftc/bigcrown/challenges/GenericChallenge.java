@@ -14,6 +14,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -143,14 +146,18 @@ public class GenericChallenge implements Listener {
     // But in the challenge subclasses, we still need to properly clean challenges, such as kill bats.
     // (Put a delay on it to make sure other events get executed first)
     @EventHandler
-    public void onLogoutWhileInChallenge(PlayerQuitEvent event) {
+    public void onLogoutWhileInChallengeGeneric(PlayerQuitEvent event) {
         if (getPlayer() == null) return;
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
-        	if (event.getPlayer().getName() == getPlayer().getName()) {
-                setChallengeCancelled(true);
-                Main.plugin.setChallengeInUse(getChallengeType(), false);
-                Main.plugin.playersThatQuitDuringChallenge.add(getPlayer().getName());
-            }
-        }, 5);
+        if (event.getPlayer().getName() == getPlayer().getName()) {
+	        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
+	            setChallengeCancelled(true);
+	            Main.plugin.setChallengeInUse(getChallengeType(), false);
+	            Main.plugin.playersThatQuitDuringChallenge.add(getPlayer().getName());
+	        }, 5);
+        }
+		PlayerQuitEvent.getHandlerList().unregister(this);
+		EntityDeathEvent.getHandlerList().unregister(this);
+		PlayerDeathEvent.getHandlerList().unregister(this);
+		EntityDamageByEntityEvent.getHandlerList().unregister(this);
     }
 }

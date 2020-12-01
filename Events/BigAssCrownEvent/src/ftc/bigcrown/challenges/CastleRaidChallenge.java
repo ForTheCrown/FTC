@@ -40,7 +40,7 @@ import net.md_5.bungee.api.ChatColor;
 public class CastleRaidChallenge extends GenericChallenge implements Challenge, Listener {
 	
 
-	private Location startLocation = new Location(Bukkit.getWorld("world"), -4.5, 5, 37.5); // TODO
+	private Location startLocation = new Location(Bukkit.getWorld("world_void"), 464.5, 160, -295.5);
 	
 	private boolean raidHappening = false;
 	private boolean startedRaid = false;
@@ -135,6 +135,9 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 				capturePointBossBar.removeAll();
 			}
 			resetAll();
+			PlayerQuitEvent.getHandlerList().unregister(this);
+			EntityDeathEvent.getHandlerList().unregister(this);
+			PlayerDeathEvent.getHandlerList().unregister(this);
 		}
 
 	}
@@ -145,10 +148,7 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		if (event.getEntity().getName() == getPlayer().getName()) {
 			setChallengeCancelled(true);
 			Main.plugin.setChallengeInUse(getChallengeType(), false);
-			if (capturePointBossBar != null) {
-				capturePointBossBar.setVisible(false);
-				capturePointBossBar.removeAll();
-			}
+			endChallenge();
 			resetAll();
 		}
 	}
@@ -218,31 +218,34 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		
 	}
 	
-
+	private Location getNewLoc(Location loc) {
+		Location result = loc;
+		result.setWorld(Bukkit.getWorld("world_void"));
+		result.setX((result.getX() - 744) * (-1));
+		result.setY(result.getY() + 92);
+		result.setZ((result.getZ() - 808) * (-1));
+		return result;
+	}
+	
+	
 	private void startWave1() {
 		if (!(raidwave.isEmpty())) return;
 		// Wave 1
     	Set<Location> locs = new HashSet<Location>();
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 274.5, 68, 1121.5));
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 267.5, 69, 1112.5));
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 269.5, 68, 1092.5));
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 289.5, 68, 1094.5));
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 290.5, 69, 1111.5));
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 291.5, 69, 1131.5));
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1137.5));
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1131.5));
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 289.5, 76, 1136.5));
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 273.5, 75, 1083.5));
-//	        	locs.add(new Location(Bukkit.getWorld("world"), 289.5, 77, 1080.5));
-    	
-    	// TODO update locs
-    	locs.add(new Location(Bukkit.getWorld("world"), -32.5, 18, -6.5));
-    	locs.add(new Location(Bukkit.getWorld("world"), -48.5, 18, -6.5));
-    	locs.add(new Location(Bukkit.getWorld("world"), -32.5, 18, 11.5));
-    	locs.add(new Location(Bukkit.getWorld("world"), -48.5, 18, 11.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 274.5, 68, 1121.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 267.5, 69, 1112.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 269.5, 68, 1092.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 289.5, 68, 1094.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 290.5, 69, 1111.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 291.5, 69, 1131.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1137.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1131.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 289.5, 76, 1136.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 273.5, 75, 1083.5));
+    	locs.add(new Location(Bukkit.getWorld("world"), 289.5, 77, 1080.5));
     	
     	for (Location spawnLocation : locs) {
-    		Vindicator vindi = spawnLocation.getWorld().spawn(spawnLocation, Vindicator.class);
+    		Vindicator vindi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Vindicator.class);
     		addCustomStuffToVindicator(vindi);
     		raidwave.add(vindi);
     	}
@@ -255,43 +258,37 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 			@Override
 	        public void run() {
 	        	Set<Location> locsv = new HashSet<Location>();
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 274.5, 68, 1121.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 267.5, 69, 1112.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 68, 1092.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 68, 1094.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 290.5, 69, 1111.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 291.5, 69, 1131.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1137.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1131.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 273.5, 75, 1083.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 77, 1080.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 274.5, 68, 1121.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 267.5, 69, 1112.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 68, 1092.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 68, 1094.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 290.5, 69, 1111.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 291.5, 69, 1131.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1137.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1131.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 273.5, 75, 1083.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 77, 1080.5));
 	        	
 	        	Set<Location> locsp = new HashSet<Location>();
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 68, 1094.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 69, 1083.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 293.5, 69, 1083.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 295.5, 69, 1093.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 282.5, 69, 1118.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 284.5, 69, 1128.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 288.5, 81, 1124.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 261.5, 81, 1110.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 261.5, 81, 1096.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 289.5, 83, 1078.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 298.5, 83, 1116.5));
-	        	
-	        	// TODO update locs
-	        	locsv.add(new Location(Bukkit.getWorld("world"), -32.5, 18, -6.5));
-	        	locsp.add(new Location(Bukkit.getWorld("world"), -48.5, 18, -6.5));
-	        	locsv.add(new Location(Bukkit.getWorld("world"), -32.5, 18, 11.5));
-	        	locsp.add(new Location(Bukkit.getWorld("world"), -48.5, 18, 11.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 68, 1094.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 69, 1083.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 293.5, 69, 1083.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 295.5, 69, 1093.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 282.5, 69, 1118.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 284.5, 69, 1128.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 288.5, 81, 1124.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 261.5, 81, 1110.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 261.5, 81, 1096.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 289.5, 83, 1078.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 298.5, 83, 1116.5));
 				
 	        	for (Location spawnLocation : locsv) {
-	        		Vindicator vindi = spawnLocation.getWorld().spawn(spawnLocation, Vindicator.class);
+	        		Vindicator vindi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Vindicator.class);
 	        		addCustomStuffToVindicator(vindi);
 	        		raidwave2.add(vindi);
 	        	}
 	        	for (Location spawnLocation : locsp) {
-	        		Pillager pilli = spawnLocation.getWorld().spawn(spawnLocation, Pillager.class);
+	        		Pillager pilli = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Pillager.class);
 	        		addCustomStuffToPillager(pilli);
 	        		raidwave2.add(pilli);
 	        	}
@@ -306,59 +303,52 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 			@Override
 	        public void run() {
 	        	Set<Location> locsv = new HashSet<Location>();
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 274.5, 68, 1121.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 267.5, 69, 1112.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 68, 1092.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 68, 1094.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1131.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 76, 1136.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 273.5, 75, 1083.5));
-//	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 77, 1080.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 274.5, 68, 1121.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 267.5, 69, 1112.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 68, 1092.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 68, 1094.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1131.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 76, 1136.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 273.5, 75, 1083.5));
+	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 77, 1080.5));
 	        	
 	        	Set<Location> locsp = new HashSet<Location>();
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 68, 1094.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 69, 1083.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 293.5, 69, 1083.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 295.5, 69, 1093.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 282.5, 69, 1118.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 284.5, 69, 1128.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 294.5, 69, 1119.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 268.5, 74, 1134.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 289.5, 83, 1078.5));
-//	        	locsp.add(new Location(Bukkit.getWorld("world"), 298.5, 83, 1116.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 68, 1094.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 69, 1083.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 293.5, 69, 1083.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 295.5, 69, 1093.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 282.5, 69, 1118.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 284.5, 69, 1128.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 294.5, 69, 1119.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 268.5, 74, 1134.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 289.5, 83, 1078.5));
+	        	locsp.add(new Location(Bukkit.getWorld("world"), 298.5, 83, 1116.5));
 	        	
 	        	Set<Location> locsr = new HashSet<Location>();
-//	        	locsr.add(new Location(Bukkit.getWorld("world"), 277.5, 74, 1130.5));
-//	        	locsr.add(new Location(Bukkit.getWorld("world"), 266.5, 70, 1089.5));
-//	        	locsr.add(new Location(Bukkit.getWorld("world"), 273.5, 69, 1134.5));
+	        	locsr.add(new Location(Bukkit.getWorld("world"), 277.5, 74, 1130.5));
+	        	locsr.add(new Location(Bukkit.getWorld("world"), 266.5, 70, 1089.5));
+	        	locsr.add(new Location(Bukkit.getWorld("world"), 273.5, 69, 1134.5));
 	        	
 	        	Set<Location> locse = new HashSet<Location>();
-//	        	locse.add(new Location(Bukkit.getWorld("world"), 290.5, 69, 1104.5));
-//	        	locse.add(new Location(Bukkit.getWorld("world"), 292.5, 70, 1081.5));
-//	        	locse.add(new Location(Bukkit.getWorld("world"), 295.5, 69, 1081.5));
-//	        	locse.add(new Location(Bukkit.getWorld("world"), 293.5, 75, 1128.5));
-	        	
-	        	// TODO update locs
-	        	locsv.add(new Location(Bukkit.getWorld("world"), -32.5, 18, -6.5));
-	        	locsp.add(new Location(Bukkit.getWorld("world"), -48.5, 18, -6.5));
-	        	locsr.add(new Location(Bukkit.getWorld("world"), -32.5, 18, 11.5));
-	        	locse.add(new Location(Bukkit.getWorld("world"), -48.5, 18, 11.5));
-	        	
-	        	
+	        	locse.add(new Location(Bukkit.getWorld("world"), 290.5, 69, 1104.5));
+	        	locse.add(new Location(Bukkit.getWorld("world"), 292.5, 70, 1081.5));
+	        	locse.add(new Location(Bukkit.getWorld("world"), 295.5, 69, 1081.5));
+	        	locse.add(new Location(Bukkit.getWorld("world"), 293.5, 75, 1128.5));
+	        		
 				
 	        	for (Location spawnLocation : locsv) {
-	        		Vindicator vindi = spawnLocation.getWorld().spawn(spawnLocation, Vindicator.class);
+	        		Vindicator vindi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Vindicator.class);
 	        		addCustomStuffToVindicator(vindi);
 	        		raidwave3.add(vindi);
 	        	}
 	        	for (Location spawnLocation : locsp) {
-	        		Pillager pilli = spawnLocation.getWorld().spawn(spawnLocation, Pillager.class);
+	        		Pillager pilli = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Pillager.class);
 	        		addCustomStuffToPillager(pilli);
 	        		
 	        		raidwave3.add(pilli);
 	        	}
 	        	for (Location spawnLocation : locsr) {
-	        		Ravager ravi = spawnLocation.getWorld().spawn(spawnLocation, Ravager.class);
+	        		Ravager ravi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Ravager.class);
 	        		ravi.setLootTable(loot);
 	        		ravi.setRemoveWhenFarAway(false);
 	        		ravi.setPersistent(true);
@@ -366,7 +356,7 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 	        		raidwave3.add(ravi);
 	        	}
 	        	for (Location spawnLocation : locse) {
-	        		Evoker evoki = spawnLocation.getWorld().spawn(spawnLocation, Evoker.class);
+	        		Evoker evoki = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Evoker.class);
 	        		evoki.setPatrolLeader(false);
 	        		evoki.setLootTable(loot);
 	        		evoki.setRemoveWhenFarAway(false);

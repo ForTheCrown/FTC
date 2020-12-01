@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component jdk="JavaSE-1.8" jdk_type="JavaSDK">
-	<exclude-output/>
-	<contentEntry url="file://$MODULE_DIR$"/>
-	<levels>
-		<level name="paper-288" value="project"/>
-		<level name="spigot-1.16.4" value="project"/>
-	</levels>
-</component>
