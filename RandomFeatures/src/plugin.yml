@@ -1,7 +1,7 @@
 name: RandomFeatures
 version: 2.0
-author: Wout
-main: me.wout.RandomFeatures.Main
+author: Wout, Ants
+main: ftc.randomfeatures.Main
 description: Plugin with random custom features used on FTC.
 api-version: 1.16
 

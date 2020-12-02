@@ -1,5 +1,6 @@
-package me.wout.RandomFeatures.commands;
+package ftc.randomfeatures.commands;
 
+import ftc.randomfeatures.Main;
 import org.bukkit.command.CommandExecutor;
 
 import java.util.List;
@@ -11,9 +12,27 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import me.wout.RandomFeatures.Main;
 
 public class Grave implements CommandExecutor{
+
+	/*
+	 * ----------------------------------------
+	 * 			Command description:
+	 * ----------------------------------------
+	 * Returns any lost Royal or Pirate items to the player after their death
+	 *
+	 *
+	 * Valid usages of command:
+	 * - /grave
+	 *
+	 * Permissions used:
+	 * - NONE
+	 *
+	 * Referenced other classes:
+	 * - Main: Main.plugin
+	 *
+	 * Author: Wout
+	 */
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

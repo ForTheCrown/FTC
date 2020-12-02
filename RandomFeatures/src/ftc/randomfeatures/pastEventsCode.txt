@@ -1,0 +1,273 @@
+
+	// -----
+
+	/*public String getRegionWorld() {
+		return getConfig().getString("RegionWorld");
+	}*/
+
+	/*public List<String> getOtherWorlds() {
+		return (List<String>) getConfig().getStringList("OtherWorlds");
+	}*/
+
+
+	// MOTHERBAT
+	/*@EventHandler
+	public void onEntityDeath(EntityDeathEvent event)
+	{
+		if(event.getEntity() instanceof Bat) {
+	    	Bat mother = (Bat) event.getEntity();
+	    	if (mother.isCustomNameVisible()) {
+	    		for (int i = 0;i<5;i++)
+	    			mother.getWorld().spawnEntity(mother.getLocation(), EntityType.BAT);
+	    	}
+	     }
+	}
+	*/
+
+	// ITEM-RIGHTCLICK ADDS SCORE
+	/*@EventHandler
+	public void onPlayerClick(PlayerInteractEvent event) {
+		Player player = (Player) event.getPlayer();
+
+		if (player.getInventory().getItemInMainHand().getType() == Material.getMaterial(getConfig().getString("Item"))) {
+			ItemStack handItem = player.getInventory().getItemInMainHand();
+			int amount = handItem.getAmount();
+
+			if (handItem.getEnchantments().containsKey(Enchantment.CHANNELING)) {
+				Objective scoreboardobj = player.getScoreboard().getObjective(DisplaySlot.PLAYER_LIST);
+				if (!scoreboardobj.getName().equalsIgnoreCase(getConfig().getString("Scoreboard"))) {
+					player.sendMessage(ChatColor.RED + "[" + ChatColor.GOLD + "FTC" + ChatColor.RED + "]" + ChatColor.RESET + " You can't do this at this moment!");
+					return;
+				}
+
+				@SuppressWarnings("deprecation")
+				Score score = scoreboardobj.getScore(player);
+				score.setScore(score.getScore() + amount);
+
+				handItem.setAmount(0);
+				if (amount == 1) player.sendMessage(ChatColor.GOLD + "[FTC]" + ChatColor.RESET + " Added " + ChatColor.YELLOW + "1" + ChatColor.RESET + " point to your score!");
+				else player.sendMessage(ChatColor.GOLD + "[FTC]" + ChatColor.RESET + " Added " + ChatColor.YELLOW + amount + ChatColor.RESET + " points to your score!");
+			}
+		}
+	}*/
+
+
+	// PINATA
+	/*private boolean canDrop = true;
+	@EventHandler
+	public void onPlayerHitPinata(EntityDamageByEntityEvent event) {
+		if (event.getEntity() instanceof Husk && event.getDamager() instanceof Player) {
+            Husk husk = (Husk) event.getEntity();
+            Player player = (Player) event.getDamager();
+
+            if (husk.getCustomName() != null && husk.getCustomName().contains(ChatColor.YELLOW + "$$$")) {
+            	Objective scoreboardobj = player.getScoreboard().getObjective(DisplaySlot.PLAYER_LIST);
+				if (!scoreboardobj.getName().equalsIgnoreCase(getConfig().getString("Scoreboard"))) {
+					//player.sendMessage(ChatColor.RED + "[" + ChatColor.GOLD + "FTC" + ChatColor.RED + "]" + ChatColor.RESET + " You can't do this at this moment!");
+					return;
+				}
+				@SuppressWarnings("deprecation")
+				Score score = scoreboardobj.getScore(player);
+				score.setScore(score.getScore() + 1);
+				player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2f, 1.0f);
+
+				if (canDrop == false) return;
+
+				double random = Math.random();
+				if (random < 0.33) {
+					Item gold = player.getWorld().dropItem(husk.getLocation(), new ItemStack(Material.GOLD_INGOT));
+					gold.setVelocity(new Vector(0, 0.2, 0));
+				}
+				else if (random > 0.85) {
+					Item diamond = player.getWorld().dropItem(husk.getLocation(), new ItemStack(Material.DIAMOND));
+					diamond.setVelocity(new Vector(0, 0.2, 0));
+				}
+				else return;
+
+				this.canDrop = false;
+				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			        @Override
+			        public void run() {
+			        	canDrop = true;
+			        }
+			    }, 100L);
+            }
+        }
+	}*/
+
+
+
+	// PINATA HAROLD TP
+	/*private Set<Player> teleportingPlayers = new HashSet<Player>();
+
+	@EventHandler
+	public void onPlayerClick(PlayerInteractEntityEvent event) {
+		if(!event.getHand().equals(EquipmentSlot.HAND))
+			return;
+		Player player = (Player) event.getPlayer();
+		if (event.getRightClicked().getType() == EntityType.VILLAGER) {
+			if (event.getRightClicked().getName().contains(ChatColor.GOLD + "Harold")) {
+				if (teleportingPlayers.contains(player)) return;
+				teleportingPlayers.add(player);
+				player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 200, 4));
+				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			        @Override
+			        public void run() {
+			        	player.teleport(new Location(Bukkit.getWorld("world"), -66.5d, 75d, 900.5d, 90f, 0f));
+			        	player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.5f, 1f);
+			        	teleportingPlayers.remove(player);
+			        }
+			    }, 120L);
+			}
+		}
+	}*/
+
+	// ENDER WEEK
+	/*private Set<UUID> endermenCD = new HashSet<UUID>();
+
+	@EventHandler
+	public void onEntityDeath(EntityDeathEvent event)
+	{
+		if (event.getEntity().getKiller() == null) return;
+
+		Objective scoreboardobj = event.getEntity().getKiller().getScoreboard().getObjective(DisplaySlot.PLAYER_LIST);
+		if (!scoreboardobj.getName().equalsIgnoreCase(getConfig().getString("Scoreboard"))) {
+			return;
+		}
+		@SuppressWarnings("deprecation")
+		Score score = scoreboardobj.getScore(event.getEntity().getKiller());
+
+		if(event.getEntity().getType() == EntityType.ENDERMAN) {
+			event.getEntity().setCustomNameVisible(true);
+			event.getEntity().setCustomName(ChatColor.LIGHT_PURPLE + "+1 Point");
+			score.setScore(score.getScore() + 1);
+			endermenCD.remove(event.getEntity().getUniqueId());
+	    }
+		else if (event.getEntity().getType() == EntityType.ENDERMITE) {
+			event.getEntity().setCustomNameVisible(true);
+			event.getEntity().setCustomName(ChatColor.LIGHT_PURPLE + "+5 Points");
+			score.setScore(score.getScore() + 5);
+		}
+		else if (event.getEntity().getType() == EntityType.SHULKER) {
+			event.getEntity().setCustomNameVisible(true);
+			event.getEntity().setCustomName(ChatColor.LIGHT_PURPLE + "+15 Points");
+			score.setScore(score.getScore() + 15);
+		}
+		else if (event.getEntity().getType() == EntityType.ENDER_DRAGON) {
+			score.setScore(score.getScore() + 500);
+		}
+	}
+
+	@EventHandler
+	public void onEndermanTeleport(EntityTeleportEvent event) {
+		if (event.getEntityType() == EntityType.ENDERMAN && !endermenCD.contains(event.getEntity().getUniqueId())) {
+			event.getEntity().getWorld().spawn(event.getFrom(), Endermite.class);
+			endermenCD.add(event.getEntity().getUniqueId());
+		}
+	}*/
+
+	// HAROLD PROTECTING
+	/*int killcounter = 0;
+
+	@EventHandler
+	public void onEntityDeath(EntityDeathEvent event)
+	{
+		// HAROLD DIED
+		if (event.getEntity().getType() == EntityType.VILLAGER && event.getEntity().isGlowing()) {
+			killcounter = 0;
+		}
+
+		if (event.getEntity().getKiller() == null) return;
+
+		// ENTITY IS ZOMBIE / HUSK WITH BUTTON ON HEAD
+		if (event.getEntity().getType() == EntityType.ZOMBIE || event.getEntity().getType() == EntityType.HUSK) {
+			if (event.getEntity().getEquipment().getHelmet().getType() != Material.STONE_BUTTON) {
+				return;
+			}
+			Objective scoreboardobj = event.getEntity().getKiller().getScoreboard().getObjective(DisplaySlot.PLAYER_LIST);
+			if (!scoreboardobj.getName().equalsIgnoreCase(getConfig().getString("Scoreboard"))) {
+				return;
+			}
+			@SuppressWarnings("deprecation")
+			Score score = scoreboardobj.getScore(event.getEntity().getKiller());
+
+			event.getEntity().setCustomNameVisible(true);
+			event.getEntity().setCustomName(ChatColor.GOLD + "+1 Point");
+			killcounter++;
+
+			if (killcounter % 10 == 0) {
+				event.getEntity().getKiller().sendMessage(ChatColor.GRAY + "You've killed " + killcounter + " enemies in this run.");
+				double chance = Math.random();
+				if (chance > 0.8) {
+					Bukkit.dispatchCommand(this.getServer().getConsoleSender(), "crate givekey " + event.getEntity().getKiller().getName() + " crate1 1");
+				}
+			}
+
+			if (killcounter > score.getScore()) {
+				score.setScore(killcounter);
+			}
+
+	    }
+
+	}*/
+
+	// Harold old-heads to new-heads
+	/*@SuppressWarnings("deprecation")
+	@EventHandler
+	public void onPlayerClick(PlayerInteractEntityEvent event) {
+		if(!event.getHand().equals(EquipmentSlot.HAND))
+			return;
+
+		if (event.getRightClicked().getType() == EntityType.VILLAGER)
+		{
+			if (event.getRightClicked().getName().contains(ChatColor.GOLD + "Harold"))
+			{
+				Player player = (Player) event.getPlayer();
+				ItemStack itemInHand = player.getInventory().getItemInMainHand();
+				if (itemInHand != null && itemInHand.getType() == Material.PLAYER_HEAD && itemInHand.hasItemMeta() && itemInHand.getItemMeta().getDisplayName().contains(ChatColor.YELLOW + "" + ChatColor.BOLD))
+				{
+					String itemInHandName = itemInHand.getItemMeta().getDisplayName().split(" Head")[0];
+					ItemStack bestMatchingItem = null;
+					int minDistance = 999;
+					Set<Location> headChestLocs = new HashSet<Location>();
+					for (int i = 0; i < 4; i++)
+					{
+						Location chestloc = new Location(Bukkit.getWorld("world"), 208, 61, 1001+i);
+						headChestLocs.add(chestloc);
+					}
+
+
+					for (Location loc : headChestLocs)
+					{
+						for (int slot = 0; slot < 27; slot++)
+						{
+							ItemStack chosenItem = ((Chest) loc.getWorld().getBlockAt(loc).getState()).getInventory().getContents()[slot];
+
+							if (chosenItem != null && chosenItem.hasItemMeta() && chosenItem.getType() == Material.PLAYER_HEAD)
+							{
+								if (StringUtils.getLevenshteinDistance(itemInHandName, ((SkullMeta) chosenItem.getItemMeta()).getOwner()) < minDistance)
+								{
+									//Bukkit.broadcastMessage(((SkullMeta) chosenItem.getItemMeta()).getOwner() + " - " + StringUtils.getLevenshteinDistance(itemInHandName, ((SkullMeta) chosenItem.getItemMeta()).getOwner()));
+									bestMatchingItem = chosenItem.clone();
+									minDistance = StringUtils.getLevenshteinDistance(itemInHandName, ((SkullMeta) chosenItem.getItemMeta()).getOwner());
+								}
+							}
+						}
+					}
+					if (minDistance > 4)
+					{
+						player.sendMessage(ChatColor.GRAY + "No matching head found :(");
+						return;
+					}
+					int amount = itemInHand.getAmount();
+					itemInHand.setAmount(0);
+					for (int i = amount; i != 0; i--)
+					{
+						player.getInventory().addItem(bestMatchingItem);
+					}
+					player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1f, 1f);
+					this.getServer().getConsoleSender().sendMessage(player.getName() + " gave " + amount + " " + itemInHandName + ChatColor.RESET + " to Harold, and received " + bestMatchingItem.getItemMeta().getDisplayName() + ChatColor.RESET + ".");
+				}
+			}
+		}
+	}*/

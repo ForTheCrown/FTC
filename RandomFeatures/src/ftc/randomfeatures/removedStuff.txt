@@ -1,4 +1,4 @@
-package me.wout.RandomFeatures;
+package ftc.randomfeatures;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+
+import ftc.randomfeatures.commands.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -44,16 +46,10 @@ import org.bukkit.plugin.java.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import me.wout.RandomFeatures.commands.ChristmasGift;
-import me.wout.RandomFeatures.commands.Crowntop;
-import me.wout.RandomFeatures.commands.Deathtop;
-import me.wout.RandomFeatures.commands.Grave;
-import me.wout.RandomFeatures.commands.wild;
-
 public class Main extends JavaPlugin implements Listener {
-	
+
 	public static Main plugin;
-	
+
 	//public BossBar capturePointHealth;
 	public int state = 0;
 	//public Capture cap;
@@ -64,16 +60,16 @@ public class Main extends JavaPlugin implements Listener {
 	//public Set<LivingEntity> raidwave2 = new HashSet<LivingEntity>();
 	//public Set<LivingEntity> raidwave3 = new HashSet<LivingEntity>();
 	private boolean hasFrozenAll = false;
-	
+
 	public File graves;
 	public YamlConfiguration gravesyaml;
-	
+
 	public void onEnable() {
 		plugin = this;
-		
+
 		getConfig().options().copyDefaults(true);
 		saveDefaultConfig();
-		
+
 		// Commands + Events
 		//plugin.getCommand("capture").setExecutor(this);
 		//plugin.getCommand("capturing").setExecutor(this);
@@ -83,26 +79,26 @@ public class Main extends JavaPlugin implements Listener {
 		//getServer().getPluginCommand("aahelp").setExecutor(this);
 		getServer().getPluginCommand("wild").setExecutor(new wild());
 		getServer().getPluginCommand("christmasgift").setExecutor(new ChristmasGift());
-		
+
 		getServer().getPluginManager().registerEvents(this, this);
-		
+
 		// Check datafolder.
 		File dir = getDataFolder();
 		if (!dir.exists())
 			if (!dir.mkdir())
 				System.out.println("Could not create directory for plugin: " + getDescription().getName());
-		
+
 	}
-	
+
 	// -----
-	
-	
+
+
 	public void onDisable() {
 		loadFiles();
 		saveyaml(gravesyaml, graves);
 		unloadFiles();
 	}
-	
+
 	public void loadFiles() {
 		graves = new File(getDataFolder(), "GravesData.yml");
 		if(!graves.exists()){
@@ -117,13 +113,13 @@ public class Main extends JavaPlugin implements Listener {
         	gravesyaml = YamlConfiguration.loadConfiguration(graves);
         }
 	}
-	
+
 	public void unloadFiles() {
 		saveyaml(gravesyaml, graves);
 		gravesyaml = null;
 		graves = null;
 	}
-	
+
 	private void saveyaml(YamlConfiguration yaml, File file) {
 		try {
 			yaml.save(file);
@@ -131,9 +127,9 @@ public class Main extends JavaPlugin implements Listener {
 			e.printStackTrace();
 		}
 	}
-	
+
 	// -----
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("aaconfig")) {
@@ -144,23 +140,23 @@ public class Main extends JavaPlugin implements Listener {
 				sender.sendMessage(ChatColor.RED + "You don't have permission to do this!");
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	/*public String getRegionWorld() {
 		return getConfig().getString("RegionWorld");
 	}*/
-	
+
 	/*public List<String> getOtherWorlds() {
 		return (List<String>) getConfig().getStringList("OtherWorlds");
 	}*/
-	
-	
+
+
 	// MOTHERBAT
 	/*@EventHandler
 	public void onEntityDeath(EntityDeathEvent event)
-	{             
+	{
 		if(event.getEntity() instanceof Bat) {
 	    	Bat mother = (Bat) event.getEntity();
 	    	if (mother.isCustomNameVisible()) {
@@ -170,7 +166,7 @@ public class Main extends JavaPlugin implements Listener {
 	     }
 	}
 	*/
-	
+
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		loadFiles();
@@ -178,10 +174,10 @@ public class Main extends JavaPlugin implements Listener {
 			event.getPlayer().sendMessage(ChatColor.GRAY + "[FTC] You have royal items in your " + ChatColor.YELLOW + "/grave" + ChatColor.GRAY + ".");
 		}
 		unloadFiles();
-		
+
 		if (!hasFrozenAll)
 		{
-			for (World world : Bukkit.getServer().getWorlds()) 
+			for (World world : Bukkit.getServer().getWorlds())
 			{
 				for (Entity e : world.getEntities())
 					if (e.getType() == EntityType.VILLAGER && e.isInvulnerable()) ((Villager) e).setCollidable(false);
@@ -190,7 +186,7 @@ public class Main extends JavaPlugin implements Listener {
 			Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "!" + ChatColor.RESET + " Tried freezing all villagers");
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		loadFiles();
@@ -199,11 +195,11 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		unloadFiles();
 	}
-	
+
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = (Player) event.getEntity();
-		
+
 		// Find royal tools
 		List<ItemStack> graveitems = new ArrayList<ItemStack>();
 		for (ItemStack item : player.getInventory().getContents()) {
@@ -214,14 +210,14 @@ public class Main extends JavaPlugin implements Listener {
 				}
 			}
 		}
-		
+
 		// Add to file or existing grave if found.
 		if (!graveitems.isEmpty()) {
 			loadFiles();
 			if (gravesyaml.getList(player.getUniqueId().toString()) == null) {
 				gravesyaml.createSection(player.getUniqueId().toString());
 				gravesyaml.set(player.getUniqueId().toString(), graveitems);
-				
+
 			}
 			else {
 				@SuppressWarnings("unchecked")
@@ -233,40 +229,40 @@ public class Main extends JavaPlugin implements Listener {
 			}
 			unloadFiles();
 		}
-		
-		
+
+
 	}
 
-	
-	
+
+
 	// ITEM-RIGHTCLICK ADDS SCORE
 	/*@EventHandler
 	public void onPlayerClick(PlayerInteractEvent event) {
 		Player player = (Player) event.getPlayer();
-		
+
 		if (player.getInventory().getItemInMainHand().getType() == Material.getMaterial(getConfig().getString("Item"))) {
 			ItemStack handItem = player.getInventory().getItemInMainHand();
 			int amount = handItem.getAmount();
-			
+
 			if (handItem.getEnchantments().containsKey(Enchantment.CHANNELING)) {
 				Objective scoreboardobj = player.getScoreboard().getObjective(DisplaySlot.PLAYER_LIST);
 				if (!scoreboardobj.getName().equalsIgnoreCase(getConfig().getString("Scoreboard"))) {
 					player.sendMessage(ChatColor.RED + "[" + ChatColor.GOLD + "FTC" + ChatColor.RED + "]" + ChatColor.RESET + " You can't do this at this moment!");
 					return;
 				}
-				
+
 				@SuppressWarnings("deprecation")
 				Score score = scoreboardobj.getScore(player);
 				score.setScore(score.getScore() + amount);
-				
+
 				handItem.setAmount(0);
 				if (amount == 1) player.sendMessage(ChatColor.GOLD + "[FTC]" + ChatColor.RESET + " Added " + ChatColor.YELLOW + "1" + ChatColor.RESET + " point to your score!");
 				else player.sendMessage(ChatColor.GOLD + "[FTC]" + ChatColor.RESET + " Added " + ChatColor.YELLOW + amount + ChatColor.RESET + " points to your score!");
 			}
 		}
 	}*/
-	
-	
+
+
 	// PINATA
 	/*private boolean canDrop = true;
 	@EventHandler
@@ -274,7 +270,7 @@ public class Main extends JavaPlugin implements Listener {
 		if (event.getEntity() instanceof Husk && event.getDamager() instanceof Player) {
             Husk husk = (Husk) event.getEntity();
             Player player = (Player) event.getDamager();
-            
+
             if (husk.getCustomName() != null && husk.getCustomName().contains(ChatColor.YELLOW + "$$$")) {
             	Objective scoreboardobj = player.getScoreboard().getObjective(DisplaySlot.PLAYER_LIST);
 				if (!scoreboardobj.getName().equalsIgnoreCase(getConfig().getString("Scoreboard"))) {
@@ -285,9 +281,9 @@ public class Main extends JavaPlugin implements Listener {
 				Score score = scoreboardobj.getScore(player);
 				score.setScore(score.getScore() + 1);
 				player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2f, 1.0f);
-				
+
 				if (canDrop == false) return;
-				
+
 				double random = Math.random();
 				if (random < 0.33) {
 					Item gold = player.getWorld().dropItem(husk.getLocation(), new ItemStack(Material.GOLD_INGOT));
@@ -298,7 +294,7 @@ public class Main extends JavaPlugin implements Listener {
 					diamond.setVelocity(new Vector(0, 0.2, 0));
 				}
 				else return;
-				
+
 				this.canDrop = false;
 				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			        @Override
@@ -309,12 +305,12 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
 	}*/
-	
-	
-	
+
+
+
 	// PINATA HAROLD TP
 	/*private Set<Player> teleportingPlayers = new HashSet<Player>();
-	
+
 	@EventHandler
 	public void onPlayerClick(PlayerInteractEntityEvent event) {
 		if(!event.getHand().equals(EquipmentSlot.HAND))
@@ -336,22 +332,22 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}
 	}*/
-	
+
 	// ENDER WEEK
 	/*private Set<UUID> endermenCD = new HashSet<UUID>();
-	
+
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event)
-	{       
+	{
 		if (event.getEntity().getKiller() == null) return;
-		
+
 		Objective scoreboardobj = event.getEntity().getKiller().getScoreboard().getObjective(DisplaySlot.PLAYER_LIST);
 		if (!scoreboardobj.getName().equalsIgnoreCase(getConfig().getString("Scoreboard"))) {
 			return;
 		}
 		@SuppressWarnings("deprecation")
 		Score score = scoreboardobj.getScore(event.getEntity().getKiller());
-		
+
 		if(event.getEntity().getType() == EntityType.ENDERMAN) {
 			event.getEntity().setCustomNameVisible(true);
 			event.getEntity().setCustomName(ChatColor.LIGHT_PURPLE + "+1 Point");
@@ -366,13 +362,13 @@ public class Main extends JavaPlugin implements Listener {
 		else if (event.getEntity().getType() == EntityType.SHULKER) {
 			event.getEntity().setCustomNameVisible(true);
 			event.getEntity().setCustomName(ChatColor.LIGHT_PURPLE + "+15 Points");
-			score.setScore(score.getScore() + 15);	
+			score.setScore(score.getScore() + 15);
 		}
 		else if (event.getEntity().getType() == EntityType.ENDER_DRAGON) {
 			score.setScore(score.getScore() + 500);
 		}
 	}
-		
+
 	@EventHandler
 	public void onEndermanTeleport(EntityTeleportEvent event) {
 		if (event.getEntityType() == EntityType.ENDERMAN && !endermenCD.contains(event.getEntity().getUniqueId())) {
@@ -383,17 +379,17 @@ public class Main extends JavaPlugin implements Listener {
 
 	// HAROLD PROTECTING
 	/*int killcounter = 0;
-	
+
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event)
-	{       
+	{
 		// HAROLD DIED
 		if (event.getEntity().getType() == EntityType.VILLAGER && event.getEntity().isGlowing()) {
 			killcounter = 0;
 		}
-		
+
 		if (event.getEntity().getKiller() == null) return;
-		
+
 		// ENTITY IS ZOMBIE / HUSK WITH BUTTON ON HEAD
 		if (event.getEntity().getType() == EntityType.ZOMBIE || event.getEntity().getType() == EntityType.HUSK) {
 			if (event.getEntity().getEquipment().getHelmet().getType() != Material.STONE_BUTTON) {
@@ -405,11 +401,11 @@ public class Main extends JavaPlugin implements Listener {
 			}
 			@SuppressWarnings("deprecation")
 			Score score = scoreboardobj.getScore(event.getEntity().getKiller());
-			
+
 			event.getEntity().setCustomNameVisible(true);
 			event.getEntity().setCustomName(ChatColor.GOLD + "+1 Point");
 			killcounter++;
-			
+
 			if (killcounter % 10 == 0) {
 				event.getEntity().getKiller().sendMessage(ChatColor.GRAY + "You've killed " + killcounter + " enemies in this run.");
 				double chance = Math.random();
@@ -417,15 +413,15 @@ public class Main extends JavaPlugin implements Listener {
 					Bukkit.dispatchCommand(this.getServer().getConsoleSender(), "crate givekey " + event.getEntity().getKiller().getName() + " crate1 1");
 				}
 			}
-			
+
 			if (killcounter > score.getScore()) {
 				score.setScore(killcounter);
 			}
-			
+
 	    }
-		
+
 	}*/
-	
+
 	// Harold old-heads to new-heads
 	/*@SuppressWarnings("deprecation")
 	@EventHandler
@@ -433,34 +429,34 @@ public class Main extends JavaPlugin implements Listener {
 		if(!event.getHand().equals(EquipmentSlot.HAND))
 			return;
 
-		if (event.getRightClicked().getType() == EntityType.VILLAGER) 
+		if (event.getRightClicked().getType() == EntityType.VILLAGER)
 		{
-			if (event.getRightClicked().getName().contains(ChatColor.GOLD + "Harold")) 
+			if (event.getRightClicked().getName().contains(ChatColor.GOLD + "Harold"))
 			{
 				Player player = (Player) event.getPlayer();
 				ItemStack itemInHand = player.getInventory().getItemInMainHand();
-				if (itemInHand != null && itemInHand.getType() == Material.PLAYER_HEAD && itemInHand.hasItemMeta() && itemInHand.getItemMeta().getDisplayName().contains(ChatColor.YELLOW + "" + ChatColor.BOLD)) 
+				if (itemInHand != null && itemInHand.getType() == Material.PLAYER_HEAD && itemInHand.hasItemMeta() && itemInHand.getItemMeta().getDisplayName().contains(ChatColor.YELLOW + "" + ChatColor.BOLD))
 				{
 					String itemInHandName = itemInHand.getItemMeta().getDisplayName().split(" Head")[0];
 					ItemStack bestMatchingItem = null;
 					int minDistance = 999;
 					Set<Location> headChestLocs = new HashSet<Location>();
-					for (int i = 0; i < 4; i++) 
+					for (int i = 0; i < 4; i++)
 					{
 						Location chestloc = new Location(Bukkit.getWorld("world"), 208, 61, 1001+i);
 						headChestLocs.add(chestloc);
 					}
-					
-					
-					for (Location loc : headChestLocs) 
+
+
+					for (Location loc : headChestLocs)
 					{
 						for (int slot = 0; slot < 27; slot++)
 						{
 							ItemStack chosenItem = ((Chest) loc.getWorld().getBlockAt(loc).getState()).getInventory().getContents()[slot];
-							
-							if (chosenItem != null && chosenItem.hasItemMeta() && chosenItem.getType() == Material.PLAYER_HEAD) 
+
+							if (chosenItem != null && chosenItem.hasItemMeta() && chosenItem.getType() == Material.PLAYER_HEAD)
 							{
-								if (StringUtils.getLevenshteinDistance(itemInHandName, ((SkullMeta) chosenItem.getItemMeta()).getOwner()) < minDistance) 
+								if (StringUtils.getLevenshteinDistance(itemInHandName, ((SkullMeta) chosenItem.getItemMeta()).getOwner()) < minDistance)
 								{
 									//Bukkit.broadcastMessage(((SkullMeta) chosenItem.getItemMeta()).getOwner() + " - " + StringUtils.getLevenshteinDistance(itemInHandName, ((SkullMeta) chosenItem.getItemMeta()).getOwner()));
 									bestMatchingItem = chosenItem.clone();
@@ -486,9 +482,9 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}
 	}*/
-	
+
 	//199 66 958
-	
+
 	@EventHandler
 	public void onPlayerClick(PlayerInteractEntityEvent event) {
 		if(!event.getHand().equals(EquipmentSlot.HAND))
@@ -499,7 +495,7 @@ public class Main extends JavaPlugin implements Listener {
 				if (item != null
 						&& item.hasItemMeta()
 						&& item.getItemMeta().hasLore()
-						&& item.getItemMeta().getLore().get(0).contains("Right click harold with this item in your hand...")) 
+						&& item.getItemMeta().getLore().get(0).contains("Right click harold with this item in your hand..."))
 				{
 					Chest chest = (Chest) event.getRightClicked().getWorld().getBlockAt(new Location(event.getRightClicked().getWorld(), 199, 66, 958)).getState();
 					event.getRightClicked().getWorld().dropItem(event.getPlayer().getLocation(), chest.getInventory().getItem(0));
@@ -510,12 +506,12 @@ public class Main extends JavaPlugin implements Listener {
 				else {
 					event.getPlayer().sendMessage(ChatColor.GRAY + "You need to hold a Halloween Ticket.");
 				}
-				
+
 			}
 		}
 	}
-	
-	
+
+
 	@EventHandler
 	public void test(EntityPortalEnterEvent event)
 	{
@@ -531,54 +527,54 @@ public class Main extends JavaPlugin implements Listener {
 					event.getEntity().teleport(new Location(Bukkit.getWorld("world"), 200.5, 70, 1000.5));
 				}
 			}
-			else 
+			else
 			{
 				event.getEntity().teleport(new Location(Bukkit.getWorld("world"), 282.0, 72, 948.0));
 			}
 		}
-		else 
+		else
 		{
 			// Wildportals
 			Location locs[] = {new Location(Bukkit.getWorld("world"), 181, 67, 1000), new Location(Bukkit.getWorld("world"), 269, 62, 1014)};
-			
-			for (Location loc : locs) 
+
+			for (Location loc : locs)
 			{
 				try {
 					if (loc.distance(event.getEntity().getLocation()) > 3) continue;
 				} catch (Exception e) {
 					continue;
 				}
-				
+
 				if (!(event.getEntity() instanceof Player))
 					return;
-				
+
 				Player player = (Player) event.getEntity();
-				 
+
 				if(player != null) {
 					int x = 0;
 					if (Math.random() < 0.5)
 						x = getRandomNumberInRange(200, 4800);
-					else 
+					else
 						x = getRandomNumberInRange(-4800, -200);
-					
+
 					int z = 0;
 					if (Math.random() < 0.5)
 						z = getRandomNumberInRange(200, 4800);
-					else 
+					else
 						z = getRandomNumberInRange(-4800, -200);
-					
+
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 400, 1));
 					player.teleport(new Location(player.getWorld(), x, 150, z));
-					
+
 					player.setBedSpawnLocation(new Location(player.getWorld(), 200, 70, 1000), true);
 					player.sendMessage(ChatColor.GRAY + "You've been teleported. To get back to spawn, you can do " + ChatColor.YELLOW + "/findpost" + ChatColor.GRAY + " and then " + ChatColor.YELLOW + "/visit hazelguard" + ChatColor.GRAY + ".");
 					break;
-				} 
+				}
 			}
 		}
-		
+
 	}
-	
+
 	private static int getRandomNumberInRange(int min, int max) {
 		if (min >= max) {
 			return 0;
@@ -586,10 +582,10 @@ public class Main extends JavaPlugin implements Listener {
 		Random r = new Random();
 		return r.nextInt((max - min) + 1) + min;
 	}
-	
-	
+
+
 	/*@EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent event) 
+    public void onPlayerChat(AsyncPlayerChatEvent event)
 	{
 		if (event.getPlayer().hasPermission("ftc.donator3"))
 		{
@@ -611,33 +607,33 @@ public class Main extends JavaPlugin implements Listener {
 			return;
 		}
 	}*/
-	
+
 	Set<UUID> eggs = new HashSet<>();
-	
+
 	@EventHandler
 	public void smokeBomb(PlayerInteractEvent event) {
 		if (event.getHand() != EquipmentSlot.HAND) return;
 		if (event.getPlayer().getInventory().getItemInMainHand() == null) return;
-		
-		if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) 
+
+		if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)
 		{
 			ItemStack itemInMainHand = event.getPlayer().getInventory().getItemInMainHand();
 			if (itemInMainHand.getType() == Material.FIREWORK_STAR && itemInMainHand.getItemMeta().getDisplayName().contains(ChatColor.GRAY + "Smoke Bomb"))
 			{
 				if (event.getPlayer().hasCooldown(Material.FIREWORK_STAR)) return;
-				
+
 				if (event.getPlayer().getGameMode() != GameMode.CREATIVE && event.getPlayer().getGameMode() != GameMode.SPECTATOR) itemInMainHand.setAmount(itemInMainHand.getAmount()-1);
 				Egg egg = (Egg) event.getPlayer().launchProjectile(Egg.class);
 				egg.playEffect(EntityEffect.TOTEM_RESURRECT);
 				egg.setCustomName(ChatColor.GRAY + "Boom!");
 				eggs.add(egg.getUniqueId());
 				eggSmoke();
-				
+
 				event.getPlayer().setCooldown(Material.FIREWORK_STAR, 200);
 			}
 		}
 	}
-	
+
 	private void eggSmoke() {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 	        @Override
@@ -657,24 +653,24 @@ public class Main extends JavaPlugin implements Listener {
 	        }
 	    }, 3);
 	}
-	
+
 	@EventHandler
 	public void smokeBomb(PlayerEggThrowEvent event) {
 		if (event.getEgg().getCustomName() != null && event.getEgg().getCustomName().contains(ChatColor.GRAY + "Boom!")) {
 			event.setHatching(false);
 		}
 	}
-	
+
 	@EventHandler
 	public void smokeBomb(ProjectileHitEvent event) {
-		if (event.getEntity() instanceof Egg && event.getEntity().getCustomName() != null && event.getEntity().getCustomName().contains(ChatColor.GRAY + "Boom!")) 
+		if (event.getEntity() instanceof Egg && event.getEntity().getCustomName() != null && event.getEntity().getCustomName().contains(ChatColor.GRAY + "Boom!"))
 		{
 			eggs.remove(event.getEntity().getUniqueId());
 			//execute at Wout run particle minecraft:campfire_signal_smoke ~ ~1.6 ~ 0.15 0.05 0.15 0 10 force
 			Location loc = event.getEntity().getLocation();
 			loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1);
 			loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc.getX(), loc.getY()+1, loc.getZ(), 10, 1, 1, 1, 0);
-			
+
 			double x = loc.getBlockX();
 			double y = loc.getBlockY();
 			double z = loc.getBlockZ();
@@ -685,8 +681,8 @@ public class Main extends JavaPlugin implements Listener {
 					}
 				}
 			}
-			
+
 		}
 	}
-	
+
 }

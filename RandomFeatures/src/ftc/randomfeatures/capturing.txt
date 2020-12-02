@@ -1,4 +1,4 @@
-package me.wout.RandomFeatures.commands;
+package ftc.randomfeatures.commands;
 
 import org.bukkit.command.CommandExecutor;
 
@@ -16,13 +16,13 @@ public class Capturing implements CommandExecutor, Listener {
 	private boolean lock = false;
 	private String playername = "Notch";
 	*/
-	
+
 //	public Capturing(main plugin, Location loc) {
 //		//this.loc = loc;
 //		//this.plugin = plugin;
 //		//plugin.getCommand("capturing").setExecutor(this);
 //	}
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
@@ -31,7 +31,7 @@ public class Capturing implements CommandExecutor, Listener {
 			return false;
 		}
 		lock = !lock;
-		
+
 		if (plugin.capturePointHealth == null) {
 			plugin.state = 0;
 			return false;
@@ -40,7 +40,7 @@ public class Capturing implements CommandExecutor, Listener {
 		doUntilState0();*/
 		return true;
 	}
-	
+
 	/*private void doUntilState0() {
 		boolean currentlock = lock;
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -51,7 +51,7 @@ public class Capturing implements CommandExecutor, Listener {
 	    			plugin.state = 0;
 	    			return;
 	    		}
-	    		
+
 	    		nearbyEntites = (List<Entity>) loc.getWorld().getNearbyEntities(loc, 0.6, 2, 0.6);
 	    		List<Entity> nearbyPlayers = new ArrayList<Entity>();
 	    		for (Entity ent : nearbyEntites) {
@@ -60,7 +60,7 @@ public class Capturing implements CommandExecutor, Listener {
 	    			}
 	    		}
 	    		String name = "";
-	    		
+
 	    		// Set correct state.
 	    		if (nearbyPlayers.size() != 1) {
 	    			plugin.state = 2;
@@ -74,7 +74,7 @@ public class Capturing implements CommandExecutor, Listener {
 	    		else {
 	    			plugin.state = 2;
 	    		}
-	    		
+
 	    		List<Entity> nearbyEntites2 = (List<Entity>) loc.getWorld().getNearbyEntities(loc, 60, 80, 60);
 	    		// Do action based on state.
 	    		if (plugin.state == 1) {
@@ -88,18 +88,18 @@ public class Capturing implements CommandExecutor, Listener {
 	    					startEvent(name, nearbyEntites2);
 	    				}
 	    			}
-	    			
-	    		} 
+
+	    		}
 	    		else if (plugin.state == 2) {
 	    			loseHealth(plugin.capturePointHealth, 0.006);
 	    		}
 	    		else if (plugin.state == 3) {
 	    			loseHealth(plugin.capturePointHealth, 0.015);
-	    		} 
+	    		}
 	    		else {
 	    			return;
 	    		}
-	    		
+
 	    		for (Entity ent : nearbyEntites2) {
 	    			if (ent != null && ent instanceof Player && plugin.capturePointHealth != null) {
 	    				plugin.capturePointHealth.addPlayer((Player) ent);
@@ -108,9 +108,9 @@ public class Capturing implements CommandExecutor, Listener {
     			doUntilState0();
 	        }
 	    }, 5l);
-		
-		
-		
+
+
+
 	}
 
 	protected void startEvent(String playername, List<Entity> nearbyEntites2) {
@@ -121,13 +121,13 @@ public class Capturing implements CommandExecutor, Listener {
 			return;
 		}
 		itemInHand.setAmount(itemInHand.getAmount()-1);
-		
+
 		for (int i = 0; i < nearbyEntites2.size(); i++) {
 			if (nearbyEntites2.get(i) != null && nearbyEntites2.get(i) instanceof Player) {
 				((Player) nearbyEntites2.get(i)).playSound(((Player) nearbyEntites2.get(i)).getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 1.3f);
-			} 
+			}
 		}
-		
+
 		plugin.busy = true;
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 	        @Override
@@ -141,7 +141,7 @@ public class Capturing implements CommandExecutor, Listener {
 	    }, 50l);
 		startWave1();
 	}
-	
+
 	private void startWave3() {
 		if (!(plugin.raidwave3.isEmpty())) return;
 		// Wave 3
@@ -158,7 +158,7 @@ public class Capturing implements CommandExecutor, Listener {
 	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 76, 1136.5));
 	        	locsv.add(new Location(Bukkit.getWorld("world"), 273.5, 75, 1083.5));
 	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 77, 1080.5));
-	        	
+
 	        	Set<Location> locsp = new HashSet<Location>();
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 68, 1094.5));
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 69, 1083.5));
@@ -170,35 +170,35 @@ public class Capturing implements CommandExecutor, Listener {
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 268.5, 74, 1134.5));
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 289.5, 83, 1078.5));
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 298.5, 83, 1116.5));
-	        	
+
 	        	Set<Location> locsr = new HashSet<Location>();
 	        	locsr.add(new Location(Bukkit.getWorld("world"), 277.5, 74, 1130.5));
 	        	locsr.add(new Location(Bukkit.getWorld("world"), 266.5, 70, 1089.5));
 	        	locsr.add(new Location(Bukkit.getWorld("world"), 273.5, 69, 1134.5));
-	        	
+
 	        	Set<Location> locse = new HashSet<Location>();
 	        	locse.add(new Location(Bukkit.getWorld("world"), 290.5, 69, 1104.5));
 	        	locse.add(new Location(Bukkit.getWorld("world"), 292.5, 70, 1081.5));
 	        	locse.add(new Location(Bukkit.getWorld("world"), 295.5, 69, 1081.5));
 	        	locse.add(new Location(Bukkit.getWorld("world"), 293.5, 75, 1128.5));
-	        	
+
 	        	LootTable loot = new LootTable() {
-					
+
 					@Override
 					public NamespacedKey getKey() {
 						return new NamespacedKey(plugin, "woutvoid");
 					}
-					
+
 					@Override
 					public Collection<ItemStack> populateLoot(Random arg0, LootContext arg1) {
 						return null;
 					}
-					
+
 					@Override
 					public void fillInventory(Inventory arg0, Random arg1, LootContext arg2) {
 					}
 				};
-				
+
 	        	for (Location spawnLocation : locsv) {
 	        		Vindicator vindi = spawnLocation.getWorld().spawn(spawnLocation, Vindicator.class);
 	        		vindi.setPatrolLeader(false);
@@ -207,16 +207,16 @@ public class Capturing implements CommandExecutor, Listener {
 	        		vindi.getEquipment().setItemInMainHandDropChance(0f);
 	        		vindi.setRemoveWhenFarAway(false);
 	        		vindi.setPersistent(true);
-	        		
+
 	        		Attributable att = (Attributable) vindi;
-	        		
+
 	        		AttributeInstance maxHealth = att.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 	        		maxHealth.setBaseValue(40);
 	        		vindi.setHealth(40);
-	        		
+
 	        		AttributeInstance knockBackRes = att.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 	        		knockBackRes.setBaseValue(0.7f);
-	        		
+
 	        		plugin.raidwave3.add(vindi);
 	        	}
 	        	for (Location spawnLocation : locsp) {
@@ -227,13 +227,13 @@ public class Capturing implements CommandExecutor, Listener {
 	        		pilli.getEquipment().setItemInMainHandDropChance(0f);
 	        		pilli.setRemoveWhenFarAway(false);
 	        		pilli.setPersistent(true);
-	        		
+
 	        		Attributable att = (Attributable) pilli;
-	        		
+
 	        		AttributeInstance maxHealth = att.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 	        		maxHealth.setBaseValue(30);
 	        		pilli.setHealth(30);
-	        		
+
 	        		plugin.raidwave3.add(pilli);
 	        	}
 	        	for (Location spawnLocation : locsr) {
@@ -241,7 +241,7 @@ public class Capturing implements CommandExecutor, Listener {
 	        		ravi.setLootTable(loot);
 	        		ravi.setRemoveWhenFarAway(false);
 	        		ravi.setPersistent(true);
-	        		
+
 	        		plugin.raidwave3.add(ravi);
 	        	}
 	        	for (Location spawnLocation : locse) {
@@ -250,19 +250,19 @@ public class Capturing implements CommandExecutor, Listener {
 	        		evoki.setLootTable(loot);
 	        		evoki.setRemoveWhenFarAway(false);
 	        		evoki.setPersistent(true);
-	        		
+
 	        		Attributable att = (Attributable) evoki;
 	        		AttributeInstance maxHealth = att.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 	        		maxHealth.setBaseValue(40);
 	        		evoki.setHealth(40);
-	        		
+
 	        		plugin.raidwave3.add(evoki);
 	        	}
 	        }
 	    }, 50l);
-		
+
 	}
-	
+
 	private void startWave2() {
 		if (!(plugin.raidwave2.isEmpty())) return;
 		// Wave 2
@@ -281,7 +281,7 @@ public class Capturing implements CommandExecutor, Listener {
 	        	locsv.add(new Location(Bukkit.getWorld("world"), 269.5, 69, 1131.5));
 	        	locsv.add(new Location(Bukkit.getWorld("world"), 273.5, 75, 1083.5));
 	        	locsv.add(new Location(Bukkit.getWorld("world"), 289.5, 77, 1080.5));
-	        	
+
 	        	Set<Location> locsp = new HashSet<Location>();
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 68, 1094.5));
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 277.5, 69, 1083.5));
@@ -294,24 +294,24 @@ public class Capturing implements CommandExecutor, Listener {
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 261.5, 81, 1096.5));
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 289.5, 83, 1078.5));
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 298.5, 83, 1116.5));
-	        	
+
 	        	LootTable loot = new LootTable() {
-					
+
 					@Override
 					public NamespacedKey getKey() {
 						return new NamespacedKey(plugin, "woutvoid");
 					}
-					
+
 					@Override
 					public Collection<ItemStack> populateLoot(Random arg0, LootContext arg1) {
 						return null;
 					}
-					
+
 					@Override
 					public void fillInventory(Inventory arg0, Random arg1, LootContext arg2) {
 					}
 				};
-				
+
 	        	for (Location spawnLocation : locsv) {
 	        		Vindicator vindi = spawnLocation.getWorld().spawn(spawnLocation, Vindicator.class);
 	        		vindi.setPatrolLeader(false);
@@ -320,21 +320,21 @@ public class Capturing implements CommandExecutor, Listener {
 	        		vindi.getEquipment().setItemInMainHandDropChance(0f);
 	        		vindi.setRemoveWhenFarAway(false);
 	        		vindi.setPersistent(true);
-	        		
+
 	        		Attributable att = (Attributable) vindi;
-	        		
+
 	        		AttributeInstance maxHealth = att.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 	        		maxHealth.setBaseValue(40);
 	        		vindi.setHealth(40);
-	        		
+
 	        		AttributeInstance knockBackRes = att.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 	        		knockBackRes.setBaseValue(0.7f);
-	        		
-	        		
+
+
 	        		/*PotionEffect potion = new PotionEffect(PotionEffectType.INVISIBILITY, 9999, 0, false, false);
 	        		potion.apply((LivingEntity) vindi);
-	        		
-	        		
+
+
 	        		plugin.raidwave2.add(vindi);
 	        	}
 	        	for (Location spawnLocation : locsp) {
@@ -345,19 +345,19 @@ public class Capturing implements CommandExecutor, Listener {
 	        		pilli.getEquipment().setItemInMainHandDropChance(0f);
 	        		pilli.setRemoveWhenFarAway(false);
 	        		pilli.setPersistent(true);
-	        		
+
 	        		Attributable att = (Attributable) pilli;
-	        		
+
 	        		AttributeInstance maxHealth = att.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 	        		maxHealth.setBaseValue(30);
 	        		pilli.setHealth(30);
-	        		
+
 	        		plugin.raidwave2.add(pilli);
 	        	}
 	        }
 	    }, 50l);
 	}
-	
+
 
 	private void startWave1() {
 		if (!(plugin.raidwave.isEmpty())) return;
@@ -378,24 +378,24 @@ public class Capturing implements CommandExecutor, Listener {
 	        	locs.add(new Location(Bukkit.getWorld("world"), 289.5, 76, 1136.5));
 	        	locs.add(new Location(Bukkit.getWorld("world"), 273.5, 75, 1083.5));
 	        	locs.add(new Location(Bukkit.getWorld("world"), 289.5, 77, 1080.5));
-	        	
+
 	        	LootTable loot = new LootTable() {
-					
+
 					@Override
 					public NamespacedKey getKey() {
 						return new NamespacedKey(plugin, "woutvoid");
 					}
-					
+
 					@Override
 					public Collection<ItemStack> populateLoot(Random arg0, LootContext arg1) {
 						return null;
 					}
-					
+
 					@Override
 					public void fillInventory(Inventory arg0, Random arg1, LootContext arg2) {
 					}
 				};
-	        	
+
 	        	for (Location spawnLocation : locs) {
 	        		Vindicator vindi = spawnLocation.getWorld().spawn(spawnLocation, Vindicator.class);
 	        		vindi.setPatrolLeader(false);
@@ -404,31 +404,31 @@ public class Capturing implements CommandExecutor, Listener {
 	        		vindi.getEquipment().setItemInMainHandDropChance(0f);
 	        		vindi.setRemoveWhenFarAway(false);
 	        		vindi.setPersistent(true);
-	        		
+
 	        		Attributable att = (Attributable) vindi;
-	        		
+
 	        		AttributeInstance maxHealth = att.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 	        		maxHealth.setBaseValue(40);
 	        		vindi.setHealth(40);
-	        		
+
 	        		AttributeInstance knockBackRes = att.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 	        		knockBackRes.setBaseValue(0.8f);
-	        		
+
 	        		/*PotionEffect potion = new PotionEffect(PotionEffectType.INVISIBILITY, 9999, 0, false, false);
 	        		potion.apply((LivingEntity) vindi);
-	        		
-	        		
+
+
 	        		plugin.raidwave.add(vindi);
 	        	}
 	        }
 	    }, 50l);
 	}
-	
+
 	int wavecount = 0;
-	
+
 	@EventHandler
 	public void playerKillRaidMob(EntityDeathEvent event) {
-		if (plugin.raidwave.contains(event.getEntity())) {	
+		if (plugin.raidwave.contains(event.getEntity())) {
 			double random = Math.random();
 			if (random < 0.45) {
 				Item emerald = event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), new ItemStack(Material.EMERALD, 3));
@@ -492,7 +492,7 @@ public class Capturing implements CommandExecutor, Listener {
 			}
 		}
 	}
-	
+
 	/*@EventHandler
 	public void onPlayerDeath2(PlayerDeathEvent event) {
 		Player player = (Player) event.getEntity();
@@ -511,11 +511,11 @@ public class Capturing implements CommandExecutor, Listener {
 			int pointslost = (score.getScore() - (int) (score.getScore() * 0.9));
 			score.setScore(score.getScore() - pointslost);
 			player.sendMessage(ChatColor.RED + "[FTC]" + ChatColor.GRAY + " You've lost " + pointslost + " points because you died here!");
-			
+
 			if (player.getKiller() != null && player.getKiller() != player) {
 				@SuppressWarnings("deprecation")
 				Score killerscore = scoreboardobj.getScore(player.getKiller());
-				
+
 				if (killerscore.getScore() < 50) {
 					player.getKiller().sendMessage(ChatColor.YELLOW + "[FTC]" + ChatColor.GRAY + " You've gained some of their points! (" + pointslost + " + 10)");
 					killerscore.setScore(((int) (killerscore.getScore() + pointslost + 10)));
@@ -524,13 +524,13 @@ public class Capturing implements CommandExecutor, Listener {
 					player.getKiller().sendMessage(ChatColor.YELLOW + "[FTC]" + ChatColor.GRAY + " You've gained some of their points! (" + pointslost + ")");
 					killerscore.setScore(((int) (killerscore.getScore() + pointslost)));
 				}
-				
+
 			}
-			
+
 		}
-			
+
 	}*/
-	
+
 
 	//private void doStuff(EntityDeathEvent event, Set<LivingEntity> raidwave) {
 		// OTHERS
@@ -542,7 +542,7 @@ public class Capturing implements CommandExecutor, Listener {
         		potion.apply(ent);
         	}
     	}
-    	
+
     	// CHECK REQUIREMENTS
 		/*if (!(event.getEntity().getKiller() instanceof Player)) return;
 		Player player = (Player) event.getEntity().getKiller();
@@ -551,7 +551,7 @@ public class Capturing implements CommandExecutor, Listener {
 			player.sendMessage(ChatColor.RED + "[" + ChatColor.GOLD + "FTC" + ChatColor.RED + "]" + ChatColor.RESET + " You can't do this at this moment!");
 			return;
 		}
-		
+
 		// ADDSCORE (3 or 1)
 		@SuppressWarnings("deprecation")
 		Score score = scoreboardobj.getScore(player);
@@ -566,9 +566,9 @@ public class Capturing implements CommandExecutor, Listener {
 			        	score.setScore(score.getScore() + 1);
 			        }
 			    }, 4l * i);
-				
+
 			}
-    	} 
+    	}
     	else {
     		event.getEntity().setCustomName(ChatColor.YELLOW + "Kill: " + ChatColor.BOLD + "+1");
 			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -601,13 +601,13 @@ public class Capturing implements CommandExecutor, Listener {
     	catch (IllegalArgumentException ignored) {
     		plugin.capturePointHealth.setProgress(0);
     	}
-    	
+
     	if (plugin.capturePointHealth.getProgress() <= 0) {
 			if (plugin.capturePointHealth != null ) {
 				plugin.capturePointHealth.setVisible(false);
 				plugin.capturePointHealth.removeAll();
 				plugin.capturePointHealth = null;
-				
+
 				if (plugin.state == 2) {
 					plugin.state = 0;
 					wavecount = 0;

@@ -1,4 +1,4 @@
-package me.wout.RandomFeatures.commands;
+package ftc.randomfeatures.commands;
 
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.Bukkit;
@@ -12,7 +12,6 @@ import org.bukkit.util.Vector;
 
 import net.md_5.bungee.api.ChatColor;
 
-//import ftc.name.Main;
 
 public class ChristmasGift implements CommandExecutor {
 

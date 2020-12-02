@@ -1,5 +1,6 @@
-package me.wout.RandomFeatures.commands;
+package ftc.randomfeatures.commands;
 
+import ftc.randomfeatures.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -10,9 +11,27 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import me.wout.RandomFeatures.Main;
 
 public class Crowntop implements CommandExecutor {
+
+	/*
+	 * ----------------------------------------
+	 * 			Command description:
+	 * ----------------------------------------
+	 * Shows the crown leaderboard to the player that executes the command
+	 *
+	 *
+	 * Valid usages of command:
+	 * - /crowntop
+	 *
+	 * Permissions used:
+	 * - NONE
+	 *
+	 * Referenced other classes:
+	 * - Main: Main.plugin
+	 *
+	 * Author: Wout
+	 */
 	
 	@SuppressWarnings("deprecation")
 	@Override
