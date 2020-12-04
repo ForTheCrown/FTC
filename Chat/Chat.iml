@@ -24,25 +24,25 @@
     </content>
     <orderEntry type="jdk" jdkName="JavaSE-1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library name="paper-274.jar">
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library>
         <CLASSES>
-          <root url="file://C:/Users/Wout/Desktop/Server/paper-274.jar" />
+          <root url="jar://$MODULE_DIR$/../../../Testserver.cuck/spigot-1.16.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../../../Testserver.cuck/spigot-1.16.4.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../Testserver.cuck/paper-1.16.4-300.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library name="spigot-1.16.4.jar">
-        <CLASSES>
-          <root url="file://C:/Users/Wout/Desktop/Server/spigot-1.16.4.jar" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="library" name="paper-288" level="project" />
-    <orderEntry type="library" name="spigot-1.16.4" level="project" />
   </component>
 </module>

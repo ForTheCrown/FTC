@@ -12,27 +12,28 @@ public class Help implements CommandExecutor{
 	 * ----------------------------------------
 	 * 			Command description:
 	 * ----------------------------------------
-	 * Sends the help message (incomplete lol)
+	 * Brings up the help GUI.
 	 * 
 	 * 
 	 * Valid usages of command:
-	 * - /aahelp 
+	 * - /help
 	 * 
 	 * Referenced other classes:
 	 * - Main: Main.plugin
-	 * - ...
 	 * 
-	 * Author: Wout
+	 * Author: Botul
+	 * Editor: Wout
 	 */
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		
-		if (!(sender instanceof Player) || !(sender.isOp())) {
+		if (!(sender instanceof Player)) {
 			sender.sendMessage(ChatColor.RED + "Only opped players can do this.");
 			return false;
 		}
 		Player player = (Player) sender;
+
+
 		
 		player.sendMessage(ChatColor.GOLD + "Oi! " + ChatColor.GRAY + "This needs some work..");
 		return true;
