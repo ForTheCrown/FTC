@@ -2,31 +2,23 @@ package ftc.bigcrown.challenges;
 
 import ftc.bigcrown.Main;
 import net.md_5.bungee.api.ChatColor;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 import org.bukkit.*;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Zombie;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.BoundingBox;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class ProtectHaroldChallenge extends GenericChallenge {
 
@@ -75,10 +67,18 @@ public class ProtectHaroldChallenge extends GenericChallenge {
 		else getPlayer().sendMessage(ChatColor.YELLOW + "You've protected Harold from 1 zombie!");
 
 		// Add to crown scoreboard:
-    	Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
-    	Score crownScore = mainScoreboard.getObjective("crown").getScore(getPlayer().getName());
-    	crownScore.setScore(crownScore.getScore() + score);
-		
+    	//Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
+    	//Score crownScore = mainScoreboard.getObjective("crown").getScore(getPlayer().getName());
+    	//crownScore.setScore(crownScore.getScore() + score);
+
+		// If their current score is bigger than their record score
+		if(isRecordSmallerThanScore()){
+			Score playerScore = getRecordScoreboardObjective().getScore(getPlayer().getName());
+			playerScore.setScore(scoreMap.get(getPlayer().getUniqueId()));
+			scoreMap.remove(getPlayer().getUniqueId());
+		}
+
+		calculatePlayerScore();
 		teleportBack();
 		
 		PlayerQuitEvent.getHandlerList().unregister(this);
@@ -164,7 +164,7 @@ public class ProtectHaroldChallenge extends GenericChallenge {
 		harold.setCustomName(ChatColor.YELLOW + "Harold");
 		harold.setCustomNameVisible(true);
 		harold.setVillagerLevel(5);
-		harold.setRecipes(new ArrayList<MerchantRecipe>());
+		harold.setRecipes(new ArrayList<>());
 	}
 
 	private void clearMobs() {

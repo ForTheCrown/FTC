@@ -54,7 +54,6 @@ public class ChallengeClass implements Listener {
     		
     		Item ticketItem = player.getLocation().getWorld().dropItem(player.getLocation(), ticket);
     		ticketItem.setVelocity(new Vector(0, 0.2, 0));
-    		Main.plugin.setChallengeInUse(challenge, false);
             break;
         case PINATA:
         	PinataChallenge pC = new PinataChallenge(player);

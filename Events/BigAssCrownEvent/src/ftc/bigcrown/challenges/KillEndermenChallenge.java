@@ -1,5 +1,7 @@
 package ftc.bigcrown.challenges;
 
+import ftc.bigcrown.Main;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -12,10 +14,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
-
-import ftc.bigcrown.Main;
-import net.md_5.bungee.api.ChatColor;
 
 public class KillEndermenChallenge extends GenericChallenge implements Challenge, Listener {
 	
@@ -24,7 +22,7 @@ public class KillEndermenChallenge extends GenericChallenge implements Challenge
 	
 	public KillEndermenChallenge(Player player) {
 		super(player, ChallengeType.ENDERMEN);
-		if (player == null || Main.plugin.getChallengeInUse(getChallengeType())) return;
+		if (Main.plugin.getChallengeInUse(getChallengeType())) return;
 
 		// All needed setters from super class:
  		setObjectiveName("endermenKilled");
@@ -43,14 +41,14 @@ public class KillEndermenChallenge extends GenericChallenge implements Challenge
 		// Send instruction on what to do:
 		this.sendTitle();
 
+		//adds player to score map
+		scoreMap.put(getPlayer().getUniqueId(), getStartScore());
+
 		// Countdown, so start timer immediately after title:
 		KillEndermenChallenge kec = this;
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-	        @Override
-	        public void run() {
-	        	if (!isChallengeCancelled()) timer = new TimerCountingDown(kec, 60, true);
-	        }
-	    }, 50L);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
+			if (!isChallengeCancelled()) timer = new TimerCountingDown(kec, 60, true);
+		}, 50L);
 	}
 
 	public void endChallenge() {
@@ -63,10 +61,18 @@ public class KillEndermenChallenge extends GenericChallenge implements Challenge
 		if (score != 1) this.getPlayer().sendMessage(ChatColor.YELLOW + "You've killed " + score + " endermen!");
 		else this.getPlayer().sendMessage(ChatColor.YELLOW + "You've killed 1 enderman!");
 		// Add to crown scoreboard:
-    	Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
-    	Score crownScore = mainScoreboard.getObjective("crown").getScore(getPlayer().getName());
-    	crownScore.setScore(crownScore.getScore() + score);
+    	//Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
+    	//Score crownScore = mainScoreboard.getObjective("crown").getScore(getPlayer().getName());
+    	//crownScore.setScore(crownScore.getScore() + score);
 
+		// If their current score is bigger than their record score
+		if(isRecordSmallerThanScore()){
+			Score playerScore = getRecordScoreboardObjective().getScore(getPlayer().getName());
+			playerScore.setScore(scoreMap.get(getPlayer().getUniqueId()));
+			scoreMap.remove(getPlayer().getUniqueId());
+		}
+
+		calculatePlayerScore();
 		teleportBack();
 		
 		PlayerQuitEvent.getHandlerList().unregister(this);

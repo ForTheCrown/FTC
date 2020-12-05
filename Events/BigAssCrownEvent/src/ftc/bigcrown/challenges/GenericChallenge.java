@@ -1,12 +1,6 @@
 package ftc.bigcrown.challenges;
 
 import ftc.bigcrown.Main;
-
-import java.util.Collection;
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -25,6 +19,9 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
+
+import javax.annotation.Nonnull;
+import java.util.*;
 
 public class GenericChallenge implements Listener {
 	
@@ -48,6 +45,7 @@ public class GenericChallenge implements Listener {
 	private ChallengeType challengeType;
 	private boolean challengeCancelled = false;
 	private int startScore;
+	public Map<UUID, Integer> scoreMap = new HashMap<>();
 	public LootTable loot = new LootTable() {
 		@Override public NamespacedKey getKey() {return new NamespacedKey(Main.plugin, "woutvoid");}
 		@Override public Collection<ItemStack> populateLoot(Random arg0, LootContext arg1) {return null;}
@@ -105,6 +103,30 @@ public class GenericChallenge implements Listener {
     public void setChallengeCancelled(boolean cancel) {
 		this.challengeCancelled = cancel;
 	}
+
+	public boolean isRecordSmallerThanScore(){
+		int record = getRecordScoreboardObjective().getScore(this.getPlayer().getName()).getScore();
+		int score = scoreMap.get(player.getUniqueId());
+		if(record - score >= 0) return true;
+		return false;
+	}
+
+	public Objective getCrownObjective(){
+		Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
+		return mainScoreboard.getObjective("crown");
+	}
+	public void calculatePlayerScore(){
+    	Scoreboard scoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
+    	int raidScr = scoreboard.getObjective("raidTimesRecord").getScore(getPlayer().getName()).getScore();
+		int batScr = scoreboard.getObjective("batsKilledRecord").getScore(getPlayer().getName()).getScore();
+		int endScr = scoreboard.getObjective("endermenKilledRecord").getScore(getPlayer().getName()).getScore();
+		int pinScr = scoreboard.getObjective("pinataHitsRecord").getScore(getPlayer().getName()).getScore();
+		int haroldScr = scoreboard.getObjective("zombiesKilledRecord").getScore(getPlayer().getName()).getScore();
+		int finalScore = raidScr + batScr + endScr + pinScr + haroldScr;
+
+		Score crownScore = getCrownObjective().getScore(getPlayer().getName());
+		crownScore.setScore(finalScore);
+	}
     
     
     
@@ -116,6 +138,10 @@ public class GenericChallenge implements Listener {
         Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
         return mainScoreboard.getObjective(getObjectiveName());
     }
+	public Objective getRecordScoreboardObjective() {
+		Scoreboard mainScoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
+		return mainScoreboard.getObjective(getObjectiveName() + "Record");
+	}
     
     // Returns the difference in score between the start & end of a challenge,
     // used to display how much points they earned.

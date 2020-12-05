@@ -34,7 +34,7 @@ public class Main extends JavaPlugin {
     public Map<ChallengeType, Boolean> createMap() {
     	Map<ChallengeType, Boolean> map = new HashMap<>();
     	for (ChallengeType type : ChallengeType.values()) {
-    		map.put(type, false);
+    		if(type != ChallengeType.RACE) map.put(type, false);
     	}
 		return map;
 	}
