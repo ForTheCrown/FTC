@@ -112,7 +112,7 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 				Bat bat = loc.getWorld().spawn(loc, Bat.class);
 				bat.setHealth(1);
 			}
-		}, 0, 750);
+		}, 0, 500);
 	}
 	
 	private void killBats() {
