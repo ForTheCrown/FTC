@@ -1,28 +1,15 @@
 package ftc.bigcrown.challenges;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
+import ftc.bigcrown.Main;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.*;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Evoker;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Pillager;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Ravager;
-import org.bukkit.entity.Vindicator;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -34,13 +21,16 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
 
-import ftc.bigcrown.Main;
-import net.md_5.bungee.api.ChatColor;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CastleRaidChallenge extends GenericChallenge implements Challenge, Listener {
 	
 
 	private Location startLocation = new Location(Bukkit.getWorld("world_void"), 464.5, 160, -295.5);
+
+	private long playerStartTime;
+	private long timeTaken;
 	
 	private boolean raidHappening = false;
 	private boolean startedRaid = false;
@@ -86,6 +76,9 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		raidHappening = true;
 		state = 1;
 		capturePointLoop();
+
+		//starts time measurement
+		playerStartTime = System.currentTimeMillis();
 	}
 
 
@@ -95,21 +88,38 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		
 		getPlayer().playSound(getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
 
-		// Amount of raiders killed:
+		/* // Amount of raiders killed:
 		int score = calculateScore();
 		if (completed) {
 			score -= 50;
 			completed = false;
 		}
 		if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've killed " + score + " raiders!");
-		else getPlayer().sendMessage(ChatColor.YELLOW + "You've killed 1 raider!");
+		else getPlayer().sendMessage(ChatColor.YELLOW + "You've killed 1 raider!"); */
 
+		//time taken to finish all 3 waves and a score calculator called compareDicks lol
+		timeTaken = System.currentTimeMillis() - playerStartTime;
+		compareDicks();
+
+		calculatePlayerScore();
 		resetAll();
 		teleportBack();
 		
 		PlayerQuitEvent.getHandlerList().unregister(this);
 		EntityDeathEvent.getHandlerList().unregister(this);
 		PlayerDeathEvent.getHandlerList().unregister(this);
+	}
+
+	public void compareDicks(){
+		final long maxTime = 15*60*1000;
+		int score = (int) (maxTime - timeTaken)/1000/4;
+		if(score < 0) score = 0;
+		scoreMap.put(getPlayer().getUniqueId(), score);
+		if(isRecordSmallerThanScore()){
+			Score playerScore = getRecordScoreboardObjective().getScore(getPlayer().getName());
+			playerScore.setScore(score);
+		}
+		scoreMap.remove(getPlayer().getUniqueId());
 	}
 
 
@@ -403,7 +413,7 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		pillager.setRemoveWhenFarAway(false);
 		pillager.setPersistent(true);
 		
-		Attributable att = (Attributable) pillager;
+		Attributable att = pillager;
 		
 		AttributeInstance maxHealth = att.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 		maxHealth.setBaseValue(30);
@@ -428,9 +438,11 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 				getPlayer().playSound(getPlayer().getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
 				getPlayer().sendMessage(ChatColor.GRAY + "[FTC] Defeated all mobs in the arena!");
 				
-				Score score = getScoreboardObjective().getScore(getPlayer().getName());
-				score.setScore(score.getScore() + 50);
-				getPlayer().sendMessage(ChatColor.GRAY + "You've received 50 points for completing this challenge!");
+				//Score score = getScoreboardObjective().getScore(getPlayer().getName());
+				//score.setScore(score.getScore() + 50);
+				//getPlayer().sendMessage(ChatColor.GRAY + "You've received 50 points for completing this challenge!");
+
+				getPlayer().sendMessage(ChatColor.GRAY + "You beat all 3 waves in:" + getTimeTakenClock().toString());
 				ItemStack emerald_block = new ItemStack(Material.EMERALD_BLOCK, 10);
 				try {
 					 getPlayer().getInventory().addItem(emerald_block);
@@ -448,7 +460,20 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 			}
 		}
 	}
-	
+
+	public StringBuilder getTimeTakenClock(){
+		int intTimeTaken = (int) timeTaken;
+		int minutes = (intTimeTaken /60000) % 60;
+		int seconds = (intTimeTaken / 1000) % 60;
+		int milliseconds = (intTimeTaken/100 ) % 100;
+
+		StringBuilder message = new StringBuilder(" ");
+		message.append(String.format("%02d", minutes)).append(":");
+		message.append(String.format("%02d", seconds)).append(":");
+		message.append(String.format("%02d", milliseconds));
+		return message;
+	}
+
 	private void doStuff(EntityDeathEvent event, Set<LivingEntity> raidwave) {
 		// Drops
 		event.getDrops().clear();
@@ -544,5 +569,4 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		raidwave3.clear();
 
 	}
-
 }

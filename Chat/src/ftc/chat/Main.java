@@ -50,7 +50,7 @@ public class Main extends JavaPlugin implements Listener {
 		// Commands
 		getServer().getPluginCommand("bc").setExecutor(new Broadcast());
 		getServer().getPluginCommand("rlchat").setExecutor(new ReloadConfig());
-		getServer().getPluginCommand("aahelp").setExecutor(new Help()); //incomplete
+		getServer().getPluginCommand("help").setExecutor(new Help()); //incomplete
 		
 		
 		getServer().getPluginCommand("toggleemotes").setExecutor(new ToggleEmotes());

@@ -23,10 +23,10 @@ public class PinataChallenge extends GenericChallenge implements Challenge, List
 
     public PinataChallenge(Player player) {
         super(player, ChallengeType.PINATA);
-        if (player == null || Main.plugin.getChallengeInUse(getChallengeType())) return;
+        if (Main.plugin.getChallengeInUse(getChallengeType())) return;
         
         // All needed setters from super class:
- 		setObjectiveName("crown");
+ 		setObjectiveName("pinataHits");
  		setReturnLocation(getPlayer().getLocation());
  		setStartLocation(this.startLocation);
  		setStartScore();
@@ -38,6 +38,9 @@ public class PinataChallenge extends GenericChallenge implements Challenge, List
     	// Teleport player to challenge:
     	getPlayer().teleport(getStartLocation());
     	getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+
+    	// Add player to score map
+		scoreMap.put(getPlayer().getUniqueId(), 0);
     	
     	sendTitle();
     	// No countdown, so start timer immediately after title:
@@ -54,7 +57,7 @@ public class PinataChallenge extends GenericChallenge implements Challenge, List
 		getPlayer().playSound(getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 2f, 1.5f);
 
 		// Amount of pinata hits:
-		int score = calculateScore();
+		int score = scoreMap.get(getPlayer().getUniqueId());
 		if (score == 0) {
 			getPlayer().sendMessage(ChatColor.GRAY + "You've hit the Pinata 0 times!");
 			getPlayer().sendMessage(ChatColor.YELLOW + "Who could hurt such a cutie??");
@@ -64,9 +67,15 @@ public class PinataChallenge extends GenericChallenge implements Challenge, List
 		}
 		else if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've hit the Pinata " + score + " times!");
 		else getPlayer().sendMessage(ChatColor.YELLOW + "You've hit the Pinata 1 time!");
-		
-		
 
+		// If their current score is bigger than their record score
+		if(isRecordSmallerThanScore()){
+			Score playerScore = getRecordScoreboardObjective().getScore(getPlayer().getName());
+			playerScore.setScore(scoreMap.get(getPlayer().getUniqueId()));
+			scoreMap.remove(getPlayer().getUniqueId());
+		}
+
+		calculatePlayerScore();
 		teleportBack();
 		EntityDamageByEntityEvent.getHandlerList().unregister(this);
 		PlayerQuitEvent.getHandlerList().unregister(this);
@@ -90,7 +99,8 @@ public class PinataChallenge extends GenericChallenge implements Challenge, List
         Rabbit bunny = (Rabbit) event.getEntity();
         if (bunny.getCustomName() == null || (!bunny.getCustomName().contains(ChatColor.YELLOW + "P"))) return;
 
-        Score score = getScoreboardObjective().getScore(player.getName());
+        scoreMap.put(getPlayer().getUniqueId(), scoreMap.get(getPlayer().getUniqueId()) + 1);
+        Score score = getScoreboardObjective().getScore(getPlayer().getName());
         score.setScore(score.getScore() + 1);
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2f, 1.0f);
 

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BigAssCrownEvent.iml" filepath="$PROJECT_DIR$/BigAssCrownEvent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/BigAssCrownEvent.iml" filepath="$PROJECT_DIR$/.idea/BigAssCrownEvent.iml" />
     </modules>
   </component>
 </project>
