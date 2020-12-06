@@ -28,12 +28,12 @@ public class HurtMobHealthBar implements Listener {
         double currentHealth = damaged.getHealth()/2;
         double healthLost = maxHealth - currentHealth;
 
-        if(damaged.getCustomName() != null && !damaged.getCustomName().contains("❤ ")) Main.plugin.withSetNames.put(damaged.getUniqueId(), damaged.getCustomName());
+        if(damaged.getCustomName() != null && !damaged.getCustomName().contains("❤")) Main.plugin.withSetNames.put(damaged.getUniqueId(), damaged.getCustomName());
         String healthBar = "";
 
         for(int i = 0; i <= maxHealth; i++){
-            if(i <= healthLost) healthBar += ChatColor.GRAY + "❤ ";
-            else healthBar += ChatColor.RED + "❤ ";
+            if(i <= healthLost) healthBar += ChatColor.GRAY + "❤";
+            else healthBar += ChatColor.RED + "❤";
         }
         damaged.setCustomNameVisible(true);
         damaged.setCustomName(healthBar);
