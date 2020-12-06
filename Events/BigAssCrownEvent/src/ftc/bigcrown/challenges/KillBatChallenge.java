@@ -21,6 +21,7 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 	private Location startLocation = new Location(Bukkit.getWorld("world_void"), 377.5, 152, -368.5);
 	private TimerCountingDown timer;
 	private Timer batSpawnTimer;
+	private int batAmount;
 	
 	public KillBatChallenge(Player player) {
 		super(player, ChallengeType.HUNT_BATS);
@@ -39,6 +40,8 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 		// Teleport player to challenge:
 		getPlayer().teleport(getStartLocation());
 		getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+
+		batAmount = 0;
 
 		sendTitle();
 		// No countdown, so start timer immediately after title:
@@ -98,19 +101,23 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 			loc.setZ(loc.getZ() + (0.1*i));
 
 			Bat bat = loc.getWorld().spawn(loc, Bat.class);
+			batAmount += 1;
 			bat.setHealth(1);
 		}
 
 		batSpawnTimer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				Location loc = getStartLocation().clone();
-				loc.setX(loc.getX() + (0.1*Main.plugin.getRandomNumberInRange(-12, 13)));
-				loc.setY(loc.getY() + 2.5);
-				loc.setZ(loc.getZ() + (0.1*Main.plugin.getRandomNumberInRange(-12, 13)));
+				if(batAmount < 11){
+					Location loc = getStartLocation().clone();
+					loc.setX(loc.getX() + (0.1 * Main.plugin.getRandomNumberInRange(-12, 13)));
+					loc.setY(loc.getY() + 2.5);
+					loc.setZ(loc.getZ() + (0.1 * Main.plugin.getRandomNumberInRange(-12, 13)));
 
-				Bat bat = loc.getWorld().spawn(loc, Bat.class);
-				bat.setHealth(1);
+					Bat bat = loc.getWorld().spawn(loc, Bat.class);
+					batAmount += 1;
+					bat.setHealth(1);
+				}
 			}
 		}, 0, 500);
 	}
@@ -122,6 +129,7 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 				ent.teleport(ent.getLocation().add(0, -300, 0));
 			}
 		}
+		batAmount = 0;
 		batSpawnTimer.cancel();
 		batSpawnTimer.purge();
 	}
@@ -143,6 +151,7 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 		if (event.getEntity().getKiller() == null || this.getPlayer() == null) return;
 		if (event.getEntity().getType() != EntityType.BAT || event.getEntity().getKiller().getName() != this.getPlayer().getName()) return;
 
+		batAmount -= 1;
 		event.getEntity().setCustomNameVisible(true);
 		event.getEntity().setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + "+1");
 	}
