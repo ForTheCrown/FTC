@@ -28,7 +28,7 @@ public class Main extends JavaPlugin {
 			"{SkullOwner:{Id:[I;2112825111,-414429584,-2029219499,-1043660854],Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWQ5N2Y0ZjQ0ZTc5NmY3OWNhNDMwOTdmYWE3YjRmZTkxYzQ0NWM3NmU1YzI2YTVhZDc5NGY1ZTQ3OTgzNyJ9fX0=\"}]}}}",
 			"{SkullOwner:{Id:[I;-1365545979,1889357537,-1100829119,-1307254765],Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmM2YWY2YWQxOGUxM2YyNWE1Yjc0NDcyNTJiNWU5YWI4MTgwYzA1ZGU1OTg1ZmJhZjdiNGZjNGUxZDI0MTY2In19fQ==\"}]}}}"
 	);
-	public List<Integer> locsInUse = new ArrayList<>();
+	public List<Location> locsInUse = new ArrayList<>();
     public Set<String> playersThatQuitDuringChallenge = new HashSet<>();
     public Map<ChallengeType, Boolean> challengeIsFree = createMap();
     public Map<ChallengeType, Boolean> createMap() {
@@ -93,8 +93,8 @@ public class Main extends JavaPlugin {
 	}
 	
 	// Checks if a location is suited for spawning
-	private boolean canSpawnPresent(int id) {
-		return !this.locsInUse.contains(id) && getLocationList().get(id).getBlock().getType() == Material.AIR;
+	private boolean canSpawnPresent(Location location) {
+		return !this.locsInUse.contains(location) && location.getBlock().getType() == Material.AIR;
 	}
 	
 
@@ -102,16 +102,18 @@ public class Main extends JavaPlugin {
 		List<Location> locList = getLocationList();
 		
 		// Pick random number, if it's already in use,
-		// pick a new random number (added saveGuard just in case of endless loop).
-		int saveGuard = 300;
+		// pick a new random number (added safeGuard just in case of endless loop).
+		int safeGuard = 300;
 		int locId = getRandomNumberInRange(0, locList.size() - 1);
+		Location nLoc = new Location(locList.get(locId).getWorld(), locList.get(locId).getBlockX(), locList.get(locId).getBlockY(), locList.get(locId).getBlockZ());
 		
-		while ((!canSpawnPresent(locId)) && saveGuard > 0) {
+		while ((!canSpawnPresent(nLoc)) && safeGuard > 0) {
 			locId = getRandomNumberInRange(0, locList.size() - 1);
-			saveGuard--;
+			nLoc = new Location(locList.get(locId).getWorld(), locList.get(locId).getBlockX(), locList.get(locId).getBlockY(), locList.get(locId).getBlockZ());
+			safeGuard--;
 		}
-		if (saveGuard <= 0) { Bukkit.getConsoleSender().sendMessage("Endless loop :("); return; }
-		else locsInUse.add(locId);
+		if (safeGuard <= 0) { Bukkit.getConsoleSender().sendMessage("Endless loop :("); return; }
+		else locsInUse.add(nLoc);
 
 		
 		// Actual spawning part

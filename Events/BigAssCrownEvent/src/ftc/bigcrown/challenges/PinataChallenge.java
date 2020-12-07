@@ -19,7 +19,8 @@ public class PinataChallenge extends GenericChallenge implements Challenge, List
 
 	private TimerCountingDown timer;
     public boolean canDrop = true;
-    private Location startLocation = new Location(Bukkit.getWorld("world_void"), 349.5, 162, -289.5, -45, 0);
+    //private Location startLocation = new Location(Bukkit.getWorld("world_void"), 349.5, 162, -289.5, -45, 0);
+    private Location startLocation = new Location(Bukkit.getWorld("world"), 349.5, 162, -289.5, -45, 0);
 
     public PinataChallenge(Player player) {
         super(player, ChallengeType.PINATA);

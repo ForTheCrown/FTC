@@ -13,15 +13,13 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.util.BoundingBox;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class KillBatChallenge extends GenericChallenge implements Challenge, Listener {
 	
-	private Location startLocation = new Location(Bukkit.getWorld("world_void"), 377.5, 152, -368.5);
+	//private Location startLocation = new Location(Bukkit.getWorld("world_void"), 377.5, 152, -368.5);
+	private Location startLocation = new Location(Bukkit.getWorld("world"), 377.5, 152, -368.5);
 	private TimerCountingDown timer;
-	private Timer batSpawnTimer;
 	private int batAmount;
+	private boolean batSpawningCancelled = true;
 	
 	public KillBatChallenge(Player player) {
 		super(player, ChallengeType.HUNT_BATS);
@@ -42,6 +40,10 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 		getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
 		batAmount = 0;
+		batSpawningCancelled = false;
+		
+		//adds player to score map
+		scoreMap.put(getPlayer().getUniqueId(), getStartScore());
 
 		sendTitle();
 		// No countdown, so start timer immediately after title:
@@ -75,10 +77,9 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
     	//crownScore.setScore(crownScore.getScore() + score);
 
 		// If their current score is bigger than their record score
-		if(isRecordSmallerThanScore()){
-			Score playerScore = getRecordScoreboardObjective().getScore(getPlayer().getName());
-			playerScore.setScore(scoreMap.get(getPlayer().getUniqueId()));
-			scoreMap.remove(getPlayer().getUniqueId());
+		Score playerRecordScore = getRecordScoreboardObjective().getScore(getPlayer().getName());
+		if(score > playerRecordScore.getScore()) {
+			playerRecordScore.setScore(score);
 		}
 
 		calculatePlayerScore();
@@ -104,22 +105,19 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 			batAmount += 1;
 			bat.setHealth(1);
 		}
+		
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
+			if(!batSpawningCancelled && batAmount < 11) {
+				Location loc = getStartLocation().clone();
+				loc.setX(loc.getX() + (0.1*Main.plugin.getRandomNumberInRange(-5, 5)));
+				loc.setY(loc.getY() + 2.5);
+				loc.setZ(loc.getZ() + (0.1*Main.plugin.getRandomNumberInRange(-5, 5)));
 
-		batSpawnTimer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				if(batAmount < 11){
-					Location loc = getStartLocation().clone();
-					loc.setX(loc.getX() + (0.1 * Main.plugin.getRandomNumberInRange(-12, 13)));
-					loc.setY(loc.getY() + 2.5);
-					loc.setZ(loc.getZ() + (0.1 * Main.plugin.getRandomNumberInRange(-12, 13)));
-
-					Bat bat = loc.getWorld().spawn(loc, Bat.class);
-					batAmount += 1;
-					bat.setHealth(1);
-				}
+				Bat bat = loc.getWorld().spawn(loc, Bat.class);
+				batAmount += 1;
+				bat.setHealth(1);
 			}
-		}, 0, 500);
+		}, 20);
 	}
 	
 	private void killBats() {
@@ -130,8 +128,7 @@ public class KillBatChallenge extends GenericChallenge implements Challenge, Lis
 			}
 		}
 		batAmount = 0;
-		batSpawnTimer.cancel();
-		batSpawnTimer.purge();
+		batSpawningCancelled = true;
 	}
 
 	@EventHandler
