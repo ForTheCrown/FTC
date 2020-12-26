@@ -1,0 +1,13 @@
+lists:
+  quitPlayers:
+
+  disqualifiedPlayers:
+
+lobby-location:
+start-location:
+
+settings:
+  remove-on-quit: true
+  remove-on-shutdown: true
+  cumulative-points: false
+  to-spawn-on-end: true
