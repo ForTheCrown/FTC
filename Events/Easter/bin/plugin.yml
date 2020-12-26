@@ -1,0 +1,6 @@
+name: Event
+version: 1.0
+author: Wout
+main: me.wout.Event.main
+description: Plugin that does the event stuff.
+api-version: 1.15

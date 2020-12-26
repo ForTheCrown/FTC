@@ -1,0 +1,15 @@
+name: Dungeons
+version: 1.0
+author: Wout
+main: me.wout.Dungeons.main
+description: Plugin that introduces special mobs!
+api-version: 1.15
+
+commands:
+  rankadd:
+    description: adds a rank.
+  rankremove:
+    description: removes a rank.
+  addlore:
+    description: adds lore.
+ 
