@@ -25,17 +25,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cb2ad54b-4690-45e2-8951-29c806719103" name="Default Changelist" comment="Changed the bat spawning a bit, they now spawn every 500 milliseconds if there's less than 10 of them">
-      <change beforePath="$PROJECT_DIR$/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/.classpath" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/BigAssCrownEvent.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BigAssCrownEvent.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/BigAssCrownEvent_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/BigAssCrownEvent_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/bin/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/java/ftc/crownapi/APIListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/java/ftc/crownapi/Main.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/java/ftc/crownapi/apievents/CrownEnterEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/java/ftc/crownapi/apievents/CrownQuitEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/java/ftc/crownapi/commands/CrownAPICommand.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/java/ftc/crownapi/commands/CrownAPITabCompleter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/java/ftc/crownapi/types/CrownEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/java/ftc/crownapi/types/CrownEventUser.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/java/ftc/crownapi/types/interfaces/CrownEventIUser.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/java/ftc/crownapi/types/interfaces/ICrownEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/resources/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../CrownEventAPI/src/main/resources/plugin.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/ftc/bigcrown/commands/MyScoreCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ftc/bigcrown/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ftc/bigcrown/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/CastleRaidChallenge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/CastleRaidChallenge.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/GenericChallenge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/GenericChallenge.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/KillBatChallenge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/KillBatChallenge.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/KillEndermenChallenge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/KillEndermenChallenge.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/PinataChallenge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/PinataChallenge.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/ProtectHaroldChallenge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ftc/bigcrown/challenges/ProtectHaroldChallenge.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/plugin.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../RandomFeatures/bin/ftc/randomfeatures/features/HurtMobHealthBar$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../RandomFeatures/bin/ftc/randomfeatures/features/HurtMobHealthBar$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../RandomFeatures/bin/ftc/randomfeatures/features/HurtMobHealthBar.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../RandomFeatures/bin/ftc/randomfeatures/features/HurtMobHealthBar.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../RandomFeatures/src/ftc/randomfeatures/features/HurtMobHealthBar.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../RandomFeatures/src/ftc/randomfeatures/features/HurtMobHealthBar.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -148,10 +157,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="440" y="99" key="#Project_Structure/0.0.1920.1050@0.0.1920.1050" timestamp="1607282019654" />
-    <state x="765" y="228" key="#com.intellij.ide.util.MemberChooser" timestamp="1607182528148">
+    <state x="765" y="228" key="#com.intellij.ide.util.MemberChooser" timestamp="1607380538878">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="765" y="228" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1607182528148" />
+    <state x="765" y="228" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1607380538878" />
     <state x="790" y="134" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog" timestamp="1607088201977">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>

@@ -3,6 +3,7 @@ package ftc.bigcrown;
 import ftc.bigcrown.challenges.ChallengeType;
 import ftc.bigcrown.commands.BigBootyEventCommand;
 import ftc.bigcrown.commands.BigBootyTabCompleter;
+import ftc.bigcrown.commands.MyScoreCommand;
 import ftc.bigcrown.events.Events;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -55,6 +56,8 @@ public class Main extends JavaPlugin {
 		// Commands
 		getServer().getPluginCommand("BigBootyEvent").setExecutor(new BigBootyEventCommand());
 		getServer().getPluginCommand("BigBootyEvent").setTabCompleter(new BigBootyTabCompleter());
+
+		getServer().getPluginCommand("myscores").setExecutor(new MyScoreCommand());
 		
 		runLoop = true;
 		loop();

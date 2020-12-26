@@ -16,3 +16,6 @@ commands:
   capturepoint:
     description: "This was such a mess to make jesus"
     permission: bbe.admin
+  myscore:
+    permission-message: "You do not have permission to use this"
+    permission: bbe.myscore
