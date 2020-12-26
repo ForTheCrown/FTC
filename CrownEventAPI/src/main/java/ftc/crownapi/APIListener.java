@@ -29,7 +29,6 @@ public class APIListener extends CrownEvent implements Listener {
             user.teleportToEventLobby();
         }
         user.setHasQuitInEvent(false);
-        user.removeFromScoreMap();
     }
 
     // Adds player to the LeftInEvent players list when they leave
@@ -40,6 +39,7 @@ public class APIListener extends CrownEvent implements Listener {
         if(!user.isInEvent()) return;
         user.setHasQuitInEvent(true);
         user.setInEvent(false);
+        user.removeFromScoreMap();
     }
 
     // Keep in mind: These custom events have to be called on in the event plugins themselves. They don't fire whenever lol

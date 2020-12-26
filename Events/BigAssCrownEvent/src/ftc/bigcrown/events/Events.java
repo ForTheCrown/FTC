@@ -32,7 +32,6 @@ public class Events implements Listener {
     	// Biggest checks first -> lowest amount of code to execute each time event gets called
     	if (event.getHand() == EquipmentSlot.OFF_HAND) return;
 		if (!event.getRightClicked().isInvulnerable()) return;
-		
     	
     	// Only look for Present slime interactions
         if (!(event.getRightClicked() instanceof Slime)) return;
