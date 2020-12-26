@@ -1,0 +1,25 @@
+name: Pirate
+version: 1.0
+author: Wout
+main: me.wout.Pirate.Main
+description: Plugin that does the pirate stuff.
+api-version: 1.15
+commands:
+  GHTargetShowName:
+    description: Shows the name of the nearby targets.
+  ghtarget:
+    description: Spawns a grappling hook target.
+  parrot:
+    description: Gives pirates a parrot pet lol.
+  rlpirate:
+    description: Reloads the pirate plugin.
+  leave:
+    description: Leaves the grappling parkour.
+  updatelb:
+    description: Updates the pp leaderboard.
+  commanduno:
+    description: First choice for Smith.
+  commandduo:
+    description: Second choice for Smith.
+  commandtres:
+    description: Third choice for Smith.

@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="RandomFeatures.jar">
-    <output-path>$PROJECT_DIR$/../../../Testserver.cuck/plugins</output-path>
-    <root id="archive" name="RandomFeatures.jar">
-      <element id="module-output" name="RandomFeatures" />
-    </root>
-  </artifact>
-</component>

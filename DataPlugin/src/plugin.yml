@@ -1,0 +1,36 @@
+name: DataPlugin
+version: 1.0
+author: Wout
+main: me.wout.DataPlugin.main
+description: Plugin that does the data stuff.
+api-version: 1.16
+commands:
+  addrank:
+    description: Adds a rank to a player in the config.
+  removerank:
+    description: Removes a rank from a player in the config.
+  listrank:
+    description: Lists a rank of a player in the config.
+  canswapbranch:
+    description: Shows if a player can swap branches according to in the config.
+  setswapbranch:
+    description: Sets canswapbranch to true or false for a player in the config.
+  setbranch:
+    description: Sets branch of a player if canswapbranch is true in the config.
+  getbranch:
+    description: Gets branch of a player in the config.
+  rank:
+    aliases: [ranks]
+    description: Shows rank gui.
+  makebaron:
+    description: Isn't it obvious?
+  makeking:
+    description: Isn't it obvious?
+  removeking:
+    description: Isn't it obvious?
+  addpet:
+    description: Adds a pet to the list of pets of a player.
+  commandun:
+    description: First option for Jerome.
+  commanddeux:
+    description: Second option for Jeromre.
