@@ -105,6 +105,8 @@ public class GenericChallenge implements Listener {
 	}
 
 	public boolean isRecordSmallerThanScore(){
+    	if(getRecordScoreboardObjective() == null) Bukkit.broadcastMessage("getRecordScoreboardObjective is null in isRecordSmallerThanScore");
+    	if(getRecordScoreboardObjective().getScore(getPlayer().getName()) == null) Bukkit.broadcastMessage("getScore is null");
 		int record = getRecordScoreboardObjective().getScore(this.getPlayer().getName()).getScore();
 		int score = scoreMap.get(player.getUniqueId());
 		if(record - score >= 0) return true;
@@ -119,9 +121,9 @@ public class GenericChallenge implements Listener {
     	Scoreboard scoreboard = Main.plugin.getServer().getScoreboardManager().getMainScoreboard();
     	int raidScr = scoreboard.getObjective("raidTimesRecord").getScore(getPlayer().getName()).getScore();
 		int batScr = scoreboard.getObjective("batsKilledRecord").getScore(getPlayer().getName()).getScore();
-		int endScr = scoreboard.getObjective("endermenKilledRecord").getScore(getPlayer().getName()).getScore();
+		int endScr = scoreboard.getObjective("endKilledRecord").getScore(getPlayer().getName()).getScore();
 		int pinScr = scoreboard.getObjective("pinataHitsRecord").getScore(getPlayer().getName()).getScore();
-		int haroldScr = scoreboard.getObjective("zombiesKilledRecord").getScore(getPlayer().getName()).getScore();
+		int haroldScr = scoreboard.getObjective("zombieKillRecord").getScore(getPlayer().getName()).getScore();
 		int finalScore = raidScr + batScr + endScr + pinScr + haroldScr;
 
 		Score crownScore = getCrownObjective().getScore(getPlayer().getName());

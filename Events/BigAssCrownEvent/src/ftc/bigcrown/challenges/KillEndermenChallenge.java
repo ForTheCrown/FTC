@@ -25,7 +25,7 @@ public class KillEndermenChallenge extends GenericChallenge implements Challenge
 		if (Main.plugin.getChallengeInUse(getChallengeType())) return;
 
 		// All needed setters from super class:
- 		setObjectiveName("endermenKilled");
+ 		setObjectiveName("endKilled");
  		setReturnLocation(getPlayer().getLocation());
  		setStartLocation(this.startLocation);
  		setStartScore();

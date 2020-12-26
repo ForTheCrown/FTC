@@ -30,7 +30,7 @@ public class ProtectHaroldChallenge extends GenericChallenge {
         if (player == null || Main.plugin.getChallengeInUse(getChallengeType())) return;
         
         // All needed setters from super class:
- 		setObjectiveName("zombiesKilled");
+ 		setObjectiveName("zombieKill");
  		setReturnLocation(getPlayer().getLocation());
  		setStartLocation(this.startLocation);
  		setStartScore();
@@ -42,6 +42,9 @@ public class ProtectHaroldChallenge extends GenericChallenge {
     	// Teleport player to challenge:
     	getPlayer().teleport(getStartLocation());
     	getPlayer().playSound(getStartLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+    	
+		//adds player to score map
+		scoreMap.put(getPlayer().getUniqueId(), getStartScore());
     	
     	sendTitle();
     	

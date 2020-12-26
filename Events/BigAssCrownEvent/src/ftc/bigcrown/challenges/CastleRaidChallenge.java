@@ -27,7 +27,8 @@ import java.util.Set;
 public class CastleRaidChallenge extends GenericChallenge implements Challenge, Listener {
 	
 
-	private Location startLocation = new Location(Bukkit.getWorld("world_void"), 464.5, 160, -295.5);
+	//private Location startLocation = new Location(Bukkit.getWorld("world_void"), 464.5, 160, -295.5);
+	private Location startLocation = new Location(Bukkit.getWorld("world"), 464.5, 160, -295.5);
 
 	private long playerStartTime;
 	private long timeTaken;
@@ -46,7 +47,7 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		if (player == null || Main.plugin.getChallengeInUse(getChallengeType())) return;
 		
 		// All needed setters from super class:
-		setObjectiveName("crown");
+		setObjectiveName("raidTimes");
 		setReturnLocation(getPlayer().getLocation());
 		setStartLocation(this.startLocation);
 		setStartScore();
@@ -66,6 +67,9 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		// Create capture point bossbar:
 		capturePointBossBar = Bukkit.createBossBar(ChatColor.YELLOW + "Capture Point", BarColor.YELLOW, BarStyle.SEGMENTED_12);
 		capturePointBossBar.setProgress(0.99f);
+		
+		//adds player to score map
+		scoreMap.put(getPlayer().getUniqueId(), getStartScore());
 		
 		// Show bossbar:
 		capturePointBossBar.addPlayer(getPlayer());
@@ -97,9 +101,6 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 		if (score != 1) getPlayer().sendMessage(ChatColor.YELLOW + "You've killed " + score + " raiders!");
 		else getPlayer().sendMessage(ChatColor.YELLOW + "You've killed 1 raider!"); */
 
-		//time taken to finish all 3 waves and a score calculator called compareDicks lol
-		timeTaken = System.currentTimeMillis() - playerStartTime;
-		compareDicks();
 
 		calculatePlayerScore();
 		resetAll();
@@ -111,10 +112,12 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 	}
 
 	public void compareDicks(){
-		final long maxTime = 15*60*1000;
-		int score = (int) (maxTime - timeTaken)/1000/4;
+		long maxTime = 15*60*1000;
+		int score = (int) ((maxTime - timeTaken)/1000/4);
 		if(score < 0) score = 0;
 		scoreMap.put(getPlayer().getUniqueId(), score);
+		Score normalScore = getScoreboardObjective().getScore(getPlayer().getName());
+		normalScore.setScore(scoreMap.get(getPlayer().getUniqueId()) + getStartScore());
 		if(isRecordSmallerThanScore()){
 			Score playerScore = getRecordScoreboardObjective().getScore(getPlayer().getName());
 			playerScore.setScore(score);
@@ -230,7 +233,8 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 	
 	private Location getNewLoc(Location loc) {
 		Location result = loc;
-		result.setWorld(Bukkit.getWorld("world_void"));
+		//result.setWorld(Bukkit.getWorld("world_void"));
+		result.setWorld(Bukkit.getWorld("world"));
 		result.setX((result.getX() - 744) * (-1));
 		result.setY(result.getY() + 92);
 		result.setZ((result.getZ() - 808) * (-1));
@@ -255,7 +259,8 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
     	locs.add(new Location(Bukkit.getWorld("world"), 289.5, 77, 1080.5));
     	
     	for (Location spawnLocation : locs) {
-    		Vindicator vindi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Vindicator.class);
+    		//Vindicator vindi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Vindicator.class);
+    		Vindicator vindi = Bukkit.getWorld("world").spawn(getNewLoc(spawnLocation), Vindicator.class);
     		addCustomStuffToVindicator(vindi);
     		raidwave.add(vindi);
     	}
@@ -293,12 +298,14 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 	        	locsp.add(new Location(Bukkit.getWorld("world"), 298.5, 83, 1116.5));
 				
 	        	for (Location spawnLocation : locsv) {
-	        		Vindicator vindi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Vindicator.class);
+	        		//Vindicator vindi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Vindicator.class);
+	        		Vindicator vindi = Bukkit.getWorld("world").spawn(getNewLoc(spawnLocation), Vindicator.class);
 	        		addCustomStuffToVindicator(vindi);
 	        		raidwave2.add(vindi);
 	        	}
 	        	for (Location spawnLocation : locsp) {
-	        		Pillager pilli = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Pillager.class);
+	        		//Pillager pilli = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Pillager.class);
+	        		Pillager pilli = Bukkit.getWorld("world").spawn(getNewLoc(spawnLocation), Pillager.class);
 	        		addCustomStuffToPillager(pilli);
 	        		raidwave2.add(pilli);
 	        	}
@@ -347,18 +354,21 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 	        		
 				
 	        	for (Location spawnLocation : locsv) {
-	        		Vindicator vindi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Vindicator.class);
+	        		//Vindicator vindi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Vindicator.class);
+	        		Vindicator vindi = Bukkit.getWorld("world").spawn(getNewLoc(spawnLocation), Vindicator.class);
 	        		addCustomStuffToVindicator(vindi);
 	        		raidwave3.add(vindi);
 	        	}
 	        	for (Location spawnLocation : locsp) {
-	        		Pillager pilli = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Pillager.class);
+	        		//Pillager pilli = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Pillager.class);
+	        		Pillager pilli = Bukkit.getWorld("world").spawn(getNewLoc(spawnLocation), Pillager.class);
 	        		addCustomStuffToPillager(pilli);
 	        		
 	        		raidwave3.add(pilli);
 	        	}
 	        	for (Location spawnLocation : locsr) {
-	        		Ravager ravi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Ravager.class);
+	        		//Ravager ravi = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Ravager.class);
+	        		Ravager ravi = Bukkit.getWorld("world").spawn(getNewLoc(spawnLocation), Ravager.class);
 	        		ravi.setLootTable(loot);
 	        		ravi.setRemoveWhenFarAway(false);
 	        		ravi.setPersistent(true);
@@ -366,7 +376,8 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 	        		raidwave3.add(ravi);
 	        	}
 	        	for (Location spawnLocation : locse) {
-	        		Evoker evoki = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Evoker.class);
+	        		//Evoker evoki = Bukkit.getWorld("world_void").spawn(getNewLoc(spawnLocation), Evoker.class);
+	        		Evoker evoki = Bukkit.getWorld("world").spawn(getNewLoc(spawnLocation), Evoker.class);
 	        		evoki.setPatrolLeader(false);
 	        		evoki.setLootTable(loot);
 	        		evoki.setRemoveWhenFarAway(false);
@@ -441,6 +452,10 @@ public class CastleRaidChallenge extends GenericChallenge implements Challenge, 
 				//Score score = getScoreboardObjective().getScore(getPlayer().getName());
 				//score.setScore(score.getScore() + 50);
 				//getPlayer().sendMessage(ChatColor.GRAY + "You've received 50 points for completing this challenge!");
+				
+				//time taken to finish all 3 waves and a score calculator called compareDicks lol
+				timeTaken = System.currentTimeMillis() - playerStartTime;
+				compareDicks();
 
 				getPlayer().sendMessage(ChatColor.GRAY + "You beat all 3 waves in:" + getTimeTakenClock().toString());
 				ItemStack emerald_block = new ItemStack(Material.EMERALD_BLOCK, 10);
