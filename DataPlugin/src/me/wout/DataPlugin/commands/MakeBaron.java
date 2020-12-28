@@ -1,5 +1,6 @@
 package me.wout.DataPlugin.commands;
 
+import me.wout.DataPlugin.FtcDataMain;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -8,13 +9,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
-import me.wout.DataPlugin.main;
-
 public class MakeBaron implements CommandExecutor {
 
-	private main plugin;
+	private FtcDataMain plugin;
 
-	public MakeBaron(main plugin) 
+	public MakeBaron(FtcDataMain plugin)
 	{
 		plugin.getCommand("makebaron").setExecutor(this);
 		this.plugin = plugin;
@@ -46,7 +45,7 @@ public class MakeBaron implements CommandExecutor {
 		Bukkit.dispatchCommand(plugin.getServer().getConsoleSender(), "addrank " + args[0] + " baron");
 		sender.sendMessage(ChatColor.GRAY + "Added baron to their rank set.");
 		
-		Objective baron = Bukkit.getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron");
+		Objective baron = Bukkit.getServer().getScoreboardManager().getFtcDataMainScoreboard().getObjective("Baron");
 		Score baronPoints = baron.getScore(args[0]);
 		baronPoints.setScore(1);
 		

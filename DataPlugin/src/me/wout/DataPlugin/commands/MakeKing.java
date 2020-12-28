@@ -1,18 +1,17 @@
 package me.wout.DataPlugin.commands;
 
+import me.wout.DataPlugin.FtcDataMain;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import me.wout.DataPlugin.main;
-
 public class MakeKing implements CommandExecutor {
 
-	private main plugin;
+	private FtcDataMain plugin;
 
-	public MakeKing(main plugin) 
+	public MakeKing(FtcDataMain plugin)
 	{
 		plugin.getCommand("makeking").setExecutor(this);
 		this.plugin = plugin;

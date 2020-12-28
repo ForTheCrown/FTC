@@ -1,17 +1,16 @@
 package me.wout.DataPlugin.commands;
 
+import me.wout.DataPlugin.FtcDataMain;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import me.wout.DataPlugin.main;
-
 public class canswapbranch implements CommandExecutor {
 
-	private main plugin;
+	private FtcDataMain plugin;
 
-	public canswapbranch(main plugin) 
+	public canswapbranch(FtcDataMain plugin)
 	{
 		plugin.getCommand("canswapbranch").setExecutor(this);
 		this.plugin = plugin;

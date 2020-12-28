@@ -2,19 +2,18 @@ package me.wout.DataPlugin.commands;
 
 import java.util.UUID;
 
+import me.wout.DataPlugin.FtcDataMain;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import me.wout.DataPlugin.main;
-
 public class RemoveKing implements CommandExecutor {
 
-	private main plugin;
+	private FtcDataMain plugin;
 
-	public RemoveKing(main plugin) 
+	public RemoveKing(FtcDataMain plugin)
 	{
 		plugin.getCommand("removeking").setExecutor(this);
 		this.plugin = plugin;

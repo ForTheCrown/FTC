@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import me.wout.DataPlugin.FtcDataMain;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,13 +18,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import me.wout.DataPlugin.main;
-
 public class rank implements CommandExecutor {
 
-	private main plugin;
+	private FtcDataMain plugin;
 
-	public rank(main plugin) 
+	public rank(FtcDataMain plugin)
 	{
 		plugin.getCommand("rank").setExecutor(this);
 		this.plugin = plugin;
@@ -89,21 +88,21 @@ public class rank implements CommandExecutor {
 	
 	private void addInvItems(Inventory invToOpen, String playeruuid, String branch, Boolean isActiveBranch) 
 	{
-		ItemStack mainItem; 
+		ItemStack FtcDataMainItem;
 		
 		switch (branch) 
 		{
 		case ("Pirate"):
-			mainItem = makeItem(Material.OAK_BOAT, 1, ChatColor.AQUA + "Pirates", ChatColor.GRAY + "Sailors who bow to no Crown.");
+			FtcDataMainItem = makeItem(Material.OAK_BOAT, 1, ChatColor.AQUA + "Pirates", ChatColor.GRAY + "Sailors who bow to no Crown.");
 			setPirateRanks(invToOpen, playeruuid, isActiveBranch);
 			break;
 			
 		default:
-			mainItem = makeItem(Material.IRON_SWORD, 1, ChatColor.AQUA + "Knights", ChatColor.GRAY + "The Crown's most loyal players.");
+			FtcDataMainItem = makeItem(Material.IRON_SWORD, 1, ChatColor.AQUA + "Knights", ChatColor.GRAY + "The Crown's most loyal players.");
 			setKnightRanks(invToOpen, playeruuid, isActiveBranch);
 			break;
 		}
-		invToOpen.setItem(4, mainItem);
+		invToOpen.setItem(4, FtcDataMainItem);
 	
 		ItemStack defaultRankItem = makeItem(Material.MAP, 1, "Default", ChatColor.GRAY + "This is default for new players.");
 		if (isActiveBranch) makeAvailable(defaultRankItem, true, isActiveBranch);

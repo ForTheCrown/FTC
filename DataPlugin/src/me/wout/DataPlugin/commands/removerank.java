@@ -3,19 +3,18 @@ package me.wout.DataPlugin.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.wout.DataPlugin.FtcDataMain;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import me.wout.DataPlugin.main;
-
 public class removerank implements CommandExecutor {
 
-	private main plugin;
+	private FtcDataMain plugin;
 
-	public removerank(main plugin) 
+	public removerank(FtcDataMain plugin)
 	{
 		plugin.getCommand("removerank").setExecutor(this);
 		this.plugin = plugin;

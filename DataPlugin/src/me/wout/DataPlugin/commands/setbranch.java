@@ -2,18 +2,17 @@ package me.wout.DataPlugin.commands;
 
 import java.util.List;
 
+import me.wout.DataPlugin.FtcDataMain;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import me.wout.DataPlugin.main;
-
 public class setbranch implements CommandExecutor {
 
-	private main plugin;
+	private FtcDataMain plugin;
 
-	public setbranch(main plugin) 
+	public setbranch(FtcDataMain plugin)
 	{
 		plugin.getCommand("setbranch").setExecutor(this);
 		this.plugin = plugin;
