@@ -9,27 +9,42 @@ import org.bukkit.event.HandlerList;
 public class CrownEnterEvent extends Event implements Cancellable {
 
     private final CrownEventUser user;
-    private final String eventName;
     private final Location preEntryLoc;
+    private final boolean hasTimer;
+    private final int timeInSeconds;
 
     boolean cancelled;
 
-    public CrownEnterEvent (CrownEventUser user, String eventName, Location preEntryLocation){
+    public CrownEnterEvent (CrownEventUser user, Location preEntryLocation, boolean hasTimer){
         this.user = user;
-        this.eventName = eventName;
         this.preEntryLoc = preEntryLocation;
+        this.hasTimer = hasTimer;
+        hasTimerCountingDown = false;
+        timeInSeconds = 0;
+    }
+    public CrownEnterEvent (CrownEventUser user, Location preEntryLocation, boolean hasTimerCountingDown, int timeInSeconds){
+        this.user = user;
+        this.preEntryLoc = preEntryLocation;
+        this.hasTimerCountingDown = hasTimerCountingDown;
+        this.timeInSeconds = timeInSeconds;
+        hasTimer = false;
     }
 
-    public String getEventName(){
-        return eventName;
-    }
     public CrownEventUser getUser(){
         return user;
     }
     public Location getPreEntryLoc(){
         return preEntryLoc;
     }
-
+    public boolean getHasTimer() {
+        return hasTimer;
+    }
+    public boolean getHasTimerCountingDown() {
+        return hasTimerCountingDown;
+    }
+    public int getTimeInSeconds() {
+        return timeInSeconds;
+    }
 
     private static final HandlerList handlers = new HandlerList();
     public HandlerList getHandlers() {

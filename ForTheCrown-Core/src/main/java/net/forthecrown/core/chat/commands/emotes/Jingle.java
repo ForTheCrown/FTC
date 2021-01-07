@@ -1,0 +1,150 @@
+package net.forthecrown.core.chat.commands.emotes;
+
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.chat.Chat;
+import net.forthecrown.core.files.FtcUserData;
+import org.bukkit.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+public class Jingle implements CommandExecutor {
+
+    /*
+     * ----------------------------------------
+     * 			Command description:
+     * ----------------------------------------
+     * Command that allows players to vibe on Jingle Bells.
+     * Only works if they both have emotes enabled.
+     *
+     * Valid usages of command:
+     * - /jingle
+     *
+     * Referenced other classes:
+     * - FtcCore
+     * - Chat
+     *
+     * Main Author: Wout
+     * Edit: Botul
+     */
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        // Sender must be a player:
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Only players may execute this command.");
+            return false;
+        }
+        Player player = (Player) sender;
+        FtcUserData playerData = FtcCore.getUserData(player.getUniqueId());
+
+        if(Chat.isOnCooldown(player)){
+            sender.sendMessage(ChatColor.GRAY + "You jingle too often lol");
+            sender.sendMessage(ChatColor.DARK_GRAY + "This only works every 6 seconds.");
+            return false;
+        }
+        /*if(!playerData.getEmotesAvailable().contains("JINGLE")){
+            player.sendMessage(ChatColor.GRAY + "You haven't unlocked this emote yet.");
+            return false;
+        }*/
+
+        if (args.length < 1 || args[0].equalsIgnoreCase(sender.getName())) {
+            Chat.addToEmoteCooldown(player, 6*20);
+            jingle(player);
+            return true;
+        }
+        if(!playerData.getAllowsEmotes()){
+            Chat.senderEmoteOffMessage(player);
+            return false;
+        }
+
+        Player target;
+        try {
+            target = Bukkit.getPlayer(args[0]);
+        } catch (Exception e){
+            player.sendMessage(args[0] + " is not a currently online player.");
+            return false;
+        }
+        FtcUserData targetData = FtcCore.getUserData(target.getUniqueId());
+
+        if(!targetData.getAllowsEmotes()){
+            player.sendMessage(ChatColor.GRAY + "This player has disabled emotes.");
+            return false;
+        }
+
+        // Actual jingling:
+        player.sendMessage("You've sent " + ChatColor.YELLOW + target.getName() + ChatColor.RESET + " a sick Christmas beat!");
+        target.sendMessage("You've received jingle vibes from " + ChatColor.YELLOW + player.getName() + ChatColor.RESET + "!");
+
+        Chat.addToEmoteCooldown(player, 6*20);
+        jingle(target);
+
+        return true;
+    }
+
+    private void jingle(Player player) {
+        Location loc = player.getLocation();
+        loc.getWorld().spawnParticle(Particle.SNOW_SHOVEL,loc, 25, 0.1, 0, 0.1, 1);
+        loc.getWorld().spawnParticle(Particle.END_ROD, loc, 50, 0.1, 0, 0.1, 0.1);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(FtcCore.getInstance(), () -> {
+            //b = bass //s = snare
+            playSound(0, loc, midTone); //b
+            playSound(4, loc, midTone); //s
+            playSound(8, loc, midTone); //b
+
+            playSound(16, loc, midTone); //b
+            playSound(20, loc, midTone); //s
+            playSound(24, loc, midTone); //b
+
+            playSound(32, loc, midTone); //b
+            playSound(36, loc, 1.8f); //s
+            playSound(40, loc, 1.2f); //b
+            playSound(44, loc, midTone); //s
+
+            playSound(48, loc, midTone); //b
+            playSound(52, loc, midTone); //s
+            playSound(56, loc, midTone); //b
+
+
+            playSound(64, loc, highTone); //b
+            playSound(68, loc, highTone); //s
+            playSound(72, loc, highTone); //b
+
+            playSound(78, loc, highTone); //s
+            playSound(80, loc, highTone); //b
+            playSound(84, loc, midTone); //s
+            playSound(88, loc, midTone); //b
+
+            playSound(96, loc, midTone);  //b
+            playSound(100, loc, 1.3f); //s
+            playSound(104, loc, 1.3f); //s
+            playSound(108, loc, 1.7f); //s
+            playSound(112, loc, midTone); //s
+            playSound(120, loc, 2.0f);
+        }, 8);
+    }
+
+    private Set<Integer> bass = new HashSet<>(Arrays.asList(
+            0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96));
+    private Set<Integer> snare = new HashSet<>(Arrays.asList(
+            4, 20, 36, 44, 52, 68, 78, 84, 100, 104, 108, 112));
+    private float midTone = 1.5f;
+    private float highTone = 1.7f;
+
+    private void playSound(int delay, Location loc, float pitch) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(FtcCore.getInstance(), () -> {
+            if (bass.contains(delay)) {
+                loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, SoundCategory.MASTER, 0.2F, 1F);
+            }
+            else if (snare.contains(delay)) {
+                loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_SNARE, SoundCategory.MASTER, 1F, 1F);
+            }
+            loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.MASTER, 1F, pitch);
+        }, delay);
+    }
+}

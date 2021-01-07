@@ -1,12 +1,12 @@
 package ftc.crownapi.types.interfaces;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface ICrownEvent {
 
@@ -14,21 +14,17 @@ public interface ICrownEvent {
     void removeFromScoreMap(Player player);
     void setScoreMap(Map<Player, Integer> map);
 
-    List<Player> getPlayersInEvent();
-    void setPlayersInEvent(List<Player> list);
+    List<UUID> getPlayersInEvent();
+    void setPlayersInEvent(List<UUID> list);
 
-    List<Player> getDisqualifiedPlayers();
-    void setDisqualifiedPlayers(List<Player> list);
+    List<UUID> getDisqualifiedPlayers();
+    void setDisqualifiedPlayers(List<UUID> list);
 
-    List<Player> getPlayersThatQuitInEvent();
-    void setPlayersThatQuitInEventList(List<Player> list);
+    List<UUID> getPlayersThatQuitInEvent();
+    void setPlayersThatQuitInEventList(List<UUID> list);
 
     Objective getCrownObjective();
     Scoreboard getScoreboard();
 
-    Location getStartLocation();
-    void setStartLocation(Location location);
-
-    Location getLobbyLocation();
-    void setLobbyLocation(Location location);
+    StringBuilder getTimerString(long time);
 }

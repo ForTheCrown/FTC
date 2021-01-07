@@ -1,6 +1,7 @@
 package ftc.crownapi.types;
 
-import ftc.crownapi.Main;
+import ftc.crownapi.EventApi;
+import ftc.crownapi.apievents.CrownLeaveEvent;
 import ftc.crownapi.types.interfaces.CrownEventIUser;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -9,14 +10,12 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Score;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class CrownEventUser implements CrownEventIUser {
 
-    private static final CrownEvent crownMain = new CrownEvent();
+    private final CrownEvent crownMain;
+    private final EventApi main;
 
     //server Locations
     private static final Location hazLoc = new Location(Bukkit.getWorld("world"), 200.5, 70, 1000.5);
@@ -24,31 +23,35 @@ public class CrownEventUser implements CrownEventIUser {
     private static final Location ketilLoc = new Location(Bukkit.getWorld("world"), -1800.5, 82, -2199.5);
 
     //timer variables
-    private static final Timer timer = new Timer();
-    private static long timerTime;
-    private static long timeLeft;
+    private Timer timer;
+    private long timerTime;
+    private long timeLeft;
+    private boolean hasTimer = false;
 
     //Base player variable and Constructor
     private final Player base;
-    public CrownEventUser(Player base){
+    public CrownEventUser(Player base, EventApi main, CrownEvent crownMain){
         this.base = base;
+        this.main = main;
+        this.crownMain = crownMain;
+        EventApi.loadedUsers.add(this);
     }
 
     //the void of interface methods lol
     @Override
     public boolean isInEvent() {
-        return crownMain.getPlayersInEvent().contains(base);
+        return crownMain.getPlayersInEvent().contains(base.getUniqueId());
     }
     @Override
     public void setInEvent(boolean value) {
-        List<Player> list = crownMain.getPlayersInEvent();
+        List<UUID> list = crownMain.getPlayersInEvent();
         if(value){
-            list.add(base);
+            list.add(base.getUniqueId());
             crownMain.setPlayersInEvent(list);
             return;
         }
         if(isInEvent()){
-            list.remove(base);
+            list.remove(base.getUniqueId());
             crownMain.setPlayersInEvent(list);
         }
     }
@@ -67,19 +70,29 @@ public class CrownEventUser implements CrownEventIUser {
     }
 
     @Override
-    public void disqualify() {
-        Main.plugin.disqualifiedPlayersList.add(base);
-        if(isInEvent()) teleportToHazelguard();
+    public void setDisqualified(boolean value) {
+        List<UUID> list = crownMain.getDisqualifiedPlayers();
+        if(!value && list.contains(base.getUniqueId())){
+            list.remove(base.getUniqueId());
+            crownMain.setDisqualifiedPlayers(list);
+            return;
+        }
+        if (value) {
+            list.add(base.getUniqueId());
+            crownMain.setDisqualifiedPlayers(list);
+            if (isInEvent()) teleportToHazelguard();
+            getCrownScore().setScore(getCrownScore().getScore() * -1);
+        }
     }
     @Override
     public boolean isDisqualified(){
-        return crownMain.getDisqualifiedPlayers().contains(base);
+        return crownMain.getDisqualifiedPlayers().contains(base.getUniqueId());
     }
 
 
     @Override
     public int getScoreMapScore() {
-        return Main.plugin.scoreMap.getOrDefault(base, 0);
+        return main.scoreMap.getOrDefault(base, 0);
     }
     @Override
     public void setScoreMapScore(int score) {
@@ -87,7 +100,6 @@ public class CrownEventUser implements CrownEventIUser {
         score_map.put(base, score);
         crownMain.setScoreMap(score_map);
     }
-
     @Override
     public void addToScoreMap() {
         Map<Player, Integer> score_map = crownMain.getScoreMap();
@@ -107,18 +119,18 @@ public class CrownEventUser implements CrownEventIUser {
         return crownMain.getCrownObjective().getScore(base.getName());
     }
     @Override
-    public int scoreMapCrownScoreDifference() {
-        return getScoreMapScore() - getCrownScore().getScore();
+    public boolean isRecordSmallerThanScore(){
+        return getCrownScore().getScore() < getScoreMapScore();
     }
 
 
     @Override
     public void teleportToEventLobby() {
-        base.teleport(crownMain.getLobbyLocation());
+        if(crownMain.getLobbyLocation() != null) base.teleport(crownMain.getLobbyLocation());
     }
     @Override
     public void teleportToEventStart() {
-        base.teleport(crownMain.getStartLocation());
+        if(crownMain.getStartLocation() != null) base.teleport(crownMain.getStartLocation());
     }
 
 
@@ -143,22 +155,21 @@ public class CrownEventUser implements CrownEventIUser {
 
     @Override
     public boolean hasQuitInEvent() {
-        return crownMain.getPlayersThatQuitInEvent().contains(base);
+        return crownMain.getPlayersThatQuitInEvent().contains(base.getUniqueId());
     }
 
     @Override
     public void setHasQuitInEvent(boolean value) {
+        List<UUID> plrList = crownMain.getPlayersThatQuitInEvent();
         if(value){
-            List<Player> plrList = crownMain.getPlayersThatQuitInEvent();
-            plrList.add(base);
+            plrList.add(base.getUniqueId());
             crownMain.setPlayersThatQuitInEventList(plrList);
             return;
         }
         if(hasQuitInEvent()){
-            List<Player> plrList = crownMain.getPlayersThatQuitInEvent();
-            plrList.remove(base);
-            crownMain.setPlayersThatQuitInEventList(plrList);
+            plrList.remove(base.getUniqueId());
         }
+        crownMain.setPlayersThatQuitInEventList(plrList);
     }
 
 
@@ -173,32 +184,29 @@ public class CrownEventUser implements CrownEventIUser {
     }
 
     @Override
+    public boolean hasTimer(){
+        return hasTimer;
+    }
+    @Override
     public void startTimer() {
+        timer = new Timer();
         timerTime = 0;
-        timer.schedule(new TimerTask() {
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                if(!hasTimer) hasTimer = true;
                 timerTime += 100;
-                long minutes = (timerTime /60000) % 60;
-                long seconds = (timerTime / 1000) % 60;
-                long milliseconds = (timerTime/100 ) % 100;
+                if(timerTime > 3540000) stopTimer();
 
-                StringBuilder message = new StringBuilder("Timer: ");
-                message.append(String.format("%02d", minutes)).append(":");
-                message.append(String.format("%02d", seconds)).append(":");
-                message.append(String.format("%02d", milliseconds));
-
-                base.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message.toString()));
+                base.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(crownMain.getTimerString(timerTime).toString()));
             }
         }, 0, 100);
     }
     @Override
     public void stopTimer() {
         timer.cancel();
-    }
-    @Override
-    public void purgeTimer() {
         timer.purge();
+        hasTimer = false;
     }
     @Override
     public long getTimerEndTime() {
@@ -207,22 +215,23 @@ public class CrownEventUser implements CrownEventIUser {
 
     @Override
     public void startTimerTickingDown(long timeInSeconds) { //What the fuck is this
+        timer = new Timer();
         timeLeft = timeInSeconds * 1000;
-        timer.schedule(new TimerTask() {
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if(timeLeft <= 0 ) timer.cancel();
+                if(!hasTimer) hasTimer = true;
+
+                //if timer has run out
+                if(timeLeft <= 0 ) {
+                    stopTimer();
+                    //To quote Wout: "Async to sync >:|"
+                    Bukkit.getServer().getScheduler().runTask(main, () -> Bukkit.getPluginManager().callEvent(new CrownLeaveEvent(getUser(), getPlayer().getLocation(), getTimerTickingDownTimeLeft(), true)));
+                    return;
+                }
                 timeLeft -= 100;
-                long minutes = (timeLeft /60000) % 60;
-                long seconds = (timeLeft / 1000) % 60;
-                long milliseconds = (timeLeft/100 ) % 100;
 
-                StringBuilder message = new StringBuilder("Timer: ");
-                message.append(String.format("%02d", minutes)).append(":");
-                message.append(String.format("%02d", seconds)).append(":");
-                message.append(String.format("%02d", milliseconds));
-
-                base.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message.toString()));
+                base.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(crownMain.getTimerString(timeLeft).toString()));
             }
         }, 0, 100);
     }

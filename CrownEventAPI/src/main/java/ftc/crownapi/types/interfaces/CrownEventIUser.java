@@ -17,7 +17,7 @@ public interface CrownEventIUser {
     void teleportToKetilheim();
 
     //admin methods
-    void disqualify();
+    void setDisqualified(boolean value);
     boolean isDisqualified();
 
     //score map methods
@@ -28,7 +28,7 @@ public interface CrownEventIUser {
 
     //crown score methods
     Score getCrownScore();
-    int scoreMapCrownScoreDifference();
+    boolean isRecordSmallerThanScore();
 
     //event methods
     void teleportToEventLobby();
@@ -49,9 +49,9 @@ public interface CrownEventIUser {
     Player getPlayer();
 
     //timer methods
+    boolean hasTimer();
     void startTimer();
     void stopTimer();
-    void purgeTimer();
     long getTimerEndTime();
 
     void startTimerTickingDown(long timeInSeconds);
