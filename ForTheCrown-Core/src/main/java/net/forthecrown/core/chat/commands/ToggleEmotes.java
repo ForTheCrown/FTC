@@ -1,7 +1,7 @@
 package net.forthecrown.core.chat.commands;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.files.FtcUserData;
+import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -38,8 +38,9 @@ public class ToggleEmotes implements CommandExecutor {
             sender.sendMessage("Only players may execute this command!");
             return false;
         }
+
         Player player = (Player) sender;
-        FtcUserData userData = FtcCore.getUserData(player.getUniqueId());
+        FtcUser userData = FtcCore.getUserData(player.getUniqueId());
         String message = ChatColor.GRAY + "You can longer send or recieve emotes.";
 
         if(userData.getAllowsEmotes()) userData.setAllowsEmotes(false);

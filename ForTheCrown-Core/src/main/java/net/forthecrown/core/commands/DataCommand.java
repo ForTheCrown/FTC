@@ -10,3 +10,6 @@ public class DataCommand implements CommandExecutor {
         return false;
     }
 }
+
+//TODO getters and setters for everything in the FtcUser class
+//TODO resetPrices arg to reset all prices and amountEarned

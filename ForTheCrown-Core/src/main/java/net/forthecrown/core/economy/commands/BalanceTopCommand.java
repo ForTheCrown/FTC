@@ -19,7 +19,12 @@ public class BalanceTopCommand implements CommandExecutor {
             try {
                 page = Integer.parseInt(args[0]);
             } catch (Exception e){
-                sender.sendMessage("The argument must be a number!");
+                sender.sendMessage(ChatColor.GRAY + "The argument must be a number!");
+                return false;
+            }
+
+            if(page < 0){
+                sender.sendMessage(ChatColor.GRAY + "Negative numbers cannot be used!");
                 return false;
             }
         }
@@ -29,31 +34,31 @@ public class BalanceTopCommand implements CommandExecutor {
 
     private void sendBaltopMessage(CommandSender sender, @Nonnegative int page){
         List<String> baltopList = getBaltopList();
+        Collections.reverse(baltopList);
         int index = page;
-        if(page != 0) index = page*10;
+        if(index != 0) index--;
 
-        if(page > baltopList.size()/10) {
+        if(page > ((baltopList.size()-1)/10)) {
             sender.sendMessage("Out of range");
             return;
         }
 
-        sender.sendMessage("----- Top balances -----");
-        for(int i = index+1 ; i <= index+10 ; i++){
-            if(baltopList.get(i) == null) break;
-            sender.sendMessage(ChatColor.GOLD + "" + i + ". " + ChatColor.RESET + baltopList.get(i));
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7------ &eTop balances &7------"));
+        for(int i = 0 ; i < 10 ; i++){
+            if((index*10) + i > baltopList.size()) break;
+            sender.sendMessage(ChatColor.GOLD + "" + ((index*10) + i+1) + ") " + ChatColor.RESET + baltopList.get((index*10) + i));
         }
-        sender.sendMessage("------ Page " + (page+1) + "/" + (baltopList.size()/10) + " ------");
+        sender.sendMessage(ChatColor.GRAY + "------ "  + ChatColor.YELLOW + "Page " + (index+1) + "/" + ((baltopList.size())/10) + ChatColor.GRAY + " ------");
     }
 
     private List<String> getBaltopList(){
         Map<UUID, Integer> map = getSortedBalances();
         List<String> list = new ArrayList<>();
-        list.add("Dummy");
 
         for(UUID id : getSortedBalances().keySet()){
             String message;
 
-            message = getPlayerName(id) + ": " + map.get(id);
+            message = Bukkit.getOfflinePlayer(id).getName() + " - " + ChatColor.YELLOW + map.get(id) + " Rhines";
             list.add(message);
         }
         return list;

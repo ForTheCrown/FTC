@@ -2,7 +2,7 @@ package net.forthecrown.core.chat.commands.emotes;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.chat.Chat;
-import net.forthecrown.core.files.FtcUserData;
+import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -28,7 +28,7 @@ public class Poke implements CommandExecutor {
             return false;
         }
         Player player = (Player) sender;
-        FtcUserData playerData = FtcCore.getUserData(player.getUniqueId());
+        FtcUser playerData = FtcCore.getUserData(player.getUniqueId());
 
         // Sender can't be on cooldown:
         if (onCooldown.contains(player)) {
@@ -56,7 +56,7 @@ public class Poke implements CommandExecutor {
             player.sendMessage(args[0] + " is not a currently online player.");
             return false;
         }
-        FtcUserData targetData = FtcCore.getUserData(target.getUniqueId());
+        FtcUser targetData = FtcCore.getUserData(target.getUniqueId());
 
         if(!targetData.getAllowsEmotes()){
             player.sendMessage(ChatColor.GRAY + "This player has disabled emotes.");

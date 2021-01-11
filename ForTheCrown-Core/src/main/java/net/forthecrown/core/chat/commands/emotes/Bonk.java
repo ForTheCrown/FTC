@@ -2,7 +2,7 @@ package net.forthecrown.core.chat.commands.emotes;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.chat.Chat;
-import net.forthecrown.core.files.FtcUserData;
+import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -41,7 +41,7 @@ public class Bonk implements CommandExecutor {
             return false;
         }
         Player player = (Player) sender;
-        FtcUserData playerData = FtcCore.getUserData(player.getUniqueId());
+        FtcUser playerData = FtcCore.getUserData(player.getUniqueId());
 
         // Sender can't be on cooldown:
         if (Chat.isOnCooldown(player)) {
@@ -62,7 +62,7 @@ public class Bonk implements CommandExecutor {
             player.sendMessage(args[0] + " is not a currently online player.");
             return false;
         }
-        FtcUserData targetData = FtcCore.getUserData(target.getUniqueId());
+        FtcUser targetData = FtcCore.getUserData(target.getUniqueId());
 
         if (!playerData.getAllowsEmotes()) {
             Chat.senderEmoteOffMessage(player);

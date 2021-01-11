@@ -12,10 +12,8 @@ public class BroadcastCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(args.length < 1) return false;
-        String message = net.forthecrown.core.files.Messages.getPrefix();
-        for (String s : args){
-            message += s + " ";
-        }
+        String message = FtcCore.getPrefix();
+        message += String.join(" ", args);
         message = Chat.replaceEmojis(message);
         message = ChatColor.translateAlternateColorCodes('&', message);
 

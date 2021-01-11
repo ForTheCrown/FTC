@@ -1,7 +1,8 @@
 package net.forthecrown.core.economy.commands;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.files.FtcUserData;
+import net.forthecrown.core.economy.Economy;
+import net.forthecrown.core.economy.files.Balances;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,10 +18,10 @@ public class BalanceCommand implements CommandExecutor {
             return false;
         }
         Player player = (Player) sender;
-        FtcUserData playerData = FtcCore.getUserData(player.getUniqueId());
+        Balances bals = Economy.getBalances();
 
         if(args.length < 1){
-            player.sendMessage("Your balance: " + playerData.getBalance());
+            player.sendMessage("Your balance: " + bals.getBalance(player.getUniqueId()));
             return true;
         }
 
@@ -33,9 +34,7 @@ public class BalanceCommand implements CommandExecutor {
             return false;
         }
 
-        FtcUserData targetData = FtcCore.getUserData(targetUUID);
-        player.sendMessage(args[0] + "'s balance is: " + targetData.getBalance());
-
+        player.sendMessage(args[0] + "'s balance is: " + bals.getBalance(targetUUID));
         return true;
     }
 }

@@ -2,7 +2,7 @@ package net.forthecrown.core.chat.commands.emotes;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.chat.Chat;
-import net.forthecrown.core.files.FtcUserData;
+import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -54,8 +54,8 @@ public class Mwah implements CommandExecutor {
             player.sendMessage(args[0] + " is not a currently online player.");
             return false;
         }
-        FtcUserData playerData = FtcCore.getUserData(player.getUniqueId());
-        FtcUserData targetData = FtcCore.getUserData(target.getUniqueId());
+        FtcUser playerData = FtcCore.getUserData(player.getUniqueId());
+        FtcUser targetData = FtcCore.getUserData(target.getUniqueId());
 
         // Sender should have emotes enabled:
         if(!playerData.getAllowsEmotes()){

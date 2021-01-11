@@ -12,7 +12,8 @@ public class FtcFileManager{
     private final String directory;
     private final boolean stopIfFileDoesntExist;
 
-    protected boolean needsDefaults = false;
+    protected boolean fileDoesntExist = false;
+    private boolean deleted = false;
 
     protected File file;
     protected FileConfiguration fileConfig;
@@ -41,11 +42,11 @@ public class FtcFileManager{
         else file = new File(FtcCore.getInstance().getDataFolder() + "/" + directory, fileName + ".yml");
 
         //if the directory doesn't exist and it can't create it
-        if(!file.getParentFile().exists() && !file.getParentFile().mkdirs()) System.out.println("[SEVERE!] Failed to create " + fileName + " directory, at " + FtcCore.getInstance().getDataFolder() + "/" + "folder;");
+        if(!file.getParentFile().exists() && !file.getParentFile().mkdirs()) System.out.println("[SEVERE!] Failed to create " + fileName + " directory, at " + FtcCore.getInstance().getDataFolder() + "/" + directory);
 
         if(!file.exists()){
-            if(stopIfFileDoesntExist) throw new NullPointerException();
-            needsDefaults = true;
+            if(stopIfFileDoesntExist) return;
+            fileDoesntExist = true;
             try{
                 file.createNewFile();
             }catch (IOException e){
@@ -62,6 +63,7 @@ public class FtcFileManager{
     }
 
     public void save(){
+        if(deleted) return;
         try{
             fileConfig.save(file);
         } catch (IOException e){
@@ -70,5 +72,11 @@ public class FtcFileManager{
     }
     public FileConfiguration getFile(){
         return fileConfig;
+    }
+
+    protected void delete(){
+        fileConfig = null;
+        file.delete();
+        deleted = true;
     }
 }

@@ -1,0 +1,144 @@
+name: FTCCore
+version: @version@
+main: net.forthecrown.core.FtcCore
+api-version: 1.16
+authors: [ Botul, Wout ]
+
+commands:
+  ftcreload:
+    permission: ftc.admin
+    permission-message: Oi! Why are you trying to reload the plugin!
+    description: Reloads the FTC-Core plugin.
+    aliases:
+      - ftcrl
+      - reloadftc
+      - rlftc
+  staffchat:
+    permission: ftc.staffchat
+    permission-message: You do not have permission to use this!
+    description: The StaffChat command.
+    aliases:
+      - sc
+    usage: '§7Usage: /sc <message>'
+  staffchattoggle:
+    permission: ftc.staffchat
+    permission-message: You do not have permission to use this!
+    description: Toggles all your chat messages going to the StaffChat.
+    aliases:
+      - sct
+  broadcast:
+    permission: ftc.admin
+    permission-message: You do not have permission to use this!
+    description: Broadcasts a message to the entire server.
+    aliases:
+      - bc
+  tpask:
+    description: Asks a player to teleport to them.
+    permission: ftc.tpa
+    permission-message: You do not have permission to use this!
+    aliases:
+      - tpa
+    usage: '§7Usage:§r /tpa <player>'
+  tpaskhere:
+    description: Asks a player to teleport to them.
+    permission: ftc.tpahere
+    permission-message: You do not have permission to use this!
+    aliases:
+      - tpahere
+    usage: '§7Usage:§r /tpahere <player>'
+  discord:
+    description: Gives you the servers discord link.
+  findpost:
+    description: Shows you the nearest region pole.
+    aliases:
+      - findpole
+  posthelp:
+    description: Displays info for region poles.
+    aliases:
+      - polehelp
+  spawn:
+    description: Tells you how to get to spawn
+  scare:
+    description: Scares another player.
+    permission: ftc.emotes.scare
+    permission-message: You aren't allowed to scare people lol
+  jingle:
+    description: Plays a christmas song.
+    permission: ftc.emotes.jingle
+    permission-message: You aren't allowed to jingle lol
+  poke:
+    description: Pokes another player.
+    permission: ftc.emotes
+    permission-message: You do not have permission to use this!
+  mwah:
+    description: Kisses another player.
+    permission: ftc.emotes
+    permission-message: You do not have permission to use this!
+    aliases:
+      - smooch
+      - kiss
+  bonk:
+    description: Bonks another player.
+    permission: ftc.emotes
+    permission-message: You do not have permission to use this!
+  toggleemotes:
+    description: Toggles the ability to recieve and send emotes.
+    permission: ftc.emotes
+    permission-message: You do not have permission to use this!
+  addbalance:
+    description: Adds to a players balance.
+    usage: '§7Usage:§r /addbal <player> <amount>, amount should be negative to remove'
+    permission: ftc.admin
+    permission-message: You do not have permission to use this!
+    aliases:
+      - addbal
+      - addcash
+      - addbank
+      - addmoney
+  balancetop:
+    description: Displays the players with the biggest balances.
+    aliases:
+      - baltop
+      - topbal
+  setbalance:
+    description: Sets a players balance.
+    permission: ftc.admin
+    permission-message: You do not have permission to use this!
+    aliases:
+      - setcash
+      - setbal
+      - setmoney
+      - setbank
+    usage: '§7Usage:§r /setbal <playername> <amount>'
+  balance:
+    description: Displays a players balance.
+    aliases:
+      - bal
+      - bank
+      - cash
+      - money
+  leavevanish:
+    description: Places a player in vanish and tells the server they left.
+    permission: ftc.admin
+    permission-message: You do not have permission to use this!
+    aliases:
+      - fullvanish
+      - fv
+      - lv
+    usage: '§7Usage:§r /leavevanish [playername]'
+  pay:
+    description: Pays another player money
+    usage: '§7Usage:§r /pay <user> <amount>'
+  ftccore:
+    description: The primary FtcCore command.
+    permission: ftc.admin
+    permission-message: You do not have permission to use this!
+  becomebaron:
+    description: Allows you to become a baron if you have 500,000 Rhines.
+    permission: ftc.becomebaron
+    permission-message: You do not have permission to use this!
+  shop:
+    description: Opens the Shop GUI in which one can sell things
+    permission: ftc.shop
+    permission-message: You do not have permission to use this!
+    usage: 'Usage: /shop [mining | farming | drops]'

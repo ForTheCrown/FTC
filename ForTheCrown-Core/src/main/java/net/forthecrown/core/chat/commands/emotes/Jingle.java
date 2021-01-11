@@ -2,7 +2,7 @@ package net.forthecrown.core.chat.commands.emotes;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.chat.Chat;
-import net.forthecrown.core.files.FtcUserData;
+import net.forthecrown.core.files.FtcUser;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -41,7 +41,7 @@ public class Jingle implements CommandExecutor {
             return false;
         }
         Player player = (Player) sender;
-        FtcUserData playerData = FtcCore.getUserData(player.getUniqueId());
+        FtcUser playerData = FtcCore.getUserData(player.getUniqueId());
 
         if(Chat.isOnCooldown(player)){
             sender.sendMessage(ChatColor.GRAY + "You jingle too often lol");
@@ -70,7 +70,7 @@ public class Jingle implements CommandExecutor {
             player.sendMessage(args[0] + " is not a currently online player.");
             return false;
         }
-        FtcUserData targetData = FtcCore.getUserData(target.getUniqueId());
+        FtcUser targetData = FtcCore.getUserData(target.getUniqueId());
 
         if(!targetData.getAllowsEmotes()){
             player.sendMessage(ChatColor.GRAY + "This player has disabled emotes.");

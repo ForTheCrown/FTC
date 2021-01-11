@@ -1,7 +1,8 @@
 package net.forthecrown.core.economy.commands;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.files.FtcUserData;
+import net.forthecrown.core.economy.Economy;
+import net.forthecrown.core.economy.files.Balances;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,7 +12,7 @@ import java.util.UUID;
 public class AddBalanceCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(args.length < 2) return false;
+        if(args.length != 2) return false;
 
         UUID targetUUID;
         try {
@@ -29,8 +30,8 @@ public class AddBalanceCommand implements CommandExecutor {
             return false;
         }
 
-        FtcUserData targetData = FtcCore.getUserData(targetUUID);
-        targetData.setBalance(targetData.getBalance() + amountToAdd);
+        Balances bals = Economy.getBalances();
+        bals.setBalance(targetUUID, bals.getBalance(targetUUID) + amountToAdd);
         return true;
     }
 }

@@ -17,9 +17,10 @@ public class AutoAnnouncer extends FtcFileManager {
         super("announcer");
         addDefaults();
         reload();
+        startAnnoncments();
     }
     private void addDefaults(){
-        fileConfig.addDefault("delay", 12000);
+        getFile().addDefault("delay", 12000);
         List<String> list = new ArrayList<>();
         list.add("To visit a region, do &e/visit &rwhen you are near a region pole.");
         list.add("Please use the Resource World in Hazelguard if you need a lot of materials.");
@@ -34,8 +35,8 @@ public class AutoAnnouncer extends FtcFileManager {
         list.add("You can do &e/polehelp &rif you need some help with regionpoles.");
         list.add("You can &e/vote&r for a chance to grab as much items as you can in the &eBank Vault&r!");
         list.add("&eThe End &ris only open the first 7 days of every month, it closes and resets again after.");
-        fileConfig.addDefault("announcements", list);
-        fileConfig.options().copyDefaults(true);
+        getFile().addDefault("announcements", list);
+        getFile().options().copyDefaults(true);
         super.save();
     }
 
@@ -43,11 +44,10 @@ public class AutoAnnouncer extends FtcFileManager {
         super.reload();
         thingsToAnnounce = getFile().getStringList("announcements");
         delay = getFile().getLong("delay");
-        startAnnoncments();
     }
     public void save(){
-        fileConfig.set("delay", getDelay());
-        fileConfig.set("announcements", getAnnouncements());
+        getFile().set("delay", getDelay());
+        getFile().set("announcements", getAnnouncements());
         super.save();
     }
 
@@ -64,7 +64,7 @@ public class AutoAnnouncer extends FtcFileManager {
         this.thingsToAnnounce = announcements;
     }
 
-    public void startAnnoncments(){
+    private void startAnnoncments(){
         Bukkit.getScheduler().scheduleSyncRepeatingTask(FtcCore.getInstance(), new Runnable() {
             int counter = 0;
             @Override

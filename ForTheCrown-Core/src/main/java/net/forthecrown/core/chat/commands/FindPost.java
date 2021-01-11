@@ -73,7 +73,7 @@ public class FindPost implements CommandExecutor {
         if (x < 0) x_pole -= 400;
         if (z < 0) z_pole -= 400;
 
-        player.sendMessage(net.forthecrown.core.files.Messages.getPrefix()+ ChatColor.YELLOW + "The region pole closest to you:");
+        player.sendMessage(FtcCore.getPrefix()+ ChatColor.YELLOW + "The region pole closest to you:");
         player.sendMessage(ChatColor.YELLOW + "x = " + x_pole + ", z = " + z_pole);
 
         return true;

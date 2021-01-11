@@ -7,7 +7,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Balances extends FtcFileManager {
 
@@ -39,7 +41,7 @@ public class Balances extends FtcFileManager {
 
     public void save(){
         for(UUID id : balanceMap.keySet()){
-            fileConfig.set(id.toString(), getBalances().get(id));
+            if(balanceMap.get(id) != 100) fileConfig.set(id.toString(), getBalances().get(id));
         }
         super.save();
     }
@@ -76,10 +78,11 @@ public class Balances extends FtcFileManager {
                 continue;
             }
 
-            if(oldDataSection.getInt(s) != 100) balanceMap.put(id, oldDataSection.getInt(s));
+            if(oldDataSection.getInt(s) > 100) balanceMap.put(id, oldDataSection.getInt(s));
         }
         save();
-        reload();
+
+        oldFile.delete();
     }
 
     private boolean legacyFileExists(){

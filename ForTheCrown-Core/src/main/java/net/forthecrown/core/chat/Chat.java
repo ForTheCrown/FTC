@@ -8,16 +8,14 @@ import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class Chat {
 
     private final FtcCore main = FtcCore.getInstance();
     private static Chat chatMain;
-    private static List<Player> sctPlayers = new ArrayList<>();
+    private static Set<Player> sctPlayers = new HashSet<>();
     private static String discord;
 
     private static Set<Player> onCooldown = new HashSet<>();
@@ -56,14 +54,14 @@ public class Chat {
         return chatMain;
     }
 
-    public static List<Player> getSCTPlayers(){
+    public static Set<Player> getSCTPlayers(){
         return sctPlayers;
     }
-    public static void setSCTPlayers(List<Player> sctPlayers){
+    public static void setSCTPlayers(Set<Player> sctPlayers){
         Chat.sctPlayers = sctPlayers;
     }
     public static String getDiscord(){
-        return discord;
+        return ChatColor.translateAlternateColorCodes('&', discord);
     }
     public static void setDiscord(String discord){
         Chat.discord = discord;
@@ -90,7 +88,7 @@ public class Chat {
     }
 
     public static void senderEmoteOffMessage(Player player){
-        player.sendMessage(ChatColor.GRAY + "You've emotes turned off.");
+        player.sendMessage(ChatColor.GRAY + "You have emotes turned off.");
         player.sendMessage(ChatColor.GRAY + "Do " + ChatColor.RESET + "/toggleemotes" + ChatColor.GRAY + " to enable them.");
     }
 

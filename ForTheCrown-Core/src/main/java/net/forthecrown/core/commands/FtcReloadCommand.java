@@ -2,7 +2,7 @@ package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.economy.Economy;
-import net.forthecrown.core.files.FtcUserData;
+import net.forthecrown.core.files.FtcUser;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -46,7 +46,7 @@ public class FtcReloadCommand implements CommandExecutor {
                     reloadMsg = "Balances";
                     break;
                 case "userdata":
-                    for (FtcUserData data : FtcUserData.loadedData){
+                    for (FtcUser data : FtcUser.loadedData){
                         data.reload();
                     }
                     reloadMsg = "All currently loaded user data's";
