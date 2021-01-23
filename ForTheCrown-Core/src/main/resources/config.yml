@@ -1,7 +1,12 @@
-prefix: '&6[FTC]&r  '
-discord: 'Join our discord server:&b https://discord.gg/wXjHNdp'
+Prefix: '&6[FTC]&r '
+Discord: 'Join our discord server:&b https://discord.gg/wXjHNdp'
 StartRhines: 100
 BaronPrice: 500000
+MaxMoneyAmount: 50000000
+UserDataResetInterval: 5356800000L
+Taxes: true
+
+King: empty
 
 DefaultPrices:
   ROTTEN_FLESH: 2
@@ -47,3 +52,5 @@ DefaultPrices:
   DIORITE: 5
   GRANITE: 5
   DIRT: 2
+  SANDSTONE: 2
+  NETHERRACK: 2

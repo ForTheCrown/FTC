@@ -1,14 +1,11 @@
 package ftc.cosmetics.inventories;
 
 
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import ftc.cosmetics.Main;
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.files.FtcUser;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -18,21 +15,18 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import ftc.cosmetics.Main;
-import net.md_5.bungee.api.ChatColor;
-
 public class DeathParticleMenu implements Listener {
 
 	private Inventory inv;
-	private String playerUUID;
+	private FtcUser user;
 	
-	public DeathParticleMenu(String playerUUID) {
+	public DeathParticleMenu(FtcUser user) {
 		CustomInventory cinv = new CustomInventory(36, "Death Effects", false, true);
 		cinv.setHeadItemSlot(0);
 		cinv.setReturnItemSlot(4);
 		
 		this.inv = cinv.getInventory();
-		this.playerUUID = playerUUID;
+		this.user = user;
 	}
 	
 	
@@ -43,44 +37,13 @@ public class DeathParticleMenu implements Listener {
 
 	private Inventory makeInventory() {
 		Inventory result = this.inv;
-		String activeDeathParticle = Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getString("players." + playerUUID + ".ParticleDeathActive");
-		List<String> deathParticles = Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getStringList("players." + playerUUID + ".ParticleDeathAvailable");
 		
-		ItemStack noEffect = Main.plugin.makeItem(Material.BARRIER, 1, ChatColor.GOLD + "No effect", ChatColor.GRAY + "Click to go back to default dying", ChatColor.GRAY + "without any effects.");
+		ItemStack noEffect = FtcCore.makeItem(Material.BARRIER, 1, true, ChatColor.GOLD + "No effect", ChatColor.GRAY + "Click to go back to default dying", ChatColor.GRAY + "without any effects.");
 		
-		ItemStack souls = Main.plugin.makeItem(Material.GRAY_DYE, 1, ChatColor.YELLOW + "Souls", ChatColor.GRAY + "Scary souls escaping from your body.", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
-		ItemStack totem = Main.plugin.makeItem(Material.GRAY_DYE, 1, ChatColor.YELLOW + "Faulty Totem", ChatColor.GRAY + "The particles are there, but you still die?", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
-		ItemStack explosion = Main.plugin.makeItem(Material.GRAY_DYE, 1, ChatColor.YELLOW + "Creeper", ChatColor.GRAY + "Always wanted to know what it feels like...", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
-		ItemStack enderRing = Main.plugin.makeItem(Material.GRAY_DYE, 1, ChatColor.YELLOW + "Ender Ring", ChatColor.GRAY + "Ender particles doing ring stuff.", ChatColor.GRAY + "Makes you scream like an enderman lol", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
-		
-		if (deathParticles.contains("SOUL")) souls = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "Souls", ChatColor.GRAY + "Scary souls escaping from your body.", "", ChatColor.GRAY + "Click to use this effect.");
-		if (deathParticles.contains("TOTEM")) totem = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "Faulty Totem", ChatColor.GRAY + "The particles are there, but you still die?", "", ChatColor.GRAY + "Click to use this effect.");
-		if (deathParticles.contains("EXPLOSION")) explosion = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "Creeper", ChatColor.GRAY + "Always wanted to know what it feels like...", "", ChatColor.GRAY + "Click to use this effect.");
-		if (deathParticles.contains("ENDER_RING")) enderRing = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "Ender Ring", ChatColor.GRAY + "Ender particles doing ring stuff.", "", ChatColor.GRAY + "Makes you scream like an enderman lol", ChatColor.GRAY + "Click to use this effect.");
-				
-		if (activeDeathParticle == null) {
-			Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + playerUUID + ".ParticleDeathActive", "none");
-			Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").saveConfig();
-			activeDeathParticle = "none";
-		}
-		
-		switch (activeDeathParticle) {
-		case "SOUL":
-			souls.addUnsafeEnchantment(Enchantment.CHANNELING, 0);
-			break;
-		case "TOTEM":
-			totem.addUnsafeEnchantment(Enchantment.CHANNELING, 0);
-			break;
-		case "EXPLOSION":
-			explosion.addUnsafeEnchantment(Enchantment.CHANNELING, 0);
-			break;
-		case "ENDER_RING":
-			enderRing.addUnsafeEnchantment(Enchantment.CHANNELING, 0);
-			break;
-		default:
-			noEffect.addUnsafeEnchantment(Enchantment.CHANNELING, 0);
-			break;
-		}
+		ItemStack souls = getEffectItem("SOUL", "&eSouls", ChatColor.GRAY + "Scary souls escaping from your body.", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
+		ItemStack totem = getEffectItem("TOTEM", "&eFaulty Totem", ChatColor.GRAY + "The particles are there, but you still die?", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
+		ItemStack explosion = getEffectItem("EXPLOSION", ChatColor.YELLOW + "Creeper", ChatColor.GRAY + "Always wanted to know what it feels like...", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
+		ItemStack enderRing = getEffectItem("ENDER_RING", ChatColor.YELLOW + "Ender Ring", ChatColor.GRAY + "Ender particles doing ring stuff.", ChatColor.GRAY + "Makes you scream like an enderman lol", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
 		
 		result.setItem(10, souls);
 		result.setItem(11, totem);
@@ -90,6 +53,15 @@ public class DeathParticleMenu implements Listener {
 		result.setItem(31, noEffect);
 		
 		return result;
+	}
+
+	private ItemStack getEffectItem(String effect, String name, String... desc){
+		ItemStack dumb = FtcCore.makeItem(Material.GRAY_DYE, 1, true, name, desc);
+
+		if(user.getDeathParticle() != null && user.getDeathParticle().contains(effect)) dumb.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
+		if(user.getParticleDeathAvailable().contains(effect)) dumb.setType(Material.ORANGE_DYE);
+
+		return dumb;
 	}
 	
 	@EventHandler

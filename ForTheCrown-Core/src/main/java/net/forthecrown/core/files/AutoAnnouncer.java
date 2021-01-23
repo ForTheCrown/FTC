@@ -12,12 +12,15 @@ public class AutoAnnouncer extends FtcFileManager {
 
     private List<String> thingsToAnnounce = new ArrayList<>();
     private long delay;
+    int id = -1;
 
     public AutoAnnouncer() {
         super("announcer");
-        addDefaults();
-        reload();
-        startAnnoncments();
+
+        if(fileDoesntExist) addDefaults();
+        else reload();
+
+        startAnnouncer();
     }
     private void addDefaults(){
         getFile().addDefault("delay", 12000);
@@ -38,6 +41,7 @@ public class AutoAnnouncer extends FtcFileManager {
         getFile().addDefault("announcements", list);
         getFile().options().copyDefaults(true);
         super.save();
+        reload();
     }
 
     public void reload(){
@@ -64,8 +68,17 @@ public class AutoAnnouncer extends FtcFileManager {
         this.thingsToAnnounce = announcements;
     }
 
-    private void startAnnoncments(){
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(FtcCore.getInstance(), new Runnable() {
+    public void stopAnnouncer(){
+        Bukkit.getScheduler().cancelTask(id);
+    }
+
+    public void startAnnouncer(){
+        if(id != -1) stopAnnouncer();
+        announcerProper();
+    }
+
+    private void announcerProper(){
+        id = Bukkit.getScheduler().scheduleSyncRepeatingTask(FtcCore.getInstance(), new Runnable() {
             int counter = 0;
             @Override
             public void run() {

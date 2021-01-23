@@ -12,6 +12,26 @@ import java.util.Set;
 
 public class LeaveVanishCommand implements CommandExecutor {
 
+    /*
+     * ----------------------------------------
+     * 			Command description:
+     * ----------------------------------------
+     * Makes the executor or player go into vanish and display a left the game message
+     *
+     *
+     * Valid usages of command:
+     * - /leavevansih
+     * - /leavevanish <player>
+     *
+     * Permissions used:
+     * - ftc.admin
+     *
+     * Referenced other classes:
+     * - (Essentials)
+     *
+     * Author: Botul
+     */
+
     Set<Player> vanishedPlayer = new HashSet<>();
 
     @Override

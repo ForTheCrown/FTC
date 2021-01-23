@@ -14,13 +14,7 @@ public class UpdateLB implements CommandExecutor {
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
-	{
-		if (!sender.isOp())
-		{
-			sender.sendMessage(ChatColor.RED + "You don't have permission to do this.");
-			return false;
-		}
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Main.plugin.updateLeaderBoard();
 		return true;
 	}

@@ -33,28 +33,24 @@ public class BaseEgg implements Listener {
 	@EventHandler
 	public void onEggUse(BlockPlaceEvent event) {
 		if (event.getHand() != EquipmentSlot.HAND) return;
-		if (event.getItemInHand() == null) return;
 		if (event.isCancelled()) return;
 		
 		
-		if (event.getBlockPlaced().getType() == Material.TURTLE_EGG) 
-		{
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-				@Override
-				public void run() {
-					if (event.getBlockPlaced().getLocation().getBlock().getType() == Material.TURTLE_EGG)
-					{
-						ItemMeta meta = event.getItemInHand().getItemMeta();
-						if (meta.getLore() != null) 
-						{
-							event.getBlockPlaced().getLocation().getBlock().setType(Material.AIR);
-							//if (plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getString("players." + event.getPlayer().getUniqueId().toString() + ".ActiveBranch").contains("Pirate")) 
-							//{
-							spawnCorrectEntity(event.getPlayer(), event.getBlock().getLocation().add(0.5, 1, 0.5), meta.getLore().get(0), meta.getDisplayName());
-							event.getItemInHand().setAmount(event.getItemInHand().getAmount() - 1);
-							//}
-							//else event.getPlayer().sendMessage(ChatColor.RED + "Only pirates can do this.");
-						}	
+		if (event.getBlockPlaced().getType() == Material.TURTLE_EGG) {
+
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.plugin, () -> {
+				if (event.getBlockPlaced().getLocation().getBlock().getType() == Material.TURTLE_EGG) {
+					ItemMeta meta = event.getItemInHand().getItemMeta();
+
+					if (meta.getLore() != null) {
+
+						event.getBlockPlaced().getLocation().getBlock().setType(Material.AIR);
+						//if (plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getString("players." + event.getPlayer().getUniqueId().toString() + ".ActiveBranch").contains("Pirate"))
+						//{
+						spawnCorrectEntity(event.getPlayer(), event.getBlock().getLocation().add(0.5, 1, 0.5), meta.getLore().get(0), meta.getDisplayName());
+						event.getItemInHand().setAmount(event.getItemInHand().getAmount() - 1);
+						//}
+						//else event.getPlayer().sendMessage(ChatColor.RED + "Only pirates can do this.");
 					}
 				}
 			}, 2L);
@@ -64,17 +60,16 @@ public class BaseEgg implements Listener {
 
 	@SuppressWarnings("deprecation")
 	private void spawnCorrectEntity(Player player, Location spawnLocation, String loreline, String displayName) {
-		if (loreline == null || loreline == "" || player == null) return;
+		if (loreline == null || loreline.equals("") || player == null) return;
 		
-		if (loreline.contains("Bartender"))
-		{
+		if (loreline.contains("Bartender")) {
 			Villager bartender = player.getWorld().spawn(spawnLocation, Villager.class);
 			bartender.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
 			bartender.setVillagerLevel(5);
 			bartender.setVillagerType(Villager.Type.PLAINS);
 			bartender.setProfession(Profession.BUTCHER);
 			
-			if (displayName == null || displayName == "") bartender.setCustomName("Bartender");
+			if (displayName == null || displayName.equals("")) bartender.setCustomName("Bartender");
 			else bartender.setCustomName(displayName);
 			
 			
@@ -120,13 +115,12 @@ public class BaseEgg implements Listener {
 			bartender.setRecipes(trades);
 		}
 		
-		else if (loreline.contains("Mending Villager"))
-		{
+		else if (loreline.contains("Mending Villager")) {
 			Villager mender = player.getWorld().spawn(spawnLocation, Villager.class);
 			mender.setVillagerLevel(2);
 			mender.setProfession(Profession.LIBRARIAN);
 			
-			if (displayName != null && displayName != "") mender.setCustomName(displayName);
+			if (displayName != null && !displayName.equals("")) mender.setCustomName(displayName);
 			
 			List<MerchantRecipe> trades = new ArrayList<>();
 			
@@ -146,28 +140,22 @@ public class BaseEgg implements Listener {
 			mender.setRecipes(trades);
 		}
 		
-		else if (loreline.contains("Charged Creeper"))
-		{
+		else if (loreline.contains("Charged Creeper")) {
 			Creeper creeper = player.getWorld().spawn(spawnLocation, Creeper.class);
 			creeper.setPowered(true);
 		}
-		else if (loreline.contains("White Fox"))
-		{
+		else if (loreline.contains("White Fox")) {
 			Fox whiteFox = player.getWorld().spawn(spawnLocation, Fox.class);
-			whiteFox.setFoxType(Fox.Type.SNOW);
-		}
-		else if (loreline.contains("Passive Pillager"))
-		{
+			whiteFox.setFoxType(Fox.Type.SNOW); }
+		else if (loreline.contains("Passive Pillager")) {
 			Pillager passivePillager = player.getWorld().spawn(spawnLocation, Pillager.class);
 			passivePillager.getEquipment().setItemInMainHand(null);
 		}
-		else if (loreline.contains("Skelly Boy"))
-		{
+		else if (loreline.contains("Skelly Boy")) {
 			Skeleton skellyboy = player.getWorld().spawn(spawnLocation, Skeleton.class);
 			skellyboy.getEquipment().setItemInMainHand(null);
 		}
-		else 
-		{
+		else {
 			try {
 				player.getWorld().spawnEntity(spawnLocation, EntityType.fromName(loreline.replace(" ", "_").toUpperCase()));
 			} catch (Exception e) {

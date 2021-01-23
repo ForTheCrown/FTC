@@ -1,8 +1,8 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.economy.Economy;
-import net.forthecrown.core.economy.files.Balances;
+import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.files.Balances;
 import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -14,7 +14,33 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.text.DecimalFormat;
+
 public class BecomeBaronCommand implements CommandExecutor {
+
+    /*
+     * ----------------------------------------
+     * 			Command description:
+     * ----------------------------------------
+     * Explain what command is supposed to be used for..
+     *
+     *
+     * Valid usages of command:
+     * - /becomebaron
+     * - /becomebaron confirm
+     *
+     * Permissions used:
+     * - NONE
+     *
+     * Referenced other classes:
+     * - FtcCore: FtcCore.getPrefix | FtcCore.getUserData
+     * - Balances
+     * - Economy: Economy.getBalances
+     * - FtcUser: user.isBaron | user.setBaron
+     *
+     * Author: Botul
+     */
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)){
@@ -23,8 +49,8 @@ public class BecomeBaronCommand implements CommandExecutor {
         }
         int baronPrice = FtcCore.getInstance().getConfig().getInt("BaronPrice");
         Player player = (Player) sender;
-        FtcUser data = FtcCore.getUserData(player.getUniqueId());
-        Balances bals = Economy.getBalances();
+        FtcUser data = FtcCore.getUser(player.getUniqueId());
+        Balances bals = FtcCore.getBalances();
 
         if(data.isBaron()){
             player.sendMessage("You are already a baron!");
@@ -49,7 +75,11 @@ public class BecomeBaronCommand implements CommandExecutor {
         confirmBaron.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/becomebaron confirm"));
         confirmBaron.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Become a baron.")));
 
-        TextComponent baronConfirmMessage = new TextComponent(FtcCore.getPrefix() + ChatColor.translateAlternateColorCodes('&', "&rAre you sure you wish to become a &6baron&r? This will cost &e500,000 &rRhines "));
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        decimalFormat.setGroupingUsed(true);
+        decimalFormat.setGroupingSize(3);
+
+        TextComponent baronConfirmMessage = new TextComponent(FtcCore.getPrefix() + ChatColor.translateAlternateColorCodes('&', "&rAre you sure you wish to become a " + Rank.BARON.getPrefix().replaceAll(" ", "") + "? This will cost &e" + decimalFormat.format(baronPrice) + " Rhines "));
         baronConfirmMessage.addExtra(confirmBaron);
 
         player.spigot().sendMessage(baronConfirmMessage);

@@ -3,16 +3,10 @@ version: @version@
 main: net.forthecrown.core.FtcCore
 api-version: 1.16
 authors: [ Botul, Wout ]
+loadbefore:
+  - Essentials
 
 commands:
-  ftcreload:
-    permission: ftc.admin
-    permission-message: Oi! Why are you trying to reload the plugin!
-    description: Reloads the FTC-Core plugin.
-    aliases:
-      - ftcrl
-      - reloadftc
-      - rlftc
   staffchat:
     permission: ftc.staffchat
     permission-message: You do not have permission to use this!
@@ -31,6 +25,7 @@ commands:
     permission-message: You do not have permission to use this!
     description: Broadcasts a message to the entire server.
     aliases:
+      - announce
       - bc
   tpask:
     description: Asks a player to teleport to them.
@@ -133,6 +128,7 @@ commands:
     description: The primary FtcCore command.
     permission: ftc.admin
     permission-message: You do not have permission to use this!
+    usage: '§7Usage:§r /ftcore <reload | save | announcer | reload'
   becomebaron:
     description: Allows you to become a baron if you have 500,000 Rhines.
     permission: ftc.becomebaron
@@ -141,4 +137,18 @@ commands:
     description: Opens the Shop GUI in which one can sell things
     permission: ftc.shop
     permission-message: You do not have permission to use this!
-    usage: 'Usage: /shop [mining | farming | drops]'
+    usage: '§7Usage:§r /shop [mining | farming | drops]'
+  rank:
+    permission: ftc.ranks
+    permission-message: You do not have permission to use this!
+    aliases:
+      - ranks
+      - rankgui
+      - rankui
+  npcconverse:
+    description: 'The Command used by the ClickEventApi execute code ran by clickable text'
+  kingmaker:
+    usage: '§7Usage:§r /kingmaker <remove | player> [king | queen]'
+    permission: ftc.ranks
+    permission-message: You do not have permission to use this!
+    description: 'This command is used to assign and unassign a king or queen'

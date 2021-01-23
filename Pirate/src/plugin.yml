@@ -3,23 +3,25 @@ version: 1.0
 author: Wout
 main: me.wout.Pirate.Main
 description: Plugin that does the pirate stuff.
-api-version: 1.15
+api-version: 1.16
+depend:
+  - FTCCore
+
 commands:
   GHTargetShowName:
+    permission: ftc.pirate.showname
     description: Shows the name of the nearby targets.
   ghtarget:
+    permission: ftc.pirate.ghtarget
     description: Spawns a grappling hook target.
   parrot:
+    permission: ftc.pirate.parrot
     description: Gives pirates a parrot pet lol.
   rlpirate:
+    permission: ftc.pirate.reload
     description: Reloads the pirate plugin.
   leave:
     description: Leaves the grappling parkour.
   updatelb:
+    permission: ftc.pirate.update
     description: Updates the pp leaderboard.
-  commanduno:
-    description: First choice for Smith.
-  commandduo:
-    description: Second choice for Smith.
-  commandtres:
-    description: Third choice for Smith.

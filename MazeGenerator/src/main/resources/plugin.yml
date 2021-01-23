@@ -1,0 +1,10 @@
+name: MazeGenerator
+version: ${project.version}
+main: net.forthecrown.mazegen.Main
+api-version: 1.16
+authors: [ Botul ]
+
+commands:
+  mazegen:
+    permission: ftc.mazegen.admin
+    permission-message: No permission lol

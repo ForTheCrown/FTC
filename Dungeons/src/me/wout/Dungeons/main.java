@@ -9,6 +9,9 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.files.FtcUser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -68,10 +71,10 @@ import me.wout.Dungeons.commands.removeDonator;
 
 public class main extends JavaPlugin implements Listener {
 	
-	List<ItemStack> zhambieItems = new ArrayList<ItemStack>();
-	List<ItemStack> skalatanItems = new ArrayList<ItemStack>();
-	List<ItemStack> spideyItems = new ArrayList<ItemStack>();
-	List<ItemStack> drawnedItems = new ArrayList<ItemStack>();
+	List<ItemStack> zhambieItems = new ArrayList<>();
+	List<ItemStack> skalatanItems = new ArrayList<>();
+	List<ItemStack> spideyItems = new ArrayList<>();
+	List<ItemStack> drawnedItems = new ArrayList<>();
 	//List<ItemStack> magmacubeItems = new ArrayList<ItemStack>();
 	ItemMeta meta;
 	List<String> lore = new ArrayList<String>();
@@ -182,22 +185,14 @@ public class main extends JavaPlugin implements Listener {
 				dummy.setCustomName(damageName);
 				mayChange.add(0);
 				
-				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			        @Override
-			        public void run() {
-			        	dummy.setHealth(200);
-			        }
-			    }, 5L);
-				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			        @Override
-			        public void run() {
-			        	mayChange.remove(0);
-			        	if (mayChange.isEmpty()) {
-			        		dummy.setCustomName(ChatColor.GOLD + "Hit Me!");
-			        		dummy.setHealth(200);
-			        	}
-			        }
-			    }, 100L);
+				Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> dummy.setHealth(200), 5L);
+				Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+					mayChange.remove(0);
+					if (mayChange.isEmpty()) {
+						dummy.setCustomName(ChatColor.GOLD + "Hit Me!");
+						dummy.setHealth(200);
+					}
+				}, 100L);
 			}
 		}
 	}
@@ -279,7 +274,7 @@ public class main extends JavaPlugin implements Listener {
 					}
 					player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "[FTC] " + ChatColor.WHITE + "You've been promoted to " + ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "Knight" + ChatColor.DARK_GRAY + "]" + ChatColor.WHITE + " !");
 					player.sendMessage(ChatColor.WHITE + "You can select the tag in " + ChatColor.YELLOW + "/rank" + ChatColor.WHITE + " now.");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "addrank " + player.getName() + " knight");
+					FtcCore.getUser(player.getUniqueId()).addRank(Rank.KNIGHT);
 					Bukkit.dispatchCommand(getServer().getConsoleSender(), "lp user " + player.getName() + " parent add free-rank");
 				}
 				else {
@@ -291,7 +286,7 @@ public class main extends JavaPlugin implements Listener {
 			String name = event.getRightClicked().getName();
 			
 			if (name.contains(ChatColor.AQUA + "Spawn Zhambie")) {
-				if (checkIfInvContainsAllItems(event.getPlayer().getInventory(), zhambieItems) == true) {
+				if (checkIfInvContainsAllItems(event.getPlayer().getInventory(), zhambieItems)) {
 					takeItems(event.getPlayer().getInventory(), zhambieItems);
 					player.sendMessage(ChatColor.GRAY + "[FTC] You have summoned Zhambie!");
 					z.summonZhambie(event.getRightClicked().getLocation());
@@ -305,7 +300,7 @@ public class main extends JavaPlugin implements Listener {
 			}
 			
 			else if (name.contains(ChatColor.AQUA + "Spawn Skalatan")) {
-				if (checkIfInvContainsAllItems(event.getPlayer().getInventory(), skalatanItems) == true) {
+				if (checkIfInvContainsAllItems(event.getPlayer().getInventory(), skalatanItems)) {
 					takeItems(event.getPlayer().getInventory(), skalatanItems);
 					player.sendMessage(ChatColor.GRAY + "[FTC] You have summoned Skalatan!");
 					s.summonSkalatan(event.getRightClicked().getLocation());
@@ -319,7 +314,7 @@ public class main extends JavaPlugin implements Listener {
 			}
 			
 			else if (name.contains(ChatColor.AQUA + "Spawn Hidey Spidey")) {
-				if (checkIfInvContainsAllItems(event.getPlayer().getInventory(), spideyItems) == true) {
+				if (checkIfInvContainsAllItems(event.getPlayer().getInventory(), spideyItems)) {
 					takeItems(event.getPlayer().getInventory(), spideyItems);
 					player.sendMessage(ChatColor.GRAY + "[FTC] You have summoned Hidey Spidey!");
 					h.summonHideySpidey(event.getRightClicked().getLocation());
@@ -332,7 +327,7 @@ public class main extends JavaPlugin implements Listener {
 				sendSpiderMessage(player, true);
 			}
 			else if (name.contains(ChatColor.AQUA + "Spawn Drawned")) {
-				if (checkIfInvContainsAllItems(event.getPlayer().getInventory(), drawnedItems) == true) {
+				if (checkIfInvContainsAllItems(event.getPlayer().getInventory(), drawnedItems)) {
 					takeItems(event.getPlayer().getInventory(), drawnedItems);
 					player.sendMessage(ChatColor.GRAY + "[FTC] You have summoned Drawned!");
 					d.summonDrawned(event.getRightClicked().getLocation());
@@ -382,7 +377,7 @@ public class main extends JavaPlugin implements Listener {
 				ItemStack item4 = new ItemStack(Material.GOLDEN_SWORD, 1);
 				ItemMeta meta4 = item4.getItemMeta();
 				meta4.setDisplayName(ChatColor.GOLD + "-" + ChatColor.YELLOW + ChatColor.BOLD + "Royal Sword" + ChatColor.GOLD + "-");
-				ArrayList<String> lore4 = new ArrayList<String>();
+				ArrayList<String> lore4 = new ArrayList<>();
 				lore4.add(ChatColor.GRAY + "Rank I");
 				lore4.add(ChatColor.DARK_GRAY + "------------------------------");
 				lore4.add(ChatColor.GOLD + "The bearer of this weapon has proven themselves");
@@ -490,7 +485,7 @@ public class main extends JavaPlugin implements Listener {
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onMotherKill(EntityDeathEvent event){
-        if(event.getEntity().getKiller() instanceof Player && event.getEntity() instanceof Spider){
+        if(event.getEntity().getKiller() != null && event.getEntity() instanceof Spider){
         	if (event.getEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() == 75d) {
         		Location spawnLoc =  event.getEntity().getLocation();
         		
@@ -510,8 +505,8 @@ public class main extends JavaPlugin implements Listener {
 	
 	@EventHandler(ignoreCancelled = true)
     public void onMobDeath(EntityDeathEvent event){
-        if(event.getEntity().getKiller() instanceof Player){
-			if (((Player) event.getEntity().getKiller()).getInventory().getItemInMainHand().getType() == Material.GOLDEN_SWORD || ((Player) event.getEntity().getKiller()).getInventory().getItemInMainHand().getType() == Material.NETHERITE_SWORD) {
+        if(event.getEntity().getKiller() != null){
+			if (event.getEntity().getKiller().getInventory().getItemInMainHand().getType() == Material.GOLDEN_SWORD || ((Player) event.getEntity().getKiller()).getInventory().getItemInMainHand().getType() == Material.NETHERITE_SWORD) {
 				Player player = (Player) event.getEntity().getKiller();
 				if (player.getInventory().getItemInMainHand().getItemMeta().getDisplayName().contains(ChatColor.YELLOW + "" + ChatColor.BOLD + "Royal Sword") || player.getInventory().getItemInMainHand().getItemMeta().getDisplayName().contains(net.md_5.bungee.api.ChatColor.of("#D1C8BA") + "")) {
 					EntityDamageEvent event2 = event.getEntity().getLastDamageCause();
@@ -561,8 +556,6 @@ public class main extends JavaPlugin implements Listener {
 		else if (rankLine.contains(ChatColor.GRAY + "Rank I")) {
 			if (entity.getType().equals(EntityType.ZOMBIE)) actuallyAddXp(player.getName(), lore, meta, sword, "Rank II", ChatColor.AQUA + "0/1000" + ChatColor.DARK_AQUA + " Skeletons to Rank Up.");
 		}
-		else return;
-		
 	}
 	
 	private void actuallyAddXp(String player, List<String> lore, ItemMeta meta, ItemStack sword, String newRank, String Upgrade) {
@@ -576,12 +569,7 @@ public class main extends JavaPlugin implements Listener {
 			Bukkit.getPlayer(player).playSound(Bukkit.getPlayer(player).getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1.2f);
 			Bukkit.getPlayer(player).playSound(Bukkit.getPlayer(player).getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
 			for (int i = 0; i <= 5; i++) {
-				Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			        @Override
-			        public void run() {
-			        	Bukkit.getPlayer(player).getWorld().spawnParticle(Particle.TOTEM, Bukkit.getPlayer(player).getLocation().getX(), Bukkit.getPlayer(player).getLocation().getY()+2, Bukkit.getPlayer(player).getLocation().getZ(), 30, 0.2d, 0.1d, 0.2d, 0.275d);
-			        }
-			    }, i*5L);
+				Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> Bukkit.getPlayer(player).getWorld().spawnParticle(Particle.TOTEM, Bukkit.getPlayer(player).getLocation().getX(), Bukkit.getPlayer(player).getLocation().getY()+2, Bukkit.getPlayer(player).getLocation().getZ(), 30, 0.2d, 0.1d, 0.2d, 0.275d), i*5L);
 			}
 			
 			Bukkit.getPlayer(player).sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.WHITE + "Your Sword was upgraded to " + newRank + "!");

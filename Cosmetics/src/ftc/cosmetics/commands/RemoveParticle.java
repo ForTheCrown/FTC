@@ -34,44 +34,8 @@ public class RemoveParticle implements CommandExecutor {
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		
-		// Sender must be opped:
-		if (!sender.isOp()) {
-			sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
-			return false;
-		}
-		
 		// Valid use of command:
-		if (args.length != 3) {
-			sender.sendMessage(ChatColor.RED + "/removeparticle [player] [arrow/death/emote] [particle]");
-			return false;
-		}
-		
-		// Try getting uuid of given arg:
-		String targetUuid;
-		try {
-			targetUuid = Bukkit.getPlayer(args[0]).getUniqueId().toString();
-		}
-		catch (Exception e) {
-			try {
-				targetUuid = Bukkit.getOfflinePlayer(args[0]).getUniqueId().toString();
-			}
-			catch (Exception e2) {
-				sender.sendMessage(ChatColor.GRAY + args[0] + " is not a valid player.");
-				return false;
-			}
-		}
-		if (!Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getConfigurationSection("players").getKeys(false).contains(targetUuid)) {
-			sender.sendMessage(ChatColor.GRAY + args[0] + " not found in dataplugin config.");
-			return false;
-		}
-		
-		// Found matching uuid but names do not match, update name:
-		if (!Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getString("players." + targetUuid + ".PlayerName").equalsIgnoreCase(args[0]))
-		{
-			Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + targetUuid + ".PlayerName", args[0]);
-		}
-		
+		if (args.length != 3) return false;
 		
 		switch (args[1]) {
 		case "arrow":

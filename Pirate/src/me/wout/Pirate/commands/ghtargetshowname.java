@@ -17,27 +17,18 @@ public class ghtargetshowname implements CommandExecutor {
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
-	{
-		if (!(sender instanceof Player))
-		{
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (!(sender instanceof Player)) {
 			sender.sendMessage("Only players can execute this command.");
 			return false;
 		}
 		
 		Player player = (Player) sender;
-		if (!player.isOp())
-		{
-			player.sendMessage(ChatColor.RED + "You don't have permission to do this.");
-			return false;
-		}
 		
-		for (Entity nearbyEntity : player.getWorld().getNearbyEntities(player.getLocation(), 2, 2, 2))
-		{
+		for (Entity nearbyEntity : player.getWorld().getNearbyEntities(player.getLocation(), 2, 2, 2)) {
 			if (nearbyEntity.getType() != EntityType.ARMOR_STAND) continue;
 			
-			if (nearbyEntity.getCustomName() != null && nearbyEntity.getCustomName().contains("GHTargetStand"))
-			{
+			if (nearbyEntity.getCustomName() != null && nearbyEntity.getCustomName().contains("GHTargetStand")) {
 				if (nearbyEntity.isCustomNameVisible()) nearbyEntity.setCustomNameVisible(false);
 				else nearbyEntity.setCustomNameVisible(true);
 				return true;				

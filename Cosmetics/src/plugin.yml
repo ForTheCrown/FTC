@@ -9,10 +9,10 @@ commands:
   cosmetics:
     description: Opens the cosmetics tab.
   addparticle:
+    usage: '/addparticle [player] [arrow/death/emote] [particle]'
+    permission: ftc.cosmetics.admin
     description: Adds a particle to a player in the DataPlugin config.
   removeparticle:
+    usage: '/removeparticle [player] [arrow/death/emote] [particle]'
+    permission: ftc.cosmetics.admin
     description: Removes a particle from a player in the DataPlugin config.
-  addgems:
-    description: Adds gems to a player in the DataPlugin config.
-  getgems:
-    description: Gets the amount of gems a player has.

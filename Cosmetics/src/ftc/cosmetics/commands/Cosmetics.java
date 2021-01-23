@@ -1,12 +1,13 @@
 package ftc.cosmetics.commands;
 
-import org.bukkit.command.CommandExecutor;
+import ftc.cosmetics.Main;
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
+import net.forthecrown.core.files.FtcUser;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import ftc.cosmetics.Main;
-import net.md_5.bungee.api.ChatColor;
 
 public class Cosmetics implements CommandExecutor {
 
@@ -28,14 +29,11 @@ public class Cosmetics implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		// Sender must be player:
-		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.RED + "Only players can do this.");
-			return false;
-		}
+		if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 		
 		Player player = (Player) sender;
-		player.openInventory(Main.plugin.getMainCosmeticInventory(player.getUniqueId().toString()));
+		FtcUser user = FtcCore.getUser(player.getUniqueId());
+		player.openInventory(Main.plugin.getMainCosmeticInventory(user));
 		
 		return true;
 	}

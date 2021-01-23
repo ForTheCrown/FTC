@@ -1,5 +1,6 @@
 package ftc.cosmetics.inventories;
 
+import net.forthecrown.core.FtcCore;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -21,10 +22,10 @@ public class CustomInventory {
 	public CustomInventory(int size, String title, boolean needHead, boolean needReturn) {
 		this.inv = Bukkit.createInventory(Main.holder, size, title);
 		
-		if (needHead) this.headItem = Main.plugin.makeItem(Material.NETHER_STAR, 1, ChatColor.YELLOW + "Menu", "", ChatColor.DARK_GRAY + "ulala");
+		if (needHead) this.headItem = FtcCore.makeItem(Material.NETHER_STAR, 1, true, ChatColor.YELLOW + "Menu", "", ChatColor.DARK_GRAY + "ulala");
 		else this.headItem = getGlassFiller();
 		
-		if (needReturn) this.returnItem = Main.plugin.makeItem(Material.PAPER, 1, ChatColor.YELLOW + "< Go Back");
+		if (needReturn) this.returnItem = FtcCore.makeItem(Material.PAPER, 1, true, ChatColor.YELLOW + "< Go Back");
 		else this.returnItem = getGlassFiller();
 	}
 	
@@ -68,7 +69,7 @@ public class CustomInventory {
 	
 
 	public ItemStack getGlassFiller() {
-		return Main.plugin.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, " ");
+		return FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
 	}
 	
 	public Inventory getInventory() {

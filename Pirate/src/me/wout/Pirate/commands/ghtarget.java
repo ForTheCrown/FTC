@@ -21,29 +21,21 @@ public class ghtarget implements CommandExecutor {
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
-	{
-		if (!(sender instanceof Player))
-		{
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (!(sender instanceof Player)) {
 			sender.sendMessage("Only players can execute this command.");
 			return false;
 		}
 		
 		Player player = (Player) sender;
 		if (!player.isOp())
-		{
-			player.sendMessage(ChatColor.RED + "You don't have permission to do this.");
-			return false;
-		}
 		
-		if (args.length < 6)
-		{
+		if (args.length < 6) {
 			player.sendMessage(ChatColor.RED + "Invalid use of command:");
 			player.sendMessage(ChatColor.GRAY + "/ghtarget [id] [class] x y z yaw (hookuses) (distance)");
 			return false;
 		}
-		else 
-		{
+		else {
 			int ghStandCreateID, ghStandClass, ghYawToCords,  ghHookUsesToGive = 0, ghHookDistanceToGive = 0;
 			double ghXToCords, ghYToCords, ghZToCords;
 			try {
@@ -84,5 +76,6 @@ public class ghtarget implements CommandExecutor {
 			
 			return true;	
 		}
+		return true;
 	}
 }

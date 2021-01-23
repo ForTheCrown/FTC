@@ -10,30 +10,21 @@ public class FtcFileManager{
 
     private final String fileName;
     private final String directory;
-    private final boolean stopIfFileDoesntExist;
 
     protected boolean fileDoesntExist = false;
     private boolean deleted = false;
 
-    protected File file;
-    protected FileConfiguration fileConfig;
+    private File file;
+    private FileConfiguration fileConfig;
 
-    public FtcFileManager(String fileName, String folder){
+    protected FtcFileManager(String fileName, String folder){
         this.directory = folder;
         this.fileName = fileName;
-        stopIfFileDoesntExist = false;
         loadFile();
     }
-    public FtcFileManager(String fileName, String folder, boolean stopIfFileDoesntExist){
-        this.directory = folder;
-        this.fileName = fileName;
-        this.stopIfFileDoesntExist = stopIfFileDoesntExist;
-        loadFile();
-    }
-    public FtcFileManager(String fileName){
+    protected FtcFileManager(String fileName){
         directory = null;
         this.fileName = fileName;
-        stopIfFileDoesntExist = false;
         loadFile();
     }
 
@@ -45,7 +36,6 @@ public class FtcFileManager{
         if(!file.getParentFile().exists() && !file.getParentFile().mkdirs()) System.out.println("[SEVERE!] Failed to create " + fileName + " directory, at " + FtcCore.getInstance().getDataFolder() + "/" + directory);
 
         if(!file.exists()){
-            if(stopIfFileDoesntExist) return;
             fileDoesntExist = true;
             try{
                 file.createNewFile();
@@ -58,11 +48,11 @@ public class FtcFileManager{
     }
 
     //methods used by child classes
-    public void reload(){
+    protected void reload(){
         fileConfig = YamlConfiguration.loadConfiguration(file);
     }
 
-    public void save(){
+    protected void save(){
         if(deleted) return;
         try{
             fileConfig.save(file);
@@ -70,13 +60,15 @@ public class FtcFileManager{
             e.printStackTrace();
         }
     }
-    public FileConfiguration getFile(){
+
+    protected FileConfiguration getFile(){
         return fileConfig;
     }
 
     protected void delete(){
         fileConfig = null;
-        file.delete();
+        if(!file.delete()) System.out.println("[WARNING] Couldn't delete file named " + fileName);
         deleted = true;
+        file = null;
     }
 }

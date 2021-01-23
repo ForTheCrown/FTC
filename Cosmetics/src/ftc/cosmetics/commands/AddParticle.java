@@ -1,15 +1,18 @@
 package ftc.cosmetics.commands;
 
-import org.bukkit.command.CommandExecutor;
-
-import java.util.List;
-
+import ftc.cosmetics.Main;
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.InvalidArgumentException;
+import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
+import net.forthecrown.core.files.FtcUser;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import ftc.cosmetics.Main;
-import net.md_5.bungee.api.ChatColor;
+import java.util.List;
 
 public class AddParticle implements CommandExecutor {
 
@@ -30,77 +33,51 @@ public class AddParticle implements CommandExecutor {
 	 * Author: Wout
 	 */
 	
-	
-	@SuppressWarnings("deprecation")
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		// Sender must be opped:
-		if (!sender.isOp()) {
-			sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
-			return false;
-		}
-		
 		// Valid use of command:
-		if (args.length != 3) {
-			sender.sendMessage(ChatColor.RED + "/addparticle [player] [arrow/death/emote] [particle]");
-			return false;
-		}
-		
-		// Try getting uuid of given arg:
-		String targetUuid;
+		if (args.length != 3) return false;
+
+		FtcUser user;
 		try {
-			targetUuid = Bukkit.getPlayer(args[0]).getUniqueId().toString();
-		}
-		catch (Exception e) {
-			try {
-				targetUuid = Bukkit.getOfflinePlayer(args[0]).getUniqueId().toString();
-			}
-			catch (Exception e2) {
-				sender.sendMessage(ChatColor.GRAY + args[0] + " is not a valid player.");
-				return false;
-			}
-		}
-		if (!Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getConfigurationSection("players").getKeys(false).contains(targetUuid)) {
-			sender.sendMessage(ChatColor.GRAY + args[0] + " not found in dataplugin config.");
-			return false;
-		}
-		
-		// Found matching uuid but names do not match, update name:
-		if (!Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getString("players." + targetUuid + ".PlayerName").equalsIgnoreCase(args[0]))
-		{
-			Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + targetUuid + ".PlayerName", args[0]);
+			user = FtcCore.getUser(FtcCore.getOffOnUUID(args[0]));
+		} catch (NullPointerException e){
+			throw new InvalidPlayerInArgument(sender, args[0]);
 		}
 		
 		
 		switch (args[1]) {
 		case "arrow":
 		{
-			List<String> availableEffects = Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getStringList("players." + targetUuid + ".ParticleArrowAvailable");
+			List<Particle> arrowParticles = user.getParticleArrowAvailable();
+			Particle bruh;
+			try {
+				bruh = Particle.valueOf(args[2]);
+			} catch (NullPointerException e){ throw new InvalidArgumentException(sender, "Invalid particle"); }
 			
-			if (availableEffects.contains(args[2])) {
+			if (arrowParticles.contains(bruh)) {
 				sender.sendMessage(ChatColor.GRAY + "This player already has this particle.");
-				return false;
+				return true;
 			}
-			else if (!Main.plugin.getAcceptedArrowParticles().contains(args[2])) {
+			else if (!Main.plugin.getAcceptedArrowParticles().contains(bruh)) {
 				sender.sendMessage(ChatColor.GRAY + "Use one of these particles:");
 				String message = ChatColor.GRAY + "";
-				for (String particle : Main.plugin.getAcceptedArrowParticles()) {
-					message += particle + ", ";
+				for (Particle particle : Main.plugin.getAcceptedArrowParticles()) {
+					message += particle.toString() + ", ";
 				}
-				sender.sendMessage(message);
-				return false;
+				throw new InvalidArgumentException(sender, message);
 			}
 			else {
-				availableEffects.add(args[2]);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + targetUuid + ".ParticleArrowAvailable", availableEffects);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").saveConfig();
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Added &f" + args[2] + "&7 to &f" + args[0] + "&7's arrow-particles."));
+				arrowParticles.add(bruh);
+				user.setParticleArrowAvailable(arrowParticles);
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Added &f" + args[2] + "&7 to &f" + user.getName() + "&7's arrow-particles."));
 				return true;
 			}
 		}
 		case "death":
 		{
-			List<String> availableEffects = Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getStringList("players." + targetUuid + ".ParticleDeathAvailable");
+			List<String> availableEffects = user.getParticleDeathAvailable();
 			
 			if (availableEffects.contains(args[2])) {
 				sender.sendMessage(ChatColor.GRAY + "This player already has this particle.");
@@ -112,22 +89,18 @@ public class AddParticle implements CommandExecutor {
 				for (String particle : Main.plugin.getAcceptedDeathParticles()) {
 					message += particle + ", ";
 				}
-				sender.sendMessage(message);
-				return false;
+				throw new InvalidArgumentException(sender, message);
 			}
 			else {
 				availableEffects.add(args[2]);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + targetUuid + ".ParticleDeathAvailable", availableEffects);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").saveConfig();
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Added &f" + args[2] + "&7 to &f" + args[0] + "&7's death-particles."));
+				user.setParticleDeathAvailable(availableEffects);
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Added &f" + args[2] + "&7 to &f" + user.getName() + "&7's death-particles."));
 				return true;
 			}
 		}
 		case "emote":
 		{
-			List<String> availableEmotes = Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getStringList("players." + targetUuid + ".EmotesAvailable");
-			
-			if (availableEmotes.contains(args[2])) {
+			if (user.getPlayer().hasPermission("ftc.emotes." + args[2])) {
 				sender.sendMessage(ChatColor.GRAY + "This player already has this emote.");
 				return false;
 			}
@@ -137,21 +110,16 @@ public class AddParticle implements CommandExecutor {
 				for (String emote : Main.plugin.getAcceptedEmotes()) {
 					message += emote + ", ";
 				}
-				sender.sendMessage(message);
-				return false;
+				throw new InvalidArgumentException(sender, message);
 			}
 			else {
-				availableEmotes.add(args[2]);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + targetUuid + ".EmotesAvailable", availableEmotes);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").saveConfig();
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Added &f" + args[2] + "&7 to &f" + args[0] + "&7's emotes."));
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + user.getName() + " permission set ftc.emotes." + args[2]);
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Added &f" + args[2] + "&7 to &f" + user.getName() + "&7's emotes."));
 				return true;
 			}
 			
 		}
-		default: 
-			sender.sendMessage(ChatColor.RED + "/addparticle [player] [arrow/death/emote] [particle]");
-			return false;
+		default: return false;
 		}
 	}
 }

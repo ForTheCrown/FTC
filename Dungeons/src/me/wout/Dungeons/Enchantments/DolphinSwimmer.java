@@ -52,7 +52,6 @@ public class DolphinSwimmer extends Enchantment implements Listener {
 	
 	@EventHandler
 	public void anvil(PrepareAnvilEvent event) {
-		if (event.getInventory() == null) return;
 		if (event.getInventory().getItem(0) != null && event.getInventory().getItem(1) != null && event.getInventory().getItem(2) != null)
 		{
 			if (event.getInventory().getItem(0).containsEnchantment(this) || event.getInventory().getItem(1).containsEnchantment(this)) 

@@ -1,28 +1,26 @@
 package ftc.cosmetics.inventories;
 
-import java.util.List;
-
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.files.FtcUser;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import ftc.cosmetics.Main;
-import net.md_5.bungee.api.ChatColor;
-
 public class EmoteMenu implements Listener {
 
 	private Inventory inv;
-	private String playerUUID;
+	private final FtcUser user;
 	
-	public EmoteMenu(String playerUUID) {
+	public EmoteMenu(FtcUser user) {
 		CustomInventory cinv = new CustomInventory(36, "Emotes", false, true);
 		cinv.setHeadItemSlot(0);
 		cinv.setReturnItemSlot(4);
 		
 		this.inv = cinv.getInventory();
-		this.playerUUID = playerUUID;
+		this.user = user;
 	}
 	
 	
@@ -33,23 +31,21 @@ public class EmoteMenu implements Listener {
 
 	private Inventory makeInventory() {
 		Inventory result = this.inv;
-		Boolean noEmoter = Main.plugin.getServer().getPluginManager().getPlugin("Chat").getConfig().getStringList("NoEmotes").contains(playerUUID);
-		
-		List<String> emotes = Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getStringList("players." + playerUUID + ".EmotesAvailable");
+		boolean noEmoter = !user.allowsEmotes();
 		
 		ItemStack noEmote;
-		if (noEmoter) noEmote = Main.plugin.makeItem(Material.BARRIER, 1, ChatColor.GOLD + "Emotes Disabled", ChatColor.GRAY + "Rightclick to enable sending and receiving emotes.");
-		else noEmote = Main.plugin.makeItem(Material.STRUCTURE_VOID, 1, ChatColor.GOLD + "Emotes Enabled", ChatColor.GRAY + "Rightclick to disable sending and receiving emotes.");
+		if (noEmoter) noEmote = FtcCore.makeItem(Material.BARRIER, 1, true, ChatColor.GOLD + "Emotes Disabled", ChatColor.GRAY + "Right-click to enable sending and receiving emotes.");
+		else noEmote = FtcCore.makeItem(Material.STRUCTURE_VOID, 1, true, ChatColor.GOLD + "Emotes Enabled", ChatColor.GRAY + "Right-click to disable sending and receiving emotes.");
 		noEmote.addUnsafeEnchantment(Enchantment.CHANNELING, 0);
 		
-		ItemStack bonk = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "/bonk", ChatColor.GRAY + "Bonk.");
-		ItemStack mwah = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "/mwah", ChatColor.GRAY + "Shower your friends with love.");
-		ItemStack poke = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "/poke", ChatColor.GRAY + "Poking someone makes them jump back a bit.");
+		ItemStack bonk = FtcCore.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/bonk", ChatColor.GRAY + "Bonk.");
+		ItemStack mwah = FtcCore.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/mwah", ChatColor.GRAY + "Shower your friends with love.");
+		ItemStack poke = FtcCore.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/poke", ChatColor.GRAY + "Poking someone makes them jump back a bit.");
 		
-		ItemStack scare = Main.plugin.makeItem(Material.GRAY_DYE, 1, ChatColor.YELLOW + "/scare", ChatColor.GRAY + "Can be earned around Halloween.");
-		ItemStack jingle = Main.plugin.makeItem(Material.GRAY_DYE, 1, ChatColor.YELLOW + "/jingle", ChatColor.GRAY + "Can be earned around Christmas.");
-		if (emotes.contains("SCARE")) scare = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "/scare", ChatColor.GRAY + "Can be earned around Halloween.");
-		if (emotes.contains("JINGLE")) jingle = Main.plugin.makeItem(Material.ORANGE_DYE, 1, ChatColor.YELLOW + "/jingle", ChatColor.GRAY + "Can be earned around Christmas.");
+		ItemStack scare = FtcCore.makeItem(Material.GRAY_DYE, 1, true, ChatColor.YELLOW + "/scare", ChatColor.GRAY + "Can be earned around Halloween.");
+		ItemStack jingle = FtcCore.makeItem(Material.GRAY_DYE, 1, true, ChatColor.YELLOW + "/jingle", ChatColor.GRAY + "Can be earned around Christmas.");
+		if (user.getPlayer().hasPermission("ftc.emotes.scare")) scare.setType(Material.ORANGE_DYE);
+		if (user.getPlayer().hasPermission("ftc.emotes.jingle")) jingle.setType(Material.ORANGE_DYE);
 		
 		result.setItem(12, bonk);
 		result.setItem(13, mwah);
