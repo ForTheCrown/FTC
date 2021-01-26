@@ -34,6 +34,7 @@ public class EmojiTabCompleter implements TabCompleter {
         emojiList.add(":blush:");
         emojiList.add(":sad:");
         emojiList.add(":pleased:");
+        emojiList.add(":fedup:");
 
         return StringUtil.copyPartialMatches(args[argN], emojiList, new ArrayList<>());
     }

@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -19,7 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class ArrowParticleMenu implements Listener {
 
-	private Inventory inv;
+	private final Inventory inv;
 	private FtcUser user;
 	
 	public ArrowParticleMenu(FtcUser user) {
@@ -50,7 +51,7 @@ public class ArrowParticleMenu implements Listener {
 		ItemStack honeytrail = getEffectItem(Particle.DRIPPING_HONEY, "&eSticky Trail", ChatColor.GRAY + "For those who enjoy looking at the trail lol", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
 		ItemStack smoke = getEffectItem(Particle.CAMPFIRE_COSY_SMOKE, "&eSmoke", "&7Pretend to be a cannon.", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
 		ItemStack souls = getEffectItem(Particle.SOUL, "&eSouls", "&7Scary souls escaping from your arrow.", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
-		ItemStack firework = getEffectItem(Particle.FIREWORKS_SPARK, "&eFirework", "&7Almost as if you're using a crossbow." , "&7Click to purchase for &61000 &7Gems");
+		ItemStack firework = getEffectItem(Particle.FIREWORKS_SPARK, "&eFirework", "&7Almost as if you're using a crossbow.", "" , "&7Click to purchase for &61000 &7Gems");
 
 		if(user.getArrowParticle() == null) noEffect.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
 
@@ -81,8 +82,10 @@ public class ArrowParticleMenu implements Listener {
 	public void onPlayerShootsBow(EntityShootBowEvent event) {
 		if (event.getEntity().getType() != EntityType.PLAYER) return;
 
+		Player player = (Player) event.getEntity();
+		user = FtcCore.getUser(player.getUniqueId());
 		Particle activeArrowParticle = user.getArrowParticle();
-		if (activeArrowParticle == null) return;
+		if(activeArrowParticle == null) return;
 
 		double speed = 0;
 		if (activeArrowParticle == Particle.FIREWORKS_SPARK) speed = 0.1;

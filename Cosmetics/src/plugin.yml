@@ -4,6 +4,8 @@ author: Wout
 main: ftc.cosmetics.Main
 description: Plugin that handles the cosmetics.
 api-version: 1.16
+depend:
+  - FTCCore
 
 commands:
   cosmetics:

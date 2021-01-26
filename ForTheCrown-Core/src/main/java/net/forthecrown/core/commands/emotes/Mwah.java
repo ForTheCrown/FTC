@@ -1,6 +1,8 @@
 package net.forthecrown.core.commands.emotes;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -12,19 +14,18 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mwah implements CommandExecutor {
+public class Mwah implements CrownCommandExecutor {
 
     private List<Player> onCooldown = new ArrayList<>();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
         // Sender must be a player:
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may execute this command.");
@@ -33,10 +34,7 @@ public class Mwah implements CommandExecutor {
         Player player = (Player) sender;
         Location loc = player.getLocation();
 
-        if (onCooldown.contains(player)) {
-            sender.sendMessage(ChatColor.GRAY + "You kiss too often :D");
-            return false;
-        }
+        if(FtcCore.isOnCooldown(player)) throw new InvalidCommandExecution(player, "You kiss too much lol");
 
         // Command no args or target = sender:
         if (args.length < 1 || args[0].equalsIgnoreCase(player.getName())) {

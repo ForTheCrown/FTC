@@ -1,17 +1,19 @@
 package ftc.cosmetics.commands;
 
-import org.bukkit.command.CommandExecutor;
-
-import java.util.List;
-
-import org.bukkit.Bukkit;
+import ftc.cosmetics.Main;
+import net.forthecrown.core.CrownCommandExecutor;
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.InvalidArgumentException;
+import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
+import net.forthecrown.core.files.FtcUser;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import ftc.cosmetics.Main;
-import net.md_5.bungee.api.ChatColor;
+import java.util.List;
 
-public class RemoveParticle implements CommandExecutor {
+public class RemoveParticle implements CrownCommandExecutor {
 
 	/*
 	 * ----------------------------------------
@@ -33,42 +35,44 @@ public class RemoveParticle implements CommandExecutor {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		// Valid use of command:
+	public boolean run(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length != 3) return false;
+
+		FtcUser user;
+		try {
+			user = FtcCore.getUser(FtcCore.getOffOnUUID(args[0]));
+		} catch (Exception e){ throw new InvalidPlayerInArgument(sender); }
 		
 		switch (args[1]) {
 		case "arrow":
 		{
-			List<String> availableEffects = Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getStringList("players." + targetUuid + ".ParticleArrowAvailable");
+			List<Particle> availableEffects = user.getParticleArrowAvailable();
+			Particle part;
+			try {
+				part = Particle.valueOf(args[2]);
+			} catch (NullPointerException e){ throw new InvalidArgumentException(sender, "Not a valid particle"); }
 
-			if (!Main.plugin.getAcceptedArrowParticles().contains(args[2])) {
+			if (!Main.plugin.getAcceptedArrowParticles().contains(part)) {
 				sender.sendMessage(ChatColor.GRAY + "Use one of these particles:");
 				String message = ChatColor.GRAY + "";
-				for (String particle : Main.plugin.getAcceptedArrowParticles()) {
-					message += particle + ", ";
+				for (Particle particle : Main.plugin.getAcceptedArrowParticles()) {
+					message += particle.toString() + ", ";
 				}
-				sender.sendMessage(message);
-				return false;
+				throw new InvalidArgumentException(sender, message);
 			}
-			if (availableEffects.contains(args[2])) {
-				availableEffects.remove(args[2]);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + targetUuid + ".ParticleArrowAvailable", availableEffects);
-				if (Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getString("players." + targetUuid + ".ParticleArrowActive").contains(args[2]))
-					Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + targetUuid + ".ParticleArrowActive", "none");
-				
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").saveConfig();
+			if (availableEffects.contains(part)) {
+
+				availableEffects.remove(part);
+				user.setParticleArrowAvailable(availableEffects);
+
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Removed &f" + args[2] + "&7 from &f" + args[0] + "&7's arrow-particles."));
 				return true;
 			}
-			else {
-				sender.sendMessage(ChatColor.GRAY + "This player doesn't have this particle.");
-				return false;
-			}
+			else throw new InvalidArgumentException(sender, "This player does not have this particle: " + args[2]);
 		}
 		case "death":
 		{
-			List<String> availableEffects = Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getStringList("players." + targetUuid + ".ParticleDeathAvailable");
+			List<String> availableEffects = user.getParticleDeathAvailable();
 
 			if (!Main.plugin.getAcceptedDeathParticles().contains(args[2])) {
 				sender.sendMessage(ChatColor.GRAY + "Use one of these particles:");
@@ -76,54 +80,17 @@ public class RemoveParticle implements CommandExecutor {
 				for (String particle : Main.plugin.getAcceptedDeathParticles()) {
 					message += particle + ", ";
 				}
-				sender.sendMessage(message);
-				return false;
+				throw new InvalidArgumentException(sender, message);
 			}
 			if (availableEffects.contains(args[2])) {
 				availableEffects.remove(args[2]);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + targetUuid + ".ParticleDeathAvailable", availableEffects);
-				if (Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getString("players." + targetUuid + ".ParticleDeathActive").contains(args[2]))
-					Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + targetUuid + ".ParticleDeathActive", "none");
-				
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").saveConfig();
+				user.setParticleDeathAvailable(availableEffects);
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Removed &f" + args[2] + "&7 from &f" + args[0] + "&7's death-particles."));
 				return true;
 			}
-			else {
-				sender.sendMessage(ChatColor.GRAY + "This player doesn't have this particle.");
-				return false;
-			}
+			else throw new InvalidArgumentException(sender, "This player does not have this particle: " + args[2]);
 		}
-		case "emote":
-		{
-			List<String> availableEmotes = Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getStringList("players." + targetUuid + ".EmotesAvailable");
-
-			if (!Main.plugin.getAcceptedEmotes().contains(args[2])) {
-				sender.sendMessage(ChatColor.GRAY + "Use one of these emotes:");
-				String message = ChatColor.GRAY + "";
-				for (String emote : Main.plugin.getAcceptedEmotes()) {
-					message += emote + ", ";
-				}
-				sender.sendMessage(message);
-				return false;
-			}
-			if (availableEmotes.contains(args[2])) {
-				availableEmotes.remove(args[2]);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().set("players." + targetUuid + ".EmotesAvailable", availableEmotes);	
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").saveConfig();
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Removed &f" + args[2] + "&7 from &f" + args[0] + "&7's emotes."));
-				return true;
-			}
-			else {
-				sender.sendMessage(ChatColor.GRAY + "This player doesn't have this emote.");
-				return false;
-			}
-		}
-		default: 
-		{
-			sender.sendMessage(ChatColor.RED + "/removeparticle [player] [arrow/death/emote] [particle]");
-			return false;
-		}
+		default: return false;
 		}
 	}
 }

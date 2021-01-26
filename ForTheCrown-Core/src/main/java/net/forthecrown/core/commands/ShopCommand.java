@@ -1,12 +1,21 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.InvalidArgumentException;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.forthecrown.core.inventories.SellShop;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
-public class ShopCommand implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class ShopCommand implements CrownCommandExecutor, TabCompleter {
 
     /*
      * ----------------------------------------
@@ -25,19 +34,21 @@ public class ShopCommand implements CommandExecutor {
      * Author: Botul
      */
 
+    public ShopCommand(){
+        FtcCore.getInstance().getCommandHandler().registerCommand("shop", this, this);
+    }
+
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player)){
-            sender.sendMessage("Only players may execute this command!");
-            return true;
-        }
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+        if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
+
         Player player = (Player) sender;
         SellShop sellShop = new SellShop(player);
 
         if(args.length == 0) player.openInventory(sellShop.mainMenu());
         else {
          switch (args[0]){
-             default: return false;
+             default: throw new InvalidArgumentException(sender);
 
              case "drops":
                  player.openInventory(sellShop.dropsMenu());
@@ -54,5 +65,13 @@ public class ShopCommand implements CommandExecutor {
              }
         }
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> argList = Arrays.asList("drops", "farming", "mining", "web");
+        if(args.length == 1) return StringUtil.copyPartialMatches(args[0], argList, new ArrayList<>());
+
+        return null;
     }
 }

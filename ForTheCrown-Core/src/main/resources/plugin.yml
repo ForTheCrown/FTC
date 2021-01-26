@@ -5,6 +5,7 @@ api-version: 1.16
 authors: [ Botul, Wout ]
 loadbefore:
   - Essentials
+  - OpenInv
 
 commands:
   staffchat:
@@ -128,7 +129,7 @@ commands:
     description: The primary FtcCore command.
     permission: ftc.admin
     permission-message: You do not have permission to use this!
-    usage: '§7Usage:§r /ftcore <reload | save | announcer | reload'
+    usage: '§7Usage:§r /ftcore <reload | save | announcer | reload>'
   becomebaron:
     description: Allows you to become a baron if you have 500,000 Rhines.
     permission: ftc.becomebaron
@@ -152,3 +153,23 @@ commands:
     permission: ftc.ranks
     permission-message: You do not have permission to use this!
     description: 'This command is used to assign and unassign a king or queen'
+  editshop:
+    permission: ftc.shop.edit
+    permission-message: You do not have permission to use this!
+    usage: 'Usage: /editshop <bruh moment>'
+  deposit:
+    permission: ftc.deposit
+    aliases:
+    permission-message: You do not have permission to use this!
+    usage: '§7Usage:§r /deposit'
+    description: 'Used to add all of the currently held gold coins into your balance'
+  withdraw:
+    permission: ftc.withdraw
+    permission-message: You do not have permission to use this!
+    usage: '§7Usage:§r /withdraw <amount>'
+    description: 'Used to get cold coins from your balance'
+  gems:
+    permission: ftc.gems
+    permission-message: You do not have permission to use this!
+    usage: '§7Usage:§r /gems <player>'
+    description: Shows the amount of gems you have or another player has

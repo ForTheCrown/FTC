@@ -1,12 +1,12 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class SpawnCommand implements CommandExecutor {
+public class SpawnCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -27,7 +27,7 @@ public class SpawnCommand implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
         // Information:
         sender.sendMessage(FtcCore.getPrefix() + ChatColor.YELLOW + "Information about spawn:");
         sender.sendMessage("Spawn is called Hazelguard, you can tp using regionpoles.");

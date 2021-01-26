@@ -1,5 +1,7 @@
 package me.wout.Pirate.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -13,19 +15,15 @@ import org.bukkit.inventory.ItemStack;
 
 import me.wout.Pirate.Main;
 
-public class ghtarget implements CommandExecutor {
+public class ghtarget implements CrownCommandExecutor {
 
-	public ghtarget() 
-	{
-		Main.plugin.getCommand("ghtarget").setExecutor(this);
+	public ghtarget() {
+		Main.plugin.getCommandHandler().registerCommand("ghtarget", this);
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!(sender instanceof Player)) {
-			sender.sendMessage("Only players can execute this command.");
-			return false;
-		}
+	public boolean run(CommandSender sender, Command cmd, String label, String[] args) {
+		if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 		
 		Player player = (Player) sender;
 		if (!player.isOp())

@@ -1,12 +1,12 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
-import org.bukkit.Bukkit;
+import net.forthecrown.core.exceptions.CrownException;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class BroadcastCommand implements CommandExecutor {
+public class BroadcastCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -29,15 +29,10 @@ public class BroadcastCommand implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
         if(args.length < 1) return false;
 
-        String message = FtcCore.getPrefix();
-        message += String.join(" ", args); //joins the args array into one string
-        message = FtcCore.replaceEmojis(message); //replaces any emojis in the message
-        message = FtcCore.translateHexCodes(message); //adds chatcolor
-
-        Bukkit.broadcastMessage(message);
+        FtcCore.getAnnouncer().announceToAll(String.join(" ", args));
         return true;
     }
 }

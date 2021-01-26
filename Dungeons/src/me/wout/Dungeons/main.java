@@ -227,8 +227,8 @@ public class main extends JavaPlugin implements Listener {
 		if (found) event.getEntity().sendMessage(ChatColor.RED + "[FTC] " + ChatColor.WHITE + "You lost a random amount of your Dungeon Items...");
 	}
 	
-	
-	@EventHandler(ignoreCancelled = true)
+
+	@EventHandler
 	public void onPlayerClick(PlayerInteractEntityEvent event) {
 		if(!event.getHand().equals(EquipmentSlot.HAND))
 			return;

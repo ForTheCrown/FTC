@@ -34,12 +34,12 @@ public class JeromeEvent implements Listener, ClickEventTask {
     public void onJeromeSpeakTo(PlayerInteractEntityEvent event){
         if(event.getRightClicked().getType() != EntityType.VILLAGER) return;
         if(event.getHand() != EquipmentSlot.HAND) return;
-        if(FtcCore.isOnCooldown(event.getPlayer())) return;
         Villager villie = (Villager) event.getRightClicked();
         if(villie.getCustomName() != null && !villie.getCustomName().contains(ChatColor.YELLOW + "Jerome")) return;
         if(!villie.isInvulnerable()) return;
         event.setCancelled(true);
 
+        if(FtcCore.isOnCooldown(event.getPlayer())) return;
         FtcCore.addToCooldown(event.getPlayer(), 20, false);
 
         Player player = event.getPlayer();

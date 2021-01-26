@@ -1,5 +1,6 @@
 package me.wout.Pirate.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import org.bukkit.command.CommandExecutor;
 
 import org.bukkit.Bukkit;
@@ -12,14 +13,14 @@ import org.bukkit.entity.Player;
 
 import me.wout.Pirate.Main;
 
-public class Leave implements CommandExecutor{
+public class Leave implements CrownCommandExecutor {
 	
 	public Leave() {
-		Main.plugin.getCommand("leave").setExecutor(this);
+		Main.plugin.getCommandHandler().registerCommand("leave", this);
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean run(CommandSender sender, Command cmd, String label, String[] args) {
 		// Checks if sender is a player.
 		if (!(sender instanceof Player)) {
 			sender.sendMessage(ChatColor.RED + "Only players can do this.");

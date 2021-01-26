@@ -1,17 +1,18 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.*;
 import net.forthecrown.core.files.Balances;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class PayCommand implements CommandExecutor {
+public class PayCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -31,45 +32,30 @@ public class PayCommand implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player)) {
-            sender.sendMessage("Only players may execute this command!");
-            return true;
-        }
-        if(args.length != 2) return false;
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+        if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
+        if(args.length != 2) throw new TooLittleArgumentsException(sender);
 
         Player player = (Player) sender;
         UUID playerUUID = player.getUniqueId();
         UUID target;
 
-        if(args[0].contains(player.getName())) return false;
+        if(args[0].contains(player.getName())) throw new InvalidArgumentException(sender, "You can't pay yourself");
 
         try {
             target = FtcCore.getOffOnUUID(args[0]);
-            Bukkit.getOfflinePlayer(args[0]).getName();
-        } catch (Exception e){
-            player.sendMessage(ChatColor.GRAY + args[0] + " is not a valid player");
-            return true;
-        }
+        } catch (Exception e){ throw new InvalidPlayerInArgument(sender, args[0]); }
 
         int amountToPay;
         try {
             amountToPay = Integer.parseInt(args[1]);
-        } catch (Exception e){
-            return false;
-        }
+        } catch (Exception e){ throw new InvalidArgumentException(sender, "The amount to pay must be a number!"); }
 
-        if(amountToPay <= 0){
-            player.sendMessage("You can't pay nothing/negative amounts");
-            return true;
-        }
+        if(amountToPay <= 0) throw new InvalidArgumentException(sender, "You can't pay negative amounts");
 
         Balances bals = FtcCore.getBalances();
 
-        if(bals.getBalance(playerUUID) < amountToPay){
-            player.sendMessage(ChatColor.GRAY + "You're not able to afford that");
-            return true;
-        }
+        if(bals.getBalance(playerUUID) < amountToPay) throw new CannotAffordTransaction(sender);
 
         //gives money to target
         bals.addBalance(target, amountToPay, true);

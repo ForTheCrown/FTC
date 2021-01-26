@@ -1,19 +1,30 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.exceptions.CrownException;
+import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
 import net.forthecrown.core.files.FtcUser;
 import net.forthecrown.core.files.SignShop;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.util.StringUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class CoreCommand implements CommandExecutor {
+public class CoreCommand implements CrownCommandExecutor, TabCompleter {
+
+    public CoreCommand(){
+        FtcCore.getInstance().getCommandHandler().registerCommand("ftccore", this, this);
+    }
+
+
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
         if(args.length < 1) return false;
 
         switch (args[0]){
@@ -46,6 +57,11 @@ public class CoreCommand implements CommandExecutor {
                         for(SignShop shop : SignShop.loadedShops){ shop.save(); }
                         sender.sendMessage("All loaded SignShops have been saved");
                         return true;
+
+                    case "blackmarket":
+                        FtcCore.getBlackMarket().save();
+                        sender.sendMessage("Black market saved");
+                        return true;
                 }
 
             case "reload":
@@ -77,6 +93,11 @@ public class CoreCommand implements CommandExecutor {
                         for(SignShop shop : SignShop.loadedShops){ shop.reload(); }
                         sender.sendMessage("All loaded SignShops have been reloaded");
                         return true;
+
+                    case "blackmarket":
+                        FtcCore.getBlackMarket().reload();
+                        sender.sendMessage("Black market reloaded");
+                        return true;
                 }
 
             case "announcer":
@@ -98,7 +119,7 @@ public class CoreCommand implements CommandExecutor {
                 FtcUser user;
                 try {
                     user = FtcCore.getUser(FtcCore.getOffOnUUID(args[1]));
-                } catch (NullPointerException e){ return false; }
+                } catch (NullPointerException e){ throw new InvalidPlayerInArgument(sender, args[1]); }
 
                 switch (args[2]){
                     case "addpet":
@@ -168,9 +189,9 @@ public class CoreCommand implements CommandExecutor {
                         }
                         try {
                             user.setBranch(Branch.valueOf(args[3].toUpperCase()));
-                            sender.sendMessage(args[1] + " is now a " + user.getBranch().toString());
+                            sender.sendMessage(args[1] + " is now apart of the " + user.getBranch().getName());
+                            return true;
                         } catch (Exception e){ return false; }
-                        break;
 
                     case "addgems":
                         if(args.length < 4) return false;
@@ -182,12 +203,76 @@ public class CoreCommand implements CommandExecutor {
 
                         user.addGems(gems);
                         sender.sendMessage("Added " + gems + " gems to " + args[1]);
-
+                        return true;
                 }
-
-
             default: return false;
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> argList = new ArrayList<>();
+        int argN = args.length -1;
+
+        if(args.length == 1){
+            argList.add("reload");
+            argList.add("save");
+            argList.add("announcer");
+            argList.add("user");
+        }
+        if(args.length == 2){
+            switch (args[0]){
+                case "reload":
+                case "save":
+                    argList.add("announcer");
+                    argList.add("balances");
+                    argList.add("users");
+                    argList.add("signshops");
+                    argList.add("blackmarket");
+                    break;
+                case "announcer":
+                    argList.add("stop");
+                    argList.add("start");
+                    break;
+                case "user":
+                    return null;
+                default:
+                    return new ArrayList<>();
+            }
+        }
+
+        if(args.length == 3 && args[0].contains("user")){
+            argList.add("addpet");
+            argList.add("rank");
+            argList.add("makebaron");
+            argList.add("canswapbranch");
+            argList.add("branch");
+            argList.add("addgems");
+        }
+
+        if(args.length == 4){
+            switch (args[2]){
+                case "rank":
+                    argList.add("add");
+                    argList.add("remove");
+                    break;
+                case "branch":
+                    for(Branch b : Branch.values()){
+                        argList.add(b.toString());
+                    }
+                    break;
+                default:
+                    return new ArrayList<>();
+            }
+        }
+
+        if(args.length == 5 && args[3].contains("rank")){
+            for(Rank r : Rank.values()){
+                argList.add(r.toString());
+            }
+        }
+
+        return StringUtil.copyPartialMatches(args[argN], argList, new ArrayList<>());
     }
 }
 

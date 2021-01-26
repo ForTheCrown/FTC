@@ -1,12 +1,13 @@
 package net.forthecrown.core.commands.emotes;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -14,13 +15,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Poke implements CommandExecutor {
+public class Poke implements CrownCommandExecutor {
 
     List<Player> onCooldown = new ArrayList<>();
     List<String> pokeOwies = Arrays.asList("stomach", "back", "arm", "butt", "cheek", "neck");
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
         // Sender must be a player:
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may execute this command.");
@@ -30,10 +31,7 @@ public class Poke implements CommandExecutor {
         FtcUser playerData = FtcCore.getUser(player.getUniqueId());
 
         // Sender can't be on cooldown:
-        if (onCooldown.contains(player)) {
-            sender.sendMessage(ChatColor.GRAY + "You poke people too often.");
-            return false;
-        }
+        if(FtcCore.isOnCooldown(player)) throw new InvalidCommandExecution(player, "You poke people too often lol");
 
         // Command no args or target = sender:
         if (args.length < 1 || args[0].equalsIgnoreCase(player.getName())) {

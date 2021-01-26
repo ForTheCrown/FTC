@@ -1,10 +1,11 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.inventories.RankInventory;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.forthecrown.core.files.FtcUser;
+import net.forthecrown.core.inventories.RankInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,14 +58,13 @@ public class RankGuiUseEvent implements Listener {
             return;
         }
 
-        if(clickedRank == user.getRank()){
-            user.sendMessage("&7This already is your rank");
+        if(event.getCurrentItem().getEnchantments().size() > 0){
+            user.sendMessage("&7This is already your rank!");
             return;
         }
 
-        if(clickedRank.getRankBranch() != Branch.DEFAULT && user.getBranch() != clickedRank.getRankBranch()) {
-            user.sendMessage("&7This rank is not in your branch (" + clickedRank.getRankBranch().getName() + ")");
-            return;
+        if(clickedRank.getRankBranch() != Branch.DEFAULT){
+            if(user.getBranch() != clickedRank.getRankBranch()) throw new InvalidCommandExecution(user, "&cThis rank is not in your branch!");
         }
 
         if(clickedRank == Rank.DEFAULT){
@@ -73,7 +73,7 @@ public class RankGuiUseEvent implements Listener {
             user.sendMessage("&7Your rank is now the default rank.");
         } else{
             user.setRank(clickedRank);
-            user.sendMessage(clickedRank.getPrefix() + "&7has become your new rank! (" + user.getBranch().getName() + ")");
+            user.sendMessage(clickedRank.getPrefix() + "&7has become your new rank! (Branch: " + user.getBranch().getName() + ")");
         }
 
         //reload inventory

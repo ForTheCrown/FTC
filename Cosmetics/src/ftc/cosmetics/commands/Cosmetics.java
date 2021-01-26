@@ -1,15 +1,15 @@
 package ftc.cosmetics.commands;
 
 import ftc.cosmetics.Main;
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.forthecrown.core.files.FtcUser;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Cosmetics implements CommandExecutor {
+public class Cosmetics implements CrownCommandExecutor {
 
 	/*
 	 * ----------------------------------------
@@ -28,7 +28,7 @@ public class Cosmetics implements CommandExecutor {
 	 */
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean run(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 		
 		Player player = (Player) sender;

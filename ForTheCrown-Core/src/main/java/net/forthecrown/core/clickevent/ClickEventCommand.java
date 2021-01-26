@@ -17,7 +17,6 @@ public class ClickEventCommand implements CommandExecutor {
         String id = args[0];
 
         ClickEventManager.callClickEvent(id, args, ((Player) sender));
-        ClickEventManager.allowCommandUsage((Player) sender, false);
         return true;
     }
 }

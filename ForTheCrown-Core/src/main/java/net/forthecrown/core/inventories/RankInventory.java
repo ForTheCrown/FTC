@@ -19,14 +19,16 @@ public class RankInventory {
     }
 
     public Inventory getUsersRankGUI(){
-        switch (user.getRank().getRankBranch()){
+        switch (user.getBranch()){
             case PIRATES:
                 return getPiratesGUI();
             case VIKINGS:
                 return getVikingsGUI();
             case ROYALS:
-            default:
+            case DEFAULT:
                 return getRoyalsGUI();
+            default:
+                throw new IllegalStateException("Unexpected value: " + user.getRank().getRankBranch());
         }
     }
 
@@ -55,11 +57,17 @@ public class RankInventory {
 
         if(user.hasRank(Rank.LEGEND) || user.getPlayer().hasPermission("ftc.legend")) inv.setItem(13, getRankItem(Material.MAP, Rank.LEGEND, "The rarest rank on all of FTC"));
 
-        inv.setItem(21, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.SAILOR, ""));
-        inv.setItem(23, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.PIRATE, ""));
+        inv.setItem(21, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.SAILOR, ChatColor.GRAY + "Acquired by gathering 10 pirate points by finding",
+                ChatColor.GRAY + "treasures, hunting mob heads or completing",
+                ChatColor.GRAY + "some grappling hook challenge levels."));
+        inv.setItem(23, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.PIRATE, ChatColor.GRAY + "Acquired by gathering 50 pirate points by finding",
+                ChatColor.GRAY + "treasures, hunting mob heads or completing",
+                ChatColor.GRAY + "some grappling hook challenge levels."));
 
-        inv.setItem(39, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.CAPTAIN, ""));
-        inv.setItem(41, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.ADMIRAL, ""));
+        inv.setItem(39, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.CAPTAIN, ChatColor.GRAY + "Included in the Tier 2 Donator ranks package,",
+                ChatColor.GRAY + "which costs €20.00 in the webstore."));
+        inv.setItem(41, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.ADMIRAL, ChatColor.GRAY + "Included in the Tier 3 Donator ranks package,",
+                ChatColor.GRAY + "which costs €6.00/month in the webstore."));
 
         return inv;
     }
@@ -112,6 +120,10 @@ public class RankInventory {
         else s = rank.getPrefix();
 
         ItemStack item = FtcCore.makeItem(mat, 1, true, s, description);
+        if(Rank.getFreeRanks().contains(rank)){
+            if(user.getAvailableRanks().contains(rank))item.setType(Material.MAP);
+            else item.setType(Material.PAPER);
+        }
         if(rank == user.getRank()) item.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
 
         return item;

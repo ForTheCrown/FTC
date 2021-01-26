@@ -2,7 +2,7 @@ package net.forthecrown.core.events;
 
 import net.forthecrown.core.customevents.SignShopUseEvent;
 import net.forthecrown.core.enums.ShopType;
-import net.forthecrown.core.files.Balances;
+import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.forthecrown.core.files.FtcUser;
 import net.forthecrown.core.files.SignShop;
 import net.md_5.bungee.api.ChatColor;
@@ -23,22 +23,17 @@ public class ShopUseListener implements Listener {
         //just the variables
         Player player = event.getPlayer();
         SignShop shop = event.getShop();
+        FtcUser customer = event.getCustomer();
 
         if(shop.getExampleItem() == null){
             if(shop.getShopInventory().getContents()[0] == null){
                 shop.setOutOfStock(true);
-                player.sendMessage("");
-            }
-
-            shop.setExampleItem(shop.getShopInventory().getContents()[0]);
+                throw new InvalidCommandExecution(customer, "");
+            } else shop.setExampleItem(shop.getShopInventory().getContents()[0]);
         }
 
         Inventory playerInv = player.getInventory();
         Inventory shopInv = shop.getShopInventory();
-
-        Balances bals = event.getBalances();
-        FtcUser owner = event.getOwner();
-        FtcUser customer = event.getCustomer();
 
         boolean shopHasSpace = shop.getShopInventory().firstEmpty() != -1;
         boolean customerHasSpace = playerInv.firstEmpty() != -1;
@@ -84,6 +79,7 @@ public class ShopUseListener implements Listener {
                 }
                 if(tempInt != 0){ //if there isn't enough items in the shop's inventory
                     customer.sendMessage("&7The Shop does not have enough stock");
+                    shop.setOutOfStock(true);
                     event.setCancelled(true);
                     return;
                 }
@@ -114,7 +110,7 @@ public class ShopUseListener implements Listener {
                     return;
                 }
 
-                playerInv.addItem(shop.getExampleItem().clone()); //adds the item to player's inventory
+                playerInv.addItem(shop.getExampleItem()); //adds the item to player's inventory
 
                 event.setCustomerBalance(event.getCustomerBalance() - shop.getPrice());
 
@@ -128,6 +124,11 @@ public class ShopUseListener implements Listener {
                 break;
 
             case SELL_SHOP: //again some overlap
+                if(shop.isOutOfStock()){
+                    customer.sendMessage("&cThis shop is currently unusable. &7Please tell the owner to remake the shop");
+                    return;
+                }
+
                 if(event.getOwnerBalance() < shop.getPrice()){
                     customer.sendMessage("&7The owner of this shop is not able to afford this");
                     event.setCancelled(true);
@@ -181,7 +182,7 @@ public class ShopUseListener implements Listener {
                     event.setOwnerBalance(event.getOwnerBalance() - shop.getPrice());
 
                     Inventory inv = shop.getShopInventory();
-                    inv.addItem(shop.getExampleItem().clone());
+                    inv.addItem(shop.getExampleItem());
                     shop.setShopInventory(inv);
 
                     try {

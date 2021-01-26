@@ -1,15 +1,15 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public class StaffChatToggleCommand implements CommandExecutor {
+public class StaffChatToggleCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -29,7 +29,7 @@ public class StaffChatToggleCommand implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)){
             sender.sendMessage("Only players may execute this command!");
             return false;

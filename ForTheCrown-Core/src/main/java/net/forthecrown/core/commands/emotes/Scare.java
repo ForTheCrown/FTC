@@ -1,19 +1,19 @@
 package net.forthecrown.core.commands.emotes;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.files.FtcUser;
 import org.bukkit.*;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class Scare implements CommandExecutor {
+public class Scare implements CrownCommandExecutor {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
         // Sender must be a player:
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may execute this command.");

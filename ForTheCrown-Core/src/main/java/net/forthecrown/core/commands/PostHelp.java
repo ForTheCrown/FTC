@@ -1,12 +1,12 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class PostHelp implements CommandExecutor {
+public class PostHelp implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -27,7 +27,7 @@ public class PostHelp implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
         // Send information:
         sender.sendMessage(FtcCore.getPrefix() + ChatColor.YELLOW + "Information about regionpoles:");
         sender.sendMessage("You can only teleport between regionpoles.");

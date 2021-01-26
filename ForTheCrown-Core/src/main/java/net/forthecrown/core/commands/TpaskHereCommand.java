@@ -1,5 +1,8 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
+import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -7,11 +10,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class TpaskHereCommand implements CommandExecutor {
+public class TpaskHereCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -36,12 +38,8 @@ public class TpaskHereCommand implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // Checks if sender is a player.
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can do this.");
-            return false;
-        }
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         Player player = (Player) sender;
 
         // Valid command use
@@ -51,10 +49,7 @@ public class TpaskHereCommand implements CommandExecutor {
         try {
             target = Bukkit.getPlayer(args[0]);
         }
-        catch (Exception e) {
-            player.sendMessage(ChatColor.GRAY + args[0] + " is not online.");
-            return true;
-        }
+        catch (Exception e) { throw new InvalidPlayerInArgument(sender, args[0]); }
 
         // Tpahere & sender message.
         TextComponent cancelTPA = new TextComponent(ChatColor.GRAY + "[✖]");

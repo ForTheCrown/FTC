@@ -1,16 +1,18 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
+import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class LeaveVanishCommand implements CommandExecutor {
+public class LeaveVanishCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -35,11 +37,8 @@ public class LeaveVanishCommand implements CommandExecutor {
     Set<Player> vanishedPlayer = new HashSet<>();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player)){
-            sender.sendMessage("Only player may execute this command!");
-            return true;
-        }
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+        if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 
         Player player = (Player) sender;
 
@@ -59,9 +58,7 @@ public class LeaveVanishCommand implements CommandExecutor {
             Player target;
             try {
                 target = Bukkit.getPlayer(args[0]);
-            } catch (Exception e) {
-                return false;
-            }
+            } catch (Exception e) { throw new InvalidPlayerInArgument(sender, args[0]); }
 
             Bukkit.dispatchCommand(Bukkit.getConsoleSender() ,"vanish " + target.getName());
 

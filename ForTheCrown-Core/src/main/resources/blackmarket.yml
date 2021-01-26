@@ -1,0 +1,110 @@
+Daily_Items:
+  Enchant: WATER_WORKER
+  Crops: []
+  Drops: []
+  Mining: []
+
+Price_Per_Item:
+  MobDrops:
+    ROTTEN_FLESH: 3
+    BONE: 6
+    ARROW: 6
+    STRING: 3
+    SPIDER_EYE: 6
+    LEATHER: 11
+    GUNPOWDER: 6
+    BLAZE_ROD: 6
+    SLIME_BALL: 5
+    COD: 3
+    MAGMA_CREAM: 5
+    CHICKEN: 5
+    RABBIT: 15
+    MUTTON: 8
+    PORKCHOP: 8
+    FEATHER: 5
+  Crops:
+    BAMBOO: 3
+    KELP: 3
+    CACTUS: 4
+    MELON: 5
+    VINE: 10
+    SUGAR_CANE: 3
+    POTATO: 5
+    WHEAT: 11
+    CARROT: 5
+    PUMPKIN: 3
+    BEETROOT_SEEDS: 5
+    BEETROOT: 7
+    SWEET_BERRIES: 8
+    CHORUS_FRUIT: 10
+    WHEAT_SEEDS: 4
+    JUNGLE_SAPLING: 4
+    OAK_SAPLING: 4
+    BIRCH_SAPLING: 4
+    ACACIA_SAPLING: 4
+    DARK_OAK_SAPLING: 5
+    SPRUCE_SAPLING: 3
+    WITHER_ROSE: 3
+    WARPED_FUNGUS: 4
+    WARPED_ROOTS: 4
+    APPLE: 10
+    CRIMSON_FUNGUS: 4
+    CRIMSON_ROOTS: 4
+  Mining:
+    LAPIS_LAZULI: 15
+    DIAMOND: 400
+    EMERALD: 25
+    COAL: 15
+    QUARTZ: 10
+    IRON_INGOT: 6
+    GOLD_INGOT: 8
+    REDSTONE: 15
+    STONE: 3
+    COBBLESTONE: 3
+    GRAVEL: 3
+    SAND: 3
+    ANDESITE: 5
+    DIORITE: 5
+    GRANITE: 5
+    DIRT: 3
+    NETHERRACK: 2
+    BASALT: 5
+    BLACKSTONE: 3
+    NETHERITE_SCRAP: 500
+    TORCH: 5
+    LANTERN: 7
+    FLINT: 10
+    REDSTONE_ORE: 10
+    IRON_ORE: 10
+    COAL_ORE: 10
+  Enchants:
+    power: 250000
+    flame: 75000
+    punch: 150000
+    sharpness: 250000
+    bane_of_arthropods: 50000
+    smite: 75000
+    depth_strider: 150000
+    efficiency: 250000
+    unbreaking: 250000
+    fire_aspect: 150000
+    frost_walker: 50000
+    impaling: 100000
+    knockback: 250000
+    fortune: 500000
+    luck_of_the_sea: 50000
+    lure: 50000
+    respiration: 75000
+    piercing: 75000
+    protection: 250000
+    blast_protection: 150000
+    feather_falling: 250000
+    fire_protection: 150000
+    projectile_protection: 150000
+    soul_speed: 100000
+    sweeping: 250000
+    thorns: 500000
+    aqua_affinity: 100000
+Day: 1
+MaxEarnings: 50000
+EnchantLevel: 0

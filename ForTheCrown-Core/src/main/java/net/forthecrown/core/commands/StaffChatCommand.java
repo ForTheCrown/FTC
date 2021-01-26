@@ -1,14 +1,14 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class StaffChatCommand implements CommandExecutor {
+public class StaffChatCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -31,7 +31,7 @@ public class StaffChatCommand implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
         String staffPrefix = ChatColor.DARK_GRAY + "[Staff] ";
         String message = staffPrefix + ChatColor.GRAY + "%SENDER%"  + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + "%MESSAGE%";
 

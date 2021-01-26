@@ -94,7 +94,17 @@ public class SignShopCreateEvent implements Listener {
         Sign sign = (Sign) shop.getBlock().getState();
 
         Inventory inv = event.getInventory();
-        if(!shop.setExampleItems(inv.getContents())){
+        boolean trash;
+        try{
+            trash = shop.setExampleItems(inv.getContents());
+        } catch (NullPointerException e){
+            player.sendMessage(ChatColor.RED + "The inventory was empty!");
+            sign.setLine(3, sign.getLine(3).replaceAll(":", ""));
+            sign.update();
+            return;
+        }
+
+        if(!trash){
             for (ItemStack stack : inv.getContents()){
                 if (stack == null) continue;
                 player.getInventory().addItem(stack);
@@ -108,7 +118,7 @@ public class SignShopCreateEvent implements Listener {
             String loooooonngg = ChatColor.GREEN + "SignShop created!" + ChatColor.RESET + " It'll " +
                     shop.getType().toString().toLowerCase().replaceAll("_shop", "").replaceAll("admin_", "") + " " +
                     shop.getExampleItem().getAmount() + " " +
-                    shop.getExampleItem().getType().toString().toLowerCase() +
+                    shop.getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
                     " for " + shop.getPrice() +
                     " Rhines. Use Shift + Right Click to restock the shop.";
 

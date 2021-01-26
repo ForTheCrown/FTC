@@ -1,10 +1,10 @@
 package net.forthecrown.core.commands.emotes;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.files.FtcUser;
 import org.bukkit.*;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Jingle implements CommandExecutor {
+public class Jingle implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -33,7 +33,7 @@ public class Jingle implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
         // Sender must be a player:
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may execute this command.");
@@ -42,15 +42,11 @@ public class Jingle implements CommandExecutor {
         Player player = (Player) sender;
         FtcUser playerData = FtcCore.getUser(player.getUniqueId());
 
-        if(FtcCore.isOnCooldown(player)){
+        if(FtcCore.isOnCooldown(player)) {
             sender.sendMessage(ChatColor.GRAY + "You jingle too often lol");
             sender.sendMessage(ChatColor.DARK_GRAY + "This only works every 6 seconds.");
             return false;
         }
-        /*if(!playerData.getEmotesAvailable().contains("JINGLE")){
-            player.sendMessage(ChatColor.GRAY + "You haven't unlocked this emote yet.");
-            return false;
-        }*/
 
         if (args.length < 1 || args[0].equalsIgnoreCase(sender.getName())) {
             FtcCore.addToCooldown(player, 6*20, true);

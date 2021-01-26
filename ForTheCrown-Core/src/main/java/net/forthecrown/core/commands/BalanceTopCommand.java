@@ -1,16 +1,18 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.CrownException;
+import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nonnegative;
 import java.util.*;
 
-public class BalanceTopCommand implements CommandExecutor {
+public class BalanceTopCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -32,20 +34,14 @@ public class BalanceTopCommand implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
         int page = 0;
         if(args.length >= 1) {
             try {
                 page = Integer.parseInt(args[0]);
-            } catch (Exception e){
-                sender.sendMessage(ChatColor.GRAY + "The argument must be a number!");
-                return false;
-            }
+            } catch (Exception e){ throw new InvalidArgumentException(sender, "Page number must be a number"); }
 
-            if(page < 0){
-                sender.sendMessage(ChatColor.GRAY + "Negative numbers cannot be used!");
-                return false;
-            }
+            if(page < 0){ throw new InvalidArgumentException(sender, "Page number cannot be negative"); }
         }
         sendBaltopMessage(sender, page);
         return true;

@@ -30,9 +30,8 @@ public class ChatEvents implements Listener {
     }
 
 
-    @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent event)
-    {
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String playerName = player.getName();
         String message = event.getMessage();
@@ -60,12 +59,13 @@ public class ChatEvents implements Listener {
         if (FtcCore.getSCTPlayers().contains(player)) {
             event.setCancelled(true);
 
+            String message1 = ChatColor.DARK_GRAY + "[Staff] " + ChatColor.GRAY + playerName + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + FtcCore.translateHexCodes(message);
+
             for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
                 if (!(onlinePlayer.hasPermission("ftc.staffchat"))) continue;
-                String message1 = ChatColor.DARK_GRAY + "[Staff] " + playerName + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + FtcCore.translateHexCodes(message);
                 onlinePlayer.sendMessage(message1);
-                System.out.println(message1);
             }
+            System.out.println(message1);
             return;
         }
 

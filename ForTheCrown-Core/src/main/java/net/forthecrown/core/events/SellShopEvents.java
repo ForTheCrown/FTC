@@ -1,10 +1,10 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.inventories.SellShop;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.files.Balances;
 import net.forthecrown.core.files.FtcUser;
+import net.forthecrown.core.inventories.SellShop;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
@@ -133,20 +133,20 @@ public class SellShopEvents implements Listener {
             if(seller.getSellAmount() == SellAmount.ALL){ //remove the itemstack and add it to the finalSell variable
                 finalSell += stack.getAmount();
                 sellAmount = 0;
-                playerInventory.remove(stack);
+                playerInventory.removeItem(stack);
                 continue;
             }
 
             if(stack.getAmount() >= sellAmount){ //if the stack is larger than the remaining sellAmount
                 stack.setAmount(stack.getAmount() - sellAmount);
-                if(stack.getAmount() < 0) playerInventory.remove(stack);
+                if(stack.getAmount() < 0) playerInventory.removeItem(stack);
                 sellAmount = 0;
                 break;
             }
 
             if(stack.getAmount() < sellAmount){ //if the stack is smaller than the remaining sellAmount
                 sellAmount -= stack.getAmount(); //lessens the sellAmount so the next item requires only the amount of items still needed
-                playerInventory.remove(stack);
+                playerInventory.removeItem(stack);
             }
         }
         if(sellAmount != 0) return false; //if there's not enough items and you aren't selling all
@@ -158,7 +158,9 @@ public class SellShopEvents implements Listener {
 
         bals.addBalance(uuid, toPay, true); //does the actual paying and adds the itemsSold to the seller
         seller.setAmountEarned(toSell, seller.getAmountEarned(toSell)+toPay); //How the fuck does this keep resetting everytime
-        player.sendMessage("You sold " + finalSell + " " + s + " for " + toPay);
+        seller.sendMessage("&7You sold &e" + finalSell + " " + s + " &7for &6" + toPay + " Rhines");
+
+        System.out.println(seller.getName() + " sold " + finalSell + " " + s + " for " + toPay);
 
         int comparison1 = seller.getItemPrice(toSell);
 

@@ -1,13 +1,16 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.InvalidArgumentException;
+import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
+import net.forthecrown.core.exceptions.TooLittleArgumentsException;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.UUID;
 
-public class SetBalanceCommand implements CommandExecutor {
+public class SetBalanceCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -30,20 +33,21 @@ public class SetBalanceCommand implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(args.length != 2) return false;
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+        if(args.length != 2) throw new TooLittleArgumentsException(sender);
 
         UUID targetUUID;
         try {
             targetUUID = FtcCore.getOffOnUUID(args[0]);
-        } catch (NullPointerException e){ return false; }
+        } catch (NullPointerException e){ throw new InvalidPlayerInArgument(sender, args[0]); }
 
         int amountToSet;
         try {
             amountToSet = Integer.parseInt(args[1]);
-        } catch (Exception e){ return false; }
+        } catch (Exception e){ throw new InvalidArgumentException(sender, args[1] + " is not a number"); }
 
         FtcCore.getBalances().setBalance(targetUUID, amountToSet);
+        sender.sendMessage(FtcCore.translateHexCodes("&e" + args[0] + " &7now has &6" + amountToSet + " Rhines"));
         return true;
     }
 }

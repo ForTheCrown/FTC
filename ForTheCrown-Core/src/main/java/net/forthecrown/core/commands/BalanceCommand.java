@@ -1,16 +1,19 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.CrownException;
+import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.forthecrown.core.files.Balances;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class BalanceCommand implements CommandExecutor {
+public class BalanceCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -32,11 +35,9 @@ public class BalanceCommand implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player)){
-            sender.sendMessage("Only players may execute this command!");
-            return false;
-        }
+    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
+        if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
+
         Player player = (Player) sender;
         Balances bals = FtcCore.getBalances();
 
@@ -48,11 +49,7 @@ public class BalanceCommand implements CommandExecutor {
         UUID targetUUID;
         try {
             targetUUID = FtcCore.getOffOnUUID(args[0]);
-        } catch (NullPointerException e){
-            e.printStackTrace();
-            player.sendMessage(ChatColor.GRAY + args[0] + " is not a valid playername");
-            return false;
-        }
+        } catch (NullPointerException e){ throw new InvalidPlayerInArgument(sender, args[0]); }
 
         player.sendMessage(ChatColor.GOLD + "$ " + ChatColor.YELLOW + args[0] + ChatColor.GRAY + " currently has " + ChatColor.GOLD + bals.getBalance(targetUUID) + " Rhines");
         return true;

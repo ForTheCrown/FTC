@@ -17,7 +17,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class SignShopInteractEvent implements Listener {
 
@@ -42,14 +44,15 @@ public class SignShopInteractEvent implements Listener {
         SignShop shop;
         try {
             shop = FtcCore.getSignShop(event.getClickedBlock().getLocation());
-        } catch (NullPointerException e){
+        } catch (Exception e){
             e.printStackTrace();
             return;
         }
         Player player = event.getPlayer();
 
         //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it
-        if(player.isSneaking() && (shop.getOwner() == player.getUniqueId() || player.hasPermission("ftc.admin"))){
+
+        if(player.isSneaking() && (shop.getOwner().equals(player.getUniqueId()) || player.hasPermission("ftc.admin"))){
             player.openInventory(shop.getShopInventory());
             dopfguijh.put(player.getUniqueId(), shop);
             return;

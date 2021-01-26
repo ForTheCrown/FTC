@@ -50,6 +50,10 @@ public class FtcUser extends FtcFileManager {
     private long totalEarnings;
     private long nextResetTime;
 
+    private FtcUser lastMessanger;
+    private boolean isMuted;
+    private boolean isSoftMuted;
+
 
     public FtcUser(UUID base){
         super(base.toString(), "playerdata");
@@ -79,7 +83,7 @@ public class FtcUser extends FtcFileManager {
         setGems(getFile().getInt("Gems"));
         setAllowsEmotes(getFile().getBoolean("AllowsEmotes"));
         setTotalEarnings(getFile().getLong("TotalEarnings"));
-        setNextResetTime(getFile().getLong("NextResetTime"));
+        setNextResetTime(getFile().getLong("TimeStamps.NextResetTime"));
         setSellAmount(SellAmount.valueOf(getFile().getString("SellAmount").toUpperCase()));
 
         if(!getFile().getString("ArrowParticle").contains("none")) setArrowParticle(Particle.valueOf(getFile().getString("ArrowParticle")));
@@ -117,7 +121,7 @@ public class FtcUser extends FtcFileManager {
             setAmountEarnedMap(tempMap);
         }
 
-        if(isOnline() && !name.equals(getPlayer().getName())){ //transfers all scores to new player name if player name changes
+        if(isOnline() && name != null && !name.equals(getPlayer().getName())){ //transfers all scores to new player name if player name changes
             Scoreboard scoreboard = getPlayer().getScoreboard();
             for (Objective obj : scoreboard.getObjectives()){
                 if(!obj.getScore(name).isScoreSet()) continue;
@@ -142,7 +146,7 @@ public class FtcUser extends FtcFileManager {
         getFile().set("Gems", getGems());
         getFile().set("SellAmount", getSellAmount().toString());
         getFile().set("TotalEarnings", getTotalEarnings());
-        getFile().set("NextResetTime", getNextResetTime());
+        getFile().set("TimeStamps.NextResetTime", getNextResetTime());
         getFile().set("AllowsEmotes", allowsEmotes());
 
         if(getArrowParticle() == null) getFile().set("ArrowParticle", "none");
@@ -355,12 +359,20 @@ public class FtcUser extends FtcFileManager {
     }
 
     public boolean isBaron() {
-        Score score = getPlayer().getScoreboard().getObjective("baron").getScore(getName());
+        Score score = getPlayer().getScoreboard().getObjective("Baron").getScore(getName());
         return score.isScoreSet() && score.getScore() == 1;
     }
     public void setBaron(boolean baron) {
         int yayNay = baron ? 1 : 0;
-        FtcCore.getInstance().getServer().getScoreboardManager().getMainScoreboard().getObjective("baron").getScore(getName()).setScore(yayNay);
+        FtcCore.getInstance().getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName()).setScore(yayNay);
+        if(baron){
+            addRank(Rank.BARON);
+            addRank(Rank.BARONESS);
+        }
+        else{
+             removeRank(Rank.BARON);
+             removeRank(Rank.BARONESS);
+        }
     }
 
     public SellAmount getSellAmount() {
@@ -398,7 +410,9 @@ public class FtcUser extends FtcFileManager {
     }
 
     public String getName(){
-        return name;
+        if(name != null) return name;
+        else if(Bukkit.getPlayer(getBase()) != null) return Bukkit.getPlayer(getBase()).getName();
+        else return Bukkit.getOfflinePlayer(getBase()).getName();
     }
 
     public Branch getBranch(){
@@ -450,6 +464,13 @@ public class FtcUser extends FtcFileManager {
 
     private void permsCheck(){
         if(!isOnline()) return;
+
+        if(getName().contains("Paranor")) addRank(Rank.LEGEND);
+        if(isBaron() && !hasRank(Rank.BARON)){
+            addRank(Rank.BARON);
+            addRank(Rank.BARONESS);
+        }
+
         if(getPlayer().hasPermission("ftc.donator3")){
             addRank(Rank.PRINCE);
             addRank(Rank.PRINCESS);
@@ -488,7 +509,7 @@ public class FtcUser extends FtcFileManager {
         getFile().addDefault("AllowsEmotes", true);
         getFile().addDefault("SellAmount", SellAmount.PER_1.toString());
         getFile().addDefault("TotalEarnings", 0);
-        getFile().addDefault("NextResetTime", System.currentTimeMillis() + FtcCore.getUserDataResetInterval());
+        getFile().addDefault("TimeStamps.NextResetTime", System.currentTimeMillis() + FtcCore.getUserDataResetInterval());
         getFile().options().copyDefaults(true);
 
         super.save();
@@ -507,7 +528,7 @@ public class FtcUser extends FtcFileManager {
         FileConfiguration oldYamlFile = YamlConfiguration.loadConfiguration(oldFile);
         ConfigurationSection oldYaml = oldYamlFile.getConfigurationSection("players." + getBase().toString());
 
-        setRank(Rank.valueOf(oldYaml.getString("CurrentRank").toUpperCase()));
+        setRank(Rank.valueOf(oldYaml.getString("CurrentRank").toUpperCase()), false);
         setCanSwapBranch(oldYaml.getBoolean("CanSwapBranch"));
         setPets(oldYaml.getStringList("Pets"));
         setAllowsRidingPlayers(oldYaml.getBoolean("AllowsRidingPlayers"));
@@ -517,16 +538,22 @@ public class FtcUser extends FtcFileManager {
 
         if(oldYaml.get("ParticleArrowActive") != null && !oldYaml.getString("ParticleArrowActive").contains("none")) setArrowParticle(Particle.valueOf(oldYaml.getString("ParticleArrowActive")));
 
+        //branch conversion
+        if(oldYaml.getString("ActiveBranch").contains("Knight")) setBranch(Branch.ROYALS);
+        else setBranch(Branch.valueOf(oldYaml.getString("ActiveBranch").toUpperCase() + "S"));
+
         //Rank conversion
         Set<Rank> tempList = new HashSet<>();
         if(oldYaml.getList("PirateRanks") != null && oldYaml.getList("PirateRanks").size() > 0){
             for (String s : oldYaml.getStringList("PirateRanks")){
-                try { tempList.add(Rank.valueOf(s.toUpperCase()));
+                try { tempList.add(Rank.valueOf(s.toUpperCase() + "S"));
                 } catch (Exception ignored){}
             }
         }
         if(oldYaml.getList("KnightRanks") != null && oldYaml.getList("KnightRanks").size() > 0){
             for (String s : oldYaml.getStringList("KnightRanks")){
+                if(s.toLowerCase().contains("baron")) addRank(Rank.BARONESS);
+
                 try { tempList.add(Rank.valueOf(s.toUpperCase()));
                 } catch (Exception ignored){}
             }
@@ -535,13 +562,19 @@ public class FtcUser extends FtcFileManager {
         setAvailableRanks(tempList);
         setBranch(getRank().getRankBranch());
 
-        if(oldYaml.getList("ParticleArrowAvailable ") != null){
+        if(oldYaml.getList("ParticleArrowAvailable") != null){
             List<Particle> tempList1 = new ArrayList<>();
-            for (String s : oldYaml.getStringList("ParticleArrowAvailable ")){
+            for (String s : oldYaml.getStringList("ParticleArrowAvailable")){
                 try { tempList1.add(Particle.valueOf(s.toUpperCase()));
                 } catch (Exception ignored){}
             }
             setParticleArrowAvailable(tempList1);
+        }
+
+        if(oldYaml.getStringList("EmotesAvailable").size() > 0){
+            for (String s : oldYaml.getStringList("EmotesAvailable")){
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + getName() + " permission set ftc.emotes." + s.toLowerCase());
+            }
         }
 
         oldYamlFile.set("players." + getBase().toString(), null);

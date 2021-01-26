@@ -8,13 +8,13 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AutoAnnouncer extends FtcFileManager {
+public class CrownAnnouncer extends FtcFileManager  {
 
     private List<String> thingsToAnnounce = new ArrayList<>();
     private long delay;
     int id = -1;
 
-    public AutoAnnouncer() {
+    public CrownAnnouncer() {
         super("announcer");
 
         if(fileDoesntExist) addDefaults();
@@ -75,6 +75,20 @@ public class AutoAnnouncer extends FtcFileManager {
     public void startAnnouncer(){
         if(id != -1) stopAnnouncer();
         announcerProper();
+    }
+
+    public void announceToAll(String message) {
+        Bukkit.broadcastMessage(FtcCore.getPrefix() + FtcCore.translateHexCodes(FtcCore.replaceEmojis(message)));
+    }
+
+    public void announce(String message) {
+        for (Player player : Bukkit.getOnlinePlayers())
+        {
+            // Don't broadcast info messages to players in the Senate.
+            if (player.getWorld().getName().contains("senate")) continue;
+
+            player.sendMessage(FtcCore.translateHexCodes(message));
+        }
     }
 
     private void announcerProper(){

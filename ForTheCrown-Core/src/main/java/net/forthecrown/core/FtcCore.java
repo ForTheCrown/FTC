@@ -1,15 +1,15 @@
 package net.forthecrown.core;
 
+import net.forthecrown.core.clickevent.ClickEventCommand;
 import net.forthecrown.core.commands.*;
 import net.forthecrown.core.commands.emotes.*;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.events.*;
 import net.forthecrown.core.events.npc.JeromeEvent;
-import net.forthecrown.core.files.AutoAnnouncer;
 import net.forthecrown.core.files.Balances;
+import net.forthecrown.core.files.CrownAnnouncer;
 import net.forthecrown.core.files.FtcUser;
 import net.forthecrown.core.files.SignShop;
-import net.forthecrown.core.clickevent.ClickEventCommand;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,19 +20,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class FtcCore extends JavaPlugin {
+public final class FtcCore extends CrownPlugin {
 
     private static FtcCore instance;
     private static String prefix = "&6[FTC]&r  ";
     private static long userDataResetInterval = 5356800000L; //2 months by default
     private static boolean taxesEnabled = true;
-    private static UUID king;
+    private static String king;
 
     private static final Map<Material, Integer> defaultItemPrices = new HashMap<>();
     private Integer maxMoneyAmount;
@@ -41,12 +41,16 @@ public final class FtcCore extends JavaPlugin {
     private static final Set<Player> onCooldown = new HashSet<>();
     private static String discord;
 
-    private AutoAnnouncer autoAnnouncer;
+    private CrownAnnouncer autoAnnouncer;
     private Balances balFile;
+    private CrownCommandHandler cmdReg;
+
+    private BlackMarket bm;
 
     @Override
     public void onEnable() {
         instance = this;
+        cmdReg = super.getCommandHandler();
 
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
@@ -57,12 +61,13 @@ public final class FtcCore extends JavaPlugin {
         userDataResetInterval = getConfig().getLong("UserDataResetInterval");
         taxesEnabled = getConfig().getBoolean("Taxes");
         discord = FtcCore.getInstance().getConfig().getString("Discord");
-        autoAnnouncer = new AutoAnnouncer();
+        autoAnnouncer = new CrownAnnouncer();
         balFile = new Balances();
+        bm = new BlackMarket();
         maxMoneyAmount = FtcCore.getInstance().getConfig().getInt("MaxMoneyAmount");
         loadDefaultItemPrices();
 
-        if(!getConfig().getString("King").contains("empty")) king = UUID.fromString(getConfig().getString("King"));
+        if (!getConfig().getString("King").contains("empty")) king = getConfig().getString("King");
         else king = null;
 
         Server server = getServer();
@@ -80,53 +85,57 @@ public final class FtcCore extends JavaPlugin {
         server.getPluginManager().registerEvents(new SignShopDestroyEvent(), this);
         server.getPluginManager().registerEvents(new ShopUseListener(), this);
 
+        server.getPluginManager().registerEvents(new BlackMarketEvents(), this);
+
         //commands
-        server.getPluginCommand("kingmaker").setExecutor(new KingMakerCommand());
-        server.getPluginCommand("kingmaker").setTabCompleter(new KingMakerTabCompleter());
+        cmdReg.registerCommand("kingmaker", new KingMakerCommand());
+        cmdReg.registerTabCompleter("kingmaker", new KingMakerTabCompleter());
 
-        server.getPluginCommand("leavevanish").setExecutor(new LeaveVanishCommand());
-        server.getPluginCommand("becomebaron").setExecutor(new BecomeBaronCommand());
-        server.getPluginCommand("rank").setExecutor(new RankCommand());
-        server.getPluginCommand("ftccore").setExecutor(new CoreCommand());
-        server.getPluginCommand("ftccore").setTabCompleter(new CoreTabCompleter());
+        cmdReg.registerCommand("leavevanish", new LeaveVanishCommand());
+        cmdReg.registerCommand("becomebaron", new BecomeBaronCommand());
+        cmdReg.registerCommand("rank", new RankCommand());
 
-        server.getPluginCommand("balance").setExecutor(new BalanceCommand());
-        server.getPluginCommand("balancetop").setExecutor(new BalanceTopCommand());
+        new CoreCommand();
 
-        server.getPluginCommand("pay").setExecutor(new PayCommand());
-        server.getPluginCommand("addbalance").setExecutor(new AddBalanceCommand());
-        server.getPluginCommand("setbalance").setExecutor(new SetBalanceCommand());
+        cmdReg.registerCommand("balance", new BalanceCommand());
+        cmdReg.registerCommand("balancetop", new BalanceTopCommand());
 
-        server.getPluginCommand("shop").setExecutor(new ShopCommand());
-        server.getPluginCommand("shop").setTabCompleter(new ShopTabCompleter());
+        cmdReg.registerCommand("pay", new PayCommand());
+        cmdReg.registerCommand("addbalance", new AddBalanceCommand());
+        cmdReg.registerCommand("setbalance", new SetBalanceCommand());
 
-        server.getPluginCommand("editshop").setExecutor(new ShopEditCommand());
-        server.getPluginCommand("editshop").setTabCompleter(new ShopEditTabCompleter());
+        new GemsCommand();
 
-        server.getPluginCommand("staffchat").setExecutor(new StaffChatCommand());
-        server.getPluginCommand("staffchat").setTabCompleter(new EmojiTabCompleter());
-        server.getPluginCommand("staffchattoggle").setExecutor(new StaffChatToggleCommand());
+        new ShopCommand();
+        new ShopEditCommand();
 
-        server.getPluginCommand("broadcast").setExecutor(new BroadcastCommand());
+        new WithdrawCommand();
+        new DepositCommand();
 
-        server.getPluginCommand("discord").setExecutor(new Discord());
-        server.getPluginCommand("findpost").setExecutor(new  FindPost());
-        server.getPluginCommand("posthelp").setExecutor(new PostHelp());
-        server.getPluginCommand("spawn").setExecutor(new SpawnCommand());
+        cmdReg.registerCommand("staffchat", new StaffChatCommand());
+        cmdReg.registerTabCompleter("staffchat", new EmojiTabCompleter());
+        cmdReg.registerCommand("staffchattoggle", new StaffChatToggleCommand());
 
-        server.getPluginCommand("tpask").setExecutor(new  TpaskCommand());
-        server.getPluginCommand("tpaskhere").setExecutor(new  TpaskHereCommand());
+        cmdReg.registerCommand("broadcast", new BroadcastCommand());
 
-        server.getPluginCommand("toggleemotes").setExecutor(new ToggleEmotes());
-        server.getPluginCommand("bonk").setExecutor(new Bonk());
-        server.getPluginCommand("mwah").setExecutor(new Mwah());
-        server.getPluginCommand("poke").setExecutor(new Poke());
-        server.getPluginCommand("scare").setExecutor(new Scare());
-        server.getPluginCommand("jingle").setExecutor(new Jingle());
+        cmdReg.registerCommand("discord", new Discord());
+        cmdReg.registerCommand("findpost", new FindPost());
+        cmdReg.registerCommand("posthelp", new PostHelp());
+        cmdReg.registerCommand("spawn", new SpawnCommand());
+
+        cmdReg.registerCommand("tpask", new TpaskCommand());
+        cmdReg.registerCommand("tpaskhere", new TpaskHereCommand());
+
+        cmdReg.registerCommand("toggleemotes", new ToggleEmotes());
+        cmdReg.registerCommand("bonk", new Bonk());
+        cmdReg.registerCommand("mwah", new Mwah());
+        cmdReg.registerCommand("poke", new Poke());
+        cmdReg.registerCommand("scare", new Scare());
+        cmdReg.registerCommand("jingle", new Jingle());
 
         periodicalSave();
+        clearCooldowns();
     }
-
 
     @Override
     public void onDisable() {
@@ -136,6 +145,10 @@ public final class FtcCore extends JavaPlugin {
     //every hour it saves everything
     private void periodicalSave(){
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, FtcCore::saveFTC, 72000, 72000);
+    }
+
+    private void clearCooldowns(){
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, onCooldown::clear, 12000, 12000);
     }
 
     public static void reloadFTC(){
@@ -151,20 +164,21 @@ public final class FtcCore extends JavaPlugin {
         getBalances().reload();
         getInstance().maxMoneyAmount = FtcCore.getInstance().getConfig().getInt("MaxMoneyAmount");
 
+        getBlackMarket().reload();
+
         prefix = getInstance().getConfig().getString("Prefix");
         discord = FtcCore.getInstance().getConfig().getString("Discord");
         userDataResetInterval = getInstance().getConfig().getLong("UserDataResetInterval");
         taxesEnabled = getInstance().getConfig().getBoolean("Taxes");
 
-        if(!getInstance().getConfig().getString("King").contains("empty")) king = UUID.fromString(getInstance().getConfig().getString("King"));
-        else king = null;
+        if(!getInstance().getConfig().getString("King").contains("empty")) king = getInstance().getConfig().getString("King");
+        else king = "empty"; //like my soul
     }
     public static void saveFTC(){
         for(FtcUser data : FtcUser.loadedData){
             data.save();
         }
         getInstance().getConfig().set("prefix", prefix);
-        getInstance().saveConfig();
 
         getAnnouncer().save();
 
@@ -172,10 +186,11 @@ public final class FtcCore extends JavaPlugin {
             if(!shop.wasDeleted()) shop.save();
         }
         getBalances().save();
+        getBlackMarket().save();
 
-        if(getKing() == null) getInstance().getConfig().set("King", "empty");
-        else getInstance().getConfig().set("King", getKing().toString());
+        getInstance().getConfig().set("King", king);
 
+        getInstance().saveConfig();
         System.out.println("[SAVED] FtcCore saved");
     }
 
@@ -185,11 +200,18 @@ public final class FtcCore extends JavaPlugin {
     }
 
     public static UUID getKing() {
-        return king;
+        UUID result;
+        try {
+            result = UUID.fromString(king);
+        } catch (Exception e){
+            result = null;
+        }
+        return result;
     }
 
-    public static void setKing(UUID king) {
-        FtcCore.king = king;
+    public static void setKing(@Nullable UUID newKing) {
+        if(newKing == null) king = "empty";
+        else king = newKing.toString();
     }
 
     public Map<Material, Integer> getItemPrices(){ //returns the default item Price Map
@@ -231,14 +253,15 @@ public final class FtcCore extends JavaPlugin {
     public static FtcCore getInstance(){
         return instance;
     }
-    public static AutoAnnouncer getAnnouncer(){
+    public static CrownAnnouncer getAnnouncer(){
         return getInstance().autoAnnouncer;
     }
-    public static Balances getBalances(){ //The only way to get the balances class
+    public static Balances getBalances(){
         return getInstance().balFile;
     }
-
-
+    public static BlackMarket getBlackMarket() {
+        return getInstance().bm;
+    }
 
     //Yeah, no clue
     public static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
@@ -289,7 +312,7 @@ public final class FtcCore extends JavaPlugin {
         player.sendMessage(ChatColor.GRAY + "Do " + ChatColor.RESET + "/toggleemotes" + ChatColor.GRAY + " to enable them.");
     }
 
-    public static SignShop getSignShop(Location signShop) throws NullPointerException { //gets a signshop, throws a null exception if the shop file doesn't exist
+    public static SignShop getSignShop(Location signShop) throws Exception { //gets a signshop, throws a null exception if the shop file doesn't exist
         for(SignShop shop : SignShop.loadedShops){
             if(shop.getLocation() == signShop) return shop;
         }
@@ -299,6 +322,7 @@ public final class FtcCore extends JavaPlugin {
         return new SignShop(location, shopType, price, ownerUUID);
     }
 
+    @Deprecated
     public static FtcUser getUser(UUID base) {
         for (FtcUser data : FtcUser.loadedData){
             if(base == data.getBase()) return data;
@@ -311,11 +335,7 @@ public final class FtcCore extends JavaPlugin {
         try{
             toReturn = Bukkit.getPlayer(playerName).getUniqueId();
         } catch (NullPointerException e){
-            try {
-                toReturn = Bukkit.getOfflinePlayerIfCached(playerName).getUniqueId();
-            } catch (NullPointerException e1){
-                toReturn = null;
-            }
+            toReturn = Bukkit.getOfflinePlayerIfCached(playerName).getUniqueId();
         }
         return toReturn;
     }

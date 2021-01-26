@@ -1,7 +1,11 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.exceptions.CannotAffordTransaction;
+import net.forthecrown.core.exceptions.CrownException;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.forthecrown.core.files.Balances;
 import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
@@ -10,13 +14,12 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 
-public class BecomeBaronCommand implements CommandExecutor {
+public class BecomeBaronCommand implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -42,11 +45,8 @@ public class BecomeBaronCommand implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player)){
-            sender.sendMessage("Only players may execute this command!");
-            return false;
-        }
+    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
+        if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         int baronPrice = FtcCore.getInstance().getConfig().getInt("BaronPrice");
         Player player = (Player) sender;
         FtcUser data = FtcCore.getUser(player.getUniqueId());
@@ -57,10 +57,7 @@ public class BecomeBaronCommand implements CommandExecutor {
             return false;
         }
 
-        if(bals.getBalance(player.getUniqueId()) < baronPrice){
-            player.sendMessage("You do not have enough money for baron");
-            return false;
-        }
+        if(bals.getBalance(player.getUniqueId()) < baronPrice) throw new CannotAffordTransaction(sender, "You need at least 500,000 Rhines to be come baron");
 
         if(args.length == 1 && args[0].contains("confirm")){
             bals.setBalance(player.getUniqueId(), bals.getBalance(player.getUniqueId()) - baronPrice);

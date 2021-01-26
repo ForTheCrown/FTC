@@ -35,7 +35,7 @@ public class SignShop extends FtcFileManager {
     private boolean wasDeleted = false;
 
     //used by getSignShop
-    public SignShop(Location signBlock) throws NullPointerException {
+    public SignShop(Location signBlock) throws Exception {
         super(signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ(), "shopdata");
         this.fileName = signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ();
 
@@ -228,17 +228,15 @@ public class SignShop extends FtcFileManager {
     }
 
     public void setOutOfStock(boolean outOfStock) {
-        if(getType() != ShopType.ADMIN_BUY_SHOP && getType() != ShopType.BUY_SHOP) return;
+        if(getType().equals(ShopType.ADMIN_SELL_SHOP)) return;
 
         this.outOfStock = outOfStock;
 
-        Sign sign = (Sign) block.getState();
-        if(outOfStock){
-            sign.setLine(0, getType().getOutOfStockLabel());
-            setExampleItem(null);
-        } else sign.setLine(0, getType().getInStockLabel());
+        Sign sign = (Sign) getBlock().getState();
+        if(outOfStock)sign.setLine(0, getType().getOutOfStockLabel());
+        else sign.setLine(0, getType().getInStockLabel());
 
-        sign.update();
+        sign.update(true);
     }
 
     public ItemStack getExampleItem() {
@@ -259,9 +257,12 @@ public class SignShop extends FtcFileManager {
 
     private void initInv(){
         shopInv = Bukkit.createInventory(null, 27, "Shop contents:");
-        for(ItemStack stack : contents){
-            if(shopInv.firstEmpty() == -1) break;
-            shopInv.addItem(stack);
+
+        if(contents.size() > 0){
+            for(ItemStack stack : contents){
+                if(shopInv.firstEmpty() == -1) break;
+                shopInv.addItem(stack);
+            }
         }
     }
 
@@ -302,18 +303,20 @@ public class SignShop extends FtcFileManager {
         initInv();
 
         if(oldConfig.getItemStack("Inventory.shop") != null) setExampleItem(oldConfig.getItemStack("Inventory.shop"));
-        else setExampleItem(contents.get(0));
+        else if (0 < contents.size()) setExampleItem(contents.get(0));
 
-        try {
-            ItemStack stack = getExampleItem();
-            stack.setAmount(Integer.parseInt(sign.getLine(1).replaceAll("[\\D]", "")));
-            setExampleItem(stack);
-        } catch (Exception e){
+        if(oldConfig.getItemStack("Inventory.shop") == null){
             try {
                 ItemStack stack = getExampleItem();
-                stack.setAmount(Integer.parseInt(sign.getLine(2).replaceAll("[\\D]", "")));
+                stack.setAmount(Integer.parseInt(ChatColor.stripColor(sign.getLine(1)).replaceAll("[\\D]", "")));
                 setExampleItem(stack);
-            } catch (Exception ignored) {}
+            } catch (Exception e){
+                try {
+                    ItemStack stack = getExampleItem();
+                    stack.setAmount(Integer.parseInt(ChatColor.stripColor(sign.getLine(1)).replaceAll("[\\D]", "")));
+                    setExampleItem(stack);
+                } catch (Exception ignored) {}
+            }
         }
 
         sign.setLine(0, getType().getInStockLabel());

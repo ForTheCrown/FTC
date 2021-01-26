@@ -1,8 +1,8 @@
 package me.wout.Pirate;
 
 import me.wout.Pirate.commands.*;
+import net.forthecrown.core.CrownPlugin;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.files.FtcUser;
 import org.bukkit.*;
@@ -28,7 +28,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
@@ -37,7 +36,7 @@ import java.io.IOException;
 import java.util.*;
 
 
-public class Main extends JavaPlugin implements Listener {
+public class Main extends CrownPlugin implements Listener {
 	
 	//public File wilhelmFile;
 	//public YamlConfiguration wilhelmYaml;
@@ -73,7 +72,8 @@ public class Main extends JavaPlugin implements Listener {
 		new UpdateLB();
 		
 		getServer().getPluginManager().registerEvents(new BaseEgg(), this);
-		
+		getServer().getPluginManager().registerEvents(new NpcSmithEvent(), this);
+
 		updateDate();
 	}
 
@@ -113,9 +113,9 @@ public class Main extends JavaPlugin implements Listener {
 
 				 killOldTreasure(new Location(Bukkit.getWorld(getConfig().getString("TreasureLoc.world")), getConfig().getInt("TreasureLoc.x"), getConfig().getInt("TreasureLoc.y"), getConfig().getInt("TreasureLoc.z")));
 
-				 int x = getRandomNumberInRange(-1970, 1970);
-				 int y = getRandomNumberInRange(40, 50);
-				 int z = getRandomNumberInRange(-1970, 1970);
+				 int x = FtcCore.getRandomNumberInRange(-1970, 1970);
+				 int y = FtcCore.getRandomNumberInRange(40, 50);
+				 int z = FtcCore.getRandomNumberInRange(-1970, 1970);
 				 //int x = getRandomNumberInRange(-50, 50);
 				 //int y = getRandomNumberInRange(40, 50);
 				 //int z = getRandomNumberInRange(-50, 50);
@@ -132,7 +132,7 @@ public class Main extends JavaPlugin implements Listener {
 			{
 				// Picks a day for the trader to spawn.
 				getConfig().set("Week", cal.get(Calendar.WEEK_OF_MONTH));
-				getConfig().set("ChosenDayForTrader", getRandomNumberInRange(2, 6));
+				getConfig().set("ChosenDayForTrader", FtcCore.getRandomNumberInRange(2, 6));
 				saveConfig();
 			}
 			Location loc = new Location(Bukkit.getWorld("world"), -629.5, 44.2, 3839.5, 0, 0);
@@ -221,37 +221,7 @@ public class Main extends JavaPlugin implements Listener {
 				else {
 					player.sendMessage(ChatColor.GOLD + "{FTC} " + ChatColor.RESET + "Bring Wilhelm a " + getConfig().getString("ChosenHead") + ChatColor.RESET + " head for a reward.");
 				}
-			}
-
-			else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Ramun")) 
-			{
-				event.setCancelled(true);
-				
-				// Open parrots shop inventory
-				if(user.getBranch() != Branch.PIRATES){
-					user.sendMessage("&7Only pirates can buy from Ramun");
-					return;
-				}
-				Inventory invToOpen = Bukkit.createInventory(null, 27, "Parrot Shop");
-				ItemStack pane = FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, ChatColor.GRAY + " ");
-
-				for (int i = 0; i < 10; i++) {
-					invToOpen.setItem(i, pane);
-				}
-				for (int i = 17; i < 27; i++) {
-					invToOpen.setItem(i, pane);
-				}
-
-				invToOpen.setItem(11, FtcCore.makeItem(Material.GRAY_WOOL, 1 , true, ChatColor.GRAY + "Gray Parrot", ChatColor.YELLOW + "Costs 50,000 Rhines.", ChatColor.DARK_GRAY + "Do /parrot gray to summon it"));
-				invToOpen.setItem(12, FtcCore.makeItem(Material.GREEN_WOOL, 1, true, ChatColor.GREEN + "Green Parrot", ChatColor.YELLOW + "Costs 50,000 Rhines.", ChatColor.DARK_GRAY + "Do /parrot green to summon it"));
-				invToOpen.setItem(13, FtcCore.makeItem(Material.BLUE_WOOL, 1, true, ChatColor.BLUE + "Blue Parrot", ChatColor.YELLOW + "Costs 100,000 Rhines.", ChatColor.DARK_GRAY + "Do /parrot blue to summon it"));
-				invToOpen.setItem(14, FtcCore.makeItem(Material.RED_WOOL, 1, true, ChatColor.RED + "Red Parrot", ChatColor.YELLOW + "Available only for Captains.", ChatColor.DARK_GRAY + "Do /parrot red to summon it"));
-				invToOpen.setItem(14, FtcCore.makeItem(Material.LIGHT_BLUE_WOOL, 1, true, ChatColor.RED + "Aqua Parrot", ChatColor.YELLOW + "Available only for Admirals.", ChatColor.DARK_GRAY + "Do /parrot aqua to summon it"));
-
-				player.openInventory(invToOpen);
-			}
-			
-			else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Jack")) {
+			} else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Jack")) {
 				event.setCancelled(true);
 				openLevelSelector(player);
 			}
@@ -451,7 +421,7 @@ public class Main extends JavaPlugin implements Listener {
 	private ItemStack getItemFromList(List<ItemStack> list) {
 		ItemStack result;
 		
-		int index = getRandomNumberInRange(0, list.size()-1);
+		int index = FtcCore.getRandomNumberInRange(0, list.size()-1);
 		result = list.get(index);
 		int count = 0;
 		while (list.contains(result) && (count++ != list.size())) {
@@ -499,8 +469,8 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		else 
 		{
-			int chosenChest = getRandomNumberInRange(1, 4);
-			int slot = getRandomNumberInRange(0, 26);
+			int chosenChest = FtcCore.getRandomNumberInRange(1, 4);
+			int slot = FtcCore.getRandomNumberInRange(0, 26);
 			Location chosenLoc;
 			switch (chosenChest) { 
 				case 1:
@@ -532,14 +502,6 @@ public class Main extends JavaPlugin implements Listener {
 	
 	private Location getloc(String section) {
 		return new Location(Bukkit.getWorld(getConfig().getString(section + ".world")), getConfig().getInt(section + ".x"), getConfig().getInt(section + ".y"), getConfig().getInt(section + ".z"));
-	}
-	
-	private static int getRandomNumberInRange(int min, int max) {
-		if (min >= max) {
-			return 0;
-		}
-		Random r = new Random();
-		return r.nextInt((max - min) + 1) + min;
 	}
 	
 	private void giveReward(Player player) {
@@ -609,6 +571,7 @@ public class Main extends JavaPlugin implements Listener {
 		for (int j = 1; j <= size; j++) {
 			int max = Integer.MIN_VALUE;
 			
+
 			// Zoek max in result
 			for (String s : unsortedResult) {
 				if (objective.getScore(s).getScore() > max) {
@@ -622,16 +585,6 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		
 		return sortedResult;
-	}
-	
-	
-	@EventHandler
-	public void onPlayerTab(PlayerCommandSendEvent e) {
-		List<String> blockedCommands = new ArrayList<>();
-		blockedCommands.add("commanduno");
-		blockedCommands.add("commandduo");
-		blockedCommands.add("commandtres");
-		e.getCommands().removeAll(blockedCommands);
 	}
 
 	@Override

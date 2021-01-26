@@ -1,13 +1,20 @@
 package ftc.cosmetics;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import ftc.cosmetics.commands.AddParticle;
+import ftc.cosmetics.commands.Cosmetics;
+import ftc.cosmetics.commands.RemoveParticle;
+import ftc.cosmetics.inventories.ArrowParticleMenu;
+import ftc.cosmetics.inventories.CustomInventory;
+import ftc.cosmetics.inventories.DeathParticleMenu;
+import ftc.cosmetics.inventories.EmoteMenu;
+import net.forthecrown.core.CrownCommandHandler;
+import net.forthecrown.core.CrownPlugin;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.files.FtcUser;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -18,32 +25,26 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.*;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
-import ftc.cosmetics.commands.AddParticle;
-import ftc.cosmetics.commands.Cosmetics;
-import ftc.cosmetics.commands.RemoveParticle;
-import ftc.cosmetics.inventories.ArrowParticleMenu;
-import ftc.cosmetics.inventories.CustomInventory;
-import ftc.cosmetics.inventories.DeathParticleMenu;
-import ftc.cosmetics.inventories.EmoteMenu;
-import net.md_5.bungee.api.ChatColor;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class Main extends JavaPlugin implements Listener {
-	
+public class Main extends CrownPlugin implements Listener, CommandExecutor {
+
 	public static Main plugin;
 	public static InventoryHolder holder;
-	
+	public CrownCommandHandler cmdReg;
+
 	public int option = 0;
 	
 	public void onEnable() {
+		cmdReg = getCommandHandler();
+
 		plugin = this;
 		holder = () -> null;
 		
@@ -58,12 +59,17 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new DeathParticleMenu(null), this);
 		
 		// Commands
-		getServer().getPluginCommand("cosmetics").setExecutor(new Cosmetics());
+		/*getServer().getPluginCommand("cosmetics").setExecutor(new Cosmetics());
 		
 		getServer().getPluginCommand("addparticle").setExecutor(new AddParticle());
-		getServer().getPluginCommand("removeparticle").setExecutor(new RemoveParticle());
+		getServer().getPluginCommand("removeparticle").setExecutor(new RemoveParticle());*/
+
+		cmdReg.registerCommand("cosmetics", new Cosmetics());
+
+		cmdReg.registerCommand("addparticle", new AddParticle());
+		cmdReg.registerCommand("addparticle", new RemoveParticle());
 	}
-	
+
 	Set<String> onCooldown = new HashSet<>();
 	
 	@EventHandler
@@ -73,6 +79,8 @@ public class Main extends JavaPlugin implements Listener {
         if (event.getRightClicked() instanceof Player && event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR) {
             Player p2 = (Player) event.getRightClicked();
             Player player = event.getPlayer();
+
+            if(player.getWorld().getName().contains("world_void")) return;
 
             FtcUser rider = FtcCore.getUser(player.getUniqueId());
             FtcUser ridden = FtcCore.getUser(p2.getUniqueId());
@@ -183,6 +191,30 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}	
 	}
+
+	private void doArrowParticleStuff(Particle particle, Player player, FtcUser user, int gemCost){
+		if(!user.getParticleArrowAvailable().contains(particle)){
+			if(user.getGems() < gemCost) throw new CannotAffordTransaction(player);
+			user.addGems(-gemCost);
+
+			List<Particle> set = user.getParticleArrowAvailable();
+			set.add(particle);
+			user.setParticleArrowAvailable(set);
+		}
+		user.setArrowParticle(particle);
+	}
+
+	private void doDeathParticleStuff(String effect, Player player, FtcUser user, int gemCost){
+		if(!user.getParticleDeathAvailable().contains(effect)){
+			if(user.getGems() < gemCost) throw new CannotAffordTransaction(player);
+			user.addGems(-gemCost);
+
+			List<String> asd = user.getParticleDeathAvailable();
+			asd.add(effect);
+			user.setParticleDeathAvailable(asd);
+		}
+		user.setDeathParticle(effect);
+	}
 	
 	@EventHandler
 	public void onPlayerClickItemInInv(InventoryClickEvent event) {
@@ -221,156 +253,92 @@ public class Main extends JavaPlugin implements Listener {
 				}
 			}
 			
-			else if (title.contains("Arrow Effects")) 
-			{
+			else if (title.contains("Arrow Effects")) {
 				ArrowParticleMenu apm = new ArrowParticleMenu(user);
-				
+
+				int gemCost = 0;
+				try {
+					gemCost = Integer.parseInt(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(2)).replaceAll("[\\D]", ""));
+				} catch (Exception ignored){ }
+
+
 				switch (slot) {
 				case 4:
 					player.openInventory(getMainCosmeticInventory(user));
 					break;
 				case 10:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleArrowActive", "FLAME")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "arrow", "FLAME")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleArrowActive", "FLAME");
-						}
-					}
+					doArrowParticleStuff(Particle.FLAME, player, user, gemCost);
 					player.openInventory(apm.getInv());
 					break;
 				case 11:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleArrowActive", "SNOWBALL")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "arrow", "SNOWBALL")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleArrowActive", "SNOWBALL");
-						}
-					}
+					doArrowParticleStuff(Particle.SNOWBALL, player, user, gemCost);
 					player.openInventory(apm.getInv());
 					break;
 				case 12:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleArrowActive", "SNEEZE")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "arrow", "SNEEZE")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleArrowActive", "SNEEZE");
-							player.openInventory(apm.getInv());
-						}
-					}
+					doArrowParticleStuff(Particle.SNEEZE, player, user, gemCost);
 					player.openInventory(apm.getInv());
 					break;
 				case 13:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleArrowActive", "HEART")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "arrow", "HEART")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleArrowActive", "HEART");
-							player.openInventory(apm.getInv());
-						}
-					}
+					doArrowParticleStuff(Particle.HEART, player, user, gemCost);
 					player.openInventory(apm.getInv());
 					break;
 				case 14:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleArrowActive", "DAMAGE_INDICATOR")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "arrow", "DAMAGE_INDICATOR")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleArrowActive", "DAMAGE_INDICATOR");
-							player.openInventory(apm.getInv());
-						}
-					}
+					doArrowParticleStuff(Particle.DAMAGE_INDICATOR, player, user, gemCost);
 					player.openInventory(apm.getInv());
 					break;
 				case 15:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleArrowActive", "DRIPPING_HONEY")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "arrow", "DRIPPING_HONEY")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleArrowActive", "DRIPPING_HONEY");
-							player.openInventory(apm.getInv());
-						}
-					}
+					doArrowParticleStuff(Particle.DRIPPING_HONEY, player, user, gemCost);
 					player.openInventory(apm.getInv());
 					break;
 				case 16:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleArrowActive", "CAMPFIRE_COSY_SMOKE")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "arrow", "CAMPFIRE_COSY_SMOKE")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleArrowActive", "CAMPFIRE_COSY_SMOKE");
-							player.openInventory(apm.getInv());
-						}
-					}
+					doArrowParticleStuff(Particle.CAMPFIRE_COSY_SMOKE, player, user, gemCost);
 					player.openInventory(apm.getInv());
 					break;
 				case 19:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleArrowActive", "SOUL")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "arrow", "SOUL")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleArrowActive", "SOUL");
-							player.openInventory(apm.getInv());
-						}
-					}
+					doArrowParticleStuff(Particle.SOUL, player, user, gemCost);
 					player.openInventory(apm.getInv());
 					break;
 				case 20:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleArrowActive", "FIREWORKS_SPARK")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "arrow", "FIREWORKS_SPARK")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleArrowActive", "FIREWORKS_SPARK");
-						}
-					}
+					doArrowParticleStuff(Particle.FIREWORKS_SPARK, player, user, gemCost);
 					player.openInventory(apm.getInv());
 					break;
 				case 31:
 					user.setArrowParticle(null);
 					player.openInventory(apm.getInv());
 					break;
-				default:
-					return;
+
+				default: return;
 				}
 				
 				player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").saveConfig();
 			}
 			
-			else if (title.contains("Death Effects"))
-			{
+			else if (title.contains("Death Effects")) {
 				DeathParticleMenu dpm = new DeathParticleMenu(user);
-				
+
+				int gemCost = 0;
+				try {
+					gemCost = Integer.parseInt(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(2)).replaceAll("[\\D]", ""));
+				} catch (Exception ignored){ }
+
 				switch (slot) {
 				case 4:
 					player.openInventory(getMainCosmeticInventory(user));
 					break;
 				case 10:
-					//they own it
-					if(user.getParticleDeathAvailable().contains("SOUL")){
-						user.setDeathParticle("SOUL");
-						player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-					} else {
-						//TODO Attempt purchase
-					}
+					doDeathParticleStuff("SOUL", player, user, gemCost);
 					player.openInventory(dpm.getInv());
 					break;
 				case 11:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleDeathActive", "TOTEM")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "death", "TOTEM")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleDeathActive", "TOTEM");
-						}
-					}
+					doDeathParticleStuff("TOTEM", player, user, gemCost);
 					player.openInventory(dpm.getInv());
 					break;
 				case 12:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleDeathActive", "EXPLOSION")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "death", "EXPLOSION")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleDeathActive", "EXPLOSION");
-						}
-					}
+					doDeathParticleStuff("EXPLOSION", player, user, gemCost);
 					player.openInventory(dpm.getInv());
 					break;
 				case 13:
-					if (!setEffectIfOwned(playeruuid, event.getInventory(), slot, ".ParticleDeathActive", "ENDER_RING")) {
-						if (tryBuyEffect(event.getClickedInventory().getItem(slot), player, "death", "ENDER_RING")) {
-							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-							setEffect(playeruuid, ".ParticleDeathActive", "ENDER_RING");
-						}
-					}
+					doDeathParticleStuff("ENDER_RING", player, user, gemCost);
 					player.openInventory(dpm.getInv());
 					break;
 				case 31:
@@ -382,7 +350,6 @@ public class Main extends JavaPlugin implements Listener {
 				}
 				
 				player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
-				Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").saveConfig();
 			}
 			
 			else if (title.contains("Emotes"))
@@ -449,10 +416,5 @@ public class Main extends JavaPlugin implements Listener {
 	public Set<String> getAcceptedDeathParticles() {
 		return new HashSet<>(
 				Arrays.asList("SOUL", "TOTEM", "EXPLOSION", "ENDER_RING"));
-	}
-	
-	public Set<String> getAcceptedEmotes() {
-		return new HashSet<>(
-				Arrays.asList("scare", "jingle"));
 	}
 }

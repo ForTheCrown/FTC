@@ -3,6 +3,12 @@ package me.wout.Pirate.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.forthecrown.core.CrownCommandExecutor;
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.enums.Branch;
+import net.forthecrown.core.exceptions.InvalidBranchException;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
+import net.forthecrown.core.files.FtcUser;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -14,35 +20,22 @@ import org.bukkit.entity.Player;
 
 import me.wout.Pirate.Main;
 
-public class parrot implements CommandExecutor {
+public class parrot implements CrownCommandExecutor {
 	
 	public parrot() {
-		Main.plugin.getCommand("parrot").setExecutor(this);
+		Main.plugin.getCommandHandler().registerCommand("parrot", this);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
-	{
-		// Checks if sender is a player.
-		if (!(sender instanceof Player)) {
-			return false;
-		}
+	public boolean run(CommandSender sender, Command cmd, String label, String[] args) {
+		if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 		Player player = (Player) sender;
+		FtcUser user = FtcCore.getUser(player.getUniqueId());
 		
-		//temp
-		/*if (!player.isOp()) 
-		{
-			player.sendMessage("No perms");
-			return false;
-		}*/
+		if(user.getBranch() != Branch.PIRATES) throw new InvalidBranchException(sender, "Only pirates can have a parrot!");
 		
-		if (!Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getString("players." + player.getUniqueId().toString() + ".ActiveBranch").contains("Pirate")) {
-			player.sendMessage(ChatColor.RED + "Only pirates can have a parrot pet.");
-			return false;
-		}
-		
-		List<String> colors = new ArrayList<String>();
+		List<String> colors = new ArrayList<>();
 		colors.add("gray"); colors.add("green"); colors.add("aqua"); colors.add("blue"); colors.add("red");
 		
 		if (args.length == 0)
@@ -80,7 +73,7 @@ public class parrot implements CommandExecutor {
 		}
 		
 		
-		List<String> pets = Main.plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getStringList("players." + player.getUniqueId().toString() + ".Pets");
+		List<String> pets = user.getPets();
 		switch (args[0]) { 
 			case "gray":
 				if (pets.contains("gray_parrot")) {

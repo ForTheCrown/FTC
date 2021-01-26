@@ -71,7 +71,7 @@ public class NpcSmithEvent implements Listener, ClickEventTask {
 
         FtcUser user = FtcCore.getUser(player.getUniqueId());
 
-        if(args[0].contains("cutlass")){
+        if(args[1].contains("cutlass")){
             if(!player.hasPermission("ftc.donator2") && user.getBranch() != Branch.PIRATES){
                 user.sendMessage("&7Only pirate captains can get this weapon!");
                 return;
@@ -82,10 +82,14 @@ public class NpcSmithEvent implements Listener, ClickEventTask {
                 if(stack == null) continue;
 
                 if(stack.getType() != Material.GOLDEN_SWORD && !stack.hasItemMeta() || !stack.getItemMeta().hasDisplayName()) continue;
-                if(!stack.getItemMeta().getDisplayName().contains(FtcCore.translateHexCodes("&6-&eRoyal Sword&6-"))) continue;
+                if(!stack.getItemMeta().getDisplayName().contains(FtcCore.translateHexCodes("&6-&e&lRoyal Sword&6-"))) continue;
 
                 sword = stack;
                 break;
+            }
+            if(sword == null){
+                user.sendMessage("&7You need to have a Royal Sword in your inventory");
+                return;
             }
 
             sword.setType(Material.NETHERITE_SWORD);
@@ -99,7 +103,7 @@ public class NpcSmithEvent implements Listener, ClickEventTask {
             sword.setItemMeta(meta);
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
 
-        } else if(args[0].contains("join")){
+        } else if(args[1].contains("join")){
             if(user.getBranch() == Branch.PIRATES){
                 user.sendMessage("&7You are already a pirate.");
                 return;

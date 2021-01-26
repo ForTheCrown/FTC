@@ -3,6 +3,9 @@ package net.forthecrown.core.enums;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum Rank {
     //royals
     KNIGHT ( "&8[&7Knight&8] &r", Branch.ROYALS),
@@ -50,6 +53,10 @@ public enum Rank {
 
     public Branch getRankBranch() {
         return rankBranch;
+    }
+
+    public static List<Rank> getFreeRanks(){
+        return Arrays.asList(Rank.KNIGHT, Rank.BARON, Rank.BARONESS, Rank.SAILOR, Rank.PIRATE, Rank.VIKING, Rank.BERSERKER, Rank.SHIELD_MAIDEN);
     }
 
     public static Rank fromPrefix(String s){

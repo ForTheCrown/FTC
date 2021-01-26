@@ -1,14 +1,16 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.CrownException;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class FindPost implements CommandExecutor {
+public class FindPost implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -30,12 +32,9 @@ public class FindPost implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
         // Sender must be player:
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can do this.");
-            return false;
-        }
+        if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 
         Player player = (Player) sender;
         Location loc = player.getLocation();

@@ -1,6 +1,9 @@
 package net.forthecrown.core.commands.emotes;
 
+import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -8,11 +11,10 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Bonk implements CommandExecutor {
+public class Bonk implements CrownCommandExecutor {
 
     /*
      * ----------------------------------------
@@ -33,12 +35,9 @@ public class Bonk implements CommandExecutor {
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
         // Sender must be player:
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players can use this command");
-            return false;
-        }
+        if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         Player player = (Player) sender;
         FtcUser playerData = FtcCore.getUser(player.getUniqueId());
 
@@ -55,10 +54,7 @@ public class Bonk implements CommandExecutor {
 
         // Both sender and target should have emotes enabled:
         Player target = Bukkit.getPlayer(args[0]);
-        if(target == null){
-            player.sendMessage(args[0] + " is not a currently online player.");
-            return false;
-        }
+        if(target == null) throw new InvalidPlayerInArgument(sender, args[0]);
         FtcUser targetData = FtcCore.getUser(target.getUniqueId());
 
         if (!playerData.allowsEmotes()) {

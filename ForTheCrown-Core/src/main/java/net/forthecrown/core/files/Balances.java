@@ -60,12 +60,10 @@ public class Balances extends FtcFileManager {
         FtcCore.getUser(uuid).addTotalEarnings(amount);
 
         if(FtcCore.areTaxesEnabled() && isTaxed && getTaxPercentage(uuid) > 1){
-            int amountToRemove = amount * (getTaxPercentage(uuid)/100);
+            int amountToRemove = (int) (amount * ((float) getTaxPercentage(uuid)/100));
             amount -= amountToRemove;
 
-            try {
-                Bukkit.getPlayer(uuid).sendMessage("You were taxed " + getTaxPercentage(uuid) + "%, which means you lost " + amountToRemove + " Rhines");
-            } catch (Exception ignored){}
+            FtcCore.getUser(uuid).sendMessage("&7You were taxed " + getTaxPercentage(uuid) + "%, which means you lost " + amountToRemove + " Rhines of your last transaction");
         }
 
         balanceMap.put(uuid, getBalance(uuid) + amount);
@@ -74,7 +72,7 @@ public class Balances extends FtcFileManager {
     public Integer getTaxPercentage(UUID uuid){
         if(getBalance(uuid) < 500000) return 0; //if the player has less thank 500k rhines, no tax
 
-        int percent = Math.round((((float) FtcCore.getUser(uuid).getTotalEarnings()) / 50000F) * 10);
+        int percent = (int) (FtcCore.getUser(uuid).getTotalEarnings() / 50000 * 10);
         if(percent >= 30) return 50;
         return percent;
     }
