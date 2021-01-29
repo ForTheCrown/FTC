@@ -4,7 +4,7 @@ StartRhines: 100
 BaronPrice: 500000
 MaxMoneyAmount: 50000000
 UserDataResetInterval: 5356800000L
-Taxes: true
+Taxes: false
 
 King: empty
 

@@ -59,7 +59,7 @@ public class ChatEvents implements Listener {
         if (FtcCore.getSCTPlayers().contains(player)) {
             event.setCancelled(true);
 
-            String message1 = ChatColor.DARK_GRAY + "[Staff] " + ChatColor.GRAY + playerName + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + FtcCore.translateHexCodes(message);
+            String message1 = ChatColor.DARK_GRAY + "[Staff] " + ChatColor.GRAY + playerName + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + FtcCore.translateHexCodes(message.replaceAll("\\\\", ""));
 
             for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
                 if (!(onlinePlayer.hasPermission("ftc.staffchat"))) continue;

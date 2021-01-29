@@ -3,8 +3,8 @@ package net.forthecrown.core.events;
 import net.forthecrown.core.customevents.SignShopUseEvent;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
+import net.forthecrown.core.files.CrownSignShop;
 import net.forthecrown.core.files.FtcUser;
-import net.forthecrown.core.files.SignShop;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,14 +22,12 @@ public class ShopUseListener implements Listener {
     public void onShopUse(SignShopUseEvent event){
         //just the variables
         Player player = event.getPlayer();
-        SignShop shop = event.getShop();
+        CrownSignShop shop = event.getShop();
         FtcUser customer = event.getCustomer();
 
         if(shop.getExampleItem() == null){
-            if(shop.getShopInventory().getContents()[0] == null){
-                shop.setOutOfStock(true);
-                throw new InvalidCommandExecution(customer, "");
-            } else shop.setExampleItem(shop.getShopInventory().getContents()[0]);
+            if(shop.getShopInventory().getContents()[0] == null) shop.setOutOfStock(true);
+            throw new InvalidCommandExecution(customer, "&7This shops is non functional,&r please ask to the owner to remake it");
         }
 
         Inventory playerInv = player.getInventory();
@@ -110,7 +108,7 @@ public class ShopUseListener implements Listener {
                     return;
                 }
 
-                playerInv.addItem(shop.getExampleItem()); //adds the item to player's inventory
+                playerInv.addItem(shop.getExampleItem().clone()); //adds the item to player's inventory
 
                 event.setCustomerBalance(event.getCustomerBalance() - shop.getPrice());
 
@@ -182,7 +180,7 @@ public class ShopUseListener implements Listener {
                     event.setOwnerBalance(event.getOwnerBalance() - shop.getPrice());
 
                     Inventory inv = shop.getShopInventory();
-                    inv.addItem(shop.getExampleItem());
+                    inv.addItem(shop.getExampleItem().clone());
                     shop.setShopInventory(inv);
 
                     try {

@@ -6,9 +6,7 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * This seems to be a better alternative to having a custom command handler, but I can't be arsed to convert every command class over to it... again
@@ -21,12 +19,14 @@ import java.util.Set;
 public abstract class CrownCommand extends Command implements CrownCommandExecutor {
 
     private final String prefix;
-    private static final Set<CrownCommand> registeredCommands = new HashSet<>();
+
+    private String permMessage = "&7You do not have permission to do this!";
 
     protected CrownCommand(String name) {
         super(name);
         prefix = "ftccore";
-        registeredCommands.add(this);
+
+        setPermissionMessage(permMessage);
     }
 
     protected CrownCommand(String name, String cmdPrefix) {
@@ -66,9 +66,5 @@ public abstract class CrownCommand extends Command implements CrownCommandExecut
         } catch (CrownException e){
             return true;
         }
-    }
-
-    public static Set<CrownCommand> getRegisteredCommands(){
-        return registeredCommands;
     }
 }

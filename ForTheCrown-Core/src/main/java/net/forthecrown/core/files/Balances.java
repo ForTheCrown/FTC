@@ -26,6 +26,32 @@ public class Balances extends FtcFileManager {
         else reload();
     }
 
+    @Override
+    public void save(){
+        for(UUID id : balanceMap.keySet()){
+            if(balanceMap.get(id) != startRhines) getFile().set(id.toString(), getBalanceMap().get(id));
+        }
+        super.save();
+    }
+
+    @Override
+    public void reload(){
+        super.reload();
+        startRhines = FtcCore.getInstance().getConfig().getInt("StartRhines");
+        for(String string : getFile().getKeys(true)){
+            UUID id;
+            try {
+                id = UUID.fromString(string);
+            } catch (Exception e){
+                e.printStackTrace();
+                continue;
+            }
+
+            int balance = getFile().getInt(string);
+            balanceMap.put(id, balance);
+        }
+    }
+
     public Map<UUID, Integer> getBalanceMap(){
         return balanceMap;
     }
@@ -75,32 +101,6 @@ public class Balances extends FtcFileManager {
         int percent = (int) (FtcCore.getUser(uuid).getTotalEarnings() / 50000 * 10);
         if(percent >= 30) return 50;
         return percent;
-    }
-
-    @Override
-    public void save(){
-        for(UUID id : balanceMap.keySet()){
-            if(balanceMap.get(id) != startRhines) getFile().set(id.toString(), getBalanceMap().get(id));
-        }
-        super.save();
-    }
-
-    @Override
-    public void reload(){
-        super.reload();
-        startRhines = FtcCore.getInstance().getConfig().getInt("StartRhines");
-        for(String string : getFile().getKeys(true)){
-            UUID id;
-            try {
-                id = UUID.fromString(string);
-            } catch (Exception e){
-                e.printStackTrace();
-                continue;
-            }
-
-            int balance = getFile().getInt(string);
-            balanceMap.put(id, balance);
-        }
     }
 
 

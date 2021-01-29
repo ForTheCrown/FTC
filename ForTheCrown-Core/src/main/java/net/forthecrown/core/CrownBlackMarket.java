@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
-public class BlackMarket {
+public class CrownBlackMarket {
 
     private final Map<Material, Integer> crops = new HashMap<>();
     private final Map<Material, Integer> mining = new HashMap<>();
@@ -45,7 +45,7 @@ public class BlackMarket {
 
     private final Set<UUID> boughtEnchant = new HashSet<>();
 
-    public BlackMarket(){
+    public CrownBlackMarket(){
 
         file = new File(FtcCore.getInstance().getDataFolder(), "blackmarket.yml");
         if(!file.exists()){

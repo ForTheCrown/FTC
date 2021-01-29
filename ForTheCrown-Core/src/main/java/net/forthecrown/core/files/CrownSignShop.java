@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.*;
 
-public class SignShop extends FtcFileManager {
+public class CrownSignShop extends FtcFileManager {
 
     private final Location location;
     private final Block block;
@@ -30,12 +30,12 @@ public class SignShop extends FtcFileManager {
     private Inventory shopInv;
     private List<ItemStack> contents = new ArrayList<>();
 
-    public static final Set<SignShop> loadedShops = new HashSet<>();
+    public static final Set<CrownSignShop> loadedShops = new HashSet<>();
 
     private boolean wasDeleted = false;
 
     //used by getSignShop
-    public SignShop(Location signBlock) throws Exception {
+    public CrownSignShop(Location signBlock) throws Exception {
         super(signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ(), "shopdata");
         this.fileName = signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ();
 
@@ -55,7 +55,7 @@ public class SignShop extends FtcFileManager {
     }
 
     //used by createSignShop
-    public SignShop(Location location, ShopType shopType, Integer price, UUID shopOwner) {
+    public CrownSignShop(Location location, ShopType shopType, Integer price, UUID shopOwner) {
         super(location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "shopdata");
         fileName = location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ();
         this.location = location;
@@ -170,17 +170,22 @@ public class SignShop extends FtcFileManager {
     public ItemStack[] setItems(ItemStack[] toSet){
         List<ItemStack> toReturn = new ArrayList<>();
         if(toSet.length > 27) return null;
-        if(isOutOfStock() || getExampleItem() == null) setExampleItem(toSet[0]);
-        getShopInventory().clear();
+        if(getExampleItem() == null) setExampleItem(toSet[0]);
 
+        int i = 0;
         for(ItemStack stack : toSet){
             if(stack == null) continue;
             if(stack.getType() != getExampleItem().getType()) {
                 toReturn.add(stack);
                 continue;
             }
-            getShopInventory().setItem(getShopInventory().firstEmpty(), stack);
+            getShopInventory().setItem(i, stack);
             setOutOfStock(false);
+            i++;
+        }
+
+        for (int a = i; a < getShopInventory().getSize(); a++){
+            getShopInventory().setItem(a, null);
         }
 
         save();
@@ -249,6 +254,17 @@ public class SignShop extends FtcFileManager {
 
     public boolean wasDeleted(){
         return wasDeleted;
+    }
+
+    public boolean isInventoryEmpty(){
+        for (ItemStack stack : getShopInventory()){
+            if(stack != null) return false;
+        }
+        return true;
+    }
+
+    public boolean isInventoryFull(){
+        return getShopInventory().firstEmpty() == -1;
     }
 
 

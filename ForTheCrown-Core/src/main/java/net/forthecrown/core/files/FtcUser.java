@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Particle;
+import org.bukkit.command.MessageCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -21,12 +22,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class FtcUser extends FtcFileManager {
+public class FtcUser extends FtcFileManager implements MessageCommandSender {
 
     public static final Set<FtcUser> loadedData = new HashSet<>();
 
     private final UUID base;
-    private final Balances balance = FtcCore.getBalances();
 
     //Already in the file, added by Wout
     private String name;
@@ -50,9 +50,13 @@ public class FtcUser extends FtcFileManager {
     private long totalEarnings;
     private long nextResetTime;
 
+    /**
     private FtcUser lastMessanger;
     private boolean isMuted;
     private boolean isSoftMuted;
+
+     private long timeUntilUnmute;
+     */
 
 
     public FtcUser(UUID base){

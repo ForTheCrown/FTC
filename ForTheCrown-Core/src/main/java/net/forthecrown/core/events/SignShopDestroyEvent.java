@@ -2,7 +2,7 @@ package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
-import net.forthecrown.core.files.SignShop;
+import net.forthecrown.core.files.CrownSignShop;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
@@ -18,7 +18,7 @@ public class SignShopDestroyEvent implements Listener {
         if(!sign.getLine(0).contains("=[Buy]=") && !sign.getLine(0).contains("=[Sell]=")) return;
         if(!sign.getLine(3).contains(ChatColor.DARK_GRAY + "Price: ")) return;
 
-        SignShop shop;
+        CrownSignShop shop;
         try {
             shop = FtcCore.getSignShop(event.getBlock().getLocation());
         } catch (Exception e){

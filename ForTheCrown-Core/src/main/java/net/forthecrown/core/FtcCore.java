@@ -9,7 +9,7 @@ import net.forthecrown.core.events.npc.JeromeEvent;
 import net.forthecrown.core.files.Balances;
 import net.forthecrown.core.files.CrownAnnouncer;
 import net.forthecrown.core.files.FtcUser;
-import net.forthecrown.core.files.SignShop;
+import net.forthecrown.core.files.CrownSignShop;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -31,7 +31,7 @@ public final class FtcCore extends CrownPlugin {
     private static FtcCore instance;
     private static String prefix = "&6[FTC]&r  ";
     private static long userDataResetInterval = 5356800000L; //2 months by default
-    private static boolean taxesEnabled = true;
+    private static boolean taxesEnabled;
     private static String king;
 
     private static final Map<Material, Integer> defaultItemPrices = new HashMap<>();
@@ -45,7 +45,7 @@ public final class FtcCore extends CrownPlugin {
     private Balances balFile;
     private CrownCommandHandler cmdReg;
 
-    private BlackMarket bm;
+    private CrownBlackMarket bm;
 
     @Override
     public void onEnable() {
@@ -63,7 +63,7 @@ public final class FtcCore extends CrownPlugin {
         discord = FtcCore.getInstance().getConfig().getString("Discord");
         autoAnnouncer = new CrownAnnouncer();
         balFile = new Balances();
-        bm = new BlackMarket();
+        bm = new CrownBlackMarket();
         maxMoneyAmount = FtcCore.getInstance().getConfig().getInt("MaxMoneyAmount");
         loadDefaultItemPrices();
 
@@ -158,7 +158,7 @@ public final class FtcCore extends CrownPlugin {
         }
 
         getInstance().loadDefaultItemPrices();
-        for(SignShop shop : SignShop.loadedShops){
+        for(CrownSignShop shop : CrownSignShop.loadedShops){
             shop.reload();
         }
         getBalances().reload();
@@ -178,17 +178,18 @@ public final class FtcCore extends CrownPlugin {
         for(FtcUser data : FtcUser.loadedData){
             data.save();
         }
-        getInstance().getConfig().set("prefix", prefix);
+        getInstance().getConfig().set("Prefix", prefix);
 
         getAnnouncer().save();
 
-        for(SignShop shop : SignShop.loadedShops){
+        for(CrownSignShop shop : CrownSignShop.loadedShops){
             if(!shop.wasDeleted()) shop.save();
         }
         getBalances().save();
         getBlackMarket().save();
 
         getInstance().getConfig().set("King", king);
+        getInstance().getConfig().set("Taxes", taxesEnabled);
 
         getInstance().saveConfig();
         System.out.println("[SAVED] FtcCore saved");
@@ -233,7 +234,7 @@ public final class FtcCore extends CrownPlugin {
     }
 
     public static String getPrefix(){
-        return translateHexCodes(prefix);
+        return CrownUtils.translateHexCodes(prefix);
     }
 
     public static long getUserDataResetInterval(){
@@ -259,12 +260,14 @@ public final class FtcCore extends CrownPlugin {
     public static Balances getBalances(){
         return getInstance().balFile;
     }
-    public static BlackMarket getBlackMarket() {
+    public static CrownBlackMarket getBlackMarket() {
         return getInstance().bm;
     }
 
     //Yeah, no clue
+    @Deprecated
     public static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
+    @Deprecated
     public static String translateHexCodes (String textToTranslate) {
 
         Matcher matcher = HEX_PATTERN.matcher(textToTranslate);
@@ -289,7 +292,7 @@ public final class FtcCore extends CrownPlugin {
 
     public static String replaceEmojis(String string){ //replaces every emoji in the given string
         String message = string;
-        message = message.replaceAll(":shrug:", "¯\\\\_(ツ)_/¯");
+        message = message.replaceAll(":shrug:", "¯\\\\\\_(ツ)_/¯");
         message = message.replaceAll(":ughcry:", "(ಥ﹏ಥ)");
         message = message.replaceAll(":hug:", "༼ つ ◕_◕ ༽つ");
         message = message.replaceAll(":hugcry:", "༼ つ ಥ_ಥ ༽つ");
@@ -312,14 +315,14 @@ public final class FtcCore extends CrownPlugin {
         player.sendMessage(ChatColor.GRAY + "Do " + ChatColor.RESET + "/toggleemotes" + ChatColor.GRAY + " to enable them.");
     }
 
-    public static SignShop getSignShop(Location signShop) throws Exception { //gets a signshop, throws a null exception if the shop file doesn't exist
-        for(SignShop shop : SignShop.loadedShops){
+    public static CrownSignShop getSignShop(Location signShop) throws Exception { //gets a signshop, throws a null exception if the shop file doesn't exist
+        for(CrownSignShop shop : CrownSignShop.loadedShops){
             if(shop.getLocation() == signShop) return shop;
         }
-        return new SignShop(signShop);
+        return new CrownSignShop(signShop);
     }
-    public static SignShop createSignShop(Location location, ShopType shopType, Integer price, UUID ownerUUID){ //creates a signshop
-        return new SignShop(location, shopType, price, ownerUUID);
+    public static CrownSignShop createSignShop(Location location, ShopType shopType, Integer price, UUID ownerUUID){ //creates a signshop
+        return new CrownSignShop(location, shopType, price, ownerUUID);
     }
 
     @Deprecated
@@ -340,6 +343,7 @@ public final class FtcCore extends CrownPlugin {
         return toReturn;
     }
 
+    @Deprecated
     public static Integer getRandomNumberInRange(int min, int max) {
         if (min >= max) {
             return 0;
@@ -348,6 +352,7 @@ public final class FtcCore extends CrownPlugin {
         return r.nextInt((max - min) + 1) + min;
     }
 
+    @Deprecated
     public static ItemStack makeItem(Material material, int amount, boolean hideFlags, String name, String... loreStrings) {
         ItemStack result = new ItemStack(material, amount);
         ItemMeta meta = result.getItemMeta();

@@ -7,7 +7,8 @@ import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
 import net.forthecrown.core.files.FtcUser;
-import net.forthecrown.core.files.SignShop;
+import net.forthecrown.core.files.CrownSignShop;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -54,7 +55,7 @@ public class CoreCommand implements CrownCommandExecutor, TabCompleter {
                         return true;
 
                     case "signshops":
-                        for(SignShop shop : SignShop.loadedShops){ shop.save(); }
+                        for(CrownSignShop shop : CrownSignShop.loadedShops){ shop.save(); }
                         sender.sendMessage("All loaded SignShops have been saved");
                         return true;
 
@@ -66,8 +67,16 @@ public class CoreCommand implements CrownCommandExecutor, TabCompleter {
 
             case "reload":
                 if(args.length < 2){
+                    //FtcCore.reloadFTC();
+                    sender.sendMessage(ChatColor.RED + "Warning! " + ChatColor.RESET + "You're about to reload all of the plugin's configs without saving! Are you sure you want to do that");
+                    sender.sendMessage("Do /ftccore reloadconfirm to confirm");
+                    return true;
+                }
+
+            case "reloadconfirm":
+                if(args.length < 2){
                     FtcCore.reloadFTC();
-                    sender.sendMessage("FTC-Core has been reloaded");
+                    sender.sendMessage("FTC-Core successfully reloaded!");
                     return true;
                 }
 
@@ -90,7 +99,7 @@ public class CoreCommand implements CrownCommandExecutor, TabCompleter {
                         return true;
 
                     case "signshops":
-                        for(SignShop shop : SignShop.loadedShops){ shop.reload(); }
+                        for(CrownSignShop shop : CrownSignShop.loadedShops){ shop.reload(); }
                         sender.sendMessage("All loaded SignShops have been reloaded");
                         return true;
 
@@ -222,7 +231,7 @@ public class CoreCommand implements CrownCommandExecutor, TabCompleter {
         }
         if(args.length == 2){
             switch (args[0]){
-                case "reload":
+                case "reloadconfirm":
                 case "save":
                     argList.add("announcer");
                     argList.add("balances");

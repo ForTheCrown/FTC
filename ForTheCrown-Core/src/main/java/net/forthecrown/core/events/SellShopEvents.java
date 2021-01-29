@@ -8,8 +8,8 @@ import net.forthecrown.core.inventories.SellShop;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.WanderingTrader;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -27,12 +27,12 @@ public class SellShopEvents implements Listener {
     public void onServerShopNpcUse(PlayerInteractEntityEvent event){
         if(event.getHand() != EquipmentSlot.HAND) return;
         if(event.getRightClicked().getType() != EntityType.WANDERING_TRADER) return;
-        WanderingTrader trader = (WanderingTrader) event.getRightClicked();
+        LivingEntity trader = (LivingEntity) event.getRightClicked();
 
-        if(trader.hasAI() && trader.getCustomName() != null && !trader.getCustomName().contains("Server Shop")) return;
+        if(trader.hasAI() && trader.getCustomName() == null || !trader.getCustomName().contains("Server Shop")) return;
 
         event.getPlayer().openInventory(new SellShop(event.getPlayer()).mainMenu());
-
+        event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -59,7 +59,6 @@ public class SellShopEvents implements Listener {
 
         if(item.getType() == Material.GRAY_STAINED_GLASS_PANE) return;
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
-
         //change sell amount
         if(item.getType() == Material.BLACK_STAINED_GLASS_PANE){
             switch (item.getItemMeta().getDisplayName()){
@@ -106,12 +105,14 @@ public class SellShopEvents implements Listener {
             case OAK_SAPLING:
                 player.openInventory(sellShop.farmingMenu());
                 break;
-            case ROTTEN_FLESH:
-                player.openInventory(sellShop.dropsMenu());
-                break;
             case IRON_PICKAXE:
                 player.openInventory(sellShop.miningMenu());
                 break;
+            case ROTTEN_FLESH:
+                if(item.getItemMeta().getDisplayName().contains("Drops")) {
+                    player.openInventory(sellShop.dropsMenu());
+                    break;
+                }
             default:
                 if(!sellItems(item.getType(), user)) player.sendMessage("Couldn't sell items!");
         }

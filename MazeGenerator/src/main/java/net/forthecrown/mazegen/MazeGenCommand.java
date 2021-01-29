@@ -22,18 +22,13 @@ public class MazeGenCommand implements CommandExecutor {
             switch (args[0]){
                 case "pos1":
                     Location loc = new Location(player.getWorld(), player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ());
-                    main.pos1 = loc;
+                    main.pos2 = loc;
                     player.sendMessage("Pos1 set!");
                     break;
                 case "pos2":
                     Location loc1 = new Location(player.getWorld(), player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ());
-                    main.pos2 = loc1;
+                    main.pos1 = loc1;
                     player.sendMessage("Pos2 set!");
-                    break;
-                case "entrypos":
-                    Location loc2 = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getBlockY(), player.getLocation().getBlockZ() + 0.5);
-                    main.entryLoc = loc2;
-                    player.sendMessage("EntryPos set!");
                     break;
                 case "test":
                     main.enterEvent(player);
@@ -45,7 +40,7 @@ public class MazeGenCommand implements CommandExecutor {
                     player.sendMessage("Starting maze generation!");
                     break;
                 case "gamegen":
-                    main.generateIngameMaze();
+                    main.generateIngameMaze(player);
                     player.sendMessage("Starting ingame generation");
                     break;
                 default:

@@ -1,6 +1,7 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.CrownCommandExecutor;
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -39,7 +40,7 @@ public class StaffChatCommand implements CrownCommandExecutor {
 
         String initialMmg = String.join(" ", args);
 
-        initialMmg = FtcCore.translateHexCodes(FtcCore.replaceEmojis(initialMmg));
+        initialMmg = CrownUtils.translateHexCodes(FtcCore.replaceEmojis(initialMmg).replace("\\", "\\\\"));
         message = message.replaceAll("%MESSAGE%", initialMmg);
 
         if(sender instanceof Player) message = message.replaceAll("%SENDER%", sender.getName());

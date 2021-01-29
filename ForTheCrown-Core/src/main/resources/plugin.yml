@@ -150,7 +150,7 @@ commands:
     description: 'The Command used by the ClickEventApi execute code ran by clickable text'
   kingmaker:
     usage: '§7Usage:§r /kingmaker <remove | player> [king | queen]'
-    permission: ftc.ranks
+    permission: ftc.admin.ranks
     permission-message: You do not have permission to use this!
     description: 'This command is used to assign and unassign a king or queen'
   editshop:

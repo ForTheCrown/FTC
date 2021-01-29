@@ -2,7 +2,7 @@ package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.ShopType;
-import net.forthecrown.core.files.SignShop;
+import net.forthecrown.core.files.CrownSignShop;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public class SignShopCreateEvent implements Listener {
 
-    private final Map<UUID, SignShop> asdasdaqsd = new HashMap<>();//Yes! I rolled my face on the keyboard to get the name
+    private final Map<UUID, CrownSignShop> asdasdaqsd = new HashMap<>();//Yes! I rolled my face on the keyboard to get the name
 
     //WHAT AM I DOING
     @EventHandler(ignoreCancelled = true)
@@ -72,7 +72,7 @@ public class SignShopCreateEvent implements Listener {
             return;
         }
 
-        SignShop shop = FtcCore.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
+        CrownSignShop shop = FtcCore.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
 
         player.openInventory(shop.getExampleInventory());
         asdasdaqsd.put(player.getUniqueId(), shop);
@@ -89,7 +89,7 @@ public class SignShopCreateEvent implements Listener {
         if(event.getInventory().getType() != InventoryType.HOPPER) return;
         Player player = (Player) event.getPlayer();
 
-        SignShop shop = asdasdaqsd.get(player.getUniqueId());
+        CrownSignShop shop = asdasdaqsd.get(player.getUniqueId());
         asdasdaqsd.remove(player.getUniqueId());
         Sign sign = (Sign) shop.getBlock().getState();
 
@@ -107,7 +107,8 @@ public class SignShopCreateEvent implements Listener {
         if(!trash){
             for (ItemStack stack : inv.getContents()){
                 if (stack == null) continue;
-                player.getInventory().addItem(stack);
+                if(player.getInventory().firstEmpty() == -1) player.getWorld().dropItemNaturally(player.getLocation(), stack);
+                else player.getInventory().addItem(stack);
             }
             player.sendMessage(ChatColor.DARK_RED + "SignShop creation failed!" + ChatColor.RED + " Please only specify one item stack, not several");
             sign.setLine(0, ChatColor.DARK_RED + ChatColor.stripColor(shop.getType().getInStockLabel()));

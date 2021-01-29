@@ -1,6 +1,6 @@
 package net.forthecrown.core.events;
 
-import net.forthecrown.core.BlackMarket;
+import net.forthecrown.core.CrownBlackMarket;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
@@ -44,7 +44,7 @@ public class BlackMarketEvents implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-        BlackMarket bm = FtcCore.getBlackMarket();
+        CrownBlackMarket bm = FtcCore.getBlackMarket();
         FtcUser user = FtcCore.getUser(player.getUniqueId());
 
         if(user.getBranch() != Branch.PIRATES) throw new InvalidBranchException(player, "Pirate");
@@ -84,7 +84,7 @@ public class BlackMarketEvents implements Listener {
         if(event.getCurrentItem().hasItemMeta() && !event.getCurrentItem().getItemMeta().getLore().get(0).contains("Value: ")) return;
 
         Player player = (Player) event.getWhoClicked();
-        BlackMarket bm = FtcCore.getBlackMarket();
+        CrownBlackMarket bm = FtcCore.getBlackMarket();
         FtcUser user = FtcCore.getUser(event.getWhoClicked().getUniqueId());
         Balances bals = FtcCore.getBalances();
 
@@ -145,7 +145,7 @@ public class BlackMarketEvents implements Listener {
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
     }
 
-    private boolean sellItem(FtcUser user, Balances bals, BlackMarket bm, Material toSell){
+    private boolean sellItem(FtcUser user, Balances bals, CrownBlackMarket bm, Material toSell){
         int sellAmount = user.getSellAmount().getInt();
         int finalSell = sellAmount;
         if(finalSell == -1) finalSell++;
@@ -189,7 +189,7 @@ public class BlackMarketEvents implements Listener {
         return true;
     }
 
-    private void buyEnchant(FtcUser user, Balances bals, BlackMarket bm){
+    private void buyEnchant(FtcUser user, Balances bals, CrownBlackMarket bm){
         if(bals.getBalance(user.getBase()) < bm.getEnchantPrice(bm.getDailyEnchantment())) throw new CannotAffordTransaction(user.getPlayer());
         if(user.getPlayer().getInventory().firstEmpty() == -1){
             user.sendMessage("There's no room in your inventory!");

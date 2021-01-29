@@ -5,13 +5,15 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
-import net.forthecrown.core.files.SignShop;
+import net.forthecrown.core.files.CrownSignShop;
+import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class ShopEditCommand implements CrownCommandExecutor, TabCompleter {
         if(!sign.getLine(0).contains("=[Buy]=") && !sign.getLine(0).contains("=[Sell]=") && !sign.getLine(3).contains(ChatColor.GRAY + "Price: "))
             throw new InvalidCommandExecution(sender, "You must be looking at a sign shop!");
 
-        SignShop shop;
+        CrownSignShop shop;
         try {
             shop = FtcCore.getSignShop(sign.getLocation());
         } catch (Exception e){
@@ -45,6 +47,8 @@ public class ShopEditCommand implements CrownCommandExecutor, TabCompleter {
         if(!shop.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) throw new InvalidCommandExecution(sender, "&cYou must be the owner of the shop!");
 
         if(args.length < 1)  return false;
+
+        FtcUser user = FtcCore.getUser(player.getUniqueId());
 
         switch (args[0]){
             case "line1":
@@ -61,6 +65,23 @@ public class ShopEditCommand implements CrownCommandExecutor, TabCompleter {
                     String toSet = String.join(" ", args).replace("line2 ", "");
                     sign.setLine(2, toSet);
                 }
+                break;
+
+            case "sellamount":
+                if(args.length != 2) throw new InvalidArgumentException(sender, "You must specify an amount");
+                if(shop.getExampleItem() == null) throw new InvalidCommandExecution(player, "&7This shops is non functional,&r please ask to the owner to remake it");
+
+                int amount;
+                try {
+                    amount = Integer.parseInt(args[1]);
+                } catch (Exception e){ throw new InvalidArgumentException(sender, "The amount must be number"); }
+
+                if(amount <= 0 || amount > 64) throw new InvalidArgumentException(sender, "The number cannot be zero or less, and cannot be larger than 64");
+
+                ItemStack item = shop.getExampleItem();
+                item.setAmount(amount);
+                shop.setExampleItem(item);
+                user.sendMessage("This shop will now sell items in " + amount + " quantities");
                 break;
 
             case "price":
@@ -89,6 +110,7 @@ public class ShopEditCommand implements CrownCommandExecutor, TabCompleter {
         if(args.length == 1){
             toReturn.add("line1");
             toReturn.add("line2");
+            toReturn.add("sellamount");
             toReturn.add("price");
             return StringUtil.copyPartialMatches(args[argN], toReturn, new ArrayList<>());
         }

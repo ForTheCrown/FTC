@@ -4,7 +4,7 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.customevents.SignShopUseEvent;
 import net.forthecrown.core.files.Balances;
 import net.forthecrown.core.files.FtcUser;
-import net.forthecrown.core.files.SignShop;
+import net.forthecrown.core.files.CrownSignShop;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class SignShopInteractEvent implements Listener {
 
-    private final Map<UUID, SignShop> dopfguijh = new HashMap<>(); //Yes! I rolled my face on the keyboard to get the name... V.2
+    private final Map<UUID, CrownSignShop> dopfguijh = new HashMap<>(); //Yes! I rolled my face on the keyboard to get the name... V.2
 
     @EventHandler
     public void onSignShopUser(PlayerInteractEvent event){
@@ -41,7 +41,7 @@ public class SignShopInteractEvent implements Listener {
         }
         FtcCore.addToCooldown(event.getPlayer(), 6, false);
 
-        SignShop shop;
+        CrownSignShop shop;
         try {
             shop = FtcCore.getSignShop(event.getClickedBlock().getLocation());
         } catch (Exception e){
@@ -71,7 +71,7 @@ public class SignShopInteractEvent implements Listener {
         Player player = (Player) event.getPlayer();
 
         Inventory inv = event.getInventory();
-        SignShop shop = dopfguijh.get(player.getUniqueId());
+        CrownSignShop shop = dopfguijh.get(player.getUniqueId());
         dopfguijh.remove(player.getUniqueId());
         ItemStack[] invalidItems = shop.setItems(inv.getStorageContents()); //setItems returns an array of invalid items that couldn't be added to the shop inventory
 

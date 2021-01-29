@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrownAnnouncer extends FtcFileManager  {
+public class CrownAnnouncer extends FtcFileManager {
 
     private List<String> thingsToAnnounce = new ArrayList<>();
     private long delay;

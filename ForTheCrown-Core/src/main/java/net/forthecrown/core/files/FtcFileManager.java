@@ -6,7 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 
-public class FtcFileManager{
+public class FtcFileManager {
 
     private final String fileName;
     private final String directory;

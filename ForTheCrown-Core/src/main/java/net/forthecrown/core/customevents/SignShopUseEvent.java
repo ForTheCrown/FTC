@@ -3,7 +3,7 @@ package net.forthecrown.core.customevents;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.files.Balances;
 import net.forthecrown.core.files.FtcUser;
-import net.forthecrown.core.files.SignShop;
+import net.forthecrown.core.files.CrownSignShop;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -15,12 +15,12 @@ public class SignShopUseEvent extends Event implements Cancellable {
     private final FtcUser owner;
     private final Player player;
 
-    private final SignShop shop;
+    private final CrownSignShop shop;
     private final Balances bals;
 
     private boolean cancelled;
 
-    public SignShopUseEvent(SignShop shop, FtcUser customer, Player player, Balances bals) {
+    public SignShopUseEvent(CrownSignShop shop, FtcUser customer, Player player, Balances bals) {
         this.shop = shop;
         this.customer = customer;
         this.player = player;
@@ -28,7 +28,7 @@ public class SignShopUseEvent extends Event implements Cancellable {
         owner = FtcCore.getUser(shop.getOwner());
     }
 
-    public SignShop getShop() {
+    public CrownSignShop getShop() {
         return shop;
     }
 

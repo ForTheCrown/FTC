@@ -7,9 +7,9 @@ import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
 import net.forthecrown.core.exceptions.TooLittleArgumentsException;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class KingMakerCommand implements CrownCommandExecutor {
 
@@ -25,10 +25,8 @@ public class KingMakerCommand implements CrownCommandExecutor {
             sender.sendMessage("King has been removed!");
             return true;
         } else {
-            Player player;
-            try {
-                player = Bukkit.getPlayer(args[0]);
-            } catch (NullPointerException e){ throw new InvalidPlayerInArgument(sender, args[0]); }
+            OfflinePlayer player = Bukkit.getOfflinePlayerIfCached(args[0]);
+            if(player == null) throw new InvalidPlayerInArgument(sender, args[0]);
 
             if(FtcCore.getKing() != null){
                 sender.sendMessage(ChatColor.GRAY + "There is already a king!");
