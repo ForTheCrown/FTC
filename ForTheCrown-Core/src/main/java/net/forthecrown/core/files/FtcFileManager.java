@@ -1,6 +1,5 @@
 package net.forthecrown.core.files;
 import net.forthecrown.core.FtcCore;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -8,14 +7,14 @@ import java.io.IOException;
 
 public class FtcFileManager {
 
-    private final String fileName;
-    private final String directory;
+    protected final String fileName;
+    protected final String directory;
 
     protected boolean fileDoesntExist = false;
-    private boolean deleted = false;
+    protected boolean deleted = false;
 
     private File file;
-    private FileConfiguration fileConfig;
+    private YamlConfiguration fileConfig;
 
     protected FtcFileManager(String fileName, String folder){
         this.directory = folder;
@@ -61,7 +60,7 @@ public class FtcFileManager {
         }
     }
 
-    protected FileConfiguration getFile(){
+    protected YamlConfiguration getFile(){
         return fileConfig;
     }
 

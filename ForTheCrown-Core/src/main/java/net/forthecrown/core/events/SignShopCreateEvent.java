@@ -31,8 +31,7 @@ public class SignShopCreateEvent implements Listener {
     //WHAT AM I DOING
     @EventHandler(ignoreCancelled = true)
     public void onSignShopCreate(SignChangeEvent event){
-        if(event.getLine(0) == null) return;
-        if(event.getLine(3) == null) return;
+        if(event.getLine(0) == null || event.getLine(0).equals("")) return;
 
         Player player = event.getPlayer();
 
@@ -58,8 +57,14 @@ public class SignShopCreateEvent implements Listener {
                 break;
         }
 
+        if(event.getLine(3) == null || event.getLine(3).equals("")){
+            player.sendMessage("You dumbass");
+            return;
+        }
+
         Sign sign = (Sign) event.getBlock().getState();
         String lastLine = event.getLine(3).toLowerCase();
+
 
         lastLine = lastLine.replaceAll("[\\D]", ""); //replaces all letter chars, leaves only numbers to make the price
         lastLine = lastLine.replaceAll(" ", ""); //removes all spaces
@@ -67,14 +72,9 @@ public class SignShopCreateEvent implements Listener {
         int price;
         try {
             price = Integer.parseInt(lastLine);
-        } catch (Exception e){
-            return;
-        }
+        } catch (Exception e){ throw new CrownException(player, "&7The last line must contain numbers!"); }
 
-        if(event.getLine(2) == null && event.getLine(1) == null) {
-            player.sendMessage("You must provide a description of the item");
-            return;
-        }
+        if(event.getLine(2).equals("") && event.getLine(1).equals("")) throw new CrownException(player, "&7You must provide a description of the shop's items");
 
         CrownSignShop shop = FtcCore.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
 

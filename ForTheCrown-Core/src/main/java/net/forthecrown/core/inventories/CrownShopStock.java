@@ -23,14 +23,14 @@ public class CrownShopStock implements ShopStock {
         for (ItemStack stack : contents){
             if(stack.getType() == material) return true;
         }
-        return true;
+        return false;
     }
 
     public boolean contains(Material material, int amount){
         for (ItemStack stack : contents){
             if(stack.getType() == material && (amount -= stack.getMaxStackSize()) <= 0) return true;
         }
-        return true;
+        return false;
     }
 
     public boolean containsExampleItem(){
@@ -48,23 +48,26 @@ public class CrownShopStock implements ShopStock {
     public void removeItem(Material material, int amount){
         if(amount != -1 && !contains(material, amount)) throw new NullPointerException("There isn't enough items to remove in the inventory!");
 
+        List<ItemStack> toRemove = new ArrayList<>();
         for (ItemStack stack : contents){
             if(amount == -1){
-                contents.remove(stack);
+                toRemove.add(stack);
                 continue;
             }
 
             if(stack.getAmount() >= amount){
                 stack.setAmount(stack.getAmount() - amount);
-                if(stack.getAmount() < 1) contents.remove(stack);
+                if(stack.getAmount() < 1) toRemove.add(stack);
                 break;
             }
 
             if(stack.getAmount() < amount){
-                contents.remove(stack);
+                toRemove.add(stack);
                 amount -= stack.getAmount();
             }
         }
+
+        contents.removeAll(toRemove);
     }
 
     public List<ItemStack> getContents() {
@@ -82,6 +85,9 @@ public class CrownShopStock implements ShopStock {
         if(exampleItem == null) throw new NullPointerException("A null item cannot be set as a shop's example item");
         this.exampleItem = exampleItem;
         contents.add(exampleItem);
-        shop.save();
+    }
+
+    public CrownSignShop getOwningShop() {
+        return shop;
     }
 }

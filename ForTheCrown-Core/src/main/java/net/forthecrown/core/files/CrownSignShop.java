@@ -24,8 +24,6 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
     private final Location location;
     private final Block block;
-    private final String fileName;
-    private boolean wasDeleted = false;
 
     private UUID owner;
     private Integer price;
@@ -36,12 +34,10 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     //used by getSignShop
     public CrownSignShop(Location signBlock) throws NullPointerException {
         super(signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ(), "shopdata");
-        this.fileName = signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ();
 
         //file doesn't exist nor does the legacy file, there for go fuck yourself
         if (fileDoesntExist && !legacyFileExists()) {
             super.delete();
-            wasDeleted = true;
             throw new NullPointerException("Could not load shop file! Named, " + fileName);
         }
 
@@ -58,7 +54,6 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     //used by createSignShop
     public CrownSignShop(Location location, ShopType shopType, Integer price, UUID shopOwner) {
         super(location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "shopdata");
-        fileName = location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ();
         this.location = location;
         this.block = location.getBlock();
         this.type = shopType;
@@ -79,7 +74,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     }
 
     public void save() {
-        if(wasDeleted) return;
+        if(deleted) return;
         getFile().set("Owner", getOwner().toString());
         getFile().set("Location", getLocation());
         getFile().set("Type", getType().toString());
@@ -121,7 +116,6 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         }
 
         super.delete();
-        wasDeleted = true;
         FtcCore.loadedShops.remove(this);
     }
 
@@ -139,10 +133,10 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
     public Inventory getExampleInventory(){
         Inventory inv = Bukkit.createInventory(null, InventoryType.HOPPER, "Specify what and how much");
-        inv.setItem(0, FtcCore.makeItem(Material.BARRIER, 1, true, "&7-"));
-        inv.setItem(1, FtcCore.makeItem(Material.BARRIER, 1, true, "&7-"));
-        inv.setItem(3, FtcCore.makeItem(Material.BARRIER, 1, true, "&7-"));
-        inv.setItem(4, FtcCore.makeItem(Material.BARRIER, 1, true, "&7-"));
+        inv.setItem(0, FtcCore.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(1, FtcCore.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(3, FtcCore.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(4, FtcCore.makeItem(Material.BARRIER, 1, true, ""));
 
         return inv;
     }
@@ -235,7 +229,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     }
 
     public boolean wasDeleted(){
-        return wasDeleted;
+        return deleted;
     }
 
     public CrownShopStock getStock() {
@@ -243,12 +237,12 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     }
 
     private boolean legacyFileExists() {
-        File oldFile = new File("plugins/ShopsReworked/ShopData/" + this.fileName + ".yml");
+        File oldFile = new File("plugins/ShopsReworked/ShopData/" + fileName + ".yml");
         return oldFile.exists();
     }
 
     private void convertLegacy() { //I have no idea
-        File oldFile = new File("plugins/ShopsReworked/ShopData/" + this.fileName + ".yml");
+        File oldFile = new File("plugins/ShopsReworked/ShopData/" + fileName + ".yml");
         FileConfiguration oldConfig = YamlConfiguration.loadConfiguration(oldFile);
 
         Sign sign = (Sign) getBlock().getState();

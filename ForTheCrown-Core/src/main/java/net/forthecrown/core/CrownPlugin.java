@@ -1,12 +1,9 @@
 package net.forthecrown.core;
 
-import net.forthecrown.core.files.FtcUser;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Set;
 
 public abstract class CrownPlugin extends JavaPlugin  {
 
@@ -45,10 +42,6 @@ public abstract class CrownPlugin extends JavaPlugin  {
 
     public void registerCommand(String command, CrownCommandExecutor executor, TabCompleter completer){
         handler.registerCommand(command, executor, completer);
-    }
-
-    public Set<FtcUser> getOnlineUsers(){
-        return FtcUser.loadedData;
     }
 
     /*

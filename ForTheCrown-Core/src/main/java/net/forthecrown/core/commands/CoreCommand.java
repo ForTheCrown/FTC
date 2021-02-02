@@ -54,12 +54,12 @@ public class CoreCommand implements CrownCommandExecutor, TabCompleter {
                         return true;
 
                     case "users":
-                        for (FtcUser user : FtcUser.loadedData){ user.save(); }
+                        for (FtcUser user : FtcCore.loadedUsers){ user.save(); }
                         sender.sendMessage("All loaded user data's have been saved");
                         return true;
 
                     case "signshops":
-                        for(CrownSignShop shop : CrownSignShop.loadedShops){ shop.save(); }
+                        for(CrownSignShop shop : FtcCore.loadedShops){ shop.save(); }
                         sender.sendMessage("All loaded SignShops have been saved");
                         return true;
 
@@ -103,12 +103,12 @@ public class CoreCommand implements CrownCommandExecutor, TabCompleter {
                         return true;
 
                     case "users":
-                        for (FtcUser user : FtcUser.loadedData){ user.reload(); }
+                        for (FtcUser user : FtcCore.loadedUsers){ user.reload(); }
                         sender.sendMessage("All loaded user data's have been reloaded");
                         return true;
 
                     case "signshops":
-                        for(CrownSignShop shop : CrownSignShop.loadedShops){ shop.reload(); }
+                        for(CrownSignShop shop : FtcCore.loadedShops){ shop.reload(); }
                         sender.sendMessage("All loaded SignShops have been reloaded");
                         return true;
 

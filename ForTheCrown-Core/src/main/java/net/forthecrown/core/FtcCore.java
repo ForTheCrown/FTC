@@ -184,12 +184,12 @@ public final class FtcCore extends CrownPlugin {
         getInstance().reloadConfig();
 
         getAnnouncer().reload();
-        for (FtcUser data : FtcUser.loadedData){
+        for (FtcUser data : loadedUsers){
             data.reload();
         }
 
         getInstance().loadDefaultItemPrices();
-        for(CrownSignShop shop : CrownSignShop.loadedShops){
+        for(CrownSignShop shop : loadedShops){
             shop.reload();
         }
         getBalances().reload();
@@ -197,13 +197,13 @@ public final class FtcCore extends CrownPlugin {
         getBlackMarket().reload();
     }
     public static void saveFTC(){
-        for(FtcUser data : FtcUser.loadedData) {
+        for(FtcUser data : loadedUsers) {
             data.save();
         }
 
         getAnnouncer().save();
 
-        for(CrownSignShop shop : CrownSignShop.loadedShops){
+        for(CrownSignShop shop : loadedShops){
             if(!shop.wasDeleted()) shop.save();
         }
         getBalances().save();
@@ -211,11 +211,6 @@ public final class FtcCore extends CrownPlugin {
 
         getInstance().saveConfig();
         System.out.println("[SAVED] FtcCore saved");
-    }
-
-
-    public Set<FtcUser> getOnlineUsers(){
-        return FtcUser.loadedData;
     }
 
     public static UUID getKing() {
