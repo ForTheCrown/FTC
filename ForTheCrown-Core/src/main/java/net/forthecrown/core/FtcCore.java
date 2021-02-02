@@ -1,15 +1,11 @@
 package net.forthecrown.core;
 
-import net.forthecrown.core.clickevent.ClickEventCommand;
 import net.forthecrown.core.commands.*;
 import net.forthecrown.core.commands.emotes.*;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.events.*;
 import net.forthecrown.core.events.npc.JeromeEvent;
-import net.forthecrown.core.files.Balances;
-import net.forthecrown.core.files.CrownAnnouncer;
-import net.forthecrown.core.files.FtcUser;
-import net.forthecrown.core.files.CrownSignShop;
+import net.forthecrown.core.files.*;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -43,19 +39,20 @@ public final class FtcCore extends CrownPlugin {
 
     private CrownAnnouncer autoAnnouncer;
     private Balances balFile;
-    private CrownCommandHandler cmdReg;
-
     private CrownBlackMarket bm;
+
+    private static Timer saver;
+
+    public static final Set<CrownSignShop> loadedShops = new HashSet<>();
+    public static final Set<FtcUser> loadedUsers = new HashSet<>();
 
     @Override
     public void onEnable() {
         instance = this;
-        cmdReg = super.getCommandHandler();
+        CrownCommandHandler cmdReg = getCommandHandler();
 
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
-
-        getServer().getPluginCommand("npcconverse").setExecutor(new ClickEventCommand());
 
         prefix = getConfig().getString("Prefix");
         userDataResetInterval = getConfig().getLong("UserDataResetInterval");
@@ -112,8 +109,8 @@ public final class FtcCore extends CrownPlugin {
         new WithdrawCommand();
         new DepositCommand();
 
-        cmdReg.registerCommand("staffchat", new StaffChatCommand());
-        cmdReg.registerTabCompleter("staffchat", new EmojiTabCompleter());
+        getCommand("staffchat").setExecutor(new StaffChatCommand());
+        getCommand("staffchat").setTabCompleter(new EmojiTabCompleter());
         cmdReg.registerCommand("staffchattoggle", new StaffChatToggleCommand());
 
         cmdReg.registerCommand("broadcast", new BroadcastCommand());
@@ -133,25 +130,59 @@ public final class FtcCore extends CrownPlugin {
         cmdReg.registerCommand("scare", new Scare());
         cmdReg.registerCommand("jingle", new Jingle());
 
-        periodicalSave();
-        clearCooldowns();
+        if(getConfig().getBoolean("System.save-periodically")) periodicalSave();
     }
 
     @Override
     public void onDisable() {
-        saveFTC();
+        if(getConfig().getBoolean("System.save-on-disable")) saveFTC();
     }
 
     //every hour it saves everything
     private void periodicalSave(){
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, FtcCore::saveFTC, 72000, 72000);
+        saver = new Timer();
+        final long interval = getConfig().getInt("System.save-interval-mins")*60*1000;
+
+        saver.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                saveFTC();
+            }
+        }, interval, interval);
     }
 
-    private void clearCooldowns(){
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, onCooldown::clear, 12000, 12000);
+    @Override
+    public void saveConfig() {
+        getInstance().getConfig().set("King", king);
+        getInstance().getConfig().set("Taxes", taxesEnabled);
+        getInstance().getConfig().set("Prefix", prefix);
+
+        super.saveConfig();
+    }
+
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+
+        prefix = getConfig().getString("Prefix");
+        discord = getConfig().getString("Discord");
+        userDataResetInterval = getConfig().getLong("UserDataResetInterval");
+        taxesEnabled = getConfig().getBoolean("Taxes");
+        maxMoneyAmount = getConfig().getInt("MaxMoneyAmount");
+
+        if(!getConfig().getString("King").contains("empty")) king = getConfig().getString("King");
+        else king = "empty"; //like my soul
+
+        if(getConfig().getBoolean("System.save-periodically")) periodicalSave();
+        else if (saver != null){
+            saver.cancel();
+            saver.purge();
+        }
     }
 
     public static void reloadFTC(){
+        getInstance().reloadConfig();
+
         getAnnouncer().reload();
         for (FtcUser data : FtcUser.loadedData){
             data.reload();
@@ -162,23 +193,13 @@ public final class FtcCore extends CrownPlugin {
             shop.reload();
         }
         getBalances().reload();
-        getInstance().maxMoneyAmount = FtcCore.getInstance().getConfig().getInt("MaxMoneyAmount");
 
         getBlackMarket().reload();
-
-        prefix = getInstance().getConfig().getString("Prefix");
-        discord = FtcCore.getInstance().getConfig().getString("Discord");
-        userDataResetInterval = getInstance().getConfig().getLong("UserDataResetInterval");
-        taxesEnabled = getInstance().getConfig().getBoolean("Taxes");
-
-        if(!getInstance().getConfig().getString("King").contains("empty")) king = getInstance().getConfig().getString("King");
-        else king = "empty"; //like my soul
     }
     public static void saveFTC(){
-        for(FtcUser data : FtcUser.loadedData){
+        for(FtcUser data : FtcUser.loadedData) {
             data.save();
         }
-        getInstance().getConfig().set("Prefix", prefix);
 
         getAnnouncer().save();
 
@@ -187,9 +208,6 @@ public final class FtcCore extends CrownPlugin {
         }
         getBalances().save();
         getBlackMarket().save();
-
-        getInstance().getConfig().set("King", king);
-        getInstance().getConfig().set("Taxes", taxesEnabled);
 
         getInstance().saveConfig();
         System.out.println("[SAVED] FtcCore saved");
@@ -234,7 +252,7 @@ public final class FtcCore extends CrownPlugin {
     }
 
     public static String getPrefix(){
-        return CrownUtils.translateHexCodes(prefix);
+        return FtcCore.translateHexCodes(prefix);
     }
 
     public static long getUserDataResetInterval(){
@@ -265,9 +283,7 @@ public final class FtcCore extends CrownPlugin {
     }
 
     //Yeah, no clue
-    @Deprecated
     public static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
-    @Deprecated
     public static String translateHexCodes (String textToTranslate) {
 
         Matcher matcher = HEX_PATTERN.matcher(textToTranslate);
@@ -292,7 +308,7 @@ public final class FtcCore extends CrownPlugin {
 
     public static String replaceEmojis(String string){ //replaces every emoji in the given string
         String message = string;
-        message = message.replaceAll(":shrug:", "¯\\\\\\_(ツ)_/¯");
+        message = message.replaceAll(":shrug:", "¯\\\\_(ツ)_/¯");
         message = message.replaceAll(":ughcry:", "(ಥ﹏ಥ)");
         message = message.replaceAll(":hug:", "༼ つ ◕_◕ ༽つ");
         message = message.replaceAll(":hugcry:", "༼ つ ಥ_ಥ ༽つ");
@@ -315,21 +331,16 @@ public final class FtcCore extends CrownPlugin {
         player.sendMessage(ChatColor.GRAY + "Do " + ChatColor.RESET + "/toggleemotes" + ChatColor.GRAY + " to enable them.");
     }
 
-    public static CrownSignShop getSignShop(Location signShop) throws Exception { //gets a signshop, throws a null exception if the shop file doesn't exist
-        for(CrownSignShop shop : CrownSignShop.loadedShops){
-            if(shop.getLocation() == signShop) return shop;
-        }
+    public static CrownSignShop getShop(Location signShop) throws Exception { //gets a signshop, throws a null exception if the shop file doesn't exist
+        for(CrownSignShop shop : loadedShops) if(shop.getLocation() == signShop) return shop;
         return new CrownSignShop(signShop);
     }
     public static CrownSignShop createSignShop(Location location, ShopType shopType, Integer price, UUID ownerUUID){ //creates a signshop
         return new CrownSignShop(location, shopType, price, ownerUUID);
     }
 
-    @Deprecated
     public static FtcUser getUser(UUID base) {
-        for (FtcUser data : FtcUser.loadedData){
-            if(base == data.getBase()) return data;
-        }
+        for (FtcUser data : loadedUsers) if(base == data.getBase()) return data;
         return new FtcUser(base);
     }
 
@@ -343,7 +354,6 @@ public final class FtcCore extends CrownPlugin {
         return toReturn;
     }
 
-    @Deprecated
     public static Integer getRandomNumberInRange(int min, int max) {
         if (min >= max) {
             return 0;
@@ -352,7 +362,6 @@ public final class FtcCore extends CrownPlugin {
         return r.nextInt((max - min) + 1) + min;
     }
 
-    @Deprecated
     public static ItemStack makeItem(Material material, int amount, boolean hideFlags, String name, String... loreStrings) {
         ItemStack result = new ItemStack(material, amount);
         ItemMeta meta = result.getItemMeta();

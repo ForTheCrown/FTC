@@ -1,5 +1,7 @@
-package net.forthecrown.core;
+package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownCommandExecutor;
+import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.CrownException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -27,7 +29,7 @@ public abstract class CrownCommand extends Command implements CrownCommandExecut
         else prefix = "ftccore";
 
         setPermission("ftc.commands." + name);
-        setPermissionMessage("&7You do not have permission to do this!");
+        setPermissionMessage("&7You do not have permission to use this command!");
     }
 
     protected Command setAliases(String... aliases) {
@@ -49,10 +51,14 @@ public abstract class CrownCommand extends Command implements CrownCommandExecut
         return super.setUsage(FtcCore.translateHexCodes(usage));
     }
 
-    protected boolean register(){
+    public boolean register(){
         CommandMap map = FtcCore.getInstance().getServer().getCommandMap();
         map.register(getName(), prefix, this);
         return super.register(map);
+    }
+
+    public boolean unregister(){
+        return super.unregister(FtcCore.getInstance().getServer().getCommandMap());
     }
 
     @Override

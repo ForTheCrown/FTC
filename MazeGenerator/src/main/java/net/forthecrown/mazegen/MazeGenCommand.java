@@ -1,6 +1,5 @@
 package net.forthecrown.mazegen;
 
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,27 +19,17 @@ public class MazeGenCommand implements CommandExecutor {
 
         if(args.length < 2){
             switch (args[0]){
-                case "pos1":
-                    Location loc = new Location(player.getWorld(), player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ());
-                    main.pos2 = loc;
-                    player.sendMessage("Pos1 set!");
-                    break;
-                case "pos2":
-                    Location loc1 = new Location(player.getWorld(), player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ());
-                    main.pos1 = loc1;
-                    player.sendMessage("Pos2 set!");
-                    break;
                 case "test":
                     main.enterEvent(player);
                     player.sendMessage("Attempting to enter event!");
                     break;
                 case "generate":
+                    main.calculateHeightWidth(Main.POS_1, Main.POS_2);
                     main.generateMaze();
-                    main.calculateHeightWidth(main.pos1, main.pos2);
-                    player.sendMessage("Starting maze generation!");
+                    player.sendMessage("Maze generation complete!");
                     break;
                 case "gamegen":
-                    main.generateIngameMaze(player);
+                    main.generateIngameMaze(null);
                     player.sendMessage("Starting ingame generation");
                     break;
                 default:

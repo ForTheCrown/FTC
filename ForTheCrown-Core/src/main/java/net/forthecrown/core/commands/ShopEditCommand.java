@@ -1,6 +1,5 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
@@ -11,7 +10,6 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
@@ -19,10 +17,12 @@ import org.bukkit.util.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShopEditCommand implements CrownCommandExecutor, TabCompleter {
+public class ShopEditCommand extends CrownCommand {
 
     public ShopEditCommand(){
-        FtcCore.getInstance().getCommandHandler().registerCommand("editshop", this, this);
+        super("editshop", FtcCore.getInstance());
+        setUsage("&7Usage: &r/editshop <price | line1 | line2 | sellamount> <value>");
+        register();
     }
 
     @Override
@@ -38,7 +38,7 @@ public class ShopEditCommand implements CrownCommandExecutor, TabCompleter {
 
         CrownSignShop shop;
         try {
-            shop = FtcCore.getSignShop(sign.getLocation());
+            shop = FtcCore.getShop(sign.getLocation());
         } catch (Exception e){
             e.printStackTrace();
             return true;
@@ -69,7 +69,7 @@ public class ShopEditCommand implements CrownCommandExecutor, TabCompleter {
 
             case "sellamount":
                 if(args.length != 2) throw new InvalidArgumentException(sender, "You must specify an amount");
-                if(shop.getExampleItem() == null) throw new InvalidCommandExecution(player, "&7This shops is non functional,&r please ask to the owner to remake it");
+                if(shop.getStock().getExampleItem() == null) throw new InvalidCommandExecution(player, "&7This shops is non functional,&r please ask to the owner to remake it");
 
                 int amount;
                 try {
@@ -78,9 +78,9 @@ public class ShopEditCommand implements CrownCommandExecutor, TabCompleter {
 
                 if(amount <= 0 || amount > 64) throw new InvalidArgumentException(sender, "The number cannot be zero or less, and cannot be larger than 64");
 
-                ItemStack item = shop.getExampleItem();
+                ItemStack item = shop.getStock().getExampleItem();
                 item.setAmount(amount);
-                shop.setExampleItem(item);
+                shop.getStock().setExampleItem(item);
                 user.sendMessage("This shop will now sell items in " + amount + " quantities");
                 break;
 
@@ -94,6 +94,7 @@ public class ShopEditCommand implements CrownCommandExecutor, TabCompleter {
 
                 shop.setPrice(newPrice);
                 shop.save();
+                shop.reload();
                 break;
 
             default: return false;
@@ -102,8 +103,7 @@ public class ShopEditCommand implements CrownCommandExecutor, TabCompleter {
         return true;
     }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public List<String> tabComplete(CommandSender sender, Command command, String alias, String[] args) {
         int argN = args.length-1;
         List<String> toReturn = new ArrayList<>();
 

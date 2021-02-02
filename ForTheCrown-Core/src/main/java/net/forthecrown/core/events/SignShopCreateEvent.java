@@ -1,16 +1,20 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
+import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.files.CrownSignShop;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Sound;
+import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -84,25 +88,38 @@ public class SignShopCreateEvent implements Listener {
     }
 
     @EventHandler
+    public void invClickEvent(InventoryClickEvent event){
+        if(event.getCurrentItem() == null) return;
+        if(!event.getView().getTitle().contains("Specify what and how much")) return;
+        if(event.getCurrentItem().getType() == Material.BARRIER) event.setCancelled(true);
+    }
+
+    @EventHandler
     public void onInventoryClose(InventoryCloseEvent event){ //sets the example item and adds the item(s) to the shop's inventory
         if(!asdasdaqsd.containsKey(event.getPlayer().getUniqueId())) return;
         if(event.getInventory().getType() != InventoryType.HOPPER) return;
         Player player = (Player) event.getPlayer();
 
-        CrownSignShop shop = asdasdaqsd.get(player.getUniqueId());
+        SignShop shop = asdasdaqsd.get(player.getUniqueId());
         asdasdaqsd.remove(player.getUniqueId());
         Sign sign = (Sign) shop.getBlock().getState();
 
         Inventory inv = event.getInventory();
-        boolean trash;
-        try{
-            trash = shop.setExampleItems(inv.getContents());
-        } catch (NullPointerException e){
-            player.sendMessage(ChatColor.RED + "The inventory was empty!");
-            sign.setLine(3, sign.getLine(3).replaceAll(":", ""));
+
+        ItemStack item = inv.getContents()[2];
+        if(item == null){
+            sign.setLine(3, ChatColor.DARK_GRAY + "Price " + ChatColor.RESET + shop.getPrice());
             sign.update();
-            return;
+            throw new CrownException(player, "&4Shop creation failed! &cNo item in the inventory");
         }
+
+        shop.getStock().setExampleItem(item);
+        Bukkit.broadcastMessage(shop.getStock().getExampleItem().toString());
+        Bukkit.broadcastMessage(shop.getStock().getContents().toString());
+    }
+}
+/*
+        boolean trash = shop.dealWithExampleItems(inv);
 
         if(!trash){
             for (ItemStack stack : inv.getContents()){
@@ -127,5 +144,4 @@ public class SignShopCreateEvent implements Listener {
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
             shop.setOutOfStock(false);
         }
-    }
-}
+ */

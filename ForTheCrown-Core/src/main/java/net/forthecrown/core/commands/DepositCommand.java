@@ -39,7 +39,7 @@ public class DepositCommand implements CrownCommandExecutor {
         amount = amount * mainItem.getAmount();
 
         Balances bals = FtcCore.getBalances();
-        bals.addBalance(player.getUniqueId(), amount, true);
+        bals.addBalance(player.getUniqueId(), amount);
         player.sendMessage(FtcCore.translateHexCodes("&7You deposited " + mainItem.getAmount() + " coins and and received &6" + amount + " Rhines"));
         player.getInventory().removeItem(mainItem);
         return true;

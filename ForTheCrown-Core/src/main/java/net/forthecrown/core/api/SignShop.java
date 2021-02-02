@@ -1,10 +1,10 @@
 package net.forthecrown.core.api;
 
 import net.forthecrown.core.enums.ShopType;
+import net.forthecrown.core.inventories.CrownShopStock;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
@@ -13,13 +13,7 @@ public interface SignShop {
 
     Inventory getShopInventory();
 
-    void setShopInventory(Inventory inventory);
-
     Inventory getExampleInventory();
-
-    boolean setExampleItems(ItemStack[] exampleItem);
-
-    ItemStack[] setItems(ItemStack[] toSet);
 
     Location getLocation();
 
@@ -41,9 +35,7 @@ public interface SignShop {
 
     void setOutOfStock(boolean outOfStock);
 
-    ItemStack getExampleItem();
-
-    void setExampleItem(ItemStack exampleItem);
-
     boolean wasDeleted();
+
+    CrownShopStock getStock();
 }

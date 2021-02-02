@@ -1,10 +1,11 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.customevents.SignShopUseEvent;
 import net.forthecrown.core.files.Balances;
-import net.forthecrown.core.files.FtcUser;
 import net.forthecrown.core.files.CrownSignShop;
+import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -17,9 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class SignShopInteractEvent implements Listener {
 
@@ -43,7 +42,7 @@ public class SignShopInteractEvent implements Listener {
 
         CrownSignShop shop;
         try {
-            shop = FtcCore.getSignShop(event.getClickedBlock().getLocation());
+            shop = FtcCore.getShop(event.getClickedBlock().getLocation());
         } catch (Exception e){
             e.printStackTrace();
             return;
@@ -65,22 +64,38 @@ public class SignShopInteractEvent implements Listener {
     }
 
     @EventHandler
-    public void onInvClose(InventoryCloseEvent event){ //items added
-        if(event.getInventory().getType() != InventoryType.CHEST) return;
-        if(!dopfguijh.containsKey(event.getPlayer().getUniqueId())) return;
+    public void onInvClose(InventoryCloseEvent event) { //items added
+        if (event.getInventory().getType() != InventoryType.CHEST) return;
+        if (!dopfguijh.containsKey(event.getPlayer().getUniqueId())) return;
         Player player = (Player) event.getPlayer();
 
         Inventory inv = event.getInventory();
-        CrownSignShop shop = dopfguijh.get(player.getUniqueId());
+        SignShop shop = dopfguijh.get(player.getUniqueId());
         dopfguijh.remove(player.getUniqueId());
-        ItemStack[] invalidItems = shop.setItems(inv.getStorageContents()); //setItems returns an array of invalid items that couldn't be added to the shop inventory
 
-        if(invalidItems != null && invalidItems.length > 0){
+        List<ItemStack> temp = new ArrayList<>();
+        for (ItemStack item : inv){
+            if(item == null) continue;
+            if(item.getType() == shop.getStock().getExampleItem().getType()) player.getInventory().addItem(item);
+
+            temp.add(item);
+        }
+
+        shop.getStock().setContents(temp);
+    }
+}
+
+/*
+        List<ItemStack> temp = Arrays.asList(inv.getStorageContents());
+        System.out.println(temp.toString());
+
+        List<ItemStack> invalidItems = shop.setItems(temp); //setItems returns an array of invalid items that couldn't be added to the shop inventory
+
+        if(invalidItems != null && invalidItems.size() > 0){
             for (ItemStack stack : invalidItems){
                 if(player.getInventory().firstEmpty() == -1) player.getLocation().getWorld().dropItemNaturally(player.getLocation(), stack);
                 else player.getInventory().addItem(stack);
             }
             player.sendMessage(FtcCore.getPrefix() + ChatColor.GRAY + "Unable to add items to shop!");
         }
-    }
-}
+ */

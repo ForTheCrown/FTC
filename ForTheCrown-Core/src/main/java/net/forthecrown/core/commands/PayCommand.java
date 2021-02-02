@@ -58,7 +58,7 @@ public class PayCommand implements CrownCommandExecutor {
         if(bals.getBalance(playerUUID) < amountToPay) throw new CannotAffordTransaction(sender);
 
         //gives money to target
-        bals.addBalance(target, amountToPay, true);
+        bals.addBalance(target, amountToPay);
 
         //removes money from player
         bals.addBalance(playerUUID, -amountToPay);

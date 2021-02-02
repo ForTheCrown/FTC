@@ -1,15 +1,14 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class StaffChatCommand implements CrownCommandExecutor {
+public class StaffChatCommand implements CommandExecutor {
 
     /*
      * ----------------------------------------
@@ -32,21 +31,20 @@ public class StaffChatCommand implements CrownCommandExecutor {
      */
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         String staffPrefix = ChatColor.DARK_GRAY + "[Staff] ";
-        String message = staffPrefix + ChatColor.GRAY + "%SENDER%"  + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + "%MESSAGE%";
+        String message = staffPrefix + ChatColor.GRAY + "%SENDER%"  + ChatColor.GRAY + ChatColor.BOLD + " >" + ChatColor.RESET + " ";
 
         if(args.length < 1) return false;
 
         String initialMmg = String.join(" ", args);
 
-        initialMmg = CrownUtils.translateHexCodes(FtcCore.replaceEmojis(initialMmg).replace("\\", "\\\\"));
-        message = message.replaceAll("%MESSAGE%", initialMmg);
+        initialMmg = FtcCore.translateHexCodes(FtcCore.replaceEmojis(initialMmg).replace("\\", "\\\\"));
 
         if(sender instanceof Player) message = message.replaceAll("%SENDER%", sender.getName());
         else message = message.replaceAll("%SENDER%", "Console");
 
-        for (Player p : Bukkit.getOnlinePlayers()){ if(p.hasPermission("ftc.staffchat")) p.sendMessage(message); }
+        for (Player p : Bukkit.getOnlinePlayers()){ if(p.hasPermission("ftc.staffchat")) p.sendMessage(message + initialMmg); }
         return true;
     }
 }

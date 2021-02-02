@@ -3,6 +3,7 @@ version: @version@
 main: net.forthecrown.core.FtcCore
 api-version: 1.16
 authors: [ Botul, Wout ]
+prefix: ftccore
 loadbefore:
   - Essentials
   - OpenInv
@@ -34,14 +35,12 @@ commands:
     permission-message: You do not have permission to use this!
     aliases:
       - tpa
-    usage: '§7Usage:§r /tpa <player>'
   tpaskhere:
     description: Asks a player to teleport to them.
     permission: ftc.tpahere
     permission-message: You do not have permission to use this!
     aliases:
       - tpahere
-    usage: '§7Usage:§r /tpahere <player>'
   discord:
     description: Gives you the servers discord link.
   findpost:
@@ -146,17 +145,11 @@ commands:
       - ranks
       - rankgui
       - rankui
-  npcconverse:
-    description: 'The Command used by the ClickEventApi execute code ran by clickable text'
   kingmaker:
     usage: '§7Usage:§r /kingmaker <remove | player> [king | queen]'
     permission: ftc.admin.ranks
     permission-message: You do not have permission to use this!
     description: 'This command is used to assign and unassign a king or queen'
-  editshop:
-    permission: ftc.shop.edit
-    permission-message: You do not have permission to use this!
-    usage: 'Usage: /editshop <bruh moment>'
   deposit:
     permission: ftc.deposit
     aliases:

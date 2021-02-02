@@ -97,4 +97,6 @@ public interface CrownUser extends MessageCommandSender {
     void clearTabPrefix();
 
     boolean isOnline();
+
+
 }

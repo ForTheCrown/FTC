@@ -1,7 +1,7 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.exceptions.InvalidCommandExecution;
+import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.files.CrownSignShop;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Sign;
@@ -20,15 +20,15 @@ public class SignShopDestroyEvent implements Listener {
 
         CrownSignShop shop;
         try {
-            shop = FtcCore.getSignShop(event.getBlock().getLocation());
+            shop = FtcCore.getShop(event.getBlock().getLocation());
         } catch (Exception e){
             e.printStackTrace();
             return;
         }
 
-        if(!shop.getOwner().equals(event.getPlayer().getUniqueId())){
+        if(!shop.getOwner().equals(event.getPlayer().getUniqueId()) && !event.getPlayer().hasPermission("ftc.admin")){
             event.setCancelled(true);
-            throw new InvalidCommandExecution(event.getPlayer(), "&cYou cannot destroy a sign you do not own!");
+            throw new CrownException(event.getPlayer(), "&cYou cannot destroy a shop you do not own!");
         }
 
         shop.destroyShop(); //destroys the shop

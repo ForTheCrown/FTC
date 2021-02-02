@@ -61,11 +61,13 @@ public class SignShopUseEvent extends Event implements Cancellable {
     }
 
     public void addOwnerBalance(Integer amount){
-        bals.addBalance(shop.getOwner(), amount, true);
+        if(!getCustomer().getBase().equals(getOwner().getBase())) bals.addBalance(getOwner().getBase(), amount, true);
+        else bals.addBalance(shop.getOwner(), amount);
     }
 
     public void addCustomerBalance(Integer amount){
-        bals.addBalance(customer.getBase(), amount, true);
+        if(!getCustomer().getBase().equals(getOwner().getBase())) bals.addBalance(getCustomer().getBase(), amount, true);
+        else bals.addBalance(getCustomer().getBase(), amount);
     }
 
     public FtcUser getOwner(){

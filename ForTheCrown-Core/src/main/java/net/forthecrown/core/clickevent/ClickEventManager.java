@@ -5,12 +5,16 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public final class ClickEventManager {
 
     private static final Map<String, ClickEventTask> registeredClickEvents = new HashMap<>();
     private static final Set<Player> allowedToUseCommand = new HashSet<>();
+    private static final ClickEventCommand CLICK_COMMAND = new ClickEventCommand();
 
     private ClickEventManager(){
     }
@@ -51,8 +55,15 @@ public final class ClickEventManager {
         if(allow){
             if(allowedToUseCommand.contains(player)) return;
             allowedToUseCommand.add(player);
-            Bukkit.getScheduler().runTaskLater(FtcCore.getInstance(), () -> allowedToUseCommand.remove(player), 60*20); //automatically makes it so you can't use the NPC command after a minute
-        } else allowedToUseCommand.remove(player);
+            CLICK_COMMAND.register();
+            Bukkit.getScheduler().runTaskLater(FtcCore.getInstance(), () -> {
+                allowedToUseCommand.remove(player);
+                CLICK_COMMAND.unregister();
+            }, 60*20); //automatically makes it so you can't use the NPC command after a minute
+        } else{
+            allowedToUseCommand.remove(player);
+            CLICK_COMMAND.unregister();
+        }
     }
 
     public static String getClickEventCommand(String id, String... args){

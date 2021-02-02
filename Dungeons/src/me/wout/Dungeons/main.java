@@ -11,7 +11,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.files.FtcUser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

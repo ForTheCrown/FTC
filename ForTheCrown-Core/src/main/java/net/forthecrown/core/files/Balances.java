@@ -3,11 +3,7 @@ package net.forthecrown.core.files;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -22,8 +18,7 @@ public class Balances extends FtcFileManager {
 
         startRhines = FtcCore.getInstance().getConfig().getInt("StartRhines");
 
-        if(legacyFileExists()) convertFromLegacy();
-        else reload();
+        reload();
     }
 
     @Override
@@ -101,33 +96,5 @@ public class Balances extends FtcFileManager {
         int percent = (int) (FtcCore.getUser(uuid).getTotalEarnings() / 50000 * 10);
         if(percent >= 30) return 50;
         return percent;
-    }
-
-
-    private void convertFromLegacy(){ //this actually works :D
-        File oldFile = new File("plugins/ShopsReworked/PlayerBalances.yml");
-        if(!oldFile.exists()) return;
-
-        FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(oldFile);
-        ConfigurationSection oldDataSection = fileConfig.getConfigurationSection("PlayerData");
-
-        for(String s : oldDataSection.getKeys(true)) {
-            UUID id;
-            try {
-                id = UUID.fromString(s);
-            } catch (Exception e){
-                continue;
-            }
-
-            if(oldDataSection.getInt(s) > startRhines) balanceMap.put(id, oldDataSection.getInt(s));
-        }
-        save();
-
-        oldFile.delete();
-    }
-
-    private boolean legacyFileExists(){
-        File oldFile = new File("plugins/ShopsReworked/PlayerBalances.yml");
-        return oldFile.exists();
     }
 }

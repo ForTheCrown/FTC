@@ -1,14 +1,11 @@
 package net.forthecrown.core.events;
 
-import net.forthecrown.core.CrownBlackMarket;
+import net.forthecrown.core.files.CrownBlackMarket;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
-import net.forthecrown.core.exceptions.CannotAffordTransaction;
-import net.forthecrown.core.exceptions.InvalidBranchException;
-import net.forthecrown.core.exceptions.InvalidCommandExecution;
-import net.forthecrown.core.exceptions.NoRankException;
+import net.forthecrown.core.exceptions.*;
 import net.forthecrown.core.files.Balances;
 import net.forthecrown.core.files.FtcUser;
 import org.bukkit.ChatColor;
@@ -35,6 +32,7 @@ public class BlackMarketEvents implements Listener {
         if(event.getHand() != EquipmentSlot.HAND) return;
         Villager villie = (Villager) event.getRightClicked();
         if(!villie.isInvulnerable()) return;
+        if(villie.getCustomName() == null) return;
         if(!villie.getCustomName().contains("George") && !villie.getCustomName().contains("Otto") && !villie.getCustomName().contains("Herbert") &&
                 !villie.getCustomName().contains("Edward") && !villie.getCustomName().contains("Ramun")) return;
 
@@ -47,13 +45,14 @@ public class BlackMarketEvents implements Listener {
         CrownBlackMarket bm = FtcCore.getBlackMarket();
         FtcUser user = FtcCore.getUser(player.getUniqueId());
 
-        if(user.getBranch() != Branch.PIRATES) throw new InvalidBranchException(player, "Pirate");
+        if(user.getBranch() != Branch.PIRATES) throw new CrownException(player, villie.getCustomName() + " only trusts real pirates");
+
         if(villie.getCustomName().contains("George")) player.openInventory(bm.getMiningInventory(user));
         else if(villie.getCustomName().contains("Otto")) player.openInventory(bm.getDropInventory(user));
         else if(villie.getCustomName().contains("Herbert")) player.openInventory(bm.getFarmingInventory(user));
         else if(villie.getCustomName().contains("Edward")){
-            if(!bm.isAllowedToBuyEnchant(player)) throw new InvalidCommandExecution(player, "-&eYou've already purchased from me today, scram!&r-");
-            if(!bm.enchantAvailable()) throw new InvalidCommandExecution(player, "-&eUnfortunately, my good sir, I don't have anything to sell you at this moment&r-");
+            if(!bm.isAllowedToBuyEnchant(player)) throw new CrownException(player, "-&eYou've already purchased from me today, scram!&r-");
+            if(!bm.enchantAvailable()) throw new CrownException(player, "-&eUnfortunately, my good sir, I don't have anything to sell you at this moment&r-");
             player.openInventory(bm.getEnchantInventory());
         }
         else if(villie.getCustomName().contains("Ramun")) player.openInventory(bm.getParrotInventory());

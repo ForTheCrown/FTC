@@ -31,7 +31,8 @@ public abstract class CrownPlugin extends JavaPlugin  {
     //This method should only get called if a command has no set executor
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return handler.executeCommand(command, sender, label, args);
+        if(handler.getRegisteredCommands().containsKey(command.getName())) return handler.executeCommand(command, sender, label, args);
+        return true;
     }
 
     public void registerCommand(String command, CrownCommandExecutor executor){

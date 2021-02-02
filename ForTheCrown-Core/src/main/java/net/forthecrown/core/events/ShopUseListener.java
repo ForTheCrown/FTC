@@ -25,18 +25,17 @@ public class ShopUseListener implements Listener {
         CrownSignShop shop = event.getShop();
         FtcUser customer = event.getCustomer();
 
-        if(shop.getExampleItem() == null){
+        if(shop.getStock().getExampleItem() == null){
             if(shop.getShopInventory().getContents()[0] == null) shop.setOutOfStock(true);
             throw new InvalidCommandExecution(customer, "&7This shops is non functional,&r please ask to the owner to remake it");
         }
 
         Inventory playerInv = player.getInventory();
-        Inventory shopInv = shop.getShopInventory();
 
         boolean shopHasSpace = shop.getShopInventory().firstEmpty() != -1;
         boolean customerHasSpace = playerInv.firstEmpty() != -1;
 
-        int tempInt = shop.getExampleItem().getAmount();
+        int tempInt = shop.getStock().getExampleItem().getAmount();
 
         //Some of these if statements overlap, but for a reason
         switch (shop.getType()){
@@ -58,7 +57,8 @@ public class ShopUseListener implements Listener {
                 }
 
                 //this is basically the same thing in the SellShopEvents class, but worse lol
-                for(ItemStack stack : shopInv){ //loops through the shop's inventory and removes the equivalent amount of items as dictated by the exampleItem in signShop
+                /*
+                 for(ItemStack stack : shopInv){ //loops through the shop's inventory and removes the equivalent amount of items as dictated by the exampleItem in signShop
                     if(stack == null) continue;
                     if(stack.getType() != shop.getExampleItem().getType()) continue;
                     if(tempInt == 0) break;
@@ -75,25 +75,30 @@ public class ShopUseListener implements Listener {
                         shopInv.remove(stack);
                     }
                 }
+
                 if(tempInt != 0){ //if there isn't enough items in the shop's inventory
                     customer.sendMessage("&7The Shop does not have enough stock");
                     shop.setOutOfStock(true);
                     event.setCancelled(true);
                     return;
-                }
-                if(isInvEmpty(shopInv)) shop.setOutOfStock(true); //if the inv is now empty, set it to be out of stock, dw setOutOfStock checks if the type is admin shop or not
+                }*/
 
-                shop.setShopInventory(shopInv); //sets the changed inventory to be the shops inventory
+                if(shop.getStock().containsExampleItem()){
+                    shop.getStock().removeExampleItemAmount();
+                }
+
+                if(shop.getStock().getContents().isEmpty()) shop.setOutOfStock(true);
+                //shop.setShopInventory(shopInv); //sets the changed inventory to be the shops inventory
                 event.addOwnerBalance(shop.getPrice());
 
                 try { //tries telling the owner someone bought from them, if they're online
                     final String longAF = ChatColor.GOLD + player.getName() +
                             ChatColor.GRAY + " bought " +
-                            ChatColor.YELLOW + shop.getExampleItem().getAmount() + " " +
-                            shop.getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
+                            ChatColor.YELLOW + shop.getStock().getExampleItem().getAmount() + " " +
+                            shop.getStock().getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
                             ChatColor.GRAY + " from you for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
 
-                    Bukkit.getPlayer(shop.getOwner()).sendMessage(longAF);
+                    event.getOwner().sendMessage(longAF);
                 } catch (Exception ignored){}
 
             case ADMIN_BUY_SHOP: //This has some of the same if statements as the last case, but if they overlap, it has to happen, don't know how to do it better
@@ -108,13 +113,13 @@ public class ShopUseListener implements Listener {
                     return;
                 }
 
-                playerInv.addItem(shop.getExampleItem().clone()); //adds the item to player's inventory
+                playerInv.addItem(shop.getStock().getExampleItem().clone()); //adds the item to player's inventory
 
                 event.setCustomerBalance(event.getCustomerBalance() - shop.getPrice());
 
                 String customerMsg1 = ChatColor.GRAY + "You bought " +
-                        ChatColor.YELLOW + shop.getExampleItem().getAmount() + " " +
-                        shop.getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
+                        ChatColor.YELLOW + shop.getStock().getExampleItem().getAmount() + " " +
+                        shop.getStock().getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
                         ChatColor.GRAY + " for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
 
                 player.sendMessage(customerMsg1);
@@ -144,8 +149,8 @@ public class ShopUseListener implements Listener {
                 List<ItemStack> toRemove = new ArrayList<>(); //honestly, this was the only way I could do this without modifying the players inv in realtime and then seeing they didn't have enough items
                 for(ItemStack stack : playerContents){
                     if(stack == null) continue;
-                    if(stack.getType() != shop.getExampleItem().getType()) continue;
-                    if(!stack.getItemMeta().getDisplayName().contains(shop.getExampleItem().getItemMeta().getDisplayName())) continue;
+                    if(stack.getType() != shop.getStock().getExampleItem().getType()) continue;
+                    if(!stack.getItemMeta().getDisplayName().contains(shop.getStock().getExampleItem().getItemMeta().getDisplayName())) continue;
 
                     if(stack.getAmount() >= tempInt){
                         stack.setAmount(stack.getAmount() - tempInt);
@@ -170,22 +175,19 @@ public class ShopUseListener implements Listener {
                 }
 
                 final String customerMsg = ChatColor.GRAY + "You sold " +
-                        ChatColor.YELLOW + shop.getExampleItem().getAmount() + " " +
-                        shop.getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
+                        ChatColor.YELLOW + shop.getStock().getExampleItem().getAmount() + " " +
+                        shop.getStock().getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
                         ChatColor.GRAY + " for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
 
                 player.sendMessage(customerMsg);
 
                 if(shop.getType() == ShopType.SELL_SHOP) {
                     event.setOwnerBalance(event.getOwnerBalance() - shop.getPrice());
-
-                    Inventory inv = shop.getShopInventory();
-                    inv.addItem(shop.getExampleItem().clone());
-                    shop.setShopInventory(inv);
+                    shop.getStock().add(shop.getStock().getExampleItem());
 
                     try {
                         final String loooonnng = ChatColor.GOLD + player.getName() + ChatColor.GRAY +
-                                " sold " + ChatColor.YELLOW + shop.getExampleItem().getAmount() + " " + shop.getExampleItem().getType().toString().replaceAll("_", " ").toLowerCase() +
+                                " sold " + ChatColor.YELLOW + shop.getStock().getExampleItem().getAmount() + " " + shop.getStock().getExampleItem().getType().toString().replaceAll("_", " ").toLowerCase() +
                                 ChatColor.GRAY + " to you for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
 
                         Bukkit.getPlayer(shop.getOwner()).sendMessage(loooonnng);

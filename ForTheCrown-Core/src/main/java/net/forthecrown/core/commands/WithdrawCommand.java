@@ -1,7 +1,7 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.CrownCommandExecutor;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.CrownItems;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
@@ -44,7 +44,7 @@ public class WithdrawCommand implements TabCompleter, CrownCommandExecutor {
         if(player.getInventory().firstEmpty() == -1) throw new InvalidCommandExecution(player, "&cYour inventory is full! &7No space for the coin");
 
         bals.setBalance(player.getUniqueId(), bals.getBalance(player.getUniqueId()) - amount);
-        player.getInventory().setItem(player.getInventory().firstEmpty(), CrownUtils.getCoins(amount));
+        player.getInventory().setItem(player.getInventory().firstEmpty(), CrownItems.getCoins(amount));
         return true;
     }
 

@@ -38,6 +38,10 @@ public class CoreCommand implements CrownCommandExecutor, TabCompleter {
 
                 switch (args[1]){
                     default: return false;
+                    case "config":
+                        FtcCore.getInstance().saveConfig();
+                        sender.sendMessage("Main config has been saved");
+                        return true;
 
                     case "balances":
                         FtcCore.getBalances().save();
@@ -82,6 +86,11 @@ public class CoreCommand implements CrownCommandExecutor, TabCompleter {
 
                 switch (args[1]){
                     default: return false;
+
+                    case "config":
+                        FtcCore.getInstance().reloadConfig();
+                        sender.sendMessage("Main config has been reloaded");
+                        return true;
 
                     case "balances":
                         FtcCore.getBalances().reload();
@@ -238,6 +247,7 @@ public class CoreCommand implements CrownCommandExecutor, TabCompleter {
                     argList.add("users");
                     argList.add("signshops");
                     argList.add("blackmarket");
+                    argList.add("config");
                     break;
                 case "announcer":
                     argList.add("stop");

@@ -1,9 +1,13 @@
 package net.forthecrown.core.files;
 
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
+import net.forthecrown.core.inventories.CrownShopStock;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -16,26 +20,21 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.*;
 
-public class CrownSignShop extends FtcFileManager {
+public class CrownSignShop extends FtcFileManager implements SignShop {
 
     private final Location location;
     private final Block block;
     private final String fileName;
+    private boolean wasDeleted = false;
 
     private UUID owner;
     private Integer price;
     private ShopType type;
     private boolean outOfStock;
-    private ItemStack exampleItem;
-    private Inventory shopInv;
-    private List<ItemStack> contents = new ArrayList<>();
-
-    public static final Set<CrownSignShop> loadedShops = new HashSet<>();
-
-    private boolean wasDeleted = false;
+    private final CrownShopStock stock;
 
     //used by getSignShop
-    public CrownSignShop(Location signBlock) throws Exception {
+    public CrownSignShop(Location signBlock) throws NullPointerException {
         super(signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ(), "shopdata");
         this.fileName = signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ();
 
@@ -49,7 +48,9 @@ public class CrownSignShop extends FtcFileManager {
         this.location = signBlock;
         this.block = signBlock.getBlock();
 
-        loadedShops.add(this);
+        stock = new CrownShopStock(this);
+
+        FtcCore.loadedShops.add(this);
         if (legacyFileExists()) convertLegacy();
         else reload();
     }
@@ -73,8 +74,8 @@ public class CrownSignShop extends FtcFileManager {
         getFile().options().copyDefaults(true);
         super.save();
 
-        loadedShops.add(this);
-        initInv();
+        stock = new CrownShopStock(this);
+        FtcCore.loadedShops.add(this);
     }
 
     public void save() {
@@ -83,15 +84,9 @@ public class CrownSignShop extends FtcFileManager {
         getFile().set("Location", getLocation());
         getFile().set("Type", getType().toString());
         getFile().set("Price", getPrice());
-        getFile().set("ExampleItem", getExampleItem());
-
-        List<ItemStack> tempList = new ArrayList<>();
-        for(ItemStack stack : getShopInventory().getContents()){
-            if(stack == null) continue;
-            tempList.add(stack);
-        }
-
-        getFile().set("ItemList", tempList);
+        getFile().set("ExampleItem", getStock().getExampleItem());
+        getFile().set("OutOfStock", isOutOfStock());
+        getFile().set("ItemList", getStock().getContents());
 
         super.save();
     }
@@ -102,52 +97,57 @@ public class CrownSignShop extends FtcFileManager {
         setOwner(UUID.fromString(getFile().getString("Owner")));
         setType(ShopType.valueOf(getFile().getString("Type")));
         setPrice(getFile().getInt("Price"));
+        if(getFile().get("GetOutOfStock") != null) setOutOfStock(getFile().getBoolean("OutOfStock"));
 
-        ItemStack exItem;
         try{
-            contents = (List<ItemStack>) getFile().getList("ItemList");
-            exItem = getFile().getItemStack("ExampleItem");
+            stock.setContents((List<ItemStack>) getFile().getList("ItemList"));
+            getStock().setExampleItem(getFile().getItemStack("ExampleItem"));
 
-            if(contents.size() > 0) setOutOfStock(false);
+            if(stock.getContents().size() > 0) setOutOfStock(false);
         } catch (IndexOutOfBoundsException e){
-            contents = new ArrayList<>();
-            exItem = null;
+            stock.setContents(new ArrayList<>());
             setOutOfStock(true);
         }
-        setExampleItem(exItem);
 
         Sign sign = (Sign) getBlock().getState();
         sign.setLine(3, ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + getPrice());
         sign.update();
-
-        initInv();
     }
 
     public void destroyShop() {
-        if(contents.size() > 0) {
-            for (ItemStack stack : getShopInventory()) if(stack != null) location.getWorld().dropItemNaturally(location, stack);
+        if(stock.getContents().size() > 0) {
+            for (ItemStack stack : stock.getContents()){ location.getWorld().dropItemNaturally(location, stack); }
             location.getWorld().spawnParticle(Particle.CLOUD, location.add(0.5, 0.5, 0.5), 5, 0.1D, 0.1D, 0.1D, 0.05D);
         }
 
         super.delete();
         wasDeleted = true;
-        loadedShops.remove(this);
+        FtcCore.loadedShops.remove(this);
     }
 
     public Inventory getShopInventory(){
-        return shopInv;
-    }
-    public void setShopInventory(Inventory inventory){
-        shopInv = inventory;
+        Bukkit.broadcastMessage(stock.getContents().toString());
+        Inventory shopInv = Bukkit.createInventory(null, 27, "Shop Contents");
+        int i = 0;
+        for (ItemStack item : stock.getContents()){
+            shopInv.setItem(i, item);
+            i++;
+        }
 
-        save();
-        reload();
+        return shopInv;
     }
 
     public Inventory getExampleInventory(){
-        return Bukkit.createInventory(null, InventoryType.HOPPER, "Specify what to sell and how much");
+        Inventory inv = Bukkit.createInventory(null, InventoryType.HOPPER, "Specify what and how much");
+        inv.setItem(0, FtcCore.makeItem(Material.BARRIER, 1, true, "&7-"));
+        inv.setItem(1, FtcCore.makeItem(Material.BARRIER, 1, true, "&7-"));
+        inv.setItem(3, FtcCore.makeItem(Material.BARRIER, 1, true, "&7-"));
+        inv.setItem(4, FtcCore.makeItem(Material.BARRIER, 1, true, "&7-"));
+
+        return inv;
     }
 
+/*
     public boolean setExampleItems(ItemStack[] exampleItem){
         ItemStack item = null;
         for(ItemStack stack : exampleItem){
@@ -158,9 +158,7 @@ public class CrownSignShop extends FtcFileManager {
         if(item == null) throw new NullPointerException();
         setExampleItem(item);
 
-        Inventory inv = getShopInventory();
-        inv.addItem(item);
-        setShopInventory(inv);
+        stock.add(item);
 
         setOutOfStock(false);
         save();
@@ -172,28 +170,21 @@ public class CrownSignShop extends FtcFileManager {
         if(toSet.length > 27) return null;
         if(getExampleItem() == null) setExampleItem(toSet[0]);
 
-        int i = 0;
         for(ItemStack stack : toSet){
             if(stack == null) continue;
             if(stack.getType() != getExampleItem().getType()) {
                 toReturn.add(stack);
                 continue;
             }
-            getShopInventory().setItem(i, stack);
+            stock.add(stack);
             setOutOfStock(false);
-            i++;
         }
-
-        for (int a = i; a < getShopInventory().getSize(); a++){
-            getShopInventory().setItem(a, null);
-        }
-
-        save();
 
         ItemStack[] asd = new ItemStack[toReturn.size()];
         toReturn.toArray(asd);
         return asd;
     }
+ */
 
     public Location getLocation() {
         return location;
@@ -217,7 +208,6 @@ public class CrownSignShop extends FtcFileManager {
 
     public void setType(ShopType shopType) {
         this.type = shopType;
-        initInv();
     }
 
     public Integer getPrice() {
@@ -244,42 +234,12 @@ public class CrownSignShop extends FtcFileManager {
         sign.update(true);
     }
 
-    public ItemStack getExampleItem() {
-        return exampleItem;
-    }
-
-    public void setExampleItem(ItemStack exampleItem) {
-        this.exampleItem = exampleItem;
-    }
-
     public boolean wasDeleted(){
         return wasDeleted;
     }
 
-    public boolean isInventoryEmpty(){
-        for (ItemStack stack : getShopInventory()){
-            if(stack != null) return false;
-        }
-        return true;
-    }
-
-    public boolean isInventoryFull(){
-        return getShopInventory().firstEmpty() == -1;
-    }
-
-
-
-
-
-    private void initInv(){
-        shopInv = Bukkit.createInventory(null, 27, "Shop contents:");
-
-        if(contents.size() > 0){
-            for(ItemStack stack : contents){
-                if(shopInv.firstEmpty() == -1) break;
-                shopInv.addItem(stack);
-            }
-        }
+    public CrownShopStock getStock() {
+        return stock;
     }
 
     private boolean legacyFileExists() {
@@ -315,22 +275,21 @@ public class CrownSignShop extends FtcFileManager {
             }
         } else setOutOfStock(true);
 
-        contents = tempList;
-        initInv();
+        stock.setContents(tempList);
 
-        if(oldConfig.getItemStack("Inventory.shop") != null) setExampleItem(oldConfig.getItemStack("Inventory.shop"));
-        else if (0 < contents.size()) setExampleItem(contents.get(0));
+        if(oldConfig.getItemStack("Inventory.shop") != null) getStock().setExampleItem(oldConfig.getItemStack("Inventory.shop"));
+        else if (0 < stock.getContents().size()) getStock().setExampleItem(stock.getContents().get(0));
 
         if(oldConfig.getItemStack("Inventory.shop") == null){
             try {
-                ItemStack stack = getExampleItem();
+                ItemStack stack = getStock().getExampleItem();
                 stack.setAmount(Integer.parseInt(ChatColor.stripColor(sign.getLine(1)).replaceAll("[\\D]", "")));
-                setExampleItem(stack);
+                stock.setExampleItem(stack);
             } catch (Exception e){
                 try {
-                    ItemStack stack = getExampleItem();
+                    ItemStack stack = getStock().getExampleItem();
                     stack.setAmount(Integer.parseInt(ChatColor.stripColor(sign.getLine(1)).replaceAll("[\\D]", "")));
-                    setExampleItem(stack);
+                    getStock().setExampleItem(stack);
                 } catch (Exception ignored) {}
             }
         }

@@ -16,6 +16,13 @@ import org.bukkit.entity.Player;
 
 public class Bonk implements CrownCommandExecutor {
 
+    /*public Bonk(){
+        super("bonk");
+
+        setPermission("ftc.emotes.bonk");
+        register();
+    }*/
+
     /*
      * ----------------------------------------
      * 			Command description:

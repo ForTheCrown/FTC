@@ -1,7 +1,7 @@
-package net.forthecrown.core;
+package net.forthecrown.core.files;
 
 import com.google.common.base.Charsets;
-import net.forthecrown.core.files.FtcUser;
+import net.forthecrown.core.FtcCore;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -46,7 +46,6 @@ public class CrownBlackMarket {
     private final Set<UUID> boughtEnchant = new HashSet<>();
 
     public CrownBlackMarket(){
-
         file = new File(FtcCore.getInstance().getDataFolder(), "blackmarket.yml");
         if(!file.exists()){
             try {

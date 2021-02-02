@@ -1,14 +1,11 @@
 package net.forthecrown.core.files;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Particle;
-import org.bukkit.command.MessageCommandSender;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -22,10 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class FtcUser extends FtcFileManager implements MessageCommandSender {
-
-    public static final Set<FtcUser> loadedData = new HashSet<>();
-
+public class FtcUser extends FtcFileManager implements CrownUser {
     private final UUID base;
 
     //Already in the file, added by Wout
@@ -50,15 +44,6 @@ public class FtcUser extends FtcFileManager implements MessageCommandSender {
     private long totalEarnings;
     private long nextResetTime;
 
-    /**
-    private FtcUser lastMessanger;
-    private boolean isMuted;
-    private boolean isSoftMuted;
-
-     private long timeUntilUnmute;
-     */
-
-
     public FtcUser(UUID base){
         super(base.toString(), "playerdata");
         this.base = base;
@@ -68,7 +53,7 @@ public class FtcUser extends FtcFileManager implements MessageCommandSender {
         if(legacyDataExists()) convertLegacy();
         if(shouldResetEarnings()) resetEarnings();
 
-        loadedData.add(this);
+        FtcCore.loadedUsers.add(this);
         permsCheck();
     }
 
@@ -179,7 +164,7 @@ public class FtcUser extends FtcFileManager implements MessageCommandSender {
             Map<String, Integer> tempMap = new HashMap<>();
 
             for (Material mat : getItemPrices().keySet()){
-                tempMap.put(mat.toString(), getItemPrice(mat));
+                if(!getItemPrice(mat).equals(FtcCore.getInstance().getItemPrice(mat))) tempMap.put(mat.toString(), getItemPrice(mat));
             }
             getFile().createSection("ItemPrices", tempMap);
         }
@@ -199,9 +184,10 @@ public class FtcUser extends FtcFileManager implements MessageCommandSender {
 
     public void unload(){
         save();
-        loadedData.remove(this);
+        FtcCore.loadedUsers.remove(this);
     }
 
+    @Override
     public int configurePriceForItem(Material item){
         int startPrice = FtcCore.getInstance().getItemPrice(item);
         int amountEarned1 = getAmountEarned(item);
@@ -212,114 +198,148 @@ public class FtcUser extends FtcFileManager implements MessageCommandSender {
     }
 
 
+    @Override
     public UUID getBase(){
         return base;
     }
 
+    @Override
     public Player getPlayer(){
         return Bukkit.getPlayer(getBase());
     }
 
+    @Override
     public OfflinePlayer getOfflinePlayer(){
         return Bukkit.getOfflinePlayerIfCached(getName());
     }
 
+    @Override
     public Set<Rank> getAvailableRanks(){
         return ranks;
     }
+
+    @Override
     public void setAvailableRanks(Set<Rank> ranks){
         this.ranks = ranks;
     }
 
+    @Override
     public boolean hasRank(Rank rank){
         return getAvailableRanks().contains(rank);
     }
 
+    @Override
     public void addRank(Rank rank){
         ranks.add(rank);
     }
+    @Override
     public void removeRank(Rank rank){
         if(hasRank(rank)) ranks.remove(rank);
     }
 
+    @Override
     public Rank getRank(){
         return currentRank;
     }
+    @Override
     public void setRank(Rank rank){
         setRank(rank, true);
     }
 
+    @Override
     public void setRank(Rank rank, boolean setPrefix){
         currentRank = rank;
 
         if(setPrefix) setTabPrefix(rank.getColorlessPrefix());
     }
 
+    @Override
     public boolean getCanSwapBranch() {
         return canSwapBranch;
     }
+
+    @Override
     public void setCanSwapBranch(boolean canSwapBranch) {
         this.canSwapBranch = canSwapBranch;
     }
 
+    @Override
     public List<String> getPets() {
         return pets;
     }
+
+    @Override
     public void setPets(List<String> pets) {
         this.pets = pets;
     }
 
+    @Override
     public Particle getArrowParticle() {
         return particleArrowActive;
     }
+    @Override
     public void setArrowParticle(Particle particleArrowActive) {
         this.particleArrowActive = particleArrowActive;
     }
 
+    @Override
     public List<Particle> getParticleArrowAvailable() {
         return particleArrowAvailable;
     }
+    @Override
     public void setParticleArrowAvailable(List<Particle> particleArrowAvailable) {
         this.particleArrowAvailable = particleArrowAvailable;
     }
 
+    @Override
     public String getDeathParticle() {
         return particleDeathActive;
     }
+    @Override
     public void setDeathParticle(String particleDeathActive) {
         this.particleDeathActive = particleDeathActive;
     }
 
+    @Override
     public List<String> getParticleDeathAvailable() {
         return particleDeathAvailable;
     }
+    @Override
     public void setParticleDeathAvailable(List<String> particleDeathAvailable) {
         this.particleDeathAvailable = particleDeathAvailable;
     }
+    @Override
     public boolean allowsRidingPlayers() {
         return allowsRidingPlayers;
     }
+    @Override
     public void setAllowsRidingPlayers(boolean allowsRidingPlayers) {
         this.allowsRidingPlayers = allowsRidingPlayers;
     }
 
+    @Override
     public int getGems() {
         return gems;
     }
+    @Override
     public void setGems(int gems) {
         this.gems = gems;
     }
+    @Override
     public void addGems(int gems){
         this.gems += gems;
     }
 
+    @Override
     public boolean allowsEmotes() {
         return allowsEmotes;
     }
+    @Override
     public void setAllowsEmotes(boolean allowsEmotes) {
         this.allowsEmotes = allowsEmotes;
     }
 
+    @Override
     public Integer getItemPrice(Material item){
         int i;
         try {
@@ -329,17 +349,21 @@ public class FtcUser extends FtcFileManager implements MessageCommandSender {
         }
         return i;
     }
+    @Override
     public void setItemPrice(Material item, int price){
         itemPrices.put(item, price);
     }
 
+    @Override
     public Map<Material, Integer> getItemPrices() {
         return itemPrices;
     }
+    @Override
     public void setItemPrices(@Nonnull Map<Material, Integer> itemPrices) {
         this.itemPrices = itemPrices;
     }
 
+    @Override
     public Integer getAmountEarned(Material material){
         int i;
         try {
@@ -349,23 +373,28 @@ public class FtcUser extends FtcFileManager implements MessageCommandSender {
         }
         return i;
     }
+    @Override
     public void setAmountEarned(Material material, Integer amount){
         amountEarned.put(material, amount);
 
         setItemPrice(material, configurePriceForItem(material));
     }
 
+    @Override
     public Map<Material, Integer> getAmountEarnedMap() {
         return amountEarned;
     }
+    @Override
     public void setAmountEarnedMap(@Nonnull Map<Material, Integer> amountSold) {
         this.amountEarned = amountSold;
     }
 
+    @Override
     public boolean isBaron() {
-        Score score = getPlayer().getScoreboard().getObjective("Baron").getScore(getName());
+        Score score = FtcCore.getInstance().getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName());
         return score.isScoreSet() && score.getScore() == 1;
     }
+    @Override
     public void setBaron(boolean baron) {
         int yayNay = baron ? 1 : 0;
         FtcCore.getInstance().getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName()).setScore(yayNay);
@@ -379,31 +408,39 @@ public class FtcUser extends FtcFileManager implements MessageCommandSender {
         }
     }
 
+    @Override
     public SellAmount getSellAmount() {
         return sellAmount;
     }
+    @Override
     public void setSellAmount(SellAmount sellAmount) {
         this.sellAmount = sellAmount;
     }
 
+    @Override
     public long getTotalEarnings(){
         return totalEarnings;
     }
 
+    @Override
     public void setTotalEarnings(long amount){
         totalEarnings = amount;
     }
+    @Override
     public void addTotalEarnings(long amount){
         setTotalEarnings(getTotalEarnings() + amount);
     }
 
+    @Override
     public long getNextResetTime(){
         return nextResetTime;
     }
+    @Override
     public void setNextResetTime(long nextResetTime) {
         this.nextResetTime = nextResetTime;
     }
 
+    @Override
     public void resetEarnings(){
         amountEarned.clear();
         itemPrices.clear();
@@ -413,36 +450,53 @@ public class FtcUser extends FtcFileManager implements MessageCommandSender {
         nextResetTime = System.currentTimeMillis() + FtcCore.getUserDataResetInterval();
     }
 
+    @Override
     public String getName(){
         if(name != null) return name;
         else if(Bukkit.getPlayer(getBase()) != null) return Bukkit.getPlayer(getBase()).getName();
         else return Bukkit.getOfflinePlayer(getBase()).getName();
     }
 
+    @Override
     public Branch getBranch(){
         return branch;
     }
 
+    @Override
     public void setBranch(Branch branch){
         this.branch = branch;
     }
 
+    @Override
     public void setTabPrefix(String s){
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tab player " + getName() + " tabprefix " + s);
     }
 
+    @Override
     public void clearTabPrefix(){
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tab player " + getName() + " tabprefix ");
     }
 
+    @Override
     public void sendMessage(String message){
         if(!isOnline()) return;
         getPlayer().sendMessage(FtcCore.translateHexCodes(message));
     }
 
+    @Override
     public boolean isOnline() {
         return getPlayer() != null;
     }
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public boolean equals(Object o) {

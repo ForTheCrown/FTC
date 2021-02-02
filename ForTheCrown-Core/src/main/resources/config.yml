@@ -6,6 +6,11 @@ MaxMoneyAmount: 50000000
 UserDataResetInterval: 5356800000L
 Taxes: false
 
+System:
+  save-on-disable: true
+  save-periodically: true
+  save-interval-mins: 60
+
 King: empty
 
 DefaultPrices:

@@ -10,6 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nonnegative;
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class BalanceTopCommand implements CrownCommandExecutor {
@@ -72,10 +73,14 @@ public class BalanceTopCommand implements CrownCommandExecutor {
         Map<UUID, Integer> map = getSortedBalances();
         List<String> list = new ArrayList<>();
 
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        decimalFormat.setGroupingUsed(true);
+        decimalFormat.setGroupingSize(3);
+
         for(UUID id : getSortedBalances().keySet()){
             String message;
 
-            message = Bukkit.getOfflinePlayer(id).getName() + " - " + ChatColor.YELLOW + map.get(id) + " Rhines";
+            message = Bukkit.getOfflinePlayer(id).getName() + " - " + ChatColor.YELLOW + decimalFormat.format(map.get(id)) + " Rhines";
             list.add(message);
         }
         return list;

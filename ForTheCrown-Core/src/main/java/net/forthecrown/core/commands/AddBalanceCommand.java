@@ -12,6 +12,16 @@ import java.util.UUID;
 public class AddBalanceCommand implements CrownCommandExecutor {
 
     /*
+    public AddBalanceCommand() {
+        super("addbalance");
+        setAliases("addbal", "addcash", "addbank");
+        setPermission("ftc.commands.addbalance");
+        setUsage("&7Usage: &r/addbalance <player> <amount>");
+        register();
+    }
+     */
+
+    /*
      * ----------------------------------------
      * 			Command description:
      * ----------------------------------------
@@ -26,7 +36,7 @@ public class AddBalanceCommand implements CrownCommandExecutor {
      *
      * Referenced other classes:
      * - Balances
-     * - Economy: Economy.getBalances
+     * - FtcCore: FtcCore.getBalances
      *
      * Author: Wout
      */

@@ -15,6 +15,19 @@ import java.util.UUID;
 
 public class BalanceCommand implements CrownCommandExecutor {
 
+    /*public BalanceCommand() {
+        super("balance");
+
+        setPermission("ftc.balance");
+        setUsage("&7Usage: &r/balance <player>");
+        setAliases("bal", "bank", "cash", "money");
+        setDescription("Displays a player's balance");
+
+        register();
+    }*/
+
+
+
     /*
      * ----------------------------------------
      * 			Command description:

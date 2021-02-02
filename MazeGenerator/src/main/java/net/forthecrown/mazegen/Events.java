@@ -1,21 +1,19 @@
 package net.forthecrown.mazegen;
 
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Score;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class Events implements Listener {
 
-    Set<Player> inMaze = new HashSet<>();
+    private final Set<Player> cooldown = new HashSet<>();
 
     private final Main main;
     public Events(Main main) {
@@ -24,40 +22,35 @@ public class Events implements Listener {
 
     @EventHandler
     public void onEventEnter(PlayerInteractAtEntityEvent event){
-        if(event.getRightClicked().getType() != EntityType.ARMOR_STAND) return;
+        if(!event.getRightClicked().getWorld().getName().equals("world_void")) return;
         if(!event.getRightClicked().isInvulnerable()) return;
-        if(event.getRightClicked().getCustomName().contains(ChatColor.YELLOW + "Click me to enter the event!")){
+        if(event.getRightClicked().getCustomName() == null) return;
+
+        if(event.getRightClicked().getCustomName().contains(ChatColor.GOLD + "Harold") && event.getRightClicked().getType() == EntityType.VILLAGER){
             event.setCancelled(true);
+            if(cooldown.contains(event.getPlayer())) return;
 
-            if(main.getConfig().getLocation("EntryPos") == null){
-                event.getPlayer().sendMessage("There is no set entry position for the maze!");
-                return;
-            }
-            if(inMaze.size() > 0){
-                event.getPlayer().sendMessage("There is already a player in the maze!");
+            if(main.inMaze != null){
+                event.getPlayer().sendMessage(ChatColor.GRAY + "There is already a player in the maze!");
                 return;
             }
 
+            cooldown.add(event.getPlayer());
             main.enterEvent(event.getPlayer());
-        } else if (event.getRightClicked().getCustomName().contains("Exit the maze!")){
+            doCooldownThings(event.getPlayer());
+
+        } else if (event.getRightClicked().getCustomName().contains("Exit the maze!") && event.getRightClicked().getType() == EntityType.ARMOR_STAND){
             event.setCancelled(true);
+            if(cooldown.contains(event.getPlayer())) return;
+            if(main.inMaze == null || main.inMaze != event.getPlayer()) return;
+            main.finishEvent(event.getPlayer());
 
-            int gems = 0;
-            for (ItemStack stack: event.getPlayer().getInventory()){
-                if(stack == null) continue;
-                if(stack.getType() != Material.DIAMOND && !stack.hasItemMeta()) continue;
-
-                gems++;
-                event.getPlayer().getInventory().removeItem(stack);
-            }
-
-            if(gems > 0){
-                event.getPlayer().sendMessage("You earned " + (gems*10) + " points from collected gems!");
-                Score score = main.getServer().getScoreboardManager().getMainScoreboard().getObjective("crown").getScore(event.getPlayer().getName());
-                score.setScore(score.getScore() + (gems*10));
-            }
-
-
+            event.getRightClicked().remove();
         }
+    }
+
+    private void doCooldownThings(Player player){
+        cooldown.add(player);
+        Bukkit.getScheduler().runTaskLater(main, () -> cooldown.remove(player), 20);
     }
 }
