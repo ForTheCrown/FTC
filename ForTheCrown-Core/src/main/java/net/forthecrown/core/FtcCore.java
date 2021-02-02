@@ -327,7 +327,7 @@ public final class FtcCore extends CrownPlugin {
     }
 
     public static CrownSignShop getShop(Location signShop) throws Exception { //gets a signshop, throws a null exception if the shop file doesn't exist
-        for(CrownSignShop shop : loadedShops) if(shop.getLocation() == signShop) return shop;
+        for(CrownSignShop shop : loadedShops) if(shop.getLocation().equals(signShop)) return shop;
         return new CrownSignShop(signShop);
     }
     public static CrownSignShop createSignShop(Location location, ShopType shopType, Integer price, UUID ownerUUID){ //creates a signshop

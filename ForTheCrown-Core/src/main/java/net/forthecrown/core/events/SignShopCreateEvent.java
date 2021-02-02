@@ -113,9 +113,19 @@ public class SignShopCreateEvent implements Listener {
             throw new CrownException(player, "&4Shop creation failed! &cNo item in the inventory");
         }
 
-        shop.getStock().setExampleItem(item);
         Bukkit.broadcastMessage(shop.getStock().getExampleItem().toString());
         Bukkit.broadcastMessage(shop.getStock().getContents().toString());
+
+        String loooooonngg = ChatColor.GREEN + "SignShop created!" + ChatColor.RESET + " It'll " +
+                shop.getType().toString().toLowerCase().replaceAll("_shop", "").replaceAll("admin_", "") + " " +
+                shop.getStock().getExampleItem().getAmount() + " " +
+                shop.getStock().getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
+                " for " + shop.getPrice() +
+                " Rhines. Use Shift + Right Click to restock the shop.";
+
+        player.sendMessage(loooooonngg);
+        shop.getStock().setExampleItem(item);
+        shop.setOutOfStock(false);
     }
 }
 /*
