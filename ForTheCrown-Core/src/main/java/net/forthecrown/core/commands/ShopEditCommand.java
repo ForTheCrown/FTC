@@ -1,6 +1,7 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.BrokenShopException;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
@@ -45,7 +46,6 @@ public class ShopEditCommand extends CrownCommand {
         }
 
         if(!shop.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) throw new InvalidCommandExecution(sender, "&cYou must be the owner of the shop!");
-
         if(args.length < 1)  return false;
 
         FtcUser user = FtcCore.getUser(player.getUniqueId());
@@ -57,6 +57,7 @@ public class ShopEditCommand extends CrownCommand {
                  String toSet = String.join(" ", args).replace("line1 ", "");
                  sign.setLine(1, toSet);
                 }
+                user.sendMessage(ChatColor.GREEN + "First line changed!");
                 break;
 
             case "line2":
@@ -65,23 +66,24 @@ public class ShopEditCommand extends CrownCommand {
                     String toSet = String.join(" ", args).replace("line2 ", "");
                     sign.setLine(2, toSet);
                 }
+                user.sendMessage(ChatColor.GREEN + "Second line changed!");
                 break;
 
             case "sellamount":
                 if(args.length != 2) throw new InvalidArgumentException(sender, "You must specify an amount");
-                if(shop.getStock().getExampleItem() == null) throw new InvalidCommandExecution(player, "&7This shops is non functional,&r please ask to the owner to remake it");
+                if(shop.getStock().getExampleItem() == null) throw new BrokenShopException(player);
 
                 int amount;
                 try {
                     amount = Integer.parseInt(args[1]);
-                } catch (Exception e){ throw new InvalidArgumentException(sender, "The amount must be number"); }
+                } catch (Exception e){ throw new InvalidArgumentException(sender, "&7The amount must be number"); }
 
-                if(amount <= 0 || amount > 64) throw new InvalidArgumentException(sender, "The number cannot be zero or less, and cannot be larger than 64");
+                if(amount <= 0 || amount > 64) throw new InvalidArgumentException(sender, "&7The number cannot be zero or less, and cannot be larger than 64");
 
                 ItemStack item = shop.getStock().getExampleItem();
                 item.setAmount(amount);
                 shop.getStock().setExampleItem(item);
-                user.sendMessage("This shop will now sell items in " + amount + " quantities");
+                user.sendMessage("&7This shop will now sell items in &e" + amount + " item amounts");
                 break;
 
             case "price":
@@ -94,17 +96,16 @@ public class ShopEditCommand extends CrownCommand {
 
                 shop.setPrice(newPrice);
                 shop.save();
-                shop.reload();
+                shop.getSign().update();
+                user.sendMessage(ChatColor.GREEN + "Price changed! &7The price of this shop is now " + ChatColor.YELLOW + newPrice + "&r!");
                 break;
 
             default: return false;
         }
-        sign.update();
         return true;
     }
 
     public List<String> tabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        int argN = args.length-1;
         List<String> toReturn = new ArrayList<>();
 
         if(args.length == 1){
@@ -112,7 +113,7 @@ public class ShopEditCommand extends CrownCommand {
             toReturn.add("line2");
             toReturn.add("sellamount");
             toReturn.add("price");
-            return StringUtil.copyPartialMatches(args[argN], toReturn, new ArrayList<>());
+            return StringUtil.copyPartialMatches(args[args.length-1], toReturn, new ArrayList<>());
         }
         return new ArrayList<>();
     }

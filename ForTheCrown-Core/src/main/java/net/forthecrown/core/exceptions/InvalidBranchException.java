@@ -4,9 +4,14 @@ import org.bukkit.command.CommandSender;
 
 public class InvalidBranchException extends InvalidCommandExecution {
     public InvalidBranchException(CommandSender sender) {
-        super(sender, "&cWrong branch!");
+        super(sender, "&8Wrong branch!");
     }
+
     public InvalidBranchException(CommandSender sender, String correctBranch) {
-        super(sender, "&cWrong branch! &7 Only " + correctBranch + "s are able to do this!");
+        super(sender, "&8Wrong branch! &7 Only " + correctBranch + "s are able to do this!");
+    }
+
+    public InvalidBranchException(CommandSender sender, String correctBranch, String extraInfo) {
+        super(sender, "&8Wrong branch! &7 Only " + correctBranch + "s are able to do this! &r" + extraInfo);
     }
 }

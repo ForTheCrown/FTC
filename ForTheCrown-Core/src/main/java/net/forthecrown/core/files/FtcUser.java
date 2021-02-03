@@ -22,22 +22,22 @@ import java.util.*;
 public class FtcUser extends FtcFileManager implements CrownUser {
     private final UUID base;
 
-    //Already in the file, added by Wout
+    //Already in the file, made by Wout
     private String name;
     private Rank currentRank;
     private Set<Rank> ranks;
     private Branch branch;
-    private boolean canSwapBranch;
+    private boolean canSwapBranch = true;
     private List<String> pets;
     private Particle particleArrowActive;
     private List<Particle> particleArrowAvailable;
     private String particleDeathActive;
     private List<String> particleDeathAvailable;
-    private boolean allowsRidingPlayers;
+    private boolean allowsRidingPlayers = true;
     private int gems;
 
     //Added by Botul
-    private boolean allowsEmotes;
+    private boolean allowsEmotes = true;
     private Map<Material, Integer> itemPrices = new HashMap<>();
     private Map<Material, Integer> amountEarned = new HashMap<>();
     private SellAmount sellAmount;

@@ -73,7 +73,10 @@ public class SignShopInteractEvent implements Listener {
         List<ItemStack> temp = new ArrayList<>();
         for (ItemStack item : inv){
             if(item == null) continue;
-            if(item.getType() == shop.getStock().getExampleItem().getType()) player.getInventory().addItem(item);
+            if(item.getType() != shop.getStock().getExampleItem().getType()){
+                player.getInventory().addItem(item);
+                continue;
+            }
 
             temp.add(item);
         }

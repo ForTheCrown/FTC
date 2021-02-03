@@ -8,8 +8,10 @@ public class CrownException extends RuntimeException{
     public CrownException() {
     }
 
+    private String message;
     public CrownException(CommandSender sender, String message) {
         super(FtcCore.translateHexCodes(message));
+        this.message = message;
         sendMessage(sender, message);
     }
 
@@ -23,7 +25,7 @@ public class CrownException extends RuntimeException{
 
     @Override
     public String getMessage(){
-        return null;
+        return message;
     }
 
     @Override

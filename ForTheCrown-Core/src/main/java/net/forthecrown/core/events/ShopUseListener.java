@@ -2,11 +2,11 @@ package net.forthecrown.core.events;
 
 import net.forthecrown.core.customevents.SignShopUseEvent;
 import net.forthecrown.core.enums.ShopType;
-import net.forthecrown.core.exceptions.InvalidCommandExecution;
+import net.forthecrown.core.exceptions.BrokenShopException;
+import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.files.CrownSignShop;
 import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,8 +26,8 @@ public class ShopUseListener implements Listener {
         FtcUser customer = event.getCustomer();
 
         if(shop.getStock().getExampleItem() == null){
-            if(shop.getShopInventory().getContents()[0] == null) shop.setOutOfStock(true);
-            throw new InvalidCommandExecution(customer, "&7This shops is non functional,&r please ask to the owner to remake it");
+            shop.setOutOfStock(true);
+            throw new BrokenShopException(player);
         }
 
         Inventory playerInv = player.getInventory();
@@ -83,23 +83,23 @@ public class ShopUseListener implements Listener {
                     return;
                 }*/
 
-                if(shop.getStock().containsExampleItem()){
-                    shop.getStock().removeExampleItemAmount();
+                if(shop.getStock().containsExampleItem())shop.getStock().removeExampleItemAmount();
+                else{
+                    shop.setOutOfStock(true);
+                    throw new CrownException(player, "&7Shop does not have enough stock");
                 }
 
                 if(shop.getStock().getContents().isEmpty()) shop.setOutOfStock(true);
                 //shop.setShopInventory(shopInv); //sets the changed inventory to be the shops inventory
                 event.addOwnerBalance(shop.getPrice());
 
-                try { //tries telling the owner someone bought from them, if they're online
-                    final String longAF = ChatColor.GOLD + player.getName() +
-                            ChatColor.GRAY + " bought " +
-                            ChatColor.YELLOW + shop.getStock().getExampleItem().getAmount() + " " +
-                            shop.getStock().getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
-                            ChatColor.GRAY + " from you for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
+                final String longAF = ChatColor.GOLD + player.getName() +
+                        ChatColor.GRAY + " bought " +
+                        ChatColor.YELLOW + shop.getStock().getExampleItem().getAmount() + " " +
+                        shop.getStock().getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
+                        ChatColor.GRAY + " from you for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
 
-                    event.getOwner().sendMessage(longAF);
-                } catch (Exception ignored){}
+                event.getOwner().sendMessage(longAF);
 
             case ADMIN_BUY_SHOP: //This has some of the same if statements as the last case, but if they overlap, it has to happen, don't know how to do it better
                 if(!customerHasSpace){
@@ -122,7 +122,7 @@ public class ShopUseListener implements Listener {
                         shop.getStock().getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
                         ChatColor.GRAY + " for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
 
-                player.sendMessage(customerMsg1);
+                customer.sendMessage(customerMsg1);
 
                 break;
 
@@ -171,7 +171,7 @@ public class ShopUseListener implements Listener {
                 }
 
                 for(ItemStack stack : toRemove){
-                    playerInv.remove(stack);
+                    playerInv.removeItem(stack);
                 }
 
                 final String customerMsg = ChatColor.GRAY + "You sold " +
@@ -179,19 +179,17 @@ public class ShopUseListener implements Listener {
                         shop.getStock().getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
                         ChatColor.GRAY + " for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
 
-                player.sendMessage(customerMsg);
+                customer.sendMessage(customerMsg);
 
                 if(shop.getType() == ShopType.SELL_SHOP) {
                     event.setOwnerBalance(event.getOwnerBalance() - shop.getPrice());
                     shop.getStock().add(shop.getStock().getExampleItem());
 
-                    try {
-                        final String loooonnng = ChatColor.GOLD + player.getName() + ChatColor.GRAY +
-                                " sold " + ChatColor.YELLOW + shop.getStock().getExampleItem().getAmount() + " " + shop.getStock().getExampleItem().getType().toString().replaceAll("_", " ").toLowerCase() +
-                                ChatColor.GRAY + " to you for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
+                    final String loooonnng = ChatColor.GOLD + player.getName() + ChatColor.GRAY +
+                            " sold " + ChatColor.YELLOW + shop.getStock().getExampleItem().getAmount() + " " + shop.getStock().getExampleItem().getType().toString().replaceAll("_", " ").toLowerCase() +
+                            ChatColor.GRAY + " to you for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
 
-                        Bukkit.getPlayer(shop.getOwner()).sendMessage(loooonnng);
-                    } catch (Exception ignored){}
+                    event.getOwner().sendMessage(loooonnng);
                 }
 
                 event.addCustomerBalance(shop.getPrice());
@@ -199,12 +197,5 @@ public class ShopUseListener implements Listener {
             default:
                 throw new IllegalStateException("Unexpected value: " + shop.getType());
         }
-    }
-
-    private boolean isInvEmpty(Inventory inv){
-        for(ItemStack stack : inv){
-            if(stack != null) return false;
-        }
-        return true;
     }
 }

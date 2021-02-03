@@ -236,6 +236,11 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         return stock;
     }
 
+    public Sign getSign(){
+        return (Sign) getBlock().getState();
+    }
+
+
     private boolean legacyFileExists() {
         File oldFile = new File("plugins/ShopsReworked/ShopData/" + fileName + ".yml");
         return oldFile.exists();
@@ -272,7 +277,6 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         stock.setContents(tempList);
 
         if(oldConfig.getItemStack("Inventory.shop") != null) getStock().setExampleItem(oldConfig.getItemStack("Inventory.shop"));
-        else if (0 < stock.getContents().size()) getStock().setExampleItem(stock.getContents().get(0));
 
         if(oldConfig.getItemStack("Inventory.shop") == null){
             try {

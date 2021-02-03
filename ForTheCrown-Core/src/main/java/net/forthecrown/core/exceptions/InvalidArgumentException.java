@@ -4,9 +4,9 @@ import org.bukkit.command.CommandSender;
 
 public class InvalidArgumentException extends InvalidCommandExecution {
     public InvalidArgumentException(CommandSender sender) {
-        super(sender, "&cInvalid arguments!");
+        super(sender, "&7Invalid arguments!");
     }
     public InvalidArgumentException(CommandSender sender, String extraInfo) {
-        super(sender, "&cInvalid arguments! &r" + extraInfo);
+        super(sender, "&7Invalid arguments! &r" + extraInfo);
     }
 }

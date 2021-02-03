@@ -17,14 +17,6 @@ public abstract class CrownPlugin extends JavaPlugin  {
         return handler;
     }
 
-    public void saveCore(){
-
-    }
-
-    public void reloadCore(){
-
-    }
-
     //This method should only get called if a command has no set executor
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

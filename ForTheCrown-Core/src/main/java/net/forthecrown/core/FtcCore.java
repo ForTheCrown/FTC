@@ -344,7 +344,9 @@ public final class FtcCore extends CrownPlugin {
         try{
             toReturn = Bukkit.getPlayer(playerName).getUniqueId();
         } catch (NullPointerException e){
-            toReturn = Bukkit.getOfflinePlayerIfCached(playerName).getUniqueId();
+            try {
+                toReturn = Bukkit.getOfflinePlayerIfCached(playerName).getUniqueId();
+            } catch (NullPointerException e1){ toReturn = null;}
         }
         return toReturn;
     }

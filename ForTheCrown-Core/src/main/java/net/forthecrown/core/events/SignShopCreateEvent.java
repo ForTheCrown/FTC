@@ -6,7 +6,6 @@ import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.files.CrownSignShop;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
@@ -31,7 +30,7 @@ public class SignShopCreateEvent implements Listener {
     //WHAT AM I DOING
     @EventHandler(ignoreCancelled = true)
     public void onSignShopCreate(SignChangeEvent event){
-        if(event.getLine(0) == null || event.getLine(0).equals("")) return;
+        if(event.getLine(0).isBlank()) return;
 
         Player player = event.getPlayer();
 
@@ -57,14 +56,10 @@ public class SignShopCreateEvent implements Listener {
                 break;
         }
 
-        if(event.getLine(3) == null || event.getLine(3).equals("")){
-            player.sendMessage("You dumbass");
-            return;
-        }
+        if(event.getLine(3).isBlank()) throw new CrownException(player, "&7The last line must contain a price!");
 
         Sign sign = (Sign) event.getBlock().getState();
         String lastLine = event.getLine(3).toLowerCase();
-
 
         lastLine = lastLine.replaceAll("[\\D]", ""); //replaces all letter chars, leaves only numbers to make the price
         lastLine = lastLine.replaceAll(" ", ""); //removes all spaces
@@ -74,7 +69,7 @@ public class SignShopCreateEvent implements Listener {
             price = Integer.parseInt(lastLine);
         } catch (Exception e){ throw new CrownException(player, "&7The last line must contain numbers!"); }
 
-        if(event.getLine(2).equals("") && event.getLine(1).equals("")) throw new CrownException(player, "&7You must provide a description of the shop's items");
+        if(event.getLine(2).isBlank() && event.getLine(1).isBlank()) throw new CrownException(player, "&7You must provide a description of the shop's items");
 
         CrownSignShop shop = FtcCore.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
 
@@ -113,18 +108,19 @@ public class SignShopCreateEvent implements Listener {
             throw new CrownException(player, "&4Shop creation failed! &cNo item in the inventory");
         }
 
-        Bukkit.broadcastMessage(shop.getStock().getExampleItem().toString());
-        Bukkit.broadcastMessage(shop.getStock().getContents().toString());
+        shop.getStock().setExampleItemAndAdd(item);
 
         String loooooonngg = ChatColor.GREEN + "SignShop created!" + ChatColor.RESET + " It'll " +
-                shop.getType().toString().toLowerCase().replaceAll("_shop", "").replaceAll("admin_", "") + " " +
+                "sell " +
                 shop.getStock().getExampleItem().getAmount() + " " +
                 shop.getStock().getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
                 " for " + shop.getPrice() +
-                " Rhines. Use Shift + Right Click to restock the shop.";
+                " Rhines.";
+
+        if(shop.getType() == ShopType.SELL_SHOP || shop.getType() == ShopType.ADMIN_SELL_SHOP) loooooonngg = loooooonngg.replaceAll("sell", "buy");
 
         player.sendMessage(loooooonngg);
-        shop.getStock().setExampleItem(item);
+        player.sendMessage(ChatColor.GRAY + "Use Shift + Right Click to restock the shop.");
         shop.setOutOfStock(false);
     }
 }
