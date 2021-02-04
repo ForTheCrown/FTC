@@ -1,6 +1,5 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
@@ -10,7 +9,14 @@ import org.bukkit.command.CommandSender;
 
 import java.util.UUID;
 
-public class SetBalanceCommand implements CrownCommandExecutor {
+public class SetBalanceCommand extends CrownCommand {
+    public SetBalanceCommand(){
+        super("setbalance", FtcCore.getInstance());
+
+        setAliases("setbal", "setcash", "setbank", "setmoney");
+        setDescription("Sets a players balance.");
+        register();
+    }
 
     /*
      * ----------------------------------------

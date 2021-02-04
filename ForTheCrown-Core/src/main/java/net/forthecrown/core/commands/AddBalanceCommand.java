@@ -1,6 +1,5 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
@@ -9,17 +8,16 @@ import org.bukkit.command.CommandSender;
 
 import java.util.UUID;
 
-public class AddBalanceCommand implements CrownCommandExecutor {
+public class AddBalanceCommand extends CrownCommand{
 
-    /*
     public AddBalanceCommand() {
-        super("addbalance");
+        super("addbalance", FtcCore.getInstance());
+
         setAliases("addbal", "addcash", "addbank");
         setPermission("ftc.commands.addbalance");
         setUsage("&7Usage: &r/addbalance <player> <amount>");
         register();
     }
-     */
 
     /*
      * ----------------------------------------
@@ -53,7 +51,7 @@ public class AddBalanceCommand implements CrownCommandExecutor {
         int amountToAdd;
         try {
             amountToAdd = Integer.parseInt(args[1]);
-        } catch (Exception e){ throw new InvalidArgumentException(sender, args[1] + " is not a number"); }
+        } catch (Exception e){ throw new InvalidArgumentException(sender, args[1] + " &7must be a number"); }
 
         FtcCore.getBalances().addBalance(targetUUID, amountToAdd);
         sender.sendMessage(args[0] + " now has " + FtcCore.getBalances().getBalance(targetUUID) + " Rhines");

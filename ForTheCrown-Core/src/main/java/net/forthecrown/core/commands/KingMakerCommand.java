@@ -1,6 +1,5 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
@@ -10,8 +9,23 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
-public class KingMakerCommand implements CrownCommandExecutor {
+import java.util.ArrayList;
+import java.util.List;
+
+public class KingMakerCommand extends CrownCommand implements TabCompleter {
+
+    public KingMakerCommand(){
+        super("kingmaker", FtcCore.getInstance());
+
+        setDescription("This command is used to assign and unassign a king or queen");
+        setUsage("&7Usage:&r /kingmaker <remove | player> [king | queen]");
+        setTabCompleter(this);
+        register();
+    }
 
     @Override
     public boolean run(CommandSender sender, Command command, String label, String[] args) {
@@ -42,5 +56,24 @@ public class KingMakerCommand implements CrownCommandExecutor {
             FtcCore.setKing(player.getUniqueId());
         }
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> argList = new ArrayList<>();
+        int argN = args.length -1;
+
+        if(args.length == 1){
+            argList.add("remove");
+            for (Player p : Bukkit.getOnlinePlayers()){
+                argList.add(p.getName());
+            }
+            return StringUtil.copyPartialMatches(args[argN], argList, new ArrayList<>());
+        }
+        if(args.length == 2){
+            argList.add("queen");
+            argList.add("king");
+        }
+        return StringUtil.copyPartialMatches(args[argN], argList, new ArrayList<>());
     }
 }

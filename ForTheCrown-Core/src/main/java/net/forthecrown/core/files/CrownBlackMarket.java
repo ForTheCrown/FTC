@@ -2,6 +2,7 @@ package net.forthecrown.core.files;
 
 import com.google.common.base.Charsets;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,7 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
-public class CrownBlackMarket {
+public class CrownBlackMarket implements net.forthecrown.core.api.BlackMarket {
 
     private final Map<Material, Integer> crops = new HashMap<>();
     private final Map<Material, Integer> mining = new HashMap<>();
@@ -235,20 +236,24 @@ public class CrownBlackMarket {
         return temp;
     }
 
+    @Override
     public Integer getAmountEarned(Material material){
         if(amountEarned.keySet().contains(material)) return amountEarned.get(material);
         return 0;
     }
 
+    @Override
     public void setAmountEarned(Material material, Integer amount){
         amountEarned.put(material, amount);
     }
 
+    @Override
     public boolean isSoldOut(Material material){
         if(getAmountEarned(material) != null) return getAmountEarned(material) > maxEarnings;
         else return false;
     }
 
+    @Override
     public Integer getItemPrice(Material material){
         if (crops.containsKey(material)) return crops.get(material);
         if (mining.containsKey(material)) return mining.get(material);
@@ -256,24 +261,29 @@ public class CrownBlackMarket {
         return null;
     }
 
+    @Override
     public void doEnchantTimer(){
         Bukkit.getScheduler().scheduleSyncRepeatingTask(FtcCore.getInstance(), () -> enchantAvailable = !enchantAvailable, 216000, 216000);
         System.out.println("Edward is now selling: " + enchantAvailable);
     }
 
+    @Override
     public boolean isAllowedToBuyEnchant(Player player){
         return !boughtEnchant.contains(player.getUniqueId());
     }
 
+    @Override
     public void setAllowedToBuyEnchant(Player p, boolean out){
         if(out) boughtEnchant.remove(p.getUniqueId());
         else boughtEnchant.add(p.getUniqueId());
     }
 
+    @Override
     public boolean enchantAvailable(){
         return enchantAvailable;
     }
 
+    @Override
     public void setItemPrice(String branch, Material material, Integer price){
         switch (branch.toLowerCase()){
             case "mining":
@@ -290,18 +300,22 @@ public class CrownBlackMarket {
         }
     }
 
+    @Override
     public Integer getEnchantPrice(Enchantment enchantment){
         return enchants.get(enchantment);
     }
+    @Override
     public void setEnchantPrice(Enchantment enchantment, Integer price){
         enchants.put(enchantment, price);
     }
 
+    @Override
     public Enchantment getDailyEnchantment(){
         return dailyEnchantment;
     }
 
-    public Inventory getDropInventory(FtcUser user){
+    @Override
+    public Inventory getDropInventory(CrownUser user){
         ItemStack header = FtcCore.makeItem(Material.ROTTEN_FLESH, 1, true, "&bDrops");
         Inventory inv = getBaseInventory("Black Market: Drops", header);
 
@@ -314,7 +328,8 @@ public class CrownBlackMarket {
         return inv;
     }
 
-    public Inventory getMiningInventory(FtcUser user){
+    @Override
+    public Inventory getMiningInventory(CrownUser user){
         ItemStack header = FtcCore.makeItem(Material.IRON_PICKAXE, 1, true, "&bMining");
         Inventory inv = getBaseInventory("Black Market: Mining", header);
 
@@ -327,7 +342,8 @@ public class CrownBlackMarket {
         return inv;
     }
 
-    public Inventory getFarmingInventory(FtcUser user){
+    @Override
+    public Inventory getFarmingInventory(CrownUser user){
         ItemStack header = FtcCore.makeItem(Material.OAK_SAPLING, 1, true, "&bCrops");
         Inventory inv = getBaseInventory("Black Market: Crops", header);
 
@@ -340,6 +356,7 @@ public class CrownBlackMarket {
         return inv;
     }
 
+    @Override
     public Inventory getEnchantInventory(){
         ItemStack rod = FtcCore.makeItem(Material.END_ROD, 1, true, "&7-");
         rod.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
@@ -361,6 +378,7 @@ public class CrownBlackMarket {
         return inv;
     }
 
+    @Override
     public Inventory getParrotInventory(){
         Inventory invToOpen = Bukkit.createInventory(null, 27, "Parrot Shop");
         ItemStack pane = FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, ChatColor.GRAY + " ");
@@ -397,7 +415,7 @@ public class CrownBlackMarket {
         return base;
     }
 
-    private ItemStack makeSellableItem(Material material, FtcUser user){
+    private ItemStack makeSellableItem(Material material, CrownUser user){
         String s = material.toString().toLowerCase().replaceAll("_", " ");
         ItemStack item = FtcCore.makeItem(material, 1, true, s,
                 "&eValue: " + getItemPrice(material) + " Rhines per item,",
@@ -419,6 +437,7 @@ public class CrownBlackMarket {
         return item;
     }
 
+    @Override
     public ItemStack getDailyEnchantBook(){
         ItemStack item = FtcCore.makeItem(Material.ENCHANTED_BOOK, 1, false, null, "&7An enchantment book purchased from &eEdward");
         item.addUnsafeEnchantment(getDailyEnchantment(), enchantLevel);

@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
@@ -36,7 +37,7 @@ import java.io.IOException;
 import java.util.*;
 
 
-public class Main extends CrownPlugin implements Listener {
+public class Main extends JavaPlugin implements Listener {
 	
 	//public File wilhelmFile;
 	//public YamlConfiguration wilhelmYaml;

@@ -1,9 +1,8 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.exceptions.*;
-import net.forthecrown.core.files.Balances;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -12,7 +11,15 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class PayCommand implements CrownCommandExecutor {
+public class PayCommand extends CrownCommand {
+
+    public PayCommand(){
+        super("pay", FtcCore.getInstance());
+
+        setDescription("Pays another player money");
+        setUsage("&7Usage: &r/pay <user> <amount>");
+        register();
+    }
 
     /*
      * ----------------------------------------

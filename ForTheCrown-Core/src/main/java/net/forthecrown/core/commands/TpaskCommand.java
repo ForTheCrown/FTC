@@ -1,6 +1,6 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
+import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
@@ -14,7 +14,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class TpaskCommand implements CrownCommandExecutor {
+public class TpaskCommand extends CrownCommand {
+
+    public TpaskCommand(){
+        super("tpask", FtcCore.getInstance());
+
+        setAliases("tpa");
+        setDescription("Asks a player to teleport to them.");
+        register();
+    }
 
     /*
      * ----------------------------------------

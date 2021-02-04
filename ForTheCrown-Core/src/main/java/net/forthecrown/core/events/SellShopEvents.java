@@ -1,9 +1,9 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Balances;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.SellAmount;
-import net.forthecrown.core.files.Balances;
-import net.forthecrown.core.files.FtcUser;
 import net.forthecrown.core.inventories.SellShop;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -50,7 +50,7 @@ public class SellShopEvents implements Listener {
 
         if(FtcCore.isOnCooldown(player)) return;
 
-        FtcUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = FtcCore.getUser(player.getUniqueId());
         SellShop sellShop = new SellShop(user);
 
         FtcCore.addToCooldown(player, 5, false);
@@ -118,7 +118,7 @@ public class SellShopEvents implements Listener {
         }
     }
 
-    private boolean sellItems(Material toSell, FtcUser seller){
+    private boolean sellItems(Material toSell, CrownUser seller){
         int sellAmount = seller.getSellAmount().getInt();
         int finalSell = sellAmount;
         if(sellAmount == -1) finalSell++;

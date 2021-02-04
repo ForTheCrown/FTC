@@ -1,16 +1,17 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.exceptions.BrokenShopException;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
-import net.forthecrown.core.files.CrownSignShop;
-import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
@@ -18,7 +19,7 @@ import org.bukkit.util.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShopEditCommand extends CrownCommand {
+public class ShopEditCommand extends CrownCommand implements TabCompleter {
 
     public ShopEditCommand(){
         super("editshop", FtcCore.getInstance());
@@ -37,7 +38,7 @@ public class ShopEditCommand extends CrownCommand {
         if(!sign.getLine(0).contains("=[Buy]=") && !sign.getLine(0).contains("=[Sell]=") && !sign.getLine(3).contains(ChatColor.GRAY + "Price: "))
             throw new InvalidCommandExecution(sender, "You must be looking at a sign shop!");
 
-        CrownSignShop shop;
+        SignShop shop;
         try {
             shop = FtcCore.getShop(sign.getLocation());
         } catch (Exception e){
@@ -48,13 +49,14 @@ public class ShopEditCommand extends CrownCommand {
         if(!shop.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) throw new InvalidCommandExecution(sender, "&cYou must be the owner of the shop!");
         if(args.length < 1)  return false;
 
-        FtcUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = FtcCore.getUser(player.getUniqueId());
 
         switch (args[0]){
             case "line1":
                 if(args.length == 1) sign.setLine(1, "");
                 else {
                  String toSet = String.join(" ", args).replace("line1 ", "");
+                 if(player.hasPermission("ftc.donator2")) toSet = FtcCore.translateHexCodes(toSet);
                  sign.setLine(1, toSet);
                 }
                 user.sendMessage(ChatColor.GREEN + "First line changed!");
@@ -64,6 +66,7 @@ public class ShopEditCommand extends CrownCommand {
                 if(args.length == 1) sign.setLine(2, "");
                 else {
                     String toSet = String.join(" ", args).replace("line2 ", "");
+                    if(player.hasPermission("ftc.donator2")) toSet = FtcCore.translateHexCodes(toSet);
                     sign.setLine(2, toSet);
                 }
                 user.sendMessage(ChatColor.GREEN + "Second line changed!");
@@ -84,7 +87,7 @@ public class ShopEditCommand extends CrownCommand {
                 item.setAmount(amount);
                 shop.getStock().setExampleItem(item);
                 user.sendMessage("&7This shop will now sell items in &e" + amount + " item amounts");
-                break;
+                return true;
 
             case "price":
                 if(args.length != 2) throw new InvalidArgumentException(sender, "You must specify a price");
@@ -94,18 +97,19 @@ public class ShopEditCommand extends CrownCommand {
                     newPrice = Integer.parseInt(args[1]);
                 } catch (Exception e){ throw new InvalidArgumentException(sender, args[1] + " is not a number!"); }
 
-                shop.setPrice(newPrice);
+                shop.setPrice(newPrice, true);
                 shop.save();
-                shop.getSign().update();
-                user.sendMessage(ChatColor.GREEN + "Price changed! &7The price of this shop is now " + ChatColor.YELLOW + newPrice + "&r!");
+                user.sendMessage(ChatColor.GREEN + "Price changed! &7The price of this shop is now " + ChatColor.YELLOW + newPrice + "&7!");
                 break;
 
             default: return false;
         }
+        sign.update();
         return true;
     }
 
-    public List<String> tabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> toReturn = new ArrayList<>();
 
         if(args.length == 1){
@@ -113,7 +117,7 @@ public class ShopEditCommand extends CrownCommand {
             toReturn.add("line2");
             toReturn.add("sellamount");
             toReturn.add("price");
-            return StringUtil.copyPartialMatches(args[args.length-1], toReturn, new ArrayList<>());
+            return StringUtil.copyPartialMatches(args[0], toReturn, new ArrayList<>());
         }
         return new ArrayList<>();
     }

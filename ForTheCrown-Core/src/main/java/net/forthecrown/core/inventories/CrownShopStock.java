@@ -1,14 +1,18 @@
 package net.forthecrown.core.inventories;
 
 import net.forthecrown.core.api.ShopStock;
+import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.files.CrownSignShop;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CrownShopStock implements ShopStock {
 
@@ -20,55 +24,68 @@ public class CrownShopStock implements ShopStock {
         this.shop = shop;
     }
 
+    @Override
     public boolean contains(Material material){
-        for (ItemStack stack : contents){
+        for (ItemStack stack : getContents()){
             if(stack.getType() == material) return true;
         }
         return false;
     }
 
+    @Override
     public boolean contains(Material material, @Nonnegative int amount){
         if(material == null || material == Material.AIR) return false;
         if(amount == 0) return true;
-        for (ItemStack i : contents){
+        for (ItemStack i : getContents()){
             if(i.getType() == material && (amount -= i.getAmount()) <= 0) return true;
         }
 
         return false;
     }
 
+    @Override
     public boolean containsExampleItem(){
-        return contains(exampleItem.getType(), exampleItem.getAmount());
+        return contains(getExampleItem().getType(), getExampleItem().getAmount());
     }
 
+    @Override
     public void removeExampleItemAmount(){
-        removeItem(exampleItem.getType(), exampleItem.getAmount());
+        removeItem(getExampleItem().getType(), getExampleItem().getAmount());
     }
 
+    @Override
     public void add(@Nonnull ItemStack stack){
-        if(contents.isEmpty()){
-            contents.add(stack.clone());
+        if(isFull()) throw new IllegalArgumentException("Contents is full!");
+        if(isEmpty()){
+            contents.add(stack);
             return;
         }
-        if(isFull()) throw new IllegalArgumentException("stock is full!");
 
-        ItemStack fuckFuck = stack.clone();
-        int lastItemAmount = getContents().get(getContents().size()-1).getAmount();
+        Inventory inv = Bukkit.createInventory(null, 27);
 
-        if(lastItemAmount == getExampleItem().getMaxStackSize()) contents.add(stack.clone());
-        else if(lastItemAmount < getExampleItem().getMaxStackSize()){
-            int a = lastItemAmount - fuckFuck.getAmount();
+        ItemStack[] array = new ItemStack[27];
+        inv.setContents(getContents().toArray(array));
+        inv.addItem(stack);
+
+        List<ItemStack> temp = new ArrayList<>();
+        for (ItemStack i : inv.getContents()){
+            if(i == null) continue;
+            temp.add(i);
         }
+        setContents(temp);
     }
 
+    @Override
     public boolean isFull(){
         return contents.size() > 27;
     }
 
+    @Override
     public boolean isEmpty(){
         return contents.isEmpty();
     }
 
+    @Override
     public void removeItem(Material material, @Nonnegative int amount){
         if(amount == 0 && !contains(material, amount)) throw new NullPointerException("There isn't enough items to remove in the inventory!");
 
@@ -87,33 +104,66 @@ public class CrownShopStock implements ShopStock {
         contents.removeAll(toRemove);
     }
 
+    @Override
     public List<ItemStack> getContents() {
         return contents;
     }
+    @Override
     public void setContents(@Nonnull List<ItemStack> contents) {
         if(this.contents.size() < contents.size()) shop.setOutOfStock(false);
         this.contents = contents;
     }
 
+    @Override
     public ItemStack getExampleItem() {
         if(exampleItem.getType() == Material.AIR) return null;
         return exampleItem.clone();
     }
 
+    @Override
     public void setExampleItem(ItemStack exampleItem) {
         if(exampleItem == null || exampleItem.getType() == Material.AIR) throw new NullPointerException("A null item cannot be set as a shop's example item");
         this.exampleItem = exampleItem;
         shop.setOutOfStock(false);
     }
 
+    @Override
     public void setExampleItemAndAdd(ItemStack exampleItem){
-        if(exampleItem == null || exampleItem.getType() == Material.AIR) throw new NullPointerException("A null item cannot be set as a shop's example item");
-        this.exampleItem = exampleItem;
-        shop.setOutOfStock(false);
-        contents.add(exampleItem);
+        setExampleItem(exampleItem);
+        add(getExampleItem());
     }
 
-    public CrownSignShop getOwningShop() {
+    @Override
+    public SignShop getOwningShop() {
         return shop;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CrownShopStock that = (CrownShopStock) o;
+        return Objects.equals(getContents(), that.getContents()) &&
+                Objects.equals(getExampleItem(), that.getExampleItem()) &&
+                Objects.equals(shop, that.shop);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getContents(), shop);
+    }
+
+    @Override
+    public String toString() {
+        return "CrownShopStock{" +
+                "contents=" + contents +
+                ", exampleItem=" + exampleItem +
+                ", shop=" + shop +
+                '}';
+    }
+
+    @Override
+    public void clear(){
+        contents.clear();
     }
 }

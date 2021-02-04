@@ -1,12 +1,19 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.CrownException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-public class BroadcastCommand implements CrownCommandExecutor {
+public class BroadcastCommand extends CrownCommand  {
+
+    public BroadcastCommand(){
+        super("broadcast", FtcCore.getInstance());
+
+        setDescription("Broadcasts a message to the entire server.");
+        setAliases("announce", "bc", "ac");
+        register();
+    }
 
     /*
      * ----------------------------------------

@@ -1,11 +1,11 @@
 package net.forthecrown.core.events.npc;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.clickevent.ClickEventManager;
 import net.forthecrown.core.clickevent.ClickEventTask;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -64,7 +64,7 @@ public class JeromeEvent implements Listener, ClickEventTask {
         //args[0] is the ID of the npc
 
         if(args[1].contains("join")){
-            FtcUser user = FtcCore.getUser(player.getUniqueId());
+            CrownUser user = FtcCore.getUser(player.getUniqueId());
             Branch royals = Branch.ROYALS;
 
             if(user.getBranch() == Branch.ROYALS){

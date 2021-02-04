@@ -43,6 +43,11 @@ public enum Rank {
         this.rankBranch = rankBranch;
     }
 
+    Rank(String tabPrefix, Branch rankBranch, Rank femaleEquiv){
+        this.tabPrefix = tabPrefix;
+        this.rankBranch = rankBranch;
+    }
+
     public String getPrefix(){
         return FtcCore.translateHexCodes(tabPrefix);
     }

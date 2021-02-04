@@ -1,12 +1,19 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-public class PostHelp implements CrownCommandExecutor {
+public class PostHelp extends CrownCommand {
+
+    public PostHelp(){
+        super("posthelp", FtcCore.getInstance());
+
+        setAliases("polehelp");
+        setDescription("Displays info for region poles.");
+        register();
+    }
 
     /*
      * ----------------------------------------

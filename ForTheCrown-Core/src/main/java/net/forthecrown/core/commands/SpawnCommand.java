@@ -1,12 +1,18 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-public class SpawnCommand implements CrownCommandExecutor {
+public class SpawnCommand extends CrownCommand {
+
+    public SpawnCommand(){
+        super("spawn", FtcCore.getInstance());
+
+        setPermission(null);
+        register();
+    }
 
     /*
      * ----------------------------------------

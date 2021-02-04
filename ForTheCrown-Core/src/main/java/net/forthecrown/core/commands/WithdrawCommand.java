@@ -1,14 +1,13 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.CrownItems;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Balances;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
-import net.forthecrown.core.files.Balances;
-import net.forthecrown.core.files.FtcUser;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -17,10 +16,15 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WithdrawCommand implements TabCompleter, CrownCommandExecutor {
+public class WithdrawCommand extends CrownCommand implements TabCompleter{
 
     public WithdrawCommand(){
-        FtcCore.getInstance().getCommandHandler().registerCommand("withdraw", this, this);
+        super("withdraw", FtcCore.getInstance());
+
+        setTabCompleter(this);
+        setUsage("&7Usage:&r /withdraw <amount>");
+        setDescription("Used to get cold coins from your balance");
+        register();
     }
 
     @Override
@@ -38,7 +42,7 @@ public class WithdrawCommand implements TabCompleter, CrownCommandExecutor {
 
         Player player = (Player) sender;
         Balances bals = FtcCore.getBalances();
-        FtcUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = FtcCore.getUser(player.getUniqueId());
 
         if(amount > bals.getBalance(player.getUniqueId())) throw new CannotAffordTransaction(player);
         if(player.getInventory().firstEmpty() == -1) throw new InvalidCommandExecution(player, "&cYour inventory is full! &7No space for the coin");

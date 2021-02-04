@@ -5,7 +5,10 @@ import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -182,6 +185,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         super.save();
     }
 
+    @Override
     public void unload(){
         save();
         FtcCore.loadedUsers.remove(this);
@@ -232,6 +236,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     public void addRank(Rank rank){
         ranks.add(rank);
     }
+
     @Override
     public void removeRank(Rank rank){
         if(hasRank(rank)) ranks.remove(rank);
@@ -519,6 +524,20 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         return Objects.hash(getBase(), currentRank, getCanSwapBranch(), getPets(), particleArrowActive, particleDeathActive, allowsRidingPlayers, getGems(), allowsEmotes, getSellAmount(), getTotalEarnings());
     }
 
+    @Override
+    public String toString() {
+        return "FtcUser{" +
+                "base=" + base +
+                ", name='" + name + '\'' +
+                ", currentRank=" + currentRank +
+                ", branch=" + branch +
+                ", canSwapBranch=" + canSwapBranch +
+                ", gems=" + gems +
+                ", allowsEmotes=" + allowsEmotes +
+                ", totalEarnings=" + totalEarnings +
+                ", nextResetTime=" + nextResetTime +
+                '}';
+    }
 
     private void permsCheck(){
         if(!isOnline()) return;

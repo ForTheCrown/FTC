@@ -4,7 +4,6 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.files.CrownSignShop;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -25,7 +24,7 @@ import java.util.UUID;
 
 public class SignShopCreateEvent implements Listener {
 
-    private final Map<UUID, CrownSignShop> asdasdaqsd = new HashMap<>();//Yes! I rolled my face on the keyboard to get the name
+    private final Map<UUID, SignShop> asdasdaqsd = new HashMap<>();//Yes! I rolled my face on the keyboard to get the name
 
     //WHAT AM I DOING
     @EventHandler(ignoreCancelled = true)
@@ -71,7 +70,7 @@ public class SignShopCreateEvent implements Listener {
 
         if(event.getLine(2).isBlank() && event.getLine(1).isBlank()) throw new CrownException(player, "&7You must provide a description of the shop's items");
 
-        CrownSignShop shop = FtcCore.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
+        SignShop shop = FtcCore.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
 
         player.openInventory(shop.getExampleInventory());
         asdasdaqsd.put(player.getUniqueId(), shop);

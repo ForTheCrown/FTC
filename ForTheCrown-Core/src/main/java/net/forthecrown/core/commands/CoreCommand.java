@@ -1,13 +1,13 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
-import net.forthecrown.core.files.FtcUser;
 import net.forthecrown.core.files.CrownSignShop;
+import net.forthecrown.core.files.FtcUser;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,10 +17,16 @@ import org.bukkit.util.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CoreCommand implements CrownCommandExecutor, TabCompleter {
+public class CoreCommand extends CrownCommand implements TabCompleter {
 
     public CoreCommand(){
-        FtcCore.getInstance().getCommandHandler().registerCommand("ftccore", this, this);
+        super("ftccore", FtcCore.getInstance());
+
+        setDescription("The primary FTC-Core command");
+        setUsage("&7Usage:&r /ftcore <reload | save | announcer | reload>");
+
+        setTabCompleter(this);
+        register();
     }
 
 
@@ -134,7 +140,7 @@ public class CoreCommand implements CrownCommandExecutor, TabCompleter {
             case "user":
                 if(args.length < 3) return false;
 
-                FtcUser user;
+                CrownUser user;
                 try {
                     user = FtcCore.getUser(FtcCore.getOffOnUUID(args[1]));
                 } catch (NullPointerException e){ throw new InvalidPlayerInArgument(sender, args[1]); }

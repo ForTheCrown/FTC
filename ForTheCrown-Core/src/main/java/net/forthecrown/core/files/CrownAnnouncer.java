@@ -1,6 +1,7 @@
 package net.forthecrown.core.files;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Announcer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -8,7 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrownAnnouncer extends FtcFileManager {
+public class CrownAnnouncer extends FtcFileManager implements Announcer {
 
     private List<String> thingsToAnnounce = new ArrayList<>();
     private long delay;

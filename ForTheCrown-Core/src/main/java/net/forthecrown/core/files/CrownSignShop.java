@@ -1,6 +1,7 @@
 package net.forthecrown.core.files;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.ShopStock;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.inventories.CrownShopStock;
@@ -18,7 +19,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class CrownSignShop extends FtcFileManager implements SignShop {
 
@@ -29,7 +33,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     private Integer price;
     private ShopType type;
     private boolean outOfStock;
-    private final CrownShopStock stock;
+    private final ShopStock stock;
 
     //used by getSignShop
     public CrownSignShop(Location signBlock) throws NullPointerException {
@@ -109,6 +113,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         sign.update();
     }
 
+    @Override
     public void destroyShop() {
         if(stock.getContents().size() > 0) {
             for (ItemStack stack : stock.getContents()){ location.getWorld().dropItemNaturally(location, stack); }
@@ -119,8 +124,8 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         FtcCore.loadedShops.remove(this);
     }
 
+    @Override
     public Inventory getShopInventory(){
-        Bukkit.broadcastMessage(stock.getContents().toString());
         Inventory shopInv = Bukkit.createInventory(null, 27, "Shop Contents");
         int i = 0;
         for (ItemStack item : stock.getContents()){
@@ -131,6 +136,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         return shopInv;
     }
 
+    @Override
     public Inventory getExampleInventory(){
         Inventory inv = Bukkit.createInventory(null, InventoryType.HOPPER, "Specify what and how much");
         inv.setItem(0, FtcCore.makeItem(Material.BARRIER, 1, true, ""));
@@ -180,42 +186,62 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     }
  */
 
+    @Override
     public Location getLocation() {
         return location;
     }
 
+    @Override
     public Block getBlock() {
         return block;
     }
 
+    @Override
     public UUID getOwner() {
         return owner;
     }
 
+    @Override
     public void setOwner(UUID shopOwner) {
         this.owner = shopOwner;
     }
 
+    @Override
     public ShopType getType() {
         return type;
     }
 
+    @Override
     public void setType(ShopType shopType) {
         this.type = shopType;
     }
 
+    @Override
     public Integer getPrice() {
         return price;
     }
 
+    @Override
     public void setPrice(Integer price) {
+        setPrice(price, false);
+    }
+    @Override
+    public void setPrice(Integer price, boolean updateSign) {
         this.price = price;
+
+        if(updateSign){
+            Sign sign = (Sign) getBlock().getState();
+            sign.setLine(3, ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + getPrice());
+            sign.update(true);
+        }
     }
 
+    @Override
     public boolean isOutOfStock() {
         return outOfStock;
     }
 
+    @Override
     public void setOutOfStock(boolean outOfStock) {
         if(getType().equals(ShopType.ADMIN_SELL_SHOP)) return;
 
@@ -228,18 +254,37 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         sign.update(true);
     }
 
+    @Override
     public boolean wasDeleted(){
         return deleted;
     }
 
-    public CrownShopStock getStock() {
+    @Override
+    public ShopStock getStock() {
         return stock;
     }
 
+    @Override
     public Sign getSign(){
         return (Sign) getBlock().getState();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SignShop that = (SignShop) o;
+        return getLocation().equals(that.getLocation()) &&
+                getOwner().equals(that.getOwner()) &&
+                getPrice().equals(that.getPrice()) &&
+                getType() == that.getType() &&
+                getStock().equals(that.getStock());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getLocation(), getOwner(), getPrice(), getType());
+    }
 
     private boolean legacyFileExists() {
         File oldFile = new File("plugins/ShopsReworked/ShopData/" + fileName + ".yml");

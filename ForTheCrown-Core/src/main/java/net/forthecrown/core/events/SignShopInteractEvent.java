@@ -1,11 +1,10 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Balances;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.customevents.SignShopUseEvent;
-import net.forthecrown.core.files.Balances;
-import net.forthecrown.core.files.CrownSignShop;
-import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -18,11 +17,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class SignShopInteractEvent implements Listener {
 
-    private final Map<UUID, CrownSignShop> dopfguijh = new HashMap<>(); //Yes! I rolled my face on the keyboard to get the name... V.2
+    private final Map<UUID, SignShop> dopfguijh = new HashMap<>(); //Yes! I rolled my face on the keyboard to get the name... V.2
 
     @EventHandler
     public void onSignShopUser(PlayerInteractEvent event){
@@ -37,7 +38,7 @@ public class SignShopInteractEvent implements Listener {
 
         FtcCore.addToCooldown(event.getPlayer(), 6, false);
 
-        CrownSignShop shop;
+        SignShop shop;
         try {
             shop = FtcCore.getShop(event.getClickedBlock().getLocation());
         } catch (Exception e){
@@ -55,7 +56,7 @@ public class SignShopInteractEvent implements Listener {
         }
 
         Balances bals = FtcCore.getBalances();
-        FtcUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = FtcCore.getUser(player.getUniqueId());
 
         FtcCore.getInstance().getServer().getPluginManager().callEvent(new SignShopUseEvent(shop, user, player, bals));
     }
@@ -70,7 +71,7 @@ public class SignShopInteractEvent implements Listener {
         SignShop shop = dopfguijh.get(player.getUniqueId());
         dopfguijh.remove(player.getUniqueId());
 
-        List<ItemStack> temp = new ArrayList<>();
+        shop.getStock().clear();
         for (ItemStack item : inv){
             if(item == null) continue;
             if(item.getType() != shop.getStock().getExampleItem().getType()){
@@ -78,10 +79,8 @@ public class SignShopInteractEvent implements Listener {
                 continue;
             }
 
-            temp.add(item);
+            shop.getStock().add(item);
         }
-
-        shop.getStock().setContents(temp);
     }
 }
 

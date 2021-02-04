@@ -1,0 +1,9 @@
+name: FTCcosmetics
+version: 1.0
+author: Wout
+main: net.forthecrown.cosmetics.Cosmetics
+description: Plugin that handles the cosmetics.
+api-version: 1.16
+prefix: ftccosmetics
+depend:
+  - FTCCore

@@ -1,14 +1,21 @@
 package net.forthecrown.core.commands.emotes;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.commands.CrownCommand;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
-import net.forthecrown.core.files.FtcUser;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ToggleEmotes implements CrownCommandExecutor {
+public class ToggleEmotes extends CrownCommand {
+
+    public ToggleEmotes(){
+        super("toggleemotes", FtcCore.getInstance());
+
+        setPermission("ftc.emotes");
+        register();
+    }
 
     /*
      * ----------------------------------------
@@ -37,7 +44,7 @@ public class ToggleEmotes implements CrownCommandExecutor {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 
         Player player = (Player) sender;
-        FtcUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = FtcCore.getUser(player.getUniqueId());
         String message = "&7You can longer send or receive emotes.";
 
         user.setAllowsEmotes(!user.allowsEmotes());

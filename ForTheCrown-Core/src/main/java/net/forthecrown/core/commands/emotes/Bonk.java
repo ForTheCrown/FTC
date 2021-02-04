@@ -1,10 +1,10 @@
 package net.forthecrown.core.commands.emotes;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.commands.CrownCommand;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
-import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,14 +14,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Bonk implements CrownCommandExecutor {
+public class Bonk extends CrownCommand {
 
-    /*public Bonk(){
-        super("bonk");
+    public Bonk(){
+        super("bonk", FtcCore.getInstance());
 
         setPermission("ftc.emotes.bonk");
         register();
-    }*/
+    }
 
     /*
      * ----------------------------------------
@@ -46,7 +46,7 @@ public class Bonk implements CrownCommandExecutor {
         // Sender must be player:
         if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         Player player = (Player) sender;
-        FtcUser playerData = FtcCore.getUser(player.getUniqueId());
+        CrownUser playerData = FtcCore.getUser(player.getUniqueId());
 
         // Sender can't be on cooldown:
         if (FtcCore.isOnCooldown(player)) {
@@ -62,7 +62,7 @@ public class Bonk implements CrownCommandExecutor {
         // Both sender and target should have emotes enabled:
         Player target = Bukkit.getPlayer(args[0]);
         if(target == null) throw new InvalidPlayerInArgument(sender, args[0]);
-        FtcUser targetData = FtcCore.getUser(target.getUniqueId());
+        CrownUser targetData = FtcCore.getUser(target.getUniqueId());
 
         if (!playerData.allowsEmotes()) {
             FtcCore.senderEmoteOffMessage(player);

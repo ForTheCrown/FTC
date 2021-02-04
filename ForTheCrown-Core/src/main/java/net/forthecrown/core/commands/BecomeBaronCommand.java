@@ -1,13 +1,12 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Balances;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
-import net.forthecrown.core.files.Balances;
-import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -19,7 +18,10 @@ import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 
-public class BecomeBaronCommand implements CrownCommandExecutor {
+public class BecomeBaronCommand extends CrownCommand  {
+    public BecomeBaronCommand() {
+        super("becomebaron", FtcCore.getInstance());
+    }
 
     /*
      * ----------------------------------------
@@ -49,7 +51,7 @@ public class BecomeBaronCommand implements CrownCommandExecutor {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         int baronPrice = FtcCore.getInstance().getConfig().getInt("BaronPrice");
         Player player = (Player) sender;
-        FtcUser data = FtcCore.getUser(player.getUniqueId());
+        CrownUser data = FtcCore.getUser(player.getUniqueId());
         Balances bals = FtcCore.getBalances();
 
         if(data.isBaron()){

@@ -1,6 +1,5 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ShopCommand implements CrownCommandExecutor, TabCompleter {
+public class ShopCommand extends CrownCommand implements TabCompleter {
 
     /*
      * ----------------------------------------
@@ -35,7 +34,12 @@ public class ShopCommand implements CrownCommandExecutor, TabCompleter {
      */
 
     public ShopCommand(){
-        FtcCore.getInstance().getCommandHandler().registerCommand("shop", this, this);
+        super("shop", FtcCore.getInstance());
+
+        setUsage("&7Usage:&r /shop [mining | farming | drops]");
+        setDescription("Opens the Shop GUI in which one can sell things");
+        setTabCompleter(this);
+        register();
     }
 
     @Override

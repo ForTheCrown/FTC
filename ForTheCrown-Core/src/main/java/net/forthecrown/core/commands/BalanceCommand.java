@@ -1,11 +1,10 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
-import net.forthecrown.core.files.Balances;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,10 +12,10 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class BalanceCommand implements CrownCommandExecutor {
+public class BalanceCommand extends CrownCommand {
 
-    /*public BalanceCommand() {
-        super("balance");
+    public BalanceCommand() {
+        super("balance", FtcCore.getInstance());
 
         setPermission("ftc.balance");
         setUsage("&7Usage: &r/balance <player>");
@@ -24,7 +23,7 @@ public class BalanceCommand implements CrownCommandExecutor {
         setDescription("Displays a player's balance");
 
         register();
-    }*/
+    }
 
 
 

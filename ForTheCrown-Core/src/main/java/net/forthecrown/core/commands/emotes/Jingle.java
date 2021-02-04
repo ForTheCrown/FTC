@@ -1,8 +1,8 @@
 package net.forthecrown.core.commands.emotes;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.files.FtcUser;
+import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.commands.CrownCommand;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -12,7 +12,15 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Jingle implements CrownCommandExecutor {
+public class Jingle extends CrownCommand {
+
+    public Jingle(){
+        super("jingle", FtcCore.getInstance());
+
+        setPermission("ftc.emotes.jingle");
+        setDescription("Plays a christmas song. :)");
+        register();
+    }
 
     /*
      * ----------------------------------------
@@ -40,7 +48,7 @@ public class Jingle implements CrownCommandExecutor {
             return false;
         }
         Player player = (Player) sender;
-        FtcUser playerData = FtcCore.getUser(player.getUniqueId());
+        CrownUser playerData = FtcCore.getUser(player.getUniqueId());
 
         if(FtcCore.isOnCooldown(player)) {
             sender.sendMessage(ChatColor.GRAY + "You jingle too often lol");
@@ -64,7 +72,7 @@ public class Jingle implements CrownCommandExecutor {
             return false;
         }
 
-        FtcUser targetData = FtcCore.getUser(target.getUniqueId());
+        CrownUser targetData = FtcCore.getUser(target.getUniqueId());
 
         if(!targetData.allowsEmotes()){
             player.sendMessage(ChatColor.GRAY + "This player has disabled emotes.");

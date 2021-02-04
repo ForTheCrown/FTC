@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Pirate.jar">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="Pirate.jar">
+      <element id="module-output" name="Pirate" />
+    </root>
+  </artifact>
+</component>

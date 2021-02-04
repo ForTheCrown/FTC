@@ -1,10 +1,10 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
-import net.forthecrown.core.files.FtcUser;
 import net.forthecrown.core.inventories.RankInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -30,7 +30,7 @@ public class RankGuiUseEvent implements Listener {
         if(!event.getCurrentItem().getItemMeta().hasDisplayName()) return;
 
         Player player = (Player) event.getWhoClicked();
-        FtcUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = FtcCore.getUser(player.getUniqueId());
         RankInventory rankInv = new RankInventory(user);
         String currentInvTitle = event.getView().getTitle();
         String clickedRankString = event.getCurrentItem().getItemMeta().getDisplayName();

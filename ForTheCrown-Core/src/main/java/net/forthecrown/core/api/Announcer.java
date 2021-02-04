@@ -2,7 +2,7 @@ package net.forthecrown.core.api;
 
 import java.util.List;
 
-public interface Announcer {
+public interface Announcer extends CrownFileManager {
 
     /**
      * Gets the delay between automatic announcements

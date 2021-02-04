@@ -1,12 +1,18 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.CrownException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-public class Discord implements CrownCommandExecutor {
+public class Discord extends CrownCommand {
+    public Discord(){
+        super("Discord", FtcCore.getInstance());
+
+        setPermission(null);
+        setDescription("Gives you the servers discord link.");
+        register();
+    }
 
     /*
     * Just sends the player the discord link

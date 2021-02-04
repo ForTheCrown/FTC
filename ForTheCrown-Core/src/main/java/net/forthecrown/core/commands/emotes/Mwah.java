@@ -1,9 +1,9 @@
 package net.forthecrown.core.commands.emotes;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.commands.CrownCommand;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
-import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -20,7 +20,16 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mwah implements CrownCommandExecutor {
+public class Mwah extends CrownCommand {
+
+    public Mwah(){
+        super("mwah", FtcCore.getInstance());
+
+        setAliases("smooch", "kiss");
+        setPermission("ftc.emotes");
+        setDescription("Kisses another player.");
+        register();
+    }
 
     private List<Player> onCooldown = new ArrayList<>();
 
@@ -50,8 +59,8 @@ public class Mwah implements CrownCommandExecutor {
             return false;
         }
 
-        FtcUser playerData = FtcCore.getUser(player.getUniqueId());
-        FtcUser targetData = FtcCore.getUser(target.getUniqueId());
+        CrownUser playerData = FtcCore.getUser(player.getUniqueId());
+        CrownUser targetData = FtcCore.getUser(target.getUniqueId());
 
         // Sender should have emotes enabled:
         if(!playerData.allowsEmotes()){

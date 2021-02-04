@@ -1,6 +1,5 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
@@ -13,7 +12,14 @@ import javax.annotation.Nonnegative;
 import java.text.DecimalFormat;
 import java.util.*;
 
-public class BalanceTopCommand implements CrownCommandExecutor {
+public class BalanceTopCommand extends CrownCommand  {
+    public BalanceTopCommand() {
+        super("balancetop", FtcCore.getInstance());
+
+        setAliases("baltop", "banktop", "cashtop", "topbals");
+        setDescription("Displays all the player's balances in order from biggest to smallest");
+        register();
+    }
 
     /*
      * ----------------------------------------

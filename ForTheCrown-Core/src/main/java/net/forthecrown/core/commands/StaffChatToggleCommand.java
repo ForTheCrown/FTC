@@ -1,6 +1,5 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
@@ -9,7 +8,15 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public class StaffChatToggleCommand implements CrownCommandExecutor {
+public class StaffChatToggleCommand extends CrownCommand {
+
+    public StaffChatToggleCommand(){
+        super("staffchattoggle", FtcCore.getInstance());
+
+        setAliases("sct", "sctoggle");
+        setPermission("ftc.staffchat");
+        register();
+    }
 
     /*
      * ----------------------------------------

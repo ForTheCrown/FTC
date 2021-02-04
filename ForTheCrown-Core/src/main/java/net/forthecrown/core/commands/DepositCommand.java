@@ -1,21 +1,23 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
-import net.forthecrown.core.files.Balances;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class DepositCommand implements CrownCommandExecutor {
+public class DepositCommand extends CrownCommand  {
 
     public DepositCommand(){
-        FtcCore.getInstance().getCommandHandler().registerCommand("deposit", this);
+        super("deposit", FtcCore.getInstance());
+
+        setUsage("&7Usage: &r/deposit");
+        register();
     }
 
     @Override

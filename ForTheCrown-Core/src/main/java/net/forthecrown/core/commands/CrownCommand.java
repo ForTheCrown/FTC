@@ -6,6 +6,7 @@ import net.forthecrown.core.exceptions.CrownException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import java.util.List;
 public abstract class CrownCommand extends Command implements CrownCommandExecutor {
 
     private final String prefix;
+    private TabCompleter tabCompleter;
 
     protected CrownCommand(String name, Plugin plugin) {
         super(name);
@@ -32,13 +34,16 @@ public abstract class CrownCommand extends Command implements CrownCommandExecut
         setPermissionMessage("&7You do not have permission to use this command!");
     }
 
-    protected Command setAliases(String... aliases) {
-        return super.setAliases(Arrays.asList(aliases));
+    protected void setTabCompleter(TabCompleter tabCompleter){
+        this.tabCompleter = tabCompleter;
     }
 
-    @Override
-    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
-        return super.tabComplete(sender, alias, args);
+    protected TabCompleter getTabCompleter() {
+        return tabCompleter;
+    }
+
+    protected Command setAliases(String... aliases) {
+        return super.setAliases(Arrays.asList(aliases));
     }
 
     @Override
@@ -68,5 +73,16 @@ public abstract class CrownCommand extends Command implements CrownCommandExecut
         } catch (CrownException e){
             return true;
         }
+    }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
+        if(getTabCompleter() != null){
+            TabCompleter tab = getTabCompleter();
+            List<String> asd = tab.onTabComplete(sender, this, alias, args);
+
+            if(asd != null) return asd;
+        }
+        return super.tabComplete(sender, alias, args);
     }
 }

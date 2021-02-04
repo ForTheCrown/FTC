@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="paper-1.16.4-416">
+    <CLASSES>
+      <root url="jar://D:/FtcCloneServer/paper-1.16.4-416.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../ForTheCrown-Core/target/FTC-Core-1.1-MAYBE-STABLE.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

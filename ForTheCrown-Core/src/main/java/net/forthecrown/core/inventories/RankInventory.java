@@ -1,9 +1,9 @@
 package net.forthecrown.core.inventories;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,8 +13,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class RankInventory {
 
-    private final FtcUser user;
-    public RankInventory(FtcUser user) {
+    private final CrownUser user;
+    public RankInventory(CrownUser user) {
         this.user = user;
     }
 

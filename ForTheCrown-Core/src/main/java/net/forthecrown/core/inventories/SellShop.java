@@ -1,8 +1,8 @@
 package net.forthecrown.core.inventories;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.SellAmount;
-import net.forthecrown.core.files.FtcUser;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,12 +13,12 @@ import org.bukkit.inventory.ItemStack;
 
 public class SellShop {
 
-    private final FtcUser user;
+    private final CrownUser user;
 
     public SellShop(Player base){
         user = FtcCore.getUser(base.getUniqueId());
     }
-    public SellShop(FtcUser base){
+    public SellShop(CrownUser base){
         user = base;
     }
 

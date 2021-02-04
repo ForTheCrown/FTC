@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="FTC-Core-0.5-TESTING">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../ForTheCrown-Core/target/FTC-Core-0.5-TESTING.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

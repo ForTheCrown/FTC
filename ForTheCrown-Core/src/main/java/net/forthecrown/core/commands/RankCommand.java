@@ -1,6 +1,5 @@
 package net.forthecrown.core.commands;
 
-import net.forthecrown.core.CrownCommandExecutor;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
@@ -9,7 +8,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class RankCommand implements CrownCommandExecutor {
+public class RankCommand extends CrownCommand {
+
+    public RankCommand(){
+        super("rank", FtcCore.getInstance());
+
+        setAliases("ranks");
+        register();
+    }
 
     /*
      * ----------------------------------------
@@ -21,8 +27,6 @@ public class RankCommand implements CrownCommandExecutor {
      * Valid usages of command:
      * - /rank
      * - /ranks
-     * - /rankgui
-     * - /rankui
      *
      * Author: Wout
      */

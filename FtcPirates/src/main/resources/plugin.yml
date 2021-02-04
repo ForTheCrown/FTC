@@ -1,0 +1,12 @@
+name: Pirate
+version: ${project.version}
+main: net.forthecrown.pirates.Pirates
+api-version: 1.16
+authors: [ Wout ]
+depend:
+  - FTCCore
+
+commands:
+  rlpirate:
+    permission: ftc.pirate.reload
+    description: Reloads the pirate plugin.

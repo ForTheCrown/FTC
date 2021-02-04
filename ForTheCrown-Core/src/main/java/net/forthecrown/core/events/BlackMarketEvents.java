@@ -1,13 +1,15 @@
 package net.forthecrown.core.events;
 
-import net.forthecrown.core.files.CrownBlackMarket;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Balances;
+import net.forthecrown.core.api.BlackMarket;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
-import net.forthecrown.core.exceptions.*;
-import net.forthecrown.core.files.Balances;
-import net.forthecrown.core.files.FtcUser;
+import net.forthecrown.core.exceptions.CannotAffordTransaction;
+import net.forthecrown.core.exceptions.CrownException;
+import net.forthecrown.core.exceptions.NoRankException;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -42,8 +44,8 @@ public class BlackMarketEvents implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-        CrownBlackMarket bm = FtcCore.getBlackMarket();
-        FtcUser user = FtcCore.getUser(player.getUniqueId());
+        BlackMarket bm = FtcCore.getBlackMarket();
+        CrownUser user = FtcCore.getUser(player.getUniqueId());
 
         if(user.getBranch() != Branch.PIRATES) throw new CrownException(player, villie.getCustomName() + " only trusts real pirates");
 
@@ -83,8 +85,8 @@ public class BlackMarketEvents implements Listener {
         if(event.getCurrentItem().hasItemMeta() && !event.getCurrentItem().getItemMeta().getLore().get(0).contains("Value: ")) return;
 
         Player player = (Player) event.getWhoClicked();
-        CrownBlackMarket bm = FtcCore.getBlackMarket();
-        FtcUser user = FtcCore.getUser(event.getWhoClicked().getUniqueId());
+        BlackMarket bm = FtcCore.getBlackMarket();
+        CrownUser user = FtcCore.getUser(event.getWhoClicked().getUniqueId());
         Balances bals = FtcCore.getBalances();
 
         if(event.getView().getTitle().contains("Parrot Shop")){
@@ -144,7 +146,7 @@ public class BlackMarketEvents implements Listener {
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
     }
 
-    private boolean sellItem(FtcUser user, Balances bals, CrownBlackMarket bm, Material toSell){
+    private boolean sellItem(CrownUser user, Balances bals, BlackMarket bm, Material toSell){
         int sellAmount = user.getSellAmount().getInt();
         int finalSell = sellAmount;
         if(finalSell == -1) finalSell++;
@@ -188,7 +190,7 @@ public class BlackMarketEvents implements Listener {
         return true;
     }
 
-    private void buyEnchant(FtcUser user, Balances bals, CrownBlackMarket bm){
+    private void buyEnchant(CrownUser user, Balances bals, BlackMarket bm){
         if(bals.getBalance(user.getBase()) < bm.getEnchantPrice(bm.getDailyEnchantment())) throw new CannotAffordTransaction(user.getPlayer());
         if(user.getPlayer().getInventory().firstEmpty() == -1){
             user.sendMessage("There's no room in your inventory!");
