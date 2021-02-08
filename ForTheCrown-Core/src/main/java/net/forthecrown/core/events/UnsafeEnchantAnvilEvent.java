@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.PrepareAnvilEvent;
 
 public class UnsafeEnchantAnvilEvent implements Listener {
 
+    //TODO: everything lol
     @EventHandler(ignoreCancelled = true)
     public void onPrepareAnvil(PrepareAnvilEvent event) {
         for(HumanEntity entity : event.getViewers()){

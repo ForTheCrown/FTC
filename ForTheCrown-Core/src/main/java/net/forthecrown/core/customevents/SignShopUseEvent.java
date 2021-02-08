@@ -93,5 +93,4 @@ public class SignShopUseEvent extends Event implements Cancellable {
     public static HandlerList getHandlerList() {
         return handlers;
     }
-
 }

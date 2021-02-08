@@ -23,6 +23,7 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
         super("ftccore", FtcCore.getInstance());
 
         setDescription("The primary FTC-Core command");
+        setPermission("ftc.commands.admin");
         setUsage("&7Usage:&r /ftcore <reload | save | announcer | reload>");
 
         setTabCompleter(this);

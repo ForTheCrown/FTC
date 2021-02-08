@@ -6,6 +6,7 @@ import net.forthecrown.core.commands.CrownCommand;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -19,7 +20,7 @@ public class Poke extends CrownCommand {
     public Poke(){
         super("poke", FtcCore.getInstance());
 
-        setPermissionMessage("ftc.emotes");
+        setPermission("ftc.emotes");
         setDescription("Pokes another player.");
         register();
     }
@@ -68,9 +69,11 @@ public class Poke extends CrownCommand {
         int pokeOwieInt = (int)(Math.random()*pokeOwies.size()); //The random int that determines what body part they'll poke lol
         player.sendMessage("You poked " + ChatColor.YELLOW + target.getName() + "'s " + ChatColor.RESET + pokeOwies.get(pokeOwieInt));
 
-        target.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RESET + " poked your " + pokeOwies.get(pokeOwieInt));
-        target.getWorld().playSound(target.getLocation(), Sound.ENCHANT_THORNS_HIT, 3.0F, 1.8F);
-        target.setVelocity(target.getVelocity().add(target.getLocation().getDirection().normalize().multiply(-0.3).setY(.1)));
+        if(target.getGameMode() != GameMode.SPECTATOR){
+            target.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RESET + " poked your " + pokeOwies.get(pokeOwieInt));
+            target.getWorld().playSound(target.getLocation(), Sound.ENCHANT_THORNS_HIT, 3.0F, 1.8F);
+            target.setVelocity(target.getVelocity().add(target.getLocation().getDirection().normalize().multiply(-0.3).setY(.1)));
+        }
 
         // Put sender on cooldown:
         FtcCore.addToCooldown(player, 5*20, true);

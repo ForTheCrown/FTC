@@ -56,8 +56,13 @@ public class InMazeEvents implements Listener {
         placeLoc.createExplosion(1, false, false);
         placeLoc.add(0, 1, 0).getBlock().setType(Material.AIR);
 
+        if(i > 3) i = 3;
+
         i--;
-        if(i < 1) player.getInventory().removeItemAnySlot(main.getBomber());
+        if(i < 1){
+            player.getInventory().removeItemAnySlot(main.getBomber());
+            return;
+        }
 
         player.sendMessage(ChatColor.GRAY + "Bomb was used! " + ChatColor.YELLOW + i + " uses" + ChatColor.GRAY + " remaining.");
 

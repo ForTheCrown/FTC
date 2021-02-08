@@ -19,6 +19,11 @@ public final class ClickEventManager {
     private ClickEventManager(){
     }
 
+    /**
+     * Registers a click event and returns a string ID, which is used to call it later
+     * @param classToCall The ClickEventTask class that gets called when the click event is executed
+     * @return the string ID used to later call the click event
+     */
     public static String registerClickEvent(ClickEventTask classToCall){
         String npcID = generateRandomID();
         if(npcID == null) throw new NullPointerException("Unable to generate ID for NPC");
@@ -27,15 +32,29 @@ public final class ClickEventManager {
         return npcID;
     }
 
+    /**
+     * Unregisters a click event
+     * @param id the ID of the event to unregister
+     */
     public static void unregisterClickEvent(String id){
         if(registeredClickEvents.get(id) == null) throw new NullPointerException("No Npc with this ID exists: " + id);
         registeredClickEvents.remove(id);
     }
 
+    /**
+     * Gets all registered click event IDs
+     * @return registered click event IDs
+     */
     public static Set<String> getRegisteredClickEvents(){
         return registeredClickEvents.keySet();
     }
 
+    /**
+     * Calls a click event
+     * @param id The ID of the ClickEventTask to call
+     * @param args Any additional args you might want to parse
+     * @param player The player that calls the click event
+     */
     public static void callClickEvent(String id, String[] args, Player player){
         if(registeredClickEvents.get(id) == null) throw new NullPointerException("No Npc with this ID exists: " + id);
 
@@ -67,6 +86,9 @@ public final class ClickEventManager {
     }
 
     public static String getClickEventCommand(String id, String... args){
+       return getCommand(id, args);
+    }
+    public static String getCommand(String id, String... args){
         return "/npcconverse " + id + " " + String.join(" ", args);
     }
 

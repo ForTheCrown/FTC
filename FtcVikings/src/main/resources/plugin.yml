@@ -1,0 +1,9 @@
+name: Vikings
+version: ${project.version}
+main: net.forthecrown.vikings.Vikings
+api-version: 1.16
+depend:
+  - FTCCore
+  - Multiverse-Core
+authors:
+  - Botul

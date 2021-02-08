@@ -43,11 +43,6 @@ public enum Rank {
         this.rankBranch = rankBranch;
     }
 
-    Rank(String tabPrefix, Branch rankBranch, Rank femaleEquiv){
-        this.tabPrefix = tabPrefix;
-        this.rankBranch = rankBranch;
-    }
-
     public String getPrefix(){
         return FtcCore.translateHexCodes(tabPrefix);
     }
@@ -61,7 +56,7 @@ public enum Rank {
     }
 
     public static List<Rank> getFreeRanks(){
-        return Arrays.asList(Rank.KNIGHT, Rank.BARON, Rank.BARONESS, Rank.SAILOR, Rank.PIRATE, Rank.VIKING, Rank.BERSERKER, Rank.SHIELD_MAIDEN);
+        return Arrays.asList(Rank.KNIGHT, Rank.BARON, Rank.BARONESS, Rank.SAILOR, Rank.PIRATE, Rank.VIKING, Rank.BERSERKER);
     }
 
     public static Rank fromPrefix(String s){

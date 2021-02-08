@@ -12,14 +12,6 @@ import org.bukkit.plugin.Plugin;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * This seems to be a better alternative to having a custom command handler, but I can't be arsed to convert every command class over to it... again
- * It does also require that I YEET every command in the commands section the plugin.yml
- *
- * A class just needs to extend this and do any setters it wants in the constructor.
- * The last line in the constructor MUST always be register();
- * Because that registers the command, and if that doesn't happen, the command will never be usable
- */
 public abstract class CrownCommand extends Command implements CrownCommandExecutor {
 
     private final String prefix;
@@ -68,6 +60,8 @@ public abstract class CrownCommand extends Command implements CrownCommandExecut
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+        if(!testPermission(sender)) return true;
+
         try {
             return run(sender, this, commandLabel, args);
         } catch (CrownException e){

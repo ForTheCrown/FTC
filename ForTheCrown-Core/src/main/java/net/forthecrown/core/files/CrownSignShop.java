@@ -147,45 +147,6 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         return inv;
     }
 
-/*
-    public boolean setExampleItems(ItemStack[] exampleItem){
-        ItemStack item = null;
-        for(ItemStack stack : exampleItem){
-            if(stack == null) continue;
-            if(item == null) item = stack;
-            else return false;
-        }
-        if(item == null) throw new NullPointerException();
-        setExampleItem(item);
-
-        stock.add(item);
-
-        setOutOfStock(false);
-        save();
-        return true;
-    }
-
-    public ItemStack[] setItems(ItemStack[] toSet){
-        List<ItemStack> toReturn = new ArrayList<>();
-        if(toSet.length > 27) return null;
-        if(getExampleItem() == null) setExampleItem(toSet[0]);
-
-        for(ItemStack stack : toSet){
-            if(stack == null) continue;
-            if(stack.getType() != getExampleItem().getType()) {
-                toReturn.add(stack);
-                continue;
-            }
-            stock.add(stack);
-            setOutOfStock(false);
-        }
-
-        ItemStack[] asd = new ItemStack[toReturn.size()];
-        toReturn.toArray(asd);
-        return asd;
-    }
- */
-
     @Override
     public Location getLocation() {
         return location;

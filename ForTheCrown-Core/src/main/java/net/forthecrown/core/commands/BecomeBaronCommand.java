@@ -21,6 +21,7 @@ import java.text.DecimalFormat;
 public class BecomeBaronCommand extends CrownCommand  {
     public BecomeBaronCommand() {
         super("becomebaron", FtcCore.getInstance());
+        register();
     }
 
     /*

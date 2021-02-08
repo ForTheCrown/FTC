@@ -17,7 +17,6 @@ public class BalanceCommand extends CrownCommand {
     public BalanceCommand() {
         super("balance", FtcCore.getInstance());
 
-        setPermission("ftc.balance");
         setUsage("&7Usage: &r/balance <player>");
         setAliases("bal", "bank", "cash", "money");
         setDescription("Displays a player's balance");

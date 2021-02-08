@@ -35,7 +35,7 @@ public class JeromeEvent implements Listener, ClickEventTask {
         if(event.getRightClicked().getType() != EntityType.VILLAGER) return;
         if(event.getHand() != EquipmentSlot.HAND) return;
         Villager villie = (Villager) event.getRightClicked();
-        if(villie.getCustomName() == null || !villie.getCustomName().contains(ChatColor.YELLOW + "Jerome")) return;
+        if(villie.getCustomName() == null || villie.getCustomName().equals("") || !villie.getCustomName().contains(ChatColor.YELLOW + "Jerome")) return;
         if(!villie.isInvulnerable()) return;
         event.setCancelled(true);
 
@@ -46,11 +46,11 @@ public class JeromeEvent implements Listener, ClickEventTask {
         ClickEventManager.allowCommandUsage(player, true);
 
         TextComponent message1 = new TextComponent(ChatColor.YELLOW + "[Info about Knight]");
-        message1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventManager.getClickEventCommand(npcID, "info")));
+        message1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventManager.getCommand(npcID, "info")));
         message1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GRAY + "" + ChatColor.ITALIC + "Click me!")));
 
         TextComponent message2 = new TextComponent(ChatColor.YELLOW + "[Join Knights]");
-        message2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventManager.getClickEventCommand(npcID, "join")));
+        message2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventManager.getCommand(npcID, "join")));
         message2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GRAY + "" + ChatColor.ITALIC + "Click me!")));
 
         player.sendMessage(ChatColor.GOLD + "--" + ChatColor.WHITE + " Hi, what can I do for you? " + ChatColor.GOLD + "--");

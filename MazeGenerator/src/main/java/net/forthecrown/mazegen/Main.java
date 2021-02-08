@@ -177,7 +177,9 @@ public final class Main extends JavaPlugin {
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
 
         timer.destroyTimer();
-        if(player.getInventory().contains(getBomber())) player.getInventory().removeItemAnySlot(getBomber());
+        try {
+            player.getInventory().removeItemAnySlot(getBomber());
+        } catch (Exception ignored) {}
 
         PlayerMoveEvent.getHandlerList().unregister(inMazeEvents);
         PlayerInteractEvent.getHandlerList().unregister(inMazeEvents);

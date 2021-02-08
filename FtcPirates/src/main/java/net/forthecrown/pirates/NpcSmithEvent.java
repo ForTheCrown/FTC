@@ -40,7 +40,7 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
         if(event.getHand() != EquipmentSlot.HAND) return;
         if(FtcCore.isOnCooldown(event.getPlayer())) return;
         Villager villie = (Villager) event.getRightClicked();
-        if(villie.getCustomName() != null && !villie.getCustomName().contains(ChatColor.YELLOW + "Smith")) return;
+        if(villie.getCustomName() == null || !villie.getCustomName().contains(ChatColor.YELLOW + "Smith")) return;
         if(!villie.isInvulnerable()) return;
         event.setCancelled(true);
 
@@ -95,7 +95,7 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
             sword.setType(Material.NETHERITE_SWORD);
 
             ItemMeta meta = sword.getItemMeta();
-            meta.setDisplayName(ChatColor.RESET + FtcCore.translateHexCodes("&#917558-&#D1C8BACaptain's Cutlass&#917558-"));
+            meta.setDisplayName(ChatColor.RESET + FtcCore.translateHexCodes("&#917558-&#D1C8BA&lCaptain's Cutlass&#917558-"));
             List<String> lores = meta.getLore();
             lores.set(2, FtcCore.translateHexCodes("&#917558The brearer of this cutlass bows to no laws, to no king,"));
             lores.set(3, FtcCore.translateHexCodes("&#917558its wielder leads their crew towards everlasting riches."));

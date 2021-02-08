@@ -11,6 +11,7 @@ public class PostHelp extends CrownCommand {
         super("posthelp", FtcCore.getInstance());
 
         setAliases("polehelp");
+        setPermission(null);
         setDescription("Displays info for region poles.");
         register();
     }

@@ -3,6 +3,8 @@ package net.forthecrown.pirates;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.exceptions.CannotAffordTransaction;
+import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.pirates.commands.*;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -221,6 +223,13 @@ public final class Pirates extends JavaPlugin implements Listener {
             } else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Jack")) {
                 event.setCancelled(true);
                 openLevelSelector(player);
+            } else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Ben")){
+                if(!user.getAvailableRanks().contains(Rank.PIRATE)) throw new CrownException(user, "&eBen &7only trusts real pirates!");
+                if(FtcCore.getBalances().getBalance(player.getUniqueId()) < 50000) throw new CannotAffordTransaction(player);
+
+                FtcCore.getBalances().addBalance(player.getUniqueId(), -50000);
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gh give " + player.getName() + " 50");
+                user.sendMessage("&7You bought a grappling hook from &eBen &7for &e50,000 Rhines");
             }
 
         }

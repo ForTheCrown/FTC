@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="FTC-Core-1.1-MAYBE-STABLE">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../ForTheCrown-Core/target/FTC-Core-1.1-MAYBE-STABLE.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -110,8 +110,8 @@ public class CrownShopStock implements ShopStock {
     }
     @Override
     public void setContents(@Nonnull List<ItemStack> contents) {
-        if(this.contents.size() < contents.size()) shop.setOutOfStock(false);
         this.contents = contents;
+        shop.setOutOfStock(false);
     }
 
     @Override

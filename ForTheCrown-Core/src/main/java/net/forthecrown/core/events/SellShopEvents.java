@@ -166,7 +166,7 @@ public class SellShopEvents implements Listener {
         int comparison1 = seller.getItemPrice(toSell);
 
         //if the price dropped
-        if(comparison1 < comparison0) player.sendMessage("Your price for " + s + " has dropped to " + comparison1);
+        if(comparison1 < comparison0) seller.sendMessage("&7Your price for " + s + " has dropped to " + comparison1);
 
         return true;
     }

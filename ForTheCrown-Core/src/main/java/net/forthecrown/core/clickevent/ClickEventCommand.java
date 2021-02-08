@@ -10,7 +10,7 @@ public class ClickEventCommand extends CrownCommand {
 
     public ClickEventCommand(){
         super("npcconverse", FtcCore.getInstance());
-        setDescription("The Command used by the ClickEventApi execute code ran by clickable text");
+        setDescription("The Command used by the ClickEventManager to execute code ran by clickable text");
     }
 
     @Override

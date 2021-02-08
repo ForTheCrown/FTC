@@ -2,6 +2,9 @@ package net.forthecrown.core.api;
 
 import java.util.List;
 
+/**
+ * The class representing the ingame Announcer.
+ */
 public interface Announcer extends CrownFileManager {
 
     /**

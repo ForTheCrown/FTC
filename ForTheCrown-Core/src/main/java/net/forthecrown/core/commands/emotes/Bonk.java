@@ -6,10 +6,7 @@ import net.forthecrown.core.commands.CrownCommand;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,7 +16,7 @@ public class Bonk extends CrownCommand {
     public Bonk(){
         super("bonk", FtcCore.getInstance());
 
-        setPermission("ftc.emotes.bonk");
+        setPermission("ftc.emotes");
         register();
     }
 
@@ -80,9 +77,11 @@ public class Bonk extends CrownCommand {
         player.sendMessage("You bonked " + ChatColor.YELLOW + target.getName() + ChatColor.RESET + "!");
         target.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.RESET + " bonked you!");
 
-        target.teleport(loc);
-        target.getWorld().playSound(loc, Sound.ENTITY_SHULKER_HURT_CLOSED, 2.0F, 0.8F);
-        target.getWorld().spawnParticle(Particle.CRIT, loc.getX(), loc.getY()+1, loc.getZ(), 5, 0.5, 0.5, 0.5);
+        if(target.getGameMode() != GameMode.SPECTATOR){
+            target.teleport(loc);
+            target.getWorld().playSound(loc, Sound.ENTITY_SHULKER_HURT_CLOSED, 2.0F, 0.8F);
+            target.getWorld().spawnParticle(Particle.CRIT, loc.getX(), loc.getY()+1, loc.getZ(), 5, 0.5, 0.5, 0.5);
+        }
 
         // Put sender on cooldown:
         FtcCore.addToCooldown(player, 5*20, true);

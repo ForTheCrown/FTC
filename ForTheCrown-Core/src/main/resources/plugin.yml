@@ -3,10 +3,9 @@ version: @version@
 main: net.forthecrown.core.FtcCore
 api-version: 1.16
 authors: [ Botul, Wout ]
-prefix: ftccore
 loadbefore:
-  - Essentials
   - OpenInv
+  - Essentials
 
 commands:
   staffchat:

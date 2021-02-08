@@ -19,7 +19,7 @@ public class TpaskCommand extends CrownCommand {
     public TpaskCommand(){
         super("tpask", FtcCore.getInstance());
 
-        setAliases("tpa");
+        setAliases("tpa", "tprequest", "tpr");
         setDescription("Asks a player to teleport to them.");
         register();
     }
@@ -65,6 +65,7 @@ public class TpaskCommand extends CrownCommand {
 
         TextComponent sentRequest = new TextComponent(ChatColor.GOLD + "Request sent to " + ChatColor.YELLOW + target.getName() + ChatColor.GOLD + ". ");
         sentRequest.addExtra(cancelTPA);
+
         player.spigot().sendMessage(sentRequest);
         player.performCommand("essentials:tpa " + target.getName());
 

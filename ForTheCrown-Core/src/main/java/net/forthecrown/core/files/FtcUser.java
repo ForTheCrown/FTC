@@ -541,8 +541,8 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
     private void permsCheck(){
         if(!isOnline()) return;
-
         if(getName().contains("Paranor")) addRank(Rank.LEGEND);
+
         if(isBaron() && !hasRank(Rank.BARON)){
             addRank(Rank.BARON);
             addRank(Rank.BARONESS);

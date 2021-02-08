@@ -44,5 +44,6 @@
     </orderEntry>
     <orderEntry type="library" name="paper-1.16.4-416" level="project" />
     <orderEntry type="library" name="spigot-1.16.4" level="project" />
+    <orderEntry type="library" name="FTC-Core-1.1-MAYBE-STABLE" level="project" />
   </component>
 </module>
