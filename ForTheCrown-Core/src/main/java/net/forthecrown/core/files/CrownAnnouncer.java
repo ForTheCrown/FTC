@@ -1,5 +1,6 @@
 package net.forthecrown.core.files;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Announcer;
 import org.bukkit.Bukkit;
@@ -79,7 +80,7 @@ public class CrownAnnouncer extends FtcFileManager implements Announcer {
     }
 
     public void announceToAll(String message) {
-        Bukkit.broadcastMessage(FtcCore.getPrefix() + FtcCore.translateHexCodes(FtcCore.replaceEmojis(message)));
+        Bukkit.broadcastMessage(FtcCore.getPrefix() + CrownUtils.translateHexCodes(CrownUtils.formatEmojis(message)));
     }
 
     public void announce(String message) {
@@ -88,7 +89,7 @@ public class CrownAnnouncer extends FtcFileManager implements Announcer {
             // Don't broadcast info messages to players in the Senate.
             if (player.getWorld().getName().contains("senate")) continue;
 
-            player.sendMessage(FtcCore.translateHexCodes(message));
+            player.sendMessage(CrownUtils.translateHexCodes(message));
         }
     }
 

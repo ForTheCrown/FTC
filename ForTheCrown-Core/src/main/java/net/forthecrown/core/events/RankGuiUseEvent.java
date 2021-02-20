@@ -69,10 +69,12 @@ public class RankGuiUseEvent implements Listener {
 
         if(clickedRank == Rank.DEFAULT){
             user.setRank(clickedRank, false);
-            user.clearTabPrefix();
+            if(!user.isKing()) user.clearTabPrefix();
             user.sendMessage("&7Your rank is now the default rank.");
-        } else{
-            user.setRank(clickedRank);
+        }
+        else{
+            if(!user.isKing()) user.setRank(clickedRank);
+            else user.sendMessage("&7You are currently the king, you will see your rank prefix once another player becomes king");
             user.sendMessage(clickedRank.getPrefix() + "&7has become your new rank! (Branch: " + user.getBranch().getName() + ")");
         }
 

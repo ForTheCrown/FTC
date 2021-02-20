@@ -1,21 +1,45 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ChatEvents implements Listener {
 
     private final FtcCore main = FtcCore.getInstance();
+
+    private static final String staffChatFormat = ChatColor.DARK_GRAY + "[Staff] " + ChatColor.GRAY + "%SENDER%"  + ChatColor.GRAY + ChatColor.BOLD + " >" + ChatColor.RESET + " ";
+    public static final Set<CommandSender> ignoringStaffChat = new HashSet<>();
+    public static boolean scMuted = false;
+
+    public static void sendStaffChatMessage(@Nullable CommandSender sender, String message){
+        if(scMuted && sender != null){
+            sender.sendMessage(ChatColor.GRAY + "Staff chat is muted");
+            return;
+        }
+        if(sender == null) message = CrownUtils.formatStaffChatMessage("Info", message);
+        else message = CrownUtils.formatStaffChatMessage(sender.getName(), message);
+
+        for (Player p : Bukkit.getOnlinePlayers()){
+            if((p.hasPermission("ftc.staffchat") && !ignoringStaffChat.contains(p)))
+                p.sendMessage(message);
+        }
+        System.out.println(message);
+    }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
@@ -51,21 +75,14 @@ public class ChatEvents implements Listener {
         }
 
         // Edit message to have emotes:
-        if (player.hasPermission("ftc.donator3"))  message = FtcCore.replaceEmojis(message);
+        if (player.hasPermission("ftc.donator3"))  message = CrownUtils.formatEmojis(message);
 
         event.setMessage(message);
 
         // Handle players with staffchat toggled on:
         if (FtcCore.getSCTPlayers().contains(player)) {
             event.setCancelled(true);
-
-            String message1 = ChatColor.DARK_GRAY + "[Staff] " + ChatColor.GRAY + playerName + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + FtcCore.translateHexCodes(message.replaceAll("\\\\", ""));
-
-            for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
-                if (!(onlinePlayer.hasPermission("ftc.staffchat"))) continue;
-                onlinePlayer.sendMessage(message1);
-            }
-            System.out.println(message1);
+            sendStaffChatMessage(player, message);
             return;
         }
 
@@ -88,7 +105,7 @@ public class ChatEvents implements Listener {
             }
 
             for (Player senator : Bukkit.getWorld("world_senate").getPlayers()) {
-                senator.sendMessage(prettyPlayerName + " " + ChatColor.GRAY + ChatColor.BOLD + ">" + ChatColor.RESET + " " + FtcCore.translateHexCodes(message));
+                senator.sendMessage(prettyPlayerName + " " + ChatColor.GRAY + ChatColor.BOLD + ">" + ChatColor.RESET + " " + CrownUtils.translateHexCodes(message));
             }
             main.getServer().getConsoleSender().sendMessage("[SENATE] " + playerName + " > " + message);
         }

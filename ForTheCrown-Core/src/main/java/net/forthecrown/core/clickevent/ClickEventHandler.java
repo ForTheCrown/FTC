@@ -10,13 +10,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public final class ClickEventManager {
+public final class ClickEventHandler {
 
     private static final Map<String, ClickEventTask> registeredClickEvents = new HashMap<>();
     private static final Set<Player> allowedToUseCommand = new HashSet<>();
     private static final ClickEventCommand CLICK_COMMAND = new ClickEventCommand();
 
-    private ClickEventManager(){
+    private ClickEventHandler(){
     }
 
     /**
@@ -85,9 +85,6 @@ public final class ClickEventManager {
         }
     }
 
-    public static String getClickEventCommand(String id, String... args){
-       return getCommand(id, args);
-    }
     public static String getCommand(String id, String... args){
         return "/npcconverse " + id + " " + String.join(" ", args);
     }

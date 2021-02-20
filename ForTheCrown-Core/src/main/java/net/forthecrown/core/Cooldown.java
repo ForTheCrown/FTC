@@ -4,17 +4,23 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * I am completely surprised this worked first try
+ */
 public final class Cooldown {
 
     private static final Map<String, Set<CommandSender>> COOLDOWN_MAP = new HashMap<>();
 
+    private Cooldown(){ }
+
     public static boolean contains(CommandSender sender){
-        return contains(sender, "CategoryGeneral");
+        return contains(sender, "general");
     }
 
     public static boolean contains(CommandSender sender, String category){
@@ -27,17 +33,19 @@ public final class Cooldown {
     }
 
     public static void add(CommandSender sender, @Nonnegative int timeInTicks){
-        add(sender, "CategoryGeneral", timeInTicks);
+        add(sender, "general", timeInTicks);
     }
 
-    public static void add(CommandSender sender, String category, @Nonnegative int timeInTicks){
+    public static void add(CommandSender sender, String category, @Nullable @Nonnegative Integer timeInTicks){
         COOLDOWN_MAP.computeIfAbsent(category, k -> new HashSet<>());
 
         Set<CommandSender> set = COOLDOWN_MAP.get(category);
         set.add(sender);
         COOLDOWN_MAP.put(category, set);
 
-        Bukkit.getScheduler().runTaskLater(FtcCore.getInstance(), () -> remove(sender, category), timeInTicks);
+        if(timeInTicks != null){
+            Bukkit.getScheduler().runTaskLater(FtcCore.getInstance(), () -> remove(sender, category), timeInTicks);
+        }
     }
 
     public static void remove(CommandSender sender){

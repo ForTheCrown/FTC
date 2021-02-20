@@ -16,13 +16,11 @@ public class ClickEventCommand extends CrownCommand {
     @Override
     public boolean run(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)) return false;
-        if(!ClickEventManager.isAllowedToUseCommand((Player) sender)) return false;
+        if(!ClickEventHandler.isAllowedToUseCommand((Player) sender)) return false;
         if(args.length < 1) return false;
-        if(!ClickEventManager.getRegisteredClickEvents().contains(args[0])) return false;
+        if(!ClickEventHandler.getRegisteredClickEvents().contains(args[0])) return false;
 
-        String id = args[0];
-
-        ClickEventManager.callClickEvent(id, args, ((Player) sender));
+        ClickEventHandler.callClickEvent(args[0], args, ((Player) sender));
         return true;
     }
 }

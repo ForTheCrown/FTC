@@ -1,5 +1,6 @@
 package net.forthecrown.core.files;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.ShopStock;
 import net.forthecrown.core.api.SignShop;
@@ -49,8 +50,8 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         this.block = signBlock.getBlock();
 
         stock = new CrownShopStock(this);
-
         FtcCore.loadedShops.add(this);
+
         if (legacyFileExists()) convertLegacy();
         else reload();
     }
@@ -77,8 +78,10 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         FtcCore.loadedShops.add(this);
     }
 
+    @Override
     public void save() {
-        if(deleted) return;
+        if(wasDeleted()) return;
+
         getFile().set("Owner", getOwner().toString());
         getFile().set("Location", getLocation());
         getFile().set("Type", getType().toString());
@@ -90,6 +93,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         super.save();
     }
 
+    @Override
     public void reload() {
         super.reload();
 
@@ -103,14 +107,12 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
             getStock().setExampleItem(getFile().getItemStack("ExampleItem"));
 
             if(stock.getContents().size() > 0) setOutOfStock(false);
-        } catch (IndexOutOfBoundsException e){
+        } catch (Exception e){
             stock.setContents(new ArrayList<>());
             setOutOfStock(true);
         }
 
-        Sign sign = (Sign) getBlock().getState();
-        sign.setLine(3, ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + getPrice());
-        sign.update();
+        updateSign();
     }
 
     @Override
@@ -120,7 +122,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
             location.getWorld().spawnParticle(Particle.CLOUD, location.add(0.5, 0.5, 0.5), 5, 0.1D, 0.1D, 0.1D, 0.05D);
         }
 
-        super.delete();
+        delete();
         FtcCore.loadedShops.remove(this);
     }
 
@@ -139,10 +141,10 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     @Override
     public Inventory getExampleInventory(){
         Inventory inv = Bukkit.createInventory(null, InventoryType.HOPPER, "Specify what and how much");
-        inv.setItem(0, FtcCore.makeItem(Material.BARRIER, 1, true, ""));
-        inv.setItem(1, FtcCore.makeItem(Material.BARRIER, 1, true, ""));
-        inv.setItem(3, FtcCore.makeItem(Material.BARRIER, 1, true, ""));
-        inv.setItem(4, FtcCore.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(0, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(1, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(3, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(4, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
 
         return inv;
     }
@@ -190,11 +192,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     public void setPrice(Integer price, boolean updateSign) {
         this.price = price;
 
-        if(updateSign){
-            Sign sign = (Sign) getBlock().getState();
-            sign.setLine(3, ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + getPrice());
-            sign.update(true);
-        }
+        if(updateSign) updateSign();
     }
 
     @Override
@@ -207,12 +205,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         if(getType().equals(ShopType.ADMIN_SELL_SHOP)) return;
 
         this.outOfStock = outOfStock;
-
-        Sign sign = (Sign) getBlock().getState();
-        if(outOfStock)sign.setLine(0, getType().getOutOfStockLabel());
-        else sign.setLine(0, getType().getInStockLabel());
-
-        sign.update(true);
+        updateSign();
     }
 
     @Override
@@ -228,6 +221,20 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     @Override
     public Sign getSign(){
         return (Sign) getBlock().getState();
+    }
+
+    @Override
+    public void updateSign(){
+        Sign s = getSign();
+
+        String ln1 = getType().getInStockLabel();
+        if(isOutOfStock()) ln1 = getType().getOutOfStockLabel();
+
+        String ln3 = ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + getPrice();
+
+        s.setLine(0, ln1);
+        s.setLine(3, ln3);
+        s.update(true);
     }
 
     @Override
@@ -272,34 +279,15 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
             setPrice(Integer.parseInt(ChatColor.stripColor(sign.getLine(3)).replaceAll("[\\D]", "").replaceAll("\\$", "")));
         } catch (NullPointerException e){ setPrice(500); }
 
-        List<ItemStack> tempList = new ArrayList<>();
-        if(oldConfig.getList("Inventory.content").size() != 0){
-            for(ItemStack stack : (List<ItemStack>) oldConfig.getList("Inventory.content")){
-                if(stack == null) continue;
-                tempList.add(stack);
-            }
-        } else setOutOfStock(true);
-
-        stock.setContents(tempList);
-
-        if(oldConfig.getItemStack("Inventory.shop") != null) getStock().setExampleItem(oldConfig.getItemStack("Inventory.shop"));
-
-        if(oldConfig.getItemStack("Inventory.shop") == null){
-            try {
-                ItemStack stack = getStock().getExampleItem();
-                stack.setAmount(Integer.parseInt(ChatColor.stripColor(sign.getLine(1)).replaceAll("[\\D]", "")));
-                stock.setExampleItem(stack);
-            } catch (Exception e){
-                try {
-                    ItemStack stack = getStock().getExampleItem();
-                    stack.setAmount(Integer.parseInt(ChatColor.stripColor(sign.getLine(1)).replaceAll("[\\D]", "")));
-                    getStock().setExampleItem(stack);
-                } catch (Exception ignored) {}
-            }
+        for(ItemStack stack : (List<ItemStack>) oldConfig.getList("Inventory.content")){
+            if(stack == null) continue;
+            stock.add(stack);
         }
 
-        sign.setLine(0, getType().getInStockLabel());
-        sign.update();
+        stock.setExampleItem((ItemStack) oldConfig.getList("Inventory.shop").get(0));
+        if(stock.getExampleItem() == null){
+            if(stock.getContents().size() > 0) getStock().setExampleItem(stock.getContents().get(0));
+        }
 
         oldFile.delete();
 

@@ -1,5 +1,6 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.customevents.SignShopUseEvent;
@@ -57,33 +58,6 @@ public class ShopUseListener implements Listener {
                     return;
                 }
 
-                //this is basically the same thing in the SellShopEvents class, but worse lol
-                /*
-                 for(ItemStack stack : shopInv){ //loops through the shop's inventory and removes the equivalent amount of items as dictated by the exampleItem in signShop
-                    if(stack == null) continue;
-                    if(stack.getType() != shop.getExampleItem().getType()) continue;
-                    if(tempInt == 0) break;
-
-                    if(stack.getAmount() >= tempInt){ //if the amount of the stack is greater than or equal to the tempInt
-                        stack.setAmount(stack.getAmount() - tempInt); //lessen the stack
-                        if(stack.getAmount() <= 0) shopInv.remove(stack); //remove it if the amount is 0
-                        tempInt = 0;
-                        break;
-                    }
-
-                    if(stack.getAmount() < tempInt){
-                        tempInt -= stack.getAmount();
-                        shopInv.remove(stack);
-                    }
-                }
-
-                if(tempInt != 0){ //if there isn't enough items in the shop's inventory
-                    customer.sendMessage("&7The Shop does not have enough stock");
-                    shop.setOutOfStock(true);
-                    event.setCancelled(true);
-                    return;
-                }*/
-
                 if(shop.getStock().containsExampleItem())shop.getStock().removeExampleItemAmount();
                 else{
                     shop.setOutOfStock(true);
@@ -97,7 +71,7 @@ public class ShopUseListener implements Listener {
                 final String longAF = ChatColor.GOLD + player.getName() +
                         ChatColor.GRAY + " bought " +
                         ChatColor.YELLOW + example.getAmount() + " " +
-                        example.getType().toString().toLowerCase().replaceAll("_", " ") +
+                        CrownUtils.capitalizeWords(example.getType().toString().toLowerCase().replaceAll("_", " ")) +
                         ChatColor.GRAY + " from you for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
 
                 event.getOwner().sendMessage(longAF);
@@ -120,7 +94,7 @@ public class ShopUseListener implements Listener {
 
                 String customerMsg1 = ChatColor.GRAY + "You bought " +
                         ChatColor.YELLOW + example.getAmount() + " " +
-                        example.getType().toString().toLowerCase().replaceAll("_", " ") +
+                        CrownUtils.capitalizeWords(example.getType().toString().toLowerCase().replaceAll("_", " ")) +
                         ChatColor.GRAY + " for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
 
                 customer.sendMessage(customerMsg1);
@@ -201,3 +175,30 @@ public class ShopUseListener implements Listener {
         }
     }
 }
+
+//this is basically the same thing in the SellShopEvents class, but worse lol
+                /*
+                 for(ItemStack stack : shopInv){ //loops through the shop's inventory and removes the equivalent amount of items as dictated by the exampleItem in signShop
+                    if(stack == null) continue;
+                    if(stack.getType() != shop.getExampleItem().getType()) continue;
+                    if(tempInt == 0) break;
+
+                    if(stack.getAmount() >= tempInt){ //if the amount of the stack is greater than or equal to the tempInt
+                        stack.setAmount(stack.getAmount() - tempInt); //lessen the stack
+                        if(stack.getAmount() <= 0) shopInv.remove(stack); //remove it if the amount is 0
+                        tempInt = 0;
+                        break;
+                    }
+
+                    if(stack.getAmount() < tempInt){
+                        tempInt -= stack.getAmount();
+                        shopInv.remove(stack);
+                    }
+                }
+
+                if(tempInt != 0){ //if there isn't enough items in the shop's inventory
+                    customer.sendMessage("&7The Shop does not have enough stock");
+                    shop.setOutOfStock(true);
+                    event.setCancelled(true);
+                    return;
+                }*/

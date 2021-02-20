@@ -1,12 +1,16 @@
 package net.forthecrown.vikings.commands;
 
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.CrownCommand;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.forthecrown.vikings.Vikings;
-import net.forthecrown.vikings.raids.managers.RaidDifficulty;
-import net.forthecrown.vikings.raids.managers.VikingRaid;
+import net.forthecrown.vikings.blessings.VikingBlessing;
+import net.forthecrown.vikings.raids.RaidDifficulty;
+import net.forthecrown.vikings.raids.RaidHandler;
+import net.forthecrown.vikings.raids.VikingRaid;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -23,7 +27,7 @@ public class VikingsCommand extends CrownCommand implements TabCompleter {
 
         setPermission("ftc.vikings.admin");
         setTabCompleter(this);
-        setUsage("&7Usage: /vikings <test> <raid name>\nor /viking <end | complete>");
+        setUsage("&7Usage: /vikings <test> <raid name>\n /viking <end | complete>");
         register();
     }
 
@@ -32,10 +36,12 @@ public class VikingsCommand extends CrownCommand implements TabCompleter {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         if(args.length < 1) return false;
 
+        Player player = (Player) sender;
+
         if(args[0].contains("test")){
             if(args.length < 2) return false;
 
-            VikingRaid raid = Vikings.getRaidHandler().getFromName(args[1]);
+            VikingRaid raid = RaidHandler.fromName(args[1]);
             if(raid == null) throw new InvalidArgumentException(sender, args[1] + " is not a valid raid");
 
             RaidDifficulty difficulty = RaidDifficulty.NORMAL;
@@ -45,17 +51,36 @@ public class VikingsCommand extends CrownCommand implements TabCompleter {
                 } catch (Exception ignored) {}
             }
 
-            Vikings.getRaidHandler().callRaid(raid, (Player) sender, difficulty);
+            Vikings.getRaidHandler().callRaid(raid, player, difficulty);
         }
         else if(args[0].contains("end")){
-            VikingRaid raid = Vikings.getRaidHandler().getFromPlayer(((Player) sender));
+            VikingRaid raid = RaidHandler.fromPlayer(player);
             if(raid == null) return false;
 
             raid.onRaidEnd();
         }
         else if(args[0].contains("complete")){
-            VikingRaid raid = Vikings.getRaidHandler().getFromPlayer(((Player) sender));
+            VikingRaid raid = RaidHandler.fromPlayer(player);
+            if(raid == null) return false;
+
             raid.onRaidComplete();
+        }
+        else if (args[0].contains("blessing")){
+            if(args.length != 3) return false;
+
+            VikingBlessing blessing = VikingBlessing.fromName(args[2]);
+            if(blessing == null) throw new InvalidArgumentException(sender, args[2] + " is not a valid blessing");
+            CrownUser user = FtcCore.getUser(player);
+
+            if(args[1].contains("use")){
+                blessing.beginUsage(user);
+                player.sendMessage("Starting blessing usage!");
+            }
+
+            if(args[1].contains("stop")){
+                blessing.endUsage(user);
+                user.sendMessage("You are no longer using a blessing");
+            }
         }
         return true;
     }
@@ -68,11 +93,29 @@ public class VikingsCommand extends CrownCommand implements TabCompleter {
             toReturn.add("test");
             toReturn.add("end");
             toReturn.add("complete");
+            toReturn.add("blessing");
         }
 
         if(args.length == 2 && args[0].contains("test")){
             for (VikingRaid r : Vikings.getRaidHandler().getRaids()){
                 toReturn.add(r.getName());
+            }
+        }
+
+        if(args.length == 3 && args[0].contains("test")){
+            for (RaidDifficulty d: RaidDifficulty.values()){
+                toReturn.add(d.toString());
+            }
+        }
+
+        if(args.length == 2 && args[0].contains("blessing")){
+            toReturn.add("use");
+            toReturn.add("stop");
+        }
+
+        if(args.length == 3 && (args[1].contains("use") || args[1].contains("stop"))){
+            for (VikingBlessing b : VikingBlessing.getBlessings()){
+                toReturn.add(b.getName());
             }
         }
 

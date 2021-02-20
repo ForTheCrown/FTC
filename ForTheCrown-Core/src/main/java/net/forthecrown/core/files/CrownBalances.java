@@ -87,7 +87,7 @@ public class CrownBalances extends FtcFileManager implements Balances {
 
         FtcCore.getUser(uuid).addTotalEarnings(amount);
 
-        if(FtcCore.areTaxesEnabled() && isTaxed && getTaxPercentage(uuid) > 1){
+        if(FtcCore.areTaxesEnabled() && isTaxed && getTaxPercentage(uuid) > 1 && amount > 1){
             int amountToRemove = (int) (amount * ((float) getTaxPercentage(uuid)/100));
             amount -= amountToRemove;
 

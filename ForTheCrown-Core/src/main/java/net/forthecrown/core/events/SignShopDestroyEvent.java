@@ -15,7 +15,9 @@ public class SignShopDestroyEvent implements Listener {
     public void onSignDestroy(BlockBreakEvent event){
         if(!(event.getBlock().getState() instanceof Sign)) return;
         Sign sign = (Sign) event.getBlock().getState();
-        if(!sign.getLine(0).contains("=[Buy]=") && !sign.getLine(0).contains("=[Sell]=")) return;
+
+        if(!sign.getLine(0).contains("=[Buy]=") && !sign.getLine(0).contains("=[Sell]=")
+            && !sign.getLine(0).contains("-[Buy]-") && !sign.getLine(0).contains("-[Sell]-")) return;
         if(!sign.getLine(3).contains(ChatColor.DARK_GRAY + "Price: ")) return;
 
         SignShop shop;

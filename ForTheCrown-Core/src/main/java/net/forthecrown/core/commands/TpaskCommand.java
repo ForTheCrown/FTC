@@ -53,10 +53,8 @@ public class TpaskCommand extends CrownCommand {
 
         if (args.length < 1 || args[0].equalsIgnoreCase(sender.getName())) return false;
 
-        Player target;
-        try {
-            target = Bukkit.getPlayer(args[0]);
-        } catch (Exception e) { throw new InvalidPlayerInArgument(sender, args[0]); }
+        Player target = Bukkit.getPlayer(args[0]);
+        if(target == null) throw new InvalidPlayerInArgument(sender, args[0]);
 
         // Tpa & sender message.
         TextComponent cancelTPA = new TextComponent(ChatColor.GRAY + "[✖]");

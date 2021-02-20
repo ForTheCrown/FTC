@@ -1,9 +1,12 @@
 package net.forthecrown.core.commands.emotes;
 
+import net.forthecrown.core.Cooldown;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.CrownCommand;
+import net.forthecrown.core.exceptions.EmoteDisabledException;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -33,14 +36,12 @@ public class Mwah extends CrownCommand {
     @Override
     public boolean run(CommandSender sender, Command command, String label, String[] args) {
         // Sender must be a player:
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may execute this command.");
-            return false;
-        }
+        if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
+
         Player player = (Player) sender;
         Location loc = player.getLocation();
 
-        if(FtcCore.isOnCooldown(player)) throw new InvalidCommandExecution(player, "You kiss too much lol");
+        if(Cooldown.contains(sender, "Core_Emote_Mwah")) throw new InvalidCommandExecution(player, "You kiss too much lol");
 
         // Command no args or target = sender:
         if (args.length < 1 || args[0].equalsIgnoreCase(player.getName())) {
@@ -60,14 +61,10 @@ public class Mwah extends CrownCommand {
         CrownUser targetData = FtcCore.getUser(target.getUniqueId());
 
         // Sender should have emotes enabled:
-        if(!playerData.allowsEmotes()){
-            FtcCore.senderEmoteOffMessage(player);;
-            return false;
-        }
-        if(!targetData.allowsEmotes()){
-            player.sendMessage(ChatColor.GRAY + "This player has disabled emotes.");
-            return false;
-        }
+        if(!playerData.allowsEmotes()) throw new EmoteDisabledException(sender).senderDisabled();
+        if(!targetData.allowsEmotes()) throw new EmoteDisabledException(sender).targetDisabled();
+
+        Cooldown.add(sender, "Core_Emote_Mwah", 5*20);
 
         // Actual smooching:
         player.sendMessage(ChatColor.RED + "❤" + ChatColor.RESET + " You smooched " + target.getName() + ChatColor.RED + " ❤");
@@ -86,8 +83,6 @@ public class Mwah extends CrownCommand {
         loc.getWorld().spawnParticle(Particle.HEART, loc.getX(), loc.getY()+1, loc.getZ(), 5, 0.5, 0.5, 0.5);
         loc.getWorld().playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_UP, 3.0F, 2F);
 
-        // Put sender on cooldown:
-        FtcCore.addToCooldown(player, 5*20, true);
         return true;
     }
 }

@@ -26,6 +26,9 @@ public class ToggleEmotes extends CrownCommand {
      * 	- mwah
      * 	- poke
      * 	- bonk
+     *  - jingle
+     *  - scare
+     *  - hug
      *
      *
      * Valid usages of command:
@@ -44,7 +47,7 @@ public class ToggleEmotes extends CrownCommand {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 
         Player player = (Player) sender;
-        CrownUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = FtcCore.getUser(player);
         String message = "&7You can longer send or receive emotes.";
 
         user.setAllowsEmotes(!user.allowsEmotes());

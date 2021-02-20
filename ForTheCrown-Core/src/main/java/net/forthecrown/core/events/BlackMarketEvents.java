@@ -1,5 +1,6 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.Cooldown;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.BlackMarket;
@@ -38,8 +39,8 @@ public class BlackMarketEvents implements Listener {
         if(!villie.getCustomName().contains("George") && !villie.getCustomName().contains("Otto") && !villie.getCustomName().contains("Herbert") &&
                 !villie.getCustomName().contains("Edward") && !villie.getCustomName().contains("Ramun")) return;
 
-        if(FtcCore.isOnCooldown(event.getPlayer())) return;
-        FtcCore.addToCooldown(event.getPlayer(), 20, false);
+        if(Cooldown.contains(event.getPlayer())) return;
+        Cooldown.add(event.getPlayer(), 20);
 
         event.setCancelled(true);
 
@@ -137,7 +138,7 @@ public class BlackMarketEvents implements Listener {
                 player.openInventory(bm.getFarmingInventory(user));
                 break;
             case "enchants":
-                player.openInventory(bm.getEnchantInventory());
+                player.closeInventory();
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + event.getView().getTitle().toLowerCase().replaceAll("black market: ", ""));

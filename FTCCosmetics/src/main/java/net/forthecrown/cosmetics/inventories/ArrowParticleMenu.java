@@ -1,5 +1,6 @@
 package net.forthecrown.cosmetics.inventories;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.cosmetics.Cosmetics;
@@ -44,7 +45,7 @@ public class ArrowParticleMenu implements Listener {
     private Inventory makeInventory() {
         Inventory result = this.inv;
 
-        ItemStack noEffect = FtcCore.makeItem(Material.BARRIER, 1, true, ChatColor.GOLD + "No effect", ChatColor.GRAY + "Click to go back to default arrows", ChatColor.GRAY + "without any effects.");
+        ItemStack noEffect = CrownUtils.makeItem(Material.BARRIER, 1, true, ChatColor.GOLD + "No effect", ChatColor.GRAY + "Click to go back to default arrows", ChatColor.GRAY + "without any effects.");
 
         ItemStack flame = getEffectItem(Particle.FLAME, "&eFlame", ChatColor.GRAY + "Works perfectly with flame arrows.", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
         ItemStack snow = getEffectItem(Particle.SNOWBALL, "&eSnowy", ChatColor.GRAY + "To stay in the Christmas spirit!", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
@@ -75,7 +76,7 @@ public class ArrowParticleMenu implements Listener {
     }
 
     private ItemStack getEffectItem(Particle effect, String name, String... desc){
-        ItemStack shit = FtcCore.makeItem(Material.GRAY_DYE, 1, true, name, desc);
+        ItemStack shit = CrownUtils.makeItem(Material.GRAY_DYE, 1, true, name, desc);
         if(user.getArrowParticle() != null && user.getArrowParticle() == effect) shit.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
         if(user.getParticleArrowAvailable().contains(effect)) shit.setType(Material.ORANGE_DYE);
         return shit;

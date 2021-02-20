@@ -1,4 +1,5 @@
 package net.forthecrown.cosmetics;
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
@@ -370,18 +371,18 @@ public final class Cosmetics extends JavaPlugin implements Listener {
         CustomInventory cinv = new CustomInventory(54, ChatColor.BOLD + "C" + ChatColor.RESET + "osmetics", true, false);
         Inventory inv = cinv.getInventory();
 
-        inv.setItem(20, FtcCore.makeItem(Material.BOW, 1, true, ChatColor.YELLOW + "Arrow Particle Trails", "", ChatColor.GRAY + "Upgrade your arrows with fancy particle", ChatColor.GRAY + "trails as they fly through the air!"));
-        inv.setItem(22, FtcCore.makeItem(Material.TOTEM_OF_UNDYING, 1, true, ChatColor.YELLOW + "Emotes", "", ChatColor.GRAY + "Poking, smooching, bonking and more", ChatColor.GRAY + "to interact with your friends."));
-        inv.setItem(24, FtcCore.makeItem(Material.SKELETON_SKULL, 1, true, ChatColor.YELLOW + "Death Particles", "", ChatColor.GRAY + "Make your deaths more spectacular by", ChatColor.GRAY + "exploding into pretty particles!"));
+        inv.setItem(20, CrownUtils.makeItem(Material.BOW, 1, true, ChatColor.YELLOW + "Arrow Particle Trails", "", ChatColor.GRAY + "Upgrade your arrows with fancy particle", ChatColor.GRAY + "trails as they fly through the air!"));
+        inv.setItem(22, CrownUtils.makeItem(Material.TOTEM_OF_UNDYING, 1, true, ChatColor.YELLOW + "Emotes", "", ChatColor.GRAY + "Poking, smooching, bonking and more", ChatColor.GRAY + "to interact with your friends."));
+        inv.setItem(24, CrownUtils.makeItem(Material.SKELETON_SKULL, 1, true, ChatColor.YELLOW + "Death Particles", "", ChatColor.GRAY + "Make your deaths more spectacular by", ChatColor.GRAY + "exploding into pretty particles!"));
 
         if (user.allowsRidingPlayers()) {
-            inv.setItem(40, FtcCore.makeItem(Material.SADDLE, 1, true,ChatColor.YELLOW + "You can ride other players!", "",
+            inv.setItem(40, CrownUtils.makeItem(Material.SADDLE, 1, true,ChatColor.YELLOW + "You can ride other players!", "",
                     ChatColor.GRAY + "Right-click someone to jump on top of them.",
                     ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
                     ChatColor.GRAY + "Click to disable this feature."));
         }
         else {
-            inv.setItem(40, FtcCore.makeItem(Material.BARRIER, 1, true, ChatColor.YELLOW + "You've disabled riding other players.", "",
+            inv.setItem(40, CrownUtils.makeItem(Material.BARRIER, 1, true, ChatColor.YELLOW + "You've disabled riding other players.", "",
                     ChatColor.GRAY + "Right-click someone to jump on top of them.",
                     ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
                     ChatColor.GRAY + "Click to enable this feature."));

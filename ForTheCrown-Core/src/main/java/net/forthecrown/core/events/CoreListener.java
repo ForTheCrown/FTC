@@ -6,18 +6,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.UUID;
-
 public class CoreListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
-        FtcCore.getUser(event.getPlayer().getUniqueId());
+        FtcCore.getUser(event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event){
-        UUID id = event.getPlayer().getUniqueId();
-        FtcCore.getUser(id).unload();
+        FtcCore.getUser(event.getPlayer()).unload();
     }
 }

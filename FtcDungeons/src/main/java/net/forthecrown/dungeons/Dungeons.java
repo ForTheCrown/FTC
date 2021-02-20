@@ -84,10 +84,10 @@ public final class Dungeons extends JavaPlugin implements Listener {
         fillLists();
 
         loadEnchantments();
-        this.getServer().getPluginManager().registerEvents(enchant1, this);
-        this.getServer().getPluginManager().registerEvents(enchant2, this);
-        this.getServer().getPluginManager().registerEvents(enchant3, this);
-        this.getServer().getPluginManager().registerEvents(enchant4, this);
+        getServer().getPluginManager().registerEvents(enchant1, this);
+        getServer().getPluginManager().registerEvents(enchant2, this);
+        getServer().getPluginManager().registerEvents(enchant3, this);
+        getServer().getPluginManager().registerEvents(enchant4, this);
     }
 
     private void fillLists() {
@@ -104,7 +104,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
         makeItem(spideyItems, Material.STRING, 30);
         makeItem(spideyItems, Material.FERMENTED_SPIDER_EYE, 20);
         makeItem(spideyItems, Material.SPIDER_EYE, 45);
-        makeSpecialItem(spideyItems, Material.TIPPED_ARROW, 5, PotionEffectType.POISON);
+        makeSpecialItem(spideyItems, Material.TIPPED_ARROW, 5);
 
         makeItem(drawnedItems, Material.IRON_NUGGET, 1, "Iron Artifact");
         makeItem(drawnedItems, Material.PRISMARINE_CRYSTALS, 1, "Elder Artifact");
@@ -134,7 +134,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
     }
 
 
-    private void makeSpecialItem(List<ItemStack> list, Material mat, int amount, PotionEffectType effect) {
+    private void makeSpecialItem(List<ItemStack> list, Material mat, int amount) {
         ItemStack item = new ItemStack(mat, amount);
         meta = item.getItemMeta();
         meta.setLore(lore);
@@ -147,7 +147,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
     }
 
-    ArrayList<Integer> mayChange = new ArrayList<Integer>();
+    ArrayList<Integer> mayChange = new ArrayList<>();
 
     @EventHandler(ignoreCancelled = true)
     public void onHit(EntityDamageByEntityEvent event) {
@@ -205,7 +205,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
     public void onPlayerClick(PlayerInteractEntityEvent event) {
         if(!event.getHand().equals(EquipmentSlot.HAND))
             return;
-        Player player = (Player) event.getPlayer();
+        Player player = event.getPlayer();
 
         if (event.getRightClicked().getType() == EntityType.VILLAGER) {
             if (event.getRightClicked().getName().contains(ChatColor.GOLD + "Diego")) {
@@ -479,7 +479,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onMobDeath(EntityDeathEvent event){
         if(event.getEntity().getKiller() != null){
-            if (event.getEntity().getKiller().getInventory().getItemInMainHand().getType() == Material.GOLDEN_SWORD || ((Player) event.getEntity().getKiller()).getInventory().getItemInMainHand().getType() == Material.NETHERITE_SWORD) {
+            if (event.getEntity().getKiller().getInventory().getItemInMainHand().getType() == Material.GOLDEN_SWORD || event.getEntity().getKiller().getInventory().getItemInMainHand().getType() == Material.NETHERITE_SWORD) {
                 Player player = event.getEntity().getKiller();
                 if (player.getInventory().getItemInMainHand().getItemMeta().getDisplayName().contains(ChatColor.YELLOW + "" + ChatColor.BOLD + "Royal Sword") || player.getInventory().getItemInMainHand().getItemMeta().getDisplayName().contains(net.md_5.bungee.api.ChatColor.of("#D1C8BA") + "")) {
                     EntityDamageEvent event2 = event.getEntity().getLastDamageCause();
@@ -498,7 +498,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
         List<String> lore = meta.getLore();
         String rankLine = lore.get(0);
 
-        boolean isDonator = Bukkit.getPlayer(UUID.fromString(player.getUniqueId().toString())).hasPermission("ftc.donator1");
+        boolean isDonator = player.hasPermission("ftc.donator1");
 
         if (rankLine.contains(ChatColor.GRAY + "Rank IX")) {
             if (entity.getType().equals(EntityType.WITHER) && isDonator) actuallyAddXp(player.getName(), lore, meta, sword, "Rank X", ChatColor.DARK_AQUA + "Max Rank.");
@@ -578,13 +578,13 @@ public final class Dungeons extends JavaPlugin implements Listener {
         if (event.getEntity() instanceof WitherSkeleton && (event.getDamager() instanceof Player || event.getDamager().getType() == EntityType.ARROW)) {
             WitherSkeleton Josh = (WitherSkeleton) event.getEntity();
             if (Josh.getCustomName() != null && Josh.getCustomName().contains("Josh") && Josh.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-                if (canDrop == false) return;
+                if (!canDrop) return;
 
                 double random = Math.random();
                 if (random < 0.25) {
                     ItemStack item = new ItemStack(Material.BLACK_DYE, 1);
                     ItemMeta meta = item.getItemMeta();
-                    List<String> lore = new ArrayList<String>();
+                    List<String> lore = new ArrayList<>();
                     lore.add("Dungeon Item");
                     meta.setLore(lore);
                     meta.setDisplayName("Wither Goo");
@@ -594,12 +594,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
                 }
                 else return;
                 this.canDrop = false;
-                Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-                    @Override
-                    public void run() {
-                        canDrop = true;
-                    }
-                }, 100L);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> canDrop = true, 100L);
             }
         }
     }
@@ -671,7 +666,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
                 if (invItem != null) {
                     if (invItem.getType() == item.getType() && invItem.getAmount() >= item.getAmount()) {
                         if (invItem.getItemMeta().getLore() != null && invItem.getItemMeta().getLore().contains("Dungeon Item")) {
-                            if (invItem.getItemMeta().getDisplayName() != null && item.getItemMeta().getDisplayName() != null && invItem.getItemMeta().getDisplayName().contains(item.getItemMeta().getDisplayName())) {
+                            if (item.getItemMeta().getDisplayName() != null && invItem.getItemMeta().getDisplayName().contains(item.getItemMeta().getDisplayName())) {
                                 found = true;
                                 break;
                             }
@@ -709,11 +704,11 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
     private void takeGoldenApples(PlayerInventory inv) {
         int size = 36;
-        List<ItemStack> itemsToGet = new ArrayList<ItemStack>();
+        List<ItemStack> itemsToGet = new ArrayList<>();
 
         ItemStack apple = new ItemStack(Material.GOLDEN_APPLE, 1);
         ItemMeta meta = apple.getItemMeta();
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         lore.add("hug");
         meta.setLore(lore);
         apple.setItemMeta(meta);

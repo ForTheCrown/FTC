@@ -1,8 +1,9 @@
 package net.forthecrown.core.events.npc;
 
+import net.forthecrown.core.Cooldown;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.clickevent.ClickEventManager;
+import net.forthecrown.core.clickevent.ClickEventHandler;
 import net.forthecrown.core.clickevent.ClickEventTask;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
@@ -25,7 +26,7 @@ public class JeromeEvent implements Listener, ClickEventTask {
     private final String npcID;
 
     public JeromeEvent(){
-        npcID = ClickEventManager.registerClickEvent(this);
+        npcID = ClickEventHandler.registerClickEvent(this);
     }
 
 
@@ -39,18 +40,18 @@ public class JeromeEvent implements Listener, ClickEventTask {
         if(!villie.isInvulnerable()) return;
         event.setCancelled(true);
 
-        if(FtcCore.isOnCooldown(event.getPlayer())) return;
-        FtcCore.addToCooldown(event.getPlayer(), 20, false);
+        if(Cooldown.contains(event.getPlayer())) return;
+        Cooldown.add(event.getPlayer(), 20);
 
         Player player = event.getPlayer();
-        ClickEventManager.allowCommandUsage(player, true);
+        ClickEventHandler.allowCommandUsage(player, true);
 
         TextComponent message1 = new TextComponent(ChatColor.YELLOW + "[Info about Knight]");
-        message1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventManager.getCommand(npcID, "info")));
+        message1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(npcID, "info")));
         message1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GRAY + "" + ChatColor.ITALIC + "Click me!")));
 
         TextComponent message2 = new TextComponent(ChatColor.YELLOW + "[Join Knights]");
-        message2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventManager.getCommand(npcID, "join")));
+        message2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(npcID, "join")));
         message2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GRAY + "" + ChatColor.ITALIC + "Click me!")));
 
         player.sendMessage(ChatColor.GOLD + "--" + ChatColor.WHITE + " Hi, what can I do for you? " + ChatColor.GOLD + "--");
@@ -64,7 +65,7 @@ public class JeromeEvent implements Listener, ClickEventTask {
         //args[0] is the ID of the npc
 
         if(args[1].contains("join")){
-            CrownUser user = FtcCore.getUser(player.getUniqueId());
+            CrownUser user = FtcCore.getUser(player);
             Branch royals = Branch.ROYALS;
 
             if(user.getBranch() == Branch.ROYALS){

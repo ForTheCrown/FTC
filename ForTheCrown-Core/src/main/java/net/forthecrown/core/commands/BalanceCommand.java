@@ -57,10 +57,8 @@ public class BalanceCommand extends CrownCommand {
             return true;
         }
 
-        UUID targetUUID;
-        try {
-            targetUUID = FtcCore.getOffOnUUID(args[0]);
-        } catch (NullPointerException e){ throw new InvalidPlayerInArgument(sender, args[0]); }
+        UUID targetUUID = FtcCore.getOffOnUUID(args[0]);
+        if(targetUUID == null) throw new InvalidPlayerInArgument(sender, args[0]);
 
         player.sendMessage(ChatColor.GOLD + "$ " + ChatColor.YELLOW + args[0] + ChatColor.GRAY + " currently has " + ChatColor.GOLD + bals.getBalance(targetUUID) + " Rhines");
         return true;

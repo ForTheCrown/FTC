@@ -6,7 +6,7 @@ import net.forthecrown.core.enums.SellAmount;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Particle;
-import org.bukkit.command.MessageCommandSender;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
@@ -15,10 +15,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public interface CrownUser extends CrownFileManager, MessageCommandSender {
+public interface CrownUser extends CrownFileManager, CommandSender {
 
     /**
-     * Unloads the file
+     * Saves and then unloads the file
      * <p>Removes it from the loadedUsers list and YEETs the object to the mercy of the Java Trash Collector</p>
      */
     void unload();
@@ -368,7 +368,7 @@ public interface CrownUser extends CrownFileManager, MessageCommandSender {
      * Sends the user a message, works just like the sendMessage in Player, but it also translates hexcodes and & chars as color codes
      * @param message The message to send to the user
      */
-    void sendMessage(String message);
+    void sendMessage(@Nonnull String message);
 
     /**
      * Gets if the user is online
@@ -376,6 +376,34 @@ public interface CrownUser extends CrownFileManager, MessageCommandSender {
      * @return Whether the user is online
      */
     boolean isOnline();
+
+    /**
+     * Gets if the user is a king
+     * <p>Note: whether a user is a king is not stored on a per player basis, that'd be stupid. But rather this sees if FtcCore.getKing equals getBase</p>
+     * @return Whether the user is the king or queen
+     */
+    boolean isKing();
+
+    /**
+     * Sets if the user is the king
+     * <p>Again, just does FtcCore.setKing and sets it to be getBase</p>
+     * @param king Whether the user is to be king
+     */
+    void setKing(boolean king, boolean setPrefix);
+
+    void setKing(boolean king, boolean setPrefix, boolean isFemale);
+
+    void setKing(boolean king);
+
+    /**
+     * Makes the user perform a command. Be careful, the command sender will be CrownUser and not Player
+     * <p>If you want to make the player tied to the user perform the command, use: getPlayer().performCommand()</p>
+     * @param command The command to perform
+     */
+    void performCommand(String command);
+
+    @Override
+    void sendMessage(@Nonnull String... messages);
 
     @Override
     boolean equals(Object o);

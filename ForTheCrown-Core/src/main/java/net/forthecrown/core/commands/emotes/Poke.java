@@ -1,9 +1,12 @@
 package net.forthecrown.core.commands.emotes;
 
+import net.forthecrown.core.Cooldown;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.CrownCommand;
+import net.forthecrown.core.exceptions.EmoteDisabledException;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -30,15 +33,12 @@ public class Poke extends CrownCommand {
     @Override
     public boolean run(CommandSender sender, Command command, String label, String[] args) {
         // Sender must be a player:
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may execute this command.");
-            return false;
-        }
+        if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         Player player = (Player) sender;
         CrownUser playerData = FtcCore.getUser(player.getUniqueId());
 
         // Sender can't be on cooldown:
-        if(FtcCore.isOnCooldown(player)) throw new InvalidCommandExecution(player, "You poke people too often lol");
+        if(Cooldown.contains(player, "Core_Emote_Poke")) throw new InvalidCommandExecution(player, "You poke people too often lol");
 
         // Command no args or target = sender:
         if (args.length < 1 || args[0].equalsIgnoreCase(player.getName())) {
@@ -48,10 +48,7 @@ public class Poke extends CrownCommand {
         }
 
         // Sender should have emotes enabled:
-        if(!playerData.allowsEmotes()){
-            FtcCore.senderEmoteOffMessage(player);
-            return false;
-        }
+        if(!playerData.allowsEmotes()) throw new EmoteDisabledException(sender).senderDisabled();
 
         Player target = Bukkit.getPlayer(args[0]);
         if(target == null){
@@ -60,10 +57,7 @@ public class Poke extends CrownCommand {
         }
         CrownUser targetData = FtcCore.getUser(target.getUniqueId());
 
-        if(!targetData.allowsEmotes()){
-            player.sendMessage(ChatColor.GRAY + "This player has disabled emotes.");
-            return false;
-        }
+        if(!targetData.allowsEmotes()) throw new EmoteDisabledException(sender).targetDisabled();
 
         // Actual poking:
         int pokeOwieInt = (int)(Math.random()*pokeOwies.size()); //The random int that determines what body part they'll poke lol
@@ -76,7 +70,7 @@ public class Poke extends CrownCommand {
         }
 
         // Put sender on cooldown:
-        FtcCore.addToCooldown(player, 5*20, true);
+        Cooldown.add(player, "Core_Emote_Poke", 5*20);
         return true;
     }
 }

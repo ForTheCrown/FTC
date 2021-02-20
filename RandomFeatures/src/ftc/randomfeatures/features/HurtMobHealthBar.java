@@ -1,8 +1,8 @@
 package ftc.randomfeatures.features;
 
 import ftc.randomfeatures.Main;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -91,5 +92,29 @@ public class HurtMobHealthBar implements Listener {
                 }
             }
         }.runTaskLater(Main.plugin, 5*20);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        if (!event.getDeathMessage().contains("❤")) return;
+        if(!(event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent)) return;
+
+        EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
+
+        String name = damageEvent.getDamager().getType().toString().toLowerCase().replaceAll("_", "");
+        name = capitalizeWord(name);
+        String message = event.getDeathMessage().replaceAll("❤", "") + name;
+        event.setDeathMessage(message);
+    }
+
+    public static String capitalizeWord(String str){
+        String[] words = str.split("\\s");
+        String capitalizeWord="";
+        for(String w:words){
+            String first = w.substring(0,1);
+            String afterfirst = w.substring(1);
+            capitalizeWord += first.toUpperCase()+afterfirst+" ";
+        }
+        return capitalizeWord.trim();
     }
 }

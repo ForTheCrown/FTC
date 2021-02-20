@@ -17,12 +17,13 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class parrot extends CrownCommand {
+public class ParrotCommand extends CrownCommand {
 
-    public parrot(){
+    public ParrotCommand(){
         super("parrot", Pirates.plugin);
 
         setPermission(null);
+        register();
     }
 
     @SuppressWarnings("deprecation")

@@ -117,6 +117,12 @@ public interface SignShop extends CrownFileManager {
      */
     Sign getSign();
 
+    /**
+     * Updates the ingame sign representing this shop
+     * <p>Should be used to apply changes to the sign</p>
+     */
+    void updateSign();
+
     @Override
     boolean equals(Object o);
 

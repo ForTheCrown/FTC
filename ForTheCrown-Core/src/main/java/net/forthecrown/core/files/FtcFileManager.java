@@ -5,7 +5,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 
-public class FtcFileManager {
+public abstract class FtcFileManager {
 
     protected final String fileName;
     protected final String directory;
@@ -48,11 +48,14 @@ public class FtcFileManager {
 
     //methods used by child classes
     protected void reload(){
+        performFileNullCheck();
         fileConfig = YamlConfiguration.loadConfiguration(file);
     }
 
     protected void save(){
         if(deleted) return;
+        performFileNullCheck();
+
         try{
             fileConfig.save(file);
         } catch (IOException e){
@@ -65,9 +68,14 @@ public class FtcFileManager {
     }
 
     protected void delete(){
-        fileConfig = null;
+        performFileNullCheck();
         if(!file.delete()) System.out.println("[WARNING] Couldn't delete file named " + fileName);
         deleted = true;
+        fileConfig = null;
         file = null;
+    }
+
+    private void performFileNullCheck(){ //believe you me, this is better than getting an exception that just reads: "NullPointerException: null" lol
+        if(file == null) throw new NullPointerException(fileName + " in folder " + directory + " is null. Halting reload and throwing exception :p");
     }
 }

@@ -1,5 +1,6 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.InvalidArgumentException;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
@@ -53,7 +54,7 @@ public class SetBalanceCommand extends CrownCommand {
         } catch (Exception e){ throw new InvalidArgumentException(sender, args[1] + " is not a number"); }
 
         FtcCore.getBalances().setBalance(targetUUID, amountToSet);
-        sender.sendMessage(FtcCore.translateHexCodes("&e" + args[0] + " &7now has &6" + amountToSet + " Rhines"));
+        sender.sendMessage(CrownUtils.translateHexCodes("&e" + args[0] + " &7now has &6" + amountToSet + " Rhines"));
         return true;
     }
 }

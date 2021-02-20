@@ -1,23 +1,28 @@
 package net.forthecrown.core.files;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Particle;
+import net.forthecrown.core.exceptions.UserNotOnlineException;
+import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -167,7 +172,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
             Map<String, Integer> tempMap = new HashMap<>();
 
             for (Material mat : getItemPrices().keySet()){
-                if(!getItemPrice(mat).equals(FtcCore.getInstance().getItemPrice(mat))) tempMap.put(mat.toString(), getItemPrice(mat));
+                if(getItemPrice(mat) < FtcCore.getInstance().getItemPrice(mat)) tempMap.put(mat.toString(), getItemPrice(mat));
             }
             getFile().createSection("ItemPrices", tempMap);
         }
@@ -349,6 +354,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         int i;
         try {
             i = itemPrices.get(item);
+            if(i > FtcCore.getInstance().getItemPrice(item)) i = FtcCore.getInstance().getItemPrice(item);
         } catch (NullPointerException e){
             return FtcCore.getInstance().getItemPrice(item);
         }
@@ -453,13 +459,14 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
         save();
         nextResetTime = System.currentTimeMillis() + FtcCore.getUserDataResetInterval();
+        System.out.println(getName() + " earnings reset, next reset in: " + (getNextResetTime()/1000) + " seconds");
     }
 
     @Override
     public String getName(){
         if(name != null) return name;
-        else if(Bukkit.getPlayer(getBase()) != null) return Bukkit.getPlayer(getBase()).getName();
-        else return Bukkit.getOfflinePlayer(getBase()).getName();
+        if(isOnline()) return Bukkit.getPlayer(getBase()).getName();
+        return Bukkit.getOfflinePlayer(getBase()).getName();
     }
 
     @Override
@@ -473,8 +480,9 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     }
 
     @Override
-    public void setTabPrefix(String s){
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tab player " + getName() + " tabprefix " + s);
+    public void setTabPrefix(@Nullable String s){
+        if(s == null || s.equals("")) clearTabPrefix();
+        else Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tab player " + getName() + " tabprefix " + s);
     }
 
     @Override
@@ -483,9 +491,34 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     }
 
     @Override
-    public void sendMessage(String message){
-        if(!isOnline()) return;
-        getPlayer().sendMessage(FtcCore.translateHexCodes(message));
+    public void sendMessage(@Nonnull String message){
+        performOnlineCheck();
+        getPlayer().sendMessage(CrownUtils.translateHexCodes(message));
+    }
+
+    @Override
+    public void sendMessage(@Nonnull String... messages){
+        for (String s: messages){
+            sendMessage(s);
+        }
+    }
+
+    @Override
+    public void sendMessage(UUID sender, String message) {
+        performOnlineCheck();
+        getPlayer().sendMessage(sender, CrownUtils.translateHexCodes(message));
+    }
+
+    @Override
+    public void sendMessage(UUID sender, String[] messages) {
+        for (String s: messages){
+            sendMessage(sender, s);
+        }
+    }
+
+    @Override
+    public Server getServer() {
+        return FtcCore.getInstance().getServer();
     }
 
     @Override
@@ -493,11 +526,150 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         return getPlayer() != null;
     }
 
+    @Override
+    public boolean isKing() {
+        return FtcCore.getKing().equals(getBase());
+    }
+
+    @Override
+    public void setKing(boolean king, boolean setPrefix) {
+        setKing(king, setPrefix, false);
+    }
+
+    @Override
+    public void setKing(boolean king, boolean setPrefix, boolean isFemale) {
+        if(king){
+            if(setPrefix){
+                if(!isFemale) setTabPrefix("&l[&e&lKing&r&l] &r");
+                else setTabPrefix("&l[&e&lQueen&r&l] &r");
+            }
+            FtcCore.setKing(getBase());
+            return;
+        }
+
+        FtcCore.setKing(null);
+        if(setPrefix){
+            if(getRank() != Rank.DEFAULT) setTabPrefix(getRank().getColorlessPrefix());
+            else clearTabPrefix();
+        }
+    }
+
+    @Override
+    public void setKing(boolean king) {
+        setKing(king, false, false);
+    }
+
+    //---------------------------
+    // The following methods are inherited from CommandSender
+    // Cuz MessageCommandSender still had these methods, but no code for them
+    //---------------------------
+
+    @Override
+    public Spigot spigot() {
+        performOnlineCheck();
+        return getPlayer().spigot();
+    }
 
 
+    @Override
+    public boolean isPermissionSet(String name) {
+        performOnlineCheck();
+        return getPlayer().isPermissionSet(name);
+    }
 
+    @Override
+    public boolean isPermissionSet(Permission perm) {
+        performOnlineCheck();
+        return getPlayer().isPermissionSet(perm);
+    }
 
+    @Override
+    public boolean hasPermission(String name) {
+        performOnlineCheck();
+        return getPlayer().hasPermission(name);
+    }
 
+    @Override
+    public boolean hasPermission(Permission perm) {
+        performOnlineCheck();
+        return getPlayer().hasPermission(perm);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value) {
+        performOnlineCheck();
+        return getPlayer().addAttachment(plugin, name, value);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin) {
+        performOnlineCheck();
+        return getPlayer().addAttachment(plugin);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value, int ticks) {
+        performOnlineCheck();
+        return getPlayer().addAttachment(plugin, name, value, ticks);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, int ticks) {
+        performOnlineCheck();
+        return getPlayer().addAttachment(plugin, ticks);
+    }
+
+    @Override
+    public void removeAttachment(PermissionAttachment attachment) {
+        performOnlineCheck();
+        getPlayer().removeAttachment(attachment);
+    }
+
+    @Override
+    public void recalculatePermissions() {
+        performOnlineCheck();
+        getPlayer().recalculatePermissions();
+    }
+
+    @Override
+    public Set<PermissionAttachmentInfo> getEffectivePermissions() {
+        performOnlineCheck();
+        return getPlayer().getEffectivePermissions();
+    }
+
+    @Override
+    public boolean isOp() {
+        performOnlineCheck();
+        return getPlayer().isOp();
+    }
+
+    @Override
+    public void setOp(boolean value) {
+        performOnlineCheck();
+        getPlayer().setOp(value);
+    }
+
+    @Override
+    public void sendMessage(BaseComponent component) {
+        performOnlineCheck();
+        getPlayer().sendMessage(component);
+    }
+
+    @Override
+    public void sendMessage(BaseComponent... components) {
+        performOnlineCheck();
+        getPlayer().sendMessage(components);
+    }
+
+    @Override
+    public void performCommand(String command){
+        performOnlineCheck();
+        getServer().dispatchCommand(this, command);
+    }
+
+    private void performOnlineCheck(){
+        if(!isOnline()) throw new UserNotOnlineException(this);
+    }
 
 
 
@@ -541,7 +713,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
     private void permsCheck(){
         if(!isOnline()) return;
-        if(getName().contains("Paranor")) addRank(Rank.LEGEND);
+        if(getName().contains("Paranor")) addRank(Rank.LEGEND); //fuckin para lmao
 
         if(isBaron() && !hasRank(Rank.BARON)){
             addRank(Rank.BARON);

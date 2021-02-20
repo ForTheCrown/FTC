@@ -1,51 +1,53 @@
-package net.forthecrown.vikings.raids.managers;
+package net.forthecrown.vikings.raids;
 
 import net.forthecrown.vikings.Vikings;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.PluginManager;
 
-public abstract class GenericRaid implements VikingRaid, Listener {
+import javax.annotation.Nullable;
+
+public abstract class VikingRaid implements Listener {
 
     protected final Location raidLocation;
     protected final String name;
+    protected final Server server;
+
     protected Player usingPlayer;
     protected RaidDifficulty difficulty = RaidDifficulty.NORMAL;
-    protected PluginManager manager;
 
-    protected GenericRaid(Location raidLocation, String name){
+    protected VikingRaid(Location raidLocation, String name, Server server){
         this.raidLocation = raidLocation;
         this.name = name;
+        this.server = server;
     }
 
-    @Override
     public RaidDifficulty getDifficulty() {
         return difficulty;
     }
 
-    @Override
     public void setDifficulty(RaidDifficulty difficulty) {
         this.difficulty = difficulty;
     }
 
-    @Override
-    public void raidInit(Player player, RaidDifficulty difficulty, PluginManager manager) {
+    public void initRaid(Player player, RaidDifficulty difficulty) {
         this.difficulty = difficulty;
         this.usingPlayer = player;
 
-        this.manager = manager;
-        manager.registerEvents(this, Vikings.getInstance());
+        server.getPluginManager().registerEvents(this, Vikings.getInstance());
 
         onRaidLoad();
         player.teleport(getRaidLocation());
     }
 
-    @Override
+    public abstract void onRaidLoad();
+    public abstract void onRaidComplete();
+
     public void onRaidEnd() {
         getUsingPlayer().teleport(Vikings.getRaidHandler().getExitLocation());
         setUsingPlayer(null);
@@ -57,24 +59,21 @@ public abstract class GenericRaid implements VikingRaid, Listener {
         return raidLocation;
     }
 
-    @Override
-    public void setUsingPlayer( Player player) {
+    public void setUsingPlayer(@Nullable Player player) {
         usingPlayer = player;
     }
 
-    @Override
     public Player getUsingPlayer() {
         return usingPlayer;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
     @Override
     public String toString() {
-        return name;
+        return "AbstractRaid{name=" + name + "}";
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -90,6 +89,6 @@ public abstract class GenericRaid implements VikingRaid, Listener {
         if(getUsingPlayer() == null) return;
         if(!event.getPlayer().equals(getUsingPlayer())) return;
 
-        getUsingPlayer().teleport(Vikings.getRaidHandler().getExitLocation());
+        onRaidEnd();
     }
 }

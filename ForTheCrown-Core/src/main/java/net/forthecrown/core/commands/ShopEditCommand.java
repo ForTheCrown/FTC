@@ -1,5 +1,6 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.SignShop;
@@ -24,6 +25,7 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
     public ShopEditCommand(){
         super("editshop", FtcCore.getInstance());
         setUsage("&7Usage: &r/editshop <price | line1 | line2 | sellamount> <value>");
+        setTabCompleter(this);
         register();
     }
 
@@ -43,7 +45,7 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
             shop = FtcCore.getShop(sign.getLocation());
         } catch (Exception e){
             e.printStackTrace();
-            return true;
+            throw new InvalidCommandExecution(sender, "You must be looking at a sign shop!");
         }
 
         if(!shop.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) throw new InvalidCommandExecution(sender, "&cYou must be the owner of the shop!");
@@ -56,7 +58,10 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
                 if(args.length == 1) sign.setLine(1, "");
                 else {
                  String toSet = String.join(" ", args).replace("line1 ", "");
-                 if(player.hasPermission("ftc.donator2")) toSet = FtcCore.translateHexCodes(toSet);
+
+                 if(player.hasPermission("ftc.donator2")) toSet = CrownUtils.translateHexCodes(toSet);
+                 if(player.hasPermission("ftc.donator3")) toSet = CrownUtils.formatEmojis(toSet);
+
                  sign.setLine(1, toSet);
                 }
                 user.sendMessage(ChatColor.GREEN + "First line changed!");
@@ -66,13 +71,16 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
                 if(args.length == 1) sign.setLine(2, "");
                 else {
                     String toSet = String.join(" ", args).replace("line2 ", "");
-                    if(player.hasPermission("ftc.donator2")) toSet = FtcCore.translateHexCodes(toSet);
+
+                    if(player.hasPermission("ftc.donator2")) toSet = CrownUtils.translateHexCodes(toSet);
+                    if(player.hasPermission("ftc.donator3")) toSet = CrownUtils.formatEmojis(toSet);
+
                     sign.setLine(2, toSet);
                 }
                 user.sendMessage(ChatColor.GREEN + "Second line changed!");
                 break;
 
-            case "sellamount":
+            case "tradeamount":
                 if(args.length != 2) throw new InvalidArgumentException(sender, "You must specify an amount");
                 if(shop.getStock().getExampleItem() == null) throw new BrokenShopException(player);
 
@@ -86,7 +94,7 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
                 ItemStack item = shop.getStock().getExampleItem();
                 item.setAmount(amount);
                 shop.getStock().setExampleItem(item);
-                user.sendMessage("&7This shop will now sell items in &e" + amount + " item amounts");
+                user.sendMessage("&7This shop will now trade items in &e" + amount + " item amounts");
                 return true;
 
             case "price":
@@ -99,7 +107,7 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
 
                 shop.setPrice(newPrice, true);
                 shop.save();
-                user.sendMessage(ChatColor.GREEN + "Price changed! &7The price of this shop is now " + ChatColor.YELLOW + newPrice + "&7!");
+                user.sendMessage(ChatColor.GREEN + "Price changed! &7The price of this shop is now " + ChatColor.YELLOW + newPrice + " Rhines&7!");
                 break;
 
             default: return false;
@@ -115,7 +123,7 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
         if(args.length == 1){
             toReturn.add("line1");
             toReturn.add("line2");
-            toReturn.add("sellamount");
+            toReturn.add("tradeamount");
             toReturn.add("price");
             return StringUtil.copyPartialMatches(args[0], toReturn, new ArrayList<>());
         }

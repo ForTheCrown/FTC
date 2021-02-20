@@ -1,6 +1,6 @@
 package net.forthecrown.core.enums;
 
-import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.CrownUtils;
 
 import javax.annotation.Nonnull;
 
@@ -21,11 +21,11 @@ public enum ShopType {
 
     @Nonnull
     public String getInStockLabel(){
-        return FtcCore.translateHexCodes(inStock);
+        return CrownUtils.translateHexCodes(inStock);
     }
 
     @Nonnull
     public String getOutOfStockLabel() {
-        return FtcCore.translateHexCodes(outOfStock);
+        return CrownUtils.translateHexCodes(outOfStock);
     }
 }

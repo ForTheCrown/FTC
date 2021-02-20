@@ -1,5 +1,6 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
@@ -41,8 +42,8 @@ public class DepositCommand extends CrownCommand  {
         amount = amount * mainItem.getAmount();
 
         Balances bals = FtcCore.getBalances();
-        bals.addBalance(player.getUniqueId(), amount);
-        player.sendMessage(FtcCore.translateHexCodes("&7You deposited " + mainItem.getAmount() + " coins and and received &6" + amount + " Rhines"));
+        bals.addBalance(player.getUniqueId(), amount, false);
+        player.sendMessage(CrownUtils.translateHexCodes("&7You deposited " + mainItem.getAmount() + " coins and and received &6" + amount + " Rhines"));
         player.getInventory().removeItem(mainItem);
         return true;
     }

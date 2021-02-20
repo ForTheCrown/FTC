@@ -1,19 +1,28 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.events.ChatEvents;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StaffChatCommand implements CommandExecutor, TabCompleter {
+public class StaffChatCommand extends CrownCommand implements TabCompleter {
+
+    public StaffChatCommand(){
+        super("staffchat", FtcCore.getInstance());
+
+        setPermission("ftc.staffchat");
+        setAliases("sc");
+        setDescription("Sends a message to the staff chat");
+        setUsage("&8Usage: &7/sc <message>");
+        setTabCompleter(this);
+        register();
+    }
 
     /*
      * ----------------------------------------
@@ -30,38 +39,64 @@ public class StaffChatCommand implements CommandExecutor, TabCompleter {
      * - ftc.staffchat
      *
      * Referenced other classes:
-     * - Chat: Chat.replaceEmojis
-     *
+     * - FtcCore: FtcCore.replaceEmojis
+     * - ChatEvents: ChatEvents.sendStaffChatMessage and other variables
      * Author: Botul
      */
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String staffPrefix = ChatColor.DARK_GRAY + "[Staff] ";
-        String message = staffPrefix + ChatColor.GRAY + "%SENDER%"  + ChatColor.GRAY + ChatColor.BOLD + " >" + ChatColor.RESET + " ";
-
+    public boolean run(CommandSender sender, Command command, String label, String[] args) {
         if(args.length < 1) return false;
 
-        String initialMmg = String.join(" ", args);
+        if(args[0].contains("cmd:")){
+            String cmd = args[0].toLowerCase().replaceAll("cmd:", "");
 
-        initialMmg = FtcCore.translateHexCodes(FtcCore.replaceEmojis(initialMmg).replace("\\", "\\\\"));
+            switch (cmd){
+                case "visible":
+                    if(ChatEvents.ignoringStaffChat.contains(sender)){
+                        ChatEvents.ignoringStaffChat.remove(sender);
+                        sender.sendMessage(ChatColor.GRAY + "You will now see staff chat messages again");
+                    } else {
+                        ChatEvents.ignoringStaffChat.add(sender);
+                        sender.sendMessage(ChatColor.GRAY + "You will no longer see staff chat messages");
+                    }
+                    return true;
 
-        if(sender instanceof Player) message = message.replaceAll("%SENDER%", sender.getName());
-        else message = message.replaceAll("%SENDER%", "Console");
+                case "mute":
+                    if(!sender.hasPermission("ftc.staffchat.admin")) break;
+                    if(ChatEvents.scMuted){
+                        sender.sendMessage(ChatColor.GRAY + "Staff Chat is no longer muted");
+                        ChatEvents.sendStaffChatMessage(null, sender.getName() + " has unmuted staff chat");
+                    }
+                    else{
+                        sender.sendMessage(ChatColor.GRAY + "Staff chat is now muted");
+                        ChatEvents.sendStaffChatMessage(null, sender.getName() + " has muted staff chat");
+                    }
 
-        for (Player p : Bukkit.getOnlinePlayers()){ if(p.hasPermission("ftc.staffchat")) p.sendMessage(message + initialMmg); }
+                    ChatEvents.scMuted = !ChatEvents.scMuted;
+                    return true;
+
+                default:
+            }
+        }
+        ChatEvents.sendStaffChatMessage(sender, String.join(" ", args));
         return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         int argN = args.length-1;
-
         List<String> emojiList = new ArrayList<>();
+
+        if(argN == 0 && args[0].contains("cmd:")){
+            emojiList.add("cmd:visible");
+            if(sender.hasPermission("ftc.staffchat.admin"))emojiList.add("cmd:mute");
+        }
+
         emojiList.add(":shrug:");
         emojiList.add(":ughcry:");
-        emojiList.add(":gimme:");
-        emojiList.add(":gimmecry:");
+        emojiList.add(":hug:");
+        emojiList.add(":hugcry:");
         emojiList.add(":bear:");
         emojiList.add(":smooch:");
         emojiList.add(":why:");
@@ -73,6 +108,8 @@ public class StaffChatCommand implements CommandExecutor, TabCompleter {
         emojiList.add(":sad:");
         emojiList.add(":pleased:");
         emojiList.add(":fedup:");
+
+        emojiList.addAll(getPlayerNameList());
 
         return StringUtil.copyPartialMatches(args[argN], emojiList, new ArrayList<>());
     }

@@ -12,10 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 	
@@ -23,6 +20,19 @@ public class Main extends JavaPlugin implements Listener {
 	
 	public File graves;
 	public YamlConfiguration gravesyaml;
+
+	//valentines day stuffs
+
+	public static Set<UUID> valentinesPlayer = new HashSet<>();
+	/*public static final List<ItemStack> VALENTINE_ITEMS = Arrays.asList(
+			new ItemStack(Material.RED_BED),
+			new ItemStack(Material.PUMPKIN_PIE, 32),
+			new ItemStack(Material.ROSE_BUSH, 5),
+			new ItemStack(Material.LANTERN, 2),
+			new ItemStack(Material.CARROT, 10),
+			new ItemStack(Material.BAKED_POTATO, 16)
+			);
+			*/
 
 	//For the HealthBar
 	public Map<UUID, String> withSetNames = new HashMap<>();
@@ -57,14 +67,17 @@ public class Main extends JavaPlugin implements Listener {
 		pm.registerEvents(healthBar, this);
 		pm.registerEvents(smokeBomb, this);
 		pm.registerEvents(graveFeature, this);
+		//pm.registerEvents(new HaroldValentinesEvent(), this);
 		//pm.registerEvents(wildPortal, this);
-		
-		// Check datafolder.
-		File dir = getDataFolder();
-		if (!dir.exists())
-			if (!dir.mkdir())
-				System.out.println("Could not create directory for plugin: " + getDescription().getName());
-		
+
+		Set<UUID> temp = new HashSet<>();
+		for (String s : getConfig().getStringList("ValentinesPlayer")){
+			try {
+				temp.add(UUID.fromString(s));
+			} catch (Exception ignored) {}
+		}
+		valentinesPlayer = temp;
+		if(valentinesPlayer.size() > 0) pm.registerEvents(new TempEvent(), this);
 	}
 	
 	// -----
@@ -78,6 +91,13 @@ public class Main extends JavaPlugin implements Listener {
 		for(UUID uuid: withSetNames.keySet()){
 			Bukkit.getEntity(uuid).setCustomName(withSetNames.getOrDefault(uuid, null));
 		}
+
+		List<String> temp = new ArrayList<>();
+		for (UUID id: valentinesPlayer){
+			temp.add(id.toString());
+		}
+		getConfig().set("ValentinesPlayer", temp);
+		saveConfig();
 	}
 	
 	public void loadFiles() {

@@ -1,5 +1,6 @@
 package net.forthecrown.cosmetics.inventories;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.md_5.bungee.api.ChatColor;
@@ -21,10 +22,10 @@ public class CustomInventory {
     public CustomInventory(int size, String title, boolean needHead, boolean needReturn) {
         this.inv = Bukkit.createInventory(Cosmetics.holder, size, title);
 
-        if (needHead) this.headItem = FtcCore.makeItem(Material.NETHER_STAR, 1, true, ChatColor.YELLOW + "Menu", "", ChatColor.DARK_GRAY + "ulala");
+        if (needHead) this.headItem = CrownUtils.makeItem(Material.NETHER_STAR, 1, true, ChatColor.YELLOW + "Menu", "", ChatColor.DARK_GRAY + "ulala");
         else this.headItem = getGlassFiller();
 
-        if (needReturn) this.returnItem = FtcCore.makeItem(Material.PAPER, 1, true, ChatColor.YELLOW + "< Go Back");
+        if (needReturn) this.returnItem = CrownUtils.makeItem(Material.PAPER, 1, true, ChatColor.YELLOW + "< Go Back");
         else this.returnItem = getGlassFiller();
     }
 
@@ -68,7 +69,7 @@ public class CustomInventory {
 
 
     public ItemStack getGlassFiller() {
-        return FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
+        return CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
     }
 
     public Inventory getInventory() {

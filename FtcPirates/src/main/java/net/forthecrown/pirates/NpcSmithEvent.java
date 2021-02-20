@@ -1,8 +1,10 @@
 package net.forthecrown.pirates;
 
+import net.forthecrown.core.Cooldown;
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.clickevent.ClickEventManager;
+import net.forthecrown.core.clickevent.ClickEventHandler;
 import net.forthecrown.core.clickevent.ClickEventTask;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
@@ -31,33 +33,33 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
     private final String clickID;
 
     public NpcSmithEvent(){
-        clickID = ClickEventManager.registerClickEvent(this);
+        clickID = ClickEventHandler.registerClickEvent(this);
     }
 
     @EventHandler
     public void onSmithInteract(PlayerInteractEntityEvent event){
         if(event.getRightClicked().getType() != EntityType.VILLAGER) return;
         if(event.getHand() != EquipmentSlot.HAND) return;
-        if(FtcCore.isOnCooldown(event.getPlayer())) return;
+        if(Cooldown.contains(event.getPlayer())) return;
         Villager villie = (Villager) event.getRightClicked();
         if(villie.getCustomName() == null || !villie.getCustomName().contains(ChatColor.YELLOW + "Smith")) return;
         if(!villie.isInvulnerable()) return;
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-        FtcCore.addToCooldown(player, 20, false);
-        ClickEventManager.allowCommandUsage(player, true);
+        Cooldown.add(player, 20);
+        ClickEventHandler.allowCommandUsage(player, true);
 
         TextComponent message1 = new TextComponent(ChatColor.YELLOW + "[Info about Pirates]");
-        message1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventManager.getClickEventCommand(clickID, "info")));
+        message1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(clickID, "info")));
         message1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click me!")));
 
         TextComponent message2 = new TextComponent(ChatColor.YELLOW + "[Join Pirates]");
-        message2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventManager.getClickEventCommand(clickID, "join")));
+        message2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(clickID, "join")));
         message2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click me!")));
 
         TextComponent message3 = new TextComponent(ChatColor.GOLD + "[Captain's Cutlass]");
-        message3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventManager.getClickEventCommand(clickID, "cutlass")));
+        message3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(clickID, "cutlass")));
         message2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click me!")));
 
         player.sendMessage(ChatColor.GOLD + "--" + ChatColor.WHITE + " Aye mate, what can I do for ya? " + ChatColor.GOLD + "--");
@@ -82,7 +84,7 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
                 if(stack == null) continue;
 
                 if(stack.getType() != Material.GOLDEN_SWORD && !stack.hasItemMeta() || !stack.getItemMeta().hasDisplayName()) continue;
-                if(!stack.getItemMeta().getDisplayName().contains(FtcCore.translateHexCodes("&6-&e&lRoyal Sword&6-"))) continue;
+                if(!stack.getItemMeta().getDisplayName().contains(CrownUtils.translateHexCodes("&6-&e&lRoyal Sword&6-"))) continue;
 
                 sword = stack;
                 break;
@@ -95,10 +97,10 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
             sword.setType(Material.NETHERITE_SWORD);
 
             ItemMeta meta = sword.getItemMeta();
-            meta.setDisplayName(ChatColor.RESET + FtcCore.translateHexCodes("&#917558-&#D1C8BA&lCaptain's Cutlass&#917558-"));
+            meta.setDisplayName(ChatColor.RESET + CrownUtils.translateHexCodes("&#917558-&#D1C8BA&lCaptain's Cutlass&#917558-"));
             List<String> lores = meta.getLore();
-            lores.set(2, FtcCore.translateHexCodes("&#917558The brearer of this cutlass bows to no laws, to no king,"));
-            lores.set(3, FtcCore.translateHexCodes("&#917558its wielder leads their crew towards everlasting riches."));
+            lores.set(2, CrownUtils.translateHexCodes("&#917558The brearer of this cutlass bows to no laws, to no king,"));
+            lores.set(3, CrownUtils.translateHexCodes("&#917558its wielder leads their crew towards everlasting riches."));
             meta.setLore(lores);
             sword.setItemMeta(meta);
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);

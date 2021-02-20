@@ -2,7 +2,7 @@ package net.forthecrown.core.exceptions;
 
 import org.bukkit.command.CommandSender;
 
-public class InvalidBranchException extends InvalidCommandExecution {
+public class InvalidBranchException extends CrownException {
     public InvalidBranchException(CommandSender sender) {
         super(sender, "&8Wrong branch!");
     }

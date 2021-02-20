@@ -1,5 +1,6 @@
 package net.forthecrown.core.inventories;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.SellAmount;
@@ -24,7 +25,7 @@ public class SellShop {
 
     public Inventory dropsMenu(){
         Inventory inv = getBaseInventory("Mob Drops Shop Menu");
-        inv.setItem(4, FtcCore.makeItem(Material.ROTTEN_FLESH, 1, true, "&bDrops"));
+        inv.setItem(4, CrownUtils.makeItem(Material.ROTTEN_FLESH, 1, true, "&bDrops"));
 
         inv.setItem(20, getSellableItem(Material.ROTTEN_FLESH));
         inv.setItem(21, getSellableItem(Material.BONE));
@@ -42,7 +43,7 @@ public class SellShop {
 
     public Inventory farmingMenu(){
         Inventory inv = getBaseInventory("Farming Items Shop Menu");
-        inv.setItem(4, FtcCore.makeItem(Material.OAK_SAPLING, 1, true, "&bFarming"));
+        inv.setItem(4, CrownUtils.makeItem(Material.OAK_SAPLING, 1, true, "&bFarming"));
 
         inv.setItem(20, getSellableItem(Material.BAMBOO));
         inv.setItem(21, getSellableItem(Material.KELP));
@@ -65,7 +66,7 @@ public class SellShop {
 
     public Inventory miningMenu(){
         Inventory inv = getBaseInventory("Mining Items Shop Menu");
-        inv.setItem(4, FtcCore.makeItem(Material.IRON_PICKAXE, 1, true, "&bMining"));
+        inv.setItem(4, CrownUtils.makeItem(Material.IRON_PICKAXE, 1, true, "&bMining"));
 
         inv.setItem(11, getSellableItem(Material.LAPIS_LAZULI));
         inv.setItem(12, getSellableItem(Material.QUARTZ));
@@ -94,12 +95,12 @@ public class SellShop {
     public Inventory mainMenu(){
         Inventory inv = Bukkit.createInventory(null, 27, "FTC Shop");
 
-        inv.setItem(11, FtcCore.makeItem(Material.GOLD_BLOCK, 1, true, "&e-Item Shop-", "&7Sell vanilla items."));
-        inv.setItem(15, FtcCore.makeItem(Material.EMERALD_BLOCK, 1, true, "&e-Web store-", "&7Online server shop."));
+        inv.setItem(11, CrownUtils.makeItem(Material.GOLD_BLOCK, 1, true, "&e-Item Shop-", "&7Sell vanilla items."));
+        inv.setItem(15, CrownUtils.makeItem(Material.EMERALD_BLOCK, 1, true, "&e-Web store-", "&7Online server shop."));
 
         for(int i = 0; i < 10; i++){
-            inv.setItem(i, FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
-            inv.setItem(i+17, FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
+            inv.setItem(i, CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
+            inv.setItem(i+17, CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
         }
 
         return inv;
@@ -108,13 +109,13 @@ public class SellShop {
     public Inventory decidingMenu(){
         Inventory inv = Bukkit.createInventory(null, 27, "FTC Shop");
 
-        inv.setItem(11, FtcCore.makeItem(Material.OAK_SAPLING, 1, true, "&bFarming", "&7Crops and other farmable items."));
-        inv.setItem(13, FtcCore.makeItem(Material.IRON_PICKAXE, 1, true, "&bMining", "&7Ores and common blocks."));
-        inv.setItem(15, FtcCore.makeItem(Material.ROTTEN_FLESH, 1, true, "&bDrops", "&7Common mobdrops."));
+        inv.setItem(11, CrownUtils.makeItem(Material.OAK_SAPLING, 1, true, "&bFarming", "&7Crops and other farmable items."));
+        inv.setItem(13, CrownUtils.makeItem(Material.IRON_PICKAXE, 1, true, "&bMining", "&7Ores and common blocks."));
+        inv.setItem(15, CrownUtils.makeItem(Material.ROTTEN_FLESH, 1, true, "&bDrops", "&7Common mobdrops."));
 
         for(int i = 0; i < 10; i++){
-            inv.setItem(i, FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
-            inv.setItem(i+17, FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
+            inv.setItem(i, CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
+            inv.setItem(i+17, CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
         }
 
         return inv;
@@ -129,28 +130,23 @@ public class SellShop {
                 "&7Amount you will sell: " + sellAmount.getInt().toString().replaceAll("-1", "all") + ".",
                 "&7Change the amount setting on the right."
         };
-        return FtcCore.makeItem(material, 1, true, null, asd);
+        return CrownUtils.makeItem(material, 1, true, null, asd);
     }
 
     private Inventory getBaseInventory(String menuName){
         Inventory inv = Bukkit.createInventory(null, 54, ChatColor.translateAlternateColorCodes('&', menuName));
-        inv.setItem(0, FtcCore.makeItem(Material.PAPER, 1, true, "&e< Previous page"));
+        inv.setItem(0, CrownUtils.makeItem(Material.PAPER, 1, true, "&e< Previous page"));
 
-        //the following 3  B L O C K S  adds the gray glass panes
-        for (int i = 1; i < 9; i++){
-            if(i == 0 || i == 4) continue;
-            inv.setItem(i, FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
+        //add glass panes
+        final ItemStack border = CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
+        for (int i = 1; i < 54; i++){
+            if(i == 4) i++;
+            if(i == 10 || i == 19 || i == 28 || i == 37) i += 8;
+
+            inv.setItem(i, border);
         }
 
-        for(int i = 0; i < 9; i++){
-            inv.setItem(i+45, FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
-        }
-
-        inv.setItem(9, FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
-        inv.setItem(18, FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
-        inv.setItem(27, FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
-        inv.setItem(36, FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
-
+        //black sell amount panes
         inv.setItem(17, getSellAmountPane(SellAmount.PER_1));
         inv.setItem(26, getSellAmountPane(SellAmount.PER_16));
         inv.setItem(35, getSellAmountPane(SellAmount.PER_64));
@@ -164,16 +160,16 @@ public class SellShop {
         ItemStack toReturn;
         switch (paneToGet){
             case ALL:
-                toReturn = FtcCore.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell all", asd);
+                toReturn = CrownUtils.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell all", asd);
                 break;
             case PER_1:
-                toReturn = FtcCore.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell 1", asd);
+                toReturn = CrownUtils.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell 1", asd);
                 break;
             case PER_16:
-                toReturn = FtcCore.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell per 16", asd);
+                toReturn = CrownUtils.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell per 16", asd);
                 break;
             case PER_64:
-                toReturn = FtcCore.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell per 64", asd);
+                toReturn = CrownUtils.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell per 64", asd);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + paneToGet);

@@ -1,9 +1,12 @@
 package net.forthecrown.vikings;
 
+import net.forthecrown.vikings.blessings.FastRunner;
+import net.forthecrown.vikings.blessings.HeadChoppingBlessing;
+import net.forthecrown.vikings.blessings.VikingBlessing;
 import net.forthecrown.vikings.commands.VikingsCommand;
 import net.forthecrown.vikings.raids.MonasteryRaid;
-import net.forthecrown.vikings.raids.managers.RaidHandler;
-import net.forthecrown.vikings.raids.managers.VikingRaid;
+import net.forthecrown.vikings.raids.RaidHandler;
+import net.forthecrown.vikings.raids.VikingRaid;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Vikings extends JavaPlugin {
@@ -16,7 +19,12 @@ public final class Vikings extends JavaPlugin {
         instance = this;
         handler = new RaidHandler(getServer());
 
+        getServer().getPluginManager().registerEvents(new RaidChooseListener(), this);
+
         handler.registerRaid(new MonasteryRaid());
+
+        new FastRunner();
+        new HeadChoppingBlessing();
 
         new VikingsCommand();
     }
@@ -26,6 +34,11 @@ public final class Vikings extends JavaPlugin {
         for(VikingRaid r : handler.getRaids()){
             if(r.getUsingPlayer() == null) continue;
             r.onRaidEnd();
+        }
+
+        for (VikingBlessing b: VikingBlessing.getBlessings()){
+            b.save();
+            b.clearTempUsers();
         }
     }
 

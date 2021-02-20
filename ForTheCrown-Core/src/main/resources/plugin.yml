@@ -6,12 +6,3 @@ authors: [ Botul, Wout ]
 loadbefore:
   - OpenInv
   - Essentials
-
-commands:
-  staffchat:
-    permission: ftc.staffchat
-    permission-message: You do not have permission to use this!
-    description: The StaffChat command.
-    aliases:
-      - sc
-    usage: '§7Usage: /sc <message>'

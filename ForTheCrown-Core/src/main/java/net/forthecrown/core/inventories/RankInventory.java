@@ -1,6 +1,6 @@
 package net.forthecrown.core.inventories;
 
-import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
@@ -48,14 +48,14 @@ public class RankInventory {
         inv.setItem(33, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.PRINCE, "&7Included in Tier-3 Donator ranks package,", "&7which costs €6.00/month in the webstore."));
         inv.setItem(42, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.PRINCESS, "&7Included in Tier-3 Donator ranks package,", "&7which costs €6.00/month in the webstore."));
 
-        if(user.hasRank(Rank.LEGEND) || user.getPlayer().hasPermission("ftc.legend")) inv.setItem(22, getRankItem(Material.MAP, Rank.LEGEND, "The rarest rank on all of FTC"));
+        inv.setItem(22, getLegendRank());
         return inv;
     }
 
     public Inventory getPiratesGUI(){
         Inventory inv = getBaseInventory(Branch.PIRATES, "Pirates");
 
-        if(user.hasRank(Rank.LEGEND) || user.getPlayer().hasPermission("ftc.legend")) inv.setItem(13, getRankItem(Material.MAP, Rank.LEGEND, "The rarest rank on all of FTC"));
+        inv.setItem(13, getLegendRank());
 
         inv.setItem(21, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.SAILOR, ChatColor.GRAY + "Acquired by gathering 10 pirate points by finding",
                 ChatColor.GRAY + "treasures, hunting mob heads or completing",
@@ -75,33 +75,46 @@ public class RankInventory {
     public Inventory getVikingsGUI(){
         Inventory inv = getBaseInventory(Branch.VIKINGS, "Vikings");
 
+        inv.setItem(20, getRankItem(Material.PAPER, Rank.VIKING, ""));
+        inv.setItem(21, getRankItem(Material.PAPER, Rank.BERSERKER, ""));
+
+        inv.setItem(23, getRankItem(Material.PAPER, Rank.WARRIOR, ""));
+        inv.setItem(24, getRankItem(Material.PAPER, Rank.SHIELD_MAIDEN, ""));
+
+        inv.setItem(39, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.HERSIR, ChatColor.GRAY + "Included in the Tier 2 Donator ranks package,",
+                ChatColor.GRAY + "which costs €20.00 in the webstore."));
+        inv.setItem(41, getRankItem(Material.GLOBE_BANNER_PATTERN, Rank.JARL, ChatColor.GRAY + "Included in the Tier 3 Donator ranks package,",
+                ChatColor.GRAY + "which costs €6.00/month in the webstore."));
+
+        inv.setItem(13, getLegendRank());
+
         return inv;
     }
 
     private Inventory getBaseInventory(Branch branch, String title){
-        Inventory inventory = Bukkit.createInventory(null, 54, ChatColor.translateAlternateColorCodes('&', title));
+        Inventory inventory = Bukkit.createInventory(null, 54, CrownUtils.translateHexCodes("Ranks: " + title));
 
-        inventory.setItem(8, FtcCore.makeItem(Material.PAPER, 1, true, "&eNext page >"));
+        inventory.setItem(8, CrownUtils.makeItem(Material.PAPER, 1, true, "&eNext page >"));
         inventory.setItem(10, getRankItem(Material.MAP, Rank.DEFAULT, "This is the default rank!"));
 
         //border making
         ItemStack borderItem;
         switch (branch){
             case ROYALS:
-                borderItem = FtcCore.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, " ");
-                inventory.setItem(4, FtcCore.makeItem(Material.IRON_SWORD, 1, true, ChatColor.AQUA + "Royals", "&7The Crown's most loyal knights and nobles!"));
+                borderItem = CrownUtils.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, " ");
+                inventory.setItem(4, CrownUtils.makeItem(Material.IRON_SWORD, 1, true, ChatColor.AQUA + "Royals", "&7The Crown's most loyal knights and nobles!"));
                 break;
             case PIRATES:
-                borderItem = FtcCore.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
-                inventory.setItem(4, FtcCore.makeItem(Material.OAK_BOAT, 1, true, ChatColor.AQUA + "Pirates", "&7Sailors who bow to no crown!"));
+                borderItem = CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
+                inventory.setItem(4, CrownUtils.makeItem(Material.OAK_BOAT, 1, true, ChatColor.AQUA + "Pirates", "&7Sailors who bow to no crown!"));
                 break;
             case VIKINGS:
-                borderItem = FtcCore.makeItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, true, " ");
-                inventory.setItem(4, FtcCore.makeItem(Material.IRON_AXE, 1, true, ChatColor.AQUA + "Vikings", "&7Northern uncontrollable warrios with a bloodlust!"));
+                borderItem = CrownUtils.makeItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, true, " ");
+                inventory.setItem(4, CrownUtils.makeItem(Material.IRON_AXE, 1, true, ChatColor.AQUA + "Vikings", "&7Northern uncontrollable warrios with a bloodlust!"));
                 break;
             default:
-                inventory.setItem(4, FtcCore.makeItem(Material.IRON_SWORD, 1, true, ChatColor.AQUA + "Royals", "&7The Crown's most loyal knights and nobles!"));
-                borderItem = FtcCore.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "  ");
+                inventory.setItem(4, CrownUtils.makeItem(Material.IRON_SWORD, 1, true, ChatColor.AQUA + "Royals", "&7The Crown's most loyal knights and nobles!"));
+                borderItem = CrownUtils.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "  ");
                 break;
         }
 
@@ -114,17 +127,22 @@ public class RankInventory {
         return inventory;
     }
 
-    private ItemStack getRankItem(Material mat, Rank rank, String... description){
+    private ItemStack getLegendRank(){
+        if(user.hasRank(Rank.LEGEND) || user.getPlayer().hasPermission("ftc.legend")) return getRankItem(Material.MAP, Rank.LEGEND, "The rarest rank on all of FTC");
+        return null;
+    }
+
+    private ItemStack getRankItem(Material mat, Rank rank, String... description) {
         String s;
-        if(rank == Rank.DEFAULT) s = "Default";
+        if (rank == Rank.DEFAULT) s = "Default";
         else s = rank.getPrefix();
 
-        ItemStack item = FtcCore.makeItem(mat, 1, true, s, description);
-        if(Rank.getFreeRanks().contains(rank)){
-            if(user.getAvailableRanks().contains(rank))item.setType(Material.MAP);
+        ItemStack item = CrownUtils.makeItem(mat, 1, true, s, description);
+        if (Rank.getFreeRanks().contains(rank)) {
+            if (user.getAvailableRanks().contains(rank)) item.setType(Material.MAP);
             else item.setType(Material.PAPER);
         }
-        if(rank == user.getRank()) item.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
+        if (rank == user.getRank()) item.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
 
         return item;
     }

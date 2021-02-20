@@ -1,4 +1,4 @@
-package net.forthecrown.vikings.raids.managers;
+package net.forthecrown.vikings.raids;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,12 +19,12 @@ public class RaidHandler {
         this.server = server;
     }
 
-    public VikingRaid getFromName(String name){
+    public static VikingRaid fromName(String name){
         for (VikingRaid r : VIKING_RAIDS) if(r.getName().equals(name)) return r;
         return null;
     }
 
-    public VikingRaid getFromPlayer(Player player){
+    public static VikingRaid fromPlayer(Player player){
         for (VikingRaid r : VIKING_RAIDS){
             if(r.getUsingPlayer() == null) continue;
             if(r.getUsingPlayer().equals(player)) return r;
@@ -44,15 +44,15 @@ public class RaidHandler {
         VIKING_RAIDS.remove(vikingRaid);
     }
 
-    public void callRaid(Player player, VikingRaid vikingRaid){
-        callRaid(vikingRaid, player, RaidDifficulty.NORMAL);
-    }
-
     public Location getExitLocation() {
         return exitLocation;
     }
 
+    public void callRaid(Player player, VikingRaid vikingRaid){
+        callRaid(vikingRaid, player, RaidDifficulty.NORMAL);
+    }
+
     public void callRaid(VikingRaid vikingRaid, Player player, RaidDifficulty difficulty){
-        vikingRaid.raidInit(player, difficulty, server.getPluginManager());
+        vikingRaid.initRaid(player, difficulty);
     }
 }

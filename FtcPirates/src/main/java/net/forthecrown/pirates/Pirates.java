@@ -1,5 +1,6 @@
 package net.forthecrown.pirates;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Rank;
@@ -7,10 +8,7 @@ import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.pirates.commands.*;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Chest;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -66,9 +64,10 @@ public final class Pirates extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         new ghtarget();
         new ghtargetshowname();
-        new parrot();
+        new ParrotCommand();
         new Leave();
         new UpdateLB();
+        new PirateReload();
 
         getServer().getPluginManager().registerEvents(new BaseEgg(), this);
         getServer().getPluginManager().registerEvents(new NpcSmithEvent(), this);
@@ -95,15 +94,15 @@ public final class Pirates extends JavaPlugin implements Listener {
         saveyaml(yaml, offlineWithParrots);
     }
 
-    private void updateDate() {
+    public void updateDate() {
+        Calendar cal = Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE);
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-            Calendar cal = Calendar.getInstance();
-            if (cal.get(Calendar.DAY_OF_WEEK) != getConfig().getInt("Day"))
-            {
+            if (cal.get(Calendar.DAY_OF_WEEK) != getConfig().getInt("Day")) {
+
                 getConfig().set("Day", cal.get(Calendar.DAY_OF_WEEK));
                 ItemStack chosenItem = getRandomHeadFromChest();
-                //Bukkit.broadcastMessage(chosenItem + "");
-                getConfig().set("ChosenHead", ((SkullMeta) chosenItem.getItemMeta()).getOwningPlayer().getName());
+                getConfig().set("ChosenHead", ((SkullMeta) chosenItem.getItemMeta()).getPlayerProfile().getName());
 
                 List<String> temp = getConfig().getStringList("PlayerWhoSoldHeadAlready");
                 temp.clear();
@@ -112,9 +111,9 @@ public final class Pirates extends JavaPlugin implements Listener {
 
                 killOldTreasure(new Location(Bukkit.getWorld(getConfig().getString("TreasureLoc.world")), getConfig().getInt("TreasureLoc.x"), getConfig().getInt("TreasureLoc.y"), getConfig().getInt("TreasureLoc.z")));
 
-                int x = FtcCore.getRandomNumberInRange(-1970, 1970);
-                int y = FtcCore.getRandomNumberInRange(40, 50);
-                int z = FtcCore.getRandomNumberInRange(-1970, 1970);
+                final int x = CrownUtils.getRandomNumberInRange(-1970, 1970);
+                final int y = CrownUtils.getRandomNumberInRange(40, 50);
+                final int z = CrownUtils.getRandomNumberInRange(-1970, 1970);
                 //int x = getRandomNumberInRange(-50, 50);
                 //int y = getRandomNumberInRange(40, 50);
                 //int z = getRandomNumberInRange(-50, 50);
@@ -122,52 +121,18 @@ public final class Pirates extends JavaPlugin implements Listener {
                 getConfig().set("TreasureLoc.y", y);
                 getConfig().set("TreasureLoc.z", z);
 
-                spawnTreasureShulker(new Location(Bukkit.getWorld(getConfig().getString("TreasureLoc.world")), getConfig().getInt("TreasureLoc.x"), getConfig().getInt("TreasureLoc.y"), getConfig().getInt("TreasureLoc.z")));
+                spawnTreasureShulker(new Location(Bukkit.getWorld(getConfig().getString("TreasureLoc.world")), x, y, z));
 
                 saveConfig();
             }
 
-            if (cal.get(Calendar.WEEK_OF_MONTH) != getConfig().getInt("Week"))
-            {
+            if (cal.get(Calendar.WEEK_OF_MONTH) != getConfig().getInt("Week")) {
                 // Picks a day for the trader to spawn.
                 getConfig().set("Week", cal.get(Calendar.WEEK_OF_MONTH));
-                getConfig().set("ChosenDayForTrader", FtcCore.getRandomNumberInRange(2, 6));
                 saveConfig();
             }
-            Location loc = new Location(Bukkit.getWorld("world"), -629.5, 44.2, 3839.5, 0, 0);
-            killRareEnchantTraders(loc);
-            if (getConfig().getInt("ChosenDayForTrader") == Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) spawnRareEnchantTrader(loc);
         }, 20L);
     }
-
-
-    protected void killRareEnchantTraders(Location loc) {
-        for (Entity ent : loc.getWorld().getNearbyEntities(loc, 1, 1, 1)) {
-            if (ent.getType() != EntityType.PLAYER && ent instanceof LivingEntity) {
-                Bukkit.getConsoleSender().sendMessage("Killed " + ent.getType().toString().toLowerCase() + " at enchantvillager spot.");
-                ent.remove();
-            }
-        }
-
-    }
-
-
-    private void spawnRareEnchantTrader(Location loc) {
-        Villager villager = loc.getWorld().spawn(loc, Villager.class);
-        villager.setAdult();
-        villager.setVillagerType(Villager.Type.SAVANNA);
-        villager.setProfession(Villager.Profession.LIBRARIAN);
-        villager.setVillagerLevel(5);
-        villager.setCustomName(ChatColor.YELLOW + "Edward");
-        villager.setCustomNameVisible(true);
-        villager.setPersistent(true);
-        villager.setRemoveWhenFarAway(false);
-        villager.setRecipes(new ArrayList<>());
-        villager.setCollidable(false);
-        villager.setInvulnerable(true);
-        villager.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
-    }
-
 
 
     protected void killOldTreasure(Location location) {
@@ -427,7 +392,7 @@ public final class Pirates extends JavaPlugin implements Listener {
     private ItemStack getItemFromList(List<ItemStack> list) {
         ItemStack result;
 
-        int index = FtcCore.getRandomNumberInRange(0, list.size()-1);
+        int index = CrownUtils.getRandomNumberInRange(0, list.size()-1);
         result = list.get(index);
         int count = 0;
         while (list.contains(result) && (count++ != list.size())) {
@@ -475,8 +440,8 @@ public final class Pirates extends JavaPlugin implements Listener {
         }
         else
         {
-            int chosenChest = FtcCore.getRandomNumberInRange(1, 4);
-            int slot = FtcCore.getRandomNumberInRange(0, 26);
+            int chosenChest = CrownUtils.getRandomNumberInRange(1, 4);
+            int slot = CrownUtils.getRandomNumberInRange(0, 26);
             Location chosenLoc;
             switch (chosenChest) {
                 case 1:
@@ -591,21 +556,6 @@ public final class Pirates extends JavaPlugin implements Listener {
         }
 
         return sortedResult;
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("rlpirate")) {
-            if (sender.isOp()) {
-                this.reloadConfig();
-                updateDate();
-                sender.sendMessage(ChatColor.GRAY + "Pirate config reloaded.");
-            } else {
-                sender.sendMessage(ChatColor.RED + "You don't have permission to do this!");
-            }
-        }
-
-        return true;
     }
 
     // parrot uuid - player uuid

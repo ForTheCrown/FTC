@@ -5,8 +5,3 @@ api-version: 1.16
 authors: [ Wout ]
 depend:
   - FTCCore
-
-commands:
-  rlpirate:
-    permission: ftc.pirate.reload
-    description: Reloads the pirate plugin.

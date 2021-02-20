@@ -1,4 +1,4 @@
-package net.forthecrown.vikings.raids.managers;
+package net.forthecrown.vikings.raids;
 
 import javax.annotation.Nonnegative;
 
@@ -23,7 +23,7 @@ public enum RaidDifficulty {
 
     //If we use the same GUI like we did for the GrapplingHooks, we might need something to get an int from the level's name
     //and translate it into the difficulty
-    //Or they get to choose it, in which case this miht still help lol
+    //Or they get to choose it, in which case this might still help lol
     public static RaidDifficulty getFromNumber(@Nonnegative int i){
         if(i >= 3) return VERY_HARD;
         if(i <= 0) return EASY;

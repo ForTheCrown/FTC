@@ -1,5 +1,6 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.Cooldown;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
@@ -27,7 +28,7 @@ public class SignShopInteractEvent implements Listener {
 
     @EventHandler
     public void onSignShopUser(PlayerInteractEvent event){
-        if(FtcCore.isOnCooldown(event.getPlayer())) return;
+        if(Cooldown.contains(event.getPlayer())) return;
         if(event.getClickedBlock() == null) return;
         if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if(!(event.getClickedBlock().getState() instanceof Sign)) return;
@@ -36,7 +37,7 @@ public class SignShopInteractEvent implements Listener {
         if(!sign.getLine(0).contains("=[Buy]=") && !sign.getLine(0).contains("=[Sell]=") && !sign.getLine(0).contains("-[Sell]-") && !sign.getLine(0).contains("-[Buy]-")) return;
         if(!sign.getLine(3).contains(ChatColor.DARK_GRAY + "Price: ")) return;
 
-        FtcCore.addToCooldown(event.getPlayer(), 6, false);
+        Cooldown.add(event.getPlayer(), 6);
 
         SignShop shop;
         try {

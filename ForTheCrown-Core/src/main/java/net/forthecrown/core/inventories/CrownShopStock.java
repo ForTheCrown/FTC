@@ -61,6 +61,7 @@ public class CrownShopStock implements ShopStock {
             return;
         }
 
+        //this is dumb, stop using an inventory
         Inventory inv = Bukkit.createInventory(null, 27);
 
         ItemStack[] array = new ItemStack[27];
@@ -77,7 +78,7 @@ public class CrownShopStock implements ShopStock {
 
     @Override
     public boolean isFull(){
-        return contents.size() > 27;
+        return contents.size() >= 27;
     }
 
     @Override
@@ -87,7 +88,7 @@ public class CrownShopStock implements ShopStock {
 
     @Override
     public void removeItem(Material material, @Nonnegative int amount){
-        if(amount == 0 && !contains(material, amount)) throw new NullPointerException("There isn't enough items to remove in the inventory!");
+        if(amount == 0 || !contains(material, amount)) throw new NullPointerException("There isn't enough items to remove in the inventory!");
 
         List<ItemStack> toRemove = new ArrayList<>();
         for (ItemStack stack : contents){
@@ -116,13 +117,17 @@ public class CrownShopStock implements ShopStock {
 
     @Override
     public ItemStack getExampleItem() {
-        if(exampleItem.getType() == Material.AIR) return null;
+        if(exampleItem == null || exampleItem.getType() == Material.AIR){
+            System.out.println("shop at " + getOwningShop().getLocation().toString() + " has null example item");
+            return null;
+        }
         return exampleItem.clone();
     }
 
     @Override
     public void setExampleItem(ItemStack exampleItem) {
-        if(exampleItem == null || exampleItem.getType() == Material.AIR) throw new NullPointerException("A null item cannot be set as a shop's example item");
+        if(exampleItem != null && exampleItem.getType() == Material.AIR) return;
+
         this.exampleItem = exampleItem;
         shop.setOutOfStock(false);
     }

@@ -1,5 +1,6 @@
 package net.forthecrown.cosmetics.inventories;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.md_5.bungee.api.ChatColor;
@@ -33,25 +34,29 @@ public class EmoteMenu {
         boolean noEmoter = !user.allowsEmotes();
 
         ItemStack noEmote;
-        if (noEmoter) noEmote = FtcCore.makeItem(Material.BARRIER, 1, true, ChatColor.GOLD + "Emotes Disabled", ChatColor.GRAY + "Right-click to enable sending and receiving emotes.");
-        else noEmote = FtcCore.makeItem(Material.STRUCTURE_VOID, 1, true, ChatColor.GOLD + "Emotes Enabled", ChatColor.GRAY + "Right-click to disable sending and receiving emotes.");
+        if (noEmoter) noEmote = CrownUtils.makeItem(Material.BARRIER, 1, true, ChatColor.GOLD + "Emotes Disabled", ChatColor.GRAY + "Right-click to enable sending and receiving emotes.");
+        else noEmote = CrownUtils.makeItem(Material.STRUCTURE_VOID, 1, true, ChatColor.GOLD + "Emotes Enabled", ChatColor.GRAY + "Right-click to disable sending and receiving emotes.");
         noEmote.addUnsafeEnchantment(Enchantment.CHANNELING, 0);
 
-        ItemStack bonk = FtcCore.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/bonk", ChatColor.GRAY + "Bonk.");
-        ItemStack mwah = FtcCore.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/mwah", ChatColor.GRAY + "Shower your friends with love.");
-        ItemStack poke = FtcCore.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/poke", ChatColor.GRAY + "Poking someone makes them jump back a bit.");
+        ItemStack bonk = CrownUtils.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/bonk", ChatColor.GRAY + "Bonk.");
+        ItemStack mwah = CrownUtils.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/mwah", ChatColor.GRAY + "Shower your friends with love.");
+        ItemStack poke = CrownUtils.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/poke", ChatColor.GRAY + "Poking someone makes them jump back a bit.");
 
-        ItemStack scare = FtcCore.makeItem(Material.GRAY_DYE, 1, true, ChatColor.YELLOW + "/scare", ChatColor.GRAY + "Can be earned around Halloween.");
-        ItemStack jingle = FtcCore.makeItem(Material.GRAY_DYE, 1, true, ChatColor.YELLOW + "/jingle", ChatColor.GRAY + "Can be earned around Christmas.");
+        ItemStack hug = CrownUtils.makeItem(Material.GRAY_DYE, 1 , true, ChatColor.YELLOW + "/hug", ChatColor.GRAY + "Hug people :D");
+
+        ItemStack scare = CrownUtils.makeItem(Material.GRAY_DYE, 1, true, ChatColor.YELLOW + "/scare", ChatColor.GRAY + "Can be earned around Halloween.");
+        ItemStack jingle = CrownUtils.makeItem(Material.GRAY_DYE, 1, true, ChatColor.YELLOW + "/jingle", ChatColor.GRAY + "Can be earned around Christmas.");
         if (user.getPlayer().hasPermission("ftc.emotes.scare")) scare.setType(Material.ORANGE_DYE);
         if (user.getPlayer().hasPermission("ftc.emotes.jingle")) jingle.setType(Material.ORANGE_DYE);
+        if (user.hasPermission("ftc.emotes.hug")) hug.setType(Material.ORANGE_DYE);
 
         result.setItem(12, bonk);
         result.setItem(13, mwah);
         result.setItem(14, poke);
 
-        result.setItem(19, scare);
-        result.setItem(20, jingle);
+        result.setItem(21, scare);
+        result.setItem(22, jingle);
+        result.setItem(23, hug);
 
         result.setItem(31, noEmote);
 

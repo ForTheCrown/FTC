@@ -53,7 +53,7 @@ public class AddBalanceCommand extends CrownCommand{
             amountToAdd = Integer.parseInt(args[1]);
         } catch (Exception e){ throw new InvalidArgumentException(sender, args[1] + " &7must be a number"); }
 
-        FtcCore.getBalances().addBalance(targetUUID, amountToAdd);
+        FtcCore.getBalances().addBalance(targetUUID, amountToAdd, false);
         sender.sendMessage(args[0] + " now has " + FtcCore.getBalances().getBalance(targetUUID) + " Rhines");
         return true;
     }

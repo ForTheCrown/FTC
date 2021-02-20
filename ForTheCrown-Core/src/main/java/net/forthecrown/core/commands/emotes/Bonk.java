@@ -1,8 +1,11 @@
 package net.forthecrown.core.commands.emotes;
 
+import net.forthecrown.core.Cooldown;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.CrownCommand;
+import net.forthecrown.core.exceptions.CrownException;
+import net.forthecrown.core.exceptions.EmoteDisabledException;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
 import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.md_5.bungee.api.ChatColor;
@@ -42,14 +45,11 @@ public class Bonk extends CrownCommand {
     public boolean run(CommandSender sender, Command command, String label, String[] args) {
         // Sender must be player:
         if (!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
+        if(Cooldown.contains(sender, "Core_Emote_Bonk")) throw new CrownException(sender, "&7You bonk people too often lol");
+
         Player player = (Player) sender;
         CrownUser playerData = FtcCore.getUser(player.getUniqueId());
 
-        // Sender can't be on cooldown:
-        if (FtcCore.isOnCooldown(player)) {
-            sender.sendMessage(ChatColor.GRAY + "You bonk people too often lol");
-            return false;
-        }
         // Command no args:
         if (args.length < 1 || args[0].equalsIgnoreCase(sender.getName())) {
             sender.sendMessage("Don't hurt yourself ❤");
@@ -61,14 +61,8 @@ public class Bonk extends CrownCommand {
         if(target == null) throw new InvalidPlayerInArgument(sender, args[0]);
         CrownUser targetData = FtcCore.getUser(target.getUniqueId());
 
-        if (!playerData.allowsEmotes()) {
-            FtcCore.senderEmoteOffMessage(player);
-            return false;
-        }
-        if (!targetData.allowsEmotes()) {
-            player.sendMessage(ChatColor.GRAY + "This player has disabled emotes.");
-            return false;
-        }
+        if (!playerData.allowsEmotes()) throw new EmoteDisabledException(sender).senderDisabled();
+        if (!targetData.allowsEmotes()) throw new EmoteDisabledException(sender).targetDisabled();
 
         // Actual bonking:
         Location loc = target.getLocation();
@@ -84,7 +78,7 @@ public class Bonk extends CrownCommand {
         }
 
         // Put sender on cooldown:
-        FtcCore.addToCooldown(player, 5*20, true);
+        Cooldown.add(sender, "Core_Emote_Bonk", 3*20);
         return true;
     }
 }

@@ -1,10 +1,13 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.Cooldown;
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.inventories.SellShop;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
@@ -15,7 +18,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -45,15 +47,13 @@ public class SellShopEvents implements Listener {
 
         event.setCancelled(true);
 
-        Inventory inv = event.getClickedInventory();
         Player player = (Player) event.getWhoClicked();
 
-        if(FtcCore.isOnCooldown(player)) return;
+        if(Cooldown.contains(player, "Core_SellShop")) return;
+        Cooldown.add(player, "Core_SellShop", 6);
 
         CrownUser user = FtcCore.getUser(player.getUniqueId());
         SellShop sellShop = new SellShop(user);
-
-        FtcCore.addToCooldown(player, 5, false);
 
         ItemStack item = event.getCurrentItem();
 
@@ -99,8 +99,8 @@ public class SellShopEvents implements Listener {
                 player.openInventory(sellShop.decidingMenu());
                 break;
             case EMERALD_BLOCK:
-                player.performCommand("buy");
                 player.closeInventory();
+                user.sendMessage("&7Webstore address:", ChatColor.AQUA + "for-the-crown.tebex.io");
                 break;
             case OAK_SAPLING:
                 player.openInventory(sellShop.farmingMenu());
@@ -114,7 +114,7 @@ public class SellShopEvents implements Listener {
                     break;
                 }
             default:
-                if(!sellItems(item.getType(), user)) player.sendMessage("Couldn't sell items!");
+                if(!sellItems(item.getType(), user)) user.sendMessage("&7Couldn't sell items!");
         }
     }
 
@@ -155,7 +155,10 @@ public class SellShopEvents implements Listener {
         UUID uuid = player.getUniqueId();
         int toPay = finalSell * seller.getItemPrice(toSell);
         int comparison0 = seller.getItemPrice(toSell);
-        String s = toSell.toString().toLowerCase().replaceAll("_", " ");
+
+        String s = CrownUtils.capitalizeWords(toSell.toString().toLowerCase().replaceAll("_", " "));
+        s = s.substring(0, s.length()-1) + s.substring(s.length()-1).replaceAll("s", "");
+        if(seller.getSellAmount().getInt() > 1) s += "s";
 
         bals.addBalance(uuid, toPay, true); //does the actual paying and adds the itemsSold to the seller
         seller.setAmountEarned(toSell, seller.getAmountEarned(toSell)+toPay); //How the fuck does this keep resetting everytime

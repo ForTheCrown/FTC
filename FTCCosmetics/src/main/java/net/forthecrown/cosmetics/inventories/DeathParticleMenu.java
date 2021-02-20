@@ -1,5 +1,6 @@
 package net.forthecrown.cosmetics.inventories;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.cosmetics.Cosmetics;
@@ -40,7 +41,7 @@ public class DeathParticleMenu implements Listener {
     private Inventory makeInventory() {
         Inventory result = this.inv;
 
-        ItemStack noEffect = FtcCore.makeItem(Material.BARRIER, 1, true, ChatColor.GOLD + "No effect", ChatColor.GRAY + "Click to go back to default dying", ChatColor.GRAY + "without any effects.");
+        ItemStack noEffect = CrownUtils.makeItem(Material.BARRIER, 1, true, ChatColor.GOLD + "No effect", ChatColor.GRAY + "Click to go back to default dying", ChatColor.GRAY + "without any effects.");
 
         ItemStack souls = getEffectItem("SOUL", "&eSouls", ChatColor.GRAY + "Scary souls escaping from your body.", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
         ItemStack totem = getEffectItem("TOTEM", "&eFaulty Totem", ChatColor.GRAY + "The particles are there, but you still die?", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
@@ -58,7 +59,7 @@ public class DeathParticleMenu implements Listener {
     }
 
     private ItemStack getEffectItem(String effect, String name, String... desc){
-        ItemStack dumb = FtcCore.makeItem(Material.GRAY_DYE, 1, true, name, desc);
+        ItemStack dumb = CrownUtils.makeItem(Material.GRAY_DYE, 1, true, name, desc);
 
         if(user.getDeathParticle() != null && user.getDeathParticle().contains(effect)) dumb.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
         if(user.getParticleDeathAvailable().contains(effect)) dumb.setType(Material.ORANGE_DYE);
