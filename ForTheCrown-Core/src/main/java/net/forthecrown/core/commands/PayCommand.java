@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 
 public class PayCommand extends CrownCommand {
@@ -39,7 +40,7 @@ public class PayCommand extends CrownCommand {
      */
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         if(args.length != 2) throw new TooLittleArgumentsException(sender);
 

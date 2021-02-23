@@ -26,31 +26,34 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 
 public class FtcUser extends FtcFileManager implements CrownUser {
-    private final UUID base;
 
-    //Already in the file, made by Wout
+    private final UUID base;
     private String name;
+
     private Rank currentRank;
     private Set<Rank> ranks;
     private Branch branch;
-    private boolean canSwapBranch = true;
+
     private List<String> pets;
     private Particle particleArrowActive;
     private List<Particle> particleArrowAvailable;
     private String particleDeathActive;
     private List<String> particleDeathAvailable;
-    private boolean allowsRidingPlayers = true;
-    private int gems;
 
-    //Added by Botul
+    private int gems;
+    private boolean canSwapBranch = true;
     private boolean allowsEmotes = true;
+    private boolean allowsRidingPlayers = true;
+    private long totalEarnings;
+    private long nextResetTime;
+    private long nextBranchSwapAllowed;
+
     private Map<Material, Integer> itemPrices = new HashMap<>();
     private Map<Material, Integer> amountEarned = new HashMap<>();
     private SellAmount sellAmount;
-    private long totalEarnings;
-    private long nextResetTime;
 
     public FtcUser(UUID base){
         super(base.toString(), "playerdata");
@@ -72,7 +75,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         name = getFile().getString("PlayerName");
         setRank(Rank.valueOf(getFile().getString("CurrentRank")), false);
         setBranch(Branch.valueOf(getFile().getString("Branch")));
-        setCanSwapBranch(getFile().getBoolean("CanSwapBranch"));
+        setCanSwapBranch(getFile().getBoolean("CanSwapBranch"), false);
         setPets(getFile().getStringList("Pets"));
         setDeathParticle(getFile().getString("DeathParticle"));
         setParticleDeathAvailable(getFile().getStringList("ParticleDeathAvailable"));
@@ -80,8 +83,12 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         setGems(getFile().getInt("Gems"));
         setAllowsEmotes(getFile().getBoolean("AllowsEmotes"));
         setTotalEarnings(getFile().getLong("TotalEarnings"));
-        setNextResetTime(getFile().getLong("TimeStamps.NextResetTime"));
         setSellAmount(SellAmount.valueOf(getFile().getString("SellAmount").toUpperCase()));
+
+        setNextResetTime(getFile().getLong("TimeStamps.NextResetTime"));
+
+        nextBranchSwapAllowed = getFile().getLong("TimeStamps.NextBranchSwap");
+        if(nextBranchSwapAllowed != 0) checkBranchSwapping();
 
         if(!getFile().getString("ArrowParticle").contains("none")) setArrowParticle(Particle.valueOf(getFile().getString("ArrowParticle")));
         else setArrowParticle(null);
@@ -102,6 +109,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
             setParticleArrowAvailable(tempList);
         } else setParticleDeathAvailable(new ArrayList<>());
 
+        itemPrices.clear();
         if(getFile().getConfigurationSection("ItemPrices") != null && getFile().getConfigurationSection("ItemPrices").getKeys(true).size() > 0){
             Map<Material, Integer> tempMap = new HashMap<>();
             for (String s : getFile().getConfigurationSection("ItemPrices").getKeys(false)){
@@ -110,6 +118,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
             setItemPrices(tempMap);
         }
 
+        amountEarned.clear();
         if(getFile().getConfigurationSection("AmountEarned") != null && getFile().getConfigurationSection("AmountEarned").getKeys(true).size() > 0){
             Map<Material, Integer> tempMap = new HashMap<>();
             for (String s : getFile().getConfigurationSection("AmountEarned").getKeys(false)){
@@ -132,10 +141,12 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
     @Override
     public void save(){
+        if(deleted) return;
+
         getFile().set("PlayerName", getName());
         getFile().set("CurrentRank", getRank().toString());
         getFile().set("Branch", getBranch().toString());
-        getFile().set("CanSwapBranch", getCanSwapBranch());
+        getFile().set("CanSwapBranch", canSwapBranch);
         getFile().set("Pets", getPets());
         getFile().set("DeathParticle", getDeathParticle());
         getFile().set("ParticleDeathAvailable", getParticleDeathAvailable());
@@ -143,8 +154,12 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         getFile().set("Gems", getGems());
         getFile().set("SellAmount", getSellAmount().toString());
         getFile().set("TotalEarnings", getTotalEarnings());
-        getFile().set("TimeStamps.NextResetTime", getNextResetTime());
         getFile().set("AllowsEmotes", allowsEmotes());
+
+        getFile().set("TimeStamps.NextResetTime", getNextResetTime());
+        getFile().set("TimeStamps.LastLoad", System.currentTimeMillis());
+        if(!canSwapBranch) getFile().set("TimeStamps.NextBranchSwap", nextBranchSwapAllowed);
+        else getFile().set("TimeStamps.NextBranchSwap", null);
 
         if(getArrowParticle() == null) getFile().set("ArrowParticle", "none");
         else getFile().set("ArrowParticle", getArrowParticle().toString());
@@ -206,7 +221,6 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         return (int) Math.ceil( (1+startPrice)*Math.exp( -amountEarned1*Math.log(1+startPrice)/500000 )-1 );
     }
 
-
     @Override
     public UUID getBase(){
         return base;
@@ -219,7 +233,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
     @Override
     public OfflinePlayer getOfflinePlayer(){
-        return Bukkit.getOfflinePlayerIfCached(getName());
+        return Bukkit.getOfflinePlayer(getBase());
     }
 
     @Override
@@ -265,12 +279,16 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
     @Override
     public boolean getCanSwapBranch() {
+        checkBranchSwapping();
         return canSwapBranch;
     }
 
     @Override
-    public void setCanSwapBranch(boolean canSwapBranch) {
+    public void setCanSwapBranch(boolean canSwapBranch, boolean addToCooldown) {
         this.canSwapBranch = canSwapBranch;
+
+        if(addToCooldown) nextBranchSwapAllowed = System.currentTimeMillis() + FtcCore.getBranchSwapCooldown();
+        else nextBranchSwapAllowed = 0;
     }
 
     @Override
@@ -459,14 +477,13 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
         save();
         nextResetTime = System.currentTimeMillis() + FtcCore.getUserDataResetInterval();
-        System.out.println(getName() + " earnings reset, next reset in: " + (getNextResetTime()/1000) + " seconds");
+        System.out.println(getName() + " earnings reset, next reset in: " + ((((getNextResetTime()/1000)/60)/60)/24) + " days");
     }
 
     @Override
     public String getName(){
-        if(name != null) return name;
-        if(isOnline()) return Bukkit.getPlayer(getBase()).getName();
-        return Bukkit.getOfflinePlayer(getBase()).getName();
+        if(name == null) name = getOfflinePlayer().getName();
+        return name;
     }
 
     @Override
@@ -481,7 +498,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
     @Override
     public void setTabPrefix(@Nullable String s){
-        if(s == null || s.equals("")) clearTabPrefix();
+        if(s == null || s.isBlank()) clearTabPrefix();
         else Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tab player " + getName() + " tabprefix " + s);
     }
 
@@ -492,7 +509,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
     @Override
     public void sendMessage(@Nonnull String message){
-        performOnlineCheck();
+        if(!isOnline()) return;
         getPlayer().sendMessage(CrownUtils.translateHexCodes(message));
     }
 
@@ -537,6 +554,11 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     }
 
     @Override
+    public Scoreboard getScoreboard(){
+        return FtcCore.getInstance().getServer().getScoreboardManager().getMainScoreboard();
+    }
+
+    @Override
     public void setKing(boolean king, boolean setPrefix, boolean isFemale) {
         if(king){
             if(setPrefix){
@@ -548,10 +570,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         }
 
         FtcCore.setKing(null);
-        if(setPrefix){
-            if(getRank() != Rank.DEFAULT) setTabPrefix(getRank().getColorlessPrefix());
-            else clearTabPrefix();
-        }
+        if(setPrefix) setTabPrefix(getRank().getColorlessPrefix());
     }
 
     @Override
@@ -559,11 +578,17 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         setKing(king, false, false);
     }
 
+    @Override
+    public void delete() {
+        super.delete();
+    }
+
     //---------------------------
     // The following methods are inherited from CommandSender
     // Cuz MessageCommandSender still had these methods, but no code for them
     //---------------------------
 
+    @Nonnull
     @Override
     public Spigot spigot() {
         performOnlineCheck();
@@ -671,9 +696,21 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         if(!isOnline()) throw new UserNotOnlineException(this);
     }
 
+    @Override
+    public long getNextAllowedBranchSwap() {
+        return nextBranchSwapAllowed;
+    }
 
+    @Override
+    public boolean performBranchSwappingCheck(){
+        if(getCanSwapBranch()) return true;
 
+        final long timUntil = getNextAllowedBranchSwap() - System.currentTimeMillis();
 
+        sendMessage("&7You cannot currently swap branches!");
+        sendMessage("&7You can swap your branch in &e" + CrownUtils.convertMillisIntoTime(timUntil) + "&7.");
+        return false;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -739,7 +776,15 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     }
 
     private boolean shouldResetEarnings(){
-        return nextResetTime - System.currentTimeMillis() >= 0;
+        return System.currentTimeMillis() > getNextResetTime();
+    }
+
+    private void checkBranchSwapping(){
+        if(canSwapBranch) return; //If you're already allowed to swap branches then who cares lol
+        if(nextBranchSwapAllowed == 0 || nextBranchSwapAllowed > System.currentTimeMillis()) return; //0 means no cooldown, I think
+
+        canSwapBranch = true;
+        FtcCore.getInstance().getLogger().log(Level.INFO, getName() + "'s branch swapping allowed: " + canSwapBranch);
     }
 
     private void addDefaults(){
@@ -759,6 +804,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         getFile().addDefault("SellAmount", SellAmount.PER_1.toString());
         getFile().addDefault("TotalEarnings", 0);
         getFile().addDefault("TimeStamps.NextResetTime", System.currentTimeMillis() + FtcCore.getUserDataResetInterval());
+        getFile().addDefault("TimeStamps.LastLoad", System.currentTimeMillis());
         getFile().options().copyDefaults(true);
 
         super.save();
@@ -778,7 +824,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         ConfigurationSection oldYaml = oldYamlFile.getConfigurationSection("players." + getBase().toString());
 
         setRank(Rank.valueOf(oldYaml.getString("CurrentRank").toUpperCase()), false);
-        setCanSwapBranch(oldYaml.getBoolean("CanSwapBranch"));
+        setCanSwapBranch(oldYaml.getBoolean("CanSwapBranch"), false);
         setPets(oldYaml.getStringList("Pets"));
         setAllowsRidingPlayers(oldYaml.getBoolean("AllowsRidingPlayers"));
         setDeathParticle(oldYaml.getString("ParticleDeathActive"));

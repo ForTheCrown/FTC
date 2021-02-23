@@ -2,12 +2,12 @@ package net.forthecrown.core.files;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class CrownBalances extends FtcFileManager implements Balances {
 
@@ -65,7 +65,7 @@ public class CrownBalances extends FtcFileManager implements Balances {
     @Override
     public void setBalance(UUID uuid, Integer amount){
         if(amount >= FtcCore.getMaxMoneyAmount()){
-            System.out.println(ChatColor.YELLOW + "[WARNING] " + uuid.toString() + " is on or over the maximum balance limit!");
+            FtcCore.getInstance().getLogger().log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
             balanceMap.put(uuid, FtcCore.getMaxMoneyAmount());
             return;
         }
@@ -77,10 +77,11 @@ public class CrownBalances extends FtcFileManager implements Balances {
     public void addBalance(UUID uuid, Integer amount){
         addBalance(uuid, amount, false);
     }
+
     @Override
     public void addBalance(UUID uuid, Integer amount, boolean isTaxed){
         if(amount + getBalance(uuid) >= FtcCore.getMaxMoneyAmount()){
-            System.out.println(ChatColor.YELLOW + "[Warning] " + uuid.toString() + " / " + Bukkit.getOfflinePlayer(uuid).getName() + " is on or over the maximum balance limit!");
+            FtcCore.getInstance().getLogger().log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
             balanceMap.put(uuid, FtcCore.getMaxMoneyAmount());
             return;
         }

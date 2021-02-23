@@ -6,6 +6,7 @@ import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.exceptions.CrownException;
+import net.forthecrown.pirates.auctions.PirateAuctionShop;
 import net.forthecrown.pirates.commands.*;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
@@ -41,6 +42,7 @@ public final class Pirates extends JavaPlugin implements Listener {
     //public List<ItemStack> itemsToGet = new ArrayList<ItemStack>();
     public File offlineWithParrots;
     public static Pirates plugin;
+    public static final Map<String, PirateAuctionShop> loadedAuctions = new HashMap<>();
 
     public void onEnable() {
         plugin = this;

@@ -8,6 +8,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
+
 public class ToggleEmotes extends CrownCommand {
 
     public ToggleEmotes(){
@@ -43,7 +45,7 @@ public class ToggleEmotes extends CrownCommand {
      */
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 
         Player player = (Player) sender;

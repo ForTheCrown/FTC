@@ -3,24 +3,28 @@ package net.forthecrown.core;
 import net.forthecrown.core.api.*;
 import net.forthecrown.core.commands.*;
 import net.forthecrown.core.commands.emotes.*;
-import net.forthecrown.core.crownevents.CrownEvent;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.events.*;
 import net.forthecrown.core.events.npc.JeromeEvent;
 import net.forthecrown.core.files.*;
+import net.forthecrown.core.inventories.CustomInventoryHolder;
+import net.forthecrown.core.inventories.SignShopInventoryOwner;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.logging.Level;
 
 public final class FtcCore extends JavaPlugin {
 
     private static FtcCore instance;
     private static String prefix = "&6[FTC]&r  ";
     private static long userDataResetInterval = 5356800000L; //2 months by default
+    private static long branchSwapCooldown = 172800000; //2 days by default
     private static boolean taxesEnabled;
     private static String king;
 
@@ -67,21 +71,19 @@ public final class FtcCore extends JavaPlugin {
         server.getPluginManager().registerEvents(new JeromeEvent(), this);
 
         server.getPluginManager().registerEvents(new CoreListener(), this);
-        server.getPluginManager().registerEvents(new RankGuiUseEvent(), this);
         server.getPluginManager().registerEvents(new ChatEvents(), this);
 
-        server.getPluginManager().registerEvents(new SellShopEvents(), this);
         server.getPluginManager().registerEvents(new SignShopCreateEvent(), this);
         server.getPluginManager().registerEvents(new SignShopInteractEvent(), this);
         server.getPluginManager().registerEvents(new SignShopDestroyEvent(), this);
         server.getPluginManager().registerEvents(new ShopUseListener(), this);
 
         server.getPluginManager().registerEvents(new BlackMarketEvents(), this);
-        server.getPluginManager().registerEvents(new UnsafeEnchantAnvilEvent(), this);
 
         doCommands();
 
         if(getConfig().getBoolean("System.save-periodically")) periodicalSave();
+        if(getConfig().getBoolean("System.run-deleter-on-startup")) new FileDeleter(getDataFolder());
     }
 
     private void doCommands(){
@@ -135,15 +137,24 @@ public final class FtcCore extends JavaPlugin {
     public void onDisable() {
         if(getConfig().getBoolean("System.save-on-disable")) saveFTC();
 
-        for (Player p: CrownEvent.inEvent){
-            p.teleport(CrownUtils.LOCATION_HAZELGUARD);
+        Bukkit.getScheduler().cancelTasks(this);
+        if(saver != null){
+            saver.cancel();
+            saver.purge();
+        }
+
+        for (Player p: Bukkit.getOnlinePlayers()){
+            InventoryHolder holder = p.getOpenInventory().getTopInventory().getHolder();
+            if(holder instanceof CustomInventoryHolder || holder instanceof SignShopInventoryOwner){
+                p.closeInventory();
+            }
         }
     }
 
     //every hour it saves everything
     private void periodicalSave(){
         saver = new Timer();
-        final long interval = getConfig().getInt("System.save-interval-mins")*60*1000;
+        final long interval = getConfig().getInt("System.save-interval-mins")*60000;
 
         saver.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -156,8 +167,6 @@ public final class FtcCore extends JavaPlugin {
     @Override
     public void saveConfig() {
         getInstance().getConfig().set("King", king);
-        getInstance().getConfig().set("Taxes", taxesEnabled);
-        getInstance().getConfig().set("Prefix", prefix);
 
         super.saveConfig();
     }
@@ -171,6 +180,7 @@ public final class FtcCore extends JavaPlugin {
         userDataResetInterval = getConfig().getLong("UserDataResetInterval");
         taxesEnabled = getConfig().getBoolean("Taxes");
         maxMoneyAmount = getConfig().getInt("MaxMoneyAmount");
+        branchSwapCooldown = getConfig().getLong("BranchSwapCooldown");
 
         if(!getConfig().getString("King").contains("empty")) king = getConfig().getString("King");
         else king = "empty"; //like my soul
@@ -214,12 +224,20 @@ public final class FtcCore extends JavaPlugin {
         getBlackMarket().save();
 
         getInstance().saveConfig();
-        System.out.println("[SAVED] FtcCore saved");
+        FtcCore.getInstance().getLogger().log(Level.INFO, "FTC-Core saved");
     }
 
     public static Set<CrownUser> getLoadedUsers(){
         Set<CrownUser> temp = new HashSet<>();
         temp.addAll(loadedUsers);
+        return temp;
+    }
+
+    public static Set<CrownUser> getOnlineUsers(){
+        Set<CrownUser> temp = new HashSet<>();
+        for (FtcUser u: loadedUsers){
+            if(u.isOnline()) temp.add(u);
+        }
         return temp;
     }
 
@@ -272,6 +290,9 @@ public final class FtcCore extends JavaPlugin {
         return getInstance().maxMoneyAmount;
     }
 
+    public static long getBranchSwapCooldown() {
+        return branchSwapCooldown;
+    }
 
     //get a part of the plugin with these
     public static FtcCore getInstance(){

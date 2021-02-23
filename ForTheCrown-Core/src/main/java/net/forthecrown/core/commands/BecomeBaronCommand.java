@@ -16,6 +16,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
 import java.text.DecimalFormat;
 
 public class BecomeBaronCommand extends CrownCommand  {
@@ -48,7 +49,7 @@ public class BecomeBaronCommand extends CrownCommand  {
      */
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) throws CrownException {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         int baronPrice = FtcCore.getInstance().getConfig().getInt("BaronPrice");
         Player player = (Player) sender;

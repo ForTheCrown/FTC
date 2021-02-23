@@ -4,8 +4,8 @@ import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.SellAmount;
+import net.forthecrown.core.events.SellShopEvents;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -17,10 +17,13 @@ public class SellShop {
     private final CrownUser user;
 
     public SellShop(Player base){
-        user = FtcCore.getUser(base.getUniqueId());
+        this(FtcCore.getUser(base));
     }
+
     public SellShop(CrownUser base){
         user = base;
+
+        FtcCore.getInstance().getServer().getPluginManager().registerEvents(new SellShopEvents(base.getPlayer(), this), FtcCore.getInstance());
     }
 
     public Inventory dropsMenu(){
@@ -93,7 +96,7 @@ public class SellShop {
     }
 
     public Inventory mainMenu(){
-        Inventory inv = Bukkit.createInventory(null, 27, "FTC Shop");
+        Inventory inv = new CustomInventoryHolder("FTC Shop", 27).getInventory();
 
         inv.setItem(11, CrownUtils.makeItem(Material.GOLD_BLOCK, 1, true, "&e-Item Shop-", "&7Sell vanilla items."));
         inv.setItem(15, CrownUtils.makeItem(Material.EMERALD_BLOCK, 1, true, "&e-Web store-", "&7Online server shop."));
@@ -107,7 +110,7 @@ public class SellShop {
     }
 
     public Inventory decidingMenu(){
-        Inventory inv = Bukkit.createInventory(null, 27, "FTC Shop");
+        Inventory inv = new CustomInventoryHolder("FTC Shop", 27).getInventory();
 
         inv.setItem(11, CrownUtils.makeItem(Material.OAK_SAPLING, 1, true, "&bFarming", "&7Crops and other farmable items."));
         inv.setItem(13, CrownUtils.makeItem(Material.IRON_PICKAXE, 1, true, "&bMining", "&7Ores and common blocks."));
@@ -134,7 +137,8 @@ public class SellShop {
     }
 
     private Inventory getBaseInventory(String menuName){
-        Inventory inv = Bukkit.createInventory(null, 54, ChatColor.translateAlternateColorCodes('&', menuName));
+        CustomInventoryHolder holder = new CustomInventoryHolder(menuName, 54);
+        Inventory inv = holder.getInventory();
         inv.setItem(0, CrownUtils.makeItem(Material.PAPER, 1, true, "&e< Previous page"));
 
         //add glass panes

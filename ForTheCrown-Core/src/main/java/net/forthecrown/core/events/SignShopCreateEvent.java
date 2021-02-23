@@ -1,6 +1,8 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.exceptions.CrownException;
@@ -10,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -18,13 +21,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 public class SignShopCreateEvent implements Listener {
-
-    private final Map<UUID, SignShop> asdasdaqsd = new HashMap<>();//Yes! I rolled my face on the keyboard to get the name
 
     //WHAT AM I DOING
     @EventHandler(ignoreCancelled = true)
@@ -73,7 +70,8 @@ public class SignShopCreateEvent implements Listener {
         SignShop shop = FtcCore.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
 
         player.openInventory(shop.getExampleInventory());
-        asdasdaqsd.put(player.getUniqueId(), shop);
+
+        FtcCore.getInstance().getServer().getPluginManager().registerEvents(new SignShopSubClass1(player, shop), FtcCore.getInstance());
 
         if(shopType == ShopType.BUY_SHOP) event.setLine(0, shopType.getOutOfStockLabel());
         else event.setLine(0, shopType.getInStockLabel());
@@ -81,72 +79,60 @@ public class SignShopCreateEvent implements Listener {
         event.setLine(3, ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + price); //idk, I thought putting ALL_CODES would make triggering events involving the shops harder
     }
 
-    @EventHandler
-    public void invClickEvent(InventoryClickEvent event){
-        if(event.getCurrentItem() == null) return;
-        if(!event.getView().getTitle().contains("Specify what and how much")) return;
-        if(event.getCurrentItem().getType() == Material.BARRIER) event.setCancelled(true);
-    }
+    public class SignShopSubClass1 implements Listener{
 
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event){ //sets the example item and adds the item(s) to the shop's inventory
-        if(!asdasdaqsd.containsKey(event.getPlayer().getUniqueId())) return;
-        if(event.getInventory().getType() != InventoryType.HOPPER) return;
-        Player player = (Player) event.getPlayer();
+        private final Player player;
+        private final SignShop shop;
 
-        SignShop shop = asdasdaqsd.get(player.getUniqueId());
-        asdasdaqsd.remove(player.getUniqueId());
-        Sign sign = (Sign) shop.getBlock().getState();
-
-        Inventory inv = event.getInventory();
-
-        ItemStack item = inv.getContents()[2];
-        if(item == null){
-            sign.setLine(3, ChatColor.DARK_GRAY + "Price " + ChatColor.RESET + shop.getPrice());
-            sign.update();
-            throw new CrownException(player, "&4Shop creation failed! &cNo item in the inventory");
+        public SignShopSubClass1(Player p, SignShop s){
+            player = p;
+            shop = s;
         }
 
-        shop.getStock().setExampleItemAndAdd(item);
+        @EventHandler
+        public void invClickEvent(InventoryClickEvent event){
+            if(event.getCurrentItem() == null) return;
+            if(!event.getWhoClicked().equals(player)) return;
+            if(event.getCurrentItem().getType() == Material.BARRIER) event.setCancelled(true);
+        }
 
-        String loooooonngg = ChatColor.GREEN + "SignShop created!" + ChatColor.RESET + " It'll " +
-                "sell " +
-                shop.getStock().getExampleItem().getAmount() + " " +
-                shop.getStock().getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
-                " for " + shop.getPrice() +
-                " Rhines.";
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent event){ //sets the example item and adds the item(s) to the shop's inventory
+            if(!event.getPlayer().equals(player)) return;
+            if(event.getInventory().getType() != InventoryType.HOPPER) return;
 
-        if(shop.getType() == ShopType.SELL_SHOP || shop.getType() == ShopType.ADMIN_SELL_SHOP) loooooonngg = loooooonngg.replaceAll("sell", "buy");
+            Player player = (Player) event.getPlayer();
+            Sign sign = (Sign) shop.getBlock().getState();
 
-        player.sendMessage(loooooonngg);
-        player.sendMessage(ChatColor.GRAY + "Use Shift + Right Click to restock the shop.");
-        shop.setOutOfStock(false);
-    }
-}
-/*
-        boolean trash = shop.dealWithExampleItems(inv);
+            HandlerList.unregisterAll(this);
 
-        if(!trash){
-            for (ItemStack stack : inv.getContents()){
-                if (stack == null) continue;
-                if(player.getInventory().firstEmpty() == -1) player.getWorld().dropItemNaturally(player.getLocation(), stack);
-                else player.getInventory().addItem(stack);
+            Inventory inv = event.getInventory();
+            ShopInventory shopInv = shop.getInventory();
+
+            ItemStack item = inv.getContents()[2];
+            if(item == null){
+                sign.setLine(3, ChatColor.DARK_GRAY + "Price " + ChatColor.RESET + shop.getPrice());
+                sign.update();
+                shop.destroyShop();
+                throw new CrownException(player, "&4Shop creation failed! &cNo item in the inventory");
             }
-            player.sendMessage(ChatColor.DARK_RED + "SignShop creation failed!" + ChatColor.RED + " Please only specify one item stack, not several");
-            sign.setLine(0, ChatColor.DARK_RED + ChatColor.stripColor(shop.getType().getInStockLabel()));
-            sign.setLine(3, sign.getLine(3).replaceAll(":", ""));
-            sign.update();
-            shop.destroyShop();
-        } else {
+
+            shopInv.setExampleItem(item);
+            shopInv.addItem(item);
+
             String loooooonngg = ChatColor.GREEN + "SignShop created!" + ChatColor.RESET + " It'll " +
-                    shop.getType().toString().toLowerCase().replaceAll("_shop", "").replaceAll("admin_", "") + " " +
-                    shop.getExampleItem().getAmount() + " " +
-                    shop.getExampleItem().getType().toString().toLowerCase().replaceAll("_", " ") +
+                    "sell " +
+                    shopInv.getExampleItem().getAmount() + " " +
+                    CrownUtils.getItemNormalName(shopInv.getExampleItem()) +
                     " for " + shop.getPrice() +
-                    " Rhines. Use Shift + Right Click to restock the shop.";
+                    " Rhines.";
+
+            if(shop.getType() == ShopType.SELL_SHOP || shop.getType() == ShopType.ADMIN_SELL_SHOP) loooooonngg = loooooonngg.replaceAll("sell", "buy");
 
             player.sendMessage(loooooonngg);
-            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
+            player.sendMessage(ChatColor.GRAY + "Use Shift + Right Click to restock the shop.");
             shop.setOutOfStock(false);
+            shop.save();
         }
- */
+    }
+}

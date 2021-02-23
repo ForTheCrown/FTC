@@ -1,5 +1,5 @@
 name: MarchEvent
 version: ${project.version}
-main: net.forthecrown.marchevent.Marchevent
+main: net.forthecrown.marchevent.EventMain
 api-version: 1.16
 depend: [ FTCCore ]

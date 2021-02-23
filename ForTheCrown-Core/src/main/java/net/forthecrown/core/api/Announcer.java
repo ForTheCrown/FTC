@@ -1,6 +1,13 @@
 package net.forthecrown.core.api;
 
+import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.FtcCore;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * The class representing the ingame Announcer.
@@ -53,4 +60,34 @@ public interface Announcer extends CrownFileManager {
      */
     void announce(String message);
 
+    /**
+     * Broadcasts a message, used for debugging
+     * @param message The message to broadcasts
+     */
+    static void ac(String message){
+        acLiteral(CrownUtils.translateHexCodes(CrownUtils.formatEmojis(message)));
+    }
+
+    static void acLiteral(String message){
+        for (Player p: Bukkit.getOnlinePlayers()){
+            p.sendMessage(message);
+        }
+        System.out.println(message);
+    }
+
+    /**
+     * Logs a message in the console
+     * @param level the level on which to log
+     * @param message The message to log
+     */
+    static void log(Level level, String message){
+        FtcCore.getInstance().getLogger().log(level, message);
+    }
+
+    /**
+     *
+     * @param message
+     * @param permission
+     */
+    void announceToAllWithPerms(String message, @Nullable String permission);
 }

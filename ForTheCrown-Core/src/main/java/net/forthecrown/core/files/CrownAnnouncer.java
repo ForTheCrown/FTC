@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,43 +47,67 @@ public class CrownAnnouncer extends FtcFileManager implements Announcer {
         reload();
     }
 
+    @Override
     public void reload(){
         super.reload();
         thingsToAnnounce = getFile().getStringList("announcements");
         delay = getFile().getLong("delay");
     }
+
+    @Override
     public void save(){
         getFile().set("delay", getDelay());
         getFile().set("announcements", getAnnouncements());
         super.save();
     }
 
+    @Override
     public long getDelay(){
         return delay;
     }
+
+    @Override
     public void setDelay(long delay){
         this.delay = delay;
     }
+
+    @Override
     public List<String> getAnnouncements(){
         return thingsToAnnounce;
     }
+
+    @Override
     public void setAnnouncements(List<String> announcements){
         this.thingsToAnnounce = announcements;
     }
 
+    @Override
     public void stopAnnouncer(){
         Bukkit.getScheduler().cancelTask(id);
     }
 
+    @Override
     public void startAnnouncer(){
         if(id != -1) stopAnnouncer();
         announcerProper();
     }
 
+    @Override
     public void announceToAll(String message) {
-        Bukkit.broadcastMessage(FtcCore.getPrefix() + CrownUtils.translateHexCodes(CrownUtils.formatEmojis(message)));
+        message = FtcCore.getPrefix() + message;
+        Announcer.ac(message);
     }
 
+    @Override
+    public void announceToAllWithPerms(String message, @Nullable String permission){
+        message = CrownUtils.translateHexCodes(CrownUtils.formatEmojis(message));
+        for (Player p: Bukkit.getOnlinePlayers()){
+            if(permission == null || p.hasPermission(permission)) p.sendMessage(message);
+        }
+        System.out.println(message);
+    }
+
+    @Override
     public void announce(String message) {
         for (Player player : Bukkit.getOnlinePlayers())
         {

@@ -50,7 +50,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
     List<ItemStack> drawnedItems = new ArrayList<>();
     //List<ItemStack> magmacubeItems = new ArrayList<ItemStack>();
     ItemMeta meta;
-    List<String> lore = new ArrayList<String>();
+    List<String> lore = new ArrayList<>();
     Plugin plugin = this;
 
     Zhambie z = new Zhambie(this);
@@ -154,7 +154,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
         if (event.getEntity() instanceof Husk) {
             Husk dummy = (Husk) event.getEntity();
             if (dummy.getCustomName() != null && (dummy.getCustomName().contains(ChatColor.GOLD + "Hit Me!") || dummy.getCustomName().contains(ChatColor.RED + "Damage:"))) {
-                String damageName = ChatColor.RED + "Damage: " + String.format("%.1f", event.getDamage());;
+                String damageName = ChatColor.RED + "Damage: " + String.format("%.1f", event.getDamage());
                 dummy.setCustomName(damageName);
                 mayChange.add(0);
 
@@ -172,10 +172,8 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void anvil(PrepareAnvilEvent event) {
-        if (event.getInventory() == null) return;
         if (event.getInventory().getItem(0) != null && event.getInventory().getItem(1) != null && event.getInventory().getItem(2) != null) {
-            if ((event.getInventory().getItem(0).getItemMeta().getDisplayName() != null && event.getInventory().getItem(1).getItemMeta().getDisplayName().contains(ChatColor.YELLOW + "" + ChatColor.BOLD + "Royal Sword"))
-                    || ((event.getInventory().getItem(0).getItemMeta().getDisplayName() != null && event.getInventory().getItem(0).getItemMeta().getDisplayName().contains(ChatColor.YELLOW + "" + ChatColor.BOLD + "Royal Sword")))) {
+            if (event.getInventory().getItem(1).getItemMeta().getDisplayName().contains(ChatColor.YELLOW + "" + ChatColor.BOLD + "Royal Sword") || event.getInventory().getItem(0).getItemMeta().getDisplayName().contains(ChatColor.YELLOW + "" + ChatColor.BOLD + "Royal Sword")) {
                 ItemStack item = event.getResult();
                 ItemMeta meta = item.getItemMeta();
                 meta.setDisplayName(ChatColor.GOLD + "-" + ChatColor.YELLOW + ChatColor.BOLD + "Royal Sword" + ChatColor.GOLD + "-");
@@ -215,7 +213,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
                     ItemStack sword = new ItemStack(Material.GOLDEN_SWORD, 1);
                     ItemMeta swordMeta = sword.getItemMeta();
                     swordMeta.setDisplayName(ChatColor.GOLD + "-" + ChatColor.YELLOW + ChatColor.BOLD + "Royal Sword" + ChatColor.GOLD + "-");
-                    ArrayList<String> lore = new ArrayList<String>();
+                    ArrayList<String> lore = new ArrayList<>();
                     lore.add(ChatColor.GRAY + "Rank I");
                     lore.add(ChatColor.DARK_GRAY + "------------------------------");
                     lore.add(ChatColor.GOLD + "The bearer of this weapon has proven themselves,");
@@ -238,12 +236,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
                     player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1.2f);
                     player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
                     for (int i = 0; i <= 5; i++) {
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-                            @Override
-                            public void run() {
-                                player.getWorld().spawnParticle(Particle.TOTEM, player.getLocation().getX(), player.getLocation().getY()+2, player.getLocation().getZ(), 30, 0.2d, 0.1d, 0.2d, 0.275d);
-                            }
-                        }, i*5L);
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> player.getWorld().spawnParticle(Particle.TOTEM, player.getLocation().getX(), player.getLocation().getY()+2, player.getLocation().getZ(), 30, 0.2d, 0.1d, 0.2d, 0.275d), i*5L);
                     }
                     player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "[FTC] " + ChatColor.WHITE + "You've been promoted to " + ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "Knight" + ChatColor.DARK_GRAY + "]" + ChatColor.WHITE + " !");
                     player.sendMessage(ChatColor.WHITE + "You can select the tag in " + ChatColor.YELLOW + "/rank" + ChatColor.WHITE + " now.");
@@ -322,7 +315,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
             else if (name.contains(ChatColor.AQUA + "customs")) {
                 ItemStack item = new ItemStack(Material.BOW, 1);
                 ItemMeta meta = item.getItemMeta();
-                ArrayList<String> lore = new ArrayList<String>();
+                ArrayList<String> lore = new ArrayList<>();
                 lore.add(ChatColor.GRAY + enchant1.getName());
                 meta.setLore(lore);
                 item.setItemMeta(meta);
@@ -331,7 +324,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
                 ItemStack item2 = new ItemStack(Material.SHIELD, 1);
                 ItemMeta meta2 = item2.getItemMeta();
-                ArrayList<String> lore2 = new ArrayList<String>();
+                ArrayList<String> lore2 = new ArrayList<>();
                 lore2.add(ChatColor.GRAY + enchant2.getName());
                 meta2.setLore(lore2);
                 item2.setItemMeta(meta2);
@@ -340,7 +333,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
                 ItemStack item3 = new ItemStack(Material.DIAMOND_SWORD, 1);
                 ItemMeta meta3 = item3.getItemMeta();
-                ArrayList<String> lore3 = new ArrayList<String>();
+                ArrayList<String> lore3 = new ArrayList<>();
                 lore3.add(ChatColor.GRAY + enchant3.getName());
                 meta3.setLore(lore3);
                 item3.setItemMeta(meta3);
@@ -373,7 +366,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
                 ItemStack item5 = new ItemStack(Material.TRIDENT, 1);
                 ItemMeta meta5 = item5.getItemMeta();
-                ArrayList<String> lore5 = new ArrayList<String>();
+                ArrayList<String> lore5 = new ArrayList<>();
                 lore5.add(ChatColor.GRAY + enchant4.getName());
                 meta5.setLore(lore5);
                 item5.setItemMeta(meta5);
@@ -685,21 +678,18 @@ public final class Dungeons extends JavaPlugin implements Listener {
         int size = 36;
         for (ItemStack item : itemsToTake) {
             for (int i = 0; i < size; i++) {
-                ItemStack invItem = inv.getItem(i);
-                if (inv.getItem(i) != null) {
+                if (inv.getItem(i) == null) continue;
+                    ItemStack invItem = inv.getItem(i);
 
-                    if (invItem.getType() == item.getType() && invItem.getAmount() >= item.getAmount()) {
-                        if (invItem.getItemMeta().getLore() != null && invItem.getItemMeta().getLore().contains("Dungeon Item")) {
-                            if (invItem.getItemMeta().getDisplayName() != null && item.getItemMeta().getDisplayName() != null && invItem.getItemMeta().getDisplayName().contains(item.getItemMeta().getDisplayName())) {
-                                invItem.setAmount(invItem.getAmount() - item.getAmount());
-                            }
+                if (invItem.getType() == item.getType() && invItem.getAmount() >= item.getAmount()) {
+                    if (invItem.getItemMeta().getLore() != null && invItem.getItemMeta().getLore().contains("Dungeon Item")) {
+                        if (invItem.getItemMeta().getDisplayName().contains(item.getItemMeta().getDisplayName())) {
+                            invItem.setAmount(invItem.getAmount() - item.getAmount());
                         }
                     }
                 }
             }
-
         }
-        return;
     }
 
     private void takeGoldenApples(PlayerInventory inv) {
@@ -716,7 +706,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
         ItemStack apple2 = new ItemStack(Material.GOLDEN_APPLE, 1);
         ItemMeta meta2 = apple2.getItemMeta();
-        lore.clear();;
+        lore.clear();
         lore.add("style");
         meta2.setLore(lore);
         apple2.setItemMeta(meta2);
@@ -751,11 +741,11 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
     private boolean checkIfInvContainsAllApples(PlayerInventory inv) {
         int size = 36;
-        List<ItemStack> itemsToGet = new ArrayList<ItemStack>();
+        List<ItemStack> itemsToGet = new ArrayList<>();
 
         ItemStack apple = new ItemStack(Material.GOLDEN_APPLE, 1);
         ItemMeta meta = apple.getItemMeta();
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         lore.add("hug");
         meta.setLore(lore);
         apple.setItemMeta(meta);
@@ -763,7 +753,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
         ItemStack apple2 = new ItemStack(Material.GOLDEN_APPLE, 1);
         ItemMeta meta2 = apple2.getItemMeta();
-        lore.clear();;
+        lore.clear();
         lore.add("style");
         meta2.setLore(lore);
         apple2.setItemMeta(meta2);
@@ -777,7 +767,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
         apple3.setItemMeta(meta3);
         itemsToGet.add(apple3);
 
-        Boolean found;
+        boolean found;
 
         for (ItemStack item : itemsToGet) {
             found = false;
@@ -815,33 +805,17 @@ public final class Dungeons extends JavaPlugin implements Listener {
             HashMap<NamespacedKey, Enchantment> byId = (HashMap<NamespacedKey, Enchantment>) byIdField.get(null);
             HashMap<NamespacedKey, Enchantment> byName = (HashMap<NamespacedKey, Enchantment>) byNameField.get(null);
 
-            if (byId.containsKey(enchant1.getKey())) {
-                byId.remove(enchant1.getKey());
-            }
-            if (byName.containsKey(enchant1.getKey())) {
-                byName.remove(enchant1.getKey());
-            }
+            byId.remove(enchant1.getKey());
+            byName.remove(enchant1.getKey());
 
-            if (byId.containsKey(enchant2.getKey())) {
-                byId.remove(enchant2.getKey());
-            }
-            if (byName.containsKey(enchant2.getKey())) {
-                byName.remove(enchant2.getKey());
-            }
+            byId.remove(enchant2.getKey());
+            byName.remove(enchant2.getKey());
 
-            if (byId.containsKey(enchant3.getKey())) {
-                byId.remove(enchant3.getKey());
-            }
-            if (byName.containsKey(enchant3.getKey())) {
-                byName.remove(enchant3.getKey());
-            }
+            byId.remove(enchant3.getKey());
+            byName.remove(enchant3.getKey());
 
-            if (byId.containsKey(enchant4.getKey())) {
-                byId.remove(enchant4.getKey());
-            }
-            if (byName.containsKey(enchant4.getKey())) {
-                byName.remove(enchant4.getKey());
-            }
+            byId.remove(enchant4.getKey());
+            byName.remove(enchant4.getKey());
 
         } catch (Exception ignored) {
         }

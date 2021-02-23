@@ -12,6 +12,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
+
 public class DepositCommand extends CrownCommand  {
 
     public DepositCommand(){
@@ -22,7 +24,7 @@ public class DepositCommand extends CrownCommand  {
     }
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args)  {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args)  {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 
         Player player = (Player) sender;
@@ -43,7 +45,7 @@ public class DepositCommand extends CrownCommand  {
 
         Balances bals = FtcCore.getBalances();
         bals.addBalance(player.getUniqueId(), amount, false);
-        player.sendMessage(CrownUtils.translateHexCodes("&7You deposited " + mainItem.getAmount() + " coins and and received &6" + amount + " Rhines"));
+        player.sendMessage(CrownUtils.translateHexCodes("&7You deposited " + mainItem.getAmount() + " coins and received &6" + amount + " Rhines"));
         player.getInventory().removeItem(mainItem);
         return true;
     }

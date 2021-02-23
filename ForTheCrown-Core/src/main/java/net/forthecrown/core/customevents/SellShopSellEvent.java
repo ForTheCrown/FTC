@@ -27,11 +27,6 @@ public class SellShopSellEvent extends Event implements Cancellable {
         this.item = item;
         this.sellAmount = seller.getSellAmount();
     }
-    
-
-    public void addSellerBalance(int amount){
-        balances.addBalance(seller.getBase(), amount);
-    }
 
     public CrownUser getSeller() {
         return seller;

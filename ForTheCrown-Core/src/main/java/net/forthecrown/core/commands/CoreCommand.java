@@ -1,19 +1,23 @@
 package net.forthecrown.core.commands;
 
+import net.forthecrown.core.CrownItems;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
+import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.forthecrown.core.files.CrownSignShop;
 import net.forthecrown.core.files.FtcUser;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +28,7 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
 
         setDescription("The primary FTC-Core command");
         setPermission("ftc.commands.admin");
-        setUsage("&7Usage:&r /ftcore <reload | save | announcer | reload>");
+        setUsage("&7Usage:&r /ftcore <reload | save | crownitem | announcer | reload>");
 
         setTabCompleter(this);
         register();
@@ -32,7 +36,7 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
 
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) throws CrownException {
         if(args.length < 1) return false;
 
         switch (args[0]){
@@ -194,14 +198,19 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
                         break;
 
                     case "canswapbranch":
-                        if(args.length < 4 || args[3].contains("true")){
-                            user.setCanSwapBranch(true);
+                        if(args.length < 4){
+                            sender.sendMessage(user.getName() + " canSwapBranch: " + user.getCanSwapBranch());
+                            return true;
+                        }
+
+                        if(args[3].contains("true")){
+                            user.setCanSwapBranch(true, true);
                             sender.sendMessage(args[1] + " is now allowed to swap branches");
                             return true;
                         }
 
                         if(args[3].contains("false")){
-                            user.setCanSwapBranch(false);
+                            user.setCanSwapBranch(false, true);
                             sender.sendMessage(args[1] + " is no longer allowed to swap branches");
                             return true;
                         }
@@ -218,6 +227,17 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
                             return true;
                         } catch (Exception e){ return false; }
 
+                    case "resetearnings":
+                        user.resetEarnings();
+                        sender.sendMessage("Earnings of user " + args[1] + " has been reset");
+                        break;
+
+                    case "totalreset":
+                        user.delete();
+                        user.unload();
+                        sender.sendMessage("All user data for " + args[1] + " has been deleted");
+                        break;
+
                     case "addgems":
                         if(args.length < 4) return false;
 
@@ -228,6 +248,41 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
 
                         user.addGems(gems);
                         sender.sendMessage("Added " + gems + " gems to " + args[1]);
+                        return true;
+                }
+
+            case "crownitem":
+                if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
+                Player player = (Player) sender;
+                if(args.length < 2) return false;
+
+                switch (args[1]){
+                    case "crown":
+                        int level = 1;
+                        if(args.length < 4) return false;
+
+                        try {
+                            level = Integer.parseInt(args[2]);
+                        } catch (Exception e){
+                            return false;
+                        }
+
+                        player.getInventory().addItem(CrownItems.getCrown(level, args[3], args[4]));
+                        sender.sendMessage("You got a crown");
+                        return true;
+
+                    case "coin":
+                        int amount = 100;
+                        if(args.length > 2){
+                            try {
+                                amount = Integer.parseInt(args[2]);
+                            } catch (Exception e){
+                                return false;
+                            }
+                        }
+
+                        player.getInventory().addItem(CrownItems.getCoins(amount));
+                        sender.sendMessage("You got " + amount + " Rhines worth of coins");
                         return true;
                 }
             default: return false;
@@ -244,6 +299,7 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
             argList.add("save");
             argList.add("announcer");
             argList.add("user");
+            argList.add("crownitem");
         }
         if(args.length == 2){
             switch (args[0]){
@@ -261,9 +317,16 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
                     argList.add("start");
                     break;
                 case "user":
-                    return null;
+                    argList.addAll(getPlayerNameList());
+                    break;
+                case "crownitem":
+                    argList.add("crown");
+                    argList.add("cutlass");
+                    argList.add("royalsword");
+                    argList.add("coin");
+                    break;
                 default:
-                    return new ArrayList<>();
+                    return null;
             }
         }
 
@@ -274,6 +337,8 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
             argList.add("canswapbranch");
             argList.add("branch");
             argList.add("addgems");
+            argList.add("totalreset");
+            argList.add("resetearnings");
         }
 
         if(args.length == 4){

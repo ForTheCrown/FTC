@@ -8,39 +8,102 @@ import org.bukkit.inventory.ItemStack;
 
 public interface BlackMarket extends CrownFileManager{
 
+    /**
+     * Gets the amount of Rhines earned from a material
+     * @param material The material to get
+     * @return The amount earned from that material
+     */
     Integer getAmountEarned(Material material);
 
+    /**
+     * Sets the amount that's been earned from a material
+     * @param material The material to set the amount of
+     * @param amount The amount that's been earned from it
+     */
     void setAmountEarned(Material material, Integer amount);
 
+    /**
+     * Checks if a material is sold out, aka if earnings are above the max earning limit
+     * @param material The material to check
+     * @return Whether it's sold out or not
+     */
     boolean isSoldOut(Material material);
 
+    /**
+     * Gets the price of an item in BM
+     * @param material The material to get the price of
+     * @return The price of the material
+     */
     Integer getItemPrice(Material material);
 
-    void doEnchantTimer();
-
+    /**
+     * Checks if a player is allowed to buy enchantments from Edward
+     * @param player The player to check for
+     * @return Whether the player is allowed to purchase enchantments
+     */
     boolean isAllowedToBuyEnchant(Player player);
 
-    void setAllowedToBuyEnchant(Player p, boolean out);
+    /**
+     * Sets if a player is allowed to buy enchants
+     * @param p The player to set the value of
+     * @param allowed Whether the player is allowed to purchase enchantments
+     */
+    void setAllowedToBuyEnchant(Player p, boolean allowed);
 
+    /**
+     * Checks if Edward is currently selling enchantments
+     * @return Whether Edward is selling or not
+     */
     boolean enchantAvailable();
 
-    void setItemPrice(String branch, Material material, Integer price);
+    /**
+     * Sets the price of an item in the BM
+     * @param material The material to set the price of
+     * @param price The new price of the item
+     */
+    void setItemPrice(Material material, Integer price);
 
+    /**
+     * Gets the price of an enchantment
+     * @param enchantment The enchantment to get the price of
+     * @return The price
+     */
     Integer getEnchantPrice(Enchantment enchantment);
 
+    /**
+     * Sets the price of an enchantment
+     * @param enchantment The enchantment to set the price of
+     * @param price The new price
+     */
     void setEnchantPrice(Enchantment enchantment, Integer price);
 
+    /**
+     * Gets the enchantment being sold today
+     * @return The enchantment being sold today
+     */
     Enchantment getDailyEnchantment();
 
+    /**
+     * Gets the inventory of Otto, aka the drops inventory
+     * @param user The user opening the inventory
+     * @return The inventory
+     */
     Inventory getDropInventory(CrownUser user);
 
     Inventory getMiningInventory(CrownUser user);
 
     Inventory getFarmingInventory(CrownUser user);
 
-    Inventory getEnchantInventory();
+
+    Inventory getEnchantInventory(ItemStack userItem, boolean accepting);
 
     Inventory getParrotInventory();
 
     ItemStack getDailyEnchantBook();
+
+    ItemStack getAcceptEnchantButton();
+
+    ItemStack getDenyEnchantButton();
+
+    int getDailyEnchantLevel();
 }

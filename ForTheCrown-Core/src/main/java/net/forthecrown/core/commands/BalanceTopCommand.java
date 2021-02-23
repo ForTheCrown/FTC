@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -41,7 +42,7 @@ public class BalanceTopCommand extends CrownCommand  {
      */
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) throws CrownException {
         int page = 0;
         if(args.length >= 1) {
             try {

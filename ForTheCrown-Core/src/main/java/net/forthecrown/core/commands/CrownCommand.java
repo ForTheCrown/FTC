@@ -1,5 +1,6 @@
 package net.forthecrown.core.commands;
 
+import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.CrownException;
@@ -26,11 +27,15 @@ public abstract class CrownCommand extends Command {
     private final String prefix;
     private TabCompleter tabCompleter;
 
+    protected static final List<String> COMMON_DURATIONS = ImmutableList.of("1", "60", "600", "3600", "86400");
+    protected static final List<String> COMMON_DATE_DIFFS = ImmutableList.of("1m", "15m", "1h", "3h", "12h", "1d", "1w", "1mo", "1y");
+
     protected CrownCommand(String name, Plugin plugin) {
         super(name);
         if(plugin.getDescription().getPrefix() != null) prefix = plugin.getDescription().getPrefix();
         else prefix = "ftccore";
 
+        setUsage("");
         setPermission("ftc.commands." + name);
         setPermissionMessage("&7You do not have permission to use this command!");
     }
@@ -82,10 +87,11 @@ public abstract class CrownCommand extends Command {
         if(!testPermission(sender)) return true;
 
         try {
-            return run(sender, this, commandLabel, args);
-        } catch (CrownException e){
-            return true;
-        }
+            if(!run(sender, this, commandLabel, args)){
+                if(usageMessage != null && !usageMessage.isBlank()) sender.sendMessage(getUsage().split("\n"));
+            }
+        } catch (CrownException ignored){ }
+        return true;
     }
 
     @Override

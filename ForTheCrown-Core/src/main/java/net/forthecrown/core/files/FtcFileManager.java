@@ -4,6 +4,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
 public abstract class FtcFileManager {
 
@@ -32,14 +33,16 @@ public abstract class FtcFileManager {
         else file = new File(FtcCore.getInstance().getDataFolder() + "/" + directory, fileName + ".yml");
 
         //if the directory doesn't exist and it can't create it
-        if(!file.getParentFile().exists() && !file.getParentFile().mkdirs()) System.out.println("[SEVERE!] Failed to create " + fileName + " directory, at " + FtcCore.getInstance().getDataFolder() + "/" + directory);
+        if(!file.getParentFile().exists() && !file.getParentFile().mkdirs())
+            FtcCore.getInstance().getLogger().log(Level.SEVERE, "Failed to create " + fileName + " directory, at " + FtcCore.getInstance().getDataFolder() + "/" + directory);
 
         if(!file.exists()){
             fileDoesntExist = true;
             try{
                 file.createNewFile();
+                FtcCore.getInstance().getLogger().log(Level.INFO, "Creating file " + fileName + " in " + directory);
             }catch (IOException e){
-                System.out.println("[SEVERE!] Failed to create " + fileName);
+                FtcCore.getInstance().getLogger().log(Level.SEVERE, "Failed to create " + fileName + " in " +directory);
                 e.printStackTrace();
             }
         }
@@ -69,7 +72,7 @@ public abstract class FtcFileManager {
 
     protected void delete(){
         performFileNullCheck();
-        if(!file.delete()) System.out.println("[WARNING] Couldn't delete file named " + fileName);
+        if(!file.delete()) FtcCore.getInstance().getLogger().log(Level.WARNING, "Couldn't delete file named " + fileName);
         deleted = true;
         fileConfig = null;
         file = null;

@@ -5,6 +5,8 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nonnull;
+
 public class SpawnCommand extends CrownCommand {
 
     public SpawnCommand(){
@@ -33,7 +35,7 @@ public class SpawnCommand extends CrownCommand {
      */
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         // Information:
         sender.sendMessage(FtcCore.getPrefix() + ChatColor.YELLOW + "Information about spawn:");
         sender.sendMessage("Spawn is called Hazelguard, you can tp using regionpoles.");

@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.util.StringUtil;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class KingMakerCommand extends CrownCommand implements TabCompleter {
     }
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(args.length < 1) return false;
 
         if(args[0].contains("remove")){

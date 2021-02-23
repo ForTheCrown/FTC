@@ -6,6 +6,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
+
 public class ClickEventCommand extends CrownCommand {
 
     public ClickEventCommand(){
@@ -14,7 +16,7 @@ public class ClickEventCommand extends CrownCommand {
     }
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(!(sender instanceof Player)) return false;
         if(!ClickEventHandler.isAllowedToUseCommand((Player) sender)) return false;
         if(args.length < 1) return false;

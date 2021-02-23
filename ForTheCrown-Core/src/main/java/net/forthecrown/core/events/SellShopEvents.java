@@ -5,19 +5,18 @@ import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.customevents.SellShopSellEvent;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.inventories.SellShop;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -25,27 +24,22 @@ import java.util.UUID;
 
 public class SellShopEvents implements Listener {
 
-    @EventHandler
-    public void onServerShopNpcUse(PlayerInteractEntityEvent event){
-        if(event.getHand() != EquipmentSlot.HAND) return;
-        if(event.getRightClicked().getType() != EntityType.WANDERING_TRADER) return;
-        LivingEntity trader = (LivingEntity) event.getRightClicked();
+    private final Player player;
+    private final SellShop sellShop;
 
-        if(trader.hasAI() && trader.getCustomName() == null || !trader.getCustomName().contains("Server Shop")) return;
-
-        event.getPlayer().openInventory(new SellShop(event.getPlayer()).mainMenu());
-        event.setCancelled(true);
+    public SellShopEvents(Player p, SellShop shop){
+        player = p;
+        sellShop = shop;
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onInvClick(InventoryClickEvent event){
-        if(!event.getView().getTitle().contains("FTC Shop") && !event.getView().getTitle().contains(" Shop Menu")) return;
+        if(!event.getWhoClicked().equals(player)) return;
         if(event.isShiftClick()){ event.setCancelled(true); return; }
         if(event.getClickedInventory() instanceof PlayerInventory) return;
-        if(!(event.getClickedInventory() instanceof PlayerInventory)) event.setCancelled(true);
-        if(event.getCurrentItem() == null) return;
 
         event.setCancelled(true);
+        if(event.getCurrentItem() == null) return;
 
         Player player = (Player) event.getWhoClicked();
 
@@ -53,7 +47,7 @@ public class SellShopEvents implements Listener {
         Cooldown.add(player, "Core_SellShop", 6);
 
         CrownUser user = FtcCore.getUser(player.getUniqueId());
-        SellShop sellShop = new SellShop(user);
+        SellShop sellShop = this.sellShop;
 
         ItemStack item = event.getCurrentItem();
 
@@ -114,19 +108,24 @@ public class SellShopEvents implements Listener {
                     break;
                 }
             default:
-                if(!sellItems(item.getType(), user)) user.sendMessage("&7Couldn't sell items!");
+                FtcCore.getInstance().getServer().getPluginManager().callEvent(new SellShopSellEvent(user, FtcCore.getBalances(), item.getType()));
         }
     }
 
-    private boolean sellItems(Material toSell, CrownUser seller){
+    @EventHandler(ignoreCancelled = true)
+    public void onSellShopUse(SellShopSellEvent event){
+        CrownUser seller = event.getSeller();
+        Material toSell = event.getItem();
+
         int sellAmount = seller.getSellAmount().getInt();
         int finalSell = sellAmount;
         if(sellAmount == -1) finalSell++;
 
-        Player player = seller.getPlayer();
+        Balances bals = event.getBalances();
 
-        Balances bals = FtcCore.getBalances();
+        Player player = event.getSellerPlayer();
         PlayerInventory playerInventory = player.getInventory();
+
         for(ItemStack stack : playerInventory){
             if(stack == null) continue;
             if(stack.getType() != toSell) continue;
@@ -150,7 +149,11 @@ public class SellShopEvents implements Listener {
                 playerInventory.removeItem(stack);
             }
         }
-        if(sellAmount != 0) return false; //if there's not enough items and you aren't selling all
+        if(sellAmount != 0){
+            seller.sendMessage("&7You don't have enough items to sell");
+            event.setCancelled(true);
+            return;
+        }
 
         UUID uuid = player.getUniqueId();
         int toPay = finalSell * seller.getItemPrice(toSell);
@@ -170,8 +173,13 @@ public class SellShopEvents implements Listener {
 
         //if the price dropped
         if(comparison1 < comparison0) seller.sendMessage("&7Your price for " + s + " has dropped to " + comparison1);
-
-        return true;
     }
 
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if(!event.getPlayer().equals(player)) return;
+        if(event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
+
+        HandlerList.unregisterAll(this);
+    }
 }

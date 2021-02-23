@@ -2,10 +2,10 @@ package net.forthecrown.core.files;
 
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.ShopStock;
+import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
-import net.forthecrown.core.inventories.CrownShopStock;
+import net.forthecrown.core.inventories.CrownShopInventory;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -29,12 +29,12 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
     private final Location location;
     private final Block block;
+    private final ShopInventory inventory;
 
     private UUID owner;
     private Integer price;
     private ShopType type;
     private boolean outOfStock;
-    private final ShopStock stock;
 
     //used by getSignShop
     public CrownSignShop(Location signBlock) throws NullPointerException {
@@ -42,14 +42,14 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
         //file doesn't exist nor does the legacy file, there for go fuck yourself
         if (fileDoesntExist && !legacyFileExists()) {
-            super.delete();
+            delete();
             throw new NullPointerException("Could not load shop file! Named, " + fileName);
         }
 
         this.location = signBlock;
         this.block = signBlock.getBlock();
 
-        stock = new CrownShopStock(this);
+        inventory = new CrownShopInventory(this);
         FtcCore.loadedShops.add(this);
 
         if (legacyFileExists()) convertLegacy();
@@ -74,7 +74,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         getFile().options().copyDefaults(true);
         super.save();
 
-        stock = new CrownShopStock(this);
+        inventory = new CrownShopInventory(this);
         FtcCore.loadedShops.add(this);
     }
 
@@ -86,9 +86,9 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         getFile().set("Location", getLocation());
         getFile().set("Type", getType().toString());
         getFile().set("Price", getPrice());
-        getFile().set("ExampleItem", getStock().getExampleItem());
+        getFile().set("ExampleItem", getInventory().getExampleItem());
         getFile().set("OutOfStock", isOutOfStock());
-        getFile().set("ItemList", getStock().getContents());
+        getFile().set("ItemList", getInventory().getShopContents());
 
         super.save();
     }
@@ -103,12 +103,12 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         if(getFile().get("GetOutOfStock") != null) setOutOfStock(getFile().getBoolean("OutOfStock"));
 
         try{
-            stock.setContents((List<ItemStack>) getFile().getList("ItemList"));
-            getStock().setExampleItem(getFile().getItemStack("ExampleItem"));
+            inventory.setShopContents((List<ItemStack>) getFile().getList("ItemList"));
+            getInventory().setExampleItem(getFile().getItemStack("ExampleItem"));
 
-            if(stock.getContents().size() > 0) setOutOfStock(false);
+            if(inventory.getShopContents().size() > 0) setOutOfStock(false);
         } catch (Exception e){
-            stock.setContents(new ArrayList<>());
+            inventory.setShopContents(new ArrayList<>());
             setOutOfStock(true);
         }
 
@@ -117,8 +117,8 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
     @Override
     public void destroyShop() {
-        if(stock.getContents().size() > 0) {
-            for (ItemStack stack : stock.getContents()){ location.getWorld().dropItemNaturally(location, stack); }
+        if(inventory.getShopContents().size() > 0) {
+            for (ItemStack stack : inventory.getShopContents()){ location.getWorld().dropItemNaturally(location, stack); }
             location.getWorld().spawnParticle(Particle.CLOUD, location.add(0.5, 0.5, 0.5), 5, 0.1D, 0.1D, 0.1D, 0.05D);
         }
 
@@ -127,26 +127,19 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     }
 
     @Override
-    public Inventory getShopInventory(){
-        Inventory shopInv = Bukkit.createInventory(null, 27, "Shop Contents");
-        int i = 0;
-        for (ItemStack item : stock.getContents()){
-            shopInv.setItem(i, item);
-            i++;
-        }
-
-        return shopInv;
-    }
-
-    @Override
     public Inventory getExampleInventory(){
-        Inventory inv = Bukkit.createInventory(null, InventoryType.HOPPER, "Specify what and how much");
+        Inventory inv = Bukkit.createInventory(getInventory().getHolder(), InventoryType.HOPPER, "Specify what and how much");
         inv.setItem(0, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
         inv.setItem(1, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
         inv.setItem(3, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
         inv.setItem(4, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
 
         return inv;
+    }
+
+    @Override
+    public String getName(){
+        return fileName;
     }
 
     @Override
@@ -214,8 +207,8 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     }
 
     @Override
-    public ShopStock getStock() {
-        return stock;
+    public ShopInventory getInventory() {
+        return inventory;
     }
 
     @Override
@@ -234,7 +227,8 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
         s.setLine(0, ln1);
         s.setLine(3, ln3);
-        s.update(true);
+
+        Bukkit.getScheduler().runTask(FtcCore.getInstance(), () -> s.update(true));
     }
 
     @Override
@@ -246,7 +240,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
                 getOwner().equals(that.getOwner()) &&
                 getPrice().equals(that.getPrice()) &&
                 getType() == that.getType() &&
-                getStock().equals(that.getStock());
+                getInventory().equals(that.getInventory());
     }
 
     @Override
@@ -281,12 +275,12 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
         for(ItemStack stack : (List<ItemStack>) oldConfig.getList("Inventory.content")){
             if(stack == null) continue;
-            stock.add(stack);
+            inventory.addItem(stack);
         }
 
-        stock.setExampleItem((ItemStack) oldConfig.getList("Inventory.shop").get(0));
-        if(stock.getExampleItem() == null){
-            if(stock.getContents().size() > 0) getStock().setExampleItem(stock.getContents().get(0));
+        inventory.setExampleItem((ItemStack) oldConfig.getList("Inventory.shop").get(0));
+        if(inventory.getExampleItem() == null){
+            if(inventory.getShopContents().size() > 0) getInventory().setExampleItem(inventory.getShopContents().get(0));
         }
 
         oldFile.delete();

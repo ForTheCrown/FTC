@@ -9,18 +9,20 @@ import org.bukkit.inventory.Inventory;
 import java.util.UUID;
 
 public interface SignShop extends CrownFileManager {
+
+    /**
+     * Gets the file name of the shop
+     * <p>
+     * Example: world_101_63_1002
+     * </p>
+     * @return The file name of the shop
+     */
+    String getName();
+
     /**
      * Destroys the shop lol
      */
     void destroyShop();
-
-    /**
-     * Gets the shop inventory
-     *
-     * <p>This is what will be displayed to the user so they can see what's in the shop and change the contents</p>
-     * @return An inventory of the shop's contents
-     */
-    Inventory getShopInventory();
 
     /**
      * Gets the hopper inventory with 1 available slot, used for setting the exampleItem of a shop
@@ -109,7 +111,7 @@ public interface SignShop extends CrownFileManager {
      * Gets the shop's stock
      * @return The shop's stock
      */
-    ShopStock getStock();
+    ShopInventory getInventory();
 
     /**
      * Gets the sign on which the shop is located

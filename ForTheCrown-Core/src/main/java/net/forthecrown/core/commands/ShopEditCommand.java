@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
     }
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         Player player = (Player) sender;
 
@@ -82,7 +83,7 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
 
             case "tradeamount":
                 if(args.length != 2) throw new InvalidArgumentException(sender, "You must specify an amount");
-                if(shop.getStock().getExampleItem() == null) throw new BrokenShopException(player);
+                if(shop.getInventory().getExampleItem() == null) throw new BrokenShopException(player);
 
                 int amount;
                 try {
@@ -91,9 +92,9 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
 
                 if(amount <= 0 || amount > 64) throw new InvalidArgumentException(sender, "&7The number cannot be zero or less, and cannot be larger than 64");
 
-                ItemStack item = shop.getStock().getExampleItem();
+                ItemStack item = shop.getInventory().getExampleItem();
                 item.setAmount(amount);
-                shop.getStock().setExampleItem(item);
+                shop.getInventory().setExampleItem(item);
                 user.sendMessage("&7This shop will now trade items in &e" + amount + " item amounts");
                 return true;
 
@@ -106,7 +107,6 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
                 } catch (Exception e){ throw new InvalidArgumentException(sender, args[1] + " is not a number!"); }
 
                 shop.setPrice(newPrice, true);
-                shop.save();
                 user.sendMessage(ChatColor.GREEN + "Price changed! &7The price of this shop is now " + ChatColor.YELLOW + newPrice + " Rhines&7!");
                 break;
 

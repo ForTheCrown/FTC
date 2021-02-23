@@ -5,8 +5,9 @@ import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.BlackMarket;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.inventories.CustomInventoryHolder;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
@@ -14,6 +15,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -263,8 +265,7 @@ public class CrownBlackMarket implements BlackMarket {
         return null;
     }
 
-    @Override
-    public void doEnchantTimer(){
+    private void doEnchantTimer(){
         Bukkit.getScheduler().scheduleSyncRepeatingTask(FtcCore.getInstance(), () -> enchantAvailable = !enchantAvailable, 216000, 216000);
         System.out.println("Edward is now selling: " + enchantAvailable);
     }
@@ -275,8 +276,8 @@ public class CrownBlackMarket implements BlackMarket {
     }
 
     @Override
-    public void setAllowedToBuyEnchant(Player p, boolean out){
-        if(out) boughtEnchant.remove(p.getUniqueId());
+    public void setAllowedToBuyEnchant(Player p, boolean allowed){
+        if(allowed) boughtEnchant.remove(p.getUniqueId());
         else boughtEnchant.add(p.getUniqueId());
     }
 
@@ -286,20 +287,11 @@ public class CrownBlackMarket implements BlackMarket {
     }
 
     @Override
-    public void setItemPrice(String branch, Material material, Integer price){
-        switch (branch.toLowerCase()){
-            case "mining":
-                mining.put(material, price);
-                break;
-            case "crops":
-                crops.put(material, price);
-                break;
-            case "drops":
-                drops.put(material, price);
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + branch);
-        }
+    public void setItemPrice(Material material, Integer price){
+        if(mining.containsKey(material)) mining.put(material, price);
+        if(drops.containsKey(material)) drops.put(material, price);
+        if(crops.containsKey(material)) crops.put(material, price);
+        throw new IllegalArgumentException(material.toString() + " is not a valid material");
     }
 
     @Override
@@ -359,12 +351,16 @@ public class CrownBlackMarket implements BlackMarket {
     }
 
     @Override
-    public Inventory getEnchantInventory(){
+    public Inventory getEnchantInventory(ItemStack userItem, boolean accepting){
         ItemStack rod = CrownUtils.makeItem(Material.END_ROD, 1, true, "&7-");
         rod.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
         ItemStack purpleGlass = CrownUtils.makeItem(Material.PURPLE_STAINED_GLASS_PANE, 1 ,true, "&7-");
 
         Inventory inv = getBaseInventory("Black Market: Enchants", rod);
+
+        final ItemStack border = CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
+        inv.setItem(10, border);
+        inv.setItem(16, border);
 
         inv.setItem(12, rod);
         inv.setItem(14, rod);
@@ -375,14 +371,37 @@ public class CrownBlackMarket implements BlackMarket {
         inv.setItem(18, purpleGlass);
         inv.setItem(26, purpleGlass);
 
-        inv.setItem(13, getCoolEnchant());
+        ItemStack acceptingOrDenying = getAcceptEnchantButton();
+        if(!accepting) acceptingOrDenying = getDenyEnchantButton();
+        inv.setItem(13, acceptingOrDenying);
+
+        if(userItem != null) inv.setItem(11, userItem);
+
+        inv.setItem(15, getCoolEnchant());
 
         return inv;
     }
 
     @Override
+    public ItemStack getAcceptEnchantButton(){
+        return CrownUtils.makeItem(Material.LIME_STAINED_GLASS_PANE, 1, true, ChatColor.GREEN + "[Accept and Pay]",
+                "&7Enchant the item for " + getEnchantPrice(getDailyEnchantment()) + " Rhines");
+    }
+
+    @Override
+    public ItemStack getDenyEnchantButton(){
+        return CrownUtils.makeItem(Material.RED_STAINED_GLASS_PANE, 1, true, ChatColor.RED + "[Cannot accept]",
+                "&7Cannot accept enchantment!", "&7");
+    }
+
+    @Override
+    public int getDailyEnchantLevel(){
+        return enchantLevel;
+    }
+
+    @Override
     public Inventory getParrotInventory(){
-        Inventory invToOpen = Bukkit.createInventory(null, 27, "Parrot Shop");
+        Inventory invToOpen = new CustomInventoryHolder("Parrot Shop", 27).getInventory();
         ItemStack pane = CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, ChatColor.GRAY + " ");
 
         for (int i = 0; i < 10; i++) {
@@ -402,7 +421,8 @@ public class CrownBlackMarket implements BlackMarket {
     }
 
     private Inventory getBaseInventory(String name, ItemStack header){
-        Inventory base = Bukkit.createInventory(null, 27, name);
+        CustomInventoryHolder holder = new CustomInventoryHolder(name, InventoryType.CHEST);
+        Inventory base = holder.getInventory();
         final ItemStack borderItem = CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
 
         base.setItem(4, header);

@@ -78,7 +78,7 @@ public final class ClickEventHandler {
             Bukkit.getScheduler().runTaskLater(FtcCore.getInstance(), () -> {
                 allowedToUseCommand.remove(player);
                 CLICK_COMMAND.unregister();
-            }, 60*20); //automatically makes it so you can't use the NPC command after a minute
+            }, 30*20); //automatically makes it so you can't use the NPC command after a minute
         } else{
             allowedToUseCommand.remove(player);
             CLICK_COMMAND.unregister();

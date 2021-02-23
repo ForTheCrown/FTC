@@ -6,6 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
 import java.util.Set;
 
 public class StaffChatToggleCommand extends CrownCommand {
@@ -36,7 +37,7 @@ public class StaffChatToggleCommand extends CrownCommand {
      */
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(!(sender instanceof Player)){
             sender.sendMessage("Only players may execute this command!");
             return false;

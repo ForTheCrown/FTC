@@ -8,17 +8,14 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class CrownUtils {
 
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("CET");
-
     public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 1000, 70, 200);
 
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
@@ -46,10 +43,8 @@ public final class CrownUtils {
 
     //Yeah, no clue
     public static String translateHexCodes (String textToTranslate) {
-
         Matcher matcher = HEX_PATTERN.matcher(textToTranslate);
         StringBuffer buffer = new StringBuffer();
-
 
         while(matcher.find()) {
             final boolean isEscaped = matcher.group(0) == null;
@@ -96,7 +91,108 @@ public final class CrownUtils {
         return result;
     }
 
+    public static String getItemNormalName(ItemStack stack){
+        return capitalizeWords(stack.getType().toString().replaceAll("_", " ").toLowerCase());
+    }
+
     public static String formatStaffChatMessage(String senderName, String message){
-        return translateHexCodes(formatEmojis(staffChatFormat.replaceAll("%SENDER%", senderName).concat(message)));
+        return translateHexCodes(formatEmojis(staffChatFormat.replaceAll("%SENDER%", senderName) + message));
+    }
+
+    public static String convertMillisIntoTime(long millis){
+        long hours = (millis / 3600000);
+        long minutes = (millis /60000) % 60;
+        long seconds = (millis / 1000) % 60;
+        long days = hours / 24;
+        hours -= days*24;
+
+        StringBuilder stringBuilder = new StringBuilder();
+        if(days > 0)stringBuilder.append(days).append(" day" + s(days) + ", ");
+        if(hours > 0) stringBuilder.append(hours).append(" hour" + s(hours) + ", ");
+        if(minutes > 0) stringBuilder.append(minutes).append(" minute" + s(minutes) + " and ");
+
+        stringBuilder.append(seconds).append(" second" + s(days));
+
+        return stringBuilder.toString();
+    }
+
+    private static String s(long l){
+        if(l > 1) return "s";
+        return "";
+    }
+
+    /*
+     * The following RomanNumeral converters and code was made by Baeldung
+     * Link: https://www.baeldung.com/java-convert-roman-arabic
+     */
+
+    public static int romanToArabic(String input) {
+        String romanNumeral = input.toUpperCase();
+        int result = 0;
+
+        List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
+
+        int i = 0;
+
+        while ((romanNumeral.length() > 0) && (i < romanNumerals.size())) {
+            RomanNumeral symbol = romanNumerals.get(i);
+            if (romanNumeral.startsWith(symbol.name())) {
+                result += symbol.getValue();
+                romanNumeral = romanNumeral.substring(symbol.name().length());
+            } else {
+                i++;
+            }
+        }
+
+        if (romanNumeral.length() > 0) {
+            throw new IllegalArgumentException(input + " cannot be converted to a Roman Numeral");
+        }
+
+        return result;
+    }
+
+    public static String arabicToRoman(int number) {
+        if ((number <= 0) || (number > 4000)) {
+            throw new IllegalArgumentException(number + " is not in range (0,4000]");
+        }
+
+        List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
+
+        int i = 0;
+        StringBuilder sb = new StringBuilder();
+
+        while ((number > 0) && (i < romanNumerals.size())) {
+            RomanNumeral currentSymbol = romanNumerals.get(i);
+            if (currentSymbol.getValue() <= number) {
+                sb.append(currentSymbol.name());
+                number -= currentSymbol.getValue();
+            } else {
+                i++;
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public enum RomanNumeral {
+        I(1), IV(4), V(5), IX(9), X(10),
+        XL(40), L(50), XC(90), C(100),
+        CD(400), D(500), CM(900), M(1000);
+
+        private int value;
+
+        RomanNumeral(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public static List<RomanNumeral> getReverseSortedValues() {
+            return Arrays.stream(values())
+                    .sorted(Comparator.comparing((RomanNumeral e) -> e.value).reversed())
+                    .collect(Collectors.toList());
+        }
     }
 }

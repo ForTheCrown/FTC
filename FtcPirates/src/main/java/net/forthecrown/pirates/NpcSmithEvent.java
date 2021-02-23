@@ -99,7 +99,7 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
             ItemMeta meta = sword.getItemMeta();
             meta.setDisplayName(ChatColor.RESET + CrownUtils.translateHexCodes("&#917558-&#D1C8BA&lCaptain's Cutlass&#917558-"));
             List<String> lores = meta.getLore();
-            lores.set(2, CrownUtils.translateHexCodes("&#917558The brearer of this cutlass bows to no laws, to no king,"));
+            lores.set(2, CrownUtils.translateHexCodes("&#917558The bearer of this cutlass bows to no laws, to no king,"));
             lores.set(3, CrownUtils.translateHexCodes("&#917558its wielder leads their crew towards everlasting riches."));
             meta.setLore(lores);
             sword.setItemMeta(meta);
@@ -110,12 +110,14 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
                 user.sendMessage("&7You are already a pirate.");
                 return;
             }
+            if(!user.performBranchSwappingCheck()) return;
             if(user.getRank() != Rank.DEFAULT){
                 user.sendMessage("&7You need to be the default rank to join the Pirates.");
                 return;
             }
 
             user.setBranch(Branch.PIRATES);
+            user.setCanSwapBranch(false, true);
             user.sendMessage("You're now a pirate!");
         } else Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + player.getName() + " [\"\",{\"text\":\"The Pirates\",\"bold\":true,\"color\":\"gold\"},{\"text\":\"\\n The pirates are a new faction, which is all about illegal merchandise!\\n\\n\"},{\"text\":\"Joining the Pirates\",\"color\":\"gold\"},{\"text\":\"\\n To join the pirates you'll need 10 PP, Pirate Points. To get PP you must either finish levels in the Grappling Hook Parkour or find treasure chests in the RW. In addition, you can earn money and PP by selling heads to the dreaded \"},{\"text\":\"Captain Willhelm\",\"color\":\"yellow\"},{\"text\":\".\\n\\n\"},{\"text\":\"Pirate Ranks\",\"color\":\"gold\"},{\"text\":\"\\n The pirates have their own ranks: Sailor, Pirate, Captain and Admiral.\\n Sailor can be gotten with 10 PP, but Pirate will require you to have 50 PP. Captain and Admiral must be bought from the webstore (Tier 2 and Tier 3)\\n\\n\"},{\"text\":\"Black Market\",\"color\":\"gold\"},{\"text\":\"\\n The pirates have a black market. where they can sell goods without a price decline. In addition, you can buy parrots, that never leave you, alongside slaves from \"},{\"text\":\"Ramun the Slave-trader\",\"color\":\"yellow\"},{\"text\":\".\\n\\n However, Hazelguard will not allow people guilty of piracy to own shops in town, so pirates will have their shops seized and they won't be able to open new ones. The pirates do however have their own shops in the Black market.\"}]");
     }

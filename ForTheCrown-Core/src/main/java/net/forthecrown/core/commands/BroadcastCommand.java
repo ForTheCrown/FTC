@@ -5,6 +5,8 @@ import net.forthecrown.core.exceptions.CrownException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nonnull;
+
 public class BroadcastCommand extends CrownCommand  {
 
     public BroadcastCommand(){
@@ -36,7 +38,7 @@ public class BroadcastCommand extends CrownCommand  {
      */
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) throws CrownException {
         if(args.length < 1) return false;
 
         FtcCore.getAnnouncer().announceToAll(String.join(" ", args));

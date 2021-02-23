@@ -1,18 +1,17 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.CrownItems;
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.exceptions.CannotAffordTransaction;
-import net.forthecrown.core.exceptions.InvalidArgumentException;
-import net.forthecrown.core.exceptions.InvalidCommandExecution;
-import net.forthecrown.core.exceptions.NonPlayerExecutor;
+import net.forthecrown.core.exceptions.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,10 +27,10 @@ public class WithdrawCommand extends CrownCommand implements TabCompleter{
     }
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 
-        if(args.length != 1) return false;
+        if(args.length != 1) throw new InvalidCommandExecution(sender, CrownUtils.translateHexCodes(getUsage())); // return false just doesn't work wtf
 
         int amount;
         try {
@@ -49,6 +48,7 @@ public class WithdrawCommand extends CrownCommand implements TabCompleter{
 
         bals.setBalance(player.getUniqueId(), bals.getBalance(player.getUniqueId()) - amount);
         player.getInventory().setItem(player.getInventory().firstEmpty(), CrownItems.getCoins(amount));
+        user.sendMessage("&7You got a coin that's worth &6" + amount + " Rhines");
         return true;
     }
 

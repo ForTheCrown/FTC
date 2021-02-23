@@ -5,7 +5,6 @@ import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -92,7 +91,8 @@ public class RankInventory {
     }
 
     private Inventory getBaseInventory(Branch branch, String title){
-        Inventory inventory = Bukkit.createInventory(null, 54, CrownUtils.translateHexCodes("Ranks: " + title));
+        CustomInventoryHolder holder = new CustomInventoryHolder(CrownUtils.translateHexCodes(title), 54);
+        Inventory inventory = holder.getInventory();
 
         inventory.setItem(8, CrownUtils.makeItem(Material.PAPER, 1, true, "&eNext page >"));
         inventory.setItem(10, getRankItem(Material.MAP, Rank.DEFAULT, "This is the default rank!"));
@@ -104,17 +104,20 @@ public class RankInventory {
                 borderItem = CrownUtils.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, " ");
                 inventory.setItem(4, CrownUtils.makeItem(Material.IRON_SWORD, 1, true, ChatColor.AQUA + "Royals", "&7The Crown's most loyal knights and nobles!"));
                 break;
+
             case PIRATES:
                 borderItem = CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
                 inventory.setItem(4, CrownUtils.makeItem(Material.OAK_BOAT, 1, true, ChatColor.AQUA + "Pirates", "&7Sailors who bow to no crown!"));
                 break;
+
             case VIKINGS:
                 borderItem = CrownUtils.makeItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, true, " ");
-                inventory.setItem(4, CrownUtils.makeItem(Material.IRON_AXE, 1, true, ChatColor.AQUA + "Vikings", "&7Northern uncontrollable warrios with a bloodlust!"));
+                inventory.setItem(4, CrownUtils.makeItem(Material.IRON_AXE, 1, true, ChatColor.AQUA + "Vikings", "&7Warriors from the north with an", "uncontrollable lust for blood"));
                 break;
+
             default:
                 inventory.setItem(4, CrownUtils.makeItem(Material.IRON_SWORD, 1, true, ChatColor.AQUA + "Royals", "&7The Crown's most loyal knights and nobles!"));
-                borderItem = CrownUtils.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "  ");
+                borderItem = CrownUtils.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, " ");
                 break;
         }
 

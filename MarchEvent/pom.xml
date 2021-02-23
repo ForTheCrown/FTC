@@ -73,9 +73,9 @@
         <dependency>
             <groupId>net.forthecrown.core</groupId>
             <artifactId>FTC-Core</artifactId>
-            <version>1.1-MAYBE-STABLE</version>
+            <version>1.2-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/ander/Desktop/ThePitOfTrash/FTC/ForTheCrown-Core/target/FTC-Core-1.1-MAYBE-STABLE.jar</systemPath>
+            <systemPath>C:/Users/ander/Desktop/ThePitOfTrash/FTC/ForTheCrown-Core/target/FTC-Core-1.2-SNAPSHOT.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

@@ -2,23 +2,22 @@ package net.forthecrown.core.crownevents;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public final class EventTimer {
+public class EventTimer {
 
     private long elapseTime = 0;
     private final Player player;
     private final Timer timer;
-    private final CrownEvent event;
+    private final Runnable runnable;
 
-    public EventTimer(Player p, CrownEvent e){
+    public EventTimer(Player p, Runnable onTimerExpire){
         player = p;
-        event = e;
+        runnable = onTimerExpire;
         timer = new Timer();
     }
 
@@ -30,8 +29,7 @@ public final class EventTimer {
 
                 int minutes = (int) ((elapseTime /60000) % 60);
                 if(minutes >= maxMinutes){
-                    event.onEventEnd(player, EventEndCause.TIMER_EXPIRE);
-                    player.sendMessage(ChatColor.GRAY + "You took too long lol");
+                    runnable.run();
                     stopTimer();
                     return;
                 }
@@ -50,7 +48,7 @@ public final class EventTimer {
                 elapseTime -= 100;
 
                 if(elapseTime <= 0){
-                    event.onEventEnd(player, EventEndCause.TIMER_DOWN_EXPIRE);
+                    runnable.run();
                 }
 
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getTimerCounter(elapseTime).toString()));
@@ -66,6 +64,11 @@ public final class EventTimer {
     public long getPlayerTime(){
         return elapseTime;
     }
+
+    public Player getPlayer() {
+        return player;
+    }
+
 
 
     public static StringBuilder getTimerCounter(long timeInMillis){
@@ -87,12 +90,11 @@ public final class EventTimer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EventTimer that = (EventTimer) o;
-        return player.equals(that.player) &&
-                event.equals(that.event);
+        return player.equals(that.player);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(player, event);
+        return Objects.hash(player);
     }
 }

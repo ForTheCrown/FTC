@@ -33,7 +33,7 @@ public enum Rank {
     JARL ("<Jarl>", Branch.VIKINGS),
 
     //non branch ranks
-    DEFAULT ("Default", Branch.DEFAULT),
+    DEFAULT ("", Branch.DEFAULT),
     LEGEND("&#dfdfdf[&#fff147Legend&#dfdfdf] &r", Branch.DEFAULT);
 
     private final String tabPrefix;
@@ -60,10 +60,13 @@ public enum Rank {
     }
 
     public static Rank fromPrefix(String s){
-        String s1 = ChatColor.stripColor(s).replaceAll("}", "").replaceAll("\\{", "").replaceAll("]", "").replaceAll("\\[", "");
-        if(s1.toLowerCase().contains("Default")) return Rank.DEFAULT;
+        String s1 = ChatColor.stripColor(s).replaceAll("\\p{P}", "").toLowerCase(); //removes all punctuation marks, including brackets and stuff
+
+        if(s1.toLowerCase().contains("default") || s1.isBlank()) return Rank.DEFAULT;
         for (Rank r : values()){
-            if(ChatColor.stripColor(r.getPrefix()).replaceAll("}", "").replaceAll("\\{", "").replaceAll("]", "").replaceAll("\\[", "").contains(s1)) return r;
+            String s2 = ChatColor.stripColor(r.getPrefix()).replaceAll("\\p{P}", "").toLowerCase();
+
+            if(s2.contains(s1)) return r;
         }
         return null;
     }

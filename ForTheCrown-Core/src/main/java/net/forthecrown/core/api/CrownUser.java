@@ -8,6 +8,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -111,7 +112,19 @@ public interface CrownUser extends CrownFileManager, CommandSender {
      * Sets if the user is allowed to swap branches
      * @param canSwapBranch Whether the user is allowed to swap branches
      */
-    void setCanSwapBranch(boolean canSwapBranch);
+    void setCanSwapBranch(boolean canSwapBranch, boolean addToCooldown);
+
+    /**
+     * Gets when the branch swapping cooldown will expire in milli seconds
+     * @return The system time of the next time the player is allowed to swap branches
+     */
+    long getNextAllowedBranchSwap();
+
+    /**
+     *
+     * @return
+     */
+    boolean performBranchSwappingCheck();
 
     /**
      * Gets a list of all pets belonging to the user
@@ -404,6 +417,17 @@ public interface CrownUser extends CrownFileManager, CommandSender {
 
     @Override
     void sendMessage(@Nonnull String... messages);
+
+    /**
+     * Deletes the user's data
+     */
+    void delete();
+
+    /**
+     * Gets the user's scoreboard
+     * @return The main scoreboard
+     */
+    Scoreboard getScoreboard();
 
     @Override
     boolean equals(Object o);

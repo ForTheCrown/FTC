@@ -36,6 +36,10 @@ public final class Cooldown {
         add(sender, "general", timeInTicks);
     }
 
+    public static void add(CommandSender sender, String category){
+        add(sender, category, null);
+    }
+
     public static void add(CommandSender sender, String category, @Nullable @Nonnegative Integer timeInTicks){
         COOLDOWN_MAP.computeIfAbsent(category, k -> new HashSet<>());
 
@@ -49,7 +53,7 @@ public final class Cooldown {
     }
 
     public static void remove(CommandSender sender){
-        remove(sender, "CategoryGeneral");
+        remove(sender, "general");
     }
 
     public static void remove(CommandSender sender, String category){
@@ -61,5 +65,10 @@ public final class Cooldown {
         Set<CommandSender> set1 = COOLDOWN_MAP.get(category);
         set1.remove(sender);
         COOLDOWN_MAP.put(category, set1);
+    }
+
+    public static Set<CommandSender> getCategory(String s){
+        COOLDOWN_MAP.computeIfAbsent(s, k -> new HashSet<>());
+        return COOLDOWN_MAP.get(s);
     }
 }

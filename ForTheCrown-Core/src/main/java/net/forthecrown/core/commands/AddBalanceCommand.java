@@ -6,6 +6,7 @@ import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 
 public class AddBalanceCommand extends CrownCommand{
@@ -40,7 +41,7 @@ public class AddBalanceCommand extends CrownCommand{
      */
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) {
+    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(args.length != 2) return false;
 
         UUID targetUUID;

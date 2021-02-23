@@ -9,22 +9,28 @@ import net.forthecrown.core.inventories.RankInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.PlayerInventory;
 
 public class RankGuiUseEvent implements Listener {
 
+    private final Player player;
+
+    public RankGuiUseEvent(Player player){
+        this.player = player;
+    }
+
     //Rank GUI event
     @EventHandler
     public void onInvClick(InventoryClickEvent event){
-        if(!event.getView().getTitle().contains("Pirates") && !event.getView().getTitle().contains("Royals") && !event.getView().getTitle().contains("Vikings")) return;
+        if(!event.getWhoClicked().equals(player)) return;
         if(event.isShiftClick()){ event.setCancelled(true); return; }
         if(event.getClickedInventory() instanceof PlayerInventory) return;
-        if(!(event.getClickedInventory() instanceof PlayerInventory)) event.setCancelled(true);
-        if(event.getCurrentItem() == null) return;
-
         event.setCancelled(true);
+        if(event.getCurrentItem() == null) return;
 
         if(event.getCurrentItem().getType() != Material.PAPER && event.getCurrentItem().getType() != Material.MAP && event.getCurrentItem().getType() != Material.GLOBE_BANNER_PATTERN) return;
         if(!event.getCurrentItem().getItemMeta().hasDisplayName()) return;
@@ -90,5 +96,13 @@ public class RankGuiUseEvent implements Listener {
                 player.openInventory(rankInv.getVikingsGUI());
                 break;
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if(!event.getPlayer().equals(player)) return;
+        if(event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
+
+        HandlerList.unregisterAll(this);
     }
 }
