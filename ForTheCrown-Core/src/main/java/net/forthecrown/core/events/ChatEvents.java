@@ -22,7 +22,6 @@ public class ChatEvents implements Listener {
 
     private final FtcCore main = FtcCore.getInstance();
 
-    private static final String staffChatFormat = ChatColor.DARK_GRAY + "[Staff] " + ChatColor.GRAY + "%SENDER%"  + ChatColor.GRAY + ChatColor.BOLD + " >" + ChatColor.RESET + " ";
     public static final Set<CommandSender> ignoringStaffChat = new HashSet<>();
     public static boolean scMuted = false;
 
@@ -115,7 +114,7 @@ public class ChatEvents implements Listener {
             List<Player> recipientsToRemove = new ArrayList<>();
 
             for (Player recipient : event.getRecipients()) if (recipient.getWorld().getName().contains("senate")) recipientsToRemove.add(recipient);
-            for (Player playerToRemove : recipientsToRemove) event.getRecipients().remove(playerToRemove);
+            event.getRecipients().removeAll(recipientsToRemove);
         }
     }
 }

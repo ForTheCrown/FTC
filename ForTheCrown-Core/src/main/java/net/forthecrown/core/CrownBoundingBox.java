@@ -3,10 +3,12 @@ package net.forthecrown.core;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class CrownBoundingBox extends BoundingBox {
@@ -25,6 +27,10 @@ public class CrownBoundingBox extends BoundingBox {
         this.world = loc1.getWorld();
     }
 
+    public World getWorld() {
+        return world;
+    }
+
     public List<Player> getPlayersIn(){
         List<Player> temp = new ArrayList<>();
         for (Entity e: world.getNearbyEntities(this)){
@@ -32,5 +38,36 @@ public class CrownBoundingBox extends BoundingBox {
             temp.add((Player) e);
         }
         return temp;
+    }
+
+    public Collection<Entity> getResidingEntities(){
+        Collection<Entity> temp = new ArrayList<>();
+        for (Entity e: world.getNearbyEntities(this)){
+            temp.add(e);
+        }
+        return temp;
+    }
+
+    public Collection<LivingEntity> getResidingLivingEntities(){
+        Collection<LivingEntity> temp = new ArrayList<>();
+        for (Entity e: world.getNearbyEntities(this)){
+            if(!(e instanceof LivingEntity)) continue;
+            temp.add((LivingEntity) e);
+        }
+        return temp;
+    }
+
+    public boolean contains(CrownBoundingBox box){
+        if(!getWorld().equals(box.getWorld())) return false;
+        return contains(box);
+    }
+
+    public boolean contains(Location location){
+        if(!getWorld().equals(location.getWorld())) return false;
+        return contains(location.getX(), location.getY(), location.getZ());
+    }
+
+    public static CrownBoundingBox wrapBoundingBox(BoundingBox box, World world){
+        return new CrownBoundingBox(world, box.getMinX(), box.getMinY(), box.getMinZ(), box.getMaxX(), box.getMaxY(), box.getMaxZ());
     }
 }

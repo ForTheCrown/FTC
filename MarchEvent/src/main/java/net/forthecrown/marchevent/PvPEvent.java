@@ -1,120 +1,359 @@
 package net.forthecrown.marchevent;
 
+import net.forthecrown.core.CrownBoundingBox;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.api.Announcer;
+import net.forthecrown.marchevent.commands.CrownGameCommand;
 import net.forthecrown.marchevent.events.InEventListener;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import net.kyori.adventure.text.Component;
+import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.util.BoundingBox;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
 
 public class PvPEvent {
 
     public static Set<Player> inEvent = new HashSet<>();
 
-    public static final List<ItemStack> itemList = Arrays.asList(
+    public static final List<ItemStack> ITEM_LIST = Arrays.asList(
             new ItemStack(Material.STONE_SWORD, 1),
-            new ItemStack(Material.ARROW, 6),
-            new ItemStack(Material.BOW)
+            new ItemStack(Material.ARROW, 16),
+            new ItemStack(Material.BOW),
+            new ItemStack(Material.SHEARS)
     );
 
     private final InEventListener inEventListener = new InEventListener();
 
-    public static final BoundingBox yellowEntry = new BoundingBox(353, 127, 67, 355, 125, 65);
-    public static final BoundingBox blueEntry = new BoundingBox(366, 125, 65, 368, 127, 67);
+    public static final BoundingBox YELLOW_ENTRY_BOX = new BoundingBox(-750, 81, 1007, -747, 70, 1003);
+    public static final BoundingBox BLUE_ENTRY_BOX = new BoundingBox(-738, 81, 1007, -735, 70, 1003);
 
-    public static final World eventWorld = Bukkit.getWorld("world_void");
-    public static final Location yellowStart = new Location(eventWorld, 334, 124, 92);
-    public static final Location blueStart = new Location(eventWorld, 388, 124, 92);
-    public static final Location exitLocation = new Location(eventWorld, 361, 127, 65);
-    public static final Location centerLocation = new Location(eventWorld, 360, 116, 91);
+    public static final World EVENT_WORLD = Bukkit.getWorld("world");
+    public static final Location YELLOW_START = new Location(EVENT_WORLD, -770, 77, 1031, -90, 0);
+    public static final Location BLUE_START = new Location(EVENT_WORLD, -716, 77, 1031, 90, 0);
+
+    public static final Location EXIT_LOCATION = new Location(EVENT_WORLD, -743, 80, 1004.5);
+    public static final Location CENTER_LOCATION = new Location(EVENT_WORLD, -744, 69, 1030);
+    public static final Location DOOR_LOCATION = new Location(EVENT_WORLD, -720, 76, 1030);
+
+    public static final Set<Player> BLUE_TEAM = new HashSet<>();
+    public static final Set<Player> YELLOW_TEAM = new HashSet<>();
+
+    public static final CrownBoundingBox ARENA_VICINITY = new CrownBoundingBox(EVENT_WORLD, -782, 0, 995, -704, 255, 1070);
+
+    private static BossBar bar;
+    private int tickerId;
+
+    public static void tellPlayersInVicinity(String message){
+        List<Player> players = ARENA_VICINITY.getPlayersIn();
+        message = CrownUtils.translateHexCodes(message);
+
+        for (Player p: players){
+            p.sendMessage(message);
+        }
+        Announcer.log(Level.INFO, message);
+    }
 
     public void startEvent(){
+        tellPlayersInVicinity("&eRound starting!");
         EventMain.getInstance().getServer().getPluginManager().registerEvents(inEventListener, EventMain.getInstance());
+
+        resetEvent(false);
+        bar = Bukkit.createBossBar("", BarColor.BLUE, BarStyle.SEGMENTED_10);
+        bar.setProgress(0);
+        for (Player p: CENTER_LOCATION.getNearbyPlayers(50)){
+            bar.addPlayer(p);
+        }
+
+        setDoorBlocks(Material.AIR);
+        tickerId = startTicker();
+        logGame();
     }
 
     public void endEvent(){
         HandlerList.unregisterAll(inEventListener);
+        Bukkit.getScheduler().cancelTask(tickerId);
+        bar.removeAll();
 
-        for (Player p: inEvent) {
-            removePlayer(p);
-        }
+        resetEvent(true);
+    }
+
+    public void clearItemAndEffects(String name){
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:clear " + name);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect clear " + name);
     }
 
     public void endEvent(String winner){
-        endEvent();
+        tellPlayersInVicinity(winner + " won the round!");
 
-        Announcer.acLiteral(CrownUtils.translateHexCodes(winner + " won the round!"));
+        addTeamScores(!winner.toLowerCase().contains("blue"));
+
+        endEvent();
     }
 
-    public void resetEvent(){
+    public void addTeamScores(boolean yellowWinner){
+        Objective crown = EventMain.getInstance().getServer().getScoreboardManager().getMainScoreboard().getObjective("crown");
 
+        Set<Player> winningTeam = YELLOW_TEAM;
+        Set<Player> losingTeam = BLUE_TEAM;
+
+        if(!yellowWinner){
+            winningTeam = BLUE_TEAM;
+            losingTeam = YELLOW_TEAM;
+        }
+
+        for (Player p: winningTeam){
+            Score score = crown.getScore(p.getName());
+            score.setScore(score.getScore() + 3);
+
+            p.sendMessage(ChatColor.GRAY + "You got " + ChatColor.YELLOW + " 3 points" + ChatColor.GRAY + " for winning!");
+        }
+
+        for (Player p: losingTeam){
+            Score score = crown.getScore(p.getName());
+            score.setScore(score.getScore() + 1);
+
+            p.sendMessage(ChatColor.GRAY + "You got " + ChatColor.YELLOW + " 1 point" + ChatColor.GRAY + " for surviving!");
+        }
+    }
+
+    public void resetEvent(boolean end){
+        setCenterBlocks(Material.STONE);
+        setDoorBlocks(Material.CYAN_STAINED_GLASS, Material.YELLOW_STAINED_GLASS);
+
+        winningTeam = 0;
+        wasLastNeutral = true;
+        amount = 0;
+        timeUntilOpen = 200;
+        if(end){
+            for (Player p: inEvent) {
+                p.teleport(EXIT_LOCATION);
+                clearItemAndEffects(p.getName());
+            }
+
+            CrownGameCommand.reset();
+            inEvent.clear();
+            BLUE_TEAM.clear();
+            YELLOW_TEAM.clear();
+        }
+    }
+
+    public void setCenterBlocks(Material mat){
+        Location toReset = CENTER_LOCATION.clone();
+
+        toReset.getBlock().setType(mat);
+        toReset.add(1, 0, 0).getBlock().setType(mat);
+        toReset.add(0, 0, 1).getBlock().setType(mat);
+        toReset.add(-1, 0, 0).getBlock().setType(mat);
+    }
+
+    public void setDoorBlocks(Material mat){
+        setDoorBlocks(mat, mat);
+    }
+
+    public void setDoorBlocks(Material blue, Material yellow){
+        Location toReset = DOOR_LOCATION.clone();
+        toReset.getBlock().setType(blue);
+        toReset.add(0, 1, 0).getBlock().setType(blue);
+        toReset.add(0, 0, 1).getBlock().setType(blue);
+        toReset.add(0, -1, 0).getBlock().setType(blue);
+        toReset.add(-47, 0, 0).getBlock().setType(yellow);
+        toReset.add(0, 1, 0).getBlock().setType(yellow);
+        toReset.add(0, 0, -1).getBlock().setType(yellow);
+        toReset.add(0, -1, 0).getBlock().setType(yellow);
     }
 
     public void removePlayer(Player p){
-        p.teleport(exitLocation);
+        p.teleport(EXIT_LOCATION);
         inEvent.remove(p);
+
+        BLUE_TEAM.remove(p);
+        YELLOW_TEAM.remove(p);
     }
 
-    public void doCenterBlockCheck(){
+    public void checkCentralBlocks(){
         byte yellowBlocks = 0;
         byte blueBlocks = 0;
         final byte[] xMod = {0, 1, 0, -1};
-        final byte[] yMod = {0, 0, 1, 0};
-        Location toCheck = centerLocation.clone();
+        final byte[] zMod = {0, 0, 1, 0};
+        Location toCheck = CENTER_LOCATION.clone();
 
         for(int i = 0; i < 4; i++){
-            Material mat = toCheck.add(xMod[i], 0, yMod[i]).getBlock().getType();
+            Material mat = toCheck.add(xMod[i], 0, zMod[i]).getBlock().getType();
+
+            if(mat == Material.AIR || mat == Material.GRAY_WOOL){
+                winningTeam = 0;
+                return;
+            }
 
             if(mat == Material.CYAN_WOOL) blueBlocks++;
             else if(mat == Material.YELLOW_WOOL) yellowBlocks++;
         }
 
-        if(yellowBlocks == 4) endEvent("&eYellow");
-        if(blueBlocks == 4) endEvent("&cBlue");
+        if(yellowBlocks == 4) winningTeam = 1;
+        else if(blueBlocks == 4) winningTeam = -1;
+        else winningTeam = 0;
     }
 
     public void moveToStartingPositions(){
-        movePlayersInBboxToPlace(yellowEntry, yellowStart);
-        movePlayersInBboxToPlace(blueEntry, blueStart);
+        resetEvent(false);
+        moveFromStartToPrepLocation(YELLOW_ENTRY_BOX, YELLOW_START, true);
+        moveFromStartToPrepLocation(BLUE_ENTRY_BOX, BLUE_START, false);
+        tellPlayersInVicinity("&eTo your positions!");
     }
 
-    public void movePlayersInBboxToPlace(BoundingBox boundingBox, Location loc){
-        for (Entity e: eventWorld.getNearbyEntities(boundingBox)){
+    public void moveFromStartToPrepLocation(BoundingBox boundingBox, Location loc, boolean yellow){
+        for (Entity e: EVENT_WORLD.getNearbyEntities(boundingBox)){
             if(!(e instanceof Player)) continue;
-            e.teleport(loc);
+            Player p = (Player) e;
+
+            if(yellow) YELLOW_TEAM.add(p);
+            else BLUE_TEAM.add(p);
+
+            p.teleport(loc);
+            p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
+            p.setSaturation(20f);
+
+            clearItemAndEffects(p.getName());
+
+            giveItems(p, yellow);
+            inEvent.add(p);
         }
+    }
+
+    public ItemStack getCustomPotion(){
+        ItemStack stack = new ItemStack(Material.SPLASH_POTION);
+
+        PotionMeta meta = (PotionMeta) stack.getItemMeta();
+        meta.addCustomEffect(new PotionEffect(PotionEffectType.HEAL, 0, 0), true);
+        meta.displayName(Component.text(ChatColor.WHITE + "Splash potion of Healing"));
+
+        stack.setItemMeta(meta);
+
+        return stack;
+    }
+
+    public void giveItems(Player p, boolean yellow){
+        Material mat = Material.CYAN_WOOL;
+        PlayerInventory pInv = p.getInventory();
+        if(yellow) mat = Material.YELLOW_WOOL;
+
+        for(ItemStack i: ITEM_LIST){
+            pInv.addItem(i);
+        }
+
+        pInv.addItem(new ItemStack(mat, 16));
+        pInv.setHelmet(new ItemStack(mat));
+        pInv.addItem(getCustomPotion());
+    }
+
+    private static byte winningTeam = 0;
+    private double amount = 0;
+    private boolean wasLastNeutral;
+    private short timeUntilOpen = 200;
+
+    public int startTicker(){
+        return Bukkit.getScheduler().scheduleSyncRepeatingTask(EventMain.getInstance(), () -> {
+
+            if(timeUntilOpen == 0){
+                setCenterBlocks(Material.GRAY_WOOL);
+                tellPlayersInVicinity("&eThe middle is now open!");
+                timeUntilOpen = -1;
+            } else if(timeUntilOpen > 0) timeUntilOpen--;
+
+            if(winningTeam == 0){
+                bar.setVisible(false);
+                wasLastNeutral = true;
+                return;
+            } else if(wasLastNeutral){
+                wasLastNeutral = false;
+                bar.setVisible(true);
+                bar.setProgress(0);
+                amount = 0;
+            }
+
+            if(winningTeam == 1){ //yellow
+                bar.setTitle("Yellow");
+                bar.setColor(BarColor.YELLOW);
+            } else if(winningTeam == -1){ //blue
+                bar.setTitle("Blue");
+                bar.setColor(BarColor.BLUE);
+            }
+
+            amount = amount + 0.02;
+
+            try {
+                bar.setProgress(amount);
+            } catch (IllegalArgumentException e){ //over 1.0
+                String winner = "&bBlue";
+                if(winningTeam == 1) winner = "&eYellow";
+                endEvent(winner);
+            }
+        }, 1, 1);
     }
 
     public boolean checkAllPlayersForItems(){
-        for (Entity e: eventWorld.getNearbyEntities(yellowEntry)){
+        boolean toReturn = true;
+        int playerAmount = 0;
+
+        for (Entity e: EVENT_WORLD.getNearbyEntities(YELLOW_ENTRY_BOX)){
             if(e.getType() != EntityType.PLAYER) continue;
 
             Player p = (Player) e;
             if(!p.getInventory().isEmpty()){
-                Announcer.acLiteral(p.getName() + " does not have a full inventory!");
-                return false;
+                tellPlayersInVicinity(p.getName() + " &7doesn't have an empty inventory!");
+                toReturn = false;
             }
+            playerAmount++;
         }
 
-        for (Entity e: eventWorld.getNearbyEntities(blueEntry)){
+        for (Entity e: EVENT_WORLD.getNearbyEntities(BLUE_ENTRY_BOX)){
             if(e.getType() != EntityType.PLAYER) continue;
-
             Player p = (Player) e;
             if(!p.getInventory().isEmpty()){
-                Announcer.acLiteral(p.getName() + " does not have a full inventory!");
-                return false;
+                tellPlayersInVicinity(p.getName() + " &7doesn't have an empty inventory!");
+                toReturn = false;
             }
+            playerAmount++;
         }
 
-        return true;
+        if(playerAmount < 2){
+            toReturn = false;
+
+            if(playerAmount == 0) tellPlayersInVicinity("&eNo players are in the starting areas!");
+            else tellPlayersInVicinity("&eNot enough players, one more is needed!");
+        }
+        return toReturn;
+    }
+
+    private void logGame(){
+        Announcer.log(Level.INFO, "--- Arena round starting ---");
+        StringBuilder s = new StringBuilder("Participants, Blue Team: ");
+        for (Player p: BLUE_TEAM){
+            s.append(p.getName()).append(" ");
+        }
+        s.append(". Yellow Team: ");
+        for (Player p: YELLOW_TEAM){
+            s.append(p.getName()).append(" ");
+        }
+        Announcer.log(Level.INFO, s.toString());
     }
 }

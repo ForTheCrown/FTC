@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The class representing the ingame Announcer.
@@ -62,12 +63,16 @@ public interface Announcer extends CrownFileManager {
 
     /**
      * Broadcasts a message, used for debugging
-     * @param message The message to broadcasts
+     * @param message The message to broadcast
      */
     static void ac(String message){
         acLiteral(CrownUtils.translateHexCodes(CrownUtils.formatEmojis(message)));
     }
 
+    /**
+     * Broadcasts a message without formatting hex colors or emojis
+     * @param message The message to broadcast
+     */
     static void acLiteral(String message){
         for (Player p: Bukkit.getOnlinePlayers()){
             p.sendMessage(message);
@@ -76,13 +81,23 @@ public interface Announcer extends CrownFileManager {
     }
 
     /**
+     * Broadcasts a message with the [FTC] prefix
+     * @param message the message to broadcast
+     */
+    static void prefixAc(String message){
+        ac(FtcCore.getPrefix() + message);
+    }
+
+    /**
      * Logs a message in the console
      * @param level the level on which to log
      * @param message The message to log
      */
     static void log(Level level, String message){
-        FtcCore.getInstance().getLogger().log(level, message);
+        logger.log(level, message);
     }
+
+    Logger logger = FtcCore.getInstance().getLogger();
 
     /**
      *

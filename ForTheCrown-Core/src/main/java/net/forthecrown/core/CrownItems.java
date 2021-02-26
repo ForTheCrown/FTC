@@ -16,7 +16,7 @@ public final class CrownItems {
     public static ItemStack getCoins(int amount){
         return CrownUtils.makeItem(Material.SUNFLOWER, 1, true, "&eRhines",
                 "&6Worth " + amount + " Rhines", "&8Do /deposit to add this to your balance",
-                "&8Minted in the year " + CrownUtils.arabicToRoman((int) (Bukkit.getWorld("world").getTime()/265)) + ".",
+                "&8Minted in the year " + CrownUtils.arabicToRoman(CrownUtils.worldTimeToYears(Bukkit.getWorld("world"))) + ".",
                 s());
     }
 
@@ -41,6 +41,9 @@ public final class CrownItems {
 
         ItemMeta meta = crown.getItemMeta();
         AttributeModifier attributeModifier;
+
+        meta.setUnbreakable(true);
+
         int eLevel = 5;
 
         if(level > 1){

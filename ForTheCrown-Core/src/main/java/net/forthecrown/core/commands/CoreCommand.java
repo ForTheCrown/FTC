@@ -20,6 +20,7 @@ import org.bukkit.util.StringUtil;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class CoreCommand extends CrownCommand implements TabCompleter {
 
@@ -145,10 +146,9 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
             case "user":
                 if(args.length < 3) return false;
 
-                CrownUser user;
-                try {
-                    user = FtcCore.getUser(FtcCore.getOffOnUUID(args[1]));
-                } catch (NullPointerException e){ throw new InvalidPlayerInArgument(sender, args[1]); }
+                UUID id = FtcCore.getOffOnUUID(args[1]);
+                if(id == null) throw new InvalidPlayerInArgument(sender, args[1]);
+                CrownUser user = FtcCore.getUser(id);
 
                 switch (args[2]){
                     case "addpet":
@@ -184,7 +184,12 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
                         return true;
 
                     case "makebaron":
-                        if(args.length < 4 || args[3].contains("true")) {
+                        if(args.length < 4) {
+                            sender.sendMessage("User isBaron: " + user.isBaron());
+                            return true;
+                        }
+
+                        if(args[3].contains("true")){
                             user.setBaron(true);
                             sender.sendMessage(args[1] + " was made into a baron!");
                             return true;
@@ -330,6 +335,15 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
             }
         }
 
+        if(args.length == 4 && args[1].contains("crown")){
+            argList.add("King");
+            argList.add("Queen");
+        }
+
+        if(args.length == 5 && args[1].contains("crown")){
+            argList.addAll(getPlayerNameList());
+        }
+
         if(args.length == 3 && args[0].contains("user")){
             argList.add("addpet");
             argList.add("rank");
@@ -351,6 +365,11 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
                     for(Branch b : Branch.values()){
                         argList.add(b.toString());
                     }
+                    break;
+                case "makebaron":
+                case "canswapbranch":
+                    argList.add("true");
+                    argList.add("false");
                     break;
                 default:
                     return new ArrayList<>();

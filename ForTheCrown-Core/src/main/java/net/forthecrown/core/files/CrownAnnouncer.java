@@ -123,7 +123,7 @@ public class CrownAnnouncer extends FtcFileManager implements Announcer {
             int counter = 0;
             @Override
             public void run() {
-                String message = FtcCore.getPrefix() + ChatColor.translateAlternateColorCodes('&', getAnnouncements().get(counter));
+                String message = FtcCore.getPrefix() + CrownUtils.translateHexCodes(getAnnouncements().get(counter));
                 for (Player player : Bukkit.getOnlinePlayers())
                 {
                     // Don't broadcast info messages to players in the Senate.

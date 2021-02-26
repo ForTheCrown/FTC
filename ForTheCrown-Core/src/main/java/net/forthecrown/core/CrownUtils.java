@@ -4,6 +4,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,6 +21,10 @@ public final class CrownUtils {
 
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
     private static final String staffChatFormat = "&8[Staff] &7%SENDER% &7&l> &r";
+
+    public static int worldTimeToYears(World world){
+        return (int) ((world.getFullTime()/1000)/24)/365;
+    }
 
     public static String formatEmojis(String string){ //replaces every emoji in the given string
         String message = string;
@@ -179,7 +184,7 @@ public final class CrownUtils {
         XL(40), L(50), XC(90), C(100),
         CD(400), D(500), CM(900), M(1000);
 
-        private int value;
+        private final int value;
 
         RomanNumeral(int value) {
             this.value = value;

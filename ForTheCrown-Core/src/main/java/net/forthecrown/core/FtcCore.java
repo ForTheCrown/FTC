@@ -119,6 +119,7 @@ public final class FtcCore extends JavaPlugin {
         new FindPost();
         new PostHelp();
         new SpawnCommand();
+        new MapCommand();
 
         new TpaskCommand();
         new TpaskHereCommand();

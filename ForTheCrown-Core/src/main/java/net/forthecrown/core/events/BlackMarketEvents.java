@@ -84,6 +84,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
         if(!customName.contains("Edward")){
             FtcCore.getInstance().getServer().getPluginManager().registerEvents(new BmSubClass1(player), FtcCore.getInstance());
         }
+
     }
 
     private void doEdwardStuff(CrownUser user, BlackMarket bm){
