@@ -1,5 +1,7 @@
 package net.forthecrown.core;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -81,11 +83,11 @@ public final class CrownUtils {
         ItemStack result = new ItemStack(material, amount);
         ItemMeta meta = result.getItemMeta();
 
-        if (name != null) meta.setDisplayName(ChatColor.RESET + translateHexCodes(name));
+        if (name != null) meta.displayName(Component.text(ChatColor.RESET + translateHexCodes(name)));
         if (loreStrings != null) {
-            List<String> lore = new ArrayList<>();
-            for(String s : loreStrings){ lore.add(ChatColor.RESET + translateHexCodes(s)); }
-            meta.setLore(lore);
+            List<Component> lore = new ArrayList<>();
+            for(String s : loreStrings){ lore.add(Component.text(ChatColor.RESET + translateHexCodes(s))); }
+            meta.lore(lore);
         }
         if (hideFlags) {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -104,6 +106,20 @@ public final class CrownUtils {
         return translateHexCodes(formatEmojis(staffChatFormat.replaceAll("%SENDER%", senderName) + message));
     }
 
+    public static String getStringFromComponent(Component component){
+        TextComponent text = (TextComponent) component;
+        if(text.content().isBlank()){
+            for (Component c: text.children()){
+                TextComponent text1 = (TextComponent) c;
+                if(text1.content().isBlank()) continue;
+
+                text = (TextComponent) text.children().get(0);
+                break;
+            }
+        }
+        return text.content();
+    }
+
     public static String convertMillisIntoTime(long millis){
         long hours = (millis / 3600000);
         long minutes = (millis /60000) % 60;
@@ -112,11 +128,11 @@ public final class CrownUtils {
         hours -= days*24;
 
         StringBuilder stringBuilder = new StringBuilder();
-        if(days > 0)stringBuilder.append(days).append(" day" + s(days) + ", ");
-        if(hours > 0) stringBuilder.append(hours).append(" hour" + s(hours) + ", ");
-        if(minutes > 0) stringBuilder.append(minutes).append(" minute" + s(minutes) + " and ");
+        if(days > 0) stringBuilder.append(days).append(" day").append(s(days)).append(", ");
+        if(hours > 0) stringBuilder.append(hours).append(" hour").append(s(hours)).append(", ");
+        if(minutes > 0) stringBuilder.append(minutes).append(" minute").append(s(minutes)).append(" and ");
 
-        stringBuilder.append(seconds).append(" second" + s(days));
+        stringBuilder.append(seconds).append(" second" + s(seconds));
 
         return stringBuilder.toString();
     }

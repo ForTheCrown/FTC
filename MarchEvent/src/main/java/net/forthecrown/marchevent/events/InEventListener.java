@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -35,14 +36,17 @@ public class InEventListener implements Listener {
         Player player = event.getEntity();
         EventMain.getEvent().clearItemAndEffects(player.getName());
 
-        Objective obj = EventMain.getInstance().getServer().getScoreboardManager().getMainScoreboard().getObjective("crown");
-        Score killerScr = obj.getScore(player.getKiller().getName());
-        if(!killerScr.isScoreSet()) killerScr.setScore(2);
-        else killerScr.setScore(killerScr.getScore()+2);
+        if(!areOnSameTeams(player, player.getKiller())) {
+            Objective obj = EventMain.getInstance().getServer().getScoreboardManager().getMainScoreboard().getObjective("crown");
+            Score killerScr = obj.getScore(player.getKiller().getName());
+            if (!killerScr.isScoreSet()) killerScr.setScore(2);
+            else killerScr.setScore(killerScr.getScore() + 2);
+
+            player.sendMessage(CrownUtils.translateHexCodes("&7You were killed by &e" + player.getKiller().getName()));
+            player.getKiller().sendMessage(CrownUtils.translateHexCodes("&7You killed &e" + player.getName() + "&7 and earned &e2 points"));
+        }
 
         EventMain.getEvent().removePlayer(player);
-        player.sendMessage(CrownUtils.translateHexCodes("&7You were killed by &e" + player.getKiller().getName()));
-        player.getKiller().sendMessage(CrownUtils.translateHexCodes("&7You killed &e" + player.getName() + "&7 and earned &e2 points"));
 
         new BukkitRunnable() {
             @Override
@@ -50,6 +54,21 @@ public class InEventListener implements Listener {
                 event.getEntity().teleport(PvPEvent.EXIT_LOCATION);
             }
         }.runTaskLater(EventMain.getInstance(), 1);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if(!(event.getDamager() instanceof Player) && !PvPEvent.inEvent.contains((Player) event.getDamager())) return;
+        if(!(event.getEntity() instanceof Player) && !PvPEvent.inEvent.contains((Player) event.getEntity())) return;
+
+        Player p1 = (Player) event.getDamager();
+        Player p2 = (Player) event.getEntity();
+        if(areOnSameTeams(p1, p2)) event.setCancelled(true);
+    }
+
+    private boolean areOnSameTeams(Player p1, Player p2){
+        if(PvPEvent.YELLOW_TEAM.contains(p1) && PvPEvent.YELLOW_TEAM.contains(p2)) return true;
+        return PvPEvent.BLUE_TEAM.contains(p1) && PvPEvent.BLUE_TEAM.contains(p2);
     }
 
     @EventHandler(ignoreCancelled = true)

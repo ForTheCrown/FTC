@@ -1,6 +1,7 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.Cooldown;
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
@@ -28,18 +29,21 @@ public class SignShopInteractEvent implements Listener {
         if(!(event.getClickedBlock().getState() instanceof Sign)) return;
 
         Sign sign = (Sign) event.getClickedBlock().getState();
-        if(!sign.getLine(0).contains("=[Buy]=") && !sign.getLine(0).contains("=[Sell]=") && !sign.getLine(0).contains("-[Sell]-") && !sign.getLine(0).contains("-[Buy]-")) return;
-        if(!sign.getLine(3).contains(ChatColor.DARK_GRAY + "Price: ")) return;
+
+        String line0 = CrownUtils.getStringFromComponent(sign.line(0));
+        String line3 = CrownUtils.getStringFromComponent(sign.line(3));
+
+        if(!line0.contains("=[Buy]=")
+                && !line0.contains("=[Sell]=")
+                && !line0.contains("-[Sell]-")
+                && !line0.contains("-[Buy]-")) return;
+        if(!line3.contains(ChatColor.DARK_GRAY + "Price: ")) return;
 
         Cooldown.add(event.getPlayer(), 6);
 
-        SignShop shop;
-        try {
-            shop = FtcCore.getShop(event.getClickedBlock().getLocation());
-        } catch (Exception e){
-            e.printStackTrace();
-            return;
-        }
+        SignShop shop = FtcCore.getShop(event.getClickedBlock().getLocation());
+        if(shop == null) return;
+
         Player player = event.getPlayer();
 
         //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it

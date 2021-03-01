@@ -5,10 +5,12 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public interface SignShop extends CrownFileManager {
+public interface SignShop extends CrownFileManager, InventoryHolder {
 
     /**
      * Gets the file name of the shop
@@ -108,12 +110,6 @@ public interface SignShop extends CrownFileManager {
     boolean wasDeleted();
 
     /**
-     * Gets the shop's stock
-     * @return The shop's stock
-     */
-    ShopInventory getInventory();
-
-    /**
      * Gets the sign on which the shop is located
      * @return The S I G N
      */
@@ -124,6 +120,9 @@ public interface SignShop extends CrownFileManager {
      * <p>Should be used to apply changes to the sign</p>
      */
     void updateSign();
+
+    @Override
+    @NotNull ShopInventory getInventory();
 
     @Override
     boolean equals(Object o);

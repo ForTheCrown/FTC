@@ -30,14 +30,14 @@ public final class CrownItems {
 
     //TODO getRoyalSword, getCutlass, getVikingAxe
 
-    public static ItemStack getCrown(int level, String ownerTitle, String owner){
+    public static ItemStack getCrown(int level, String owner ){
         String levelS = CrownUtils.arabicToRoman(level);
         ItemStack crown = CrownUtils.makeItem(Material.GOLDEN_HELMET, 1, false, "&6-&e&lCrown&6-",
                 "&7Rank " + levelS,
                 "&8--------------------------------",
                 "&6Only the worthy shall wear this ",
                 "&6symbol of strength and power.",
-                "&8Crafted for " + ownerTitle + " " + owner);
+                "&8Crafted for " + owner);
 
         ItemMeta meta = crown.getItemMeta();
         AttributeModifier attributeModifier;

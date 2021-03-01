@@ -117,13 +117,14 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
     @Override
     public void destroyShop() {
-        if(inventory.getShopContents().size() > 0) {
+        FtcCore.loadedShops.remove(this);
+        if(inventory != null && inventory.getShopContents().size() > 0) {
             for (ItemStack stack : inventory.getShopContents()){ location.getWorld().dropItemNaturally(location, stack); }
             location.getWorld().spawnParticle(Particle.CLOUD, location.add(0.5, 0.5, 0.5), 5, 0.1D, 0.1D, 0.1D, 0.05D);
         }
 
+        getLocation().getBlock().breakNaturally();
         delete();
-        FtcCore.loadedShops.remove(this);
     }
 
     @Override

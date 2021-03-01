@@ -5,7 +5,6 @@ import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.files.CrownSignShop;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -15,16 +14,15 @@ import java.util.List;
 public class CrownShopInventory extends CraftInventoryCustom implements ShopInventory {
 
     private final CrownSignShop owningShop;
-    private static final SignShopInventoryOwner owner = new SignShopInventoryOwner();
     private ItemStack exampleItem;
     public CrownShopInventory(CrownSignShop signShop){
-        super(owner, InventoryType.CHEST, "Shop Contents");
+        super(signShop, InventoryType.CHEST, "Shop Contents");
         owningShop = signShop;
     }
 
     @Override
     public HashMap<Integer, ItemStack> addItem(ItemStack... items) {
-        getOwningShop().setOutOfStock(false);
+        owningShop.setOutOfStock(false);
         return super.addItem(items);
     }
 
@@ -51,13 +49,18 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
     }
 
     @Override
+    public SignShop getHolder() {
+        return owningShop;
+    }
+
+    @Override
     public boolean isFull() {
         return firstEmpty() == -1;
     }
 
     @Override
     public ItemStack getExampleItem() {
-        if(exampleItem == null) throw new NullPointerException(getOwningShop().getName() + " has null example item");
+        if(exampleItem == null) throw new NullPointerException(owningShop.getName() + " has null example item");
         return exampleItem.clone();
     }
 
@@ -74,17 +77,12 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
     }
 
     @Override
-    public SignShop getOwningShop() {
-        return owningShop;
-    }
-
-    @Override
     public HashMap<Integer, ItemStack> removeItemAnySlot(ItemStack... items) throws IllegalArgumentException {
         return removeItem(items);
     }
 
     @Override
-    public InventoryHolder getHolder(boolean useSnapshot) {
-        return owner;
+    public SignShop getHolder(boolean useSnapshot) {
+        return owningShop;
     }
 }

@@ -1,18 +1,19 @@
 package net.forthecrown.core.commands;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.events.ChatEvents;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.util.StringUtil;
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-public class StaffChatCommand extends CrownCommand implements TabCompleter {
+public class StaffChatCommand extends CrownCommandBuilder {
 
     public StaffChatCommand(){
         super("staffchat", FtcCore.getInstance());
@@ -21,7 +22,7 @@ public class StaffChatCommand extends CrownCommand implements TabCompleter {
         setAliases("sc");
         setDescription("Sends a message to the staff chat");
         setUsage("&8Usage: &7/sc <message>");
-        setTabCompleter(this);
+
         register();
     }
 
@@ -46,6 +47,28 @@ public class StaffChatCommand extends CrownCommand implements TabCompleter {
      */
 
     @Override
+    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+        command.then(argument("message", StringArgumentType.greedyString())
+                .suggests()
+
+                .executes(c -> {
+                    ChatEvents.sendStaffChatMessage(c.getSource().getBukkitSender(), c.getArgument("message", String.class));
+                    return 0;
+                })
+        );
+    }
+
+    public static <S> CompletableFuture<Suggestions> listCompletionsBranch(CommandContext<S> context, SuggestionsBuilder builder){
+        String input = builder.getInput();
+        String token = input.substring(input.lastIndexOf(' ')).trim();
+
+        for (Branch r: Branch.values()){
+            if(token.isBlank() || r.toString().regionMatches(true, 0, token, 0, token.length())) builder.suggest(r.toString());
+        }
+        return builder.buildFuture();
+    }
+
+    /*@Override
     public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(args.length < 1) return false;
 
@@ -112,6 +135,6 @@ public class StaffChatCommand extends CrownCommand implements TabCompleter {
 
         emojiList.addAll(getPlayerNameList());
 
-        return StringUtil.copyPartialMatches(args[argN], emojiList, new ArrayList<>());
-    }
+        return emojiList;
+    }*/
 }

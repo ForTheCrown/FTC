@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons.enchantments;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -11,6 +12,7 @@ import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -85,6 +87,11 @@ public class HealingBlock extends Enchantment implements Listener {
     public boolean canEnchantItem(ItemStack item) {
         if (item.getType() == Material.SHIELD) return true;
         else return false;
+    }
+
+    @Override
+    public @NotNull Component displayName(int level) {
+        return Component.text("Healing Block");
     }
 
     @Override

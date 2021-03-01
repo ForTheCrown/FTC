@@ -1,21 +1,22 @@
 package net.forthecrown.core.commands;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.exceptions.InvalidArgumentException;
-import net.forthecrown.core.exceptions.NonPlayerExecutor;
+import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.inventories.SellShop;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+public class ShopCommand extends CrownCommandBuilder {
 
-public class ShopCommand extends CrownCommand implements TabCompleter {
+    public ShopCommand(){
+        super("shop", FtcCore.getInstance());
+
+        setUsage("&7Usage:&r /shop [mining | farming | drops]");
+        setDescription("Opens the Shop GUI in which one can sell things");
+        register();
+    }
 
     /*
      * ----------------------------------------
@@ -34,16 +35,46 @@ public class ShopCommand extends CrownCommand implements TabCompleter {
      * Author: Botul
      */
 
-    public ShopCommand(){
-        super("shop", FtcCore.getInstance());
-
-        setUsage("&7Usage:&r /shop [mining | farming | drops]");
-        setDescription("Opens the Shop GUI in which one can sell things");
-        setTabCompleter(this);
-        register();
+    @Override
+    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+        command
+                .executes(c ->{
+                    Player player = getPlayerSender(c);
+                    player.openInventory(new SellShop(player).mainMenu());
+                    return 0;
+                })
+                .then(argument("drops")
+                    .executes(c -> {
+                        Player player = getPlayerSender(c);
+                        player.openInventory(new SellShop(player).dropsMenu());
+                        return 0;
+                    })
+                )
+                .then(argument("mining")
+                        .executes(c -> {
+                            Player player = getPlayerSender(c);
+                            player.openInventory(new SellShop(player).miningMenu());
+                            return 0;
+                        })
+                )
+                .then(argument("drops")
+                        .executes(c -> {
+                            Player player = getPlayerSender(c);
+                            player.openInventory(new SellShop(player).dropsMenu());
+                            return 0;
+                        })
+                )
+                .then(argument("web")
+                        .executes(c -> {
+                            CrownUser user = getUserSender(c);
+                            user.sendMessage("&7Our webstore:");
+                            user.sendMessage("&bhttps://for-the-crown.tebex.io/");
+                            return 0;
+                        })
+                );
     }
 
-    @Override
+    /*@Override
     public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
 
@@ -72,11 +103,12 @@ public class ShopCommand extends CrownCommand implements TabCompleter {
         return true;
     }
 
+    private static final List<String> argL = ImmutableList.of("drops", "farming", "mining", "web");
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        List<String> argList = Arrays.asList("drops", "farming", "mining", "web");
-        if(args.length == 1) return StringUtil.copyPartialMatches(args[0], argList, new ArrayList<>());
+        if(args.length == 1) return argL;
 
         return null;
-    }
+    }*/
 }

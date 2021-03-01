@@ -1,8 +1,8 @@
 package net.forthecrown.vikings;
 
 import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.inventories.CustomInventoryHolder;
 import net.forthecrown.vikings.raids.VikingRaid;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -10,7 +10,8 @@ import org.bukkit.inventory.ItemStack;
 public final class VikingUtils {
 
     public static Inventory getRaidSelector(){
-        Inventory result = Bukkit.createInventory(null, 27, "Raid Selection");
+        CustomInventoryHolder holder = new CustomInventoryHolder("Raid Selection", 27);
+        Inventory result = holder.getInventory();
 
         final ItemStack border = CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "");
         for (int i = 0; i < 27; i++){

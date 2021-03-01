@@ -1,5 +1,6 @@
 package net.forthecrown.core.commands;
 
+import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
@@ -15,7 +16,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.StringUtil;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -116,17 +116,11 @@ public class ShopEditCommand extends CrownCommand implements TabCompleter {
         return true;
     }
 
+    private static final List<String> argL = ImmutableList.of("line1", "lin2", "tradeamount", "price");
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        List<String> toReturn = new ArrayList<>();
-
-        if(args.length == 1){
-            toReturn.add("line1");
-            toReturn.add("line2");
-            toReturn.add("tradeamount");
-            toReturn.add("price");
-            return StringUtil.copyPartialMatches(args[0], toReturn, new ArrayList<>());
-        }
+        if(args.length == 1) return argL;
         return new ArrayList<>();
     }
 }

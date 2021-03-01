@@ -1,18 +1,20 @@
 package net.forthecrown.core.commands;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
-import net.forthecrown.core.exceptions.*;
+import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
+import net.md_5.bungee.api.ChatColor;
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-import javax.annotation.Nonnull;
 import java.util.UUID;
 
-public class PayCommand extends CrownCommand {
+public class PayCommand extends CrownCommandBuilder {
 
     public PayCommand(){
         super("pay", FtcCore.getInstance());
@@ -40,6 +42,36 @@ public class PayCommand extends CrownCommand {
      */
 
     @Override
+    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+        command
+                .then(argument("player", StringArgumentType.word())
+                        .suggests((c, b) -> getPlayerList(b).buildFuture())
+
+                        .then(argument("amount", IntegerArgumentType.integer(1, FtcCore.getMaxMoneyAmount()))
+                                .executes(c ->{
+                                    CrownUser user = getUserSender(c);
+                                    Balances bals = FtcCore.getBalances();
+
+                                    int amount = c.getArgument("amount", Integer.class);
+                                    if(amount > bals.getBalance(user.getBase())) throw new CrownCommandException("You cannot afford to pay " + amount);
+
+                                    String targetName = c.getArgument("player", String.class);
+                                    UUID id = getUUID(targetName);
+
+                                    bals.addBalance(id, amount);
+                                    bals.addBalance(user.getBase(), -amount);
+
+                                    user.sendMessage(ChatColor.GRAY + "You've paid " + ChatColor.GOLD + amount + " Rhines " + ChatColor.GRAY + "to " + ChatColor.YELLOW + targetName);
+                                    try{
+                                        Bukkit.getPlayer(id).sendMessage(ChatColor.GRAY + "You've received " + ChatColor.GOLD + amount + " Rhines " + ChatColor.GRAY + "by " + ChatColor.YELLOW + user.getName());
+                                    } catch (Exception ignored){}
+                                    return 0;
+                                })
+                        )
+                );
+    }
+
+    /*@Override
     public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         if(args.length != 2) throw new TooLittleArgumentsException(sender);
@@ -79,5 +111,5 @@ public class PayCommand extends CrownCommand {
         }
 
         return true;
-    }
+    }*/
 }

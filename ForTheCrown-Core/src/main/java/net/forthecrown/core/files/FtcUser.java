@@ -7,7 +7,9 @@ import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.exceptions.UserNotOnlineException;
-import net.md_5.bungee.api.chat.BaseComponent;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,6 +22,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,6 +51,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     private boolean canSwapBranch = true;
     private boolean allowsEmotes = true;
     private boolean allowsRidingPlayers = true;
+    private boolean publicProfile = true;
     private long totalEarnings;
     private long nextResetTime;
     private long nextBranchSwapAllowed;
@@ -84,6 +89,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         setAllowsEmotes(getFile().getBoolean("AllowsEmotes"));
         setTotalEarnings(getFile().getLong("TotalEarnings"));
         setSellAmount(SellAmount.valueOf(getFile().getString("SellAmount").toUpperCase()));
+        setProfilePublic(getFile().getBoolean("ProfilePublic", true));
 
         setNextResetTime(getFile().getLong("TimeStamps.NextResetTime"));
 
@@ -155,6 +161,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         getFile().set("SellAmount", getSellAmount().toString());
         getFile().set("TotalEarnings", getTotalEarnings());
         getFile().set("AllowsEmotes", allowsEmotes());
+        getFile().set("ProfilePublic", isProfilePublic());
 
         getFile().set("TimeStamps.NextResetTime", getNextResetTime());
         getFile().set("TimeStamps.LastLoad", System.currentTimeMillis());
@@ -274,7 +281,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     public void setRank(Rank rank, boolean setPrefix){
         currentRank = rank;
 
-        if(setPrefix) setTabPrefix(rank.getColorlessPrefix());
+        if(setPrefix && rank != Rank.DEFAULT) setTabPrefix(rank.getColorlessPrefix());
     }
 
     @Override
@@ -510,7 +517,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     @Override
     public void sendMessage(@Nonnull String message){
         if(!isOnline()) return;
-        getPlayer().sendMessage(CrownUtils.translateHexCodes(message));
+        sendMessage(Component.text(CrownUtils.translateHexCodes(message)));
     }
 
     @Override
@@ -518,6 +525,12 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         for (String s: messages){
             sendMessage(s);
         }
+    }
+
+    @Override
+    public void sendMessage(@NonNull Component message) {
+        if(!isOnline()) return;
+        getPlayer().sendMessage(message);
     }
 
     @Override
@@ -581,6 +594,16 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     @Override
     public void delete() {
         super.delete();
+    }
+
+    @Override
+    public boolean isProfilePublic() {
+        return publicProfile;
+    }
+
+    @Override
+    public void setProfilePublic(boolean publicProfile) {
+        this.publicProfile = publicProfile;
     }
 
     //---------------------------
@@ -675,21 +698,14 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     }
 
     @Override
-    public void sendMessage(BaseComponent component) {
-        performOnlineCheck();
-        getPlayer().sendMessage(component);
-    }
-
-    @Override
-    public void sendMessage(BaseComponent... components) {
-        performOnlineCheck();
-        getPlayer().sendMessage(components);
-    }
-
-    @Override
     public void performCommand(String command){
         performOnlineCheck();
         getServer().dispatchCommand(this, command);
+    }
+
+    @Override
+    public void sendMessage(@NotNull Identity identity, @NotNull Component message, @NotNull MessageType type) {
+        getPlayer().sendMessage(identity, message, type);
     }
 
     private void performOnlineCheck(){
@@ -735,7 +751,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
     @Override
     public String toString() {
-        return "FtcUser{" +
+        return getClass().getName() + "{" +
                 "base=" + base +
                 ", name='" + name + '\'' +
                 ", currentRank=" + currentRank +
@@ -803,6 +819,8 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         getFile().addDefault("AllowsEmotes", true);
         getFile().addDefault("SellAmount", SellAmount.PER_1.toString());
         getFile().addDefault("TotalEarnings", 0);
+        getFile().addDefault("ProfilePublic", true);
+
         getFile().addDefault("TimeStamps.NextResetTime", System.currentTimeMillis() + FtcCore.getUserDataResetInterval());
         getFile().addDefault("TimeStamps.LastLoad", System.currentTimeMillis());
         getFile().options().copyDefaults(true);

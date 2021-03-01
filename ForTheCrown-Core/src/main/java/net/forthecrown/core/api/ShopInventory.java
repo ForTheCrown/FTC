@@ -2,6 +2,7 @@ package net.forthecrown.core.api;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,12 +63,6 @@ public interface ShopInventory extends Inventory {
     void setExampleItemAndAdd(ItemStack exampleItem);
 
     /**
-     * Gets the shop that owns this stock
-     * @return The shop that owns this stock
-     */
-    SignShop getOwningShop();
-
-    /**
      * Sets the shops contents and sorts it
      * @param list The new contents of the shop
      */
@@ -84,6 +79,12 @@ public interface ShopInventory extends Inventory {
      * <p>Doesn't reset the example item</p>
      */
     void clear();
+
+    @Override
+    @Nullable SignShop getHolder();
+
+    @Override
+    @Nullable SignShop getHolder(boolean useSnapshot);
 
     @Override
     boolean equals(Object o);

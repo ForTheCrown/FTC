@@ -20,18 +20,13 @@ public class SignShopDestroyEvent implements Listener {
             && !sign.getLine(0).contains("-[Buy]-") && !sign.getLine(0).contains("-[Sell]-")) return;
         if(!sign.getLine(3).contains(ChatColor.DARK_GRAY + "Price: ")) return;
 
-        SignShop shop;
-        try {
-            shop = FtcCore.getShop(event.getBlock().getLocation());
-        } catch (Exception e){
-            e.printStackTrace();
-            return;
-        }
+        SignShop shop = FtcCore.getShop(event.getBlock().getLocation());
+        if(shop == null) return;
 
-        if(!shop.getOwner().equals(event.getPlayer().getUniqueId()) && !event.getPlayer().hasPermission("ftc.admin")){
-            event.setCancelled(true);
+        event.setCancelled(true);
+
+        if(!shop.getOwner().equals(event.getPlayer().getUniqueId()) && !event.getPlayer().hasPermission("ftc.admin"))
             throw new CrownException(event.getPlayer(), "&cYou cannot destroy a shop you do not own!");
-        }
 
         shop.destroyShop(); //destroys the shop
     }

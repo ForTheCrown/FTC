@@ -1,25 +1,22 @@
 package net.forthecrown.core.commands;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.core.commands.brigadier.exceptions.CannotAffordTransactionException;
 import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.exceptions.CannotAffordTransaction;
-import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 
-import javax.annotation.Nonnull;
 import java.text.DecimalFormat;
 
-public class BecomeBaronCommand extends CrownCommand  {
+public class BecomeBaronCommand extends CrownCommandBuilder {
     public BecomeBaronCommand() {
         super("becomebaron", FtcCore.getInstance());
         register();
@@ -49,6 +46,54 @@ public class BecomeBaronCommand extends CrownCommand  {
      */
 
     @Override
+    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+        int baronPrice = FtcCore.getInstance().getConfig().getInt("BaronPrice");
+        Balances bals = FtcCore.getBalances();
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        decimalFormat.setGroupingUsed(true);
+        decimalFormat.setGroupingSize(3);
+
+        command
+                .executes(c -> {
+                    CrownUser user = getUserSender(c);
+
+                    if(user.isBaron()){
+                        user.sendMessage("&7You are already a baron!");
+                        return 0;
+                    }
+
+                    if(bals.getBalance(user.getBase()) < baronPrice) throw new CannotAffordTransactionException("You need at least 500,000 Rhines");
+
+                    TextComponent confirmBaron = new TextComponent(ChatColor.GREEN + "[Confirm]");
+                    confirmBaron.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/becomebaron confirm"));
+                    confirmBaron.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Become a baron.")));
+
+                    TextComponent baronConfirmMessage = new TextComponent(FtcCore.getPrefix() + ChatColor.translateAlternateColorCodes('&', "&rAre you sure you wish to become a " + Rank.BARON.getPrefix().replaceAll(" ", "") + "? This will cost &e" + decimalFormat.format(baronPrice) + " Rhines "));
+                    baronConfirmMessage.addExtra(confirmBaron);
+
+                    user.spigot().sendMessage(baronConfirmMessage);
+                    return 0;
+                })
+                .then(argument("confirm")
+                        .executes(c -> {
+                            CrownUser p = getUserSender(c);
+
+                            if(p.isBaron()){
+                                p.sendMessage("&7You are already a baron!");
+                                return 0;
+                            }
+
+                            if(bals.getBalance(p.getBase()) < baronPrice) throw new CannotAffordTransactionException("You need at least 500,000 Rhines");
+
+                            bals.setBalance(p.getBase(), bals.getBalance(p.getBase()) - baronPrice);
+                            p.setBaron(true);
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6Congratulations!&r You are now a &ebaron&r!"));
+                            return 0;
+                        })
+                );
+    }
+
+    /*@Override
     public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) throws CrownException {
         if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
         int baronPrice = FtcCore.getInstance().getConfig().getInt("BaronPrice");
@@ -85,5 +130,5 @@ public class BecomeBaronCommand extends CrownCommand  {
 
         player.spigot().sendMessage(baronConfirmMessage);
         return true;
-    }
+    }*/
 }

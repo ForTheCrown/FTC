@@ -44,4 +44,18 @@ public interface Balances extends CrownFileManager {
      */
     Integer getTaxPercentage(UUID uuid);
 
+    /**
+     * Returns a more readable version of a person's balance
+     * @param id The ID of the balance to get
+     * @return A more readable number, example: 1,000,000 instead of 1000000
+     */
+    String getDecimalizedBalance(UUID id);
+
+    /**
+     * Sets a user's balance, ignoring the maximum balance limit
+     * @param id The id of the balance to set
+     * @param amount The amount to set the balance
+     */
+    void setLimitlessBalance(UUID id, Integer amount);
+
 }

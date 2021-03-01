@@ -15,7 +15,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +118,6 @@ public class VikingsCommand extends CrownCommand implements TabCompleter {
             }
         }
 
-        return StringUtil.copyPartialMatches(args[args.length-1], toReturn, new ArrayList<>());
+        return toReturn;
     }
 }

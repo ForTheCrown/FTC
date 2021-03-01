@@ -65,17 +65,19 @@ public interface Announcer extends CrownFileManager {
      * Broadcasts a message, used for debugging
      * @param message The message to broadcast
      */
-    static void ac(String message){
-        acLiteral(CrownUtils.translateHexCodes(CrownUtils.formatEmojis(message)));
+    static void ac(Object message){
+        if(message == null) message = "null";
+        acLiteral(CrownUtils.translateHexCodes(CrownUtils.formatEmojis(message.toString())));
     }
 
     /**
      * Broadcasts a message without formatting hex colors or emojis
      * @param message The message to broadcast
      */
-    static void acLiteral(String message){
+    static void acLiteral(Object message){
+        if(message == null) message = "null";
         for (Player p: Bukkit.getOnlinePlayers()){
-            p.sendMessage(message);
+            p.sendMessage(message.toString());
         }
         System.out.println(message);
     }
@@ -85,6 +87,7 @@ public interface Announcer extends CrownFileManager {
      * @param message the message to broadcast
      */
     static void prefixAc(String message){
+        if(message == null) message = "null";
         ac(FtcCore.getPrefix() + message);
     }
 
@@ -94,6 +97,7 @@ public interface Announcer extends CrownFileManager {
      * @param message The message to log
      */
     static void log(Level level, String message){
+        if(message == null) message = "null";
         logger.log(level, message);
     }
 

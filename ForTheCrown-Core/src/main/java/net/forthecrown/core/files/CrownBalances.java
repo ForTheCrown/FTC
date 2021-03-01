@@ -4,6 +4,7 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import org.bukkit.Bukkit;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -13,11 +14,15 @@ public class CrownBalances extends FtcFileManager implements Balances {
 
     private Map<UUID, Integer> balanceMap = new HashMap<>(); //this is how all the balances are stored, in a private Map
     private int startRhines;
+    private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
     public CrownBalances() { //This class should only get constructed once, in the main class on startup
         super("balance");
 
         startRhines = FtcCore.getInstance().getConfig().getInt("StartRhines");
+
+        decimalFormat.setGroupingUsed(true);
+        decimalFormat.setGroupingSize(3);
 
         reload();
     }
@@ -62,15 +67,25 @@ public class CrownBalances extends FtcFileManager implements Balances {
         if(balanceMap.containsKey(uuid)) return balanceMap.getOrDefault(uuid, startRhines);
         return 100;
     }
+
+    @Override
+    public String getDecimalizedBalance(UUID id){
+        return decimalFormat.format(getBalance(id));
+    }
+
     @Override
     public void setBalance(UUID uuid, Integer amount){
         if(amount >= FtcCore.getMaxMoneyAmount()){
             FtcCore.getInstance().getLogger().log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
-            balanceMap.put(uuid, FtcCore.getMaxMoneyAmount());
-            return;
+            amount = FtcCore.getMaxMoneyAmount();
         }
 
-        balanceMap.put(uuid, amount);
+        setLimitlessBalance(uuid, amount);
+    }
+
+    @Override
+    public void setLimitlessBalance(UUID id, Integer amount){
+        balanceMap.put(id, amount);
     }
 
     @Override

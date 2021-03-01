@@ -31,6 +31,30 @@ public class CrownBoundingBox extends BoundingBox {
         return world;
     }
 
+    public Location getCenterLocation(){
+        return getCenterLocation(0, 0);
+    }
+
+    public Location getMinLocattion(){
+        return getMinLocation(0, 0);
+    }
+
+    public Location getMaxLocation(){
+        return getMaxLocation(0, 0);
+    }
+
+    public Location getCenterLocation(float yaw, float pitch){
+        return getCenter().toLocation(getWorld(), yaw, pitch);
+    }
+
+    public Location getMinLocation(float yaw, float pitch){
+        return getMin().toLocation(getWorld(), yaw, pitch);
+    }
+
+    public Location getMaxLocation(float yaw, float pitch){
+        return getMax().toLocation(getWorld(), yaw, pitch);
+    }
+
     public List<Player> getPlayersIn(){
         List<Player> temp = new ArrayList<>();
         for (Entity e: world.getNearbyEntities(this)){
@@ -59,12 +83,17 @@ public class CrownBoundingBox extends BoundingBox {
 
     public boolean contains(CrownBoundingBox box){
         if(!getWorld().equals(box.getWorld())) return false;
-        return contains(box);
+        return super.contains(box);
+    }
+
+    public boolean overlaps(CrownBoundingBox box){
+        if(!getWorld().equals(box.getWorld())) return false;
+        return super.overlaps(box);
     }
 
     public boolean contains(Location location){
         if(!getWorld().equals(location.getWorld())) return false;
-        return contains(location.getX(), location.getY(), location.getZ());
+        return super.contains(location.toVector());
     }
 
     public static CrownBoundingBox wrapBoundingBox(BoundingBox box, World world){

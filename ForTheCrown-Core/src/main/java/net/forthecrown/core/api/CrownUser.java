@@ -429,6 +429,10 @@ public interface CrownUser extends CrownFileManager, CommandSender {
      */
     Scoreboard getScoreboard();
 
+    boolean isProfilePublic();
+
+    void setProfilePublic(boolean publicProfile);
+
     @Override
     boolean equals(Object o);
 

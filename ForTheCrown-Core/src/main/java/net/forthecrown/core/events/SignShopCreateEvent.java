@@ -6,6 +6,7 @@ import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.exceptions.CrownException;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -26,13 +27,17 @@ public class SignShopCreateEvent implements Listener {
     //WHAT AM I DOING
     @EventHandler(ignoreCancelled = true)
     public void onSignShopCreate(SignChangeEvent event){
-        if(event.getLine(0).isBlank()) return;
+        if(CrownUtils.getStringFromComponent(event.line(0)).isBlank()) return;
 
         Player player = event.getPlayer();
 
-        ShopType shopType;
+        String line0 = CrownUtils.getStringFromComponent(event.line(0));
+        String line1 = CrownUtils.getStringFromComponent(event.line(1));
+        String line2 = CrownUtils.getStringFromComponent(event.line(2));
+        String line3 = CrownUtils.getStringFromComponent(event.line(3));
 
-        switch (event.getLine(0).toLowerCase()){
+        ShopType shopType;
+        switch (line0.toLowerCase()){
             default: return; //switch statement to set the shop's type, basically that's it
 
             case "-[buy]-":
@@ -52,20 +57,17 @@ public class SignShopCreateEvent implements Listener {
                 break;
         }
 
-        if(event.getLine(3).isBlank()) throw new CrownException(player, "&7The last line must contain a price!");
+        if(line3.isBlank()) throw new CrownException(player, "&7The last line must contain a price!");
 
         Sign sign = (Sign) event.getBlock().getState();
-        String lastLine = event.getLine(3).toLowerCase();
-
-        lastLine = lastLine.replaceAll("[\\D]", ""); //replaces all letter chars, leaves only numbers to make the price
-        lastLine = lastLine.replaceAll(" ", ""); //removes all spaces
+        String lastLine = line3.toLowerCase().replaceAll("[\\D]", "").trim();
 
         int price;
         try {
             price = Integer.parseInt(lastLine);
         } catch (Exception e){ throw new CrownException(player, "&7The last line must contain numbers!"); }
 
-        if(event.getLine(2).isBlank() && event.getLine(1).isBlank()) throw new CrownException(player, "&7You must provide a description of the shop's items");
+        if(line2.isBlank() && line1.isBlank()) throw new CrownException(player, "&7You must provide a description of the shop's items");
 
         SignShop shop = FtcCore.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
 
@@ -73,10 +75,10 @@ public class SignShopCreateEvent implements Listener {
 
         FtcCore.getInstance().getServer().getPluginManager().registerEvents(new SignShopSubClass1(player, shop), FtcCore.getInstance());
 
-        if(shopType == ShopType.BUY_SHOP) event.setLine(0, shopType.getOutOfStockLabel());
-        else event.setLine(0, shopType.getInStockLabel());
+        if(shopType == ShopType.BUY_SHOP) event.line(0, Component.text(shopType.getOutOfStockLabel()));
+        else event.line(0, Component.text(shopType.getInStockLabel()));
 
-        event.setLine(3, ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + price); //idk, I thought putting ALL_CODES would make triggering events involving the shops harder
+        event.line(3, Component.text(ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + price)); //idk, I thought putting ALL_CODES would make triggering events involving the shops harder
     }
 
     public class SignShopSubClass1 implements Listener{
@@ -110,8 +112,8 @@ public class SignShopCreateEvent implements Listener {
             ShopInventory shopInv = shop.getInventory();
 
             ItemStack item = inv.getContents()[2];
-            if(item == null){
-                sign.setLine(3, ChatColor.DARK_GRAY + "Price " + ChatColor.RESET + shop.getPrice());
+            if(item == null || item.getType() == Material.AIR){
+                sign.line(3, Component.text(ChatColor.DARK_GRAY + "Price " + ChatColor.RESET + shop.getPrice()));
                 sign.update();
                 shop.destroyShop();
                 throw new CrownException(player, "&4Shop creation failed! &cNo item in the inventory");

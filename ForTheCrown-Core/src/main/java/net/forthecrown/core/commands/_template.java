@@ -21,6 +21,12 @@ public class _template extends CrownCommand{
     }
 
     /*
+     * This legacy stuff lol
+     * Get with the times old man B)
+     * We usin' Brigadier now lol
+     */
+
+    /*
      * ----------------------------------------
      * 			Command description:
      * ----------------------------------------

@@ -1,28 +1,33 @@
 package net.forthecrown.core.commands;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.core.CrownItems;
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.core.commands.brigadier.TypeCreator;
+import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
+import net.forthecrown.core.commands.brigadier.exceptions.InvalidPlayerArgumentException;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
-import net.forthecrown.core.exceptions.NonPlayerExecutor;
 import net.forthecrown.core.files.CrownSignShop;
 import net.forthecrown.core.files.FtcUser;
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
-public class CoreCommand extends CrownCommand implements TabCompleter {
+public class CoreCommand extends CrownCommandBuilder {
 
     public CoreCommand(){
         super("ftccore", FtcCore.getInstance());
@@ -31,362 +36,298 @@ public class CoreCommand extends CrownCommand implements TabCompleter {
         setPermission("ftc.commands.admin");
         setUsage("&7Usage:&r /ftcore <reload | save | crownitem | announcer | reload>");
 
-        setTabCompleter(this);
         register();
     }
 
+    private static final String USER_ARG = "user";
 
     @Override
-    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) throws CrownException {
-        if(args.length < 1) return false;
+    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+        command
+                .then(argument("save")
+                        .executes(c -> doAllThings(getSender(c), true))
 
-        switch (args[0]){
-            case "save":
-                if(args.length < 2){
-                    FtcCore.saveFTC();
-                    sender.sendMessage("FTC-Core has been saved");
-                    return true;
-                }
+                        .then(argument("announcer").executes(c -> doThing(getSender(c), SaveReloadPart.ANNOUNCER, true)))
+                        .then(argument("blackmarket").executes(c -> doThing(getSender(c), SaveReloadPart.BLACK_MARKET, true)))
+                        .then(argument("balances").executes(c -> doThing(getSender(c), SaveReloadPart.BALANCES, true)))
+                        .then(argument("config").executes(c -> doThing(getSender(c), SaveReloadPart.CONFIG, true)))
+                        .then(argument("users").executes(c -> doThing(getSender(c), SaveReloadPart.USERS, true)))
+                        .then(argument("shops").executes(c -> doThing(getSender(c), SaveReloadPart.SHOPS, true)))
+                )
+                .then(argument("reloadconfirm")
+                        .executes(c -> doAllThings(getSender(c), false))
 
-                switch (args[1]){
-                    default: return false;
-                    case "config":
-                        FtcCore.getInstance().saveConfig();
-                        sender.sendMessage("Main config has been saved");
-                        return true;
+                        .then(argument("announcer").executes(c -> doThing(getSender(c), SaveReloadPart.ANNOUNCER, false)))
+                        .then(argument("blackmarket").executes(c -> doThing(getSender(c), SaveReloadPart.BLACK_MARKET, false)))
+                        .then(argument("balances").executes(c -> doThing(getSender(c), SaveReloadPart.BALANCES, false)))
+                        .then(argument("config").executes(c -> doThing(getSender(c), SaveReloadPart.CONFIG, false)))
+                        .then(argument("users").executes(c -> doThing(getSender(c), SaveReloadPart.USERS, false)))
+                        .then(argument("shops").executes(c -> doThing(getSender(c), SaveReloadPart.SHOPS, false)))
+                )
+                .then(argument("reload")
+                    .executes(c -> {
+                        CommandSender sender = getSender(c);
+                        sender.sendMessage(ChatColor.RED + "Warning! " + ChatColor.RESET + "You're about to reload one or all of the plugin's configs! Make sure you've saved!");
+                        sender.sendMessage("Do /ftccore reloadconfirm to confirm");
+                        return 0;
+                    })
+                )
+                .then(argument("user")
+                        .then(argument(USER_ARG, StringArgumentType.word())
+                                .suggests((c, b) -> getPlayerList(b).buildFuture())
 
-                    case "balances":
-                        FtcCore.getBalances().save();
-                        sender.sendMessage("Balances have been saved");
-                        return true;
+                                .then(argument("baron")
+                                        .then(argument("isBaron", BoolArgumentType.bool())
+                                                .suggests((c, b) -> listCompletions(b, "true", "false").buildFuture())
 
-                    case "announcer":
-                        FtcCore.getAnnouncer().save();
-                        sender.sendMessage("The AutoAnnouncer has been saved");
-                        return true;
+                                                .executes(c ->{
+                                                    CrownUser user = getUser(c);
+                                                    boolean isBaron = c.getArgument("isBaron", Boolean.class);
+                                                    if(user.isBaron() == isBaron) throw new CrownCommandException(user.getName() + "'s baron value is the same as entered!");
 
-                    case "users":
-                        for (FtcUser user : FtcCore.loadedUsers){ user.save(); }
-                        sender.sendMessage("All loaded user data's have been saved");
-                        return true;
+                                                    user.setBaron(isBaron);
+                                                    getSender(c).sendMessage(user.getName() + " isBaron " + user.isBaron());
+                                                    return 0;
+                                                })
+                                        )
+                                        .executes(c ->{
+                                            CrownUser user = getUser(c);
+                                            getSender(c).sendMessage(user.getName() + " is baron: " + user.isBaron());
+                                            return 0;
+                                        })
+                                )
+                                .then(argument("addpet")
+                                        .then(argument("pet", StringArgumentType.word())
+                                                .executes(c -> {
+                                                    CrownUser user = getUser(c);
 
-                    case "signshops":
-                        for(CrownSignShop shop : FtcCore.loadedShops){ shop.save(); }
-                        sender.sendMessage("All loaded SignShops have been saved");
-                        return true;
+                                                    List<String> pets = user.getPets();
+                                                    pets.add(c.getArgument("pet", String.class));
+                                                    user.setPets(pets);
 
-                    case "blackmarket":
-                        FtcCore.getBlackMarket().save();
-                        sender.sendMessage("Black market saved");
-                        return true;
-                }
+                                                    getSender(c).sendMessage(user.getName() + " pet added");
+                                                    return 0;
+                                                })
+                                        )
+                                )
+                                .then(argument("rank")
+                                        .executes(c -> {
+                                            CrownUser user = getUser(c);
+                                            getSender(c).sendMessage(user.getName() + "'s rank is " + user.getRank().getPrefix());
+                                            return 0;
+                                        })
 
-            case "reload":
-                if(args.length < 2){
-                    //FtcCore.reloadFTC();
-                    sender.sendMessage(ChatColor.RED + "Warning! " + ChatColor.RESET + "You're about to reload all of the plugin's configs without saving! Are you sure you want to do that");
-                    sender.sendMessage("Do /ftccore reloadconfirm to confirm");
-                    return true;
-                }
+                                        .then(argument("add")
+                                                .then(argument("rankToAdd", StringArgumentType.word())
+                                                        .suggests(TypeCreator::listRankSuggestions)
+                                                        .executes(c ->{
+                                                            CrownUser user = getUser(c);
+                                                            Rank rank = TypeCreator.getRank(c, "rankToAdd");
 
-            case "reloadconfirm":
-                if(args.length < 2){
-                    FtcCore.reloadFTC();
-                    sender.sendMessage("FTC-Core successfully reloaded!");
-                    return true;
-                }
+                                                            user.addRank(rank);
+                                                            getSender(c).sendMessage(user.getName() + " now has " + rank.getPrefix());
+                                                            return 0;
+                                                        })
+                                                )
+                                        )
+                                        .then(argument("remove")
+                                                .then(argument("rankToRemove", StringArgumentType.word())
+                                                        .suggests(TypeCreator::listRankSuggestions)
+                                                        .executes(c ->{
+                                                            CrownUser user = getUser(c);
+                                                            Rank rank = TypeCreator.getRank(c, "rankToRemove");
 
-                switch (args[1]){
-                    default: return false;
+                                                            user.removeRank(rank);
+                                                            c.getSource().getBukkitSender().sendMessage(user.getName() + " no longer has " + rank.getPrefix());
+                                                            return 0;
+                                                        })
+                                                )
+                                        )
+                                )
+                                .then(argument("branch")
+                                        .executes(c ->{
+                                            CrownUser user = getUser(c);
+                                            getSender(c).sendMessage(user.getName() + "'s branch is " + user.getBranch().toString());
+                                            return 0;
+                                        })
+                                        .then(argument("branchToSet", StringArgumentType.word())
+                                                .suggests(TypeCreator::listCompletionsBranch)
+                                                .executes(c ->{
+                                                    CrownUser user = getUser(c);
+                                                    Branch branch = TypeCreator.getBranch(c, "branchToSet");
+                                                    user.setBranch(branch);
+                                                    getSender(c).sendMessage(user.getName() + " is now a " + branch.getName());
+                                                    return 0;
+                                                })
+                                        )
+                                )
+                                .then(argument("addgems")
+                                        .then(argument("gemAmount", IntegerArgumentType.integer())
+                                                .executes(c ->{
+                                                    CrownUser user = getUser(c);
+                                                    int gems = c.getArgument("gemAmount", Integer.class);
 
-                    case "config":
-                        FtcCore.getInstance().reloadConfig();
-                        sender.sendMessage("Main config has been reloaded");
-                        return true;
+                                                    user.addGems(gems);
+                                                    getSender(c).sendMessage(user.getName() + " now has " + user.getGems() + " gems");
+                                                    return 0;
+                                                })
+                                        )
+                                )
+                                .then(argument("resetearnings")
+                                        .executes(c ->{
+                                            getUser(c).resetEarnings();
+                                            getSender(c).sendMessage(getUser(c).getName() + " earings' reset");
+                                            return 0;
+                                        })
+                                )
+                                .then(argument("totalreset")
+                                        .executes(c -> {
+                                            c.getSource().getBukkitSender().sendMessage("Uhm nothing lol");
+                                            return 0;
+                                        })
+                                )
+                                .then(argument("delete")
+                                        .executes(c ->{
+                                            CrownUser user = getUser(c);
 
-                    case "balances":
-                        FtcCore.getBalances().reload();
-                        sender.sendMessage("Balances have been reloaded");
-                        return true;
+                                            user.delete();
+                                            getSender(c).sendMessage(user.getName() + "'s user data has been deleted");
+                                            return 0;
+                                        })
+                                )
+                        )
+                )
+                .then(argument("announcer")
+                        .then(argument("start").executes(c -> announcerThing(c, true)))
+                        .then(argument("stop").executes(c -> announcerThing(c, false)))
+                )
+                .then(argument("item")
+                        .then(argument("crown")
+                                .then(argument("level", IntegerArgumentType.integer(1, 6))
+                                        .then(argument("owner", StringArgumentType.greedyString())
+                                                .executes(c ->{
+                                                    Player player = getPlayerSender(c);
+                                                    int level = c.getArgument("level", Integer.class);
+                                                    String owner = c.getArgument("owner", String.class);
 
-                    case "announcer":
-                        FtcCore.getAnnouncer().reload();
-                        sender.sendMessage("The AutoAnnouncer has been reloaded");
-                        return true;
+                                                    player.getInventory().addItem(CrownItems.getCrown(level, owner));
+                                                    getSender(c).sendMessage("You got a level " + level + " crown");
 
-                    case "users":
-                        for (FtcUser user : FtcCore.loadedUsers){ user.reload(); }
-                        sender.sendMessage("All loaded user data's have been reloaded");
-                        return true;
+                                                    return 0;
+                                                })
+                                        )
+                                )
+                        )
+                        .then(argument("coin")
+                                .then(argument("amount", IntegerArgumentType.integer(1))
+                                        .executes(c -> giveCoins(getPlayerSender(c), c.getArgument("amount", Integer.class)))
+                                )
+                                .executes(c -> giveCoins(getPlayerSender(c), 100))
+                        )
+                        .then(argument("royalsword")
+                                .executes(c -> {
+                                    c.getSource().getBukkitSender().sendMessage("Uhm nothing lol");
+                                    return 0;
+                                })
+                        )
+                        .then(argument("cutlass")
+                                .executes(c -> {
+                                    c.getSource().getBukkitSender().sendMessage("Uhm nothing lol");
+                                    return 0;
+                                })
+                        )
+                );
+    }
 
-                    case "signshops":
-                        for(CrownSignShop shop : FtcCore.loadedShops){ shop.reload(); }
-                        sender.sendMessage("All loaded SignShops have been reloaded");
-                        return true;
+    private int giveCoins(Player player, int amount){
+        player.getInventory().addItem(CrownItems.getCoins(amount));
+        player.sendMessage("You got " + amount + " Rhines worth of coins");
+        return 0;
+    }
 
-                    case "blackmarket":
-                        FtcCore.getBlackMarket().reload();
-                        sender.sendMessage("Black market reloaded");
-                        return true;
-                }
+    private int announcerThing(CommandContext<CommandListenerWrapper> c, boolean start){
+        if(start){
+            FtcCore.getAnnouncer().startAnnouncer();
+            getSender(c).sendMessage("Announcer started");
+            return 0;
+        }
 
-            case "announcer":
-                if(args.length < 2) return false;
+        FtcCore.getAnnouncer().stopAnnouncer();
+        getSender(c).sendMessage("Announcer stopped");
+        return 0;
+    }
 
-                if(args[1].contains("start")){
-                    FtcCore.getAnnouncer().startAnnouncer();
-                    sender.sendMessage("Announcer has been started!");
-                    return true;
-                } else {
-                    FtcCore.getAnnouncer().stopAnnouncer();
-                    sender.sendMessage("Announcer has been stopped!");
-                    return true;
-                }
+    private CrownUser getUser(CommandContext<CommandListenerWrapper> c) throws InvalidPlayerArgumentException {
+        String playerName = c.getArgument(USER_ARG, String.class);
+        UUID id = getUUID(playerName);
+        return FtcCore.getUser(id);
+    }
 
-            case "user":
-                if(args.length < 3) return false;
+    private int doThing(CommandSender sender, SaveReloadPart thingTo, boolean save){
+        thingTo.run(save);
+        if(save) sender.sendMessage(thingTo.getSaveMessage());
+        else sender.sendMessage(thingTo.getReloadMessage());
+        return 0;
+    }
 
-                UUID id = FtcCore.getOffOnUUID(args[1]);
-                if(id == null) throw new InvalidPlayerInArgument(sender, args[1]);
-                CrownUser user = FtcCore.getUser(id);
+    private int doAllThings(CommandSender sender, boolean save){
+        for (SaveReloadPart t: SaveReloadPart.values()){
+            t.run(save);
+            if(save) sender.sendMessage(t.getSaveMessage());
+            else sender.sendMessage(t.getReloadMessage());
+        }
 
-                switch (args[2]){
-                    case "addpet":
-                        if(args.length < 4) return false;
-                        List<String> tempList = user.getPets();
-                        tempList.add(args[3]);
-                        user.setPets(tempList);
-                        return true;
+        Announcer.log(Level.INFO, "FTC-Core saved");
+        return 0;
+    }
 
-                    case "rank":
-                        if(args.length < 4 || args[3].contains("list")){
-                            sender.sendMessage(args[1] + " has the following ranks: " + user.getAvailableRanks().toString());
-                            return true;
-                        }
+    private enum SaveReloadPart {
+        ANNOUNCER ("Announcer", (b) -> {
+            if(b) FtcCore.getAnnouncer().save();
+            else FtcCore.getAnnouncer().reload();
+        }),
+        BALANCES ("Balances", b -> {
+            if(b) FtcCore.getBalances().save();
+            else FtcCore.getBalances().reload();
+        }),
+        USERS ("Users", b -> {
+            if(b) for (FtcUser u: FtcCore.loadedUsers) u.save();
+            else for (FtcUser u: FtcCore.loadedUsers) u.reload();
+        }),
+        SHOPS ("Signshops", b ->{
+            if(b) for (CrownSignShop u: FtcCore.loadedShops) u.save();
+            else for (CrownSignShop u: FtcCore.loadedShops) u.reload();
+        }),
+        BLACK_MARKET ("Black Market", b -> {
+            if(b) FtcCore.getBlackMarket().save();
+            else FtcCore.getBlackMarket().reload();
+        }),
+        CONFIG ("Main Config", b -> {
+            if(b) FtcCore.getInstance().saveConfig();
+            else FtcCore.getInstance().reloadConfig();
+        });
 
-                        if(args.length < 5) return false;
+        private final String msg;
+        private final Runnable runnable;
+        SaveReloadPart(String msg, Runnable runnable){
+            this.msg = msg;
+            this.runnable = runnable;
+        }
 
-                        Rank rank;
-                        try {
-                            rank = Rank.valueOf(args[4].toUpperCase());
-                        } catch (Exception e) { return false; }
+        public String getReloadMessage() {
+            return CrownUtils.translateHexCodes("&7" + msg + " reloaded.");
+        }
 
-                        if(args[3].contains("add")){
-                            user.addRank(rank);
-                            sender.sendMessage(args[4] + " was added to " + args[1]);
-                        } else if (args[3].contains("remove")){
-                            user.removeRank(rank);
-                            sender.sendMessage(args[4] + " was removed from " + args[1]);
-                        } else if(args[3].contains("set")){
-                            user.setRank(rank, true);
-                            sender.sendMessage(args[1] + " is now a " + rank.toString());
-                        } else return false;
-                        return true;
+        public String getSaveMessage() {
+            return CrownUtils.translateHexCodes("&7" + msg + " saved.");
+        }
 
-                    case "makebaron":
-                        if(args.length < 4) {
-                            sender.sendMessage("User isBaron: " + user.isBaron());
-                            return true;
-                        }
-
-                        if(args[3].contains("true")){
-                            user.setBaron(true);
-                            sender.sendMessage(args[1] + " was made into a baron!");
-                            return true;
-                        }
-
-                        if(args[3].contains("false")){
-                            user.setBaron(false);
-                            sender.sendMessage(args[1] + " is no longer a baron");
-                            return true;
-                        }
-                        break;
-
-                    case "canswapbranch":
-                        if(args.length < 4){
-                            sender.sendMessage(user.getName() + " canSwapBranch: " + user.getCanSwapBranch());
-                            return true;
-                        }
-
-                        if(args[3].contains("true")){
-                            user.setCanSwapBranch(true, true);
-                            sender.sendMessage(args[1] + " is now allowed to swap branches");
-                            return true;
-                        }
-
-                        if(args[3].contains("false")){
-                            user.setCanSwapBranch(false, true);
-                            sender.sendMessage(args[1] + " is no longer allowed to swap branches");
-                            return true;
-                        }
-                        break;
-
-                    case "branch":
-                        if(args.length < 4){
-                            sender.sendMessage(args[1] + "'s branch is: " + user.getBranch().toString());
-                            return true;
-                        }
-                        try {
-                            user.setBranch(Branch.valueOf(args[3].toUpperCase()));
-                            sender.sendMessage(args[1] + " is now apart of the " + user.getBranch().getName());
-                            return true;
-                        } catch (Exception e){ return false; }
-
-                    case "resetearnings":
-                        user.resetEarnings();
-                        sender.sendMessage("Earnings of user " + args[1] + " has been reset");
-                        break;
-
-                    case "totalreset":
-                        user.delete();
-                        user.unload();
-                        sender.sendMessage("All user data for " + args[1] + " has been deleted");
-                        break;
-
-                    case "addgems":
-                        if(args.length < 4) return false;
-
-                        int gems;
-                        try {
-                            gems = Integer.parseInt(args[3]);
-                        } catch (NullPointerException e) { return false; }
-
-                        user.addGems(gems);
-                        sender.sendMessage("Added " + gems + " gems to " + args[1]);
-                        return true;
-                }
-
-            case "crownitem":
-                if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
-                Player player = (Player) sender;
-                if(args.length < 2) return false;
-
-                switch (args[1]){
-                    case "crown":
-                        int level = 1;
-                        if(args.length < 4) return false;
-
-                        try {
-                            level = Integer.parseInt(args[2]);
-                        } catch (Exception e){
-                            return false;
-                        }
-
-                        player.getInventory().addItem(CrownItems.getCrown(level, args[3], args[4]));
-                        sender.sendMessage("You got a crown");
-                        return true;
-
-                    case "coin":
-                        int amount = 100;
-                        if(args.length > 2){
-                            try {
-                                amount = Integer.parseInt(args[2]);
-                            } catch (Exception e){
-                                return false;
-                            }
-                        }
-
-                        player.getInventory().addItem(CrownItems.getCoins(amount));
-                        sender.sendMessage("You got " + amount + " Rhines worth of coins");
-                        return true;
-                }
-            default: return false;
+        public void run(boolean save){
+            runnable.run(save);
         }
     }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        List<String> argList = new ArrayList<>();
-        int argN = args.length -1;
-
-        if(args.length == 1){
-            argList.add("reload");
-            argList.add("save");
-            argList.add("announcer");
-            argList.add("user");
-            argList.add("crownitem");
-        }
-        if(args.length == 2){
-            switch (args[0]){
-                case "reloadconfirm":
-                case "save":
-                    argList.add("announcer");
-                    argList.add("balances");
-                    argList.add("users");
-                    argList.add("signshops");
-                    argList.add("blackmarket");
-                    argList.add("config");
-                    break;
-                case "announcer":
-                    argList.add("stop");
-                    argList.add("start");
-                    break;
-                case "user":
-                    argList.addAll(getPlayerNameList());
-                    break;
-                case "crownitem":
-                    argList.add("crown");
-                    argList.add("cutlass");
-                    argList.add("royalsword");
-                    argList.add("coin");
-                    break;
-                default:
-                    return null;
-            }
-        }
-
-        if(args.length == 4 && args[1].contains("crown")){
-            argList.add("King");
-            argList.add("Queen");
-        }
-
-        if(args.length == 5 && args[1].contains("crown")){
-            argList.addAll(getPlayerNameList());
-        }
-
-        if(args.length == 3 && args[0].contains("user")){
-            argList.add("addpet");
-            argList.add("rank");
-            argList.add("makebaron");
-            argList.add("canswapbranch");
-            argList.add("branch");
-            argList.add("addgems");
-            argList.add("totalreset");
-            argList.add("resetearnings");
-        }
-
-        if(args.length == 4){
-            switch (args[2]){
-                case "rank":
-                    argList.add("add");
-                    argList.add("remove");
-                    break;
-                case "branch":
-                    for(Branch b : Branch.values()){
-                        argList.add(b.toString());
-                    }
-                    break;
-                case "makebaron":
-                case "canswapbranch":
-                    argList.add("true");
-                    argList.add("false");
-                    break;
-                default:
-                    return new ArrayList<>();
-            }
-        }
-
-        if(args.length == 5 && args[3].contains("rank")){
-            for(Rank r : Rank.values()){
-                argList.add(r.toString());
-            }
-        }
-
-        return StringUtil.copyPartialMatches(args[argN], argList, new ArrayList<>());
+    private interface Runnable{
+        void run(boolean save);
     }
 }
-
-//TODO getters and setters for everything in the FtcUser class
-/* Needed args:
- * addpet, rank <remove | add | list>, makebaron, canswapbranch [set], branch <get | set>,
- */

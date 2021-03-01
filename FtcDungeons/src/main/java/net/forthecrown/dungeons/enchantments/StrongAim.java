@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons.enchantments;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -79,6 +81,11 @@ public class StrongAim extends Enchantment implements Listener {
     public boolean canEnchantItem(ItemStack item) {
         if (item.getType() == Material.BOW) return true;
         else return false;
+    }
+
+    @Override
+    public @NotNull Component displayName(int level) {
+        return Component.text("Strong Aim");
     }
 
     @Override

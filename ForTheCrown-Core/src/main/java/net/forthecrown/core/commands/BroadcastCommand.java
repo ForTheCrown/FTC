@@ -1,13 +1,12 @@
 package net.forthecrown.core.commands;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.exceptions.CrownException;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 
-import javax.annotation.Nonnull;
-
-public class BroadcastCommand extends CrownCommand  {
+public class BroadcastCommand extends CrownCommandBuilder {
 
     public BroadcastCommand(){
         super("broadcast", FtcCore.getInstance());
@@ -38,10 +37,20 @@ public class BroadcastCommand extends CrownCommand  {
      */
 
     @Override
+    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+        command.then(argument("announcement", StringArgumentType.greedyString())
+                .executes(context -> {
+                    FtcCore.getAnnouncer().announceToAll(context.getArgument("announcement", String.class));
+                    return 0;
+                })
+        );
+    }
+
+    /*@Override
     public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) throws CrownException {
         if(args.length < 1) return false;
 
         FtcCore.getAnnouncer().announceToAll(String.join(" ", args));
         return true;
-    }
+    }*/
 }

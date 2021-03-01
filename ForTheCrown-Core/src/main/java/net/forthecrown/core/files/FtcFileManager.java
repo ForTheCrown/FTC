@@ -1,5 +1,6 @@
 package net.forthecrown.core.files;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Announcer;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -76,6 +77,7 @@ public abstract class FtcFileManager {
         deleted = true;
         fileConfig = null;
         file = null;
+        Announcer.log(Level.INFO, "Deleting file named " + fileName + " in " + directory);
     }
 
     private void performFileNullCheck(){ //believe you me, this is better than getting an exception that just reads: "NullPointerException: null" lol

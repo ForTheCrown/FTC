@@ -1,5 +1,7 @@
 package net.forthecrown.dungeons.enchantments;
 
+import net.forthecrown.core.CrownUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -17,6 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -78,6 +81,11 @@ public class DolphinSwimmer extends Enchantment implements Listener {
     public boolean canEnchantItem(ItemStack item) {
         if (item.getType() == Material.TRIDENT) return true;
         else return false;
+    }
+
+    @Override
+    public @NotNull Component displayName(int level) {
+        return Component.text("Dolphin Swimmer");
     }
 
     @Override

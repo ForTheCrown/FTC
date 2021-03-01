@@ -2,13 +2,13 @@ package net.forthecrown.core;
 
 import net.forthecrown.core.api.*;
 import net.forthecrown.core.commands.*;
+import net.forthecrown.core.commands.brigadier.RoyalBrigadier;
 import net.forthecrown.core.commands.emotes.*;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.events.*;
 import net.forthecrown.core.events.npc.JeromeEvent;
 import net.forthecrown.core.files.*;
 import net.forthecrown.core.inventories.CustomInventoryHolder;
-import net.forthecrown.core.inventories.SignShopInventoryOwner;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -44,9 +44,12 @@ public final class FtcCore extends JavaPlugin {
     public static final Set<CrownSignShop> loadedShops = new HashSet<>();
     public static final Set<FtcUser> loadedUsers = new HashSet<>();
 
+    private RoyalBrigadier brigadier;
+
     @Override
     public void onEnable() {
         instance = this;
+        brigadier = new RoyalBrigadier(this);
 
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
@@ -100,9 +103,10 @@ public final class FtcCore extends JavaPlugin {
         new PayCommand();
         new AddBalanceCommand();
         new SetBalanceCommand();
-        new RemoveBalance();
+        new ResetBalance();
 
         new GemsCommand();
+        new ProfileCommand();
 
         new ShopCommand();
         //new ShopEditCommand();
@@ -146,7 +150,7 @@ public final class FtcCore extends JavaPlugin {
 
         for (Player p: Bukkit.getOnlinePlayers()){
             InventoryHolder holder = p.getOpenInventory().getTopInventory().getHolder();
-            if(holder instanceof CustomInventoryHolder || holder instanceof SignShopInventoryOwner){
+            if(holder instanceof CustomInventoryHolder || holder instanceof SignShop){
                 p.closeInventory();
             }
         }
@@ -288,7 +292,7 @@ public final class FtcCore extends JavaPlugin {
     }
 
     public static Integer getMaxMoneyAmount(){
-        return getInstance().maxMoneyAmount;
+        return instance.maxMoneyAmount;
     }
 
     public static long getBranchSwapCooldown() {
@@ -310,9 +314,25 @@ public final class FtcCore extends JavaPlugin {
     }
 
 
-    public static SignShop getShop(Location signShop) throws Exception { //gets a signshop, throws a null exception if the shop file doesn't exist
-        for(CrownSignShop shop : loadedShops) if(shop.getLocation().equals(signShop)) return shop;
-        return new CrownSignShop(signShop);
+    public static SignShop getShop(Location signShop) { //gets a signshop, throws a null exception if the shop file doesn't exist
+        SignShop toReturn = null;
+
+        for(CrownSignShop shop : loadedShops){
+            if(shop.getLocation().equals(signShop)){
+                toReturn = shop;
+                break;
+            }
+        }
+        if(toReturn == null){
+            try {
+                toReturn = new CrownSignShop(signShop);
+            } catch (Exception e){
+                Announcer.log(Level.SEVERE, e.getMessage());
+                toReturn = null;
+            }
+        }
+
+        return toReturn;
     }
     public static SignShop createSignShop(Location location, ShopType shopType, Integer price, UUID ownerUUID){ //creates a signshop
         return new CrownSignShop(location, shopType, price, ownerUUID);
@@ -338,7 +358,7 @@ public final class FtcCore extends JavaPlugin {
     public static UUID getOffOnUUID(String playerName){
         UUID toReturn;
         try{
-            toReturn = Bukkit.getPlayer(playerName).getUniqueId();
+            toReturn = Bukkit.getPlayerExact(playerName).getUniqueId();
         } catch (NullPointerException e){
             try {
                 toReturn = Bukkit.getOfflinePlayerIfCached(playerName).getUniqueId();

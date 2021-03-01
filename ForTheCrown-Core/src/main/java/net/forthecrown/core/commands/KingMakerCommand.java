@@ -1,32 +1,67 @@
 package net.forthecrown.core.commands;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.exceptions.InvalidArgumentException;
-import net.forthecrown.core.exceptions.InvalidPlayerInArgument;
-import net.md_5.bungee.api.ChatColor;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.util.StringUtil;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
-public class KingMakerCommand extends CrownCommand implements TabCompleter {
+public class KingMakerCommand extends CrownCommandBuilder {
 
     public KingMakerCommand(){
         super("kingmaker", FtcCore.getInstance());
 
         setDescription("This command is used to assign and unassign a king or queen");
         setUsage("&7Usage:&r /kingmaker <remove | player> [king | queen]");
-        setTabCompleter(this);
         register();
     }
 
     @Override
+    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+        command
+                .executes(c -> {
+                    c.getSource().getBukkitSender().sendMessage("The Current king is " + Bukkit.getOfflinePlayer(FtcCore.getKing()).getName());
+                    return 0;
+                })
+                .then(argument("remove")
+                        .executes(c ->{
+                            if(FtcCore.getKing() == null) throw new CrownCommandException("There is already no king");
+
+                            FtcCore.setKing(null);
+                            c.getSource().getBukkitSender().sendMessage("King has been removed");
+                            return 0;
+                        })
+                )
+                .then(argument("player", StringArgumentType.word())
+                        .suggests((c, b) -> getPlayerList(b).buildFuture())
+                        .executes(c -> makeKing(c, false))
+
+                        .then(argument("queen").executes(c -> makeKing(c, true)))
+                        .then(argument("king").executes(c -> makeKing(c, false)))
+                );
+    }
+
+    private int makeKing(CommandContext<CommandListenerWrapper> c, boolean isQueen) throws CrownCommandException {
+        if(FtcCore.getKing() != null) throw new CrownCommandException("There already is a king");
+
+        String playerName = c.getArgument("player", String.class);
+        UUID id = getUUID(playerName);
+
+        FtcCore.setKing(id);
+        c.getSource().getBukkitSender().sendMessage(playerName + " is now the new king :D");
+
+        String prefix = "&l[&e&lKing&r&l] &r";
+        if(isQueen) prefix = "&l[&e&lQueen&r&l] &r";
+        Bukkit.dispatchCommand(c.getSource().getBukkitSender(), "tab player " + playerName + " tabprefix " + prefix);
+        return 0;
+    }
+
+    /*@Override
     public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
         if(args.length < 1) return false;
 
@@ -69,6 +104,6 @@ public class KingMakerCommand extends CrownCommand implements TabCompleter {
             argList.add("queen");
             argList.add("king");
         }
-        return StringUtil.copyPartialMatches(args[args.length - 1], argList, new ArrayList<>());
-    }
+        return argList;
+    }*/
 }

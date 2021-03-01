@@ -74,15 +74,8 @@ public final class ClickEventHandler {
         if(allow){
             if(allowedToUseCommand.contains(player)) return;
             allowedToUseCommand.add(player);
-            CLICK_COMMAND.register();
-            Bukkit.getScheduler().runTaskLater(FtcCore.getInstance(), () -> {
-                allowedToUseCommand.remove(player);
-                CLICK_COMMAND.unregister();
-            }, 30*20); //automatically makes it so you can't use the NPC command after a minute
-        } else{
-            allowedToUseCommand.remove(player);
-            CLICK_COMMAND.unregister();
-        }
+            Bukkit.getScheduler().runTaskLater(FtcCore.getInstance(), () -> allowedToUseCommand.remove(player), 30*20); //automatically makes it so you can't use the NPC command after a minute
+        } else allowedToUseCommand.remove(player);
     }
 
     public static String getCommand(String id, String... args){

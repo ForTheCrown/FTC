@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.dungeons.bosses.Drawned;
@@ -13,6 +14,8 @@ import net.forthecrown.dungeons.enchantments.DolphinSwimmer;
 import net.forthecrown.dungeons.enchantments.HealingBlock;
 import net.forthecrown.dungeons.enchantments.PoisonCrit;
 import net.forthecrown.dungeons.enchantments.StrongAim;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -37,6 +40,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -50,7 +54,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
     List<ItemStack> drawnedItems = new ArrayList<>();
     //List<ItemStack> magmacubeItems = new ArrayList<ItemStack>();
     ItemMeta meta;
-    List<String> lore = new ArrayList<>();
+    List<Component> lore = Collections.singletonList(Component.text("Dungeon Item"));
     Plugin plugin = this;
 
     Zhambie z = new Zhambie(this);
@@ -65,7 +69,6 @@ public final class Dungeons extends JavaPlugin implements Listener {
     DolphinSwimmer enchant4 = new DolphinSwimmer(new NamespacedKey(this, "dolphinswimmer"), this);
 
     public void onEnable() {
-        lore.add("Dungeon Item");
 
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
@@ -118,26 +121,19 @@ public final class Dungeons extends JavaPlugin implements Listener {
     }
 
 
-    private void makeItem(List<ItemStack> list, Material mat, int amount, String... name) {
-        ItemStack item = new ItemStack(mat, amount);
-        meta = item.getItemMeta();
-        meta.setLore(lore);
-        if (name != null) {
-            String itemname = "";
-            for (String str : name) {
-                itemname = itemname + str;
-            }
-            meta.setDisplayName(itemname);
-        }
-        item.setItemMeta(meta);
+    private void makeItem(List<ItemStack> list, Material mat, int amount, @Nullable String name) {
+        ItemStack item = CrownUtils.makeItem(mat, amount, false, name);
         list.add(item);
+    }
+    private void makeItem(List<ItemStack> list, Material mat, int amount ) {
+        makeItem(list, mat, amount, null);
     }
 
 
     private void makeSpecialItem(List<ItemStack> list, Material mat, int amount) {
         ItemStack item = new ItemStack(mat, amount);
         meta = item.getItemMeta();
-        meta.setLore(lore);
+        meta.lore(lore);
         item.setItemMeta(meta);
 
         PotionMeta pmeta = (PotionMeta) item.getItemMeta();
@@ -147,7 +143,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
     }
 
-    ArrayList<Integer> mayChange = new ArrayList<>();
+    List<Integer> mayChange = new ArrayList<>();
 
     @EventHandler(ignoreCancelled = true)
     public void onHit(EntityDamageByEntityEvent event) {
@@ -212,16 +208,16 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
                     ItemStack sword = new ItemStack(Material.GOLDEN_SWORD, 1);
                     ItemMeta swordMeta = sword.getItemMeta();
-                    swordMeta.setDisplayName(ChatColor.GOLD + "-" + ChatColor.YELLOW + ChatColor.BOLD + "Royal Sword" + ChatColor.GOLD + "-");
-                    ArrayList<String> lore = new ArrayList<>();
-                    lore.add(ChatColor.GRAY + "Rank I");
-                    lore.add(ChatColor.DARK_GRAY + "------------------------------");
-                    lore.add(ChatColor.GOLD + "The bearer of this weapon has proven themselves,");
-                    lore.add(ChatColor.GOLD + "not only to the Crown, but also to the Gods...");
-                    lore.add(ChatColor.DARK_GRAY + "------------------------------");
-                    lore.add(ChatColor.AQUA + "0/1000" + ChatColor.DARK_AQUA + " Zombies to Rank Up.");
-                    lore.add(ChatColor.DARK_GRAY + "Donators can upgrade Royal tools beyond Rank 5.");
-                    swordMeta.setLore(lore);
+                    swordMeta.displayName(Component.text(ChatColor.GOLD + "-" + ChatColor.YELLOW + ChatColor.BOLD + "Royal Sword" + ChatColor.GOLD + "-"));
+                    ArrayList<Component> lore = new ArrayList<>();
+                    lore.add(Component.text(ChatColor.GRAY + "Rank I"));
+                    lore.add(Component.text(ChatColor.DARK_GRAY + "------------------------------"));
+                    lore.add(Component.text(ChatColor.GOLD + "The bearer of this weapon has proven themselves,"));
+                    lore.add(Component.text(ChatColor.GOLD + "not only to the Crown, but also to the Gods..."));
+                    lore.add(Component.text(ChatColor.DARK_GRAY + "------------------------------"));
+                    lore.add(Component.text(ChatColor.AQUA + "0/1000" + ChatColor.DARK_AQUA + " Zombies to Rank Up."));
+                    lore.add(Component.text(ChatColor.DARK_GRAY + "Donators can upgrade Royal tools beyond Rank 5."));
+                    swordMeta.lore(lore);
                     swordMeta.setUnbreakable(true);
                     AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), "generic.attackDamage", 7, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
                     swordMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, modifier);
@@ -440,7 +436,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
 		list.add(item);
 	}*/
 
-    private LootTable empty = new LootTable() {
+    private final LootTable empty = new LootTable() {
         @Override
         public NamespacedKey getKey() {return new NamespacedKey(plugin, "empty");}
         @Override

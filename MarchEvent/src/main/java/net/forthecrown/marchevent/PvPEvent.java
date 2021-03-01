@@ -6,6 +6,7 @@ import net.forthecrown.core.api.Announcer;
 import net.forthecrown.marchevent.commands.CrownGameCommand;
 import net.forthecrown.marchevent.events.InEventListener;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -22,6 +23,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 
 import java.util.Arrays;
@@ -36,7 +38,7 @@ public class PvPEvent {
 
     public static final List<ItemStack> ITEM_LIST = Arrays.asList(
             new ItemStack(Material.STONE_SWORD, 1),
-            new ItemStack(Material.ARROW, 16),
+            new ItemStack(Material.ARROW, 6),
             new ItemStack(Material.BOW),
             new ItemStack(Material.SHEARS)
     );
@@ -62,6 +64,17 @@ public class PvPEvent {
     private static BossBar bar;
     private int tickerId;
 
+    public static Team yellowTeam;
+    public static Team blueTeam;
+
+    public PvPEvent(){
+        yellowTeam = EventMain.getInstance().getServer().getScoreboardManager().getMainScoreboard().getTeam("yellowTeam");
+        blueTeam = EventMain.getInstance().getServer().getScoreboardManager().getMainScoreboard().getTeam("blueTeam");
+
+        yellowTeam.setAllowFriendlyFire(false);
+        blueTeam.setAllowFriendlyFire(false);
+    }
+
     public static void tellPlayersInVicinity(String message){
         List<Player> players = ARENA_VICINITY.getPlayersIn();
         message = CrownUtils.translateHexCodes(message);
@@ -72,9 +85,10 @@ public class PvPEvent {
         Announcer.log(Level.INFO, message);
     }
 
-    public void startEvent(){
+    public void startEvent(boolean countdown){
         tellPlayersInVicinity("&eRound starting!");
         EventMain.getInstance().getServer().getPluginManager().registerEvents(inEventListener, EventMain.getInstance());
+        logGame();
 
         resetEvent(false);
         bar = Bukkit.createBossBar("", BarColor.BLUE, BarStyle.SEGMENTED_10);
@@ -83,9 +97,13 @@ public class PvPEvent {
             bar.addPlayer(p);
         }
 
-        setDoorBlocks(Material.AIR);
-        tickerId = startTicker();
-        logGame();
+        if(countdown){
+            this.countdown = 6;
+            countdownID = startBeginningCountdown();
+        } else {
+            setDoorBlocks(Material.AIR);
+            tickerId = startTicker();
+        }
     }
 
     public void endEvent(){
@@ -94,6 +112,36 @@ public class PvPEvent {
         bar.removeAll();
 
         resetEvent(true);
+    }
+
+    private int countdownID;
+    private int countdown = 6;
+
+    public int startBeginningCountdown(){
+        return Bukkit.getScheduler().scheduleSyncRepeatingTask(EventMain.getInstance(), () -> {
+            countdown--;
+
+            if(countdown < 1){
+                setDoorBlocks(Material.AIR);
+                tickerId = startTicker();
+                stopBeginningCountdown();
+
+                for (Player p: inEvent){
+                    p.showTitle(Title.title(Component.text(ChatColor.YELLOW + "Go!"), Component.text("")));
+                    p.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f, 1.0f);
+                }
+
+            } else {
+                for (Player p: ARENA_VICINITY.getPlayersIn()){
+                    p.showTitle(Title.title(Component.text(ChatColor.YELLOW + "" + countdown), Component.text("gates open in")));
+                }
+            }
+        }, 0, 20);
+    }
+
+    public void stopBeginningCountdown(){
+        Bukkit.getScheduler().cancelTask(countdownID);
+        countdown = 6;
     }
 
     public void clearItemAndEffects(String name){
@@ -124,14 +172,14 @@ public class PvPEvent {
             Score score = crown.getScore(p.getName());
             score.setScore(score.getScore() + 3);
 
-            p.sendMessage(ChatColor.GRAY + "You got " + ChatColor.YELLOW + " 3 points" + ChatColor.GRAY + " for winning!");
+            p.sendMessage(ChatColor.GRAY + "You got" + ChatColor.YELLOW + " 3 points" + ChatColor.GRAY + " for winning!");
         }
 
         for (Player p: losingTeam){
             Score score = crown.getScore(p.getName());
             score.setScore(score.getScore() + 1);
 
-            p.sendMessage(ChatColor.GRAY + "You got " + ChatColor.YELLOW + " 1 point" + ChatColor.GRAY + " for surviving!");
+            p.sendMessage(ChatColor.GRAY + "You got" + ChatColor.YELLOW + " 1 point" + ChatColor.GRAY + " for surviving!");
         }
     }
 
@@ -149,11 +197,23 @@ public class PvPEvent {
                 clearItemAndEffects(p.getName());
             }
 
+            createTeams();
             CrownGameCommand.reset();
             inEvent.clear();
             BLUE_TEAM.clear();
             YELLOW_TEAM.clear();
         }
+    }
+
+    public void createTeams(){
+        yellowTeam.unregister();
+        blueTeam.unregister();
+
+        yellowTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("yellowTeam");
+        blueTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("blueTeam");
+
+        yellowTeam.setAllowFriendlyFire(false);
+        blueTeam.setAllowFriendlyFire(false);
     }
 
     public void setCenterBlocks(Material mat){
@@ -235,6 +295,9 @@ public class PvPEvent {
             clearItemAndEffects(p.getName());
 
             giveItems(p, yellow);
+            if(yellow) yellowTeam.addEntry(p.getUniqueId().toString());
+            else blueTeam.addEntry(p.getUniqueId().toString());
+
             inEvent.add(p);
         }
     }
@@ -244,7 +307,7 @@ public class PvPEvent {
 
         PotionMeta meta = (PotionMeta) stack.getItemMeta();
         meta.addCustomEffect(new PotionEffect(PotionEffectType.HEAL, 0, 0), true);
-        meta.displayName(Component.text(ChatColor.WHITE + "Splash potion of Healing"));
+        meta.setDisplayName(ChatColor.WHITE + "Splash potion of Healing");
 
         stack.setItemMeta(meta);
 

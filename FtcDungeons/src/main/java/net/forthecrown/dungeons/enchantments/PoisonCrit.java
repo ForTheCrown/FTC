@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons.enchantments;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -16,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -82,6 +84,11 @@ public class PoisonCrit extends Enchantment implements Listener {
     @Override
     public boolean canEnchantItem(ItemStack item) {
         return false;
+    }
+
+    @Override
+    public @NotNull Component displayName(int level) {
+        return Component.text("Poison Crit");
     }
 
     @Override

@@ -1,19 +1,19 @@
 package net.forthecrown.core.commands;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.exceptions.InvalidArgumentException;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.md_5.bungee.api.ChatColor;
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
 import java.text.DecimalFormat;
 import java.util.*;
 
-public class BalanceTopCommand extends CrownCommand  {
+public class BalanceTopCommand extends CrownCommandBuilder {
     public BalanceTopCommand() {
         super("balancetop", FtcCore.getInstance());
 
@@ -42,6 +42,22 @@ public class BalanceTopCommand extends CrownCommand  {
      */
 
     @Override
+    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+        command
+                .executes(context -> {
+                    sendBaltopMessage(context.getSource().getBukkitSender(), 0);
+                    return 0;
+                })
+                .then(argument("page", IntegerArgumentType.integer(0, Math.round(((float) FtcCore.getBalances().getBalanceMap().size())/10)))
+                        .executes(context -> {
+                            Integer soup = context.getArgument("page", Integer.class);
+                            sendBaltopMessage(context.getSource().getBukkitSender(), soup);
+                            return 0;
+                        })
+                );
+    }
+
+    /*@Override
     public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) throws CrownException {
         int page = 0;
         if(args.length >= 1) {
@@ -53,7 +69,7 @@ public class BalanceTopCommand extends CrownCommand  {
         }
         sendBaltopMessage(sender, page);
         return true;
-    }
+    }*/
 
     private void sendBaltopMessage(CommandSender sender, @Nonnegative int page){
         List<String> baltopList = getBaltopList();
@@ -64,7 +80,7 @@ public class BalanceTopCommand extends CrownCommand  {
         int stupidity = Math.round(((float) baltopList.size())/10); //This is so that if you have a weird number of balances, say 158, there's an extra page for those last 8 ones
 
         if(page > stupidity) {
-            sender.sendMessage("Out of range");
+            sender.sendMessage(ChatColor.GRAY + "Out of range");
             return;
         }
 
@@ -73,7 +89,7 @@ public class BalanceTopCommand extends CrownCommand  {
             if((index*10) + i >= baltopList.size()) break;
             sender.sendMessage(ChatColor.GOLD + "" + ((index*10) + i+1) + ") " + ChatColor.RESET + baltopList.get((index*10) + i));
         }
-        sender.sendMessage(ChatColor.GRAY + "------ "  + ChatColor.YELLOW + "Page " + (index+1) + "/" + stupidity + ChatColor.GRAY + " ------");
+        sender.sendMessage(ChatColor.GRAY + "------- "  + ChatColor.YELLOW + "Page " + (index+1) + "/" + stupidity + ChatColor.GRAY + " -------");
     }
 
     private List<String> getBaltopList(){

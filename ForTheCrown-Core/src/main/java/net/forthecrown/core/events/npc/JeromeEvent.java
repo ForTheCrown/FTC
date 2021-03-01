@@ -69,14 +69,14 @@ public class JeromeEvent implements Listener, ClickEventTask {
             Branch royals = Branch.ROYALS;
 
             if(user.getBranch() == Branch.ROYALS){
-                player.sendMessage(ChatColor.GRAY + "You are already apart of the Royals!");
+                player.sendMessage(ChatColor.GRAY + "You are already a part of the Royals!");
                 return;
             }
 
             if(!user.performBranchSwappingCheck()) return;
 
             if(user.getRank() != Rank.DEFAULT){
-                player.sendMessage(ChatColor.GRAY + "You must have the default rank to join the" + royals.getName());
+                player.sendMessage(ChatColor.GRAY + "You must have the default rank to join the " + royals.getName());
                 return;
             }
 

@@ -1,5 +1,6 @@
 package net.forthecrown.marchevent.commands;
 
+import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.commands.CrownCommand;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.exceptions.InvalidCommandExecution;
@@ -74,7 +75,7 @@ public class CrownGameCommand extends CrownCommand implements TabCompleter {
                     return true;
                 }
 
-                event.startEvent();
+                event.startEvent(true);
                 sender.sendMessage("Starting event");
                 break;
 
