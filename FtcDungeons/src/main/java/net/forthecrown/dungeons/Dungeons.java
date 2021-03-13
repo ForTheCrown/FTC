@@ -7,15 +7,12 @@ import net.forthecrown.dungeons.bosses.Drawned;
 import net.forthecrown.dungeons.bosses.HideySpidey;
 import net.forthecrown.dungeons.bosses.Skalatan;
 import net.forthecrown.dungeons.bosses.Zhambie;
-import net.forthecrown.dungeons.commands.addDonator;
 import net.forthecrown.dungeons.commands.addlore;
-import net.forthecrown.dungeons.commands.removeDonator;
 import net.forthecrown.dungeons.enchantments.DolphinSwimmer;
 import net.forthecrown.dungeons.enchantments.HealingBlock;
 import net.forthecrown.dungeons.enchantments.PoisonCrit;
 import net.forthecrown.dungeons.enchantments.StrongAim;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -34,7 +31,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffectType;
@@ -55,7 +51,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
     //List<ItemStack> magmacubeItems = new ArrayList<ItemStack>();
     ItemMeta meta;
     List<Component> lore = Collections.singletonList(Component.text("Dungeon Item"));
-    Plugin plugin = this;
+    static Dungeons plugin;
 
     Zhambie z = new Zhambie(this);
     Skalatan s = new Skalatan(this);
@@ -63,18 +59,32 @@ public final class Dungeons extends JavaPlugin implements Listener {
     Drawned d = new Drawned(this);
     //Magmalovania m = new Magmalovania(this);
 
-    StrongAim enchant1 = new StrongAim(new NamespacedKey(this, "strongaim"), this);
-    HealingBlock enchant2 = new HealingBlock(new NamespacedKey(this, "healingblock"), this);
-    PoisonCrit enchant3 = new PoisonCrit(new NamespacedKey(this, "criticalpoison"), this);
-    DolphinSwimmer enchant4 = new DolphinSwimmer(new NamespacedKey(this, "dolphinswimmer"), this);
+    StrongAim strongAim;
+    HealingBlock healingBlock;
+    PoisonCrit poisonCrit;
+    DolphinSwimmer dolphinSwimmer;
 
     public void onEnable() {
+        try {
+            Field f = Enchantment.class.getDeclaredField("acceptingNew");
+            f.setAccessible(true);
+            f.set(null, true);
+
+            strongAim = new StrongAim(new NamespacedKey(this, "strongaim"), this);
+            healingBlock = new HealingBlock(new NamespacedKey(this, "healingblock"), this);
+            poisonCrit = new PoisonCrit(new NamespacedKey(this, "criticalpoison"), this);
+            dolphinSwimmer = new DolphinSwimmer(new NamespacedKey(this, "dolphinswimmer"), this);
+            loadEnchantments();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        plugin = this;
 
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
 
-        new addDonator(this);
-        new removeDonator(this);
         new addlore(this);
 
         getServer().getPluginManager().registerEvents(this, this);
@@ -85,12 +95,6 @@ public final class Dungeons extends JavaPlugin implements Listener {
         //getServer().getPluginManager().registerEvents(m, this);
 
         fillLists();
-
-        loadEnchantments();
-        getServer().getPluginManager().registerEvents(enchant1, this);
-        getServer().getPluginManager().registerEvents(enchant2, this);
-        getServer().getPluginManager().registerEvents(enchant3, this);
-        getServer().getPluginManager().registerEvents(enchant4, this);
     }
 
     private void fillLists() {
@@ -127,6 +131,12 @@ public final class Dungeons extends JavaPlugin implements Listener {
     }
     private void makeItem(List<ItemStack> list, Material mat, int amount ) {
         makeItem(list, mat, amount, null);
+    }
+
+    private static boolean regged = false;
+    public static void enchantCheck(){
+        if(regged) return;
+        regged = true;
     }
 
 
@@ -312,28 +322,28 @@ public final class Dungeons extends JavaPlugin implements Listener {
                 ItemStack item = new ItemStack(Material.BOW, 1);
                 ItemMeta meta = item.getItemMeta();
                 ArrayList<String> lore = new ArrayList<>();
-                lore.add(ChatColor.GRAY + enchant1.getName());
+                lore.add(ChatColor.GRAY + strongAim.getName());
                 meta.setLore(lore);
                 item.setItemMeta(meta);
-                item.addUnsafeEnchantment(enchant1, 1);
+                item.addUnsafeEnchantment(strongAim, 1);
                 player.getInventory().addItem(item);
 
                 ItemStack item2 = new ItemStack(Material.SHIELD, 1);
                 ItemMeta meta2 = item2.getItemMeta();
                 ArrayList<String> lore2 = new ArrayList<>();
-                lore2.add(ChatColor.GRAY + enchant2.getName());
+                lore2.add(ChatColor.GRAY + healingBlock.getName());
                 meta2.setLore(lore2);
                 item2.setItemMeta(meta2);
-                item2.addUnsafeEnchantment(enchant2, 1);
+                item2.addUnsafeEnchantment(healingBlock, 1);
                 player.getInventory().addItem(item2);
 
                 ItemStack item3 = new ItemStack(Material.DIAMOND_SWORD, 1);
                 ItemMeta meta3 = item3.getItemMeta();
                 ArrayList<String> lore3 = new ArrayList<>();
-                lore3.add(ChatColor.GRAY + enchant3.getName());
+                lore3.add(ChatColor.GRAY + poisonCrit.getName());
                 meta3.setLore(lore3);
                 item3.setItemMeta(meta3);
-                item3.addUnsafeEnchantment(enchant3, 1);
+                item3.addUnsafeEnchantment(poisonCrit, 1);
                 player.getInventory().addItem(item3);
 
                 ItemStack item4 = new ItemStack(Material.GOLDEN_SWORD, 1);
@@ -363,10 +373,10 @@ public final class Dungeons extends JavaPlugin implements Listener {
                 ItemStack item5 = new ItemStack(Material.TRIDENT, 1);
                 ItemMeta meta5 = item5.getItemMeta();
                 ArrayList<String> lore5 = new ArrayList<>();
-                lore5.add(ChatColor.GRAY + enchant4.getName());
+                lore5.add(ChatColor.GRAY + dolphinSwimmer.getName());
                 meta5.setLore(lore5);
                 item5.setItemMeta(meta5);
-                item5.addUnsafeEnchantment(enchant4, 1);
+                item5.addUnsafeEnchantment(dolphinSwimmer, 1);
                 player.getInventory().addItem(item5);
             }
 			/*else if (name.contains(ChatColor.RED + "Magmalovania")) {
@@ -791,7 +801,7 @@ public final class Dungeons extends JavaPlugin implements Listener {
 
     @SuppressWarnings("unchecked")
     public void onDisable() {
-        try {
+        /*try {
             Field byIdField = Enchantment.class.getDeclaredField("byId");
             Field byNameField = Enchantment.class.getDeclaredField("byName");
 
@@ -801,53 +811,26 @@ public final class Dungeons extends JavaPlugin implements Listener {
             HashMap<NamespacedKey, Enchantment> byId = (HashMap<NamespacedKey, Enchantment>) byIdField.get(null);
             HashMap<NamespacedKey, Enchantment> byName = (HashMap<NamespacedKey, Enchantment>) byNameField.get(null);
 
-            byId.remove(enchant1.getKey());
-            byName.remove(enchant1.getKey());
+            byId.remove(strongAim.getKey());
+            byName.remove(strongAim.getKey());
 
-            byId.remove(enchant2.getKey());
-            byName.remove(enchant2.getKey());
+            byId.remove(poisonCrit.getKey());
+            byName.remove(poisonCrit.getKey());
 
-            byId.remove(enchant3.getKey());
-            byName.remove(enchant3.getKey());
+            byId.remove(healingBlock.getKey());
+            byName.remove(healingBlock.getKey());
 
-            byId.remove(enchant4.getKey());
-            byName.remove(enchant4.getKey());
+            byId.remove(dolphinSwimmer.getKey());
+            byName.remove(dolphinSwimmer.getKey());
 
         } catch (Exception ignored) {
-        }
+        }*/
     }
 
     private void loadEnchantments() {
-        try {
-            try {
-                Field f = Enchantment.class.getDeclaredField("acceptingNew");
-                f.setAccessible(true);
-                f.set(null, true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Enchantment.registerEnchantment(enchant1);
-            } catch (IllegalArgumentException ignored) {
-            }
-
-            try {
-                Enchantment.registerEnchantment(enchant2);
-            } catch (IllegalArgumentException ignored) {
-            }
-
-            try {
-                Enchantment.registerEnchantment(enchant3);
-            } catch (IllegalArgumentException ignored) {
-            }
-
-            try {
-                Enchantment.registerEnchantment(enchant4);
-            } catch (IllegalArgumentException ignored) {
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Enchantment.registerEnchantment(strongAim);
+        Enchantment.registerEnchantment(healingBlock);
+        Enchantment.registerEnchantment(poisonCrit);
+        Enchantment.registerEnchantment(dolphinSwimmer);
     }
 }

@@ -17,12 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * This exists for the sole reason of my laziness of throwing CrownExceptions in command classes, instead of writing return false statements with messages
- * {@link CrownException}
- */
 
-@Deprecated
+/**
+ * Deprecated in favour of CrownCommandBuilder, which uses Brigadier
+ */
 public abstract class CrownCommand extends Command {
 
     private final String prefix;
@@ -41,7 +39,6 @@ public abstract class CrownCommand extends Command {
         setPermissionMessage("&7You do not have permission to use this command!");
     }
 
-    @Deprecated
     public abstract boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) throws CrownException;
 
     protected static List<String> getPlayerNameList(){

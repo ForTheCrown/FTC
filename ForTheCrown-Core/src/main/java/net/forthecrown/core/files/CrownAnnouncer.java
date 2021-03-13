@@ -11,14 +11,14 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrownAnnouncer extends FtcFileManager implements Announcer {
+public class CrownAnnouncer extends FtcFileManager<FtcCore> implements Announcer {
 
     private List<String> thingsToAnnounce = new ArrayList<>();
     private long delay;
     int id = -1;
 
     public CrownAnnouncer() {
-        super("announcer");
+        super("announcer", FtcCore.getInstance());
 
         if(fileDoesntExist) addDefaults();
         else reload();
@@ -99,7 +99,7 @@ public class CrownAnnouncer extends FtcFileManager implements Announcer {
     }
 
     @Override
-    public void announceToAllWithPerms(String message, @Nullable String permission){
+    public void announce(String message, @Nullable String permission){
         message = CrownUtils.translateHexCodes(CrownUtils.formatEmojis(message));
         for (Player p: Bukkit.getOnlinePlayers()){
             if(permission == null || p.hasPermission(permission)) p.sendMessage(message);

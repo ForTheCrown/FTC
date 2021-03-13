@@ -127,10 +127,12 @@ public class SellShop {
     private ItemStack getSellableItem(Material material){
         int price = user.getItemPrice(material);
         SellAmount sellAmount = user.getSellAmount();
+        String sellAmountNum = sellAmount.getInt().toString();
+        if(sellAmount == SellAmount.ALL) sellAmountNum = "all";
         String[] asd = {
                 "&eValue: " + price + " Rhines per item,",
                 ChatColor.GOLD + "" + price*64 + " Rhines per stack.",
-                "&7Amount you will sell: " + sellAmount.getInt().toString().replaceAll("-1", "all") + ".",
+                "&7Amount you will sell: " + sellAmountNum + ".",
                 "&7Change the amount setting on the right."
         };
         return CrownUtils.makeItem(material, 1, true, null, asd);

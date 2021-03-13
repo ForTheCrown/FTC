@@ -1,6 +1,8 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.BranchFlag;
 import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.CrownWorldGuard;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
@@ -22,6 +24,7 @@ public class ShopUseListener implements Listener {
         //just the variables
         Player player = event.getPlayer();
         CrownUser customer = event.getCustomer();
+        CrownUser owner = event.getOwner();
 
         SignShop shop = event.getShop();
         ShopInventory shopInv = shop.getInventory();
@@ -32,6 +35,15 @@ public class ShopUseListener implements Listener {
             shop.setOutOfStock(true);
             event.setCancelled(true);
             throw new BrokenShopException(player);
+        }
+
+        if(!BranchFlag.flagAllows(owner, CrownWorldGuard.SHOP_OWNERSHIP_FLAG)){
+            customer.sendMessage("&7The owner of this shop is not allowed to sell items here (" + owner.getBranch().getSingularName() + ")");
+            return;
+        }
+        if(!BranchFlag.flagAllows(customer, CrownWorldGuard.SHOP_USAGE_FLAG)){
+            customer.sendMessage("&7You are not allowed to use shops here! " + owner.getBranch().getName() + " only!");
+            return;
         }
 
         Inventory playerInv = player.getInventory();
@@ -65,14 +77,13 @@ public class ShopUseListener implements Listener {
                     throw new CrownException(player, "&7Shop does not have enough stock");
                 }
 
-                if(shopInv.isEmpty() || !shopInv.containsAtLeast(example, example.getAmount())) shop.setOutOfStock(true);
                 event.addOwnerBalance(shop.getPrice());
 
                 final String longAF = ChatColor.GOLD + player.getName() +
                         ChatColor.GRAY + " bought " +
                         ChatColor.YELLOW + example.getAmount() + " " +
                         CrownUtils.getItemNormalName(example) +
-                        ChatColor.GRAY + " from you for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
+                        ChatColor.GRAY + " from you for " + ChatColor.GOLD + CrownUtils.decimalizeNumber(shop.getPrice()) + " Rhines";
 
                 event.getOwner().sendMessage(longAF);
 
@@ -88,13 +99,13 @@ public class ShopUseListener implements Listener {
                     return;
                 }
 
-                playerInv.addItem(example); //adds the item to player's inventory
-                event.setCustomerBalance(event.getCustomerBalance() - shop.getPrice());
-
                 String customerMsg1 = ChatColor.GRAY + "You bought " +
                         ChatColor.YELLOW + example.getAmount() + " " +
                         CrownUtils.getItemNormalName(example) +
-                        ChatColor.GRAY + " for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
+                        ChatColor.GRAY + " for " + ChatColor.GOLD + CrownUtils.decimalizeNumber(shop.getPrice()) + " Rhines";
+
+                playerInv.addItem(example); //adds the item to player's inventory
+                event.setCustomerBalance(event.getCustomerBalance() - shop.getPrice());
 
                 customer.sendMessage(customerMsg1);
                 break;
@@ -123,18 +134,19 @@ public class ShopUseListener implements Listener {
                 final String customerMsg = ChatColor.GRAY + "You sold " +
                         ChatColor.YELLOW + example.getAmount() + " " +
                         CrownUtils.getItemNormalName(example) +
-                        ChatColor.GRAY + " for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
+                        ChatColor.GRAY + " for " + ChatColor.GOLD + CrownUtils.decimalizeNumber(shop.getPrice()) + " Rhines";
 
                 customer.sendMessage(customerMsg);
 
                 if(shop.getType() == ShopType.SELL_SHOP) {
-                    event.setOwnerBalance(event.getOwnerBalance() - shop.getPrice());
-                    shopInv.addItem(example);
 
                     final String ownerMsg = ChatColor.GOLD + player.getName() + ChatColor.GRAY +
                             " sold " + ChatColor.YELLOW + example.getAmount() + " " +
                             CrownUtils.getItemNormalName(example) +
-                            ChatColor.GRAY + " to you for " + ChatColor.GOLD + shop.getPrice() + " Rhines";
+                            ChatColor.GRAY + " to you for " + ChatColor.GOLD + CrownUtils.decimalizeNumber(shop.getPrice()) + " Rhines";
+
+                    event.setOwnerBalance(event.getOwnerBalance() - shop.getPrice());
+                    shopInv.addItem(example);
 
                     event.getOwner().sendMessage(ownerMsg);
                 }
@@ -144,5 +156,6 @@ public class ShopUseListener implements Listener {
             default:
                 throw new IllegalStateException("Unexpected value: " + shop.getType());
         }
+        shopInv.performStockCheck();
     }
 }

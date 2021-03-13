@@ -40,6 +40,12 @@ public class MonasteryRaid extends VikingRaid {
     }
 
     @Override
+    public void onRaidEnd() {
+        if(zombies.size() > 0) for (Zombie z: zombies) z.remove();
+        super.onRaidEnd();
+    }
+
+    @Override
     public void onRaidComplete() {
         Bukkit.broadcastMessage("Raid complete! :D");
 
@@ -58,7 +64,7 @@ public class MonasteryRaid extends VikingRaid {
 
         if(zombies.size() < 1){
             Bukkit.broadcastMessage("Finished raid in event");
-            onRaidComplete();
+            completeRaid();
         }
     }
 

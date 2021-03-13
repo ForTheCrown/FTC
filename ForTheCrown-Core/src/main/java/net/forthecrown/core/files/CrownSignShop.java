@@ -6,6 +6,7 @@ import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.inventories.CrownShopInventory;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -13,23 +14,21 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.File;
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class CrownSignShop extends FtcFileManager implements SignShop {
+public class CrownSignShop extends FtcFileManager<FtcCore> implements SignShop {
 
     private final Location location;
     private final Block block;
-    private final ShopInventory inventory;
+    private final CrownShopInventory inventory;
 
     private UUID owner;
     private Integer price;
@@ -38,27 +37,23 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
     //used by getSignShop
     public CrownSignShop(Location signBlock) throws NullPointerException {
-        super(signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ(), "shopdata");
+        super(signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ(), "shopdata", true, FtcCore.getInstance());
 
-        //file doesn't exist nor does the legacy file, there for go fuck yourself
-        if (fileDoesntExist && !legacyFileExists()) {
-            delete();
-            throw new NullPointerException("Could not load shop file! Named, " + fileName);
-        }
+        //file doesn't exist there for go fuck yourself
+        if (fileDoesntExist) throw new NullPointerException("Could not load shop file! Named, " + fileName);
 
         this.location = signBlock;
         this.block = signBlock.getBlock();
 
         inventory = new CrownShopInventory(this);
-        FtcCore.loadedShops.add(this);
+        FtcCore.LOADED_SHOPS.add(this);
 
-        if (legacyFileExists()) convertLegacy();
-        else reload();
+        reload();
     }
 
     //used by createSignShop
     public CrownSignShop(Location location, ShopType shopType, Integer price, UUID shopOwner) {
-        super(location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "shopdata");
+        super(location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "shopdata", false, FtcCore.getInstance());
         this.location = location;
         this.block = location.getBlock();
         this.type = shopType;
@@ -75,7 +70,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         super.save();
 
         inventory = new CrownShopInventory(this);
-        FtcCore.loadedShops.add(this);
+        FtcCore.LOADED_SHOPS.add(this);
     }
 
     @Override
@@ -90,7 +85,11 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         getFile().set("OutOfStock", isOutOfStock());
         getFile().set("ItemList", getInventory().getShopContents());
 
-        super.save();
+        try {
+            super.save();
+        } catch (NullPointerException e){
+            FtcCore.LOADED_SHOPS.remove(this);
+        }
     }
 
     @Override
@@ -117,7 +116,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
     @Override
     public void destroyShop() {
-        FtcCore.loadedShops.remove(this);
+        FtcCore.LOADED_SHOPS.remove(this);
         if(inventory != null && inventory.getShopContents().size() > 0) {
             for (ItemStack stack : inventory.getShopContents()){ location.getWorld().dropItemNaturally(location, stack); }
             location.getWorld().spawnParticle(Particle.CLOUD, location.add(0.5, 0.5, 0.5), 5, 0.1D, 0.1D, 0.1D, 0.05D);
@@ -129,7 +128,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
     @Override
     public Inventory getExampleInventory(){
-        Inventory inv = Bukkit.createInventory(getInventory().getHolder(), InventoryType.HOPPER, "Specify what and how much");
+        Inventory inv = Bukkit.createInventory(this, InventoryType.HOPPER, Component.text("Specify what and how much"));
         inv.setItem(0, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
         inv.setItem(1, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
         inv.setItem(3, CrownUtils.makeItem(Material.BARRIER, 1, true, ""));
@@ -207,6 +206,7 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
         return deleted;
     }
 
+    @Nonnull
     @Override
     public ShopInventory getInventory() {
         return inventory;
@@ -226,8 +226,8 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
 
         String ln3 = ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + getPrice();
 
-        s.setLine(0, ln1);
-        s.setLine(3, ln3);
+        s.line(0, Component.text(ln1));
+        s.line(3, Component.text(ln3));
 
         Bukkit.getScheduler().runTask(FtcCore.getInstance(), () -> s.update(true));
     }
@@ -247,46 +247,5 @@ public class CrownSignShop extends FtcFileManager implements SignShop {
     @Override
     public int hashCode() {
         return Objects.hash(getLocation(), getOwner(), getPrice(), getType());
-    }
-
-    private boolean legacyFileExists() {
-        File oldFile = new File("plugins/ShopsReworked/ShopData/" + fileName + ".yml");
-        return oldFile.exists();
-    }
-
-    private void convertLegacy() { //I have no idea
-        File oldFile = new File("plugins/ShopsReworked/ShopData/" + fileName + ".yml");
-        FileConfiguration oldConfig = YamlConfiguration.loadConfiguration(oldFile);
-
-        Sign sign = (Sign) getBlock().getState();
-        String line1 = sign.getLine(0).toLowerCase();
-
-        setOwner(UUID.fromString(oldConfig.getString("Player")));
-
-        if(line1.contains("=[buy]=")) setType(ShopType.ADMIN_BUY_SHOP);
-        else if(line1.contains("=[sell]=")) setType(ShopType.ADMIN_SELL_SHOP);
-        else if(line1.contains("-[sell]-")) setType(ShopType.SELL_SHOP);
-        else setType(ShopType.BUY_SHOP);
-
-        if(line1.contains(ChatColor.DARK_RED + "buy") || line1.contains(ChatColor.RED + "buy")) setOutOfStock(true);
-
-        try {
-            setPrice(Integer.parseInt(ChatColor.stripColor(sign.getLine(3)).replaceAll("[\\D]", "").replaceAll("\\$", "")));
-        } catch (NullPointerException e){ setPrice(500); }
-
-        for(ItemStack stack : (List<ItemStack>) oldConfig.getList("Inventory.content")){
-            if(stack == null) continue;
-            inventory.addItem(stack);
-        }
-
-        inventory.setExampleItem((ItemStack) oldConfig.getList("Inventory.shop").get(0));
-        if(inventory.getExampleItem() == null){
-            if(inventory.getShopContents().size() > 0) getInventory().setExampleItem(inventory.getShopContents().get(0));
-        }
-
-        oldFile.delete();
-
-        save();
-        reload();
     }
 }

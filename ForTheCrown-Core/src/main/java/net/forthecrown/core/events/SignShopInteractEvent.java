@@ -3,11 +3,9 @@ package net.forthecrown.core.events;
 import net.forthecrown.core.Cooldown;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.Balances;
-import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.customevents.SignShopUseEvent;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,6 +16,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 public class SignShopInteractEvent implements Listener {
 
@@ -37,7 +36,7 @@ public class SignShopInteractEvent implements Listener {
                 && !line0.contains("=[Sell]=")
                 && !line0.contains("-[Sell]-")
                 && !line0.contains("-[Buy]-")) return;
-        if(!line3.contains(ChatColor.DARK_GRAY + "Price: ")) return;
+        if(!line3.contains("Price: ")) return;
 
         Cooldown.add(event.getPlayer(), 6);
 
@@ -46,18 +45,20 @@ public class SignShopInteractEvent implements Listener {
 
         Player player = event.getPlayer();
 
-        //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it
+        sign.getBlock().getBlockData();
 
+        //This does nothing rn, will be useful in the future
+        if(!sign.getPersistentDataContainer().has(FtcCore.SHOP_KEY, PersistentDataType.STRING))
+            sign.getPersistentDataContainer().set(FtcCore.SHOP_KEY, PersistentDataType.STRING, "SignShop");
+
+        //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it
         if(player.isSneaking() && (shop.getOwner().equals(player.getUniqueId()) || player.hasPermission("ftc.admin"))){
             player.openInventory(shop.getInventory());
             FtcCore.getInstance().getServer().getPluginManager().registerEvents(new SignShopInteractSubClass(player, shop), FtcCore.getInstance());
             return;
         }
 
-        Balances bals = FtcCore.getBalances();
-        CrownUser user = FtcCore.getUser(player.getUniqueId());
-
-        FtcCore.getInstance().getServer().getPluginManager().callEvent(new SignShopUseEvent(shop, user, player, bals));
+        FtcCore.getInstance().getServer().getPluginManager().callEvent(new SignShopUseEvent(shop, FtcCore.getUser(player), player, FtcCore.getBalances()));
     }
 
     public class SignShopInteractSubClass implements Listener {
@@ -75,12 +76,13 @@ public class SignShopInteractEvent implements Listener {
             if(!event.getPlayer().equals(player)) return;
 
             Inventory inv = event.getInventory();
+            ShopInventory shopInv = shop.getInventory();
             ItemStack[] contents = inv.getContents().clone();
-            final ItemStack example = shop.getInventory().getExampleItem();
+            final ItemStack example = shopInv.getExampleItem();
 
             HandlerList.unregisterAll(this);
 
-            shop.getInventory().clear();
+            shopInv.clear();
 
             for (ItemStack item : contents){
                 if(item == null) continue;
@@ -90,8 +92,9 @@ public class SignShopInteractEvent implements Listener {
                     continue;
                 }
 
-                shop.getInventory().addItem(item);
+                shopInv.addItem(item);
             }
+            shopInv.performStockCheck();
         }
     }
 }

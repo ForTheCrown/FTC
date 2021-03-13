@@ -1,20 +1,22 @@
 package net.forthecrown.core.commands.brigadier;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.LiteralMessage;
+import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.exceptions.InvalidPlayerArgumentException;
 import net.forthecrown.core.commands.brigadier.exceptions.NonPlayerSenderException;
+import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
+import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
@@ -24,6 +26,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
 public abstract class CrownCommandBuilder implements Predicate<CommandListenerWrapper> {
@@ -37,11 +40,9 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
     private String usage;
     private String permission;
     private String permissionMessage;
-    private LiteralArgumentBuilder<CommandListenerWrapper> command;
+    private final LiteralArgumentBuilder<CommandListenerWrapper> command;
     private boolean registered;
     private VanillaCommandWrapper wrapper;
-
-    //private final PluginCommand pluginCommand = new PluginCommand(this);
 
     protected CrownCommandBuilder(@NotNull String name, @NotNull Plugin plugin) {
         this.name = name;
@@ -64,6 +65,15 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
         CommandDispatcher<CommandListenerWrapper> dispatcher = RoyalBrigadier.getDispatcher().a();
         dispatcher.register(command);
 
+        initializeWrapper();
+        CommandMap map = plugin.getServer().getCommandMap();
+        map.register(getName(), fallbackPrefix, wrapper);
+        wrapper.register(map);
+
+        registered = true;
+    }
+
+    protected final void initializeWrapper(){
         wrapper = new VanillaCommandWrapper(RoyalBrigadier.getDispatcher(), command.build());
         wrapper.setPermission(permission);
         wrapper.setAliases(aliases);
@@ -72,12 +82,6 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
         wrapper.setUsage(usage);
         wrapper.setLabel(name);
         wrapper.setName(name);
-
-        CommandMap map = plugin.getServer().getCommandMap();
-        map.register(getName(), fallbackPrefix, wrapper);
-        wrapper.register(map);
-
-        registered = true;
     }
 
     protected LiteralArgumentBuilder<CommandListenerWrapper> argument(String name){
@@ -86,15 +90,6 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
 
     protected RequiredArgumentBuilder<CommandListenerWrapper, ?> argument(String name, ArgumentType<?> type){
         return RequiredArgumentBuilder.argument(name, type);
-    }
-
-    protected SuggestionsBuilder getPlayerList(SuggestionsBuilder builder){
-        List<String> pNames = new ArrayList<>();
-        for (Player p: Bukkit.getOnlinePlayers()){
-            pNames.add(p.getName());
-        }
-
-        return listCompletions(builder, pNames);
     }
 
     protected boolean testPlayerSenderSilent(CommandListenerWrapper source){
@@ -118,40 +113,11 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
         return c.getSource().getBukkitSender();
     }
 
-    protected SuggestionsBuilder listCompletions( SuggestionsBuilder b, String... suggestions){
-        return listCompletions(b, Arrays.asList(suggestions));
-    }
-
-    protected SuggestionsBuilder listCompletions(SuggestionsBuilder b, List<String> suggestions){
-        String input = b.getInput();
-        String token = input.substring(input.lastIndexOf(' ')).trim();
-        for (String s: suggestions){
-            if(token.isBlank() || s.regionMatches(true, 0, token, 0, token.length())) b.suggest(s);
-        }
-        return b;
-    }
-
-    protected SuggestionsBuilder listCompletions(SuggestionsBuilder b, Map<String, String> completionsAndTips){
-        String input = b.getInput();
-        String token = input.substring(input.lastIndexOf(' ')).trim();
-        for (String s: completionsAndTips.keySet()){
-            if(token.isBlank() || s.regionMatches(true, 0, token, 0, token.length())) b.suggest(s, new LiteralMessage(completionsAndTips.get(s)));
-        }
-        return b;
-    }
-
     protected UUID getUUID(@NotNull String name) throws InvalidPlayerArgumentException {
         Validate.notNull(name, "The name cannot be null");
         UUID toReturn = FtcCore.getOffOnUUID(name);
         if(toReturn == null) throw new InvalidPlayerArgumentException(name);
         return toReturn;
-    }
-
-    protected String getLastArgument(String input){
-        int lastIndex = input.lastIndexOf(' ');
-        if(lastIndex == -1) return null;
-
-        return input.substring(lastIndex);
     }
 
     @Override
@@ -179,6 +145,11 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
     public void setAliases(String... aliases) {
         if(isRegistered()) return;
         this.aliases = Arrays.asList(aliases);
+    }
+
+    public void setAliases(List<String> list){
+        if(isRegistered()) return;
+        this.aliases = list;
     }
 
     public String getDescription() {
@@ -227,5 +198,48 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
 
     public String getUsage() {
         return CrownUtils.translateHexCodes(usage);
+    }
+
+    public static void broadcastAdmin(CommandListenerWrapper sender, String message){
+        broadcastAdmin(sender, new ChatComponentText(message), true);
+    }
+
+    public static void broadcastAdmin(CommandListenerWrapper sender, IChatBaseComponent message, boolean senderSees){
+        sender.sendMessage(message, senderSees);
+    }
+
+    public static void broadcastAdmin(CommandSender sender, String message){
+        broadcastAdmin(VanillaCommandWrapper.getListener(sender), message);
+    }
+
+    //Copied from CommandSource.java... in the damn FabricMC API
+    public static CompletableFuture<Suggestions> suggestMatching(SuggestionsBuilder suggestionsBuilder, String... strings) {
+        return suggestMatching(suggestionsBuilder, Arrays.asList(strings));
+    }
+
+    public static CompletableFuture<Suggestions> suggestMatching(SuggestionsBuilder suggestionsBuilder, Collection<String> strings){
+        String string = suggestionsBuilder.getRemaining().toLowerCase();
+
+        for (String s: strings){
+            if(s == null) continue;
+            if(stringMatches(string, s.toLowerCase())) suggestionsBuilder.suggest(s);
+        }
+
+        return suggestionsBuilder.buildFuture();
+    }
+
+    public static CompletableFuture<Suggestions> suggestMatching(SuggestionsBuilder suggestionsBuilder, Map<String, Message> strings){
+        String string = suggestionsBuilder.getRemaining().toLowerCase();
+
+        for (String s: strings.keySet()){
+            if(s == null) continue;
+            if(stringMatches(string, s.toLowerCase())) suggestionsBuilder.suggest(s, strings.get(s));
+        }
+
+        return suggestionsBuilder.buildFuture();
+    }
+
+    private static boolean stringMatches(String token, String string) {
+        return string.toLowerCase().startsWith(token.toLowerCase());
     }
 }

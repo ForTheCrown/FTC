@@ -1,24 +1,75 @@
 package net.forthecrown.core.commands.brigadier;
 
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.commands.*;
+import net.forthecrown.core.commands.emotes.*;
 import net.minecraft.server.v1_16_R3.CommandDispatcher;
-import net.minecraft.server.v1_16_R3.MinecraftServer;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 
 //cool name lul
-public class RoyalBrigadier {
+
+/**
+ * ForTheCrown's command handler, The RoyalBrigadier lol
+ * <p>Allows the usage of the server's native Brigadier command engine.</p>
+ */
+public final class RoyalBrigadier {
 
     private static CommandDispatcher dispatcher;
+    private final FtcCore plugin;
 
-    private final Plugin plugin;
-
-    public RoyalBrigadier(Plugin plugin){
+    public RoyalBrigadier(FtcCore plugin){
         this.plugin = plugin;
+        dispatcher = ((CraftServer) plugin.getServer()).getServer().getCommandDispatcher();
 
-        dispatcher = MinecraftServer.getServer().getCommandDispatcher();
+        loadCommands();
+    }
+
+    public FtcCore getPlugin() {
+        return plugin;
     }
 
     public void loadCommands(){
+        //admin commands
+        new CommandKingMaker();
+        new CommandBroadcast();
+        new CommandCore();
+        new CommandStaffChat();
+        new CommandStaffChatToggle();
 
+        //utility / misc commands
+        new CommandGems();
+        new CommandProfile();
+        new CommandRank();
+        //new ShopEditCommand();
+
+        //economy commands
+        new CommandShop();
+        new CommandBalance();
+        new CommandBalanceTop();
+        new CommandPay();
+        new CommandWithdraw();
+        new CommandDeposit();
+        new CommandBecomeBaron();
+
+        //help commands
+        new HelpDiscord();
+        new HelpFindPost();
+        new HelpPost();
+        new HelpSpawn();
+        new HelpMap();
+
+        //tpa commands
+        new CommandTpask();
+        new CommandTpaskHere();
+
+        //emotes
+        new EmoteToggle();
+        new EmoteBonk();
+        new EmoteSmooch();
+        new EmotePoke();
+        new EmoteScare();
+        new EmoteJingle();
+        new EmoteHug();
     }
 
     public static CommandDispatcher getDispatcher() {

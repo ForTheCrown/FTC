@@ -1,141 +1,79 @@
 package net.forthecrown.core;
 
 import net.forthecrown.core.api.*;
-import net.forthecrown.core.commands.*;
 import net.forthecrown.core.commands.brigadier.RoyalBrigadier;
-import net.forthecrown.core.commands.emotes.*;
+import net.forthecrown.core.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.events.*;
 import net.forthecrown.core.events.npc.JeromeEvent;
 import net.forthecrown.core.files.*;
-import net.forthecrown.core.inventories.CustomInventoryHolder;
+import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 
 public final class FtcCore extends JavaPlugin {
 
     private static FtcCore instance;
+
     private static String prefix = "&6[FTC]&r  ";
     private static long userDataResetInterval = 5356800000L; //2 months by default
     private static long branchSwapCooldown = 172800000; //2 days by default
     private static boolean taxesEnabled;
     private static String king;
-
+    private static String discord;
     private static final Map<Material, Integer> defaultItemPrices = new HashMap<>();
     private Integer maxMoneyAmount;
 
     private Set<Player> sctPlayers = new HashSet<>();
-    private static final Set<Player> onCooldown = new HashSet<>();
-    private static String discord;
 
-    private CrownAnnouncer autoAnnouncer;
-    private CrownBalances balFile;
-    private CrownBlackMarket bm;
+    private static CrownAnnouncer announcer;
+    private static CrownBalances balFile;
+    private static CrownBlackMarket bm;
+    private static RoyalBrigadier brigadier;
 
     private static Timer saver;
 
-    public static final Set<CrownSignShop> loadedShops = new HashSet<>();
-    public static final Set<FtcUser> loadedUsers = new HashSet<>();
+    public static final Set<CrownSignShop> LOADED_SHOPS = new HashSet<>();
+    public static final Set<FtcUser> LOADED_USERS = new HashSet<>();
+    public static final Set<ArmorStandLeaderboard> LEADERBOARDS = new HashSet<>();
 
-    private RoyalBrigadier brigadier;
+    public static NamespacedKey SHOP_KEY;
+
+    private static CrownWorldGuard crownWorldGuard;
 
     @Override
     public void onEnable() {
         instance = this;
-        brigadier = new RoyalBrigadier(this);
-
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
+        reloadConfig();
 
-        prefix = getConfig().getString("Prefix");
-        userDataResetInterval = getConfig().getLong("UserDataResetInterval");
-        taxesEnabled = getConfig().getBoolean("Taxes");
-        discord = getConfig().getString("Discord");
-        maxMoneyAmount = getConfig().getInt("MaxMoneyAmount");
-        loadDefaultItemPrices();
+        announcer = new CrownAnnouncer();
+        balFile = new CrownBalances(this);
+        bm = new CrownBlackMarket(this);
+        brigadier = new RoyalBrigadier(this);
 
-        autoAnnouncer = new CrownAnnouncer();
-        balFile = new CrownBalances();
-        bm = new CrownBlackMarket();
+        SHOP_KEY = new NamespacedKey(this, "signshop");
 
-        if (!getConfig().getString("King").contains("empty")) king = getConfig().getString("King");
-        else king = null;
+        registerEvents();
+        if(getConfig().getBoolean("System.run-deleter-on-startup")) new FileChecker(getDataFolder());
 
-        Server server = getServer();
-
-        //events
-        server.getPluginManager().registerEvents(new JeromeEvent(), this);
-
-        server.getPluginManager().registerEvents(new CoreListener(), this);
-        server.getPluginManager().registerEvents(new ChatEvents(), this);
-
-        server.getPluginManager().registerEvents(new SignShopCreateEvent(), this);
-        server.getPluginManager().registerEvents(new SignShopInteractEvent(), this);
-        server.getPluginManager().registerEvents(new SignShopDestroyEvent(), this);
-        server.getPluginManager().registerEvents(new ShopUseListener(), this);
-
-        server.getPluginManager().registerEvents(new BlackMarketEvents(), this);
-
-        doCommands();
-
-        if(getConfig().getBoolean("System.save-periodically")) periodicalSave();
-        if(getConfig().getBoolean("System.run-deleter-on-startup")) new FileDeleter(getDataFolder());
+        File file = new File("plugins/DataPlugin/config.yml");
+        if(file.exists()) new UserDataConverter(file);
     }
 
-    private void doCommands(){
-        new KingMakerCommand();
-
-        new BecomeBaronCommand();
-        new RankCommand();
-
-        new CoreCommand();
-
-        new BalanceCommand();
-        new BalanceTopCommand();
-
-        new PayCommand();
-        new AddBalanceCommand();
-        new SetBalanceCommand();
-        new ResetBalance();
-
-        new GemsCommand();
-        new ProfileCommand();
-
-        new ShopCommand();
-        //new ShopEditCommand();
-
-        new WithdrawCommand();
-        new DepositCommand();
-
-        new StaffChatCommand();
-        new StaffChatToggleCommand();
-
-        new BroadcastCommand();
-
-        new Discord();
-        new FindPost();
-        new PostHelp();
-        new SpawnCommand();
-        new MapCommand();
-
-        new TpaskCommand();
-        new TpaskHereCommand();
-
-        new ToggleEmotes();
-        new Bonk();
-        new Mwah();
-        new Poke();
-        new Scare();
-        new Jingle();
-
-        new Hug();
+    @Override
+    public void onLoad() {
+        crownWorldGuard = new CrownWorldGuard(this);
+        crownWorldGuard.registerFlags();
     }
 
     @Override
@@ -149,10 +87,42 @@ public final class FtcCore extends JavaPlugin {
         }
 
         for (Player p: Bukkit.getOnlinePlayers()){
-            InventoryHolder holder = p.getOpenInventory().getTopInventory().getHolder();
-            if(holder instanceof CustomInventoryHolder || holder instanceof SignShop){
-                p.closeInventory();
+            p.closeInventory();
+        }
+
+        for (ArmorStandLeaderboard a: LEADERBOARDS){
+            a.destroy();
+        }
+    }
+
+    private void registerEvents(){
+        Server server = getServer();
+
+        server.getPluginManager().registerEvents(new JeromeEvent(), this);
+
+        server.getPluginManager().registerEvents(new CoreListener(), this);
+        server.getPluginManager().registerEvents(new ChatEvents(), this);
+
+        server.getPluginManager().registerEvents(new SignShopCreateEvent(), this);
+        server.getPluginManager().registerEvents(new SignShopInteractEvent(), this);
+        server.getPluginManager().registerEvents(new SignShopDestroyEvent(), this);
+        server.getPluginManager().registerEvents(new ShopUseListener(), this);
+
+        server.getPluginManager().registerEvents(new BlackMarketEvents(), this);
+    }
+
+    private void loadDefaultItemPrices(){
+        ConfigurationSection itemPrices = getInstance().getConfig().getConfigurationSection("DefaultPrices");
+
+        for(String s : itemPrices.getKeys(true)){
+            Material mat;
+            try {
+                mat = Material.valueOf(s);
+            } catch (Exception e){
+                continue;
             }
+
+            defaultItemPrices.put(mat, itemPrices.getInt(s));
         }
     }
 
@@ -187,6 +157,8 @@ public final class FtcCore extends JavaPlugin {
         maxMoneyAmount = getConfig().getInt("MaxMoneyAmount");
         branchSwapCooldown = getConfig().getLong("BranchSwapCooldown");
 
+        loadDefaultItemPrices();
+
         if(!getConfig().getString("King").contains("empty")) king = getConfig().getString("King");
         else king = "empty"; //like my soul
 
@@ -197,30 +169,14 @@ public final class FtcCore extends JavaPlugin {
         }
     }
 
-    public static void reloadFTC(){
-        getInstance().reloadConfig();
-
-        getAnnouncer().reload();
-        for (FtcUser data : loadedUsers){
-            data.reload();
-        }
-
-        getInstance().loadDefaultItemPrices();
-        for(CrownSignShop shop : loadedShops){
-            shop.reload();
-        }
-        getBalances().reload();
-
-        getBlackMarket().reload();
-    }
     public static void saveFTC(){
-        for(FtcUser data : loadedUsers) {
+        for(FtcUser data : LOADED_USERS) {
             data.save();
         }
 
         getAnnouncer().save();
 
-        for(CrownSignShop shop : loadedShops){
+        for(CrownSignShop shop : LOADED_SHOPS){
             try {
                 shop.save();
             } catch (Exception ignored) {}
@@ -229,23 +185,22 @@ public final class FtcCore extends JavaPlugin {
         getBlackMarket().save();
 
         getInstance().saveConfig();
-        FtcCore.getInstance().getLogger().log(Level.INFO, "FTC-Core saved");
+        Announcer.log(Level.INFO, "FTC-Core saved");
     }
 
     public static Set<CrownUser> getLoadedUsers(){
-        Set<CrownUser> temp = new HashSet<>();
-        temp.addAll(loadedUsers);
-        return temp;
+        return new HashSet<>(LOADED_USERS);
     }
 
     public static Set<CrownUser> getOnlineUsers(){
         Set<CrownUser> temp = new HashSet<>();
-        for (FtcUser u: loadedUsers){
+        for (FtcUser u: LOADED_USERS){
             if(u.isOnline()) temp.add(u);
         }
         return temp;
     }
 
+    @Nullable
     public static UUID getKing() {
         UUID result;
         try {
@@ -257,7 +212,10 @@ public final class FtcCore extends JavaPlugin {
     }
 
     public static void setKing(@Nullable UUID newKing) {
-        if(newKing == null) king = "empty";
+        if(newKing == null){
+            getUser(getKing()).clearTabPrefix();
+            king = "empty";
+        }
         else king = newKing.toString();
     }
 
@@ -304,20 +262,23 @@ public final class FtcCore extends JavaPlugin {
         return instance;
     }
     public static Announcer getAnnouncer(){
-        return getInstance().autoAnnouncer;
+        return announcer;
     }
     public static Balances getBalances(){
-        return getInstance().balFile;
+        return balFile;
     }
     public static BlackMarket getBlackMarket() {
-        return getInstance().bm;
+        return bm;
+    }
+    public static RoyalBrigadier getRoyalBrigadier(){
+        return brigadier;
     }
 
 
     public static SignShop getShop(Location signShop) { //gets a signshop, throws a null exception if the shop file doesn't exist
         SignShop toReturn = null;
 
-        for(CrownSignShop shop : loadedShops){
+        for(CrownSignShop shop : LOADED_SHOPS){
             if(shop.getLocation().equals(signShop)){
                 toReturn = shop;
                 break;
@@ -346,8 +307,9 @@ public final class FtcCore extends JavaPlugin {
         return getUser(base.getUniqueId());
     }
 
-    public static CrownUser getUser(UUID base) {
-        for (CrownUser data : loadedUsers) if(base == data.getBase()) return data;
+    public static CrownUser getUser(@NotNull UUID base) {
+        Validate.notNull(base, "UUID cannot be null");
+        for (CrownUser data : LOADED_USERS) if(data.getBase().equals(base)) return data;
         return new FtcUser(base);
     }
 
@@ -365,20 +327,5 @@ public final class FtcCore extends JavaPlugin {
             } catch (Exception ignored){ toReturn = null; }
         }
         return toReturn;
-    }
-
-    private void loadDefaultItemPrices(){
-        ConfigurationSection itemPrices = getInstance().getConfig().getConfigurationSection("DefaultPrices");
-
-        for(String s : itemPrices.getKeys(true)){
-            Material mat;
-            try {
-                mat = Material.valueOf(s);
-            } catch (Exception e){
-                continue;
-            }
-
-            defaultItemPrices.put(mat, itemPrices.getInt(s));
-        }
     }
 }

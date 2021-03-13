@@ -3,7 +3,7 @@ Daily_Items:
   Crops: []
   Drops: []
   Mining: []
-
+PurchasedEnchant: []
 Price_Per_Item:
   MobDrops:
     ROTTEN_FLESH: 3
@@ -78,33 +78,34 @@ Price_Per_Item:
     IRON_ORE: 10
     COAL_ORE: 10
   Enchants:
-    power: 250000
-    flame: 75000
-    punch: 150000
-    sharpness: 250000
-    bane_of_arthropods: 50000
-    smite: 75000
-    depth_strider: 150000
-    efficiency: 250000
-    unbreaking: 250000
-    fire_aspect: 150000
-    frost_walker: 50000
-    impaling: 100000
-    knockback: 250000
-    fortune: 500000
-    luck_of_the_sea: 50000
-    lure: 50000
-    respiration: 75000
-    piercing: 75000
-    protection: 250000
-    blast_protection: 150000
-    feather_falling: 250000
-    fire_protection: 150000
-    projectile_protection: 150000
-    soul_speed: 100000
-    sweeping: 250000
-    thorns: 500000
-    aqua_affinity: 100000
+    impaling: 12500
+    thorns: 25000
+    piercing: 15000
+    fire_protection: 20000
+    smite: 7500
+    unbreaking: 20000
+    feather_falling: 20000
+    respiration: 20000
+    protection: 30000
+    knockback: 35000
+    projectile_protection: 20000
+    fire_aspect: 50000
+    luck_of_the_sea: 14000
+    lure: 12000
+    punch: 17500
+    frost_walker: 25000
+    power: 70000
+    sharpness: 45000
+    bane_of_arthropods: 7500
+    soul_speed: 17500
+    efficiency: 28000
+    fortune: 55000
+    aqua_affinity: 25000
+    depth_strider: 18000
+    flame: 25000
+    blast_protection: 20000
+    sweeping: 25000
 Day: 1
 MaxEarnings: 50000
 EnchantLevel: 0
+EnchantPrice: 0

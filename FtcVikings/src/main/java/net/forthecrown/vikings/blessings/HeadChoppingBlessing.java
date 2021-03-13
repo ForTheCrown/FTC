@@ -46,7 +46,7 @@ public class HeadChoppingBlessing extends VikingBlessing{
     public void onPlayerDeath(PlayerDeathEvent event) {
         if(event.getEntity().getKiller() == null) return;
         if(!getUsers().contains(event.getEntity().getKiller().getUniqueId())) return;
-        if(CrownUtils.getRandomNumberInRange(0, 1000) > dropChance) return;
+        if(CrownUtils.getRandomNumberInRange(0, 1000) < dropChance) return;
 
         event.getEntity().getWorld().dropItemNaturally(event.getEntity().getLocation(), getPlayerHead(event.getEntity()));
     }

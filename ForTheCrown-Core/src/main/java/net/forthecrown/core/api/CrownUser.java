@@ -1,5 +1,6 @@
 package net.forthecrown.core.api;
 
+import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public interface CrownUser extends CrownFileManager, CommandSender {
+public interface CrownUser extends CrownFileManager<FtcCore>, CommandSender {
 
     /**
      * Saves and then unloads the file
@@ -397,15 +398,15 @@ public interface CrownUser extends CrownFileManager, CommandSender {
      */
     boolean isKing();
 
+    void setKing(boolean king, boolean setPrefix);
+
+    void setKing(boolean king, boolean setPrefix, boolean isFemale);
+
     /**
      * Sets if the user is the king
      * <p>Again, just does FtcCore.setKing and sets it to be getBase</p>
      * @param king Whether the user is to be king
      */
-    void setKing(boolean king, boolean setPrefix);
-
-    void setKing(boolean king, boolean setPrefix, boolean isFemale);
-
     void setKing(boolean king);
 
     /**
@@ -415,6 +416,10 @@ public interface CrownUser extends CrownFileManager, CommandSender {
      */
     void performCommand(String command);
 
+    /**
+     * Sends an array of messages to the user
+     * @param messages The messsages to send
+     */
     @Override
     void sendMessage(@Nonnull String... messages);
 
@@ -429,9 +434,23 @@ public interface CrownUser extends CrownFileManager, CommandSender {
      */
     Scoreboard getScoreboard();
 
+    /**
+     * Gets if the user's profile is private or public
+     * @return ^^^^
+     */
     boolean isProfilePublic();
 
+    /**
+     * Sets the user's profile to either public or private
+     * @param publicProfile
+     */
     void setProfilePublic(boolean publicProfile);
+
+    /**
+     * Gets the object which hold data for this user
+     * @return The user's data container
+     */
+    UserDataContainer getDataContainer();
 
     @Override
     boolean equals(Object o);

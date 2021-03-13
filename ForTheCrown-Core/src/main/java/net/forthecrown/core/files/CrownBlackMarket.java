@@ -5,6 +5,7 @@ import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.BlackMarket;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.DailyEnchantment;
 import net.forthecrown.core.inventories.CustomInventoryHolder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -27,31 +28,29 @@ import java.util.*;
 
 public class CrownBlackMarket implements BlackMarket {
 
+    private YamlConfiguration configFile;
+    private final File file;
+
     private final Map<Material, Integer> crops = new HashMap<>();
     private final Map<Material, Integer> mining = new HashMap<>();
     private final Map<Material, Integer> drops = new HashMap<>();
     private final Map<Enchantment, Integer> enchants = new HashMap<>();
 
+    private final Map<Material, Integer> amountEarned = new HashMap<>();
+    private Set<UUID> boughtEnchant = new HashSet<>();
+
     private List<Material> dailyCrops = new ArrayList<>();
     private List<Material> dailyMining = new ArrayList<>();
     private List<Material> dailyDrops = new ArrayList<>();
     private Enchantment dailyEnchantment;
+    private CrownDailyEnchantment enchantmentType;
 
     private int maxEarnings = 50000;
-    private final Map<Material, Integer> amountEarned = new HashMap<>();
-
-    private YamlConfiguration configFile;
-    private final File file;
-
     private int dayOfWeek;
-    private int enchantLevel;
-
     private boolean enchantAvailable = true;
 
-    private final Set<UUID> boughtEnchant = new HashSet<>();
-
-    public CrownBlackMarket(){
-        file = new File(FtcCore.getInstance().getDataFolder(), "blackmarket.yml");
+    public CrownBlackMarket(FtcCore core){
+        file = new File(core.getDataFolder(), "blackmarket.yml");
         if(!file.exists()){
             try {
                 file.createNewFile();
@@ -61,7 +60,7 @@ public class CrownBlackMarket implements BlackMarket {
         }
         configFile = YamlConfiguration.loadConfiguration(file);
 
-        final InputStream defConfig = FtcCore.getInstance().getResource("blackmarket.yml");
+        final InputStream defConfig = core.getResource("blackmarket.yml");
         if(defConfig == null) return;
 
         configFile.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfig, Charsets.UTF_8)));
@@ -74,6 +73,7 @@ public class CrownBlackMarket implements BlackMarket {
         }
 
         reload();
+        doEnchantTimer(core);
     }
 
     public void reload(){
@@ -101,14 +101,22 @@ public class CrownBlackMarket implements BlackMarket {
 
         dayOfWeek = configFile.getInt("Day");
         maxEarnings = configFile.getInt("MaxEarnings");
-        if(configFile.getInt("EnchantLevel") != 0) enchantLevel = configFile.getInt("EnchantLevel");
 
+        Set<UUID> temp = new HashSet<>();
+        for (String s: configFile.getStringList("PurchasedEnchant")){
+            try {
+                temp.add(UUID.fromString(s));
+            } catch (Exception ignored) {}
+        }
+        boughtEnchant = temp;
 
 
         dailyCrops = convertStringToMaterial(configFile.getStringList("Daily_Items.Crops"));
         dailyDrops = convertStringToMaterial(configFile.getStringList("Daily_Items.Drops"));
         dailyMining = convertStringToMaterial(configFile.getStringList("Daily_Items.Mining"));
         dailyEnchantment = EnchantmentWrapper.getByKey(NamespacedKey.minecraft(configFile.getString("Daily_Items.Enchant").toLowerCase()));
+
+        enchantmentType = new CrownDailyEnchantment(this, dailyEnchantment, getEnchantBasePrice(dailyEnchantment), dailyEnchantment.getMaxLevel() + CrownUtils.getRandomNumberInRange(1, 2));
 
         if(dayOfWeek != Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK)) randomizeItems();
     }
@@ -170,8 +178,8 @@ public class CrownBlackMarket implements BlackMarket {
                 }
             }
         }
-
-        enchantLevel = dailyEnchantment.getMaxLevel() + CrownUtils.getRandomNumberInRange(1, 2);
+        boughtEnchant.clear();
+        enchantmentType = new CrownDailyEnchantment(this, dailyEnchantment, getEnchantBasePrice(dailyEnchantment), dailyEnchantment.getMaxLevel() + CrownUtils.getRandomNumberInRange(1, 2));
 
         save();
     }
@@ -194,13 +202,20 @@ public class CrownBlackMarket implements BlackMarket {
         dailyItems.set("Crops", makeStringList(dailyCrops));
         dailyItems.set("Drops", makeStringList(dailyDrops));
         dailyItems.set("Mining",makeStringList(dailyMining));
-        dailyItems.set("Enchant", dailyEnchantment.getKey().toString().replaceAll("minecraft:", ""));
+        dailyItems.set("Enchant", getDailyEnchantment().getEnchantment().getKey().toString().replaceAll("minecraft:", ""));
 
         configFile.set("MaxEarnings", maxEarnings);
         configFile.set("Day", dayOfWeek);
-        configFile.set("EnchantLevel", enchantLevel);
+        configFile.set("EnchantLevel", getDailyEnchantment().getLevel());
+        configFile.set("EnchantPrice", getDailyEnchantment().getPrice());
 
         configFile.createSection("AmountEarned", makeStringMap(amountEarned));
+
+        List<String> temp = new ArrayList<>();
+        for (UUID id: boughtEnchant){
+            temp.add(id.toString());
+        }
+        configFile.set("PurchasedEnchant", temp);
 
         try {
             configFile.save(file);
@@ -241,6 +256,11 @@ public class CrownBlackMarket implements BlackMarket {
     }
 
     @Override
+    public DailyEnchantment getDailyEnchantment(){
+        return enchantmentType;
+    }
+
+    @Override
     public Integer getAmountEarned(Material material){
         if(amountEarned.keySet().contains(material)) return amountEarned.get(material);
         return 0;
@@ -265,8 +285,8 @@ public class CrownBlackMarket implements BlackMarket {
         return null;
     }
 
-    private void doEnchantTimer(){
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(FtcCore.getInstance(), () -> enchantAvailable = !enchantAvailable, 216000, 216000);
+    private void doEnchantTimer(FtcCore core){
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(core, () -> enchantAvailable = !enchantAvailable, 216000, 216000);
         System.out.println("Edward is now selling: " + enchantAvailable);
     }
 
@@ -295,17 +315,12 @@ public class CrownBlackMarket implements BlackMarket {
     }
 
     @Override
-    public Integer getEnchantPrice(Enchantment enchantment){
+    public Integer getEnchantBasePrice(Enchantment enchantment){
         return enchants.get(enchantment);
     }
     @Override
-    public void setEnchantPrice(Enchantment enchantment, Integer price){
+    public void setEnchantBasePrice(Enchantment enchantment, Integer price){
         enchants.put(enchantment, price);
-    }
-
-    @Override
-    public Enchantment getDailyEnchantment(){
-        return dailyEnchantment;
     }
 
     @Override
@@ -385,18 +400,13 @@ public class CrownBlackMarket implements BlackMarket {
     @Override
     public ItemStack getAcceptEnchantButton(){
         return CrownUtils.makeItem(Material.LIME_STAINED_GLASS_PANE, 1, true, ChatColor.GREEN + "[Accept and Pay]",
-                "&7Enchant the item for " + getEnchantPrice(getDailyEnchantment()) + " Rhines");
+                "&7Enchant the item for " + CrownUtils.decimalizeNumber(getDailyEnchantment().getPrice()) + " Rhines");
     }
 
     @Override
     public ItemStack getDenyEnchantButton(){
         return CrownUtils.makeItem(Material.RED_STAINED_GLASS_PANE, 1, true, ChatColor.RED + "[Cannot accept]",
-                "&7Cannot accept enchantment!", "&7");
-    }
-
-    @Override
-    public int getDailyEnchantLevel(){
-        return enchantLevel;
+                "&7Cannot accept enchantment!");
     }
 
     @Override
@@ -453,16 +463,8 @@ public class CrownBlackMarket implements BlackMarket {
     }
 
     private ItemStack getCoolEnchant(){
-        ItemStack item = CrownUtils.makeItem(Material.ENCHANTED_BOOK, 1, false, null, "&6Value: &e" + getEnchantPrice(dailyEnchantment) + " Rhines&6.");
-        item.addUnsafeEnchantment(getDailyEnchantment(), enchantLevel);
-
-        return item;
-    }
-
-    @Override
-    public ItemStack getDailyEnchantBook(){
-        ItemStack item = CrownUtils.makeItem(Material.ENCHANTED_BOOK, 1, false, null, "&7An enchantment book purchased from &eEdward");
-        item.addUnsafeEnchantment(getDailyEnchantment(), enchantLevel);
+        ItemStack item = CrownUtils.makeItem(Material.ENCHANTED_BOOK, 1, false, null, "&6Value: &e" + CrownUtils.decimalizeNumber(getDailyEnchantment().getPrice()) + " Rhines&6.");
+        item.addUnsafeEnchantment(getDailyEnchantment().getEnchantment(), getDailyEnchantment().getLevel());
 
         return item;
     }

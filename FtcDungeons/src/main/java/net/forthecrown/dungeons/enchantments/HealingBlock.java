@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons.enchantments;
 
+import net.forthecrown.dungeons.Dungeons;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
@@ -22,12 +23,13 @@ public class HealingBlock extends Enchantment implements Listener {
 
     NamespacedKey key;
     Plugin plugin;
-    Set<String> cd = new HashSet<String>();
+    Set<String> cd = new HashSet<>();
 
     public HealingBlock(NamespacedKey key, Plugin plugin) {
         super(key);
         this.plugin = plugin;
         this.key = key;
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @SuppressWarnings("deprecation")

@@ -45,29 +45,29 @@ public class SignShopUseEvent extends Event implements Cancellable {
     }
 
     public Integer getCustomerBalance(){
-        return bals.getBalance(customer.getBase());
+        return bals.get(customer.getBase());
     }
 
     public void setCustomerBalance(Integer amount){
-        bals.setBalance(customer.getBase(), amount);
+        bals.set(customer.getBase(), amount);
     }
 
     public Integer getOwnerBalance(){
-        return bals.getBalance(shop.getOwner());
+        return bals.get(shop.getOwner());
     }
 
     public void setOwnerBalance(Integer amount){
-        bals.setBalance(shop.getOwner(), amount);
+        bals.set(shop.getOwner(), amount);
     }
 
     public void addOwnerBalance(Integer amount){
-        if(!getCustomer().getBase().equals(getOwner().getBase())) bals.addBalance(getOwner().getBase(), amount, true);
-        else bals.addBalance(shop.getOwner(), amount);
+        if(!getCustomer().getBase().equals(getOwner().getBase())) bals.add(getOwner().getBase(), amount, true);
+        else bals.add(shop.getOwner(), amount);
     }
 
     public void addCustomerBalance(Integer amount){
-        if(!getCustomer().getBase().equals(getOwner().getBase())) bals.addBalance(getCustomer().getBase(), amount, true);
-        else bals.addBalance(getCustomer().getBase(), amount);
+        if(!getCustomer().getBase().equals(getOwner().getBase())) bals.add(getCustomer().getBase(), amount, true);
+        else bals.add(getCustomer().getBase(), amount);
     }
 
     public CrownUser getOwner(){

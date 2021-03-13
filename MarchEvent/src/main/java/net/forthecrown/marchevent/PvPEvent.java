@@ -23,7 +23,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 
 import java.util.Arrays;
@@ -61,18 +60,12 @@ public class PvPEvent {
 
     public static final CrownBoundingBox ARENA_VICINITY = new CrownBoundingBox(EVENT_WORLD, -782, 0, 995, -704, 255, 1070);
 
+    public static final Set<Player> died = new HashSet<>();
+
     private static BossBar bar;
     private int tickerId;
 
-    public static Team yellowTeam;
-    public static Team blueTeam;
-
     public PvPEvent(){
-        yellowTeam = EventMain.getInstance().getServer().getScoreboardManager().getMainScoreboard().getTeam("yellowTeam");
-        blueTeam = EventMain.getInstance().getServer().getScoreboardManager().getMainScoreboard().getTeam("blueTeam");
-
-        yellowTeam.setAllowFriendlyFire(false);
-        blueTeam.setAllowFriendlyFire(false);
     }
 
     public static void tellPlayersInVicinity(String message){
@@ -170,14 +163,15 @@ public class PvPEvent {
 
         for (Player p: winningTeam){
             Score score = crown.getScore(p.getName());
-            score.setScore(score.getScore() + 3);
+            score.setScore(score.getScore() + 2*2);
 
             p.sendMessage(ChatColor.GRAY + "You got" + ChatColor.YELLOW + " 3 points" + ChatColor.GRAY + " for winning!");
         }
 
         for (Player p: losingTeam){
+            if(died.contains(p)) continue;
             Score score = crown.getScore(p.getName());
-            score.setScore(score.getScore() + 1);
+            score.setScore(score.getScore() + 1*2);
 
             p.sendMessage(ChatColor.GRAY + "You got" + ChatColor.YELLOW + " 1 point" + ChatColor.GRAY + " for surviving!");
         }
@@ -193,27 +187,16 @@ public class PvPEvent {
         timeUntilOpen = 200;
         if(end){
             for (Player p: inEvent) {
-                p.teleport(EXIT_LOCATION);
                 clearItemAndEffects(p.getName());
+                p.teleport(EXIT_LOCATION);
             }
 
-            createTeams();
             CrownGameCommand.reset();
             inEvent.clear();
             BLUE_TEAM.clear();
             YELLOW_TEAM.clear();
+            died.clear();
         }
-    }
-
-    public void createTeams(){
-        yellowTeam.unregister();
-        blueTeam.unregister();
-
-        yellowTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("yellowTeam");
-        blueTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("blueTeam");
-
-        yellowTeam.setAllowFriendlyFire(false);
-        blueTeam.setAllowFriendlyFire(false);
     }
 
     public void setCenterBlocks(Material mat){
@@ -244,9 +227,6 @@ public class PvPEvent {
     public void removePlayer(Player p){
         p.teleport(EXIT_LOCATION);
         inEvent.remove(p);
-
-        BLUE_TEAM.remove(p);
-        YELLOW_TEAM.remove(p);
     }
 
     public void checkCentralBlocks(){
@@ -295,8 +275,6 @@ public class PvPEvent {
             clearItemAndEffects(p.getName());
 
             giveItems(p, yellow);
-            if(yellow) yellowTeam.addEntry(p.getUniqueId().toString());
-            else blueTeam.addEntry(p.getUniqueId().toString());
 
             inEvent.add(p);
         }
@@ -306,8 +284,8 @@ public class PvPEvent {
         ItemStack stack = new ItemStack(Material.SPLASH_POTION);
 
         PotionMeta meta = (PotionMeta) stack.getItemMeta();
-        meta.addCustomEffect(new PotionEffect(PotionEffectType.HEAL, 0, 0), true);
-        meta.setDisplayName(ChatColor.WHITE + "Splash potion of Healing");
+        meta.addCustomEffect(new PotionEffect(PotionEffectType.HEAL, 1, 1), true);
+        meta.displayName(Component.text(ChatColor.WHITE + "Splash potion of Healing"));
 
         stack.setItemMeta(meta);
 

@@ -13,7 +13,6 @@ import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.exceptions.NoRankException;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -89,9 +88,9 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
 
     private void doEdwardStuff(CrownUser user, BlackMarket bm){
         user.sendMessage("&eEdward &7is currently selling &e" +
-                CrownUtils.capitalizeWords(bm.getDailyEnchantment().getKey().toString().replaceAll("minecraft:", "").replaceAll("_", " "))
-                + " " + CrownUtils.arabicToRoman(bm.getDailyEnchantLevel()) + " &7for &6"
-                + bm.getEnchantPrice(bm.getDailyEnchantment()) + " Rhines");
+                CrownUtils.capitalizeWords(bm.getDailyEnchantment().getEnchantment().getKey().toString().replaceAll("minecraft:", "").replaceAll("_", " "))
+                + " " + CrownUtils.arabicToRoman(bm.getDailyEnchantment().getLevel()) + " &7for &6"
+                + CrownUtils.decimalizeNumber(bm.getDailyEnchantment().getPrice()) + " Rhines");
 
         ClickEventHandler.allowCommandUsage(user.getPlayer(), true);
 
@@ -106,48 +105,39 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
     }
 
 
-    private boolean sellItem(CrownUser user, Balances bals, BlackMarket bm, Material toSell){
+    private void sellItem(CrownUser user, Balances bals, BlackMarket bm, Material toSell){
         int sellAmount = user.getSellAmount().getInt();
         int finalSell = sellAmount;
-        if(finalSell == -1) finalSell++;
 
         Player player = user.getPlayer();
         PlayerInventory playerInventory = player.getInventory();
 
-        for(ItemStack stack : playerInventory){
-            if(stack == null) continue;
-            if(stack.getType() != toSell) continue;
+        ItemStack toSellItem = new ItemStack(toSell, sellAmount);
 
-            if(user.getSellAmount() == SellAmount.ALL){ //remove the itemstack and add it to the finalSell variable
-                finalSell += stack.getAmount();
-                sellAmount = 0;
-                playerInventory.removeItem(stack);
-                continue;
-            }
-
-            if(stack.getAmount() >= sellAmount){ //if the stack is larger than the remaining sellAmount
-                stack.setAmount(stack.getAmount() - sellAmount);
-                if(stack.getAmount() < 0) playerInventory.removeItem(stack);
-                sellAmount = 0;
-                break;
-            }
-
-            if(stack.getAmount() < sellAmount){ //if the stack is smaller than the remaining sellAmount
-                sellAmount -= stack.getAmount(); //lessens the sellAmount so the next item requires only the amount of items still needed
-                playerInventory.removeItem(stack);
-            }
+        if(!playerInventory.contains(toSell, sellAmount)){
+            user.sendMessage("&7You don't have enough items to sell");
+            return;
         }
-        if(sellAmount != 0) return false; //if there's not enough items and you aren't selling all
+
+        if(user.getSellAmount() == SellAmount.ALL){
+            finalSell = 0;
+            for (ItemStack i: playerInventory){
+                if(i == null) continue;
+                if(i.getType() != toSell) continue;
+
+                finalSell += i.getAmount();
+                playerInventory.removeItemAnySlot(i);
+            }
+        } else playerInventory.removeItemAnySlot(toSellItem);
 
         String s = toSell.toString().toLowerCase().replaceAll("_", " ");
         int toPay = bm.getItemPrice(toSell) * finalSell;
 
-        bals.addBalance(user.getBase(), toPay, false);
+        bals.add(user.getBase(), toPay, false);
         bm.setAmountEarned(toSell, bm.getAmountEarned(toSell) + toPay);
         user.sendMessage("&7You sold &e" + finalSell + " " + s + " &7for &6" + toPay + " Rhines");
 
         System.out.println(user.getName() + " sold " + finalSell + " " + s + " for " + toPay);
-        return true;
     }
 
     @Override
@@ -195,6 +185,10 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
             if(event.getCurrentItem() == null) return;
 
             event.setCancelled(true);
+
+            if(Cooldown.contains(player)) return;
+            Cooldown.add(player, 20);
+
             Material toSell = event.getCurrentItem().getType();
 
             switch (toSell){
@@ -226,14 +220,14 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
                 }
 
                 if(event.getCurrentItem().getItemMeta().getLore().get(0).contains("only for Admirals.")){
-                    if(!user.hasRank(Rank.ADMIRAL)) throw new NoRankException(player, "You need to be an Admiral to get this parrot!");
+                    if(!user.hasRank(Rank.ADMIRAL)) throw new CrownException(player, "&eYou need to be an Admiral to get this parrot!");
                 } else if(event.getCurrentItem().getItemMeta().getLore().get(0).contains("only for Captains.")){
-                    if(!user.hasRank(Rank.CAPTAIN)) throw new NoRankException(player, "You need to be a Captain to get this parrot!");
+                    if(!user.hasRank(Rank.CAPTAIN)) throw new CrownException(player, "&eYou need to be a Captain to get this parrot!");
                 } else {
                     int cost = Integer.parseInt(ChatColor.stripColor(event.getCurrentItem().getLore().get(0)).replaceAll("[\\D]", ""));
 
-                    if(bals.getBalance(user.getBase()) < cost) throw new CannotAffordTransaction(player);
-                    bals.setBalance(user.getBase(), bals.getBalance(user.getBase())  - cost);
+                    if(bals.get(user.getBase()) < cost) throw new CannotAffordTransaction(player);
+                    bals.set(user.getBase(), bals.get(user.getBase())  - cost);
                 }
 
                 if(pets.contains(color + "_parrot")){
@@ -248,7 +242,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
             }
 
             if(bm.getItemPrice(toSell) == null && toSell != Material.ENCHANTED_BOOK) return;
-            if(!sellItem(user, bals, bm, toSell)) user.sendMessage("&7Couldn't sell items!");
+            sellItem(user, bals, bm, toSell);
 
             switch (event.getView().getTitle().toLowerCase().replaceAll("black market: ", "")){
                 case "drops":
@@ -279,15 +273,15 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
             if(event.getSlot() == 11 && (event.getAction() == InventoryAction.PICKUP_ALL || event.getAction() == InventoryAction.SWAP_WITH_CURSOR)) return;
             if(event.getCurrentItem() == null) return;
 
+            ItemStack toCheck = event.getClickedInventory().getItem(11);
+            if(toCheck == null) return;
+
             Player player = (Player) event.getWhoClicked();
             Balances balances = FtcCore.getBalances();
             BlackMarket bm = FtcCore.getBlackMarket();
 
-            ItemStack toCheck = event.getClickedInventory().getItem(11);
-            if(toCheck == null) return;
-
-            Enchantment enchantment = bm.getDailyEnchantment();
-            if(!enchantment.canEnchantItem(toCheck)){
+            Enchantment enchantment = bm.getDailyEnchantment().getEnchantment();
+            if(!canEnchantItem(toCheck, enchantment)){
                 player.openInventory(bm.getEnchantInventory(toCheck, false));
                 return;
             } else player.openInventory(bm.getEnchantInventory(toCheck, true));
@@ -295,13 +289,13 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
             if(event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE)){
                 if(event.getClickedInventory().getItem(11) == null) throw new CrownException(player, "&7Place an item to enchant in the empty slot");
 
-                if(balances.getBalance(player.getUniqueId()) < bm.getEnchantPrice(bm.getDailyEnchantment())) throw new CannotAffordTransaction(player);
-                balances.addBalance(player.getUniqueId(), -bm.getEnchantPrice(bm.getDailyEnchantment()));
+                if(balances.get(player.getUniqueId()) < bm.getDailyEnchantment().getPrice()) throw new CannotAffordTransaction(player);
+                balances.add(player.getUniqueId(), -bm.getDailyEnchantment().getPrice());
 
                 ItemStack toEnchant = event.getClickedInventory().getItem(11).clone();
 
                 ItemMeta meta = toEnchant.getItemMeta();
-                meta.addEnchant(enchantment, bm.getDailyEnchantLevel(), true);
+                meta.addEnchant(enchantment, bm.getDailyEnchantment().getLevel(), true);
                 toEnchant.setItemMeta(meta);
 
                 try {
@@ -315,6 +309,10 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
                 player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_HIT, 1.0f, 1.0f);
                 bm.setAllowedToBuyEnchant(player, false);
             }
+        }
+
+        private boolean canEnchantItem(ItemStack toEnchant, Enchantment enchantment){
+            return enchantment.canEnchantItem(toEnchant);
         }
     }
 }

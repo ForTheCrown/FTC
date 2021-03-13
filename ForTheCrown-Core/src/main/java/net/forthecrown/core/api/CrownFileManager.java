@@ -1,6 +1,8 @@
 package net.forthecrown.core.api;
 
-public interface CrownFileManager {
+import org.bukkit.plugin.java.JavaPlugin;
+
+public interface CrownFileManager<P extends JavaPlugin> {
 
     /**
      * Saves the file
@@ -11,4 +13,10 @@ public interface CrownFileManager {
      * Reloads the file
      */
     void reload();
+
+    /**
+     * Gets the plugin that created this file
+     * @return File owning plugin
+     */
+    P getPlugin();
 }

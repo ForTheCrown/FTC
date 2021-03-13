@@ -1,11 +1,13 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.exceptions.InvalidCommandExecution;
+import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.inventories.RankInventory;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,8 +40,8 @@ public class RankGuiUseEvent implements Listener {
         Player player = (Player) event.getWhoClicked();
         CrownUser user = FtcCore.getUser(player.getUniqueId());
         RankInventory rankInv = new RankInventory(user);
-        String currentInvTitle = event.getView().getTitle();
-        String clickedRankString = event.getCurrentItem().getItemMeta().getDisplayName();
+        String currentInvTitle = CrownUtils.getFullStringComponents((TextComponent) event.getView().title());
+        String clickedRankString = CrownUtils.getFullStringComponents((TextComponent) event.getCurrentItem().getItemMeta().displayName());
 
         if(clickedRankString.contains("Next page")){
             switch (currentInvTitle){
@@ -70,7 +72,7 @@ public class RankGuiUseEvent implements Listener {
         }
 
         if(clickedRank.getRankBranch() != Branch.DEFAULT){
-            if(user.getBranch() != clickedRank.getRankBranch()) throw new InvalidCommandExecution(user, "&cThis rank is not in your branch!");
+            if(user.getBranch() != clickedRank.getRankBranch()) throw new CrownException(user, "&cThis rank is not in your branch!");
         }
 
         if(clickedRank == Rank.DEFAULT){

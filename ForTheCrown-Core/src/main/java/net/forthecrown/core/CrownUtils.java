@@ -2,6 +2,9 @@ package net.forthecrown.core;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -10,7 +13,10 @@ import org.bukkit.World;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
+import java.text.DateFormatSymbols;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,7 +75,7 @@ public final class CrownUtils {
         for(String w:words){
             String first = w.substring(0,1);
             String afterfirst = w.substring(1);
-            capitalizeWord += first.toUpperCase() + afterfirst+" ";
+            capitalizeWord += first.toUpperCase() + afterfirst + " ";
         }
         return capitalizeWord.trim();
     }
@@ -83,11 +89,11 @@ public final class CrownUtils {
         ItemStack result = new ItemStack(material, amount);
         ItemMeta meta = result.getItemMeta();
 
-        if (name != null) meta.displayName(Component.text(ChatColor.RESET + translateHexCodes(name)));
+        if (name != null) meta.setDisplayName(ChatColor.RESET + "" + ChatColor.WHITE + translateHexCodes(name));
         if (loreStrings != null) {
-            List<Component> lore = new ArrayList<>();
-            for(String s : loreStrings){ lore.add(Component.text(ChatColor.RESET + translateHexCodes(s))); }
-            meta.lore(lore);
+            List<String> lore = new ArrayList<>();
+            for(String s : loreStrings){ lore.add(ChatColor.RESET + "" + ChatColor.WHITE + translateHexCodes(s)); }
+            meta.setLore(lore);
         }
         if (hideFlags) {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -98,12 +104,68 @@ public final class CrownUtils {
         return result;
     }
 
+    public static TextComponent makeComponent(String text, @Nullable TextColor color, @Nullable ClickEvent click, @Nullable HoverEvent hover){
+        TextComponent component = Component.text(text);
+        if(color != null) component = component.color(color);
+        if(click != null) component = component.clickEvent(click);
+        if(hover != null) component = component.hoverEvent(hover);
+        return component;
+    }
+
+    public static String getFullStringComponents(TextComponent text){
+        StringBuilder result = new StringBuilder(text.content());
+        for (Component c: text.children()){
+            result.append(((TextComponent) c).content());
+        }
+        return result.toString();
+    }
+
+    public static String getDateFromMillis(long millis){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(millis);
+
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        String s = day + "";
+
+        DateFormatSymbols sF = DateFormatSymbols.getInstance();
+
+        s += getDaySuffix(day);
+        s += "of ";
+        s += sF.getMonths()[c.get(Calendar.MONTH)];
+        s += " " + c.get(Calendar.YEAR);
+
+        return s;
+    }
+
+    private static String getDaySuffix(int day){
+        if (day >= 11 && day <= 13) {
+            return "th ";
+        }
+        switch (day%10){
+            case 1:
+                return "st ";
+            case 2:
+                return "nd ";
+            case 3:
+                return "rd ";
+            default:
+                return "th ";
+        }
+    }
+
     public static String getItemNormalName(ItemStack stack){
         return capitalizeWords(stack.getType().toString().replaceAll("_", " ").toLowerCase());
     }
 
     public static String formatStaffChatMessage(String senderName, String message){
         return translateHexCodes(formatEmojis(staffChatFormat.replaceAll("%SENDER%", senderName) + message));
+    }
+
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
+    public static String decimalizeNumber(Number number){
+        DECIMAL_FORMAT.setGroupingUsed(true);
+        DECIMAL_FORMAT.setGroupingSize(3);
+        return DECIMAL_FORMAT.format(number);
     }
 
     public static String getStringFromComponent(Component component){
@@ -138,7 +200,7 @@ public final class CrownUtils {
     }
 
     private static String s(long l){
-        if(l > 1) return "s";
+        if(l != 1) return "s";
         return "";
     }
 

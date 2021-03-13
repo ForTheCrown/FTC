@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public interface BlackMarket extends CrownFileManager{
+public interface BlackMarket {
 
     /**
      * Gets the amount of Rhines earned from a material
@@ -68,20 +68,16 @@ public interface BlackMarket extends CrownFileManager{
      * @param enchantment The enchantment to get the price of
      * @return The price
      */
-    Integer getEnchantPrice(Enchantment enchantment);
+    Integer getEnchantBasePrice(Enchantment enchantment);
 
     /**
      * Sets the price of an enchantment
      * @param enchantment The enchantment to set the price of
      * @param price The new price
      */
-    void setEnchantPrice(Enchantment enchantment, Integer price);
+    void setEnchantBasePrice(Enchantment enchantment, Integer price);
 
-    /**
-     * Gets the enchantment being sold today
-     * @return The enchantment being sold today
-     */
-    Enchantment getDailyEnchantment();
+    DailyEnchantment getDailyEnchantment();
 
     /**
      * Gets the inventory of Otto, aka the drops inventory
@@ -99,11 +95,11 @@ public interface BlackMarket extends CrownFileManager{
 
     Inventory getParrotInventory();
 
-    ItemStack getDailyEnchantBook();
-
     ItemStack getAcceptEnchantButton();
 
     ItemStack getDenyEnchantButton();
 
-    int getDailyEnchantLevel();
+    void save();
+
+    void reload();
 }

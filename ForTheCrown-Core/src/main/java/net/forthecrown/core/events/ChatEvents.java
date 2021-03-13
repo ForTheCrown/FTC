@@ -2,6 +2,7 @@ package net.forthecrown.core.events;
 
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Announcer;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,30 +15,22 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.logging.Level;
 
 public class ChatEvents implements Listener {
 
     private final FtcCore main = FtcCore.getInstance();
 
-    public static final Set<CommandSender> ignoringStaffChat = new HashSet<>();
-    public static boolean scMuted = false;
-
-    public static void sendStaffChatMessage(@Nullable CommandSender sender, String message){
-        if(scMuted && sender != null){
-            sender.sendMessage(ChatColor.GRAY + "Staff chat is muted");
-            return;
-        }
+    public static void sendStaffChatMessage(@Nullable CommandSender sender, String message, boolean cmd){
         if(sender == null) message = CrownUtils.formatStaffChatMessage("Info", message);
         else message = CrownUtils.formatStaffChatMessage(sender.getName(), message);
 
         for (Player p : Bukkit.getOnlinePlayers()){
-            if((p.hasPermission("ftc.staffchat") && !ignoringStaffChat.contains(p)))
+            if((p.hasPermission("ftc.staffchat")))
                 p.sendMessage(message);
         }
-        System.out.println(message);
+        if(!cmd) System.out.println(message);
     }
 
     @EventHandler
@@ -46,10 +39,11 @@ public class ChatEvents implements Listener {
         Location loc = player.getLocation();
 
         // Tell the Player where they died, but ignore world_void deaths.
+        String diedAt = "died at x=" + loc.getBlockX() + ", y=" + loc.getBlockY() + ", z=" + loc.getBlockZ() + ".";
         if (!loc.getWorld().getName().equalsIgnoreCase("world_void"))
-            player.sendMessage(ChatColor.GRAY + "[FTC] You died at x=" + loc.getBlockX() + ", y=" + loc.getBlockY() + ", z=" + loc.getBlockZ() + ".");
+            player.sendMessage(ChatColor.GRAY + "[FTC] You " + diedAt);
 
-        main.getServer().getConsoleSender().sendMessage(ChatColor.RED + "! " + ChatColor.RESET + player.getName() + " died at x=" + loc.getBlockX() + ", y=" + loc.getBlockY() + ", z=" + loc.getBlockZ() + ", world=" + loc.getWorld().getName() + ".");
+        Announcer.log(Level.INFO, "! " + player.getName() + " " + diedAt);
     }
 
 
@@ -69,7 +63,7 @@ public class ChatEvents implements Listener {
             if(upCastCharNumber > (message.length()/2) && !player.hasPermission("ftc.chatcaseignore")) {
                 message = message.toLowerCase();
                 message += "!";
-                player.sendMessage("Refrain from using all caps messages");
+                player.sendMessage("Refrain from using all caps messages.");
             }
         }
 
@@ -81,7 +75,7 @@ public class ChatEvents implements Listener {
         // Handle players with staffchat toggled on:
         if (FtcCore.getSCTPlayers().contains(player)) {
             event.setCancelled(true);
-            sendStaffChatMessage(player, message);
+            sendStaffChatMessage(player, message, false);
             return;
         }
 

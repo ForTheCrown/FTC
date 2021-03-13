@@ -1,5 +1,6 @@
 package net.forthecrown.core.api;
 
+import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.ShopType;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public interface SignShop extends CrownFileManager, InventoryHolder {
+public interface SignShop extends CrownFileManager<FtcCore>, InventoryHolder {
 
     /**
      * Gets the file name of the shop
@@ -121,6 +122,10 @@ public interface SignShop extends CrownFileManager, InventoryHolder {
      */
     void updateSign();
 
+    /**
+     * Gets the shop's inventory
+     * @return The shop's inventory
+     */
     @Override
     @NotNull ShopInventory getInventory();
 

@@ -1,7 +1,10 @@
 package net.forthecrown.core.crownevents;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.forthecrown.core.FtcCore;
+import net.minecraft.server.v1_16_R3.IChatBaseComponent;
+import net.minecraft.server.v1_16_R3.PacketPlayOutChat;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -10,7 +13,7 @@ import java.util.TimerTask;
 
 public class EventTimer {
 
-    private long elapseTime = 0;
+    private long elapsedTime = 0;
     private final Player player;
     private final Timer timer;
     private final Runnable runnable;
@@ -25,33 +28,33 @@ public class EventTimer {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                elapseTime += 100;
+                elapsedTime += 100;
 
-                int minutes = (int) ((elapseTime /60000) % 60);
+                int minutes = (int) ((elapsedTime /60000) % 60);
                 if(minutes >= maxMinutes){
-                    runnable.run();
+                    Bukkit.getScheduler().runTask(FtcCore.getInstance(), runnable);
                     stopTimer();
-                    return;
                 }
 
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getTimerCounter(elapseTime).toString()));
+                sendActionBar(player, getTimerCounter(elapsedTime).toString());
             }
         }, 0, 100);
     }
 
     public void startTimerTickingDown(int maxTimeMins){
-        elapseTime = maxTimeMins;
+        elapsedTime = maxTimeMins;
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                elapseTime -= 100;
+                elapsedTime -= 100;
 
-                if(elapseTime <= 0){
-                    runnable.run();
+                if(elapsedTime <= 0){
+                    Bukkit.getScheduler().runTask(FtcCore.getInstance(), runnable);
+                    stopTimer();
                 }
 
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getTimerCounter(elapseTime).toString()));
+                sendActionBar(player, getTimerCounter(elapsedTime).toString());
             }
         }, 0, 100);
     }
@@ -61,15 +64,13 @@ public class EventTimer {
         timer.purge();
     }
 
-    public long getPlayerTime(){
-        return elapseTime;
+    public long getTime(){
+        return elapsedTime;
     }
 
     public Player getPlayer() {
         return player;
     }
-
-
 
     public static StringBuilder getTimerCounter(long timeInMillis){
         long minutes = (timeInMillis /60000) % 60;
@@ -84,6 +85,13 @@ public class EventTimer {
         return message;
     }
 
+
+    private static void sendActionBar(Player p, String message){
+        CraftPlayer c = (CraftPlayer) p;
+        IChatBaseComponent text = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
+        PacketPlayOutChat packet = new PacketPlayOutChat(text, net.minecraft.server.v1_16_R3.ChatMessageType.GAME_INFO, p.getUniqueId());
+        c.getHandle().playerConnection.sendPacket(packet);
+    }
 
     @Override
     public boolean equals(Object o) {

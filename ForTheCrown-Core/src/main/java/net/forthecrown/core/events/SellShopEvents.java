@@ -55,7 +55,9 @@ public class SellShopEvents implements Listener {
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
         //change sell amount
         if(item.getType() == Material.BLACK_STAINED_GLASS_PANE){
-            switch (item.getItemMeta().getDisplayName()){
+            String displayName = CrownUtils.getStringFromComponent(item.getItemMeta().displayName());
+
+            switch (displayName){
                 case "Sell 1":
                     user.setSellAmount(SellAmount.PER_1);
                     break;
@@ -119,41 +121,30 @@ public class SellShopEvents implements Listener {
 
         int sellAmount = seller.getSellAmount().getInt();
         int finalSell = sellAmount;
-        if(sellAmount == -1) finalSell++;
+
+        ItemStack toSellItem = new ItemStack(toSell, finalSell);
 
         Balances bals = event.getBalances();
 
         Player player = event.getSellerPlayer();
         PlayerInventory playerInventory = player.getInventory();
 
-        for(ItemStack stack : playerInventory){
-            if(stack == null) continue;
-            if(stack.getType() != toSell) continue;
-
-            if(seller.getSellAmount() == SellAmount.ALL){ //remove the itemstack and add it to the finalSell variable
-                finalSell += stack.getAmount();
-                sellAmount = 0;
-                playerInventory.removeItem(stack);
-                continue;
-            }
-
-            if(stack.getAmount() >= sellAmount){ //if the stack is larger than the remaining sellAmount
-                stack.setAmount(stack.getAmount() - sellAmount);
-                if(stack.getAmount() < 0) playerInventory.removeItem(stack);
-                sellAmount = 0;
-                break;
-            }
-
-            if(stack.getAmount() < sellAmount){ //if the stack is smaller than the remaining sellAmount
-                sellAmount -= stack.getAmount(); //lessens the sellAmount so the next item requires only the amount of items still needed
-                playerInventory.removeItem(stack);
-            }
-        }
-        if(sellAmount != 0){
+        if(!playerInventory.contains(toSell, sellAmount)){
             seller.sendMessage("&7You don't have enough items to sell");
             event.setCancelled(true);
             return;
         }
+
+        if(seller.getSellAmount() == SellAmount.ALL){
+            finalSell = 0;
+            for (ItemStack i: playerInventory){
+                if(i == null) continue;
+                if(i.getType() != toSell) continue;
+
+                finalSell += i.getAmount();
+                playerInventory.removeItemAnySlot(i);
+            }
+        } else playerInventory.removeItemAnySlot(toSellItem);
 
         UUID uuid = player.getUniqueId();
         int toPay = finalSell * seller.getItemPrice(toSell);
@@ -163,9 +154,9 @@ public class SellShopEvents implements Listener {
         s = s.substring(0, s.length()-1) + s.substring(s.length()-1).replaceAll("s", "");
         if(seller.getSellAmount().getInt() > 1) s += "s";
 
-        bals.addBalance(uuid, toPay, true); //does the actual paying and adds the itemsSold to the seller
+        bals.add(uuid, toPay, true); //does the actual paying and adds the itemsSold to the seller
         seller.setAmountEarned(toSell, seller.getAmountEarned(toSell)+toPay); //How the fuck does this keep resetting everytime
-        seller.sendMessage("&7You sold &e" + finalSell + " " + s + " &7for &6" + toPay + " Rhines");
+        seller.sendMessage("&7You sold &e" + finalSell + " " + s + " &7for &6" + CrownUtils.decimalizeNumber(toPay) + " Rhines");
 
         System.out.println(seller.getName() + " sold " + finalSell + " " + s + " for " + toPay);
 
@@ -183,3 +174,34 @@ public class SellShopEvents implements Listener {
         HandlerList.unregisterAll(this);
     }
 }
+
+/**
+ * for(ItemStack stack : playerInventory){
+ *             if(stack == null) continue;
+ *             if(stack.getType() != toSell) continue;
+ *
+ *             if(seller.getSellAmount() == SellAmount.ALL){ //remove the itemstack and add it to the finalSell variable
+ *                 finalSell += stack.getAmount();
+ *                 sellAmount = 0;
+ *                 playerInventory.removeItemAnySlot(stack);
+ *                 continue;
+ *             }
+ *
+ *             if(stack.getAmount() >= sellAmount){ //if the stack is larger than the remaining sellAmount
+ *                 stack.setAmount(stack.getAmount() - sellAmount);
+ *                 if(stack.getAmount() < 0) playerInventory.removeItemAnySlot(stack);
+ *                 sellAmount = 0;
+ *                 break;
+ *             }
+ *
+ *             if(stack.getAmount() < sellAmount){ //if the stack is smaller than the remaining sellAmount
+ *                 sellAmount -= stack.getAmount(); //lessens the sellAmount so the next item requires only the amount of items still needed
+ *                 playerInventory.removeItemAnySlot(stack);
+ *             }
+ *         }
+ *         if(sellAmount != 0){
+ *             seller.sendMessage("&7You don't have enough items to sell");
+ *             event.setCancelled(true);
+ *             return;
+ *         }
+ */

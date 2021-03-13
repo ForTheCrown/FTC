@@ -1,6 +1,11 @@
 package net.forthecrown.core.events;
 
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.CrownWorldGuard;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
@@ -21,6 +26,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 public class SignShopCreateEvent implements Listener {
 
@@ -69,10 +75,14 @@ public class SignShopCreateEvent implements Listener {
 
         if(line2.isBlank() && line1.isBlank()) throw new CrownException(player, "&7You must provide a description of the shop's items");
 
+        //WorldGuard flag check
+        LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+        ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(wgPlayer.getLocation());
+        if(!set.testState(wgPlayer, CrownWorldGuard.SHOP_CREATION) && !player.hasPermission("ftc.admin")) throw new CrownException(player, "&c&lHey! &7Shop creation is disabled here");
+
         SignShop shop = FtcCore.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
 
         player.openInventory(shop.getExampleInventory());
-
         FtcCore.getInstance().getServer().getPluginManager().registerEvents(new SignShopSubClass1(player, shop), FtcCore.getInstance());
 
         if(shopType == ShopType.BUY_SHOP) event.line(0, Component.text(shopType.getOutOfStockLabel()));
@@ -126,7 +136,7 @@ public class SignShopCreateEvent implements Listener {
                     "sell " +
                     shopInv.getExampleItem().getAmount() + " " +
                     CrownUtils.getItemNormalName(shopInv.getExampleItem()) +
-                    " for " + shop.getPrice() +
+                    " for " + CrownUtils.decimalizeNumber(shop.getPrice()) +
                     " Rhines.";
 
             if(shop.getType() == ShopType.SELL_SHOP || shop.getType() == ShopType.ADMIN_SELL_SHOP) loooooonngg = loooooonngg.replaceAll("sell", "buy");
@@ -135,6 +145,9 @@ public class SignShopCreateEvent implements Listener {
             player.sendMessage(ChatColor.GRAY + "Use Shift + Right Click to restock the shop.");
             shop.setOutOfStock(false);
             shop.save();
+
+
+            shop.getSign().getPersistentDataContainer().set(FtcCore.SHOP_KEY, PersistentDataType.STRING, "SignShop");
         }
     }
 }

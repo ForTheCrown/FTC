@@ -12,22 +12,20 @@ import org.bukkit.event.Listener;
 
 import java.util.*;
 
-public abstract class VikingBlessing extends FtcFileManager implements Listener {
+public abstract class VikingBlessing extends FtcFileManager<Vikings> implements Listener {
     private static final Set<VikingBlessing> BLESSINGS = new HashSet<>();
 
     private final Server server;
     protected final String name;
-    protected final Vikings main;
 
     private final Set<UUID> usingUsers = new HashSet<>(); //name lol
     private final Set<UUID> tempUsers = new HashSet<>();
 
     protected VikingBlessing(String name, Vikings plugin){
-        super(name, "vikingblessings");
+        super(name, "vikingblessings", plugin);
 
         this.name = name;
         this.server = plugin.getServer();
-        main = plugin;
         BLESSINGS.add(this);
 
         reload();
@@ -64,7 +62,7 @@ public abstract class VikingBlessing extends FtcFileManager implements Listener 
     }
 
     public void registerEvents(){
-        server.getPluginManager().registerEvents(this, main);
+        server.getPluginManager().registerEvents(this, getPlugin());
     }
 
     public void unregisterEvents(){
@@ -80,7 +78,7 @@ public abstract class VikingBlessing extends FtcFileManager implements Listener 
         tempUsers.add(user.getBase());
         onPlayerEquip(user);
 
-        Bukkit.getScheduler().runTaskLater(main, () -> endUsage(user), expiresInTicks);
+        Bukkit.getScheduler().runTaskLater(getPlugin(), () -> endUsage(user), expiresInTicks);
     }
 
     public final void endUsage(CrownUser user){
@@ -113,9 +111,9 @@ public abstract class VikingBlessing extends FtcFileManager implements Listener 
         return name;
     }
 
-    public static VikingBlessing fromName(String s){
-        for (VikingBlessing b: BLESSINGS){
-            if(s.equals(b.getName())) return b;
+    public static VikingBlessing fromName(String name){
+        for (VikingBlessing b: getBlessings()){
+            if(b.getName().equalsIgnoreCase(name)) return b;
         }
         return null;
     }

@@ -7,9 +7,5 @@ depend:
   - FTCCore
 
 commands:
-  rankadd:
-    description: adds a rank.
-  rankremove:
-    description: removes a rank.
   addlore:
     description: adds lore.

@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons.enchantments;
 
+import net.forthecrown.dungeons.Dungeons;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
@@ -28,6 +29,7 @@ public class PoisonCrit extends Enchantment implements Listener {
     public PoisonCrit(NamespacedKey key, Plugin plugin) {
         super(key);
         this.key = key;
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler

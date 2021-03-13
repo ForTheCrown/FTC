@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 /**
  * The class representing the ingame Announcer.
  */
-public interface Announcer extends CrownFileManager {
+public interface Announcer extends CrownFileManager<FtcCore> {
 
     /**
      * Gets the delay between automatic announcements
@@ -108,5 +108,5 @@ public interface Announcer extends CrownFileManager {
      * @param message
      * @param permission
      */
-    void announceToAllWithPerms(String message, @Nullable String permission);
+    void announce(String message, @Nullable String permission);
 }

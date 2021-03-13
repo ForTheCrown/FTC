@@ -8,21 +8,21 @@ import java.util.List;
 
 public enum Rank {
     //royals
-    KNIGHT ( "&8[&7Knight&8] &r", Branch.ROYALS),
-    BARON ("&8[&7Baron&8] &r", Branch.ROYALS),
-    BARONESS( "&8[&7Baroness&8] &r", Branch.ROYALS),
+    KNIGHT ( "&8[&7Knight&8] &f", Branch.ROYALS),
+    BARON ("&8[&7Baron&8] &f", Branch.ROYALS),
+    BARONESS( "&8[&7Baroness&8] &f", Branch.ROYALS),
     LORD ("&#959595[&6Lord&#959595] &r", Branch.ROYALS),
     LADY( "&#959595[&6Lady&#959595] &r", Branch.ROYALS),
     DUKE ("&7[&#ffbf15Duke&7] &r", Branch.ROYALS),
     DUCHESS( "&7[&#ffbf15Duchess&7] &r", Branch.ROYALS),
-    PRINCE ("[&#FBFF0FPrince&r] &r", Branch.ROYALS),
-    PRINCESS ( "[&#FBFF0FPrincess&r] &r", Branch.ROYALS),
+    PRINCE ("[&#FBFF0FPrince&f] &r", Branch.ROYALS),
+    PRINCESS ( "[&#FBFF0FPrincess&f] &r", Branch.ROYALS),
 
     //pirates
     SAILOR ("&8&l{&7Sailor&8&l} &r", Branch.PIRATES),
     PIRATE ("&8&l{&7Pirate&8&l} &r", Branch.PIRATES),
     CAPTAIN ("&7{&6Captain&7} &r", Branch.PIRATES),
-    ADMIRAL ("{&eAdmiral&r} &r", Branch.PIRATES),
+    ADMIRAL ("{&eAdmiral&f} &r", Branch.PIRATES),
 
     //vikings
     VIKING ("<Viking>", Branch.VIKINGS),
@@ -62,7 +62,7 @@ public enum Rank {
     public static Rank fromPrefix(String s){
         String s1 = ChatColor.stripColor(s).replaceAll("\\p{P}", "").toLowerCase(); //removes all punctuation marks, including brackets and stuff
 
-        if(s1.toLowerCase().contains("default") || s1.isBlank()) return Rank.DEFAULT;
+        if(s1.toLowerCase().contains("default") || s1.isBlank()) return DEFAULT;
         for (Rank r : values()){
             String s2 = ChatColor.stripColor(r.getPrefix()).replaceAll("\\p{P}", "").toLowerCase();
 

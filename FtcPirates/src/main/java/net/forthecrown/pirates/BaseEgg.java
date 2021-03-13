@@ -1,5 +1,6 @@
 package net.forthecrown.pirates;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,15 +36,10 @@ public class BaseEgg implements Listener {
                 if (event.getBlockPlaced().getLocation().getBlock().getType() == Material.TURTLE_EGG) {
                     ItemMeta meta = event.getItemInHand().getItemMeta();
 
-                    if (meta.getLore() != null) {
-
+                    if (meta.hasLore()) {
                         event.getBlockPlaced().getLocation().getBlock().setType(Material.AIR);
-                        //if (plugin.getServer().getPluginManager().getPlugin("DataPlugin").getConfig().getString("players." + event.getPlayer().getUniqueId().toString() + ".ActiveBranch").contains("Pirate"))
-                        //{
                         spawnCorrectEntity(event.getPlayer(), event.getBlock().getLocation().add(0.5, 1, 0.5), meta.getLore().get(0), meta.getDisplayName());
                         event.getItemInHand().setAmount(event.getItemInHand().getAmount() - 1);
-                        //}
-                        //else event.getPlayer().sendMessage(ChatColor.RED + "Only pirates can do this.");
                     }
                 }
             }, 2L);
@@ -51,7 +47,6 @@ public class BaseEgg implements Listener {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void spawnCorrectEntity(Player player, Location spawnLocation, String loreline, String displayName) {
         if (loreline == null || loreline.equals("") || player == null) return;
 
@@ -72,7 +67,7 @@ public class BaseEgg implements Listener {
             PotionMeta toxicSewageTeaMeta = (PotionMeta) toxicSewageTea.getItemMeta();
             toxicSewageTeaMeta.setColor(org.bukkit.Color.fromRGB(6583123));
             toxicSewageTeaMeta.addCustomEffect(new PotionEffect(PotionEffectType.CONFUSION, 300, 0), true);
-            toxicSewageTeaMeta.setDisplayName("Toxic Sewage Tea");
+            toxicSewageTeaMeta.displayName(Component.text("Toxic Sewage Tea"));
             toxicSewageTea.setItemMeta(toxicSewageTeaMeta);
 
             MerchantRecipe recipe0 = new MerchantRecipe(toxicSewageTea, 0, Integer.MAX_VALUE, false);
@@ -84,7 +79,7 @@ public class BaseEgg implements Listener {
             sailorSweatMeta.setColor(org.bukkit.Color.fromRGB(3682594));
             sailorSweatMeta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 0, 0), true);
             sailorSweatMeta.addCustomEffect(new PotionEffect(PotionEffectType.CONFUSION, 300, 0), true);
-            sailorSweatMeta.setDisplayName("Sailor Sweat");
+            sailorSweatMeta.displayName(Component.text("Sailor Sweat"));
             sailorSweat.setItemMeta(sailorSweatMeta);
 
             MerchantRecipe recipe1 = new MerchantRecipe(sailorSweat, 0, Integer.MAX_VALUE, false);
@@ -95,7 +90,7 @@ public class BaseEgg implements Listener {
             PotionMeta puddleJuiceMeta = (PotionMeta) puddleJuice.getItemMeta();
             puddleJuiceMeta.setColor(org.bukkit.Color.fromRGB(16776965));
             puddleJuiceMeta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 300, 2), true);
-            puddleJuiceMeta.setDisplayName("Puddle Juice");
+            puddleJuiceMeta.displayName(Component.text("Puddle Juice"));
             puddleJuice.setItemMeta(puddleJuiceMeta);
 
             MerchantRecipe recipe2 = new MerchantRecipe(puddleJuice, 0, Integer.MAX_VALUE, false);
@@ -150,7 +145,7 @@ public class BaseEgg implements Listener {
         }
         else {
             try {
-                player.getWorld().spawnEntity(spawnLocation, EntityType.fromName(loreline.replace(" ", "_").toUpperCase()));
+                player.getWorld().spawnEntity(spawnLocation, EntityType.valueOf(loreline.replace(" ", "_").toUpperCase()));
             } catch (Exception e) {
                 Bukkit.broadcastMessage("rip");
             }

@@ -12,11 +12,11 @@ public enum ShopType {
     ADMIN_BUY_SHOP ("&b&l=[Buy]=", "&4&l=[Buy]=");
 
     private final String inStock;
-    private final String outOfStock;
+    private final String outStock;
 
-    ShopType(@Nonnull String firstLine, @Nonnull String outOfStockLine){
-        this.inStock = firstLine;
-        this.outOfStock = outOfStockLine;
+    ShopType(@Nonnull String inStock, @Nonnull String outStock){
+        this.inStock = inStock;
+        this.outStock = outStock;
     }
 
     @Nonnull
@@ -26,6 +26,6 @@ public enum ShopType {
 
     @Nonnull
     public String getOutOfStockLabel() {
-        return CrownUtils.translateHexCodes(outOfStock);
+        return CrownUtils.translateHexCodes(outStock);
     }
 }

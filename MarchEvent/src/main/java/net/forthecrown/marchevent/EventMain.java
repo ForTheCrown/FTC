@@ -13,8 +13,8 @@ public final class EventMain extends JavaPlugin {
     public void onEnable() {
         plugin = this;
 
-        new CrownGameCommand();
         event = new PvPEvent();
+        new CrownGameCommand();
     }
 
     @Override

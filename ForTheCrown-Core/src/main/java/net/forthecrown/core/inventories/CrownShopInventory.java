@@ -7,6 +7,7 @@ import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,15 +16,10 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
 
     private final CrownSignShop owningShop;
     private ItemStack exampleItem;
+
     public CrownShopInventory(CrownSignShop signShop){
         super(signShop, InventoryType.CHEST, "Shop Contents");
         owningShop = signShop;
-    }
-
-    @Override
-    public HashMap<Integer, ItemStack> addItem(ItemStack... items) {
-        owningShop.setOutOfStock(false);
-        return super.addItem(items);
     }
 
     @Override
@@ -48,6 +44,7 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
         }
     }
 
+    @Nonnull
     @Override
     public SignShop getHolder() {
         return owningShop;
@@ -60,8 +57,30 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
 
     @Override
     public ItemStack getExampleItem() {
-        if(exampleItem == null) throw new NullPointerException(owningShop.getName() + " has null example item");
-        return exampleItem.clone();
+        try {
+            return exampleItem.clone();
+        } catch (Exception e){
+            return null;
+        }
+    }
+
+    @Override
+    public int getTotalItemAmount(){
+        int amount = 0;
+
+        for (ItemStack i: getContents()){
+            if(i == null) continue;
+
+            amount += i.getAmount();
+        }
+
+        return amount;
+    }
+
+    @Override
+    public void performStockCheck(){
+        if(getExampleItem() == null) return;
+        getHolder().setOutOfStock(getTotalItemAmount() < getExampleItem().getAmount());
     }
 
     @Override
@@ -69,18 +88,13 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
         this.exampleItem = exampleItem;
     }
 
-    @Override
-    public void setExampleItemAndAdd(ItemStack exampleItem) {
-        setExampleItem(exampleItem);
-
-        addItem(exampleItem);
-    }
-
+    @Nonnull
     @Override
     public HashMap<Integer, ItemStack> removeItemAnySlot(ItemStack... items) throws IllegalArgumentException {
         return removeItem(items);
     }
 
+    @Nonnull
     @Override
     public SignShop getHolder(boolean useSnapshot) {
         return owningShop;

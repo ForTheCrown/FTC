@@ -1,123 +1,138 @@
 package net.forthecrown.vikings.commands;
 
-import net.forthecrown.core.FtcCore;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.CrownCommand;
-import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.exceptions.InvalidArgumentException;
-import net.forthecrown.core.exceptions.NonPlayerExecutor;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.vikings.Vikings;
 import net.forthecrown.vikings.blessings.VikingBlessing;
-import net.forthecrown.vikings.raids.RaidDifficulty;
+import net.forthecrown.vikings.inventory.BlessingSelector;
+import net.forthecrown.vikings.inventory.RaidSelector;
 import net.forthecrown.vikings.raids.RaidHandler;
 import net.forthecrown.vikings.raids.VikingRaid;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class VikingsCommand extends CrownCommand implements TabCompleter {
+public class VikingsCommand extends CrownCommandBuilder {
 
     public VikingsCommand() {
         super("viking", Vikings.getInstance());
 
         setPermission("ftc.vikings.admin");
-        setTabCompleter(this);
         setUsage("&7Usage: /vikings <test> <raid name>\n /viking <end | complete>");
         register();
     }
 
     @Override
-    public boolean run(CommandSender sender, Command command, String label, String[] args) throws CrownException {
-        if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
-        if(args.length < 1) return false;
+    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+        command
+                .then(argument("reload")
+                        .executes(c -> {
+                            Vikings.reloadVikings();
+                            getSender(c).sendMessage("Vikings reloaded");
+                            return 0;
+                        })
+                )
+                .then(argument("save")
+                        .executes(c ->{
+                            Vikings.saveVikings();
+                            getSender(c).sendMessage("Vikings saved");
+                            return 0;
+                        })
+                )
 
-        Player player = (Player) sender;
+                .then(argument("raid")
+                        .then(argument("start")
+                                .then(argument("raid", StringArgumentType.word())
+                                        .executes(c -> {
+                                            Player p = getPlayerSender(c);
 
-        if(args[0].contains("test")){
-            if(args.length < 2) return false;
+                                            VikingRaid raid = RaidHandler.fromName(c.getArgument("raid", String.class));
+                                            if(raid == null) throw new CrownCommandException("Invalid raid!");
 
-            VikingRaid raid = RaidHandler.fromName(args[1]);
-            if(raid == null) throw new InvalidArgumentException(sender, args[1] + " is not a valid raid");
+                                            Vikings.getRaidHandler().callRaid(p, raid);
+                                            p.sendMessage("Starting raid!");
+                                            return 0;
+                                        })
+                                )
+                        )
+                        .then(argument("stop")
+                                .executes(c -> {
+                                    Player p = getPlayerSender(c);
 
-            RaidDifficulty difficulty = RaidDifficulty.NORMAL;
-            if(args.length == 3){
-                try {
-                    difficulty = RaidDifficulty.valueOf(args[2].toUpperCase());
-                } catch (Exception ignored) {}
-            }
+                                    VikingRaid raid = RaidHandler.fromPlayer(p);
+                                    if(raid == null) throw new CrownCommandException("You are not currently in a raid!");
 
-            Vikings.getRaidHandler().callRaid(raid, player, difficulty);
-        }
-        else if(args[0].contains("end")){
-            VikingRaid raid = RaidHandler.fromPlayer(player);
-            if(raid == null) return false;
+                                    raid.onRaidEnd();
+                                    p.sendMessage("Ending raid");
+                                    return 0;
+                                })
+                        )
+                        .then(argument("complete")
+                                .executes(c -> {
+                                    Player p = getPlayerSender(c);
 
-            raid.onRaidEnd();
-        }
-        else if(args[0].contains("complete")){
-            VikingRaid raid = RaidHandler.fromPlayer(player);
-            if(raid == null) return false;
+                                    VikingRaid raid = RaidHandler.fromPlayer(p);
+                                    if(raid == null) throw new CrownCommandException("You are not currently in a raid!");
 
-            raid.onRaidComplete();
-        }
-        else if (args[0].contains("blessing")){
-            if(args.length != 3) return false;
+                                    raid.completeRaid();
+                                    p.sendMessage("Ending raid as success");
+                                    return 0;
+                                })
+                        )
+                        .then(argument("inventory")
+                                .executes(c->{
+                                    CrownUser user = getUserSender(c);
 
-            VikingBlessing blessing = VikingBlessing.fromName(args[2]);
-            if(blessing == null) throw new InvalidArgumentException(sender, args[2] + " is not a valid blessing");
-            CrownUser user = FtcCore.getUser(player);
+                                    try {
+                                        user.getPlayer().openInventory(new RaidSelector(user).getInventory());
+                                    } catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    return 0;
+                                })
+                        )
+                )
+                .then(argument("blessing")
+                        .then(argument("blessingName", StringArgumentType.word())
+                                .then(argument("beginUsage")
+                                        .executes(c -> {
+                                            CrownUser user = getUserSender(c);
 
-            if(args[1].contains("use")){
-                blessing.beginUsage(user);
-                player.sendMessage("Starting blessing usage!");
-            }
+                                            VikingBlessing b = VikingBlessing.fromName(c.getArgument("blessingName", String.class));
+                                            if(b == null) throw new CrownCommandException("Invalid blessing!");
 
-            if(args[1].contains("stop")){
-                blessing.endUsage(user);
-                user.sendMessage("You are no longer using a blessing");
-            }
-        }
-        return true;
-    }
+                                            b.beginUsage(user);
+                                            user.sendMessage("Starting blessing usage!");
+                                            return 0;
+                                        })
+                                )
+                                .then(argument("endUsage")
+                                        .executes(c ->{
+                                            CrownUser user = getUserSender(c);
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        List<String> toReturn = new ArrayList<>();
+                                            VikingBlessing b = VikingBlessing.fromName(c.getArgument("blessingName", String.class));
+                                            if(b == null) throw new CrownCommandException("Invalid blessing!");
 
-        if(args.length == 1){
-            toReturn.add("test");
-            toReturn.add("end");
-            toReturn.add("complete");
-            toReturn.add("blessing");
-        }
+                                            b.endUsage(user);
+                                            user.sendMessage("Stopping blessing usage!");
+                                            return 0;
+                                        })
+                                )
+                        )
+                        .then(argument("inventory")
+                                .executes(c->{
+                                    CrownUser user = getUserSender(c);
 
-        if(args.length == 2 && args[0].contains("test")){
-            for (VikingRaid r : Vikings.getRaidHandler().getRaids()){
-                toReturn.add(r.getName());
-            }
-        }
-
-        if(args.length == 3 && args[0].contains("test")){
-            for (RaidDifficulty d: RaidDifficulty.values()){
-                toReturn.add(d.toString());
-            }
-        }
-
-        if(args.length == 2 && args[0].contains("blessing")){
-            toReturn.add("use");
-            toReturn.add("stop");
-        }
-
-        if(args.length == 3 && (args[1].contains("use") || args[1].contains("stop"))){
-            for (VikingBlessing b : VikingBlessing.getBlessings()){
-                toReturn.add(b.getName());
-            }
-        }
-
-        return toReturn;
+                                    try {
+                                        user.getPlayer().openInventory(new BlessingSelector(user).getInventory());
+                                    } catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    return 0;
+                                })
+                        )
+                );
     }
 }

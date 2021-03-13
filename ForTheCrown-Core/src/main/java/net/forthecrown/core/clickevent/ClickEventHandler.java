@@ -1,6 +1,7 @@
 package net.forthecrown.core.clickevent;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.exceptions.CrownException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -59,11 +60,13 @@ public final class ClickEventHandler {
         if(registeredClickEvents.get(id) == null) throw new NullPointerException("No Npc with this ID exists: " + id);
 
         ClickEventTask task = registeredClickEvents.get(id);
-        task.run(player, args);
+        try {
+            task.run(player, args);
+        } catch (CrownException ignored) {}
     }
 
-    public static boolean isClickEventRegistered(String id){
-        return registeredClickEvents.containsKey(id);
+    public static boolean isRegistered(String id){
+        return registeredClickEvents.containsKey(id) && registeredClickEvents.get(id) != null;
     }
 
     public static boolean isAllowedToUseCommand(Player player){
@@ -81,9 +84,6 @@ public final class ClickEventHandler {
     public static String getCommand(String id, String... args){
         return "/npcconverse " + id + " " + String.join(" ", args);
     }
-
-
-
 
 
     private static String generateRandomID(){

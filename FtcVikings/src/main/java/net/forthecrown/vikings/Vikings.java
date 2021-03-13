@@ -19,7 +19,7 @@ public final class Vikings extends JavaPlugin {
         instance = this;
         handler = new RaidHandler(getServer());
 
-        getServer().getPluginManager().registerEvents(new RaidChooseListener(), this);
+        getServer().getPluginManager().registerEvents(new VikingListener(), this);
 
         handler.registerRaid(new MonasteryRaid());
 
@@ -39,6 +39,22 @@ public final class Vikings extends JavaPlugin {
         for (VikingBlessing b: VikingBlessing.getBlessings()){
             b.save();
             b.clearTempUsers();
+        }
+    }
+
+    public static void reloadVikings() {
+        getInstance().reloadConfig();
+
+        for (VikingBlessing b: VikingBlessing.getBlessings()){
+            b.reload();
+        }
+    }
+
+    public static void saveVikings(){
+        getInstance().saveConfig();
+
+        for (VikingBlessing b: VikingBlessing.getBlessings()){
+            b.save();
         }
     }
 

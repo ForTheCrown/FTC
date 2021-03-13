@@ -1,15 +1,16 @@
 package net.forthecrown.cosmetics.inventories;
 
 import net.forthecrown.core.CrownUtils;
-import net.forthecrown.core.FtcCore;
-import net.forthecrown.cosmetics.Cosmetics;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-public class CustomInventory {
+public class CustomInventory implements InventoryHolder {
 
     public Inventory inv;
 
@@ -20,7 +21,7 @@ public class CustomInventory {
     private ItemStack returnItem;
 
     public CustomInventory(int size, String title, boolean needHead, boolean needReturn) {
-        this.inv = Bukkit.createInventory(Cosmetics.holder, size, title);
+        this.inv = Bukkit.createInventory(this, size, Component.text(title));
 
         if (needHead) this.headItem = CrownUtils.makeItem(Material.NETHER_STAR, 1, true, ChatColor.YELLOW + "Menu", "", ChatColor.DARK_GRAY + "ulala");
         else this.headItem = getGlassFiller();
@@ -72,7 +73,7 @@ public class CustomInventory {
         return CrownUtils.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
     }
 
-    public Inventory getInventory() {
+    public @NotNull Inventory getInventory() {
         return makeInventory();
     }
 

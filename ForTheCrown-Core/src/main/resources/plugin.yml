@@ -6,3 +6,5 @@ authors: [ Botul, Wout ]
 loadbefore:
   - OpenInv
   - Essentials
+depend:
+  - WorldGuard

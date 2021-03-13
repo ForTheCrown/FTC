@@ -3,6 +3,7 @@ package net.forthecrown.core.files;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserDataContainer;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
@@ -32,10 +33,12 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
-public class FtcUser extends FtcFileManager implements CrownUser {
+public class FtcUser extends FtcFileManager<FtcCore> implements CrownUser {
 
     private final UUID base;
     private String name;
+
+    private final FtcUserDataContainer dataContainer;
 
     private Rank currentRank;
     private Set<Rank> ranks;
@@ -60,16 +63,18 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     private Map<Material, Integer> amountEarned = new HashMap<>();
     private SellAmount sellAmount;
 
-    public FtcUser(UUID base){
-        super(base.toString(), "playerdata");
+    public FtcUser(@NotNull UUID base){
+        super(base.toString(), "playerdata", FtcCore.getInstance());
         this.base = base;
+
+        dataContainer = new FtcUserDataContainer(this);
 
         if(fileDoesntExist) addDefaults();
         else reload();
         if(legacyDataExists()) convertLegacy();
         if(shouldResetEarnings()) resetEarnings();
 
-        FtcCore.loadedUsers.add(this);
+        FtcCore.LOADED_USERS.add(this);
         permsCheck();
     }
 
@@ -79,7 +84,10 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
         name = getFile().getString("PlayerName");
         setRank(Rank.valueOf(getFile().getString("CurrentRank")), false);
-        setBranch(Branch.valueOf(getFile().getString("Branch")));
+
+        branch = Branch.valueOf(getFile().getString("Branch"));
+        //setBranch(Branch.valueOf(getFile().getString("Branch")));
+
         setCanSwapBranch(getFile().getBoolean("CanSwapBranch"), false);
         setPets(getFile().getStringList("Pets"));
         setDeathParticle(getFile().getString("DeathParticle"));
@@ -143,6 +151,12 @@ public class FtcUser extends FtcFileManager implements CrownUser {
             }
             name = getPlayer().getName();
         }
+
+        if(totalEarnings < 0) totalEarnings = 0;
+
+        ConfigurationSection dataSec = getFile().getConfigurationSection("DataContainer");
+        if(dataSec == null) dataSec = getFile().createSection("DataContainer");
+        dataContainer.deserialize(dataSec);
     }
 
     @Override
@@ -159,9 +173,11 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         getFile().set("AllowsRidingPlayers", allowsRidingPlayers());
         getFile().set("Gems", getGems());
         getFile().set("SellAmount", getSellAmount().toString());
-        getFile().set("TotalEarnings", getTotalEarnings());
         getFile().set("AllowsEmotes", allowsEmotes());
         getFile().set("ProfilePublic", isProfilePublic());
+
+        if(totalEarnings < 0) totalEarnings = 0;
+        getFile().set("TotalEarnings", getTotalEarnings());
 
         getFile().set("TimeStamps.NextResetTime", getNextResetTime());
         getFile().set("TimeStamps.LastLoad", System.currentTimeMillis());
@@ -209,13 +225,15 @@ public class FtcUser extends FtcFileManager implements CrownUser {
             getFile().createSection("AmountEarned", tempMap);
         }
 
+        if(!dataContainer.isEmpty()) getFile().createSection("DataContainer", dataContainer.serialize());
+
         super.save();
     }
 
     @Override
     public void unload(){
         save();
-        FtcCore.loadedUsers.remove(this);
+        FtcCore.LOADED_USERS.remove(this);
     }
 
     @Override
@@ -487,6 +505,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         System.out.println(getName() + " earnings reset, next reset in: " + ((((getNextResetTime()/1000)/60)/60)/24) + " days");
     }
 
+    @Nonnull
     @Override
     public String getName(){
         if(name == null) name = getOfflinePlayer().getName();
@@ -517,7 +536,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     @Override
     public void sendMessage(@Nonnull String message){
         if(!isOnline()) return;
-        sendMessage(Component.text(CrownUtils.translateHexCodes(message)));
+        getPlayer().sendMessage(CrownUtils.translateHexCodes(message));
     }
 
     @Override
@@ -534,7 +553,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     }
 
     @Override
-    public void sendMessage(UUID sender, String message) {
+    public void sendMessage(UUID sender, @Nonnull String message) {
         performOnlineCheck();
         getPlayer().sendMessage(sender, CrownUtils.translateHexCodes(message));
     }
@@ -546,6 +565,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         }
     }
 
+    @Nonnull
     @Override
     public Server getServer() {
         return FtcCore.getInstance().getServer();
@@ -557,18 +577,19 @@ public class FtcUser extends FtcFileManager implements CrownUser {
     }
 
     @Override
+    public Scoreboard getScoreboard(){
+        return FtcCore.getInstance().getServer().getScoreboardManager().getMainScoreboard();
+    }
+
+    @Override
     public boolean isKing() {
-        return FtcCore.getKing().equals(getBase());
+        if(FtcCore.getKing() != null) return FtcCore.getKing().equals(getBase());
+        return false;
     }
 
     @Override
     public void setKing(boolean king, boolean setPrefix) {
         setKing(king, setPrefix, false);
-    }
-
-    @Override
-    public Scoreboard getScoreboard(){
-        return FtcCore.getInstance().getServer().getScoreboardManager().getMainScoreboard();
     }
 
     @Override
@@ -606,6 +627,11 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         this.publicProfile = publicProfile;
     }
 
+    @Override
+    public UserDataContainer getDataContainer() {
+        return dataContainer;
+    }
+
     //---------------------------
     // The following methods are inherited from CommandSender
     // Cuz MessageCommandSender still had these methods, but no code for them
@@ -620,55 +646,57 @@ public class FtcUser extends FtcFileManager implements CrownUser {
 
 
     @Override
-    public boolean isPermissionSet(String name) {
+    public boolean isPermissionSet(@Nonnull String name) {
         performOnlineCheck();
         return getPlayer().isPermissionSet(name);
     }
 
     @Override
-    public boolean isPermissionSet(Permission perm) {
+    public boolean isPermissionSet(@Nonnull Permission perm) {
         performOnlineCheck();
         return getPlayer().isPermissionSet(perm);
     }
 
     @Override
-    public boolean hasPermission(String name) {
+    public boolean hasPermission(@Nonnull String name) {
         performOnlineCheck();
         return getPlayer().hasPermission(name);
     }
 
     @Override
-    public boolean hasPermission(Permission perm) {
+    public boolean hasPermission(@Nonnull Permission perm) {
         performOnlineCheck();
         return getPlayer().hasPermission(perm);
     }
 
+    @Nonnull
     @Override
-    public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value) {
+    public PermissionAttachment addAttachment(@Nonnull Plugin plugin, @Nonnull String name, boolean value) {
         performOnlineCheck();
         return getPlayer().addAttachment(plugin, name, value);
     }
 
+    @Nonnull
     @Override
-    public PermissionAttachment addAttachment(Plugin plugin) {
+    public PermissionAttachment addAttachment(@Nonnull Plugin plugin) {
         performOnlineCheck();
         return getPlayer().addAttachment(plugin);
     }
 
     @Override
-    public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value, int ticks) {
+    public PermissionAttachment addAttachment(@Nonnull Plugin plugin, @Nonnull String name, boolean value, int ticks) {
         performOnlineCheck();
         return getPlayer().addAttachment(plugin, name, value, ticks);
     }
 
     @Override
-    public PermissionAttachment addAttachment(Plugin plugin, int ticks) {
+    public PermissionAttachment addAttachment(@Nonnull Plugin plugin, int ticks) {
         performOnlineCheck();
         return getPlayer().addAttachment(plugin, ticks);
     }
 
     @Override
-    public void removeAttachment(PermissionAttachment attachment) {
+    public void removeAttachment(@Nonnull PermissionAttachment attachment) {
         performOnlineCheck();
         getPlayer().removeAttachment(attachment);
     }
@@ -679,6 +707,7 @@ public class FtcUser extends FtcFileManager implements CrownUser {
         getPlayer().recalculatePermissions();
     }
 
+    @Nonnull
     @Override
     public Set<PermissionAttachmentInfo> getEffectivePermissions() {
         performOnlineCheck();

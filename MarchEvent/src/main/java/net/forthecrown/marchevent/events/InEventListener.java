@@ -22,7 +22,6 @@ public class InEventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent event) {
         if(!PvPEvent.inEvent.contains(event.getPlayer())) return;
-
         EventMain.getEvent().removePlayer(event.getPlayer());
     }
 
@@ -39,14 +38,14 @@ public class InEventListener implements Listener {
         if(!areOnSameTeams(player, player.getKiller())) {
             Objective obj = EventMain.getInstance().getServer().getScoreboardManager().getMainScoreboard().getObjective("crown");
             Score killerScr = obj.getScore(player.getKiller().getName());
-            if (!killerScr.isScoreSet()) killerScr.setScore(2);
-            else killerScr.setScore(killerScr.getScore() + 2);
+            if (!killerScr.isScoreSet()) killerScr.setScore(3*2);
+            else killerScr.setScore(killerScr.getScore() + 3*2);
 
             player.sendMessage(CrownUtils.translateHexCodes("&7You were killed by &e" + player.getKiller().getName()));
             player.getKiller().sendMessage(CrownUtils.translateHexCodes("&7You killed &e" + player.getName() + "&7 and earned &e2 points"));
         }
 
-        EventMain.getEvent().removePlayer(player);
+        PvPEvent.died.add(player);
 
         new BukkitRunnable() {
             @Override
@@ -58,8 +57,8 @@ public class InEventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if(!(event.getDamager() instanceof Player) && !PvPEvent.inEvent.contains((Player) event.getDamager())) return;
-        if(!(event.getEntity() instanceof Player) && !PvPEvent.inEvent.contains((Player) event.getEntity())) return;
+        if(!(event.getDamager() instanceof Player) || !PvPEvent.inEvent.contains((Player) event.getDamager())) return;
+        if(!(event.getEntity() instanceof Player) || !PvPEvent.inEvent.contains((Player) event.getEntity())) return;
 
         Player p1 = (Player) event.getDamager();
         Player p2 = (Player) event.getEntity();

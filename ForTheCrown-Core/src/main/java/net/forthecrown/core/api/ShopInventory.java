@@ -2,9 +2,8 @@ package net.forthecrown.core.api;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
 
 public interface ShopInventory extends Inventory {
@@ -24,43 +23,10 @@ public interface ShopInventory extends Inventory {
     ItemStack getExampleItem();
 
     /**
-     * Stores the given ItemStacks in the inventory. This will try to fill
-     * existing stacks and empty slots as well as it can.
-     * <p>
-     * The returned HashMap contains what it couldn't store, where the key is
-     * the index of the parameter, and the value is the ItemStack at that
-     * index of the varargs parameter. If all items are stored, it will return
-     * an empty HashMap.
-     * <p>
-     * If you pass in ItemStacks which exceed the maximum stack size for the
-     * Material, first they will be added to partial stacks where
-     * Material.getMaxStackSize() is not exceeded, up to
-     * Material.getMaxStackSize(). When there are no partial stacks left
-     * stacks will be split on Inventory.getMaxStackSize() allowing you to
-     * exceed the maximum stack size for that material.
-     * <p>
-     * It is known that in some implementations this method will also set
-     * the inputted argument amount to the number of that item not placed in
-     * slots.
-     *
-     * @param items The ItemStacks to add
-     * @return A HashMap containing items that didn't fit.
-     * @throws IllegalArgumentException if items or any element in it is null
-     */
-    @Override
-    HashMap<Integer, ItemStack> addItem(ItemStack... items) throws IllegalArgumentException;
-
-    /**
      * Sets the exampleItem
      * @param exampleItem the new ExampleItem
      */
     void setExampleItem(ItemStack exampleItem);
-
-    /**
-     * Sets the exampleItem and adds it to the stock's contents
-     * @param exampleItem The new ExampleItem
-     */
-    void setExampleItemAndAdd(ItemStack exampleItem);
 
     /**
      * Sets the shops contents and sorts it
@@ -80,11 +46,34 @@ public interface ShopInventory extends Inventory {
      */
     void clear();
 
+    /**
+     * Gets the SignShop belonging to the open inventory
+     *
+     * @return The holder of the inventory
+     */
     @Override
-    @Nullable SignShop getHolder();
+    @NotNull SignShop getHolder();
 
+    /**
+     * Gets the SignShop belonging to the open inventory
+     *
+     * @param useSnapshot Create a snapshot if the holder is a tile entity
+     * @return The holder of the inventory
+     */
     @Override
-    @Nullable SignShop getHolder(boolean useSnapshot);
+    @NotNull SignShop getHolder(boolean useSnapshot);
+
+    /**
+     * Gets the total amount of items in the inventory
+     * @return Total amount of items
+     */
+    int getTotalItemAmount();
+
+    /**
+     * Checks if the shop has enough stock
+     * And changes the ingame sign accordingly
+     */
+    void performStockCheck();
 
     @Override
     boolean equals(Object o);

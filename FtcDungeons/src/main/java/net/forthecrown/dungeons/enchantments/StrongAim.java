@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons.enchantments;
 
+import net.forthecrown.dungeons.Dungeons;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -29,6 +30,7 @@ public class StrongAim extends Enchantment implements Listener {
         super(key);
         this.plugin = plugin;
         this.key = key;
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler

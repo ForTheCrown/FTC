@@ -8,11 +8,12 @@ import net.forthecrown.core.clickevent.ClickEventHandler;
 import net.forthecrown.core.clickevent.ClickEventTask;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -50,22 +51,22 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
         Cooldown.add(player, 20);
         ClickEventHandler.allowCommandUsage(player, true);
 
-        TextComponent message1 = new TextComponent(ChatColor.YELLOW + "[Info about Pirates]");
-        message1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(clickID, "info")));
-        message1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click me!")));
+        TextComponent message3 = CrownUtils.makeComponent("[Captain's Cutlass]", NamedTextColor.GOLD,
+                ClickEvent.runCommand(ClickEventHandler.getCommand(clickID, "cutlass")),
+                HoverEvent.showText(Component.text("Click me!")));
 
-        TextComponent message2 = new TextComponent(ChatColor.YELLOW + "[Join Pirates]");
-        message2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(clickID, "join")));
-        message2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click me!")));
+        TextComponent message2 = CrownUtils.makeComponent("[Join Pirates]", NamedTextColor.YELLOW,
+                ClickEvent.runCommand(ClickEventHandler.getCommand(clickID, "join")),
+                HoverEvent.showText(Component.text("Click me!")));
 
-        TextComponent message3 = new TextComponent(ChatColor.GOLD + "[Captain's Cutlass]");
-        message3.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(clickID, "cutlass")));
-        message2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click me!")));
+        TextComponent message1 = CrownUtils.makeComponent("[Info about Pirates]", NamedTextColor.YELLOW,
+                ClickEvent.runCommand(ClickEventHandler.getCommand(clickID, "info")),
+                HoverEvent.showText(Component.text("Click me!")));
 
         player.sendMessage(ChatColor.GOLD + "--" + ChatColor.WHITE + " Aye mate, what can I do for ya? " + ChatColor.GOLD + "--");
-        player.spigot().sendMessage(message1);
-        player.spigot().sendMessage(message2);
-        player.spigot().sendMessage(message3);
+        player.sendMessage(message1);
+        player.sendMessage(message2);
+        player.sendMessage(message3);
     }
 
     @Override

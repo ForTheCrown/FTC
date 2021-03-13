@@ -4,27 +4,16 @@ import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.exceptions.CannotAffordTransaction;
-import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.pirates.auctions.PirateAuctionShop;
+import net.forthecrown.pirates.auctions.AuctionManager;
 import net.forthecrown.pirates.commands.*;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.*;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Objective;
@@ -32,7 +21,10 @@ import org.bukkit.scoreboard.Score;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.UUID;
 
 public final class Pirates extends JavaPlugin implements Listener {
 
@@ -42,7 +34,11 @@ public final class Pirates extends JavaPlugin implements Listener {
     //public List<ItemStack> itemsToGet = new ArrayList<ItemStack>();
     public File offlineWithParrots;
     public static Pirates plugin;
-    public static final Map<String, PirateAuctionShop> loadedAuctions = new HashMap<>();
+    public GrapplingHook grapplingHook;
+
+    public PirateEvents events;
+
+    private static AuctionManager auctionManager;
 
     public void onEnable() {
         plugin = this;
@@ -63,14 +59,18 @@ public final class Pirates extends JavaPlugin implements Listener {
             }
         }
 
-        getServer().getPluginManager().registerEvents(this, this);
-        new ghtarget();
-        new ghtargetshowname();
-        new ParrotCommand();
-        new Leave();
-        new UpdateLB();
-        new PirateReload();
+        grapplingHook = new GrapplingHook(this);
+        auctionManager = new AuctionManager(this);
+        events = new PirateEvents(this);
 
+        new CommandGhTarget();
+        new CommandGhShowName();
+        new CommandParrot();
+        new CommandLeave();
+        new CommandUpdateLeaderboard();
+        new CommandPirateReload();
+
+        getServer().getPluginManager().registerEvents(events, this);
         getServer().getPluginManager().registerEvents(new BaseEgg(), this);
         getServer().getPluginManager().registerEvents(new NpcSmithEvent(), this);
 
@@ -80,7 +80,7 @@ public final class Pirates extends JavaPlugin implements Listener {
     @SuppressWarnings("deprecation")
     public void onDisable() {
         List<String> players = new ArrayList<>();
-        for (UUID playeruuid : parrots.values())
+        for (UUID playeruuid : events.parrots.values())
         {
             try { // Online while reload
                 Bukkit.getPlayer(playeruuid).setShoulderEntityLeft(null);
@@ -89,11 +89,16 @@ public final class Pirates extends JavaPlugin implements Listener {
                 players.add(playeruuid.toString());
             }
         }
-        parrots.clear();
+        events.parrots.clear();
+        auctionManager.saveAuctions();
 
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(offlineWithParrots);
         yaml.set("Players", players);
         saveyaml(yaml, offlineWithParrots);
+    }
+
+    public static AuctionManager getAuctionManager() {
+        return auctionManager;
     }
 
     public void updateDate() {
@@ -158,80 +163,22 @@ public final class Pirates extends JavaPlugin implements Listener {
 
     }
 
-    @EventHandler
-    public void onPlayerClick(PlayerInteractEntityEvent event) {
-        if(!event.getHand().equals(EquipmentSlot.HAND))
-            return;
-
-        Player player = event.getPlayer();
-        CrownUser user = FtcCore.getUser(player.getUniqueId());
-        if (event.getRightClicked().getType() == EntityType.VILLAGER) {
-            if (event.getRightClicked().getName().contains(ChatColor.GOLD + "Wilhelm"))
-            {
-                event.setCancelled(true);
-
-                if (getConfig().getStringList("PlayerWhoSoldHeadAlready").contains(player.getUniqueId().toString()))
-                {
-                    player.sendMessage(ChatColor.GRAY + "You've already sold a " + getConfig().getString("ChosenHead") + ChatColor.GRAY + " head today.");
-                    return;
-                }
-                if (checkIfInvContainsHead(event.getPlayer().getInventory())) {
-                    //player.getWorld().playEffect(event.getRightClicked().getLocation(), Effect.VILLAGER_PLANT_GROW, 1);
-                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
-                    giveReward(player);
-                    List<String> temp = getConfig().getStringList("PlayerWhoSoldHeadAlready");
-                    temp.add(player.getUniqueId().toString());
-                    getConfig().set("PlayerWhoSoldHeadAlready", temp);
-                    saveConfig();
-                }
-                else {
-                    player.sendMessage(ChatColor.GOLD + "{FTC} " + ChatColor.RESET + "Bring Wilhelm a " + getConfig().getString("ChosenHead") + ChatColor.RESET + " head for a reward.");
-                }
-            } else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Jack")) {
-                event.setCancelled(true);
-                openLevelSelector(player);
-            } else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Ben")){
-                if(!user.getAvailableRanks().contains(Rank.PIRATE)) throw new CrownException(user, "&eBen &7only trusts real pirates!");
-                if(FtcCore.getBalances().getBalance(player.getUniqueId()) < 50000) throw new CannotAffordTransaction(player);
-
-                FtcCore.getBalances().addBalance(player.getUniqueId(), -50000);
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gh give " + player.getName() + " 50");
-                user.sendMessage("&7You bought a grappling hook from &eBen &7for &e50,000 Rhines");
-            }
-
-        }
-        else if (event.getRightClicked().getType() == EntityType.SHULKER) {
-            Shulker treasureShulker = (Shulker) event.getRightClicked();
-            if ((!treasureShulker.hasAI()) && treasureShulker.getColor() == DyeColor.GRAY) {
-                if (getConfig().getStringList("PlayerWhoFoundTreasureAlready").contains(player.getUniqueId().toString())) player.sendMessage(ChatColor.GRAY + "You've already opened this treasure today.");
-                else {
-                    giveTreasure(player);
-                    List<String> temp = getConfig().getStringList("PlayerWhoFoundTreasureAlready");
-                    temp.add(player.getUniqueId().toString());
-                    getConfig().set("PlayerWhoFoundTreasureAlready", temp);
-                    saveConfig();
-                }
-            }
-        }
-    }
-
-
-    private void giveTreasure(Player player) {
+    void giveTreasure(Player player) {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
 
         double moneyDecider = Math.random();
         if (moneyDecider <= 0.6) {
-            FtcCore.getBalances().addBalance(player.getUniqueId(), 5000, false);
+            FtcCore.getBalances().add(player.getUniqueId(), 5000, false);
             player.sendMessage(ChatColor.GRAY + "You've found a treasure with " + ChatColor.YELLOW + "5,000 rhines" + ChatColor.GRAY + " inside.");
             Bukkit.dispatchCommand(getServer().getConsoleSender(), "crate givekey " + player.getName() + " lootbox1 1");
         }
         else if (moneyDecider > 0.6 && moneyDecider <= 0.9) {
-            FtcCore.getBalances().addBalance(player.getUniqueId(), 10000, false);
+            FtcCore.getBalances().add(player.getUniqueId(), 10000, false);
             player.sendMessage(ChatColor.GRAY + "You've found a treasure with " + ChatColor.YELLOW + "10,000 rhines" + ChatColor.GRAY + " inside.");
             Bukkit.dispatchCommand(getServer().getConsoleSender(), "crate givekey " + player.getName() + " lootbox1 2");
         }
         else {
-            FtcCore.getBalances().addBalance(player.getUniqueId(), 20000, false);
+            FtcCore.getBalances().add(player.getUniqueId(), 20000, false);
             player.sendMessage(ChatColor.GRAY + "You've found a treasure with " + ChatColor.YELLOW + "20,000 rhines" + ChatColor.GRAY + " inside.");
             Bukkit.dispatchCommand(getServer().getConsoleSender(), "crate givekey " + player.getName() + " lootbox1 3");
         }
@@ -314,8 +261,7 @@ public final class Pirates extends JavaPlugin implements Listener {
     }
 
 
-    private void spawnLeaderboard(int amount)
-    {
+    private void spawnLeaderboard(int amount) {
         removeLeaderboard();
         List<String> top = getTopPlayers(Bukkit.getServer().getScoreboardManager().getMainScoreboard().getObjective("PiratePoints"), amount);
         double distanceBetween = 0.27;
@@ -340,8 +286,7 @@ public final class Pirates extends JavaPlugin implements Listener {
         if (isScoreStand) getLeaderBoardArmorStands().add(armorstand);
     }
 
-    private void removeLeaderboard()
-    {
+    private void removeLeaderboard() {
         for (ArmorStand armorstand : getAllLeaderboardArmorstands())
         {
             armorstand.remove();
@@ -356,13 +301,11 @@ public final class Pirates extends JavaPlugin implements Listener {
 
 
     private final List<ArmorStand> leaderboardArmorstands = new ArrayList<>();
-    public List<ArmorStand> getLeaderBoardArmorStands()
-    {
+    public List<ArmorStand> getLeaderBoardArmorStands() {
         return leaderboardArmorstands;
     }
     private final List<ArmorStand> allLeaderboardArmorstands = new ArrayList<>();
-    public List<ArmorStand> getAllLeaderboardArmorstands()
-    {
+    public List<ArmorStand> getAllLeaderboardArmorstands() {
         return allLeaderboardArmorstands;
     }
 
@@ -370,8 +313,7 @@ public final class Pirates extends JavaPlugin implements Listener {
         return new Location(Bukkit.getWorld("world"), -639.0, 70, 3830.5, 90, 0); // TODO UPDATE?
     }
 
-    public void updateLeaderBoard()
-    {
+    public void updateLeaderBoard() {
         removeLeaderboard();
         spawnLeaderboard(5);
 		/*List<String> top = getTopPlayers(Bukkit.getServer().getScoreboardManager().getMainScoreboard().getObjective("PiratePoints"), getLeaderBoardArmorStands().size());
@@ -404,30 +346,7 @@ public final class Pirates extends JavaPlugin implements Listener {
         return result;
     }
 
-
-
-    @EventHandler
-    public void onPlayerClick(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)
-        {
-            if (event.getHand().equals(EquipmentSlot.HAND))
-            {
-                if (event.getItem() != null && event.getItem().getType() == Material.COMPASS)
-                {
-                    if (event.getPlayer().getLocation().getWorld().getName().equalsIgnoreCase(getConfig().getString("TreasureLoc.world"))) {
-                        Location targetLoc = new Location(Bukkit.getWorld(getConfig().getString("TreasureLoc.world")), getConfig().getInt("TreasureLoc.x"), getConfig().getInt("TreasureLoc.y"), getConfig().getInt("TreasureLoc.z"));
-                        event.getPlayer().setCompassTarget(targetLoc);
-                        Location playerloc = event.getPlayer().getLocation();
-                        playerloc.getWorld().playSound(playerloc, Sound.ITEM_LODESTONE_COMPASS_LOCK, 1, 1);
-                        //playerloc.getWorld().spawnParticle(Particle.END_ROD, playerloc.getX(), playerloc.getY()+0.5, playerloc.getZ(), 5, 0.7, 0, 0.7, 0.02);
-                    }
-                }
-            }
-        }
-    }
-
-    public ItemStack getRandomHeadFromChest()
-    {
+    public ItemStack getRandomHeadFromChest() {
         Location chestLoc1 = getloc("HeadChestLocation1");
         Location chestLoc2 = getloc("HeadChestLocation2");
         Location chestLoc3 = getloc("HeadChestLocation3");
@@ -440,8 +359,7 @@ public final class Pirates extends JavaPlugin implements Listener {
         {
             return null;
         }
-        else
-        {
+        else {
             int chosenChest = CrownUtils.getRandomNumberInRange(1, 4);
             int slot = CrownUtils.getRandomNumberInRange(0, 26);
             Location chosenLoc;
@@ -460,8 +378,7 @@ public final class Pirates extends JavaPlugin implements Listener {
 
             ItemStack chosenItem = ((Chest) Bukkit.getWorld("world").getBlockAt(chosenLoc).getState()).getInventory().getContents()[slot];
             int nextSlot = slot+1;
-            while (nextSlot % 27 != slot && chosenItem == null)
-            {
+            while (nextSlot % 27 != slot && chosenItem == null) {
                 nextSlot++;
                 chosenItem = ((Chest) Bukkit.getWorld("world").getBlockAt(chosenLoc).getState()).getInventory().getContents()[nextSlot % 27];
             }
@@ -477,22 +394,20 @@ public final class Pirates extends JavaPlugin implements Listener {
         return new Location(Bukkit.getWorld(getConfig().getString(section + ".world")), getConfig().getInt(section + ".x"), getConfig().getInt(section + ".y"), getConfig().getInt(section + ".z"));
     }
 
-    private void giveReward(Player player) {
-        FtcCore.getBalances().addBalance(player.getUniqueId(), 10000, false);
+    void giveReward(Player player) {
+        FtcCore.getBalances().add(player.getUniqueId(), 10000, false);
         player.sendMessage(ChatColor.GRAY + "You've received " + ChatColor.GOLD + "10,000 rhines" + ChatColor.GRAY + " from " + ChatColor.YELLOW + "Wilhelm" + ChatColor.GRAY + ".");
         givePP(player, 2);
     }
 
 
     @SuppressWarnings("deprecation")
-    private boolean checkIfInvContainsHead(PlayerInventory inv) {
+    boolean checkIfInvContainsHead(PlayerInventory inv) {
         int size = 36;
 
-        for (int i = 0; i < size; i++)
-        {
+        for (int i = 0; i < size; i++) {
             ItemStack invItem = inv.getItem(i);
             if (invItem != null) {
-
                 if (invItem.getType() == Material.PLAYER_HEAD) {
                     if (invItem.hasItemMeta() && ((SkullMeta) invItem.getItemMeta()).getOwner().equalsIgnoreCase(getConfig().getString("ChosenHead"))) {
                         invItem.setAmount(invItem.getAmount()-1);
@@ -510,22 +425,16 @@ public final class Pirates extends JavaPlugin implements Listener {
         List<String> unsortedResult = new ArrayList<>();
         int score;
         for(String name : objective.getScoreboard().getEntries()) {
-            if (unsortedResult.size() < top)
-            {
+            if (unsortedResult.size() < top) {
                 unsortedResult.add(name);
             }
-            else
-            {
+            else {
                 score = objective.getScore(name).getScore();
-                for (String nameInList : unsortedResult)
-                {
-                    if (score > objective.getScore(nameInList).getScore())
-                    {
+                for (String nameInList : unsortedResult) {
+                    if (score > objective.getScore(nameInList).getScore()) {
                         String lowestPlayer = nameInList;
-                        for (String temp : unsortedResult)
-                        {
-                            if (objective.getScore(temp).getScore() < objective.getScore(lowestPlayer).getScore())
-                            {
+                        for (String temp : unsortedResult) {
+                            if (objective.getScore(temp).getScore() < objective.getScore(lowestPlayer).getScore()) {
                                 lowestPlayer = temp;
                             }
                         }
@@ -560,37 +469,6 @@ public final class Pirates extends JavaPlugin implements Listener {
         return sortedResult;
     }
 
-    // parrot uuid - player uuid
-    public Map<UUID, UUID> parrots = new HashMap<>();
-
-    @EventHandler
-    public void onParrotDismount(CreatureSpawnEvent event)
-    {
-        if (parrots.containsKey(event.getEntity().getUniqueId()))
-        {
-
-            if (Bukkit.getPlayer(parrots.get(event.getEntity().getUniqueId())).isFlying()) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-                    event.getEntity().remove();
-                    Bukkit.getPlayer(parrots.get(event.getEntity().getUniqueId())).sendMessage(ChatColor.GRAY + "Poof! Parrot gone.");
-                    parrots.remove(event.getEntity().getUniqueId());
-                }, 1L);
-            }
-            else {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onParrotDeath(EntityDeathEvent event) {
-        if (parrots.containsKey(event.getEntity().getUniqueId())) {
-            event.getDrops().clear();
-            event.setDroppedExp(0);
-            parrots.remove(event.getEntity().getUniqueId());
-        }
-    }
-
 	/*@SuppressWarnings("deprecation")
 	@EventHandler
 	public void parrotCarrierLogsOut(PlayerQuitEvent event) {
@@ -602,318 +480,11 @@ public final class Pirates extends JavaPlugin implements Listener {
 		}
 	}*/
 
-    @SuppressWarnings("deprecation")
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event)
-    {
-        YamlConfiguration yaml = YamlConfiguration.loadConfiguration(offlineWithParrots);
-        List<String> players = yaml.getStringList("Players");
-        if (players.contains(event.getPlayer().getUniqueId().toString()))
-        {
-            event.getPlayer().setShoulderEntityLeft(null);
-            players.remove(event.getPlayer().getUniqueId().toString());
-            yaml.set("Players", players);
-            saveyaml(yaml, offlineWithParrots);
-        }
-    }
-
-
-    // *************************************** Grappling Hook Parkour *************************************** //
-
-    public File getPlayerLevelsFile() {
-        File file = new File(getDataFolder(), "PlayerLevelProgress.yml");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return file;
-    }
-
-    public File getArmorStandFile() {
-        File file = new File(getDataFolder(), "TargetStandData.yml");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return file;
-    }
-
-    public void saveyaml(YamlConfiguration yaml, File file) {
+    public void saveyaml(FileConfiguration yaml, File file) {
         try {
             yaml.save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-
-    @EventHandler
-    public void onPlayerArmorStandEvent(PlayerInteractAtEntityEvent event)
-    {
-        if (event.getHand() != EquipmentSlot.HAND) return;
-        Player player = event.getPlayer();
-
-        if (event.getRightClicked().getType() == EntityType.ARMOR_STAND && event.getRightClicked().isInvulnerable() && event.getRightClicked().getCustomName() != null && event.getRightClicked().getCustomName().contains("GHTargetStand"))
-        {
-            final String ghArmorStandID = "Stand_" + event.getRightClicked().getName().split(" ")[1];
-
-            YamlConfiguration yaml = YamlConfiguration.loadConfiguration(getArmorStandFile());
-            Location loc = new Location(player.getWorld(), yaml.getDouble(ghArmorStandID + ".XToCords"), yaml.getDouble(ghArmorStandID + ".YToCords"), yaml.getDouble(ghArmorStandID + ".ZToCords"), yaml.getInt(ghArmorStandID + ".YawToCords"), 0);
-
-            player.sendMessage(ChatColor.GRAY + "Stand on the glowstone for 2 seconds.");
-
-            Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-                if (player.getLocation().clone().subtract(0, 1, 0).getBlock().getType() == Material.GLOWSTONE) {
-
-                    player.getInventory().clear();
-                    player.teleport(loc);
-                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP , 1.0F, 2.0F);
-                    player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You've advanced to the next level!");
-
-                    if (yaml.getInt(ghArmorStandID + ".StandClass") != 3) Bukkit.dispatchCommand(getServer().getConsoleSender(), "grapplinghook give " + player.getName() + " " + yaml.getInt(ghArmorStandID + ".NextLevelHooks") + " " + yaml.getInt(ghArmorStandID + ".NextLevelDistance"));
-
-                    File playerProgressFile = getPlayerLevelsFile();
-                    YamlConfiguration playerProgressYaml = YamlConfiguration.loadConfiguration(playerProgressFile);
-
-                    int level;
-                    try {
-                        level = Integer.parseInt(event.getRightClicked().getName().split(" ")[1]);
-                    }
-                    catch (Exception e) {
-                        getServer().getConsoleSender().sendMessage(ChatColor.RED + "Wrong target-armorstand found: " + event.getRightClicked().getName().split(" ")[1] + " as id is not valid.");
-                        return;
-                    }
-
-
-                    List<String> levelList = getLevelList();
-
-                    if (!playerProgressYaml.getStringList(player.getUniqueId().toString()).contains(levelList.get(level))) {
-                        switch (yaml.getInt(ghArmorStandID + ".StandClass")) {
-                            case 2:
-                                player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You have recieved " + ChatColor.GOLD  + "25000 Rhines " + ChatColor.GRAY + "for completing all levels in a biome.");
-                                FtcCore.getBalances().addBalance(player.getUniqueId(), 25000);
-                                givePP(player, 5);
-                                break;
-                            case 3:
-                                player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You have recieved " + ChatColor.GOLD + "25000 Rhines " + ChatColor.GRAY + "for completing all the Grappling Hook levels!");
-                                FtcCore.getBalances().addBalance(player.getUniqueId(), 25000);
-                                givePP(player, 25);
-                                break;
-                            default:
-                                break;
-
-                        }
-                    }
-
-
-                    if (playerProgressYaml.getStringList(player.getUniqueId().toString()).isEmpty()) {
-                        playerProgressYaml.createSection(player.getUniqueId().toString());
-                        List<String> list = new ArrayList<>();
-                        list.add("started");
-                        list.add(levelList.get(level));
-                        playerProgressYaml.set(player.getUniqueId().toString(), list);
-                    }
-                    else {
-                        List<String> list = playerProgressYaml.getStringList(player.getUniqueId().toString());
-                        if (!list.contains(levelList.get(level))) list.add(levelList.get(level));
-                        playerProgressYaml.set(player.getUniqueId().toString(), list);
-                    }
-                    saveyaml(playerProgressYaml, playerProgressFile);
-                }
-                else {
-                    player.sendMessage(ChatColor.GRAY + "Cancelled.");
-                }
-            }, 40L);
-        }
-    }
-
-    @EventHandler
-    public void equipping(PlayerArmorStandManipulateEvent event) {
-        if (event.getRightClicked().isInvulnerable() && event.getRightClicked().getCustomName() != null && event.getRightClicked().getCustomName().contains("GHTargetStand")) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onPlayerClickItemInInv(InventoryClickEvent event) {
-        String title = event.getView().getTitle();
-
-        if (title.contains("Level Selector")) {
-            event.setCancelled(true);
-            Player player = (Player) event.getWhoClicked();
-
-            if (!player.getWorld().getName().contains("world_void")) return; // extra check
-
-            if (!invClear(player)) {
-                player.sendMessage(ChatColor.GRAY + "Your inventory has to be completely empty to enter.");
-                return; // TODO Make portal check for empty inventory too
-            }
-
-            if (event.getInventory().getItem(event.getSlot()) == null) return;
-            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
-
-            if (getCompletedLevelIndicators().contains(event.getInventory().getItem(event.getSlot()).getType()) || event.getInventory().getItem(event.getSlot()).getEnchantments().containsKey(Enchantment.CHANNELING)) {
-
-                int slot = event.getSlot() - 1;
-                Location loc;
-
-                if (slot == 39) slot = 35;
-                if (slot == -1) {
-                    loc = new Location(player.getWorld(), -1003.5, 21, 3.5, 180, 0); // Level 1 start
-                    Bukkit.dispatchCommand(getServer().getConsoleSender(), "grapplinghook give " + player.getName());
-                }
-                else {
-                    YamlConfiguration yaml = YamlConfiguration.loadConfiguration(getArmorStandFile());
-                    String ghArmorStandID = "Stand_" + slot;
-                    loc = new Location(player.getWorld(), yaml.getDouble(ghArmorStandID + ".XToCords"), yaml.getDouble(ghArmorStandID + ".YToCords"), yaml.getDouble(ghArmorStandID + ".ZToCords"), yaml.getInt(ghArmorStandID + ".YawToCords"), 0);
-                    Bukkit.dispatchCommand(getServer().getConsoleSender(), "grapplinghook give " + player.getName() + " " + yaml.getInt(ghArmorStandID + ".NextLevelHooks") + " " + yaml.getInt(ghArmorStandID + ".NextLevelDistance"));
-                }
-
-                player.teleport(loc);
-                player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT , 1.0F, 1.0F);
-                player.sendMessage(ChatColor.GRAY + "You can " + ChatColor.YELLOW + "/leave" + ChatColor.GRAY + " at any time.");
-            }
-        }
-    }
-
-
-    private void openLevelSelector(Player player) {
-        Inventory inv = createLevelSelectorInv(player);
-        inv = personalizeInventory(player, inv);
-        player.openInventory(inv);
-    }
-
-    private List<String> getLevelList() {
-        String[] levelnames = {"Journey", "Journey Limited", "Ship", "Ship Limited", "Sky Battle", "Sky Battle Limited", "Floating Islands", "Floating Islands Limited", "Floating Islands Limited Distance", "Big Beans", "Big Beans Limited", "Floating Ruins", "Floating Ruins Temple", "Floating Ruins Temple Limited", "Annoying Islands",
-                "Bunk Ships", "Bunk Ships Limited", "Shark Attack", "Sharks Failed", "Watchtower", "Watchtower Limited", "More Towers", "More Towers Limited", "Not Enough Towers", "Not Enough Towers Limited", "The Climb", "The Limited Climb", "Weird Object",
-                "Tetrominoes Limited", "Tetris", "Tetris Limited", "Tetris Cannons", "Nightmare", "Angry Tetromino", "Parkour A", "Parkour B", "Temple of the Void"};
-
-        List<String> levelList = new ArrayList<>();
-        for (String level : levelnames) levelList.add(level);
-
-        return levelList;
-    }
-
-
-
-    private Inventory createLevelSelectorInv(Player player) {
-        Inventory result = Bukkit.createInventory(player, 54, "Level Selector");
-
-        List<String> levelList = getLevelList();
-
-        ItemStack item;
-        ItemMeta meta;
-        for (int i = 0; i < result.getSize(); i++) {
-            if (i < 15) {
-                item = new ItemStack(Material.GRASS_BLOCK);
-                meta = item.getItemMeta();
-                meta.setDisplayName(ChatColor.AQUA + levelList.get(i) + ChatColor.RESET);
-                item.setItemMeta(meta);
-                result.setItem(i, item);
-            }
-            else if (i >= 15 && i < 27) {
-                item = new ItemStack(Material.RED_SANDSTONE);
-                meta = item.getItemMeta();
-                meta.setDisplayName(ChatColor.AQUA + levelList.get(i) + ChatColor.RESET);
-                item.setItemMeta(meta);
-                result.setItem(i, item);
-            }
-            else if (i >= 27 && i < 34) {
-                item = new ItemStack(Material.PURPLE_STAINED_GLASS);
-                meta = item.getItemMeta();
-                meta.setDisplayName(ChatColor.AQUA + levelList.get(i) + ChatColor.RESET);
-                item.setItemMeta(meta);
-                result.setItem(i, item);
-            }
-            else if (i == 34 || i == 35) {
-                item = new ItemStack(Material.OAK_PLANKS);
-                meta = item.getItemMeta();
-                meta.setDisplayName(ChatColor.AQUA + levelList.get(i) + ChatColor.RESET);
-                item.setItemMeta(meta);
-                result.setItem(i, item);
-            }
-            else if (i == 40) {
-                item = new ItemStack(Material.GILDED_BLACKSTONE);
-                meta = item.getItemMeta();
-                meta.setDisplayName(ChatColor.AQUA + "Temple of the Void");
-                item.setItemMeta(meta);
-                result.setItem(i, item);
-            }
-            else if (i > 40) break;
-        }
-        return result;
-    }
-
-    private Inventory personalizeInventory(Player player, Inventory inv) {
-        File file = getPlayerLevelsFile();
-        YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
-
-        if (yaml.getStringList(player.getUniqueId().toString()).isEmpty()) {
-            yaml.createSection(player.getUniqueId().toString());
-            List<String> list = new ArrayList<String>();
-            list.add("started");
-            yaml.set(player.getUniqueId().toString(), list);
-            saveyaml(yaml, file);
-        }
-        else {
-            ItemStack item;
-            for (String completedLevel : yaml.getStringList(player.getUniqueId().toString())) {
-                if (completedLevel.contains("started")) continue;
-                item = getItemWithNameFrom(inv, completedLevel);
-                if (item == null) continue;
-                if (item.getType() == Material.RED_SANDSTONE) item.setType(Material.ORANGE_TERRACOTTA);
-                else if (item.getType() == Material.PURPLE_STAINED_GLASS) item.setType(Material.PURPLE_TERRACOTTA);
-                else if (item.getType() == Material.OAK_PLANKS) item.setType(Material.TERRACOTTA);
-                else if (item.getType() == Material.GILDED_BLACKSTONE) item.setType(Material.BLACK_TERRACOTTA);
-                else item.setType(Material.GREEN_TERRACOTTA);
-
-                //inv.setItem(i, item);
-            }
-        }
-
-
-        for (int i = 0; i < 41; i++) {
-            if (inv.getItem(i) != null && inv.getItem(i).getType() != Material.AIR && (!getCompletedLevelIndicators().contains(inv.getItem(i).getType()))) {
-                inv.getItem(i).addUnsafeEnchantment(Enchantment.CHANNELING, 1);
-                break;
-            }
-        }
-
-        return inv;
-    }
-
-    private List<Material> getCompletedLevelIndicators() {
-        List<Material> result = new ArrayList<Material>();
-        result.add(Material.GREEN_TERRACOTTA);
-        result.add(Material.ORANGE_TERRACOTTA);
-        result.add(Material.PURPLE_TERRACOTTA);
-        result.add(Material.TERRACOTTA);
-        result.add(Material.BLACK_TERRACOTTA);
-
-        return result;
-    }
-
-    private ItemStack getItemWithNameFrom(Inventory inv, String name) {
-        for (ItemStack item : inv.getContents()) {
-            //Bukkit.broadcastMessage(item.getItemMeta().getDisplayName());
-            if (item != null && item.getType() != Material.AIR && item.getItemMeta().getDisplayName().contains(name))
-                return item;
-        }
-        return null;
-    }
-
-
-    public boolean invClear(Player player) {
-        PlayerInventory playerInv = player.getInventory();
-        for (ItemStack item : playerInv) {
-            if (item != null) return false;
-        }
-        return true;
     }
 }

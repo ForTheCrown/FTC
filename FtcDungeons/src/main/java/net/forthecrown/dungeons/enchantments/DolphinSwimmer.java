@@ -1,6 +1,5 @@
 package net.forthecrown.dungeons.enchantments;
 
-import net.forthecrown.core.CrownUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -32,6 +31,8 @@ public class DolphinSwimmer extends Enchantment implements Listener {
         super(key);
         this.plugin = plugin;
         this.key = key;
+
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
@@ -47,7 +48,7 @@ public class DolphinSwimmer extends Enchantment implements Listener {
                 }
 
                 event.getPlayer().removePotionEffect(PotionEffectType.DOLPHINS_GRACE);
-                event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 120, 0));
+                event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 120, 1));
                 event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_AMBIENT, 1f, 1.5f);
             }
         }
