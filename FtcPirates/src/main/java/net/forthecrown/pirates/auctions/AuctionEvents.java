@@ -1,7 +1,10 @@
 package net.forthecrown.pirates.auctions;
 
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.enums.Branch;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -38,7 +41,7 @@ public class AuctionEvents implements Listener {
         Sign sign = (Sign) event.getClickedBlock().getState();
         if(!sign.getPersistentDataContainer().has(AuctionManager.AUCTION_KEY, PersistentDataType.BYTE)) return;
 
-        String line3 = CrownUtils.getFullStringComponents((TextComponent) sign.line(3));
+        String line3 = ComponentUtils.getString(sign.line(3));
 
         Player p = event.getPlayer();
         Auction auction = AuctionManager.getAuction(sign.getLocation());
@@ -49,11 +52,18 @@ public class AuctionEvents implements Listener {
             return;
         }
 
+        CrownUser user = FtcCore.getUser(p);
+
         if(line3.contains("NONE")){ //Unclaimed auction
             p.sendMessage(ChatColor.GRAY + "This auction is currently not in use!");
 
+            if(user.getBranch() != Branch.PIRATES){
+                user.sendMessage("&7You need to be a pirate to use auctions");
+                return;
+            }
+
             //claim shop option
-            TextComponent claimOption = CrownUtils.makeComponent("[Click here and enter a minimum bid to claim]", NamedTextColor.AQUA,
+            TextComponent claimOption = ComponentUtils.makeComponent("[Click here and enter a minimum bid to claim]", NamedTextColor.AQUA,
                     ClickEvent.suggestCommand("/au " + auction.getName() + " claim "),
                     HoverEvent.showText(Component.text("Enter the starting price for the auction")));
             p.sendMessage(claimOption);
@@ -69,14 +79,16 @@ public class AuctionEvents implements Listener {
         p.sendMessage(ChatColor.GRAY + "The current top bid is: " + ChatColor.YELLOW + auction.getHighestBid() + " Rhines." + ChatColor.GRAY + " Bidder: " + ChatColor.YELLOW + auction.getHighestBidder().getName());
         p.sendMessage(ChatColor.GRAY + "The auction will expire in " + ChatColor.YELLOW + CrownUtils.convertMillisIntoTime(auction.getExpiresAt() - System.currentTimeMillis()));
 
-        //bidding option
-        TextComponent text = CrownUtils.makeComponent("[Bid]", NamedTextColor.AQUA,
-                ClickEvent.suggestCommand("/au " + auction.getName() + " bid " + (auction.getHighestBid() + 1)),
-                HoverEvent.showText(Component.text("Bid on this auction.")));
+        if(!user.equals(auction.getOwner())){
+            //bidding option
+            TextComponent text = ComponentUtils.makeComponent("[Bid]", NamedTextColor.AQUA,
+                    ClickEvent.suggestCommand("/au " + auction.getName() + " bid " + (auction.getHighestBid() + 1)),
+                    HoverEvent.showText(Component.text("Bid on this auction.")));
 
-        TextComponent message = Component.text("Would you like to bid on this? ").color(NamedTextColor.GRAY);
-        message = message.append(text);
+            TextComponent message = Component.text("Would you like to bid on this? ").color(NamedTextColor.GRAY);
+            message = message.append(text);
 
-        p.sendMessage(message);
+            p.sendMessage(message);
+        }
     }
 }

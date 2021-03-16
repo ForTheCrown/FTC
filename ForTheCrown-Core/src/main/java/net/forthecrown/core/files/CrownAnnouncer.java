@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrownAnnouncer extends FtcFileManager<FtcCore> implements Announcer {
+public class CrownAnnouncer extends AbstractSerializer<FtcCore> implements Announcer {
 
     private List<String> thingsToAnnounce = new ArrayList<>();
     private long delay;

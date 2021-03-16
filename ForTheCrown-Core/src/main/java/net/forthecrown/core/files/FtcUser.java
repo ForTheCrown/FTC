@@ -2,7 +2,9 @@ package net.forthecrown.core.files;
 
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.Grave;
 import net.forthecrown.core.api.UserDataContainer;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
@@ -13,9 +15,8 @@ import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -28,17 +29,16 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
-public class FtcUser extends FtcFileManager<FtcCore> implements CrownUser {
+public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     private final UUID base;
     private String name;
 
     private final FtcUserDataContainer dataContainer;
+    private final FtcUserGrave grave;
 
     private Rank currentRank;
     private Set<Rank> ranks;
@@ -63,18 +63,19 @@ public class FtcUser extends FtcFileManager<FtcCore> implements CrownUser {
     private Map<Material, Integer> amountEarned = new HashMap<>();
     private SellAmount sellAmount;
 
+
     public FtcUser(@NotNull UUID base){
         super(base.toString(), "playerdata", FtcCore.getInstance());
         this.base = base;
 
         dataContainer = new FtcUserDataContainer(this);
+        grave = new FtcUserGrave(this);
 
         if(fileDoesntExist) addDefaults();
         else reload();
-        if(legacyDataExists()) convertLegacy();
         if(shouldResetEarnings()) resetEarnings();
 
-        FtcCore.LOADED_USERS.add(this);
+        FtcCore.LOADED_USERS.put(base, this);
         permsCheck();
     }
 
@@ -84,10 +85,7 @@ public class FtcUser extends FtcFileManager<FtcCore> implements CrownUser {
 
         name = getFile().getString("PlayerName");
         setRank(Rank.valueOf(getFile().getString("CurrentRank")), false);
-
-        branch = Branch.valueOf(getFile().getString("Branch"));
-        //setBranch(Branch.valueOf(getFile().getString("Branch")));
-
+        setBranch(Branch.valueOf(getFile().getString("Branch")));
         setCanSwapBranch(getFile().getBoolean("CanSwapBranch"), false);
         setPets(getFile().getStringList("Pets"));
         setDeathParticle(getFile().getString("DeathParticle"));
@@ -157,6 +155,11 @@ public class FtcUser extends FtcFileManager<FtcCore> implements CrownUser {
         ConfigurationSection dataSec = getFile().getConfigurationSection("DataContainer");
         if(dataSec == null) dataSec = getFile().createSection("DataContainer");
         dataContainer.deserialize(dataSec);
+
+        try {
+            List<ItemStack> lists = (List<ItemStack>) getFile().getList("Grave");
+            grave.setItems(lists);
+        } catch (Exception ignored){}
     }
 
     @Override
@@ -175,6 +178,7 @@ public class FtcUser extends FtcFileManager<FtcCore> implements CrownUser {
         getFile().set("SellAmount", getSellAmount().toString());
         getFile().set("AllowsEmotes", allowsEmotes());
         getFile().set("ProfilePublic", isProfilePublic());
+        getFile().set("Grave", grave.getItems());
 
         if(totalEarnings < 0) totalEarnings = 0;
         getFile().set("TotalEarnings", getTotalEarnings());
@@ -536,7 +540,7 @@ public class FtcUser extends FtcFileManager<FtcCore> implements CrownUser {
     @Override
     public void sendMessage(@Nonnull String message){
         if(!isOnline()) return;
-        getPlayer().sendMessage(CrownUtils.translateHexCodes(message));
+        sendMessage(ComponentUtils.convertString(message));
     }
 
     @Override
@@ -758,6 +762,11 @@ public class FtcUser extends FtcFileManager<FtcCore> implements CrownUser {
     }
 
     @Override
+    public Grave getGrave() {
+        return grave;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -856,79 +865,5 @@ public class FtcUser extends FtcFileManager<FtcCore> implements CrownUser {
 
         super.save();
         reload();
-    }
-
-    private boolean legacyDataExists(){
-        File oldFile = new File("plugins/DataPlugin/config.yml");
-        if(!oldFile.exists()) return false;
-        FileConfiguration oldYaml = YamlConfiguration.loadConfiguration(oldFile);
-        return (oldYaml.get("players." + base.toString()) != null);
-    }
-
-    private void convertLegacy(){
-        File oldFile = new File("plugins/DataPlugin/config.yml");
-        FileConfiguration oldYamlFile = YamlConfiguration.loadConfiguration(oldFile);
-        ConfigurationSection oldYaml = oldYamlFile.getConfigurationSection("players." + getBase().toString());
-
-        setRank(Rank.valueOf(oldYaml.getString("CurrentRank").toUpperCase()), false);
-        setCanSwapBranch(oldYaml.getBoolean("CanSwapBranch"), false);
-        setPets(oldYaml.getStringList("Pets"));
-        setAllowsRidingPlayers(oldYaml.getBoolean("AllowsRidingPlayers"));
-        setDeathParticle(oldYaml.getString("ParticleDeathActive"));
-        setParticleDeathAvailable(oldYaml.getStringList("ParticleDeathAvailable"));
-        setGems(oldYaml.getInt("Gems"));
-
-        if(oldYaml.get("ParticleArrowActive") != null && !oldYaml.getString("ParticleArrowActive").contains("none")) setArrowParticle(Particle.valueOf(oldYaml.getString("ParticleArrowActive")));
-
-        //branch conversion
-        if(oldYaml.getString("ActiveBranch").contains("Knight")) setBranch(Branch.ROYALS);
-        else setBranch(Branch.valueOf(oldYaml.getString("ActiveBranch").toUpperCase() + "S"));
-
-        //Rank conversion
-        Set<Rank> tempList = new HashSet<>();
-        if(oldYaml.getList("PirateRanks") != null && oldYaml.getList("PirateRanks").size() > 0){
-            for (String s : oldYaml.getStringList("PirateRanks")){
-                try { tempList.add(Rank.valueOf(s.toUpperCase() + "S"));
-                } catch (Exception ignored){}
-            }
-        }
-        if(oldYaml.getList("KnightRanks") != null && oldYaml.getList("KnightRanks").size() > 0){
-            for (String s : oldYaml.getStringList("KnightRanks")){
-                if(s.toLowerCase().contains("baron")) addRank(Rank.BARONESS);
-
-                try { tempList.add(Rank.valueOf(s.toUpperCase()));
-                } catch (Exception ignored){}
-            }
-        }
-        tempList.add(Rank.DEFAULT);
-        setAvailableRanks(tempList);
-        setBranch(getRank().getRankBranch());
-
-        if(oldYaml.getList("ParticleArrowAvailable") != null){
-            List<Particle> tempList1 = new ArrayList<>();
-            for (String s : oldYaml.getStringList("ParticleArrowAvailable")){
-                try { tempList1.add(Particle.valueOf(s.toUpperCase()));
-                } catch (Exception ignored){}
-            }
-            setParticleArrowAvailable(tempList1);
-        }
-
-        if(oldYaml.getStringList("EmotesAvailable").size() > 0){
-            for (String s : oldYaml.getStringList("EmotesAvailable")){
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + getName() + " permission set ftc.emotes." + s.toLowerCase());
-            }
-        }
-
-        oldYamlFile.set("players." + getBase().toString(), null);
-        try {
-            oldYamlFile.save(oldFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        addRank(Rank.DEFAULT);
-
-        permsCheck();
-        save();
     }
 }

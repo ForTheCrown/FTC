@@ -62,7 +62,11 @@ public final class ClickEventHandler {
         ClickEventTask task = registeredClickEvents.get(id);
         try {
             task.run(player, args);
-        } catch (CrownException ignored) {}
+        }
+        catch (CrownException ignored) {}
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static boolean isRegistered(String id){

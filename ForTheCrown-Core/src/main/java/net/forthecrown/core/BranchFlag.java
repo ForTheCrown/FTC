@@ -1,16 +1,13 @@
 package net.forthecrown.core;
 
-import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
+import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
 
 public class BranchFlag extends Flag<Branch> {
 
@@ -46,16 +43,10 @@ public class BranchFlag extends Flag<Branch> {
         }
     }
 
-    public static boolean flagAllows(CrownUser user, BranchFlag flag){
-        LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(user.getPlayer());
-        Collection<Branch> collection = WorldGuard.getInstance().getPlatform()
+    public static Branch queryFlag(Location interacting, BranchFlag flag){
+        return WorldGuard.getInstance()
+                .getPlatform()
                 .getRegionContainer().createQuery()
-                .getApplicableRegions(wgPlayer.getLocation()).queryAllValues(wgPlayer, flag);
-
-        for (Branch b: collection){
-            if(b == null) continue;
-            if(!user.getBranch().equals(b)) return false;
-        }
-        return true;
+                .queryValue(BukkitAdapter.adapt(interacting), null, flag);
     }
 }

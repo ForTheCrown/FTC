@@ -85,7 +85,7 @@ public class CommandStaffChat extends CrownCommandBuilder {
         String input = builder.getInput();
         builder = builder.createOffset(input.lastIndexOf(' ')+1);
 
-        List<String> argList = emojiList;
+        List<String> argList = new ArrayList<>(emojiList);
         for (Player p: Bukkit.getOnlinePlayers()){
             argList.add(p.getName());
         }

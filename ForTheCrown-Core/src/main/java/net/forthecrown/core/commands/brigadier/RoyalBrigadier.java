@@ -35,12 +35,13 @@ public final class RoyalBrigadier {
         new CommandCore();
         new CommandStaffChat();
         new CommandStaffChatToggle();
+        new CommandHologram();
 
         //utility / misc commands
         new CommandGems();
         new CommandProfile();
         new CommandRank();
-        //new ShopEditCommand();
+        new CommandGrave();
 
         //economy commands
         new CommandShop();
@@ -70,6 +71,7 @@ public final class RoyalBrigadier {
         new EmoteScare();
         new EmoteJingle();
         new EmoteHug();
+        new EmotePog();
     }
 
     public static CommandDispatcher getDispatcher() {

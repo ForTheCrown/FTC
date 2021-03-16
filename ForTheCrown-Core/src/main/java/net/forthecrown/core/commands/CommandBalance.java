@@ -17,7 +17,7 @@ public class CommandBalance extends CrownCommandBuilder {
         super("balance", FtcCore.getInstance());
 
         setUsage("&7Usage: &r/balance <player>");
-        setAliases("bal", "bank", "cash", "money");
+        setAliases("bal", "bank", "cash", "money", "ebal", "ebalance", "emoney");
         setDescription("Displays a player's balance");
 
         register();

@@ -1,11 +1,11 @@
 package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.EntityType;
+import net.forthecrown.core.commands.brigadier.types.EntityArgType;
 import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -21,7 +21,7 @@ public class CommandTpask extends CrownCommandBuilder {
     public CommandTpask(){
         super("tpask", FtcCore.getInstance());
 
-        setAliases("tpa", "tprequest", "tpr");
+        setAliases("tpa", "tprequest", "tpr", "etpa", "etpask");
         setDescription("Asks a to teleport to a player.");
         register();
     }
@@ -56,11 +56,11 @@ public class CommandTpask extends CrownCommandBuilder {
                 .executes(c -> {
                     Player player = getPlayerSender(c);
 
-                    Player target = EntityType.getPlayer(c, "player");
+                    Player target = EntityArgType.getPlayer(c, "player");
                     if(target.equals(player)) throw new CrownCommandException("&7You cannot teleport to yourself");
 
                     //sender part
-                    TextComponent cancelTPA = CrownUtils.makeComponent("[✖]", NamedTextColor.GRAY,
+                    TextComponent cancelTPA = ComponentUtils.makeComponent("[✖]", NamedTextColor.GRAY,
                             ClickEvent.runCommand("/tpacancel"),
                             HoverEvent.showText(Component.text("Cancel teleportation request.")));
 

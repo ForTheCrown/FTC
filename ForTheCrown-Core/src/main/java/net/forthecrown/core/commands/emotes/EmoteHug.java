@@ -1,8 +1,8 @@
 package net.forthecrown.core.commands.emotes;
 
 import net.forthecrown.core.Cooldown;
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -30,7 +30,7 @@ public class EmoteHug extends CommandEmote {
         }
 
         //Do the hugging
-        TextComponent hugClick = CrownUtils.makeComponent(ChatColor.RED + "❤ " + ChatColor.YELLOW + user.getName() + ChatColor.RESET + " hugged you" + ChatColor.YELLOW + " ʕっ•ᴥ•ʔっ" + ChatColor.RED + " ❤",
+        TextComponent hugClick = ComponentUtils.makeComponent(ChatColor.RED + "❤ " + ChatColor.YELLOW + user.getName() + ChatColor.RESET + " hugged you" + ChatColor.YELLOW + " ʕっ•ᴥ•ʔっ" + ChatColor.RED + " ❤",
                 null, ClickEvent.runCommand("/hug " + user.getName()),
                 HoverEvent.showText(Component.text("Hug them back ❤")));
 

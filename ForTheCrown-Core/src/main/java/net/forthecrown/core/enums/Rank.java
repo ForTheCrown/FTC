@@ -1,6 +1,8 @@
 package net.forthecrown.core.enums;
 
 import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.ComponentUtils;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
 import java.util.Arrays;
@@ -49,6 +51,10 @@ public enum Rank {
 
     public String getColorlessPrefix(){
         return tabPrefix;
+    }
+
+    public Component getComponent(){
+        return ComponentUtils.convertString(getColorlessPrefix());
     }
 
     public Branch getRankBranch() {

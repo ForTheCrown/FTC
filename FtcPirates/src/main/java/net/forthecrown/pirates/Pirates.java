@@ -4,6 +4,7 @@ import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.pirates.auctions.Auction;
 import net.forthecrown.pirates.auctions.AuctionManager;
 import net.forthecrown.pirates.commands.*;
 import org.bukkit.*;
@@ -91,6 +92,10 @@ public final class Pirates extends JavaPlugin implements Listener {
         }
         events.parrots.clear();
         auctionManager.saveAuctions();
+
+        for (Auction a: AuctionManager.getAuctions().values()){
+            a.removeDisplay();
+        }
 
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(offlineWithParrots);
         yaml.set("Players", players);

@@ -3,6 +3,7 @@ package net.forthecrown.core.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.CrownItems;
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
@@ -42,7 +43,7 @@ public class CommandWithdraw extends CrownCommandBuilder {
 
                     bals.add(player.getUniqueId(), -amount, false);
                     player.getInventory().addItem(CrownItems.getCoins(amount));
-                    user.sendMessage("&7You got a coin that's worth &6" + amount + " Rhines");
+                    user.sendMessage("&7You got a coin that's worth &6" + CrownUtils.decimalizeNumber(amount) + " Rhines");
                     return 0;
                 })
         );

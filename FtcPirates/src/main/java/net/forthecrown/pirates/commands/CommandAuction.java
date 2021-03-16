@@ -11,6 +11,7 @@ import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
+import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.pirates.auctions.Auction;
@@ -151,11 +152,18 @@ public class CommandAuction extends CrownCommandBuilder {
                         )
                 )
                 .then(argument("claim")
+                        /*.requires(c -> {
+                            if(c.getBukkitSender() instanceof Player) return false;
+                            CrownUser user = FtcCore.getUser(((Player) c.getBukkitSender()).getUniqueId());
+                            return user.getBranch() == Branch.PIRATES;
+                        })*/
+
                         .then(argument("startingBid", IntegerArgumentType.integer(1, 500000))
                                 .executes(c -> {
                                     CrownUser user = getUserExecutor(c);
                                     Auction auction = auctionFromArg(c);
 
+                                    if(user.getBranch() != Branch.PIRATES) throw new CrownCommandException("&7You must be a pirate to claim an auction");
                                     if(claimedClaiming.contains(auction.getName())) throw new CrownCommandException("&7Someone is already claiming this Auction");
                                     if(auction.isClaimed()) throw new CrownCommandException("&7" + auction.getName() + " is already claimed by " + auction.getOwner().getName());
 
@@ -171,7 +179,7 @@ public class CommandAuction extends CrownCommandBuilder {
 
     protected CrownUser getUserExecutor(CommandContext<CommandListenerWrapper> c) throws CrownCommandException {
         CrownUser toReturn = super.getUserSender(c);
-        if(!AuctionManager.AUCTION_AREA.getPlayersIn().contains(toReturn.getPlayer())) throw new CrownCommandException("&7You must be near the auction area to interact with it!");
+        if(!AuctionManager.AUCTION_AREA.getPlayers().contains(toReturn.getPlayer())) throw new CrownCommandException("&7You must be near the auction area to interact with it!");
         return toReturn;
     }
 
@@ -226,6 +234,8 @@ public class CommandAuction extends CrownCommandBuilder {
             if(!event.getPlayer().equals(owner.getPlayer())) return;
             if(event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
             HandlerList.unregisterAll(this);
+
+            claimedClaiming.remove(auction.getName());
 
             ItemStack item = event.getInventory().getItem(2);
             if(item == null) throw new CrownException(event.getPlayer(), "Auction claiming failed, no item in slot");

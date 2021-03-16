@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public interface CrownUser extends CrownFileManager<FtcCore>, CommandSender {
+public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender {
 
     /**
      * Saves and then unloads the file
@@ -451,6 +451,8 @@ public interface CrownUser extends CrownFileManager<FtcCore>, CommandSender {
      * @return The user's data container
      */
     UserDataContainer getDataContainer();
+
+    Grave getGrave();
 
     @Override
     boolean equals(Object o);

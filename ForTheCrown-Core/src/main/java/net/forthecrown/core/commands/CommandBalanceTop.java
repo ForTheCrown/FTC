@@ -19,7 +19,7 @@ public class CommandBalanceTop extends CrownCommandBuilder {
 
         maxPage = Math.round(((float) FtcCore.getBalances().getBalanceMap().size())/10);
 
-        setAliases("baltop", "banktop", "cashtop", "topbals");
+        setAliases("baltop", "banktop", "cashtop", "topbals", "ebaltop", "ebalancetop");
         setDescription("Displays all the player's balances in order from biggest to smallest");
         register();
     }

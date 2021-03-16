@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="DataPlugin.jar">
-    <output-path>$PROJECT_DIR$/../../../Testserver.cuck/plugins</output-path>
-    <root id="archive" name="DataPlugin.jar">
-      <element id="module-output" name="DataPlugin" />
-    </root>
-  </artifact>
-</component>

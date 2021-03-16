@@ -7,6 +7,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.CrownWorldGuard;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
@@ -33,14 +34,14 @@ public class SignShopCreateEvent implements Listener {
     //WHAT AM I DOING
     @EventHandler(ignoreCancelled = true)
     public void onSignShopCreate(SignChangeEvent event){
-        if(CrownUtils.getStringFromComponent(event.line(0)).isBlank()) return;
+        if(ComponentUtils.getString(event.line(0)).isBlank()) return;
 
         Player player = event.getPlayer();
 
-        String line0 = CrownUtils.getStringFromComponent(event.line(0));
-        String line1 = CrownUtils.getStringFromComponent(event.line(1));
-        String line2 = CrownUtils.getStringFromComponent(event.line(2));
-        String line3 = CrownUtils.getStringFromComponent(event.line(3));
+        String line0 = ComponentUtils.getString(event.line(0));
+        String line1 = ComponentUtils.getString(event.line(1));
+        String line2 = ComponentUtils.getString(event.line(2));
+        String line3 = ComponentUtils.getString(event.line(3));
 
         ShopType shopType;
         switch (line0.toLowerCase()){

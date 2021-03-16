@@ -1,6 +1,6 @@
 package net.forthecrown.pirates.auctions;
 
-import net.forthecrown.core.api.CrownFileManager;
+import net.forthecrown.core.api.CrownSerializer;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.pirates.Pirates;
@@ -12,11 +12,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 import java.util.UUID;
 
-public interface Auction extends CrownFileManager<Pirates> {
+public interface Auction extends CrownSerializer<Pirates> {
 
     void delete();
 
-    void createSlime();
+    void createDisplay();
 
     Entity getDisplayEntity();
 
@@ -43,6 +43,8 @@ public interface Auction extends CrownFileManager<Pirates> {
     CrownUser getHighestBidder();
 
     void setHighestBidder(CrownUser highestBidder);
+
+    void removeDisplay();
 
     CrownUser getOwner();
 

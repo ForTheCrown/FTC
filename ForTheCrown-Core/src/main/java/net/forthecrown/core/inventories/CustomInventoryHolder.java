@@ -5,6 +5,8 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
+import javax.annotation.Nonnull;
+
 public class CustomInventoryHolder implements InventoryHolder {
 
     private final Inventory inv;
@@ -20,6 +22,7 @@ public class CustomInventoryHolder implements InventoryHolder {
         inv = Bukkit.createInventory(this, InventoryType.CHEST);
     }
 
+    @Nonnull
     @Override
     public Inventory getInventory() {
         return inv;

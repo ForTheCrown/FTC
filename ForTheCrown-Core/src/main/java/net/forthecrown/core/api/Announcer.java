@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 /**
  * The class representing the ingame Announcer.
  */
-public interface Announcer extends CrownFileManager<FtcCore> {
+public interface Announcer extends CrownSerializer<FtcCore> {
 
     /**
      * Gets the delay between automatic announcements

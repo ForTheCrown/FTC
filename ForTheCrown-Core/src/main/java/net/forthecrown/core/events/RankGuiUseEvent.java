@@ -1,7 +1,7 @@
 package net.forthecrown.core.events;
 
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
@@ -40,8 +40,8 @@ public class RankGuiUseEvent implements Listener {
         Player player = (Player) event.getWhoClicked();
         CrownUser user = FtcCore.getUser(player.getUniqueId());
         RankInventory rankInv = new RankInventory(user);
-        String currentInvTitle = CrownUtils.getFullStringComponents((TextComponent) event.getView().title());
-        String clickedRankString = CrownUtils.getFullStringComponents((TextComponent) event.getCurrentItem().getItemMeta().displayName());
+        String currentInvTitle = ComponentUtils.getString((TextComponent) event.getView().title());
+        String clickedRankString = ComponentUtils.getString((TextComponent) event.getCurrentItem().getItemMeta().displayName());
 
         if(clickedRankString.contains("Next page")){
             switch (currentInvTitle){

@@ -9,9 +9,7 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Slime;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -58,7 +56,7 @@ public class PlayerRidingManager implements Listener {
             return;
         }
         if(Cooldown.contains(user)) return;
-        Cooldown.add(user, 10);
+        Cooldown.add(user, 20);
 
         if(rider.isInsideVehicle() || riddenPlayer.getPassengers().size() > 0 || rider.getPassengers().size() > 0) return;
         if(!riddenPlayer.getPassengers().isEmpty()) return;
@@ -72,11 +70,6 @@ public class PlayerRidingManager implements Listener {
         }
 
         beginRiding(rider, riddenPlayer);
-    }
-
-    private boolean isSlimeSeat(Entity entity){
-        if(!(entity instanceof Slime)) return false;
-        return entity.isInvulnerable() && !entity.isCustomNameVisible();
     }
 
     /*@EventHandler

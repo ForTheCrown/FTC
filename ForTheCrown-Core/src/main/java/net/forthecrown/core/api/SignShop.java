@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public interface SignShop extends CrownFileManager<FtcCore>, InventoryHolder {
+public interface SignShop extends CrownSerializer<FtcCore>, InventoryHolder {
 
     /**
      * Gets the file name of the shop

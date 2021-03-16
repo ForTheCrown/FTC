@@ -7,7 +7,6 @@ import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import net.minecraft.server.v1_16_R3.IVectorPosition;
 import net.minecraft.server.v1_16_R3.Vec3D;
 import org.bukkit.Location;
-import org.bukkit.World;
 
 public class Vector3DType {
 
@@ -19,9 +18,9 @@ public class Vector3DType {
         return ArgumentVec3.a(centerIntegers);
     }
 
-    public static Location getLocation(CommandContext<CommandListenerWrapper> c, String argument, World world) throws CommandSyntaxException {
+    public static Location getLocation(CommandContext<CommandListenerWrapper> c, String argument) throws CommandSyntaxException {
         Vec3D vec = ArgumentVec3.a(c, argument);
-        return new Location(world, vec.x, vec.y, vec.z);
+        return new Location(c.getSource().getWorld().getWorld(), vec.x, vec.y, vec.z);
     }
 
     public static IVectorPosition getPosArgument(CommandContext<CommandListenerWrapper> c, String argument){

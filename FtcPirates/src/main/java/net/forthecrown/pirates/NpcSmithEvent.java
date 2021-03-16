@@ -1,5 +1,6 @@
 package net.forthecrown.pirates;
 
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.Cooldown;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
@@ -51,15 +52,15 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
         Cooldown.add(player, 20);
         ClickEventHandler.allowCommandUsage(player, true);
 
-        TextComponent message3 = CrownUtils.makeComponent("[Captain's Cutlass]", NamedTextColor.GOLD,
+        TextComponent message3 = ComponentUtils.makeComponent("[Captain's Cutlass]", NamedTextColor.GOLD,
                 ClickEvent.runCommand(ClickEventHandler.getCommand(clickID, "cutlass")),
                 HoverEvent.showText(Component.text("Click me!")));
 
-        TextComponent message2 = CrownUtils.makeComponent("[Join Pirates]", NamedTextColor.YELLOW,
+        TextComponent message2 = ComponentUtils.makeComponent("[Join Pirates]", NamedTextColor.YELLOW,
                 ClickEvent.runCommand(ClickEventHandler.getCommand(clickID, "join")),
                 HoverEvent.showText(Component.text("Click me!")));
 
-        TextComponent message1 = CrownUtils.makeComponent("[Info about Pirates]", NamedTextColor.YELLOW,
+        TextComponent message1 = ComponentUtils.makeComponent("[Info about Pirates]", NamedTextColor.YELLOW,
                 ClickEvent.runCommand(ClickEventHandler.getCommand(clickID, "info")),
                 HoverEvent.showText(Component.text("Click me!")));
 

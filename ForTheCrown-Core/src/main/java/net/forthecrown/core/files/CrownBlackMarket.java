@@ -73,7 +73,7 @@ public class CrownBlackMarket implements BlackMarket {
         }
 
         reload();
-        doEnchantTimer(core);
+        //doEnchantTimer(core);
     }
 
     public void reload(){

@@ -3,7 +3,7 @@ package net.forthecrown.vikings;
 import net.forthecrown.vikings.blessings.FastRunner;
 import net.forthecrown.vikings.blessings.HeadChoppingBlessing;
 import net.forthecrown.vikings.blessings.VikingBlessing;
-import net.forthecrown.vikings.commands.VikingsCommand;
+import net.forthecrown.vikings.commands.CommandViking;
 import net.forthecrown.vikings.raids.MonasteryRaid;
 import net.forthecrown.vikings.raids.RaidHandler;
 import net.forthecrown.vikings.raids.VikingRaid;
@@ -26,7 +26,7 @@ public final class Vikings extends JavaPlugin {
         new FastRunner();
         new HeadChoppingBlessing();
 
-        new VikingsCommand();
+        new CommandViking();
     }
 
     @Override

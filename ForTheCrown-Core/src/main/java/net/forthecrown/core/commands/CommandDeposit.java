@@ -3,6 +3,7 @@ package net.forthecrown.core.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
@@ -49,7 +50,7 @@ public class CommandDeposit extends CrownCommandBuilder {
             int amount;
             try {
                 Component component = mainItem.getItemMeta().lore().get(0);
-                String lore = ChatColor.stripColor(CrownUtils.getStringFromComponent(component)).replaceAll("[\\D]", "").trim();
+                String lore = ChatColor.stripColor(ComponentUtils.getString(component)).replaceAll("[\\D]", "").trim();
                 amount = Integer.parseInt(lore);
             } catch (NumberFormatException e) { throw new CrownCommandException( "You need to be holding the coins you wish to deposit 2"); }
 
@@ -57,7 +58,7 @@ public class CommandDeposit extends CrownCommandBuilder {
 
             Balances bals = FtcCore.getBalances();
             bals.add(player.getUniqueId(), amount, false);
-            player.sendMessage(CrownUtils.translateHexCodes("&7You deposited " + mainItem.getAmount() + " coins and received &6" + amount + " Rhines"));
+            player.sendMessage(CrownUtils.translateHexCodes("&7You deposited " + mainItem.getAmount() + " coins and received &6" + CrownUtils.decimalizeNumber(amount) + " Rhines"));
             player.getInventory().removeItem(mainItem);
 
             return 0;

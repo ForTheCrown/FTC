@@ -5,7 +5,7 @@ import net.forthecrown.core.FtcCore;
 import java.util.Map;
 import java.util.UUID;
 
-public interface Balances extends CrownFileManager<FtcCore> {
+public interface Balances extends CrownSerializer<FtcCore> {
 
     Map<UUID, Integer> getBalanceMap();
     void setBalanceMap(Map<UUID, Integer> balanceMap);

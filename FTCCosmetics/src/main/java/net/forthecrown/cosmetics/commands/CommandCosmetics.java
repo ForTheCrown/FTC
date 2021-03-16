@@ -15,15 +15,6 @@ public class CommandCosmetics extends CrownCommandBuilder {
         register();
     }
 
-    @Override
-    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
-        command.executes(c -> {
-           CrownUser u = getUserSender(c);
-           u.getPlayer().openInventory(Cosmetics.plugin.getMainCosmeticInventory(u));
-           return 0;
-        });
-    }
-
     /*
      * ----------------------------------------
      * 			Command description:
@@ -39,4 +30,13 @@ public class CommandCosmetics extends CrownCommandBuilder {
      *
      * Author: Wout
      */
+
+    @Override
+    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+        command.executes(c -> {
+           CrownUser u = getUserSender(c);
+           u.getPlayer().openInventory(Cosmetics.plugin.getMainCosmeticInventory(u));
+           return 0;
+        });
+    }
 }

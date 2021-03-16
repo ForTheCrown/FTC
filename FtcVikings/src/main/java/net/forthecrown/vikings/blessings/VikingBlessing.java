@@ -2,20 +2,17 @@ package net.forthecrown.vikings.blessings;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.files.FtcFileManager;
+import net.forthecrown.core.files.AbstractSerializer;
 import net.forthecrown.vikings.Vikings;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import java.util.*;
 
-public abstract class VikingBlessing extends FtcFileManager<Vikings> implements Listener {
+public abstract class VikingBlessing extends AbstractSerializer<Vikings> implements Listener {
     private static final Set<VikingBlessing> BLESSINGS = new HashSet<>();
-
-    private final Server server;
     protected final String name;
 
     private final Set<UUID> usingUsers = new HashSet<>(); //name lol
@@ -25,7 +22,6 @@ public abstract class VikingBlessing extends FtcFileManager<Vikings> implements 
         super(name, "vikingblessings", plugin);
 
         this.name = name;
-        this.server = plugin.getServer();
         BLESSINGS.add(this);
 
         reload();
@@ -62,7 +58,7 @@ public abstract class VikingBlessing extends FtcFileManager<Vikings> implements 
     }
 
     public void registerEvents(){
-        server.getPluginManager().registerEvents(this, getPlugin());
+        getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
     }
 
     public void unregisterEvents(){

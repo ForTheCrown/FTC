@@ -5,7 +5,7 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.files.FtcFileManager;
+import net.forthecrown.core.files.AbstractSerializer;
 import net.forthecrown.pirates.Pirates;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -25,26 +25,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class PirateAuction extends FtcFileManager<Pirates> implements Auction {
+public class PirateAuction extends AbstractSerializer<Pirates> implements Auction {
 
     private String name;
-
     private final Sign sign;
     private final Location location;
 
     private CrownUser highestBidder;
     private CrownUser owner;
+    private Map<UUID, Integer> bids = new HashMap<>();
+    private ItemStack item;
+    private Entity displayEntity;
 
     private int highestBid;
     private int baseBid;
     private boolean waitingForItemClaim;
     private long expiresAt;
     private boolean adminAuction;
-
-    private Map<UUID, Integer> bids = new HashMap<>();
-    private ItemStack item;
-
-    private Entity displayEntity;
 
     //gets
     public PirateAuction(Location location) {
@@ -96,6 +93,8 @@ public class PirateAuction extends FtcFileManager<Pirates> implements Auction {
         getFile().set("Owner", owner);
         getFile().set("HighestBidder", bidder);
 
+        removeDisplay();
+
         if(bids != null && !bids.isEmpty()){
             Map<String, Integer> temp = new HashMap<>();
             for (UUID id: bids.keySet()){
@@ -131,8 +130,7 @@ public class PirateAuction extends FtcFileManager<Pirates> implements Auction {
             setHighestBid(getFile().getInt("HighestBid"));
             expiresAt = getFile().getLong("Expires");
 
-            if(getDisplayEntity() != null) getDisplayEntity().remove();
-            createSlime();
+            createDisplay();
         }
 
         ConfigurationSection section = getFile().getConfigurationSection("Bids");
@@ -167,7 +165,7 @@ public class PirateAuction extends FtcFileManager<Pirates> implements Auction {
     }
 
     @Override
-    public void createSlime(){
+    public void createDisplay(){
         if(getItem() == null || getItem().getType() == Material.AIR) return;
 
         WallSign signData = (WallSign) getSign().getBlockData();
@@ -216,6 +214,7 @@ public class PirateAuction extends FtcFileManager<Pirates> implements Auction {
         getSign().line(2, Component.text(CrownUtils.getItemNormalName(item)));
 
         updateSign();
+        createDisplay();
     }
 
     @Override
@@ -232,6 +231,7 @@ public class PirateAuction extends FtcFileManager<Pirates> implements Auction {
 
                 bals.add(user.getBase(), -getHighestBid(), false);
                 bals.add(owner.getBase(), getHighestBid(), false);
+                owner.sendMessage("&6$ &7You've received &e" + CrownUtils.decimalizeNumber(getHighestBid()) + " Rhines &7from &e" + getName() + "&7 by &e" + user.getName());
             }
 
             user.getPlayer().getInventory().addItem(getItem());
@@ -270,6 +270,7 @@ public class PirateAuction extends FtcFileManager<Pirates> implements Auction {
 
         getSign().line(1, Component.text(""));
         getSign().line(2, Component.text(""));
+        removeDisplay();
 
         updateSign();
     }
@@ -297,6 +298,19 @@ public class PirateAuction extends FtcFileManager<Pirates> implements Auction {
     @Override
     public void setHighestBidder(CrownUser highestBidder) {
         this.highestBidder = highestBidder;
+    }
+
+    @Override
+    public void removeDisplay(){
+        if(displayEntity != null){
+            displayEntity.remove();
+            return;
+        }
+
+        for (Entity e: getLocation().getNearbyEntities(1, 1, 1)){
+            if(!(e instanceof ArmorStand)) continue;
+            e.remove();
+        }
     }
 
     @Override
@@ -343,6 +357,8 @@ public class PirateAuction extends FtcFileManager<Pirates> implements Auction {
         if(isWaitingForItemClaim()) return false;
         if(System.currentTimeMillis() > expiresAt){
             setWaitingForItemClaim(true);
+            getSign().line(0, AuctionManager.WAITING_FOR_ITEM_CLAIM_LABEL);
+            updateSign();
             giveBalancesToLosers(false);
             return false;
         }
@@ -359,7 +375,7 @@ public class PirateAuction extends FtcFileManager<Pirates> implements Auction {
 
             int amount = bids.get(id);
 
-            FtcCore.getUser(id).sendMessage("&7You got &e" + amount + " Rhines&7 from your bid on &e" + getName());
+            FtcCore.getUser(id).sendMessage("&6$ &7You received &e" + CrownUtils.decimalizeNumber(amount) + " Rhines&7 from your bid on &e" + getName());
             bals.add(id, amount);
         }
     }

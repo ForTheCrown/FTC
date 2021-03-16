@@ -7,6 +7,7 @@ import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.customevents.SignShopUseEvent;
+import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.exceptions.BrokenShopException;
 import net.forthecrown.core.exceptions.CrownException;
@@ -37,13 +38,16 @@ public class ShopUseListener implements Listener {
             throw new BrokenShopException(player);
         }
 
-        if(!BranchFlag.flagAllows(owner, CrownWorldGuard.SHOP_OWNERSHIP_FLAG)){
-            customer.sendMessage("&7The owner of this shop is not allowed to sell items here (" + owner.getBranch().getSingularName() + ")");
-            return;
+        //WorldGuard checks
+        Branch allowedOwner = BranchFlag.queryFlag(shop.getLocation(), CrownWorldGuard.SHOP_OWNERSHIP_FLAG);
+        Branch allowedUser = BranchFlag.queryFlag(shop.getLocation(), CrownWorldGuard.SHOP_USAGE_FLAG);
+        if(allowedOwner != null && owner.getBranch() != Branch.DEFAULT && shop.getType() != ShopType.ADMIN_BUY_SHOP && shop.getType() != ShopType.ADMIN_SELL_SHOP && allowedOwner != owner.getBranch()){
+            event.setCancelled(true);
+            throw new CrownException(customer, "&7The owner of this shop is not allowed to operate here! (" + allowedOwner.getName() + " only)");
         }
-        if(!BranchFlag.flagAllows(customer, CrownWorldGuard.SHOP_USAGE_FLAG)){
-            customer.sendMessage("&7You are not allowed to use shops here! " + owner.getBranch().getName() + " only!");
-            return;
+        if(allowedUser != null && customer.getBranch() != Branch.DEFAULT && allowedUser != customer.getBranch()){
+            event.setCancelled(true);
+            throw new CrownException(customer, "&7Only " + allowedUser.getName() + " are allowed to use shops here!");
         }
 
         Inventory playerInv = player.getInventory();
@@ -74,7 +78,7 @@ public class ShopUseListener implements Listener {
                 else{
                     shop.setOutOfStock(true);
                     event.setCancelled(true);
-                    throw new CrownException(player, "&7Shop does not have enough stock");
+                    throw new CrownException(player, "&7This shop is out of stock");
                 }
 
                 event.addOwnerBalance(shop.getPrice());

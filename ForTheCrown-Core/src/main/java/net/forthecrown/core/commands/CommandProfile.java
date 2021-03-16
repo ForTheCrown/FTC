@@ -11,6 +11,7 @@ import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
+import org.bukkit.Statistic;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
@@ -36,6 +37,7 @@ public class CommandProfile extends CrownCommandBuilder {
      * Shows some basic info about a user.
      *
      * Valid usages of command:
+     * - /profile
      * - /profile [player]
      *
      * Main Author: Botul
@@ -55,7 +57,6 @@ public class CommandProfile extends CrownCommandBuilder {
                         .executes(c ->{
                             CrownUser user = getUserSender(c);
                             CrownUser profile = UserType.getUser(c, "player");
-
                             sendProfileMessage(profile, user);
                             return 0;
                         })
@@ -85,6 +86,8 @@ public class CommandProfile extends CrownCommandBuilder {
             user.sendMessage("&eAllowed to swap branches in: &r" + time);
         }
 
+        user.sendMessage("&ePlay time: &r" + CrownUtils.decimalizeNumber(profile.getOfflinePlayer().getStatistic(Statistic.PLAY_ONE_MINUTE)/20/60/60) + " hours");
+
         Objective pp = profile.getScoreboard().getObjective("PiratePoints");
         Score score = pp.getScore(profile.getName());
         if(score.isScoreSet() && score.getScore() > 0) user.sendMessage("&ePirate points: &r" + score.getScore());
@@ -93,9 +96,7 @@ public class CommandProfile extends CrownCommandBuilder {
         Score crownScr = crown.getScore(profile.getName());
         if(crownScr.isScoreSet() && crownScr.getScore() > 0) user.sendMessage("&eCrown score: &r" + crownScr.getScore());
 
-        //user.sendMessage("&eFirst joined: &r" + CrownUtils.getTimeFromMillis(profile.getFirstJoin()));
-
-        if(profile.getGems() > 0) user.sendMessage("&eGems: &r" + profile.getGems());
+        if(profile.getGems() > 0) user.sendMessage("&eGems: &r" + CrownUtils.decimalizeNumber(profile.getGems()));
         user.sendMessage("&eBalance: &r" + bals.getDecimalized(profile.getBase()) + " Rhines");
         user.sendMessage("&6--------------------------");
     }

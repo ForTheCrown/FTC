@@ -34,9 +34,6 @@ public class CommandShop extends CrownCommandBuilder {
      * - /shop
      * - /shop <farming | mining | drops | web>
      *
-     * Referenced other classes:
-     * - SellShop
-     *
      * Author: Botul
      */
 
@@ -48,6 +45,7 @@ public class CommandShop extends CrownCommandBuilder {
                     player.openInventory(new SellShop(player).mainMenu());
                     return 0;
                 })
+
                 .then(argument("drops")
                     .executes(c -> {
                         Player player = getPlayerSender(c);
@@ -74,10 +72,9 @@ public class CommandShop extends CrownCommandBuilder {
                             CrownUser user = getUserSender(c);
                             user.sendMessage("&7Our webstore:");
 
-                            TextComponent text = Component.text("https://for-the-crown.tebex.io/");
-                            text = text.color(NamedTextColor.AQUA);
-                            text = text.clickEvent(ClickEvent.openUrl("https://for-the-crown.tebex.io/"));
-                            text = text.hoverEvent(HoverEvent.showText(Component.text("Opens the server's webstore")));
+                            TextComponent text = Component.text("https://for-the-crown.tebex.io/").color(NamedTextColor.AQUA)
+                                    .clickEvent(ClickEvent.openUrl("https://for-the-crown.tebex.io/"))
+                                    .hoverEvent(HoverEvent.showText(Component.text("Opens the server's webstore")));
 
                             user.sendMessage(text);
                             return 0;

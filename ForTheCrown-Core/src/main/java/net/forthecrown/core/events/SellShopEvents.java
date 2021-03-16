@@ -3,6 +3,7 @@ package net.forthecrown.core.events;
 import net.forthecrown.core.Cooldown;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.customevents.SellShopSellEvent;
@@ -35,7 +36,7 @@ public class SellShopEvents implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onInvClick(InventoryClickEvent event){
         if(!event.getWhoClicked().equals(player)) return;
-        if(event.isShiftClick()){ event.setCancelled(true); return; }
+        if(event.isShiftClick()) event.setCancelled(true);
         if(event.getClickedInventory() instanceof PlayerInventory) return;
 
         event.setCancelled(true);
@@ -55,7 +56,7 @@ public class SellShopEvents implements Listener {
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
         //change sell amount
         if(item.getType() == Material.BLACK_STAINED_GLASS_PANE){
-            String displayName = CrownUtils.getStringFromComponent(item.getItemMeta().displayName());
+            String displayName = ComponentUtils.getString(item.getItemMeta().displayName());
 
             switch (displayName){
                 case "Sell 1":

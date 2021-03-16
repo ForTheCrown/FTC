@@ -1,8 +1,9 @@
 package net.forthecrown.core.enums;
 
 import net.forthecrown.core.CrownUtils;
-
-import javax.annotation.Nonnull;
+import net.forthecrown.core.ComponentUtils;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 public enum ShopType {
 
@@ -14,18 +15,28 @@ public enum ShopType {
     private final String inStock;
     private final String outStock;
 
-    ShopType(@Nonnull String inStock, @Nonnull String outStock){
+    ShopType(@NotNull String inStock, @NotNull String outStock){
         this.inStock = inStock;
         this.outStock = outStock;
     }
 
-    @Nonnull
+    @NotNull
     public String getInStockLabel(){
         return CrownUtils.translateHexCodes(inStock);
     }
 
-    @Nonnull
+    @NotNull
     public String getOutOfStockLabel() {
         return CrownUtils.translateHexCodes(outStock);
+    }
+
+    @NotNull
+    public Component getInComponent(){
+        return ComponentUtils.convertString(getInStockLabel());
+    }
+
+    @NotNull
+    public Component getOutComponent(){
+        return ComponentUtils.convertString(getOutOfStockLabel());
     }
 }

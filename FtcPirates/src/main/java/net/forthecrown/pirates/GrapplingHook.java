@@ -1,7 +1,6 @@
 package net.forthecrown.pirates;
 
 import net.forthecrown.core.Cooldown;
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
@@ -15,8 +14,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -190,59 +191,13 @@ public class GrapplingHook implements Listener {
         }
     }
 
-    @EventHandler
-    public void onPlayerClickItemInInv(InventoryClickEvent event) {
-        if(!(event.getView().getTopInventory().getHolder() instanceof CustomInventoryHolder)) return;
-        if(event.getClickedInventory() instanceof PlayerInventory) return;
-        event.setCancelled(true);
-
-        String title = CrownUtils.getStringFromComponent(event.getView().title());
-
-        if (title.contains("Level Selector")) {
-            if(Cooldown.contains(event.getWhoClicked())) return;
-            Cooldown.add(event.getWhoClicked(), 6);
-            Player player = (Player) event.getWhoClicked();
-
-            if (!player.getWorld().getName().contains("world_void")) return; // extra check
-
-            if (!player.getInventory().isEmpty()) {
-                player.sendMessage(ChatColor.GRAY + "Your inventory has to be completely empty to enter.");
-                event.setCancelled(true);
-                return; // TODO Make portal check for empty inventory too
-            }
-
-            if (event.getInventory().getItem(event.getSlot()) == null) return;
-            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
-
-            if (COMPLETED_LEVEL_INDICATORS.contains(event.getInventory().getItem(event.getSlot()).getType()) || event.getInventory().getItem(event.getSlot()).getEnchantments().containsKey(Enchantment.CHANNELING)) {
-
-                int slot = event.getSlot() - 1;
-                Location loc;
-
-                if (slot == 39) slot = 35;
-                if (slot == -1) {
-                    loc = new Location(player.getWorld(), -1003.5, 21, 3.5, 180, 0); // Level 1 start
-                    Bukkit.dispatchCommand(main.getServer().getConsoleSender(), "grapplinghook give " + player.getName());
-                }
-                else {
-                    YamlConfiguration yaml = YamlConfiguration.loadConfiguration(getArmorStandFile());
-                    String ghArmorStandID = "Stand_" + slot;
-                    loc = new Location(player.getWorld(), yaml.getDouble(ghArmorStandID + ".XToCords"), yaml.getDouble(ghArmorStandID + ".YToCords"), yaml.getDouble(ghArmorStandID + ".ZToCords"), yaml.getInt(ghArmorStandID + ".YawToCords"), 0);
-                    Bukkit.dispatchCommand(main.getServer().getConsoleSender(), "grapplinghook give " + player.getName() + " " + yaml.getInt(ghArmorStandID + ".NextLevelHooks") + " " + yaml.getInt(ghArmorStandID + ".NextLevelDistance"));
-                }
-
-                player.teleport(loc);
-                player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT , 1.0F, 1.0F);
-                player.sendMessage(ChatColor.GRAY + "You can " + ChatColor.YELLOW + "/leave" + ChatColor.GRAY + " at any time.");
-            }
-        }
-    }
-
 
     void openLevelSelector(Player player) {
         Inventory inv = createLevelSelectorInv();
         inv = personalizeInventory(player, inv);
         player.openInventory(inv);
+
+        Pirates.plugin.getServer().getPluginManager().registerEvents(new GhSubClass(player), Pirates.plugin);
     }
 
 
@@ -295,7 +250,6 @@ public class GrapplingHook implements Listener {
         return result;
     }
 
-    //????????? What inventory
     private Inventory personalizeInventory(Player player, Inventory inv) {
         CrownUser user = FtcCore.getUser(player);
 
@@ -348,5 +302,66 @@ public class GrapplingHook implements Listener {
                 return item;
         }
         return null;
+    }
+
+    public class GhSubClass implements Listener {
+
+        private final Player p;
+        private GhSubClass(Player p){
+            this.p = p;
+        }
+
+        @EventHandler
+        public void onPlayerClickItemInInv(InventoryClickEvent event) {
+            if(!event.getWhoClicked().equals(p)) return;
+            if(event.isShiftClick()) event.setCancelled(true);
+            if(event.getClickedInventory() instanceof PlayerInventory) return;
+            event.setCancelled(true);
+
+            if(Cooldown.contains(event.getWhoClicked())) return;
+            Cooldown.add(event.getWhoClicked(), 6);
+            Player player = (Player) event.getWhoClicked();
+
+            if (!player.getWorld().getName().contains("world_void")) return; // extra check
+
+            if (!player.getInventory().isEmpty()) {
+                player.sendMessage(ChatColor.GRAY + "Your inventory has to be completely empty to enter.");
+                event.setCancelled(true);
+                return;
+            }
+
+            if (event.getInventory().getItem(event.getSlot()) == null) return;
+            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
+
+            if (COMPLETED_LEVEL_INDICATORS.contains(event.getInventory().getItem(event.getSlot()).getType()) || event.getInventory().getItem(event.getSlot()).getEnchantments().containsKey(Enchantment.CHANNELING)) {
+
+                int slot = event.getSlot() - 1;
+                Location loc;
+
+                if (slot == 39) slot = 35;
+                if (slot == -1) {
+                    loc = new Location(player.getWorld(), -1003.5, 21, 3.5, 180, 0); // Level 1 start
+                    Bukkit.dispatchCommand(main.getServer().getConsoleSender(), "grapplinghook give " + player.getName());
+                }
+                else {
+                    YamlConfiguration yaml = YamlConfiguration.loadConfiguration(getArmorStandFile());
+                    String ghArmorStandID = "Stand_" + slot;
+                    loc = new Location(player.getWorld(), yaml.getDouble(ghArmorStandID + ".XToCords"), yaml.getDouble(ghArmorStandID + ".YToCords"), yaml.getDouble(ghArmorStandID + ".ZToCords"), yaml.getInt(ghArmorStandID + ".YawToCords"), 0);
+                    Bukkit.dispatchCommand(main.getServer().getConsoleSender(), "grapplinghook give " + player.getName() + " " + yaml.getInt(ghArmorStandID + ".NextLevelHooks") + " " + yaml.getInt(ghArmorStandID + ".NextLevelDistance"));
+                }
+
+                player.teleport(loc);
+                player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT , 1.0F, 1.0F);
+                player.sendMessage(ChatColor.GRAY + "You can " + ChatColor.YELLOW + "/leave" + ChatColor.GRAY + " at any time.");
+            }
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onInventoryClose(InventoryCloseEvent event) {
+            if(!event.getPlayer().equals(p)) return;
+            if(event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
+
+            HandlerList.unregisterAll(this);
+        }
     }
 }

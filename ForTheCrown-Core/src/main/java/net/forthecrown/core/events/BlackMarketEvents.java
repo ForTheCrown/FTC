@@ -13,10 +13,11 @@ import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.exceptions.CrownException;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -94,14 +95,13 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
 
         ClickEventHandler.allowCommandUsage(user.getPlayer(), true);
 
-        TextComponent text = new TextComponent(ChatColor.AQUA + "[Open Shop]");
-        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(npcID)));
-        text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Opens Edward's inventory and allows you to apply his enchantment to one of your items")));
+        TextComponent text = Component.text("[Open Shop]").color(NamedTextColor.AQUA)
+                .clickEvent(ClickEvent.runCommand(ClickEventHandler.getCommand(npcID)))
+                .hoverEvent(HoverEvent.showText(Component.text("Opens Edward's inventory and allows you to apply his enchantment to one of your items")));
 
-        TextComponent text1 = new TextComponent(ChatColor.GRAY + "Would you like to purchase it? ");
-        text1.addExtra(text);
+        TextComponent text1 = Component.text("Would you like to purchase it? ").color(NamedTextColor.GRAY).append(text);
 
-        user.getPlayer().spigot().sendMessage(text1);
+        user.sendMessage(text1);
     }
 
 

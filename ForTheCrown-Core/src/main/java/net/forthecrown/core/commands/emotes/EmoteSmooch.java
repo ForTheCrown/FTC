@@ -1,6 +1,7 @@
 package net.forthecrown.core.commands.emotes;
 
 import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -29,7 +30,7 @@ public class EmoteSmooch extends CommandEmote {
 
         sender.sendMessage(ChatColor.RED + "❤" + ChatColor.RESET + " You smooched " + recipient.getName() + ChatColor.RED + " ❤");
 
-        TextComponent text = CrownUtils.makeComponent(CrownUtils.translateHexCodes("&c♥ &e" + sender.getName() + " &rsmooched you! &r( ^ 3^) &c❤"),
+        TextComponent text = ComponentUtils.makeComponent(CrownUtils.translateHexCodes("&c♥ &e" + sender.getName() + " &rsmooched you! &r( ^ 3^) &c❤"),
                 null, ClickEvent.runCommand("/mwah " + sender.getName()),
                 HoverEvent.showText(Component.text("Click to smooch them back")));
         recipient.sendMessage(text);

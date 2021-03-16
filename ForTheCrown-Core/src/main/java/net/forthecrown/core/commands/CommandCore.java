@@ -11,10 +11,10 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.TypeCreator;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.core.commands.brigadier.exceptions.InvalidPlayerArgumentException;
 import net.forthecrown.core.commands.brigadier.types.ParticleType;
+import net.forthecrown.core.commands.brigadier.types.TypeCreator;
 import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
@@ -42,7 +42,6 @@ public class CommandCore extends CrownCommandBuilder {
 
         setDescription("The primary FTC-Core command");
         setPermission("ftc.commands.admin");
-        setUsage("&7Usage:&r /ftcore <reload | save | crownitem | announcer | reload>");
 
         this.bals = FtcCore.getBalances();
         this.maxMoney = FtcCore.getMaxMoneyAmount();
@@ -112,6 +111,23 @@ public class CommandCore extends CrownCommandBuilder {
                 .then(argument("user")
                         .then(argument(USER_ARG, UserType.user())
                                 .suggests((c, b) -> UserType.listSuggestions(b))
+
+                                .then(argument("save")
+                                        .executes(c -> {
+                                            CrownUser u = getUser(c);
+                                            u.save();
+                                            broadcastAdmin(c.getSource(), "Saved data of " + u.getName());
+                                            return 0;
+                                        })
+                                )
+                                .then(argument("reload")
+                                        .executes(c -> {
+                                            CrownUser u = getUser(c);
+                                            u.reload();
+                                            broadcastAdmin(c.getSource(), "Reloaded data of " + u.getName());
+                                            return 0;
+                                        })
+                                )
 
                                 .then(argument("balance")
                                         .executes(c-> {
@@ -386,6 +402,7 @@ public class CommandCore extends CrownCommandBuilder {
                                             CrownUser user = getUser(c);
 
                                             user.delete();
+                                            user.unload();
                                             getSender(c).sendMessage(user.getName() + "'s user data has been deleted");
                                             return 0;
                                         })
@@ -487,16 +504,16 @@ public class CommandCore extends CrownCommandBuilder {
             else FtcCore.getBalances().reload();
         }),
         USERS ("Users", b -> {
-            if(b) for (FtcUser u: FtcCore.LOADED_USERS) u.save();
-            else for (FtcUser u: FtcCore.LOADED_USERS) u.reload();
+            if(b) for (FtcUser u: FtcCore.LOADED_USERS.values()) u.save();
+            else for (FtcUser u: FtcCore.LOADED_USERS.values()) u.reload();
         }),
         SHOPS ("Signshops", b ->{
-            if(b) for (CrownSignShop u: FtcCore.LOADED_SHOPS){
+            if(b) for (CrownSignShop u: FtcCore.LOADED_SHOPS.values()){
                 try {
                     u.save();
                 } catch (Exception ignored) {}
             }
-            else for (CrownSignShop u: FtcCore.LOADED_SHOPS){
+            else for (CrownSignShop u: FtcCore.LOADED_SHOPS.values()){
                 try {
                     u.reload();
                 } catch (Exception ignored) {}

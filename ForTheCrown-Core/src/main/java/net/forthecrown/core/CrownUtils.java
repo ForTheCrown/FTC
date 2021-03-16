@@ -1,11 +1,8 @@
 package net.forthecrown.core;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.TextColor;
 import net.md_5.bungee.api.ChatColor;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,8 +10,9 @@ import org.bukkit.World;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnegative;
 import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -26,9 +24,16 @@ public final class CrownUtils {
 
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("CET");
     public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 1000, 70, 200);
-
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
-    private static final String staffChatFormat = "&8[Staff] &7%SENDER% &7&l> &r";
+    private static final DecimalFormat DECIMAL_FORMAT;
+
+    private CrownUtils() {}
+
+    static {
+        DECIMAL_FORMAT = new DecimalFormat("#.##");
+        DECIMAL_FORMAT.setGroupingUsed(true);
+        DECIMAL_FORMAT.setGroupingSize(3);
+    }
 
     public static int worldTimeToYears(World world){
         return (int) ((world.getFullTime()/1000)/24)/365;
@@ -55,7 +60,9 @@ public final class CrownUtils {
     }
 
     //Yeah, no clue
-    public static String translateHexCodes (String textToTranslate) {
+    public static String translateHexCodes(@NotNull String textToTranslate) {
+        Validate.notNull(textToTranslate, "Text to translate cannot be null");
+
         Matcher matcher = HEX_PATTERN.matcher(textToTranslate);
         StringBuffer buffer = new StringBuffer();
 
@@ -85,16 +92,14 @@ public final class CrownUtils {
         return new Random().nextInt((max - min) + 1) + min;
     }
 
-    public static ItemStack makeItem(Material material, int amount, boolean hideFlags, String name, String... loreStrings) {
+    public static ItemStack makeItem(@NotNull Material material, @Nonnegative int amount, boolean hideFlags, Component name, Component... loreStrings) {
+        Validate.notNull(material, "Material cannot be null");
+
         ItemStack result = new ItemStack(material, amount);
         ItemMeta meta = result.getItemMeta();
 
-        if (name != null) meta.setDisplayName(ChatColor.RESET + "" + ChatColor.WHITE + translateHexCodes(name));
-        if (loreStrings != null) {
-            List<String> lore = new ArrayList<>();
-            for(String s : loreStrings){ lore.add(ChatColor.RESET + "" + ChatColor.WHITE + translateHexCodes(s)); }
-            meta.setLore(lore);
-        }
+        if(name != null) meta.displayName(name);
+        if (loreStrings != null) meta.lore(Arrays.asList(loreStrings));
         if (hideFlags) {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
@@ -104,20 +109,20 @@ public final class CrownUtils {
         return result;
     }
 
-    public static TextComponent makeComponent(String text, @Nullable TextColor color, @Nullable ClickEvent click, @Nullable HoverEvent hover){
-        TextComponent component = Component.text(text);
-        if(color != null) component = component.color(color);
-        if(click != null) component = component.clickEvent(click);
-        if(hover != null) component = component.hoverEvent(hover);
-        return component;
-    }
+    public static ItemStack makeItem(@NotNull Material material, @Nonnegative int amount, boolean hideFlags, String name, String... lores){
+        Validate.notNull(material, "Material cannot be null");
 
-    public static String getFullStringComponents(TextComponent text){
-        StringBuilder result = new StringBuilder(text.content());
-        for (Component c: text.children()){
-            result.append(((TextComponent) c).content());
+        Component[] lore = null;
+        if(lores != null){
+            lore = new Component[lores.length];
+            for (int i = 0; i < lores.length; i++){
+                if(lores[i] == null || lores[i].isBlank()) lore[i] = Component.text("");
+                lore[i] = ComponentUtils.convertString(lores[i]);
+            }
         }
-        return result.toString();
+        Component nameC = name == null ? null : ComponentUtils.convertString(name);
+
+        return makeItem(material, amount, hideFlags, nameC, lore);
     }
 
     public static String getDateFromMillis(long millis){
@@ -157,29 +162,8 @@ public final class CrownUtils {
         return capitalizeWords(stack.getType().toString().replaceAll("_", " ").toLowerCase());
     }
 
-    public static String formatStaffChatMessage(String senderName, String message){
-        return translateHexCodes(formatEmojis(staffChatFormat.replaceAll("%SENDER%", senderName) + message));
-    }
-
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
     public static String decimalizeNumber(Number number){
-        DECIMAL_FORMAT.setGroupingUsed(true);
-        DECIMAL_FORMAT.setGroupingSize(3);
         return DECIMAL_FORMAT.format(number);
-    }
-
-    public static String getStringFromComponent(Component component){
-        TextComponent text = (TextComponent) component;
-        if(text.content().isBlank()){
-            for (Component c: text.children()){
-                TextComponent text1 = (TextComponent) c;
-                if(text1.content().isBlank()) continue;
-
-                text = (TextComponent) text.children().get(0);
-                break;
-            }
-        }
-        return text.content();
     }
 
     public static String convertMillisIntoTime(long millis){

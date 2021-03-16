@@ -2,14 +2,14 @@ package net.forthecrown.core;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class CrownBoundingBox extends BoundingBox {
 
@@ -27,6 +27,7 @@ public class CrownBoundingBox extends BoundingBox {
         this.world = loc1.getWorld();
     }
 
+    @NotNull
     public World getWorld() {
         return world;
     }
@@ -55,30 +56,20 @@ public class CrownBoundingBox extends BoundingBox {
         return getMax().toLocation(getWorld(), yaw, pitch);
     }
 
-    public List<Player> getPlayersIn(){
-        List<Player> temp = new ArrayList<>();
-        for (Entity e: world.getNearbyEntities(this)){
-            if(!(e instanceof Player)) continue;
-            temp.add((Player) e);
-        }
-        return temp;
+    public Collection<Player> getPlayers(){
+        return getEntitiesByType(Player.class);
     }
 
-    public Collection<Entity> getResidingEntities(){
-        Collection<Entity> temp = new ArrayList<>();
-        for (Entity e: world.getNearbyEntities(this)){
-            temp.add(e);
-        }
-        return temp;
+    public Collection<Entity> getEntities(){
+        return getWorld().getNearbyEntities(this);
     }
 
-    public Collection<LivingEntity> getResidingLivingEntities(){
-        Collection<LivingEntity> temp = new ArrayList<>();
-        for (Entity e: world.getNearbyEntities(this)){
-            if(!(e instanceof LivingEntity)) continue;
-            temp.add((LivingEntity) e);
-        }
-        return temp;
+    public <T extends Entity> Collection<T> getEntitiesByType(Class<? extends T> type){
+        return getWorld().getNearbyEntitiesByType(type, getCenterLocation(), getWidthX()/2, getHeight()/2, getWidthZ()/2);
+    }
+
+    public Collection<LivingEntity> getLivingEntities(){
+        return getEntitiesByType(LivingEntity.class);
     }
 
     public boolean contains(CrownBoundingBox box){
@@ -94,6 +85,14 @@ public class CrownBoundingBox extends BoundingBox {
     public boolean contains(Location location){
         if(!getWorld().equals(location.getWorld())) return false;
         return super.contains(location.toVector());
+    }
+
+    public boolean contains(Block block){
+        return contains(block.getLocation());
+    }
+
+    public boolean contains(Entity entity){
+        return contains(entity.getLocation());
     }
 
     public static CrownBoundingBox wrapBoundingBox(BoundingBox box, World world){

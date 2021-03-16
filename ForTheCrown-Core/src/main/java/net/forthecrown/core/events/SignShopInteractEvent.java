@@ -1,11 +1,12 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.Cooldown;
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.customevents.SignShopUseEvent;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,8 +30,8 @@ public class SignShopInteractEvent implements Listener {
 
         Sign sign = (Sign) event.getClickedBlock().getState();
 
-        String line0 = CrownUtils.getStringFromComponent(sign.line(0));
-        String line3 = CrownUtils.getStringFromComponent(sign.line(3));
+        String line0 = ComponentUtils.getString((TextComponent) sign.line(0));
+        String line3 = ComponentUtils.getString((TextComponent) sign.line(3));
 
         if(!line0.contains("=[Buy]=")
                 && !line0.contains("=[Sell]=")

@@ -82,9 +82,7 @@ public class ArmorStandLeaderboard {
     private Map<String, Integer> getSortedMap(){
         List<Map.Entry<String, Integer>> list = new ArrayList<>(getList().entrySet());
         list.sort(Map.Entry.comparingByValue());
-
-        list.sort(Map.Entry.comparingByValue());
-
+        
         Map<String, Integer> result = new LinkedHashMap<>();
         for (Map.Entry<String, Integer> entry : list) {
             result.put(entry.getKey(), entry.getValue());

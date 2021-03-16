@@ -35,7 +35,7 @@ public final class AuctionManager {
 
     public static NamespacedKey AUCTION_KEY;
 
-    public static final CrownBoundingBox AUCTION_AREA = new CrownBoundingBox(Bukkit.getWorld("world"), -657, 49, 3848, -616, 21, -3810);
+    public static final CrownBoundingBox AUCTION_AREA = new CrownBoundingBox(Bukkit.getWorld("world"), -657, 49, 3848, -616, 21, 3810);
 
     public AuctionManager(Pirates main){
         main.getServer().getPluginManager().registerEvents(new AuctionEvents(), main);

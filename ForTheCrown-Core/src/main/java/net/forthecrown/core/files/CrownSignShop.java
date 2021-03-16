@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class CrownSignShop extends FtcFileManager<FtcCore> implements SignShop {
+public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignShop {
 
     private final Location location;
     private final Block block;
@@ -36,17 +36,17 @@ public class CrownSignShop extends FtcFileManager<FtcCore> implements SignShop {
     private boolean outOfStock;
 
     //used by getSignShop
-    public CrownSignShop(Location signBlock) throws NullPointerException {
-        super(signBlock.getWorld().getName() + "_" + signBlock.getBlockX() + "_" + signBlock.getBlockY() + "_" + signBlock.getBlockZ(), "shopdata", true, FtcCore.getInstance());
+    public CrownSignShop(Location location) throws NullPointerException {
+        super(location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "shopdata", true, FtcCore.getInstance());
 
         //file doesn't exist there for go fuck yourself
         if (fileDoesntExist) throw new NullPointerException("Could not load shop file! Named, " + fileName);
 
-        this.location = signBlock;
-        this.block = signBlock.getBlock();
+        this.location = location;
+        this.block = location.getBlock();
 
         inventory = new CrownShopInventory(this);
-        FtcCore.LOADED_SHOPS.add(this);
+        FtcCore.LOADED_SHOPS.put(location, this);
 
         reload();
     }
@@ -70,7 +70,7 @@ public class CrownSignShop extends FtcFileManager<FtcCore> implements SignShop {
         super.save();
 
         inventory = new CrownShopInventory(this);
-        FtcCore.LOADED_SHOPS.add(this);
+        FtcCore.LOADED_SHOPS.put(location, this);
     }
 
     @Override

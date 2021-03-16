@@ -2,18 +2,25 @@ package net.forthecrown.core.events;
 
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.Announcer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -22,15 +29,23 @@ public class ChatEvents implements Listener {
 
     private final FtcCore main = FtcCore.getInstance();
 
-    public static void sendStaffChatMessage(@Nullable CommandSender sender, String message, boolean cmd){
-        if(sender == null) message = CrownUtils.formatStaffChatMessage("Info", message);
-        else message = CrownUtils.formatStaffChatMessage(sender.getName(), message);
+    public static void sendStaffChatMessage(CommandSender sender, String message, boolean cmd){
+        TextComponent senderText = Component.text(sender.getName()).color(NamedTextColor.GRAY);
+        if(sender instanceof Player) senderText = senderText.hoverEvent(((Player) sender).asHoverEvent()).clickEvent(ClickEvent.suggestCommand("/w " + sender.getName()));
+
+        message = CrownUtils.formatEmojis(message);
+
+        TextComponent text = Component.text("").color(NamedTextColor.WHITE)
+                .append(Component.text("[Staff] ").color(NamedTextColor.DARK_GRAY))
+                .append(senderText)
+                .append(Component.text(" > ").style(Style.style(NamedTextColor.DARK_GRAY, TextDecoration.BOLD)))
+                .append(ComponentUtils.convertString(message));
 
         for (Player p : Bukkit.getOnlinePlayers()){
             if((p.hasPermission("ftc.staffchat")))
-                p.sendMessage(message);
+                p.sendMessage(text);
         }
-        if(!cmd) System.out.println(message);
+        if(!cmd) Bukkit.getConsoleSender().sendMessage(text);
     }
 
     @EventHandler
@@ -53,7 +68,6 @@ public class ChatEvents implements Listener {
         String playerName = player.getName();
         String message = event.getMessage();
 
-
         //If more than half the message has uppercase letters it makes it all lower case
         if(message.length() > 8){
             int upCastCharNumber = 0;
@@ -62,6 +76,7 @@ public class ChatEvents implements Listener {
             }
             if(upCastCharNumber > (message.length()/2) && !player.hasPermission("ftc.chatcaseignore")) {
                 message = message.toLowerCase();
+                message = StringUtils.capitalize(message);
                 message += "!";
                 player.sendMessage("Refrain from using all caps messages.");
             }

@@ -22,7 +22,7 @@ public class CommandTpaskHere extends CrownCommandBuilder {
     public CommandTpaskHere(){
         super("tpaskhere", FtcCore.getInstance());
 
-        setAliases("tpahere");
+        setAliases("tpahere", "eptahere", "etpaskhere");
         setDescription("Asks a player to teleport to them.");
         register();
     }

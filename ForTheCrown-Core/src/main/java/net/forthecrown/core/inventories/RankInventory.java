@@ -95,7 +95,7 @@ public class RankInventory {
         Inventory inventory = holder.getInventory();
 
         inventory.setItem(8, CrownUtils.makeItem(Material.PAPER, 1, true, "&eNext page >"));
-        inventory.setItem(10, getRankItem(Material.MAP, Rank.DEFAULT, "This is the default rank!"));
+        inventory.setItem(10, getRankItem(Material.MAP, Rank.DEFAULT, "&7This is the default rank!"));
 
         //border making
         ItemStack borderItem;
@@ -131,7 +131,7 @@ public class RankInventory {
     }
 
     private ItemStack getLegendRank(){
-        if(user.hasRank(Rank.LEGEND) || user.getPlayer().hasPermission("ftc.legend")) return getRankItem(Material.MAP, Rank.LEGEND, "The rarest rank on all of FTC");
+        if(user.hasRank(Rank.LEGEND) || user.getPlayer().hasPermission("ftc.legend")) return getRankItem(Material.MAP, Rank.LEGEND, "&7The rarest rank on all of FTC");
         return null;
     }
 

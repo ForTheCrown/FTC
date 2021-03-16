@@ -1,30 +1,25 @@
 package net.forthecrown.core.files;
 
+import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.Balances;
 import org.bukkit.Bukkit;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class CrownBalances extends FtcFileManager<FtcCore> implements Balances {
+public class CrownBalances extends AbstractSerializer<FtcCore> implements Balances {
 
     private Map<UUID, Integer> balanceMap = new HashMap<>(); //this is how all the balances are stored, in a private Map
     private int startRhines;
-    private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
     public CrownBalances(FtcCore core) { //This class should only get constructed once, in the main class on startup
         super("balance", core);
 
         startRhines = FtcCore.getInstance().getConfig().getInt("StartRhines");
-
-        decimalFormat.setGroupingUsed(true);
-        decimalFormat.setGroupingSize(3);
-
         reload();
     }
 
@@ -71,13 +66,13 @@ public class CrownBalances extends FtcFileManager<FtcCore> implements Balances {
 
     @Override
     public String getDecimalized(UUID id){
-        return decimalFormat.format(get(id));
+        return CrownUtils.decimalizeNumber(get(id));
     }
 
     @Override
     public void set(UUID uuid, Integer amount){
         if(amount >= FtcCore.getMaxMoneyAmount()){
-            FtcCore.getInstance().getLogger().log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
+            Announcer.log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
             amount = FtcCore.getMaxMoneyAmount();
         }
 
@@ -108,7 +103,7 @@ public class CrownBalances extends FtcFileManager<FtcCore> implements Balances {
             int amountToRemove = (int) (amount * ((float) getTax(uuid)/100));
             amount -= amountToRemove;
 
-            FtcCore.getUser(uuid).sendMessage("&7You were taxed " + getTax(uuid) + "%, which means you lost " + amountToRemove + " Rhines of your last transaction");
+            FtcCore.getUser(uuid).sendMessage("&7You were taxed " + getTax(uuid) + "%, which means you lost " + CrownUtils.decimalizeNumber(amountToRemove) + " Rhines of your last transaction");
         }
 
         balanceMap.put(uuid, get(uuid) + amount);

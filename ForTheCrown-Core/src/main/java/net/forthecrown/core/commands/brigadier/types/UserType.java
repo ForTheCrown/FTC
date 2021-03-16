@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 public class UserType {
 
     public static ArgumentEntity onlinePlayer(){
-        return EntityType.player();
+        return EntityArgType.player();
     }
 
     public static StringArgumentType user(){
@@ -40,7 +40,7 @@ public class UserType {
     }
 
     public static CrownUser getOnlineUser(CommandContext<CommandListenerWrapper> c, String argument) throws CommandSyntaxException {
-        return FtcCore.getUser(EntityType.getPlayer(c, argument));
+        return FtcCore.getUser(EntityArgType.getPlayer(c, argument));
     }
 
     public static CompletableFuture<Suggestions> listSuggestions(SuggestionsBuilder b){
