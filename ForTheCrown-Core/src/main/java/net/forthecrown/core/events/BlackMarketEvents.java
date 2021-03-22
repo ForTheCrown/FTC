@@ -1,7 +1,7 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.Cooldown;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.BlackMarket;

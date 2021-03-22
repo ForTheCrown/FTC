@@ -9,7 +9,8 @@ import net.forthecrown.core.enums.Branch;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
-public class BranchFlag extends Flag<Branch> {
+public class
+BranchFlag extends Flag<Branch> {
 
     protected BranchFlag(String name) {
         super(name);

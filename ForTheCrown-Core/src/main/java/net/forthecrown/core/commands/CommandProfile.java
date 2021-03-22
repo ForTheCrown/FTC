@@ -2,12 +2,12 @@ package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.core.crownevents.EventTimer;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
@@ -64,40 +64,55 @@ public class CommandProfile extends CrownCommandBuilder {
     }
 
     public void sendProfileMessage(CrownUser profile, CrownUser user){
-        String name = profile.getName() + "'s";
-        if(profile.equals(user)) name = "Your";
+        boolean self = profile.equals(user);
 
-        if(!name.equals("Your") && !profile.isProfilePublic()){
+        if(!self && !profile.isProfilePublic()){
             if(!user.hasPermission(getPermission() + ".bypass")){
-                user.sendMessage(name + " profile is not public");
+                user.sendMessage(profile.getName() + " profile is not public");
                 return;
             }
         }
 
-        Balances bals = FtcCore.getBalances();
+        //Header
+        String header = "&6---- &e" + profile.getName() + "'s player profile &6----";
+        user.sendMessage(header);
 
-        user.sendMessage("&6---- &e" + name + " player profile &6----");
+        //Branch
         if(profile.getBranch() != Branch.DEFAULT) user.sendMessage("&eBranch: &r" + profile.getBranch().getName());
+        //Rank
         if(profile.getRank() != Rank.DEFAULT) user.sendMessage("&eRank: &r" + profile.getRank().getPrefix());
-        if(!profile.getCanSwapBranch() && (name.equals("Your") || user.hasPermission(getPermission() + ".bypass") )){
+
+        //Branch spawn time thing
+        if(!profile.getCanSwapBranch() && (self || user.hasPermission(getPermission() + ".bypass") )){
             long timeUntil = profile.getNextAllowedBranchSwap() - System.currentTimeMillis();
             String time = CrownUtils.convertMillisIntoTime(timeUntil);
 
             user.sendMessage("&eAllowed to swap branches in: &r" + time);
         }
 
+        //Play time
         user.sendMessage("&ePlay time: &r" + CrownUtils.decimalizeNumber(profile.getOfflinePlayer().getStatistic(Statistic.PLAY_ONE_MINUTE)/20/60/60) + " hours");
 
+        //Pirate points
         Objective pp = profile.getScoreboard().getObjective("PiratePoints");
         Score score = pp.getScore(profile.getName());
         if(score.isScoreSet() && score.getScore() > 0) user.sendMessage("&ePirate points: &r" + score.getScore());
 
+        //Crown score objective
         Objective crown = profile.getScoreboard().getObjective("crown");
         Score crownScr = crown.getScore(profile.getName());
-        if(crownScr.isScoreSet() && crownScr.getScore() > 0) user.sendMessage("&eCrown score: &r" + crownScr.getScore());
+        if(crownScr.isScoreSet() && crownScr.getScore() > 0) user.sendMessage("&eCrown score: &r" + EventTimer.getTimerCounter(crownScr.getScore()).toString());
 
+        //gems and balance
         if(profile.getGems() > 0) user.sendMessage("&eGems: &r" + CrownUtils.decimalizeNumber(profile.getGems()));
-        user.sendMessage("&eBalance: &r" + bals.getDecimalized(profile.getBase()) + " Rhines");
-        user.sendMessage("&6--------------------------");
+        user.sendMessage("&eBalance: &r" + FtcCore.getBalances().getDecimalized(profile.getBase()) + " Rhines");
+
+        //Footer size roughly lines up with header size
+        StringBuilder footer = new StringBuilder("&6");
+        for (int i = 0; i < header.length()*0.75; i++){
+            footer.append("-");
+        }
+
+        user.sendMessage(footer.toString());
     }
 }

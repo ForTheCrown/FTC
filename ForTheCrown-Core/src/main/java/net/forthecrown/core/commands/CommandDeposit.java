@@ -1,9 +1,9 @@
 package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.ComponentUtils;
+import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;

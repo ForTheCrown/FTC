@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 public class UserType {
 
     public static ArgumentEntity onlinePlayer(){
-        return EntityArgType.player();
+        return TargetSelectorType.player();
     }
 
     public static StringArgumentType user(){
@@ -40,7 +40,7 @@ public class UserType {
     }
 
     public static CrownUser getOnlineUser(CommandContext<CommandListenerWrapper> c, String argument) throws CommandSyntaxException {
-        return FtcCore.getUser(EntityArgType.getPlayer(c, argument));
+        return FtcCore.getUser(TargetSelectorType.getPlayer(c, argument));
     }
 
     public static CompletableFuture<Suggestions> listSuggestions(SuggestionsBuilder b){
@@ -51,40 +51,12 @@ public class UserType {
         return CrownCommandBuilder.suggestMatching(b, pNames);
     }
 
-    /**
-     * Yo, don't use this lmao, it takes a solid second to load all the players' names
-     * @param b
-     * @return
-     */
+    //This takes like a solid second to load all the names lol
     public static CompletableFuture<Suggestions> listALLplayers(SuggestionsBuilder b){
-        List<String> pNames = new ArrayList<>();
+        String token = b.getRemaining().toLowerCase();
         for (OfflinePlayer p: Bukkit.getOfflinePlayers()){
-            pNames.add(p.getName());
+            if(p.getName().toLowerCase().startsWith(token)) b.suggest(p.getName());
         }
-        return CrownCommandBuilder.suggestMatching(b, pNames);
+        return b.buildFuture();
     }
-
-    //CAN'T USE: Forces client to disconnect because of mismatch between client arguments and server arguments
-
-   /*public static class Serializer implements ArgumentSerializer<UserArgumentType> {
-       //toPacket
-       @Override
-       public void a(UserArgumentType userArgumentType, PacketDataSerializer packetDataSerializer) {
-           packetDataSerializer.writeBoolean(userArgumentType.acceptsOffline);
-       }
-
-       //fromPacket
-       @Override
-       public UserArgumentType b(PacketDataSerializer packetDataSerializer) {
-           return new UserArgumentType(packetDataSerializer.readBoolean());
-       }
-
-       //toJson
-       @Override
-       public void a(UserArgumentType userArgumentType, JsonObject jsonObject) {
-           Announcer.ac("toPacket " + jsonObject + " SEP " + userArgumentType.toString());
-           jsonObject.addProperty("acceptsOffline", userArgumentType.acceptsOffline ? "true" : "false");
-           Announcer.ac("toPacket " + jsonObject + " SEP " + userArgumentType.toString());
-       }
-   }*/
 }

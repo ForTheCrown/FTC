@@ -1,14 +1,14 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.Cooldown;
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.clickevent.ClickEventHandler;
 import net.forthecrown.core.clickevent.ClickEventTask;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;

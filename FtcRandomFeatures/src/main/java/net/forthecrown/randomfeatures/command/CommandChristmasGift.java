@@ -2,7 +2,7 @@ package net.forthecrown.randomfeatures.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.EntityArgType;
+import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
 import net.forthecrown.randomfeatures.RandomFeatures;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Bukkit;
@@ -26,10 +26,10 @@ public class CommandChristmasGift extends CrownCommandBuilder {
     @Override
     protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
         command
-                .then(argument("player", EntityArgType.player())
+                .then(argument("player", TargetSelectorType.player())
                         .executes(c -> {
                             CommandSender sender = c.getSource().getBukkitSender();
-                            Player player = EntityArgType.getPlayer(c, "player");
+                            Player player = TargetSelectorType.getPlayer(c, "player");
                             Location targetLoc = player.getLocation();
 
                             // Get shulker:

@@ -1,9 +1,9 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.Cooldown;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.customevents.SellShopSellEvent;
@@ -18,6 +18,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -49,45 +50,27 @@ public class SellShopEvents implements Listener {
 
         CrownUser user = FtcCore.getUser(player.getUniqueId());
         SellShop sellShop = this.sellShop;
-
         ItemStack item = event.getCurrentItem();
 
         if(item.getType() == Material.GRAY_STAINED_GLASS_PANE) return;
+        view = event.getView();
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
         //change sell amount
         if(item.getType() == Material.BLACK_STAINED_GLASS_PANE){
             String displayName = ComponentUtils.getString(item.getItemMeta().displayName());
 
-            switch (displayName){
-                case "Sell 1":
-                    user.setSellAmount(SellAmount.PER_1);
-                    break;
-                case "Sell per 16":
-                    user.setSellAmount(SellAmount.PER_16);
-                    break;
-                case "Sell per 64":
-                    user.setSellAmount(SellAmount.PER_64);
-                    break;
-                case "Sell all":
-                    user.setSellAmount(SellAmount.ALL);
-                    break;
+            int sellAmountInt;
+            try {
+                sellAmountInt = Integer.parseInt(displayName.replaceAll("[\\D]", "").trim());
+            } catch (Exception e){
+                sellAmountInt = -1;
             }
+            SellAmount newAmount = SellAmount.fromInt(sellAmountInt);
+            user.setSellAmount(newAmount);
 
             //reloads the inventory, cuz changing the lores of all the items is a pain too great to even imagine
-            switch (event.getView().getTitle().replaceAll(" Shop Menu", "")){
-                case "Mob Drops":
-                    player.openInventory(sellShop.dropsMenu());
-                    return;
-                case "Farming Items":
-                    player.openInventory(sellShop.farmingMenu());
-                    return;
-                case "Mining Items":
-                    player.openInventory(sellShop.miningMenu());
-                    return;
-                default:
-                    player.openInventory(sellShop.decidingMenu());
-                    return;
-            }
+            reloadInventory();
+            return;
         }
 
         switch (item.getType()){
@@ -112,6 +95,26 @@ public class SellShopEvents implements Listener {
                 }
             default:
                 FtcCore.getInstance().getServer().getPluginManager().callEvent(new SellShopSellEvent(user, FtcCore.getBalances(), item.getType()));
+        }
+    }
+
+    private InventoryView view;
+    private void reloadInventory(){
+        if(view == null) return;
+
+        //reloads the inventory, cuz changing the lores of all the items is a pain too great to even imagine
+        switch (ComponentUtils.getString(view.title()).replaceAll(" Shop Menu", "")){
+            case "Mob Drops":
+                player.openInventory(sellShop.dropsMenu());
+                return;
+            case "Farming Items":
+                player.openInventory(sellShop.farmingMenu());
+                return;
+            case "Mining Items":
+                player.openInventory(sellShop.miningMenu());
+                return;
+            default:
+                player.openInventory(sellShop.decidingMenu());
         }
     }
 
@@ -164,7 +167,10 @@ public class SellShopEvents implements Listener {
         int comparison1 = seller.getItemPrice(toSell);
 
         //if the price dropped
-        if(comparison1 < comparison0) seller.sendMessage("&7Your price for " + s + " has dropped to " + comparison1);
+        if(comparison1 < comparison0){
+            seller.sendMessage("&7Your price for " + s + " has dropped to " + comparison1);
+            reloadInventory();
+        }
     }
 
     @EventHandler
@@ -175,34 +181,3 @@ public class SellShopEvents implements Listener {
         HandlerList.unregisterAll(this);
     }
 }
-
-/**
- * for(ItemStack stack : playerInventory){
- *             if(stack == null) continue;
- *             if(stack.getType() != toSell) continue;
- *
- *             if(seller.getSellAmount() == SellAmount.ALL){ //remove the itemstack and add it to the finalSell variable
- *                 finalSell += stack.getAmount();
- *                 sellAmount = 0;
- *                 playerInventory.removeItemAnySlot(stack);
- *                 continue;
- *             }
- *
- *             if(stack.getAmount() >= sellAmount){ //if the stack is larger than the remaining sellAmount
- *                 stack.setAmount(stack.getAmount() - sellAmount);
- *                 if(stack.getAmount() < 0) playerInventory.removeItemAnySlot(stack);
- *                 sellAmount = 0;
- *                 break;
- *             }
- *
- *             if(stack.getAmount() < sellAmount){ //if the stack is smaller than the remaining sellAmount
- *                 sellAmount -= stack.getAmount(); //lessens the sellAmount so the next item requires only the amount of items still needed
- *                 playerInventory.removeItemAnySlot(stack);
- *             }
- *         }
- *         if(sellAmount != 0){
- *             seller.sendMessage("&7You don't have enough items to sell");
- *             event.setCancelled(true);
- *             return;
- *         }
- */

@@ -4,10 +4,10 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.CrownWorldGuard;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.ComponentUtils;
+import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
@@ -86,8 +86,8 @@ public class SignShopCreateEvent implements Listener {
         player.openInventory(shop.getExampleInventory());
         FtcCore.getInstance().getServer().getPluginManager().registerEvents(new SignShopSubClass1(player, shop), FtcCore.getInstance());
 
-        if(shopType == ShopType.BUY_SHOP) event.line(0, Component.text(shopType.getOutOfStockLabel()));
-        else event.line(0, Component.text(shopType.getInStockLabel()));
+        if(shopType == ShopType.BUY_SHOP) event.line(0, shopType.outOfStockLabel());
+        else event.line(0, shopType.inStockLabel());
 
         event.line(3, Component.text(ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + price)); //idk, I thought putting ALL_CODES would make triggering events involving the shops harder
     }

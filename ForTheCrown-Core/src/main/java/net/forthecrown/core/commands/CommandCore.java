@@ -6,7 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.core.CrownItems;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
@@ -26,7 +26,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -108,6 +107,7 @@ public class CommandCore extends CrownCommandBuilder {
                         return 0;
                     })
                 )
+
                 .then(argument("user")
                         .then(argument(USER_ARG, UserType.user())
                                 .suggests((c, b) -> UserType.listSuggestions(b))
@@ -201,6 +201,14 @@ public class CommandCore extends CrownCommandBuilder {
                                             return 0;
                                         })
 
+                                        .then(argument("unset")
+                                                .executes(c -> {
+                                                    CrownUser u = getUser(c);
+                                                    u.setArrowParticle(null);
+                                                    broadcastAdmin(c.getSource(), "unset");
+                                                    return 0;
+                                                })
+                                        )
                                         .then(argument("set")
                                                 .then(argument("activeParticle", ParticleType.particle())
                                                         .executes(c -> {
@@ -252,6 +260,7 @@ public class CommandCore extends CrownCommandBuilder {
                                             c.getSource().getBukkitSender().sendMessage(u.getParticleDeathAvailable().toString());
                                             return 0;
                                         })
+
                                         .then(argument("add")
                                                 .then(argument("particle", StringArgumentType.word())
                                                         .executes(c -> {
@@ -325,6 +334,14 @@ public class CommandCore extends CrownCommandBuilder {
                                             return 0;
                                         })
 
+                                        .then(argument("list")
+                                                .executes(c -> {
+                                                    CrownUser user = getUser(c);
+                                                    c.getSource().getBukkitSender().sendMessage(user.getName() + "'s ranks as a List.toString lol:");
+                                                    c.getSource().getBukkitSender().sendMessage(user.getAvailableRanks().toString());
+                                                    return 0;
+                                                })
+                                        )
                                         .then(argument("add")
                                                 .then(argument("rankToAdd", StringArgumentType.word())
                                                         .suggests(TypeCreator::listRankSuggestions)
@@ -361,7 +378,6 @@ public class CommandCore extends CrownCommandBuilder {
                                         .then(argument("branchToSet", StringArgumentType.word())
                                                 .suggests(TypeCreator::listBranchSuggestions)
                                                 .executes(c ->{
-                                                    if(c.getSource().getBukkitSender() instanceof ConsoleCommandSender) throw new CrownCommandException("Called");
                                                     CrownUser user = getUser(c);
                                                     Branch branch = TypeCreator.getBranch(c, "branchToSet");
                                                     user.setBranch(branch);
@@ -448,7 +464,31 @@ public class CommandCore extends CrownCommandBuilder {
                                     return 0;
                                 })
                         )
+                        .then(argument("voteticket")
+                                .executes(c -> {
+                                    Player player = getPlayerSender(c);
+                                    return giveTicket(false, player);
+                                })
+                        )
+                        .then(argument("eliteticket")
+                                .executes(c -> {
+                                    Player player = getPlayerSender(c);
+                                    return giveTicket(true, player);
+                                })
+                        )
                 );
+    }
+
+    private int giveTicket(boolean elite, Player player){
+        try {
+            if(elite) player.getInventory().addItem(CrownItems.ELITE_VOTE_TICKET);
+            else player.getInventory().addItem(CrownItems.VOTE_TICKET);
+        } catch (Exception e){
+            player.sendMessage("Inventory full");
+            return 0;
+        }
+        broadcastAdmin(player, "Giving vote ticket");
+        return 0;
     }
 
     private int giveCoins(Player player, int amount){

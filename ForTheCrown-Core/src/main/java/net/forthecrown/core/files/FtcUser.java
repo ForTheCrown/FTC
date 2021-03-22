@@ -1,8 +1,10 @@
 package net.forthecrown.core.files;
 
-import net.forthecrown.core.CrownUtils;
+import io.papermc.paper.adventure.AdventureComponent;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.ComponentUtils;
+import net.forthecrown.core.utils.ListConverter;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.Grave;
 import net.forthecrown.core.api.UserDataContainer;
@@ -10,11 +12,18 @@ import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.exceptions.UserNotOnlineException;
+import net.forthecrown.core.utils.MapConverter;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.craftbukkit.v1_16_R3.CraftOfflinePlayer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
@@ -30,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 
 public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
@@ -63,6 +73,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     private Map<Material, Integer> amountEarned = new HashMap<>();
     private SellAmount sellAmount;
 
+    private EntityPlayer handle;
 
     public FtcUser(@NotNull UUID base){
         super(base.toString(), "playerdata", FtcCore.getInstance());
@@ -77,6 +88,8 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
         FtcCore.LOADED_USERS.put(base, this);
         permsCheck();
+
+        if(isOnline()) handle = getOnlineHandle().getHandle();
     }
 
     @Override
@@ -106,37 +119,23 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         else setArrowParticle(null);
 
         if(getFile().getList("AvailableRanks") != null){
-            Set<Rank> tempList = new HashSet<>();
-            for (String s : getFile().getStringList("AvailableRanks")){
-                tempList.add(Rank.valueOf(s));
-            }
-            setAvailableRanks(tempList);
+            setAvailableRanks(ListConverter.toSet(getFile().getStringList("AvailableRanks"), Rank::valueOf));
         } else setAvailableRanks(new HashSet<>());
 
         if(getFile().getList("ArrowParticleAvailable") != null){
-            List<Particle> tempList = new ArrayList<>();
-            for(String s : getFile().getStringList("ArrowParticleAvailable")){
-                tempList.add(Particle.valueOf(s));
-            }
-            setParticleArrowAvailable(tempList);
+            setParticleArrowAvailable(ListConverter.toList(getFile().getStringList("ArrowParticleAvailable"), Particle::valueOf));
         } else setParticleDeathAvailable(new ArrayList<>());
 
         itemPrices.clear();
         if(getFile().getConfigurationSection("ItemPrices") != null && getFile().getConfigurationSection("ItemPrices").getKeys(true).size() > 0){
-            Map<Material, Integer> tempMap = new HashMap<>();
-            for (String s : getFile().getConfigurationSection("ItemPrices").getKeys(false)){
-                tempMap.put(Material.valueOf(s), getFile().getConfigurationSection("ItemPrices").getInt(s));
-            }
-            setItemPrices(tempMap);
+            Map<String, Object> map = getFile().getConfigurationSection("ItemPrices").getValues(false);
+            setItemPrices(MapConverter.convert(map, Material::valueOf, o -> Integer.parseInt(o.toString())));
         }
 
         amountEarned.clear();
         if(getFile().getConfigurationSection("AmountEarned") != null && getFile().getConfigurationSection("AmountEarned").getKeys(true).size() > 0){
-            Map<Material, Integer> tempMap = new HashMap<>();
-            for (String s : getFile().getConfigurationSection("AmountEarned").getKeys(false)){
-                tempMap.put(Material.valueOf(s), getFile().getConfigurationSection("AmountEarned").getInt(s));
-            }
-            setAmountEarnedMap(tempMap);
+            Map<String, Object> map = getFile().getConfigurationSection("AmountEarned").getValues(false);
+            setAmountEarnedMap(MapConverter.convert(map, Material::valueOf, o -> Integer.parseInt(o.toString())));
         }
 
         if(isOnline() && name != null && !name.equals(getPlayer().getName())){ //transfers all scores to new player name if player name changes
@@ -193,40 +192,22 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
         //rank saving
         if(getAvailableRanks().size() > 0){
-            List<String> tempList = new ArrayList<>();
-            for(Rank r : getAvailableRanks()){
-                tempList.add(r.toString());
-            }
-            getFile().set("AvailableRanks", tempList);
+            getFile().set("AvailableRanks", ListConverter.toList(getAvailableRanks(), Enum::toString));
         }
 
         //Arrow particle saving
         if(getParticleArrowAvailable().size() > 0){
-            List<String> tempList = new ArrayList<>();
-            for (Particle p : getParticleArrowAvailable()){
-                tempList.add(p.toString());
-            }
-            getFile().set("ArrowParticleAvailable", tempList);
+            getFile().set("ArrowParticleAvailable", ListConverter.toList(getParticleArrowAvailable(), Enum::toString));
         }
 
         //Item price saving
         if(getItemPrices().size() > 0){
-            Map<String, Integer> tempMap = new HashMap<>();
-
-            for (Material mat : getItemPrices().keySet()){
-                if(getItemPrice(mat) < FtcCore.getInstance().getItemPrice(mat)) tempMap.put(mat.toString(), getItemPrice(mat));
-            }
-            getFile().createSection("ItemPrices", tempMap);
+            getFile().createSection("ItemPrices", MapConverter.convertKeys(getItemPrices(), Material::toString));
         }
 
         //Amount earned saving
         if(getAmountEarnedMap().size() > 0){
-            Map<String, Integer> tempMap = new HashMap<>();
-
-            for (Material mat : getAmountEarnedMap().keySet()){
-                tempMap.put(mat.toString(), getAmountEarned(mat));
-            }
-            getFile().createSection("AmountEarned", tempMap);
+            getFile().createSection("AmountEarned", MapConverter.convertKeys(getAmountEarnedMap(), Material::toString));
         }
 
         if(!dataContainer.isEmpty()) getFile().createSection("DataContainer", dataContainer.serialize());
@@ -251,18 +232,39 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     }
 
     @Override
+    @Deprecated
     public UUID getBase(){
         return base;
     }
 
     @Override
+    public UUID getUniqueId() {
+        return base;
+    }
+
+    public CraftPlayer getOnlineHandle(){
+        return (CraftPlayer) Bukkit.getPlayer(getBase());
+    }
+
+    public CraftOfflinePlayer getOfflineHandle(){
+        return (CraftOfflinePlayer) Bukkit.getOfflinePlayer(getBase());
+    }
+
+    public EntityPlayer getHandle() {
+        if(!isOnline()) return null;
+        if(handle == null) handle = getOnlineHandle().getHandle();
+        return handle;
+    }
+
+    @Override
     public Player getPlayer(){
-        return Bukkit.getPlayer(getBase());
+        return getOnlineHandle();
     }
 
     @Override
     public OfflinePlayer getOfflinePlayer(){
-        return Bukkit.getOfflinePlayer(getBase());
+        if(isOnline()) return getOnlineHandle();
+        return getOfflineHandle();
     }
 
     @Override
@@ -506,7 +508,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
         save();
         nextResetTime = System.currentTimeMillis() + FtcCore.getUserDataResetInterval();
-        System.out.println(getName() + " earnings reset, next reset in: " + ((((getNextResetTime()/1000)/60)/60)/24) + " days");
+        System.out.println(getName() + " earnings reset, next reset in: " + ((((System.currentTimeMillis() - getNextResetTime()/1000)/60)/60)/24) + " days");
     }
 
     @Nonnull
@@ -540,7 +542,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     @Override
     public void sendMessage(@Nonnull String message){
         if(!isOnline()) return;
-        sendMessage(ComponentUtils.convertString(message));
+        sendMessage(ComponentUtils.stringToVanilla(message));
     }
 
     @Override
@@ -553,13 +555,13 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     @Override
     public void sendMessage(@NonNull Component message) {
         if(!isOnline()) return;
-        getPlayer().sendMessage(message);
+        sendMessage(new AdventureComponent(message));
     }
 
     @Override
     public void sendMessage(UUID sender, @Nonnull String message) {
-        performOnlineCheck();
-        getPlayer().sendMessage(sender, CrownUtils.translateHexCodes(message));
+        if(!isOnline()) return;
+        getOnlineHandle().sendMessage(sender, CrownUtils.translateHexCodes(message));
     }
 
     @Override
@@ -569,20 +571,42 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         }
     }
 
+    @Override
+        public void sendMessage(IChatBaseComponent message){
+        sendMessage(message, ChatMessageType.CHAT);
+    }
+
+    @Override
+    public void sendMessage(UUID id, IChatBaseComponent message){
+        sendMessage(id, message, ChatMessageType.CHAT);
+    }
+
+    @Override
+    public void sendMessage(IChatBaseComponent message, ChatMessageType type){
+        if(!isOnline()) return;
+        getHandle().playerConnection.sendPacket(new PacketPlayOutChat(message, type, SystemUtils.b));
+    }
+
+    @Override
+    public void sendMessage(UUID id, IChatBaseComponent message, ChatMessageType type){
+        if(!isOnline()) return;
+        getHandle().playerConnection.sendPacket(new PacketPlayOutChat(message, type, id));
+    }
+
     @Nonnull
     @Override
     public Server getServer() {
-        return FtcCore.getInstance().getServer();
+        return Bukkit.getServer();
     }
 
     @Override
     public boolean isOnline() {
-        return getPlayer() != null;
+        return Bukkit.getOfflinePlayer(getBase()).isOnline();
     }
 
     @Override
     public Scoreboard getScoreboard(){
-        return FtcCore.getInstance().getServer().getScoreboardManager().getMainScoreboard();
+        return getServer().getScoreboardManager().getMainScoreboard();
     }
 
     @Override
@@ -645,89 +669,87 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     @Override
     public Spigot spigot() {
         performOnlineCheck();
-        return getPlayer().spigot();
+        return getOnlineHandle().spigot();
     }
 
 
     @Override
     public boolean isPermissionSet(@Nonnull String name) {
         performOnlineCheck();
-        return getPlayer().isPermissionSet(name);
+        return getOnlineHandle().isPermissionSet(name);
     }
 
     @Override
     public boolean isPermissionSet(@Nonnull Permission perm) {
         performOnlineCheck();
-        return getPlayer().isPermissionSet(perm);
+        return getOnlineHandle().isPermissionSet(perm);
     }
 
     @Override
     public boolean hasPermission(@Nonnull String name) {
         performOnlineCheck();
-        return getPlayer().hasPermission(name);
+        return getOnlineHandle().hasPermission(name);
     }
 
     @Override
     public boolean hasPermission(@Nonnull Permission perm) {
         performOnlineCheck();
-        return getPlayer().hasPermission(perm);
+        return getOnlineHandle().hasPermission(perm);
     }
 
     @Nonnull
     @Override
     public PermissionAttachment addAttachment(@Nonnull Plugin plugin, @Nonnull String name, boolean value) {
         performOnlineCheck();
-        return getPlayer().addAttachment(plugin, name, value);
+        return getOnlineHandle().addAttachment(plugin, name, value);
     }
 
     @Nonnull
     @Override
     public PermissionAttachment addAttachment(@Nonnull Plugin plugin) {
         performOnlineCheck();
-        return getPlayer().addAttachment(plugin);
+        return getOnlineHandle().addAttachment(plugin);
     }
 
     @Override
     public PermissionAttachment addAttachment(@Nonnull Plugin plugin, @Nonnull String name, boolean value, int ticks) {
         performOnlineCheck();
-        return getPlayer().addAttachment(plugin, name, value, ticks);
+        return getOnlineHandle().addAttachment(plugin, name, value, ticks);
     }
 
     @Override
     public PermissionAttachment addAttachment(@Nonnull Plugin plugin, int ticks) {
         performOnlineCheck();
-        return getPlayer().addAttachment(plugin, ticks);
+        return getOnlineHandle().addAttachment(plugin, ticks);
     }
 
     @Override
     public void removeAttachment(@Nonnull PermissionAttachment attachment) {
         performOnlineCheck();
-        getPlayer().removeAttachment(attachment);
+        getOnlineHandle().removeAttachment(attachment);
     }
 
     @Override
     public void recalculatePermissions() {
         performOnlineCheck();
-        getPlayer().recalculatePermissions();
+        getOnlineHandle().recalculatePermissions();
     }
 
     @Nonnull
     @Override
     public Set<PermissionAttachmentInfo> getEffectivePermissions() {
         performOnlineCheck();
-        return getPlayer().getEffectivePermissions();
+        return getOnlineHandle().getEffectivePermissions();
     }
 
     @Override
     public boolean isOp() {
-        performOnlineCheck();
-        return getPlayer().isOp();
+        return getOfflinePlayer().isOp();
     }
 
     @Override
     public void setOp(boolean value) {
-        performOnlineCheck();
-        getPlayer().setOp(value);
+        getOfflinePlayer().setOp(value);
     }
 
     @Override
@@ -738,7 +760,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public void sendMessage(@NotNull Identity identity, @NotNull Component message, @NotNull MessageType type) {
-        getPlayer().sendMessage(identity, message, type);
+        getOnlineHandle().sendMessage(identity, message, type);
     }
 
     private void performOnlineCheck(){
@@ -764,6 +786,33 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     @Override
     public Grave getGrave() {
         return grave;
+    }
+
+    @Override
+    public @NonNull HoverEvent<Component> asHoverEvent() {
+        Component text = Component.text()
+                .append(name())
+                .append(Component.newline())
+                .build();
+
+        if(getBranch() != Branch.DEFAULT && isProfilePublic()){
+            text = text.append(Component.text("Branch: ").append(Component.text(branch.getName())));
+            text = text.append(Component.newline());
+        }
+
+        if(getRank() != Rank.DEFAULT){
+            text = text.append(Component.text("Rank: ").append(getRank().prefix()));
+            text = text.append(Component.newline());
+        }
+
+        text = text.append(Component.text("Type: User")).append(Component.newline());
+        text = text.append(Component.text(getBase().toString()));
+        return HoverEvent.showText(text);
+    }
+
+    @Override
+    public @NonNull HoverEvent<Component> asHoverEvent(@NonNull UnaryOperator<Component> op) {
+        return asHoverEvent();
     }
 
     @Override

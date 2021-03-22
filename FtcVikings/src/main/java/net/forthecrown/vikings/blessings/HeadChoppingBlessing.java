@@ -52,7 +52,7 @@ public class HeadChoppingBlessing extends VikingBlessing{
     }
 
     private ItemStack getPlayerHead(Player player){
-        ItemStack playerHead = CrownUtils.makeItem(Material.PLAYER_HEAD, 1, false, null);
+        ItemStack playerHead = CrownUtils.makeItem(Material.PLAYER_HEAD, 1, false, (String) null);
         SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
         skullMeta.setOwningPlayer(player);
         playerHead.setItemMeta(skullMeta);

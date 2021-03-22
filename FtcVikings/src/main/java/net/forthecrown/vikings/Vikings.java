@@ -4,20 +4,21 @@ import net.forthecrown.vikings.blessings.FastRunner;
 import net.forthecrown.vikings.blessings.HeadChoppingBlessing;
 import net.forthecrown.vikings.blessings.VikingBlessing;
 import net.forthecrown.vikings.commands.CommandViking;
+import net.forthecrown.vikings.commands.CommandVikingFunction;
 import net.forthecrown.vikings.raids.MonasteryRaid;
-import net.forthecrown.vikings.raids.RaidHandler;
+import net.forthecrown.vikings.raids.RaidManager;
 import net.forthecrown.vikings.raids.VikingRaid;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Vikings extends JavaPlugin {
 
     private static Vikings instance;
-    private static RaidHandler handler;
+    private static RaidManager handler;
 
     @Override
     public void onEnable() {
         instance = this;
-        handler = new RaidHandler(getServer());
+        handler = new RaidManager(getServer());
 
         getServer().getPluginManager().registerEvents(new VikingListener(), this);
 
@@ -27,13 +28,14 @@ public final class Vikings extends JavaPlugin {
         new HeadChoppingBlessing();
 
         new CommandViking();
+        new CommandVikingFunction();
     }
 
     @Override
     public void onDisable() {
         for(VikingRaid r : handler.getRaids()){
-            if(r.getUsingPlayer() == null) continue;
-            r.onRaidEnd();
+            if(r.getCurrentParty() == null) continue;
+            r.end();
         }
 
         for (VikingBlessing b: VikingBlessing.getBlessings()){
@@ -62,7 +64,7 @@ public final class Vikings extends JavaPlugin {
         return instance;
     }
 
-    public static RaidHandler getRaidHandler(){
+    public static RaidManager getRaidHandler(){
         return handler;
     }
 }

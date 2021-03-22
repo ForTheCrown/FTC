@@ -32,7 +32,7 @@ public class HelpMap extends CrownCommandBuilder {
             CommandSender sender = c.getSource().getBukkitSender();
             sender.sendMessage(ChatColor.GRAY + "Dynmap link:");
 
-            TextComponent text = Component.text("http://mc.forthecrown.net:3140/").color(NamedTextColor.AQUA);
+            TextComponent text = Component.text("mc.forthecrown.net:3140/").color(NamedTextColor.AQUA);
             text = text.clickEvent(ClickEvent.openUrl("http://mc.forthecrown.net:3140/"));
             text = text.hoverEvent(HoverEvent.showText(Component.text("Opens the server's dynmap.")));
             sender.sendMessage(text);

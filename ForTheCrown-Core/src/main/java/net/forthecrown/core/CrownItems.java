@@ -1,5 +1,10 @@
 package net.forthecrown.core;
 
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -18,21 +23,66 @@ public final class CrownItems {
 
     public static final NamespacedKey ITEM_KEY = new NamespacedKey(FtcCore.getInstance(), "crownitem");
 
+    public static final ItemStack VOTE_TICKET;
+    public static final ItemStack ELITE_VOTE_TICKET;
+
+    static {
+        final Component border = Component.text("-----------------------------").color(NamedTextColor.DARK_GRAY);
+        final Component line1 = Component.text("These can be used to go inside");
+        final Component line3 = Component.text("Try to get as much stuff as you");
+
+        VOTE_TICKET = CrownUtils.makeItem(
+                Material.PAPER, 1, true,
+                Component.text("Bank Ticket")
+                        .color(NamedTextColor.AQUA)
+                        .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                ,
+
+                border,
+                line1,
+                Component.text("the bank vault in Hazelguard."),
+                line3,
+                Component.text("can from chests. You get 30 sec!"),
+                border
+                );
+        VOTE_TICKET.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 1);
+        VOTE_TICKET.getItemMeta().getPersistentDataContainer().set(ITEM_KEY, PersistentDataType.BYTE, (byte) 1);
+
+
+        ELITE_VOTE_TICKET = CrownUtils.makeItem(
+                Material.PAPER, 1, true,
+                Component.text("Elite Bank Ticket")
+                    .color(NamedTextColor.AQUA)
+                    .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                ,
+
+                border,
+                line1,
+                Component.text("the elite bank vault in Hazelguard."),
+                line3,
+                Component.text("can from chests. You get 50 sec!"),
+                border
+                );
+        ELITE_VOTE_TICKET.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 2);
+        ELITE_VOTE_TICKET.getItemMeta().getPersistentDataContainer().set(ITEM_KEY, PersistentDataType.BYTE, (byte) 1);
+    }
+
     private CrownItems() {}
 
     public static boolean isCrownItem(@Nullable ItemStack item){
         if(item == null) return false;
         if(!item.hasItemMeta() || !item.getItemMeta().hasDisplayName() || !item.getItemMeta().hasLore()) return false;
+        if(item.getItemMeta().getPersistentDataContainer().has(ITEM_KEY, PersistentDataType.BYTE)) return true;
 
         ItemMeta meta = item.getItemMeta();
         String displayName = ComponentUtils.getString(meta.displayName());
         Material type = item.getType();
 
         if (type == Material.GOLDEN_HELMET) {
-            return displayName.contains("-Crown-") && ComponentUtils.getString(meta.lore().get(0)).contains("Rank ");
+            return displayName.equals(CrownUtils.translateHexCodes("&6-&e&lCrown&6-")) && ComponentUtils.getString(meta.lore().get(0)).contains("Rank ");
         }
         if(type == Material.NETHERITE_SWORD || type == Material.GOLDEN_SWORD){
-            return displayName.contains("-Captain's Cutlass") || displayName.contains("-Royal Sword-");
+            return displayName.equals("-Captain's Cutlass") || displayName.equals("-Royal Sword-");
         }
 
         return false;

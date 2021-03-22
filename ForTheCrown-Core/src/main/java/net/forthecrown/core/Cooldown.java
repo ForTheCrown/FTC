@@ -1,7 +1,9 @@
 package net.forthecrown.core;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
@@ -16,11 +18,14 @@ public final class Cooldown {
 
     private Cooldown(){ }
 
-    public static boolean contains(CommandSender sender){
+    public static boolean contains(@NotNull CommandSender sender){
         return contains(sender, "general");
     }
 
-    public static boolean contains(CommandSender sender, String category){
+    public static boolean contains(@NotNull CommandSender sender, @NotNull String category){
+        Validate.notNull(sender, "Sender was null");
+        Validate.notNull(category, "Category was null");
+
         if(COOLDOWN_MAP.get(category) == null){
             COOLDOWN_MAP.put(category, new HashSet<>());
             return false;
@@ -29,15 +34,18 @@ public final class Cooldown {
         return COOLDOWN_MAP.get(category).contains(sender);
     }
 
-    public static void add(CommandSender sender, @Nonnegative int timeInTicks){
+    public static void add(@NotNull CommandSender sender, @Nonnegative int timeInTicks){
         add(sender, "general", timeInTicks);
     }
 
-    public static void add(CommandSender sender, String category){
+    public static void add(@NotNull CommandSender sender, String category){
         add(sender, category, null);
     }
 
-    public static void add(CommandSender sender, String category, @Nullable @Nonnegative Integer timeInTicks){
+    public static void add(@NotNull CommandSender sender, @NotNull String category, @Nullable @Nonnegative Integer timeInTicks){
+        Validate.notNull(sender, "Sender is null");
+        Validate.notNull(category, "Category was null");
+
         COOLDOWN_MAP.computeIfAbsent(category, k -> new HashSet<>());
 
         Set<CommandSender> set = COOLDOWN_MAP.get(category);
@@ -53,7 +61,10 @@ public final class Cooldown {
         remove(sender, "general");
     }
 
-    public static void remove(CommandSender sender, String category){
+    public static void remove(@NotNull CommandSender sender, @NotNull String category){
+        Validate.notNull(sender, "Sender was null");
+        Validate.notNull(category, "Category was null");
+
         if(COOLDOWN_MAP.get(category) == null){
             COOLDOWN_MAP.put(category, new HashSet<>());
             return;

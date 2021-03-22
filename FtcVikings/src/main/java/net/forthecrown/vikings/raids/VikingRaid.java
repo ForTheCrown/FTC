@@ -1,7 +1,9 @@
 package net.forthecrown.vikings.raids;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserDataContainer;
 import net.forthecrown.vikings.Vikings;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -17,14 +19,15 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
+//Class existence reason: Be a generic raid that can be extended, and which acts as the center point for all the raid stuff
 public abstract class VikingRaid implements Listener {
 
     protected final Location raidLocation;
     protected final String name;
     protected final Server server;
-
-    protected Player usingPlayer;
-    protected RaidDifficulty difficulty = RaidDifficulty.NORMAL;
+    protected RaidAreaGenerator generator;
+    protected RaidParty usingParty;
+    protected boolean inUse;
 
     protected VikingRaid(Location raidLocation, String name, Server server){
         this.raidLocation = raidLocation;
@@ -32,61 +35,74 @@ public abstract class VikingRaid implements Listener {
         this.server = server;
     }
 
-    public RaidDifficulty getDifficulty() {
-        return difficulty;
-    }
+    public void initRaid(RaidParty party) {
+        setCurrentParty(party);
 
-    public void setDifficulty(RaidDifficulty difficulty) {
-        this.difficulty = difficulty;
-    }
-
-    public void initRaid(Player player, RaidDifficulty difficulty) {
-        this.difficulty = difficulty;
-        this.usingPlayer = player;
-
+        generator.generate();
         server.getPluginManager().registerEvents(this, Vikings.getInstance());
 
-        onRaidLoad();
-        player.teleport(getRaidLocation());
+        onLoad();
+        enterRaid();
     }
 
-    protected abstract void onRaidLoad();
-    protected abstract void onRaidComplete();
+    public void enterRaid(){
+        getCurrentParty().teleport(getRaidLocation());
+        onEnter();
+    }
 
-    public void onRaidEnd() {
-        getUsingPlayer().teleport(Vikings.getRaidHandler().getExitLocation());
-        setUsingPlayer(null);
+    protected void onLoad() {}
+    protected void onComplete() {}
+    protected void onLose() {end();}
+    protected void onEnter() {}
+    protected void onEnd() {}
+
+    public void end() {
+        onEnd();
+
+        getCurrentParty().teleport(RaidManager.EXIT_LOCATION);
+        Announcer.ac("sadf");
+        setCurrentParty(null);
 
         HandlerList.unregisterAll(this);
     }
 
     public void completeRaid(){
-        CrownUser user = FtcCore.getUser(getUsingPlayer());
+        for (Player p: getCurrentParty()){
+            CrownUser u = FtcCore.getUser(p);
+            UserDataContainer dataContainer = u.getDataContainer();
+            ConfigurationSection section = dataContainer.get(Vikings.getInstance());
+            List<String> completedLevels = section.getStringList("CompletedLevels");
 
-        ConfigurationSection dataSec = user.getDataContainer().get(Vikings.getInstance());
-        List<String> completedRaids = dataSec.getStringList("CompletedRaids");
-        completedRaids.add(getName());
+            completedLevels.add(getName());
+            dataContainer.set(Vikings.getInstance(), section);
+        }
 
-        dataSec.set("CompletedRaids", completedRaids);
-        user.getDataContainer().set(Vikings.getInstance(), dataSec);
-
-        onRaidComplete();
+        onComplete();
+        end();
     }
 
     public Location getRaidLocation() {
         return raidLocation;
     }
 
-    public void setUsingPlayer(@Nullable Player player) {
-        usingPlayer = player;
+    public void setCurrentParty(@Nullable RaidParty party) {
+        usingParty = party;
     }
 
-    public Player getUsingPlayer() {
-        return usingPlayer;
+    public RaidParty getCurrentParty() {
+        return usingParty;
     }
 
     public String getName() {
         return name;
+    }
+
+    public RaidAreaGenerator getGenerator() {
+        return generator;
+    }
+
+    public boolean isInUse() {
+        return inUse;
     }
 
     @Override
@@ -110,17 +126,17 @@ public abstract class VikingRaid implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if(getUsingPlayer() == null) return;
-        if(!event.getEntity().equals(getUsingPlayer())) return;
+        if(getCurrentParty() == null) return;
+        if(!getCurrentParty().getParticipants().contains(event.getEntity())) return;
 
-        onRaidEnd();
+        getCurrentParty().leaveParty(event.getEntity());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        if(getUsingPlayer() == null) return;
-        if(!event.getPlayer().equals(getUsingPlayer())) return;
+        if(getCurrentParty() == null) return;
+        if(!getCurrentParty().getParticipants().contains(event.getPlayer())) return;
 
-        onRaidEnd();
+        getCurrentParty().leaveParty(event.getPlayer());
     }
 }

@@ -1,11 +1,15 @@
 package net.forthecrown.core.crownevents;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.minecraft.server.v1_16_R3.ChatMessageType;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.PacketPlayOutChat;
+import net.minecraft.server.v1_16_R3.SystemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Consumer;
 
 import java.util.Objects;
 import java.util.Timer;
@@ -16,15 +20,18 @@ public class EventTimer {
     private long elapsedTime = 0;
     private final Player player;
     private final Timer timer;
-    private final Runnable runnable;
+    private final Consumer<Player> onTimerExpire;
+    private boolean stopped;
 
-    public EventTimer(Player p, Runnable onTimerExpire){
+    public EventTimer(Player p, Consumer<Player> onTimerExpire){
         player = p;
-        runnable = onTimerExpire;
+        this.onTimerExpire = onTimerExpire;
         timer = new Timer();
     }
 
     public void startTimer(int maxMinutes){
+        stopped = false;
+
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -32,7 +39,7 @@ public class EventTimer {
 
                 int minutes = (int) ((elapsedTime /60000) % 60);
                 if(minutes >= maxMinutes){
-                    Bukkit.getScheduler().runTask(FtcCore.getInstance(), runnable);
+                    Bukkit.getScheduler().runTask(FtcCore.getInstance(), () -> onTimerExpire.accept(getPlayer()));
                     stopTimer();
                 }
 
@@ -43,6 +50,7 @@ public class EventTimer {
 
     public void startTimerTickingDown(int maxTimeMins){
         elapsedTime = maxTimeMins;
+        stopped = false;
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -50,7 +58,7 @@ public class EventTimer {
                 elapsedTime -= 100;
 
                 if(elapsedTime <= 0){
-                    Bukkit.getScheduler().runTask(FtcCore.getInstance(), runnable);
+                    Bukkit.getScheduler().runTask(FtcCore.getInstance(), () -> onTimerExpire.accept(getPlayer()));
                     stopTimer();
                 }
 
@@ -62,6 +70,11 @@ public class EventTimer {
     public void stopTimer(){
         timer.cancel();
         timer.purge();
+        stopped = true;
+    }
+
+    public boolean wasStopped(){
+        return stopped;
     }
 
     public long getTime(){
@@ -72,24 +85,23 @@ public class EventTimer {
         return player;
     }
 
-    public static StringBuilder getTimerCounter(long timeInMillis){
-        long minutes = (timeInMillis /60000) % 60;
+    public static StringBuilder getTimerCounter(final long timeInMillis){
+        long minutes = (timeInMillis / 60000) % 60;
         long seconds = (timeInMillis / 1000) % 60;
-        long milliseconds = (timeInMillis/100 ) % 100;
+        long milliseconds = (timeInMillis /10) % 100;
 
-        StringBuilder message = new StringBuilder();
-        message.append(String.format("%02d", minutes)).append(":");
-        message.append(String.format("%02d", seconds)).append(":");
-        message.append(String.format("%02d", milliseconds));
+        final StringBuilder message = new StringBuilder()
+                .append(String.format("%02d", minutes)).append(":")
+                .append(String.format("%02d", seconds)).append(":")
+                .append(String.format("%02d", milliseconds));
 
         return message;
     }
 
-
     private static void sendActionBar(Player p, String message){
         CraftPlayer c = (CraftPlayer) p;
-        IChatBaseComponent text = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
-        PacketPlayOutChat packet = new PacketPlayOutChat(text, net.minecraft.server.v1_16_R3.ChatMessageType.GAME_INFO, p.getUniqueId());
+        IChatBaseComponent text = ComponentUtils.stringToVanilla(message);
+        PacketPlayOutChat packet = new PacketPlayOutChat(text, ChatMessageType.GAME_INFO, SystemUtils.b);
         c.getHandle().playerConnection.sendPacket(packet);
     }
 
@@ -103,6 +115,6 @@ public class EventTimer {
 
     @Override
     public int hashCode() {
-        return Objects.hash(player);
+        return Objects.hash(player, timer, onTimerExpire);
     }
 }

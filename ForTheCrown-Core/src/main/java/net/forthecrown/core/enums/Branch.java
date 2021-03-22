@@ -1,5 +1,7 @@
 package net.forthecrown.core.enums;
 
+import org.jetbrains.annotations.NotNull;
+
 public enum Branch {
     DEFAULT ("Branch-less"),
     ROYALS ("Royals", "Royal"),
@@ -17,11 +19,11 @@ public enum Branch {
         this.singularName = name;
     }
 
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
-    public String getSingularName() {
+    public @NotNull String getSingularName() {
         return singularName;
     }
 }

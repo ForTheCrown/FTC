@@ -1,6 +1,6 @@
 package net.forthecrown.core.files;
 
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
@@ -220,13 +220,11 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
     @Override
     public void updateSign(){
         Sign s = getSign();
-
-        String ln1 = getType().getInStockLabel();
-        if(isOutOfStock()) ln1 = getType().getOutOfStockLabel();
-
+        Component ln1 = getType().inStockLabel();
+        if(isOutOfStock()) ln1 = getType().outOfStockLabel();
         String ln3 = ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + getPrice();
 
-        s.line(0, Component.text(ln1));
+        s.line(0, ln1);
         s.line(3, Component.text(ln3));
 
         Bukkit.getScheduler().runTask(FtcCore.getInstance(), () -> s.update(true));

@@ -1,13 +1,12 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.inventories.RankInventory;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,15 +32,14 @@ public class RankGuiUseEvent implements Listener {
         if(event.getClickedInventory() instanceof PlayerInventory) return;
         event.setCancelled(true);
         if(event.getCurrentItem() == null) return;
-
         if(event.getCurrentItem().getType() != Material.PAPER && event.getCurrentItem().getType() != Material.MAP && event.getCurrentItem().getType() != Material.GLOBE_BANNER_PATTERN) return;
         if(!event.getCurrentItem().getItemMeta().hasDisplayName()) return;
 
         Player player = (Player) event.getWhoClicked();
         CrownUser user = FtcCore.getUser(player.getUniqueId());
         RankInventory rankInv = new RankInventory(user);
-        String currentInvTitle = ComponentUtils.getString((TextComponent) event.getView().title());
-        String clickedRankString = ComponentUtils.getString((TextComponent) event.getCurrentItem().getItemMeta().displayName());
+        String currentInvTitle = ComponentUtils.getString(event.getView().title());
+        String clickedRankString = ComponentUtils.getString(event.getCurrentItem().getItemMeta().displayName());
 
         if(clickedRankString.contains("Next page")){
             switch (currentInvTitle){

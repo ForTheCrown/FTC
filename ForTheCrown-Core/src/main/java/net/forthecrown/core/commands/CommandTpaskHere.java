@@ -64,32 +64,32 @@ public class CommandTpaskHere extends CrownCommandBuilder {
                     if(target.equals(player)) throw new CrownCommandException("You cannot teleport to yourself");
 
                     //sender part
-                    TextComponent cancelTPA = Component.text("[✖]");
-                    cancelTPA = cancelTPA.color(NamedTextColor.GRAY);
-                    cancelTPA = cancelTPA.clickEvent(ClickEvent.runCommand("/tpacancel")).content("[✖]");
-                    cancelTPA = cancelTPA.hoverEvent(HoverEvent.showText(Component.text("Cancel teleportation request.")));
+                    TextComponent cancelTPA = Component.text("[✖]")
+                            .color(NamedTextColor.GRAY)
+                            .clickEvent(ClickEvent.runCommand("/tpacancel")).content("[✖]")
+                            .hoverEvent(HoverEvent.showText(Component.text("Cancel teleportation request.")));
 
-                    TextComponent tpaMessage = Component.text(ChatColor.GOLD + "Request sent to " + ChatColor.YELLOW + target.getName() + ChatColor.GOLD + ". ");
-                    tpaMessage = tpaMessage.append(cancelTPA);
+                    TextComponent tpaMessage = Component.text(ChatColor.GOLD + "Request sent to " + ChatColor.YELLOW + target.getName() + ChatColor.GOLD + ". ")
+                            .append(cancelTPA);
 
                     player.sendMessage(tpaMessage);
                     player.performCommand("essentials:tpahere " + target.getName());
 
                     //target part
-                    TextComponent acceptTPA = Component.text("[✔]");
-                    acceptTPA = acceptTPA.color(NamedTextColor.YELLOW);
-                    acceptTPA = acceptTPA.clickEvent(ClickEvent.runCommand("/tpaccept")).content("[✔]");
-                    acceptTPA = acceptTPA.hoverEvent(HoverEvent.showText(Component.text("Accept teleportation request.")));
+                    TextComponent acceptTPA = Component.text("[✔]")
+                            .color(NamedTextColor.YELLOW)
+                            .clickEvent(ClickEvent.runCommand("/tpaccept")).content("[✔]")
+                            .hoverEvent(HoverEvent.showText(Component.text("Accept teleportation request.")));
 
-                    TextComponent denyTpa = Component.text("[✖]");
-                    denyTpa = denyTpa.color(NamedTextColor.GRAY);
-                    denyTpa = denyTpa.clickEvent(ClickEvent.runCommand("/tpdeny")).content("[✖]");
-                    denyTpa = denyTpa.hoverEvent(HoverEvent.showText(Component.text("Deny teleportation request.")));
+                    TextComponent denyTpa = Component.text("[✖]")
+                            .color(NamedTextColor.GRAY)
+                            .clickEvent(ClickEvent.runCommand("/tpdeny")).content("[✖]")
+                            .hoverEvent(HoverEvent.showText(Component.text("Deny teleportation request.")));
 
-                    TextComponent targetMessage = Component.text(ChatColor.YELLOW + player.getName() + ChatColor.GOLD + " has requested to teleport that you teleport to them. ");
-                    targetMessage = targetMessage.append(acceptTPA);
-                    targetMessage = targetMessage.append(Component.text(" "));
-                    targetMessage = targetMessage.append(denyTpa);
+                    TextComponent targetMessage = Component.text(ChatColor.YELLOW + player.getName() + ChatColor.GOLD + " has requested to teleport that you teleport to them. ")
+                            .append(acceptTPA)
+                            .append(Component.text(" "))
+                            .append(denyTpa);
 
                     target.sendMessage(targetMessage);
                     return 0;

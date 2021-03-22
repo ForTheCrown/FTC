@@ -24,6 +24,7 @@ import java.util.List;
 
 public class BaseEgg implements Listener {
 
+    //TODO invert if statements
     @EventHandler
     public void onEggUse(BlockPlaceEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;

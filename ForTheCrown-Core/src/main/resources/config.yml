@@ -7,6 +7,10 @@ UserDataResetInterval: 5356800000
 BranchSwapCooldown: 172800000
 Taxes: false
 
+Shops:
+  log-admin-purchases: true
+  log-normal-purchases: false
+
 System:
   save-on-disable: true
   save-periodically: true

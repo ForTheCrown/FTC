@@ -78,7 +78,7 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
     }
 
     @Override
-    public void performStockCheck(){
+    public void checkStock(){
         if(getExampleItem() == null) return;
         getHolder().setOutOfStock(getTotalItemAmount() < getExampleItem().getAmount());
     }

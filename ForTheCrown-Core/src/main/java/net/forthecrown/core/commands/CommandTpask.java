@@ -2,10 +2,10 @@ package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.ComponentUtils;
+import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.EntityArgType;
+import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
 import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -56,7 +56,7 @@ public class CommandTpask extends CrownCommandBuilder {
                 .executes(c -> {
                     Player player = getPlayerSender(c);
 
-                    Player target = EntityArgType.getPlayer(c, "player");
+                    Player target = TargetSelectorType.getPlayer(c, "player");
                     if(target.equals(player)) throw new CrownCommandException("&7You cannot teleport to yourself");
 
                     //sender part
@@ -64,27 +64,27 @@ public class CommandTpask extends CrownCommandBuilder {
                             ClickEvent.runCommand("/tpacancel"),
                             HoverEvent.showText(Component.text("Cancel teleportation request.")));
 
-                    TextComponent tpaMessage = Component.text(ChatColor.GOLD + "Request sent to " + ChatColor.YELLOW + target.getName() + ChatColor.GOLD + ". ");
-                    tpaMessage = tpaMessage.append(cancelTPA);
+                    TextComponent tpaMessage = Component.text(ChatColor.GOLD + "Request sent to " + ChatColor.YELLOW + target.getName() + ChatColor.GOLD + ". ")
+                            .append(cancelTPA);
 
                     player.sendMessage(tpaMessage);
                     player.performCommand("essentials:tpa " + target.getName());
 
                     //target part
-                    TextComponent acceptTPA = Component.text("[✔]");
-                    acceptTPA = acceptTPA.color(NamedTextColor.YELLOW);
-                    acceptTPA = acceptTPA.clickEvent(ClickEvent.runCommand("/tpaccept")).content("[✔]");
-                    acceptTPA = acceptTPA.hoverEvent(HoverEvent.showText(Component.text("Accept teleportation request.")));
+                    TextComponent acceptTPA = Component.text("[✔]")
+                            .color(NamedTextColor.YELLOW)
+                            .clickEvent(ClickEvent.runCommand("/tpaccept")).content("[✔]")
+                            .hoverEvent(HoverEvent.showText(Component.text("Accept teleportation request.")));
 
-                    TextComponent denyTpa = Component.text("[✖]");
-                    denyTpa = denyTpa.color(NamedTextColor.GRAY);
-                    denyTpa = denyTpa.clickEvent(ClickEvent.runCommand("/tpdeny")).content("[✖]");
-                    denyTpa = denyTpa.hoverEvent(HoverEvent.showText(Component.text("Deny teleportation request.")));
+                    TextComponent denyTpa = Component.text("[✖]")
+                            .color(NamedTextColor.GRAY)
+                            .clickEvent(ClickEvent.runCommand("/tpdeny")).content("[✖]")
+                            .hoverEvent(HoverEvent.showText(Component.text("Deny teleportation request.")));
 
-                    TextComponent targetMessage = Component.text(ChatColor.YELLOW + player.getName() + ChatColor.GOLD + " has requested to teleport to you. ");
-                    targetMessage = targetMessage.append(acceptTPA);
-                    targetMessage = targetMessage.append(Component.text(" "));
-                    targetMessage = targetMessage.append(denyTpa);
+                    TextComponent targetMessage = Component.text(ChatColor.YELLOW + player.getName() + ChatColor.GOLD + " has requested to teleport to you. ")
+                            .append(acceptTPA)
+                            .append(Component.text(" "))
+                            .append(denyTpa);
 
                     target.sendMessage(targetMessage);
                     return 0;

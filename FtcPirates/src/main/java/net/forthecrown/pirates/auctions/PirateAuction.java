@@ -1,11 +1,13 @@
 package net.forthecrown.pirates.auctions;
 
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.files.AbstractSerializer;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.core.utils.MapConverter;
 import net.forthecrown.pirates.Pirates;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -94,14 +96,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
         getFile().set("HighestBidder", bidder);
 
         removeDisplay();
-
-        if(bids != null && !bids.isEmpty()){
-            Map<String, Integer> temp = new HashMap<>();
-            for (UUID id: bids.keySet()){
-                temp.put(id.toString(), bids.get(id));
-            }
-            getFile().createSection("Bids", temp);
-        } else getFile().set("Bids", null);
+        getFile().createSection("Bids", MapConverter.convertKeys(bids, UUID::toString));
 
         super.save();
     }
@@ -210,8 +205,11 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
         expiresAt = System.currentTimeMillis() + AuctionManager.EXPIRY_DURATION;
 
+        Component itemName = ComponentUtils.convertString(CrownUtils.getItemNormalName(item));
+        if(item.getItemMeta().hasDisplayName()) itemName = item.getItemMeta().displayName();
+
         getSign().line(1, Component.text(item.getAmount()));
-        getSign().line(2, Component.text(CrownUtils.getItemNormalName(item)));
+        getSign().line(2, itemName);
 
         updateSign();
         createDisplay();

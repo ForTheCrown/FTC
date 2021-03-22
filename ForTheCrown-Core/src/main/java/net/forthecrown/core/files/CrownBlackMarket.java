@@ -1,12 +1,14 @@
 package net.forthecrown.core.files;
 
 import com.google.common.base.Charsets;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.utils.ListConverter;
 import net.forthecrown.core.api.BlackMarket;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.DailyEnchantment;
 import net.forthecrown.core.inventories.CustomInventoryHolder;
+import net.forthecrown.core.utils.MapConverter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -210,12 +212,7 @@ public class CrownBlackMarket implements BlackMarket {
         configFile.set("EnchantPrice", getDailyEnchantment().getPrice());
 
         configFile.createSection("AmountEarned", makeStringMap(amountEarned));
-
-        List<String> temp = new ArrayList<>();
-        for (UUID id: boughtEnchant){
-            temp.add(id.toString());
-        }
-        configFile.set("PurchasedEnchant", temp);
+        configFile.set("PurchasedEnchant", ListConverter.toList(boughtEnchant, UUID::toString));
 
         try {
             configFile.save(file);
@@ -225,34 +222,15 @@ public class CrownBlackMarket implements BlackMarket {
     }
 
     private Map<String, Integer> makeStringMap(Map<Material, Integer> map){
-        Map<String, Integer> tempMap = new HashMap<>();
-        for (Material mat : map.keySet()){
-            tempMap.put(mat.toString(), map.get(mat));
-        }
-        return tempMap;
+        return MapConverter.convertKeys(map, Material::toString);
     }
 
     private List<String> makeStringList( List<Material> list){
-        if(list == null) return null;
-
-        List<String> temp = new ArrayList<>();
-        for (Material material : list) {
-            temp.add(material.name());
-        }
-        return temp;
+        return ListConverter.toList(list, Enum::toString);
     }
 
     private List<Material> convertStringToMaterial(List<String> list){
-        List<Material> temp = new ArrayList<>();
-        for (String s : list){
-            Material mat;
-            try {
-                mat = Material.valueOf(s);
-            } catch (Exception e) { throw new NullPointerException("List conversion failure"); }
-
-            temp.add(mat);
-        }
-        return temp;
+        return ListConverter.toList(list, Material::valueOf);
     }
 
     @Override

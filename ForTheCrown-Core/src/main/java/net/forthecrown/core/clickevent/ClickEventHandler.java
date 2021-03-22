@@ -15,7 +15,6 @@ public final class ClickEventHandler {
 
     private static final Map<String, ClickEventTask> registeredClickEvents = new HashMap<>();
     private static final Set<Player> allowedToUseCommand = new HashSet<>();
-    private static final ClickEventCommand CLICK_COMMAND = new ClickEventCommand();
 
     private ClickEventHandler(){
     }
@@ -77,12 +76,16 @@ public final class ClickEventHandler {
         return allowedToUseCommand.contains(player);
     }
 
-    public static void allowCommandUsage(Player player, boolean allow){
+    public static void allowCommandUsage(Player player, boolean allow, boolean cooldown){
         if(allow){
             if(allowedToUseCommand.contains(player)) return;
             allowedToUseCommand.add(player);
-            Bukkit.getScheduler().runTaskLater(FtcCore.getInstance(), () -> allowedToUseCommand.remove(player), 30*20); //automatically makes it so you can't use the NPC command after a minute
+            if(cooldown) Bukkit.getScheduler().runTaskLater(FtcCore.getInstance(), () -> allowedToUseCommand.remove(player), 30*20); //automatically makes it so you can't use the NPC command after a minute
         } else allowedToUseCommand.remove(player);
+    }
+
+    public static void allowCommandUsage(Player player, boolean allow){
+        allowCommandUsage(player, allow, true);
     }
 
     public static String getCommand(String id, String... args){

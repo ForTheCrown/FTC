@@ -27,11 +27,12 @@ public class GraveEvents implements Listener {
     private void sendGraveMessage(Player p){
         CrownUser user = FtcCore.getUser(p);
         if(user.getGrave().isEmpty()) return;
-        user.sendMessage("&7[FTC] You have royal items in your &e/grave&7.");
+        user.sendMessage("&7[FTC] You have items in your &e/grave&7.");
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDeath(PlayerDeathEvent event) {
+        if(event.getKeepInventory()) return;
         CrownUser user = FtcCore.getUser(event.getEntity());
         Grave grave = user.getGrave();
         for (ItemStack i: event.getEntity().getInventory()){

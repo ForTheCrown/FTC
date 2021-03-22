@@ -1,7 +1,7 @@
 package net.forthecrown.core.enums;
 
-import net.forthecrown.core.CrownUtils;
-import net.forthecrown.core.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.core.utils.ComponentUtils;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
@@ -53,15 +53,19 @@ public enum Rank {
         return tabPrefix;
     }
 
-    public Component getComponent(){
-        return ComponentUtils.convertString(getColorlessPrefix());
+    public Component prefix(){
+        return ComponentUtils.convertString(tabPrefix);
+    }
+
+    public Component noEndSpacePrefix(){
+        return ComponentUtils.convertString(tabPrefix.replaceAll(" ", ""));
     }
 
     public Branch getRankBranch() {
         return rankBranch;
     }
 
-    public static List<Rank> getFreeRanks(){
+    public static List<Rank> freeRanks(){
         return Arrays.asList(Rank.KNIGHT, Rank.BARON, Rank.BARONESS, Rank.SAILOR, Rank.PIRATE, Rank.VIKING, Rank.BERSERKER);
     }
 

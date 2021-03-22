@@ -1,30 +1,42 @@
-package net.forthecrown.core;
+package net.forthecrown.core.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.jetbrains.annotations.Nullable;
 
-public class ComponentUtils {
+public final class ComponentUtils {
 
     public static final LegacyComponentSerializer SERIALIZER = LegacyComponentSerializer.builder()
             .extractUrls()
             .hexColors()
             .build();
 
+    public static TextComponent convertString(String text, boolean translateColors){
+        return SERIALIZER.deserialize(translateColors ? CrownUtils.translateHexCodes(text) : text);
+    }
+
     public static TextComponent convertString(String text){
-        TextComponent textComponent = SERIALIZER.deserialize(CrownUtils.translateHexCodes(text));
-        return Component.text("")
-                .color(NamedTextColor.WHITE)
-                .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
-                .append(textComponent);
+        return convertString(text, true);
+    }
+
+    public static IChatBaseComponent stringToVanilla(String text, boolean translateColors){
+        IChatBaseComponent[] texts = CraftChatMessage.fromString(translateColors ? CrownUtils.translateHexCodes(text) : text);
+        ChatComponentText merged = new ChatComponentText("");
+        for (IChatBaseComponent c: texts) {
+            merged.addSibling(c);
+        }
+        return merged;
+    }
+
+    public static IChatBaseComponent stringToVanilla(String text){
+        return stringToVanilla(text, true);
     }
 
     public static TextComponent makeComponent(String text, @Nullable TextColor color, @Nullable ClickEvent click, @Nullable HoverEvent hover){
@@ -36,7 +48,10 @@ public class ComponentUtils {
     }
 
     public static String getString(Component tex){
-        IChatBaseComponent base = IChatBaseComponent.ChatSerializer.a(GsonComponentSerializer.gson().serialize(tex));
-        return base.getString();
+        return SERIALIZER.serialize(tex);
+    }
+
+    public static String getString(IChatBaseComponent component){
+        return CraftChatMessage.fromComponent(component);
     }
 }

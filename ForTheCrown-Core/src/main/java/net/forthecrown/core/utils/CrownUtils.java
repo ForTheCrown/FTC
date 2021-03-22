@@ -1,6 +1,8 @@
-package net.forthecrown.core;
+package net.forthecrown.core.utils;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -11,6 +13,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnegative;
 import java.text.DateFormatSymbols;
@@ -92,14 +95,34 @@ public final class CrownUtils {
         return new Random().nextInt((max - min) + 1) + min;
     }
 
-    public static ItemStack makeItem(@NotNull Material material, @Nonnegative int amount, boolean hideFlags, Component name, Component... loreStrings) {
+    public static ItemStack makeItem(@NotNull Material material, @Nonnegative int amount, boolean hideFlags, @Nullable Component name, @Nullable Component... loreStrings) {
         Validate.notNull(material, "Material cannot be null");
 
         ItemStack result = new ItemStack(material, amount);
         ItemMeta meta = result.getItemMeta();
 
-        if(name != null) meta.displayName(name);
-        if (loreStrings != null) meta.lore(Arrays.asList(loreStrings));
+        if(name != null) meta.displayName(Component.text()
+                .append(name)
+                .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                .color(NamedTextColor.WHITE)
+                .build());
+
+        if (loreStrings != null) {
+            List<Component> comps = new ArrayList<>();
+
+            for (Component c: loreStrings){
+                if(c == null){
+                    comps.add(Component.newline());
+                    continue;
+                }
+                comps.add(Component.text()
+                        .append(c)
+                        .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                        .color(NamedTextColor.WHITE)
+                        .build());
+            }
+            meta.lore(comps);
+        }
         if (hideFlags) {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
@@ -120,9 +143,8 @@ public final class CrownUtils {
                 lore[i] = ComponentUtils.convertString(lores[i]);
             }
         }
-        Component nameC = name == null ? null : ComponentUtils.convertString(name);
 
-        return makeItem(material, amount, hideFlags, nameC, lore);
+        return makeItem(material, amount, hideFlags, name == null ? null : ComponentUtils.convertString(name), lore);
     }
 
     public static String getDateFromMillis(long millis){
@@ -159,7 +181,11 @@ public final class CrownUtils {
     }
 
     public static String getItemNormalName(ItemStack stack){
-        return capitalizeWords(stack.getType().toString().replaceAll("_", " ").toLowerCase());
+        return normalMaterialName(stack.getType());
+    }
+
+    public static String normalMaterialName(Material material){
+        return capitalizeWords(material.toString().replaceAll("_", " ").toLowerCase());
     }
 
     public static String decimalizeNumber(Number number){
@@ -186,6 +212,10 @@ public final class CrownUtils {
     private static String s(long l){
         if(l != 1) return "s";
         return "";
+    }
+
+    public static boolean isNullOrBlank(String str){
+        return str == null || str.isBlank();
     }
 
     /*

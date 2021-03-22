@@ -73,7 +73,7 @@ public interface ShopInventory extends Inventory {
      * Checks if the shop has enough stock
      * And changes the ingame sign accordingly
      */
-    void performStockCheck();
+    void checkStock();
 
     @Override
     boolean equals(Object o);

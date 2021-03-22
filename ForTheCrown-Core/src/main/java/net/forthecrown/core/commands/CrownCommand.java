@@ -1,7 +1,7 @@
 package net.forthecrown.core.commands;
 
 import com.google.common.collect.ImmutableList;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.exceptions.CrownException;
 import org.bukkit.Bukkit;
@@ -104,7 +104,7 @@ public abstract class CrownCommand extends Command {
     }
 
     public List<String> getMatchingEntries(String token, List<String> toFiler){
-        toFiler.removeIf(s -> !s.toLowerCase().contains(token));
+        toFiler.removeIf(s -> !s.toLowerCase().startsWith(token.toLowerCase()));
         return toFiler;
     }
 }

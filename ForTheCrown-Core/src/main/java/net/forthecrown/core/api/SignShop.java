@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public interface SignShop extends CrownSerializer<FtcCore>, InventoryHolder {
+public interface SignShop extends CrownSerializer<FtcCore>, InventoryHolder, Nameable {
 
     /**
      * Gets the file name of the shop
@@ -20,6 +20,7 @@ public interface SignShop extends CrownSerializer<FtcCore>, InventoryHolder {
      * </p>
      * @return The file name of the shop
      */
+    @Override
     String getName();
 
     /**

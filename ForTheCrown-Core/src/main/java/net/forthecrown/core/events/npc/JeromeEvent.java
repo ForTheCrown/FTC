@@ -7,11 +7,12 @@ import net.forthecrown.core.clickevent.ClickEventHandler;
 import net.forthecrown.core.clickevent.ClickEventTask;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -46,17 +47,18 @@ public class JeromeEvent implements Listener, ClickEventTask {
         Player player = event.getPlayer();
         ClickEventHandler.allowCommandUsage(player, true);
 
-        TextComponent message1 = new TextComponent(ChatColor.YELLOW + "[Info about Knight]");
-        message1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(npcID, "info")));
-        message1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GRAY + "" + ChatColor.ITALIC + "Click me!")));
-
-        TextComponent message2 = new TextComponent(ChatColor.YELLOW + "[Join Knights]");
-        message2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ClickEventHandler.getCommand(npcID, "join")));
-        message2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GRAY + "" + ChatColor.ITALIC + "Click me!")));
+        TextComponent message1 = Component.text("[Info about Knight]")
+                .color(NamedTextColor.YELLOW)
+                .clickEvent(ClickEvent.runCommand(ClickEventHandler.getCommand(npcID, "info")))
+                .hoverEvent(HoverEvent.showText(Component.text("Click me!")));
+        TextComponent message2 = Component.text("[Join Knights]")
+                .color(NamedTextColor.YELLOW)
+                .clickEvent(ClickEvent.runCommand(ClickEventHandler.getCommand(npcID, "join")))
+                .hoverEvent(HoverEvent.showText(Component.text("Click me!")));
 
         player.sendMessage(ChatColor.GOLD + "--" + ChatColor.WHITE + " Hi, what can I do for you? " + ChatColor.GOLD + "--");
-        player.spigot().sendMessage(message1);
-        player.spigot().sendMessage(message2);
+        player.sendMessage(message1);
+        player.sendMessage(message2);
     }
 
     //Chat option execution

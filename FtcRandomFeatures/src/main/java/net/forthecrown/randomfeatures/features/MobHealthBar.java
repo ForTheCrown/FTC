@@ -21,7 +21,6 @@ import java.util.UUID;
 public class MobHealthBar implements Listener {
     public Map<UUID, Integer> hitmobs = new HashMap<>();
 
-
     @EventHandler
     public void onMobDamage(EntityDamageByEntityEvent event){
         // Player should be damager:

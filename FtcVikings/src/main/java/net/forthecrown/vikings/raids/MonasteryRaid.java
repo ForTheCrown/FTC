@@ -1,12 +1,15 @@
 package net.forthecrown.vikings.raids;
 
+import net.forthecrown.core.CrownBoundingBox;
 import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.api.Announcer;
+import net.forthecrown.vikings.LiteralLootTable;
 import net.forthecrown.vikings.Vikings;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -24,32 +27,60 @@ public class MonasteryRaid extends VikingRaid {
      * ---------------------------------
      */
 
-    public static final Set<Zombie> zombies = new HashSet<>();
-    private static final Location RAID_LOCATION = new Location(Bukkit.getWorld("world_void"), -200, 6, -200);
+    public static final Set<LivingEntity> zombies = new HashSet<>();
 
     public MonasteryRaid() {
-        super(RAID_LOCATION, "Monastery", Vikings.getInstance().getServer());
+        super(new Location(Bukkit.getWorld("world_void"), -509, 4, -493),
+                "Monastery", Vikings.getInstance().getServer());
+
+        World world = Bukkit.getWorld("world_void");
+
+        generator = new RaidAreaGenerator(this)
+                .onHostileSpawn(zombie ->{
+                    zombie.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET, 1));
+                    zombie.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE, 1));
+                    zombie.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS, 1));
+                    zombie.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS, 1));
+                    //double health = zombie.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() * getCurrentParty().getModifier();
+                    //zombie.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
+                    //zombie.setHealth(health);
+                    zombies.add(zombie);
+                })
+                .setHostileMobs(EntityType.ZOMBIE)
+                .setHostileLocations(new Location(world, -500, 4, -495))
+
+                .setPassiveMobs(EntityType.VILLAGER, EntityType.ELDER_GUARDIAN)
+                .setPassiveLocations(
+                        new Location(world, -510, 5, -495),
+                        new Location(world, -510, 5, -496)
+                )
+
+                .setOriginalArea(new CrownBoundingBox(world, -429, 1, -429, -464, 20, -464))
+                .setNewArea(new CrownBoundingBox(world, -478, 1, -478, -514, 20, -514))
+
+                .setChestLootTable(new LiteralLootTable(new NamespacedKey(Vikings.getInstance(), "loottable"),
+                        new ItemStack(Material.SHEARS),
+                        new ItemStack(Material.DIAMOND, 16),
+                        new ItemStack(Material.YELLOW_TERRACOTTA, 42),
+                        new ItemStack(Material.YELLOW_BANNER, 10),
+                        new ItemStack(Material.YELLOW_CONCRETE, 15),
+                        new ItemStack(Material.NETHERITE_SWORD),
+                        new ItemStack(Material.ORANGE_TERRACOTTA, 13)))
+                .setChestLocations(
+                        new Location(world, -510, 42, -495),
+                        new Location(world, -510, 42, -496),
+                        new Location(world, -510, 42, -494)
+                );
     }
 
     @Override
-    public void onRaidLoad() {
-        if(zombies.size() > 0) for (Zombie z : zombies) z.remove();
-        zombies.clear();
-
-        spawnMobs();
+    public void onEnd() {
+        if(zombies.size() > 0) for (Entity z: zombies) z.remove();
     }
 
     @Override
-    public void onRaidEnd() {
-        if(zombies.size() > 0) for (Zombie z: zombies) z.remove();
-        super.onRaidEnd();
-    }
-
-    @Override
-    public void onRaidComplete() {
-        Bukkit.broadcastMessage("Raid complete! :D");
-
-        Bukkit.getScheduler().runTaskLater(Vikings.getInstance(), this::onRaidEnd, 3*20);
+    public void onComplete() {
+        Announcer.ac("Raid complete! :D");
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -59,11 +90,11 @@ public class MonasteryRaid extends VikingRaid {
         if(!zombies.contains(zombie)) return;
 
         event.getDrops().clear();
-        Bukkit.broadcastMessage("You killed a zomzom :D");
+        Announcer.ac("You killed a zomzom :D");
         zombies.remove(zombie);
 
         if(zombies.size() < 1){
-            Bukkit.broadcastMessage("Finished raid in event");
+            Announcer.ac("Finished raid in event");
             completeRaid();
         }
     }
@@ -77,8 +108,9 @@ public class MonasteryRaid extends VikingRaid {
             zombie.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE, 1));
             zombie.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS, 1));
             zombie.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS, 1));
-            zombie.setHealth(getDifficulty().getModifier() * 20);
-            zombie.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(zombie.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getBaseValue() * getDifficulty().getModifier());
+            zombie.setHealth(getCurrentParty().getModifier() * 20);
+            zombie.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)
+                    .setBaseValue(zombie.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getBaseValue() * getCurrentParty().getModifier());
             zombies.add(zombie);
         }
     }

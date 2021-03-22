@@ -8,11 +8,11 @@ import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.vikings.Vikings;
 import net.forthecrown.vikings.blessings.VikingBlessing;
 import net.forthecrown.vikings.inventory.BlessingSelector;
-import net.forthecrown.vikings.inventory.RaidSelector;
-import net.forthecrown.vikings.raids.RaidHandler;
-import net.forthecrown.vikings.raids.VikingRaid;
+import net.forthecrown.vikings.raids.*;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
-import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommandViking extends CrownCommandBuilder {
 
@@ -42,60 +42,72 @@ public class CommandViking extends CrownCommandBuilder {
                 )
 
                 .then(argument("raid")
-                        .then(argument("start")
-                                .then(argument("raid", StringArgumentType.word())
-                                        .executes(c -> {
-                                            Player p = getPlayerSender(c);
-
-                                            VikingRaid raid = RaidHandler.fromName(c.getArgument("raid", String.class));
-                                            if(raid == null) throw new CrownCommandException("Invalid raid!");
-
-                                            Vikings.getRaidHandler().callRaid(p, raid);
-                                            p.sendMessage("Starting raid!");
-                                            return 0;
-                                        })
-                                )
-                        )
-                        .then(argument("stop")
+                        .then(argument("generate")
                                 .executes(c -> {
-                                    Player p = getPlayerSender(c);
-
-                                    VikingRaid raid = RaidHandler.fromPlayer(p);
-                                    if(raid == null) throw new CrownCommandException("You are not currently in a raid!");
-
-                                    raid.onRaidEnd();
-                                    p.sendMessage("Ending raid");
-                                    return 0;
-                                })
-                        )
-                        .then(argument("complete")
-                                .executes(c -> {
-                                    Player p = getPlayerSender(c);
-
-                                    VikingRaid raid = RaidHandler.fromPlayer(p);
-                                    if(raid == null) throw new CrownCommandException("You are not currently in a raid!");
-
-                                    raid.completeRaid();
-                                    p.sendMessage("Ending raid as success");
-                                    return 0;
-                                })
-                        )
-                        .then(argument("inventory")
-                                .executes(c->{
-                                    CrownUser user = getUserSender(c);
+                                    RaidAreaGenerator generator = RaidManager.fromName("Monastery").getGenerator();
 
                                     try {
-                                        user.getPlayer().openInventory(new RaidSelector(user).getInventory());
+                                        broadcastAdmin(c.getSource(), "Placing specials");
+                                        generator.placeSpecialMobs();
+
+                                        broadcastAdmin(c.getSource(), "Placing passives");
+                                        generator.placePassiveMobs();
+
+                                        broadcastAdmin(c.getSource(), "Placing hostiles");
+                                        generator.placeHostileMobs();
+
+                                        broadcastAdmin(c.getSource(), "Placing chests");
+                                        generator.placeLoot();
+
+                                        broadcastAdmin(c.getSource(), "Generating area");
+                                        generator.generateChunks();
                                     } catch (Exception e){
                                         e.printStackTrace();
                                     }
                                     return 0;
                                 })
                         )
+
+                        .then(argument("create")
+                                .then(argument("raid", StringArgumentType.word())
+                                        .executes(c -> {
+                                            CrownUser u = getUserSender(c);
+                                            VikingRaid raid = RaidManager.fromName(c.getArgument("raid", String.class));
+                                            if(raid == null) throw new CrownCommandException("Invalid raid name!");
+
+                                            RaidParty party = new RaidParty(RaidDifficulty.NORMAL, raid, -1, u.getPlayer());
+                                            Vikings.getRaidHandler().registerParty("TestParty", party);
+                                            broadcastAdmin(c.getSource(), "Created RaidParty");
+                                            return 0;
+                                        })
+                                )
+                        )
+                        .then(argument("join")
+                                .executes(c -> {
+                                    CrownUser u = getUserSender(c);
+                                    RaidParty party = Vikings.getRaidHandler().partyFromName("TestParty");
+                                    if(party == null) throw new CrownCommandException("Part is null?????");
+
+                                    party.joinParty(u.getPlayer());
+                                    broadcastAdmin(c.getSource(), "Joined RaidParty");
+                                    return 0;
+                                })
+                        )
+                        .then(argument("start")
+                                .executes(c -> {
+                                    testPlayerSender(c.getSource());
+                                    RaidParty party = Vikings.getRaidHandler().partyFromName("TestParty");
+                                    if(party == null) throw new CrownCommandException("Part is null?????");
+
+                                    party.startRaid();
+                                    broadcastAdmin(c.getSource(), "Starting Raid");
+                                    return 0;
+                                })
+                        )
                 )
                 .then(argument("blessing")
                         .then(argument("blessingName", StringArgumentType.word())
-                                .suggests((c, b) -> )
+                                .suggests((c, b) -> suggestMatching(b, blessingCompletions()))
 
                                 .then(argument("beginUsage")
                                         .executes(c -> {
@@ -135,5 +147,21 @@ public class CommandViking extends CrownCommandBuilder {
                                 })
                         )
                 );
+    }
+
+    private List<String> raidCompletions(){
+        List<String> list = new ArrayList<>();
+        for (VikingRaid r: Vikings.getRaidHandler().getRaids()){
+            list.add(r.getName());
+        }
+        return list;
+    }
+
+    private List<String> blessingCompletions(){
+        List<String> list = new ArrayList<>();
+        for (VikingBlessing b: VikingBlessing.getBlessings()){
+            list.add(b.getName());
+        }
+        return list;
     }
 }

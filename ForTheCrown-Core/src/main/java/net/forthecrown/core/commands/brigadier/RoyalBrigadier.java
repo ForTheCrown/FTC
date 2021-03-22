@@ -1,6 +1,7 @@
 package net.forthecrown.core.commands.brigadier;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.clickevent.ClickEventCommand;
 import net.forthecrown.core.commands.*;
 import net.forthecrown.core.commands.emotes.*;
 import net.minecraft.server.v1_16_R3.CommandDispatcher;
@@ -36,6 +37,7 @@ public final class RoyalBrigadier {
         new CommandStaffChat();
         new CommandStaffChatToggle();
         new CommandHologram();
+        new CommandTestCore();
 
         //utility / misc commands
         new CommandGems();
@@ -58,10 +60,14 @@ public final class RoyalBrigadier {
         new HelpPost();
         new HelpSpawn();
         new HelpMap();
+        new HelpBank();
 
         //tpa commands
         new CommandTpask();
         new CommandTpaskHere();
+
+        //Click event command
+        new ClickEventCommand();
 
         //emotes
         new EmoteToggle();

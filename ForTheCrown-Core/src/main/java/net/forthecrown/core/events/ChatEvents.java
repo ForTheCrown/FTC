@@ -1,9 +1,10 @@
 package net.forthecrown.core.events;
 
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.api.Announcer;
+import net.forthecrown.core.api.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -31,15 +32,19 @@ public class ChatEvents implements Listener {
 
     public static void sendStaffChatMessage(CommandSender sender, String message, boolean cmd){
         TextComponent senderText = Component.text(sender.getName()).color(NamedTextColor.GRAY);
-        if(sender instanceof Player) senderText = senderText.hoverEvent(((Player) sender).asHoverEvent()).clickEvent(ClickEvent.suggestCommand("/w " + sender.getName()));
+        if(sender instanceof Player || sender instanceof CrownUser){
+            CrownUser user = FtcCore.getUser(sender.getName());
+            senderText = senderText
+                    .hoverEvent(user.asHoverEvent())
+                    .clickEvent(ClickEvent.suggestCommand("/w " + user.getName()));
+        }
 
-        message = CrownUtils.formatEmojis(message);
-
-        TextComponent text = Component.text("").color(NamedTextColor.WHITE)
+        TextComponent text = Component.text()
                 .append(Component.text("[Staff] ").color(NamedTextColor.DARK_GRAY))
                 .append(senderText)
                 .append(Component.text(" > ").style(Style.style(NamedTextColor.DARK_GRAY, TextDecoration.BOLD)))
-                .append(ComponentUtils.convertString(message));
+                .append(ComponentUtils.convertString(CrownUtils.formatEmojis(message)))
+                .build();
 
         for (Player p : Bukkit.getOnlinePlayers()){
             if((p.hasPermission("ftc.staffchat")))
@@ -68,15 +73,14 @@ public class ChatEvents implements Listener {
         String playerName = player.getName();
         String message = event.getMessage();
 
-        //If more than half the message has uppercase letters it makes it all lower case
-        if(message.length() > 8){
+        //If more than half the message has uppercase make it all lower case
+        if(message.length() > 8 && !player.hasPermission("ftc.chatcaseignore")){
             int upCastCharNumber = 0;
             for(int i = 0; i < message.length(); i++){
                 if(Character.isUpperCase(message.charAt(i))) upCastCharNumber++;
             }
-            if(upCastCharNumber > (message.length()/2) && !player.hasPermission("ftc.chatcaseignore")) {
-                message = message.toLowerCase();
-                message = StringUtils.capitalize(message);
+            if(upCastCharNumber > (message.length()/2)) {
+                message = StringUtils.capitalize(message.toLowerCase());
                 message += "!";
                 player.sendMessage("Refrain from using all caps messages.");
             }
@@ -84,7 +88,7 @@ public class ChatEvents implements Listener {
 
         // Edit message to have emotes:
         if (player.hasPermission("ftc.donator3"))  message = CrownUtils.formatEmojis(message);
-
+  
         event.setMessage(message);
 
         // Handle players with staffchat toggled on:
@@ -102,8 +106,7 @@ public class ChatEvents implements Listener {
             String prettyPlayerName;
 
             // Give everyone a yellow name in chat.
-            switch (playerName)
-            {
+            switch (playerName) {
                 case "Wout":
                 case "BotulToxin":
                     prettyPlayerName = ChatColor.YELLOW + "" + playerName;

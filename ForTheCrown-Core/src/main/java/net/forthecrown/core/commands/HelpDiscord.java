@@ -25,10 +25,4 @@ public class HelpDiscord extends CrownCommandBuilder {
             return 0;
         });
     }
-
-    /*@Override
-    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) throws CrownException {
-        sender.sendMessage(FtcCore.getPrefix() + FtcCore.getDiscord());
-        return true;
-    }*/
 }

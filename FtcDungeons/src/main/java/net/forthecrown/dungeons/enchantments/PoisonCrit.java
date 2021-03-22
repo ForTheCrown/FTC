@@ -1,6 +1,5 @@
 package net.forthecrown.dungeons.enchantments;
 
-import net.forthecrown.dungeons.Dungeons;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;

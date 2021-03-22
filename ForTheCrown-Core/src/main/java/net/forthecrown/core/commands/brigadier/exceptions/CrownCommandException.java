@@ -2,7 +2,7 @@ package net.forthecrown.core.commands.brigadier.exceptions;
 
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 
 public class CrownCommandException extends CommandSyntaxException {
     public CrownCommandException(String message) {

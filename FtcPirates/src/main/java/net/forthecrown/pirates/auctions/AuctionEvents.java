@@ -1,10 +1,10 @@
 package net.forthecrown.pirates.auctions;
 
-import net.forthecrown.core.ComponentUtils;
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -18,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
 public class AuctionEvents implements Listener {
@@ -76,8 +77,39 @@ public class AuctionEvents implements Listener {
             return;
         }
 
-        p.sendMessage(ChatColor.GRAY + "The current top bid is: " + ChatColor.YELLOW + auction.getHighestBid() + " Rhines." + ChatColor.GRAY + " Bidder: " + ChatColor.YELLOW + auction.getHighestBidder().getName());
-        p.sendMessage(ChatColor.GRAY + "The auction will expire in " + ChatColor.YELLOW + CrownUtils.convertMillisIntoTime(auction.getExpiresAt() - System.currentTimeMillis()));
+        ItemStack item = auction.getItem();
+        TextComponent infoText = Component.text()
+                .color(NamedTextColor.GRAY)
+                .append(Component.text("Owner: "))
+                .append(Component.text(auction.getOwner().getName()).color(NamedTextColor.YELLOW)
+                        .hoverEvent(auction.getOwner().asHoverEvent())
+                        .clickEvent(ClickEvent.suggestCommand("/w " + auction.getOwner().getName())))
+                .append(Component.text(", Item: "))
+                .append(Component.text(item.getAmount() + " " + CrownUtils.getItemNormalName(item)).color(NamedTextColor.YELLOW).hoverEvent(item.asHoverEvent()))
+                .build();
+
+        TextComponent expireMessage = Component.text().color(NamedTextColor.GRAY)
+                .append(Component.text("The auction will expire in "))
+                .append(Component.text(CrownUtils.convertMillisIntoTime(auction.getExpiresAt() - System.currentTimeMillis()))
+                        .hoverEvent(HoverEvent.showText(
+                                Component.text("Expires on the " + CrownUtils.getDateFromMillis(auction.getExpiresAt()))
+                        )))
+                .build();
+
+        TextComponent bidderMessage = Component.text().color(NamedTextColor.GRAY)
+                .append(Component.text("The current top bid is: "))
+                .append(Component.text(auction.getHighestBid() + " Rhines.")
+                        .color(NamedTextColor.YELLOW))
+                .append(Component.text(" Bidder: "))
+                .append(Component.text(auction.getHighestBidder().getName())
+                        .hoverEvent(auction.getHighestBidder().asHoverEvent())
+                        .clickEvent(ClickEvent.suggestCommand("/w " + auction.getHighestBidder().getName()))
+                        .color(NamedTextColor.YELLOW)
+                ).build();
+
+        p.sendMessage(infoText);
+        p.sendMessage(bidderMessage);
+        p.sendMessage(expireMessage);
 
         if(!user.equals(auction.getOwner())){
             //bidding option

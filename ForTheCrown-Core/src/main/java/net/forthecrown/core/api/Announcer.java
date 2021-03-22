@@ -1,6 +1,6 @@
 package net.forthecrown.core.api;
 
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

@@ -1,8 +1,10 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.BranchFlag;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.CrownWorldGuard;
+import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
@@ -14,13 +16,16 @@ import net.forthecrown.core.exceptions.CrownException;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.logging.Level;
+
 public class ShopUseListener implements Listener {
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onShopUse(SignShopUseEvent event){
         //just the variables
         Player player = event.getPlayer();
@@ -111,6 +116,14 @@ public class ShopUseListener implements Listener {
                 playerInv.addItem(example); //adds the item to player's inventory
                 event.setCustomerBalance(event.getCustomerBalance() - shop.getPrice());
 
+                if(shop.getType().isAdmin() && FtcCore.logAdminShopUsage()){
+                    Announcer.log(Level.INFO,
+                            customer.getName() + " bought " + example.getAmount() + " " + CrownUtils.getItemNormalName(example) + " at an admin shop, location: " + shop.getName());
+                } else if(FtcCore.logNormalShopUsage()){
+                    Announcer.log(Level.INFO,
+                            customer.getName() + " bought " + example.getAmount() + " " + CrownUtils.getItemNormalName(example) + " at a shop, location: " + shop.getName());
+                }
+
                 customer.sendMessage(customerMsg1);
                 break;
 
@@ -155,11 +168,19 @@ public class ShopUseListener implements Listener {
                     event.getOwner().sendMessage(ownerMsg);
                 }
 
+                if(shop.getType().isAdmin() && FtcCore.logAdminShopUsage()){
+                    Announcer.log(Level.INFO,
+                            customer.getName() + " sold " + example.getAmount() + " " + CrownUtils.getItemNormalName(example) + " at an admin shop, location: " + shop.getName());
+                } else if(FtcCore.logNormalShopUsage()){
+                    Announcer.log(Level.INFO,
+                            customer.getName() + " sold " + example.getAmount() + " " + CrownUtils.getItemNormalName(example) + " at a shop, location: " + shop.getName());
+                }
+
                 event.addCustomerBalance(shop.getPrice());
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + shop.getType());
         }
-        shopInv.performStockCheck();
+        shopInv.checkStock();
     }
 }

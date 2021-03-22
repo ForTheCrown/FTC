@@ -3,12 +3,11 @@ package net.forthecrown.vikings.inventory;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.vikings.Vikings;
-import net.forthecrown.vikings.raids.RaidHandler;
+import net.forthecrown.vikings.raids.RaidManager;
 import net.forthecrown.vikings.raids.VikingRaid;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -78,10 +77,9 @@ public class RaidSelector implements InventoryHolder, Listener {
         ItemStack clickedItem = event.getCurrentItem();
         if(!event.getCurrentItem().getItemMeta().hasDisplayName()) return;
 
-        VikingRaid raid = RaidHandler.fromName(clickedItem.getItemMeta().getDisplayName());
+        VikingRaid raid = RaidManager.fromName(clickedItem.getItemMeta().getDisplayName());
         if(raid == null) return;
 
-        Vikings.getRaidHandler().callRaid((Player) event.getWhoClicked(), raid);
         event.getWhoClicked().sendMessage("Starting raid!");
     }
 

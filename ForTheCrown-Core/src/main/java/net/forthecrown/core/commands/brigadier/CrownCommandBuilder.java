@@ -8,12 +8,12 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.exceptions.InvalidPlayerArgumentException;
 import net.forthecrown.core.commands.brigadier.exceptions.NonPlayerSenderException;
-import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import org.apache.commons.lang.Validate;
@@ -88,7 +88,7 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
         return LiteralArgumentBuilder.literal(name);
     }
 
-    protected RequiredArgumentBuilder<CommandListenerWrapper, ?> argument(String name, ArgumentType<?> type){
+    protected <T> RequiredArgumentBuilder<CommandListenerWrapper, T> argument(String name, ArgumentType<T> type){
         return RequiredArgumentBuilder.argument(name, type);
     }
 
@@ -201,7 +201,7 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
     }
 
     public static void broadcastAdmin(CommandListenerWrapper sender, String message){
-        broadcastAdmin(sender, new ChatComponentText(message), true);
+        broadcastAdmin(sender, ComponentUtils.stringToVanilla(message), true);
     }
 
     public static void broadcastAdmin(CommandListenerWrapper sender, IChatBaseComponent message, boolean senderSees){
@@ -209,7 +209,7 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
     }
 
     public static void broadcastAdmin(CommandSender sender, String message){
-        broadcastAdmin(VanillaCommandWrapper.getListener(sender), message);
+        broadcastAdmin(VanillaCommandWrapper.getListener(sender), ComponentUtils.stringToVanilla(message), true);
     }
 
     //Copied from CommandSource.java... in the damn FabricMC API

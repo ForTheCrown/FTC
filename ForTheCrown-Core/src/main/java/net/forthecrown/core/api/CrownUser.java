@@ -4,6 +4,10 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEventSource;
+import net.minecraft.server.v1_16_R3.ChatMessageType;
+import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Particle;
@@ -17,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender {
+public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, HoverEventSource<Component>, Nameable {
 
     /**
      * Saves and then unloads the file
@@ -34,11 +38,17 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender {
     int configurePriceForItem(Material item);
 
     /**
-     * Gets the base of the object
-     * <p>The base is the UUID that the object is connected to, and the data file for this user is also saved under the UUID</p>
-     * @return The UUID base
+     * @deprecated In favour of getUniqueId
+     * @return the User's UUID
      */
+    @Deprecated
     UUID getBase();
+
+    /**
+     * Gets the user's UUID
+     * @return The User's UUID
+     */
+    UUID getUniqueId();
 
     /**
      * Gets the player tied to this user
@@ -350,12 +360,6 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender {
     void resetEarnings();
 
     /**
-     * Gets the user's name
-     * @return The user's IRL name xD (player name)
-     */
-    String getName();
-
-    /**
      * Gets the user's branch
      * @return The current branch of the player
      */
@@ -383,6 +387,14 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender {
      * @param message The message to send to the user
      */
     void sendMessage(@Nonnull String message);
+
+    void sendMessage(IChatBaseComponent message);
+
+    void sendMessage(UUID id, IChatBaseComponent message);
+
+    void sendMessage(IChatBaseComponent message, ChatMessageType type);
+
+    void sendMessage(UUID id, IChatBaseComponent message, ChatMessageType type);
 
     /**
      * Gets if the user is online
@@ -442,7 +454,7 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender {
 
     /**
      * Sets the user's profile to either public or private
-     * @param publicProfile
+     * @param publicProfile ^^^^
      */
     void setProfilePublic(boolean publicProfile);
 

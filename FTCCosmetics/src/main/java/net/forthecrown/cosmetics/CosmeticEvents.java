@@ -1,9 +1,9 @@
 package net.forthecrown.cosmetics;
 
-import net.forthecrown.core.ComponentUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
+import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.cosmetics.inventories.ArrowParticleMenu;
 import net.forthecrown.cosmetics.inventories.CustomInventory;
 import net.forthecrown.cosmetics.inventories.DeathParticleMenu;

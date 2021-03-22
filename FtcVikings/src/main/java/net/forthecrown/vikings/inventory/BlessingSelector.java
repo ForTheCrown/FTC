@@ -82,9 +82,9 @@ public class BlessingSelector implements InventoryHolder, Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
-        if(!(event.getView().getTopInventory().getHolder() instanceof BlessingSelector)) return;
-        if(event.getCurrentItem() == null) return;
+        if(!event.getWhoClicked().equals(player)) return;
         if(event.getClickedInventory() instanceof PlayerInventory) return;
+        if(event.getCurrentItem() == null) return;
 
         event.setCancelled(true);
 

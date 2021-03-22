@@ -2,23 +2,20 @@ package net.forthecrown.vikings.raids;
 
 import javax.annotation.Nonnegative;
 
+//Class existence reason: provide a simple difficulty modifier for raids
 public enum RaidDifficulty {
 
     //Thought adding this to make the Raids more dynamic would be a good idea
     //Maybe, if I or we have the time, we could make the difficulty be assigned
     //automatically based off of previous performance
-    EASY (0.75f),
+    EASY (0.5f),
     NORMAL (1.0f),
-    HARD (1.25f),
-    VERY_HARD (1.5f);
+    HARD (1.5f),
+    VERY_HARD (2f);
 
-    private final float healthModifier;
+    public final float modifier;
     RaidDifficulty(float healthModifier){
-        this.healthModifier = healthModifier;
-    }
-
-    public float getModifier() {
-        return healthModifier;
+        this.modifier = healthModifier;
     }
 
     //If we use the same GUI like we did for the GrapplingHooks, we might need something to get an int from the level's name

@@ -4,7 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.Cooldown;
 import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.EntityArgType;
+import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
 import net.forthecrown.randomfeatures.RandomFeatures;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.ChatColor;
@@ -42,13 +42,13 @@ public class CommandWild extends CrownCommandBuilder {
                     wildTP(p);
                     return 0;
                 })
-                .then(argument("player", EntityArgType.player())
+                .then(argument("player", TargetSelectorType.player())
                         .requires(c -> !(c.getBukkitSender() instanceof Player))
 
                         .executes(c -> {
-                            Player p = EntityArgType.getPlayer(c, "player");
+                            Player p = TargetSelectorType.getPlayer(c, "player");
                             wildTP(p);
-                            return 0;
+                            return 1;
                         })
                 );
     }

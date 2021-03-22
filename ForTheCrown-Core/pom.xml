@@ -75,11 +75,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
+            <groupId>com.destroystokyo.paper</groupId>
+            <artifactId>paper</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>D:/Downloads/craftbukkit-1.16.5.jar</systemPath>
+            <systemPath>C:/Users/ander/Desktop/ThePitOfTrash/PaperMC/Paper-Server/target/paper-1.16.5.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>

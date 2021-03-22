@@ -1,9 +1,9 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.pirates.auctions.Auction;
 import net.forthecrown.pirates.auctions.AuctionManager;
 import net.forthecrown.pirates.commands.*;
@@ -60,10 +60,12 @@ public final class Pirates extends JavaPlugin implements Listener {
             }
         }
 
+        //types
         grapplingHook = new GrapplingHook(this);
         auctionManager = new AuctionManager(this);
         events = new PirateEvents(this);
 
+        //commands
         new CommandGhTarget();
         new CommandGhShowName();
         new CommandParrot();
@@ -71,6 +73,7 @@ public final class Pirates extends JavaPlugin implements Listener {
         new CommandUpdateLeaderboard();
         new CommandPirateReload();
 
+        //events
         getServer().getPluginManager().registerEvents(events, this);
         getServer().getPluginManager().registerEvents(new BaseEgg(), this);
         getServer().getPluginManager().registerEvents(new NpcSmithEvent(), this);

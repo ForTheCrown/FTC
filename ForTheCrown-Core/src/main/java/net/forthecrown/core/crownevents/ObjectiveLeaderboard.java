@@ -2,6 +2,7 @@ package net.forthecrown.core.crownevents;
 
 import org.bukkit.Location;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,9 @@ public class ObjectiveLeaderboard extends ArmorStandLeaderboard{
         Map<String, Integer> tempMap = new HashMap<>();
 
         for (String s: objective.getScoreboard().getEntries()){
+            Score score = objective.getScore(s);
+            if(!score.isScoreSet() || score.getScore() == 0) continue;
+
             tempMap.put(s, objective.getScore(s).getScore());
         }
         return tempMap;

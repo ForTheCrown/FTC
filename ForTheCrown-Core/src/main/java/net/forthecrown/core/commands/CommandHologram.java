@@ -2,10 +2,10 @@ package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.EntityArgType;
+import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
 import net.forthecrown.core.commands.brigadier.types.Vector3DType;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Location;
@@ -49,9 +49,9 @@ public class CommandHologram extends CrownCommandBuilder {
     protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
         command
                 .then(argument("remove")
-                        .then(argument("holograms", EntityArgType.entities())
+                        .then(argument("holograms", TargetSelectorType.entities())
                                 .executes(c -> {
-                                    Collection<? extends Entity> entities = EntityArgType.getEntities(c, "holograms");
+                                    Collection<? extends Entity> entities = TargetSelectorType.getEntities(c, "holograms");
 
                                     int removed = 0;
                                     for (Entity e: entities){

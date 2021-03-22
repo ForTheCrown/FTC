@@ -35,21 +35,6 @@ public class EmoteToggle extends CrownCommandBuilder {
      * Main Author: Botul
      */
 
-    /*@Override
-    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
-        if(!(sender instanceof Player)) throw new NonPlayerExecutor(sender);
-
-        Player player = (Player) sender;
-        CrownUser user = FtcCore.getUser(player);
-        String message = "&7You can longer send or receive emotes.";
-
-        user.setAllowsEmotes(!user.allowsEmotes());
-        if(user.allowsEmotes()) message = "&eYou can now send and receive emotes :D";
-
-        user.sendMessage(message);
-        return true;
-    }*/
-
     @Override
     protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
         command.executes(c ->{

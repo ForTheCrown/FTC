@@ -1,7 +1,7 @@
 package net.forthecrown.core.commands.emotes;
 
-import net.forthecrown.core.CrownUtils;
-import net.forthecrown.core.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.api.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;

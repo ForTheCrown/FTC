@@ -1,8 +1,8 @@
 package net.forthecrown.dungeons;
 
-import net.forthecrown.core.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.dungeons.bosses.Drawned;
 import net.forthecrown.dungeons.bosses.HideySpidey;
 import net.forthecrown.dungeons.bosses.Skalatan;

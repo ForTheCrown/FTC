@@ -1,20 +1,20 @@
 package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CannotAffordTransactionException;
 import net.forthecrown.core.enums.Rank;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
-
-import java.text.DecimalFormat;
 
 public class CommandBecomeBaron extends CrownCommandBuilder {
     public CommandBecomeBaron() {
@@ -43,9 +43,6 @@ public class CommandBecomeBaron extends CrownCommandBuilder {
     protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
         int baronPrice = FtcCore.getInstance().getConfig().getInt("BaronPrice");
         Balances bals = FtcCore.getBalances();
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        decimalFormat.setGroupingUsed(true);
-        decimalFormat.setGroupingSize(3);
 
         command
                 .executes(c -> {
@@ -56,16 +53,24 @@ public class CommandBecomeBaron extends CrownCommandBuilder {
                         return 0;
                     }
 
-                    if(bals.get(user.getBase()) < baronPrice) throw new CannotAffordTransactionException("You need at least " + decimalFormat.format(baronPrice) + " Rhines");
+                    if(bals.get(user.getUniqueId()) < baronPrice) throw new CannotAffordTransactionException("You need at least " + CrownUtils.decimalizeNumber(baronPrice) + " Rhines");
 
-                    TextComponent confirmBaron = new TextComponent(ChatColor.GREEN + "[Confirm]");
-                    confirmBaron.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/becomebaron confirm"));
-                    confirmBaron.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Become a baron.")));
+                    TextComponent message = Component.text()
+                            .append(FtcCore.prefix())
+                            .append(Component.text("Are you sure you wish to become a "))
+                            .append(Rank.BARON.noEndSpacePrefix())
+                            .append(Component.text("? This will cost "))
+                            .append(Component.text(CrownUtils.decimalizeNumber(baronPrice) + " Rhines ").color(NamedTextColor.YELLOW))
 
-                    TextComponent baronConfirmMessage = new TextComponent(FtcCore.getPrefix() + ChatColor.translateAlternateColorCodes('&', "&rAre you sure you wish to become a " + Rank.BARON.getPrefix().replaceAll(" ", "") + "? This will cost &e" + decimalFormat.format(baronPrice) + " Rhines "));
-                    baronConfirmMessage.addExtra(confirmBaron);
+                            .append(Component.text("[Confirm]")
+                                    .color(NamedTextColor.GREEN)
+                                    .clickEvent(ClickEvent.runCommand("/" + getName() + " confirm"))
+                                    .hoverEvent(HoverEvent.showText(Component.text("Click to become a baron")))
+                            )
 
-                    user.spigot().sendMessage(baronConfirmMessage);
+                            .build();
+
+                    user.sendMessage(message);
                     return 0;
                 })
                 .then(argument("confirm")

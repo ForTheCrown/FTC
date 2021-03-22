@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 public class ClickEventCommand extends CrownCommandBuilder {
 
-    ClickEventCommand(){
+    public ClickEventCommand(){
         super("npcconverse", FtcCore.getInstance());
         setDescription("The Command used by the ClickEventManager to execute code ran by clickable text");register();
         register();

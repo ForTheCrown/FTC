@@ -1,10 +1,6 @@
 package net.forthecrown.vikings;
 
-import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.enums.Branch;
-import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.vikings.inventory.RaidSelector;
+import net.forthecrown.core.ComponentUtils;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,16 +11,27 @@ public class VikingListener implements Listener {
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if(!(event.getRightClicked() instanceof Villager)) return;
-        if(event.getRightClicked().getCustomName() == null || !event.getRightClicked().getCustomName().contains("VIKING_RAID_PLACEHOLDER")) return;
+        if(event.getRightClicked().customName() == null) return;
 
-        Villager villie = (Villager) event.getRightClicked();
-        if(!villie.isInvulnerable()) return;
+        String name = ComponentUtils.getString(event.getRightClicked().customName());
 
-        event.setCancelled(true);
+        switch (name){
+            case "Brynjulf": //info dud
+                //TODO make him give info to player
+                //TODO With clickable info
+                break;
+            case "cobett": //priest dud -.-
+                //TODO make him bring up the BlessingSelector
+                break;
+            case "Eirikr": //Raid dude
+                //TODO implement the raid system talked about in Senate, described below
+                break;
 
-        CrownUser user = FtcCore.getUser(event.getPlayer().getUniqueId());
-        if(!user.getBranch().equals(Branch.VIKINGS)) throw new CrownException(user, "Only Vikings can do this!");
-
-        event.getPlayer().openInventory(new RaidSelector(FtcCore.getUser(event.getPlayer())).getInventory());
+            default:
+                return;
+        }
     }
 }
+/*
+ * Once every X hours a raid call gets put out, people can join in groups, raids will be harder the more people there are
+ */

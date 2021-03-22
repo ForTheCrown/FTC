@@ -1,6 +1,6 @@
 package net.forthecrown.core.inventories;
 
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
@@ -141,7 +141,7 @@ public class RankInventory {
         else s = rank.getPrefix();
 
         ItemStack item = CrownUtils.makeItem(mat, 1, true, s, description);
-        if (Rank.getFreeRanks().contains(rank)) {
+        if (Rank.freeRanks().contains(rank)) {
             if (user.getAvailableRanks().contains(rank)) item.setType(Material.MAP);
             else item.setType(Material.PAPER);
         }

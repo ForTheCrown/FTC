@@ -6,6 +6,9 @@ import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.command.CommandSender;
@@ -17,7 +20,7 @@ public class CommandBalance extends CrownCommandBuilder {
         super("balance", FtcCore.getInstance());
 
         setUsage("&7Usage: &r/balance <player>");
-        setAliases("bal", "bank", "cash", "money", "ebal", "ebalance", "emoney");
+        setAliases("bal", "cash", "money", "ebal", "ebalance", "emoney");
         setDescription("Displays a player's balance");
 
         register();
@@ -59,7 +62,19 @@ public class CommandBalance extends CrownCommandBuilder {
                             CommandSender sender = c.getSource().getBukkitSender();
                             CrownUser target = UserType.getUser(c, "player");
 
-                            sender.sendMessage(ChatColor.GOLD + "$ " + ChatColor.YELLOW + target.getName() + ChatColor.GRAY + " currently has " + ChatColor.GOLD + balances.getDecimalized(target.getBase()) + " Rhines");
+                            Component text = Component.text()
+                                    .color(NamedTextColor.GRAY)
+                                    .append(Component.text("$ ").color(NamedTextColor.GOLD))
+                                    .append(target.name()
+                                            .color(NamedTextColor.YELLOW)
+                                            .hoverEvent(target.asHoverEvent())
+                                            .clickEvent(ClickEvent.suggestCommand("/w " + target.getName()))
+                                    )
+                                    .append(Component.text(" currently has "))
+                                    .append(Component.text(balances.getDecimalized(target.getUniqueId()) + " Rhines").color(NamedTextColor.GOLD))
+                                    .build();
+
+                            sender.sendMessage(text);
                             return 0;
                         })
                 );

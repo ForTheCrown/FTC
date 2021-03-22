@@ -71,9 +71,10 @@ public class GrapplingHook implements Listener {
 
             if(!user.isOnline()) user.unload();
             else user.save();
-
-            getPlayerLevelsFile().delete();
         }
+        getPlayerLevelsFile().delete();
+        //BOTUL YOU ABSOLUTE RETARD
+        //... that delete() statement was in the loop, it would delete the file after 1 loop :(
     }
 
     public File getPlayerLevelsFile() {
@@ -83,11 +84,14 @@ public class GrapplingHook implements Listener {
     }
 
     public List<String> getUserLevels(CrownUser user){
-        return user.getDataContainer().get(Pirates.plugin).getStringList("CompletedLevels");
+        List<String> toReturn = user.getDataContainer().get(Pirates.plugin).getStringList("CompletedLevels");
+        return toReturn;
     }
 
     public void setUserLevels(CrownUser user, List<String> list){
-        user.getDataContainer().get(Pirates.plugin).set("CompletedLevels", list);
+        ConfigurationSection dataSec = user.getDataContainer().get(Pirates.plugin);
+        dataSec.set("CompletedLevels", list);
+        user.getDataContainer().set(Pirates.plugin, dataSec);
     }
 
     public File getArmorStandFile() {
@@ -177,6 +181,7 @@ public class GrapplingHook implements Listener {
                         if (!list.contains(levelList.get(level))) list.add(levelList.get(level));
                     }
                     setUserLevels(user, list);
+                    getUserLevels(user);
                 } else {
                     player.sendMessage(ChatColor.GRAY + "Cancelled.");
                 }
@@ -252,15 +257,16 @@ public class GrapplingHook implements Listener {
 
     private Inventory personalizeInventory(Player player, Inventory inv) {
         CrownUser user = FtcCore.getUser(player);
+        List<String> completedLevels = getUserLevels(user);
 
-        if (getUserLevels(user).isEmpty()) {
+        if (completedLevels.isEmpty()) {
             List<String> list = new ArrayList<>();
             list.add("started");
             setUserLevels(user, list);
         }
         else {
             ItemStack item;
-            for (String completedLevel : getUserLevels(user)) {
+            for (String completedLevel : completedLevels) {
                 if (completedLevel.contains("started")) continue;
 
                 item = getItemWithNameFrom(inv, completedLevel);
@@ -287,8 +293,9 @@ public class GrapplingHook implements Listener {
         }
 
         for (int i = 0; i < 41; i++) {
-            if (inv.getItem(i) != null && inv.getItem(i).getType() != Material.AIR && (!COMPLETED_LEVEL_INDICATORS.contains(inv.getItem(i).getType()))) {
-                inv.getItem(i).addUnsafeEnchantment(Enchantment.CHANNELING, 1);
+            ItemStack item = inv.getItem(i);
+            if (item != null && item.getType() != Material.AIR && (!COMPLETED_LEVEL_INDICATORS.contains(item.getType()))) {
+                item.addUnsafeEnchantment(Enchantment.CHANNELING, 1);
                 break;
             }
         }

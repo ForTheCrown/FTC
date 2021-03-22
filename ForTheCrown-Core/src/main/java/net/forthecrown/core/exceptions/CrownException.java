@@ -1,7 +1,7 @@
 package net.forthecrown.core.exceptions;
 
-import net.forthecrown.core.CrownUtils;
-import net.kyori.adventure.text.Component;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import org.bukkit.command.CommandSender;
 
 public class CrownException extends RuntimeException{
@@ -22,7 +22,7 @@ public class CrownException extends RuntimeException{
     }
 
     public void sendMessage(CommandSender sender, String message){
-        sender.sendMessage(Component.text(CrownUtils.translateHexCodes(message)));
+        sender.sendMessage(ComponentUtils.convertString(message));
     }
 
     @Override

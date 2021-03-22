@@ -1,6 +1,7 @@
 package net.forthecrown.core.crownevents;
 
-import net.forthecrown.core.CrownUtils;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -92,7 +93,7 @@ public class ArmorStandLeaderboard {
 
     private void createStand(String name, Location loc){
         ArmorStand stand = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
-        stand.setCustomName(CrownUtils.translateHexCodes(name));
+        stand.customName(ComponentUtils.convertString(name));
         stand.setCustomNameVisible(true);
         stand.setInvisible(true);
         stand.setGravity(false);

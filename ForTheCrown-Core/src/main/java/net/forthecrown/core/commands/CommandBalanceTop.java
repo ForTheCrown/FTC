@@ -2,8 +2,12 @@ package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Bukkit;
@@ -74,12 +78,26 @@ public class CommandBalanceTop extends CrownCommandBuilder {
             return;
         }
 
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7------ &eTop balances &7------"));
+        final TextComponent border = Component.text("------").color(NamedTextColor.GRAY);
+        TextComponent text = Component.text()
+                .append(border)
+                .append(Component.text(" Top balances ").color(NamedTextColor.YELLOW))
+                .append(border)
+                .append(Component.newline())
+                .build();
+
         for(int i = 0 ; i < 10 ; i++){
             if((index*10) + i >= baltopList.size()) break;
-            sender.sendMessage(ChatColor.GOLD + "" + ((index*10) + i+1) + ") " + ChatColor.RESET + baltopList.get((index*10) + i));
+
+            text = text.append(ComponentUtils.convertString(ChatColor.GOLD + "" + ((index*10) + i+1) + ") " + ChatColor.RESET + baltopList.get((index*10) + i)))
+                    .append(Component.newline());
         }
-        sender.sendMessage(ChatColor.GRAY + "------- "  + ChatColor.YELLOW + "Page " + (index+1) + "/" + stupidity + ChatColor.GRAY + " -------");
+        text = text
+                .append(border)
+                .append(Component.text(" Page " +  (index+1) + "/" + stupidity + " ").color(NamedTextColor.YELLOW))
+                .append(border);
+
+        sender.sendMessage(text);
     }
 
     private List<String> getBaltopList(){

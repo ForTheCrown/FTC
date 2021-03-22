@@ -7,6 +7,9 @@ import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.events.*;
 import net.forthecrown.core.events.npc.JeromeEvent;
 import net.forthecrown.core.files.*;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -238,6 +241,10 @@ public final class FtcCore extends JavaPlugin {
         return CrownUtils.translateHexCodes(prefix);
     }
 
+    public static Component prefix(){
+        return ComponentUtils.convertString(prefix);
+    }
+
     public static long getUserDataResetInterval(){
         return userDataResetInterval;
     }
@@ -252,6 +259,14 @@ public final class FtcCore extends JavaPlugin {
 
     public static long getBranchSwapCooldown() {
         return branchSwapCooldown;
+    }
+
+    public static boolean logAdminShopUsage(){
+        return getInstance().getConfig().getBoolean("Shops.log-admin-purchases");
+    }
+
+    public static boolean logNormalShopUsage(){
+        return getInstance().getConfig().getBoolean("Shops.log-normal-purchases");
     }
 
     //get a part of the plugin with these

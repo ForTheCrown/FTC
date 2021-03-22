@@ -5,7 +5,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 
-public class CrownWorldGuard {
+public final class CrownWorldGuard {
 
     private final FtcCore core;
 
