@@ -1,5 +1,0 @@
-name: FTCEventBoss
-version: @version@
-main: net.forthecrown.ftceventboss.FTCEventBoss
-api-version: 1.16
-depend: [ FTCCore ]

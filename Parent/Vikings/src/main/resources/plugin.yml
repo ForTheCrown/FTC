@@ -1,0 +1,10 @@
+name: Vikings
+version: @version@
+main: net.forthecrown.vikings.Vikings
+api-version: 1.16
+depend:
+  - FTCCore
+  - Multiverse-Core
+  - FastAsyncWorldEdit
+authors:
+  - Botul

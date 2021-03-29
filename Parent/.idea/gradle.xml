@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/FTC-Cosmetics" />
+            <option value="$PROJECT_DIR$/FTC-Pirates" />
+            <option value="$PROJECT_DIR$/FTC-RandomFeatures" />
+            <option value="$PROJECT_DIR$/FTC-Royals" />
+            <option value="$PROJECT_DIR$/FTC-Vikings" />
+            <option value="$PROJECT_DIR$/ForTheCrown-Core" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/Cosmetics" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/Cosmetics" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/FTC-Royals" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/FTC-Royals" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/ForTheCrown-Core" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/ForTheCrown-Core" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/Pirates" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/Pirates" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/RandomFeatures" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/RandomFeatures" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/Vikings" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/Vikings" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

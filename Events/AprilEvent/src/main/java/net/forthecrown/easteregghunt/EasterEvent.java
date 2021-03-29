@@ -3,6 +3,7 @@ package net.forthecrown.easteregghunt;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.crownevents.EventTimer;
 import net.forthecrown.core.crownevents.types.CrownEvent;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.easteregghunt.events.InEventListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,45 +20,71 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
 import java.time.Duration;
+import java.util.Objects;
 
 public class EasterEvent implements CrownEvent<EasterEntry> {
 
     private final EasterMain main;
     private final EggSpawner spawner;
+    private final IUserTracker tracker;
 
-    public static final Objective CROWN = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("crown");
-    public static final Location eventLocation = new Location(Bukkit.getWorld("world_void"), -623, 106, 266);
+    public static final Objective CROWN = Objects.requireNonNull(Bukkit.getScoreboardManager().getMainScoreboard().getObjective("crown"));
+    public static final Location EVENT_LOCATION = new Location(CrownUtils.WORLD_VOID, -623.5, 106, 266.5, 0, 0);
+    public static final Location EXIT_LOCATION = new Location(CrownUtils.WORLD_VOID, 10, 10, 10);
+    public static boolean open = true;
+
     public EasterEntry entry;
 
     public EasterEvent(EasterMain main, EggSpawner spawner){
         this.main = main;
         this.spawner = spawner;
+        this.tracker = EasterMain.tracker();
     }
 
     @Override
     public void start(Player player) {
-        spawner.placeEggs();
+        if(!open || !tracker.entryAllowed(player)) return;
 
+        tracker.increment(player);
+        open = false;
         doEntryCountdown(player);
+    }
+
+    private int initAmount = 0;
+    public int initialAmount(){
+        return initAmount;
     }
 
     @Override
     public void end(EasterEntry entry) {
         Score record = CROWN.getScore(entry.player().getName());
         CrownUser user = entry.user();
+        if(!entry.timer().wasStopped()) entry.timer().stop();
+        IChatBaseComponent scrMessage = new ChatComponentText("Score: " + entry.score()).a(EnumChatFormat.GOLD);
 
-        if(record.isScoreSet() || record.getScore() < entry.score()){
+        if(!record.isScoreSet() || record.getScore() < entry.score()){
             record.setScore(entry.score());
 
             IChatBaseComponent text = new ChatComponentText("New record! ").a(EnumChatFormat.YELLOW)
-                    .addSibling(new ChatComponentText("Score: " + entry.score()).a(EnumChatFormat.GOLD));
+                    .addSibling(scrMessage);
 
-            user.sendMessage(text, ChatMessageType.SYSTEM);
+            user.sendMessage(text, ChatMessageType.GAME_INFO);
             user.sendMessage(text, ChatMessageType.CHAT);
-        } else user.sendMessage(new ChatComponentText("Better luck next time").a(EnumChatFormat.GRAY));
+        } else {
+            IChatBaseComponent text = new ChatComponentText("Better luck next time! ").a(EnumChatFormat.GRAY)
+                    .addSibling(scrMessage);
+            user.sendMessage(text, ChatMessageType.GAME_INFO);
+            user.sendMessage(text, ChatMessageType.CHAT);
+        }
 
+        if(EasterMain.bunny.isAlive()) EasterMain.bunny.kill();
+        EasterMain.leaderboard.update();
+        spawner.removeAllEggs();
+        entry.player().teleport(EXIT_LOCATION);
         HandlerList.unregisterAll(entry.inEventListener());
+
         this.entry = null;
+        open = true;
     }
 
     @Override
@@ -66,7 +93,7 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
     }
 
     private int loopID = 0;
-    private int secondOn = 5;
+    private byte secondOn = 5;
     private void doEntryCountdown(Player player){
         secondOn = 5;
 
@@ -80,15 +107,18 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
             );
             player.showTitle(title);
 
-            InEventListener listener = new InEventListener();
             if(shouldStart){
+
+                InEventListener listener = new InEventListener();
                 entry = new EasterEntry(player, listener, new EventTimer(player, plr -> end(entry)));
                 listener.entry = entry;
                 listener.event = this;
+                entry.timer().startTickingDown(1);
 
-                EasterMain.instance.getServer().getPluginManager().registerEvents(entry.inEventListener(), EasterMain.instance);
+                EasterMain.inst.getServer().getPluginManager().registerEvents(entry.inEventListener(), EasterMain.inst);
 
-                player.teleport(eventLocation);
+                player.teleport(EVENT_LOCATION);
+                initAmount = spawner.placeEggs();
                 Bukkit.getScheduler().cancelTask(loopID);
                 return;
             }

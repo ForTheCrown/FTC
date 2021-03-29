@@ -1,11 +1,10 @@
 package net.forthecrown.dummyevent.commands;
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.crownevents.entries.TimerEntry;
 import net.forthecrown.dummyevent.SprintEvent;
 import net.forthecrown.dummyevent.SprintMain;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.entity.Player;
 
 public class CommandSprint extends CrownCommandBuilder {
@@ -17,7 +16,7 @@ public class CommandSprint extends CrownCommandBuilder {
     }
 
     @Override
-    protected void registerCommand(LiteralArgumentBuilder<CommandListenerWrapper> command) {
+    protected void registerCommand(BrigadierCommand command) {
         command
                 .then(argument("debug")
                         .then(argument("start")

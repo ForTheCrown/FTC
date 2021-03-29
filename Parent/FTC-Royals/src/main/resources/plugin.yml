@@ -1,0 +1,7 @@
+name: Royals
+version: @version@
+main: net.forthecrown.royals.Royals
+api-version: 1.16
+authors: [ Botul, Wout ]
+depend:
+  - FTCCore

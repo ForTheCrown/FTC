@@ -30,7 +30,7 @@ public final class SprintMain extends JavaPlugin {
         leaderboard.setTimerScore(true);
         leaderboard.setOrder(ArmorStandLeaderboard.Order.LOW_TO_HIGH);
         leaderboard.setFormat("&e%pos. &r%name: &e%score");
-        leaderboard.create();
+        leaderboard.update();
     }
 
     @Override

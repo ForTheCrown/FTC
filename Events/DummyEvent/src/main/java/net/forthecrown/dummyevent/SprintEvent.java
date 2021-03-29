@@ -7,8 +7,7 @@ import net.forthecrown.core.crownevents.EventTimer;
 import net.forthecrown.core.crownevents.entries.TimerEntry;
 import net.forthecrown.core.crownevents.types.TimedEvent;
 import net.minecraft.server.v1_16_R3.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -64,7 +63,7 @@ public class SprintEvent implements TimedEvent {
     public void end(TimerEntry entry){
         HandlerList.unregisterAll(entry.inEventListener());
         EventTimer timer = entry.timer();
-        if(!timer.wasStopped()) timer.stopTimer();
+        if(!timer.wasStopped()) timer.stop();
         entry.player().teleport(EXIT_LOCATION);
     }
 
@@ -94,6 +93,7 @@ public class SprintEvent implements TimedEvent {
             text = new ChatComponentText("New record! ")
                     .a(EnumChatFormat.YELLOW);
             playerScore.setScore((int) timer.getTime());
+            entry.player().getWorld().playSound(entry.player().getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.0f, 1.0f);
 
         } else {
             text = new ChatComponentText("Better luck next time! ")

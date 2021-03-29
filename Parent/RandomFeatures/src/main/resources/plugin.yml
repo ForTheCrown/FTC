@@ -1,0 +1,6 @@
+name: RandomFeatures
+version: @version@
+main: net.forthecrown.randomfeatures.RandomFeatures
+api-version: 1.16
+depend: [ FTCCore ]
+authors: [ Wout, BotulToxin ]

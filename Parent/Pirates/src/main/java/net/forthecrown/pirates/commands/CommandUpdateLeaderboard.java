@@ -1,0 +1,27 @@
+package net.forthecrown.pirates.commands;
+
+import net.forthecrown.core.commands.brigadier.BrigadierCommand;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.pirates.Pirates;
+
+public class CommandUpdateLeaderboard extends CrownCommandBuilder {
+    public CommandUpdateLeaderboard(){
+        super("updatelb", Pirates.plugin);
+        register();
+    }
+
+    @Override
+    protected void registerCommand(BrigadierCommand command) {
+        command.executes(c -> {
+            Pirates.plugin.updateLeaderBoard();
+            c.getSource().getBukkitSender().sendMessage("Leaderboard updated");
+            return 0;
+        });
+    }
+
+    /*@Override
+    public boolean run(CommandSender sender, Command cmd, String label, String[] args) {
+        Pirates.plugin.updateLeaderBoard();
+        return true;
+    }*/
+}
