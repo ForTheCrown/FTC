@@ -40,9 +40,11 @@ public enum Rank {
 
     private final String tabPrefix;
     private final Branch rankBranch;
-    Rank(String tabPrefix, Branch rankBranch){
+    private final String lpRank;
+    Rank(String tabPrefix, Branch rankBranch, String lpRank){
         this.tabPrefix = tabPrefix;
         this.rankBranch = rankBranch;
+        this.lpRank = lpRank;
     }
 
     public String getPrefix(){
