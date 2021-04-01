@@ -10,33 +10,33 @@ import java.util.List;
 
 public enum Rank {
     //royals
-    KNIGHT ( "&8[&7Knight&8] &f", Branch.ROYALS),
-    BARON ("&8[&7Baron&8] &f", Branch.ROYALS),
-    BARONESS( "&8[&7Baroness&8] &f", Branch.ROYALS),
-    LORD ("&#959595[&6Lord&#959595] &r", Branch.ROYALS),
-    LADY( "&#959595[&6Lady&#959595] &r", Branch.ROYALS),
-    DUKE ("&7[&#ffbf15Duke&7] &r", Branch.ROYALS),
-    DUCHESS( "&7[&#ffbf15Duchess&7] &r", Branch.ROYALS),
-    PRINCE ("[&#FBFF0FPrince&f] &r", Branch.ROYALS),
-    PRINCESS ( "[&#FBFF0FPrincess&f] &r", Branch.ROYALS),
+    KNIGHT ( "&8[&7Knight&8] &f", Branch.ROYALS, "free-rank"),
+    BARON ("&8[&7Baron&8] &f", Branch.ROYALS, "free-rank"),
+    BARONESS( "&8[&7Baroness&8] &f", Branch.ROYALS, "free-rank"),
+    LORD ("&#959595[&6Lord&#959595] &r", Branch.ROYALS, "donator-tier-1"),
+    LADY( "&#959595[&6Lady&#959595] &r", Branch.ROYALS, "donator-tier-1"),
+    DUKE ("&7[&#ffbf15Duke&7] &r", Branch.ROYALS, "donator-tier-2"),
+    DUCHESS( "&7[&#ffbf15Duchess&7] &r", Branch.ROYALS, "donator-tier-2"),
+    PRINCE ("[&#FBFF0FPrince&f] &r", Branch.ROYALS, "donator-tier-3"),
+    PRINCESS ( "[&#FBFF0FPrincess&f] &r", Branch.ROYALS, "donator-tier-3"),
 
     //pirates
-    SAILOR ("&8&l{&7Sailor&8&l} &r", Branch.PIRATES),
-    PIRATE ("&8&l{&7Pirate&8&l} &r", Branch.PIRATES),
-    CAPTAIN ("&7{&6Captain&7} &r", Branch.PIRATES),
-    ADMIRAL ("{&eAdmiral&f} &r", Branch.PIRATES),
+    SAILOR ("&8&l{&7Sailor&8&l} &r", Branch.PIRATES, "free-rank"),
+    PIRATE ("&8&l{&7Pirate&8&l} &r", Branch.PIRATES, "donator-tier-1"),
+    CAPTAIN ("&7{&6Captain&7} &r", Branch.PIRATES, "donator-tier-2"),
+    ADMIRAL ("{&eAdmiral&f} &r", Branch.PIRATES, "donator-tier-3"),
 
     //vikings
-    VIKING ("<Viking>", Branch.VIKINGS),
-    BERSERKER ("<Berserker>", Branch.VIKINGS),
-    WARRIOR ("<Warrior>",  Branch.VIKINGS),
-    SHIELD_MAIDEN ("<Shield-maiden>", Branch.VIKINGS),
-    HERSIR ("<Hersir>", Branch.VIKINGS),
-    JARL ("<Jarl>", Branch.VIKINGS),
+    VIKING ("<Viking>", Branch.VIKINGS, "free-rank"),
+    BERSERKER ("<Berserker>", Branch.VIKINGS, "free-rank"),
+    WARRIOR ("<Warrior>",  Branch.VIKINGS, "donator-tier-1"),
+    SHIELD_MAIDEN ("<Shield-maiden>", Branch.VIKINGS, "donator-tier-1"),
+    HERSIR ("<Hersir>", Branch.VIKINGS, "donator-tier-2"),
+    JARL ("<Jarl>", Branch.VIKINGS, "donator-tier-3"),
 
     //non branch ranks
-    DEFAULT ("DEFAULT", Branch.DEFAULT),
-    LEGEND("&#dfdfdf[&#fff147Legend&#dfdfdf] &r", Branch.DEFAULT);
+    DEFAULT ("DEFAULT", Branch.DEFAULT, "default"),
+    LEGEND("&#dfdfdf[&#fff147Legend&#dfdfdf] &r", Branch.DEFAULT, "legend");
 
     private final String tabPrefix;
     private final Branch rankBranch;
