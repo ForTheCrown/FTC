@@ -1,12 +1,16 @@
 package net.forthecrown.easteregghunt.events;
 
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.Cooldown;
 import net.forthecrown.easteregghunt.CrazyBunny;
 import net.forthecrown.easteregghunt.EasterEntry;
 import net.forthecrown.easteregghunt.EasterEvent;
 import net.forthecrown.easteregghunt.EasterMain;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -21,6 +25,8 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Score;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class InEventListener implements Listener {
 
@@ -37,13 +43,30 @@ public class InEventListener implements Listener {
         Player player = entry.player();
         Entity entity = event.getRightClicked();
         entry.inc();
+
+        if(entity.getPersistentDataContainer().get(EasterMain.spawner.key, PersistentDataType.BYTE) == (byte) 2){
+            player.sendMessage(Component.text("You got the ")
+                    .color(NamedTextColor.GRAY)
+                    .append(Component.text("Rare Golden Egg").color(NamedTextColor.GOLD))
+                    .append(Component.text("!"))
+                    .append(Component.text(" + 3 Points and + 25 Gems").color(NamedTextColor.YELLOW))
+                    .append(Component.text("!"))
+            );
+            CrownUser user = entry.user();
+            user.addGems(25);
+            entry.inc();
+            entry.inc();
+            entry.inc();
+        }
+
+        if(ThreadLocalRandom.current().nextInt(1000) < 5) EasterMain.spawner.spawnRareEgg(entity.getLocation());
         EasterMain.spawner.removeEgg((Slime) entity);
         player.getWorld().playSound(entity.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1);
         player.getWorld().spawnParticle(Particle.END_ROD, entity.getLocation(), 50, 0.1, 0, 0.1, 0.1);
 
         if(entry.score() <= this.event.initialAmount()/2) return;
 
-        placeThreeEggs(entity.getLocation());
+        if(EasterMain.spawner.placed_eggs.size() <= 20) placeThreeEggs(entity.getLocation());
         CrazyBunny bunny = EasterMain.bunny;
         if(bunny.isAlive()) return;
 
@@ -57,14 +80,15 @@ public class InEventListener implements Listener {
         }
     }
 
-    private void checkEntity(Entity entity){
-        if(!entity.equals(entry.player())) return;
-        event.end(entry);
+    private boolean checkEntity(Entity entity){
+        if(!entity.equals(entry.player())) return false;
+        Bukkit.getScheduler().runTaskLater(EasterMain.inst, () -> event.end(entry), 1);
+        return true;
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        checkEntity(event.getEntity());
+        event.setCancelled(checkEntity(event.getEntity()));
     }
 
     @EventHandler(ignoreCancelled = true)

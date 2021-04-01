@@ -14,11 +14,11 @@ public class EasterEntry extends TimerEntry {
     }
 
     public void inc(){
-        score += 10;
+        score++;
     }
 
     public void dec(){
-        score -= 10;
+        score--;
     }
 
     public int score() {

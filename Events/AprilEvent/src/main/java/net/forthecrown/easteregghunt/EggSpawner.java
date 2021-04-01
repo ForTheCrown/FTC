@@ -48,7 +48,7 @@ public class EggSpawner {
     public static final Team NO_CLIP_TEAM = Objects.requireNonNull(Bukkit.getScoreboardManager().getMainScoreboard().getTeam("NoClip"));
 
     public final NamespacedKey key;
-    private final List<Slime> placed_eggs = new ArrayList<>();
+    public final List<Slime> placed_eggs = new ArrayList<>();
 
     public EggSpawner(){
         this.random = new Random();
@@ -153,5 +153,37 @@ public class EggSpawner {
         skinURL = "http://textures.minecraft.net/texture/" + skinURL;
         newSkinProfile.getProperties().put("textures", new Property("textures", Base64Coder.encodeString("{textures:{SKIN:{url:\"" + skinURL + "\"}}}")));
         return newSkinProfile;
+    }
+
+    public void spawnRareEgg(Location banned){
+        Location toSpawnAt = EasterMain.eggSpawns.get(random.nextInt(EasterMain.eggSpawns.size()));
+        short safeGuard = 300;
+        if(banned != null){
+            while (banned.distance(toSpawnAt) < 10 && (toSpawnAt.getBlock().getType() == Material.PLAYER_HEAD || !toSpawnAt.getNearbyEntitiesByType(Slime.class, 1.5).isEmpty())) {
+                toSpawnAt = EasterMain.eggSpawns.get(random.nextInt(EasterMain.eggSpawns.size()));
+                safeGuard--;
+                if(safeGuard <= 0) return;
+            }
+        }
+        if(!toSpawnAt.getNearbyEntitiesByType(Slime.class, 1.5).isEmpty() || toSpawnAt.getBlock().getType() == Material.PLAYER_HEAD) return;
+
+        Location finalToSpawnAt = toSpawnAt;
+        toSpawnAt.getWorld().spawn(toSpawnAt, Slime.class, slime -> {
+            slime.setRemoveWhenFarAway(false);
+            slime.setPersistent(false);
+            slime.setGravity(false);
+            slime.setAI(false);
+            slime.setSize(2);
+            slime.setInvisible(true);
+            slime.setCustomNameVisible(false);
+            slime.customName(Component.text("Egg!").color(NamedTextColor.LIGHT_PURPLE));
+            slime.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 2);
+            NO_CLIP_TEAM.addEntry(slime.getUniqueId().toString());
+
+            int rotation = random.nextInt(16);
+            rotation = setSkullUrl(SKULL_TEXTURES[random.nextInt(SKULL_TEXTURES.length)], finalToSpawnAt.getBlock(), rotation);
+            slime.setRotation(rotation*45, 0);
+            placed_eggs.add(slime);
+        });
     }
 }

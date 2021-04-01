@@ -1,7 +1,6 @@
 package net.forthecrown.easteregghunt;
 
 import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.crownevents.EventTimer;
 import net.forthecrown.core.crownevents.types.CrownEvent;
@@ -33,10 +32,17 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
 
     public static final Objective CROWN = Objects.requireNonNull(Bukkit.getScoreboardManager().getMainScoreboard().getObjective("crown"));
     public static final Location EVENT_LOCATION = new Location(CrownUtils.WORLD_VOID, -623.5, 106, 266.5, 0, 0);
-    public static final Location EXIT_LOCATION = new Location(CrownUtils.WORLD_VOID, -622, 104, 273);
+    public static final Location EXIT_LOCATION = new Location(CrownUtils.WORLD_VOID, -680.5, 128, 297.5);
     public static final CrownBoundingBox EVENT_AREA = new CrownBoundingBox(CrownUtils.WORLD_VOID, -712, 0, 186, -546, 255, 352);
     public static boolean open = true;
     public static boolean shouldCancel = false;
+
+    public static BukkitRunnable bunnySpawner = new BukkitRunnable() {
+        @Override
+        public void run() {
+            EasterMain.bunny.spawn();
+        }
+    };
 
     public EasterEntry entry;
 
@@ -142,12 +148,12 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
     }
 
     private void bunnySpawnTimer(){
-        new BukkitRunnable() {
+        bunnySpawner = new BukkitRunnable() {
             @Override
             public void run() {
-                Announcer.debug("bunny Spawned");
                 EasterMain.bunny.spawn();
             }
-        }.runTaskLater(EasterMain.inst, 30*20);
+        };
+        bunnySpawner.runTaskLater(EasterMain.inst, 30*20);
     }
 }

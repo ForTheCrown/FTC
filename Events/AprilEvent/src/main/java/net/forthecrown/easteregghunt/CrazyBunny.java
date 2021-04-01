@@ -4,6 +4,9 @@ import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import net.forthecrown.core.utils.CrownUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,7 +35,9 @@ public class CrazyBunny {
            double health = 500;
            zomzom.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
            zomzom.setHealth(health);
-           zomzom.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(15);
+           zomzom.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(12.5);
+
+           zomzom.customName(Component.text("Crazy Bunny!").color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD));
 
             EntityEquipment equipment = zomzom.getEquipment();
             equipment.setHelmet(headItem());
