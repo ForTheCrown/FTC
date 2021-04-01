@@ -5,6 +5,7 @@ import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.crownevents.entries.TimerEntry;
 import net.forthecrown.dummyevent.SprintEvent;
 import net.forthecrown.dummyevent.SprintMain;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class CommandSprint extends CrownCommandBuilder {
@@ -19,6 +20,17 @@ public class CommandSprint extends CrownCommandBuilder {
     protected void registerCommand(BrigadierCommand command) {
         command
                 .then(argument("debug")
+                        .executes(c -> {
+                            SprintEvent event = SprintMain.event;
+                            event.setBarrierWall(Material.BARRIER, (byte) 1);
+                            event.setBarrierWall(Material.BARRIER, (byte) 3);
+                            event.setBarrierWall(Material.BARRIER, (byte) 4);
+                            event.setBarrierWall(Material.BARRIER, (byte) 2);
+                            event.setBarrierWall(Material.BARRIER, (byte) 0);
+
+                            return 0;
+                        })
+
                         .then(argument("start")
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);

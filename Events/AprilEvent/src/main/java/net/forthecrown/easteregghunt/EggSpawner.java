@@ -108,6 +108,8 @@ public class EggSpawner {
         location.setZ(location.getBlockZ() + .5);
 
         location.getWorld().spawn(location, Slime.class, slime -> {
+            slime.setRemoveWhenFarAway(false);
+            slime.setPersistent(false);
             slime.setGravity(false);
             slime.setAI(false);
             slime.setSize(2);

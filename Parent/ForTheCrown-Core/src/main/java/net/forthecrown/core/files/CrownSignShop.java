@@ -111,7 +111,7 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
             setOutOfStock(true);
         }
 
-        updateSign();
+        update();
     }
 
     @Override
@@ -185,7 +185,7 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
     public void setPrice(Integer price, boolean updateSign) {
         this.price = price;
 
-        if(updateSign) updateSign();
+        if(updateSign) update();
     }
 
     @Override
@@ -198,7 +198,7 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
         if(getType().equals(ShopType.ADMIN_SELL_SHOP)) return;
 
         this.outOfStock = outOfStock;
-        updateSign();
+        update();
     }
 
     @Override
@@ -218,7 +218,7 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
     }
 
     @Override
-    public void updateSign(){
+    public void update(){
         Sign s = getSign();
         Component ln1 = getType().inStockLabel();
         if(isOutOfStock()) ln1 = getType().outOfStockLabel();

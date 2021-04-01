@@ -17,6 +17,10 @@ import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.luckperms.api.cacheddata.CachedPermissionData;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.model.user.UserManager;
+import net.luckperms.api.util.Tristate;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -209,18 +213,12 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public short configurePriceForItem(Material item){
-        short startPrice = FtcCore.getInstance().getItemPrice(item);
+        short startPrice = FtcCore.getItemPrice(item);
         int amountEarned1 = getAmountEarned(item);
 
         if(amountEarned1 <= 0) return startPrice;
 
         return (short) Math.ceil( (1+startPrice)*Math.exp( -amountEarned1*Math.log(1+startPrice)/500000 )-1 );
-    }
-
-    @Override
-    @Deprecated
-    public UUID getBase(){
-        return base;
     }
 
     @Override
@@ -271,12 +269,34 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public void addRank(Rank rank){
+        addRank(rank, true);
+    }
+
+    @Override
+    public void addRank(Rank rank, boolean givePermission){
         ranks.add(rank);
+        if(givePermission) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + getName() + " parent add " + rank.getLpRank());
+    }
+
+    private User getLuckPermsUser(){
+        UserManager manager = FtcCore.LUCK_PERMS.getUserManager();
+        if(!manager.isLoaded(getUniqueId())) manager.loadUser(getUniqueId());
+        return manager.getUser(getUniqueId());
+    }
+
+    private CachedPermissionData getPerms(){
+        return getLuckPermsUser().getCachedData().getPermissionData();
     }
 
     @Override
     public void removeRank(Rank rank){
         if(hasRank(rank)) ranks.remove(rank);
+    }
+
+    public void removeRank(Rank rank, boolean removePermission){
+        if(!hasRank(rank)) return;
+        ranks.remove(rank);
+        if(removePermission) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + getName() + " parent remove " + rank.getLpRank());
     }
 
     @Override
@@ -387,14 +407,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public Short getItemPrice(Material item){
-        short i;
-        try {
-            i = itemPrices.get(item);
-            if(i > FtcCore.getInstance().getItemPrice(item)) i = FtcCore.getInstance().getItemPrice(item);
-        } catch (NullPointerException e){
-            return FtcCore.getInstance().getItemPrice(item);
-        }
-        return i;
+        return itemPrices.getOrDefault(item, FtcCore.getItemPrice(item));
     }
     @Override
     public void setItemPrice(Material item, short price){
@@ -412,19 +425,13 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public Integer getAmountEarned(Material material){
-        int i;
-        try {
-            i = getAmountEarnedMap().get(material);
-        } catch (NullPointerException e){
-            return 0;
-        }
-        return i;
+        return amountEarned.getOrDefault(material, 0);
     }
     @Override
     public void setAmountEarned(Material material, Integer amount){
         amountEarned.put(material, amount);
 
-        setItemPrice(material, (short) configurePriceForItem(material));
+        setItemPrice(material, configurePriceForItem(material));
     }
 
     @Override
@@ -493,15 +500,15 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         itemPrices.clear();
         setTotalEarnings(0);
 
-        save();
         nextResetTime = System.currentTimeMillis() + FtcCore.getUserDataResetInterval();
         System.out.println(getName() + " earnings reset, next reset in: " + ((((System.currentTimeMillis() - getNextResetTime()/1000)/60)/60)/24) + " days");
+        save();
     }
 
     @Nonnull
     @Override
     public String getName(){
-        if(name == null) name = getOfflinePlayer().getName();
+        if(CrownUtils.isNullOrBlank(name)) name = getOfflinePlayer().getName();
         return name;
     }
 
@@ -649,7 +656,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     //---------------------------
     // The following methods are inherited from CommandSender
-    // Cuz MessageCommandSender still had these methods, but no code for them
+    // Cuz CommandSender still had these methods, but no code for them
     //---------------------------
 
     @Nonnull
@@ -662,26 +669,25 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public boolean isPermissionSet(@Nonnull String name) {
-        performOnlineCheck();
+        if(!isOnline()) return getPerms().checkPermission(name) != Tristate.UNDEFINED;
         return getOnlineHandle().isPermissionSet(name);
     }
 
     @Override
     public boolean isPermissionSet(@Nonnull Permission perm) {
-        performOnlineCheck();
-        return getOnlineHandle().isPermissionSet(perm);
+        if(isOnline()) return getOnlineHandle().hasPermission(perm.getName());
+        return getPerms().checkPermission(perm.getName()).asBoolean();
     }
 
     @Override
     public boolean hasPermission(@Nonnull String name) {
-        performOnlineCheck();
-        return getOnlineHandle().hasPermission(name);
+        if(isOnline()) return getOnlineHandle().hasPermission(name);
+        return getPerms().checkPermission(name).asBoolean();
     }
 
     @Override
     public boolean hasPermission(@Nonnull Permission perm) {
-        performOnlineCheck();
-        return getOnlineHandle().hasPermission(perm);
+        return hasPermission(perm.getName());
     }
 
     @Nonnull
@@ -737,12 +743,6 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     @Override
     public void setOp(boolean value) {
         getOfflinePlayer().setOp(value);
-    }
-
-    @Override
-    public void performCommand(String command){
-        performOnlineCheck();
-        getServer().dispatchCommand(this, command);
     }
 
     @Override

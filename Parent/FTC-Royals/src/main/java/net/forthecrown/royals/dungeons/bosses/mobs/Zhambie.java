@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTables;
 import org.bukkit.potion.PotionEffect;
@@ -32,10 +33,10 @@ public class Zhambie extends DungeonBoss<Husk> {
         super(plugin, "Zhambie", new Location(Bukkit.getWorld("world_void"), -191.5, 80, 157.5),
                 (short) 60, DungeonAreas.ZHAMBIE_ROOM,
                 Arrays.asList( //Required items
-                        RoyalUtils.makeDungeonItem(Material.DRIED_KELP, 45, null),
-                        RoyalUtils.makeDungeonItem(Material.GOLD_NUGGET, 30, null),
+                        RoyalUtils.makeDungeonItem(Material.DRIED_KELP, 45,  (Component) null),
+                        RoyalUtils.makeDungeonItem(Material.GOLD_NUGGET, 30, (Component) null),
                         RoyalUtils.makeDungeonItem(Material.ROTTEN_FLESH, 15, "Knight's Flesh"),
-                        RoyalUtils.makeDungeonItem(Material.GOLD_INGOT, 1, "Hidden Mummy Ingot")
+                        mummyIngot()
                 )
         );
     }
@@ -95,10 +96,17 @@ public class Zhambie extends DungeonBoss<Husk> {
         }
 
         Husk helper = location.getWorld().spawn(location, Husk.class, zhelper  -> {
-            zhelper.getEquipment().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
-            zhelper.getEquipment().setChestplate(new ItemStack(Material.GOLDEN_CHESTPLATE));
-            zhelper.getEquipment().setBoots(new ItemStack(Material.GOLDEN_BOOTS));
-            zhelper.getEquipment().setItemInMainHand(new ItemStack(Material.GOLDEN_SWORD));
+            EntityEquipment equipment = zhelper.getEquipment();
+            equipment.setHelmet(new ItemStack(Material.GOLDEN_HELMET));
+            equipment.setChestplate(new ItemStack(Material.GOLDEN_CHESTPLATE));
+            equipment.setBoots(new ItemStack(Material.GOLDEN_BOOTS));
+            equipment.setItemInMainHand(new ItemStack(Material.GOLDEN_SWORD));
+
+            equipment.setLeggingsDropChance(0);
+            equipment.setHelmetDropChance(0);
+            equipment.setChestplateDropChance(0);
+            equipment.setBootsDropChance(0);
+
             zhelper.setAdult();
             zhelper.getWorld().playSound(zhelper.getLocation(), Sound.ENTITY_ZOMBIE_INFECT, 0.7f, 1.0f);
             zhelper.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0.8f);
@@ -117,5 +125,9 @@ public class Zhambie extends DungeonBoss<Husk> {
     public void onEntityDeath(EntityDeathEvent event) {
         if(!helpers.contains(event.getEntity())) return;
         helpers.remove(event.getEntity());
+    }
+
+    public static ItemStack mummyIngot(){
+        return RoyalUtils.makeDungeonItem(Material.GOLD_INGOT, 1, (Component) null).clone();
     }
 }

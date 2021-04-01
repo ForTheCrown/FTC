@@ -207,6 +207,7 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
     }
 
     public static void broadcastAdmin(CommandSender sender, String message){
+        if(sender instanceof CrownUser) sender = ((CrownUser) sender).getPlayer();
         broadcastAdmin(VanillaCommandWrapper.getListener(sender), ComponentUtils.stringToVanilla(message), true);
     }
 
@@ -216,28 +217,22 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
     }
 
     public static CompletableFuture<Suggestions> suggestMatching(SuggestionsBuilder suggestionsBuilder, Collection<String> strings){
-        String string = suggestionsBuilder.getRemaining().toLowerCase();
+        String token = suggestionsBuilder.getRemaining().toLowerCase();
 
         for (String s: strings){
-            if(s == null) continue;
-            if(stringMatches(string, s.toLowerCase())) suggestionsBuilder.suggest(s);
+            if(s.toLowerCase().startsWith(token)) suggestionsBuilder.suggest(s);
         }
 
         return suggestionsBuilder.buildFuture();
     }
 
     public static CompletableFuture<Suggestions> suggestMatching(SuggestionsBuilder suggestionsBuilder, Map<String, Message> strings){
-        String string = suggestionsBuilder.getRemaining().toLowerCase();
+        String token = suggestionsBuilder.getRemaining().toLowerCase();
 
         for (String s: strings.keySet()){
-            if(s == null) continue;
-            if(stringMatches(string, s.toLowerCase())) suggestionsBuilder.suggest(s, strings.get(s));
+            if(s.toLowerCase().startsWith(token)) suggestionsBuilder.suggest(s, strings.get(s));
         }
 
         return suggestionsBuilder.buildFuture();
-    }
-
-    private static boolean stringMatches(String token, String string) {
-        return string.toLowerCase().startsWith(token.toLowerCase());
     }
 }

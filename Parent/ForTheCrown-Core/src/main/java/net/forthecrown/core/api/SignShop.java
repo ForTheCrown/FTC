@@ -121,7 +121,7 @@ public interface SignShop extends CrownSerializer<FtcCore>, InventoryHolder, Nam
      * Updates the ingame sign representing this shop
      * <p>Should be used to apply changes to the sign</p>
      */
-    void updateSign();
+    void update();
 
     /**
      * Gets the shop's inventory

@@ -7,12 +7,14 @@ import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.events.*;
 import net.forthecrown.core.events.npc.JeromeEvent;
 import net.forthecrown.core.files.*;
-import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -36,6 +38,7 @@ public final class FtcCore extends JavaPlugin {
     private static String king;
     private static String discord;
     private static final Map<Material, Short> defaultItemPrices = new HashMap<>();
+    private static int saverID;
     private Integer maxMoneyAmount;
 
     private static CrownAnnouncer announcer;
@@ -44,11 +47,10 @@ public final class FtcCore extends JavaPlugin {
     private static RoyalBrigadier brigadier;
     private static CrownWorldGuard crownWorldGuard;
 
-    private static Timer saver;
-
     public static final Map<Location, CrownSignShop> LOADED_SHOPS = new HashMap<>();
     public static final Map<UUID, FtcUser> LOADED_USERS = new HashMap<>();
     public static final Set<ArmorStandLeaderboard> LEADERBOARDS = new HashSet<>();
+    public static final LuckPerms LUCK_PERMS = LuckPermsProvider.get();
 
     public static NamespacedKey SHOP_KEY;
 
@@ -81,10 +83,6 @@ public final class FtcCore extends JavaPlugin {
         if(getConfig().getBoolean("System.save-on-disable")) saveFTC();
 
         Bukkit.getScheduler().cancelTasks(this);
-        if(saver != null){
-            saver.cancel();
-            saver.purge();
-        }
 
         for (Player p: Bukkit.getOnlinePlayers()){
             p.closeInventory();
@@ -102,7 +100,7 @@ public final class FtcCore extends JavaPlugin {
         pm.registerEvents(new JeromeEvent(), this);
 
         pm.registerEvents(new CoreListener(), this);
-        pm.registerEvents(new GraveEvents(), this);
+        pm.registerEvents(new GraveListener(), this);
         pm.registerEvents(new ChatEvents(), this);
 
         pm.registerEvents(new ShopCreateEvent(), this);
@@ -130,15 +128,8 @@ public final class FtcCore extends JavaPlugin {
 
     //every hour it saves everything
     private void periodicalSave(){
-        saver = new Timer();
-        final long interval = getConfig().getInt("System.save-interval-mins")*60000;
-
-        saver.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                saveFTC();
-            }
-        }, interval, interval);
+        final long interval = getConfig().getLong("System.save-interval-mins")*60*20;
+        saverID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, FtcCore::saveFTC, interval, interval);
     }
 
     @Override
@@ -165,9 +156,9 @@ public final class FtcCore extends JavaPlugin {
         else king = "empty"; //like my soul
 
         if(getConfig().getBoolean("System.save-periodically")) periodicalSave();
-        else if (saver != null){
-            saver.cancel();
-            saver.purge();
+        else if (saverID != 0){
+            Bukkit.getScheduler().cancelTask(saverID);
+            saverID = 0;
         }
     }
 
@@ -217,10 +208,10 @@ public final class FtcCore extends JavaPlugin {
         else king = newKing.toString();
     }
 
-    public Map<Material, Short> getItemPrices(){ //returns the default item Price Map
+    public static Map<Material, Short> getItemPrices(){ //returns the default item Price Map
         return defaultItemPrices;
     }
-    public Short getItemPrice(Material material){ //Returns the default price for an item
+    public static Short getItemPrice(Material material){ //Returns the default price for an item
         return defaultItemPrices.getOrDefault(material, (short) 2);
     }
 
@@ -233,7 +224,8 @@ public final class FtcCore extends JavaPlugin {
     }
 
     public static Component prefix(){
-        return ComponentUtils.convertString(prefix)
+        return Component.text(ChatColor.stripColor(getPrefix()))
+                .color(NamedTextColor.GOLD)
                 .hoverEvent(HoverEvent.showText(Component.text("For The Crown :D, tell Botul you found this text lol").color(NamedTextColor.YELLOW)));
     }
 

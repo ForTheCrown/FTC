@@ -6,6 +6,7 @@ import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -16,6 +17,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
+import java.util.Objects;
 
 public class CrownWeapons {
 
@@ -34,8 +36,9 @@ public class CrownWeapons {
         if(!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) return false;
         if(item.getItemMeta().getPersistentDataContainer().has(CrownItems.ITEM_KEY, PersistentDataType.BYTE)) return false;
 
-        String name = ComponentUtils.getString(item.getItemMeta().displayName());
-        if(!name.contains("Royal Sword") && !name.contains("Captain's Cutlass")) return false;
+        String name = ChatColor.stripColor(ComponentUtils.getString(item.getItemMeta().displayName()));
+        boolean either = name.contains("Royal Sword") || name.contains("Captain's Cutlass");
+        if(!either) return false;
         boolean result = item.lore().size() > 1;
         if(result) updateFromLegacy(item);
         return result;
@@ -129,12 +132,14 @@ public class CrownWeapons {
 
         private CrownWeapon(ItemStack item){
             this.item = item;
-            rank = (byte) CrownUtils.romanToArabic(ChatColor.stripColor(ComponentUtils.getString(item.lore().get(0))).replaceAll("Rank ", ""));
+            List<Component> lore = Objects.requireNonNull(item.lore());
+            Byte[] loreLines = rankAndGoalLine(lore);
+            rank = (byte) CrownUtils.romanToArabic(PlainComponentSerializer.plain().serialize(lore.get(loreLines[0])).replaceAll("Rank ", ""));
 
-            Component lore5 = item.lore().get(5);
-            String parseFrom = ChatColor.stripColor(ComponentUtils.getString(lore5));
+            Component lore5 = item.lore().get(loreLines[1]);
+            String parseFrom = PlainComponentSerializer.plain().serialize(lore5).toLowerCase();
 
-            if(parseFrom.contains("Max rank.")){
+            if(parseFrom.contains("max rank")){
                 goal = -1;
                 progress = 0;
                 type = null;
@@ -150,6 +155,20 @@ public class CrownWeapons {
 
             if(mob.contains("CHARGE")) type = EntityType.AREA_EFFECT_CLOUD;
             else type = EntityType.valueOf(mob);
+        }
+
+        //first is rank, second is killed line
+        private static Byte[] rankAndGoalLine(List<Component> lore){
+            Byte[] result = new Byte[2];
+
+            for (int i = 0; i < lore.size(); i++){
+                String s = PlainComponentSerializer.plain().serialize(lore.get(i)).toLowerCase();
+
+                if(s.contains("rank ") && !s.contains("donators")) result[0] = (byte) i;
+                if(s.contains("max rank.") || s.contains("to rank up")) result[1] = (byte) i;
+            }
+
+            return result;
         }
 
         public void update(){

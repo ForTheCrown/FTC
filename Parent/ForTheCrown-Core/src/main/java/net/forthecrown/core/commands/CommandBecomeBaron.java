@@ -14,6 +14,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 
 public class CommandBecomeBaron extends CrownCommandBuilder {
     public CommandBecomeBaron() {
@@ -81,9 +82,9 @@ public class CommandBecomeBaron extends CrownCommandBuilder {
                                 return 0;
                             }
 
-                            if(bals.get(p.getBase()) < baronPrice) throw new CannotAffordTransactionException("You need at least 500,000 Rhines");
+                            if(bals.get(p.getUniqueId()) < baronPrice) throw new CannotAffordTransactionException("You need at least 500,000 Rhines");
 
-                            bals.set(p.getBase(), bals.get(p.getBase()) - baronPrice);
+                            bals.add(p.getUniqueId(), -baronPrice);
                             p.setBaron(true);
                             p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6Congratulations!&r You are now a &ebaron&r!"));
                             return 0;

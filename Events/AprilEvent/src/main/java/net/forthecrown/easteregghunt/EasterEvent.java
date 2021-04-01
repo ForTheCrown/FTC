@@ -1,5 +1,7 @@
 package net.forthecrown.easteregghunt;
 
+import net.forthecrown.core.CrownBoundingBox;
+import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.crownevents.EventTimer;
 import net.forthecrown.core.crownevents.types.CrownEvent;
@@ -16,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
@@ -30,8 +33,10 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
 
     public static final Objective CROWN = Objects.requireNonNull(Bukkit.getScoreboardManager().getMainScoreboard().getObjective("crown"));
     public static final Location EVENT_LOCATION = new Location(CrownUtils.WORLD_VOID, -623.5, 106, 266.5, 0, 0);
-    public static final Location EXIT_LOCATION = new Location(CrownUtils.WORLD_VOID, 10, 10, 10);
+    public static final Location EXIT_LOCATION = new Location(CrownUtils.WORLD_VOID, -622, 104, 273);
+    public static final CrownBoundingBox EVENT_AREA = new CrownBoundingBox(CrownUtils.WORLD_VOID, -712, 0, 186, -546, 255, 352);
     public static boolean open = true;
+    public static boolean shouldCancel = false;
 
     public EasterEntry entry;
 
@@ -47,6 +52,9 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
 
         tracker.increment(player);
         open = false;
+        initAmount = spawner.placeEggs();
+
+        shouldCancel = false;
         doEntryCountdown(player);
     }
 
@@ -98,6 +106,12 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
         secondOn = 5;
 
         loopID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> {
+            if(shouldCancel){
+                Bukkit.getScheduler().cancelTask(loopID);
+                spawner.removeAllEggs();
+                open = true;
+                return;
+            }
             final boolean shouldStart = secondOn < 1;
 
             Title title = Title.title(
@@ -108,17 +122,17 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
             player.showTitle(title);
 
             if(shouldStart){
-
                 InEventListener listener = new InEventListener();
                 entry = new EasterEntry(player, listener, new EventTimer(player, plr -> end(entry)));
                 listener.entry = entry;
                 listener.event = this;
-                entry.timer().startTickingDown(1);
 
+                entry.timer().startTickingDown(100);
                 EasterMain.inst.getServer().getPluginManager().registerEvents(entry.inEventListener(), EasterMain.inst);
 
                 player.teleport(EVENT_LOCATION);
-                initAmount = spawner.placeEggs();
+                bunnySpawnTimer();
+                EasterMain.leaderboard.update();
                 Bukkit.getScheduler().cancelTask(loopID);
                 return;
             }
@@ -127,4 +141,13 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
         }, 0, 20);
     }
 
+    private void bunnySpawnTimer(){
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Announcer.debug("bunny Spawned");
+                EasterMain.bunny.spawn();
+            }
+        }.runTaskLater(EasterMain.inst, 30*20);
+    }
 }

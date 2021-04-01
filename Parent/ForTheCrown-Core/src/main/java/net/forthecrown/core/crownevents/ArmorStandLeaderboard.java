@@ -1,20 +1,21 @@
 package net.forthecrown.core.crownevents;
 
+import net.forthecrown.core.CrownBoundingBox;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.commands.CommandHologram;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
-import net.forthecrown.core.utils.ListUtils;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnegative;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ArmorStandLeaderboard {
 
@@ -23,7 +24,6 @@ public class ArmorStandLeaderboard {
     private Map<String, Integer> list;
     private byte size;
     private final Location location;
-    private List<UUID> stands;
     private String border;
     private boolean isTimerScore;
 
@@ -33,7 +33,6 @@ public class ArmorStandLeaderboard {
      * %score for score lol
      */
     private String format;
-    private static final NamespacedKey key = new NamespacedKey(FtcCore.getInstance(), "leaderboard");
 
     public ArmorStandLeaderboard(String title, Map<String, Integer> list, Location location) {
         this.title = title;
@@ -46,16 +45,16 @@ public class ArmorStandLeaderboard {
         setFormat("%pos. %name: %score");
         setTimerScore(false);
 
-        stands = new ArrayList<>();
         FtcCore.LEADERBOARDS.add(this);
+        getLocation().getChunk().addPluginChunkTicket(FtcCore.getInstance());
     }
 
     public void update(){
-        destroy();
         create();
     }
 
     public void create(){
+        destroy();
         Location loc = getLocation().clone();
         createStand(getTitle(), loc);
         createStand(getBorder(), loc.subtract(0, 0.25, 0));
@@ -99,28 +98,22 @@ public class ArmorStandLeaderboard {
         ArmorStand stand = loc.getWorld().spawn(loc, ArmorStand.class);
         stand.customName(ComponentUtils.convertString(name));
         stand.setCustomNameVisible(true);
+        stand.setRemoveWhenFarAway(false);
         stand.setInvisible(true);
         stand.setGravity(false);
         stand.setCanMove(false);
-        stand.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
+        stand.getPersistentDataContainer().set(CommandHologram.HOLOGRAM_KEY, PersistentDataType.BYTE, (byte) 1);
 
-        stands.add(stand.getUniqueId());
     }
 
     public void destroy(){
-        if(ListUtils.isNullOrEmpty(stands)){
-            for (Entity e: getLocation().getNearbyEntitiesByType(ArmorStand.class, 7.5)){
-                if(!e.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) continue;
-                e.remove();
-            }
-        } else {
-            for (UUID id: stands){
-                try {
-                    Bukkit.getEntity(id).remove();
-                } catch (NullPointerException ignored) {}
-            }
+        Location l = getLocation().clone();
+        CrownBoundingBox area = new CrownBoundingBox(l.getWorld(), l.getX()+1, l.getY()+1, l.getZ()+1, l.getX()-1, l.getY()-(0.25*getSize()+1), l.getZ()-1);
+
+        for (ArmorStand stand : area.getEntitiesByType(ArmorStand.class)){
+            if(!stand.getPersistentDataContainer().has(CommandHologram.HOLOGRAM_KEY, PersistentDataType.BYTE)) continue;
+            stand.remove();
         }
-        stands.clear();
     }
 
     public Location getLocation() {
@@ -133,10 +126,6 @@ public class ArmorStandLeaderboard {
 
     public void setSize(@Nonnegative byte size) {
         this.size = size;
-    }
-
-    public List<UUID> getStands() {
-        return stands;
     }
 
     public String getTitle() {

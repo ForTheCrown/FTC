@@ -75,6 +75,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
         bossEntity = onSummon(context);
         bossEntity.setLootTable(LootTables.EMPTY.getLootTable());
         createBossbar(context);
+        bossBar.setProgress(1.0);
         alive = true;
     }
 
@@ -124,6 +125,10 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
         bossBar.setProgress(bossEntity.getHealth() / (bossEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
     }
 
+    public BossFightContext getContext() {
+        return context;
+    }
+
     public boolean isAlive() {
         return alive;
     }
@@ -149,11 +154,8 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
             if(!bossRoom().contains(p)) continue;
 
             if(!CrownUtils.isNullOrBlank(achievement)) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only " + achievement);
-            try {
-                p.getInventory().addItem(reward.clone());
-            } catch (Exception e){
-                bossEntity.getWorld().dropItemNaturally(bossEntity.getLocation(), reward.clone());
-            }
+            if(p.getInventory().firstEmpty() == -1) bossEntity.getWorld().dropItemNaturally(bossEntity.getLocation(), reward.clone());
+            else p.getInventory().addItem(reward.clone());
         }
     }
 

@@ -11,8 +11,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class InEventListener implements Listener {
 
-    public static CrownBoundingBox FINISH_AREA = new CrownBoundingBox(Bukkit.getWorld("world_void"), -552, 113, 462, -560, 100, 477);
-    public static CrownBoundingBox CHECKPOINT_AREA = new CrownBoundingBox(Bukkit.getWorld("world_void"), -640, 113, 534, -629, 103, 519);
+    public static CrownBoundingBox FINISH_AREA = new CrownBoundingBox(Bukkit.getWorld("world_void"), -552, 113, 462, -560, 100, 478);
+    public static CrownBoundingBox CHECKPOINT_AREA = new CrownBoundingBox(Bukkit.getWorld("world_void"), -640, 113, 547, -629, 103, 519);
     private boolean canEnd = false;
 
     private final Player player;

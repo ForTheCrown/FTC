@@ -1,5 +1,6 @@
 package net.forthecrown.royals.dungeons.bosses.mobs;
 
+import net.forthecrown.core.utils.ItemStackBuilder;
 import net.forthecrown.royals.RoyalUtils;
 import net.forthecrown.royals.Royals;
 import net.forthecrown.royals.dungeons.DungeonAreas;
@@ -29,11 +30,11 @@ public class Drawned extends DungeonBoss<Drowned> {
     public Drawned(Royals plugin) {
         super(plugin, "Drawned", new Location(DungeonAreas.WORLD, -123.5, 25.5, 38.5), (short) 300, DungeonAreas.DRAWNED_ROOM,
                 Arrays.asList(
-                        RoyalUtils.makeDungeonItem(Material.SCUTE, 1, "Turtle Artifact"),
-                        RoyalUtils.makeDungeonItem(Material.NAUTILUS_SHELL, 1, "Nautilus Artifact"),
-                        RoyalUtils.makeDungeonItem(Material.PRISMARINE_CRYSTALS, 1, "Elder Artifact"),
-                        RoyalUtils.makeDungeonItem(Material.QUARTZ, 1, "Hidden Artifact"),
-                        RoyalUtils.makeDungeonItem(Material.IRON_NUGGET, 1, "Iron Artifact")
+                        Artifacts.ELDER.item(),
+                        Artifacts.HIDDEN.item(),
+                        Artifacts.IRON.item(),
+                        Artifacts.NAUTILUS.item(),
+                        Artifacts.TURTLE.item()
                 )
         );
     }
@@ -41,15 +42,20 @@ public class Drawned extends DungeonBoss<Drowned> {
     @Override
     protected Drowned onSummon(BossFightContext context) {
         Drowned drowned = spawnLocation.getWorld().spawn(spawnLocation, Drowned.class, drawned ->{
-            drawned.getEquipment().setItemInMainHand(new ItemStack(Material.TRIDENT));
+            drawned.getEquipment().setItemInMainHand(
+                    new ItemStackBuilder(Material.TRIDENT, 1)
+                            .build()
+            );
+            drawned.getEquipment().setItemInMainHandDropChance(0);
             drawned.setAdult();
             drawned.customName(Component.text("Drawned").color(NamedTextColor.YELLOW));
             drawned.setCustomNameVisible(true);
             drawned.setRemoveWhenFarAway(false);
             drawned.setPersistent(true);
 
-            final double health = context.bossHealthMod(250);
+            final double health = context.bossHealthMod(350);
             drawned.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
+            drawned.getAttribute(Attribute.GENERIC_MAX_HEALTH).getModifiers().clear();
             drawned.setHealth(health);
 
             drawned.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(50.0);
@@ -58,7 +64,7 @@ public class Drawned extends DungeonBoss<Drowned> {
         });
 
         for (int i = 0; i < 3; i++){
-            spawnGuardian(drowned.getLocation());
+            spawnGuardian(drowned.getLocation(), false);
         }
 
         return drowned;
@@ -81,7 +87,7 @@ public class Drawned extends DungeonBoss<Drowned> {
         bossEntity.setGlowing(true);
 
         for (int i = 0; i < 3; i++){
-            spawnGuardian(bossEntity.getLocation());
+            spawnGuardian(bossEntity.getLocation(), true);
         }
 
         bossEntity.getWorld().strikeLightningEffect(bossEntity.getLocation());
@@ -96,10 +102,10 @@ public class Drawned extends DungeonBoss<Drowned> {
 
     }
 
-    private void spawnGuardian(Location location){
+    private void spawnGuardian(Location location, boolean invulnerable){
         location.getWorld().spawn(location, Guardian.class, guardian -> {
-            guardian.setInvulnerable(true);
-            guardian.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(10.0 + context.finalModifier());
+            guardian.setInvulnerable(invulnerable);
+            guardian.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(context.bossHealthMod(10));
             guardian.setLootTable(LootTables.EMPTY.getLootTable());
             guardians.add(guardian);
         });
@@ -118,5 +124,22 @@ public class Drawned extends DungeonBoss<Drowned> {
     public void onEntityDeath(EntityDeathEvent event) {
         if(!guardians.contains(event.getEntity())) return;
         guardians.remove(event.getEntity());
+    }
+
+    public enum Artifacts{
+        IRON (RoyalUtils.makeDungeonItem(Material.IRON_NUGGET, 1, "Iron Artifact")),
+        ELDER (RoyalUtils.makeDungeonItem(Material.PRISMARINE_CRYSTALS, 1, "Elder Artifact")),
+        TURTLE (RoyalUtils.makeDungeonItem(Material.SCUTE, 1, "Turtle Artifact")),
+        NAUTILUS (RoyalUtils.makeDungeonItem(Material.NAUTILUS_SHELL, 1, "Nautilus Artifact")),
+        HIDDEN (RoyalUtils.makeDungeonItem(Material.QUARTZ, 1, "Hidden Artifact"));
+
+        private final ItemStack item;
+        Artifacts(ItemStack itemStack){
+            this.item = itemStack;
+        }
+
+        public ItemStack item() {
+            return item.clone();
+        }
     }
 }

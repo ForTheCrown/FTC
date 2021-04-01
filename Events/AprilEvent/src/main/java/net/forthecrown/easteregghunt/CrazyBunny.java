@@ -3,7 +3,7 @@ package net.forthecrown.easteregghunt;
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import org.apache.commons.lang.math.RandomUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,15 +22,17 @@ public class CrazyBunny {
 
     private boolean alive;
     private Zombie entity;
+    public static final Location SPAWN_LOCATION = new Location(CrownUtils.WORLD_VOID, -656.5, 84, 269);
 
-    public void spawn(Location location){
-        entity = location.getWorld().spawn(getFreeLocation(location), Zombie.class, zomzom -> {
+    public void spawn(){
+        entity = SPAWN_LOCATION.getWorld().spawn(SPAWN_LOCATION, Zombie.class, zomzom -> {
            zomzom.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.5);
            zomzom.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 1000000, 2, false, false, false));
 
            double health = 500;
            zomzom.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
            zomzom.setHealth(health);
+           zomzom.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(15);
 
             EntityEquipment equipment = zomzom.getEquipment();
             equipment.setHelmet(headItem());
@@ -38,22 +40,14 @@ public class CrazyBunny {
             equipment.setLeggings(makeWhiteLeather(Material.LEATHER_LEGGINGS));
             equipment.setBoots(makeWhiteLeather(Material.LEATHER_BOOTS));
 
+            equipment.setBootsDropChance(0);
+            equipment.setHelmetDropChance(0);
+            equipment.setChestplateDropChance(0);
+            equipment.setLeggingsDropChance(0);
+
             zomzom.setBaby();
         });
         alive = true;
-    }
-
-    private Location getFreeLocation(Location banned){
-        Location toSpawnAt = EasterMain.eggSpawns.get(RandomUtils.nextInt(EasterMain.eggSpawns.size()));
-        short safeGuard = 300;
-        if(banned != null){
-            while (banned.distance(toSpawnAt) < 20) {
-                toSpawnAt = EasterMain.eggSpawns.get(RandomUtils.nextInt(EasterMain.eggSpawns.size()));
-                safeGuard--;
-                if(safeGuard <= 0) return null;
-            }
-        }
-        return toSpawnAt;
     }
 
     private ItemStack makeWhiteLeather(Material material){

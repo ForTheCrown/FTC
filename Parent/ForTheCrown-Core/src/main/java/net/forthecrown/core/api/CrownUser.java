@@ -42,7 +42,9 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
      * @return the User's UUID
      */
     @Deprecated
-    UUID getBase();
+    default UUID getBase(){
+        return getUniqueId();
+    }
 
     /**
      * Gets the user's UUID
@@ -87,6 +89,8 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
      * @param rank The rank to give
      */
     void addRank(Rank rank);
+
+    void addRank(Rank rank, boolean givePermission);
 
     /**
      * Removes a rank from the user
@@ -383,7 +387,7 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
     void clearTabPrefix();
 
     /**
-     * Sends the user a message, works just like the sendMessage in Player, but it also translates hexcodes and & chars as color codes
+     * Sends the user a message, works just like the sendMessage in Player, but it also translates hexcodes and '&amp;' chars as color codes
      * @param message The message to send to the user
      */
     void sendMessage(@Nonnull String message);
@@ -434,13 +438,6 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
      * @param king Whether the user is to be king
      */
     void setKing(boolean king);
-
-    /**
-     * Makes the user perform a command. Be careful, the command sender will be CrownUser and not Player
-     * <p>If you want to make the player tied to the user perform the command, use: getPlayer().performCommand()</p>
-     * @param command The command to perform
-     */
-    void performCommand(String command);
 
     /**
      * Sends an array of messages to the user

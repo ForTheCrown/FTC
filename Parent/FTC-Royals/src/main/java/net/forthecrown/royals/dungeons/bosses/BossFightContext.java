@@ -1,24 +1,28 @@
 package net.forthecrown.royals.dungeons.bosses;
 
-import com.google.common.collect.ImmutableList;
 import net.forthecrown.royals.dungeons.bosses.mobs.DungeonBoss;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 public class BossFightContext {
 
-    private final ImmutableList<Player> players;
+    private final Collection<Player> players;
     private final float finalModifier;
 
     //+1 per each in player's inv
     private int enchants = 0;
     private int armorAmount = 0;
+    //private int itemAmount = 0;
 
     public BossFightContext(DungeonBoss<?> boss){
-        this.players = ImmutableList.copyOf(boss.bossRoom().getPlayers());
+        players = boss.bossRoom().getPlayers().stream().filter(plr -> plr.getGameMode() == GameMode.SURVIVAL).collect(Collectors.toList());
 
         calculateBase();
-        float initialMod = Math.max(1, (float) (enchants + armorAmount + players.size())/7);
+        float initialMod = Math.max(1, (float) (enchants + armorAmount + players.size())/20);
         finalModifier = Math.min(initialMod, 5);
     }
 
@@ -38,8 +42,19 @@ public class BossFightContext {
                     case NETHERITE_SWORD:
                     case DIAMOND_AXE:
                     case NETHERITE_AXE:
+                    case TOTEM_OF_UNDYING:
                     case CROSSBOW:
+                    case NETHERITE_BOOTS:
+                    case NETHERITE_CHESTPLATE:
+                    case NETHERITE_LEGGINGS:
+                    case NETHERITE_HELMET:
+                    case DIAMOND_BOOTS:
+                    case DIAMOND_CHESTPLATE:
+                    case DIAMOND_LEGGINGS:
+                    case DIAMOND_HELMET:
+                    case GOLDEN_SWORD:
                     case BOW:
+                        //itemAmount++;
                         enchants += s.getEnchantments().size();
                 }
             }
@@ -54,7 +69,7 @@ public class BossFightContext {
         return armorAmount;
     }
 
-    public ImmutableList<Player> players() {
+    public Collection<Player> players() {
         return players;
     }
 
@@ -62,7 +77,15 @@ public class BossFightContext {
         return finalModifier;
     }
 
+    /*public int itemAmount() {
+        return itemAmount;
+    }*/
+
     public double bossHealthMod(double initialHealth){
         return Math.ceil(initialHealth * finalModifier);
+    }
+
+    public double bossDamageMod(double initialDamage){
+        return Math.ceil(initialDamage + finalModifier);
     }
 }

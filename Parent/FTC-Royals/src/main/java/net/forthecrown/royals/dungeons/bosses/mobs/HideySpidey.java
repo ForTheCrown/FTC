@@ -7,6 +7,7 @@ import net.forthecrown.royals.Royals;
 import net.forthecrown.royals.dungeons.DungeonAreas;
 import net.forthecrown.royals.dungeons.bosses.BossFightContext;
 import net.forthecrown.royals.dungeons.bosses.BossItems;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -34,9 +35,9 @@ public class HideySpidey extends DungeonBoss<Spider> {
     public HideySpidey(Royals plugin) {
         super(plugin, "Hidey Spidey", new Location(DungeonAreas.WORLD, -78.5, 55, 284.5), (short) 20, DungeonAreas.SPIDEY_ROOM,
                 Arrays.asList(
-                        RoyalUtils.makeDungeonItem(Material.SPIDER_EYE, 45, null),
-                        RoyalUtils.makeDungeonItem(Material.FERMENTED_SPIDER_EYE, 20, null),
-                        RoyalUtils.makeDungeonItem(Material.STRING, 30, null),
+                        RoyalUtils.makeDungeonItem(Material.SPIDER_EYE, 45, (Component) null),
+                        RoyalUtils.makeDungeonItem(Material.FERMENTED_SPIDER_EYE, 20, (Component) null),
+                        RoyalUtils.makeDungeonItem(Material.STRING, 30, (Component) null),
                         new ItemStackBuilder(Material.TIPPED_ARROW, 5)
                                 .setBaseEffect(new PotionData(PotionType.POISON))
                                 .addLore(RoyalUtils.DUNGEON_LORE)
@@ -59,7 +60,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
 
             spidey.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(25);
             spidey.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
-            spidey.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(11 + context.finalModifier());
+            spidey.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(context.bossHealthMod(11));
             spidey.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.28 + (context.finalModifier()/20));
 
             Pathfinder pathfinder = spidey.getPathfinder();
@@ -72,7 +73,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
         return spider;
     }
 
-    byte tillSpawn = 5;
+    byte tillSpawn = 7;
     @Override
     protected void onUpdate() {
         for (CaveSpider s: helpers){
@@ -82,8 +83,16 @@ public class HideySpidey extends DungeonBoss<Spider> {
         }
         tillSpawn--;
         if(tillSpawn == 0){
-            spawnHelper(random.nextInt(100) < 50 ? SpawnPart.WEST : SpawnPart.EAST);
+            if(helpers.size() < 11) spawnHelper(random.nextInt(100) < 50 ? SpawnPart.WEST : SpawnPart.EAST);
             tillSpawn = 5;
+        }
+
+        if(!bossEntity.isOnGround()){
+            Vector pos = bossEntity.getLocation().clone().toVector();
+            Vector target = spawnLocation.clone().add(0, 2, 0).toVector();
+            Vector velocity = target.subtract(pos);
+            velocity = velocity.normalize().multiply(0.25);
+            bossEntity.setVelocity(velocity);
         }
     }
 
@@ -113,7 +122,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
             double health = context.finalModifier() + 12;
             caveSpider.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
             caveSpider.setHealth(health);
-            caveSpider.setLootTable(null);
+            caveSpider.setLootTable(LootTables.EMPTY.getLootTable());
             caveSpider.getPathfinder().findPath(part.trackLocation);
             caveSpider.getPathfinder().moveTo(part.trackLocation);
             caveSpider.setLootTable(LootTables.EMPTY.getLootTable());

@@ -47,7 +47,7 @@ public class InEventListener implements Listener {
         CrazyBunny bunny = EasterMain.bunny;
         if(bunny.isAlive()) return;
 
-        bunny.spawn(player.getLocation());
+        bunny.spawn();
         player.sendMessage(ChatColor.GRAY + "The easter bunny has spawned!");
     }
 
@@ -75,7 +75,6 @@ public class InEventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
         if(!event.getEntity().equals(EasterMain.bunny.getEntity())) return;
-        event.getDrops().clear();
         if(event.getEntity().getKiller() == null) return;
         entry.player().sendMessage(ComponentUtils.convertString("&7You received &e100 points&7 for killing the Bunny!"));
         Score score = EasterEvent.CROWN.getScore(entry.player().getName());

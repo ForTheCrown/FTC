@@ -17,9 +17,11 @@ import java.time.Duration;
 public class EventStarter {
 
     private final SprintEvent event;
+    private final byte row;
 
-    public EventStarter(Player player, int path, SprintEvent event){
+    public EventStarter(Player player, byte path, SprintEvent event){
         this.event = event;
+        this.row = path;
 
         player.getActivePotionEffects().clear();
         player.getInventory().clear();
@@ -28,7 +30,7 @@ public class EventStarter {
 
     int loopID = 0;
     int secondOn = 5;
-    private void countdown(Player player, int path){
+    private void countdown(Player player, byte path){
         secondOn = 5;
         loopID = Bukkit.getScheduler().scheduleSyncRepeatingTask(SprintMain.plugin, () -> {
             Title title = Title.title(
@@ -42,7 +44,7 @@ public class EventStarter {
                 player.setWalkSpeed(0.2F);//Set back to default
                 player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.MASTER, 2.0f, 1.2f);
 
-                EventTimer timer = new EventTimer(player, plr -> {
+                EventTimer timer = new EventTimer(player, "&7Timer:&e %s", plr -> {
                     plr.sendMessage("Too slow :p");
                     event.end(SprintEvent.PARTICIPANTS.get(player));
                 });
@@ -51,7 +53,7 @@ public class EventStarter {
                 SprintEvent.AVAILABLE_ROWS.set(path, false);
                 inEventListener.entry = entry;
 
-                event.setBarrierWall(Material.AIR);
+                event.setBarrierWall(Material.AIR, path);
 
                 timer.start(5);
                 SprintEvent.PARTICIPANTS.put(player, entry);

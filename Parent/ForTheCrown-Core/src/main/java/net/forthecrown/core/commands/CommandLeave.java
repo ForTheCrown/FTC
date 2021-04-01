@@ -4,15 +4,17 @@ import net.forthecrown.core.CrownBoundingBox;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.core.utils.Pair;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class CommandLeave extends CrownCommandBuilder {
 
-    private final static Map<CrownBoundingBox, Location> ALLOWED_USAGE_AREAS = new HashMap<>();
+    private final static Map<CrownBoundingBox, Pair<Location, Function<Player, Boolean>>> ALLOWED_USAGE_AREAS = new HashMap<>();
 
     public CommandLeave(){
         super("leave", FtcCore.getInstance());
@@ -28,14 +30,15 @@ public class CommandLeave extends CrownCommandBuilder {
             for (CrownBoundingBox b: ALLOWED_USAGE_AREAS.keySet()){
                 if(!b.contains(player.getLocation())) continue;
 
-                player.teleport(ALLOWED_USAGE_AREAS.get(b));
+                Pair<Location, Function<Player, Boolean>> par = ALLOWED_USAGE_AREAS.get(b);
+                if(par.getSecond().apply(player)) player.teleport(par.getFirst());
             }
             return 0;
         });
     }
 
-    public static void addAllowedArea(CrownBoundingBox box, Location exitLocation){
-        ALLOWED_USAGE_AREAS.put(box, exitLocation);
+    public static void addAllowedArea(CrownBoundingBox box, Location exitLocation, Function<Player, Boolean> onExit){
+        ALLOWED_USAGE_AREAS.put(box, new Pair<>(exitLocation, onExit));
     }
 
     public static void removeAllowedArea(CrownBoundingBox box){

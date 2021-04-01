@@ -1,5 +1,6 @@
 package net.forthecrown.easteregghunt;
 
+import net.forthecrown.core.commands.CommandLeave;
 import net.forthecrown.core.crownevents.ObjectiveLeaderboard;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.easteregghunt.commands.CommandEasterEgg;
@@ -34,10 +35,20 @@ public final class EasterMain extends JavaPlugin {
         //command
         new CommandEasterEgg();
 
+
         tracker = new UserTracker();
         bunny = new CrazyBunny();
         spawner = new EggSpawner();
         event = new EasterEvent(this, spawner);
+
+        CommandLeave.addAllowedArea(EasterEvent.EVENT_AREA, EasterEvent.EXIT_LOCATION, player -> {
+            EasterEvent.shouldCancel = true;
+            if(event.entry == null) return false;
+            if(!event.entry.player().equals(player)) return false;
+            event.end(event.entry);
+            return true;
+        });
+
         createLeaderboard();
     }
 

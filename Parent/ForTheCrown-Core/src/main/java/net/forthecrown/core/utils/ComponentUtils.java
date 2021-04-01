@@ -6,6 +6,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IChatMutableComponent;
@@ -41,6 +42,10 @@ public final class ComponentUtils {
 
     public static IChatBaseComponent stringToVanilla(String text){
         return stringToVanilla(text, true);
+    }
+
+    public static String plainText(Component component){
+        return PlainComponentSerializer.plain().serialize(component);
     }
 
     public static String getString(Component tex){

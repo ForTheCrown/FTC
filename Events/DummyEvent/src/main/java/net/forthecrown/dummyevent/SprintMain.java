@@ -1,5 +1,6 @@
 package net.forthecrown.dummyevent;
 
+import net.forthecrown.core.commands.CommandLeave;
 import net.forthecrown.core.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.core.crownevents.ObjectiveLeaderboard;
 import net.forthecrown.dummyevent.commands.CommandSprint;
@@ -21,6 +22,11 @@ public final class SprintMain extends JavaPlugin {
         event = new SprintEvent();
         new CommandSprint();
         createLeaderboard();
+
+        CommandLeave.addAllowedArea(SprintEvent.RACE_AREA, SprintEvent.EXIT_LOCATION, player -> {
+            if(!event.isInEvent(player)) return;
+            event.endAndRemove(SprintEvent.PARTICIPANTS.get(player));
+        });
 
         getServer().getPluginManager().registerEvents(new EventListener(), this);
     }

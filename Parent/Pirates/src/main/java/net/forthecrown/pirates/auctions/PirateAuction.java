@@ -341,10 +341,11 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
         if(bids == null) bids = new HashMap<>();
 
+        final int originalValue = value;
         if(bids.containsKey(user.getUniqueId())) value = value - bids.get(user.getUniqueId());
         FtcCore.getBalances().add(user.getUniqueId(), -value);
 
-        bids.put(user.getUniqueId(), value);
+        bids.put(user.getUniqueId(), originalValue);
     }
 
     //true if not expired, false if expired

@@ -1,25 +1,24 @@
 package net.forthecrown.royals;
 
 import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.royals.dungeons.bosses.mobs.DungeonBoss;
+import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Husk;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class RoyalUtils {
@@ -27,11 +26,12 @@ public class RoyalUtils {
     public static final NamespacedKey PUNCHING_BAG_KEY = new NamespacedKey(Royals.inst, "dummy");
     public static final Component DUNGEON_LORE = Component.text("Dungeon Item");
 
-    public static ItemStack makeDungeonItem(Material material, int amount, @Nullable String name){
-        return CrownItems.makeItem(material, amount, false,
-                CrownUtils.isNullOrBlank(name) ? null : ComponentUtils.convertString(name).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE),
-                DUNGEON_LORE
-        );
+    public static ItemStack makeDungeonItem(Material material, int amount, @Nullable String name) {
+        return makeDungeonItem(material, amount, name == null ? null : Component.text(name).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE));
+    }
+
+    public static ItemStack makeDungeonItem(Material material, int amount, @Nullable Component name){
+        return CrownItems.makeItem(material, amount, false, name, DUNGEON_LORE);
     }
 
     public static TextComponent itemRequiredMessage(DungeonBoss<?> boss){
@@ -58,6 +58,12 @@ public class RoyalUtils {
             if(p.equals(result)) continue;
             if(p.getGameMode() == GameMode.SPECTATOR || p.getGameMode() == GameMode.CREATIVE) continue;
 
+            Vector pos = location.toVector();
+            Vector target = p.getLocation().toVector();
+            Vector trace = target.subtract(pos);
+            RayTraceResult resultRay = location.getWorld().rayTraceBlocks(location.clone(), trace, 25, FluidCollisionMode.NEVER, false);
+            if(resultRay == null) continue;
+
             double distance = p.getLocation().distance(location);
             if(distance < lastDistance){
                 lastDistance = distance;
@@ -81,7 +87,7 @@ public class RoyalUtils {
     }
 
     public static void spawnDummy(Location location){
-        location.getWorld().spawn(location, Zombie.class, zomzom -> {
+        location.getWorld().spawn(location, Husk.class, zomzom -> {
             zomzom.getEquipment().setHelmet(new ItemStack(Material.HAY_BLOCK));
             zomzom.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
             zomzom.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
@@ -89,7 +95,13 @@ public class RoyalUtils {
 
             zomzom.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(200);
             zomzom.setAI(false);
+            zomzom.stopSound(SoundStop.all());
             zomzom.setGravity(false);
+
+            zomzom.setCustomNameVisible(true);
+            zomzom.customName(Component.text("Hit Me!").color(NamedTextColor.GOLD));
+
+            zomzom.setPersistent(true);
             zomzom.setCanPickupItems(false);
             zomzom.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
             zomzom.getPersistentDataContainer().set(PUNCHING_BAG_KEY, PersistentDataType.BYTE, (byte) 1);

@@ -1,6 +1,7 @@
 package net.forthecrown.vikings;
 
 import net.forthecrown.core.utils.ComponentUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,7 +14,7 @@ public class VikingListener implements Listener {
         if(!(event.getRightClicked() instanceof Villager)) return;
         if(event.getRightClicked().customName() == null) return;
 
-        String name = ComponentUtils.getString(event.getRightClicked().customName());
+        String name = ChatColor.stripColor(ComponentUtils.getString(event.getRightClicked().customName()));
 
         switch (name){
             case "Brynjulf": //info dud

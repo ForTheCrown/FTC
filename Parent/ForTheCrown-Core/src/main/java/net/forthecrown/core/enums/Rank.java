@@ -67,6 +67,10 @@ public enum Rank {
         return rankBranch;
     }
 
+    public String getLpRank() {
+        return lpRank;
+    }
+
     public static List<Rank> freeRanks(){
         return Arrays.asList(Rank.KNIGHT, Rank.BARON, Rank.BARONESS, Rank.SAILOR, Rank.PIRATE, Rank.VIKING, Rank.BERSERKER);
     }

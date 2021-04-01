@@ -9,12 +9,15 @@ import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.utils.Cooldown;
 import net.forthecrown.core.utils.CrownItems;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.ItemStackBuilder;
 import net.forthecrown.royals.RoyalUtils;
 import net.forthecrown.royals.Royals;
 import net.forthecrown.royals.dungeons.bosses.BossItems;
 import net.forthecrown.royals.dungeons.bosses.Bosses;
+import net.forthecrown.royals.dungeons.bosses.mobs.Drawned;
 import net.forthecrown.royals.dungeons.bosses.mobs.Skalatan;
+import net.forthecrown.royals.dungeons.bosses.mobs.Zhambie;
 import net.forthecrown.royals.enchantments.CrownEnchant;
 import net.forthecrown.royals.enchantments.RoyalEnchants;
 import net.kyori.adventure.text.Component;
@@ -38,6 +41,8 @@ import org.bukkit.loot.LootTables;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.Bukkit.getServer;
@@ -55,16 +60,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if(event.getEntity().getPersistentDataContainer().has(RoyalUtils.PUNCHING_BAG_KEY, PersistentDataType.BYTE)) {
-            Component name = Component.text("Damage: " + String.format("%.1f", event.getDamage())).color(NamedTextColor.RED);
-
-            Zombie dummy = (Zombie) event.getEntity();
-            dummy.customName(name);
-
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> dummy.setHealth(200), 5L);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                dummy.customName(Component.text("Hit Me!").color(NamedTextColor.GOLD));
-                dummy.setHealth(200);
-            }, 100L);
+            hitDummy((Zombie) event.getEntity(), event.getDamage());
             return;
         }
         if(event.getEntity() instanceof WitherSkeleton && event.getEntity().getCustomName().contains("Josh") && DungeonAreas.DUNGEON_AREA.contains(event.getEntity())){
@@ -75,6 +71,20 @@ public class DungeonEvents implements Listener, ClickEventTask {
             item.setAmount(1);
             skeleton.getWorld().dropItemNaturally(skeleton.getLocation(), item);
         }
+    }
+
+    private final Map<Zombie, Integer> hit = new HashMap<>();
+    private void hitDummy(Zombie dummy, double damage){
+        Component name = Component.text("Damage: " + String.format("%.1f",damage)).color(NamedTextColor.RED);
+        dummy.customName(name);
+        dummy.setHealth(200);
+
+        //I've done it, the interruptable cooldown
+        if(hit.get(dummy) != null) Bukkit.getScheduler().cancelTask(hit.get(dummy));
+        hit.put(dummy, Bukkit.getScheduler().scheduleSyncDelayedTask(Royals.inst, () -> {
+            dummy.customName(Component.text("Hit Me!").color(NamedTextColor.GOLD));
+            hit.put(dummy, null);
+        }, 100));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -114,12 +124,33 @@ public class DungeonEvents implements Listener, ClickEventTask {
         Player player = event.getPlayer();
         String name = ChatColor.stripColor(slime.getCustomName());
 
+        //Interaction cooldown
         if(Cooldown.contains(player)) return;
         Cooldown.add(player, 20);
 
+        //Boss spawning
         if(name.contains("Spawn ")){
             Bosses.BY_NAME.get(name.replaceAll("Spawn ", "").trim()).attemptSpawn(player);
             return;
+        }
+
+        //Level 4 artifactss
+        if(name.contains("Artifact")){
+            //Essentials kit signs can suck my [REDACTED]
+            Drawned.Artifacts artifacts = Drawned.Artifacts.valueOf(name.substring(0, name.indexOf(" ")).toUpperCase());
+            if(Cooldown.contains(player, "dungeons_" + artifacts.toString().toLowerCase() + "_artifact")) return;
+            Cooldown.add(player, "dungeons_" + artifacts.toString().toLowerCase() + "_artifact", 5*60*20);
+            player.getInventory().addItem(artifacts.item());
+            player.sendMessage(
+                    Component.text("You got the ")
+                    .color(NamedTextColor.GRAY)
+                    .append(slime.customName().color(NamedTextColor.YELLOW))
+            );
+            return;
+
+            //Hidden -> -171.5 42, 84.5
+            //Nautilus -> -105.5 45 126.5
+            //Iron -> -110.5 46 140.5
         }
 
         switch (name){
@@ -150,9 +181,16 @@ public class DungeonEvents implements Listener, ClickEventTask {
             case "Spider Level Info":
                 player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.hideySpidey()));
                 break;
+            case "Hidden Mummy Ingot":
+                if(Cooldown.contains(player, "Dungeons_Mummy_Ingot")) return;
+                player.sendMessage(CrownUtils.translateHexCodes("&7You got the &eHidden Mummy Ingot"));
+                player.getInventory().addItem(Zhambie.mummyIngot());
+                Cooldown.add(player, "Dungeons_Mummy_Ingot", 5*20*60);
+                break;
         }
     }
 
+    //Diego clickable text code
     @Override
     public void run(Player player, String[] args) {
         PlayerInventory inv = player.getInventory();
@@ -183,8 +221,8 @@ public class DungeonEvents implements Listener, ClickEventTask {
         } else  if(args[1].contains("trident")){
             if(!inv.contains(BossItems.DRAWNED.item())) throw new CrownException(player, "You need to have the Drawned apple to get the Dolphin Swimmer Trident");
             ItemStack toGive = FORK.clone();
-            inv.addItem(toGive);
             inv.removeItemAnySlot(BossItems.DRAWNED.item());
+            inv.addItem(toGive);
         }
     }
 
@@ -207,7 +245,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
                 else item.setAmount(ThreadLocalRandom.current().nextInt(0, item.getAmount()+1));
             }
         }
-        if (found) event.getEntity().sendMessage(org.bukkit.ChatColor.RED + "[FTC] " + org.bukkit.ChatColor.WHITE + "You lost a random amount of your Dungeon Items...");
+        if (found) event.getEntity().sendMessage(ChatColor.RED + "[FTC] " + ChatColor.WHITE + "You lost a random amount of your Dungeon Items...");
     }
 
     @EventHandler(ignoreCancelled = true)

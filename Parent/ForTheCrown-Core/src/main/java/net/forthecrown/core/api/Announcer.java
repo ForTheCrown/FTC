@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -115,4 +116,13 @@ public interface Announcer extends CrownSerializer<FtcCore> {
      * @param permission
      */
     void announce(String message, @Nullable String permission);
+
+    //Hacky way of determining if we're on the test server or not
+    boolean debugEnvironment = !new File("plugins/CoreProtect/config.yml").exists();
+
+    static void debug(Object message){
+        String string_message = message == null ? "null" : message.toString();
+        if(debugEnvironment) acLiteral(string_message);
+        log(Level.INFO, string_message);
+    }
 }

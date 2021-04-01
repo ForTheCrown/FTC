@@ -1,6 +1,7 @@
 package net.forthecrown.cosmetics;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -12,7 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 public class PlayerRider implements Listener {
@@ -54,13 +54,8 @@ public class PlayerRider implements Listener {
         ridden.eject();
         seat.remove();
 
-        new BukkitRunnable(){
-            public void run(){
-                preventBadLocation();
-            }
-        }.runTaskLater(main, 5);
-
         HandlerList.unregisterAll(this);
+        Bukkit.getScheduler().runTaskLater(Cosmetics.plugin, this::preventBadLocation, 5);
         Cosmetics.getRider().riders.remove(this);
     }
 
@@ -86,6 +81,8 @@ public class PlayerRider implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDismount(EntityDismountEvent event) {
         checkSeat(event.getDismounted());
+        checkSeat(event.getEntity());
+        playerCheck(event.getDismounted());
         playerCheck(event.getEntity());
     }
 

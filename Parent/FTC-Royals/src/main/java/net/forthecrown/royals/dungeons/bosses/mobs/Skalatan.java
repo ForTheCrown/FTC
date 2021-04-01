@@ -53,6 +53,7 @@ public class Skalatan extends DungeonBoss<WitherSkeleton> {
             skalatan.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1.0F);
             skalatan.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(10.0);
             skalatan.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.305F);;
+            skalatan.getEquipment().setItemInMainHandDropChance(0);
 
             attackState = AttackState.MELEE;
             skalatan.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 999999, 1, false, false));

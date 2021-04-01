@@ -1,7 +1,9 @@
 package net.forthecrown.pirates;
 
+import net.forthecrown.core.CrownBoundingBox;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.commands.CommandLeave;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.pirates.auctions.Auction;
@@ -67,9 +69,17 @@ public final class Pirates extends JavaPlugin implements Listener {
         new CommandGhTarget();
         new CommandGhShowName();
         new CommandParrot();
-        new CommandLeave();
         new CommandUpdateLeaderboard();
         new CommandPirateReload();
+
+        CommandLeave.addAllowedArea(
+                new CrownBoundingBox(CrownUtils.WORLD_VOID, -5685, 1, -521, -886, 255, 95),
+                new Location(CrownUtils.WORLD_VOID, -800.5, 232, 11.5, -90, 0),
+                plr -> {
+                    plr.getInventory().clear();
+                    return true;
+                }
+        );
 
         //events
         getServer().getPluginManager().registerEvents(events, this);
@@ -82,8 +92,7 @@ public final class Pirates extends JavaPlugin implements Listener {
     @SuppressWarnings("deprecation")
     public void onDisable() {
         List<String> players = new ArrayList<>();
-        for (UUID playeruuid : events.parrots.values())
-        {
+        for (UUID playeruuid : events.parrots.values()) {
             try { // Online while reload
                 Bukkit.getPlayer(playeruuid).setShoulderEntityLeft(null);
             }

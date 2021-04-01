@@ -44,7 +44,7 @@ public final class RoyalBrigadier {
         new CommandProfile();
         new CommandRank();
         new CommandGrave();
-        //new CommandLeave();
+        new CommandLeave();
 
         //economy commands
         new CommandShop();

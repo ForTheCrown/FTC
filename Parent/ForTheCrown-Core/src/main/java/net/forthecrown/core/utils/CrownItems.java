@@ -130,7 +130,9 @@ public final class CrownItems {
 
     private static boolean isLegacyItem(ItemStack itemStack){
         ItemMeta meta = itemStack.getItemMeta();
-        boolean result = meta.lore().size() > 1 && ChatColor.stripColor(meta.getDisplayName()).contains("-Crown-");
+        if(meta == null) return false;
+        if(meta.lore() == null) return false;
+        boolean result =  meta.lore().size() > 1 && ChatColor.stripColor(meta.getDisplayName()).contains("-Crown-");
         if(result){
             meta.getPersistentDataContainer().set(ITEM_KEY, PersistentDataType.BYTE, (byte) 1);
             itemStack.setItemMeta(meta);

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public final class CrownUtils {
 
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("CET");
-    public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 1000, 70, 200);
+    public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 1000.5, 70, 200.5);
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
     private static final DecimalFormat DECIMAL_FORMAT;
 
