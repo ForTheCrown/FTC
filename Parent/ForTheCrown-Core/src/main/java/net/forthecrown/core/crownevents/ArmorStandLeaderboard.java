@@ -101,9 +101,9 @@ public class ArmorStandLeaderboard {
         stand.setRemoveWhenFarAway(false);
         stand.setInvisible(true);
         stand.setGravity(false);
+        stand.setInvulnerable(true);
         stand.setCanMove(false);
         stand.getPersistentDataContainer().set(CommandHologram.HOLOGRAM_KEY, PersistentDataType.BYTE, (byte) 1);
-
     }
 
     public void destroy(){

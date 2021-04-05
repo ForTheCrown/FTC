@@ -5,7 +5,10 @@ import net.forthecrown.core.clickevent.ClickEventCommand;
 import net.forthecrown.core.commands.*;
 import net.forthecrown.core.commands.emotes.*;
 import net.minecraft.server.v1_16_R3.CommandDispatcher;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 
 //cool name lul
 
@@ -38,6 +41,7 @@ public final class RoyalBrigadier {
         new CommandStaffChatToggle();
         new CommandHologram();
         new CommandTestCore();
+        new CommandComVar();
 
         //utility / misc commands
         new CommandGems();
@@ -79,6 +83,17 @@ public final class RoyalBrigadier {
         new EmoteJingle();
         new EmoteHug();
         new EmotePog();
+    }
+
+    public void resendCommandPackets(Player p){
+        CraftPlayer player = (CraftPlayer) p;
+        getDispatcher().a(player.getHandle());
+    }
+
+    public void resendAllCommandPackets(){
+        for (Player p: Bukkit.getOnlinePlayers()){
+            resendCommandPackets(p);
+        }
     }
 
     public static CommandDispatcher getDispatcher() {

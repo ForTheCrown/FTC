@@ -1,6 +1,7 @@
 package net.forthecrown.core;
 
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
@@ -23,7 +24,7 @@ public class StaffChat {
         TextComponent senderText = Component.text(sender.getName()).color(NamedTextColor.GRAY);
         if(sender instanceof Player || sender instanceof CrownUser){
             //Sender is player, make text hover event
-            CrownUser user = FtcCore.getUser(sender.getName());
+            CrownUser user = UserManager.getUser(sender.getName());
             senderText = senderText
                     .hoverEvent(user.asHoverEvent())
                     .clickEvent(ClickEvent.suggestCommand("/w " + user.getName()));

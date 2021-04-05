@@ -1,5 +1,7 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.ShopManager;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.Cooldown;
 import net.forthecrown.core.FtcCore;
@@ -40,7 +42,7 @@ public class ShopInteractEvent implements Listener {
 
         Cooldown.add(event.getPlayer(), 6);
 
-        SignShop shop = FtcCore.getShop(event.getClickedBlock().getLocation());
+        SignShop shop = ShopManager.getShop(event.getClickedBlock().getLocation());
         if(shop == null) return;
 
         Player player = event.getPlayer();
@@ -58,7 +60,7 @@ public class ShopInteractEvent implements Listener {
             return;
         }
 
-        FtcCore.getInstance().getServer().getPluginManager().callEvent(new SignShopUseEvent(shop, FtcCore.getUser(player), player, FtcCore.getBalances()));
+        FtcCore.getInstance().getServer().getPluginManager().callEvent(new SignShopUseEvent(shop, UserManager.getUser(player), player, FtcCore.getBalances()));
     }
 
     public class SignShopInteractSubClass implements Listener {

@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -18,12 +19,11 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public final class RandomFeatures extends JavaPlugin {
 
     public static RandomFeatures instance;
-    public Map<UUID, Component> withSetNames = new HashMap<>();
+    public Map<LivingEntity, Component> withSetNames = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -40,8 +40,8 @@ public final class RandomFeatures extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        for(UUID uuid: withSetNames.keySet()){
-            Bukkit.getEntity(uuid).customName(withSetNames.getOrDefault(uuid, null));
+        for(LivingEntity e: withSetNames.keySet()){
+            e.customName(withSetNames.getOrDefault(e, null));
         }
     }
 

@@ -3,6 +3,7 @@ package net.forthecrown.pirates;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.inventories.CustomInventoryHolder;
 import net.forthecrown.core.utils.Cooldown;
 import net.kyori.adventure.text.Component;
@@ -63,11 +64,11 @@ public class GrapplingHook implements Listener {
 
         for (String s: keys){
             UUID id = UUID.fromString(s);
-            CrownUser user = FtcCore.getUser(id);
+            CrownUser user = UserManager.getUser(id);
 
-            ConfigurationSection section = user.getDataContainer().get(Pirates.plugin);
+            ConfigurationSection section = user.getDataContainer().get(Pirates.inst);
             section.set("CompletedLevels", playerProgress.getStringList(s));
-            user.getDataContainer().set(Pirates.plugin, section);
+            user.getDataContainer().set(Pirates.inst, section);
 
             if(!user.isOnline()) user.unload();
             else user.save();
@@ -84,14 +85,14 @@ public class GrapplingHook implements Listener {
     }
 
     public List<String> getUserLevels(CrownUser user){
-        List<String> toReturn = user.getDataContainer().get(Pirates.plugin).getStringList("CompletedLevels");
+        List<String> toReturn = user.getDataContainer().get(Pirates.inst).getStringList("CompletedLevels");
         return toReturn;
     }
 
     public void setUserLevels(CrownUser user, List<String> list){
-        ConfigurationSection dataSec = user.getDataContainer().get(Pirates.plugin);
+        ConfigurationSection dataSec = user.getDataContainer().get(Pirates.inst);
         dataSec.set("CompletedLevels", list);
-        user.getDataContainer().set(Pirates.plugin, dataSec);
+        user.getDataContainer().set(Pirates.inst, dataSec);
     }
 
     public File getArmorStandFile() {
@@ -111,7 +112,7 @@ public class GrapplingHook implements Listener {
     public void onPlayerArmorStandEvent(PlayerInteractAtEntityEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
         Player player = event.getPlayer();
-        CrownUser user = FtcCore.getUser(player);
+        CrownUser user = UserManager.getUser(player);
 
         if (event.getRightClicked().getType() == EntityType.ARMOR_STAND
                 && event.getRightClicked().isInvulnerable()
@@ -155,12 +156,12 @@ public class GrapplingHook implements Listener {
                     if (!getUserLevels(user).contains(levelList.get(level))) {
                         switch (armorStandsFile.getInt(ghArmorStandID + ".StandClass")) {
                             case 2:
-                                player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You have recieved " + ChatColor.GOLD  + "25000 Rhines " + ChatColor.GRAY + "for completing all levels in a biome.");
+                                player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You have recieved " + ChatColor.GOLD  + "25,000 Rhines " + ChatColor.GRAY + "for completing all levels in a biome.");
                                 FtcCore.getBalances().add(player.getUniqueId(), 25000, false);
                                 main.givePP(player, 5);
                                 break;
                             case 3:
-                                player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You have recieved " + ChatColor.GOLD + "25000 Rhines " + ChatColor.GRAY + "for completing all the Grappling Hook levels!");
+                                player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You have recieved " + ChatColor.GOLD + "25,000 Rhines " + ChatColor.GRAY + "for completing all the Grappling Hook levels!");
                                 FtcCore.getBalances().add(player.getUniqueId(), 25000, false);
                                 main.givePP(player, 25);
                                 break;
@@ -202,7 +203,7 @@ public class GrapplingHook implements Listener {
         inv = personalizeInventory(player, inv);
         player.openInventory(inv);
 
-        Pirates.plugin.getServer().getPluginManager().registerEvents(new GhSubClass(player), Pirates.plugin);
+        Pirates.inst.getServer().getPluginManager().registerEvents(new GhSubClass(player), Pirates.inst);
     }
 
 
@@ -256,7 +257,7 @@ public class GrapplingHook implements Listener {
     }
 
     private Inventory personalizeInventory(Player player, Inventory inv) {
-        CrownUser user = FtcCore.getUser(player);
+        CrownUser user = UserManager.getUser(player);
         List<String> completedLevels = getUserLevels(user);
 
         if (completedLevels.isEmpty()) {

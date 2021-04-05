@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public class CommandGhShowName extends CrownCommand {
 
     public CommandGhShowName() {
-        super("GHTargetShowName", Pirates.plugin);
+        super("GHTargetShowName", Pirates.inst);
         setPermission("ftc.pirates.targetshowname");
         register();
     }

@@ -3,7 +3,6 @@ package net.forthecrown.randomfeatures.features;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.randomfeatures.RandomFeatures;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -14,23 +13,20 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class MobHealthBar implements Listener {
-    public Map<UUID, Integer> hitmobs = new HashMap<>();
+    public Map<LivingEntity, BukkitRunnable> hitmobs = new HashMap<>();
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onMobDamage(EntityDamageByEntityEvent event){
-        // Player should be damager:
-        if(!(event.getDamager() instanceof Player)) return;
-
-        // Exclude dungeons:
-        if(event.getEntity().getWorld() == Bukkit.getWorld("world_void")) return;
-
-        // Entity should be alive, but not player or boss mob:
-        if(!(event.getEntity() instanceof LivingEntity)) return;
-        if(event.getEntity() instanceof Player || event.getEntity() instanceof ArmorStand) return;
-        if(event.getEntity().getType() == EntityType.ENDER_DRAGON || event.getEntity().getType() == EntityType.WITHER) return;
+        if(!(event.getDamager() instanceof Player)) return;                     //Damager gotta be player
+        if(event.getEntity().getWorld().equals(CrownUtils.WORLD_VOID)) return;  //Not in world_void
+        if(!(event.getEntity() instanceof LivingEntity)) return;                //Must be alive
+        if(event.getEntity() instanceof Player                                  //But not another player, armor stand or Boss mob
+                || event.getEntity() instanceof ArmorStand
+                || event.getEntity() instanceof EnderDragon
+                || event.getEntity() instanceof Wither
+        ) return;
 
         LivingEntity damaged = (LivingEntity) event.getEntity();
 
@@ -43,7 +39,7 @@ public class MobHealthBar implements Listener {
         if(name != null) {
             if (!name.contains("❤")) {
                 if (damaged.isCustomNameVisible()) return; // Don't change names of entities with always visible names (without hearts in them)
-                else RandomFeatures.instance.withSetNames.put(damaged.getUniqueId(), damaged.customName()); // Save names of player-named entities
+                else RandomFeatures.instance.withSetNames.put(damaged, damaged.customName()); // Save names of player-named entities
             }
         }
 
@@ -53,9 +49,7 @@ public class MobHealthBar implements Listener {
         if (remainingHRTS < 0) remainingHRTS = 0;
         if (remainingHRTS > 20) return;
 
-        int heartsToShow; // Entities with too many hearts, can at max show 20 hearts, if their health is above that, hearts don't show.
-        if (maxHealth > 20) heartsToShow = 20;
-        else heartsToShow = maxHealth;
+        int heartsToShow = Math.min(maxHealth, 20); // Entities with too many hearts, can at max show 20 hearts, if their health is above that, hearts don't show.
 
         // Construct name with correct hearts:
         String healthBar = ChatColor.RED + "";
@@ -71,25 +65,21 @@ public class MobHealthBar implements Listener {
         // (By using a map<uuid,int>, we can make the delayed event only remove the name when the int -> 0)
         damaged.setCustomNameVisible(true);
         damaged.setCustomName(healthBar);
+        delay(damaged);
+    }
 
-        UUID id = damaged.getUniqueId();
-        if (hitmobs.containsKey(id)) hitmobs.replace(id, hitmobs.get(id) + 1);
-        else hitmobs.put(id, 1);
-
-        new BukkitRunnable() {
+    private void delay(LivingEntity damaged){
+        if(hitmobs.containsKey(damaged)) hitmobs.get(damaged).cancel(); //Cancel if already in map
+        BukkitRunnable runnable = new BukkitRunnable() { //Create new delay
             @Override
             public void run() {
-                if(!hitmobs.containsKey(id)) return;
-                hitmobs.replace(id, hitmobs.get(id) - 1);
-
-                if(hitmobs.get(id) == 0) {
-                    damaged.setCustomNameVisible(false);
-                    damaged.customName(RandomFeatures.instance.withSetNames.getOrDefault(id, null));
-                    RandomFeatures.instance.withSetNames.remove(id);
-                    hitmobs.remove(id);
-                }
+                damaged.setCustomNameVisible(false);
+                damaged.customName(RandomFeatures.instance.withSetNames.getOrDefault(damaged, null));
+                RandomFeatures.instance.withSetNames.remove(damaged);
             }
-        }.runTaskLater(RandomFeatures.instance, 5*20);
+        };
+        runnable.runTaskLater(RandomFeatures.instance, 5*20); //Start new delay
+        hitmobs.put(damaged, runnable); //Put delay in map
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -98,9 +88,8 @@ public class MobHealthBar implements Listener {
         if(!(event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent)) return;
 
         EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
-        String name = damageEvent.getDamager().getType().toString().toLowerCase().replaceAll("_", "");
+        String name = CrownUtils.normalEnum(damageEvent.getDamager().getType());
 
-        name = CrownUtils.capitalizeWords(name);
         String message = event.getDeathMessage().replaceAll("❤", "") + name;
         event.setDeathMessage(message);
     }

@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.cosmetics.inventories.ArrowParticleMenu;
@@ -59,7 +59,7 @@ public class CosmeticEvents implements Listener {
         event.setCancelled(true);
 
         Player player = (Player) event.getWhoClicked();
-        CrownUser user = FtcCore.getUser(player);
+        CrownUser user = UserManager.getUser(player);
         int slot = event.getSlot();
         String title = ComponentUtils.getString(event.getView().title());
 

@@ -3,8 +3,10 @@ package net.forthecrown.vikings.raids;
 import net.forthecrown.core.CrownBoundingBox;
 import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.utils.CrownUtils;
-import net.forthecrown.vikings.LiteralLootTable;
+import net.forthecrown.vikings.raids.valhalla.LiteralLootTable;
 import net.forthecrown.vikings.Vikings;
+import net.forthecrown.vikings.raids.valhalla.RaidAreaGenerator;
+import net.forthecrown.vikings.raids.valhalla.VikingRaid;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -33,7 +35,7 @@ public class MonasteryRaid extends VikingRaid {
         super(new Location(Bukkit.getWorld("world_void"), -509, 4, -493),
                 "Monastery", Vikings.getInstance().getServer());
 
-        World world = Bukkit.getWorld("world_void");
+        World world = CrownUtils.WORLD_VOID;
 
         generator = new RaidAreaGenerator(this)
                 .onHostileSpawn(zombie ->{

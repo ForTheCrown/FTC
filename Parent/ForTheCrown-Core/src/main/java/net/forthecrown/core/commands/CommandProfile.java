@@ -6,7 +6,6 @@ import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.types.UserType;
-import net.forthecrown.core.crownevents.EventTimer;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.utils.CrownUtils;
@@ -100,7 +99,7 @@ public class CommandProfile extends CrownCommandBuilder {
         //Crown score objective
         Objective crown = profile.getScoreboard().getObjective("crown");
         Score crownScr = crown.getScore(profile.getName());
-        if(crownScr.isScoreSet() && crownScr.getScore() > 0) user.sendMessage("&eCrown score: &r" + EventTimer.getTimerCounter(crownScr.getScore()).toString());
+        if(crownScr.isScoreSet() && crownScr.getScore() > 0) user.sendMessage("&eCrown score: &r" + crownScr.getScore());
 
         //gems and balance
         if(profile.getGems() > 0) user.sendMessage("&eGems: &r" + CrownUtils.decimalizeNumber(profile.getGems()));

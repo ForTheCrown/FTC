@@ -2,6 +2,7 @@ package net.forthecrown.core.api;
 
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.enums.SellAmount;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.jetbrains.annotations.NotNull;
@@ -263,5 +264,59 @@ public interface CrownUserAlt extends CrownUser{
     @Override
     default void setProfilePublic(boolean publicProfile) {
         getMain().setProfilePublic(publicProfile);
+    }
+
+    @Override
+    default short configurePriceForItem(Material item) {
+        return getMain().configurePriceForItem(item);
+    }
+
+    @Override
+    default void addRank(Rank rank, boolean givePermission) {
+        getMain().addRank(rank, givePermission);
+    }
+
+    @Override
+    default void removeRank(Rank rank, boolean removePermission) {
+        getMain().removeRank(rank, removePermission);
+    }
+
+    @Override
+    default boolean allowsRidingPlayers() {
+        return getMain().allowsRidingPlayers();
+    }
+
+    @Override
+    default void setAllowsRidingPlayers(boolean allowsRidingPlayers) {
+        getMain().setAllowsRidingPlayers(allowsRidingPlayers);
+    }
+
+    @Override
+    default boolean allowsEmotes() {
+        return getMain().allowsEmotes();
+    }
+
+    @Override
+    default void setAllowsEmotes(boolean allowsEmotes) {
+        getMain().setAllowsEmotes(allowsEmotes);
+    }
+
+    @Override
+    default SellAmount getSellAmount() {
+        return getMain().getSellAmount();
+    }
+
+    @Override
+    default void setSellAmount(SellAmount sellAmount) { getMain().setSellAmount(sellAmount); }
+
+    @Override
+    default void resetEarnings() { getMain().resetEarnings(); }
+
+    @Override
+    default void clearTabPrefix() { getMain().clearTabPrefix(); }
+
+    @Override
+    default UserDataContainer getDataContainer() {
+        return getMain().getDataContainer();
     }
 }

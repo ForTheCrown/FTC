@@ -1,9 +1,9 @@
-package net.forthecrown.vikings.raids;
+package net.forthecrown.vikings.raids.valhalla;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.UserDataContainer;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.vikings.Vikings;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -68,7 +68,7 @@ public abstract class VikingRaid implements Listener {
 
     public void completeRaid(){
         for (Player p: getCurrentParty()){
-            CrownUser u = FtcCore.getUser(p);
+            CrownUser u = UserManager.getUser(p);
             UserDataContainer dataContainer = u.getDataContainer();
             ConfigurationSection section = dataContainer.get(Vikings.getInstance());
             List<String> completedLevels = section.getStringList("CompletedLevels");

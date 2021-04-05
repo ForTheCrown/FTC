@@ -3,6 +3,7 @@ package net.forthecrown.pirates.auctions;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.files.AbstractSerializer;
 import net.forthecrown.core.utils.ComponentUtils;
@@ -47,7 +48,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
     //gets
     public PirateAuction(Location location) {
-        super("auction_" + location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "auctions", true, Pirates.plugin);
+        super("auction_" + location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "auctions", true, Pirates.inst);
 
         if (fileDoesntExist) throw new NullPointerException(getFile().getName() + " doesn't exist, throwing exception");
 
@@ -61,7 +62,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
     //creates
     public PirateAuction(Location location, String name){
-        super("auction_" + location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "auctions", false, Pirates.plugin);
+        super("auction_" + location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "auctions", false, Pirates.inst);
 
         this.name = name;
         this.location = location;
@@ -111,14 +112,14 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
             unClaim();
             return;
         } else {
-            this.owner = FtcCore.getUser(UUID.fromString(owner));
+            this.owner = UserManager.getUser(UUID.fromString(owner));
 
             String highestBidder = getFile().getString("HighestBidder");
             if(highestBidder == null){
                 unClaim();
                 return;
             }
-            else this.highestBidder = FtcCore.getUser(UUID.fromString(highestBidder));
+            else this.highestBidder = UserManager.getUser(UUID.fromString(highestBidder));
 
             setItem(getFile().getItemStack("Item"));
             setBaseBid(getFile().getInt("BaseBid"));
@@ -373,7 +374,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
             int amount = bids.get(id);
 
-            FtcCore.getUser(id).sendMessage("&6$ &7You received &e" + CrownUtils.decimalizeNumber(amount) + " Rhines&7 from your bid on &e" + getName());
+            UserManager.getUser(id).sendMessage("&6$ &7You received &e" + CrownUtils.decimalizeNumber(amount) + " Rhines&7 from your bid on &e" + getName());
             bals.add(id, amount);
         }
     }

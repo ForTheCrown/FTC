@@ -44,7 +44,7 @@ import java.util.concurrent.CompletableFuture;
 public class CommandAuction extends CrownCommandBuilder {
 
     public CommandAuction(){
-        super("auction", Pirates.plugin);
+        super("auction", Pirates.inst);
 
         setDescription("The primary command used for interacting with AuctionSigns");
         setAliases("au");
@@ -167,9 +167,9 @@ public class CommandAuction extends CrownCommandBuilder {
                                     if(claimedClaiming.contains(auction.getName())) throw new CrownCommandException("&7Someone is already claiming this Auction");
                                     if(auction.isClaimed()) throw new CrownCommandException("&7" + auction.getName() + " is already claimed by " + auction.getOwner().getName());
 
-                                    Pirates.plugin.getServer().getPluginManager().registerEvents(
+                                    Pirates.inst.getServer().getPluginManager().registerEvents(
                                             new AuctionClaiming(user, auction, c.getArgument("startingBid", Integer.class)),
-                                            Pirates.plugin);
+                                            Pirates.inst);
                                     return 0;
                                 })
                         )

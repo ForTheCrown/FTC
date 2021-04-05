@@ -3,18 +3,20 @@ package net.forthecrown.pirates;
 import net.forthecrown.core.CrownBoundingBox;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.commands.CommandLeave;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.pirates.auctions.Auction;
 import net.forthecrown.pirates.auctions.AuctionManager;
 import net.forthecrown.pirates.commands.*;
-import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -34,15 +36,15 @@ public final class Pirates extends JavaPlugin implements Listener {
     //public List<String> players = new ArrayList<String>();
     //public List<ItemStack> itemsToGet = new ArrayList<ItemStack>();
     public File offlineWithParrots;
-    public static Pirates plugin;
+    public static Pirates inst;
     public GrapplingHook grapplingHook;
-
     public PirateEvents events;
+    public TreasureShulker shulker;
 
     private static AuctionManager auctionManager;
 
     public void onEnable() {
-        plugin = this;
+        inst = this;
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
 
@@ -64,13 +66,14 @@ public final class Pirates extends JavaPlugin implements Listener {
         grapplingHook = new GrapplingHook(this);
         auctionManager = new AuctionManager(this);
         events = new PirateEvents(this);
+        shulker = new TreasureShulker(this);
 
         //commands
         new CommandGhTarget();
         new CommandGhShowName();
         new CommandParrot();
         new CommandUpdateLeaderboard();
-        new CommandPirateReload();
+        new CommandPirate();
 
         CommandLeave.addAllowedArea(
                 new CrownBoundingBox(CrownUtils.WORLD_VOID, -5685, 1, -521, -886, 255, 95),
@@ -120,65 +123,22 @@ public final class Pirates extends JavaPlugin implements Listener {
         Calendar cal = Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE);
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-            if (cal.get(Calendar.DAY_OF_WEEK) != getConfig().getInt("Day")) {
+            if (cal.get(Calendar.DAY_OF_WEEK) == getConfig().getInt("Day")) return;
 
-                getConfig().set("Day", cal.get(Calendar.DAY_OF_WEEK));
-                ItemStack chosenItem = getRandomHeadFromChest();
-                Validate.notNull(chosenItem, "ChosenItem was null");
-                Validate.notNull(((SkullMeta)chosenItem.getItemMeta()).getPlayerProfile(), "player profile was null");
-                Validate.notNull(((SkullMeta)chosenItem.getItemMeta()).getPlayerProfile().getName(), "player profile name was null");
-                getConfig().set("ChosenHead", ((SkullMeta) chosenItem.getItemMeta()).getPlayerProfile().getName());
+            getConfig().set("Day", cal.get(Calendar.DAY_OF_WEEK));
+            ItemStack chosenItem = getRandomHeadFromChest();
+            getConfig().set("ChosenHead", ((SkullMeta) chosenItem.getItemMeta()).getPlayerProfile().getName());
 
-                List<String> temp = getConfig().getStringList("PlayerWhoSoldHeadAlready");
-                temp.clear();
-                getConfig().set("PlayerWhoSoldHeadAlready", temp);
-                getConfig().set("PlayerWhoFoundTreasureAlready", temp);
+            List<String> temp = getConfig().getStringList("PlayerWhoSoldHeadAlready");
+            temp.clear();
+            getConfig().set("PlayerWhoSoldHeadAlready", temp);
+            getConfig().set("PlayerWhoFoundTreasureAlready", temp);
 
-                killOldTreasure(new Location(Bukkit.getWorld(getConfig().getString("TreasureLoc.world")), getConfig().getInt("TreasureLoc.x"), getConfig().getInt("TreasureLoc.y"), getConfig().getInt("TreasureLoc.z")));
+            shulker.killOld();
+            shulker.spawn();
 
-                final int x = CrownUtils.getRandomNumberInRange(-1970, 1970);
-                final int y = CrownUtils.getRandomNumberInRange(40, 50);
-                final int z = CrownUtils.getRandomNumberInRange(-1970, 1970);
-                //int x = getRandomNumberInRange(-50, 50);
-                //int y = getRandomNumberInRange(40, 50);
-                //int z = getRandomNumberInRange(-50, 50);
-                getConfig().set("TreasureLoc.x", x);
-                getConfig().set("TreasureLoc.y", y);
-                getConfig().set("TreasureLoc.z", z);
-
-                spawnTreasureShulker(new Location(Bukkit.getWorld(getConfig().getString("TreasureLoc.world")), x, y, z));
-
-                saveConfig();
-            }
-
-            if (cal.get(Calendar.WEEK_OF_MONTH) != getConfig().getInt("Week")) {
-                // Picks a day for the trader to spawn.
-                getConfig().set("Week", cal.get(Calendar.WEEK_OF_MONTH));
-                saveConfig();
-            }
+            saveConfig();
         }, 20L);
-    }
-
-
-    protected void killOldTreasure(Location location) {
-        for (Entity nearbyEntity : location.getWorld().getNearbyEntities(location, 1, 1, 1))
-        {
-            if (nearbyEntity.getType() == EntityType.SHULKER)
-            {
-                nearbyEntity.remove();
-            }
-        }
-    }
-
-    protected void spawnTreasureShulker(Location spawnLoc) {
-        spawnLoc.getBlock().setType(Material.AIR);
-        Shulker treasureShulker = spawnLoc.getWorld().spawn(spawnLoc, Shulker.class);
-        treasureShulker.setAI(false);
-        treasureShulker.setInvulnerable(true);
-        treasureShulker.setColor(DyeColor.GRAY);
-        treasureShulker.setRemoveWhenFarAway(false);
-        treasureShulker.setPersistent(true);
-
     }
 
     void giveTreasure(Player player) {
@@ -227,9 +187,7 @@ public final class Pirates extends JavaPlugin implements Listener {
 
             player.getInventory().addItem(chosenItem);
         }
-
         givePP(player, 1);
-
     }
 
 
@@ -239,7 +197,7 @@ public final class Pirates extends JavaPlugin implements Listener {
         Score ppp = pp.getScore(player);
         ppp.setScore(ppp.getScore() + toadd);
 
-        CrownUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = UserManager.getUser(player.getUniqueId());
 
         if (ppp.getScore() == 1) player.sendMessage(ChatColor.GRAY + "[FTC] You now have " + ChatColor.YELLOW + ppp.getScore() + ChatColor.GRAY + " Pirate point.");
         else {

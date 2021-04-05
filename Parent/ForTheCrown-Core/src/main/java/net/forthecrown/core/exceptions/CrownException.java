@@ -7,17 +7,18 @@ import org.bukkit.command.CommandSender;
 public class CrownException extends RuntimeException{
 
     public CrownException() {
+        super(null, null, true, false);
     }
 
     private String message;
     public CrownException(CommandSender sender, String message) {
-        super(CrownUtils.translateHexCodes(message));
+        super(CrownUtils.translateHexCodes(message), null, true, false);
         this.message = CrownUtils.translateHexCodes(message);
         sendMessage(sender, this.message);
     }
 
     public CrownException(String message){
-        super(CrownUtils.translateHexCodes(message));
+        super(CrownUtils.translateHexCodes(message), null, true, false);
         this.message = CrownUtils.translateHexCodes(message);
     }
 

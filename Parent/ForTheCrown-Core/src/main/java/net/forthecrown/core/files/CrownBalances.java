@@ -1,5 +1,6 @@
 package net.forthecrown.core.files;
 
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Announcer;
@@ -102,13 +103,13 @@ public class CrownBalances extends AbstractSerializer<FtcCore> implements Balanc
             return;
         }
 
-        if(amount > 0) FtcCore.getUser(uuid).addTotalEarnings(amount);
+        if(amount > 0) UserManager.getUser(uuid).addTotalEarnings(amount);
 
         if(FtcCore.areTaxesEnabled() && isTaxed && getTax(uuid) > 1 && amount > 1){
             int amountToRemove = (int) (amount * ((float) getTax(uuid)/100));
             amount -= amountToRemove;
 
-            FtcCore.getUser(uuid).sendMessage("&7You were taxed " + getTax(uuid) + "%, which means you lost " + CrownUtils.decimalizeNumber(amountToRemove) + " Rhines of your last transaction");
+            UserManager.getUser(uuid).sendMessage("&7You were taxed " + getTax(uuid) + "%, which means you lost " + CrownUtils.decimalizeNumber(amountToRemove) + " Rhines of your last transaction");
         }
 
         balanceMap.put(uuid, get(uuid) + amount);
@@ -118,7 +119,7 @@ public class CrownBalances extends AbstractSerializer<FtcCore> implements Balanc
     public Integer getTax(UUID uuid){
         if(get(uuid) < 500000) return 0; //if the player has less thank 500k rhines, no tax
 
-        int percent = (int) (FtcCore.getUser(uuid).getTotalEarnings() / 50000 * 10);
+        int percent = (int) (UserManager.getUser(uuid).getTotalEarnings() / 50000 * 10);
         if(percent >= 30) return 50;
         return percent;
     }

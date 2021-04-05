@@ -2,9 +2,11 @@ package net.forthecrown.core.files;
 
 import io.papermc.paper.adventure.AdventureComponent;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.Grave;
 import net.forthecrown.core.api.UserDataContainer;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
@@ -17,6 +19,9 @@ import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
@@ -25,6 +30,7 @@ import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.*;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.craftbukkit.v1_16_R3.CraftOfflinePlayer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -90,7 +96,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         else reload();
         if(shouldResetEarnings()) resetEarnings();
 
-        FtcCore.LOADED_USERS.put(base, this);
+        CrownUserManager.LOADED_USERS.put(base, this);
         permsCheck();
 
         if(isOnline()) handle = getOnlineHandle().getHandle();
@@ -207,7 +213,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     @Override
     public void unload(){
         save();
-        FtcCore.LOADED_USERS.remove(this.getUniqueId());
+        CrownUserManager.LOADED_USERS.remove(this.getUniqueId());
         handle = null;
     }
 
@@ -264,7 +270,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public boolean hasRank(Rank rank){
-        return getAvailableRanks().contains(rank);
+        return ranks.contains(rank);
     }
 
     @Override
@@ -290,11 +296,11 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public void removeRank(Rank rank){
-        if(hasRank(rank)) ranks.remove(rank);
+        removeRank(rank, true);
     }
 
+    @Override
     public void removeRank(Rank rank, boolean removePermission){
-        if(!hasRank(rank)) return;
         ranks.remove(rank);
         if(removePermission) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + getName() + " parent remove " + rank.getLpRank());
     }
@@ -453,12 +459,12 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         int yayNay = baron ? 1 : 0;
         FtcCore.getInstance().getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName()).setScore(yayNay);
         if(baron){
-            addRank(Rank.BARON);
-            addRank(Rank.BARONESS);
+            addRank(Rank.BARON, true);
+            addRank(Rank.BARONESS, false);
         }
         else{
-             removeRank(Rank.BARON);
-             removeRank(Rank.BARONESS);
+             removeRank(Rank.BARON, true);
+             removeRank(Rank.BARONESS, false);
         }
     }
 
@@ -501,7 +507,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         setTotalEarnings(0);
 
         nextResetTime = System.currentTimeMillis() + FtcCore.getUserDataResetInterval();
-        System.out.println(getName() + " earnings reset, next reset in: " + ((((System.currentTimeMillis() - getNextResetTime()/1000)/60)/60)/24) + " days");
+        System.out.println(getName() + " earnings reset, next reset in: " + (((((getNextResetTime() - System.currentTimeMillis())/1000)/60)/60)/24) + " days");
         save();
     }
 
@@ -587,6 +593,16 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         getHandle().playerConnection.sendPacket(new PacketPlayOutChat(message, type, id));
     }
 
+    @Override
+    public void sendAdminMessage(CrownCommandBuilder command, CommandSender sender, Component message){
+        if(!command.testPermissionSilent(this)) return;
+        Component component = Component.text("[ " + sender.getName() + ": ")
+                .style(Style.style(NamedTextColor.GRAY, TextDecoration.ITALIC))
+                .append(message)
+                .append(Component.text("]"));
+        sendMessage(component);
+    }
+
     @Nonnull
     @Override
     public Server getServer() {
@@ -595,7 +611,9 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public boolean isOnline() {
-        return Bukkit.getPlayer(getUniqueId()) != null;
+        boolean result = Bukkit.getPlayer(this.getUniqueId()) != null;
+        Announcer.debug(result);
+        return result;
     }
 
     @Override
@@ -750,7 +768,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         getOnlineHandle().sendMessage(identity, message, type);
     }
 
-    private void performOnlineCheck(){
+    protected void performOnlineCheck(){
         if(!isOnline()) throw new UserNotOnlineException(this);
     }
 
@@ -838,34 +856,34 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
                 '}';
     }
 
-    private void permsCheck(){
+    protected void permsCheck(){
         if(!isOnline()) return;
-        if(getName().contains("Paranor")) addRank(Rank.LEGEND); //fuckin para lmao
+        if(getName().contains("Paranor") && !hasRank(Rank.LEGEND)) addRank(Rank.LEGEND); //fuckin para lmao
 
         if(isBaron() && !hasRank(Rank.BARON)){
-            addRank(Rank.BARON);
-            addRank(Rank.BARONESS);
+            addRank(Rank.BARON, true);
+            addRank(Rank.BARONESS, false);
         }
 
-        if(getPlayer().hasPermission("ftc.donator3")){
-            addRank(Rank.PRINCE);
-            addRank(Rank.PRINCESS);
-            addRank(Rank.ADMIRAL);
+        if(getPlayer().hasPermission("ftc.donator3") && (!hasRank(Rank.PRINCE) || !hasRank(Rank.ADMIRAL))){
+            addRank(Rank.PRINCE, true);
+            addRank(Rank.PRINCESS, false);
+            addRank(Rank.ADMIRAL, false);
         }
 
-        if(getPlayer().hasPermission("ftc.donator2")){
-            addRank(Rank.DUKE);
-            addRank(Rank.DUCHESS);
-            addRank(Rank.CAPTAIN);
+        if(getPlayer().hasPermission("ftc.donator2") && (!hasRank(Rank.DUKE) || !hasRank(Rank.CAPTAIN))){
+            addRank(Rank.DUKE, true);
+            addRank(Rank.DUCHESS, false);
+            addRank(Rank.CAPTAIN, false);
         }
 
-        if(getPlayer().hasPermission("ftc.donator1") || getPlayer().hasPermission("ftc.donator")){
-            addRank(Rank.LORD);
-            addRank(Rank.LADY);
+        if(getPlayer().hasPermission("ftc.donator1") && !hasRank(Rank.LORD)){
+            addRank(Rank.LORD, true);
+            addRank(Rank.LADY, false);
         }
     }
 
-    private boolean shouldResetEarnings(){
+    protected boolean shouldResetEarnings(){
         return System.currentTimeMillis() > getNextResetTime();
     }
 

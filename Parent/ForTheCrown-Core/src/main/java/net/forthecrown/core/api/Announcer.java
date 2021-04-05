@@ -1,9 +1,12 @@
 package net.forthecrown.core.api;
 
-import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.comvars.ComVar;
+import net.forthecrown.core.comvars.ComVars;
+import net.forthecrown.core.comvars.types.ComVarType;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.CrownUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -15,6 +18,10 @@ import java.util.logging.Logger;
  * The class representing the ingame Announcer.
  */
 public interface Announcer extends CrownSerializer<FtcCore> {
+
+    static Announcer inst(){
+        return FtcCore.getAnnouncer();
+    }
 
     /**
      * Gets the delay between automatic announcements
@@ -83,10 +90,7 @@ public interface Announcer extends CrownSerializer<FtcCore> {
      */
     static void acLiteral(Object message){
         if(message == null) message = "null";
-        for (Player p: Bukkit.getOnlinePlayers()){
-            p.sendMessage(message.toString());
-        }
-        System.out.println(message);
+        Bukkit.getServer().sendMessage(ComponentUtils.convertString(message.toString(), false));
     }
 
     /**
@@ -118,11 +122,12 @@ public interface Announcer extends CrownSerializer<FtcCore> {
     void announce(String message, @Nullable String permission);
 
     //Hacky way of determining if we're on the test server or not
-    boolean debugEnvironment = !new File("plugins/CoreProtect/config.yml").exists();
+    ComVar<Boolean> debugEnvironment = ComVars.set("sv_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
 
     static void debug(Object message){
         String string_message = message == null ? "null" : message.toString();
-        if(debugEnvironment) acLiteral(string_message);
-        log(Level.INFO, string_message);
+
+        if(debugEnvironment.getValue(false)) acLiteral(string_message);
+        else log(Level.INFO, string_message);
     }
 }

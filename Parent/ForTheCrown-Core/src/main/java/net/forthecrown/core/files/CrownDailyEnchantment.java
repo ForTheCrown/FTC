@@ -2,6 +2,7 @@ package net.forthecrown.core.files;
 
 import net.forthecrown.core.api.BlackMarket;
 import net.forthecrown.core.api.DailyEnchantment;
+import net.forthecrown.core.comvars.ComVar;
 import org.bukkit.enchantments.Enchantment;
 
 public class CrownDailyEnchantment implements DailyEnchantment {
@@ -9,21 +10,22 @@ public class CrownDailyEnchantment implements DailyEnchantment {
     private final CrownBlackMarket owner;
     private final Enchantment enchantment;
     private final byte level;
-    private final int price;
-    private final int basePrice;
+    private int price;
+    private final ComVar<Integer> basePrice;
 
-    public CrownDailyEnchantment(CrownBlackMarket owner, Enchantment ench, int basePrice, byte level){
+    public CrownDailyEnchantment(CrownBlackMarket owner, Enchantment ench, ComVar<Integer> basePrice, byte level){
         this.owner = owner;
         this.enchantment = ench;
         this.level = level;
         this.basePrice = basePrice;
 
-        price = basePrice*level;
+        basePrice.setOnUpdate(integer -> price = integer*level);
+        price = basePrice.getValue()*level;
     }
 
     @Override
     public int getBasePrice() {
-        return basePrice;
+        return basePrice.getValue();
     }
 
     @Override

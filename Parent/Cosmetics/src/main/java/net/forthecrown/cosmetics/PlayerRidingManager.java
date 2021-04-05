@@ -4,10 +4,12 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.Cooldown;
+import net.forthecrown.core.utils.CrownUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,13 +45,14 @@ public class PlayerRidingManager implements Listener {
     @EventHandler
     public void playerRightClickPlayer(PlayerInteractEntityEvent event) {
         if(event.getHand() == EquipmentSlot.OFF_HAND) return;
-        if(event.getPlayer().getWorld().getName().equalsIgnoreCase("world_void")) return;
+        if(event.getPlayer().getWorld().equals(CrownUtils.WORLD_VOID)) return;
+        if(event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
         if(!(event.getRightClicked() instanceof Player)) return;
 
         Player rider = event.getPlayer();
         Player riddenPlayer = (Player) event.getRightClicked();
-        CrownUser user = FtcCore.getUser(rider);
-        CrownUser ridden  = FtcCore.getUser(riddenPlayer);
+        CrownUser user = UserManager.getUser(rider);
+        CrownUser ridden  = UserManager.getUser(riddenPlayer);
 
         if(!user.allowsRidingPlayers() || !ridden.allowsRidingPlayers()){
             user.sendMessage("&7You both have to allow riding players");

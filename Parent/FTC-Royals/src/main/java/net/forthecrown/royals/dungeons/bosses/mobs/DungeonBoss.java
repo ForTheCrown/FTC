@@ -1,6 +1,7 @@
 package net.forthecrown.royals.dungeons.bosses.mobs;
 
 import net.forthecrown.core.CrownBoundingBox;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.royals.RoyalUtils;
 import net.forthecrown.royals.Royals;
@@ -65,7 +66,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
 
     public void summon(){
         //Only 1 boss can exist and a time
-        if(alive) return;
+        if(isAlive()) return;
         //Register events and start updater loop
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         loopID = startUpdater();
@@ -74,8 +75,8 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
         context = new BossFightContext(this);
         bossEntity = onSummon(context);
         bossEntity.setLootTable(LootTables.EMPTY.getLootTable());
+
         createBossbar(context);
-        bossBar.setProgress(1.0);
         alive = true;
     }
 
@@ -85,7 +86,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
 
     public void kill(boolean server){
         //Just to prevent exceptions
-        if(!alive) return;
+        if(!isAlive()) return;
         //Unregister events and stop updater loop
         HandlerList.unregisterAll(this);
         Bukkit.getScheduler().cancelTask(loopID);
@@ -107,14 +108,14 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
         bossBar.setProgress(1.0);
         bossBar.setVisible(true);
 
-        for (Player p: context.players()){
+        for (Player p: context.getPlayers()){
             bossBar.addPlayer(p);
         }
     }
 
     private int startUpdater(){
         return Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () ->{
-            Player target = RoyalUtils.getOptimalTarget(bossEntity, bossRoom());
+            Player target = RoyalUtils.getOptimalTarget(bossEntity, getBossRoom());
             if(target != null && (bossEntity.getTarget() == null || !bossEntity.getTarget().equals(target))) bossEntity.setTarget(target);
 
             onUpdate();
@@ -133,7 +134,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
         return alive;
     }
 
-    public CrownBoundingBox bossRoom() {
+    public CrownBoundingBox getBossRoom() {
         return bossRoom;
     }
 
@@ -150,8 +151,9 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
     }
 
     protected void giveRewards(@Nullable String achievement, @NotNull ItemStack reward, @NotNull BossFightContext context){
-        for (Player p: context.players()){
-            if(!bossRoom().contains(p)) continue;
+        for (Player p: context.getPlayers()){
+            if(!getBossRoom().contains(p)) continue;
+            if(UserManager.inst().isAltFor(p.getUniqueId(), bossRoom.getPlayers())) continue;
 
             if(!CrownUtils.isNullOrBlank(achievement)) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only " + achievement);
             if(p.getInventory().firstEmpty() == -1) bossEntity.getWorld().dropItemNaturally(bossEntity.getLocation(), reward.clone());
@@ -174,6 +176,10 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
 
     public void attemptSpawn(Player player){
         Validate.notNull(player, "Player is null");
+        if(isAlive()){
+            player.sendMessage(Component.text("The boss has already been spawned").color(NamedTextColor.GRAY));
+            return;
+        }
 
         Collection<ItemStack> items = getSpawningItems();
         PlayerInventory inv = player.getInventory();

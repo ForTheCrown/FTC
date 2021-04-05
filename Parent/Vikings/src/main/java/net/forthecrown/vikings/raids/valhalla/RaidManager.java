@@ -1,4 +1,4 @@
-package net.forthecrown.vikings.raids;
+package net.forthecrown.vikings.raids.valhalla;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

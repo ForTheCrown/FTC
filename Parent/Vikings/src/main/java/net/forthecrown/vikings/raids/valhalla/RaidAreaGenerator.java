@@ -1,4 +1,4 @@
-package net.forthecrown.vikings.raids;
+package net.forthecrown.vikings.raids.valhalla;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -13,8 +13,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.vikings.NmsStructureBlockGetter;
-import net.forthecrown.vikings.VikingBuilds;
+import net.forthecrown.core.utils.ListUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -58,7 +57,7 @@ public class RaidAreaGenerator {
     private Consumer<LivingEntity> onHostileSpawn;
     private Consumer<LivingEntity> onSpecialSpawn;
 
-    RaidAreaGenerator(VikingRaid raid){
+    public RaidAreaGenerator(VikingRaid raid){
         this.raid = raid;
 
         //Set default consumers
@@ -208,25 +207,19 @@ public class RaidAreaGenerator {
      */
     public void placeSpecialMobs(){
         if (specialLocations == null || specialLocations.isEmpty()) specialLocations = hostileLocations;
-        if (specialLocations == null || specialLocations.isEmpty()) return;
-        if(specialMobs == null || specialMobs.isEmpty()) return;
-
         placeMobsInLocation(specialMobs, hostileLocations, onSpecialSpawn);
     }
     public void placeHostileMobs(){
-        if(hostileLocations == null || hostileLocations.isEmpty()) return;
-        if(hostileMobs == null || hostileMobs.isEmpty()) return;
-
         placeMobsInLocation(hostileMobs, hostileLocations, onHostileSpawn);
     }
     public void placePassiveMobs(){
-        if(passiveMobs == null || passiveMobs.isEmpty()) return;
-        if(passiveLocations == null || passiveLocations.isEmpty()) return;
-
         placeMobsInLocation(passiveMobs, passiveLocations, onPassiveSpawn);
     }
 
     public void placeMobsInLocation(List<EntityType> mobs, List<Location> locations, Consumer<LivingEntity> action){
+        if(ListUtils.isNullOrEmpty(mobs)) return;
+        if(ListUtils.isNullOrEmpty(locations)) return;
+
         for (Location l: locations){
             //Don't always spawn the entity, just every ~2/3 times
             if(random.nextInt(3) > 0) continue;
@@ -234,7 +227,7 @@ public class RaidAreaGenerator {
             LivingEntity ent = (LivingEntity) l.getWorld().spawnEntity(l,
                     mobs.get(mobs.size()-1 == 0 ? 0 : random.nextInt(mobs.size()-1)) //bOuND mUsT bE pOsItIvE
             );
-            action.accept(ent); //Apply consumer to entity
+            if(action != null) action.accept(ent); //Apply consumer to entity
         }
     }
 

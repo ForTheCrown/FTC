@@ -2,6 +2,7 @@ package net.forthecrown.royals.dungeons;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.clickevent.ClickEventHandler;
 import net.forthecrown.core.clickevent.ClickEventTask;
 import net.forthecrown.core.enums.Branch;
@@ -39,6 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.loot.LootTables;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
@@ -60,7 +62,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if(event.getEntity().getPersistentDataContainer().has(RoyalUtils.PUNCHING_BAG_KEY, PersistentDataType.BYTE)) {
-            hitDummy((Zombie) event.getEntity(), event.getDamage());
+            hitDummy((Husk) event.getEntity(), event.getDamage());
             return;
         }
         if(event.getEntity() instanceof WitherSkeleton && event.getEntity().getCustomName().contains("Josh") && DungeonAreas.DUNGEON_AREA.contains(event.getEntity())){
@@ -73,18 +75,22 @@ public class DungeonEvents implements Listener, ClickEventTask {
         }
     }
 
-    private final Map<Zombie, Integer> hit = new HashMap<>();
-    private void hitDummy(Zombie dummy, double damage){
+    private final Map<Husk, BukkitRunnable> hit = new HashMap<>();
+    private void hitDummy(Husk dummy, double damage){
         Component name = Component.text("Damage: " + String.format("%.1f",damage)).color(NamedTextColor.RED);
         dummy.customName(name);
         dummy.setHealth(200);
 
-        //I've done it, the interruptable cooldown
-        if(hit.get(dummy) != null) Bukkit.getScheduler().cancelTask(hit.get(dummy));
-        hit.put(dummy, Bukkit.getScheduler().scheduleSyncDelayedTask(Royals.inst, () -> {
-            dummy.customName(Component.text("Hit Me!").color(NamedTextColor.GOLD));
-            hit.put(dummy, null);
-        }, 100));
+        if(hit.containsKey(dummy)) hit.get(dummy).cancel();
+        BukkitRunnable runnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                dummy.customName(Component.text("Hit Me!").color(NamedTextColor.GOLD));
+                hit.remove(dummy);
+            }
+        };
+        runnable.runTaskLater(Royals.inst, 100);
+        hit.put(dummy, runnable);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -195,7 +201,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
     public void run(Player player, String[] args) {
         PlayerInventory inv = player.getInventory();
         if(args[1].contains("sword")){
-            if(!inv.contains(BossItems.ZHAMBIE.item()) || !inv.contains(BossItems.SKALATAN.item()) || !inv.contains(BossItems.HIDEY_SPIDEY.item()))
+            if(!inv.containsAtLeast(BossItems.ZHAMBIE.item(), 1) || !inv.containsAtLeast(BossItems.SKALATAN.item(), 1) || !inv.containsAtLeast(BossItems.HIDEY_SPIDEY.item(), 1))
                 throw new CrownException(player, "You need one of each kind of the boss Golden Apples to get the Royal Sword.");
             
             inv.removeItemAnySlot(BossItems.ZHAMBIE.item());
@@ -209,7 +215,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
             for (int i = 0; i <= 5; i++) {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> player.getWorld().spawnParticle(Particle.TOTEM, player.getLocation().getX(), player.getLocation().getY()+2, player.getLocation().getZ(), 30, 0.2d, 0.1d, 0.2d, 0.275d), i*5L);
             }
-            CrownUser user = FtcCore.getUser(player);
+            CrownUser user = UserManager.getUser(player);
             if(user.getBranch() == Branch.DEFAULT || user.getBranch() == Branch.ROYALS || !user.hasRank(Rank.KNIGHT)){
                 player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "[FTC] " + ChatColor.WHITE + "You've been promoted to " + ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "Knight" + ChatColor.DARK_GRAY + "]" + ChatColor.WHITE + " !");
                 player.sendMessage(ChatColor.WHITE + "You can select the tag in " + ChatColor.YELLOW + "/rank" + ChatColor.WHITE + " now.");

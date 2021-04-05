@@ -1,14 +1,15 @@
 package net.forthecrown.core.files;
 
 import com.google.common.base.Charsets;
-import net.forthecrown.core.utils.CrownItems;
-import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.utils.ListUtils;
 import net.forthecrown.core.api.BlackMarket;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.DailyEnchantment;
+import net.forthecrown.core.comvars.ComVar;
 import net.forthecrown.core.inventories.CustomInventoryHolder;
+import net.forthecrown.core.utils.CrownItems;
+import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.core.utils.ListUtils;
 import net.forthecrown.core.utils.MapUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -29,15 +30,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
+import static net.forthecrown.core.utils.BMUtils.*;
+
 public class CrownBlackMarket implements BlackMarket {
 
     private YamlConfiguration configFile;
     private final File file;
 
-    private final Map<Material, Short> crops = new HashMap<>();
-    private final Map<Material, Short> mining = new HashMap<>();
-    private final Map<Material, Short> drops = new HashMap<>();
-    private final Map<Enchantment, Integer> enchants = new HashMap<>();
+    private Map<Material, ComVar<Short>> crops = new HashMap<>();
+    private Map<Material, ComVar<Short>> mining = new HashMap<>();
+    private Map<Material, ComVar<Short>> drops = new HashMap<>();
+    private Map<Enchantment, ComVar<Integer>> enchants = new HashMap<>();
 
     private final Map<Material, Integer> amountEarned = new HashMap<>();
     private Set<UUID> boughtEnchant = new HashSet<>();
@@ -45,8 +48,8 @@ public class CrownBlackMarket implements BlackMarket {
     private List<Material> dailyCrops = new ArrayList<>();
     private List<Material> dailyMining = new ArrayList<>();
     private List<Material> dailyDrops = new ArrayList<>();
-    private Enchantment dailyEnchantment;
-    private CrownDailyEnchantment enchantmentType;
+    private Enchantment enchantment;
+    private CrownDailyEnchantment dailyEnchantment;
 
     private int maxEarnings = 50000;
     private byte dayOfWeek;
@@ -82,25 +85,10 @@ public class CrownBlackMarket implements BlackMarket {
     public void reload(){
         configFile = YamlConfiguration.loadConfiguration(file);
 
-        crops.clear();
-        for (String s : configFile.getConfigurationSection("Price_Per_Item.Crops").getKeys(false)){
-            crops.put(Material.valueOf(s), (short) configFile.getConfigurationSection("Price_Per_Item.Crops").getInt(s));
-        }
-
-        drops.clear();
-        for (String s : configFile.getConfigurationSection("Price_Per_Item.MobDrops").getKeys(false)){
-            drops.put(Material.valueOf(s), (short) configFile.getConfigurationSection("Price_Per_Item.MobDrops").getInt(s));
-        }
-
-        mining.clear();
-        for (String s : configFile.getConfigurationSection("Price_Per_Item.Mining").getKeys(false)){
-            mining.put(Material.valueOf(s), (short) configFile.getConfigurationSection("Price_Per_Item.Mining").getInt(s));
-        }
-
-        enchants.clear();
-        for (String s : configFile.getConfigurationSection("Price_Per_Item.Enchants").getKeys(false)){
-            enchants.put(EnchantmentWrapper.getByKey(NamespacedKey.minecraft(s.toLowerCase())), configFile.getConfigurationSection("Price_Per_Item.Enchants").getInt(s));
-        }
+        crops = pricesFromConfig(configFile.getConfigurationSection("Price_Per_Item.Crops"), "crops");
+        drops = pricesFromConfig(configFile.getConfigurationSection("Price_Per_Item.MobDrops"), "drops");
+        mining = pricesFromConfig(configFile.getConfigurationSection("Price_Per_Item.Mining"), "mining");
+        enchants = enchantsFromConfig(configFile.getConfigurationSection("Price_Per_Item.Enchants"));
 
         dayOfWeek = (byte) configFile.getInt("Day");
         maxEarnings = configFile.getInt("MaxEarnings");
@@ -114,12 +102,12 @@ public class CrownBlackMarket implements BlackMarket {
         boughtEnchant = temp;
 
 
-        dailyCrops = convertStringToMaterial(configFile.getStringList("Daily_Items.Crops"));
-        dailyDrops = convertStringToMaterial(configFile.getStringList("Daily_Items.Drops"));
-        dailyMining = convertStringToMaterial(configFile.getStringList("Daily_Items.Mining"));
-        dailyEnchantment = EnchantmentWrapper.getByKey(NamespacedKey.minecraft(configFile.getString("Daily_Items.Enchant").toLowerCase()));
+        dailyCrops = ListUtils.convertToList(configFile.getStringList("Daily_Items.Crops"), Material::valueOf);
+        dailyDrops = ListUtils.convertToList(configFile.getStringList("Daily_Items.Drops"), Material::valueOf);
+        dailyMining = ListUtils.convertToList(configFile.getStringList("Daily_Items.Mining"), Material::valueOf);
+        enchantment = EnchantmentWrapper.getByKey(NamespacedKey.minecraft(configFile.getString("Daily_Items.Enchant").toLowerCase()));
 
-        enchantmentType = new CrownDailyEnchantment(this, dailyEnchantment, getEnchantBasePrice(dailyEnchantment), (byte) (dailyEnchantment.getMaxLevel() + CrownUtils.getRandomNumberInRange(1, 2)));
+        dailyEnchantment = new CrownDailyEnchantment(this, enchantment, enchants.get(enchantment), (byte) (enchantment.getMaxLevel() + CrownUtils.getRandomNumberInRange(1, 2)));
 
         if(dayOfWeek != Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK)) randomizeItems();
     }
@@ -128,7 +116,7 @@ public class CrownBlackMarket implements BlackMarket {
         dayOfWeek = (byte) Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK);
 
         List<Enchantment> tempEnchList = new ArrayList<>(enchants.keySet());
-        dailyEnchantment = tempEnchList.get(CrownUtils.getRandomNumberInRange(0, tempEnchList.size()-1));
+        enchantment = tempEnchList.get(CrownUtils.getRandomNumberInRange(0, tempEnchList.size()-1));
 
         //whew boi this is retarded lmao
         List<Material> alreadyChosen = new ArrayList<>();
@@ -182,35 +170,35 @@ public class CrownBlackMarket implements BlackMarket {
             }
         }
         boughtEnchant.clear();
-        enchantmentType = new CrownDailyEnchantment(this, dailyEnchantment, getEnchantBasePrice(dailyEnchantment), (byte) (dailyEnchantment.getMaxLevel() + CrownUtils.getRandomNumberInRange(1, 2)));
+        dailyEnchantment = new CrownDailyEnchantment(this, enchantment, enchants.get(enchantment), (byte) (enchantment.getMaxLevel() + CrownUtils.getRandomNumberInRange(1, 2)));
 
         save();
     }
 
     public void save(){
         ConfigurationSection prices = configFile.createSection("Price_Per_Item");
-        prices.createSection("Crops", makeStringMap(crops));
-        prices.createSection("MobDrops", makeStringMap(drops));
-        prices.createSection("Mining", makeStringMap(mining));
+        prices.createSection("Crops", MapUtils.convert(crops, Material::toString, ComVar::getValue));
+        prices.createSection("MobDrops", MapUtils.convert(crops, Material::toString, ComVar::getValue));
+        prices.createSection("Mining", MapUtils.convert(crops, Material::toString, ComVar::getValue));
 
         Map<String, Integer> tempMap = new HashMap<>();
         for (Enchantment enchant : enchants.keySet()){
             if(enchant == null) continue;
-            tempMap.put(enchant.getKey().toString().replaceAll("minecraft:", ""), enchants.get(enchant));
+            tempMap.put(enchant.getKey().toString().replaceAll("minecraft:", ""), enchants.get(enchant).getValue());
         }
         prices.createSection("Enchants", tempMap);
 
         ConfigurationSection dailyItems = configFile.createSection("Daily_Items");
 
-        dailyItems.set("Crops", makeStringList(dailyCrops));
-        dailyItems.set("Drops", makeStringList(dailyDrops));
-        dailyItems.set("Mining",makeStringList(dailyMining));
-        dailyItems.set("Enchant", getDailyEnchantment().getEnchantment().getKey().toString().replaceAll("minecraft:", ""));
+        dailyItems.set("Crops", ListUtils.convertToList(dailyCrops, Material::toString));
+        dailyItems.set("Drops", ListUtils.convertToList(dailyDrops, Material::toString));
+        dailyItems.set("Mining",ListUtils.convertToList(dailyMining, Material::toString));
+        dailyItems.set("Enchant", getEnchantment().getEnchantment().getKey().toString().replaceAll("minecraft:", ""));
 
         configFile.set("MaxEarnings", maxEarnings);
         configFile.set("Day", dayOfWeek);
-        configFile.set("EnchantLevel", getDailyEnchantment().getLevel());
-        configFile.set("EnchantPrice", getDailyEnchantment().getPrice());
+        configFile.set("EnchantLevel", getEnchantment().getLevel());
+        configFile.set("EnchantPrice", getEnchantment().getPrice());
 
         configFile.createSection("AmountEarned", MapUtils.convertKeys(amountEarned, Material::toString));
         configFile.set("PurchasedEnchant", ListUtils.convertToList(boughtEnchant, UUID::toString));
@@ -222,21 +210,9 @@ public class CrownBlackMarket implements BlackMarket {
         }
     }
 
-    private Map<String, Short> makeStringMap(Map<Material, Short> map){
-        return MapUtils.convertKeys(map, Material::toString);
-    }
-
-    private List<String> makeStringList( List<Material> list){
-        return ListUtils.convertToList(list, Material::toString);
-    }
-
-    private List<Material> convertStringToMaterial(List<String> list){
-        return ListUtils.convertToList(list, Material::valueOf);
-    }
-
     @Override
-    public DailyEnchantment getDailyEnchantment(){
-        return enchantmentType;
+    public DailyEnchantment getEnchantment(){
+        return dailyEnchantment;
     }
 
     @Override
@@ -258,9 +234,9 @@ public class CrownBlackMarket implements BlackMarket {
 
     @Override
     public Short getItemPrice(Material material){
-        if (crops.containsKey(material)) return crops.get(material);
-        if (mining.containsKey(material)) return mining.get(material);
-        if (drops.containsKey(material)) return drops.get(material);
+        if (crops.containsKey(material)) return crops.get(material).getValue();
+        if (mining.containsKey(material)) return mining.get(material).getValue();
+        if (drops.containsKey(material)) return drops.get(material).getValue();
         return null;
     }
 
@@ -287,19 +263,23 @@ public class CrownBlackMarket implements BlackMarket {
 
     @Override
     public void setItemPrice(Material material, Short price){
-        if(mining.containsKey(material)) mining.put(material, price);
-        if(drops.containsKey(material)) drops.put(material, price);
-        if(crops.containsKey(material)) crops.put(material, price);
+        if(mining.containsKey(material)) setPrice(mining.get(material), price);
+        if(drops.containsKey(material)) setPrice(drops.get(material), price);
+        if(crops.containsKey(material)) setPrice(crops.get(material), price);
         throw new IllegalArgumentException(material.toString() + " is not a valid material");
+    }
+
+    private void setPrice(ComVar<Short> comVar, short price){
+        comVar.setValue(price);
     }
 
     @Override
     public Integer getEnchantBasePrice(Enchantment enchantment){
-        return enchants.get(enchantment);
+        return enchants.get(enchantment).getValue();
     }
     @Override
     public void setEnchantBasePrice(Enchantment enchantment, Integer price){
-        enchants.put(enchantment, price);
+        enchants.put(enchantment, enchants.get(enchantment).setValue(price));
     }
 
     @Override
@@ -379,7 +359,7 @@ public class CrownBlackMarket implements BlackMarket {
     @Override
     public ItemStack getAcceptButton(){
         return CrownItems.makeItem(Material.LIME_STAINED_GLASS_PANE, 1, true, ChatColor.GREEN + "[Accept and Pay]",
-                "&7Enchant the item for " + CrownUtils.decimalizeNumber(getDailyEnchantment().getPrice()) + " Rhines");
+                "&7Enchant the item for " + CrownUtils.decimalizeNumber(getEnchantment().getPrice()) + " Rhines");
     }
 
     @Override
@@ -442,8 +422,8 @@ public class CrownBlackMarket implements BlackMarket {
     }
 
     private ItemStack getCoolEnchant(){
-        ItemStack item = CrownItems.makeItem(Material.ENCHANTED_BOOK, 1, false, null, "&6Value: &e" + CrownUtils.decimalizeNumber(getDailyEnchantment().getPrice()) + " Rhines&6.");
-        item.addUnsafeEnchantment(getDailyEnchantment().getEnchantment(), getDailyEnchantment().getLevel());
+        ItemStack item = CrownItems.makeItem(Material.ENCHANTED_BOOK, 1, false, null, "&6Value: &e" + CrownUtils.decimalizeNumber(getEnchantment().getPrice()) + " Rhines&6.");
+        item.addUnsafeEnchantment(getEnchantment().getEnchantment(), getEnchantment().getLevel());
 
         return item;
     }

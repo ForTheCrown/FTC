@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 public class CommandGhTarget extends CrownCommand {
 
     public CommandGhTarget() {
-        super("ghtarget", Pirates.plugin);
+        super("ghtarget", Pirates.inst);
         setPermission("ftc.pirates.ghtarget");
         register();
     }
@@ -49,7 +49,7 @@ public class CommandGhTarget extends CrownCommand {
                 return false;
             }
 
-            YamlConfiguration yaml = YamlConfiguration.loadConfiguration(Pirates.plugin.grapplingHook.getArmorStandFile());
+            YamlConfiguration yaml = YamlConfiguration.loadConfiguration(Pirates.inst.grapplingHook.getArmorStandFile());
             String section = "Stand_" + ghStandCreateID;
             yaml.createSection(section);
             yaml.set(section + ".StandClass", ghStandClass);
@@ -59,7 +59,7 @@ public class CommandGhTarget extends CrownCommand {
             yaml.set(section + ".YawToCords", ghYawToCords);
             if (args.length > 6) yaml.set(section + ".NextLevelHooks", ghHookUsesToGive);
             if (args.length > 7) yaml.set(section + ".NextLevelDistance", ghHookDistanceToGive);
-            Pirates.plugin.saveyaml(yaml, Pirates.plugin.grapplingHook.getArmorStandFile());
+            Pirates.inst.saveyaml(yaml, Pirates.inst.grapplingHook.getArmorStandFile());
 
             ArmorStand ghEStandTarget = (ArmorStand) player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
 

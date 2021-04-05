@@ -54,14 +54,14 @@ public class HideySpidey extends DungeonBoss<Spider> {
             spidey.setRemoveWhenFarAway(false);
             spidey.setPersistent(true);
 
-            double health = context.bossHealthMod(300);
+            double health = context.getBossHealth(300);
             spidey.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
             spidey.setHealth(health);
 
             spidey.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(25);
             spidey.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
-            spidey.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(context.bossHealthMod(11));
-            spidey.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.28 + (context.finalModifier()/20));
+            spidey.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(context.getBossHealth(11));
+            spidey.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.28 + (context.getModifier()/20));
 
             Pathfinder pathfinder = spidey.getPathfinder();
             pathfinder.setCanFloat(false);
@@ -77,7 +77,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
     @Override
     protected void onUpdate() {
         for (CaveSpider s: helpers){
-            Player nearest = RoyalUtils.getNearestVisiblePlayer(s.getLocation(), bossRoom());
+            Player nearest = RoyalUtils.getNearestVisiblePlayer(s.getLocation(), getBossRoom());
             if(s.getTarget() != null && s.getTarget().equals(nearest)) continue;
             s.setTarget(nearest);
         }
@@ -119,7 +119,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
             velocity = velocity.normalize().multiply(1.5);
             caveSpider.setVelocity(velocity);
 
-            double health = context.finalModifier() + 12;
+            double health = context.getModifier() + 12;
             caveSpider.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
             caveSpider.setHealth(health);
             caveSpider.setLootTable(LootTables.EMPTY.getLootTable());

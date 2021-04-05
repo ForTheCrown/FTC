@@ -33,7 +33,7 @@ public class BaseEgg implements Listener {
 
         if (event.getBlockPlaced().getType() == Material.TURTLE_EGG) {
 
-            Bukkit.getScheduler().scheduleSyncDelayedTask(Pirates.plugin, () -> {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(Pirates.inst, () -> {
                 if (event.getBlockPlaced().getLocation().getBlock().getType() == Material.TURTLE_EGG) {
                     ItemMeta meta = event.getItemInHand().getItemMeta();
 

@@ -1,7 +1,7 @@
 package net.forthecrown.pirates.auctions;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
@@ -49,11 +49,11 @@ public class AuctionEvents implements Listener {
         Validate.notNull(auction, "Auction is null :(");
 
         if(auction.isWaitingForItemClaim() || !auction.performExpiryCheck()) { //Checks if the auction has expired and is waiting for the highest bidder to pick up their item
-            auction.attemptItemClaim(FtcCore.getUser(p)); //Runs a check to see if the player is the right user and if they have the balance n stuffs
+            auction.attemptItemClaim(UserManager.getUser(p)); //Runs a check to see if the player is the right user and if they have the balance n stuffs
             return;
         }
 
-        CrownUser user = FtcCore.getUser(p);
+        CrownUser user = UserManager.getUser(p);
 
         if(line3.contains("NONE")){ //Unclaimed auction
             p.sendMessage(ChatColor.GRAY + "This auction is currently not in use!");

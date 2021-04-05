@@ -1,12 +1,14 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.CrownWeapons;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.clickevent.ClickEventHandler;
 import net.forthecrown.core.clickevent.ClickEventTask;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.utils.Cooldown;
+import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -75,7 +77,7 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
     @Override
     public void run(Player player, String[] args) {
 
-        CrownUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = UserManager.getUser(player.getUniqueId());
 
         if(args[1].contains("cutlass")){
             if(!player.hasPermission("ftc.donator2") && user.getBranch() != Branch.PIRATES){
@@ -85,10 +87,7 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
 
             ItemStack sword = null;
             for(ItemStack stack : player.getInventory()){
-                if(stack == null) continue;
-
-                if(stack.getType() != Material.GOLDEN_SWORD && !stack.hasItemMeta() || !stack.getItemMeta().hasDisplayName()) continue;
-                if(!stack.getItemMeta().getDisplayName().contains(CrownUtils.translateHexCodes("&6-&e&lRoyal Sword&6-"))) continue;
+                if(!(CrownWeapons.isCrownWeapon(stack) || CrownWeapons.isLegacyWeapon(stack))) continue;
 
                 sword = stack;
                 break;
@@ -101,7 +100,7 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
             sword.setType(Material.NETHERITE_SWORD);
 
             ItemMeta meta = sword.getItemMeta();
-            meta.setDisplayName(ChatColor.RESET + CrownUtils.translateHexCodes("&#917558-&#D1C8BA&lCaptain's Cutlass&#917558-"));
+            meta.displayName(CrownItems.BASE_CUTLASS.getItemMeta().displayName());
             List<String> lores = meta.getLore();
             lores.set(2, CrownUtils.translateHexCodes("&#917558The bearer of this cutlass bows to no laws, to no king,"));
             lores.set(3, CrownUtils.translateHexCodes("&#917558its wielder leads their crew towards everlasting riches."));

@@ -2,6 +2,7 @@ package net.forthecrown.easteregghunt;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import net.forthecrown.core.api.Announcer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -166,6 +167,7 @@ public class EggSpawner {
             }
         }
         if(!toSpawnAt.getNearbyEntitiesByType(Slime.class, 1.5).isEmpty() || toSpawnAt.getBlock().getType() == Material.PLAYER_HEAD) return;
+        Announcer.debug(toSpawnAt);
 
         Location finalToSpawnAt = toSpawnAt;
         toSpawnAt.getWorld().spawn(toSpawnAt, Slime.class, slime -> {
@@ -181,7 +183,7 @@ public class EggSpawner {
             NO_CLIP_TEAM.addEntry(slime.getUniqueId().toString());
 
             int rotation = random.nextInt(16);
-            rotation = setSkullUrl(SKULL_TEXTURES[random.nextInt(SKULL_TEXTURES.length)], finalToSpawnAt.getBlock(), rotation);
+            rotation = setSkullUrl("c679efc59e22fcf34f7448bf7ab6664f799c3dff656cf483098be36c9ae1", finalToSpawnAt.getBlock(), rotation);
             slime.setRotation(rotation*45, 0);
             placed_eggs.add(slime);
         });

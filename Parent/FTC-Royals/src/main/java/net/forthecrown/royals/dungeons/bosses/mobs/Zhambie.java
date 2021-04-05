@@ -50,12 +50,12 @@ public class Zhambie extends DungeonBoss<Husk> {
             husk.setRemoveWhenFarAway(false);
             husk.setPersistent(true);
 
-            final double health = context.bossHealthMod(300);
+            final double health = context.getBossHealth(300);
             husk.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
             husk.setHealth(health);
             husk.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(25.0);
             husk.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1.0F);
-            husk.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(15.0F + context.finalModifier());
+            husk.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(15.0F + context.getModifier());
             husk.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.31F);;
 
             husk.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 999999, 1, false, false));

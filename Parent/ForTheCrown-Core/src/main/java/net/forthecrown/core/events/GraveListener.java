@@ -1,7 +1,7 @@
 package net.forthecrown.core.events;
 
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.CrownItems;
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.Grave;
 import net.kyori.adventure.text.Component;
@@ -29,7 +29,7 @@ public class GraveListener implements Listener {
     }
 
     private void sendGraveMessage(Player p){
-        CrownUser user = FtcCore.getUser(p);
+        CrownUser user = UserManager.getUser(p);
         if(user.getGrave().isEmpty()) return;
         Component component = Component.text("[FTC] You have items in your ")
                 .color(NamedTextColor.GRAY)
@@ -44,7 +44,7 @@ public class GraveListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDeath(PlayerDeathEvent event) {
         if(event.getKeepInventory()) return;
-        CrownUser user = FtcCore.getUser(event.getEntity());
+        CrownUser user = UserManager.getUser(event.getEntity());
         Grave grave = user.getGrave();
         for (ItemStack i: event.getEntity().getInventory()){
             if(CrownItems.isCrownItem(i)){

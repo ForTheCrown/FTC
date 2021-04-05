@@ -26,7 +26,7 @@ public interface SignShop extends CrownSerializer<FtcCore>, InventoryHolder, Nam
     /**
      * Destroys the shop lol
      */
-    void destroyShop();
+    void destroy(boolean removeBlock);
 
     /**
      * Gets the hopper inventory with 1 available slot, used for setting the exampleItem of a shop

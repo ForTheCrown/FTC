@@ -71,6 +71,10 @@ public enum Rank {
         return lpRank;
     }
 
+    public static Rank fromPrefix(Component component){
+        return fromPrefix(ComponentUtils.getString(component));
+    }
+
     public static List<Rank> freeRanks(){
         return Arrays.asList(Rank.KNIGHT, Rank.BARON, Rank.BARONESS, Rank.SAILOR, Rank.PIRATE, Rank.VIKING, Rank.BERSERKER);
     }
@@ -81,9 +85,5 @@ public enum Rank {
             return valueOf(s1);
         } catch (Exception ignored) {}
         return null;
-    }
-
-    public static Rank fromPrefix(Component component){
-        return fromPrefix(ComponentUtils.getString(component));
     }
 }

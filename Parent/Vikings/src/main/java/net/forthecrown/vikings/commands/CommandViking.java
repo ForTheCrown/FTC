@@ -8,7 +8,7 @@ import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.vikings.Vikings;
 import net.forthecrown.vikings.blessings.VikingBlessing;
 import net.forthecrown.vikings.inventory.BlessingSelector;
-import net.forthecrown.vikings.raids.*;
+import net.forthecrown.vikings.raids.valhalla.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +74,7 @@ public class CommandViking extends CrownCommandBuilder {
                                             VikingRaid raid = RaidManager.fromName(c.getArgument("raid", String.class));
                                             if(raid == null) throw new CrownCommandException("Invalid raid name!");
 
-                                            RaidParty party = new RaidParty(RaidDifficulty.NORMAL, raid, -1, u.getPlayer());
+                                            RaidParty party = new RaidParty(raid, -1, u.getPlayer());
                                             Vikings.getRaidHandler().registerParty("TestParty", party);
                                             broadcastAdmin(c.getSource(), "Created RaidParty");
                                             return 0;

@@ -1,6 +1,7 @@
 package net.forthecrown.core.api;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
@@ -97,6 +98,8 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
      * @param rank The rank to remove
      */
     void removeRank(Rank rank);
+
+    void removeRank(Rank rank, boolean removePermission);
 
     /**
      * Gets the user's currently active rank
@@ -413,6 +416,8 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
     void sendMessage(IChatBaseComponent message, ChatMessageType type);
 
     void sendMessage(UUID id, IChatBaseComponent message, ChatMessageType type);
+
+    void sendAdminMessage(CrownCommandBuilder command, CommandSender sender, Component message);
 
     /**
      * Gets if the user is online

@@ -4,6 +4,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import net.forthecrown.core.ShopManager;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.CrownWorldGuard;
 import net.forthecrown.core.FtcCore;
@@ -81,7 +82,7 @@ public class ShopCreateEvent implements Listener {
         ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(wgPlayer.getLocation());
         if(!set.testState(wgPlayer, CrownWorldGuard.SHOP_CREATION) && !player.hasPermission("ftc.admin")) throw new CrownException(player, "&c&lHey! &7Shop creation is disabled here");
 
-        SignShop shop = FtcCore.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
+        SignShop shop = ShopManager.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
 
         player.openInventory(shop.getExampleInventory());
         FtcCore.getInstance().getServer().getPluginManager().registerEvents(new SignShopSubClass1(player, shop), FtcCore.getInstance());
@@ -126,7 +127,7 @@ public class ShopCreateEvent implements Listener {
             if(item == null || item.getType() == Material.AIR){
                 sign.line(3, Component.text(ChatColor.DARK_GRAY + "Price " + ChatColor.RESET + shop.getPrice()));
                 sign.update();
-                shop.destroyShop();
+                shop.destroy(false);
                 throw new CrownException(player, "&4Shop creation failed! &cNo item in the inventory");
             }
 

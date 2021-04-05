@@ -28,7 +28,7 @@ public class CommandTestCore extends CrownCommandBuilder {
            //Use this command to test things lol
            //This is as close as I currently know how to get to actual automatic tests
 
-           u.sendMessage("-Test finished-");
+            u.sendMessage("-Test finished-");
            return 0;
        });
     }

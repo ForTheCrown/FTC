@@ -7,7 +7,7 @@ import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.core.commands.brigadier.types.Vector3DType;
-import net.forthecrown.vikings.VikingLootTable;
+import net.forthecrown.vikings.raids.valhalla.VikingLootTable;
 import net.forthecrown.vikings.Vikings;
 import org.bukkit.Location;
 import org.bukkit.Material;

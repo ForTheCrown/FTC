@@ -2,6 +2,7 @@ package net.forthecrown.core.crownevents;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.minecraft.server.v1_16_R3.ChatMessageType;
 import org.bukkit.Bukkit;
@@ -25,7 +26,7 @@ public class EventTimer {
 
     public EventTimer(Player p, String format, Consumer<Player> onTimerExpire){
         this.player = p;
-        this.user = FtcCore.getUser(p);
+        this.user = UserManager.getUser(p);
         this.format = format;
         this.onTimerExpire = onTimerExpire;
 

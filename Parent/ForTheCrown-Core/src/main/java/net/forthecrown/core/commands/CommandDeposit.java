@@ -51,7 +51,7 @@ public class CommandDeposit extends CrownCommandBuilder {
                 Component component = mainItem.getItemMeta().lore().get(0);
                 String lore = ChatColor.stripColor(ComponentUtils.getString(component)).replaceAll("[\\D]", "").trim();
                 amount = Integer.parseInt(lore);
-            } catch (NumberFormatException e) { throw new CrownCommandException( "You need to be holding the coins you wish to deposit 2"); }
+            } catch (NumberFormatException e) { throw new CrownCommandException("You need to be holding the coins you wish to deposit"); }
 
             amount = amount*mainItem.getAmount();
 

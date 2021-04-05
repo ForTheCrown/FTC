@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics.inventories;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.md_5.bungee.api.ChatColor;
@@ -87,7 +87,7 @@ public class ArrowParticleMenu implements Listener {
         if (event.getEntity().getType() != EntityType.PLAYER) return;
 
         Player player = (Player) event.getEntity();
-        user = FtcCore.getUser(player.getUniqueId());
+        user = UserManager.getUser(player.getUniqueId());
         Particle activeArrowParticle = user.getArrowParticle();
         if(activeArrowParticle == null) return;
 

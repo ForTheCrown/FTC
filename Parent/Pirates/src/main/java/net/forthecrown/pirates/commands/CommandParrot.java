@@ -1,7 +1,7 @@
 package net.forthecrown.pirates.commands;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.commands.CrownCommand;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.exceptions.CrownException;
@@ -19,7 +19,7 @@ import java.util.List;
 public class CommandParrot extends CrownCommand {
 
     public CommandParrot(){
-        super("parrot", Pirates.plugin);
+        super("parrot", Pirates.inst);
 
         setPermission(null);
         register();
@@ -30,7 +30,7 @@ public class CommandParrot extends CrownCommand {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player)) throw new CrownException(sender, "Only players may execute this command!");
         Player player = (Player) sender;
-        CrownUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = UserManager.getUser(player.getUniqueId());
 
         if(user.getBranch() != Branch.PIRATES) throw new CrownException(sender, "&7Only pirates can have a parrot!");
 
@@ -38,7 +38,7 @@ public class CommandParrot extends CrownCommand {
         colors.add("gray"); colors.add("green"); colors.add("aqua"); colors.add("blue"); colors.add("red");
 
         if (args.length == 0) {
-            if (Pirates.plugin.events.parrots.containsValue(player.getUniqueId())) {
+            if (Pirates.inst.events.parrots.containsValue(player.getUniqueId())) {
                 removeOldParrot(player, (Parrot) player.getShoulderEntityLeft());
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1.0f);
                 return true;
@@ -61,7 +61,7 @@ public class CommandParrot extends CrownCommand {
             player.sendMessage(ChatColor.RED + "/parrot " + ChatColor.GRAY + "to hide your parrot.");
             return false;
         }
-        if (player.getShoulderEntityLeft() != null && (!Pirates.plugin.events.parrots.containsValue(player.getUniqueId()))) {
+        if (player.getShoulderEntityLeft() != null && (!Pirates.inst.events.parrots.containsValue(player.getUniqueId()))) {
             player.sendMessage(ChatColor.GRAY + "You have a regular parrot on your shoulder atm!");
             return false;
         }
@@ -144,7 +144,7 @@ public class CommandParrot extends CrownCommand {
         player.setShoulderEntityLeft(null);
         if (parrot != null)
         {
-            Pirates.plugin.events.parrots.remove(parrot.getUniqueId());
+            Pirates.inst.events.parrots.remove(parrot.getUniqueId());
             parrot.remove();
         }
     }
@@ -154,7 +154,7 @@ public class CommandParrot extends CrownCommand {
         Parrot parrot = player.getWorld().spawn(player.getLocation(), Parrot.class);
         parrot.setVariant(color);
         parrot.setSilent(silent);
-        Pirates.plugin.events.parrots.put(parrot.getUniqueId(), player.getUniqueId());
+        Pirates.inst.events.parrots.put(parrot.getUniqueId(), player.getUniqueId());
         player.setShoulderEntityLeft(parrot);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1.0f);
     }

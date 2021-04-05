@@ -1,4 +1,4 @@
-package net.forthecrown.vikings.raids;
+package net.forthecrown.vikings.raids.valhalla;
 
 import net.forthecrown.vikings.Vikings;
 import org.bukkit.Bukkit;
@@ -7,10 +7,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnegative;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 //Class existence reason, provide VikingRaid with a way of handling multiple players
@@ -23,16 +20,19 @@ public class RaidParty implements Iterable<Player>{
     public final long startTime;
 
     private final Set<Player> participants;
-    private float difficultyModifier;
     private boolean specialsAllowed;
 
-    public RaidParty(RaidDifficulty difficulty, VikingRaid selectedRaid, @Nonnegative int startsInMinutes, Player... players){
-        this.difficulty = difficulty;
+    public RaidParty(VikingRaid selectedRaid, @Nonnegative int startsInMinutes, Player... players){
+        this(selectedRaid, startsInMinutes, Arrays.asList(players));
+    }
+
+    public RaidParty(VikingRaid selectedRaid, @Nonnegative int startsInMinutes, Collection<Player> players){
+        this.difficulty = new RaidDifficulty(this);
         this.selectedRaid = selectedRaid;
         this.startsInMinutes = startsInMinutes;
         this.startTime = System.currentTimeMillis() + startsInMinutes*60*1000;
 
-        this.participants = new HashSet<>(Arrays.asList(players));
+        this.participants = new HashSet<>(players);
         if(startsInMinutes > 0) createCountdown();
     }
 
@@ -45,7 +45,7 @@ public class RaidParty implements Iterable<Player>{
 
     public void startRaid(){
         setSpecialsAllowed(participants.size() > 3);
-        difficultyModifier = difficulty.modifier + ((float) participants.size())/2;
+        difficulty.calculateModifier();
         selectedRaid.initRaid(this);
     }
 
@@ -65,7 +65,7 @@ public class RaidParty implements Iterable<Player>{
     }
 
     public float getModifier() {
-        return difficultyModifier;
+        return difficulty.getModifier();
     }
 
     public Set<Player> getParticipants() {

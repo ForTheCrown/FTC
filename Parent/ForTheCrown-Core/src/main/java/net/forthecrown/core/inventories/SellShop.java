@@ -1,5 +1,6 @@
 package net.forthecrown.core.inventories;
 
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
@@ -17,7 +18,7 @@ public class SellShop {
     private final CrownUser user;
 
     public SellShop(Player base){
-        this(FtcCore.getUser(base));
+        this(UserManager.getUser(base));
     }
 
     public SellShop(CrownUser base){

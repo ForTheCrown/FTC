@@ -6,6 +6,7 @@ MaxMoneyAmount: 50000000
 UserDataResetInterval: 5356800000
 BranchSwapCooldown: 172800000
 Taxes: false
+HoppersInOneChunk: 64
 
 Shops:
   log-admin-purchases: true

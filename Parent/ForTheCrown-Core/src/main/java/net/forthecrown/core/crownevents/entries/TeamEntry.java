@@ -6,7 +6,6 @@ import org.bukkit.event.Listener;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.function.Consumer;
 
 public class TeamEntry extends EventEntry implements Iterable<Player> {
 
@@ -41,10 +40,5 @@ public class TeamEntry extends EventEntry implements Iterable<Player> {
     @Override
     public Iterator<Player> iterator() {
         return members.iterator();
-    }
-
-    @Override
-    public void forEach(Consumer<? super Player> action) {
-        members.forEach(action);
     }
 }

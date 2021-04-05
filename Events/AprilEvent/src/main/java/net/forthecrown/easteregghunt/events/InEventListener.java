@@ -71,7 +71,7 @@ public class InEventListener implements Listener {
         if(bunny.isAlive()) return;
 
         bunny.spawn();
-        player.sendMessage(ChatColor.GRAY + "The easter bunny has spawned!");
+        player.sendMessage(ChatColor.YELLOW + "The easter bunny has spawned!" + ChatColor.GRAY + " Look out!");
     }
 
     private void placeThreeEggs(Location location){

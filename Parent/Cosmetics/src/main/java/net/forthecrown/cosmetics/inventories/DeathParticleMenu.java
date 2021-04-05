@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics.inventories;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.md_5.bungee.api.ChatColor;
@@ -72,7 +72,7 @@ public class DeathParticleMenu implements Listener {
         if (event.getEntity().getType() != EntityType.PLAYER) return;
 
 
-        user = FtcCore.getUser(event.getEntity().getUniqueId());
+        user = UserManager.getUser(event.getEntity().getUniqueId());
 
         String activeDeathParticle = user.getDeathParticle();
         if (activeDeathParticle == null || activeDeathParticle == "" || activeDeathParticle.contains("none")) return;

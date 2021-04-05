@@ -17,7 +17,7 @@ import java.util.Collection;
 
 public class _template extends CrownCommandBuilder {
 
-    //name is the command lol /name
+    //name is the command lol "/name"
     public _template(@NotNull String name, @NotNull Plugin plugin) {
         super(name, plugin);
 
@@ -61,7 +61,7 @@ public class _template extends CrownCommandBuilder {
                             return 0; //You have to return a number, it doesn't matter what the number is
                         })
         )
-                .then(argument("required", FloatArgumentType.floatArg(0, 2)) // Required Argument, Checking and parsing is done autmatically done by Brigadier
+                .then(argument("required", FloatArgumentType.floatArg(0, 2)) // Required Argument, Checking and parsing is done automatically done by Brigadier
                         //First parameter is min, second is max, you can have only the first parameter, or no parameters at all
                         .suggests((c, b) -> UserType.listSuggestions(b)) //Tab completions for the argument, c is CommandContext
                         //b is SuggestionBuilder, another Mojang thing

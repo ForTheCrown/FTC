@@ -42,6 +42,7 @@ public final class EasterMain extends JavaPlugin {
         event = new EasterEvent(this, spawner);
 
         CommandLeave.addAllowedArea(EasterEvent.EVENT_AREA, EasterEvent.EXIT_LOCATION, player -> {
+            if(!EasterEvent.open) return false;
             EasterEvent.shouldCancel = true;
             EasterEvent.bunnySpawner.cancel();
             if(event.entry == null) return false;
@@ -54,7 +55,7 @@ public final class EasterMain extends JavaPlugin {
     }
 
     private void createLeaderboard(){
-        leaderboard = new ObjectiveLeaderboard("Easter times",
+        leaderboard = new ObjectiveLeaderboard("Easter Scores",
                 EasterEvent.CROWN,
                 new Location(CrownUtils.WORLD_VOID, -684.5, 128.5, 294.5));
 
@@ -82,6 +83,5 @@ public final class EasterMain extends JavaPlugin {
     public void onDisable() {
         saveConfig();
         if(!EasterEvent.open) event.end(event.entry);
-        tracker.save();
     }
 }

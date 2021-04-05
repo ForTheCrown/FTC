@@ -2,6 +2,7 @@ package net.forthecrown.pirates;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.exceptions.CrownException;
@@ -19,6 +20,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,14 +41,12 @@ public class PirateEvents implements Listener {
             return;
 
         Player player = event.getPlayer();
-        CrownUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = UserManager.getUser(player.getUniqueId());
         if (event.getRightClicked().getType() == EntityType.VILLAGER) {
-            if (event.getRightClicked().getName().contains(ChatColor.GOLD + "Wilhelm"))
-            {
+            if (event.getRightClicked().getName().contains(ChatColor.GOLD + "Wilhelm")) {
                 event.setCancelled(true);
 
-                if (main.getConfig().getStringList("PlayerWhoSoldHeadAlready").contains(player.getUniqueId().toString()))
-                {
+                if (main.getConfig().getStringList("PlayerWhoSoldHeadAlready").contains(player.getUniqueId().toString())) {
                     player.sendMessage(ChatColor.GRAY + "You've already sold a " + main.getConfig().getString("ChosenHead") + ChatColor.GRAY + " head today.");
                     return;
                 }
@@ -77,15 +77,14 @@ public class PirateEvents implements Listener {
         }
         else if (event.getRightClicked().getType() == EntityType.SHULKER) {
             Shulker treasureShulker = (Shulker) event.getRightClicked();
-            if ((!treasureShulker.hasAI()) && treasureShulker.getColor() == DyeColor.GRAY) {
-                if (main.getConfig().getStringList("PlayerWhoFoundTreasureAlready").contains(player.getUniqueId().toString())) player.sendMessage(ChatColor.GRAY + "You've already opened this treasure today.");
-                else {
-                    main.giveTreasure(player);
-                    List<String> temp = main.getConfig().getStringList("PlayerWhoFoundTreasureAlready");
-                    temp.add(player.getUniqueId().toString());
-                    main.getConfig().set("PlayerWhoFoundTreasureAlready", temp);
-                    main.saveConfig();
-                }
+            if (!treasureShulker.getPersistentDataContainer().has(TreasureShulker.KEY, PersistentDataType.BYTE)) return;
+            if (main.getConfig().getStringList("PlayerWhoFoundTreasureAlready").contains(player.getUniqueId().toString())) player.sendMessage(ChatColor.GRAY + "You've already opened this treasure today.");
+            else {
+                main.giveTreasure(player);
+                List<String> temp = main.getConfig().getStringList("PlayerWhoFoundTreasureAlready");
+                temp.add(player.getUniqueId().toString());
+                main.getConfig().set("PlayerWhoFoundTreasureAlready", temp);
+                main.saveConfig();
             }
         }
     }

@@ -1,5 +1,6 @@
-package net.forthecrown.vikings;
+package net.forthecrown.vikings.raids.valhalla;
 
+import net.forthecrown.vikings.Vikings;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 

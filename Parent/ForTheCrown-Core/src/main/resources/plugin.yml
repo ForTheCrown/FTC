@@ -8,3 +8,4 @@ loadbefore:
   - Essentials
 depend:
   - WorldGuard
+  - LuckPerms

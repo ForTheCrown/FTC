@@ -1,4 +1,4 @@
-package net.forthecrown.vikings;
+package net.forthecrown.vikings.raids.valhalla;
 
 import net.minecraft.server.v1_16_R3.TileEntityStructure;
 import org.bukkit.block.Block;

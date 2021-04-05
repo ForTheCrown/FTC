@@ -9,6 +9,10 @@ import org.bukkit.inventory.ItemStack;
 
 public interface BlackMarket extends CrownSerializer<FtcCore> {
 
+    static BlackMarket inst(){
+        return FtcCore.getBlackMarket();
+    }
+
     /**
      * Gets the amount of Rhines earned from a material
      * @param material The material to get
@@ -78,7 +82,7 @@ public interface BlackMarket extends CrownSerializer<FtcCore> {
      */
     void setEnchantBasePrice(Enchantment enchantment, Integer price);
 
-    DailyEnchantment getDailyEnchantment();
+    DailyEnchantment getEnchantment();
 
     /**
      * Gets the inventory of Otto, aka the drops inventory

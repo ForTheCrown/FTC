@@ -1,11 +1,25 @@
 package net.forthecrown.core.api;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.utils.CrownUtils;
+import net.kyori.adventure.text.Component;
 
 import java.util.Map;
 import java.util.UUID;
 
 public interface Balances extends CrownSerializer<FtcCore> {
+
+    static Balances inst(){
+        return FtcCore.getBalances();
+    }
+
+    static String getFormatted(int amount){
+        return CrownUtils.decimalizeNumber(amount) + " Rhines";
+    }
+
+    static Component formatted(int amount){
+        return Component.text(getFormatted(amount));
+    }
 
     Map<UUID, Integer> getBalanceMap();
     void setBalanceMap(Map<UUID, Integer> balanceMap);

@@ -78,7 +78,7 @@ public final class CrownUtils {
     public static String capitalizeWords(String str){
         String[] words = str.split("\\s");
         String capitalizeWord = "";
-        for(String w:words){
+        for(String w: words){
             String first = w.substring(0,1);
             String afterfirst = w.substring(1);
             capitalizeWord += first.toUpperCase() + afterfirst + " ";
@@ -132,11 +132,13 @@ public final class CrownUtils {
         return normalEnum(material);
     }
 
-    public static String normalEnum(Enum<?> anum){
+    public static String normalEnum(@NotNull Enum<?> anum){
+        Validate.notNull(anum, "Provided Enum was null");
         return capitalizeWords(anum.toString().replaceAll("_", " ").toLowerCase());
     }
 
-    public static String decimalizeNumber(Number number){
+    public static String decimalizeNumber(@NotNull Number number){
+        Validate.notNull(number, "Number was null");
         return DECIMAL_FORMAT.format(number);
     }
 
@@ -224,6 +226,12 @@ public final class CrownUtils {
         }
 
         return prefix + sb.toString();
+    }
+
+    public static UUID uuidFromName(String playerName){
+        try {
+            return Bukkit.getOfflinePlayerIfCached(playerName).getUniqueId();
+        } catch (NullPointerException ignored) { return null; }
     }
 
     public enum RomanNumeral {

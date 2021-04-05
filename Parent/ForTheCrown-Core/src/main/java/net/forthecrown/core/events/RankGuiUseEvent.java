@@ -1,7 +1,7 @@
 package net.forthecrown.core.events;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.exceptions.CrownException;
@@ -37,7 +37,7 @@ public class RankGuiUseEvent implements Listener {
         if(!event.getCurrentItem().getItemMeta().hasDisplayName()) return;
 
         Player player = (Player) event.getWhoClicked();
-        CrownUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = UserManager.getUser(player.getUniqueId());
         RankInventory rankInv = new RankInventory(user);
         String currentInvTitle = ChatColor.stripColor(ComponentUtils.getString(event.getView().title()));
         String clickedRankString = ComponentUtils.getString(event.getCurrentItem().getItemMeta().displayName());

@@ -45,7 +45,7 @@ public class Skalatan extends DungeonBoss<WitherSkeleton> {
             skalatan.setRemoveWhenFarAway(false);
             skalatan.setPersistent(true);
 
-            double health = context.bossHealthMod(300);
+            double health = context.getBossHealth(300);
             skalatan.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
             skalatan.setHealth(health);
 

@@ -4,6 +4,7 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.BlackMarket;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.clickevent.ClickEventHandler;
 import net.forthecrown.core.clickevent.ClickEventTask;
 import net.forthecrown.core.enums.Branch;
@@ -67,7 +68,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
 
         Player player = event.getPlayer();
         BlackMarket bm = FtcCore.getBlackMarket();
-        CrownUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = UserManager.getUser(player.getUniqueId());
 
         if(user.getBranch() != Branch.PIRATES) throw new CrownException(player, "&e" + villie.getCustomName() + " only trusts real pirates");
 
@@ -91,9 +92,9 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
 
     private void doEdwardStuff(CrownUser user, BlackMarket bm){
         user.sendMessage("&eEdward &7is currently selling &e" +
-                CrownUtils.capitalizeWords(bm.getDailyEnchantment().getEnchantment().getKey().toString().replaceAll("minecraft:", "").replaceAll("_", " "))
-                + " " + CrownUtils.arabicToRoman(bm.getDailyEnchantment().getLevel()) + " &7for &6"
-                + CrownUtils.decimalizeNumber(bm.getDailyEnchantment().getPrice()) + " Rhines");
+                CrownUtils.capitalizeWords(bm.getEnchantment().getEnchantment().getKey().toString().replaceAll("minecraft:", "").replaceAll("_", " "))
+                + " " + CrownUtils.arabicToRoman(bm.getEnchantment().getLevel()) + " &7for &6"
+                + CrownUtils.decimalizeNumber(bm.getEnchantment().getPrice()) + " Rhines");
 
         ClickEventHandler.allowCommandUsage(user.getPlayer(), true);
 
@@ -209,7 +210,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
 
             Player player = (Player) event.getWhoClicked();
             BlackMarket bm = FtcCore.getBlackMarket();
-            CrownUser user = FtcCore.getUser(event.getWhoClicked().getUniqueId());
+            CrownUser user = UserManager.getUser(event.getWhoClicked().getUniqueId());
             Balances bals = FtcCore.getBalances();
 
             if(event.getView().getTitle().contains("Parrot Shop")){
@@ -283,7 +284,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
             Balances balances = FtcCore.getBalances();
             BlackMarket bm = FtcCore.getBlackMarket();
 
-            Enchantment enchantment = bm.getDailyEnchantment().getEnchantment();
+            Enchantment enchantment = bm.getEnchantment().getEnchantment();
             if(!canEnchantItem(toCheck, enchantment)){
                 player.openInventory(bm.getEnchantInventory(toCheck, false));
                 return;
@@ -292,13 +293,13 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
             if(event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE)){
                 if(event.getClickedInventory().getItem(11) == null) throw new CrownException(player, "&7Place an item to enchant in the empty slot");
 
-                if(balances.get(player.getUniqueId()) < bm.getDailyEnchantment().getPrice()) throw new CannotAffordTransaction(player);
-                balances.add(player.getUniqueId(), -bm.getDailyEnchantment().getPrice());
+                if(balances.get(player.getUniqueId()) < bm.getEnchantment().getPrice()) throw new CannotAffordTransaction(player);
+                balances.add(player.getUniqueId(), -bm.getEnchantment().getPrice());
 
                 ItemStack toEnchant = event.getClickedInventory().getItem(11).clone();
 
                 ItemMeta meta = toEnchant.getItemMeta();
-                meta.addEnchant(enchantment, bm.getDailyEnchantment().getLevel(), true);
+                meta.addEnchant(enchantment, bm.getEnchantment().getLevel(), true);
                 toEnchant.setItemMeta(meta);
 
                 try {

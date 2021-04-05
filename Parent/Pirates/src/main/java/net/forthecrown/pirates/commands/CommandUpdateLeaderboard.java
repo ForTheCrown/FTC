@@ -6,14 +6,14 @@ import net.forthecrown.pirates.Pirates;
 
 public class CommandUpdateLeaderboard extends CrownCommandBuilder {
     public CommandUpdateLeaderboard(){
-        super("updatelb", Pirates.plugin);
+        super("updatelb", Pirates.inst);
         register();
     }
 
     @Override
     protected void registerCommand(BrigadierCommand command) {
         command.executes(c -> {
-            Pirates.plugin.updateLeaderBoard();
+            Pirates.inst.updateLeaderBoard();
             c.getSource().getBukkitSender().sendMessage("Leaderboard updated");
             return 0;
         });

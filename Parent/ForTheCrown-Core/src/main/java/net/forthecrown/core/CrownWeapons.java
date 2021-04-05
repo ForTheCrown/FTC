@@ -22,6 +22,7 @@ import java.util.Objects;
 public class CrownWeapons {
 
     public static boolean isCrownWeapon(ItemStack itemStack){
+        if(itemStack == null) return false;
         Material mat = itemStack.getType();
         if(!(mat == Material.GOLDEN_SWORD || mat == Material.NETHERITE_SWORD || mat == Material.IRON_AXE)) return false;
         if(!itemStack.hasItemMeta()) return false;
@@ -31,6 +32,7 @@ public class CrownWeapons {
     }
 
     public static boolean isLegacyWeapon(ItemStack item){
+        if(item == null) return false;
         Material mat = item.getType();
         if(!(mat == Material.GOLDEN_SWORD || mat == Material.NETHERITE_SWORD || mat == Material.IRON_AXE)) return false;
         if(!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) return false;
@@ -164,7 +166,7 @@ public class CrownWeapons {
             for (int i = 0; i < lore.size(); i++){
                 String s = PlainComponentSerializer.plain().serialize(lore.get(i)).toLowerCase();
 
-                if(s.contains("rank ") && !s.contains("donators")) result[0] = (byte) i;
+                if(s.contains("rank ") && !s.contains("donators") && !s.contains("up")) result[0] = (byte) i;
                 if(s.contains("max rank.") || s.contains("to rank up")) result[1] = (byte) i;
             }
 

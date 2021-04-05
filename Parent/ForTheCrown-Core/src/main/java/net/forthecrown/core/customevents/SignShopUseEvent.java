@@ -1,9 +1,9 @@
 package net.forthecrown.core.customevents;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.SignShop;
+import net.forthecrown.core.api.UserManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -25,7 +25,7 @@ public class SignShopUseEvent extends Event implements Cancellable {
         this.customer = customer;
         this.player = player;
         this.bals = bals;
-        owner = FtcCore.getUser(shop.getOwner());
+        owner = UserManager.getUser(shop.getOwner());
     }
 
     public SignShop getShop() {

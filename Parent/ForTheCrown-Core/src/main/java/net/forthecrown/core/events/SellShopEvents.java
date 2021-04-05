@@ -3,6 +3,7 @@ package net.forthecrown.core.events;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.customevents.SellShopSellEvent;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.inventories.SellShop;
@@ -48,7 +49,7 @@ public class SellShopEvents implements Listener {
         if(Cooldown.contains(player, "Core_SellShop")) return;
         Cooldown.add(player, "Core_SellShop", 6);
 
-        CrownUser user = FtcCore.getUser(player.getUniqueId());
+        CrownUser user = UserManager.getUser(player.getUniqueId());
         SellShop sellShop = this.sellShop;
         ItemStack item = event.getCurrentItem();
 

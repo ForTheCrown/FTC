@@ -1,8 +1,8 @@
 package net.forthecrown.vikings.inventory;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.vikings.Vikings;
@@ -108,7 +108,7 @@ public class BlessingSelector implements InventoryHolder, Listener {
         VikingBlessing blessing = VikingBlessing.fromName(clickedItem.getItemMeta().getDisplayName());
         if(blessing == null) throw new CrownException(player, "Blessing is null");
 
-        blessing.beginUsage(FtcCore.getUser(player));
+        blessing.beginUsage(UserManager.getUser(player));
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -6,8 +6,8 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.commands.brigadier.exceptions.InvalidPlayerArgumentException;
 import net.forthecrown.core.commands.brigadier.exceptions.NonPlayerSenderException;
 import net.forthecrown.core.utils.ComponentUtils;
@@ -104,7 +104,7 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
     }
 
     protected CrownUser getUserSender(CommandContext<CommandListenerWrapper> c) throws NonPlayerSenderException {
-        return FtcCore.getUser(getPlayerSender(c));
+        return UserManager.getUser(getPlayerSender(c));
     }
 
     protected CommandSender getSender(CommandContext<CommandListenerWrapper> c){
@@ -113,7 +113,7 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
 
     protected UUID getUUID(@NotNull String name) throws InvalidPlayerArgumentException {
         Validate.notNull(name, "The name cannot be null");
-        UUID toReturn = FtcCore.getOffOnUUID(name);
+        UUID toReturn = CrownUtils.uuidFromName(name);
         if(toReturn == null) throw new InvalidPlayerArgumentException(name);
         return toReturn;
     }
@@ -196,6 +196,13 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
 
     public String getUsage() {
         return CrownUtils.translateHexCodes(usage);
+    }
+
+    protected void broadcastCommand(CommandListenerWrapper c, String message){
+        for (CrownUser u: UserManager.getOnlineUsers()){
+            //Permissions check for command gets done in sendAdminMessage
+            u.sendAdminMessage(this, c.getBukkitSender(), ComponentUtils.convertString(message));
+        }
     }
 
     public static void broadcastAdmin(CommandListenerWrapper sender, String message){

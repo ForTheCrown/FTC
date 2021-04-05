@@ -1,13 +1,11 @@
 package net.forthecrown.royals.dungeons;
 
 import net.forthecrown.core.CrownBoundingBox;
-import org.bukkit.Bukkit;
+import net.forthecrown.core.utils.CrownUtils;
 import org.bukkit.World;
 
-import java.util.Objects;
-
 public class DungeonAreas {
-    public static final World WORLD = Objects.requireNonNull(Bukkit.getWorld("world_void"));
+    public static final World WORLD = CrownUtils.WORLD_VOID;
     public static final CrownBoundingBox DUNGEON_AREA = new CrownBoundingBox(WORLD, -15, 16, 295, -255, 92, 26);
 
     public static final CrownBoundingBox ZHAMBIE_ROOM = new CrownBoundingBox(WORLD, -174, 92, 171, -207, 76, 142);

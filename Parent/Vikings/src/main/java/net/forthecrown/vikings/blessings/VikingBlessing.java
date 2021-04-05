@@ -1,7 +1,7 @@
 package net.forthecrown.vikings.blessings;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.files.AbstractSerializer;
 import net.forthecrown.vikings.Vikings;
 import org.bukkit.Bukkit;
@@ -90,7 +90,7 @@ public abstract class VikingBlessing extends AbstractSerializer<Vikings> impleme
             Player player = Bukkit.getPlayer(id);
             if(player == null) continue;
 
-            onPlayerUnequip(FtcCore.getUser(player));
+            onPlayerUnequip(UserManager.getUser(player));
         }
     }
 

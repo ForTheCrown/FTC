@@ -19,7 +19,7 @@ public class BossFightContext {
     //private int itemAmount = 0;
 
     public BossFightContext(DungeonBoss<?> boss){
-        players = boss.bossRoom().getPlayers().stream().filter(plr -> plr.getGameMode() == GameMode.SURVIVAL).collect(Collectors.toList());
+        players = boss.getBossRoom().getPlayers().stream().filter(plr -> plr.getGameMode() == GameMode.SURVIVAL).collect(Collectors.toList());
 
         calculateBase();
         float initialMod = Math.max(1, (float) (enchants + armorAmount + players.size())/20);
@@ -61,19 +61,19 @@ public class BossFightContext {
         }
     }
 
-    public int enchantModifier() {
+    public int getEnchantAmount() {
         return enchants;
     }
 
-    public int armorModifier() {
+    public int getArmorAmount() {
         return armorAmount;
     }
 
-    public Collection<Player> players() {
+    public Collection<Player> getPlayers() {
         return players;
     }
 
-    public float finalModifier(){
+    public float getModifier(){
         return finalModifier;
     }
 
@@ -81,11 +81,11 @@ public class BossFightContext {
         return itemAmount;
     }*/
 
-    public double bossHealthMod(double initialHealth){
+    public double getBossHealth(double initialHealth){
         return Math.ceil(initialHealth * finalModifier);
     }
 
-    public double bossDamageMod(double initialDamage){
+    public double getBossDamage(double initialDamage){
         return Math.ceil(initialDamage + finalModifier);
     }
 }

@@ -6,8 +6,8 @@ import net.forthecrown.vikings.blessings.VikingBlessing;
 import net.forthecrown.vikings.commands.CommandViking;
 import net.forthecrown.vikings.commands.CommandVikingFunction;
 import net.forthecrown.vikings.raids.MonasteryRaid;
-import net.forthecrown.vikings.raids.RaidManager;
-import net.forthecrown.vikings.raids.VikingRaid;
+import net.forthecrown.vikings.raids.valhalla.RaidManager;
+import net.forthecrown.vikings.raids.valhalla.VikingRaid;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Vikings extends JavaPlugin {

@@ -1,7 +1,7 @@
-package net.forthecrown.core.events.npc;
+package net.forthecrown.core.events;
 
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.Cooldown;
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.clickevent.ClickEventHandler;
 import net.forthecrown.core.clickevent.ClickEventTask;
@@ -67,7 +67,7 @@ public class JeromeEvent implements Listener, ClickEventTask {
         //args[0] is the ID of the npc
 
         if(args[1].contains("join")){
-            CrownUser user = FtcCore.getUser(player);
+            CrownUser user = UserManager.getUser(player);
             Branch royals = Branch.ROYALS;
 
             if(user.getBranch() == Branch.ROYALS){

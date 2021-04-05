@@ -6,35 +6,38 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.core.CrownWeapons;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ShopManager;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.core.commands.brigadier.exceptions.InvalidPlayerArgumentException;
+import net.forthecrown.core.commands.brigadier.exceptions.NonPlayerSenderException;
 import net.forthecrown.core.commands.brigadier.types.ParticleType;
 import net.forthecrown.core.commands.brigadier.types.TypeCreator;
 import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.files.CrownSignShop;
-import net.forthecrown.core.files.FtcUser;
 import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class CommandCore extends CrownCommandBuilder {
 
@@ -89,9 +92,10 @@ public class CommandCore extends CrownCommandBuilder {
                         .then(argument("balances").executes(c -> saveOrReload(getSender(c), SaveReloadPart.BALANCES, true)))
                         .then(argument("config").executes(c -> saveOrReload(getSender(c), SaveReloadPart.CONFIG, true)))
                         .then(argument("users").executes(c -> saveOrReload(getSender(c), SaveReloadPart.USERS, true)))
+                        .then(argument("user_manager").executes(c -> saveOrReload(getSender(c), SaveReloadPart.USER_MANAGER, true)))
                         .then(argument("shops").executes(c -> saveOrReload(getSender(c), SaveReloadPart.SHOPS, true)))
                 )
-                .then(argument("reloadconfirm")
+                .then(argument("reload")
                         .executes(c -> saveOrReloadAll(getSender(c), false))
 
                         .then(argument("announcer").executes(c -> saveOrReload(getSender(c), SaveReloadPart.ANNOUNCER, false)))
@@ -99,16 +103,8 @@ public class CommandCore extends CrownCommandBuilder {
                         .then(argument("balances").executes(c -> saveOrReload(getSender(c), SaveReloadPart.BALANCES, false)))
                         .then(argument("config").executes(c -> saveOrReload(getSender(c), SaveReloadPart.CONFIG, false)))
                         .then(argument("users").executes(c -> saveOrReload(getSender(c), SaveReloadPart.USERS, false)))
+                        .then(argument("user_manager").executes(c -> saveOrReload(getSender(c), SaveReloadPart.USER_MANAGER, false)))
                         .then(argument("shops").executes(c -> saveOrReload(getSender(c), SaveReloadPart.SHOPS, false)))
-                )
-                .then(argument("reload")
-                    .executes(c -> {
-                        CommandSender sender = getSender(c);
-                        sender.sendMessage(ChatColor.RED + "Warning! " + ChatColor.RESET + "You're about to reload one or all of the plugin's configs! Make sure you've saved!");
-                        sender.sendMessage("Do /ftccore save to save");
-                        sender.sendMessage("Do /ftccore reloadconfirm to confirm");
-                        return 0;
-                    })
                 )
                 .then(argument("legacySwordUpdate")
                         .executes(c -> {
@@ -142,7 +138,6 @@ public class CommandCore extends CrownCommandBuilder {
                                             return 0;
                                         })
                                 )
-
                                 .then(argument("balance")
                                         .executes(c-> {
                                             CrownUser user = getUser(c);
@@ -467,28 +462,16 @@ public class CommandCore extends CrownCommandBuilder {
                                 .executes(c -> giveCoins(getPlayerSender(c), 100))
                         )
                         .then(argument("royalsword")
-                                .executes(c -> {
-                                    Player player = getPlayerSender(c);
-                                    player.getInventory().addItem(CrownItems.BASE_ROYAL_SWORD);
-                                    broadcastAdmin(c.getSource(), "Giving Royal Sword");
-                                    return 0;
-                                })
+                                .executes(c -> giveItem(c, CrownItems.BASE_ROYAL_SWORD, 1))
+                                .then(argument("level", IntegerArgumentType.integer(1, 10)).executes(c -> giveItem(c, CrownItems.BASE_ROYAL_SWORD, c.getArgument("level", Integer.class))))
                         )
                         .then(argument("cutlass")
-                                .executes(c -> {
-                                    Player player = getPlayerSender(c);
-                                    player.getInventory().addItem(CrownItems.BASE_CUTLASS);
-                                    broadcastAdmin(c.getSource(), "Giving Captain's Cutlass");
-                                    return 0;
-                                })
+                                .executes(c -> giveItem(c, CrownItems.BASE_CUTLASS, 1))
+                                .then(argument("level", IntegerArgumentType.integer(1, 10)).executes(c -> giveItem(c, CrownItems.BASE_CUTLASS, c.getArgument("level", Integer.class))))
                         )
                         .then(argument("vikingaxe")
-                                .executes(c -> {
-                                    Player player = getPlayerSender(c);
-                                    player.getInventory().addItem(CrownItems.BASE_VIKING_AXE);
-                                    broadcastAdmin(c.getSource(), "Giving Viking Axe");
-                                    return 0;
-                                })
+                                .executes(c -> giveItem(c, CrownItems.BASE_VIKING_AXE, 1))
+                                .then(argument("level", IntegerArgumentType.integer(1, 10)).executes(c -> giveItem(c, CrownItems.BASE_VIKING_AXE, c.getArgument("level", Integer.class))))
                         )
                         .then(argument("voteticket")
                                 .executes(c -> {
@@ -503,6 +486,21 @@ public class CommandCore extends CrownCommandBuilder {
                                 })
                         )
                 );
+    }
+
+    private int giveItem(CommandContext<CommandListenerWrapper> c, ItemStack item, int level) throws NonPlayerSenderException {
+        Player player = getPlayerSender(c);
+        ItemStack toGive = item.clone();
+        CrownWeapons.CrownWeapon weapon = CrownWeapons.fromItem(toGive);
+
+        for (int i = 0; i < level-1; i++){
+            CrownWeapons.upgradeLevel(weapon, player);
+        }
+
+        ItemMeta meta = toGive.getItemMeta();
+        player.getInventory().addItem(toGive);
+        broadcastAdmin(c.getSource(), "Giving " + (CrownUtils.isNullOrBlank(meta.getDisplayName()) ? CrownUtils.normalEnum(toGive.getType()) : meta.getDisplayName()));
+        return level;
     }
 
     private int giveTicket(boolean elite, Player player){
@@ -538,7 +536,7 @@ public class CommandCore extends CrownCommandBuilder {
     private CrownUser getUser(CommandContext<CommandListenerWrapper> c) throws InvalidPlayerArgumentException {
         String playerName = c.getArgument(USER_ARG, String.class);
         UUID id = getUUID(playerName);
-        return FtcCore.getUser(id);
+        return UserManager.getUser(id);
     }
 
     private int saveOrReload(CommandSender sender, SaveReloadPart thingTo, boolean save){
@@ -570,20 +568,12 @@ public class CommandCore extends CrownCommandBuilder {
             else FtcCore.getBalances().reload();
         }),
         USERS ("Users", b -> {
-            if(b) for (FtcUser u: FtcCore.LOADED_USERS.values()) u.save();
-            else for (FtcUser u: FtcCore.LOADED_USERS.values()) u.reload();
+            if(b) UserManager.inst().saveUsers();
+            else UserManager.inst().reloadUsers();
         }),
         SHOPS ("Signshops", b ->{
-            if(b) for (CrownSignShop u: FtcCore.LOADED_SHOPS.values()){
-                try {
-                    u.save();
-                } catch (Exception ignored) {}
-            }
-            else for (CrownSignShop u: FtcCore.LOADED_SHOPS.values()){
-                try {
-                    u.reload();
-                } catch (Exception ignored) {}
-            }
+            if(b) ShopManager.save();
+            else ShopManager.reload();
         }),
         BLACK_MARKET ("Black Market", b -> {
             if(b) FtcCore.getBlackMarket().save();
@@ -592,11 +582,15 @@ public class CommandCore extends CrownCommandBuilder {
         CONFIG ("Main Config", b -> {
             if(b) FtcCore.getInstance().saveConfig();
             else FtcCore.getInstance().reloadConfig();
+        }),
+        USER_MANAGER("User Manager", b ->{
+            if(b) UserManager.inst().save();
+            else UserManager.inst().reload();
         });
 
         private final String msg;
-        private final Runnable runnable;
-        SaveReloadPart(String msg, Runnable runnable){
+        private final Consumer<Boolean> runnable;
+        SaveReloadPart(String msg, Consumer<Boolean> runnable){
             this.msg = msg;
             this.runnable = runnable;
         }
@@ -610,11 +604,7 @@ public class CommandCore extends CrownCommandBuilder {
         }
 
         public void run(boolean save){
-            runnable.run(save);
+            runnable.accept(save);
         }
-    }
-
-    private interface Runnable{
-        void run(boolean save);
     }
 }

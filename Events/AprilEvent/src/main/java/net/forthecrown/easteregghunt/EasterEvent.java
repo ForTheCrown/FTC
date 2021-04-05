@@ -9,6 +9,7 @@ import net.forthecrown.easteregghunt.events.InEventListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
+import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.ChatMessageType;
 import net.minecraft.server.v1_16_R3.EnumChatFormat;
@@ -62,6 +63,7 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
 
         shouldCancel = false;
         doEntryCountdown(player);
+        player.setCanPickupItems(false);
     }
 
     private int initAmount = 0;
@@ -94,6 +96,8 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
         if(EasterMain.bunny.isAlive()) EasterMain.bunny.kill();
         EasterMain.leaderboard.update();
         spawner.removeAllEggs();
+        entry.player().getInventory().clear();
+        entry.player().getActivePotionEffects().clear();
         entry.player().teleport(EXIT_LOCATION);
         HandlerList.unregisterAll(entry.inEventListener());
 
@@ -133,12 +137,14 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
                 listener.entry = entry;
                 listener.event = this;
 
-                entry.timer().startTickingDown(100);
+                entry.timer().startTickingDown(1);
                 EasterMain.inst.getServer().getPluginManager().registerEvents(entry.inEventListener(), EasterMain.inst);
 
                 player.teleport(EVENT_LOCATION);
+                player.getInventory().clear();
+                player.getActivePotionEffects().clear();
                 bunnySpawnTimer();
-                EasterMain.leaderboard.update();
+                player.setCanPickupItems(true);
                 Bukkit.getScheduler().cancelTask(loopID);
                 return;
             }
@@ -152,6 +158,7 @@ public class EasterEvent implements CrownEvent<EasterEntry> {
             @Override
             public void run() {
                 EasterMain.bunny.spawn();
+                entry.player().sendMessage(ChatColor.YELLOW + "The easter bunny has spawned!" + ChatColor.GRAY + " Look out!");
             }
         };
         bunnySpawner.runTaskLater(EasterMain.inst, 30*20);

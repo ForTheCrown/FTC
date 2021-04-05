@@ -4,6 +4,7 @@ import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.easteregghunt.EasterEvent;
 import net.forthecrown.easteregghunt.EasterMain;
+import net.forthecrown.easteregghunt.UserTracker;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
@@ -22,7 +23,7 @@ public class EventListener implements Listener {
 
         Player player = event.getPlayer();
         if(!player.getInventory().isEmpty()) throw new CrownException(player, "&7You must have an empty inventory");
-        if(!EasterMain.tracker().entryAllowed(player)) throw new CrownException(player, "&7You've done too many rounds today. Come back tomorrow :)");
+        if(!EasterMain.tracker().entryAllowed(player)) throw new CrownException(player, "&7You've done too many rounds today. Come back in " + UserTracker.delayTime + " minutes :)");
         if(!EasterEvent.open) throw new CrownException(player, "&7Someone is currently in the event");
 
         EasterMain.event.start(player);

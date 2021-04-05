@@ -1,4 +1,4 @@
-package net.forthecrown.vikings;
+package net.forthecrown.vikings.raids.valhalla;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

@@ -88,6 +88,7 @@ public class CommandRoyal extends CrownCommandBuilder {
                                         name = name.decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
                                         meta.displayName(name);
                                     }
+                                    meta.lore(lore);
                                     item.setItemMeta(meta);
 
                                     broadcastAdmin(c.getSource(), "item updated");
@@ -169,7 +170,7 @@ public class CommandRoyal extends CrownCommandBuilder {
 
                                             broadcastAdmin(c.getSource(), "Boss: " + boss.getBossEntity().getCustomName());
                                             broadcastAdmin(c.getSource(), "Health: " + boss.getBossEntity().getHealth());
-                                            broadcastAdmin(c.getSource(), "finalMod: " + boss.getContext().finalModifier());
+                                            broadcastAdmin(c.getSource(), "finalMod: " + boss.getContext().getModifier());
                                             broadcastAdmin(c.getSource(), "maxHealth: " + boss.getBossEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 
                                             return 0;

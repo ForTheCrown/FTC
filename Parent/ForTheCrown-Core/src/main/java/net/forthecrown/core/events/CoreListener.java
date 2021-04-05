@@ -2,13 +2,18 @@ package net.forthecrown.core.events;
 
 import net.forthecrown.core.CrownWeapons;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.inventories.SellShop;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -21,12 +26,12 @@ public class CoreListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
-        FtcCore.getUser(event.getPlayer());
+        UserManager.getUser(event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event){
-        FtcCore.getUser(event.getPlayer()).unload();
+        UserManager.getUser(event.getPlayer()).unload();
     }
 
     @EventHandler
@@ -39,6 +44,17 @@ public class CoreListener implements Listener {
 
         event.getPlayer().openInventory(new SellShop(event.getPlayer()).mainMenu());
         event.setCancelled(true);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if(event.getBlock().getType() != Material.HOPPER) return;
+        int hopperAmount = event.getBlock().getChunk().getTileEntities(block -> block.getType() == Material.HOPPER, true).size();
+        if(FtcCore.getHoppersInOneChunk() == -1) return;
+        if(hopperAmount <= FtcCore.getHoppersInOneChunk()) return;
+
+        event.setCancelled(true);
+        event.getPlayer().sendMessage(Component.text("Too many hoppers (Max 45)").color(NamedTextColor.RED));
     }
 
     @EventHandler(ignoreCancelled = true)

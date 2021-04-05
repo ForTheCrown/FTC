@@ -1,11 +1,12 @@
 package net.forthecrown.core.files;
 
-import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ShopManager;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.inventories.CrownShopInventory;
+import net.forthecrown.core.utils.CrownItems;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -46,7 +47,7 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
         this.block = location.getBlock();
 
         inventory = new CrownShopInventory(this);
-        FtcCore.LOADED_SHOPS.put(location, this);
+        ShopManager.LOADED_SHOPS.put(location, this);
 
         reload();
     }
@@ -70,7 +71,7 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
         super.save();
 
         inventory = new CrownShopInventory(this);
-        FtcCore.LOADED_SHOPS.put(location, this);
+        ShopManager.LOADED_SHOPS.put(location, this);
     }
 
     @Override
@@ -88,7 +89,7 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
         try {
             super.save();
         } catch (NullPointerException e){
-            FtcCore.LOADED_SHOPS.remove(this.getLocation());
+            ShopManager.LOADED_SHOPS.remove(this.getLocation());
         }
     }
 
@@ -115,14 +116,14 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
     }
 
     @Override
-    public void destroyShop() {
-        FtcCore.LOADED_SHOPS.remove(this.getLocation());
+    public void destroy(boolean removeBlock) {
+        ShopManager.LOADED_SHOPS.remove(this.getLocation());
         if(inventory != null && inventory.getShopContents().size() > 0) {
             for (ItemStack stack : inventory.getShopContents()){ location.getWorld().dropItemNaturally(location, stack); }
             location.getWorld().spawnParticle(Particle.CLOUD, location.add(0.5, 0.5, 0.5), 5, 0.1D, 0.1D, 0.1D, 0.05D);
         }
 
-        getLocation().getBlock().breakNaturally();
+        if(removeBlock)getBlock().breakNaturally();
         delete();
     }
 

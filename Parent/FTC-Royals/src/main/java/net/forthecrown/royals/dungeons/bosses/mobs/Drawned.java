@@ -53,7 +53,7 @@ public class Drawned extends DungeonBoss<Drowned> {
             drawned.setRemoveWhenFarAway(false);
             drawned.setPersistent(true);
 
-            final double health = context.bossHealthMod(350);
+            final double health = context.getBossHealth(350);
             drawned.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
             drawned.getAttribute(Attribute.GENERIC_MAX_HEALTH).getModifiers().clear();
             drawned.setHealth(health);
@@ -105,7 +105,7 @@ public class Drawned extends DungeonBoss<Drowned> {
     private void spawnGuardian(Location location, boolean invulnerable){
         location.getWorld().spawn(location, Guardian.class, guardian -> {
             guardian.setInvulnerable(invulnerable);
-            guardian.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(context.bossHealthMod(10));
+            guardian.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(context.getBossHealth(10));
             guardian.setLootTable(LootTables.EMPTY.getLootTable());
             guardians.add(guardian);
         });

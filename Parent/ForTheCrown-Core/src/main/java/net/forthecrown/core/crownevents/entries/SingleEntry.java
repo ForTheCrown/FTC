@@ -1,7 +1,7 @@
 package net.forthecrown.core.crownevents.entries;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -19,6 +19,6 @@ public class SingleEntry extends EventEntry{
     }
 
     public CrownUser user(){
-        return FtcCore.getUser(entry);
+        return UserManager.getUser(entry);
     }
 }

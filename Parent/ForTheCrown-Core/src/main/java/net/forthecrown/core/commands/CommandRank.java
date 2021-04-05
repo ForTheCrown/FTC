@@ -1,6 +1,7 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.events.RankGuiUseEvent;
@@ -36,7 +37,7 @@ public class CommandRank extends CrownCommandBuilder {
             Player player = getPlayerSender(c);
 
             FtcCore.getInstance().getServer().getPluginManager().registerEvents(new RankGuiUseEvent(player), FtcCore.getInstance());
-            player.openInventory(new RankInventory(FtcCore.getUser(player)).getUsersRankGUI());
+            player.openInventory(new RankInventory(UserManager.getUser(player)).getUsersRankGUI());
             return 0;
         });
     }

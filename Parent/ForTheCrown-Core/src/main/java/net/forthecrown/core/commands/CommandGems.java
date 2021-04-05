@@ -5,6 +5,7 @@ import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.core.utils.ComponentUtils;
 
 public class CommandGems extends CrownCommandBuilder {
 
@@ -35,10 +36,8 @@ public class CommandGems extends CrownCommandBuilder {
                         .suggests((c, b) -> UserType.listSuggestions(b))
 
                         .executes(c ->{
-                            CrownUser user = getUserSender(c);
                             CrownUser other = UserType.getUser(c, "player");
-
-                            user.sendMessage("&e" + other.getName() + " &7has &e" + other.getGems() + " Gems");
+                            c.getSource().getBukkitSender().sendMessage(ComponentUtils.convertString("&e" + other.getName() + " &7has &e" + other.getGems() + " Gems"));
                             return -1000;
                         })
                 )
