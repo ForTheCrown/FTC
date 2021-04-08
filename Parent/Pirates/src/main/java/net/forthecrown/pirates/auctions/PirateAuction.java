@@ -11,6 +11,7 @@ import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.MapUtils;
 import net.forthecrown.pirates.Pirates;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -98,6 +99,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
         removeDisplay();
         if(bids != null) getFile().createSection("Bids", MapUtils.convertKeys(bids, UUID::toString));
+        else getFile().createSection("Bids");
 
         super.save();
     }
@@ -218,7 +220,17 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
     @Override
     public void attemptItemClaim(CrownUser user) throws CrownException{
-        if(!highestBidder.equals(user)) throw new CrownException(user, "You cannot claim this item!");
+        if(!highestBidder.equals(user)){
+            user.sendMessage(
+                    Component.text("You cannot claim this item! ")
+                            .color(NamedTextColor.YELLOW)
+                            .append(Component.text("Auction winner: " + getHighestBidder().getName())
+                                    .color(NamedTextColor.GRAY)
+                                    .hoverEvent(highestBidder.asHoverEvent())
+                            )
+            );
+            return;
+        }
         else {
             if (user.getPlayer().getInventory().firstEmpty() == -1) throw new CrownException(user, "Your inventory is full!");
 

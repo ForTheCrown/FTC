@@ -10,17 +10,31 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Class representing the staff chat
+ * <p>Exists because I was cleaning up the ChatEvents class lol</p>
+ */
 public class StaffChat {
     private static Set<Player> sctPlayers = new HashSet<>();
 
-    public static void send(CommandSender sender, String message, boolean cmd){
+    /**
+     * Sends a staff chat message
+     * @param sender The message's sender
+     * @param message The message
+     * @param cmd Whether the message was sent via command (If true, message won't get logged)
+     */
+    public static void send(@NotNull CommandSender sender, @NotNull String message, boolean cmd){
+        Validate.notNull(sender, "Sender was null");
+
         TextComponent senderText = Component.text(sender.getName()).color(NamedTextColor.GRAY);
         if(sender instanceof Player || sender instanceof CrownUser){
             //Sender is player, make text hover event
@@ -46,6 +60,10 @@ public class StaffChat {
         if(!cmd) Bukkit.getConsoleSender().sendMessage(text);
     }
 
+    /**
+     * Gets every player with staffChatToggle on
+     * @return staff chat toggle players
+     */
     public static Set<Player> getSCT(){ //gets a list of all the players, whose messages will always go to staffchat
         return sctPlayers;
     }

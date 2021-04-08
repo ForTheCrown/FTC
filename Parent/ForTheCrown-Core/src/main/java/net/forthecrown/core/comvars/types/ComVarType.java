@@ -10,6 +10,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+/**
+ * Represents a CommandVariableType, this is needed so a ComVar knows what type a com var actually is
+ * <p>Also, this does the string parsing and in the future it might possible also do the serializing and deserializing</p>
+ * <p>Primitive types have the types provided to you, no need to make em</p>
+ * <p>I would also making it so you only create one instance of the ComVarType implementation, not several</p>
+ * <p>A Component type also exists, I mde it as a test </p>
+ * @see ComponentComVarType
+ * @param <T> The type of the var, can be an int, string or any custom type
+ */
 public interface ComVarType<T> {
     ComVarType<Long> LONG = new PrimitiveComVarType<>(Long.class, Long::parseLong);
     ComVarType<Double> DOUBLE = new PrimitiveComVarType<>(Double.class, Double::parseDouble);

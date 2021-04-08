@@ -7,6 +7,10 @@ import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 
 import java.util.Iterator;
 
+/**
+ * A literal argument, aka enter the exact provided string to use it
+ * <p>Another NMS wrapper lol</p>
+ */
 public class LiteralArgument extends ArgumentBuilder<CommandListenerWrapper, LiteralArgument> {
     private final String literal;
 

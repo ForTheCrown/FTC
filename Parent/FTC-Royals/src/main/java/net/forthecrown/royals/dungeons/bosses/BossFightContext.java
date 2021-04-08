@@ -2,6 +2,7 @@ package net.forthecrown.royals.dungeons.bosses;
 
 import net.forthecrown.royals.dungeons.bosses.mobs.DungeonBoss;
 import org.bukkit.GameMode;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,17 +13,18 @@ public class BossFightContext {
 
     private final Collection<Player> players;
     private final float finalModifier;
+    private final DungeonBoss<?> boss;
 
     //+1 per each in player's inv
     private int enchants = 0;
     private int armorAmount = 0;
-    //private int itemAmount = 0;
 
     public BossFightContext(DungeonBoss<?> boss){
+        this.boss = boss;
         players = boss.getBossRoom().getPlayers().stream().filter(plr -> plr.getGameMode() == GameMode.SURVIVAL).collect(Collectors.toList());
 
         calculateBase();
-        float initialMod = Math.max(1, (float) (enchants + armorAmount + players.size())/20);
+        float initialMod = Math.max(1, (float) (enchants + armorAmount)/ (players.size() < 2 ? 20 : 17) );
         finalModifier = Math.min(initialMod, 5);
     }
 
@@ -31,33 +33,17 @@ public class BossFightContext {
             for (ItemStack i: p.getInventory().getArmorContents()){
                 if(i == null) continue;
                 armorAmount++;
+                enchants += i.getEnchantments().size();
             }
 
             for (ItemStack s: p.getInventory().getStorageContents()){
                 if(s == null) continue;
-
-                switch (s.getType()){
-                    case TRIDENT:
-                    case DIAMOND_SWORD:
-                    case NETHERITE_SWORD:
-                    case DIAMOND_AXE:
-                    case NETHERITE_AXE:
-                    case TOTEM_OF_UNDYING:
-                    case CROSSBOW:
-                    case NETHERITE_BOOTS:
-                    case NETHERITE_CHESTPLATE:
-                    case NETHERITE_LEGGINGS:
-                    case NETHERITE_HELMET:
-                    case DIAMOND_BOOTS:
-                    case DIAMOND_CHESTPLATE:
-                    case DIAMOND_LEGGINGS:
-                    case DIAMOND_HELMET:
-                    case GOLDEN_SWORD:
-                    case BOW:
-                        //itemAmount++;
-                        enchants += s.getEnchantments().size();
-                }
+                enchants += s.getEnchantments().size();
             }
+        }
+
+        for (Item i: boss.getBossRoom().getEntitiesByType(Item.class)){
+            enchants += i.getItemStack().getEnchantments().size();
         }
     }
 
@@ -76,10 +62,6 @@ public class BossFightContext {
     public float getModifier(){
         return finalModifier;
     }
-
-    /*public int itemAmount() {
-        return itemAmount;
-    }*/
 
     public double getBossHealth(double initialHealth){
         return Math.ceil(initialHealth * finalModifier);

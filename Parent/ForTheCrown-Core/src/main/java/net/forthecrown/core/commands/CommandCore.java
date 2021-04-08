@@ -9,6 +9,7 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.ShopManager;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.CrownUserAlt;
 import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
@@ -20,6 +21,7 @@ import net.forthecrown.core.commands.brigadier.types.TypeCreator;
 import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.files.FtcUserAlt;
 import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
@@ -72,7 +74,7 @@ public class CommandCore extends CrownCommandBuilder {
     @Override
     protected void registerCommand(BrigadierCommand command) {
         command
-                .then(argument("resetcrown")
+                .then(argument("resetcrown") //Resets the crown objective, aka, destroys and re creates it
                         .executes(c -> {
                             Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
                             Objective objective = scoreboard.getObjective("crown");
@@ -84,9 +86,10 @@ public class CommandCore extends CrownCommandBuilder {
                             return 0;
                         })
                 )
-                .then(argument("save")
-                        .executes(c -> saveOrReloadAll(getSender(c), true))
+                .then(argument("save") //Save all or a part of the plugin
+                        .executes(c -> saveOrReloadAll(getSender(c), true)) //Save all
 
+                        //Save a specific part
                         .then(argument("announcer").executes(c -> saveOrReload(getSender(c), SaveReloadPart.ANNOUNCER, true)))
                         .then(argument("blackmarket").executes(c -> saveOrReload(getSender(c), SaveReloadPart.BLACK_MARKET, true)))
                         .then(argument("balances").executes(c -> saveOrReload(getSender(c), SaveReloadPart.BALANCES, true)))
@@ -96,8 +99,9 @@ public class CommandCore extends CrownCommandBuilder {
                         .then(argument("shops").executes(c -> saveOrReload(getSender(c), SaveReloadPart.SHOPS, true)))
                 )
                 .then(argument("reload")
-                        .executes(c -> saveOrReloadAll(getSender(c), false))
+                        .executes(c -> saveOrReloadAll(getSender(c), false)) //Reload all
 
+                        //Reload a specific part
                         .then(argument("announcer").executes(c -> saveOrReload(getSender(c), SaveReloadPart.ANNOUNCER, false)))
                         .then(argument("blackmarket").executes(c -> saveOrReload(getSender(c), SaveReloadPart.BLACK_MARKET, false)))
                         .then(argument("balances").executes(c -> saveOrReload(getSender(c), SaveReloadPart.BALANCES, false)))
@@ -107,7 +111,7 @@ public class CommandCore extends CrownCommandBuilder {
                         .then(argument("shops").executes(c -> saveOrReload(getSender(c), SaveReloadPart.SHOPS, false)))
                 )
                 .then(argument("legacySwordUpdate")
-                        .executes(c -> {
+                        .executes(c -> { //Update a legacy sword, automatic detection should be good enough to not have to use this
                             Player player = getPlayerSender(c);
                             if(player.getInventory().getItemInMainHand() == null || player.getInventory().getItemInMainHand().getType() == Material.AIR){
                                 throw new CrownCommandException("&7You must be holding the weapon to update");
@@ -118,10 +122,12 @@ public class CommandCore extends CrownCommandBuilder {
                         })
                 )
 
+                //Everything relating to a specific user
                 .then(argument("user")
                         .then(argument(USER_ARG, UserType.user())
                                 .suggests((c, b) -> UserType.listSuggestions(b))
 
+                                //Save the user's data
                                 .then(argument("save")
                                         .executes(c -> {
                                             CrownUser u = getUser(c);
@@ -130,6 +136,8 @@ public class CommandCore extends CrownCommandBuilder {
                                             return 0;
                                         })
                                 )
+
+                                //Reload the user's data
                                 .then(argument("reload")
                                         .executes(c -> {
                                             CrownUser u = getUser(c);
@@ -138,13 +146,66 @@ public class CommandCore extends CrownCommandBuilder {
                                             return 0;
                                         })
                                 )
+
+                                //This alt shit can go fuck itself
+                                .then(argument("alt")
+                                        .then(argument("list")
+                                                .executes(c -> {
+                                                    CrownUser user = getUser(c);
+                                                    UserManager um = FtcCore.getUserManager();
+
+                                                    c.getSource().getBukkitSender().sendMessage(
+                                                            Component.text(user.getName() + "'s alt accounts:")
+                                                            .append(Component.newline())
+                                                            .append(Component.text(um.getAlts(user.getUniqueId()).toString()))
+                                                    );
+
+                                                    return 0;
+                                                })
+                                        )
+                                        .then(argument("for")
+                                                .then(argument("altFor", UserType.user())
+                                                        .executes(c -> {
+                                                            try {
+                                                                CrownUser user = getUser(c);
+                                                                CrownUser main = UserType.getUser(c, "altFor");
+                                                                UserManager um = FtcCore.getUserManager();
+
+                                                                um.addEntry(user.getUniqueId(), main.getUniqueId());
+                                                                user.unload();
+                                                                CrownUserAlt alt = new FtcUserAlt(user.getUniqueId(), main.getUniqueId());
+                                                                alt.save();
+
+                                                                broadcastAdmin(c.getSource(), alt.getName() + " is now an alt for " + main.getName());
+                                                            } catch (Exception e){
+                                                                e.printStackTrace();
+                                                            }
+                                                            return 0;
+                                                        })
+                                                )
+                                        )
+                                        .then(argument("for_none")
+                                                .executes(c -> {
+                                                    CrownUser user = getUser(c);
+                                                    UserManager um = FtcCore.getUserManager();
+
+                                                    if(!um.isAlt(user.getUniqueId())) throw new CrownCommandException(user.getName() + " is not an alt");
+                                                    um.removeEntry(user.getUniqueId());
+
+                                                    broadcastAdmin(c.getSource(), user.getName() + " is no longer an alt");
+                                                    return 0;
+                                                })
+                                        )
+                                )
+
                                 .then(argument("balance")
-                                        .executes(c-> {
+                                        .executes(c-> { //Shows the balance
                                             CrownUser user = getUser(c);
                                             c.getSource().getBukkitSender().sendMessage(user.getName() + " has " + bals.getDecimalized(user.getBase()) + " Rhines");
                                             return 0;
                                         })
 
+                                        //Sets the balance
                                         .then(argument("set")
                                                 .then(argument("sAmount", IntegerArgumentType.integer(0, maxMoney))
                                                         .executes(c -> {
@@ -158,6 +219,7 @@ public class CommandCore extends CrownCommandBuilder {
                                                         })
                                                 )
                                         )
+                                        //Adds to the balance
                                         .then(argument("add")
                                                 .then(argument("aAmount", IntegerArgumentType.integer(1, maxMoney))
                                                         .executes(c -> {
@@ -172,6 +234,7 @@ public class CommandCore extends CrownCommandBuilder {
                                                         })
                                                 )
                                         )
+                                        //Removes from the balance
                                         .then(argument("remove")
                                                 .then(argument("rAmount", IntegerArgumentType.integer(1, maxMoney))
                                                         .executes(c -> {
@@ -186,6 +249,7 @@ public class CommandCore extends CrownCommandBuilder {
                                                         })
                                                 )
                                         )
+                                        //Resets the balance, removes it from the BalanceMap so it doesn't take up as much data
                                         .then(argument("reset")
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
@@ -523,12 +587,12 @@ public class CommandCore extends CrownCommandBuilder {
 
     private int announcerThing(CommandContext<CommandListenerWrapper> c, boolean start){
         if(start){
-            FtcCore.getAnnouncer().startAnnouncer();
+            FtcCore.getAnnouncer().start();
             broadcastAdmin(c.getSource(), "Announcer started");
             return 0;
         }
 
-        FtcCore.getAnnouncer().stopAnnouncer();
+        FtcCore.getAnnouncer().stop();
         broadcastAdmin(c.getSource(), "Announcer stopped");
         return 0;
     }

@@ -11,8 +11,18 @@ import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A class for the Component com var type
+ */
 public class ComponentComVarType implements ComVarType<Component> {
+
+    /**
+     * The instance of the component type
+     */
     public static final ComVarType<Component> COMPONENT_TYPE = new ComponentComVarType();
+
+    //Only the class itself may construct this
+    private ComponentComVarType() {}
 
     @Override
     public Component fromString(String input) throws ComVarException {

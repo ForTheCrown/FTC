@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
+//TODO: Move into CrownUserManager
 public final class FileChecker {
 
     private final File dataFolder;

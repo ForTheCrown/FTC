@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
 public class BlockType {
-
     public static ArgumentTile material(){
         return ArgumentTile.a();
     }

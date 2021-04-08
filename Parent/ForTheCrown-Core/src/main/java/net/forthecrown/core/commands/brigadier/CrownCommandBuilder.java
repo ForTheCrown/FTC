@@ -27,6 +27,13 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
+/**
+ * The class used to create, build and register commands
+ * <p>
+ * stuff like usage and descriptions are basically worthless and exist
+ * because I can't be arsed to remove them from commands that already have them
+ * </p>
+ */
 public abstract class CrownCommandBuilder implements Predicate<CommandListenerWrapper> {
 
     private final String name;
@@ -43,12 +50,15 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
     private VanillaCommandWrapper wrapper;
 
     protected CrownCommandBuilder(@NotNull String name, @NotNull Plugin plugin) {
+        Validate.notNull(name, "Name was null");
+        Validate.notNull(plugin, "Plugin was null");
+
         this.name = name;
         this.fallbackPrefix = plugin.getDescription().getName();
         this.plugin = plugin;
 
         command = new BrigadierCommand(name);
-        permission = "ftc.commands." + name;
+        permission = "ftc.commands." + name.toLowerCase();
         permissionMessage = ChatColor.GRAY + "You do not have permission to use this";
     }
 
@@ -60,7 +70,7 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
         command.requires(this);
         registerCommand(command);
 
-        CommandDispatcher<CommandListenerWrapper> dispatcher = RoyalBrigadier.getDispatcher().a();
+        CommandDispatcher<CommandListenerWrapper> dispatcher = RoyalBrigadier.getServerCommands().a();
         dispatcher.register(command);
 
         initializeWrapper();
@@ -72,7 +82,7 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
     }
 
     protected final void initializeWrapper(){
-        wrapper = new VanillaCommandWrapper(RoyalBrigadier.getDispatcher(), command.build());
+        wrapper = new VanillaCommandWrapper(RoyalBrigadier.getServerCommands(), command.build());
         wrapper.setPermission(permission);
         wrapper.setAliases(aliases);
         wrapper.setDescription(description);
@@ -196,13 +206,6 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
 
     public String getUsage() {
         return CrownUtils.translateHexCodes(usage);
-    }
-
-    protected void broadcastCommand(CommandListenerWrapper c, String message){
-        for (CrownUser u: UserManager.getOnlineUsers()){
-            //Permissions check for command gets done in sendAdminMessage
-            u.sendAdminMessage(this, c.getBukkitSender(), ComponentUtils.convertString(message));
-        }
     }
 
     public static void broadcastAdmin(CommandListenerWrapper sender, String message){

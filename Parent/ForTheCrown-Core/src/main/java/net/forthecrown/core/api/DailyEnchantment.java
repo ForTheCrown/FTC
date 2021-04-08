@@ -2,6 +2,9 @@ package net.forthecrown.core.api;
 
 import org.bukkit.enchantments.Enchantment;
 
+/**
+ * Represents the daily enchantment on sail in the Black Market
+ */
 public interface DailyEnchantment {
     /**
      * Gets the base price of the enchantment

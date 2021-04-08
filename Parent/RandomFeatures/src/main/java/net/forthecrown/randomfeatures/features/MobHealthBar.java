@@ -76,6 +76,7 @@ public class MobHealthBar implements Listener {
                 damaged.setCustomNameVisible(false);
                 damaged.customName(RandomFeatures.instance.withSetNames.getOrDefault(damaged, null));
                 RandomFeatures.instance.withSetNames.remove(damaged);
+                hitmobs.remove(damaged);
             }
         };
         runnable.runTaskLater(RandomFeatures.instance, 5*20); //Start new delay

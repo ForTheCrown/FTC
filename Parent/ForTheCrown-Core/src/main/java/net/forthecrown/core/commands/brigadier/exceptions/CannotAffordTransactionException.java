@@ -1,5 +1,8 @@
 package net.forthecrown.core.commands.brigadier.exceptions;
 
+/**
+ * Thrown when a player cannot afford a transaction
+ */
 public class CannotAffordTransactionException extends CrownCommandException {
     public CannotAffordTransactionException(){
         super("&7You cannot afford that");

@@ -8,6 +8,7 @@ import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
 import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.forthecrown.core.utils.Cooldown;
+import net.minecraft.server.v1_16_R3.EntitySelector;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -15,13 +16,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public class _template extends CrownCommandBuilder {
+public class _guide extends CrownCommandBuilder {
 
-    //name is the command lol "/name"
-    public _template(@NotNull String name, @NotNull Plugin plugin) {
+    public _guide(@NotNull String name, @NotNull Plugin plugin) {
         super(name, plugin);
 
         //The only 2 useable ones lol
+        //unless the permission is set, the permission will be by default:
+        //ftc.commands.NAME In lowercase ofc lol
         setPermission("permission.permission");
         setPermissionMessage("No permission >:(");
 
@@ -39,6 +41,11 @@ public class _template extends CrownCommandBuilder {
      * - /<command> <args>
      *
      * Author:
+     */
+
+    /*
+     * Don't up referenced classes in the Command Description lol
+     * They would take up too many slots, and you can just read the imports anyway lol
      */
 
     /*
@@ -79,6 +86,8 @@ public class _template extends CrownCommandBuilder {
                             //net.forthecrown.core.commands.brigadier.types, then use this type of to get the variable. Otherwise
                             //It'll try to return an NMS type. Example:
                             Collection<? extends Entity> entities = TargetSelectorType.getEntities(c, "Argument");
+                            //^^^ to use the target selector, if you wanted to use getArgument, you'd have the following result:
+                            EntitySelector selector = c.getArgument("argument", EntitySelector.class);
 
                             //Brigadier can use CommandSyntaxException to end a command's execution
                             //CrownCommandException is a child class of that, it only requires a message that gets sent to the player

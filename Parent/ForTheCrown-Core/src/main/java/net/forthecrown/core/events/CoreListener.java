@@ -31,7 +31,7 @@ public class CoreListener implements Listener {
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event){
-        UserManager.getUser(event.getPlayer()).unload();
+        UserManager.getUser(event.getPlayer()).onLeave();
     }
 
     @EventHandler
@@ -69,12 +69,17 @@ public class CoreListener implements Listener {
         if (!(event2.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) || event2.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK))) return;
 
         CrownWeapons.CrownWeapon weapon = CrownWeapons.fromItem(item);
+
         if(weapon.getTarget() == EntityType.AREA_EFFECT_CLOUD){
-            if(event.getEntity() instanceof Creeper && !((Creeper) event.getEntity()).isPowered()) return;
+            if(!(event.getEntity() instanceof Creeper)) return;
+            if(!((Creeper) event.getEntity()).isPowered()) return;
         } else if(event.getEntity().getType() != weapon.getTarget()) return;
 
         short pog = (short) (weapon.getProgress() + 1);
         if(pog >= weapon.getGoal()) CrownWeapons.upgradeLevel(weapon, player);
-        else weapon.setProgress(pog);
+        else {
+            weapon.setProgress(pog);
+            weapon.update();
+        }
     }
 }

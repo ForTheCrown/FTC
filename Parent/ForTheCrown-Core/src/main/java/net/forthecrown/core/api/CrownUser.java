@@ -9,9 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEventSource;
 import net.minecraft.server.v1_16_R3.ChatMessageType;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
@@ -22,6 +20,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Represents a user's profile, all their ranks, effects and such
+ */
 public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, HoverEventSource<Component>, Nameable {
 
     /**
@@ -485,6 +486,23 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
      * @return The user's grave
      */
     Grave getGrave();
+
+    /**
+     * Gets the location of the user, or the last known location if they're not online. Will return null if no location was found
+     * @return The user's location, or last known location
+     */
+    Location getLocation();
+
+    /**
+     * Gets the world the user is in, or the last known world the player was in
+     * @return User's last known world
+     */
+    World getWorld();
+
+    /**
+     * NOT API, executes the code to make sure everything that's needed to be saved is
+     */
+    void onLeave();
 
     @Override
     boolean equals(Object o);

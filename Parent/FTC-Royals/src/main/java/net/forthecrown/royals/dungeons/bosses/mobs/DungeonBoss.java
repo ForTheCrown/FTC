@@ -1,7 +1,7 @@
 package net.forthecrown.royals.dungeons.bosses.mobs;
 
 import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.core.api.UserManager;
+import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.royals.RoyalUtils;
 import net.forthecrown.royals.Royals;
@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -96,6 +97,9 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
         bossBar.setVisible(false);
         bossBar = null;
 
+        bossEntity.getWorld().createExplosion(bossEntity.getLocation().add(0, 1, 0), 2.0f, false, false, bossEntity);
+        bossEntity.getWorld().playSound(bossEntity.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1.0f, 1.0f);
+
         if(!server) onDeath(context);
         bossEntity.remove();
         bossEntity = null;
@@ -104,7 +108,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
     }
 
     public void createBossbar(BossFightContext context){
-        bossBar = Bukkit.createBossBar(bossEntity.getCustomName(), BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC); //<- Should play some epic orchestral music lol
+        bossBar = Bukkit.createBossBar(bossEntity.getCustomName(), BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC, BarFlag.DARKEN_SKY, BarFlag.CREATE_FOG); //<- Should play some epic orchestral music lol
         bossBar.setProgress(1.0);
         bossBar.setVisible(true);
 
@@ -153,7 +157,8 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
     protected void giveRewards(@Nullable String achievement, @NotNull ItemStack reward, @NotNull BossFightContext context){
         for (Player p: context.getPlayers()){
             if(!getBossRoom().contains(p)) continue;
-            if(UserManager.inst().isAltFor(p.getUniqueId(), bossRoom.getPlayers())) continue;
+            if(FtcCore.getUserManager().isAltForAny(p.getUniqueId(), context.getPlayers())) continue;
+
 
             if(!CrownUtils.isNullOrBlank(achievement)) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only " + achievement);
             if(p.getInventory().firstEmpty() == -1) bossEntity.getWorld().dropItemNaturally(bossEntity.getLocation(), reward.clone());

@@ -12,6 +12,9 @@ import org.bukkit.enchantments.EnchantmentWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * BlackMarketUtils, not API
+ */
 public class BMUtils {
     public static Map<Material, ComVar<Short>> pricesFromConfig(ConfigurationSection section, String name){
         Map<Material, ComVar<Short>> returnVal = new HashMap<>();

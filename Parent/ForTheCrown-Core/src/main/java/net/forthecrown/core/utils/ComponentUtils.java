@@ -3,8 +3,6 @@ package net.forthecrown.core.utils;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import net.minecraft.server.v1_16_R3.ChatComponentText;
@@ -12,6 +10,9 @@ import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IChatMutableComponent;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 
+/**
+ * Utility functions relating to Components, mostly string converters lol
+ */
 public final class ComponentUtils {
 
     public static final LegacyComponentSerializer SERIALIZER = LegacyComponentSerializer.builder()
@@ -20,11 +21,7 @@ public final class ComponentUtils {
             .build();
 
     public static TextComponent convertString(String text, boolean translateColors){
-        return Component.text()
-                .append(SERIALIZER.deserialize(translateColors ? CrownUtils.translateHexCodes(text) : text))
-                .color(NamedTextColor.WHITE)
-                .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
-                .build();
+        return SERIALIZER.deserialize(translateColors ? CrownUtils.translateHexCodes(text) : text);
     }
 
     public static TextComponent convertString(String text){

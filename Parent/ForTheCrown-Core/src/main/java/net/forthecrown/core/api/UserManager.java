@@ -1,8 +1,8 @@
 package net.forthecrown.core.api;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.files.CrownUserManager;
 import net.forthecrown.core.files.FtcUser;
+import net.forthecrown.core.files.FtcUserAlt;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.ListUtils;
 import org.apache.commons.lang.Validate;
@@ -13,49 +13,122 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+/**
+ * Represents the class manages users and their ALT accounts
+ */
 public interface UserManager extends CrownSerializer<FtcCore> {
 
+    Map<UUID, FtcUser> LOADED_USERS = new HashMap<>();
+    Map<UUID, FtcUserAlt> LOADED_ALTS = new HashMap<>();
+
+    /**
+     * Gets the current instance of the UserManager
+     * @return the current UserManager instance, same as FtcCore.getUserManager(); lol
+     */
     static @NotNull UserManager inst(){
         return FtcCore.getUserManager();
     }
 
+    /**
+     * Gets a user for a player
+     * @param base The player to get the user of
+     * @return The user :|
+     */
     static CrownUser getUser(Player base){
         return getUser(base.getUniqueId());
     }
 
+    /**
+     * Gets a user for a player
+     * @param base The player to get the user of
+     * @return obvious innit
+     */
     static CrownUser getUser(OfflinePlayer base){
         return getUser(base.getUniqueId());
     }
 
+    /**
+     * Gets a user for the corresponding UUID
+     * <p>Be careful, as this doesn't check if the UUID belongs to a player or not lol</p>
+     * @param base The UUID to get the player of, will create a new user if it doesn't already exist
+     * @return A user :I
+     */
     static CrownUser getUser(@NotNull UUID base) {
         Validate.notNull(base, "UUID cannot be null");
-        if(CrownUserManager.LOADED_USERS.containsKey(base)) return CrownUserManager.LOADED_USERS.get(base);
-        return /*inst().isAlt(base) ? new FtcUserAlt(base, inst().getMain(base)) :*/ new FtcUser(base);
+        if(LOADED_USERS.containsKey(base)) return LOADED_USERS.get(base);
+        return inst().isAlt(base) ? new FtcUserAlt(base, inst().getMain(base)) : new FtcUser(base);
     }
 
+    /**
+     * Same as the above 3 methods except it takes in a player's name
+     * @param name
+     * @return
+     */
     static CrownUser getUser(String name){
         return getUser(CrownUtils.uuidFromName(name));
     }
 
+    /**
+     * Gets all currently loaded users
+     * @return The currently loaded users
+     */
     static Collection<CrownUser> getLoadedUsers(){
-        return new HashSet<>(CrownUserManager.LOADED_USERS.values());
+        return new ArrayList<>(LOADED_USERS.values());
     }
 
+    /**
+     * Gets all currently online players as users
+     * @return All online users
+     */
     static Set<CrownUser> getOnlineUsers(){
         return ListUtils.convertToSet(Bukkit.getOnlinePlayers(), UserManager::getUser);
     }
 
+    /**
+     * Saves every user object to file
+     */
     void saveUsers();
 
+    /**
+     * Reloads all user objects from file
+     */
     void reloadUsers();
 
+    /**
+     * Gets the main account for the provided ALT UUID
+     * @param id AltAccount UUID
+     * @return the alt's main, null if no main exists or if it, itself is a main
+     */
     UUID getMain(UUID id);
 
+    /**
+     * Checks if a UUID belongs to an alt account
+     * @param id
+     * @return True if it is, false if it isn't lol
+     */
     boolean isAlt(UUID id);
 
+    boolean isAltForAny(UUID id, Collection<Player> players);
+
+    boolean isMainForAny(UUID id, Collection<Player> players);
+
+    /**
+     * Gets all of the provided UUID's alt accounts
+     * @param main the main account's UUID
+     * @return All of the known alts that belong to it
+     */
     List<UUID> getAlts(UUID main);
 
-    void addAltEntry(UUID alt, UUID main);
+    /**
+     * Registers the first UUID as an alt for the second
+     * @param alt
+     * @param main
+     */
+    void addEntry(UUID alt, UUID main);
 
-    void removeAltEntry(UUID alt);
+    /**
+     * Unregisters the UUID as an alt
+     * @param alt
+     */
+    void removeEntry(UUID alt);
 }

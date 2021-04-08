@@ -1,7 +1,6 @@
 package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
@@ -9,11 +8,8 @@ import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CannotAffordTransactionException;
 import net.forthecrown.core.commands.brigadier.types.UserType;
-import net.forthecrown.core.utils.CrownUtils;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-
-import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandPay extends CrownCommandBuilder {
 
@@ -45,7 +41,7 @@ public class CommandPay extends CrownCommandBuilder {
     @Override
     protected void registerCommand(BrigadierCommand command) {
         command
-                .then(argument("player", StringArgumentType.word())
+                .then(argument("player", UserType.user())
                         .suggests((c, b) -> UserType.listSuggestions(b))
 
                         .then(argument("amount", IntegerArgumentType.integer(1, maxMoneyAmount))
@@ -54,18 +50,29 @@ public class CommandPay extends CrownCommandBuilder {
                                     Balances bals = FtcCore.getBalances();
 
                                     int amount = c.getArgument("amount", Integer.class);
-                                    if(amount > bals.get(user.getBase())) throw new CannotAffordTransactionException();
+                                    if(amount > bals.get(user.getUniqueId())) throw new CannotAffordTransactionException();
 
-                                    String targetName = c.getArgument("player", String.class);
-                                    UUID id = getUUID(targetName);
+                                    CrownUser target = UserType.getUser(c, "player");
 
-                                    bals.add(id, amount);
-                                    bals.add(user.getBase(), -amount);
+                                    bals.add(target.getUniqueId(), amount);
+                                    bals.add(user.getUniqueId(), -amount);
 
-                                    user.sendMessage(ChatColor.GRAY + "You've paid " + ChatColor.GOLD + CrownUtils.decimalizeNumber(amount) + " Rhines " + ChatColor.GRAY + "to " + ChatColor.YELLOW + targetName);
-                                    try{
-                                        Bukkit.getPlayer(id).sendMessage(ChatColor.GRAY + "You've received " + ChatColor.GOLD + CrownUtils.decimalizeNumber(amount) + " Rhines " + ChatColor.GRAY + "from " + ChatColor.YELLOW + user.getName());
-                                    } catch (Exception ignored){}
+                                    user.sendMessage(
+                                            Component.text("You've paid ")
+                                                    .color(NamedTextColor.GRAY)
+                                                    .append(Balances.formatted(amount).color(NamedTextColor.GOLD))
+                                                    .append(Component.text(" to "))
+                                                    .append(Component.text(target.getName()).color(NamedTextColor.YELLOW).hoverEvent(target))
+                                    );
+
+                                    target.sendMessage(
+                                            Component.text("You've received ")
+                                                    .color(NamedTextColor.GRAY)
+                                                    .append(Balances.formatted(amount).color(NamedTextColor.GOLD))
+                                                    .append(Component.text(" from "))
+                                                    .append(Component.text(user.getName()).color(NamedTextColor.YELLOW).hoverEvent(user))
+                                    );
+
                                     return 0;
                                 })
                         )

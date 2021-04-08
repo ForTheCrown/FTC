@@ -168,10 +168,13 @@ public class CommandRoyal extends CrownCommandBuilder {
                                             DungeonBoss<?> boss = getBoss(c);
                                             if(!boss.isAlive()) throw new CrownCommandException("Boss has not been spawned");
 
-                                            broadcastAdmin(c.getSource(), "Boss: " + boss.getBossEntity().getCustomName());
-                                            broadcastAdmin(c.getSource(), "Health: " + boss.getBossEntity().getHealth());
-                                            broadcastAdmin(c.getSource(), "finalMod: " + boss.getContext().getModifier());
-                                            broadcastAdmin(c.getSource(), "maxHealth: " + boss.getBossEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+                                            broadcastAdmin(c.getSource(), "boss: " + boss.getBossEntity().getCustomName());
+                                            broadcastAdmin(c.getSource(), "health: " + boss.getBossEntity().getHealth());
+                                            broadcastAdmin(c.getSource(), "final_mod: " + boss.getContext().getModifier());
+                                            broadcastAdmin(c.getSource(), "max_health: " + boss.getBossEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+                                            broadcastAdmin(c.getSource(), "attack_damage: " + boss.getBossEntity().getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getValue());
+                                            broadcastAdmin(c.getSource(), "armor_amount: " + boss.getContext().getArmorAmount());
+                                            broadcastAdmin(c.getSource(), "enchant_amount: " + boss.getContext().getEnchantAmount());
 
                                             return 0;
                                         })

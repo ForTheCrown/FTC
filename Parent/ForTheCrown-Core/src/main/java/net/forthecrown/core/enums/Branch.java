@@ -2,6 +2,9 @@ package net.forthecrown.core.enums;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A class representing a rank branch
+ */
 public enum Branch {
     DEFAULT ("Branch-less"),
     ROYALS ("Royals", "Royal"),
@@ -16,7 +19,7 @@ public enum Branch {
     }
     Branch(String name){
         this.name = name;
-        this.singularName = name;
+        this.singularName = null;
     }
 
     public @NotNull String getName() {
@@ -24,6 +27,6 @@ public enum Branch {
     }
 
     public @NotNull String getSingularName() {
-        return singularName;
+        return singularName == null ? name : singularName;
     }
 }

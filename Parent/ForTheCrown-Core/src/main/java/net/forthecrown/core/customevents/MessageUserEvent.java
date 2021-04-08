@@ -6,6 +6,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Currently unused. If we ever take over Essentials' message functionality, this could be used
+ */
 public class MessageUserEvent extends Event implements Cancellable {
 
     private final CommandSender sender;

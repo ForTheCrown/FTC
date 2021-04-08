@@ -64,6 +64,7 @@ public class CommandProfile extends CrownCommandBuilder {
     public void sendProfileMessage(CrownUser profile, CrownUser user){
         boolean self = profile.equals(user);
 
+        //If the profile isn't public and you don't have bypass permissions
         if(!self && !profile.isProfilePublic()){
             if(!user.hasPermission(getPermission() + ".bypass")){
                 user.sendMessage(profile.getName() + " profile is not public");

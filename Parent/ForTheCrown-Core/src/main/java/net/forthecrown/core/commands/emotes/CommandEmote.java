@@ -10,6 +10,10 @@ import net.forthecrown.core.utils.Cooldown;
 import net.forthecrown.core.utils.CrownUtils;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * The class to make the handling of emotes easier
+ * <p>Here the return value actually matters. If the returned value is below 0, they don't get added to the cooldown</p>
+ */
 public abstract class CommandEmote extends CrownCommandBuilder {
 
     protected final int cooldownTime;
@@ -45,6 +49,7 @@ public abstract class CommandEmote extends CrownCommandBuilder {
                             CrownUser recipient = UserType.getOnlineUser(c, "player");
                             if(recipient.getName().equalsIgnoreCase(sender.getName())) return executeSelf(sender);
 
+                            //If anyone's got emotes disabled, stop em
                             if(!sender.allowsEmotes()) throw EmoteDisabledException.senderDisabled();
                             if(!recipient.allowsEmotes()) throw EmoteDisabledException.targetDisabled();
 

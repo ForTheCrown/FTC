@@ -1,5 +1,10 @@
 package net.forthecrown.core.utils;
 
+/**
+ * A class containing two values
+ * @param <T> The first value
+ * @param <V> The second value
+ */
 public class Pair<T, V> {
 
     private T first;

@@ -34,6 +34,15 @@ public final class ListUtils {
         return convert(Arrays.asList(from), converter);
     }
 
+    public static <F, T> List<T> fromIterable(Iterable<F> from, Function<F, T> converter){
+        List<T> convert = new ArrayList<>();
+
+        for (F f: from){
+            convert.add(converter.apply(f));
+        }
+        return convert;
+    }
+
     public static boolean isNullOrEmpty(@Nullable Collection<?> collection){
         return collection == null || collection.isEmpty();
     }

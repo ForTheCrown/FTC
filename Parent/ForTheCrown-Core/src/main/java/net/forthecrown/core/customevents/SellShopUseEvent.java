@@ -9,7 +9,10 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class SellShopSellEvent extends Event implements Cancellable {
+/**
+ * Called when a player uses the server's sellshop
+ */
+public class SellShopUseEvent extends Event implements Cancellable {
 
     private final CrownUser seller;
     private final Balances balances;
@@ -20,7 +23,7 @@ public class SellShopSellEvent extends Event implements Cancellable {
 
     private boolean cancelled;
 
-    public SellShopSellEvent(CrownUser seller, Balances balances, Material item) {
+    public SellShopUseEvent(CrownUser seller, Balances balances, Material item) {
         this.seller = seller;
         this.balances = balances;
         this.sellerPlayer = seller.getPlayer();

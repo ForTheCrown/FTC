@@ -17,6 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A leaderboard made of ArmorStands, used for display
+ */
 public class ArmorStandLeaderboard {
 
     private String title;
@@ -49,10 +52,19 @@ public class ArmorStandLeaderboard {
         getLocation().getChunk().addPluginChunkTicket(FtcCore.getInstance());
     }
 
+    /**
+     * Because of some recent changes, this is the same as create
+     * It destroys and then creates the leaderboard. But the Create method does both
+     * of those things too lol
+     */
     public void update(){
         create();
     }
 
+    /**
+     * Destroys any preexisting leaderboards at the specified location and then creates
+     * a new leaderboard
+     */
     public void create(){
         destroy();
         Location loc = getLocation().clone();
@@ -106,6 +118,9 @@ public class ArmorStandLeaderboard {
         stand.getPersistentDataContainer().set(CommandHologram.HOLOGRAM_KEY, PersistentDataType.BYTE, (byte) 1);
     }
 
+    /**
+     * Destroys the leaderboard lol
+     */
     public void destroy(){
         Location l = getLocation().clone();
         CrownBoundingBox area = new CrownBoundingBox(l.getWorld(), l.getX()+1, l.getY()+1, l.getZ()+1, l.getX()-1, l.getY()-(0.25*getSize()+1), l.getZ()-1);

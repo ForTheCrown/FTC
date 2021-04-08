@@ -43,18 +43,19 @@ public class CommandBalance extends CrownCommandBuilder {
         Balances balances = FtcCore.getBalances();
 
         command
-                .executes(c -> {
+                .executes(c -> { //No args, player is checking their own balance
                     Player player = getPlayerSender(c);
                     player.sendMessage(ChatColor.GOLD + "$" + ChatColor.GRAY + " You currently have " + ChatColor.GOLD + balances.getWithCurrency(player.getUniqueId()));
                     return 0;
                 })
-                .then(argument("player", UserType.user())
+                .then(argument("player", UserType.user()) //Player is checking someone else's balance
                         .suggests((c, s) -> UserType.listSuggestions(s))
 
                         .executes(c ->{
                             CommandSender sender = c.getSource().getBukkitSender();
                             CrownUser target = UserType.getUser(c, "player");
 
+                            //Make the message
                             Component text = Component.text()
                                     .color(NamedTextColor.GRAY)
                                     .append(Component.text("$ ").color(NamedTextColor.GOLD))
@@ -67,6 +68,7 @@ public class CommandBalance extends CrownCommandBuilder {
                                     .append(Component.text(balances.getWithCurrency(target.getUniqueId())).color(NamedTextColor.GOLD))
                                     .build();
 
+                            //send the message
                             sender.sendMessage(text);
                             return 0;
                         })

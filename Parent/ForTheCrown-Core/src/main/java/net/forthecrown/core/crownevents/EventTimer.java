@@ -24,6 +24,12 @@ public class EventTimer {
     private final Timer timer;
     private final Consumer<Player> onTimerExpire;
 
+    /**
+     * Creates an EventTimer
+     * @param p The player the timer is for, currently no multi-player implementation exists
+     * @param format The format of the message to display, normal is just a white "%s" lol
+     * @param onTimerExpire The function to call when a timer expires for a player
+     */
     public EventTimer(Player p, String format, Consumer<Player> onTimerExpire){
         this.player = p;
         this.user = UserManager.getUser(p);
@@ -33,10 +39,19 @@ public class EventTimer {
         timer = new Timer();
     }
 
+    /**
+     * Constructs an event Timer and uses the default format
+     * @param p The player the timer is for
+     * @param onTimerExpire The function to call when the timer expires for a player
+     */
     public EventTimer(Player p, Consumer<Player> onTimerExpire){
         this(p, "%s", onTimerExpire);
     }
 
+    /**
+     * Starts the timer
+     * @param maxMinutes The maximum minutes the timer may go for until stopping the timer and calling on onTimerExpire function
+     */
     public void start(int maxMinutes){
         stopped = false;
 
@@ -54,6 +69,10 @@ public class EventTimer {
         }, 0, 100);
     }
 
+    /**
+     * Same as start(), except it ticks down lol
+     * @param maxTimeMins The allotted time the timer has
+     */
     public void startTickingDown(int maxTimeMins){
         elapsedTime = maxTimeMins*60*1000;
         stopped = false;
@@ -73,24 +92,44 @@ public class EventTimer {
         }, 0, 100);
     }
 
+    /**
+     * Stops the timer
+     */
     public void stop(){
         timer.cancel();
         timer.purge();
         stopped = true;
     }
 
+    /**
+     * Gets whether the timer was stopped
+     * @return It says above lol
+     */
     public boolean wasStopped(){
         return stopped;
     }
 
+    /**
+     * Gets the current time the timer is on in milliseconds
+     * @return The timer's time in millisecond time
+     */
     public long getTime(){
         return elapsedTime;
     }
 
+    /**
+     * Gets the player
+     * @return The player the timer belongs to
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * Turns the provided long into a timer message
+     * @param timeInMillis The time to translate, in milliseconds
+     * @return the time, in the 00:00:00 format
+     */
     public static StringBuilder getTimerCounter(final long timeInMillis){
         long minutes = (timeInMillis / 60000) % 60;
         long seconds = (timeInMillis / 1000) % 60;

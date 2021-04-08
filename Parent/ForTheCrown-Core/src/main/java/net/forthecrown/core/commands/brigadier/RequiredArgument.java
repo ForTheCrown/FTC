@@ -9,6 +9,11 @@ import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 
 import java.util.Iterator;
 
+/**
+ * A required argument, aka, enter something and then the specified argument type will attempt to parse it
+ * <p>Another wrapper for NMS :D</p>
+ * @param <T> The object to parse from an argument
+ */
 public class RequiredArgument<T> extends ArgumentBuilder<CommandListenerWrapper, RequiredArgument<T>> {
     private final String name;
     private final ArgumentType<T> type;

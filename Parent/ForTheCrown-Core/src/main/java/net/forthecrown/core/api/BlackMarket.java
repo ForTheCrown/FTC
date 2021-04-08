@@ -7,8 +7,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Represents the Questmoor Black Market
+ * <p>Extends CrownSerializer, but does NOT use AbstractSerializer. Extension is just for the methods lol</p>
+ */
 public interface BlackMarket extends CrownSerializer<FtcCore> {
 
+    /**
+     * Gets the current instance of the black market
+     * @return The current instance of the black market
+     */
     static BlackMarket inst(){
         return FtcCore.getBlackMarket();
     }

@@ -4,6 +4,9 @@ import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 
+/**
+ * A thing that can be named :3
+ */
 public interface Nameable {
 
     /**

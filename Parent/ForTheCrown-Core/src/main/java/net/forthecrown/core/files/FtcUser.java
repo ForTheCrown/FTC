@@ -1,8 +1,8 @@
 package net.forthecrown.core.files;
 
 import io.papermc.paper.adventure.AdventureComponent;
+import io.papermc.paper.adventure.PaperAdventure;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.Grave;
 import net.forthecrown.core.api.UserDataContainer;
@@ -30,6 +30,7 @@ import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.*;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.craftbukkit.v1_16_R3.CraftOfflinePlayer;
@@ -83,6 +84,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     private Map<Material, Integer> amountEarned = new HashMap<>();
     private SellAmount sellAmount;
 
+    private Location lastKnownLocation;
     private EntityPlayer handle;
 
     public FtcUser(@NotNull UUID base){
@@ -96,7 +98,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         else reload();
         if(shouldResetEarnings()) resetEarnings();
 
-        CrownUserManager.LOADED_USERS.put(base, this);
+        net.forthecrown.core.api.UserManager.LOADED_USERS.put(base, this);
         permsCheck();
 
         if(isOnline()) handle = getOnlineHandle().getHandle();
@@ -119,6 +121,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         setTotalEarnings(getFile().getLong("TotalEarnings"));
         setSellAmount(SellAmount.valueOf(getFile().getString("SellAmount").toUpperCase()));
         setProfilePublic(getFile().getBoolean("ProfilePublic", true));
+        lastKnownLocation = getFile().getLocation("LastLocation");
 
         setNextResetTime(getFile().getLong("TimeStamps.NextResetTime"));
 
@@ -188,6 +191,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
         getFile().set("AllowsEmotes", allowsEmotes());
         getFile().set("ProfilePublic", isProfilePublic());
         getFile().set("Grave", grave.getItems());
+        getFile().set("LastLocation", getLocation());
 
         if(totalEarnings < 0) totalEarnings = 0;
         getFile().set("TotalEarnings", getTotalEarnings());
@@ -213,7 +217,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     @Override
     public void unload(){
         save();
-        CrownUserManager.LOADED_USERS.remove(this.getUniqueId());
+        net.forthecrown.core.api.UserManager.LOADED_USERS.remove(this.getUniqueId());
         handle = null;
     }
 
@@ -612,7 +616,6 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     @Override
     public boolean isOnline() {
         boolean result = Bukkit.getPlayer(this.getUniqueId()) != null;
-        Announcer.debug(result);
         return result;
     }
 
@@ -791,6 +794,24 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     @Override
     public Grave getGrave() {
         return grave;
+    }
+
+    @Override
+    public Location getLocation() {
+        if(!isOnline()) return lastKnownLocation;
+        return new Location(getWorld(), handle.locX(), handle.locY(), handle.locZ(), handle.getBukkitYaw(), handle.pitch);
+    }
+
+    @Override
+    public World getWorld() {
+        if(!isOnline()) return lastKnownLocation.getWorld();
+        return handle.world.getWorld();
+    }
+
+    @Override
+    public void onLeave() {
+        lastKnownLocation = getOnlineHandle().getLocation();
+        unload();
     }
 
     @Override

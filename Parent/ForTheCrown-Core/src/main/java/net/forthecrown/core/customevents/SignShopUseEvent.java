@@ -9,6 +9,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Called when a player uses a signshop
+ */
 public class SignShopUseEvent extends Event implements Cancellable {
 
     private final CrownUser customer;

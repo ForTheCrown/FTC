@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 //cool name lul
 
 /**
- * ForTheCrown's command handler, The RoyalBrigadier lol
+ * Our own, very hacky, implementation of Mojang's own Brigadier Command Engine, the Royal Brigadier
  * <p>Allows the usage of the server's native Brigadier command engine.</p>
  */
 public final class RoyalBrigadier {
@@ -58,6 +58,7 @@ public final class RoyalBrigadier {
         new CommandWithdraw();
         new CommandDeposit();
         new CommandBecomeBaron();
+        new CommandEditShop();
 
         //help commands
         new HelpDiscord();
@@ -85,18 +86,33 @@ public final class RoyalBrigadier {
         new EmotePog();
     }
 
+    /**
+     * Resends all the commands packets, for stuff like the permissions and the test() method
+     * @param p The player to resend the packets to
+     */
     public void resendCommandPackets(Player p){
         CraftPlayer player = (CraftPlayer) p;
-        getDispatcher().a(player.getHandle());
+        getServerCommands().a(player.getHandle());
     }
 
+    /**
+     * Resends command packets for every player on the server
+     * @see RoyalBrigadier#resendCommandPackets(Player)
+     */
     public void resendAllCommandPackets(){
         for (Player p: Bukkit.getOnlinePlayers()){
             resendCommandPackets(p);
         }
     }
 
-    public static CommandDispatcher getDispatcher() {
+    /**
+     *
+     * Gets the server's command class, that handles the all things related to commands, type name is misleading
+     * <p>MCCoderPack devs were dumb AF and called this a dispatcher</p>
+     * <p>The actual dispatcher is in the command registry</p>
+     * @return The server's commands class
+     */
+    public static CommandDispatcher getServerCommands() {
         return dispatcher;
     }
 }

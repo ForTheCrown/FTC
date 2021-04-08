@@ -57,7 +57,7 @@ public class CommandDeposit extends CrownCommandBuilder {
 
             Balances bals = FtcCore.getBalances();
             bals.add(player.getUniqueId(), amount, false);
-            player.sendMessage(CrownUtils.translateHexCodes("&7You deposited " + mainItem.getAmount() + " coins and received &6" + CrownUtils.decimalizeNumber(amount) + " Rhines"));
+            player.sendMessage(CrownUtils.translateHexCodes("&7You deposited " + mainItem.getAmount() + " coin" + (mainItem.getAmount() == 1 ? "" : "s") + " and received &6" + CrownUtils.decimalizeNumber(amount) + " Rhines"));
             player.getInventory().removeItem(mainItem);
 
             return 0;

@@ -12,6 +12,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * An easy to create loottable to use in-game
+ */
 public class LiteralLootTable implements LootTable {
 
     private final NamespacedKey key;

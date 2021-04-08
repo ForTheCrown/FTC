@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * The CommandVariables class, manages and handles the CommandVariables
+ */
 public class ComVars {
     private static final Map<String, ComVar<?>> COM_VARS = new HashMap<>();
 

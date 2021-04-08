@@ -2,7 +2,6 @@ package net.forthecrown.core.files;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.ShopManager;
-import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.inventories.CrownShopInventory;
@@ -209,7 +208,7 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
 
     @Nonnull
     @Override
-    public ShopInventory getInventory() {
+    public CrownShopInventory getInventory() {
         return inventory;
     }
 

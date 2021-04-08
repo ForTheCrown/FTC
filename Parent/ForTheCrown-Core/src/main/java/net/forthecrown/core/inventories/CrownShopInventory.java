@@ -46,7 +46,7 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
 
     @Nonnull
     @Override
-    public SignShop getHolder() {
+    public CrownSignShop getHolder() {
         return owningShop;
     }
 

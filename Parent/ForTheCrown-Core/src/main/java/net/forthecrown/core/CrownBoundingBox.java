@@ -12,6 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * Like a regular BoundingBox, but it's tied to a world, so it has more operational abilities
+ */
 public class CrownBoundingBox extends BoundingBox {
 
     private final World world;

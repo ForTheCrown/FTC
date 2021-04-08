@@ -1,13 +1,14 @@
 package net.forthecrown.core.events;
 
-import net.forthecrown.core.ShopManager;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.utils.ComponentUtils;
-import net.forthecrown.core.utils.Cooldown;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.ShopManager;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.customevents.SignShopUseEvent;
+import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.utils.Cooldown;
+import org.bukkit.GameMode;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,7 +48,8 @@ public class ShopInteractEvent implements Listener {
 
         Player player = event.getPlayer();
 
-        sign.getBlock().getBlockData();
+        //Can't use in spectator lol
+        if(player.getGameMode() == GameMode.SPECTATOR) return;
 
         //This does nothing rn, will be useful in the future
         if(!sign.getPersistentDataContainer().has(FtcCore.SHOP_KEY, PersistentDataType.STRING))
@@ -60,6 +62,7 @@ public class ShopInteractEvent implements Listener {
             return;
         }
 
+        //Call the event
         FtcCore.getInstance().getServer().getPluginManager().callEvent(new SignShopUseEvent(shop, UserManager.getUser(player), player, FtcCore.getBalances()));
     }
 

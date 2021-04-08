@@ -14,7 +14,6 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 
 public class CommandBecomeBaron extends CrownCommandBuilder {
     public CommandBecomeBaron() {
@@ -48,13 +47,16 @@ public class CommandBecomeBaron extends CrownCommandBuilder {
                 .executes(c -> {
                     CrownUser user = getUserSender(c);
 
+                    //Check if already baron
                     if(user.isBaron()){
                         user.sendMessage("&7You are already a baron!");
                         return 0;
                     }
 
+                    //Check if they can afford baron
                     if(bals.get(user.getUniqueId()) < baronPrice) throw new CannotAffordTransactionException("You need at least " + CrownUtils.decimalizeNumber(baronPrice) + " Rhines");
 
+                    //Tell em cost and ask for confirmation
                     TextComponent message = Component.text()
                             .append(FtcCore.prefix())
                             .append(Component.text("Are you sure you wish to become a "))
@@ -70,6 +72,7 @@ public class CommandBecomeBaron extends CrownCommandBuilder {
 
                             .build();
 
+                    //send message
                     user.sendMessage(message);
                     return 0;
                 })
@@ -77,13 +80,16 @@ public class CommandBecomeBaron extends CrownCommandBuilder {
                         .executes(c -> {
                             CrownUser p = getUserSender(c);
 
+                            //Check if baron
                             if(p.isBaron()){
                                 p.sendMessage("&7You are already a baron!");
                                 return 0;
                             }
 
+                            //Check if affordable to user
                             if(bals.get(p.getUniqueId()) < baronPrice) throw new CannotAffordTransactionException("You need at least 500,000 Rhines");
 
+                            //remove the bal and make em baron
                             bals.add(p.getUniqueId(), -baronPrice);
                             p.setBaron(true);
                             p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6Congratulations!&r You are now a &ebaron&r!"));

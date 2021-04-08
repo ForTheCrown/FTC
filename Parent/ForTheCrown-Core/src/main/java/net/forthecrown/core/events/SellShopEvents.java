@@ -4,7 +4,7 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.customevents.SellShopSellEvent;
+import net.forthecrown.core.customevents.SellShopUseEvent;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.inventories.SellShop;
 import net.forthecrown.core.utils.ComponentUtils;
@@ -95,7 +95,7 @@ public class SellShopEvents implements Listener {
                     break;
                 }
             default:
-                FtcCore.getInstance().getServer().getPluginManager().callEvent(new SellShopSellEvent(user, FtcCore.getBalances(), item.getType()));
+                FtcCore.getInstance().getServer().getPluginManager().callEvent(new SellShopUseEvent(user, FtcCore.getBalances(), item.getType()));
         }
     }
 
@@ -120,7 +120,7 @@ public class SellShopEvents implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onSellShopUse(SellShopSellEvent event){
+    public void onSellShopUse(SellShopUseEvent event){
         CrownUser seller = event.getSeller();
         Material toSell = event.getItem();
 

@@ -25,7 +25,7 @@ public class CommandComVar extends CrownCommandBuilder {
         command.then(argument(varArg, StringArgumentType.word())
                 .suggests((c, b) -> suggestMatching(b, ComVars.getVariables()))
 
-                .executes(c -> {
+                .executes(c -> { //Just var name -> show var value
                     String name = c.getArgument("variable", String.class);
                     try {
                         c.getSource().base.sendMessage(new ChatComponentText(name + ": " + ComVars.getString(name)), null);
@@ -35,6 +35,7 @@ public class CommandComVar extends CrownCommandBuilder {
                     return 0;
                 })
 
+                //value stated -> attempt parsing
                 .then(argument("value", StringArgumentType.greedyString())
                         .suggests((c, b) -> getComType(c).suggests(c, b))
 
@@ -50,6 +51,7 @@ public class CommandComVar extends CrownCommandBuilder {
         );
     }
 
+    //Used for result suggesting
     private static final String varArg = "variable";
     private static ComVarType<?> getComType(CommandContext<CommandListenerWrapper> c){
         return ComVars.getType(c.getArgument(varArg, String.class));

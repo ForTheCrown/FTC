@@ -2,6 +2,9 @@ package net.forthecrown.core.commands.brigadier.exceptions;
 
 import net.md_5.bungee.api.ChatColor;
 
+/**
+ * Internal exception for the emote command
+ */
 public class EmoteDisabledException extends CrownCommandException {
 
     private static final String SENDER_DISABLED = ChatColor.GRAY + "You have emotes turned off." + "\n" + ChatColor.GRAY + "Do " + ChatColor.RESET + "/toggleemotes" + ChatColor.GRAY + " to enable them.";

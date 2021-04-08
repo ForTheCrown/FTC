@@ -38,15 +38,4 @@ public class ClickEventCommand extends CrownCommandBuilder {
                 })
         );
     }
-
-    /*@Override
-    public boolean run(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
-        if(!(sender instanceof Player)) return false;
-        if(!ClickEventHandler.isAllowedToUseCommand((Player) sender)) return false;
-        if(args.length < 1) return false;
-        if(!ClickEventHandler.getRegisteredClickEvents().contains(args[0])) return false;
-
-        ClickEventHandler.callClickEvent(args[0], args, ((Player) sender));
-        return true;
-    }*/
 }

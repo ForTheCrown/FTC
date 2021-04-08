@@ -21,6 +21,7 @@ import java.util.List;
 /**
  * Deprecated in favour of CrownCommandBuilder, which uses Brigadier
  */
+@Deprecated
 public abstract class CrownCommand extends Command {
 
     private final String prefix;

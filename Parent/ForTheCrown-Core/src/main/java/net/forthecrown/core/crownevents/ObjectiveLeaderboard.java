@@ -7,6 +7,9 @@ import org.bukkit.scoreboard.Score;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Same as ArmorStandLeaderboard, except this one is linked to an objective
+ */
 public class ObjectiveLeaderboard extends ArmorStandLeaderboard{
 
     private Objective objective;
@@ -17,6 +20,11 @@ public class ObjectiveLeaderboard extends ArmorStandLeaderboard{
         this.objective = list;
     }
 
+    /**
+     * Converts all scores from an objective to a map for the leaderboard to use
+     * @param objective The objective to translate
+     * @return The map of scores
+     */
     public static Map<String, Integer> convertToMap(Objective objective){
         Map<String, Integer> tempMap = new HashMap<>();
 

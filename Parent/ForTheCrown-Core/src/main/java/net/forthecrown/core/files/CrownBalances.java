@@ -5,6 +5,7 @@ import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.Balances;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 
 import java.util.HashMap;
@@ -87,7 +88,12 @@ public class CrownBalances extends AbstractSerializer<FtcCore> implements Balanc
 
     @Override
     public String getWithCurrency(UUID id) {
-        return getDecimalized(id) + " Rhine" + (get(id) != 1 ? "s" : "");
+        return Balances.getFormatted(get(id));
+    }
+
+    @Override
+    public Component withCurrency(UUID id){
+        return Component.text(getWithCurrency(id));
     }
 
     @Override

@@ -4,7 +4,16 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Represents information that can be stored in a user's data by other plugins
+ */
 public interface UserDataContainer {
+
+    /**
+     * Sets a plugin's section
+     * @param key The plugin to set the section of
+     * @param section The section
+     */
     void set(Plugin key, ConfigurationSection section);
 
     /**

@@ -5,6 +5,7 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.BlackMarket;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.DailyEnchantment;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.comvars.ComVar;
 import net.forthecrown.core.inventories.CustomInventoryHolder;
 import net.forthecrown.core.utils.CrownItems;
@@ -178,8 +179,8 @@ public class CrownBlackMarket implements BlackMarket {
     public void save(){
         ConfigurationSection prices = configFile.createSection("Price_Per_Item");
         prices.createSection("Crops", MapUtils.convert(crops, Material::toString, ComVar::getValue));
-        prices.createSection("MobDrops", MapUtils.convert(crops, Material::toString, ComVar::getValue));
-        prices.createSection("Mining", MapUtils.convert(crops, Material::toString, ComVar::getValue));
+        prices.createSection("MobDrops", MapUtils.convert(drops, Material::toString, ComVar::getValue));
+        prices.createSection("Mining", MapUtils.convert(mining, Material::toString, ComVar::getValue));
 
         Map<String, Integer> tempMap = new HashMap<>();
         for (Enchantment enchant : enchants.keySet()){
@@ -252,8 +253,17 @@ public class CrownBlackMarket implements BlackMarket {
 
     @Override
     public void setAllowedToBuyEnchant(Player p, boolean allowed){
-        if(allowed) boughtEnchant.remove(p.getUniqueId());
-        else boughtEnchant.add(p.getUniqueId());
+        UUID id = p.getUniqueId();
+        UserManager um = FtcCore.getUserManager();
+        boolean isAlt = um.isAlt(id);
+
+        if(allowed){
+            boughtEnchant.remove(p.getUniqueId());
+            boughtEnchant.removeAll(isAlt ? um.getAlts(um.getMain(id)) : um.getAlts(id));
+        } else {
+            boughtEnchant.add(p.getUniqueId());
+            boughtEnchant.addAll(isAlt ? um.getAlts(um.getMain(id)) : um.getAlts(id));
+        }
     }
 
     @Override

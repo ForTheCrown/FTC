@@ -6,6 +6,7 @@ import net.forthecrown.core.comvars.ComVars;
 import net.forthecrown.core.comvars.types.ComVarType;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 
 import javax.annotation.Nullable;
@@ -27,41 +28,43 @@ public interface Announcer extends CrownSerializer<FtcCore> {
      * Gets the delay between automatic announcements
      * @return The delay in ticks
      */
-    long getDelay();
+    short getDelay();
 
     /**
      * Sets the delay between automatic announcements
      * @param delay The new delay in ticks
      */
-    void setDelay(long delay);
+    void setDelay(short delay);
 
     /**
      * Gets the string list of announcements used by the AutoAnnouncer
      * @return The list of announcements
      */
-    List<String> getAnnouncements();
+    List<Component> getAnnouncements();
 
     /**
      * Set the list of strings the AutoAnnouncer uses, the [FTC] prefix is automatic
      * @param announcements The new list the announcer will use
      */
-    void setAnnouncements(List<String> announcements);
+    void setAnnouncements(List<Component> announcements);
 
     /**
      * Stops the AutoAnnouncer
      */
-    void stopAnnouncer();
+    void stop();
 
     /**
      * Starts the AutoAnnouncer
      */
-    void startAnnouncer();
+    void start();
 
     /**
      * Announces a message to everyone, even the console and players in the senate world
      * @param message the message to announce, hex colors are automatically translated
      */
     void announceToAll(String message);
+
+    void announceToAll(Component component);
 
     /**
      * Announces a message to every player, excluding senate world players and the console
@@ -114,6 +117,10 @@ public interface Announcer extends CrownSerializer<FtcCore> {
 
     Logger logger = FtcCore.getInstance().getLogger();
 
+    void announce(Component message);
+
+    void announce(Component message, String permission);
+
     /**
      *
      * @param message
@@ -124,10 +131,16 @@ public interface Announcer extends CrownSerializer<FtcCore> {
     //Hacky way of determining if we're on the test server or not
     ComVar<Boolean> debugEnvironment = ComVars.set("sv_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
 
+    /**
+     * Logs or announces a debug message, won't broadcast if on actual server
+     * @param message The message to log, gets toString'ed, or just prints "null" if null
+     */
     static void debug(Object message){
         String string_message = message == null ? "null" : message.toString();
 
         if(debugEnvironment.getValue(false)) acLiteral(string_message);
         else log(Level.INFO, string_message);
     }
+
+    Component formatMessage(Component message);
 }

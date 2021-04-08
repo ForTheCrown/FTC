@@ -43,7 +43,7 @@ public class CommandGems extends CrownCommandBuilder {
                 )
                 .executes(c ->{
                     CrownUser user = getUserSender(c);
-                    user.sendMessage("&7You have &e" + user.getGems() + " Gems");
+                    user.sendMessage("&7You have &e" + user.getGems() + " Gem" + (user.getGems() == 1 ? "" : "s"));
                     return 1000;
                 });
     }

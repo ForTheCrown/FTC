@@ -40,30 +40,26 @@ public class CommandBalanceTop extends CrownCommandBuilder {
      * - /baltop
      * - /baltop <page number>
      *
-     * Referenced other classes:
-     * - Balances:
-     * - Economy: Economy.getBalances
-     * - FtcCore: FtcCore.getPrefix
-     *
      * Author: Botul
      */
 
     @Override
     protected void registerCommand(BrigadierCommand command) {
         command
-                .executes(context -> {
-                    sendBaltopMessage(context.getSource().getBukkitSender(), 0);
+                .executes(c -> { //No args -> show first page
+                    sendBaltopMessage(c.getSource().getBukkitSender(), 0);
                     return 0;
                 })
                 .then(argument("page", IntegerArgumentType.integer(1, maxPage))
-                        .executes(context -> {
-                            Integer soup = context.getArgument("page", Integer.class);
-                            sendBaltopMessage(context.getSource().getBukkitSender(), soup);
+                        .executes(c -> { //Page number given -> show that page
+                            Integer soup = c.getArgument("page", Integer.class); //Delicious soup
+                            sendBaltopMessage(c.getSource().getBukkitSender(), soup);
                             return 0;
                         })
                 );
     }
 
+    //Send the message
     private void sendBaltopMessage(CommandSender sender, @Nonnegative int page){
         List<String> baltopList = getBaltopList();
         Collections.reverse(baltopList);
@@ -96,9 +92,12 @@ public class CommandBalanceTop extends CrownCommandBuilder {
                 .append(Component.text(" Page " +  (index+1) + "/" + stupidity + " ").color(NamedTextColor.YELLOW))
                 .append(border);
 
+        //ngl, now that this is just sending one message that's appended together, there's no weird 1 frame thing where the text gets sent line by line lol
+        //It just comes out as one :D
         sender.sendMessage(text);
     }
 
+    //Gets the formatted list of balances, hopefully in the correct order
     private List<String> getBaltopList(){
         Map<UUID, Integer> map = getSortedBalances();
         List<String> list = new ArrayList<>();
@@ -112,6 +111,7 @@ public class CommandBalanceTop extends CrownCommandBuilder {
         return list;
     }
 
+    //Gets a sorted list of balances
     private Map<UUID, Integer> getSortedBalances(){
         List<Map.Entry<UUID, Integer>> list = new ArrayList<>(FtcCore.getBalances().getBalanceMap().entrySet());
         list.sort(Map.Entry.comparingByValue());

@@ -64,7 +64,7 @@ public class CrownWeapons {
 
     public static void upgradeLevel(CrownWeapon weapon, Player player){
         byte rank = (byte) (weapon.rank() + 1);
-        if((rank == 5 && !player.hasPermission("ftc.donator")) || rank > 10) return;
+        if((rank == 5 && !player.hasPermission("ftc.donator1")) || rank > 10) return;
 
         //This is dumb and repetitive, but I couldn't think of a better way of doing this :(
         //Rank II -> case 3. aka gets you the Rank III requirements not the Rank II requirements
@@ -106,8 +106,8 @@ public class CrownWeapons {
                 return;
         }
         //Effects
-        player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1.2f);
-        player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
+        player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1.2f);
+        player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
         for (int i = 0; i <= 5; i++) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(FtcCore.getInstance(), () -> player.getWorld().spawnParticle(Particle.TOTEM, (
                     player).getLocation().getX(),
@@ -135,11 +135,11 @@ public class CrownWeapons {
         private CrownWeapon(ItemStack item){
             this.item = item;
             List<Component> lore = Objects.requireNonNull(item.lore());
-            Byte[] loreLines = rankAndGoalLine(lore);
+            byte[] loreLines = rankAndGoalLine(lore);
             rank = (byte) CrownUtils.romanToArabic(PlainComponentSerializer.plain().serialize(lore.get(loreLines[0])).replaceAll("Rank ", ""));
 
             Component lore5 = item.lore().get(loreLines[1]);
-            String parseFrom = PlainComponentSerializer.plain().serialize(lore5).toLowerCase();
+            String parseFrom = PlainComponentSerializer.plain().serialize(lore5).toLowerCase().replaceAll("men", "mans");
 
             if(parseFrom.contains("max rank")){
                 goal = -1;
@@ -160,8 +160,8 @@ public class CrownWeapons {
         }
 
         //first is rank, second is killed line
-        private static Byte[] rankAndGoalLine(List<Component> lore){
-            Byte[] result = new Byte[2];
+        private static byte[] rankAndGoalLine(List<Component> lore){
+            byte[] result = new byte[2];
 
             for (int i = 0; i < lore.size(); i++){
                 String s = PlainComponentSerializer.plain().serialize(lore.get(i)).toLowerCase();
@@ -174,9 +174,9 @@ public class CrownWeapons {
         }
 
         public void update(){
-            String lore5Text = type == null ? "Max rank." : CrownUtils.normalEnum(type) + "s to rank up!";
+            String lore5Text = type == null ? "Max rank." : (CrownUtils.normalEnum(type) + "s to rank up!").replaceAll("mans ", "men ");
             String lore5GoalText = goal == -1 ? "" : (progress + "/" + goal + " ");
-            Component lore5 = Component.text(lore5GoalText + (type == EntityType.AREA_EFFECT_CLOUD ? "Charged Creeper's to rank up!" : lore5Text))
+            Component lore5 = Component.text(lore5GoalText + (type == EntityType.AREA_EFFECT_CLOUD ? "Charged Creepers to rank up!" : lore5Text))
                     .color(NamedTextColor.AQUA)
                     .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
             Component lore0 = Component.text("Rank " + CrownUtils.arabicToRoman(rank))
@@ -207,7 +207,6 @@ public class CrownWeapons {
 
         public void setGoal(short goal){
             this.goal = goal;
-            update();
         }
 
         public short getProgress(){
@@ -216,7 +215,6 @@ public class CrownWeapons {
 
         public void setProgress(short progress){
             this.progress = progress;
-            update();
         }
 
         public void setNewGoal(EntityType mob, short goal, byte rank, boolean resetProgress){
@@ -233,7 +231,6 @@ public class CrownWeapons {
 
         public void setRank(byte rank){
             this.rank = rank;
-            update();
         }
 
         public byte rank() {

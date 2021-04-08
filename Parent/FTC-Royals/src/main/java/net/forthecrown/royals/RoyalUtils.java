@@ -101,6 +101,7 @@ public class RoyalUtils {
             zomzom.setCustomNameVisible(true);
             zomzom.customName(Component.text("Hit Me!").color(NamedTextColor.GOLD));
 
+            zomzom.setRemoveWhenFarAway(false);
             zomzom.setPersistent(true);
             zomzom.setCanPickupItems(false);
             zomzom.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);

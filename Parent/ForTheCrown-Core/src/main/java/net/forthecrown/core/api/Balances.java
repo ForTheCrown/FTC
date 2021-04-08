@@ -7,21 +7,47 @@ import net.kyori.adventure.text.Component;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Represents the ingame balances held by the players
+ */
 public interface Balances extends CrownSerializer<FtcCore> {
 
+    /**
+     * Gets the Balanaces instance
+     * @return The Balances instance
+     */
     static Balances inst(){
         return FtcCore.getBalances();
     }
 
+    /**
+     * Gets a formatted currency messaage
+     * @param amount The amount to format
+     * @return The message, will look like: "1,000,000 Rhines"
+     */
     static String getFormatted(int amount){
-        return CrownUtils.decimalizeNumber(amount) + " Rhines";
+        return CrownUtils.decimalizeNumber(amount) + " Rhine" + (amount == 1 ? "" : "s");
     }
 
+    /**
+     * Same thing as getFormatted but for components
+     * @param amount
+     * @return
+     */
     static Component formatted(int amount){
         return Component.text(getFormatted(amount));
     }
 
+    /**
+     * Gets the map of all balances on the server
+     * @return Every person's balance
+     */
     Map<UUID, Integer> getBalanceMap();
+
+    /**
+     * Sets the balance map
+     * @param balanceMap The balance map
+     */
     void setBalanceMap(Map<UUID, Integer> balanceMap);
 
     /**
@@ -37,6 +63,8 @@ public interface Balances extends CrownSerializer<FtcCore> {
      * @param amount The new balance of the player
      */
     void set(UUID uuid, Integer amount);
+
+    Component withCurrency(UUID id);
 
     /**
      * Adds to a players balance

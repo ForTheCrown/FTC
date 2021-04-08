@@ -13,6 +13,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * The sellshop, where players can sell their items
+ * @see SellAmount
+ */
 public class SellShop {
 
     private final CrownUser user;

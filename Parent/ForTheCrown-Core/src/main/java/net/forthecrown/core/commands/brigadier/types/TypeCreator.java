@@ -18,10 +18,6 @@ public class TypeCreator {
     private static final DynamicCommandExceptionType EXCEPTION_BRANCH = new DynamicCommandExceptionType(name -> new LiteralMessage("Unknown branch: " + name));
 
     public static <S> CompletableFuture<Suggestions> listRankSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return listRankSuggestions(context.getSource(), context, builder);
-    }
-
-    public static <S> CompletableFuture<Suggestions> listRankSuggestions(S source, CommandContext<S> context, SuggestionsBuilder builder) {
         String input = builder.getInput();
         String token = input.substring(input.lastIndexOf(' ')).trim();
 

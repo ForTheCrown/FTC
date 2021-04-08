@@ -19,8 +19,8 @@ public class UserTracker extends AbstractSerializer<EasterMain> implements IUser
     private Map<UUID, Byte> tracker = new HashMap<>();
     private byte day = 0;
     private BukkitRunnable runnable;
-    public static final ComVar<Byte> delayTime = ComVars.set("event_dailyLimit_clearInterval", ComVarType.BYTE, (byte) 15);
-    public static final ComVar<Byte> maxGoes = ComVars.set("event_dailyLimit_maxAttempts", ComVarType.BYTE, (byte) 5);
+    public static final ComVar<Byte> delayTime = ComVars.set("ev_clearInterval", ComVarType.BYTE, (byte) 15);
+    public static final ComVar<Byte> maxGoes = ComVars.set("ev_maxAttempts", ComVarType.BYTE, (byte) 5);
 
     public UserTracker() {
         super("tracker", EasterMain.inst);

@@ -6,17 +6,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-//CommandVariable class
+/**
+ * The class representing a CommandVariable
+ * <p>
+ * A type must always be specified. You probably won't have to worry about that though, as the only place this is constructed
+ * is in the {@link ComVars} class, where this stuff gets done for you :)
+ * </p>
+ * @param <T> The type stored by the variable, can be an int, String or whatever you want it to be
+ */
 public class ComVar<T>/* implements ConfigurationSerializable */ {
     private T value;
     private final ComVarType<T> type;
     private Consumer<T> onUpdate;
-    public ComVar(ComVarType<T> type, T value){
+
+    ComVar(ComVarType<T> type, T value){
         this.value = value;
         this.type = type;
     }
-
-    public ComVar(ComVarType<T> type){
+    ComVar(ComVarType<T> type){
         this.type = type;
     }
 

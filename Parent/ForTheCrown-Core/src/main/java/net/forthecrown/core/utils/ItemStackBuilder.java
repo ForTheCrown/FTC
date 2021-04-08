@@ -18,6 +18,9 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
 
+/**
+ * A class for building item stacks
+ */
 public class ItemStackBuilder implements Builder<ItemStack> {
 
     private final Material material;

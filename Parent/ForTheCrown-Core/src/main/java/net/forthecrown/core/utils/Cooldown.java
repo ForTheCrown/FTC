@@ -13,6 +13,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A class for placing players or entities on cooldowns
+ * <p>Cooldowns are divided into categories</p>
+ */
 public final class Cooldown {
 
     private static final Map<String, Set<CommandSender>> COOLDOWN_MAP = new HashMap<>();

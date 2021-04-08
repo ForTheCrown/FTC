@@ -26,6 +26,9 @@ import javax.annotation.Nonnegative;
 import java.util.Arrays;
 import java.util.UUID;
 
+/**
+ * Class for server items, such as Royal Swords, Crowns and home of the great makeItem method
+ */
 public final class CrownItems {
     private CrownItems() {}
 
@@ -209,18 +212,32 @@ public final class CrownItems {
         return result;
     }
 
+    //String to component conversion ¬_¬
     public static ItemStack makeItem(@NotNull Material material, @Nonnegative int amount, boolean hideFlags, String name, String... lores){
         Validate.notNull(material, "Material cannot be null");
+
+        Component name_c = null;
+        if(name != null){
+            name_c = Component.text()
+                    .append(ComponentUtils.convertString(name))
+                    .color(NamedTextColor.WHITE)
+                    .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                    .build();
+        }
 
         Component[] lore = null;
         if(lores != null){
             lore = new Component[lores.length];
             for (int i = 0; i < lores.length; i++){
                 if(CrownUtils.isNullOrBlank(lores[i])) lore[i] = Component.text("");
-                else lore[i] = ComponentUtils.convertString(lores[i]);
+                else lore[i] = Component.text()
+                        .append(ComponentUtils.convertString(lores[i]))
+                        .color(NamedTextColor.WHITE)
+                        .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                        .build();
             }
         }
 
-        return makeItem(material, amount, hideFlags, name == null ? null : ComponentUtils.convertString(name), lore);
+        return makeItem(material, amount, hideFlags, name_c, lore);
     }
 }

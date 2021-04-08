@@ -12,6 +12,7 @@ import net.forthecrown.core.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.core.events.*;
 import net.forthecrown.core.files.*;
 import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.core.utils.MapUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,14 +34,14 @@ import java.util.logging.Level;
 
 public final class FtcCore extends JavaPlugin {
 
+    //Not public cuz API, I don't want this value getting changed
     private static FtcCore instance;
 
-    private static String prefix = "&6[FTC]&r  ";
-    private static String king;
-    private static String discord;
-    private static final Map<Material, ComVar<Short>> defaultItemPrices = new HashMap<>();
-    private static int saverID;
-    private Integer maxMoneyAmount;
+    private static String           prefix = "&6[FTC]&r  ";
+    private static String           king;
+    private static String           discord;
+    private static int              saverID;
+    private static int              maxMoneyAmount;
 
     private static ComVar<Long>     userDataResetInterval;// = 5356800000L; //2 months by default
     private static ComVar<Long>     branchSwapCooldown;// = 172800000; //2 days by default
@@ -49,13 +50,15 @@ public final class FtcCore extends JavaPlugin {
     private static ComVar<Boolean>  logNormalShop;
     private static ComVar<Byte>     hoppersInOneChunk;
 
-    private static CrownAnnouncer   announcer;
+    //C R O W N
+    private static CrownBroadcaster json_announcer;
     private static CrownBalances    balFile;
     private static CrownBlackMarket bm;
-    private static RoyalBrigadier   brigadier;
     private static CrownWorldGuard  crownWorldGuard;
     private static CrownUserManager userManager;
+    private static RoyalBrigadier   brigadier;
 
+    private static final Map<Material, ComVar<Short>> defaultItemPrices = new HashMap<>();
     public static final Set<ArmorStandLeaderboard> LEADERBOARDS = new HashSet<>();
     public static LuckPerms LUCK_PERMS;
 
@@ -69,7 +72,7 @@ public final class FtcCore extends JavaPlugin {
         saveDefaultConfig();
         reloadConfig();
 
-        announcer = new CrownAnnouncer();
+        json_announcer = new CrownBroadcaster();
         balFile = new CrownBalances(this);
         bm = new CrownBlackMarket(this);
         brigadier = new RoyalBrigadier(this);
@@ -192,7 +195,7 @@ public final class FtcCore extends JavaPlugin {
         ShopManager.save();
         getUserManager().save();
         getUserManager().saveUsers();
-        getAnnouncer().save();
+        //getAnnouncer().save();
         getBalances().save();
         getBlackMarket().save();
 
@@ -219,9 +222,9 @@ public final class FtcCore extends JavaPlugin {
         else king = newKing.toString();
     }
 
-    /*public static Map<Material, Short> getItemPrices(){ //returns the default item Price Map
-        return defaultItemPrices;
-    }*/
+    public static Map<Material, Short> getItemPrices(){ //returns the default item Price Map
+        return MapUtils.convertValues(defaultItemPrices, ComVar::getValue);
+    }
     public static Short getItemPrice(Material material){ //Returns the default price for an item
         return defaultItemPrices.get(material).getValue((short) 2);
     }
@@ -240,6 +243,11 @@ public final class FtcCore extends JavaPlugin {
                 .hoverEvent(HoverEvent.showText(Component.text("For The Crown :D, tell Botul you found this text lol").color(NamedTextColor.YELLOW)));
     }
 
+    /*
+     * Ignore the yellow warning thing under all of the following variables
+     * That's just cuz getValue is annotated with Nullable lol
+     */
+
     public static byte getHoppersInOneChunk() {
         return hoppersInOneChunk.getValue();
     }
@@ -253,7 +261,7 @@ public final class FtcCore extends JavaPlugin {
     }
 
     public static Integer getMaxMoneyAmount(){
-        return instance.maxMoneyAmount;
+        return maxMoneyAmount;
     }
 
     public static long getBranchSwapCooldown() {
@@ -268,12 +276,12 @@ public final class FtcCore extends JavaPlugin {
         return logNormalShop.getValue();
     }
 
-    //get a part of the plugin with these
+    //Get an FTC type with one of these bad bois
     public static FtcCore getInstance(){
         return instance;
     }
     public static Announcer getAnnouncer(){
-        return announcer;
+        return json_announcer;
     }
     public static Balances getBalances(){
         return balFile;

@@ -5,6 +5,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/**
+ * Represents the storage of special items for a user on death
+ */
 public interface Grave {
     /**
      * Gets the user that the grave belongs to

@@ -1,5 +1,9 @@
 package net.forthecrown.core.commands.brigadier.exceptions;
 
+/**
+ * Used basically only by UserType lol
+ * <p>Thrown when the inputted user in the argument doesn't exist</p>
+ */
 public class InvalidPlayerArgumentException extends CrownCommandException{
 
     public InvalidPlayerArgumentException(){

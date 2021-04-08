@@ -30,9 +30,6 @@ public class CommandBroadcast extends CrownCommandBuilder {
      * Permissions used:
      * - ftc.admin
      *
-     * Referenced other classes:
-     * - FtcCore: FtcCore.getPrefix
-     *
      * Author: Wout
      */
 

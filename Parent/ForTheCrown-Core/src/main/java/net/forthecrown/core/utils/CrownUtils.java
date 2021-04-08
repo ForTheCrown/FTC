@@ -16,9 +16,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * General Utility functions as well as some useful variables, like variables for the two main worlds, world and world_void and the server's time zone lol
+ */
 public final class CrownUtils {
 
-    public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("CET");
+    public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
     public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 1000.5, 70, 200.5);
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
     private static final DecimalFormat DECIMAL_FORMAT;
@@ -27,7 +30,6 @@ public final class CrownUtils {
     public static final World WORLD_VOID = Objects.requireNonNull(Bukkit.getWorld("world_void"));
 
     private CrownUtils() {}
-
     static {
         DECIMAL_FORMAT = new DecimalFormat("#.##");
         DECIMAL_FORMAT.setGroupingUsed(true);

@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/**
+ * Represents the inventory of a sign shop
+ */
 public interface ShopInventory extends Inventory {
     /**
      * Gets if the shop is full or not

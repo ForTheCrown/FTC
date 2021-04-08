@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Makes serialization easier for subclasses
+ * @param <T> The plugin that's using this serializer, so it knows where to put the file
+ */
 public abstract class AbstractSerializer<T extends JavaPlugin> implements CrownSerializer<T> {
 
     private final T plugin;

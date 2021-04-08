@@ -11,6 +11,9 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * The RankGUI where players can choose their ranks
+ */
 public class RankInventory {
 
     private final CrownUser user;

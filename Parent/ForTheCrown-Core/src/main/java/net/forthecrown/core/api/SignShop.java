@@ -11,6 +11,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+/**
+ * Represents a sign shop lol
+ */
 public interface SignShop extends CrownSerializer<FtcCore>, InventoryHolder, Nameable {
 
     /**
