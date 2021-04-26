@@ -24,7 +24,7 @@ import java.util.Set;
  * <p>Exists because I was cleaning up the ChatEvents class lol</p>
  */
 public class StaffChat {
-    private static Set<Player> sctPlayers = new HashSet<>();
+    public static final Set<Player> sctPlayers = new HashSet<>();
 
     /**
      * Sends a staff chat message
@@ -56,18 +56,7 @@ public class StaffChat {
         for (Player p : Bukkit.getOnlinePlayers()){
             if(p.hasPermission("ftc.staffchat")) p.sendMessage(text);
         }
-        //If the message is being sent by command, don't log it
+        //If the message is being sent by command, don't log it twice
         if(!cmd) Bukkit.getConsoleSender().sendMessage(text);
-    }
-
-    /**
-     * Gets every player with staffChatToggle on
-     * @return staff chat toggle players
-     */
-    public static Set<Player> getSCT(){ //gets a list of all the players, whose messages will always go to staffchat
-        return sctPlayers;
-    }
-    public static void setSCT(Set<Player> sctPlayers){
-        StaffChat.sctPlayers = sctPlayers;
     }
 }

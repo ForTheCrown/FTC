@@ -75,7 +75,7 @@ public final class Pirates extends JavaPlugin implements Listener {
         new CommandUpdateLeaderboard();
         new CommandPirate();
 
-        CommandLeave.addAllowedArea(
+        CommandLeave.add(
                 new CrownBoundingBox(CrownUtils.WORLD_VOID, -5685, 1, -521, -886, 255, 95),
                 new Location(CrownUtils.WORLD_VOID, -800.5, 232, 11.5, -90, 0),
                 plr -> {

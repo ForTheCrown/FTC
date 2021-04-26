@@ -28,7 +28,7 @@ public class CommandWithdraw extends CrownCommandBuilder {
     @Override
     protected void registerCommand(BrigadierCommand command) {
         command.then(argument("amount", IntegerArgumentType.integer(1, maxMoney))
-                .suggests((c, b) -> suggestMatching(b, "1", "5", "10", "50", "100", "500", "1000", "5000"))
+                .suggests(suggest("1", "5", "10", "50", "100", "500", "1000", "5000"))
 
                 .executes(c -> {
                     Player player = getPlayerSender(c);

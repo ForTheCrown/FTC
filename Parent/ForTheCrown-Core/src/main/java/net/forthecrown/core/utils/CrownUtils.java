@@ -1,12 +1,20 @@
 package net.forthecrown.core.utils;
 
+import net.forthecrown.core.FtcCore;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DateFormatSymbols;
@@ -16,13 +24,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.bukkit.Bukkit.getServer;
+
 /**
  * General Utility functions as well as some useful variables, like variables for the two main worlds, world and world_void and the server's time zone lol
  */
 public final class CrownUtils {
 
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
-    public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 1000.5, 70, 200.5);
+    public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 200.5, 70, 1000.5);
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
     private static final DecimalFormat DECIMAL_FORMAT;
 
@@ -89,8 +99,7 @@ public final class CrownUtils {
     }
 
     public static Integer getRandomNumberInRange(int min, int max) {
-        if (min >= max) return 0;
-        return new Random().nextInt((max - min) + 1) + min;
+        return new CrownRandom().intInRange(min, max);
     }
 
     public static String getDateFromMillis(long millis){
@@ -126,11 +135,11 @@ public final class CrownUtils {
         }
     }
 
-    public static String getItemNormalName(ItemStack stack){
+    public static String getItemNormalName(@NotNull ItemStack stack){
         return normalMaterialName(stack.getType());
     }
 
-    public static String normalMaterialName(Material material){
+    public static String normalMaterialName(@NotNull Material material){
         return normalEnum(material);
     }
 
@@ -142,6 +151,10 @@ public final class CrownUtils {
     public static String decimalizeNumber(@NotNull Number number){
         Validate.notNull(number, "Number was null");
         return DECIMAL_FORMAT.format(number);
+    }
+
+    public static String convertTicksIntoTime(long ticks){
+        return convertMillisIntoTime(ticks * 500);
     }
 
     public static String convertMillisIntoTime(long millis){
@@ -156,18 +169,54 @@ public final class CrownUtils {
         if(hours > 0) stringBuilder.append(hours).append(" hour").append(s(hours)).append(", ");
         if(minutes > 0) stringBuilder.append(minutes).append(" minute").append(s(minutes)).append(" and ");
 
-        stringBuilder.append(seconds).append(" second" + s(seconds));
+        stringBuilder.append(seconds).append(" second").append(s(seconds));
 
         return stringBuilder.toString();
     }
 
     private static String s(long l){
-        if(l != 1) return "s";
-        return "";
+        return l == 1 ? "" : "s";
     }
 
     public static boolean isNullOrBlank(String str){
         return str == null || str.isBlank();
+    }
+
+    public static UUID uuidFromName(String playerName){
+        try {
+            return Bukkit.getOfflinePlayerIfCached(playerName).getUniqueId();
+        } catch (NullPointerException ignored) { return null; }
+    }
+
+    public static void showLeaderboard(Player player, String objectiveName){
+        Scoreboard mainScoreboard = getServer().getScoreboardManager().getMainScoreboard();
+        Objective objective = mainScoreboard.getObjective(objectiveName);
+
+        TextComponent displayName = Component.text()
+                .color(NamedTextColor.GOLD)
+                .append(Component.text("---"))
+                .append(Component.text("Leaderboard").color(NamedTextColor.YELLOW))
+                .append(Component.text("---"))
+                .build();
+
+        Scoreboard scoreboard = getServer().getScoreboardManager().getNewScoreboard();
+        Objective newObj = scoreboard.registerNewObjective(player.getName(), "dummy", displayName);
+
+        for(String name : objective.getScoreboard().getEntries()) {
+            if(!objective.getScore(name).isScoreSet() || objective.getScore(name).getScore() == 0) continue;
+            newObj.getScore(name).setScore(objective.getScore(name).getScore());
+        }
+
+        newObj.setDisplaySlot(DisplaySlot.SIDEBAR);
+        player.setScoreboard(scoreboard);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(FtcCore.getInstance(), () -> player.setScoreboard(mainScoreboard), 300L);
+    }
+
+    public static Component prettyLocationMessage(Location l, boolean includeWorld){
+        return Component.text("X=" + l.getBlockX() +
+                " Y=" + l.getBlockY() +
+                " Z=" + l.getBlockZ() +
+                (includeWorld ? " world: " + l.getWorld().getName() : ""));
     }
 
     /*
@@ -201,14 +250,14 @@ public final class CrownUtils {
     }
 
     public static String arabicToRoman(int number) {
-        if(number == 0) return "0";
+        if (number == 0) return "0";
         String prefix = "";
-        if(number < 0){
+        if (number < 0) {
             prefix = "-";
             number = -number;
         }
-        if(number > 4000){
-            for (int i = 0; i < number/4000; i++) prefix += "MMMM";
+        if (number > 4000) {
+            for (int i = 0; i < number / 4000; i++) prefix += "MMMM";
             number = number % 4000;
         }
 
@@ -228,12 +277,6 @@ public final class CrownUtils {
         }
 
         return prefix + sb.toString();
-    }
-
-    public static UUID uuidFromName(String playerName){
-        try {
-            return Bukkit.getOfflinePlayerIfCached(playerName).getUniqueId();
-        } catch (NullPointerException ignored) { return null; }
     }
 
     public enum RomanNumeral {

@@ -36,7 +36,7 @@ public class PirateEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerClick(PlayerInteractEntityEvent event) {
+    public void onPlayerClick(PlayerInteractEntityEvent event) throws CrownException {
         if(!event.getHand().equals(EquipmentSlot.HAND))
             return;
 
@@ -85,6 +85,7 @@ public class PirateEvents implements Listener {
                 temp.add(player.getUniqueId().toString());
                 main.getConfig().set("PlayerWhoFoundTreasureAlready", temp);
                 main.saveConfig();
+                main.shulker.relocate();
             }
         }
     }

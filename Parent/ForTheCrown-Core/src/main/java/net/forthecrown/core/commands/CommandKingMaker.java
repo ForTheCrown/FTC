@@ -1,15 +1,15 @@
 package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.core.commands.brigadier.types.custom.UserType;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Bukkit;
-
-import java.util.UUID;
 
 public class CommandKingMaker extends CrownCommandBuilder {
 
@@ -52,7 +52,7 @@ public class CommandKingMaker extends CrownCommandBuilder {
                         })
                 )
                 .then(argument("player", UserType.user())
-                        .suggests((c, b) -> UserType.listSuggestions(b))
+                        .suggests(UserType::suggest)
                         .executes(c -> makeKing(c, false))
 
                         .then(argument("queen").executes(c -> makeKing(c, true)))
@@ -60,18 +60,17 @@ public class CommandKingMaker extends CrownCommandBuilder {
                 );
     }
 
-    private int makeKing(CommandContext<CommandListenerWrapper> c, boolean isQueen) throws CrownCommandException {
+    private int makeKing(CommandContext<CommandListenerWrapper> c, boolean isQueen) throws CommandSyntaxException {
         if(FtcCore.getKing() != null) throw new CrownCommandException("There already is a king");
 
-        String playerName = c.getArgument("player", String.class);
-        UUID id = getUUID(playerName);
+        CrownUser king = UserType.getUser(c, "player");
 
-        FtcCore.setKing(id);
-        c.getSource().getBukkitSender().sendMessage(playerName + " is now the new king :D");
+        FtcCore.setKing(king.getUniqueId());
+        c.getSource().getBukkitSender().sendMessage(king.getName() + " is now the new king :D");
 
         String prefix = "&l[&e&lKing&r&l] &r";
         if(isQueen) prefix = "&l[&e&lQueen&r&l] &r";
-        Bukkit.dispatchCommand(c.getSource().getBukkitSender(), "tab player " + playerName + " tabprefix " + prefix);
+        Bukkit.dispatchCommand(c.getSource().getBukkitSender(), "tab player " + king.getName() + " tabprefix " + prefix);
         return 0;
     }
 }

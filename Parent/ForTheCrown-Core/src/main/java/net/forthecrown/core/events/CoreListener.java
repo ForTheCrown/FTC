@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -24,12 +25,12 @@ import org.bukkit.inventory.ItemStack;
 
 public class CoreListener implements Listener {
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event){
         UserManager.getUser(event.getPlayer());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLeave(PlayerQuitEvent event){
         UserManager.getUser(event.getPlayer()).onLeave();
     }
@@ -57,6 +58,7 @@ public class CoreListener implements Listener {
         event.getPlayer().sendMessage(Component.text("Too many hoppers (Max 45)").color(NamedTextColor.RED));
     }
 
+    //Entity death by crown weapon
     @EventHandler(ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
         if(event.getEntity().getKiller() == null) return;

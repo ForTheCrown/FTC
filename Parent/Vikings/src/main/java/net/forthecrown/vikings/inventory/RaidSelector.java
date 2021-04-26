@@ -3,8 +3,7 @@ package net.forthecrown.vikings.inventory;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.vikings.Vikings;
-import net.forthecrown.vikings.raids.valhalla.RaidManager;
-import net.forthecrown.vikings.raids.valhalla.VikingRaid;
+import net.forthecrown.vikings.valhalla.VikingRaid;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -29,7 +28,7 @@ public class RaidSelector implements InventoryHolder, Listener {
         this.user = user;
 
         initInv();
-        Vikings.getInstance().getServer().getPluginManager().registerEvents(this, Vikings.getInstance());
+        Vikings.inst().getServer().getPluginManager().registerEvents(this, Vikings.inst());
     }
 
     private void initInv(){
@@ -45,7 +44,7 @@ public class RaidSelector implements InventoryHolder, Listener {
         inv.setItem(4, CrownItems.makeItem(Material.IRON_AXE, 1, true, "Raid selection", "&bChoose a location to raid!"));
 
         int index = 11;
-        for (VikingRaid r: Vikings.getRaidHandler().getRaids()){
+        for (VikingRaid r: Vikings.getRaidManager().getRaids()){
             inv.setItem(index, getRaidItem(r));
             index++;
         }
@@ -54,7 +53,7 @@ public class RaidSelector implements InventoryHolder, Listener {
     private ItemStack getRaidItem(VikingRaid raid){
         ItemStack item = CrownItems.makeItem(Material.PAPER, 1, true, raid.getName());
 
-        if(user.getDataContainer().get(Vikings.getInstance()).getStringList("CompletedRaids").contains(raid.getName()))
+        if(user.getDataContainer().get(Vikings.inst()).getStringList("CompletedRaids").contains(raid.getName()))
             item.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
 
         return item;
@@ -77,7 +76,7 @@ public class RaidSelector implements InventoryHolder, Listener {
         ItemStack clickedItem = event.getCurrentItem();
         if(!event.getCurrentItem().getItemMeta().hasDisplayName()) return;
 
-        VikingRaid raid = RaidManager.fromName(clickedItem.getItemMeta().getDisplayName());
+        VikingRaid raid = Vikings.getRaidManager().fromName(clickedItem.getItemMeta().getDisplayName());
         if(raid == null) return;
 
         event.getWhoClicked().sendMessage("Starting raid!");

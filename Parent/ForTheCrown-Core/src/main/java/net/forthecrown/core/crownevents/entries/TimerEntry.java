@@ -1,14 +1,14 @@
 package net.forthecrown.core.crownevents.entries;
 
 import net.forthecrown.core.crownevents.EventTimer;
+import net.forthecrown.core.crownevents.InEventListener;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
-public class TimerEntry extends SingleEntry {
+public class TimerEntry extends PlayerEntry<TimerEntry> {
 
     protected final EventTimer timer;
 
-    public TimerEntry(Player user, Listener inEventListener, EventTimer timer) {
+    public TimerEntry(Player user, InEventListener<TimerEntry> inEventListener, EventTimer timer) {
         super(user, inEventListener);
 
         this.timer = timer;

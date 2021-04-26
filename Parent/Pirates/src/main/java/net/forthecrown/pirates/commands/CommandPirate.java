@@ -32,13 +32,4 @@ public class CommandPirate extends CrownCommandBuilder {
                         })
                 );
     }
-
-    /*@Override
-    public boolean run(@Nonnull CommandSender sender,@Nonnull Command command,@Nonnull String label,@Nonnull String[] args) throws CrownException {
-        Pirates.plugin.reloadConfig();
-        Pirates.plugin.updateDate();
-        Pirates.getAuctionManager().reloadAuctions();
-        sender.sendMessage(ChatColor.GRAY + "Pirate config reloaded.");
-        return true;
-    }*/
 }

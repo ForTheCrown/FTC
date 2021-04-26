@@ -5,7 +5,7 @@ import net.forthecrown.vikings.Vikings;
 
 public class FastRunner extends VikingBlessing {
     public FastRunner() {
-        super("FastRunner", Vikings.getInstance());
+        super("FastRunner", Vikings.inst());
     }
 
     @Override

@@ -16,7 +16,7 @@ public class HeadChoppingBlessing extends VikingBlessing{
     private int dropChance = 3; //0.3%
 
     public HeadChoppingBlessing() {
-        super("HeadChopping", Vikings.getInstance());
+        super("HeadChopping", Vikings.inst());
         registerEvents();
     }
 
@@ -57,6 +57,7 @@ public class HeadChoppingBlessing extends VikingBlessing{
         SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
         skullMeta.setOwningPlayer(player);
         playerHead.setItemMeta(skullMeta);
+
 
         return playerHead;
     }

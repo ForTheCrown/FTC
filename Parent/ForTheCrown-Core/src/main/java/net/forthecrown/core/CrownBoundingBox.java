@@ -8,14 +8,19 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Like a regular BoundingBox, but it's tied to a world, so it has more operational abilities
+ * And it can be iterated through
  */
-public class CrownBoundingBox extends BoundingBox {
+public class CrownBoundingBox extends BoundingBox implements Iterable<Block> {
 
     private final World world;
 
@@ -31,6 +36,26 @@ public class CrownBoundingBox extends BoundingBox {
         this.world = loc1.getWorld();
     }
 
+    public static CrownBoundingBox of(Block block){
+        return new CrownBoundingBox(block.getWorld(), block.getX(), block.getY(), block.getZ(), block.getX()+1, block.getY()+1, block.getZ()+1);
+    }
+
+    public static CrownBoundingBox of(Location location, double radius){
+        return new CrownBoundingBox(location.clone().subtract(radius, radius, radius), location.clone().add(radius, radius, radius));
+    }
+
+    public static CrownBoundingBox of(Location location, Location location1){
+        return new CrownBoundingBox(location1, location);
+    }
+
+    public static CrownBoundingBox of(Location location, double xRadius, double height, double zRadius){
+        return new CrownBoundingBox(location.clone().subtract(xRadius, height, zRadius), location.clone().add(xRadius, height, zRadius));
+    }
+
+    public static CrownBoundingBox of(BoundingBox box, World world){
+        return new CrownBoundingBox(world, box.getMinX(), box.getMinY(), box.getMinZ(), box.getMaxX(), box.getMaxY(), box.getMaxZ());
+    }
+
     @NotNull
     public World getWorld() {
         return world;
@@ -40,7 +65,7 @@ public class CrownBoundingBox extends BoundingBox {
         return getCenterLocation(0, 0);
     }
 
-    public Location getMinLocattion(){
+    public Location getMinLocation(){
         return getMinLocation(0, 0);
     }
 
@@ -99,10 +124,6 @@ public class CrownBoundingBox extends BoundingBox {
         return contains(entity.getLocation());
     }
 
-    public static CrownBoundingBox wrapBoundingBox(BoundingBox box, World world){
-        return new CrownBoundingBox(world, box.getMinX(), box.getMinY(), box.getMinZ(), box.getMaxX(), box.getMaxY(), box.getMaxZ());
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -115,5 +136,31 @@ public class CrownBoundingBox extends BoundingBox {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getWorld());
+    }
+
+    public List<Block> getBlocks(){
+        return getBlocks(null);
+    }
+
+    public List<Block> getBlocks(@Nullable Predicate<Block> predicate){
+        List<Block> blocks = new ArrayList<>();
+
+        //How in the absolute hell does this work xD
+        for (Block b : this) {
+            if (predicate == null || predicate.test(b)) blocks.add(b);
+        }
+
+        return blocks;
+    }
+
+    @Override
+    public @NotNull CrownBoundingBox clone() {
+        return of(this, getWorld());
+    }
+
+    @NotNull
+    @Override
+    public BoundingBoxIterator iterator() {
+        return new BoundingBoxIterator(this);
     }
 }

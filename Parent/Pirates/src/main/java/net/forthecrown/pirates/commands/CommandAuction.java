@@ -3,6 +3,7 @@ package net.forthecrown.pirates.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.FtcCore;
@@ -39,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class CommandAuction extends CrownCommandBuilder {
@@ -143,7 +145,7 @@ public class CommandAuction extends CrownCommandBuilder {
 
                                     Integer amount = c.getArgument("amount", Integer.class);
                                     if(amount <= auction.getHighestBid()) throw new CrownCommandException("&7You cannot bid less than the current amount");
-                                    if(amount > bals.get(user.getBase())) throw new CrownCommandException("&7You cannot afford that");
+                                    if(amount > bals.get(user.getUniqueId())) throw new CrownCommandException("&7You cannot afford that");
 
                                     auction.bidOn(user, amount);
                                     user.sendMessage("&7You have bid!");
@@ -152,11 +154,7 @@ public class CommandAuction extends CrownCommandBuilder {
                         )
                 )
                 .then(argument("claim")
-                        /*.requires(c -> {
-                            if(c.getBukkitSender() instanceof Player) return false;
-                            CrownUser user = FtcCore.getUser(((Player) c.getBukkitSender()).getUniqueId());
-                            return user.getBranch() == Branch.PIRATES;
-                        })*/
+                        .requires(this::isAllowedToOwn)
 
                         .then(argument("startingBid", IntegerArgumentType.integer(1, 500000))
                                 .executes(c -> {
@@ -164,6 +162,7 @@ public class CommandAuction extends CrownCommandBuilder {
                                     Auction auction = auctionFromArg(c);
 
                                     if(user.getBranch() != Branch.PIRATES) throw new CrownCommandException("&7You must be a pirate to claim an auction");
+                                    if(!isAllowedToOwn(c.getSource())) throw new CrownCommandException("&7You aren't allowed to own more than one auction at a time");
                                     if(claimedClaiming.contains(auction.getName())) throw new CrownCommandException("&7Someone is already claiming this Auction");
                                     if(auction.isClaimed()) throw new CrownCommandException("&7" + auction.getName() + " is already claimed by " + auction.getOwner().getName());
 
@@ -177,10 +176,19 @@ public class CommandAuction extends CrownCommandBuilder {
         );
     }
 
-    protected CrownUser getUserExecutor(CommandContext<CommandListenerWrapper> c) throws CrownCommandException {
+    protected CrownUser getUserExecutor(CommandContext<CommandListenerWrapper> c) throws CommandSyntaxException {
         CrownUser toReturn = super.getUserSender(c);
         if(!AuctionManager.AUCTION_AREA.getPlayers().contains(toReturn.getPlayer())) throw new CrownCommandException("&7You must be near the auction area to interact with it!");
         return toReturn;
+    }
+
+    private boolean isAllowedToOwn(CommandListenerWrapper source){
+        UUID id = source.getBukkitEntity().getUniqueId();
+
+        for (Auction a: AuctionManager.getAuctions().values()){
+            if(a.getOwner().getUniqueId().equals(id)) return false;
+        }
+        return true;
     }
 
     private Auction auctionFromArg(CommandContext<CommandListenerWrapper> c) throws CrownCommandException {
@@ -230,7 +238,7 @@ public class CommandAuction extends CrownCommandBuilder {
         }
 
         @EventHandler(ignoreCancelled = true)
-        public void onInventoryClose(InventoryCloseEvent event) {
+        public void onInventoryClose(InventoryCloseEvent event) throws CrownException {
             if(!event.getPlayer().equals(owner.getPlayer())) return;
             if(event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
             HandlerList.unregisterAll(this);
@@ -247,6 +255,7 @@ public class CommandAuction extends CrownCommandBuilder {
 
             auction.setClaimed(owner, startingBid, item, false);
             event.getPlayer().sendMessage(ChatColor.GREEN + "Auction claimed!");
+            FtcCore.getRoyalBrigadier().resendCommandPackets((Player) event.getPlayer());
         }
     }
 }

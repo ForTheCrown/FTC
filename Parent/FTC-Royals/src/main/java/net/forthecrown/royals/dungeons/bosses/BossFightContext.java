@@ -24,7 +24,7 @@ public class BossFightContext {
         players = boss.getBossRoom().getPlayers().stream().filter(plr -> plr.getGameMode() == GameMode.SURVIVAL).collect(Collectors.toList());
 
         calculateBase();
-        float initialMod = Math.max(1, (float) (enchants + armorAmount)/ (players.size() < 2 ? 20 : 17) );
+        float initialMod = Math.max(1, (float) (enchants + armorAmount)/ (players.size() < 2 ? 20 : 17));
         finalModifier = Math.min(initialMod, 5);
     }
 

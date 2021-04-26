@@ -2,7 +2,7 @@ package net.forthecrown.core.inventories;
 
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
-import net.forthecrown.core.files.CrownSignShop;
+import net.forthecrown.core.types.CrownSignShop;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
@@ -57,11 +57,7 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
 
     @Override
     public ItemStack getExampleItem() {
-        try {
-            return exampleItem.clone();
-        } catch (Exception e){
-            return null;
-        }
+        return exampleItem == null ? null : exampleItem.clone();
     }
 
     @Override

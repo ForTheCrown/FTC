@@ -1,26 +1,24 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.Balances;
-import net.forthecrown.core.api.BlackMarket;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
+import net.forthecrown.core.api.*;
 import net.forthecrown.core.clickevent.ClickEventHandler;
 import net.forthecrown.core.clickevent.ClickEventTask;
 import net.forthecrown.core.enums.Branch;
+import net.forthecrown.core.enums.Pet;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.exceptions.CannotAffordTransaction;
 import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.Cooldown;
-import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -52,7 +50,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
     }
 
     @EventHandler
-    public void onBlackMarketUse(PlayerInteractEntityEvent event) {
+    public void onBlackMarketUse(PlayerInteractEntityEvent event) throws CrownException {
         if(event.getRightClicked().getType() != EntityType.VILLAGER) return;
         if(event.getHand() != EquipmentSlot.HAND) return;
         Villager villie = (Villager) event.getRightClicked();
@@ -91,10 +89,16 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
     }
 
     private void doEdwardStuff(CrownUser user, BlackMarket bm){
-        user.sendMessage("&eEdward &7is currently selling &e" +
-                CrownUtils.capitalizeWords(bm.getEnchantment().getEnchantment().getKey().toString().replaceAll("minecraft:", "").replaceAll("_", " "))
-                + " " + CrownUtils.arabicToRoman(bm.getEnchantment().getLevel()) + " &7for &6"
-                + CrownUtils.decimalizeNumber(bm.getEnchantment().getPrice()) + " Rhines");
+        user.sendMessage(
+                Component.text()
+                        .color(NamedTextColor.GRAY)
+                        .append(Component.text("Edward").color(NamedTextColor.YELLOW))
+                        .append(Component.text(" is currently selling "))
+                        .append(bm.getEnchantment().getEnchantment().displayName(bm.getEnchantment().getLevel()).color(NamedTextColor.YELLOW))
+                        .append(Component.text(" for "))
+                        .append(Balances.formatted(bm.getEnchantment().getPrice()).color(NamedTextColor.GOLD))
+                        .build()
+        );
 
         ClickEventHandler.allowCommandUsage(user.getPlayer(), true);
 
@@ -109,7 +113,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
 
 
     private void sellItem(CrownUser user, Balances bals, BlackMarket bm, Material toSell){
-        int sellAmount = user.getSellAmount().getInt();
+        int sellAmount = user.getSellAmount().getValue();
         int finalSell = sellAmount;
 
         Player player = user.getPlayer();
@@ -136,7 +140,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
         String s = toSell.toString().toLowerCase().replaceAll("_", " ");
         int toPay = bm.getItemPrice(toSell) * finalSell;
 
-        bals.add(user.getBase(), toPay, false);
+        bals.add(user.getUniqueId(), toPay, false);
         bm.setAmountEarned(toSell, bm.getAmountEarned(toSell) + toPay);
         user.sendMessage("&7You sold &e" + finalSell + " " + s + " &7for &6" + toPay + " Rhines");
 
@@ -179,7 +183,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
         }
 
         @EventHandler
-        public void onBmInvUse(InventoryClickEvent event) {
+        public void onBmInvUse(InventoryClickEvent event) throws CrownException {
             if(!event.getWhoClicked().equals(player)) return;
             if(event.getView().getTitle().contains("Black Market: Enchants")) return;
             if(event.isShiftClick()){ event.setCancelled(true); }
@@ -205,7 +209,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
                 default:
             }
 
-            if(ListUtils.isNullOrEmpty(event.getCurrentItem().getItemMeta().getLore())) return;
+            if(ListUtils.isNullOrEmpty(event.getCurrentItem().getItemMeta().lore())) return;
             if(!event.getCurrentItem().getItemMeta().getLore().get(0).contains("Value: ")) return;
 
             Player player = (Player) event.getWhoClicked();
@@ -214,10 +218,13 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
             Balances bals = FtcCore.getBalances();
 
             if(event.getView().getTitle().contains("Parrot Shop")){
-                String color = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()).replaceAll(" Parrot", "").toLowerCase();
-                List<String> pets = user.getPets();
+                Pet pet = Pet.valueOf(
+                        PlainComponentSerializer.plain().serialize(event.getCurrentItem().getItemMeta().displayName())
+                                .toUpperCase().replaceAll(" ", "_")
+                );
+                List<Pet> pets = user.getPets();
 
-                if(pets.contains(color + "_parrot")){
+                if(pets.contains(pet)){
                     user.sendMessage("&7You already own this color!");
                     return;
                 }
@@ -229,18 +236,18 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
                 } else {
                     int cost = Integer.parseInt(ChatColor.stripColor(event.getCurrentItem().getLore().get(0)).replaceAll("[\\D]", ""));
 
-                    if(bals.get(user.getBase()) < cost) throw new CannotAffordTransaction(player);
-                    bals.set(user.getBase(), bals.get(user.getBase())  - cost);
+                    if(bals.get(user.getUniqueId()) < cost) throw new CannotAffordTransaction(player);
+                    bals.set(user.getUniqueId(), bals.get(user.getUniqueId())  - cost);
                 }
 
-                if(pets.contains(color + "_parrot")){
-                    user.sendMessage("&7You already own this color!");
-                    return;
-                }
-
-                pets.add(color + "_parrot");
+                pets.add(pet);
                 user.setPets(pets);
-                user.sendMessage("&7You bought a " + event.getCurrentItem().getItemMeta().getDisplayName() + "&7. Use /parrot " + color);
+                user.sendMessage(
+                        Component.text("You bought a ")
+                                .color(NamedTextColor.GREEN)
+                                .append(pet.getName())
+                                .append(Component.text(". Use /parrot " + pet.toString().toLowerCase().replaceAll("_parrot", "")))
+                );
                 return;
             }
 
@@ -269,7 +276,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
         }
 
         @EventHandler(priority = EventPriority.LOW)
-        public void onEnchantInvUse(InventoryClickEvent event){
+        public void onEnchantInvUse(InventoryClickEvent event) throws CannotAffordTransaction {
             if(!event.getWhoClicked().equals(player)) return;
             if(event.getClickedInventory() instanceof PlayerInventory) return;
             if(!event.getView().getTitle().contains("Black Market: Enchants")) return;
@@ -284,7 +291,9 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
             Balances balances = FtcCore.getBalances();
             BlackMarket bm = FtcCore.getBlackMarket();
 
-            Enchantment enchantment = bm.getEnchantment().getEnchantment();
+            DailyEnchantment daily = bm.getEnchantment();
+            Enchantment enchantment = daily.getEnchantment();
+
             if(!canEnchantItem(toCheck, enchantment)){
                 player.openInventory(bm.getEnchantInventory(toCheck, false));
                 return;
@@ -299,7 +308,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
                 ItemStack toEnchant = event.getClickedInventory().getItem(11).clone();
 
                 ItemMeta meta = toEnchant.getItemMeta();
-                meta.addEnchant(enchantment, bm.getEnchantment().getLevel(), true);
+                meta.addEnchant(enchantment, daily.getLevel(), true);
                 toEnchant.setItemMeta(meta);
 
                 try {
@@ -312,10 +321,23 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
                 player.closeInventory(InventoryCloseEvent.Reason.PLUGIN);
                 player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_HIT, 1.0f, 1.0f);
                 bm.setAllowedToBuyEnchant(player, false);
+
+                //Send message
+                player.sendMessage(
+                        Component.text("You've bought ")
+                                .color(NamedTextColor.GRAY)
+                                .append(daily.getEnchantment().displayName(daily.getLevel()).color(NamedTextColor.GOLD))
+                                .append(Component.text(" for "))
+                                .append(Balances.formatted(daily.getPrice()).color(NamedTextColor.YELLOW))
+                );
             }
         }
 
         private boolean canEnchantItem(ItemStack toEnchant, Enchantment enchantment){
+            for (Enchantment e: toEnchant.getEnchantments().keySet()){
+                if(e.getKey().equals(enchantment.getKey())) continue;
+                if(enchantment.conflictsWith(e)) return false;
+            }
             return enchantment.canEnchantItem(toEnchant);
         }
     }

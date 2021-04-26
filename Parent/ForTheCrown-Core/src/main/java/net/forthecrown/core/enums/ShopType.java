@@ -1,6 +1,6 @@
 package net.forthecrown.core.enums;
 
-import net.forthecrown.core.ShopManager;
+import net.forthecrown.core.api.ShopManager;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
@@ -19,8 +19,10 @@ public enum ShopType {
     private final Component inStock;
     private final Component outStock;
     private final boolean isAdmin;
+    private final boolean buyType;
 
     ShopType(@NotNull String label, @NotNull Style style, boolean isAdmin){
+        buyType = label.contains("Buy");
         inStock = Component.text(label).style(style);
         outStock = Component.text(label).style(ShopManager.OUT_OF_STOCK_STYLE);
 
@@ -33,6 +35,10 @@ public enum ShopType {
      */
     public boolean isAdmin() {
         return isAdmin;
+    }
+
+    public boolean isBuyType() {
+        return buyType;
     }
 
     /**

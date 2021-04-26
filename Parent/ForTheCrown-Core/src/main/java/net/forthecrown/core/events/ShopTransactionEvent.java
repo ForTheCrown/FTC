@@ -1,19 +1,18 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.BranchFlag;
-import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.CrownWorldGuard;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.Announcer;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.ShopInventory;
-import net.forthecrown.core.api.SignShop;
-import net.forthecrown.core.customevents.SignShopUseEvent;
+import net.forthecrown.core.api.*;
+import net.forthecrown.core.events.customevents.SignShopUseEvent;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.exceptions.BrokenShopException;
 import net.forthecrown.core.exceptions.CrownException;
-import net.md_5.bungee.api.ChatColor;
+import net.forthecrown.core.utils.CrownUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -26,8 +25,7 @@ import java.util.logging.Level;
 public class ShopTransactionEvent implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onShopUse(SignShopUseEvent event){
-        //just the variables
+    public void onShopUse(SignShopUseEvent event) throws CrownException {
         Player player = event.getPlayer();
         CrownUser customer = event.getCustomer();
         CrownUser owner = event.getOwner();
@@ -88,13 +86,20 @@ public class ShopTransactionEvent implements Listener {
 
                 event.addOwnerBalance(shop.getPrice());
 
-                final String longAF = ChatColor.GOLD + player.getName() +
-                        ChatColor.GRAY + " bought " +
-                        ChatColor.YELLOW + example.getAmount() + " " +
-                        CrownUtils.getItemNormalName(example) +
-                        ChatColor.GRAY + " from you for " + ChatColor.GOLD + CrownUtils.decimalizeNumber(shop.getPrice()) + " Rhines";
+                Component ownerMessage = Component.text()
+                        .color(NamedTextColor.GRAY)
+                        .append(customer.name()
+                                .color(NamedTextColor.GOLD)
+                                .hoverEvent(customer)
+                                .clickEvent(customer.asClickEvent())
+                        )
+                        .append(Component.text(" bought "))
+                        .append(Component.text(example.getAmount() + " " + CrownUtils.getItemNormalName(example)).color(NamedTextColor.YELLOW))
+                        .append(Component.text(" from you for "))
+                        .append(Balances.formatted(shop.getPrice()).color(NamedTextColor.GOLD))
+                        .build();
 
-                event.getOwner().sendMessage(longAF);
+                owner.sendMessage(ownerMessage);
 
             case ADMIN_BUY_SHOP: //This has some of the same if statements as the last case, but if they overlap, it has to happen, don't know how to do it better
                 if(!customerHasSpace){
@@ -108,10 +113,11 @@ public class ShopTransactionEvent implements Listener {
                     return;
                 }
 
-                String customerMsg1 = ChatColor.GRAY + "You bought " +
-                        ChatColor.YELLOW + example.getAmount() + " " +
-                        CrownUtils.getItemNormalName(example) +
-                        ChatColor.GRAY + " for " + ChatColor.GOLD + CrownUtils.decimalizeNumber(shop.getPrice()) + " Rhines";
+                Component boughtMessage = Component.text("You bought ")
+                        .color(NamedTextColor.GRAY)
+                        .append(Component.text(example.getAmount() + " " + CrownUtils.getItemNormalName(example)).color(NamedTextColor.YELLOW))
+                        .append(Component.text(" for "))
+                        .append(Balances.formatted(shop.getPrice()).color(NamedTextColor.GOLD));
 
                 playerInv.addItem(example); //adds the item to player's inventory
                 event.setCustomerBalance(event.getCustomerBalance() - shop.getPrice());
@@ -124,7 +130,7 @@ public class ShopTransactionEvent implements Listener {
                             customer.getName() + " bought " + example.getAmount() + " " + CrownUtils.getItemNormalName(example) + " at a shop, location: " + shop.getName());
                 }
 
-                customer.sendMessage(customerMsg1);
+                customer.sendMessage(boughtMessage);
                 break;
 
             case SELL_SHOP: //again some overlap
@@ -148,19 +154,29 @@ public class ShopTransactionEvent implements Listener {
                     return;
                 }
 
-                final String customerMsg = ChatColor.GRAY + "You sold " +
-                        ChatColor.YELLOW + example.getAmount() + " " +
-                        CrownUtils.getItemNormalName(example) +
-                        ChatColor.GRAY + " for " + ChatColor.GOLD + CrownUtils.decimalizeNumber(shop.getPrice()) + " Rhines";
+                Component customerMsg = Component.text()
+                        .color(NamedTextColor.GRAY)
+                        .append(Component.text("You sold "))
+                        .append(Component.text(example.getAmount() + " " + CrownUtils.getItemNormalName(example)).color(NamedTextColor.YELLOW))
+                        .append(Component.text(" for "))
+                        .append(Balances.formatted(shop.getPrice()).color(NamedTextColor.GOLD))
+                        .build();
 
                 customer.sendMessage(customerMsg);
 
                 if(shop.getType() == ShopType.SELL_SHOP) {
-
-                    final String ownerMsg = ChatColor.GOLD + player.getName() + ChatColor.GRAY +
-                            " sold " + ChatColor.YELLOW + example.getAmount() + " " +
-                            CrownUtils.getItemNormalName(example) +
-                            ChatColor.GRAY + " to you for " + ChatColor.GOLD + CrownUtils.decimalizeNumber(shop.getPrice()) + " Rhines";
+                    Component ownerMsg = Component.text()
+                            .color(NamedTextColor.GRAY)
+                            .append(customer.name()
+                                    .color(NamedTextColor.GOLD)
+                                    .hoverEvent(customer)
+                                    .clickEvent(customer.asClickEvent())
+                            )
+                            .append(Component.text(" sold "))
+                            .append(Component.text(example.getAmount() + " " + CrownUtils.getItemNormalName(example)))
+                            .append(Component.text(" to you for "))
+                            .append(Balances.formatted(shop.getPrice()).color(NamedTextColor.GOLD))
+                            .build();
 
                     event.setOwnerBalance(event.getOwnerBalance() - shop.getPrice());
                     shopInv.addItem(example);
@@ -181,6 +197,24 @@ public class ShopTransactionEvent implements Listener {
             default:
                 throw new IllegalStateException("Unexpected value: " + shop.getType());
         }
+        
         shopInv.checkStock();
+        sendInvMessage(owner, shop);
+    }
+
+    private void sendInvMessage(CrownUser owner, SignShop shop){
+        if(shop.getType().isAdmin()) return;
+
+        //If no good, then no go
+        if ((shop.getType() != ShopType.BUY_SHOP || !shop.getInventory().isEmpty()) && (shop.getType() != ShopType.SELL_SHOP || !shop.getInventory().isFull()))
+            return;
+
+        Location l = shop.getLocation();
+        Component builder = Component.text("Your shop at ")
+                .color(NamedTextColor.GRAY)
+                .append(CrownUtils.prettyLocationMessage(l, false).color(NamedTextColor.YELLOW))
+                .append(Component.text(shop.getType() == ShopType.BUY_SHOP ? " is out of stock" : " is full"));
+
+        owner.sendMessage(builder);
     }
 }

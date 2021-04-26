@@ -1,6 +1,6 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.core.utils.CrownRandom;
 import org.bukkit.*;
 import org.bukkit.entity.Shulker;
 import org.bukkit.persistence.PersistentDataType;
@@ -9,15 +9,17 @@ public class TreasureShulker {
 
     private final Pirates main;
     public static final NamespacedKey KEY = new NamespacedKey(Pirates.inst, "treasure");
+    private final CrownRandom random;
 
     public TreasureShulker(Pirates pirates){
         main = pirates;
+        random = new CrownRandom();
     }
 
     public Location findRandLocation(){
-        final int x = CrownUtils.getRandomNumberInRange(-1970, 1970);
-        final int y = CrownUtils.getRandomNumberInRange(40, 50);
-        final int z = CrownUtils.getRandomNumberInRange(-1970, 1970);
+        final int x = random.intInRange(-1970, 1970);
+        final int y = random.intInRange(40, 50);
+        final int z = random.intInRange(-1970, 1970);
 
         main.getConfig().set("TreasureLoc.x", x);
         main.getConfig().set("TreasureLoc.y", y);
@@ -28,6 +30,7 @@ public class TreasureShulker {
 
     public void spawn(){
         Location spawnLoc = findRandLocation();
+        spawnLoc.getBlock().setType(Material.AIR);
         spawnLoc.getWorld().spawn(spawnLoc, Shulker.class, shulker -> {
             shulker.setAI(false);
             shulker.setInvulnerable(true);
@@ -36,6 +39,11 @@ public class TreasureShulker {
             shulker.setPersistent(true);
             shulker.getPersistentDataContainer().set(KEY, PersistentDataType.BYTE, (byte) 1);
         });
+    }
+
+    public void relocate(){
+        killOld();
+        spawn();
     }
 
     public void killOld(){

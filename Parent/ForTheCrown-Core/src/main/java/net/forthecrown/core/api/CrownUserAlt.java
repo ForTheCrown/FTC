@@ -8,4 +8,10 @@ import java.util.UUID;
 public interface CrownUserAlt extends CrownUser{
     UUID getMainUniqueID();
     CrownUser getMain();
+
+    @Override
+    boolean equals(Object o);
+
+    @Override
+    int hashCode();
 }

@@ -3,6 +3,7 @@ package net.forthecrown.royals.commands;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
@@ -15,7 +16,6 @@ import net.forthecrown.royals.dungeons.bosses.BossItems;
 import net.forthecrown.royals.dungeons.bosses.Bosses;
 import net.forthecrown.royals.dungeons.bosses.mobs.DungeonBoss;
 import net.forthecrown.royals.enchantments.CrownEnchant;
-import net.forthecrown.royals.enchantments.RoyalEnchants;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
@@ -99,10 +99,17 @@ public class CommandRoyal extends CrownCommandBuilder {
 
                 .then(argument("enchant")
                         .then(argument("legacy", BoolArgumentType.bool())
-                                .then(argument("crit").executes(c -> enchantItemInHand(c, RoyalEnchants.poisonCrit(), c.getArgument("legacy", Boolean.class))))
+                                .then(argument("enchantment", RoyalEnchantType.enchant())
+                                        .executes(c -> enchantItemInHand(c,
+                                                RoyalEnchantType.getEnchant(c, "enchantment"),
+                                                c.getArgument("legacy", Boolean.class)
+                                        ))
+                                )
+
+                                /*.then(argument("crit").executes(c -> enchantItemInHand(c, RoyalEnchants.poisonCrit(), c.getArgument("legacy", Boolean.class))))
                                 .then(argument("block").executes(c -> enchantItemInHand(c, RoyalEnchants.healingBlock(), c.getArgument("legacy", Boolean.class))))
                                 .then(argument("swim").executes(c -> enchantItemInHand(c, RoyalEnchants.dolphinSwimmer(), c.getArgument("legacy", Boolean.class))))
-                                .then(argument("aim").executes(c -> enchantItemInHand(c, RoyalEnchants.strongAim(), c.getArgument("legacy", Boolean.class))))
+                                .then(argument("aim").executes(c -> enchantItemInHand(c, RoyalEnchants.strongAim(), c.getArgument("legacy", Boolean.class))))*/
                         )
                 )
 
@@ -201,7 +208,7 @@ public class CommandRoyal extends CrownCommandBuilder {
         return boss;
     }
 
-    private int enchantItemInHand(CommandContext<CommandListenerWrapper> c, CrownEnchant enchant, boolean legacy) throws CrownCommandException {
+    private int enchantItemInHand(CommandContext<CommandListenerWrapper> c, CrownEnchant enchant, boolean legacy) throws CommandSyntaxException {
         Player player = getPlayerSender(c);
         ItemStack to_enchant = player.getInventory().getItemInMainHand();
         if(to_enchant == null) throw new CrownCommandException("Hold an item you dumbass");

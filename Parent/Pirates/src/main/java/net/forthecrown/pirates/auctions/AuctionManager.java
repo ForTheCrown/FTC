@@ -28,8 +28,8 @@ public final class AuctionManager {
     private static final String LABEL = "=[Auction]=";
     private static final Component LABEL_COMPONENT = Component.text(LABEL).style(Style.style(TextDecoration.BOLD));
     public static final Component UNCLAIMED_LABEL = LABEL_COMPONENT.color(NamedTextColor.DARK_RED);
-    public static final Component CLAIMED_REGULAR_LABEL = LABEL_COMPONENT.color(NamedTextColor.GREEN);
-    public static final Component CLAIMED_ADMIN_LABEL = LABEL_COMPONENT.color(NamedTextColor.AQUA);
+    public static final Component REGULAR_LABEL = LABEL_COMPONENT.color(NamedTextColor.GREEN);
+    public static final Component ADMIN_LABEL = LABEL_COMPONENT.color(NamedTextColor.AQUA);
     public static final Component WAITING_FOR_ITEM_CLAIM_LABEL = LABEL_COMPONENT.color(NamedTextColor.YELLOW);
     public static final long EXPIRY_DURATION = 604800000L; // 2 weeks or so
 

@@ -2,15 +2,15 @@ package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.utils.ComponentUtils;
-import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nonnegative;
@@ -27,7 +27,7 @@ public class CommandBalanceTop extends CrownCommandBuilder {
         register();
     }
 
-    private int maxPage;
+    private final int maxPage;
 
     /*
      * ----------------------------------------
@@ -47,7 +47,11 @@ public class CommandBalanceTop extends CrownCommandBuilder {
     protected void registerCommand(BrigadierCommand command) {
         command
                 .executes(c -> { //No args -> show first page
-                    sendBaltopMessage(c.getSource().getBukkitSender(), 0);
+                    try {
+                        sendBaltopMessage(c.getSource().getBukkitSender(), 0);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
                     return 0;
                 })
                 .then(argument("page", IntegerArgumentType.integer(1, maxPage))
@@ -61,57 +65,54 @@ public class CommandBalanceTop extends CrownCommandBuilder {
 
     //Send the message
     private void sendBaltopMessage(CommandSender sender, @Nonnegative int page){
-        List<String> baltopList = getBaltopList();
+        List<Component> baltopList = getBaltopList();
         Collections.reverse(baltopList);
-        int index = page;
-        if(index != 0) index--;
+        if(page > 0) page--;
 
-        int stupidity = Math.round(((float) baltopList.size())/10); //This is so that if you have a weird number of balances, say 158, there's an extra page for those last 8 ones
-
-        if(page > stupidity) {
-            sender.sendMessage(ChatColor.GRAY + "Out of range");
-            return;
-        }
-
-        final TextComponent border = Component.text("------").color(NamedTextColor.GRAY);
-        TextComponent text = Component.text()
+        final TextComponent border = Component.text("------").color(NamedTextColor.GRAY).decoration(TextDecoration.STRIKETHROUGH, TextDecoration.State.TRUE);
+        TextComponent.Builder text = Component.text()
                 .append(border)
                 .append(Component.text(" Top balances ").color(NamedTextColor.YELLOW))
                 .append(border)
-                .append(Component.newline())
-                .build();
+                .append(Component.newline());
 
         for(int i = 0 ; i < 10 ; i++){
-            if((index*10) + i >= baltopList.size()) break;
+            if((page*10) + i >= baltopList.size()) break;
+            int index = (page*10) + i;
 
-            text = text.append(ComponentUtils.convertString(ChatColor.GOLD + "" + ((index*10) + i+1) + ") " + ChatColor.RESET + baltopList.get((index*10) + i)))
+            text.append(Component.text((index+1) + ") ").color(NamedTextColor.GOLD))
+                    .append(baltopList.get(index))
                     .append(Component.newline());
         }
-        text = text
-                .append(border)
-                .append(Component.text(" Page " +  (index+1) + "/" + stupidity + " ").color(NamedTextColor.YELLOW))
+        text.append(border)
+                .append(Component.text(" Page " +  (page+1) + "/" + maxPage + " ").color(NamedTextColor.YELLOW))
                 .append(border);
 
-        //ngl, now that this is just sending one message that's appended together, there's no weird 1 frame thing where the text gets sent line by line lol
-        //It just comes out as one :D
+        //ngl, now that this is just sending one message that's appended together, there's no weird 1 frame thing where
+        // the text gets sent line by line lol. It just comes out as one :D
         sender.sendMessage(text);
     }
 
-    //Gets the formatted list of balances, hopefully in the correct order
-    private List<String> getBaltopList(){
+    //Gets the formatted list of balances, in descending order
+    private List<Component> getBaltopList(){
         Map<UUID, Integer> map = getSortedBalances();
-        List<String> list = new ArrayList<>();
+        List<Component> list = new ArrayList<>();
 
         for(UUID id : getSortedBalances().keySet()){
-            String message;
+            OfflinePlayer player = Bukkit.getOfflinePlayer(id);
+            if(player == null || player.getName() == null) continue;
 
-            message = Bukkit.getOfflinePlayer(id).getName() + " - " + ChatColor.YELLOW + CrownUtils.decimalizeNumber(map.get(id)) + " Rhines";
-            list.add(message);
+            list.add(Component.text()
+                    .append(Component.text(player.getName()))
+                    .append(Component.text(" - "))
+                    .append(Balances.formatted(map.get(id)).color(NamedTextColor.YELLOW))
+                    .build());
+
         }
         return list;
     }
 
-    //Gets a sorted list of balances
+    //Gets a sorted list of balances, descending order
     private Map<UUID, Integer> getSortedBalances(){
         List<Map.Entry<UUID, Integer>> list = new ArrayList<>(FtcCore.getBalances().getBalanceMap().entrySet());
         list.sort(Map.Entry.comparingByValue());

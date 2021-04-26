@@ -40,7 +40,7 @@ public class ItemStackBuilder implements Builder<ItemStack> {
     private Map<Enchantment, Integer> enchants = new HashMap<>();
 
     public ItemStackBuilder(Material material){
-        this.material = material;
+        this(material, 1);
     }
 
     public ItemStackBuilder(Material material, int amount){

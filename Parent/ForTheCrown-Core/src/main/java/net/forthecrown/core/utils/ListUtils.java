@@ -54,4 +54,27 @@ public final class ListUtils {
         }
         return true;
     }
+
+    public static <I> String join(@NotNull Collection<I> list, @Nullable String delimiter, @NotNull Function<I, String> stringMaker){
+        return join(list, delimiter, null, null, stringMaker);
+    }
+
+    public static <I> String join(@NotNull Collection<I> list, @NotNull Function<I, String> stringFunction){
+        return join(list, null, null, null, stringFunction);
+    }
+
+    public static <I> String join(@NotNull Collection<I> list, @Nullable String delimiter, @Nullable String prefix, @Nullable String suffix, @NotNull Function<I, String> joiner){
+        StringBuilder builder = new StringBuilder(CrownUtils.isNullOrBlank(prefix) ? "" : prefix);
+
+        int iteration = 0;
+        for (I i: list){
+            iteration++;
+
+            builder.append(joiner.apply(i));
+            if(iteration < list.size()) builder.append(CrownUtils.isNullOrBlank(delimiter) ? ", " : delimiter);
+        }
+
+        if(!CrownUtils.isNullOrBlank(suffix)) builder.append(suffix);
+        return builder.toString();
+    }
 }

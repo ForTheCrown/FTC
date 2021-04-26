@@ -30,9 +30,6 @@ public class CommandStaffChatToggle extends CrownCommandBuilder {
      * - /staffchattoggle
      * - /sct
      *
-     * Permissions used:
-     * - ftc.staffchat
-     *
      * Author: Botul
      */
 
@@ -41,7 +38,7 @@ public class CommandStaffChatToggle extends CrownCommandBuilder {
         command.executes(c -> {
             Player player = getPlayerSender(c);
 
-            Set<Player> set = StaffChat.getSCT();
+            Set<Player> set = StaffChat.sctPlayers;
             String staffPrefix = ChatColor.DARK_GRAY + "[Staff] ";
 
             if(set.contains(player)){
@@ -52,7 +49,6 @@ public class CommandStaffChatToggle extends CrownCommandBuilder {
                 player.sendMessage(staffPrefix + ChatColor.GRAY + "Your messages will now all go to staffchat");
             }
 
-            StaffChat.setSCT(set);
             return 0;
         });
     }

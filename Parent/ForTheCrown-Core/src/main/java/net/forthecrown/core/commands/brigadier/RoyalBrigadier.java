@@ -10,8 +10,6 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-//cool name lul
-
 /**
  * Our own, very hacky, implementation of Mojang's own Brigadier Command Engine, the Royal Brigadier
  * <p>Allows the usage of the server's native Brigadier command engine.</p>
@@ -40,8 +38,13 @@ public final class RoyalBrigadier {
         new CommandStaffChat();
         new CommandStaffChatToggle();
         new CommandHologram();
-        new CommandTestCore();
         new CommandComVar();
+        new CommandGift();
+
+        if(FtcCore.inDebugMode.getValue(false)){
+            new CommandTestCore();
+            new HelpHelp();
+        }
 
         //utility / misc commands
         new CommandGems();
@@ -49,6 +52,11 @@ public final class RoyalBrigadier {
         new CommandRank();
         new CommandGrave();
         new CommandLeave();
+        new CommandWild();
+
+        //top me daddy xD
+        new CommandDeathTop();
+        new CommandCrownTop();
 
         //economy commands
         new CommandShop();
@@ -67,6 +75,7 @@ public final class RoyalBrigadier {
         new HelpSpawn();
         new HelpMap();
         new HelpBank();
+        new HelpShop();
 
         //tpa commands
         new CommandTpask();
@@ -84,6 +93,8 @@ public final class RoyalBrigadier {
         new EmoteJingle();
         new EmoteHug();
         new EmotePog();
+
+        plugin.getLogger().info("All commands registered");
     }
 
     /**
@@ -106,10 +117,9 @@ public final class RoyalBrigadier {
     }
 
     /**
-     *
      * Gets the server's command class, that handles the all things related to commands, type name is misleading
      * <p>MCCoderPack devs were dumb AF and called this a dispatcher</p>
-     * <p>The actual dispatcher is in the command registry</p>
+     * <p>The actual dispatcher is in the returned class</p>
      * @return The server's commands class
      */
     public static CommandDispatcher getServerCommands() {

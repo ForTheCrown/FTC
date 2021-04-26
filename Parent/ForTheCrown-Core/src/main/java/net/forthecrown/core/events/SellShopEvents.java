@@ -1,16 +1,19 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.customevents.SellShopUseEvent;
 import net.forthecrown.core.enums.SellAmount;
+import net.forthecrown.core.events.customevents.SellShopUseEvent;
 import net.forthecrown.core.inventories.SellShop;
+import net.forthecrown.core.nbt.NbtGetter;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.Cooldown;
 import net.forthecrown.core.utils.CrownUtils;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -19,11 +22,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class SellShopEvents implements Listener {
 
@@ -54,7 +57,6 @@ public class SellShopEvents implements Listener {
         ItemStack item = event.getCurrentItem();
 
         if(item.getType() == Material.GRAY_STAINED_GLASS_PANE) return;
-        view = event.getView();
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
         //change sell amount
         if(item.getType() == Material.BLACK_STAINED_GLASS_PANE){
@@ -75,45 +77,60 @@ public class SellShopEvents implements Listener {
         }
 
         switch (item.getType()){
+            case IRON_BLOCK:
+                if(sellShop.getCurrentMenu() == SellShop.Menu.MINING_BLOCKS) break;
+                player.openInventory(sellShop.miningBlocksMenu());
+                return;
             case GOLD_BLOCK:
+                if(sellShop.getCurrentMenu() == SellShop.Menu.MINING_BLOCKS) break;
             case PAPER:
+                if(sellShop.getCurrentMenu() == SellShop.Menu.MINING_BLOCKS){
+                    player.openInventory(sellShop.miningMenu());
+                    return;
+                }
+
                 player.openInventory(sellShop.decidingMenu());
-                break;
+                return;
             case EMERALD_BLOCK:
+                if(sellShop.getCurrentMenu() == SellShop.Menu.MINING_BLOCKS) break;
+
                 player.closeInventory();
                 user.sendMessage("&7Webstore address:", ChatColor.AQUA + "for-the-crown.tebex.io");
-                break;
+                return;
             case OAK_SAPLING:
-                player.openInventory(sellShop.farmingMenu());
-                break;
+                player.openInventory(sellShop.cropsMenu());
+                return;
             case IRON_PICKAXE:
                 player.openInventory(sellShop.miningMenu());
-                break;
+                return;
             case ROTTEN_FLESH:
                 if(item.getItemMeta().getDisplayName().contains("Drops")) {
                     player.openInventory(sellShop.dropsMenu());
-                    break;
+                    return;
                 }
             default:
-                FtcCore.getInstance().getServer().getPluginManager().callEvent(new SellShopUseEvent(user, FtcCore.getBalances(), item.getType()));
         }
+        Bukkit.getPluginManager().callEvent(new SellShopUseEvent(user, FtcCore.getBalances(), item.getType(), item, sellShop));
     }
 
-    private InventoryView view;
     private void reloadInventory(){
-        if(view == null) return;
+        if(sellShop.getCurrentMenu() == null) return;
 
         //reloads the inventory, cuz changing the lores of all the items is a pain too great to even imagine
-        switch (ChatColor.stripColor(ComponentUtils.getString(view.title())).replaceAll(" Shop Menu", "")){
-            case "Mob Drops":
+        switch (sellShop.getCurrentMenu()){
+            case DROPS:
                 player.openInventory(sellShop.dropsMenu());
                 return;
-            case "Farming Items":
-                player.openInventory(sellShop.farmingMenu());
+            case CROPS:
+                player.openInventory(sellShop.cropsMenu());
                 return;
-            case "Mining Items":
+            case MINING:
                 player.openInventory(sellShop.miningMenu());
                 return;
+            case MINING_BLOCKS:
+                player.openInventory(sellShop.miningBlocksMenu());
+                return;
+
             default:
                 player.openInventory(sellShop.decidingMenu());
         }
@@ -124,7 +141,7 @@ public class SellShopEvents implements Listener {
         CrownUser seller = event.getSeller();
         Material toSell = event.getItem();
 
-        int sellAmount = seller.getSellAmount().getInt();
+        int sellAmount = seller.getSellAmount().getValue();
         int finalSell = sellAmount;
 
         ItemStack toSellItem = new ItemStack(toSell, finalSell);
@@ -134,7 +151,7 @@ public class SellShopEvents implements Listener {
         Player player = event.getSellerPlayer();
         PlayerInventory playerInventory = player.getInventory();
 
-        if(!playerInventory.contains(toSell, sellAmount)){
+        if(!playerInventory.containsAtLeast(toSellItem, sellAmount)){
             seller.sendMessage("&7You don't have enough items to sell");
             event.setCancelled(true);
             return;
@@ -152,21 +169,33 @@ public class SellShopEvents implements Listener {
         } else playerInventory.removeItemAnySlot(toSellItem);
 
         UUID uuid = player.getUniqueId();
-        int toPay = finalSell * seller.getItemPrice(toSell);
+        int toPay;
+
+        Announcer.debug(event.getShop().getCurrentMenu());
+        String s = CrownUtils.normalEnum(toSell);
+
+        if(event.getShop().getCurrentMenu() == SellShop.Menu.MINING_BLOCKS){
+            String orig = NbtGetter.ofItemTags(event.getClickedItem()).getString("ingot");
+            Announcer.debug(orig);
+            toSell = Material.valueOf(orig);
+            toPay = seller.getItemPrice(toSell) * 9 * finalSell;
+        } else toPay = seller.getItemPrice(toSell) * finalSell;
+
         int comparison0 = seller.getItemPrice(toSell);
 
-        String s = CrownUtils.normalEnum(toSell);
         bals.add(uuid, toPay, true); //does the actual paying and adds the itemsSold to the seller
         seller.setAmountEarned(toSell, seller.getAmountEarned(toSell)+toPay); //How the fuck does this keep resetting everytime
-        seller.sendMessage("&7You sold &e" + finalSell + " " + s + " &7for &6" + CrownUtils.decimalizeNumber(toPay) + " Rhines");
 
-        System.out.println(seller.getName() + " sold " + finalSell + " " + s + " for " + toPay);
+        String message = CrownUtils.translateHexCodes(" sold &e" + finalSell + " " + s + " &7for &6" + Balances.getFormatted(toPay) + ".");
+
+        Announcer.log(Level.INFO, seller.getName() + message);
+        seller.sendMessage("&7You " + message);
 
         int comparison1 = seller.getItemPrice(toSell);
 
         //if the price dropped
         if(comparison1 < comparison0){
-            seller.sendMessage("&7Your price for " + s + " has dropped to " + comparison1);
+            seller.sendMessage("&7Your price for " + s + " has dropped to " + Balances.getFormatted(comparison1));
             reloadInventory();
         }
     }

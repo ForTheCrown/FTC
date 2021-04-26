@@ -7,7 +7,7 @@ import net.md_5.bungee.api.ChatColor;
  */
 public class EmoteDisabledException extends CrownCommandException {
 
-    private static final String SENDER_DISABLED = ChatColor.GRAY + "You have emotes turned off." + "\n" + ChatColor.GRAY + "Do " + ChatColor.RESET + "/toggleemotes" + ChatColor.GRAY + " to enable them.";
+    private static final String SENDER_DISABLED = ChatColor.GRAY + "You have emotes turned off.\n" + ChatColor.GRAY + "Do " + ChatColor.RESET + "/toggleemotes" + ChatColor.GRAY + " to enable them.";
     private static final String TARGET_DISABLED = ChatColor.GRAY + "This player has disabled emotes.";
 
     private EmoteDisabledException(String message){

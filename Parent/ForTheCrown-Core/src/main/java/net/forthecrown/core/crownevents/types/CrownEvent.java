@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
  * A basic CrownEvent interface
  * @param <T> The type of EventEntry this event accepts
  */
-public interface CrownEvent<T extends EventEntry> {
+public interface CrownEvent<T extends EventEntry<T>> {
 
     /**
      * Starts the Event for the specified player

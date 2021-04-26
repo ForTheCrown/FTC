@@ -1,8 +1,8 @@
 package net.forthecrown.core.api;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.files.FtcUser;
-import net.forthecrown.core.files.FtcUserAlt;
+import net.forthecrown.core.types.user.FtcUser;
+import net.forthecrown.core.types.user.FtcUserAlt;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.ListUtils;
 import org.apache.commons.lang.Validate;

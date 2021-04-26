@@ -36,17 +36,18 @@ public class EmoteHug extends CommandEmote {
 
         recipient.sendMessage(hugClick);
         user.sendMessage("&c❤ &7You hugged &e" + recipient.getName() + " ʕっ•ᴥ•ʔっ &c❤");
-        Cooldown.add(recipient, "Emote_Hug_Received", 10*20);
 
-        if(recipient.getPlayer().getGameMode() != GameMode.SPECTATOR) new HugTick(recipient);
-        else Cooldown.remove(recipient, "Emote_Hug_Received");
+        if(recipient.getPlayer().getGameMode() != GameMode.SPECTATOR){
+            Cooldown.add(recipient, "Emote_Hug_Received", 10*20);
+            new HugTick(recipient);
+        }
         return 0;
     }
 
     @Override
     protected int executeSelf(CrownUser user) {
         user.sendMessage("It's alright to hug yourself &c❤", "We've all got to love ourselves &c❤");
-        user.getPlayer().getWorld().spawnParticle(Particle.HEART, user.getPlayer().getLocation().add(0, 0.5, 0), 3, 0.25, 0.25 ,0.25);
+        user.getWorld().spawnParticle(Particle.HEART, user.getLocation().add(0, 0.5, 0), 3, 0.25, 0.25 ,0.25);
         return -1;
     }
 

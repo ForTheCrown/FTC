@@ -27,21 +27,21 @@ public class CommandLeave extends CrownCommandBuilder {
     protected void registerCommand(BrigadierCommand command) {
         command.executes(c -> {
             Player player = getPlayerSender(c);
-            for (CrownBoundingBox b: ALLOWED_USAGE_AREAS.keySet()){
-                if(!b.contains(player.getLocation())) continue;
+            for (Map.Entry<CrownBoundingBox, Pair<Location, Function<Player, Boolean>>> e: ALLOWED_USAGE_AREAS.entrySet()){
+                if(!e.getKey().contains(player.getLocation())) continue;
 
-                Pair<Location, Function<Player, Boolean>> par = ALLOWED_USAGE_AREAS.get(b);
+                Pair<Location, Function<Player, Boolean>> par = e.getValue();
                 if(par.getSecond().apply(player)) player.teleport(par.getFirst());
             }
             return 0;
         });
     }
 
-    public static void addAllowedArea(CrownBoundingBox box, Location exitLocation, Function<Player, Boolean> onExit){
+    public static void add(CrownBoundingBox box, Location exitLocation, Function<Player, Boolean> onExit){
         ALLOWED_USAGE_AREAS.put(box, new Pair<>(exitLocation, onExit));
     }
 
-    public static void removeAllowedArea(CrownBoundingBox box){
+    public static void remove(CrownBoundingBox box){
         ALLOWED_USAGE_AREAS.remove(box);
     }
 }

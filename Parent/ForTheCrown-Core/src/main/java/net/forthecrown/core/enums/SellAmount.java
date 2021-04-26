@@ -25,7 +25,7 @@ public enum SellAmount {
      * </p>
      * @return A numeric representation of the sell amount
      */
-    public Byte getInt(){
+    public Byte getValue(){
         return i;
     }
 

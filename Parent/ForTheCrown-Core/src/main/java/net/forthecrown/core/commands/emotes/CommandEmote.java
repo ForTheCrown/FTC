@@ -5,10 +5,12 @@ import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.EmoteDisabledException;
-import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.core.commands.brigadier.types.custom.UserType;
 import net.forthecrown.core.utils.Cooldown;
 import net.forthecrown.core.utils.CrownUtils;
 import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnegative;
 
 /**
  * The class to make the handling of emotes easier
@@ -20,7 +22,7 @@ public abstract class CommandEmote extends CrownCommandBuilder {
     protected final String cooldownMessage;
     protected final String cooldownCategory;
 
-    protected CommandEmote(@NotNull String name, int cooldownTime, String cooldownMessage) {
+    protected CommandEmote(@NotNull String name, @Nonnegative int cooldownTime, @NotNull String cooldownMessage) {
         super(name, FtcCore.getInstance());
 
         setPermission("ftc.emotes." + name);
@@ -35,8 +37,8 @@ public abstract class CommandEmote extends CrownCommandBuilder {
         command
                 .executes(c -> executeSelf(getUserSender(c)))
 
-                .then(argument("player", UserType.onlinePlayer())
-                        .suggests((c, b) -> UserType.listSuggestions(b))
+                .then(argument("player", UserType.user())
+                        .suggests(UserType::suggestSelector)
 
                         .executes(c -> {
                             CrownUser sender = getUserSender(c);
@@ -47,7 +49,7 @@ public abstract class CommandEmote extends CrownCommandBuilder {
                             }
 
                             CrownUser recipient = UserType.getOnlineUser(c, "player");
-                            if(recipient.getName().equalsIgnoreCase(sender.getName())) return executeSelf(sender);
+                            if(recipient.equals(sender)) return executeSelf(sender);
 
                             //If anyone's got emotes disabled, stop em
                             if(!sender.allowsEmotes()) throw EmoteDisabledException.senderDisabled();

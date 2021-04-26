@@ -20,10 +20,25 @@ public class CommandComVar extends CrownCommandBuilder {
         setAliases("convar", "consolevar", "commandvar", "commandvariables");
         register();
     }
+
+    /*
+     * ----------------------------------------
+     * 			Command description:
+     * ----------------------------------------
+     * Provides an easy way for plugins to have a
+     * variable that can be viewed and modified ingame
+     *
+     * Valid usages of command:
+     * - /comvar <variable
+     * - /comvar <variable> <value>
+     *
+     * Author: Botul
+     */
+
     @Override
     protected void registerCommand(BrigadierCommand command) {
         command.then(argument(varArg, StringArgumentType.word())
-                .suggests((c, b) -> suggestMatching(b, ComVars.getVariables()))
+                .suggests(suggest(ComVars.getVariables()))
 
                 .executes(c -> { //Just var name -> show var value
                     String name = c.getArgument("variable", String.class);

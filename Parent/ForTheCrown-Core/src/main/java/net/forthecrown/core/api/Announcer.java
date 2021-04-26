@@ -1,16 +1,12 @@
 package net.forthecrown.core.api;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.comvars.ComVar;
-import net.forthecrown.core.comvars.ComVars;
-import net.forthecrown.core.comvars.types.ComVarType;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 
 import javax.annotation.Nullable;
-import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -81,7 +77,7 @@ public interface Announcer extends CrownSerializer<FtcCore> {
         acLiteral(CrownUtils.translateHexCodes(CrownUtils.formatEmojis(message.toString())));
     }
 
-    static void ac(Object[] messages){
+    static void ac(Object... messages){
         for (Object o: messages){
             ac(o);
         }
@@ -121,6 +117,8 @@ public interface Announcer extends CrownSerializer<FtcCore> {
 
     void announce(Component message, String permission);
 
+    Component formatMessage(Component message);
+
     /**
      *
      * @param message
@@ -128,19 +126,27 @@ public interface Announcer extends CrownSerializer<FtcCore> {
      */
     void announce(String message, @Nullable String permission);
 
-    //Hacky way of determining if we're on the test server or not
-    ComVar<Boolean> debugEnvironment = ComVars.set("sv_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
-
     /**
      * Logs or announces a debug message, won't broadcast if on actual server
      * @param message The message to log, gets toString'ed, or just prints "null" if null
      */
     static void debug(Object message){
-        String string_message = message == null ? "null" : message.toString();
+        String stringMessage = message == null ? "null" : message.toString();
 
-        if(debugEnvironment.getValue(false)) acLiteral(string_message);
-        else log(Level.INFO, string_message);
+        if(FtcCore.inDebugMode.getValue(false)) acLiteral(stringMessage);
+        else log(DebugLevel.DEBUG, stringMessage);
     }
 
-    Component formatMessage(Component message);
+    static <T> T debugAndReturn(T message){
+        debug(message);
+        return message;
+    }
+
+    class DebugLevel extends Level {
+
+        public static DebugLevel DEBUG = new DebugLevel();
+        protected DebugLevel() {
+            super("DEBUG", 700);
+        }
+    }
 }

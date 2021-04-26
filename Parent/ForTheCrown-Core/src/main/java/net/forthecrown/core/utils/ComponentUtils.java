@@ -3,11 +3,9 @@ package net.forthecrown.core.utils;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
-import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.IChatMutableComponent;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 
 /**
@@ -29,20 +27,11 @@ public final class ComponentUtils {
     }
 
     public static IChatBaseComponent stringToVanilla(String text, boolean translateColors){
-        IChatBaseComponent[] texts = CraftChatMessage.fromString(translateColors ? CrownUtils.translateHexCodes(text) : text);
-        IChatMutableComponent merged = new ChatComponentText("");
-        for (IChatBaseComponent c: texts) {
-            merged.addSibling(c);
-        }
-        return merged;
+        return IChatBaseComponent.ChatSerializer.a(GsonComponentSerializer.gson().serialize(convertString(text, translateColors)));
     }
 
     public static IChatBaseComponent stringToVanilla(String text){
         return stringToVanilla(text, true);
-    }
-
-    public static String plainText(Component component){
-        return PlainComponentSerializer.plain().serialize(component);
     }
 
     public static String getString(Component tex){

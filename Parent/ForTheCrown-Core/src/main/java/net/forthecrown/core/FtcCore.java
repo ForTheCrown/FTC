@@ -1,16 +1,16 @@
 package net.forthecrown.core;
 
-import net.forthecrown.core.api.Announcer;
-import net.forthecrown.core.api.Balances;
-import net.forthecrown.core.api.BlackMarket;
-import net.forthecrown.core.api.UserManager;
+import net.forthecrown.core.api.*;
 import net.forthecrown.core.commands.brigadier.RoyalBrigadier;
 import net.forthecrown.core.comvars.ComVar;
 import net.forthecrown.core.comvars.ComVars;
 import net.forthecrown.core.comvars.types.ComVarType;
 import net.forthecrown.core.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.core.events.*;
-import net.forthecrown.core.files.*;
+import net.forthecrown.core.types.CrownBalances;
+import net.forthecrown.core.types.CrownBlackMarket;
+import net.forthecrown.core.types.CrownBroadcaster;
+import net.forthecrown.core.types.user.CrownUserManager;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.MapUtils;
 import net.kyori.adventure.text.Component;
@@ -24,15 +24,20 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 
 public final class FtcCore extends JavaPlugin {
+
+    //Hacky way of determining if we're on the test server or not
+    public static final ComVar<Boolean> inDebugMode = ComVars.set("sv_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
 
     //Not public cuz API, I don't want this value getting changed
     private static FtcCore instance;
@@ -40,7 +45,7 @@ public final class FtcCore extends JavaPlugin {
     private static String           prefix = "&6[FTC]&r  ";
     private static String           king;
     private static String           discord;
-    private static int              saverID;
+            static PeriodicalSaver  saver;
     private static int              maxMoneyAmount;
 
     private static ComVar<Long>     userDataResetInterval;// = 5356800000L; //2 months by default
@@ -54,7 +59,7 @@ public final class FtcCore extends JavaPlugin {
     private static CrownBroadcaster json_announcer;
     private static CrownBalances    balFile;
     private static CrownBlackMarket bm;
-    private static CrownWorldGuard  crownWorldGuard;
+    private static CrownWorldGuard  crownWG;
     private static CrownUserManager userManager;
     private static RoyalBrigadier   brigadier;
 
@@ -67,27 +72,27 @@ public final class FtcCore extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
         LUCK_PERMS = LuckPermsProvider.get();
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
-        reloadConfig();
 
         json_announcer = new CrownBroadcaster();
         balFile = new CrownBalances(this);
         bm = new CrownBlackMarket(this);
         brigadier = new RoyalBrigadier(this);
-        userManager = new CrownUserManager();
+        userManager = new CrownUserManager(this);
 
         SHOP_KEY = new NamespacedKey(this, "signshop");
 
         registerEvents();
-        if(getConfig().getBoolean("System.run-deleter-on-startup")) new FileChecker(getDataFolder());
+        if(getConfig().getBoolean("System.run-deleter-on-startup")) userManager.checkAllUserDatas();
     }
 
     @Override
     public void onLoad() {
-        crownWorldGuard = new CrownWorldGuard(this);
-        crownWorldGuard.registerFlags();
+        crownWG = new CrownWorldGuard(this);
+        crownWG.registerFlags();
     }
 
     @Override
@@ -96,13 +101,13 @@ public final class FtcCore extends JavaPlugin {
 
         Bukkit.getScheduler().cancelTasks(this);
 
-        for (Player p: Bukkit.getOnlinePlayers()){
-            p.closeInventory();
-        }
+        for (Player p: Bukkit.getOnlinePlayers()) p.closeInventory();
+        for (ArmorStandLeaderboard a: LEADERBOARDS) a.destroy();
+        for (LivingEntity e: MobHealthBar.NAMES.keySet()) e.customName(MobHealthBar.NAMES.getOrDefault(e, null));
 
-        for (ArmorStandLeaderboard a: LEADERBOARDS){
-            a.destroy();
-        }
+        UserManager.LOADED_USERS.clear();
+        UserManager.LOADED_ALTS.clear();
+        ShopManager.LOADED_SHOPS.clear();
     }
 
     private void registerEvents(){
@@ -121,18 +126,16 @@ public final class FtcCore extends JavaPlugin {
         pm.registerEvents(new ShopTransactionEvent(), this);
 
         pm.registerEvents(new BlackMarketEvents(), this);
+
+        pm.registerEvents(new MobHealthBar(), this);
+        pm.registerEvents(new SmokeBomb(), this);
     }
 
     private void loadDefaultItemPrices(){
         ConfigurationSection itemPrices = getInstance().getConfig().getConfigurationSection("DefaultPrices");
 
         for(String s : itemPrices.getKeys(true)){
-            Material mat;
-            try {
-                mat = Material.valueOf(s);
-            } catch (Exception e){
-                continue;
-            }
+            Material mat = Material.valueOf(s);
 
             //defaultItemPrices.put(mat, (short) itemPrices.getInt(s));
             defaultItemPrices.put(mat,
@@ -143,12 +146,6 @@ public final class FtcCore extends JavaPlugin {
                     )
             );
         }
-    }
-
-    //every hour it saves everything
-    private void periodicalSave(){
-        final long interval = getConfig().getLong("System.save-interval-mins")*60*20;
-        saverID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, FtcCore::saveFTC, interval, interval);
     }
 
     @Override
@@ -184,10 +181,12 @@ public final class FtcCore extends JavaPlugin {
         if(!getConfig().getString("King").contains("empty")) king = getConfig().getString("King");
         else king = "empty"; //like my soul
 
-        if(getConfig().getBoolean("System.save-periodically")) periodicalSave();
-        else if (saverID != 0){
-            Bukkit.getScheduler().cancelTask(saverID);
-            saverID = 0;
+        if(getConfig().getBoolean("System.save-periodically")){
+            if(saver == null || saver.isCancelled()) saver = new PeriodicalSaver(this);
+            saver.start();
+        } else if (saver != null && !saver.isCancelled()){
+            saver.cancel();
+            saver = null;
         }
     }
 
@@ -296,6 +295,6 @@ public final class FtcCore extends JavaPlugin {
         return brigadier;
     }
     public static CrownWorldGuard getCrownWorldGuard() {
-        return crownWorldGuard;
+        return crownWG;
     }
 }

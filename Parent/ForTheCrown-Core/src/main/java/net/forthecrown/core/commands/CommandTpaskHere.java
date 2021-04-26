@@ -1,20 +1,17 @@
 package net.forthecrown.core.commands;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.exceptions.InvalidPlayerArgumentException;
-import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.core.commands.brigadier.types.custom.UserType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 public class CommandTpaskHere extends CrownCommandBuilder {
 
@@ -50,16 +47,13 @@ public class CommandTpaskHere extends CrownCommandBuilder {
 
     @Override
     protected void registerCommand(BrigadierCommand command) {
-        command.then(argument("player", StringArgumentType.word())
-                .suggests((c, b) -> UserType.listSuggestions(b))
+        command.then(argument("player", UserType.user())
+                .suggests(UserType::suggest)
 
                 .executes(c -> {
-                    Player player = getPlayerSender(c);
+                    CrownUser player = getUserSender(c);
+                    CrownUser target = UserType.getOnlineUser(c, "player");
 
-                    String playerName = c.getArgument("player", String.class);
-                    Player target = Bukkit.getPlayer(playerName);
-
-                    if(target == null) throw new InvalidPlayerArgumentException(playerName);
                     if(target.equals(player)) throw new CrownCommandException("You cannot teleport to yourself");
 
                     //sender part
@@ -70,7 +64,7 @@ public class CommandTpaskHere extends CrownCommandBuilder {
                                     .hoverEvent(HoverEvent.showText(Component.text("Cancel teleportation request."))));
 
                     player.sendMessage(tpaMessage);
-                    player.performCommand("essentials:tpahere " + target.getName());
+                    player.getPlayer().performCommand("essentials:tpahere " + target.getName());
 
                     //target part
                     TextComponent targetMessage = Component.text(ChatColor.YELLOW + player.getName() + ChatColor.GOLD + " has requested that you teleport to them. ")

@@ -6,8 +6,8 @@ import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.core.utils.ComponentUtils;
-import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -57,9 +57,17 @@ public class CommandDeposit extends CrownCommandBuilder {
 
             Balances bals = FtcCore.getBalances();
             bals.add(player.getUniqueId(), amount, false);
-            player.sendMessage(CrownUtils.translateHexCodes("&7You deposited " + mainItem.getAmount() + " coin" + (mainItem.getAmount() == 1 ? "" : "s") + " and received &6" + CrownUtils.decimalizeNumber(amount) + " Rhines"));
-            player.getInventory().removeItem(mainItem);
 
+            player.sendMessage(
+                    Component.text()
+                            .color(NamedTextColor.GRAY)
+                            .append(Component.text("You deposited " + mainItem.getAmount() + " coin" +
+                                    (mainItem.getAmount() == 1 ? "" : "s") +
+                                    " and received "
+                            ))
+                            .append(Balances.formatted(amount).color(NamedTextColor.GOLD))
+            );
+            player.getInventory().removeItem(mainItem);
             return 0;
         });
     }

@@ -27,7 +27,7 @@ public class RankGuiUseEvent implements Listener {
 
     //Rank GUI event
     @EventHandler
-    public void onInvClick(InventoryClickEvent event){
+    public void onInvClick(InventoryClickEvent event) throws CrownException {
         if(!event.getWhoClicked().equals(player)) return;
         if(event.isShiftClick()){ event.setCancelled(true); return; }
         if(event.getClickedInventory() instanceof PlayerInventory) return;

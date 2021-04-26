@@ -1,11 +1,12 @@
 package net.forthecrown.core.api;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.enums.Branch;
+import net.forthecrown.core.enums.Pet;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.enums.SellAmount;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
 import net.minecraft.server.v1_16_R3.ChatMessageType;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
@@ -33,20 +34,11 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
 
     /**
      * Configures the price for a material
-     * <p>Credit to Wout for this method as this uses a mathematical calculation written by him</p>
+     * <p>Credit to Wout for this method as this uses a calculation written by him</p>
      * @param item The material which will have it's price recalculated
      * @return The new price for the item
      */
     short configurePriceForItem(Material item);
-
-    /**
-     * @deprecated In favour of getUniqueId
-     * @return the User's UUID
-     */
-    @Deprecated
-    default UUID getBase(){
-        return getUniqueId();
-    }
 
     /**
      * Gets the user's UUID
@@ -150,13 +142,32 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
      * <p>The strings are arbitrary, don't try to guess them :(</p>
      * @return The list of pets belonging to the user
      */
-    List<String> getPets();
+    List<Pet> getPets();
 
     /**
      * Sets the list of pets belonging to the user
      * @param pets The new list of pets
      */
-    void setPets(List<String> pets);
+    void setPets(List<Pet> pets);
+
+    /**
+     * Checks if the user has the specified pet
+     * @param pet The pet to look for
+     * @return It says above lol
+     */
+    boolean hasPet(Pet pet);
+
+    /**
+     * Adds a pet
+     * @param pet Pet
+     */
+    void addPet(Pet pet);
+
+    /**
+     * Removes a pet
+     * @param pet Pet
+     */
+    void removePet(Pet pet);
 
     /**
      * Gets the user's currently active arrow particle
@@ -418,8 +429,6 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
 
     void sendMessage(UUID id, IChatBaseComponent message, ChatMessageType type);
 
-    void sendAdminMessage(CrownCommandBuilder command, CommandSender sender, Component message);
-
     /**
      * Gets if the user is online
      * <p>online in this case means if getPlayer doesn't return null lol</p>
@@ -503,6 +512,10 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
      * NOT API, executes the code to make sure everything that's needed to be saved is
      */
     void onLeave();
+
+    default ClickEvent asClickEvent(){
+        return ClickEvent.suggestCommand("/w " + getName());
+    }
 
     @Override
     boolean equals(Object o);

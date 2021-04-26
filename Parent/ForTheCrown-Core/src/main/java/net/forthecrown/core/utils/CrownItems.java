@@ -4,7 +4,6 @@ import net.forthecrown.core.CrownWeapons;
 import net.forthecrown.core.FtcCore;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.Validate;
@@ -33,7 +32,6 @@ public final class CrownItems {
     private CrownItems() {}
 
     public static final NamespacedKey ITEM_KEY = new NamespacedKey(FtcCore.getInstance(), "crownitem");
-    public static final Style NON_ITALIC_WHITE = Style.style(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
 
     public static final ItemStack BASE_ROYAL_SWORD = makeRoyalWeapon(Material.GOLDEN_SWORD, Component.text("-")
                     .color(NamedTextColor.GOLD)
@@ -146,7 +144,7 @@ public final class CrownItems {
     public static ItemStack getCoins(int amount){
         return makeItem(Material.SUNFLOWER, 1, true, "&eRhines",
                 "&6Worth " + amount + " Rhines", "&8Do /deposit to add this to your balance",
-                "&8Minted in the year " + CrownUtils.arabicToRoman(CrownUtils.worldTimeToYears(Bukkit.getWorld("world"))) + ".",
+                "&8Minted in the year " + CrownUtils.arabicToRoman(CrownUtils.worldTimeToYears(CrownUtils.WORLD)) + ".",
                 s());
     }
 
@@ -158,7 +156,7 @@ public final class CrownItems {
         }
     }
 
-    public static ItemStack getCrown(int level, String owner ){
+    public static ItemStack getCrown(int level, String owner){
         String levelS = CrownUtils.arabicToRoman(level);
         ItemStack crown = makeItem(Material.GOLDEN_HELMET, 1, false, "&6-&e&lCrown&6-",
                 "&7Rank " + levelS,

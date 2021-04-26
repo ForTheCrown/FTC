@@ -8,7 +8,9 @@ import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.vikings.Vikings;
 import net.forthecrown.vikings.blessings.VikingBlessing;
 import net.forthecrown.vikings.inventory.BlessingSelector;
-import net.forthecrown.vikings.raids.valhalla.*;
+import net.forthecrown.vikings.valhalla.RaidParty;
+import net.forthecrown.vikings.valhalla.VikingRaid;
+import net.forthecrown.vikings.valhalla.generation.RaidAreaCreator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.List;
 public class CommandViking extends CrownCommandBuilder {
 
     public CommandViking() {
-        super("viking", Vikings.getInstance());
+        super("viking", Vikings.inst());
 
         setPermission("ftc.vikings.admin");
         register();
@@ -43,23 +45,10 @@ public class CommandViking extends CrownCommandBuilder {
                 .then(argument("raid")
                         .then(argument("generate")
                                 .executes(c -> {
-                                    RaidAreaGenerator generator = RaidManager.fromName("Monastery").getGenerator();
+                                    RaidAreaCreator generator = Vikings.getRaidManager().fromName("Monastery").getGenerator();
 
                                     try {
-                                        broadcastAdmin(c.getSource(), "Placing specials");
-                                        generator.placeSpecialMobs();
-
-                                        broadcastAdmin(c.getSource(), "Placing passives");
-                                        generator.placePassiveMobs();
-
-                                        broadcastAdmin(c.getSource(), "Placing hostiles");
-                                        generator.placeHostileMobs();
-
-                                        broadcastAdmin(c.getSource(), "Placing chests");
-                                        generator.placeLoot();
-
-                                        broadcastAdmin(c.getSource(), "Generating area");
-                                        generator.generateChunks();
+                                        generator.create();
                                     } catch (Exception e){
                                         e.printStackTrace();
                                     }
@@ -71,11 +60,11 @@ public class CommandViking extends CrownCommandBuilder {
                                 .then(argument("raid", StringArgumentType.word())
                                         .executes(c -> {
                                             CrownUser u = getUserSender(c);
-                                            VikingRaid raid = RaidManager.fromName(c.getArgument("raid", String.class));
+                                            VikingRaid raid = Vikings.getRaidManager().fromName(c.getArgument("raid", String.class));
                                             if(raid == null) throw new CrownCommandException("Invalid raid name!");
 
                                             RaidParty party = new RaidParty(raid, -1, u.getPlayer());
-                                            Vikings.getRaidHandler().registerParty("TestParty", party);
+                                            Vikings.getRaidManager().registerParty("TestParty", party);
                                             broadcastAdmin(c.getSource(), "Created RaidParty");
                                             return 0;
                                         })
@@ -84,10 +73,10 @@ public class CommandViking extends CrownCommandBuilder {
                         .then(argument("join")
                                 .executes(c -> {
                                     CrownUser u = getUserSender(c);
-                                    RaidParty party = Vikings.getRaidHandler().partyFromName("TestParty");
+                                    RaidParty party = Vikings.getRaidManager().partyFromName("TestParty");
                                     if(party == null) throw new CrownCommandException("Part is null?????");
 
-                                    party.joinParty(u.getPlayer());
+                                    party.join(u.getPlayer());
                                     broadcastAdmin(c.getSource(), "Joined RaidParty");
                                     return 0;
                                 })
@@ -95,7 +84,7 @@ public class CommandViking extends CrownCommandBuilder {
                         .then(argument("start")
                                 .executes(c -> {
                                     testPlayerSender(c.getSource());
-                                    RaidParty party = Vikings.getRaidHandler().partyFromName("TestParty");
+                                    RaidParty party = Vikings.getRaidManager().partyFromName("TestParty");
                                     if(party == null) throw new CrownCommandException("Part is null?????");
 
                                     party.startRaid();
@@ -150,7 +139,7 @@ public class CommandViking extends CrownCommandBuilder {
 
     private List<String> raidCompletions(){
         List<String> list = new ArrayList<>();
-        for (VikingRaid r: Vikings.getRaidHandler().getRaids()){
+        for (VikingRaid r: Vikings.getRaidManager().getRaids()){
             list.add(r.getName());
         }
         return list;

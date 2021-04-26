@@ -1,5 +1,8 @@
 package net.forthecrown.core.utils;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  * A class containing two values
  * @param <T> The first value
@@ -13,6 +16,10 @@ public class Pair<T, V> {
     public Pair(T value, V value1){
         this.first = value;
         this.second = value1;
+    }
+
+    public Pair(T value){
+        this.first = value;
     }
 
     public Pair(){}
@@ -39,5 +46,31 @@ public class Pair<T, V> {
 
     public V getOrDefaultSecond(V def){
         return second == null ? def : second;
+    }
+
+    public Pair<V, T> swap(){
+        return new Pair<>(getSecond(), getFirst());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Pair<?, ?> pair = (Pair<?, ?>) o;
+
+        return new EqualsBuilder()
+                .append(getFirst(), pair.getFirst())
+                .append(getSecond(), pair.getSecond())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getFirst())
+                .append(getSecond())
+                .toHashCode();
     }
 }

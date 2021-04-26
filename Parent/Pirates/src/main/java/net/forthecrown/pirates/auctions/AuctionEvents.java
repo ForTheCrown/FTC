@@ -3,6 +3,7 @@ package net.forthecrown.pirates.auctions;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.enums.Branch;
+import net.forthecrown.core.exceptions.CrownException;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
@@ -37,7 +38,7 @@ public class AuctionEvents implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    public void onPlayerInteract(PlayerInteractEvent event) throws CrownException {
         if(!(event.getClickedBlock().getState() instanceof Sign)) return;
         Sign sign = (Sign) event.getClickedBlock().getState();
         if(!sign.getPersistentDataContainer().has(AuctionManager.AUCTION_KEY, PersistentDataType.BYTE)) return;

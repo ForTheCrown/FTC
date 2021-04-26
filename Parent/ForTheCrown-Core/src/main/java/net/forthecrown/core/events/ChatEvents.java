@@ -1,12 +1,21 @@
 package net.forthecrown.core.events;
 
-import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.StaffChat;
 import net.forthecrown.core.api.Announcer;
+import net.forthecrown.core.api.UserManager;
+import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,13 +23,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class ChatEvents implements Listener {
-
-    private final FtcCore main = FtcCore.getInstance();
+    public static final World SENATE_WORLD = Objects.requireNonNull(Bukkit.getWorld("world_senate"));
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
@@ -60,7 +67,7 @@ public class ChatEvents implements Listener {
         event.setMessage(message);
 
         // Handle players with staffchat toggled on:
-        if (StaffChat.getSCT().contains(player)) {
+        if (StaffChat.sctPlayers.contains(player)) {
             event.setCancelled(true);
             StaffChat.send(player, message, false);
             return;
@@ -68,33 +75,48 @@ public class ChatEvents implements Listener {
 
 
         // The sender is in the Senate world.
-        if (player.getWorld().getName().contains("senate")) {
+        if (player.getWorld().equals(SENATE_WORLD)) {
             event.setCancelled(true);
             event.getRecipients().clear();
-            String prettyPlayerName;
+            TextComponent.Builder cMessage = Component.text();
+
+            TextColor color;
 
             // Give everyone a yellow name in chat.
             switch (playerName) {
                 case "Wout":
                 case "BotulToxin":
-                    prettyPlayerName = ChatColor.YELLOW + "" + playerName;
+                    color = NamedTextColor.YELLOW;
                     break;
                 default:
-                    prettyPlayerName = ChatColor.of("#FFFFA1") + "" + playerName;
+                    color = TextColor.fromHexString("#FFFFA1");
             }
 
-            for (Player senator : Bukkit.getWorld("world_senate").getPlayers()) {
-                senator.sendMessage(prettyPlayerName + " " + ChatColor.GRAY + ChatColor.BOLD + ">" + ChatColor.RESET + " " + CrownUtils.translateHexCodes(message));
-            }
-            main.getServer().getConsoleSender().sendMessage("[SENATE] " + playerName + " > " + message);
+            cMessage
+                    .append(
+                            Component.text(playerName)
+                                    .color(color)
+                                    .hoverEvent(UserManager.getUser(playerName))
+                                    .clickEvent(ClickEvent.suggestCommand("/w " + playerName))
+                    )
+                    .append(Component.text(" > ")
+                            .style(Style.style(NamedTextColor.GRAY, TextDecoration.BOLD))
+                    )
+                    .append(ComponentUtils.convertString(CrownUtils.translateHexCodes(message)));
+
+            for (Player senator : SENATE_WORLD.getPlayers()) senator.sendMessage(cMessage);
+            Announcer.log(SenateLevel.SENATE, playerName + " > " + message);
         }
 
         // The sender is not in the Senate world, remove all players in Senate world from recipients:
-        else {
-            List<Player> recipientsToRemove = new ArrayList<>();
+        else event.getRecipients().removeAll(SENATE_WORLD.getPlayers());
+    }
 
-            for (Player recipient : event.getRecipients()) if (recipient.getWorld().getName().contains("senate")) recipientsToRemove.add(recipient);
-            event.getRecipients().removeAll(recipientsToRemove);
+    public static class SenateLevel extends Level {
+        public static final SenateLevel SENATE = new SenateLevel();
+
+        protected SenateLevel() {
+            super("SENATE", 700);
         }
     }
 }

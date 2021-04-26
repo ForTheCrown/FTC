@@ -4,16 +4,18 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.commands.brigadier.exceptions.InvalidPlayerArgumentException;
-import net.forthecrown.core.commands.brigadier.exceptions.NonPlayerSenderException;
+import net.forthecrown.core.commands.brigadier.exceptions.InvalidSenderException;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.minecraft.server.v1_16_R3.*;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
@@ -60,6 +62,7 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
         command = new BrigadierCommand(name);
         permission = "ftc.commands." + name.toLowerCase();
         permissionMessage = ChatColor.GRAY + "You do not have permission to use this";
+        description = "";
     }
 
     protected abstract void registerCommand(BrigadierCommand command);
@@ -104,16 +107,15 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
         return source.getBukkitSender() instanceof Player;
     }
 
-    protected void testPlayerSender(CommandListenerWrapper source) throws NonPlayerSenderException {
-        if(!testPlayerSenderSilent(source)) throw new NonPlayerSenderException();
+    protected void testPlayerSender(CommandListenerWrapper source) throws InvalidSenderException {
+        if(!testPlayerSenderSilent(source)) throw new InvalidSenderException();
     }
 
-    protected Player getPlayerSender(CommandContext<CommandListenerWrapper> c) throws NonPlayerSenderException {
-        testPlayerSender(c.getSource());
-        return (Player) c.getSource().getBukkitSender();
+    protected Player getPlayerSender(CommandContext<CommandListenerWrapper> c) throws CommandSyntaxException {
+        return c.getSource().h().getBukkitEntity();
     }
 
-    protected CrownUser getUserSender(CommandContext<CommandListenerWrapper> c) throws NonPlayerSenderException {
+    protected CrownUser getUserSender(CommandContext<CommandListenerWrapper> c) throws CommandSyntaxException {
         return UserManager.getUser(getPlayerSender(c));
     }
 
@@ -121,11 +123,10 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
         return c.getSource().getBukkitSender();
     }
 
-    protected UUID getUUID(@NotNull String name) throws InvalidPlayerArgumentException {
-        Validate.notNull(name, "The name cannot be null");
-        UUID toReturn = CrownUtils.uuidFromName(name);
-        if(toReturn == null) throw new InvalidPlayerArgumentException(name);
-        return toReturn;
+    //Untested
+    protected <T extends CommandSender> T getAs(CommandContext<CommandListenerWrapper> c, Class<T> clazz) throws InvalidSenderException {
+        if(!clazz.isAssignableFrom(c.getSource().getBukkitSender().getClass())) throw new InvalidSenderException(clazz);
+        return (T) c.getSource().getBukkitSender();
     }
 
     @Override
@@ -208,6 +209,23 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
         return CrownUtils.translateHexCodes(usage);
     }
 
+    protected void adminMessage(CommandContext<CommandListenerWrapper> c, String message){
+        adminMessage(c, ComponentUtils.stringToVanilla(message));
+    }
+
+    protected void adminMessage(CommandContext<CommandListenerWrapper> c, Component message){
+        adminMessage(c, IChatBaseComponent.ChatSerializer.a(GsonComponentSerializer.gson().serialize(message)));
+    }
+
+    protected void adminMessage(CommandContext<CommandListenerWrapper> c, IChatBaseComponent message){
+        if(!c.getSource().base.shouldBroadcastCommands()) return;
+        IChatMutableComponent cMessage = (new ChatMessage("chat.type.admin", new Object[]{c.getSource().getScoreboardDisplayName(), message})).a(new EnumChatFormat[]{EnumChatFormat.GRAY, EnumChatFormat.ITALIC});
+
+        for (CrownUser u: UserManager.getOnlineUsers()){
+            if(testPermissionSilent(u)) u.sendMessage(cMessage);
+        }
+    }
+
     public static void broadcastAdmin(CommandListenerWrapper sender, String message){
         broadcastAdmin(sender, ComponentUtils.stringToVanilla(message), true);
     }
@@ -234,6 +252,18 @@ public abstract class CrownCommandBuilder implements Predicate<CommandListenerWr
         }
 
         return suggestionsBuilder.buildFuture();
+    }
+
+    public static SuggestionProvider<CommandListenerWrapper> suggest(String... suggestions){
+        return suggest(Arrays.asList(suggestions));
+    }
+
+    public static SuggestionProvider<CommandListenerWrapper> suggest(Collection<String> suggestions){
+        return (c, b) -> suggestMatching(b, suggestions);
+    }
+
+    public static SuggestionProvider<CommandListenerWrapper> suggest(Map<String, Message> suggestions){
+        return (c, b) -> suggestMatching(b, suggestions);
     }
 
     public static CompletableFuture<Suggestions> suggestMatching(SuggestionsBuilder suggestionsBuilder, Map<String, Message> strings){

@@ -23,15 +23,11 @@ public class RankInventory {
 
     public Inventory getUsersRankGUI(){
         switch (user.getBranch()){
-            case PIRATES:
-                return getPiratesGUI();
-            case VIKINGS:
-                return getVikingsGUI();
+            case PIRATES: return getPiratesGUI();
+            case VIKINGS: return getVikingsGUI();
             case ROYALS:
-            case DEFAULT:
-                return getRoyalsGUI();
-            default:
-                throw new IllegalStateException("Unexpected value: " + user.getRank().getRankBranch());
+            case DEFAULT: return getRoyalsGUI();
+            default: throw new IllegalStateException("Unexpected value: " + user.getRank().getRankBranch());
         }
     }
 

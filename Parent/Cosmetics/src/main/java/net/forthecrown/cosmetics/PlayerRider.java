@@ -19,17 +19,13 @@ public class PlayerRider implements Listener {
 
     public final Player rider;
     public final Player ridden;
-    private final Cosmetics main;
     private final Slime seat;
 
-    public PlayerRider(Player rider, Player ridden, Cosmetics main) {
+    public PlayerRider(Player rider, Player ridden) {
         this.rider = rider;
         this.ridden = ridden;
-        this.main = main;
 
         this.seat = getSlimeSeat(rider.getLocation());
-
-        main.getServer().getPluginManager().registerEvents(this, main);
         startRiding();
     }
 
@@ -59,7 +55,6 @@ public class PlayerRider implements Listener {
         Cosmetics.getRider().riders.remove(this);
     }
 
-    //hehehe bald
     private void preventBadLocation(){
         if(ridden.getLocation().getBlockY() <= 0 || rider.getLocation().getBlockY() <= 0){
             ridden.teleport(PlayerRidingManager.RETREAT_LOCATION);
@@ -82,7 +77,6 @@ public class PlayerRider implements Listener {
     public void onEntityDismount(EntityDismountEvent event) {
         checkSeat(event.getDismounted());
         checkSeat(event.getEntity());
-        playerCheck(event.getDismounted());
         playerCheck(event.getEntity());
     }
 

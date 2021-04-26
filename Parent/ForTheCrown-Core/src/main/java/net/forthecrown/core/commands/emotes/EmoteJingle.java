@@ -28,10 +28,6 @@ public class EmoteJingle extends CommandEmote {
      * Valid usages of command:
      * - /jingle
      *
-     * Referenced other classes:
-     * - FtcCore
-     * - Chat
-     *
      * Main Author: Wout
      * Edit: Botul
      */

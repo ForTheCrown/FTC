@@ -2,6 +2,8 @@ package net.forthecrown.core.commands.brigadier.types;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.ListUtils;
 import net.minecraft.server.v1_16_R3.ArgumentEntity;
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
@@ -40,6 +42,10 @@ public class TargetSelectorType {
 
     public static Collection<Player> getPlayers(CommandContext<CommandListenerWrapper> c, String argument) throws CommandSyntaxException {
         return ListUtils.convert(ArgumentEntity.f(c, argument), EntityPlayer::getBukkitEntity);
+    }
+
+    public static Collection<CrownUser> getUsers(CommandContext<CommandListenerWrapper> c, String argument) throws CommandSyntaxException {
+        return ListUtils.convert(getPlayers(c, argument), UserManager::getUser);
     }
 
     public static Collection<? extends Entity> getEntities(CommandContext<CommandListenerWrapper> c, String argument) throws CommandSyntaxException {

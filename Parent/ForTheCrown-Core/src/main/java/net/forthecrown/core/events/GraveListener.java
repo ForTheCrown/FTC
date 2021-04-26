@@ -1,9 +1,9 @@
 package net.forthecrown.core.events;
 
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.Grave;
+import net.forthecrown.core.api.UserManager;
+import net.forthecrown.core.utils.CrownItems;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -28,17 +28,23 @@ public class GraveListener implements Listener {
         sendGraveMessage(event.getPlayer());
     }
 
+    private static final Component message = Component.text("[FTC] You have items in your grave. ")
+            .color(NamedTextColor.GRAY)
+            .append(Component.text()
+                    .append(Component.text("/grave"))
+                    .append(Component.text(" or ").color(NamedTextColor.GRAY))
+                    .append(Component.text("[click here]"))
+
+                    .color(NamedTextColor.YELLOW)
+                    .hoverEvent(HoverEvent.showText(Component.text("Click to claim your items")))
+                    .clickEvent(ClickEvent.runCommand("/grave"))
+            )
+            .append(Component.text(" to claim them."));
+
     private void sendGraveMessage(Player p){
         CrownUser user = UserManager.getUser(p);
         if(user.getGrave().isEmpty()) return;
-        Component component = Component.text("[FTC] You have items in your ")
-                .color(NamedTextColor.GRAY)
-                .append(Component.text("/grave")
-                        .color(NamedTextColor.YELLOW)
-                        .hoverEvent(HoverEvent.showText(Component.text("Click to claim your items")))
-                        .clickEvent(ClickEvent.runCommand("/grave"))
-                );
-        user.sendMessage(component);
+        user.sendMessage(message);
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -105,6 +105,7 @@ Price_Per_Item:
     flame: 25000
     blast_protection: 20000
     sweeping: 25000
+AlreadyChosenEnchants: []
 Day: 1
 MaxEarnings: 50000
 EnchantLevel: 0

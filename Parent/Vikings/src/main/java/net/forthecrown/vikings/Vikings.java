@@ -4,10 +4,8 @@ import net.forthecrown.vikings.blessings.FastRunner;
 import net.forthecrown.vikings.blessings.HeadChoppingBlessing;
 import net.forthecrown.vikings.blessings.VikingBlessing;
 import net.forthecrown.vikings.commands.CommandViking;
-import net.forthecrown.vikings.commands.CommandVikingFunction;
-import net.forthecrown.vikings.raids.MonasteryRaid;
-import net.forthecrown.vikings.raids.valhalla.RaidManager;
-import net.forthecrown.vikings.raids.valhalla.VikingRaid;
+import net.forthecrown.vikings.valhalla.RaidManager;
+import net.forthecrown.vikings.valhalla.VikingRaid;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Vikings extends JavaPlugin {
@@ -18,34 +16,28 @@ public final class Vikings extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        handler = new RaidManager(getServer());
+        handler = new RaidManager(this);
 
         getServer().getPluginManager().registerEvents(new VikingListener(), this);
-
-        handler.registerRaid(new MonasteryRaid());
 
         new FastRunner();
         new HeadChoppingBlessing();
 
         new CommandViking();
-        new CommandVikingFunction();
     }
 
     @Override
     public void onDisable() {
         for(VikingRaid r : handler.getRaids()){
-            if(r.getCurrentParty() == null) continue;
-            r.end();
+            if(!r.isActive()) continue;
+            r.end(VikingRaid.EndCause.PLUGIN);
         }
 
-        for (VikingBlessing b: VikingBlessing.getBlessings()){
-            b.save();
-            b.clearTempUsers();
-        }
+        saveVikings();
     }
 
     public static void reloadVikings() {
-        getInstance().reloadConfig();
+        inst().reloadConfig();
 
         for (VikingBlessing b: VikingBlessing.getBlessings()){
             b.reload();
@@ -53,18 +45,20 @@ public final class Vikings extends JavaPlugin {
     }
 
     public static void saveVikings(){
-        getInstance().saveConfig();
+        inst().saveConfig();
+
+        handler.serializeAll();
 
         for (VikingBlessing b: VikingBlessing.getBlessings()){
             b.save();
         }
     }
 
-    public static Vikings getInstance(){
+    public static Vikings inst(){
         return instance;
     }
 
-    public static RaidManager getRaidHandler(){
+    public static RaidManager getRaidManager(){
         return handler;
     }
 }

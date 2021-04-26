@@ -18,10 +18,4 @@ public class CommandUpdateLeaderboard extends CrownCommandBuilder {
             return 0;
         });
     }
-
-    /*@Override
-    public boolean run(CommandSender sender, Command cmd, String label, String[] args) {
-        Pirates.plugin.updateLeaderBoard();
-        return true;
-    }*/
 }

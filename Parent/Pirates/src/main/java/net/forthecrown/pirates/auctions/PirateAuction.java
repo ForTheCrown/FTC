@@ -5,7 +5,7 @@ import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.files.AbstractSerializer;
+import net.forthecrown.core.serialization.AbstractSerializer;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.MapUtils;
@@ -72,21 +72,21 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
         AuctionManager.AUCTIONS.put(name, this);
 
         getFile().set("Name", name);
-        super.save();
+        super.save(false);
 
         getSign().getPersistentDataContainer().set(AuctionManager.AUCTION_KEY, PersistentDataType.BYTE, (byte) 1);
     }
 
     @Override
-    public void save() {
+    public void saveFile() {
         getFile().set("Name", name);
 
         String owner = null;
         String bidder = null;
 
         try {
-            owner = getOwner().getBase().toString();
-            bidder = getHighestBidder().getBase().toString();
+            owner = getOwner().getUniqueId().toString();
+            bidder = getHighestBidder().getUniqueId().toString();
         } catch (Exception ignored){ }
 
         getFile().set("Item", getItem());
@@ -100,13 +100,10 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
         removeDisplay();
         if(bids != null) getFile().createSection("Bids", MapUtils.convertKeys(bids, UUID::toString));
         else getFile().createSection("Bids");
-
-        super.save();
     }
 
     @Override
-    public void reload() {
-        super.reload();
+    public void reloadFile() {
         name = getFile().getString("Name");
         String owner = getFile().getString("Owner");
 
@@ -159,7 +156,6 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
         }
 
         Pirates.getAuctionManager().removeAuction(this);
-        super.delete();
     }
 
     @Override
@@ -231,22 +227,22 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
             );
             return;
         }
-        else {
-            if (user.getPlayer().getInventory().firstEmpty() == -1) throw new CrownException(user, "Your inventory is full!");
 
-            Balances bals = FtcCore.getBalances();
+        if (user.getPlayer().getInventory().firstEmpty() == -1) throw new CrownException(user, "Your inventory is full!");
 
-            if(!highestBidder.equals(owner)){
-                if (bals.get(user.getUniqueId()) < getHighestBid()) throw new CrownException(user, "You do not have enough money to claim the item. Come back when you're a little mmm richer");
-                if(bals.get(getOwner().getUniqueId()) < getHighestBid()) throw new CrownException(user, "The owner of the auction cannot afford that!");
+        Balances bals = FtcCore.getBalances();
 
-                bals.add(owner.getUniqueId(), getHighestBid(), false);
-                owner.sendMessage("&6$ &7You've received &e" + CrownUtils.decimalizeNumber(getHighestBid()) + " Rhines &7from &e" + getName() + "&7 by &e" + user.getName());
-            }
+        if(!highestBidder.equals(owner)){
+            if (bals.get(user.getUniqueId()) < highestBid) throw new CrownException(user, "You do not have enough money to claim the item. Come back when you're a little mmm richer");
+            if(bals.get(getOwner().getUniqueId()) < highestBid) throw new CrownException(user, "The owner of the auction cannot afford that!");
 
-            user.getPlayer().getInventory().addItem(getItem());
-            user.sendMessage("&eYou've got your item! :D");
+            bals.add(owner.getUniqueId(), getHighestBid(), false);
+            owner.sendMessage("&6$ &7You've received &e" + Balances.getFormatted(highestBid) + " &7from &e" + getName() + "&7 by &e" + user.getName());
         }
+
+        user.getPlayer().getInventory().addItem(getItem());
+        user.sendMessage("&eYou've got your item! :D");
+
         unClaim();
         save();
     }
@@ -257,8 +253,8 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
             if(isWaitingForItemClaim()){
                 getSign().line(0, AuctionManager.WAITING_FOR_ITEM_CLAIM_LABEL);
             } else {
-                if(adminAuction) getSign().line(0, AuctionManager.CLAIMED_ADMIN_LABEL);
-                else getSign().line(0, AuctionManager.CLAIMED_REGULAR_LABEL);
+                if(adminAuction) getSign().line(0, AuctionManager.ADMIN_LABEL);
+                else getSign().line(0, AuctionManager.REGULAR_LABEL);
             }
             getSign().line(3, AuctionManager.getPriceLine(highestBid));
         } else {
@@ -382,7 +378,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
         Balances bals = FtcCore.getBalances();
         for (UUID id: bids.keySet()){
-            if(!toHighestBidder && id.equals(getHighestBidder().getBase())) continue;
+            if(!toHighestBidder && id.equals(getHighestBidder().getUniqueId())) continue;
 
             int amount = bids.get(id);
 

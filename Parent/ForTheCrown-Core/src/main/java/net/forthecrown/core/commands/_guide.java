@@ -6,7 +6,7 @@ import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
-import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.core.commands.brigadier.types.custom.UserType;
 import net.forthecrown.core.utils.Cooldown;
 import net.minecraft.server.v1_16_R3.EntitySelector;
 import org.bukkit.entity.Entity;
@@ -70,7 +70,7 @@ public class _guide extends CrownCommandBuilder {
         )
                 .then(argument("required", FloatArgumentType.floatArg(0, 2)) // Required Argument, Checking and parsing is done automatically done by Brigadier
                         //First parameter is min, second is max, you can have only the first parameter, or no parameters at all
-                        .suggests((c, b) -> UserType.listSuggestions(b)) //Tab completions for the argument, c is CommandContext
+                        .suggests(UserType::suggest) //Tab completions for the argument, c is CommandContext
                         //b is SuggestionBuilder, another Mojang thing
                         //If you have a specific set of strings you want to return, use:
                         //suggestMatching(SuggestionBuilder b, String... args) or

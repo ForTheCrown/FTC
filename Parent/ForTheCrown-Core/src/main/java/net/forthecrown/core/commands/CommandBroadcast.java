@@ -2,9 +2,9 @@ package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.core.commands.brigadier.types.ComponentType;
 
 public class CommandBroadcast extends CrownCommandBuilder {
 
@@ -28,18 +28,27 @@ public class CommandBroadcast extends CrownCommandBuilder {
      * - /bc
      *
      * Permissions used:
-     * - ftc.admin
+     * - ftc.commands.broadcast
      *
      * Author: Wout
      */
 
     @Override
     protected void registerCommand(BrigadierCommand command) {
-        command.then(argument("announcement", StringArgumentType.greedyString())
-                .executes(context -> {
-                    Announcer.prefixAc(context.getArgument("announcement", String.class));
-                    return 0;
-                })
-        );
+        command
+                .then(argument("announcement", StringArgumentType.greedyString())
+                        .executes(context -> {
+                            FtcCore.getAnnouncer().announce(context.getArgument("announcement", String.class));
+                            return 0;
+                        })
+                )
+                .then(argument("-component")
+                        .then(argument("componentAnnouncement", ComponentType.component())
+                                .executes(c -> {
+                                    FtcCore.getAnnouncer().announce(ComponentType.getAdventure(c, "componentAnnouncement"));
+                                    return 0;
+                                })
+                             )
+                );
     }
 }

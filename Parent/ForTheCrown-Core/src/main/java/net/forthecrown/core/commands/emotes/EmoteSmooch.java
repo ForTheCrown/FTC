@@ -25,18 +25,18 @@ public class EmoteSmooch extends CommandEmote {
 
     @Override
     protected int execute(CrownUser sender, CrownUser recipient) {
-        Location loc = recipient.getPlayer().getLocation();
+        Location loc = recipient.getLocation();
 
         sender.sendMessage(ChatColor.RED + "❤" + ChatColor.RESET + " You smooched " + recipient.getName() + ChatColor.RED + " ❤");
 
-        TextComponent text = ComponentUtils.convertString("&c♥ &e" + sender.getName() + " &rsmooched you! &r( ^ 3^) &c❤")
+        TextComponent text = ComponentUtils.convertString("&c❤ &e" + sender.getName() + " &rsmooched you! &r( ^ 3^) &c❤")
                 .clickEvent(ClickEvent.runCommand("/mwah " + sender.getName()))
                 .hoverEvent(HoverEvent.showText(Component.text("Click to smooch them back")));
 
         recipient.sendMessage(text);
 
         if(recipient.getPlayer().getGameMode() != GameMode.SPECTATOR){
-            Location targetLoc = recipient.getPlayer().getLocation();
+            Location targetLoc = recipient.getLocation();
             targetLoc.getWorld().playSound(targetLoc, Sound.ENTITY_PUFFER_FISH_BLOW_UP, 3.0F, 2F);
             targetLoc.getWorld().spawnParticle(Particle.HEART, targetLoc.getX(), targetLoc.getY()+1, targetLoc.getZ(), 5, 0.5, 0.5, 0.5);
         }

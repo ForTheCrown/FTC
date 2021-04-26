@@ -4,7 +4,7 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.core.commands.brigadier.types.custom.UserType;
 import net.forthecrown.core.utils.ComponentUtils;
 
 public class CommandGems extends CrownCommandBuilder {
@@ -33,7 +33,7 @@ public class CommandGems extends CrownCommandBuilder {
     protected void registerCommand(BrigadierCommand command) {
         command
                 .then(argument("player", UserType.user())
-                        .suggests((c, b) -> UserType.listSuggestions(b))
+                        .suggests(UserType::suggest)
 
                         .executes(c ->{
                             CrownUser other = UserType.getUser(c, "player");

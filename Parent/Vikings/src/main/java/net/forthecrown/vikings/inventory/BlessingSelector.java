@@ -35,7 +35,7 @@ public class BlessingSelector implements InventoryHolder, Listener {
 
         initInv();
 
-        Vikings.getInstance().getServer().getPluginManager().registerEvents(this, Vikings.getInstance());
+        Vikings.inst().getServer().getPluginManager().registerEvents(this, Vikings.inst());
     }
 
     private void initInv(){
@@ -65,13 +65,13 @@ public class BlessingSelector implements InventoryHolder, Listener {
     }
 
     private boolean isCurrentlyInUse(VikingBlessing b){
-        String result = user.getDataContainer().get(Vikings.getInstance()).getString("Active");
+        String result = user.getDataContainer().get(Vikings.inst()).getString("Active");
         if(result == null) return false;
         return result.equals(b.getName());
     }
 
     private boolean isAvailableToUser(VikingBlessing b){
-        return user.getDataContainer().get(Vikings.getInstance()).getStringList("AvailableBlessings").contains(b.getName());
+        return user.getDataContainer().get(Vikings.inst()).getStringList("AvailableBlessings").contains(b.getName());
     }
 
     @Override

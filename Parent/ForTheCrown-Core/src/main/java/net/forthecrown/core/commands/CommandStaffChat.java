@@ -60,16 +60,13 @@ public class CommandStaffChat extends CrownCommandBuilder {
      * Permissions used:
      * - ftc.staffchat
      *
-     * Referenced other classes:
-     * - FtcCore: FtcCore.replaceEmojis
-     * - ChatEvents: ChatEvents.sendStaffChatMessage and other variables
      * Author: Botul
      */
 
     @Override
     protected void registerCommand(BrigadierCommand command) {
         command.then(argument("message", StringArgumentType.greedyString())
-                .suggests(CommandStaffChat::staffChatCompletions)
+                .suggests(this::completions)
 
                 .executes(c -> {
                     StaffChat.send(c.getSource().getBukkitSender(), c.getArgument("message", String.class), true);
@@ -78,9 +75,7 @@ public class CommandStaffChat extends CrownCommandBuilder {
         );
     }
 
-
-
-    private static <S> CompletableFuture<Suggestions> staffChatCompletions(CommandContext<S> context, SuggestionsBuilder builder){
+    private <S> CompletableFuture<Suggestions> completions(CommandContext<S> context, SuggestionsBuilder builder){
         String input = builder.getInput();
         builder = builder.createOffset(input.lastIndexOf(' ')+1);
 

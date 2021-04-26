@@ -27,14 +27,13 @@ public class RequiredArgument<T> extends ArgumentBuilder<CommandListenerWrapper,
     public static <T> RequiredArgument<T> argument(String name, ArgumentType<T> type) {
         return new RequiredArgument<>(name, type);
     }
-
     public RequiredArgument<T> suggests(SuggestionProvider<CommandListenerWrapper> provider) {
-        this.suggestionsProvider = provider;
-        return this.getThis();
+        suggestionsProvider = provider;
+        return this;
     }
 
     public SuggestionProvider<CommandListenerWrapper> getSuggestionsProvider() {
-        return this.suggestionsProvider;
+        return suggestionsProvider;
     }
 
     @Override
@@ -43,11 +42,11 @@ public class RequiredArgument<T> extends ArgumentBuilder<CommandListenerWrapper,
     }
 
     public ArgumentType<T> getType() {
-        return this.type;
+        return type;
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     @Override

@@ -1,12 +1,19 @@
 package net.forthecrown.core.inventories;
 
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
+import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.enums.SellAmount;
 import net.forthecrown.core.events.SellShopEvents;
-import net.md_5.bungee.api.ChatColor;
+import net.forthecrown.core.nbt.NBT;
+import net.forthecrown.core.nbt.NbtGetter;
+import net.forthecrown.core.utils.CrownItems;
+import net.forthecrown.core.utils.ItemStackBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -20,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 public class SellShop {
 
     private final CrownUser user;
+    private Menu current;
 
     public SellShop(Player base){
         this(UserManager.getUser(base));
@@ -31,76 +39,111 @@ public class SellShop {
         FtcCore.getInstance().getServer().getPluginManager().registerEvents(new SellShopEvents(base.getPlayer(), this), FtcCore.getInstance());
     }
 
+    public Inventory open(Menu menu){
+        switch (menu){
+            case CROPS: return cropsMenu();
+            case DROPS: return dropsMenu();
+            case MINING: return miningMenu();
+            case MINING_BLOCKS: return miningBlocksMenu();
+            case MAIN: return mainMenu();
+            case DECIDING: return decidingMenu();
+            default: throw new IllegalStateException("Unexpected value: " + menu);
+        }
+    }
+
     public Inventory dropsMenu(){
+        current = Menu.DROPS;
         Inventory inv = getBaseInventory("Mob Drops Shop Menu");
         inv.setItem(4, CrownItems.makeItem(Material.ROTTEN_FLESH, 1, true, "&bDrops"));
 
-        inv.setItem(20, getSellableItem(Material.ROTTEN_FLESH));
-        inv.setItem(21, getSellableItem(Material.BONE));
-        inv.setItem(22, getSellableItem(Material.ARROW));
-        inv.setItem(23, getSellableItem(Material.STRING));
-        inv.setItem(24, getSellableItem(Material.SPIDER_EYE));
-        inv.setItem(29, getSellableItem(Material.LEATHER));
-        inv.setItem(30, getSellableItem(Material.GUNPOWDER));
-        inv.setItem(31, getSellableItem(Material.BLAZE_ROD));
-        inv.setItem(32, getSellableItem(Material.SLIME_BALL));
-        inv.setItem(33, getSellableItem(Material.COD));
+        inv.setItem(20, makeSellItem(Material.ROTTEN_FLESH));
+        inv.setItem(21, makeSellItem(Material.BONE));
+        inv.setItem(22, makeSellItem(Material.ARROW));
+        inv.setItem(23, makeSellItem(Material.STRING));
+        inv.setItem(24, makeSellItem(Material.SPIDER_EYE));
+        inv.setItem(29, makeSellItem(Material.LEATHER));
+        inv.setItem(30, makeSellItem(Material.GUNPOWDER));
+        inv.setItem(31, makeSellItem(Material.BLAZE_ROD));
+        inv.setItem(32, makeSellItem(Material.SLIME_BALL));
+        inv.setItem(33, makeSellItem(Material.COD));
+        inv.setItem(40, makeSellItem(Material.INK_SAC));
 
         return inv;
     }
 
-    public Inventory farmingMenu(){
+    public Inventory cropsMenu(){
+        current = Menu.CROPS;
         Inventory inv = getBaseInventory("Farming Items Shop Menu");
         inv.setItem(4, CrownItems.makeItem(Material.OAK_SAPLING, 1, true, "&bFarming"));
 
-        inv.setItem(20, getSellableItem(Material.BAMBOO));
-        inv.setItem(21, getSellableItem(Material.KELP));
-        inv.setItem(22, getSellableItem(Material.CACTUS));
-        inv.setItem(23, getSellableItem(Material.MELON));
-        inv.setItem(24, getSellableItem(Material.VINE));
-        inv.setItem(29, getSellableItem(Material.SUGAR_CANE));
-        inv.setItem(30, getSellableItem(Material.POTATO));
-        inv.setItem(31, getSellableItem(Material.WHEAT));
-        inv.setItem(32, getSellableItem(Material.CARROT));
-        inv.setItem(33, getSellableItem(Material.PUMPKIN));
-        inv.setItem(38, getSellableItem(Material.BEETROOT_SEEDS));
-        inv.setItem(39, getSellableItem(Material.BEETROOT));
-        inv.setItem(40, getSellableItem(Material.SWEET_BERRIES));
-        inv.setItem(41, getSellableItem(Material.CHORUS_FRUIT));
-        inv.setItem(42, getSellableItem(Material.WHEAT_SEEDS));
+        inv.setItem(20, makeSellItem(Material.BAMBOO));
+        inv.setItem(21, makeSellItem(Material.KELP));
+        inv.setItem(22, makeSellItem(Material.CACTUS));
+        inv.setItem(23, makeSellItem(Material.MELON));
+        inv.setItem(24, makeSellItem(Material.VINE));
+        inv.setItem(29, makeSellItem(Material.SUGAR_CANE));
+        inv.setItem(30, makeSellItem(Material.POTATO));
+        inv.setItem(31, makeSellItem(Material.WHEAT));
+        inv.setItem(32, makeSellItem(Material.CARROT));
+        inv.setItem(33, makeSellItem(Material.PUMPKIN));
+        inv.setItem(38, makeSellItem(Material.BEETROOT_SEEDS));
+        inv.setItem(39, makeSellItem(Material.BEETROOT));
+        inv.setItem(40, makeSellItem(Material.SWEET_BERRIES));
+        inv.setItem(41, makeSellItem(Material.CHORUS_FRUIT));
+        inv.setItem(42, makeSellItem(Material.WHEAT_SEEDS));
 
         return inv;
     }
 
     public Inventory miningMenu(){
+        current = Menu.MINING;
         Inventory inv = getBaseInventory("Mining Items Shop Menu");
         inv.setItem(4, CrownItems.makeItem(Material.IRON_PICKAXE, 1, true, "&bMining"));
 
-        inv.setItem(11, getSellableItem(Material.LAPIS_LAZULI));
-        inv.setItem(12, getSellableItem(Material.QUARTZ));
-        inv.setItem(20, getSellableItem(Material.DIAMOND));
-        inv.setItem(21, getSellableItem(Material.IRON_INGOT));
-        inv.setItem(29, getSellableItem(Material.EMERALD));
-        inv.setItem(30, getSellableItem(Material.GOLD_INGOT));
-        inv.setItem(38, getSellableItem(Material.COAL));
-        inv.setItem(39, getSellableItem(Material.REDSTONE));
+        inv.setItem(11, makeSellItem(Material.LAPIS_LAZULI));
+        inv.setItem(12, makeSellItem(Material.QUARTZ));
+        inv.setItem(20, makeSellItem(Material.DIAMOND));
+        inv.setItem(21, makeSellItem(Material.IRON_INGOT));
+        inv.setItem(29, makeSellItem(Material.EMERALD));
+        inv.setItem(30, makeSellItem(Material.GOLD_INGOT));
+        inv.setItem(38, makeSellItem(Material.COAL));
+        inv.setItem(39, makeSellItem(Material.REDSTONE));
 
-        inv.setItem(14, getSellableItem(Material.STONE));
-        inv.setItem(15, getSellableItem(Material.ANDESITE));
-        inv.setItem(23, getSellableItem(Material.COBBLESTONE));
-        inv.setItem(24, getSellableItem(Material.DIORITE));
-        inv.setItem(32, getSellableItem(Material.GRAVEL));
-        inv.setItem(33, getSellableItem(Material.GRANITE));
-        inv.setItem(41, getSellableItem(Material.SAND));
-        inv.setItem(42, getSellableItem(Material.DIRT));
+        inv.setItem(14, makeSellItem(Material.STONE));
+        inv.setItem(15, makeSellItem(Material.ANDESITE));
+        inv.setItem(23, makeSellItem(Material.COBBLESTONE));
+        inv.setItem(24, makeSellItem(Material.DIORITE));
+        inv.setItem(32, makeSellItem(Material.GRAVEL));
+        inv.setItem(33, makeSellItem(Material.GRANITE));
+        inv.setItem(41, makeSellItem(Material.SAND));
+        inv.setItem(42, makeSellItem(Material.DIRT));
 
-        inv.setItem(34, getSellableItem(Material.SANDSTONE));
-        inv.setItem(25, getSellableItem(Material.NETHERRACK));
+        inv.setItem(34, makeSellItem(Material.SANDSTONE));
+        inv.setItem(25, makeSellItem(Material.NETHERRACK));
+
+        inv.setItem(8, CrownItems.makeItem(Material.IRON_BLOCK, 1, true, "&bBlocks menu"));
+        return inv;
+    }
+
+    public Inventory miningBlocksMenu(){
+        current = Menu.MINING_BLOCKS;
+        Inventory inv = getBaseInventory("Mining Blocks Shop Menu");
+
+        inv.setItem(20, makeSellBlock(Material.DIAMOND_BLOCK, Material.DIAMOND));
+        inv.setItem(21, makeSellBlock(Material.GOLD_BLOCK, Material.GOLD_INGOT));
+        inv.setItem(22, makeSellBlock(Material.EMERALD_BLOCK, Material.EMERALD));
+        inv.setItem(23, makeSellBlock(Material.IRON_BLOCK, Material.IRON_INGOT));
+        inv.setItem(24, makeSellBlock(Material.REDSTONE_BLOCK, Material.REDSTONE));
+
+        inv.setItem(32, makeSellBlock(Material.COAL_BLOCK, Material.COAL));
+        inv.setItem(31, makeSellBlock(Material.SLIME_BLOCK, Material.SLIME_BALL));
+        inv.setItem(30, makeSellBlock(Material.LAPIS_BLOCK, Material.LAPIS_LAZULI));
 
         return inv;
     }
 
     public Inventory mainMenu(){
+        current = Menu.MAIN;
         Inventory inv = new CustomInventoryHolder("FTC Shop", 27).getInventory();
 
         inv.setItem(11, CrownItems.makeItem(Material.GOLD_BLOCK, 1, true, "&e-Item Shop-", "&7Sell vanilla items."));
@@ -115,6 +158,7 @@ public class SellShop {
     }
 
     public Inventory decidingMenu(){
+        current = Menu.DECIDING;
         Inventory inv = new CustomInventoryHolder("FTC Shop", 27).getInventory();
 
         inv.setItem(11, CrownItems.makeItem(Material.OAK_SAPLING, 1, true, "&bFarming", "&7Crops and other farmable items."));
@@ -129,18 +173,35 @@ public class SellShop {
         return inv;
     }
 
-    private ItemStack getSellableItem(Material material){
-        short price = user.getItemPrice(material);
-        SellAmount sellAmount = user.getSellAmount();
-        String sellAmountNum = sellAmount.getInt().toString();
-        if(sellAmount == SellAmount.ALL) sellAmountNum = "all";
-        String[] asd = {
-                "&eValue: " + price + " Rhines per item,",
-                ChatColor.GOLD + "" + price*64 + " Rhines per stack.",
-                "&7Amount you will sell: " + sellAmountNum + ".",
-                "&7Change the amount setting on the right."
-        };
-        return CrownItems.makeItem(material, 1, true, null, asd);
+    private ItemStack makeSellBlock(Material material, Material ingot){
+        int price = user.getItemPrice(ingot) * 9;
+
+        ItemStack result = createSellItem(material, price, FtcCore.getItemPrice(ingot) * 9, user.getSellAmount());
+        NBT nbt = NbtGetter.ofItemTags(result);
+        nbt.put("ingot", ingot.toString());
+
+        return NbtGetter.applyTags(result, nbt);
+    }
+
+    private ItemStack makeSellItem(Material material){
+        return createSellItem(material, user.getItemPrice(material), FtcCore.getItemPrice(material), user.getSellAmount());
+    }
+
+    private ItemStack createSellItem(Material material, int price, int origPrice, SellAmount sellAmount){
+        final Style style = Style.style(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+        boolean thing = sellAmount == SellAmount.ALL;
+
+        ItemStackBuilder builder = new ItemStackBuilder(material)
+                .addLore(Component.text("Value: " + Balances.getFormatted(price) + " per item").style(style));
+
+        if(price < origPrice) builder.addLore(Component.text("Original price: " + Balances.getFormatted(origPrice)).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE).color(NamedTextColor.GRAY));
+
+        builder
+                .addLore(Component.text((price * 64) + " Rhines per stack.").style(style.color(NamedTextColor.GOLD)))
+                .addLore(Component.text("Amount will sell: " + (thing ? "all" : sellAmount.getValue()) + ".").style(style.color(NamedTextColor.GRAY)))
+                .addLore(Component.text("Change the amount setting on the right.").style(style.color(NamedTextColor.GRAY)));
+
+        return builder.build();
     }
 
     private Inventory getBaseInventory(String menuName){
@@ -188,5 +249,18 @@ public class SellShop {
 
         if(user.getSellAmount() == paneToGet) toReturn.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
         return toReturn;
+    }
+
+    public Menu getCurrentMenu() {
+        return current;
+    }
+
+    public enum Menu {
+        MAIN,
+        DECIDING,
+        CROPS,
+        DROPS,
+        MINING,
+        MINING_BLOCKS
     }
 }

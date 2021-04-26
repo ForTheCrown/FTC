@@ -1,15 +1,13 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.ShopManager;
+import net.forthecrown.core.api.ShopManager;
 import net.forthecrown.core.api.ShopInventory;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.customevents.SignShopUseEvent;
-import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.core.events.customevents.SignShopUseEvent;
 import net.forthecrown.core.utils.Cooldown;
 import org.bukkit.GameMode;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -19,27 +17,14 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 
 public class ShopInteractEvent implements Listener {
 
     @EventHandler
     public void onSignShopUser(PlayerInteractEvent event){
         if(Cooldown.contains(event.getPlayer())) return;
-        if(event.getClickedBlock() == null) return;
         if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if(!(event.getClickedBlock().getState() instanceof Sign)) return;
-
-        Sign sign = (Sign) event.getClickedBlock().getState();
-
-        String line0 = ComponentUtils.getString(sign.line(0));
-        String line3 = ComponentUtils.getString(sign.line(3));
-
-        if(!line0.contains("=[Buy]=")
-                && !line0.contains("=[Sell]=")
-                && !line0.contains("-[Sell]-")
-                && !line0.contains("-[Buy]-")) return;
-        if(!line3.contains("Price: ")) return;
+        if(!ShopManager.isShop(event.getClickedBlock())) return;
 
         Cooldown.add(event.getPlayer(), 6);
 
@@ -51,10 +36,6 @@ public class ShopInteractEvent implements Listener {
         //Can't use in spectator lol
         if(player.getGameMode() == GameMode.SPECTATOR) return;
 
-        //This does nothing rn, will be useful in the future
-        if(!sign.getPersistentDataContainer().has(FtcCore.SHOP_KEY, PersistentDataType.STRING))
-            sign.getPersistentDataContainer().set(FtcCore.SHOP_KEY, PersistentDataType.STRING, "SignShop");
-
         //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it
         if(player.isSneaking() && (shop.getOwner().equals(player.getUniqueId()) || player.hasPermission("ftc.admin"))){
             player.openInventory(shop.getInventory());
@@ -63,7 +44,7 @@ public class ShopInteractEvent implements Listener {
         }
 
         //Call the event
-        FtcCore.getInstance().getServer().getPluginManager().callEvent(new SignShopUseEvent(shop, UserManager.getUser(player), player, FtcCore.getBalances()));
+        new SignShopUseEvent(shop, UserManager.getUser(player), player, FtcCore.getBalances()).callEvent();
     }
 
     public class SignShopInteractSubClass implements Listener {

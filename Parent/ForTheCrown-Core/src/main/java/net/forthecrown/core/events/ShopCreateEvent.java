@@ -4,7 +4,8 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import net.forthecrown.core.ShopManager;
+import net.forthecrown.core.api.ShopManager;
+import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.CrownWorldGuard;
 import net.forthecrown.core.FtcCore;
@@ -14,6 +15,7 @@ import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.exceptions.CrownException;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -34,7 +36,7 @@ public class ShopCreateEvent implements Listener {
 
     //WHAT AM I DOING
     @EventHandler(ignoreCancelled = true)
-    public void onSignShopCreate(SignChangeEvent event){
+    public void onSignShopCreate(SignChangeEvent event) throws CrownException {
         if(ComponentUtils.getString(event.line(0)).isBlank()) return;
 
         Player player = event.getPlayer();
@@ -111,7 +113,7 @@ public class ShopCreateEvent implements Listener {
         }
 
         @EventHandler
-        public void onInventoryClose(InventoryCloseEvent event){ //sets the example item and adds the item(s) to the shop's inventory
+        public void onInventoryClose(InventoryCloseEvent event) throws CrownException { //sets the example item and adds the item(s) to the shop's inventory
             if(!event.getPlayer().equals(player)) return;
             if(event.getInventory().getType() != InventoryType.HOPPER) return;
 
@@ -132,24 +134,24 @@ public class ShopCreateEvent implements Listener {
             }
 
             shopInv.setExampleItem(item);
-            shopInv.addItem(item);
+            shopInv.addItem(item.clone());
 
-            String loooooonngg = ChatColor.GREEN + "SignShop created!" + ChatColor.RESET + " It'll " +
-                    "sell " +
-                    shopInv.getExampleItem().getAmount() + " " +
-                    CrownUtils.getItemNormalName(shopInv.getExampleItem()) +
-                    " for " + CrownUtils.decimalizeNumber(shop.getPrice()) +
-                    " Rhines.";
+            Component finishMessage = Component.text()
+                    .append(Component.text("Sign Shop created!").color(NamedTextColor.GREEN))
+                    .append(Component.text(" It'll " +
+                            (shop.getType().isBuyType() ? "sell" : "buy") +
+                            " " + item.getAmount() + " " + CrownUtils.getItemNormalName(item) +
+                            " for " + Balances.getFormatted(shop.getPrice()) + "."
+                    ))
+                    .build();
 
-            if(shop.getType() == ShopType.SELL_SHOP || shop.getType() == ShopType.ADMIN_SELL_SHOP) loooooonngg = loooooonngg.replaceAll("sell", "buy");
+            sign.getPersistentDataContainer().set(FtcCore.SHOP_KEY, PersistentDataType.BYTE, (byte) 1);
+            sign.update();
 
-            player.sendMessage(loooooonngg);
+            player.sendMessage(finishMessage);
             player.sendMessage(ChatColor.GRAY + "Use Shift + Right Click to restock the shop.");
             shop.setOutOfStock(false);
             shop.save();
-
-
-            shop.getSign().getPersistentDataContainer().set(FtcCore.SHOP_KEY, PersistentDataType.STRING, "SignShop");
         }
     }
 }

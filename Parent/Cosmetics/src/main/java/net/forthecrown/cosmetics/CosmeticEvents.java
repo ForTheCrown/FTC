@@ -27,7 +27,7 @@ public class CosmeticEvents implements Listener {
         this.main = main;
     }
 
-    private void doArrowParticleStuff(Particle particle, Player player, CrownUser user, int gemCost){
+    private void doArrowParticleStuff(Particle particle, Player player, CrownUser user, int gemCost) throws CannotAffordTransaction {
         if(!user.getParticleArrowAvailable().contains(particle)){
             if(user.getGems() < gemCost) throw new CannotAffordTransaction(player);
             user.addGems(-gemCost);
@@ -39,7 +39,7 @@ public class CosmeticEvents implements Listener {
         user.setArrowParticle(particle);
     }
 
-    private void doDeathParticleStuff(String effect, Player player, CrownUser user, int gemCost){
+    private void doDeathParticleStuff(String effect, Player player, CrownUser user, int gemCost) throws CannotAffordTransaction {
         if(!user.getParticleDeathAvailable().contains(effect)){
             if(user.getGems() < gemCost) throw new CannotAffordTransaction(player);
             user.addGems(-gemCost);
@@ -52,7 +52,7 @@ public class CosmeticEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerClickItemInInv(InventoryClickEvent event) {
+    public void onPlayerClickItemInInv(InventoryClickEvent event) throws CannotAffordTransaction {
         if(!(event.getInventory().getHolder() instanceof CustomInventory)) return;
         if(event.isShiftClick()) event.setCancelled(true);
         if (event.getClickedInventory() instanceof PlayerInventory) return;

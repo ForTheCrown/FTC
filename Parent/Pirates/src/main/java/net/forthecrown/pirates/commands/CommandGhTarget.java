@@ -1,76 +1,97 @@
 package net.forthecrown.pirates.commands;
 
-import net.forthecrown.core.commands.CrownCommand;
-import net.forthecrown.core.exceptions.CrownException;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.core.commands.brigadier.BrigadierCommand;
+import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.core.commands.brigadier.types.Vector3DType;
 import net.forthecrown.pirates.Pirates;
-import org.bukkit.ChatColor;
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class CommandGhTarget extends CrownCommand {
+import java.util.HashMap;
+import java.util.Map;
+
+public class CommandGhTarget extends CrownCommandBuilder {
 
     public CommandGhTarget() {
         super("ghtarget", Pirates.inst);
+
         setPermission("ftc.pirates.ghtarget");
         register();
     }
 
     @Override
-    public boolean run(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player)) throw new CrownException(sender, "Only players may execute this command!");
-        Player player = (Player) sender;
+    protected void registerCommand(BrigadierCommand command) {
+        command
+                .then(argument("id", IntegerArgumentType.integer())
+                .then(argument("type", IntegerArgumentType.integer())
+                        .suggests((c, b) -> suggestMatching(b, "1", "2", "3"))
+                .then(argument("yaw", IntegerArgumentType.integer())
+                        .suggests((c, b) -> suggestMatching(b, "0", "90", "180", "270", "360", "-90", "-180", "-270", "-360"))
 
-        if (args.length < 6) {
-            player.sendMessage(ChatColor.RED + "Invalid use of command:");
-            player.sendMessage(ChatColor.GRAY + "/ghtarget [id] [class] x y z yaw (hookuses) (distance)");
-            return false;
-        }
-        else {
-            int ghStandCreateID, ghStandClass, ghYawToCords,  ghHookUsesToGive = 0, ghHookDistanceToGive = 0;
-            double ghXToCords, ghYToCords, ghZToCords;
-            try {
-                ghStandCreateID = Integer.parseInt(args[0]); // Will be used in YML file to understand...
-                ghStandClass = Integer.parseInt(args[1]); // 1 for normal, 2 for biome, 3 for final
-                ghXToCords = Double.parseDouble(args[2]);
-                ghYToCords = Double.parseDouble(args[3]);
-                ghZToCords = Double.parseDouble(args[4]);
-                ghYawToCords = Integer.parseInt(args[5]);
-                if (args.length > 6) ghHookUsesToGive = Integer.parseInt(args[6]); //Amount of uses for the hook that will be given to the player
-                if (args.length > 7) ghHookDistanceToGive = Integer.parseInt(args[7]);
-            }
-            catch (Exception e) {
-                player.sendMessage(ChatColor.GRAY + "All args have to be numbers.");
-                return false;
-            }
+                .then(argument("dest", Vector3DType.vec3())
+                        .executes(c -> standArg(c, null, null))
 
-            YamlConfiguration yaml = YamlConfiguration.loadConfiguration(Pirates.inst.grapplingHook.getArmorStandFile());
-            String section = "Stand_" + ghStandCreateID;
-            yaml.createSection(section);
-            yaml.set(section + ".StandClass", ghStandClass);
-            yaml.set(section + ".XToCords", ghXToCords);
-            yaml.set(section + ".YToCords", ghYToCords);
-            yaml.set(section + ".ZToCords", ghZToCords);
-            yaml.set(section + ".YawToCords", ghYawToCords);
-            if (args.length > 6) yaml.set(section + ".NextLevelHooks", ghHookUsesToGive);
-            if (args.length > 7) yaml.set(section + ".NextLevelDistance", ghHookDistanceToGive);
-            Pirates.inst.saveyaml(yaml, Pirates.inst.grapplingHook.getArmorStandFile());
+                        .then(argument("hooks", IntegerArgumentType.integer())
+                                .executes(c -> standArg(c, "hooks", null))
 
-            ArmorStand ghEStandTarget = (ArmorStand) player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
+                                .then(argument("distance", IntegerArgumentType.integer())
+                                        .executes(c -> standArg(c, "hooks", "distance"))
+                                )
+                        )
+                ))));
+    }
 
-            ghEStandTarget.setCustomName("GHTargetStand " + args[0]);
-            ghEStandTarget.setCustomNameVisible(false); //Sets the name to be invisible, currently visible
-            ghEStandTarget.setInvulnerable(true); //makes it god lol
-            ghEStandTarget.getEquipment().setHelmet(new ItemStack(Material.GLOWSTONE)); //gives it glowstone for a head
-            ghEStandTarget.setVisible(false); //makes it invis
-            ghEStandTarget.setGravity(false); // removes its gravity
+    private int standArg(CommandContext<CommandListenerWrapper> c, String hooks, String distance) throws CommandSyntaxException {
+        Player player = getPlayerSender(c);
+        int idArg, typeArg, yawArg, hookArg, distanceArg;
 
-            return true;
-        }
+        idArg = c.getArgument("id", Integer.class);
+        typeArg = c.getArgument("type", Integer.class);
+        yawArg = c.getArgument("yaw", Integer.class);
+        hookArg = hooks == null ? -1 : c.getArgument(hooks, Integer.class);
+        distanceArg = distance == null ? -1 : c.getArgument(distance, Integer.class);
+
+        //destination
+        Location d = Vector3DType.getLocation(c, "dest");
+
+        createStand(player.getLocation(), idArg, typeArg, yawArg, hookArg, distanceArg, d.getX(), d.getY(), d.getZ());
+        return 0;
+    }
+
+    private void createStand(Location location,
+                             int id, int type, int yaw, int hooks, int distance,
+                             double x, double y, double z) {
+
+        Map<String, Object> sectionMap = new HashMap<>();
+        sectionMap.put("XToCords", x);
+        sectionMap.put("YToCords", y);
+        sectionMap.put("ZToCords", z);
+
+        sectionMap.put("StandClass", type);
+        sectionMap.put("YawToCords", yaw);
+        if(hooks != -1) sectionMap.put("NextLevelHooks", hooks);
+        if(distance != -1) sectionMap.put("NextLevelDistance", distance);
+
+        YamlConfiguration yaml = YamlConfiguration.loadConfiguration(Pirates.inst.grapplingHook.getArmorStandFile());
+        String section = "Stand_" + id;
+        yaml.createSection(section, sectionMap);
+        Pirates.inst.saveyaml(yaml, Pirates.inst.grapplingHook.getArmorStandFile());
+
+        ArmorStand ghEStandTarget = location.getWorld().spawn(location, ArmorStand.class);
+
+        ghEStandTarget.setCustomName("GHTargetStand " + id);
+        ghEStandTarget.setCustomNameVisible(false); //Sets the name to be invisible, currently visible
+        ghEStandTarget.setInvulnerable(true); //makes it god lol
+        ghEStandTarget.getEquipment().setHelmet(new ItemStack(Material.GLOWSTONE)); //gives it glowstone for a head
+        ghEStandTarget.setVisible(false); //makes it invis
+        ghEStandTarget.setGravity(false); // removes its gravity
     }
 }

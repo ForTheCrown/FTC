@@ -1,18 +1,17 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
-import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.core.commands.brigadier.types.custom.UserType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.entity.Player;
 
 public class CommandTpask extends CrownCommandBuilder {
 
@@ -48,13 +47,11 @@ public class CommandTpask extends CrownCommandBuilder {
 
     @Override
     protected void registerCommand(BrigadierCommand command) {
-        command.then(argument("player", UserType.onlinePlayer())
-                .suggests((c, b) -> UserType.listSuggestions(b))
-
+        command.then(argument("player", UserType.user())
+                .suggests(UserType::suggest)
                 .executes(c -> {
-                    Player player = getPlayerSender(c);
-
-                    Player target = TargetSelectorType.getPlayer(c, "player");
+                    CrownUser player = getUserSender(c);
+                    CrownUser target = UserType.getOnlineUser(c, "player");
                     if(target.equals(player)) throw new CrownCommandException("&7You cannot teleport to yourself");
 
                     //sender part
@@ -64,7 +61,7 @@ public class CommandTpask extends CrownCommandBuilder {
                                     .hoverEvent(HoverEvent.showText(Component.text("Cancel teleportation request."))));
 
                     player.sendMessage(tpaMessage);
-                    player.performCommand("essentials:tpa " + target.getName());
+                    player.getPlayer().performCommand("essentials:tpa " + target.getName());
 
                     //target part
                     TextComponent targetMessage = Component.text(ChatColor.YELLOW + player.getName() + ChatColor.GOLD + " has requested to teleport to you. ")

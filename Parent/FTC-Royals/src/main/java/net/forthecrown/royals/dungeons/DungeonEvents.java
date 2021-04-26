@@ -65,6 +65,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
             hitDummy((Husk) event.getEntity(), event.getDamage());
             return;
         }
+        if(CrownUtils.isNullOrBlank(event.getEntity().getCustomName())) return;
         if(event.getEntity() instanceof WitherSkeleton && event.getEntity().getCustomName().contains("Josh") && DungeonAreas.DUNGEON_AREA.contains(event.getEntity())){
             ThreadLocalRandom random = ThreadLocalRandom.current();
             if(random.nextInt(4) > 0) return;
@@ -189,16 +190,16 @@ public class DungeonEvents implements Listener, ClickEventTask {
                 break;
             case "Hidden Mummy Ingot":
                 if(Cooldown.contains(player, "Dungeons_Mummy_Ingot")) return;
+                Cooldown.add(player, "Dungeons_Mummy_Ingot", 5*20*60);
                 player.sendMessage(CrownUtils.translateHexCodes("&7You got the &eHidden Mummy Ingot"));
                 player.getInventory().addItem(Zhambie.mummyIngot());
-                Cooldown.add(player, "Dungeons_Mummy_Ingot", 5*20*60);
                 break;
         }
     }
 
     //Diego clickable text code
     @Override
-    public void run(Player player, String[] args) {
+    public void run(Player player, String[] args) throws CrownException {
         PlayerInventory inv = player.getInventory();
         if(args[1].contains("sword")){
             if(!inv.containsAtLeast(BossItems.ZHAMBIE.item(), 1) || !inv.containsAtLeast(BossItems.SKALATAN.item(), 1) || !inv.containsAtLeast(BossItems.HIDEY_SPIDEY.item(), 1))

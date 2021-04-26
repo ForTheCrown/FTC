@@ -107,6 +107,7 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
             meta.setLore(lores);
             sword.setItemMeta(meta);
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
+            player.sendMessage(Component.text("Sword converted").color(NamedTextColor.GRAY));
 
         } else if(args[1].contains("join")){
             if(user.getBranch() == Branch.PIRATES){

@@ -4,6 +4,7 @@ import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +29,8 @@ public abstract class CrownEnchant extends Enchantment {
 
     @Override
     public @NotNull Component displayName(int level) {
-        return ComponentUtils.convertString(getName() + (level <= 1 ? "" : (" " + CrownUtils.arabicToRoman(level)))).color(NamedTextColor.GRAY);
+        return ComponentUtils.convertString(getName() + (level <= 1 ? "" : (" " + CrownUtils.arabicToRoman(level))))
+                .color(NamedTextColor.GRAY)
+                .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
     }
 }

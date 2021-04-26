@@ -69,7 +69,7 @@ public class CrownWeapons {
         //This is dumb and repetitive, but I couldn't think of a better way of doing this :(
         //Rank II -> case 3. aka gets you the Rank III requirements not the Rank II requirements
         //Found that out too late, and couldn't be arsed to change the cases
-        switch (weapon.rank()+1){
+        switch (rank){
             case 1:
                 weapon.setNewGoal(EntityType.ZOMBIE, (short) 1000);
                 break;
@@ -103,14 +103,14 @@ public class CrownWeapons {
                 weapon.item().addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 5);
                 player.sendMessage(Component.text("Looting V was added to your Sword.").color(NamedTextColor.GRAY));
                 weapon.setNewGoal(null, (short) -1);
-                return;
+                break;
         }
         //Effects
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1.2f);
         player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
         for (int i = 0; i <= 5; i++) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(FtcCore.getInstance(), () -> player.getWorld().spawnParticle(Particle.TOTEM, (
-                    player).getLocation().getX(),
+            Bukkit.getScheduler().scheduleSyncDelayedTask(FtcCore.getInstance(), () -> player.getWorld().spawnParticle(Particle.TOTEM,
+                    player.getLocation().getX(),
                     player.getLocation().getY()+2,
                     player.getLocation().getZ(),
                     30, 0.2d, 0.1d, 0.2d, 0.275d),

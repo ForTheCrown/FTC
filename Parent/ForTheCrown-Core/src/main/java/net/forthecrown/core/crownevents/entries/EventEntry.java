@@ -1,5 +1,6 @@
 package net.forthecrown.core.crownevents.entries;
 
+import net.forthecrown.core.crownevents.InEventListener;
 import org.bukkit.event.Listener;
 
 /**
@@ -7,11 +8,11 @@ import org.bukkit.event.Listener;
  * Such as the timer attached to a player, their InEventListener or something similar
  * Makes keeping track of stuff in events with multiple concurrent participants easier
  */
-public abstract class EventEntry {
+public abstract class EventEntry<T extends EventEntry<T>> {
 
-    protected final Listener inEventListener;
+    protected final InEventListener<T> inEventListener;
 
-    EventEntry(Listener inEventListener){
+    EventEntry(InEventListener<T> inEventListener){
         this.inEventListener = inEventListener;
     }
 

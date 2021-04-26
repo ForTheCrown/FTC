@@ -8,9 +8,12 @@ import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.utils.Cooldown;
 import net.forthecrown.core.utils.CrownUtils;
+import net.minecraft.server.v1_16_R3.ChatComponentText;
+import net.minecraft.server.v1_16_R3.EnumChatFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,10 +37,6 @@ public class PlayerRidingManager implements Listener {
         main.getServer().getPluginManager().registerEvents(this, main);
     }
 
-    public void beginRiding(Player rider, Player ridden){
-        riders.add(new PlayerRider(rider, ridden, main));
-    }
-
     public Set<PlayerRider> getRiders() {
         return riders;
     }
@@ -54,10 +53,7 @@ public class PlayerRidingManager implements Listener {
         CrownUser user = UserManager.getUser(rider);
         CrownUser ridden  = UserManager.getUser(riddenPlayer);
 
-        if(!user.allowsRidingPlayers() || !ridden.allowsRidingPlayers()){
-            user.sendMessage("&7You both have to allow riding players");
-            return;
-        }
+        if(!canRide(user, ridden)) return;
         if(Cooldown.contains(user)) return;
         Cooldown.add(user, 20);
 
@@ -72,7 +68,27 @@ public class PlayerRidingManager implements Listener {
             return;
         }
 
-        beginRiding(rider, riddenPlayer);
+        PlayerRider riderM = new PlayerRider(rider, riddenPlayer);
+        main.getServer().getPluginManager().registerEvents(riderM, main);
+        riders.add(riderM);
+    }
+
+    public boolean canRide(CrownUser user, CrownUser ridden){
+        if(!user.allowsRidingPlayers() || !ridden.allowsRidingPlayers()){
+            user.sendMessage("&7You both have to allow riding players");
+            return false;
+        }
+
+        Location loc = ridden.getLocation();
+        Material oneAbovePlayer = loc.add(0, 2, 0).getBlock().getType();
+        Material twoAbovePlayer = loc.add(0, 3, 0).getBlock().getType();
+
+        if(oneAbovePlayer != Material.AIR || twoAbovePlayer != Material.AIR){
+            user.sendMessage(new ChatComponentText("Cannot ride player here").a(EnumChatFormat.GRAY));
+            return false;
+        }
+
+        return true;
     }
 
     /*@EventHandler

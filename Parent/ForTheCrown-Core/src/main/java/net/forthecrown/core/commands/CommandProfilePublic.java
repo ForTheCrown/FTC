@@ -4,6 +4,8 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandProfilePublic extends CrownCommandBuilder {
 
@@ -21,7 +23,7 @@ public class CommandProfilePublic extends CrownCommandBuilder {
         command.executes(c ->{
             CrownUser user = getUserSender(c);
             user.setProfilePublic(true);
-            user.sendMessage("&7Others can now see your profile.");
+            user.sendMessage(Component.text("Others can now see your profile.").color(NamedTextColor.GRAY));
             return 0;
         });
     }

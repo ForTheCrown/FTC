@@ -80,7 +80,7 @@ public class Drawned extends DungeonBoss<Drowned> {
             }, i * 8L);
         }
 
-        if(guardians.size() >= 3) return;
+        if(guardians.size() > 2) return;
 
         //Spawn the minions lol
         bossEntity.setInvulnerable(true);

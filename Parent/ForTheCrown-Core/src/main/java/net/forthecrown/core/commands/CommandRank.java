@@ -6,6 +6,7 @@ import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.events.RankGuiUseEvent;
 import net.forthecrown.core.inventories.RankInventory;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class CommandRank extends CrownCommandBuilder {
@@ -36,7 +37,7 @@ public class CommandRank extends CrownCommandBuilder {
         command.executes(c ->{
             Player player = getPlayerSender(c);
 
-            FtcCore.getInstance().getServer().getPluginManager().registerEvents(new RankGuiUseEvent(player), FtcCore.getInstance());
+            Bukkit.getPluginManager().registerEvents(new RankGuiUseEvent(player), FtcCore.getInstance());
             player.openInventory(new RankInventory(UserManager.getUser(player)).getUsersRankGUI());
             return 0;
         });

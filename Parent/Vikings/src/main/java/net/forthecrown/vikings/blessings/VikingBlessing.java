@@ -2,7 +2,7 @@ package net.forthecrown.vikings.blessings;
 
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.files.AbstractSerializer;
+import net.forthecrown.core.serialization.AbstractSerializer;
 import net.forthecrown.vikings.Vikings;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
