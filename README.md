@@ -23,4 +23,3 @@ Structure:
   • MazeGenerator
   • NetherEvent
   • RaceEvent
-<\pre>
