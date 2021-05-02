@@ -6,9 +6,9 @@ welcome to the pit of trash... :D
 Us? It's just me here :,(
 
 Structure:\
-• Parent\
-__• ForTheCrown-Core\
-__• FTC-Royals\
+• Parent\  
+• ForTheCrown-Core\  
+• FTC-Royals\
   • FTC-Pirates\
   • FTC-Vikings\
   • FTC-Cosmetics\
