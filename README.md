@@ -6,7 +6,7 @@ welcome to the pit of trash... :D
 Us? It's just me here :,(
 
 Structure:
-• Parent
+\n• Parent
   • ForTheCrown-Core
   • FTC-Royals
   • FTC-Pirates
