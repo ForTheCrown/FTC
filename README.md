@@ -7,8 +7,8 @@ Us? It's just me here :,(
 
 Structure:\
 • Parent\
-  • ForTheCrown-Core\
-  • FTC-Royals\
+__• ForTheCrown-Core\
+__• FTC-Royals\
   • FTC-Pirates\
   • FTC-Vikings\
   • FTC-Cosmetics\
