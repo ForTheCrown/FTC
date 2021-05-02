@@ -5,13 +5,13 @@ welcome to the pit of trash... :D
 
 Us? It's just me here :,(
 
-Structure:
-\n• Parent
-  • ForTheCrown-Core
-  • FTC-Royals
-  • FTC-Pirates
-  • FTC-Vikings
-  • FTC-Cosmetics
+Structure:__
+• Parent__
+  • ForTheCrown-Core__
+  • FTC-Royals__
+  • FTC-Pirates__
+  • FTC-Vikings__
+  • FTC-Cosmetics__
 • Events
   • AprilEvent
   • BigAssCrownEvent
