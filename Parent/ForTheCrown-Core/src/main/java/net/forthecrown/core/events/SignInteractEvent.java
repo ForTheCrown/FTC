@@ -1,11 +1,12 @@
 package net.forthecrown.core.events;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.ShopManager;
 import net.forthecrown.core.api.ShopInventory;
+import net.forthecrown.core.api.ShopManager;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.events.customevents.SignShopUseEvent;
+import net.forthecrown.core.types.signs.SignManager;
 import net.forthecrown.core.utils.Cooldown;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -18,33 +19,38 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class ShopInteractEvent implements Listener {
+public class SignInteractEvent implements Listener {
 
     @EventHandler
     public void onSignShopUser(PlayerInteractEvent event){
         if(Cooldown.contains(event.getPlayer())) return;
         if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if(!ShopManager.isShop(event.getClickedBlock())) return;
 
-        Cooldown.add(event.getPlayer(), 6);
+        if(ShopManager.isShop(event.getClickedBlock())){
+            Cooldown.add(event.getPlayer(), 6);
 
-        SignShop shop = ShopManager.getShop(event.getClickedBlock().getLocation());
-        if(shop == null) return;
+            SignShop shop = ShopManager.getShop(event.getClickedBlock().getLocation());
+            if(shop == null) return;
 
-        Player player = event.getPlayer();
+            Player player = event.getPlayer();
 
-        //Can't use in spectator lol
-        if(player.getGameMode() == GameMode.SPECTATOR) return;
+            //Can't use in spectator lol
+            if(player.getGameMode() == GameMode.SPECTATOR) return;
 
-        //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it
-        if(player.isSneaking() && (shop.getOwner().equals(player.getUniqueId()) || player.hasPermission("ftc.admin"))){
-            player.openInventory(shop.getInventory());
-            FtcCore.getInstance().getServer().getPluginManager().registerEvents(new SignShopInteractSubClass(player, shop), FtcCore.getInstance());
-            return;
+            //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it
+            if(player.isSneaking() && (shop.getOwner().equals(player.getUniqueId()) || player.hasPermission("ftc.admin"))){
+                player.openInventory(shop.getInventory());
+                FtcCore.getInstance().getServer().getPluginManager().registerEvents(new SignShopInteractSubClass(player, shop), FtcCore.getInstance());
+                return;
+            }
+
+            //Call the event
+            new SignShopUseEvent(shop, UserManager.getUser(player), player, FtcCore.getBalances()).callEvent();
+        } else if(SignManager.isInteractableSign(event.getClickedBlock())){
+            try {
+                SignManager.getSign(event.getClickedBlock().getLocation()).interact(event.getPlayer());
+            } catch (NullPointerException ignored) {}
         }
-
-        //Call the event
-        new SignShopUseEvent(shop, UserManager.getUser(player), player, FtcCore.getBalances()).callEvent();
     }
 
     public class SignShopInteractSubClass implements Listener {

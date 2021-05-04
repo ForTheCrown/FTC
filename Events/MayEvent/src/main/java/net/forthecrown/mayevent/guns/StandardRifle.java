@@ -35,18 +35,15 @@ public class StandardRifle extends HitScanWeapon {
         WeaponEffect effect;
         WeaponEffect.GUNSHOT.play(shot, this);
 
-        if(shot.hasHitEntity){
-            if(!(shot.target instanceof LivingEntity)) return true;
+        if(shot.hasHitEntity && shot.target instanceof LivingEntity){
             LivingEntity ent = (LivingEntity) shot.target;
 
             ent.damage(damage * 2);
             effect = WeaponEffect.BULLET_HIT_MOB;
         } else {
             Block hit = shot.hitScan.getHitBlock();
-            if(hit == null) return true;
-
             effect = WeaponEffect.BULLET_HIT_WALL;
-            BlockDamageTracker.damage(hit, damage);
+            if(BlockDamageTracker.damage(hit, damage) == 31) WeaponEffect.BLOCK_BREAK.play(shot, this);
         }
 
         effect.play(shot, this);

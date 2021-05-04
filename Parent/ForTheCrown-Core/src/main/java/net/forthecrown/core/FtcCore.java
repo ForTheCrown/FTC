@@ -1,7 +1,7 @@
 package net.forthecrown.core;
 
 import net.forthecrown.core.api.*;
-import net.forthecrown.core.commands.brigadier.RoyalBrigadier;
+import net.forthecrown.core.commands.brigadier.CoreCommands;
 import net.forthecrown.core.comvars.ComVar;
 import net.forthecrown.core.comvars.ComVars;
 import net.forthecrown.core.comvars.types.ComVarType;
@@ -10,6 +10,7 @@ import net.forthecrown.core.events.*;
 import net.forthecrown.core.types.CrownBalances;
 import net.forthecrown.core.types.CrownBlackMarket;
 import net.forthecrown.core.types.CrownBroadcaster;
+import net.forthecrown.core.types.signs.SignManager;
 import net.forthecrown.core.types.user.CrownUserManager;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.MapUtils;
@@ -40,17 +41,17 @@ public final class FtcCore extends JavaPlugin {
     public static final ComVar<Boolean> inDebugMode = ComVars.set("sv_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
 
     //Not public cuz API, I don't want this value getting changed
-    private static FtcCore instance;
+    private static FtcCore          instance;
 
     private static String           prefix = "&6[FTC]&r  ";
     private static String           king;
     private static String           discord;
             static PeriodicalSaver  saver;
-    private static int              maxMoneyAmount;
+    private static ComVar<Integer>  maxMoneyAmount;
 
-    private static ComVar<Long>     userDataResetInterval;// = 5356800000L; //2 months by default
-    private static ComVar<Long>     branchSwapCooldown;// = 172800000; //2 days by default
-    private static ComVar<Boolean>  taxesEnabled;// = false;
+    private static ComVar<Long>     userDataResetInterval;// 5356800000L aka 2 months by default
+    private static ComVar<Long>     branchSwapCooldown;// 172800000 aka 2 days by default
+    private static ComVar<Boolean>  taxesEnabled;
     private static ComVar<Boolean>  logAdminShop;
     private static ComVar<Boolean>  logNormalShop;
     private static ComVar<Byte>     hoppersInOneChunk;
@@ -61,13 +62,12 @@ public final class FtcCore extends JavaPlugin {
     private static CrownBlackMarket bm;
     private static CrownWorldGuard  crownWG;
     private static CrownUserManager userManager;
-    private static RoyalBrigadier   brigadier;
+    private static CoreCommands     brigadier;
 
-    private static final Map<Material, ComVar<Short>> defaultItemPrices = new HashMap<>();
-    public static final Set<ArmorStandLeaderboard> LEADERBOARDS = new HashSet<>();
-    public static LuckPerms LUCK_PERMS;
-
-    public static NamespacedKey SHOP_KEY;
+    private static final Map<Material, ComVar<Short>>   defaultItemPrices = new HashMap<>();
+    public static final Set<ArmorStandLeaderboard>      LEADERBOARDS = new HashSet<>();
+    public static LuckPerms                             LUCK_PERMS;
+    public static NamespacedKey                         SHOP_KEY;
 
     @Override
     public void onEnable() {
@@ -80,7 +80,7 @@ public final class FtcCore extends JavaPlugin {
         json_announcer = new CrownBroadcaster();
         balFile = new CrownBalances(this);
         bm = new CrownBlackMarket(this);
-        brigadier = new RoyalBrigadier(this);
+        brigadier = new CoreCommands(this);
         userManager = new CrownUserManager(this);
 
         SHOP_KEY = new NamespacedKey(this, "signshop");
@@ -121,7 +121,7 @@ public final class FtcCore extends JavaPlugin {
         pm.registerEvents(new ChatEvents(), this);
 
         pm.registerEvents(new ShopCreateEvent(), this);
-        pm.registerEvents(new ShopInteractEvent(), this);
+        pm.registerEvents(new SignInteractEvent(), this);
         pm.registerEvents(new ShopDestroyEvent(), this);
         pm.registerEvents(new ShopTransactionEvent(), this);
 
@@ -157,6 +157,11 @@ public final class FtcCore extends JavaPlugin {
         getConfig().set("Shops.log-normal-purchases", logNormalShop.getValue());
         getConfig().set("Shops.log-admin-purchases", logAdminShop.getValue());
         getConfig().set("HoppersInOneChunk", hoppersInOneChunk.getValue());
+        getConfig().set("MaxMoneyAmount", maxMoneyAmount.getValue());
+
+        for (Material m: defaultItemPrices.keySet()){
+            getConfig().set("DefaultPrices." + m.toString(), defaultItemPrices.get(m).getValue((short) 2));
+        }
 
         super.saveConfig();
     }
@@ -167,8 +172,8 @@ public final class FtcCore extends JavaPlugin {
 
         prefix = getConfig().getString("Prefix");
         discord = getConfig().getString("Discord");
-        maxMoneyAmount = getConfig().getInt("MaxMoneyAmount");
 
+        maxMoneyAmount = ComVars.set("sv_maxMoneyAmount", ComVarType.INTEGER, getConfig().getInt("MaxMoneyAmount"));
         branchSwapCooldown = ComVars.set("sv_branchSwapInterval", ComVarType.LONG, getConfig().getLong("BranchSwapCooldown"));
         taxesEnabled = ComVars.set("sv_taxesEnabled", ComVarType.BOOLEAN, getConfig().getBoolean("Taxes"));
         userDataResetInterval = ComVars.set("sv_userEarningsResetInterval", ComVarType.LONG, getConfig().getLong("UserDataResetInterval"));
@@ -192,9 +197,9 @@ public final class FtcCore extends JavaPlugin {
 
     public static void saveFTC(){
         ShopManager.save();
+        SignManager.saveAll();
         getUserManager().save();
         getUserManager().saveUsers();
-        //getAnnouncer().save();
         getBalances().save();
         getBlackMarket().save();
 
@@ -248,31 +253,31 @@ public final class FtcCore extends JavaPlugin {
      */
 
     public static byte getHoppersInOneChunk() {
-        return hoppersInOneChunk.getValue();
+        return hoppersInOneChunk.getValue((byte) 64);
     }
 
     public static long getUserDataResetInterval(){
-        return userDataResetInterval.getValue();
+        return userDataResetInterval.getValue(5356800000L);
     }
 
     public static boolean areTaxesEnabled(){
-        return taxesEnabled.getValue();
+        return taxesEnabled.getValue(false);
     }
 
     public static Integer getMaxMoneyAmount(){
-        return maxMoneyAmount;
+        return maxMoneyAmount.getValue(50000000);
     }
 
     public static long getBranchSwapCooldown() {
-        return branchSwapCooldown.getValue();
+        return branchSwapCooldown.getValue(172800000L);
     }
 
     public static boolean logAdminShopUsage(){
-        return logAdminShop.getValue();
+        return logAdminShop.getValue(true);
     }
 
     public static boolean logNormalShopUsage(){
-        return logNormalShop.getValue();
+        return logNormalShop.getValue(false);
     }
 
     //Get an FTC type with one of these bad bois
@@ -291,7 +296,7 @@ public final class FtcCore extends JavaPlugin {
     public static UserManager getUserManager() {
         return userManager;
     }
-    public static RoyalBrigadier getRoyalBrigadier(){
+    public static CoreCommands getRoyalBrigadier(){
         return brigadier;
     }
     public static CrownWorldGuard getCrownWorldGuard() {

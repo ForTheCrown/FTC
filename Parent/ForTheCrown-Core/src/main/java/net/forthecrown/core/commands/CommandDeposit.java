@@ -2,10 +2,10 @@ package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
 import net.forthecrown.core.utils.ComponentUtils;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -18,7 +18,6 @@ public class CommandDeposit extends CrownCommandBuilder {
     public CommandDeposit(){
         super("deposit", FtcCore.getInstance());
 
-        setUsage("&7Usage: &r/deposit");
         register();
     }
 
@@ -35,14 +34,14 @@ public class CommandDeposit extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
             Player player = getPlayerSender(c);
 
             if(player.getInventory().getItemInMainHand().getType() != Material.SUNFLOWER
                     && (!player.getInventory().getItemInMainHand().hasItemMeta()
                     || !player.getInventory().getItemInMainHand().getItemMeta().lore().get(0).contains(Component.text("Worth "))))
-                throw new CrownCommandException("You need to be holding the coins you wish to deposit");
+                throw FtcExceptionProvider.create("You need to be holding the coins you wish to deposit");
 
             ItemStack mainItem = player.getInventory().getItemInMainHand();
 
@@ -51,7 +50,7 @@ public class CommandDeposit extends CrownCommandBuilder {
                 Component component = mainItem.getItemMeta().lore().get(0);
                 String lore = ChatColor.stripColor(ComponentUtils.getString(component)).replaceAll("[\\D]", "").trim();
                 amount = Integer.parseInt(lore);
-            } catch (NumberFormatException e) { throw new CrownCommandException("You need to be holding the coins you wish to deposit"); }
+            } catch (NumberFormatException e) { throw FtcExceptionProvider.create("You need to be holding the coins you wish to deposit"); }
 
             amount = amount*mainItem.getAmount();
 

@@ -6,8 +6,9 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.StaffChat;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -23,7 +24,6 @@ public class CommandStaffChat extends CrownCommandBuilder {
         setPermission("ftc.staffchat");
         setAliases("sc");
         setDescription("Sends a message to the staff chat");
-        setUsage("&8Usage: &7/sc <message>");
 
         register();
 
@@ -64,12 +64,12 @@ public class CommandStaffChat extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command.then(argument("message", StringArgumentType.greedyString())
                 .suggests(this::completions)
 
                 .executes(c -> {
-                    StaffChat.send(c.getSource().getBukkitSender(), c.getArgument("message", String.class), true);
+                    StaffChat.send(c.getSource().asBukkit(), c.getArgument("message", String.class), true);
                     return 0;
                 })
         );
@@ -84,6 +84,6 @@ public class CommandStaffChat extends CrownCommandBuilder {
             argList.add(p.getName());
         }
 
-        return suggestMatching(builder, argList);
+        return CommandSource.suggestMatching(builder, argList);
     }
 }

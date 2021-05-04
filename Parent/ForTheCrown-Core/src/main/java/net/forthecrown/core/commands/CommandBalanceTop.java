@@ -3,8 +3,8 @@ package net.forthecrown.core.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -44,20 +44,16 @@ public class CommandBalanceTop extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> { //No args -> show first page
-                    try {
-                        sendBaltopMessage(c.getSource().getBukkitSender(), 0);
-                    } catch (Exception e){
-                        e.printStackTrace();
-                    }
+                    sendBaltopMessage(c.getSource().asBukkit(), 0);
                     return 0;
                 })
                 .then(argument("page", IntegerArgumentType.integer(1, maxPage))
                         .executes(c -> { //Page number given -> show that page
                             Integer soup = c.getArgument("page", Integer.class); //Delicious soup
-                            sendBaltopMessage(c.getSource().getBukkitSender(), soup);
+                            sendBaltopMessage(c.getSource().asBukkit(), soup);
                             return 0;
                         })
                 );

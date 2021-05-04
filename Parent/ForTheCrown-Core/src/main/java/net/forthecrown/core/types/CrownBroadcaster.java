@@ -261,6 +261,6 @@ public class CrownBroadcaster extends AbstractJsonSerializer<FtcCore> implements
     }
 
     public static Component secretAnnouncement(){
-        return Component.text("Marriage plugin when!").hoverEvent(Component.text("Whenever people see this ;)"));
+        return Component.text("Marriage plugin when!").hoverEvent(Component.text("If you hovered over this, congrats I hate you. I now have to work on the marriage plugin \n - Antsie pantsie"));
     }
 }

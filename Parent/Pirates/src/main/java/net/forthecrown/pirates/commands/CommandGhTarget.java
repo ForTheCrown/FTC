@@ -3,11 +3,11 @@ package net.forthecrown.pirates.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.Vector3DType;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.pirates.Pirates;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,15 +28,15 @@ public class CommandGhTarget extends CrownCommandBuilder {
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("id", IntegerArgumentType.integer())
                 .then(argument("type", IntegerArgumentType.integer())
-                        .suggests((c, b) -> suggestMatching(b, "1", "2", "3"))
+                        .suggests(suggestMatching( "1", "2", "3"))
                 .then(argument("yaw", IntegerArgumentType.integer())
-                        .suggests((c, b) -> suggestMatching(b, "0", "90", "180", "270", "360", "-90", "-180", "-270", "-360"))
+                        .suggests(suggestMatching( "0", "90", "180", "270", "360", "-90", "-180", "-270", "-360"))
 
-                .then(argument("dest", Vector3DType.vec3())
+                .then(argument("dest", PositionArgument.position())
                         .executes(c -> standArg(c, null, null))
 
                         .then(argument("hooks", IntegerArgumentType.integer())
@@ -49,7 +49,7 @@ public class CommandGhTarget extends CrownCommandBuilder {
                 ))));
     }
 
-    private int standArg(CommandContext<CommandListenerWrapper> c, String hooks, String distance) throws CommandSyntaxException {
+    private int standArg(CommandContext<CommandSource> c, String hooks, String distance) throws CommandSyntaxException {
         Player player = getPlayerSender(c);
         int idArg, typeArg, yawArg, hookArg, distanceArg;
 
@@ -60,7 +60,7 @@ public class CommandGhTarget extends CrownCommandBuilder {
         distanceArg = distance == null ? -1 : c.getArgument(distance, Integer.class);
 
         //destination
-        Location d = Vector3DType.getLocation(c, "dest");
+        Location d = PositionArgument.getLocation(c, "dest");
 
         createStand(player.getLocation(), idArg, typeArg, yawArg, hookArg, distanceArg, d.getX(), d.getY(), d.getZ());
         return 0;

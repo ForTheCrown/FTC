@@ -98,8 +98,7 @@ public final class Pirates extends JavaPlugin implements Listener {
         for (UUID playeruuid : events.parrots.values()) {
             try { // Online while reload
                 Bukkit.getPlayer(playeruuid).setShoulderEntityLeft(null);
-            }
-            catch (Exception e) { // Offline while reload
+            } catch (Exception e) { // Offline while reload
                 players.add(playeruuid.toString());
             }
         }

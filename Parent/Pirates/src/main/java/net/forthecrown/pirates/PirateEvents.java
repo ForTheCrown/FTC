@@ -37,8 +37,7 @@ public class PirateEvents implements Listener {
 
     @EventHandler
     public void onPlayerClick(PlayerInteractEntityEvent event) throws CrownException {
-        if(!event.getHand().equals(EquipmentSlot.HAND))
-            return;
+        if(!event.getHand().equals(EquipmentSlot.HAND)) return;
 
         Player player = event.getPlayer();
         CrownUser user = UserManager.getUser(player.getUniqueId());
@@ -92,24 +91,20 @@ public class PirateEvents implements Listener {
 
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
-            if (event.getHand().equals(EquipmentSlot.HAND)) {
-                if (event.getItem() != null && event.getItem().getType() == Material.COMPASS) {
-                    if (event.getPlayer().getLocation().getWorld().getName().equalsIgnoreCase(main.getConfig().getString("TreasureLoc.world"))) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_AIR) return;
+        if (!event.getHand().equals(EquipmentSlot.HAND)) return;
+        if (event.getItem() == null || event.getItem().getType() != Material.COMPASS) return;
+        if (!event.getPlayer().getLocation().getWorld().getName().equalsIgnoreCase(main.getConfig().getString("TreasureLoc.world"))) return;
 
-                        Location targetLoc = new Location(Bukkit.getWorld(main.getConfig().getString("TreasureLoc.world")),
-                                main.getConfig().getInt("TreasureLoc.x"),
-                                main.getConfig().getInt("TreasureLoc.y"),
-                                main.getConfig().getInt("TreasureLoc.z"));
+        Location targetLoc = new Location(Bukkit.getWorld(main.getConfig().getString("TreasureLoc.world")),
+                main.getConfig().getInt("TreasureLoc.x"),
+                main.getConfig().getInt("TreasureLoc.y"),
+                main.getConfig().getInt("TreasureLoc.z"));
 
-                        event.getPlayer().setCompassTarget(targetLoc);
-                        Location playerloc = event.getPlayer().getLocation();
-                        playerloc.getWorld().playSound(playerloc, Sound.ITEM_LODESTONE_COMPASS_LOCK, 1, 1);
-                        //playerloc.getWorld().spawnParticle(Particle.END_ROD, playerloc.getX(), playerloc.getY()+0.5, playerloc.getZ(), 5, 0.7, 0, 0.7, 0.02);
-                    }
-                }
-            }
-        }
+        event.getPlayer().setCompassTarget(targetLoc);
+        Location playerloc = event.getPlayer().getLocation();
+        playerloc.getWorld().playSound(playerloc, Sound.ITEM_LODESTONE_COMPASS_LOCK, 1, 1);
+        //playerloc.getWorld().spawnParticle(Particle.END_ROD, playerloc.getX(), playerloc.getY()+0.5, playerloc.getZ(), 5, 0.7, 0, 0.7, 0.02);
     }
 
     @SuppressWarnings("deprecation")

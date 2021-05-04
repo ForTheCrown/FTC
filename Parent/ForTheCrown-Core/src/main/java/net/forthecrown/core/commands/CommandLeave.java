@@ -2,9 +2,9 @@ package net.forthecrown.core.commands;
 
 import net.forthecrown.core.CrownBoundingBox;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.utils.Pair;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -24,7 +24,7 @@ public class CommandLeave extends CrownCommandBuilder {
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
             Player player = getPlayerSender(c);
             for (Map.Entry<CrownBoundingBox, Pair<Location, Function<Player, Boolean>>> e: ALLOWED_USAGE_AREAS.entrySet()){
@@ -32,6 +32,7 @@ public class CommandLeave extends CrownCommandBuilder {
 
                 Pair<Location, Function<Player, Boolean>> par = e.getValue();
                 if(par.getSecond().apply(player)) player.teleport(par.getFirst());
+                break;
             }
             return 0;
         });

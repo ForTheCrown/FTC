@@ -84,7 +84,7 @@ public class ArenaEntry extends PlayerEntry<ArenaEntry> implements GunHolder {
                 gun = g;
                 continue;
             }
-            if(g.remainingAmmo() < gun.remainingAmmo()) gun = g;
+            if(g.getAmmoRatio() < gun.getAmmoRatio()) gun = g;
         }
 
         return gun;

@@ -22,7 +22,7 @@ public abstract class AbstractJsonSerializer<T extends JavaPlugin> implements Cr
     private File file;
     private JsonObject json;
 
-    private final String fileName;
+    protected final String fileName;
     private final String directory;
     private final String fullFileDirectory;
     protected final T plugin;

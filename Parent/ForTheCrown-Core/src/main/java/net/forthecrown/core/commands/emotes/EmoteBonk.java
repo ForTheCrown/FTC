@@ -20,18 +20,12 @@ public class EmoteBonk extends CommandEmote {
      * ----------------------------------------
      * 			Command description:
      * ----------------------------------------
-     * Command that allows players to vibe on Jingle Bells.
-     * Only works if they both have emotes enabled.
+     * Bonks a player
      *
      * Valid usages of command:
-     * - /jingle
+     * - /bonk <player>
      *
-     * Referenced other classes:
-     * - FtcCore
-     * - Chat
-     *
-     * Main Author: Wout
-     * Edit: Botul
+     * Main Author: Botul
      */
 
     @Override

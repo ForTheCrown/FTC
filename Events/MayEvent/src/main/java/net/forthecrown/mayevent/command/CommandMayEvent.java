@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
+import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
 import net.forthecrown.mayevent.ArenaEntry;
 import net.forthecrown.mayevent.DoomEvent;
 import net.forthecrown.mayevent.MayMain;
@@ -28,6 +29,30 @@ public class CommandMayEvent extends CrownCommandBuilder {
     @Override
     protected void registerCommand(BrigadierCommand command) {
         command
+                .then(argument("updatelb")
+                        .executes(c -> {
+                            MayMain.leaderboard.update();
+
+                            adminMessage(c, "Updating Leaderboard");
+                            return 0;
+                        })
+                )
+
+                .then(argument("enter")
+                        .then(argument("player", TargetSelectorType.player())
+                                .executes(c -> {
+                                    Player selected = TargetSelectorType.getPlayer(c, "player");
+                                    if(DoomEvent.ENTRIES.containsKey(selected)){
+                                        MayMain.inst.getLogger().warning(selected.getName() + " entered the portal but was still in the entries list");
+                                        throw new CrownCommandException("What? You're already in the event!?!?");
+                                    }
+
+                                    MayMain.event.start(selected);
+                                    return 0;
+                                })
+                        )
+                )
+
                 .then(argument("gun")
                         .then(argument("gunName", WeaponArgType.gun())
                                 .suggests(WeaponArgType::suggest)

@@ -4,12 +4,13 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.Vector3DType;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.ListUtils;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.royals.RoyalUtils;
 import net.forthecrown.royals.Royals;
 import net.forthecrown.royals.dungeons.bosses.BossItems;
@@ -18,7 +19,6 @@ import net.forthecrown.royals.dungeons.bosses.mobs.DungeonBoss;
 import net.forthecrown.royals.enchantments.CrownEnchant;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -39,7 +39,7 @@ public class CommandRoyal extends CrownCommandBuilder {
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("spawndummy")
                         .executes(c -> {
@@ -47,9 +47,9 @@ public class CommandRoyal extends CrownCommandBuilder {
                             RoyalUtils.spawnDummy(player.getLocation());
                             return 0;
                         })
-                        .then(argument("location", Vector3DType.vec3())
+                        .then(argument("location", PositionArgument.position())
                                 .executes(c -> {
-                                    RoyalUtils.spawnDummy(Vector3DType.getLocation(c, "location"));
+                                    RoyalUtils.spawnDummy(PositionArgument.getLocation(c, "location"));
                                     return 0;
                                 })
                         )
@@ -60,7 +60,7 @@ public class CommandRoyal extends CrownCommandBuilder {
                                     Player player = getPlayerSender(c);
                                     ItemStack item = player.getInventory().getItemInMainHand();
                                     if(item == null || item.getType() != Material.GOLDEN_APPLE || !item.hasItemMeta() || item.getItemMeta().displayName() == null)
-                                        throw new CrownCommandException("You must be holding a boss apple!");
+                                        throw FtcExceptionProvider.create("You must be holding a boss apple!");
                                     ItemMeta meta = item.getItemMeta();
                                     Component display = item.getItemMeta().displayName();
 
@@ -77,7 +77,7 @@ public class CommandRoyal extends CrownCommandBuilder {
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
                                     ItemStack item = player.getInventory().getItemInMainHand();
-                                    if(item == null || !item.hasItemMeta()) throw new CrownCommandException("You need to be holding an item bruv");
+                                    if(item == null || !item.hasItemMeta()) throw FtcExceptionProvider.create("You need to be holding an item bruv");
                                     ItemMeta meta = item.getItemMeta();
 
                                     List<Component> lore = meta.lore() == null ? new ArrayList<>() : meta.lore();
@@ -99,9 +99,9 @@ public class CommandRoyal extends CrownCommandBuilder {
 
                 .then(argument("enchant")
                         .then(argument("legacy", BoolArgumentType.bool())
-                                .then(argument("enchantment", RoyalEnchantType.enchant())
+                                .then(argument("enchantment", RoyalEnchantType.ENCHANT)
                                         .executes(c -> enchantItemInHand(c,
-                                                RoyalEnchantType.getEnchant(c, "enchantment"),
+                                                c.getArgument("enchantment", CrownEnchant.class),
                                                 c.getArgument("legacy", Boolean.class)
                                         ))
                                 )
@@ -116,13 +116,13 @@ public class CommandRoyal extends CrownCommandBuilder {
                 .then(argument("debug")
                         .then(argument("apples")
                                 .then(argument("boss", StringArgumentType.word())
-                                        .suggests((c, b) -> suggestMatching(b, ListUtils.arrayToCollection(BossItems.values(), item -> item.toString().replaceAll(" ", "_"))))
+                                        .suggests(suggestMatching(ListUtils.arrayToCollection(BossItems.values(), item -> item.toString().replaceAll(" ", "_"))))
 
                                         .executes(c -> {
                                             BossItems boss;
                                             try {
                                                 boss = BossItems.valueOf(c.getArgument("boss", String.class).toUpperCase());
-                                            } catch (Exception e){ throw new CrownCommandException("Invalid boss"); }
+                                            } catch (Exception e){ throw FtcExceptionProvider.create("Invalid boss"); }
 
                                             Player player = getPlayerSender(c);
                                             player.getInventory().addItem(boss.item());
@@ -134,7 +134,7 @@ public class CommandRoyal extends CrownCommandBuilder {
                         )
 
                         .then(argument(bossArg, StringArgumentType.word())
-                                .suggests((c, b) -> suggestMatching(b, ListUtils.convertToList(Bosses.BY_NAME.keySet(), str -> str.replaceAll(" ", "_"))))
+                                .suggests(suggestMatching(ListUtils.convertToList(Bosses.BY_NAME.keySet(), str -> str.replaceAll(" ", "_"))))
 
                                 .then(argument("spawn")
                                         .executes(c -> {
@@ -148,7 +148,7 @@ public class CommandRoyal extends CrownCommandBuilder {
                                 .then(argument("kill")
                                         .executes(c -> {
                                             DungeonBoss<?> boss = getBoss(c);
-                                            if(!boss.isAlive()) throw new CrownCommandException("Boss isn't alive");
+                                            if(!boss.isAlive()) throw FtcExceptionProvider.create("Boss isn't alive");
 
                                             boss.kill(false);
                                             broadcastAdmin(c.getSource(), "Killing boss");
@@ -163,7 +163,7 @@ public class CommandRoyal extends CrownCommandBuilder {
                                             for (ItemStack i: boss.getSpawningItems()){
                                                 try {
                                                     player.getInventory().addItem(i.clone());
-                                                } catch (Exception e) { throw new CrownCommandException("Inventory full!"); }
+                                                } catch (Exception e) { throw FtcExceptionProvider.create("Inventory full!"); }
                                             }
 
                                             broadcastAdmin(c.getSource(), "Giving items");
@@ -173,7 +173,7 @@ public class CommandRoyal extends CrownCommandBuilder {
                                 .then(argument("battleContext")
                                         .executes(c -> {
                                             DungeonBoss<?> boss = getBoss(c);
-                                            if(!boss.isAlive()) throw new CrownCommandException("Boss has not been spawned");
+                                            if(!boss.isAlive()) throw FtcExceptionProvider.create("Boss has not been spawned");
 
                                             broadcastAdmin(c.getSource(), "boss: " + boss.getBossEntity().getCustomName());
                                             broadcastAdmin(c.getSource(), "health: " + boss.getBossEntity().getHealth());
@@ -202,16 +202,16 @@ public class CommandRoyal extends CrownCommandBuilder {
 
     private static final String bossArg = "boss";
 
-    public DungeonBoss<?> getBoss(CommandContext<CommandListenerWrapper> c) throws CrownCommandException {
+    public DungeonBoss<?> getBoss(CommandContext<CommandSource> c) throws CommandSyntaxException {
         DungeonBoss<?> boss = Bosses.BY_NAME.get(c.getArgument(bossArg, String.class).replaceAll("_", " "));
-        if(boss == null) throw new CrownCommandException("Invalid boss");
+        if(boss == null) throw FtcExceptionProvider.create("Invalid boss");
         return boss;
     }
 
-    private int enchantItemInHand(CommandContext<CommandListenerWrapper> c, CrownEnchant enchant, boolean legacy) throws CommandSyntaxException {
+    private int enchantItemInHand(CommandContext<CommandSource> c, CrownEnchant enchant, boolean legacy) throws CommandSyntaxException {
         Player player = getPlayerSender(c);
         ItemStack to_enchant = player.getInventory().getItemInMainHand();
-        if(to_enchant == null) throw new CrownCommandException("Hold an item you dumbass");
+        if(to_enchant == null) throw FtcExceptionProvider.create("Hold an item you dumbass");
 
         if(!legacy) CrownEnchant.addCrownEnchant(to_enchant, enchant, 1);
         else to_enchant.addUnsafeEnchantment(enchant, 1);

@@ -38,7 +38,7 @@ public interface DoomEvent extends CrownEvent<ArenaEntry> {
         return mobTeam;
     }).get();
 
-    Location EXIT_LOCATION = CrownUtils.LOCATION_HAZELGUARD.clone();
+    Location EXIT_LOCATION = new Location(CrownUtils.WORLD, -61.5, 70, 884.5, -90, 0);
 
     Map<Player, ArenaEntry> ENTRIES = new HashMap<>();
     BitSet IN_USE_ARENAS = new BitSet();
@@ -51,11 +51,14 @@ public interface DoomEvent extends CrownEvent<ArenaEntry> {
             return;
         }
 
-        ArenaEntry entry = new ArenaEntry(player);
-        entry.arena().start();
-        entry.regEvents(MayMain.inst);
+        Bukkit.getScheduler().runTaskAsynchronously(MayMain.inst, () -> {
+            ArenaEntry entry = new ArenaEntry(player);
+            entry.arena().start();
+            entry.regEvents(MayMain.inst);
 
-        ENTRIES.put(player, entry);
+            MayMain.eLogger.logEntry(player);
+            ENTRIES.put(player, entry);
+        });
     }
 
     @Override
@@ -63,6 +66,7 @@ public interface DoomEvent extends CrownEvent<ArenaEntry> {
         entry.inventory().clear();
         entry.player().teleport(EXIT_LOCATION);
 
+        entry.player().getActivePotionEffects().clear();
         entry.arena().shutdown();
         entry.unregEvents();
 
@@ -70,6 +74,7 @@ public interface DoomEvent extends CrownEvent<ArenaEntry> {
         int index = entry.arena().minLoc().getBlockZ() / ArenaBuilder.DISTANCE_BETWEEN;
         IN_USE_ARENAS.set(index, false);
 
+        MayMain.eLogger.logExit(entry.player());
         ENTRIES.remove(entry.player());
     }
 
@@ -91,8 +96,14 @@ public interface DoomEvent extends CrownEvent<ArenaEntry> {
                     .addSibling(new ChatComponentText(" Score: " + wave).a(EnumChatFormat.GOLD));
         }
 
+        MayMain.eLogger.logExit(entry.player(), score.getScore());
         user.sendMessage(message);
         Bukkit.getScheduler().runTaskLater(MayMain.inst, () -> end(entry), 1);
+    }
+
+    @Override
+    default String getName() {
+        return "DoomEvent";
     }
 
     //I'm just fucking around with interfaces at this point lmao

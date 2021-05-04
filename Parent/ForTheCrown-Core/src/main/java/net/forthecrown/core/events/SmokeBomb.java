@@ -20,26 +20,23 @@ public class SmokeBomb implements Listener {
 
     Set<UUID> eggs = new HashSet<>();
 
-    //todo Invert if statements
     @EventHandler
     public void smokeBomb(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) return;
 
-        if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            ItemStack itemInMainHand = event.getPlayer().getInventory().getItemInMainHand();
-            if (itemInMainHand.getType() == Material.FIREWORK_STAR && itemInMainHand.getItemMeta().getDisplayName().contains(ChatColor.GRAY + "Smoke Bomb")) {
-                if (event.getPlayer().hasCooldown(Material.FIREWORK_STAR)) return;
+        ItemStack itemInMainHand = event.getPlayer().getInventory().getItemInMainHand();
+        if (itemInMainHand.getType() != Material.FIREWORK_STAR || !itemInMainHand.getItemMeta().getDisplayName().contains(ChatColor.GRAY + "Smoke Bomb")) return;
+        if (event.getPlayer().hasCooldown(Material.FIREWORK_STAR)) return;
 
-                if (event.getPlayer().getGameMode() != GameMode.CREATIVE && event.getPlayer().getGameMode() != GameMode.SPECTATOR) itemInMainHand.setAmount(itemInMainHand.getAmount()-1);
-                Egg egg = event.getPlayer().launchProjectile(Egg.class);
-                egg.playEffect(EntityEffect.TOTEM_RESURRECT);
-                egg.setCustomName(ChatColor.GRAY + "Boom!");
-                eggs.add(egg.getUniqueId());
-                eggSmoke();
+        if (event.getPlayer().getGameMode() != GameMode.CREATIVE && event.getPlayer().getGameMode() != GameMode.SPECTATOR) itemInMainHand.setAmount(itemInMainHand.getAmount()-1);
+        Egg egg = event.getPlayer().launchProjectile(Egg.class);
+        egg.playEffect(EntityEffect.TOTEM_RESURRECT);
+        egg.setCustomName(ChatColor.GRAY + "Boom!");
+        eggs.add(egg.getUniqueId());
+        eggSmoke();
 
-                event.getPlayer().setCooldown(Material.FIREWORK_STAR, 200);
-            }
-        }
+        event.getPlayer().setCooldown(Material.FIREWORK_STAR, 200);
     }
 
     private void eggSmoke() {
@@ -66,27 +63,25 @@ public class SmokeBomb implements Listener {
         }
     }
 
-    //Todo Invert the if statement below
     @EventHandler
     public void smokeBomb(ProjectileHitEvent event) {
-        if (event.getEntity() instanceof Egg && event.getEntity().getCustomName() != null && event.getEntity().getCustomName().contains(ChatColor.GRAY + "Boom!")) {
+        if (!(event.getEntity() instanceof Egg) || event.getEntity().getCustomName() == null || !event.getEntity().getCustomName().contains(ChatColor.GRAY + "Boom!")) return;
 
-            eggs.remove(event.getEntity().getUniqueId());
-            Location loc = event.getEntity().getLocation();
-            loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1);
-            loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc.getX(), loc.getY()+1, loc.getZ(), 10, 1, 1, 1, 0);
+        eggs.remove(event.getEntity().getUniqueId());
+        Location loc = event.getEntity().getLocation();
+        loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1);
+        loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc.getX(), loc.getY()+1, loc.getZ(), 10, 1, 1, 1, 0);
 
-            double x = loc.getBlockX();
-            double y = loc.getBlockY();
-            double z = loc.getBlockZ();
-            for (int i = -1; i <= 1; i++) {
-                for (int j = 0; j <= 2; j++) {
-                    for (int k = -1; k <= 1; k++) {
-                        loc.getWorld().spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, x+i, y+j, z+k, 50, 0.5, 0.5, 0.5, 0.01);
-                    }
+        double x = loc.getBlockX();
+        double y = loc.getBlockY();
+        double z = loc.getBlockZ();
+        for (int i = -1; i <= 1; i++) {
+            for (int j = 0; j <= 2; j++) {
+                for (int k = -1; k <= 1; k++) {
+                    loc.getWorld().spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, x+i, y+j, z+k, 50, 0.5, 0.5, 0.5, 0.01);
                 }
             }
-
         }
+
     }
 }

@@ -2,8 +2,8 @@ package net.forthecrown.core.commands.emotes;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class EmoteToggle extends CrownCommandBuilder {
 
@@ -35,7 +35,7 @@ public class EmoteToggle extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command.executes(c ->{
             CrownUser user = getUserSender(c);
 

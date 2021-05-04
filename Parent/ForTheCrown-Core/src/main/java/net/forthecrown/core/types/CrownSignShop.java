@@ -7,6 +7,7 @@ import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.inventories.CrownShopInventory;
 import net.forthecrown.core.serialization.AbstractSerializer;
 import net.forthecrown.core.utils.CrownItems;
+import net.forthecrown.core.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -37,7 +38,7 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
 
     //used by getSignShop
     public CrownSignShop(Location location) throws NullPointerException {
-        super(location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "shopdata", true, FtcCore.getInstance());
+        super(CrownUtils.locationToFilename(location), "shopdata", true, FtcCore.getInstance());
 
         //file doesn't exist there for go fuck yourself
         if (fileDoesntExist) throw new NullPointerException("Could not load shop file! Named, " + fileName);
@@ -53,7 +54,7 @@ public class CrownSignShop extends AbstractSerializer<FtcCore> implements SignSh
 
     //used by createSignShop
     public CrownSignShop(Location location, ShopType shopType, Integer price, UUID shopOwner) {
-        super(location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "shopdata", false, FtcCore.getInstance());
+        super(CrownUtils.locationToFilename(location), "shopdata", false, FtcCore.getInstance());
         this.location = location;
         this.block = location.getBlock();
         this.type = shopType;

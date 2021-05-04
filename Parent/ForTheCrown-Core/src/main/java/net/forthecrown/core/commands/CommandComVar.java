@@ -1,15 +1,13 @@
 package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
+import net.forthecrown.core.commands.brigadier.types.ComVarArgument;
+import net.forthecrown.core.comvars.ComVar;
 import net.forthecrown.core.comvars.ComVars;
-import net.forthecrown.core.comvars.types.ComVarType;
-import net.minecraft.server.v1_16_R3.ChatComponentText;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandComVar extends CrownCommandBuilder {
 
@@ -36,39 +34,33 @@ public class CommandComVar extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
-        command.then(argument(varArg, StringArgumentType.word())
-                .suggests(suggest(ComVars.getVariables()))
-
+    protected void createCommand(BrigadierCommand command) {
+        command.then(argument("var", ComVarArgument.comVar())
                 .executes(c -> { //Just var name -> show var value
-                    String name = c.getArgument("variable", String.class);
-                    try {
-                        c.getSource().base.sendMessage(new ChatComponentText(name + ": " + ComVars.getString(name)), null);
-                    } catch (Exception e){
-                        throw new CrownCommandException(e.getMessage());
-                    }
+                    ComVar<?> var = c.getArgument("var", ComVar.class);
+
+                    c.getSource().sendMessage(var.getName() + ": " + var.toString());
                     return 0;
                 })
 
                 //value stated -> attempt parsing
                 .then(argument("value", StringArgumentType.greedyString())
-                        .suggests((c, b) -> getComType(c).suggests(c, b))
+                        .suggests((c, b) -> {
+                            try {
+                                ComVar<?> var = ComVarArgument.getComVar(c, "var");
+                                return var.getType().suggests(c, b);
+                            } catch (Exception e) { return Suggestions.empty(); }
+                        })
 
                         .executes(c -> {
-                            String name = c.getArgument("variable", String.class);
+                            ComVar<?> var = c.getArgument("var", ComVar.class);
                             String toParse = c.getArgument("value", String.class);
 
-                            ComVars.parseVar(name, toParse);
-                            broadcastAdmin(c.getSource(), "Set " + name + " to " + ComVars.getString(name));
+                            ComVars.parseVar(var.getName(), toParse);
+                            broadcastAdmin(c.getSource(), "Set " + var.getName() + " to " + var.toString());
                             return 0;
                         })
                 )
         );
-    }
-
-    //Used for result suggesting
-    private static final String varArg = "variable";
-    private static ComVarType<?> getComType(CommandContext<CommandListenerWrapper> c){
-        return ComVars.getType(c.getArgument(varArg, String.class));
     }
 }

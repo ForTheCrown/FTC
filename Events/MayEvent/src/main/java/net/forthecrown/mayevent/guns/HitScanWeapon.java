@@ -91,6 +91,10 @@ public abstract class HitScanWeapon {
         message = makeMessage.apply(remainingAmmo, maxAmmo);
     }
 
+    public double getAmmoRatio(){
+        return (double) remainingAmmo / (double) maxAmmo;
+    }
+
     public boolean testCooldownAndAdd(Entity source){
         if(Cooldown.contains(source, "MayEvent_Guns_" + name)) return true;
 

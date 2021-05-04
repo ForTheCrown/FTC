@@ -1,8 +1,8 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class HelpDiscord extends CrownCommandBuilder {
     public HelpDiscord(){
@@ -18,9 +18,9 @@ public class HelpDiscord extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command){
+    protected void createCommand(BrigadierCommand command){
         command.executes(c ->{
-            c.getSource().getBukkitSender().sendMessage(FtcCore.getPrefix() + FtcCore.getDiscord());
+            c.getSource().sendMessage(FtcCore.getPrefix() + FtcCore.getDiscord());
             return 0;
         });
     }

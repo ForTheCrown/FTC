@@ -3,6 +3,12 @@ package net.forthecrown.core.crownevents.types;
 import net.forthecrown.core.crownevents.entries.EventEntry;
 import org.bukkit.entity.Player;
 
+import java.time.Instant;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * A basic CrownEvent interface
  * @param <T> The type of EventEntry this event accepts
@@ -28,4 +34,7 @@ public interface CrownEvent<T extends EventEntry<T>> {
      */
     void complete(T entry);
 
+    default String getName(){
+        return "CrownEvent_" + Month.of(Date.from(Instant.now()).getMonth()).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+    }
 }

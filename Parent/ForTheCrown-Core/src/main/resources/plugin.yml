@@ -9,3 +9,4 @@ loadbefore:
 depend:
   - WorldGuard
   - LuckPerms
+  - RoyalGrenadier

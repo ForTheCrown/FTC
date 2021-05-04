@@ -202,8 +202,12 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
         if(getAvailableRanks().size() > 0) getFile().set("AvailableRanks", ListUtils.convertToList(getAvailableRanks(), Rank::toString));
         if(getParticleArrowAvailable().size() > 0) getFile().set("ArrowParticleAvailable", ListUtils.convertToList(getParticleArrowAvailable(), Particle::toString));
-        if(getItemPrices().size() > 0) getFile().createSection("ItemPrices", MapUtils.convertKeys(getItemPrices(), Material::toString));
-        if(getAmountEarnedMap().size() > 0) getFile().createSection("AmountEarned", MapUtils.convertKeys(getAmountEarnedMap(), Material::toString));
+
+        if(MapUtils.isNullOrEmpty(getItemPrices())) getFile().set("ItemPrices", null);
+        else getFile().createSection("ItemPrices", MapUtils.convertKeys(getItemPrices(), Material::toString));
+
+        if(MapUtils.isNullOrEmpty(getAmountEarnedMap())) getFile().set("AmountEarned", null);
+        else getFile().createSection("AmountEarned", MapUtils.convertKeys(getAmountEarnedMap(), Material::toString));
 
         if(!dataContainer.isEmpty()) getFile().createSection("DataContainer", dataContainer.serialize());
     }
@@ -393,7 +397,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     }
     @Override
     public void setGems(int gems) {
-        this.gems = gems;
+        this.gems = Math.max(0, gems);
     }
     @Override
     public void addGems(int gems){

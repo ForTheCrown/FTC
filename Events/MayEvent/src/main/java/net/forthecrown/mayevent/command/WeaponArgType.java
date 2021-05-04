@@ -30,9 +30,6 @@ public class WeaponArgType extends CrownArgType<HitScanWeapon> {
             case "rocketlauncher":
             case "rocket": return new RocketLauncher();
 
-            case "gauss":
-            case "GaussCannon": return new GaussCannon();
-
             case "shotgun":
             case "twelvegauge": return new TwelveGaugeShotgun();
 

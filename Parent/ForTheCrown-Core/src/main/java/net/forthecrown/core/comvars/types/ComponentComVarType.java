@@ -1,13 +1,14 @@
 package net.forthecrown.core.comvars.types;
 
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.ComVarException;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.ComponentArgument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.server.v1_16_R3.ArgumentChatComponent;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -25,11 +26,11 @@ public class ComponentComVarType implements ComVarType<Component> {
     private ComponentComVarType() {}
 
     @Override
-    public Component fromString(String input) throws ComVarException {
+    public Component fromString(String input) throws CommandSyntaxException {
         try {
             return GsonComponentSerializer.gson().deserialize(input);
         } catch (Exception e){
-            throw new ComVarException("Could not read json", input, input.length());
+            throw FtcExceptionProvider.createWithContext("Could not read json", input, 0);
         }
     }
 
@@ -39,7 +40,7 @@ public class ComponentComVarType implements ComVarType<Component> {
     }
 
     @Override
-    public CompletableFuture<Suggestions> suggests(CommandContext<CommandListenerWrapper> c, SuggestionsBuilder b) {
-        return ArgumentChatComponent.a().listSuggestions(c, b);
+    public CompletableFuture<Suggestions> suggests(CommandContext<CommandSource> c, SuggestionsBuilder b) {
+        return ComponentArgument.component().listSuggestions(c, b);
     }
 }

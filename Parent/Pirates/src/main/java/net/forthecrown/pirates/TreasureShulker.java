@@ -24,6 +24,7 @@ public class TreasureShulker {
         main.getConfig().set("TreasureLoc.x", x);
         main.getConfig().set("TreasureLoc.y", y);
         main.getConfig().set("TreasureLoc.z", z);
+        main.saveConfig();
 
         return new Location(Bukkit.getWorld(main.getConfig().getString("TreasureLoc.world")), x, y, z);
     }

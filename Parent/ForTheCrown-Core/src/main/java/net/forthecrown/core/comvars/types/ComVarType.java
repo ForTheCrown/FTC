@@ -1,10 +1,11 @@
 package net.forthecrown.core.comvars.types;
 
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.ComVarException;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
+import net.forthecrown.grenadier.CommandSource;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
@@ -30,14 +31,14 @@ public interface ComVarType<T> {
     ComVarType<String> STRING = new PrimitiveComVarType<>(String.class, String::toString);
     ComVarType<Character> CHAR = new PrimitiveComVarType<>(Character.class, str -> str.charAt(0));
 
-    T fromString(String input) throws ComVarException;
+    T fromString(String input) throws CommandSyntaxException;
     String asString(@Nullable T value);
-    default CompletableFuture<Suggestions> suggests(CommandContext<CommandListenerWrapper> c, SuggestionsBuilder b){
+    default CompletableFuture<Suggestions> suggests(CommandContext<CommandSource> c, SuggestionsBuilder b){
         return Suggestions.empty();
     }
 
-    static ComVarException mismatchException(String className, String input) {
-        return new ComVarException("Mismatch between input and variable type. Var is: " + className, input, input.length());
+    static CommandSyntaxException mismatchException(String className, String input) {
+        return FtcExceptionProvider.createWithContext("Mismatch between input and variable type. Var is: " + className, input, 0);
     }
 
     class PrimitiveComVarType<T> implements ComVarType<T> {
@@ -49,7 +50,7 @@ public interface ComVarType<T> {
         }
 
         @Override
-        public T fromString(String input) throws ComVarException {
+        public T fromString(String input) throws CommandSyntaxException {
             try {
                 return fromString.apply(input);
             } catch (RuntimeException e){

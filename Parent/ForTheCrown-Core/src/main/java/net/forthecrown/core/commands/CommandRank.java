@@ -2,10 +2,10 @@ package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.events.RankGuiUseEvent;
 import net.forthecrown.core.inventories.RankInventory;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -33,7 +33,7 @@ public class CommandRank extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command.executes(c ->{
             Player player = getPlayerSender(c);
 

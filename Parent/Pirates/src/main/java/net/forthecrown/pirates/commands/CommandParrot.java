@@ -3,14 +3,14 @@ package net.forthecrown.pirates.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.custom.PetType;
+import net.forthecrown.core.commands.brigadier.types.PetType;
 import net.forthecrown.core.enums.Pet;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Sound;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
@@ -27,21 +27,20 @@ public class CommandParrot extends CrownCommandBuilder {
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> {
                     CrownUser user = getUserSender(c);
                     removeOldParrot(user.getPlayer(), (Parrot) user.getPlayer().getShoulderEntityLeft());
                     return 0;
                 })
-                .then(argument("parrot", PetType.pet())
-                        .suggests(PetType::suggestUserAware)
+                .then(argument("parrot", PetType.PET)
                         .executes(c -> setParrot(c, false))
                         .then(argument("silent").executes(c -> setParrot(c, true)))
                 );
     }
 
-    private int setParrot(CommandContext<CommandListenerWrapper> c, boolean silent) throws CommandSyntaxException {
+    private int setParrot(CommandContext<CommandSource> c, boolean silent) throws CommandSyntaxException {
         CrownUser user = getUserSender(c);
         List<Pet> pets = user.getPets();
         Pet pet = PetType.getPet(c, "parrot");

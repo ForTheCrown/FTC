@@ -2,9 +2,9 @@ package net.forthecrown.core.clickevent;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.entity.Player;
 
 public class ClickEventCommand extends CrownCommandBuilder {
@@ -16,14 +16,14 @@ public class ClickEventCommand extends CrownCommandBuilder {
     }
 
     @Override
-    public boolean test(CommandListenerWrapper sender) {
-        if(!testPermissionSilent(sender.getBukkitSender())) return false;
-        if(!testPlayerSenderSilent(sender)) return false;
-        return ClickEventHandler.isAllowedToUseCommand((Player) sender.getBukkitSender());
+    public boolean test(CommandSource sender) {
+        if(!testPermissionSilent(sender.asBukkit())) return false;
+        if(!sender.isPlayer()) return false;
+        return ClickEventHandler.isAllowedToUseCommand((Player) sender.asBukkit());
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command.then(argument("args", StringArgumentType.greedyString())
                 .executes(c -> {
                     Player p = getPlayerSender(c);

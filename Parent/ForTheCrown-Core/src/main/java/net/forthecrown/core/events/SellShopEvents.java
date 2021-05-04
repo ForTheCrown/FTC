@@ -184,7 +184,7 @@ public class SellShopEvents implements Listener {
         int comparison0 = seller.getItemPrice(toSell);
 
         bals.add(uuid, toPay, true); //does the actual paying and adds the itemsSold to the seller
-        seller.setAmountEarned(toSell, seller.getAmountEarned(toSell)+toPay); //How the fuck does this keep resetting everytime
+        seller.setAmountEarned(toSell, seller.getAmountEarned(toSell)+toPay);
 
         String message = CrownUtils.translateHexCodes(" sold &e" + finalSell + " " + s + " &7for &6" + Balances.getFormatted(toPay) + ".");
 

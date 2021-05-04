@@ -1,7 +1,7 @@
 package net.forthecrown.pirates.commands;
 
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
 
 public class CommandPirate extends CrownCommandBuilder {
@@ -13,7 +13,7 @@ public class CommandPirate extends CrownCommandBuilder {
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("reload")
                         .executes(c -> {

@@ -102,13 +102,16 @@ public class CrownBlackMarket implements BlackMarket {
         }
         boughtEnchant = temp;
 
-
         dailyCrops = ListUtils.convertToList(configFile.getStringList("Daily_Items.Crops"), Material::valueOf);
         dailyDrops = ListUtils.convertToList(configFile.getStringList("Daily_Items.Drops"), Material::valueOf);
         dailyMining = ListUtils.convertToList(configFile.getStringList("Daily_Items.Mining"), Material::valueOf);
         enchantment = enchFromString(configFile.getString("Daily_Items.Enchant"));
 
-        dailyEnchantment = new CrownDailyEnchantment(this, enchantment, enchants.get(enchantment), (byte) (enchantment.getMaxLevel() + random.intInRange(1, 2)));
+        dailyEnchantment = new CrownDailyEnchantment(this,
+                enchantment,
+                enchants.get(enchantment),
+                (byte) configFile.getInt("Daily_Items.EnchantLevel")
+        );
 
         if(dayOfWeek != Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK)) randomizeItems();
     }
@@ -126,7 +129,11 @@ public class CrownBlackMarket implements BlackMarket {
         dailyCrops = random.pickRandomEntries(crops.keySet(), 5);
 
         boughtEnchant.clear();
-        dailyEnchantment = new CrownDailyEnchantment(this, enchantment, enchants.get(enchantment), (byte) (enchantment.getMaxLevel() + random.intInRange(1, 2)));
+        dailyEnchantment = new CrownDailyEnchantment(this,
+                enchantment,
+                enchants.get(enchantment),
+                (byte) (enchantment.getMaxLevel() + random.intInRange(1, 2))
+        );
 
         save();
     }
@@ -150,6 +157,7 @@ public class CrownBlackMarket implements BlackMarket {
         dailyItems.set("Drops", ListUtils.convertToList(dailyDrops, Material::toString));
         dailyItems.set("Mining",ListUtils.convertToList(dailyMining, Material::toString));
         dailyItems.set("Enchant", enchToSerializable(getEnchantment().getEnchantment()));
+        dailyItems.set("EnchantLevel", getEnchantment().getLevel());
 
         configFile.set("MaxEarnings", maxEarnings);
         configFile.set("Day", dayOfWeek);

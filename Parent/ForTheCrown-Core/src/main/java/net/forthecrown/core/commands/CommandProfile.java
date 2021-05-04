@@ -2,13 +2,13 @@ package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.custom.UserType;
+import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -25,7 +25,6 @@ public class CommandProfile extends CrownCommandBuilder {
         new CommandProfilePrivate(this);
 
         setAliases("playerprofile", "gameprofile");
-        setUsage("&7Usage: &r/profile <public | private> \n&7Usage: &r/profile <player>");
         setDescription("Displays a user's profile information");
 
         register();
@@ -45,7 +44,7 @@ public class CommandProfile extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> {
                     CrownUser user = getUserSender(c);
@@ -53,7 +52,6 @@ public class CommandProfile extends CrownCommandBuilder {
                     return 0;
                 })
                 .then(argument("player", UserType.user())
-                        .suggests(UserType::suggest)
 
                         .executes(c ->{
                             CrownUser user = getUserSender(c);

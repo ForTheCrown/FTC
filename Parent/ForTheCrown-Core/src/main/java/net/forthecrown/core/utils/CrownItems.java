@@ -141,8 +141,8 @@ public final class CrownItems {
         return result;
     }
 
-    public static ItemStack getCoins(int amount){
-        return makeItem(Material.SUNFLOWER, 1, true, "&eRhines",
+    public static ItemStack getCoins(int amount, int itemAmount){
+        return makeItem(Material.SUNFLOWER, itemAmount, true, "&eRhines",
                 "&6Worth " + amount + " Rhines", "&8Do /deposit to add this to your balance",
                 "&8Minted in the year " + CrownUtils.arabicToRoman(CrownUtils.worldTimeToYears(CrownUtils.WORLD)) + ".",
                 s());

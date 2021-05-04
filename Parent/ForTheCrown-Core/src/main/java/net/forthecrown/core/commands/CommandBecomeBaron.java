@@ -3,11 +3,11 @@ package net.forthecrown.core.commands;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CannotAffordTransactionException;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -39,7 +39,7 @@ public class CommandBecomeBaron extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         int baronPrice = FtcCore.getInstance().getConfig().getInt("BaronPrice");
         Balances bals = FtcCore.getBalances();
 
@@ -54,7 +54,7 @@ public class CommandBecomeBaron extends CrownCommandBuilder {
                     }
 
                     //Check if they can afford baron
-                    if(bals.get(user.getUniqueId()) < baronPrice) throw new CannotAffordTransactionException("You need at least " + CrownUtils.decimalizeNumber(baronPrice) + " Rhines");
+                    if(bals.get(user.getUniqueId()) < baronPrice) throw FtcExceptionProvider.CANNOT_AFFORD_TRANSACTION.create(Balances.getFormatted(baronPrice));
 
                     //Tell em cost and ask for confirmation
                     TextComponent message = Component.text()
@@ -87,7 +87,7 @@ public class CommandBecomeBaron extends CrownCommandBuilder {
                             }
 
                             //Check if affordable to user
-                            if(bals.get(p.getUniqueId()) < baronPrice) throw new CannotAffordTransactionException("You need at least 500,000 Rhines");
+                            if(bals.get(p.getUniqueId()) < baronPrice) throw FtcExceptionProvider.CANNOT_AFFORD_TRANSACTION.create(Balances.getFormatted(baronPrice));
 
                             //remove the bal and make em baron
                             bals.add(p.getUniqueId(), -baronPrice);

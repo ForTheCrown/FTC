@@ -300,10 +300,8 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
             } else player.openInventory(bm.getEnchantInventory(toCheck, true));
 
             if(event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE)){
-                if(event.getClickedInventory().getItem(11) == null) throw new CrownException(player, "&7Place an item to enchant in the empty slot");
-
-                if(balances.get(player.getUniqueId()) < bm.getEnchantment().getPrice()) throw new CannotAffordTransaction(player);
-                balances.add(player.getUniqueId(), -bm.getEnchantment().getPrice());
+                if(balances.get(player.getUniqueId()) < daily.getPrice()) throw new CannotAffordTransaction(player);
+                balances.add(player.getUniqueId(), -daily.getPrice());
 
                 ItemStack toEnchant = event.getClickedInventory().getItem(11).clone();
 

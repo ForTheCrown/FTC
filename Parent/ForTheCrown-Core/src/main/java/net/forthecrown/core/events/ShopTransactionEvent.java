@@ -94,7 +94,7 @@ public class ShopTransactionEvent implements Listener {
                                 .clickEvent(customer.asClickEvent())
                         )
                         .append(Component.text(" bought "))
-                        .append(Component.text(example.getAmount() + " " + CrownUtils.getItemNormalName(example)).color(NamedTextColor.YELLOW))
+                        .append(CrownUtils.itemMessage(shopInv.getExampleItem()).color(NamedTextColor.YELLOW))
                         .append(Component.text(" from you for "))
                         .append(Balances.formatted(shop.getPrice()).color(NamedTextColor.GOLD))
                         .build();
@@ -115,7 +115,7 @@ public class ShopTransactionEvent implements Listener {
 
                 Component boughtMessage = Component.text("You bought ")
                         .color(NamedTextColor.GRAY)
-                        .append(Component.text(example.getAmount() + " " + CrownUtils.getItemNormalName(example)).color(NamedTextColor.YELLOW))
+                        .append(CrownUtils.itemMessage(shopInv.getExampleItem()).color(NamedTextColor.YELLOW))
                         .append(Component.text(" for "))
                         .append(Balances.formatted(shop.getPrice()).color(NamedTextColor.GOLD));
 
@@ -157,7 +157,7 @@ public class ShopTransactionEvent implements Listener {
                 Component customerMsg = Component.text()
                         .color(NamedTextColor.GRAY)
                         .append(Component.text("You sold "))
-                        .append(Component.text(example.getAmount() + " " + CrownUtils.getItemNormalName(example)).color(NamedTextColor.YELLOW))
+                        .append(CrownUtils.itemMessage(shopInv.getExampleItem()).color(NamedTextColor.YELLOW))
                         .append(Component.text(" for "))
                         .append(Balances.formatted(shop.getPrice()).color(NamedTextColor.GOLD))
                         .build();
@@ -173,7 +173,7 @@ public class ShopTransactionEvent implements Listener {
                                     .clickEvent(customer.asClickEvent())
                             )
                             .append(Component.text(" sold "))
-                            .append(Component.text(example.getAmount() + " " + CrownUtils.getItemNormalName(example)))
+                            .append(CrownUtils.itemMessage(shopInv.getExampleItem()).color(NamedTextColor.YELLOW))
                             .append(Component.text(" to you for "))
                             .append(Balances.formatted(shop.getPrice()).color(NamedTextColor.GOLD))
                             .build();

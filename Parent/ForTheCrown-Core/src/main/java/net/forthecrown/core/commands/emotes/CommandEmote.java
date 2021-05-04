@@ -2,12 +2,12 @@ package net.forthecrown.core.commands.emotes;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.EmoteDisabledException;
-import net.forthecrown.core.commands.brigadier.types.custom.UserType;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
+import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.forthecrown.core.utils.Cooldown;
 import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnegative;
@@ -33,13 +33,11 @@ public abstract class CommandEmote extends CrownCommandBuilder {
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> executeSelf(getUserSender(c)))
 
-                .then(argument("player", UserType.user())
-                        .suggests(UserType::suggestSelector)
-
+                .then(argument("player", UserType.onlineUser())
                         .executes(c -> {
                             CrownUser sender = getUserSender(c);
 
@@ -48,12 +46,12 @@ public abstract class CommandEmote extends CrownCommandBuilder {
                                 return 0;
                             }
 
-                            CrownUser recipient = UserType.getOnlineUser(c, "player");
+                            CrownUser recipient = UserType.getUser(c, "player");
                             if(recipient.equals(sender)) return executeSelf(sender);
 
                             //If anyone's got emotes disabled, stop em
-                            if(!sender.allowsEmotes()) throw EmoteDisabledException.senderDisabled();
-                            if(!recipient.allowsEmotes()) throw EmoteDisabledException.targetDisabled();
+                            if(!sender.allowsEmotes()) throw FtcExceptionProvider.SENDER_EMOTE_DISABLED.create();
+                            if(!recipient.allowsEmotes()) throw FtcExceptionProvider.TARGET_EMOTE_DISABLED.create(recipient.getName());
 
                             if(execute(sender, recipient) >= 0 && !sender.hasPermission("ftc.admin")) Cooldown.add(sender, cooldownCategory, cooldownTime);
                             return 0;

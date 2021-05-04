@@ -1,8 +1,6 @@
 package net.forthecrown.core.utils;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import net.forthecrown.core.CrownBoundingBox;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -80,5 +78,14 @@ public class JsonUtils {
             result.add(converter.apply(t));
         }
         return result;
+    }
+
+    public static <T extends Enum<T>> T parseEnum(Class<T> clazz, JsonElement element){
+        if(element == null || element.isJsonNull()) return null;
+        return Enum.valueOf(clazz, element.getAsString().toUpperCase());
+    }
+
+    public static <E extends Enum<E>> JsonElement serializeEnum(E anum){
+        return anum == null ? JsonNull.INSTANCE : new JsonPrimitive(anum.name().toLowerCase());
     }
 }

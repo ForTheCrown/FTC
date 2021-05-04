@@ -1,9 +1,9 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
+import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Chest;
@@ -21,12 +21,12 @@ public class CommandGift extends CrownCommandBuilder {
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("player", TargetSelectorType.player())
+                .then(argument("player", EntityArgument.player())
                         .executes(c -> {
-                            CommandSender sender = c.getSource().getBukkitSender();
-                            Player player = TargetSelectorType.getPlayer(c, "player");
+                            CommandSender sender = c.getSource().asBukkit();
+                            Player player = EntityArgument.getPlayer(c, "player");
                             Location targetLoc = player.getLocation();
 
                             // Get shulker:

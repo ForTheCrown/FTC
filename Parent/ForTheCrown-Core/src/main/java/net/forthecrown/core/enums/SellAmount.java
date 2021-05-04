@@ -13,7 +13,6 @@ public enum SellAmount {
     ALL ((byte) 1);
 
     private final byte i;
-
     SellAmount(byte i) {
         this.i = i;
     }
@@ -36,16 +35,11 @@ public enum SellAmount {
      */
     public static @Nullable SellAmount fromInt(byte i){
         switch (i){
-            case 64:
-                return PER_64;
-            case 16:
-                return PER_16;
-            case 1:
-                return PER_1;
-            case -1:
-                return ALL;
-            default:
-                return null;
+            case 64: return PER_64;
+            case 16: return PER_16;
+            case 1: return PER_1;
+            case -1: return ALL;
+            default: return null;
         }
     }
 }

@@ -4,11 +4,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.custom.UserType;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
+import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Bukkit;
 
 public class CommandKingMaker extends CrownCommandBuilder {
@@ -17,7 +17,6 @@ public class CommandKingMaker extends CrownCommandBuilder {
         super("kingmaker", FtcCore.getInstance());
 
         setDescription("This command is used to assign and unassign a king or queen");
-        setUsage("&7Usage:&r /kingmaker <remove | player> [king | queen]");
         register();
     }
 
@@ -36,23 +35,22 @@ public class CommandKingMaker extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> {
-                    c.getSource().getBukkitSender().sendMessage("The Current king is " + Bukkit.getOfflinePlayer(FtcCore.getKing()).getName());
+                    c.getSource().sendMessage("The Current king is " + Bukkit.getOfflinePlayer(FtcCore.getKing()).getName());
                     return 0;
                 })
                 .then(argument("remove")
                         .executes(c ->{
-                            if(FtcCore.getKing() == null) throw new CrownCommandException("There is already no king");
+                            if(FtcCore.getKing() == null) throw FtcExceptionProvider.create("There is already no king");
 
                             FtcCore.setKing(null);
-                            c.getSource().getBukkitSender().sendMessage("King has been removed");
+                            c.getSource().sendMessage("King has been removed");
                             return 0;
                         })
                 )
-                .then(argument("player", UserType.user())
-                        .suggests(UserType::suggest)
+                .then(argument("player", UserType.USER)
                         .executes(c -> makeKing(c, false))
 
                         .then(argument("queen").executes(c -> makeKing(c, true)))
@@ -60,17 +58,17 @@ public class CommandKingMaker extends CrownCommandBuilder {
                 );
     }
 
-    private int makeKing(CommandContext<CommandListenerWrapper> c, boolean isQueen) throws CommandSyntaxException {
-        if(FtcCore.getKing() != null) throw new CrownCommandException("There already is a king");
+    private int makeKing(CommandContext<CommandSource> c, boolean isQueen) throws CommandSyntaxException {
+        if(FtcCore.getKing() != null) throw FtcExceptionProvider.create("There already is a king");
 
         CrownUser king = UserType.getUser(c, "player");
 
         FtcCore.setKing(king.getUniqueId());
-        c.getSource().getBukkitSender().sendMessage(king.getName() + " is now the new king :D");
+        c.getSource().sendMessage(king.getName() + " is now the new king :D");
 
         String prefix = "&l[&e&lKing&r&l] &r";
         if(isQueen) prefix = "&l[&e&lQueen&r&l] &r";
-        Bukkit.dispatchCommand(c.getSource().getBukkitSender(), "tab player " + king.getName() + " tabprefix " + prefix);
+        Bukkit.dispatchCommand(c.getSource().asBukkit(), "tab player " + king.getName() + " tabprefix " + prefix);
         return 0;
     }
 }

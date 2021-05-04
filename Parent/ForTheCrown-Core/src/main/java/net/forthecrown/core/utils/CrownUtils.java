@@ -219,6 +219,21 @@ public final class CrownUtils {
                 (includeWorld ? " world: " + l.getWorld().getName() : ""));
     }
 
+    public static String locationToFilename(Location l){
+        return l.getWorld().getName() + "_" + l.getBlockX() + "_" + l.getBlockY() + "_" + l.getBlockZ();
+    }
+
+    public static Component itemMessage(ItemStack itemStack){
+        Validate.notNull(itemStack);
+        return Component.text()
+                .append(Component.text(itemStack.getAmount()))
+                .append(Component.text(" "))
+                .append(Component.text(getItemNormalName(itemStack))
+                        .hoverEvent(itemStack)
+                )
+                .build();
+    }
+
     /*
      * The following RomanNumeral converters and code was made by Baeldung
      * Link: https://www.baeldung.com/java-convert-roman-arabic

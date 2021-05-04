@@ -26,9 +26,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Ghast;
-import org.bukkit.entity.Pillager;
-import org.bukkit.entity.Ravager;
+import org.bukkit.entity.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +43,9 @@ public class ArenaBuilder implements Builder<EventArena> {
 
     private List<RelativeLocation> mobSpawns;
     private List<RelativeLocation> itemDrops;
+    private Location[] wallSpawns;
     private List<TriggerableEvent> events;
+    private List<RelativeLocation> gems;
     private Map<RelativeLocation, EntityTypes<? extends EntityLiving>> specialSpawns;
 
     private final RelativeLocation firstGun;
@@ -106,6 +106,9 @@ public class ArenaBuilder implements Builder<EventArena> {
         mobSpawns.add(new RelativeLocation(34, 6, 10));
         mobSpawns.add(new RelativeLocation(33, 6, 8));
         mobSpawns.add(new RelativeLocation(31, 6, 7));
+        mobSpawns.add(new RelativeLocation(10, 13, 63));
+        mobSpawns.add(new RelativeLocation(16, 13, 62));
+        mobSpawns.add(new RelativeLocation(23, 11, 62));
 
         //Special spawns
         specialSpawns = new HashMap<>();
@@ -127,13 +130,42 @@ public class ArenaBuilder implements Builder<EventArena> {
         itemDrops.add(new RelativeLocation(15, 23, 18));
         itemDrops.add(new RelativeLocation(40, 22, 41));
 
+        //gems list
+        gems = new ArrayList<>();
+        gems.add(new RelativeLocation(7, 12, 52));
+        gems.add(new RelativeLocation(40, 10, 34));
+        gems.add(new RelativeLocation(4, 19, 41));
+
+        wallSpawns = new Location[] {
+                new RelativeLocation(minLoc.clone(), 20, 22, 5).getLocation(),
+                new RelativeLocation(minLoc.clone(), 16, 19, 4).getLocation(),
+                new RelativeLocation(minLoc.clone(), 6, 19, 9).getLocation(),
+                new RelativeLocation(minLoc.clone(), 24, 22, -84).getLocation(),
+                new RelativeLocation(minLoc.clone(), 33, 19, 5).getLocation(),
+                new RelativeLocation(minLoc.clone(), 38, 19, 12).getLocation(),
+                new RelativeLocation(minLoc.clone(), 38, 22, 19).getLocation(),
+                new RelativeLocation(minLoc.clone(), 37, 22, 34).getLocation(),
+                new RelativeLocation(minLoc.clone(), 41, 22, 35).getLocation(),
+                new RelativeLocation(minLoc.clone(), 38, 22, 47).getLocation(),
+                new RelativeLocation(minLoc.clone(), 40, 19, 54).getLocation(),
+                new RelativeLocation(minLoc.clone(), 41, 22, 65).getLocation(),
+                new RelativeLocation(minLoc.clone(), 30, 19, 66).getLocation(),
+                new RelativeLocation(minLoc.clone(), 21, 19, 64).getLocation(),
+                new RelativeLocation(minLoc.clone(), 11, 19, 66).getLocation(),
+                new RelativeLocation(minLoc.clone(), 4, 22, 64).getLocation(),
+                new RelativeLocation(minLoc.clone(), 2, 19, 57).getLocation(),
+                new RelativeLocation(minLoc.clone(), 4, 19, 47).getLocation(),
+                new RelativeLocation(minLoc.clone(), 2, 22, 42).getLocation(),
+                new RelativeLocation(minLoc.clone(), 4, 19, 27).getLocation(),
+                new RelativeLocation(minLoc.clone(), 13, 22, 14).getLocation()
+        };
     }
 
     private void createEvents(){
         events = new ArrayList<>();
 
         //Spawns the "Rhino fucker"
-        events.add(new TriggerableEvent(false, a -> a.wave() % 25 == 0, arena -> {
+        events.add(new TriggerableEvent(false, true, a -> a.wave() % 25 == 0, arena -> {
             //Remove glass panes
             CrownBoundingBox box = new CrownBoundingBox(
                     new RelativeLocation(arena.minLoc(), 35, 8, 43).getLocation(),
@@ -155,12 +187,12 @@ public class ArenaBuilder implements Builder<EventArena> {
         }));
 
         //Makes some cool destruction
-        events.add(new TriggerableEvent(true ,arena -> arena.wave() == 10, arena ->
+        events.add(new TriggerableEvent(true, false ,arena -> arena.wave() == 10, arena ->
                 MayUtils.attemptDestruction(new RelativeLocation(arena.minLoc(), 38, 20, 24).getLocation(), 3)
         ));
 
         //Drops shotgun
-        events.add(new TriggerableEvent(true, arena -> arena.wave() == 3,
+        events.add(new TriggerableEvent(true, false, arena -> arena.wave() == 3,
                 arena -> {
                     DoomEvent.EVENT_WORLD.dropItem(arena.secondGun, arena.playerShotgun.item());
                     arena.entry.player().sendMessage(Component.text("Shotgun has spawned in the office"));
@@ -168,7 +200,7 @@ public class ArenaBuilder implements Builder<EventArena> {
         ));
 
         //Ghast Spawns
-        events.add(new TriggerableEvent(false, arena -> arena.wave() % 10 == 0, arena -> {
+        events.add(new TriggerableEvent(false, true, arena -> arena.wave() % 10 == 0, arena -> {
             Location[] ghasts = new Location[]{ //Spawnable locations list
                     new RelativeLocation(arena.minLoc(), 8, 28, 40).getLocation(),
                     new RelativeLocation(arena.minLoc(), 31, 26, 53).getLocation(),
@@ -188,7 +220,8 @@ public class ArenaBuilder implements Builder<EventArena> {
             }
         }));
 
-        events.add(new TriggerableEvent(false, arena -> arena.wave() % 5 == 0, arena -> {
+        //Spawns pillagers
+        events.add(new TriggerableEvent(false, true, arena -> arena.wave() % 5 == 0, arena -> {
             Location[] spawns = new Location[] {
                     new RelativeLocation(arena.minLoc(), 4, 24, 17).getLocation(),
                     new RelativeLocation(arena.minLoc(), 4, 24, 41).getLocation(),
@@ -207,8 +240,16 @@ public class ArenaBuilder implements Builder<EventArena> {
                     pillager.getAttribute(Attribute.GENERIC_MAX_HEALTH).addModifier(arena.getWaveModifier());
                     pillager.setTarget(arena.entry.player());
                 });
+
+                arena.initialMobAmount++;
+                arena.currentMobAmount++;
             }
         }));
+
+        events.add(new TriggerableEvent(false, false,
+                arena -> arena.wave() % 100 == 0,
+                arena ->  MayUtils.spawnAndEffect(arena.startLocation, Giant.class, arena::onMobSpawn)
+        ));
     }
 
     private void buildArena(){
@@ -242,6 +283,8 @@ public class ArenaBuilder implements Builder<EventArena> {
         return new EventArena(entry,
                 ListUtils.convertToList(mobSpawns, rel -> MayUtils.validateIsAir(rel.setRelativeTo(minLoc).getLocation())),
                 ListUtils.convertToList(itemDrops, rel -> MayUtils.validateIsAir(rel.setRelativeTo(minLoc).getLocation())),
+                ListUtils.convertToList(gems, rel -> MayUtils.validateIsAir(rel.setRelativeTo(minLoc).getLocation())),
+                wallSpawns,
                 MapUtils.convertKeys(specialSpawns, rel -> MayUtils.validateIsAir(rel.setRelativeTo(minLoc).getLocation())),
                 events,
                 MayUtils.validateIsAir(firstGun.setRelativeTo(minLoc).getLocation()),

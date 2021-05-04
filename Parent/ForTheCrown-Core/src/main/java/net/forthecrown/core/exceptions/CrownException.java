@@ -1,6 +1,5 @@
 package net.forthecrown.core.exceptions;
 
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
 import org.bukkit.command.CommandSender;
@@ -10,9 +9,9 @@ import org.bukkit.command.CommandSender;
  * <p>Incompatible with Brigadier, still usable in events tho lol</p>
  * <p>It shouldn't appear in console either, since suppression is set to true</p>
  */
-public class CrownException extends CrownCommandException {
+public class CrownException extends RuntimeException {
 
-    private String message;
+    private final String message;
     public CrownException(CommandSender sender, String message) {
         super(CrownUtils.translateHexCodes(message));
         this.message = CrownUtils.translateHexCodes(message);

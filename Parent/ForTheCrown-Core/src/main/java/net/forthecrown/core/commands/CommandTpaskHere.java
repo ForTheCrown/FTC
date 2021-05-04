@@ -2,10 +2,10 @@ package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.custom.UserType;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
+import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -46,15 +46,14 @@ public class CommandTpaskHere extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
-        command.then(argument("player", UserType.user())
-                .suggests(UserType::suggest)
+    protected void createCommand(BrigadierCommand command) {
+        command.then(argument("player", UserType.onlineUser())
 
                 .executes(c -> {
                     CrownUser player = getUserSender(c);
-                    CrownUser target = UserType.getOnlineUser(c, "player");
+                    CrownUser target = UserType.getUser(c, "player");
 
-                    if(target.equals(player)) throw new CrownCommandException("You cannot teleport to yourself");
+                    if(target.equals(player)) throw FtcExceptionProvider.create("&7You cannot teleport to yourself");
 
                     //sender part
                     TextComponent tpaMessage = Component.text(ChatColor.GOLD + "Request sent to " + ChatColor.YELLOW + target.getName() + ChatColor.GOLD + ". ")

@@ -3,31 +3,46 @@ package net.forthecrown.core.commands.brigadier;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.clickevent.ClickEventCommand;
 import net.forthecrown.core.commands.*;
+import net.forthecrown.core.commands.brigadier.types.ComVarArgument;
+import net.forthecrown.core.commands.brigadier.types.PetType;
+import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.forthecrown.core.commands.emotes.*;
+import net.forthecrown.core.enums.Branch;
+import net.forthecrown.core.enums.Rank;
+import net.forthecrown.grenadier.RoyalArguments;
+import net.forthecrown.grenadier.VanillaArgumentType;
+import net.forthecrown.grenadier.types.EnumArgument;
+import net.minecraft.server.v1_16_R3.ArgumentScoreholder;
 import net.minecraft.server.v1_16_R3.CommandDispatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-/**
- * Our own, very hacky, implementation of Mojang's own Brigadier Command Engine, the Royal Brigadier
- * <p>Allows the usage of the server's native Brigadier command engine.</p>
- */
-public final class RoyalBrigadier {
+public final class CoreCommands {
+
+    public static final EnumArgument<Branch> BRANCH = EnumArgument.of(Branch.class);
+    public static final EnumArgument<Rank> RANK = EnumArgument.of(Rank.class);
 
     private static CommandDispatcher dispatcher;
     private final FtcCore plugin;
 
-    public RoyalBrigadier(FtcCore plugin){
+    public CoreCommands(FtcCore plugin){
         this.plugin = plugin;
         dispatcher = ((CraftServer) plugin.getServer()).getServer().getCommandDispatcher();
 
+        registerArguments();
         loadCommands();
     }
 
     public FtcCore getPlugin() {
         return plugin;
+    }
+
+    public void registerArguments(){
+        RoyalArguments.register(PetType.class, VanillaArgumentType.WORD);
+        RoyalArguments.register(UserType.class, VanillaArgumentType.custom(ArgumentScoreholder::b));
+        RoyalArguments.register(ComVarArgument.class, VanillaArgumentType.WORD);
     }
 
     public void loadCommands(){
@@ -40,6 +55,7 @@ public final class RoyalBrigadier {
         new CommandHologram();
         new CommandComVar();
         new CommandGift();
+        new CommandUseableSign();
 
         if(FtcCore.inDebugMode.getValue(false)){
             new CommandTestCore();
@@ -108,7 +124,7 @@ public final class RoyalBrigadier {
 
     /**
      * Resends command packets for every player on the server
-     * @see RoyalBrigadier#resendCommandPackets(Player)
+     * @see CoreCommands#resendCommandPackets(Player)
      */
     public void resendAllCommandPackets(){
         for (Player p: Bukkit.getOnlinePlayers()){

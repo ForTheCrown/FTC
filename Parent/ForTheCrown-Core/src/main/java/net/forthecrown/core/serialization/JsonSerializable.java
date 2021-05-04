@@ -1,7 +1,7 @@
 package net.forthecrown.core.serialization;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 
 public interface JsonSerializable {
-    JsonObject serialize();
+    JsonElement serialize();
 }

@@ -1,10 +1,12 @@
 package net.forthecrown.mayevent.arena;
 
 import net.forthecrown.core.CrownBoundingBox;
+import net.forthecrown.core.nbt.NBT;
+import net.forthecrown.core.nbt.NbtGetter;
+import net.forthecrown.core.utils.Cooldown;
 import net.forthecrown.core.utils.CrownRandom;
 import net.forthecrown.core.utils.ItemStackBuilder;
 import net.forthecrown.mayevent.*;
-import net.forthecrown.mayevent.events.SpawnAllowererer;
 import net.forthecrown.mayevent.guns.HitScanWeapon;
 import net.forthecrown.mayevent.guns.RocketLauncher;
 import net.forthecrown.mayevent.guns.StandardRifle;
@@ -23,8 +25,8 @@ import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -35,6 +37,7 @@ import org.bukkit.potion.PotionType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class EventArena {
 
@@ -43,6 +46,8 @@ public class EventArena {
     public final List<Location> mobSpawns;
     public final Map<Location, EntityTypes<? extends EntityLiving>> specialSpawns;
     public final List<Location> itemDrops;
+    public final List<Location> gems;
+    private final Location[] wallSpawns;
     public final List<TriggerableEvent> triggerableEvents;
     public final Location startLocation;
     public final CrownRandom random;
@@ -68,6 +73,8 @@ public class EventArena {
             ArenaEntry entry,
             List<Location> mobSpawns,
             List<Location> itemDrops,
+            List<Location> gems,
+            Location[] wallSpawns,
             Map<Location, EntityTypes<? extends EntityLiving>> specialSpawns,
             List<TriggerableEvent> triggerableEvents,
             Location firstGun,
@@ -82,6 +89,8 @@ public class EventArena {
         this.mobSpawns = mobSpawns;
         this.specialSpawns = specialSpawns;
         this.itemDrops = itemDrops;
+        this.gems = gems;
+        this.wallSpawns = wallSpawns;
         this.triggerableEvents = triggerableEvents;
 
         this.firstGun = firstGun;
@@ -114,26 +123,37 @@ public class EventArena {
 
     public void start(){
         entry.player().teleport(startLocation);
+        entry.player().setHealth(20);
+        entry.player().setFoodLevel(20);
 
         StartingKit.give(entry.player());
 
-        SpawnAllowererer temp = new SpawnAllowererer(new ArrayList<>());
+        MayUtils.dropItem(MayUtils.validateIsAir(firstGun), playerRifle.item(), false);
+        MayUtils.dropItem(MayUtils.validateIsAir(rocket), playerRocket.item(), false);
 
-        MayUtils.dropItem(MayUtils.validateIsAir(temp.add(firstGun)), playerRifle.item(), false);
-        MayUtils.dropItem(MayUtils.validateIsAir(temp.add(rocket)), playerRocket.item(), false);
+        for (Location l: itemDrops) spawnPickup(MayUtils.validateIsAir(l));
 
-        for (Location l: itemDrops) spawnPickup(MayUtils.validateIsAir(temp.add(l)));
+        ItemStack gemItem = new ItemStackBuilder(Material.DIAMOND)
+                .addEnchant(Enchantment.LUCK, 5)
+                .build();
 
-        temp.locs = null;
-        HandlerList.unregisterAll(temp);
-        temp = null;
+        NBT nbt = NbtGetter.ofItemTags(gemItem);
+        nbt.put("gems", true);
+        gemItem = NbtGetter.applyTags(gemItem, nbt);
+
+        if(!Cooldown.contains(entry.player(), "event_arena")){
+            for (Location l: gems){
+                MayUtils.dropItem(MayUtils.validateIsAir(l), gemItem, false);
+            }
+            Cooldown.add(entry.player(), "event_arena", 72000);
+        }
 
         updater = new ArenaUpdater(this);
         updater.runTaskTimer(MayMain.inst, 1, 1);
     }
 
     private int currentItemIndex = 0;
-    public void spawnRandomPickup(){
+    public void spawnNextPickup(){
         currentItemIndex++;
         if(currentItemIndex == itemDrops.size()) currentItemIndex = 0;
 
@@ -145,69 +165,44 @@ public class EventArena {
         MayUtils.dropItem(MayUtils.validateIsAir(loc), item, false);
     }
 
-    private boolean spawnAmmo = true;
-    private byte spawnFood = 3;
+    private byte spawnWhat = 5;
     private ItemStack getRandomDrop(){
-        spawnAmmo = !spawnAmmo;
 
-        if(!spawnAmmo){
-            spawnFood--;
+        spawnWhat--;
+        switch (spawnWhat) {
+            case 4: return new ItemStack(Material.ARROW, 8);
+            case 3: return new ItemStack(Material.GOLDEN_CARROT, 8);
+            case 2: return new ItemStackBuilder(Material.SPLASH_POTION, 1)
+                    .setBaseEffect(new PotionData(random.nextBoolean() ? PotionType.INSTANT_HEAL : PotionType.REGEN))
+                    .build();
 
-            if(spawnFood == 1){
-                spawnFood = 3;
-                return new ItemStack(Material.GOLDEN_CARROT, 8);
-            } else {
-                return MayUtils.addEventTag(new ItemStackBuilder(Material.SPLASH_POTION, 1)
-                        .setBaseEffect(new PotionData(random.nextBoolean() ? PotionType.INSTANT_HEAL : PotionType.REGEN))
-                        .build());
-            }
+            case 1:
+            default:
+                HitScanWeapon gun = entry.getLowestAmmoGun();
+                if(gun == null) return playerRifle.ammoPickup();
+
+                spawnWhat = 5;
+                return gun.ammoPickup();
         }
+    }
 
-        HitScanWeapon gun = entry.getLowestAmmoGun();
-        if(gun == null) return playerRifle.ammoPickup();
+    public void checkIfOnWalls(){
+        if(!(entry.player().getLocation().getBlockY() >= 42)) return;
 
-        return gun.ammoPickup();
+        for (Location l: wallSpawns){
+            Class<? extends Mob> mob = random.nextBoolean() ? Zombie.class : Skeleton.class;
+            MayUtils.spawnAndEffect(l, mob, this::onMobSpawn);
+        }
     }
 
     private void spawnMobsForWave(){
-        SpawnAllowererer temp = new SpawnAllowererer(new ArrayList<>());
 
         for (Location l: mobSpawns){
             MayUtils.validateIsAir(l);
 
-            temp.locs.add(l);
             Class<? extends Mob> clazz = random.nextBoolean() ? Zombie.class : Skeleton.class;
 
-            MayUtils.spawnAndEffect(l, clazz, mob -> {
-                AttributeModifier waveMod = getWaveModifier();
-
-                mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).addModifier(waveMod);
-                mob.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).addModifier(waveMod);
-
-                try {
-                    mob.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(waveMod);
-                } catch (Exception ignored) {}
-
-                mob.setHealth(mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-                mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.3);
-
-                mob.setLootTable(LootTables.EMPTY.getLootTable());
-
-                mob.setTarget(entry.player());
-
-                EntityEquipment eq = mob.getEquipment();
-                eq.setLeggingsDropChance(0f);
-                eq.setChestplateDropChance(0f);
-                eq.setHelmetDropChance(0f);
-                eq.setBootsDropChance(0f);
-
-                eq.setItemInMainHandDropChance(0f);
-                eq.setItemInOffHandDropChance(0f);
-
-                DoomEvent.MOB_TEAM.addEntry(mob.getUniqueId().toString());
-                initialMobAmount++;
-                currentMobAmount++;
-            });
+            MayUtils.spawnAndEffect(l, clazz, this::onMobSpawn);
         }
 
         for (Map.Entry<Location, EntityTypes<? extends EntityLiving>> e: specialSpawns.entrySet()){
@@ -223,16 +218,45 @@ public class EventArena {
             currentMobAmount++;
         }
 
-        temp.locs = null;
-        HandlerList.unregisterAll(temp);
-        temp = null;
-
         triggerableEvents.forEach(e -> e.poll(this));
 
         if(toRemove.size() > 0){
             triggerableEvents.removeAll(toRemove);
             toRemove.clear();
         }
+    }
+
+    public Consumer<? extends Mob> onMobSpawn(Mob mob){
+        return mob1 -> {
+            AttributeModifier waveMod = getWaveModifier();
+
+            mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).addModifier(waveMod);
+            mob.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).addModifier(waveMod);
+
+            try {
+                mob.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(waveMod);
+            } catch (Exception ignored) {}
+
+            mob.setHealth(mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+            mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.3);
+
+            mob.setLootTable(LootTables.EMPTY.getLootTable());
+
+            mob.setTarget(entry.player());
+
+            EntityEquipment eq = mob.getEquipment();
+            eq.setLeggingsDropChance(0f);
+            eq.setChestplateDropChance(0f);
+            eq.setHelmetDropChance(0f);
+            eq.setBootsDropChance(0f);
+
+            eq.setItemInMainHandDropChance(0f);
+            eq.setItemInOffHandDropChance(0f);
+
+            DoomEvent.MOB_TEAM.addEntry(mob.getUniqueId().toString());
+            initialMobAmount++;
+            currentMobAmount++;
+        };
     }
 
     List<TriggerableEvent> toRemove = new ArrayList<>();

@@ -18,6 +18,9 @@ public class ArenaUpdater extends BukkitRunnable {
     short waveDelay = 0;
     static final short staticWaveDelay = 200;
 
+    short wallSpawnDelay = staticWallSpawnDelay;
+    static final short staticWallSpawnDelay = 2400;
+
     private final EventArena arena;
     public ArenaUpdater(EventArena arena){ this.arena = arena; }
 
@@ -30,7 +33,6 @@ public class ArenaUpdater extends BukkitRunnable {
             arena.bossBar.setProgress(progress);
 
             if(arena.bossBar.getProgress() == 0) arena.nextWaveActual();
-            return;
         }
 
         if(waveDelay > 0){
@@ -49,14 +51,21 @@ public class ArenaUpdater extends BukkitRunnable {
         if(arena.wave() > 0 && updateMobs < 0){
             updateMobs = staticUpdateMobs;
             arena.currentMobAmount = (short) arena.box.getEntitiesByType(Mob.class).size();
+            arena.box.getEntitiesByType(Mob.class).forEach(m -> m.setTarget(arena.entry.player()));
             arena.updateBossbar();
 
             if(arena.bossBar.getProgress() == 0) arena.nextWave();
         }
 
+        wallSpawnDelay--;
+        if(wallSpawnDelay < 0){
+            wallSpawnDelay = staticWallSpawnDelay;
+            arena.checkIfOnWalls();
+        }
+
         pickupSpawnDelay--;
         if(pickupSpawnDelay < 0){
-            arena.spawnRandomPickup();
+            arena.spawnNextPickup();
             pickupSpawnDelay = 300;
         }
 

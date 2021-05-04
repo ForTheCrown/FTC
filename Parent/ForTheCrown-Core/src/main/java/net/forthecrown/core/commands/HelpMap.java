@@ -1,8 +1,8 @@
 package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -26,9 +26,9 @@ public class HelpMap extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
-            CommandSender sender = c.getSource().getBukkitSender();
+            CommandSender sender = c.getSource().asBukkit();
             sender.sendMessage(ChatColor.GRAY + "Dynmap link:");
 
             TextComponent text = Component.text("mc.forthecrown.net:3140/").color(NamedTextColor.AQUA);

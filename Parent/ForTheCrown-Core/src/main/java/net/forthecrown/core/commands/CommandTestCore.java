@@ -2,12 +2,9 @@ package net.forthecrown.core.commands;
 
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.datafixers.UserAndBalanceUpdater;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
-
-import java.io.IOException;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandTestCore extends CrownCommandBuilder {
 
@@ -20,23 +17,17 @@ public class CommandTestCore extends CrownCommandBuilder {
     }
 
     @Override
-    public boolean test(CommandListenerWrapper sender) { //test method used by Brigadier to determine who can use the command, from Predicate interface
-        return sender.getBukkitSender().isOp() && testPermissionSilent(sender.getBukkitSender());
+    public boolean test(CommandSource sender) { //test method used by Brigadier to determine who can use the command, from Predicate interface
+        return sender.asBukkit().isOp() && testPermissionSilent(sender.asBukkit());
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
                     CrownUser u = getUserSender(c);
                     u.sendMessage("-Beginning test-");
                     //Use this command to test things lol
                     //This is as close as I currently know how to get to actual automatic tests
-
-                    try {
-                        new UserAndBalanceUpdater(FtcCore.getInstance()).begin().complete();
-                    } catch (IOException e){
-                        e.printStackTrace();
-                    }
 
                     u.sendMessage("do the data thing now");
                     u.sendMessage("-Test finished-");

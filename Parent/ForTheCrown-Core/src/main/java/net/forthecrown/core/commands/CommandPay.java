@@ -1,27 +1,20 @@
 package net.forthecrown.core.commands;
 
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CannotAffordTransactionException;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.custom.UserType;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
+import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.server.v1_16_R3.ArgumentEntity;
 import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.EnumChatFormat;
-import org.bukkit.entity.Player;
 
 import java.util.Collection;
-import java.util.UUID;
 
 public class CommandPay extends CrownCommandBuilder {
 
@@ -33,7 +26,6 @@ public class CommandPay extends CrownCommandBuilder {
         maxMoneyAmount = FtcCore.getMaxMoneyAmount();
 
         setDescription("Pays another player money");
-        setUsage("&7Usage: &r/pay <user> <amount>");
         register();
     }
 
@@ -53,30 +45,11 @@ public class CommandPay extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("players", UserType.users())
-                      .suggests(UserType::suggestSelector)
-
                       .then(argument("amount", IntegerArgumentType.integer(1, maxMoneyAmount))
-                              .suggests((c, b) -> {
-                                  if(!(c.getSource().getBukkitEntity() instanceof Player)) return Suggestions.empty();
-                                  UUID id = getPlayerSender(c).getUniqueId();
-
-                                  b.suggest(bals.get(id), new LiteralMessage("Your entire balance"));
-
-                                  b.suggest(1);
-                                  suggestIf(id, 10, b);
-                                  suggestIf(id, 100, b);
-                                  suggestIf(id, 1000, b);
-
-                                  b.suggest(5);
-                                  suggestIf(id, 50, b);
-                                  suggestIf(id, 500, b);
-                                  suggestIf(id, 5000, b);
-
-                                  return b.buildFuture();
-                              })
+                              .suggests(suggestMonies())
 
                             .executes(c -> {
                                 CrownUser user = getUserSender(c);
@@ -89,18 +62,14 @@ public class CommandPay extends CrownCommandBuilder {
                 );
     }
 
-    private void suggestIf(UUID id, int amount, SuggestionsBuilder builder){
-        if(bals.get(id) > amount) builder.suggest(amount);
-    }
-
     private int pay(CrownUser user, Collection<CrownUser> targets, int amount) throws CommandSyntaxException {
-        if(amount > bals.get(user.getUniqueId())) throw new CannotAffordTransactionException();
+        if(amount > bals.get(user.getUniqueId())) throw FtcExceptionProvider.CANNOT_AFFORD_TRANSACTION.create(Balances.getFormatted(amount));
 
         byte paidAmount = 0;
 
         for (CrownUser target: targets){
             if(user.equals(target)){
-                if(targets.size() == 1) throw ArgumentEntity.e.create();
+                if(targets.size() == 1) throw UserType.NO_USERS_FOUND.create();
                 continue;
             }
 
@@ -140,7 +109,7 @@ public class CommandPay extends CrownCommandBuilder {
             paidAmount++;
         }
 
-        if(paidAmount == 0) throw new CrownCommandException("&7Found no players to pay");
+        if(paidAmount == 0) throw UserType.NO_USERS_FOUND.create();
         if(paidAmount > 1) user.sendMessage(
                 Component.text("Paid " + paidAmount + " people. Lost ")
                         .color(NamedTextColor.GRAY)

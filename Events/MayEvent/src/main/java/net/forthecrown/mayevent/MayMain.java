@@ -3,28 +3,37 @@ package net.forthecrown.mayevent;
 import net.forthecrown.core.CrownBoundingBox;
 import net.forthecrown.core.commands.CommandLeave;
 import net.forthecrown.core.crownevents.ObjectiveLeaderboard;
+import net.forthecrown.core.crownevents.reporters.EventReporter;
+import net.forthecrown.core.crownevents.reporters.ReporterFactory;
+import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.mayevent.command.CommandMayEvent;
 import net.forthecrown.mayevent.events.MayListener;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.IOException;
 
 public final class MayMain extends JavaPlugin {
 
     public static MayMain inst;
     public static DoomEvent event;
     public static ObjectiveLeaderboard leaderboard;
+    public static EventReporter eLogger;
 
     @Override
     public void onEnable() {
         inst = this;
         event = new DoomEvent.Impl();
+        eLogger = ReporterFactory.of(this, event);
 
         new CommandMayEvent();
 
         CommandLeave.add(new CrownBoundingBox(DoomEvent.EVENT_WORLD, -30000000, 0, -30000000, 30000000, 256, 30000000),
-                DoomEvent.EXIT_LOCATION, plr -> {
-                    boolean result = DoomEvent.ENTRIES.containsKey(plr);
-                    if(result) event.end(DoomEvent.ENTRIES.get(plr));
+                DoomEvent.EXIT_LOCATION, player -> {
+                    boolean result = DoomEvent.ENTRIES.containsKey(player);
+                    if(result) event.end(DoomEvent.ENTRIES.get(player));
 
                     return result;
                 }
@@ -35,7 +44,7 @@ public final class MayMain extends JavaPlugin {
     }
 
     public void createLeaderboard(){
-        leaderboard = new ObjectiveLeaderboard("Event scores", DoomEvent.CROWN, DoomEvent.EXIT_LOCATION);
+        leaderboard = new ObjectiveLeaderboard("Event scores", DoomEvent.CROWN, new Location(CrownUtils.WORLD, -47.5, 70.5, 879.5));
         leaderboard.create();
     }
 
@@ -47,6 +56,13 @@ public final class MayMain extends JavaPlugin {
     public void onDisable() {
         for (ArenaEntry e: DoomEvent.ENTRIES.values()){
             event.end(e);
+        }
+        Bukkit.getScheduler().cancelTasks(this);
+
+        try {
+            eLogger.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

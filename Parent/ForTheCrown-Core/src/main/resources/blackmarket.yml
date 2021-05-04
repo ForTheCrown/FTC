@@ -3,6 +3,7 @@ Daily_Items:
   Crops: []
   Drops: []
   Mining: []
+  EnchantLevel: 1
 PurchasedEnchant: []
 Price_Per_Item:
   MobDrops:

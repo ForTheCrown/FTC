@@ -3,9 +3,9 @@ package net.forthecrown.core.commands;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.custom.UserType;
+import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -17,7 +17,6 @@ public class CommandBalance extends CrownCommandBuilder {
     public CommandBalance() {
         super("balance", FtcCore.getInstance());
 
-        setUsage("&7Usage: &r/balance <player>");
         setAliases("bal", "cash", "money", "ebal", "ebalance", "emoney");
         setDescription("Displays a player's balance");
 
@@ -38,7 +37,7 @@ public class CommandBalance extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> { //No args, player is checking their own balance
                     Player player = getPlayerSender(c);
@@ -46,10 +45,9 @@ public class CommandBalance extends CrownCommandBuilder {
                     return 0;
                 })
                 .then(argument("player", UserType.user()) //Player is checking someone else's balance
-                        .suggests(UserType::suggest)
 
                         .executes(c ->{
-                            CommandSender sender = c.getSource().getBukkitSender();
+                            CommandSender sender = c.getSource().asBukkit();
                             CrownUser target = UserType.getUser(c, "player");
                             Balances balances = FtcCore.getBalances();
 

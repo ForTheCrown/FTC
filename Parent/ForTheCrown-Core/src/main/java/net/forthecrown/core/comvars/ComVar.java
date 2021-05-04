@@ -17,14 +17,17 @@ import java.util.function.Consumer;
 public class ComVar<T>/* implements ConfigurationSerializable */ {
     private T value;
     private final ComVarType<T> type;
+    private final String name;
     private Consumer<T> onUpdate;
 
-    ComVar(ComVarType<T> type, T value){
+    ComVar(ComVarType<T> type, String name, T value){
         this.value = value;
         this.type = type;
+        this.name = name;
     }
-    ComVar(ComVarType<T> type){
+    ComVar(ComVarType<T> type, String name){
         this.type = type;
+        this.name = name;
     }
 
     public @Nullable T getValue() {
@@ -62,6 +65,10 @@ public class ComVar<T>/* implements ConfigurationSerializable */ {
     @Override
     public String toString() {
         return type.asString(value);
+    }
+
+    public String getName() {
+        return name;
     }
 
     /*@Override

@@ -2,12 +2,12 @@ package net.forthecrown.core.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
-import net.forthecrown.core.commands.brigadier.types.Vector3DType;
 import net.forthecrown.core.utils.CrownUtils;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.ArmorStand;
@@ -46,12 +46,12 @@ public class CommandHologram extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("remove")
-                        .then(argument("holograms", TargetSelectorType.entities())
+                        .then(argument("holograms", EntityArgument.multipleEntities())
                                 .executes(c -> {
-                                    Collection<? extends Entity> entities = TargetSelectorType.getEntities(c, "holograms");
+                                    Collection<Entity> entities = EntityArgument.getEntities(c, "holograms");
 
                                     int removed = 0;
                                     for (Entity e: entities){
@@ -76,10 +76,10 @@ public class CommandHologram extends CrownCommandBuilder {
                                 })
                         )
 
-                        .then(argument("location", Vector3DType.vec3())
+                        .then(argument("location", PositionArgument.position())
                                 .then(argument("text", StringArgumentType.greedyString())
                                         .executes(c -> {
-                                            Location loc = Vector3DType.getLocation(c, "location");
+                                            Location loc = PositionArgument.getLocation(c, "location");
                                             createHologram(c.getSource(), loc, c.getArgument("text", String.class));
                                             return 0;
                                         })
@@ -88,7 +88,7 @@ public class CommandHologram extends CrownCommandBuilder {
                 );
     }
 
-    public static void createHologram(@Nullable CommandListenerWrapper source, Location location, String input){
+    public static void createHologram(@Nullable CommandSource source, Location location, String input){
         String[] names = input.split("\\{NL}");
         location.add(0, (names.length-1)*0.25, 0);
 

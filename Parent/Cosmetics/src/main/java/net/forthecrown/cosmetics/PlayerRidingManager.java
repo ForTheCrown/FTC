@@ -83,7 +83,7 @@ public class PlayerRidingManager implements Listener {
         Material oneAbovePlayer = loc.add(0, 2, 0).getBlock().getType();
         Material twoAbovePlayer = loc.add(0, 3, 0).getBlock().getType();
 
-        if(oneAbovePlayer != Material.AIR || twoAbovePlayer != Material.AIR){
+        if(oneAbovePlayer.isSolid() || twoAbovePlayer.isSolid()){
             user.sendMessage(new ChatComponentText("Cannot ride player here").a(EnumChatFormat.GRAY));
             return false;
         }

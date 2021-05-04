@@ -5,25 +5,26 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.ShopManager;
 import net.forthecrown.core.api.SignShop;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.custom.UserType;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
+import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.forthecrown.core.enums.ShopType;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -42,10 +43,10 @@ public class CommandEditShop extends CrownCommandBuilder {
     }
 
     private final int maxMoney;
-    private static final CrownCommandException EXCEPTION = new CrownCommandException("&7You must be looking at a sign shop you own");
+    private static final SimpleCommandExceptionType EXCEPTION = new SimpleCommandExceptionType(() -> CrownUtils.translateHexCodes("&7You must be looking at a sign shop you own"));
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> {
                     Player player = getPlayerSender(c);
@@ -139,15 +140,14 @@ public class CommandEditShop extends CrownCommandBuilder {
                         )
                 )
                 .then(argument("transfer")
-                        .then(argument("player_transfer", UserType.user())
-                                .suggests(UserType::suggestSelector)
+                        .then(argument("player_transfer", UserType.USER)
 
                                 .executes(c -> {
                                     CrownUser user = getUserSender(c);
                                     SignShop shop = getShop(user.getPlayer());
                                     CrownUser transferTo = UserType.getUser(c, "player_transfer");
 
-                                    if(user.equals(transferTo)) throw new CrownCommandException("Cannot transfer to yourself");
+                                    if(user.equals(transferTo)) throw FtcExceptionProvider.create("Cannot transfer to yourself");
 
                                     shop.setOwner(transferTo.getUniqueId());
 
@@ -186,7 +186,7 @@ public class CommandEditShop extends CrownCommandBuilder {
                 )
                 .then(argument("line")
                         .then(argument("line_actual", IntegerArgumentType.integer(2, 3))
-                                .suggests(suggest("2", "3"))
+                                .suggests(suggestMatching("2", "3"))
 
                                 .then(argument("line_text", StringArgumentType.greedyString())
                                         .suggests((c, b) -> {
@@ -233,7 +233,7 @@ public class CommandEditShop extends CrownCommandBuilder {
                 .append(Component.newline());
     }
 
-    private int setType(CommandContext<CommandListenerWrapper> c, boolean sell) throws CommandSyntaxException {
+    private int setType(CommandContext<CommandSource> c, boolean sell) throws CommandSyntaxException {
         Player player = getPlayerSender(c);
         SignShop shop = getShop(player);
 
@@ -254,10 +254,10 @@ public class CommandEditShop extends CrownCommandBuilder {
 
     private SignShop getShop(Player player) throws CommandSyntaxException {
         Block block = player.getTargetBlock(5);
-        if(block == null || !(block.getState() instanceof Sign)) throw EXCEPTION;
+        if(block == null || !(block.getState() instanceof Sign)) throw EXCEPTION.create();
 
         SignShop result = ShopManager.getShop(block.getLocation());
-        if(result == null || !result.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) throw EXCEPTION;
+        if(result == null || !result.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) throw EXCEPTION.create();
         return result;
     }
 

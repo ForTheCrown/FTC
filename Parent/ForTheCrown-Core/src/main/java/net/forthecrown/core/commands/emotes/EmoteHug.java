@@ -9,9 +9,9 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class EmoteHug extends CommandEmote {
 
@@ -51,26 +51,30 @@ public class EmoteHug extends CommandEmote {
         return -1;
     }
 
-    public class HugTick implements Runnable{
+    public static class HugTick extends BukkitRunnable {
         private int i = 0;
-        private final int id;
         private final CrownUser user;
 
         public HugTick(CrownUser user){
             this.user = user;
-
-            id = Bukkit.getScheduler().scheduleSyncRepeatingTask(FtcCore.getInstance(), this, 0, 2);
+            runTaskTimerAsynchronously(FtcCore.getInstance(), 0, 2);
         }
 
         @Override
         public void run() {
             if(i == 10*10){
-                Bukkit.getScheduler().cancelTask(id);
+                cancel();
                 Cooldown.remove(user, "Emote_Hug_Received");
                 return;
             }
 
-            user.getPlayer().getWorld().spawnParticle(Particle.HEART, user.getPlayer().getLocation().clone().add(0, 1, 0), 1, 0.25, 0.25 ,0.25);
+            try {
+                user.getPlayer().getWorld().spawnParticle(Particle.HEART, user.getPlayer().getLocation().clone().add(0, 1, 0), 1, 0.25, 0.25 ,0.25);
+            } catch (NullPointerException ignored) {
+                cancel();
+                Cooldown.remove(user, "Emote_Hug_Received");
+                return;
+            }
             i++;
         }
     }

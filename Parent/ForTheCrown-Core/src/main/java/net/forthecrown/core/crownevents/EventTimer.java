@@ -7,11 +7,11 @@ import net.forthecrown.core.utils.ComponentUtils;
 import net.minecraft.server.v1_16_R3.ChatMessageType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Consumer;
 
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 
 public class EventTimer {
 

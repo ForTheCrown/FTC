@@ -24,7 +24,7 @@ import java.util.UUID;
 /**
  * Represents a user's profile, all their ranks, effects and such
  */
-public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, HoverEventSource<Component>, Nameable {
+public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, HoverEventSource<Component>, Nameable, Deleteable {
 
     /**
      * Saves and then unloads the file

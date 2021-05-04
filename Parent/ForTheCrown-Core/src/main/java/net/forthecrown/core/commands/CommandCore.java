@@ -4,38 +4,38 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.papermc.paper.adventure.PaperAdventure;
 import net.forthecrown.core.CrownWeapons;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.*;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
+import net.forthecrown.core.commands.brigadier.CoreCommands;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.LiteralArgument;
-import net.forthecrown.core.commands.brigadier.RequiredArgument;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.ParticleType;
-import net.forthecrown.core.commands.brigadier.types.custom.BranchType;
-import net.forthecrown.core.commands.brigadier.types.custom.PetType;
-import net.forthecrown.core.commands.brigadier.types.custom.RankType;
-import net.forthecrown.core.commands.brigadier.types.custom.UserType;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
+import net.forthecrown.core.commands.brigadier.types.PetType;
+import net.forthecrown.core.commands.brigadier.types.UserParseResult;
+import net.forthecrown.core.commands.brigadier.types.UserType;
 import net.forthecrown.core.datafixers.ShopTagUpdater;
 import net.forthecrown.core.datafixers.UserAndBalanceUpdater;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Pet;
 import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.types.signs.SignManager;
 import net.forthecrown.core.types.user.FtcUserAlt;
 import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.ListUtils;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.ParticleArgument;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.v1_16_R3.ChatComponentText;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.SystemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -79,9 +79,9 @@ public class CommandCore extends CrownCommandBuilder {
      */
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("resetcrown") //Resets the crown objective, aka, destroys and re creates it
+                .then(literal("resetcrown") //Resets the crown objective, aka, destroys and re creates it
                         .executes(c -> {
                             Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
                             Objective objective = scoreboard.getObjective("crown");
@@ -93,8 +93,8 @@ public class CommandCore extends CrownCommandBuilder {
                             return 0;
                         })
                 )
-                .then(argument("save") //Save all or a part of the plugin
-                        .executes(c -> saveOrReloadAll(getSender(c), true)) //Save all
+                .then(literal("save") //Save all or a part of the plugin
+                        .executes(c -> saveOrReloadAll(c.getSource(), true)) //Save all
 
                         //Save a specific part
                         .then(saveReloadArg(SaveReloadPart.ANNOUNCER, true))
@@ -104,9 +104,10 @@ public class CommandCore extends CrownCommandBuilder {
                         .then(saveReloadArg(SaveReloadPart.USERS, true))
                         .then(saveReloadArg(SaveReloadPart.USER_MANAGER, true))
                         .then(saveReloadArg(SaveReloadPart.SHOPS, true))
+                        .then(saveReloadArg(SaveReloadPart.SIGN_MANAGER, true))
                 )
-                .then(argument("reload")
-                        .executes(c -> saveOrReloadAll(getSender(c), false)) //Reload all
+                .then(literal("reload")
+                        .executes(c -> saveOrReloadAll(c.getSource(), false)) //Reload all
 
                         //Reload a specific part
                         .then(saveReloadArg(SaveReloadPart.ANNOUNCER, false))
@@ -116,15 +117,15 @@ public class CommandCore extends CrownCommandBuilder {
                         .then(saveReloadArg(SaveReloadPart.USERS, false))
                         .then(saveReloadArg(SaveReloadPart.USER_MANAGER, false))
                         .then(saveReloadArg(SaveReloadPart.SHOPS, false))
+                        .then(saveReloadArg(SaveReloadPart.SIGN_MANAGER, false))
                 )
 
                 //Everything relating to a specific user
-                .then(argument("user")
-                        .then(argument(USER_ARG, UserType.user())
-                                .suggests(UserType::suggestSelector)
+                .then(literal("user")
+                        .then(argument(USER_ARG, UserType.USER)
 
                                 //Save the user's data
-                                .then(argument("save")
+                                .then(literal("save")
                                         .executes(c -> {
                                             CrownUser u = getUser(c);
                                             u.save();
@@ -134,7 +135,7 @@ public class CommandCore extends CrownCommandBuilder {
                                 )
 
                                 //Reload the user's data
-                                .then(argument("reload")
+                                .then(literal("reload")
                                         .executes(c -> {
                                             CrownUser u = getUser(c);
                                             u.reload();
@@ -144,13 +145,13 @@ public class CommandCore extends CrownCommandBuilder {
                                 )
 
                                 //This alt shit can go fuck itself
-                                .then(argument("alt")
-                                        .then(argument("list")
+                                .then(literal("alt")
+                                        .then(literal("list")
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
                                                     UserManager um = FtcCore.getUserManager();
 
-                                                    c.getSource().getBukkitSender().sendMessage(
+                                                    c.getSource().sendMessage(
                                                             Component.text(user.getName() + "'s alt accounts:")
                                                             .append(Component.newline())
                                                             .append(Component.text(um.getAlts(user.getUniqueId()).toString()))
@@ -159,13 +160,12 @@ public class CommandCore extends CrownCommandBuilder {
                                                     return 0;
                                                 })
                                         )
-                                        .then(argument("for")
+                                        .then(literal("for")
                                                 .then(argument("altFor", UserType.user())
-                                                        .suggests(UserType::suggest)
 
                                                         .executes(c -> {
                                                             CrownUser user = getUser(c);
-                                                            CrownUser main = UserType.getUser(c, "altFor");
+                                                            CrownUser main = c.getArgument("altFor", UserParseResult.class).getUser(c.getSource());
                                                             UserManager um = FtcCore.getUserManager();
 
                                                             um.addEntry(user.getUniqueId(), main.getUniqueId());
@@ -178,12 +178,12 @@ public class CommandCore extends CrownCommandBuilder {
                                                         })
                                                 )
                                         )
-                                        .then(argument("for_none")
+                                        .then(literal("for_none")
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
                                                     UserManager um = FtcCore.getUserManager();
 
-                                                    if(!um.isAlt(user.getUniqueId())) throw new CrownCommandException(user.getName() + " is not an alt");
+                                                    if(!um.isAlt(user.getUniqueId())) throw FtcExceptionProvider.create(user.getName() + " is not an alt");
                                                     um.removeEntry(user.getUniqueId());
 
                                                     broadcastAdmin(c.getSource(), user.getName() + " is no longer an alt");
@@ -192,15 +192,15 @@ public class CommandCore extends CrownCommandBuilder {
                                         )
                                 )
 
-                                .then(argument("balance")
+                                .then(literal("balance")
                                         .executes(c-> { //Shows the balance
                                             CrownUser user = getUser(c);
-                                            c.getSource().getBukkitSender().sendMessage(user.getName() + " has " + bals.getDecimalized(user.getUniqueId()) + " Rhines");
+                                            c.getSource().sendMessage(user.getName() + " has " + bals.getDecimalized(user.getUniqueId()) + " Rhines");
                                             return 0;
                                         })
 
                                         //Sets the balance
-                                        .then(argument("set")
+                                        .then(literal("set")
                                                 .then(argument("sAmount", IntegerArgumentType.integer(0, maxMoney))
                                                         .executes(c -> {
                                                             CrownUser user = getUser(c);
@@ -214,7 +214,7 @@ public class CommandCore extends CrownCommandBuilder {
                                                 )
                                         )
                                         //Adds to the balance
-                                        .then(argument("add")
+                                        .then(literal("add")
                                                 .then(argument("aAmount", IntegerArgumentType.integer(1, maxMoney))
                                                         .executes(c -> {
                                                             CrownUser user = getUser(c);
@@ -229,7 +229,7 @@ public class CommandCore extends CrownCommandBuilder {
                                                 )
                                         )
                                         //Removes from the balance
-                                        .then(argument("remove")
+                                        .then(literal("remove")
                                                 .then(argument("rAmount", IntegerArgumentType.integer(1, maxMoney))
                                                         .executes(c -> {
                                                             CrownUser user = getUser(c);
@@ -244,7 +244,7 @@ public class CommandCore extends CrownCommandBuilder {
                                                 )
                                         )
                                         //Resets the balance, removes it from the BalanceMap so it doesn't take up as much data
-                                        .then(argument("reset")
+                                        .then(literal("reset")
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
 
@@ -260,15 +260,15 @@ public class CommandCore extends CrownCommandBuilder {
                                         )
                                 )
 
-                                .then(argument("arrowparticle")
+                                .then(literal("arrowparticle")
                                         .executes(c -> {
                                             CrownUser u = getUser(c);
-                                            c.getSource().getBukkitSender().sendMessage(u.getName() + "'s ArrowParticles as a List.toString cuz I'm lazy");
-                                            c.getSource().getBukkitSender().sendMessage(u.getParticleArrowAvailable().toString());
+                                            c.getSource().sendMessage(u.getName() + "'s ArrowParticles as a List.toString cuz I'm lazy");
+                                            c.getSource().sendMessage(u.getParticleArrowAvailable().toString());
                                             return 0;
                                         })
 
-                                        .then(argument("unset")
+                                        .then(literal("unset")
                                                 .executes(c -> {
                                                     CrownUser u = getUser(c);
                                                     u.setArrowParticle(null);
@@ -276,11 +276,11 @@ public class CommandCore extends CrownCommandBuilder {
                                                     return 0;
                                                 })
                                         )
-                                        .then(argument("set")
-                                                .then(argument("activeParticle", ParticleType.particle())
+                                        .then(literal("set")
+                                                .then(argument("activeParticle", ParticleArgument.particle())
                                                         .executes(c -> {
                                                             CrownUser u = getUser(c);
-                                                            Particle p = ParticleType.getParticle(c, "activeParticle");
+                                                            Particle p = c.getArgument("activeParticle", Particle.class);
 
                                                             u.setArrowParticle(p);
                                                             broadcastAdmin(c.getSource(), "Set " + p.toString() + " as " + u.getName() + "'s active ArrowParticle");;
@@ -288,11 +288,11 @@ public class CommandCore extends CrownCommandBuilder {
                                                         })
                                                 )
                                         )
-                                        .then(argument("add")
-                                                .then(argument("arrowParticle", ParticleType.particle())
+                                        .then(literal("add")
+                                                .then(argument("arrowParticle", ParticleArgument.particle())
                                                         .executes(c -> {
                                                             CrownUser u = getUser(c);
-                                                            Particle particle = ParticleType.getParticle(c, "arrowParticle");
+                                                            Particle particle = c.getArgument("activeParticle", Particle.class);
 
                                                             List<Particle> partList = u.getParticleArrowAvailable();
                                                             partList.add(particle);
@@ -303,11 +303,11 @@ public class CommandCore extends CrownCommandBuilder {
                                                         })
                                                 )
                                         )
-                                        .then(argument("remove")
-                                                .then(argument("rArrowParticle", ParticleType.particle())
+                                        .then(literal("remove")
+                                                .then(argument("rArrowParticle", ParticleArgument.particle())
                                                         .executes(c -> {
                                                             CrownUser u = getUser(c);
-                                                            Particle particle = ParticleType.getParticle(c, "rArrowParticle");
+                                                            Particle particle = c.getArgument("activeParticle", Particle.class);
 
                                                             List<Particle> partList = u.getParticleArrowAvailable();
                                                             partList.remove(particle);
@@ -320,15 +320,15 @@ public class CommandCore extends CrownCommandBuilder {
                                         )
                                 )
 
-                                .then(argument("deathparticle")
+                                .then(literal("deathparticle")
                                         .executes(c -> {
                                             CrownUser u = getUser(c);
-                                            c.getSource().getBukkitSender().sendMessage(u.getName() + "'s DeathParticles as a List.toString cuz I'm lazy");
-                                            c.getSource().getBukkitSender().sendMessage(u.getParticleDeathAvailable().toString());
+                                            c.getSource().sendMessage(u.getName() + "'s DeathParticles as a List.toString cuz I'm lazy");
+                                            c.getSource().sendMessage(u.getParticleDeathAvailable().toString());
                                             return 0;
                                         })
 
-                                        .then(argument("add")
+                                        .then(literal("add")
                                                 .then(argument("particle", StringArgumentType.word())
                                                         .executes(c -> {
                                                             CrownUser u = getUser(c);
@@ -343,7 +343,7 @@ public class CommandCore extends CrownCommandBuilder {
                                                         })
                                                 )
                                         )
-                                        .then(argument("remove")
+                                        .then(literal("remove")
                                                 .then(argument("rParticle", StringArgumentType.word())
                                                         .executes(c -> {
                                                             CrownUser u = getUser(c);
@@ -360,14 +360,14 @@ public class CommandCore extends CrownCommandBuilder {
                                         )
                                 )
 
-                                .then(argument("baron")
+                                .then(literal("baron")
                                         .then(argument("isBaron", BoolArgumentType.bool())
-                                                .suggests((c, b) -> suggestMatching(b, "true", "false"))
+                                                .suggests(suggestMatching("true", "false"))
 
                                                 .executes(c ->{
                                                     CrownUser user = getUser(c);
                                                     boolean isBaron = c.getArgument("isBaron", Boolean.class);
-                                                    if(user.isBaron() == isBaron) throw new CrownCommandException(user.getName() + "'s baron value is the same as entered!");
+                                                    if(user.isBaron() == isBaron) throw FtcExceptionProvider.create(user.getName() + "'s baron value is the same as entered!");
 
                                                     user.setBaron(isBaron);
                                                     getSender(c).sendMessage(user.getName() + " isBaron " + user.isBaron());
@@ -380,39 +380,39 @@ public class CommandCore extends CrownCommandBuilder {
                                             return 0;
                                         })
                                 )
-                                .then(argument("pets")
-                                        .then(argument("list")
+                                .then(literal("pets")
+                                        .then(literal("list")
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
 
                                                     IChatBaseComponent component = new ChatComponentText(user.getName() + "'s pets: " +
                                                             ListUtils.join(user.getPets(), pet -> pet.toString().toLowerCase())
                                                     );
-                                                    c.getSource().base.sendMessage(component, SystemUtils.b);
+
+                                                    c.getSource().sendMessage(PaperAdventure.asAdventure(component));
                                                     return 0;
                                                 })
                                         )
-                                        .then(argument("pet", PetType.pet())
-                                                .suggests(PetType::suggest)
+                                        .then(argument("pet", PetType.PET)
 
-                                                .then(argument("add")
+                                                .then(literal("add")
                                                         .executes(c -> {
                                                             CrownUser user = getUser(c);
-                                                            Pet pet = PetType.getPet(c, "pet");
+                                                            Pet pet = c.getArgument("pet", Pet.class);
 
-                                                            if(user.hasPet(pet)) throw new CrownCommandException(user.getName() + " already has that pet");
+                                                            if(user.hasPet(pet)) throw FtcExceptionProvider.create(user.getName() + " already has that pet");
 
                                                             user.addPet(pet);
                                                             broadcastAdmin(c.getSource(), "Added " + pet.toString() + " to " + user.getName());
                                                             return 0;
                                                         })
                                                 )
-                                                .then(argument("remove")
+                                                .then(literal("remove")
                                                         .executes(c -> {
                                                             CrownUser user = getUser(c);
-                                                            Pet pet = PetType.getPet(c, "pet");
+                                                            Pet pet = c.getArgument("pet", Pet.class);
 
-                                                            if(!user.hasPet(pet)) throw new CrownCommandException(user.getName() + " doesn't have that pet");
+                                                            if(!user.hasPet(pet)) throw FtcExceptionProvider.create(user.getName() + " doesns't have that pet");
 
                                                             user.removePet(pet);
                                                             broadcastAdmin(c.getSource(), "Removed " + pet.toString() + " from " + user.getName());
@@ -421,27 +421,25 @@ public class CommandCore extends CrownCommandBuilder {
                                                 )
                                         )
                                 )
-                                .then(argument("rank")
+                                .then(literal("rank")
                                         .executes(c -> {
                                             CrownUser user = getUser(c);
                                             getSender(c).sendMessage(user.getName() + "'s rank is " + user.getRank().getPrefix());
                                             return 0;
                                         })
 
-                                        .then(argument("list")
+                                        .then(literal("list")
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
-                                                    c.getSource().getBukkitSender().sendMessage(user.getName() + "'s ranks as a List.toString lol:");
-                                                    c.getSource().getBukkitSender().sendMessage(user.getAvailableRanks().toString());
+                                                    c.getSource().sendMessage(user.getName() + "'s ranks:" + ListUtils.join(user.getAvailableRanks(), Rank::toString));
                                                     return 0;
                                                 })
                                         )
-                                        .then(argument("add")
-                                                .then(argument("rankToAdd", RankType.rank())
-                                                        .suggests(RankType::suggest)
+                                        .then(literal("add")
+                                                .then(argument("rankToAdd", CoreCommands.RANK)
                                                         .executes(c ->{
                                                             CrownUser user = getUser(c);
-                                                            Rank rank = RankType.getRank(c, "rankToRemove");
+                                                            Rank rank = c.getArgument("rankToAdd", Rank.class);
 
                                                             user.addRank(rank);
                                                             broadcastAdmin(c.getSource(), user.getName() + " now has " + rank.getPrefix());
@@ -449,12 +447,11 @@ public class CommandCore extends CrownCommandBuilder {
                                                         })
                                                 )
                                         )
-                                        .then(argument("remove")
-                                                .then(argument("rankToRemove", RankType.rank())
-                                                        .suggests(RankType::suggest)
+                                        .then(literal("remove")
+                                                .then(argument("rankToRemove", CoreCommands.RANK)
                                                         .executes(c ->{
                                                             CrownUser user = getUser(c);
-                                                            Rank rank = RankType.getRank(c, "rankToRemove");
+                                                            Rank rank = c.getArgument("rankToRemove", Rank.class);
 
                                                             user.removeRank(rank);
                                                             broadcastAdmin(c.getSource(), user.getName() + " no longer has " + rank.getPrefix());
@@ -463,24 +460,23 @@ public class CommandCore extends CrownCommandBuilder {
                                                 )
                                         )
                                 )
-                                .then(argument("branch")
+                                .then(literal("branch")
                                         .executes(c ->{
                                             CrownUser user = getUser(c);
                                             getSender(c).sendMessage(user.getName() + "'s branch is " + user.getBranch().toString());
                                             return 0;
                                         })
-                                        .then(argument("branchToSet", BranchType.branch())
-                                                .suggests(BranchType::suggest)
+                                        .then(argument("branchToSet", CoreCommands.BRANCH)
                                                 .executes(c ->{
                                                     CrownUser user = getUser(c);
-                                                    Branch branch = BranchType.getBranch(c, "branchToSet");
+                                                    Branch branch = c.getArgument("branchToSet", Branch.class);
                                                     user.setBranch(branch);
                                                     broadcastAdmin(c.getSource(), user.getName() + " is now a " + user.getBranch().getSingularName());
                                                     return 0;
                                                 })
                                         )
                                 )
-                                .then(argument("addgems")
+                                .then(literal("addgems")
                                         .then(argument("gemAmount", IntegerArgumentType.integer())
                                                 .executes(c ->{
                                                     CrownUser user = getUser(c);
@@ -493,7 +489,7 @@ public class CommandCore extends CrownCommandBuilder {
                                                 })
                                         )
                                 )
-                                .then(argument("resetearnings")
+                                .then(literal("resetearnings")
                                         .executes(c ->{
                                             CrownUser u = getUser(c);
                                             u.resetEarnings();
@@ -501,31 +497,37 @@ public class CommandCore extends CrownCommandBuilder {
                                             return 0;
                                         })
                                 )
-                                .then(argument("totalreset")
-                                        .executes(c -> {
-                                            c.getSource().getBukkitSender().sendMessage("Uhm nothing lol");
-                                            return 0;
-                                        })
-                                )
-                                .then(argument("delete")
+                                .then(literal("delete")
                                         .executes(c ->{
                                             CrownUser user = getUser(c);
 
                                             user.delete();
                                             user.unload();
-                                            getSender(c).sendMessage(user.getName() + "'s user data has been deleted");
+                                            c.getSource().sendAdmin(user.getName() + "'s user data has been deleted");
                                             return 0;
                                         })
                                 )
                         )
                 )
-                .then(argument("announcer")
-                        .then(argument("start").executes(c -> announcerThing(c, true)))
-                        .then(argument("stop").executes(c -> announcerThing(c, false)))
+                .then(literal("announcer")
+                        .then(literal("start").executes(c -> announcerThing(c, true)))
+                        .then(literal("stop").executes(c -> announcerThing(c, false)))
+                        .then(literal("announce_all")
+                                .executes(c -> {
+                                    Announcer announcer = FtcCore.getAnnouncer();
+
+                                    for (Component comp: announcer.getAnnouncements()){
+                                        announcer.announce(comp);
+                                    }
+
+                                    broadcastAdmin(c.getSource(), "All announcements have been broadcast");
+                                    return 0;
+                                })
+                        )
                 )
 
-                .then(argument("datafix")
-                        .then(argument("shops")
+                .then(literal("datafix")
+                        .then(literal("shops")
                                 .executes(c -> {
                                     broadcastAdmin(c.getSource(), "Running DataFixer");
                                     try {
@@ -538,7 +540,7 @@ public class CommandCore extends CrownCommandBuilder {
                                     return 0;
                                 })
                         )
-                        .then(argument("users")
+                        .then(literal("users")
                                 .executes(c -> {
                                     broadcastAdmin(c.getSource(), "Running data fixer");
 
@@ -554,8 +556,8 @@ public class CommandCore extends CrownCommandBuilder {
                         )
                 )
 
-                .then(argument("item")
-                        .then(argument("crown")
+                .then(literal("item")
+                        .then(literal("crown")
                                 .then(argument("level", IntegerArgumentType.integer(1, 6))
                                         .then(argument("owner", StringArgumentType.greedyString())
                                                 .executes(c ->{
@@ -571,7 +573,7 @@ public class CommandCore extends CrownCommandBuilder {
                                         )
                                 )
                         )
-                        .then(argument("coin")
+                        .then(literal("coin")
                                 .then(argument("amount", IntegerArgumentType.integer(1))
                                         .executes(c -> giveCoins(getPlayerSender(c), c.getArgument("amount", Integer.class)))
                                 )
@@ -586,25 +588,25 @@ public class CommandCore extends CrownCommandBuilder {
                 );
     }
 
-    private LiteralArgument weaponArg(String arg, ItemStack item){
-        return argument(arg)
+    private LiteralArgumentBuilder<CommandSource> weaponArg(String arg, ItemStack item){
+        return literal(arg)
                 .executes(weapon(item))
                 .then(levelArg(item));
     }
 
-    private LiteralArgument saveReloadArg(SaveReloadPart saveReloadPart, boolean save){
-        return argument(saveReloadPart.msg.toLowerCase().replaceAll(" ", "_")).executes(c -> saveOrReload(getSender(c), saveReloadPart, save));
+    private LiteralArgumentBuilder<CommandSource> saveReloadArg(SaveReloadPart saveReloadPart, boolean save){
+        return literal(saveReloadPart.msg.toLowerCase().replaceAll(" ", "_")).executes(c -> saveOrReload(c.getSource(), saveReloadPart, save));
     }
 
-    private RequiredArgument<Integer> levelArg(ItemStack item){
+    private RequiredArgumentBuilder<CommandSource, Integer> levelArg(ItemStack item){
         return argument("level", IntegerArgumentType.integer(1, 10)).executes(c -> giveWeapon(c, item, c.getArgument("level", Integer.class)));
     }
 
-    private Command<CommandListenerWrapper> weapon(ItemStack item){
+    private Command<CommandSource> weapon(ItemStack item){
         return c -> giveWeapon(c, item, 1);
     }
 
-    private int giveWeapon(CommandContext<CommandListenerWrapper> c, ItemStack item, int level) throws CommandSyntaxException {
+    private int giveWeapon(CommandContext<CommandSource> c, ItemStack item, int level) throws CommandSyntaxException {
         Player player = getPlayerSender(c);
         ItemStack toGive = item.clone();
         CrownWeapons.CrownWeapon weapon = CrownWeapons.fromItem(toGive);
@@ -632,12 +634,12 @@ public class CommandCore extends CrownCommandBuilder {
     }
 
     private int giveCoins(Player player, int amount){
-        player.getInventory().addItem(CrownItems.getCoins(amount));
+        player.getInventory().addItem(CrownItems.getCoins(amount, 1));
         player.sendMessage("You got " + amount + " Rhines worth of coins");
         return 0;
     }
 
-    private int announcerThing(CommandContext<CommandListenerWrapper> c, boolean start){
+    private int announcerThing(CommandContext<CommandSource> c, boolean start){
         if(start){
             FtcCore.getAnnouncer().start();
             broadcastAdmin(c.getSource(), "Announcer started");
@@ -649,18 +651,18 @@ public class CommandCore extends CrownCommandBuilder {
         return 0;
     }
 
-    private CrownUser getUser(CommandContext<CommandListenerWrapper> c) throws CommandSyntaxException {
-        return UserType.getUser(c, USER_ARG);
+    private CrownUser getUser(CommandContext<CommandSource> c) throws CommandSyntaxException {
+        return c.getArgument(USER_ARG, UserParseResult.class).getUser(c.getSource());
     }
 
-    private int saveOrReload(CommandSender sender, SaveReloadPart thingTo, boolean save){
+    private int saveOrReload(CommandSource sender, SaveReloadPart thingTo, boolean save){
         thingTo.runnable.accept(save);
         if(save) broadcastAdmin(sender, thingTo.saveMessage());
         else broadcastAdmin(sender, thingTo.reloadMessage());
         return 0;
     }
 
-    private int saveOrReloadAll(CommandSender sender, boolean save){
+    private int saveOrReloadAll(CommandSource sender, boolean save){
         for (SaveReloadPart t: SaveReloadPart.values()){
             t.runnable.accept(save);
             if(save) sender.sendMessage(t.saveMessage());
@@ -673,6 +675,10 @@ public class CommandCore extends CrownCommandBuilder {
     }
 
     private enum SaveReloadPart {
+        SIGN_MANAGER("Sign Manager", b -> {
+           if(b) SignManager.saveAll();
+           else SignManager.reloadAll();
+        }),
         ANNOUNCER ("Announcer", (b) -> {
             if(b) FtcCore.getAnnouncer().save();
             else FtcCore.getAnnouncer().reload();

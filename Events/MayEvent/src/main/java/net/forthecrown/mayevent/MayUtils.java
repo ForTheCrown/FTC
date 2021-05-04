@@ -2,8 +2,6 @@ package net.forthecrown.mayevent;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.core.nbt.NBT;
-import net.forthecrown.core.nbt.NbtGetter;
 import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -46,12 +44,6 @@ public class MayUtils {
 
     public static void breakBlock(Block block){
         block.breakNaturally(noDropper, true);
-    }
-
-    public static ItemStack addEventTag(ItemStack item){
-        NBT nbt = NbtGetter.ofItemTags(item);
-        nbt.put("eventItem", (byte) 1);
-        return NbtGetter.applyTags(item, nbt);
     }
 
     public static boolean isNonDestructable(Material mat){

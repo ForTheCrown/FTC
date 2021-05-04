@@ -73,12 +73,9 @@ public class CrownBalances extends AbstractSerializer<FtcCore> implements Balanc
 
     @Override
     public synchronized void set(UUID uuid, Integer amount){
-        if(amount >= FtcCore.getMaxMoneyAmount()){
-            Announcer.log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
-            amount = FtcCore.getMaxMoneyAmount();
-        }
+        if(amount >= FtcCore.getMaxMoneyAmount()) Announcer.log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
 
-        setUnlimited(uuid, amount);
+        setUnlimited(uuid, Math.max(0, Math.min(FtcCore.getMaxMoneyAmount(), amount)));
     }
 
     @Override

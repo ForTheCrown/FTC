@@ -4,22 +4,20 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.exceptions.CrownException;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.pirates.auctions.Auction;
 import net.forthecrown.pirates.auctions.AuctionManager;
 import net.forthecrown.pirates.auctions.PirateAuction;
 import net.kyori.adventure.text.Component;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -41,7 +39,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class CommandAuction extends CrownCommandBuilder {
 
@@ -58,12 +55,12 @@ public class CommandAuction extends CrownCommandBuilder {
     public final Set<String> claimedClaiming = new HashSet<>();
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         Balances bals = FtcCore.getBalances();
 
         command
                 .then(argument("save")
-                        .requires(c -> c.getBukkitSender().hasPermission(getPermission() + ".admin"))
+                        .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c -> {
                             Pirates.getAuctionManager().saveAuctions();
@@ -72,7 +69,7 @@ public class CommandAuction extends CrownCommandBuilder {
                         })
                 )
                 .then(argument("reload")
-                        .requires(c -> c.getBukkitSender().hasPermission(getPermission() + ".admin"))
+                        .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c -> {
                             Pirates.getAuctionManager().reloadAuctions();
@@ -82,19 +79,19 @@ public class CommandAuction extends CrownCommandBuilder {
                 )
 
                 .then(argument("create")
-                        .requires(c -> c.getBukkitSender().hasPermission(getPermission() + ".admin"))
+                        .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .then(argument("name", StringArgumentType.word())
                                 .executes(c -> {
                                     Player p = getPlayerSender(c);
 
                                     Block b = p.getTargetBlock(5);
-                                    if(b == null || !(b.getState() instanceof Sign)) throw new CrownCommandException("&7You need to be looking at a sign!");
+                                    if(b == null || !(b.getState() instanceof Sign)) throw FtcExceptionProvider.create("&7You need to be looking at a sign!");
 
                                     Sign sign = (Sign) b.getState();
 
                                     String name = c.getArgument("name", String.class);
-                                    if(AuctionManager.getAuctionNames().contains(name)) throw new CrownCommandException("&7An auction by this name already exists");
+                                    if(AuctionManager.getAuctionNames().contains(name)) throw FtcExceptionProvider.create("&7An auction by this name already exists");
 
                                     Auction auction = new PirateAuction(sign.getLocation(), name);
                                     auction.unClaim();
@@ -105,16 +102,16 @@ public class CommandAuction extends CrownCommandBuilder {
                         )
         )
         .then(argument(AUCTION_ARG, StringArgumentType.word())
-                .suggests(this::listAuctions)
+                .suggests(suggestMatching(AuctionManager.getAuctionNames()))
 
                 .then(argument("expire")
-                        .requires(c -> c.getBukkitSender().hasPermission(getPermission() + ".admin"))
+                        .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c -> {
                             Auction auction = auctionFromArg(c);
 
-                            if(!auction.isClaimed()) throw new CrownCommandException("&7The auction is not claimed!");
-                            if(auction.isWaitingForItemClaim()) throw new CrownCommandException("&7The auction is already expired");
+                            if(!auction.isClaimed()) throw FtcExceptionProvider.create("&7The auction is not claimed!");
+                            if(auction.isWaitingForItemClaim()) throw FtcExceptionProvider.create("&7The auction is already expired");
 
                             auction.setExpiresAt(100L);
                             auction.performExpiryCheck();
@@ -124,7 +121,7 @@ public class CommandAuction extends CrownCommandBuilder {
                         })
                 )
                 .then(argument("delete")
-                        .requires(c -> c.getBukkitSender().hasPermission(getPermission() + ".admin"))
+                        .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c ->{
                             Auction auction = auctionFromArg(c);
@@ -140,12 +137,13 @@ public class CommandAuction extends CrownCommandBuilder {
                                     CrownUser user = getUserExecutor(c);
                                     Auction auction = auctionFromArg(c);
 
-                                    if(!auction.isClaimed()) throw new CrownCommandException("&7The auction is not claimed!");
-                                    if(auction.isWaitingForItemClaim()) throw new CrownCommandException("&7You can't bid on an auction that's expired");
+                                    if(!auction.isClaimed()) throw FtcExceptionProvider.create("&7The auction is not claimed!");
+                                    if(auction.isWaitingForItemClaim()) throw FtcExceptionProvider.create("&7You can't bid on an auction that's expired");
 
                                     Integer amount = c.getArgument("amount", Integer.class);
-                                    if(amount <= auction.getHighestBid()) throw new CrownCommandException("&7You cannot bid less than the current amount");
-                                    if(amount > bals.get(user.getUniqueId())) throw new CrownCommandException("&7You cannot afford that");
+                                    if(amount <= auction.getHighestBid()) throw FtcExceptionProvider.create("&7You cannot bid less than the current amount");
+                                    if(amount > bals.get(user.getUniqueId())) throw FtcExceptionProvider.create("&7You cannot afford that");
+                                    if(auction.getOwner().equals(user)) throw FtcExceptionProvider.create("&7You cannot bid on your own auction");
 
                                     auction.bidOn(user, amount);
                                     user.sendMessage("&7You have bid!");
@@ -161,10 +159,10 @@ public class CommandAuction extends CrownCommandBuilder {
                                     CrownUser user = getUserExecutor(c);
                                     Auction auction = auctionFromArg(c);
 
-                                    if(user.getBranch() != Branch.PIRATES) throw new CrownCommandException("&7You must be a pirate to claim an auction");
-                                    if(!isAllowedToOwn(c.getSource())) throw new CrownCommandException("&7You aren't allowed to own more than one auction at a time");
-                                    if(claimedClaiming.contains(auction.getName())) throw new CrownCommandException("&7Someone is already claiming this Auction");
-                                    if(auction.isClaimed()) throw new CrownCommandException("&7" + auction.getName() + " is already claimed by " + auction.getOwner().getName());
+                                    if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.create("&7You must be a pirate to claim an auction");
+                                    if(!isAllowedToOwn(c.getSource())) throw FtcExceptionProvider.create("&7You aren't allowed to own more than one auction at a time");
+                                    if(claimedClaiming.contains(auction.getName())) throw FtcExceptionProvider.create("&7Someone is already claiming this Auction");
+                                    if(auction.isClaimed()) throw FtcExceptionProvider.create("&7" + auction.getName() + " is already claimed by " + auction.getOwner().getName());
 
                                     Pirates.inst.getServer().getPluginManager().registerEvents(
                                             new AuctionClaiming(user, auction, c.getArgument("startingBid", Integer.class)),
@@ -176,30 +174,31 @@ public class CommandAuction extends CrownCommandBuilder {
         );
     }
 
-    protected CrownUser getUserExecutor(CommandContext<CommandListenerWrapper> c) throws CommandSyntaxException {
+    protected CrownUser getUserExecutor(CommandContext<CommandSource> c) throws CommandSyntaxException {
         CrownUser toReturn = super.getUserSender(c);
-        if(!AuctionManager.AUCTION_AREA.getPlayers().contains(toReturn.getPlayer())) throw new CrownCommandException("&7You must be near the auction area to interact with it!");
+        if(!AuctionManager.AUCTION_AREA.getPlayers().contains(toReturn.getPlayer())) throw FtcExceptionProvider.create("&7You must be near the auction area to interact with it!");
         return toReturn;
     }
 
-    private boolean isAllowedToOwn(CommandListenerWrapper source){
-        UUID id = source.getBukkitEntity().getUniqueId();
+    private boolean isAllowedToOwn(CommandSource source){
+        try {
+            UUID id = source.asPlayer().getUniqueId();
 
-        for (Auction a: AuctionManager.getAuctions().values()){
-            if(a.getOwner().getUniqueId().equals(id)) return false;
+            for (Auction a: AuctionManager.getAuctions().values()){
+                if(a == null || !a.isClaimed() || a.getOwner() == null) continue;
+                if(a.getOwner().getUniqueId().equals(id)) return false;
+            }
+            return true;
+        } catch (CommandSyntaxException e){
+            return false;
         }
-        return true;
     }
 
-    private Auction auctionFromArg(CommandContext<CommandListenerWrapper> c) throws CrownCommandException {
+    private Auction auctionFromArg(CommandContext<CommandSource> c) throws CommandSyntaxException {
         String name = c.getArgument(AUCTION_ARG, String.class);
         Auction toReturn = AuctionManager.getAuction(name);
-        if(toReturn == null) throw new CrownCommandException(name + " is not a valid auction name");
+        if(toReturn == null) throw FtcExceptionProvider.create(name + " is not a valid auction name");
         return toReturn;
-    }
-
-    private CompletableFuture<Suggestions> listAuctions(CommandContext<CommandListenerWrapper> c, SuggestionsBuilder b){
-        return suggestMatching(b, AuctionManager.getAuctionNames());
     }
 
     private class AuctionClaiming implements Listener, InventoryHolder {

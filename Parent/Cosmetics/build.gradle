@@ -29,7 +29,8 @@ dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT'
     compile files("C:/Users/ander/Desktop/ThePitOfTrash/FTC/Parent/ForTheCrown-Core/build/libs/FTC-Core-1.4-SNAPSHOT.jar")
-    compile files("C:/Users/ander/Desktop/ThePitOfTrash/PaperMC/Paper-Server/target/paper-1.16.5.jar")
+    compile files('C:/Users/ander/Desktop/ThePitOfTrash/RoyalGrenadier/build/libs/RoyalGrenadier-1.0-SNAPSHOT.jar')
+    compile files("C:/Users/ander/Desktop/ThePitOfTrash/Paper/Paper-Server/target/paper-1.16.5.jar")
 }
 
 processResources {

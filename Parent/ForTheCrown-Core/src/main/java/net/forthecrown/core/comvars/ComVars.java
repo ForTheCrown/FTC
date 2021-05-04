@@ -1,6 +1,6 @@
 package net.forthecrown.core.comvars;
 
-import net.forthecrown.core.commands.brigadier.exceptions.ComVarException;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.comvars.types.ComVarType;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
@@ -21,11 +21,11 @@ public class ComVars {
         boolean alreadyExists = COM_VARS.containsKey(name);
         if(alreadyExists && !COM_VARS.get(name).getType().equals(type)) throw new IllegalArgumentException("Mismatch between provided var type and already existing var type");
 
-        ComVar<T> entry = alreadyExists ? ((ComVar<T>) COM_VARS.get(name)).update(value) : new ComVar<>(type, value);
+        ComVar<T> entry = alreadyExists ? ((ComVar<T>) COM_VARS.get(name)).update(value) : new ComVar<>(type, name, value);
         return setRaw(name, entry);
     }
 
-    public static <T> void parseVar(String name, String input) throws ComVarException {
+    public static <T> void parseVar(String name, String input) throws CommandSyntaxException {
         ComVar<T> type = (ComVar<T>) COM_VARS.get(name);
         T value = type.getType().fromString(input);
         set(name, type.getType(), value);
@@ -47,6 +47,7 @@ public class ComVars {
     public static <T> ComVar<T> setRaw(String name, ComVar<T> variable){
         Validate.notNull(variable, "Variable was null");
         Validate.notNull(name, "Name was null");
+
         COM_VARS.put(name, variable);
         return variable;
     }
@@ -57,6 +58,10 @@ public class ComVars {
         if(!COM_VARS.get(name).getType().equals(type)) throw new IllegalArgumentException("Provided type does not match stored type");
 
         return (ComVar<T>) COM_VARS.get(name);
+    }
+
+    public static ComVar<?> getVar(String name){
+        return COM_VARS.get(name);
     }
 
     public static ComVarType<?> getType(@NotNull String name){
@@ -70,6 +75,10 @@ public class ComVars {
 
     public static int size(){
         return COM_VARS.size();
+    }
+
+    public static boolean contains(String name){
+        return COM_VARS.containsKey(name);
     }
 
     public void remove(@NotNull String name){

@@ -73,8 +73,7 @@ public class TwelveGaugeShotgun extends HitScanWeapon {
     @Override
     protected boolean onUse(HitScanShot shot) {
         WeaponEffect.GUNSHOT.play(shot, this);
-        if(shot.hasHitEntity) {
-            if (!(shot.target instanceof LivingEntity)) return true;
+        if(shot.hasHitEntity && shot.target instanceof LivingEntity) {
             LivingEntity entity = (LivingEntity) shot.target;
             entity.damage(damage + shot.wave);
             WeaponEffect.BULLET_HIT_MOB.play(shot, this);

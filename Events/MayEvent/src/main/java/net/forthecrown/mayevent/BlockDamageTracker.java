@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BlockDamageTracker {
-
     public static final Map<Block, Byte> DAMAGED = new HashMap<>();
 
     public static byte damage(Block block, double damage){
@@ -18,6 +17,7 @@ public class BlockDamageTracker {
     }
 
     public static byte damage(Block block, byte damage){
+        if(block == null) return -1;
         if(MayUtils.isNonDestructable(block.getType())) return -1;
 
         if(DAMAGED.containsKey(block)){

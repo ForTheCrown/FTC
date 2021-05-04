@@ -7,9 +7,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class BossFightContext {
+public class BossFightContext implements Predicate<Player> {
 
     private final Collection<Player> players;
     private final float finalModifier;
@@ -21,12 +22,13 @@ public class BossFightContext {
 
     public BossFightContext(DungeonBoss<?> boss){
         this.boss = boss;
-        players = boss.getBossRoom().getPlayers().stream().filter(plr -> plr.getGameMode() == GameMode.SURVIVAL).collect(Collectors.toList());
+        players = boss.getBossRoom().getPlayers().stream().filter(this).collect(Collectors.toList());
 
         calculateBase();
-        float initialMod = Math.max(1, (float) (enchants + armorAmount)/ (players.size() < 2 ? 20 : 17));
+        float initialMod = Math.max(1, (float) (enchants + armorAmount) / (players.size() < 2 ? 25 : 20));
         finalModifier = Math.min(initialMod, 5);
     }
+
 
     private void calculateBase(){
         for (Player p: players){
@@ -69,5 +71,10 @@ public class BossFightContext {
 
     public double getBossDamage(double initialDamage){
         return Math.ceil(initialDamage + finalModifier);
+    }
+
+    @Override
+    public boolean test(Player player) {
+        return player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE;
     }
 }

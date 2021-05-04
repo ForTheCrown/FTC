@@ -39,6 +39,8 @@ public class GunListener implements Listener {
 
         ItemStack item = event.getItem().getItemStack();
         NBT nbt = NbtGetter.ofItemTags(item);
+
+        //Picked up gun
         if(nbt.has("gun")){
             Class<? extends HitScanWeapon> gun = classFromName(nbt.getString("gun"));
             if(gun == null) return;
@@ -54,6 +56,7 @@ public class GunListener implements Listener {
             return;
         }
 
+        //Picked up ammo
         if(nbt.has("gunPickup")) {
             event.setCancelled(true);
 
@@ -66,6 +69,17 @@ public class GunListener implements Listener {
             entry.user().sendMessage(new ChatComponentText("Picked up ammo for " + weapon.name()).a(EnumChatFormat.BOLD), ChatMessageType.GAME_INFO);
             entry.player().playSound(entry.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1f, 1f);
             return;
+        }
+
+        //Picked up gems
+        if(nbt.has("gems")){
+            event.setCancelled(true);
+            event.getItem().remove();
+
+            MayMain.eLogger.logAction(player, "Collected 500 gems");
+            entry.user().setGems(entry.user().getGems() + 500);
+            entry.user().sendMessage(new ChatComponentText("Picked up 500 gems").a(EnumChatFormat.GOLD));
+            player.playSound(entry.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1f, 1f);
         }
     }
 
@@ -93,7 +107,6 @@ public class GunListener implements Listener {
 
     public Class<? extends HitScanWeapon> classFromName(String name){
         switch (name){
-            case "Gauss Cannon": return GaussCannon.class;
             case "Rocket Launcher": return RocketLauncher.class;
             case "Assault Rifle": return StandardRifle.class;
             case "Shotgun": return TwelveGaugeShotgun.class;
