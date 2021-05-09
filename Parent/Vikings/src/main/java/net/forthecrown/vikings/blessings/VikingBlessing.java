@@ -15,8 +15,8 @@ public abstract class VikingBlessing extends AbstractSerializer<Vikings> impleme
     private static final Set<VikingBlessing> BLESSINGS = new HashSet<>();
     protected final String name;
 
-    private final Set<UUID> usingUsers = new HashSet<>(); //name lol
-    private final Set<UUID> tempUsers = new HashSet<>();
+    private final Set<UUID> currently_using = new HashSet<>(); //name lol
+    private final Set<UUID> temp_users = new HashSet<>();
 
     protected VikingBlessing(String name, Vikings plugin){
         super(name, "vikingblessings", plugin);
@@ -28,24 +28,21 @@ public abstract class VikingBlessing extends AbstractSerializer<Vikings> impleme
     }
 
     @Override
-    public void save() {
+    public void saveFile() {
         List<String> temp = new ArrayList<>();
-        for (UUID id: usingUsers){
+        for (UUID id: currently_using){
             temp.add(id.toString());
         }
 
         getFile().set("players", temp);
-        super.save();
     }
 
     @Override
-    public void reload() {
-        super.reload();
-
-        usingUsers.clear();
+    public void reloadFile() {
+        currently_using.clear();
         for (String s: getFile().getStringList("players")){
             try {
-                usingUsers.add(UUID.fromString(s));
+                currently_using.add(UUID.fromString(s));
             } catch (Exception ignored) {}
         }
     }
@@ -66,26 +63,26 @@ public abstract class VikingBlessing extends AbstractSerializer<Vikings> impleme
     }
 
     public final void beginUsage(CrownUser user){
-        usingUsers.add(user.getBase());
+        currently_using.add(user.getUniqueId());
         onPlayerEquip(user);
     }
 
     public final void beginTempUsage(CrownUser user, int expiresInTicks){
-        tempUsers.add(user.getBase());
+        temp_users.add(user.getUniqueId());
         onPlayerEquip(user);
 
         Bukkit.getScheduler().runTaskLater(getPlugin(), () -> endUsage(user), expiresInTicks);
     }
 
     public final void endUsage(CrownUser user){
-        usingUsers.remove(user.getBase());
-        tempUsers.remove(user.getBase());
+        currently_using.remove(user.getUniqueId());
+        temp_users.remove(user.getUniqueId());
         onPlayerUnequip(user);
     }
 
     public void clearTempUsers(){
-        for (UUID id: tempUsers){
-            tempUsers.remove(id);
+        for (UUID id: temp_users){
+            temp_users.remove(id);
 
             Player player = Bukkit.getPlayer(id);
             if(player == null) continue;
@@ -95,11 +92,11 @@ public abstract class VikingBlessing extends AbstractSerializer<Vikings> impleme
     }
 
     public Set<UUID> getUsers(){
-        return usingUsers;
+        return currently_using;
     }
 
     public Set<UUID> getTempUsers(){
-        return tempUsers;
+        return temp_users;
     }
 
     @Override

@@ -101,7 +101,7 @@ public class CommandAuction extends CrownCommandBuilder {
                                 })
                         )
         )
-        .then(argument(AUCTION_ARG, StringArgumentType.word())
+        .then(argument(AUCTION_ARG, AuctionArgument.auction())
                 .suggests(suggestMatching(AuctionManager.getAuctionNames()))
 
                 .then(argument("expire")
@@ -120,6 +120,23 @@ public class CommandAuction extends CrownCommandBuilder {
                             return 0;
                         })
                 )
+
+                .then(argument("force_free_for_all")
+                        .requires(c -> c.hasPermission(getPermission() + ".admin"))
+
+                        .executes(c -> {
+                            Auction auction = auctionFromArg(c);
+
+                            if(!auction.isWaitingForItemClaim()) throw FtcExceptionProvider.create("The auction is not expired");
+
+                            auction.setFreeForAll(System.currentTimeMillis() - 100);
+                            auction.performExpiryCheck();
+
+                            c.getSource().sendAdmin(auction.getName() + " set as free for all");
+                            return 0;
+                        })
+                )
+
                 .then(argument("delete")
                         .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
@@ -152,8 +169,6 @@ public class CommandAuction extends CrownCommandBuilder {
                         )
                 )
                 .then(argument("claim")
-                        .requires(this::isAllowedToOwn)
-
                         .then(argument("startingBid", IntegerArgumentType.integer(1, 500000))
                                 .executes(c -> {
                                     CrownUser user = getUserExecutor(c);
@@ -195,10 +210,7 @@ public class CommandAuction extends CrownCommandBuilder {
     }
 
     private Auction auctionFromArg(CommandContext<CommandSource> c) throws CommandSyntaxException {
-        String name = c.getArgument(AUCTION_ARG, String.class);
-        Auction toReturn = AuctionManager.getAuction(name);
-        if(toReturn == null) throw FtcExceptionProvider.create(name + " is not a valid auction name");
-        return toReturn;
+        return c.getArgument(AUCTION_ARG, Auction.class);
     }
 
     private class AuctionClaiming implements Listener, InventoryHolder {
@@ -254,7 +266,6 @@ public class CommandAuction extends CrownCommandBuilder {
 
             auction.setClaimed(owner, startingBid, item, false);
             event.getPlayer().sendMessage(ChatColor.GREEN + "Auction claimed!");
-            FtcCore.getRoyalBrigadier().resendCommandPackets((Player) event.getPlayer());
         }
     }
 }

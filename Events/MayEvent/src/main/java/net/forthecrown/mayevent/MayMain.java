@@ -6,7 +6,10 @@ import net.forthecrown.core.crownevents.ObjectiveLeaderboard;
 import net.forthecrown.core.crownevents.reporters.EventReporter;
 import net.forthecrown.core.crownevents.reporters.ReporterFactory;
 import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.grenadier.RoyalArguments;
+import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.mayevent.command.CommandMayEvent;
+import net.forthecrown.mayevent.command.WeaponArgType;
 import net.forthecrown.mayevent.events.MayListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,6 +30,8 @@ public final class MayMain extends JavaPlugin {
         inst = this;
         event = new DoomEvent.Impl();
         eLogger = ReporterFactory.of(this, event);
+
+        RoyalArguments.register(WeaponArgType.class, VanillaArgumentType.WORD);
 
         new CommandMayEvent();
 

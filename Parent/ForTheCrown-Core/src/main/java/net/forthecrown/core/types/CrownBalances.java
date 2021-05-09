@@ -89,6 +89,11 @@ public class CrownBalances extends AbstractSerializer<FtcCore> implements Balanc
     }
 
     @Override
+    public boolean canAfford(UUID id, int amount) {
+        return get(id) >= amount;
+    }
+
+    @Override
     public synchronized Component withCurrency(UUID id){
         return Component.text(getWithCurrency(id));
     }

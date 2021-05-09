@@ -514,7 +514,7 @@ public interface CrownUser extends CrownSerializer<FtcCore>, CommandSender, Hove
     void onLeave();
 
     default ClickEvent asClickEvent(){
-        return ClickEvent.suggestCommand("/w " + getName());
+        return ClickEvent.suggestCommand("/msg " + getName() + " ");
     }
 
     @Override

@@ -45,7 +45,9 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
     private int baseBid;
     private boolean waitingForItemClaim;
     private long expiresAt;
+    private long freeForAll;
     private boolean adminAuction;
+    private boolean canBeClaimedByAnyone = false;
 
     //gets
     public PirateAuction(Location location) {
@@ -96,6 +98,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
         getFile().set("Owner", owner);
         getFile().set("HighestBidder", bidder);
+        getFile().set("freeForAll", freeForAll);
 
         removeDisplay();
         if(bids != null) getFile().createSection("Bids", MapUtils.convertKeys(bids, UUID::toString));
@@ -106,6 +109,11 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
     public void reloadFile() {
         name = getFile().getString("Name");
         String owner = getFile().getString("Owner");
+
+        freeForAll = getFile().getLong("freeForAll");
+        if(freeForAll == 0) freeForAll = System.currentTimeMillis();
+
+
 
         if(owner == null){
             unClaim();
@@ -202,7 +210,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
         this.adminAuction = admin;
         this.bids = new HashMap<>();
 
-        expiresAt = System.currentTimeMillis() + AuctionManager.EXPIRY_DURATION;
+        expiresAt = System.currentTimeMillis() + Pirates.getAuctionExpirationTime();
 
         Component itemName = ComponentUtils.convertString(CrownUtils.getItemNormalName(item));
         if(item.getItemMeta().hasDisplayName()) itemName = item.getItemMeta().displayName();
@@ -215,8 +223,8 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
     }
 
     @Override
-    public void attemptItemClaim(CrownUser user) throws CrownException{
-        if(!highestBidder.equals(user)){
+    public void attemptItemClaim(CrownUser user) throws CrownException {
+        if(!canBeClaimedByAnyone && !highestBidder.equals(user)){
             user.sendMessage(
                     Component.text("You cannot claim this item! ")
                             .color(NamedTextColor.YELLOW)
@@ -224,6 +232,8 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
                                     .color(NamedTextColor.GRAY)
                                     .hoverEvent(highestBidder.asHoverEvent())
                             )
+                            .append(Component.newline())
+                            .append(willBeMadeAvailableInMessage())
             );
             return;
         }
@@ -233,15 +243,12 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
         Balances bals = FtcCore.getBalances();
 
         if(!highestBidder.equals(owner)){
-            if (bals.get(user.getUniqueId()) < highestBid) throw new CrownException(user, "You do not have enough money to claim the item. Come back when you're a little mmm richer");
-            if(bals.get(getOwner().getUniqueId()) < highestBid) throw new CrownException(user, "The owner of the auction cannot afford that!");
-
             bals.add(owner.getUniqueId(), getHighestBid(), false);
             owner.sendMessage("&6$ &7You've received &e" + Balances.getFormatted(highestBid) + " &7from &e" + getName() + "&7 by &e" + user.getName());
         }
 
         user.getPlayer().getInventory().addItem(getItem());
-        user.sendMessage("&eYou've got your item! :D");
+        user.sendMessage("&eYou got the item! :D");
 
         unClaim();
         save();
@@ -361,15 +368,28 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
     @Override
     public boolean performExpiryCheck(){
         if(!isClaimed()) return true;
+        checkFreeForAll();
         if(isWaitingForItemClaim()) return false;
         if(System.currentTimeMillis() > expiresAt){
             setWaitingForItemClaim(true);
             getSign().line(0, AuctionManager.WAITING_FOR_ITEM_CLAIM_LABEL);
             updateSign();
+            freeForAll = System.currentTimeMillis() + Pirates.getAuctionPickUpTime();
             giveBalancesToLosers(false);
             return false;
         }
         return true;
+    }
+
+    public void checkFreeForAll(){
+        if(freeForAll == 0) return;
+        if(System.currentTimeMillis() > freeForAll) canBeClaimedByAnyone = true;
+    }
+
+    private Component willBeMadeAvailableInMessage(){
+        return Component.text("Auction will be made free for all in: " )
+                .color(NamedTextColor.GRAY)
+                .append(Component.text(CrownUtils.convertMillisIntoTime(freeForAll - System.currentTimeMillis())).color(NamedTextColor.GOLD));
     }
 
     @Override
@@ -383,7 +403,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
             int amount = bids.get(id);
 
             UserManager.getUser(id).sendMessage("&6$ &7You received &e" + CrownUtils.decimalizeNumber(amount) + " Rhines&7 from your bid on &e" + getName());
-            bals.add(id, amount);
+            bals.add(id, amount, false);
         }
     }
 
@@ -449,5 +469,15 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
     @Override
     public Map<UUID, Integer> getBids() {
         return bids;
+    }
+
+    @Override
+    public void setFreeForAll(long freeForAll) {
+        this.freeForAll = freeForAll;
+    }
+
+    @Override
+    public long getFreeForAll() {
+        return freeForAll;
     }
 }

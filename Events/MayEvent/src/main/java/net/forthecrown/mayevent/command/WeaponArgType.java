@@ -1,28 +1,28 @@
 package net.forthecrown.mayevent.command;
 
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.custom.CrownArgType;
-import net.forthecrown.mayevent.guns.*;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.mayevent.guns.HitScanWeapon;
+import net.forthecrown.mayevent.guns.RocketLauncher;
+import net.forthecrown.mayevent.guns.StandardRifle;
+import net.forthecrown.mayevent.guns.TwelveGaugeShotgun;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
-public class WeaponArgType extends CrownArgType<HitScanWeapon> {
-
+public class WeaponArgType implements ArgumentType<HitScanWeapon> {
+    public static DynamicCommandExceptionType exception = new DynamicCommandExceptionType(o -> () -> "Unknown gun: " + o);
     public static WeaponArgType WEAPON = new WeaponArgType();
-
-    private WeaponArgType() {
-        super(obj -> new LiteralMessage("Unkown gun: " + obj.toString()));
-    }
+    private WeaponArgType() {}
 
     @Override
-    protected HitScanWeapon parse(StringReader reader) throws CommandSyntaxException {
+    public HitScanWeapon parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
         String name = reader.readUnquotedString();
 
@@ -42,15 +42,15 @@ public class WeaponArgType extends CrownArgType<HitScanWeapon> {
         }
     }
 
-    public static StringArgumentType gun(){
-        return StringArgumentType.word();
+    public static WeaponArgType gun(){
+        return WEAPON;
     }
 
     public static <S> HitScanWeapon getGun(CommandContext<S> c, String argument) throws CommandSyntaxException {
-        return WEAPON.parse(inputToReader(c, argument));
+        return c.getArgument(argument, HitScanWeapon.class);
     }
 
     public static <S> CompletableFuture<Suggestions> suggest(CommandContext<S> c, SuggestionsBuilder builder){
-        return CrownCommandBuilder.suggestMatching(builder, "rifle", "shotgun", "gauss", "rocket");
+        return CommandSource.suggestMatching(builder, Arrays.asList("rifle", "shotgun", "gauss", "rocket"));
     }
 }

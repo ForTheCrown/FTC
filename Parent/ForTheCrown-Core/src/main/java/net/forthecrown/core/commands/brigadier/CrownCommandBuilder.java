@@ -32,7 +32,8 @@ import java.util.UUID;
 public abstract class CrownCommandBuilder extends AbstractCommand {
     protected CrownCommandBuilder(@NotNull String name, @NotNull Plugin plugin) {
         super(name, plugin);
-        permissionMessage = ChatColor.WHITE + "Unkown command. Type \"/help\" for help";
+        permissionMessage = ChatColor.WHITE + "Unknown command. Type \"/help\" for help";
+        permission = "ftc.commands." + name;
     }
 
     protected CommandSender getSender(CommandContext<CommandSource> c){
@@ -69,7 +70,7 @@ public abstract class CrownCommandBuilder extends AbstractCommand {
             if(!c.getSource().isPlayer()) return Suggestions.empty();
             UUID id = getPlayerSender(c).getUniqueId();
 
-            b.suggest(bals.get(id), new LiteralMessage("Your entire balance"));
+            if(bals.canAfford(id, 1)) b.suggest(bals.get(id), new LiteralMessage("Your entire balance"));
 
             suggestIf(id, 1, b);
             suggestIf(id, 10, b);
@@ -86,6 +87,6 @@ public abstract class CrownCommandBuilder extends AbstractCommand {
     }
 
     private void suggestIf(UUID id, int amount, SuggestionsBuilder builder){
-        if(bals.get(id) > amount) builder.suggest(amount);
+        if(bals.get(id) > amount && (amount + "").toLowerCase().startsWith(builder.getRemaining().toLowerCase())) builder.suggest(amount);
     }
 }

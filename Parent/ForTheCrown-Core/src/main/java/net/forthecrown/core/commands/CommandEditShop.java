@@ -38,10 +38,48 @@ public class CommandEditShop extends CrownCommandBuilder {
 
         maxMoney = FtcCore.getMaxMoneyAmount();
 
+        this.usageMessage = makeUsageMessage();
+
         setAliases("shopedit", "signshop");
         register();
     }
 
+    private Component makeUsageMessage(){
+        final Component border = Component.text("------------").color(NamedTextColor.DARK_GRAY).decorate(TextDecoration.STRIKETHROUGH);
+
+        final Component header = Component.text()
+                .append(border)
+                .append(Component.text(" editshop usage ").color(NamedTextColor.YELLOW))
+                .append(border)
+                .append(Component.newline())
+                .build();
+
+        final Component footer = Component.text()
+                .append(Component.text("---------------------------------------").decorate(TextDecoration.STRIKETHROUGH))
+                .color(NamedTextColor.DARK_GRAY)
+                .build();
+
+        final Component info = Component.text("Just look at a sign shop that you own to use this command").color(NamedTextColor.GRAY);
+
+        return Component.text()
+                .append(header)
+                .append(info)
+                .append(Component.newline())
+
+                .append(argUsage("buy", "Makes the shop a buy shop"))
+                .append(argUsage("sell", "Makes the shop a sell shop"))
+
+                .append(argUsage("line <2|3>", "Changes the 2nd or 3rd line of the sign"))
+
+                .append(argUsage("amount", "Changes the amount the shop will sell / buy"))
+                .append(argUsage("price", "Changes the price of the shop"))
+                .append(argUsage("transfer", "Transfers the shop to someone else"))
+
+                .append(footer)
+                .build();
+    }
+
+    private final Component usageMessage;
     private final int maxMoney;
     private static final SimpleCommandExceptionType EXCEPTION = new SimpleCommandExceptionType(() -> CrownUtils.translateHexCodes("&7You must be looking at a sign shop you own"));
 
@@ -49,41 +87,7 @@ public class CommandEditShop extends CrownCommandBuilder {
     protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> {
-                    Player player = getPlayerSender(c);
-                    final Component border = Component.text("------------").color(NamedTextColor.DARK_GRAY).decorate(TextDecoration.STRIKETHROUGH);
-
-                    final Component header = Component.text()
-                            .append(border)
-                            .append(Component.text(" editshop usage ").color(NamedTextColor.YELLOW))
-                            .append(border)
-                            .append(Component.newline())
-                            .build();
-
-                    final Component footer = Component.text()
-                            .append(Component.text("---------------------------------------").decorate(TextDecoration.STRIKETHROUGH))
-                            .color(NamedTextColor.DARK_GRAY)
-                            .build();
-
-                    final Component info = Component.text("Just look at a sign shop that you own to use this command").color(NamedTextColor.GRAY);
-
-                    Component usageMessage = Component.text()
-                            .append(header)
-                            .append(info)
-                            .append(Component.newline())
-
-                            .append(argUsage("buy", "Makes the shop a buy shop"))
-                            .append(argUsage("sell", "Makes the shop a sell shop"))
-
-                            .append(argUsage("line <2|3>", "Changes the 2nd or 3rd line of the sign"))
-
-                            .append(argUsage("amount", "Changes the amount the shop will sell / buy"))
-                            .append(argUsage("price", "Changes the price of the shop"))
-                            .append(argUsage("transfer", "Transfers the shop to someone else"))
-
-                            .append(footer)
-                            .build();
-
-                    player.sendMessage(usageMessage);
+                    c.getSource().sendMessage(usageMessage);
                     return 0;
                 })
 

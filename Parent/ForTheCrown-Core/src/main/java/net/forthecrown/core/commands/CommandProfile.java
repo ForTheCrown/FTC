@@ -8,6 +8,7 @@ import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.core.utils.ListUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -107,6 +108,8 @@ public class CommandProfile extends CrownCommandBuilder {
                 .append(line("Gems", profile.getGems() + "", profile.getGems() > 0))
                 .append(line("Balance", FtcCore.getBalances().withCurrency(profile.getUniqueId()), true))
 
+                .append(adminInfo(user, profile))
+
                 .append(Component.newline())
                 .append(Component.text(footer.toString()).color(NamedTextColor.GOLD).decorate(TextDecoration.STRIKETHROUGH))
                 .build();
@@ -133,5 +136,13 @@ public class CommandProfile extends CrownCommandBuilder {
                 .append(Component.text(field + ": ").color(NamedTextColor.YELLOW))
                 .append(value)
                 .build() : Component.empty();
+    }
+
+    private Component adminInfo(CrownUser sender, CrownUser profile){
+        if(!sender.hasPermission(getPermission() + ".bypass")) return Component.empty();
+
+        return Component.text("\nAdmin Info:")
+                .color(NamedTextColor.YELLOW)
+                .append(line("Ranks", ListUtils.join(profile.getAvailableRanks(), Rank::toString), true));
     }
 }

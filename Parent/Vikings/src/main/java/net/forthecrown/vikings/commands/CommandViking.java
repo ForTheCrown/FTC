@@ -2,15 +2,13 @@ package net.forthecrown.vikings.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.vikings.Vikings;
 import net.forthecrown.vikings.blessings.VikingBlessing;
 import net.forthecrown.vikings.inventory.BlessingSelector;
 import net.forthecrown.vikings.valhalla.RaidParty;
 import net.forthecrown.vikings.valhalla.VikingRaid;
-import net.forthecrown.vikings.valhalla.generation.RaidAreaCreator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +23,7 @@ public class CommandViking extends CrownCommandBuilder {
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("reload")
                         .executes(c -> {

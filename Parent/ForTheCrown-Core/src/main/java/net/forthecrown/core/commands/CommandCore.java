@@ -122,7 +122,7 @@ public class CommandCore extends CrownCommandBuilder {
 
                 //Everything relating to a specific user
                 .then(literal("user")
-                        .then(argument(USER_ARG, UserType.USER)
+                        .then(argument(USER_ARG, UserType.user())
 
                                 //Save the user's data
                                 .then(literal("save")

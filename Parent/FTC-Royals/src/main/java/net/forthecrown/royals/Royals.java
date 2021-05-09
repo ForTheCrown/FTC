@@ -1,6 +1,10 @@
 package net.forthecrown.royals;
 
+import net.forthecrown.grenadier.RoyalArguments;
+import net.forthecrown.grenadier.VanillaArgumentType;
+import net.forthecrown.royals.commands.BossArgument;
 import net.forthecrown.royals.commands.CommandRoyal;
+import net.forthecrown.royals.commands.RoyalEnchantType;
 import net.forthecrown.royals.dungeons.DungeonEvents;
 import net.forthecrown.royals.dungeons.bosses.Bosses;
 import net.forthecrown.royals.enchantments.EnchantEvents;
@@ -21,15 +25,14 @@ public final class Royals extends JavaPlugin implements Listener {
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
 
-        enchantments = new RoyalEnchants(this);
-        enchantments.registerEnchantments();
-
-        bosses = new Bosses(this);
-        bosses.initBosses();
+        enchantments = RoyalEnchants.init();
+        bosses = Bosses.init();
 
         getServer().getPluginManager().registerEvents(new EnchantEvents(), this);
         getServer().getPluginManager().registerEvents(new DungeonEvents(this), this);
 
+        RoyalArguments.register(BossArgument.class, VanillaArgumentType.WORD);
+        RoyalArguments.register(RoyalEnchantType.class, VanillaArgumentType.WORD);
         new CommandRoyal();
     }
 

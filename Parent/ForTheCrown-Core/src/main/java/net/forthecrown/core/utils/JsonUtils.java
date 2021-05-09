@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 public class JsonUtils {
-    public static JsonObject serializeLocation(Location location){
+    public static JsonElement serializeLocation(Location location){
         JsonObject result = new JsonObject();
         result.addProperty("world", location.getWorld().getName());
 

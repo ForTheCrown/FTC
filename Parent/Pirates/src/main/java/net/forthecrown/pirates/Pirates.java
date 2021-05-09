@@ -5,8 +5,13 @@ import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.commands.CommandLeave;
+import net.forthecrown.core.comvars.ComVar;
+import net.forthecrown.core.comvars.ComVars;
+import net.forthecrown.core.comvars.types.ComVarType;
 import net.forthecrown.core.enums.Rank;
 import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.grenadier.RoyalArguments;
+import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.pirates.auctions.Auction;
 import net.forthecrown.pirates.auctions.AuctionManager;
 import net.forthecrown.pirates.commands.*;
@@ -29,17 +34,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * This is such a mess, holy fuck
+ */
 public final class Pirates extends JavaPlugin implements Listener {
 
-    //public File wilhelmFile;
-    //public YamlConfiguration wilhelmYaml;
-    //public List<String> players = new ArrayList<String>();
-    //public List<ItemStack> itemsToGet = new ArrayList<ItemStack>();
     public File offlineWithParrots;
     public static Pirates inst;
     public GrapplingHook grapplingHook;
     public PirateEvents events;
     public TreasureShulker shulker;
+
+    private static ComVar<Long> auctionExpirationTime;
+    private static ComVar<Long> auctionPickUpTime;
 
     private static AuctionManager auctionManager;
 
@@ -68,6 +75,8 @@ public final class Pirates extends JavaPlugin implements Listener {
         events = new PirateEvents(this);
         shulker = new TreasureShulker(this);
 
+        RoyalArguments.register(AuctionArgument.class, VanillaArgumentType.WORD);
+
         //commands
         new CommandGhTarget();
         new CommandGhShowName();
@@ -90,6 +99,22 @@ public final class Pirates extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new NpcSmithEvent(), this);
 
         updateDate();
+    }
+
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+
+        auctionExpirationTime = ComVars.set("pr_auctionExpirationTime", ComVarType.LONG, getConfig().getLong("Auctions.ExpirationTime"));
+        auctionPickUpTime = ComVars.set("pr_auctionPickupTime", ComVarType.LONG, getConfig().getLong("Auctions.PickUpTime"));
+    }
+
+    public static long getAuctionPickUpTime(){
+        return auctionPickUpTime.getValue(259200000L);
+    }
+
+    public static long getAuctionExpirationTime(){
+        return auctionExpirationTime.getValue(604800000L);
     }
 
     @SuppressWarnings("deprecation")
@@ -241,8 +266,7 @@ public final class Pirates extends JavaPlugin implements Listener {
         List<String> top = getTopPlayers(Bukkit.getServer().getScoreboardManager().getMainScoreboard().getObjective("PiratePoints"), amount);
         double distanceBetween = 0.27;
 
-        for (int i = 0; i < top.size(); i++)
-        {
+        for (int i = 0; i < top.size(); i++) {
             spawnArmorStand(getLeaderboardLoc(), distanceBetween*i, top.get(top.size()-i-1), true);
         }
 
@@ -262,15 +286,12 @@ public final class Pirates extends JavaPlugin implements Listener {
     }
 
     private void removeLeaderboard() {
-        for (ArmorStand armorstand : getAllLeaderboardArmorstands())
-        {
+        for (ArmorStand armorstand : getAllLeaderboardArmorstands()) {
             armorstand.remove();
         }
         allLeaderboardArmorstands.clear();
-        for (Entity ent : getLeaderboardLoc().getWorld().getNearbyEntities(getLeaderboardLoc(), 0.1, 5, 0.1))
-        {
-            if (ent instanceof ArmorStand)
-                ent.remove();
+        for (Entity ent : getLeaderboardLoc().getWorld().getNearbyEntities(getLeaderboardLoc(), 0.1, 5, 0.1)) {
+            if (ent instanceof ArmorStand) ent.remove();
         }
     }
 
@@ -301,8 +322,7 @@ public final class Pirates extends JavaPlugin implements Listener {
 
     private List<ItemStack> getItems(Chest chest) {
         List<ItemStack> result = new ArrayList<>();
-        for (ItemStack item : chest.getInventory().getContents())
-        {
+        for (ItemStack item : chest.getInventory().getContents()) {
             if (item != null) result.add(item);
         }
         return result;

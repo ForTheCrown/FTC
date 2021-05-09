@@ -43,7 +43,7 @@ public class CommandParrot extends CrownCommandBuilder {
     private int setParrot(CommandContext<CommandSource> c, boolean silent) throws CommandSyntaxException {
         CrownUser user = getUserSender(c);
         List<Pet> pets = user.getPets();
-        Pet pet = PetType.getPet(c, "parrot");
+        Pet pet = PetType.getPetIfOwned(c, "parrot");
 
         if(!pets.contains(pet)){
             user.sendMessage(

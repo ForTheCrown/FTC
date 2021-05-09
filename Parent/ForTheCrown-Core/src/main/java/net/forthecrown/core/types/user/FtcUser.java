@@ -102,7 +102,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     }
 
     @Override
-    public void reloadFile(){
+    protected void reloadFile(){
         name = getFile().getString("PlayerName");
         setRank(Rank.valueOf(getFile().getString("CurrentRank")), false);
         setBranch(Branch.valueOf(getFile().getString("Branch")));
@@ -170,7 +170,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     }
 
     @Override
-    public void saveFile(){
+    protected void saveFile(){
         if(deleted) return;
 
         getFile().set("PlayerName", getName());
@@ -603,8 +603,7 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public boolean isOnline() {
-        boolean result = Bukkit.getPlayer(this.getUniqueId()) != null;
-        return result;
+        return Bukkit.getPlayer(this.getUniqueId()) != null;
     }
 
     @Override
@@ -787,13 +786,13 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
     @Override
     public Location getLocation() {
         if(!isOnline()) return lastKnownLocation;
-        return new Location(handle.world.getWorld(), handle.locX(), handle.locY(), handle.locZ(), handle.getBukkitYaw(), handle.pitch);
+        return new Location(getHandle().world.getWorld(), getHandle().locX(), getHandle().locY(), getHandle().locZ(), getHandle().getBukkitYaw(), getHandle().pitch);
     }
 
     @Override
     public World getWorld() {
         if(!isOnline()) return lastKnownLocation.getWorld();
-        return handle.world.getWorld();
+        return getHandle().world.getWorld();
     }
 
     @Override

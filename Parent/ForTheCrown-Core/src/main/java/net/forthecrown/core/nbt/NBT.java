@@ -1,7 +1,10 @@
 package net.forthecrown.core.nbt;
 
+import com.google.gson.JsonElement;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
+import net.minecraft.server.v1_16_R3.MojangsonParser;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 
 import java.util.Set;
@@ -15,6 +18,14 @@ public class NBT {
 
     public static NBT empty(){
         return new NBT(new NBTTagCompound());
+    }
+
+    public static NBT fromJson(JsonElement element){
+        try {
+            return of(MojangsonParser.parse(element.getAsString()));
+        } catch (CommandSyntaxException e){
+            throw new IllegalStateException(e.getMessage());
+        }
     }
 
     final NBTTagCompound tag;

@@ -33,4 +33,8 @@ public class UserParseResult {
         if(selector == null) return Collections.singletonList(user);
         return ListUtils.convertToList(selector.getPlayers(source), UserManager::getUser);
     }
+
+    public boolean isSelectorUsed(){
+        return selector != null;
+    }
 }

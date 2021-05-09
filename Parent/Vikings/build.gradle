@@ -20,15 +20,14 @@ repositories {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
-    maven {
-        url = ("https://mvn.intellectualsites.com/content/repositories/releases/")
-    } // FAWE
+    maven { url = ("https://mvn.intellectualsites.com/content/repositories/releases/") }
 }
 
 dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly("com.intellectualsites.fawe:FAWE-Bukkit:1.16-583")
-    compile files("C:/Users/ander/Desktop/ThePitOfTrash/FTC/Parent/ForTheCrown-Core/build/libs/FTC-Core-1.4-SNAPSHOT.jar")
+    compile files("C:/Users/ander/Desktop/ThePitOfTrash/FTC/Parent/ForTheCrown-Core/build/libs/FTC-Core-1.5.1-SNAPSHOT.jar")
+    compile files('C:/Users/ander/Desktop/ThePitOfTrash/RoyalGrenadier/build/libs/RoyalGrenadier-1.0-SNAPSHOT.jar')
     compile files("C:/Users/ander/Desktop/ThePitOfTrash/Paper/Paper-Server/target/paper-1.16.5.jar")
 }
 

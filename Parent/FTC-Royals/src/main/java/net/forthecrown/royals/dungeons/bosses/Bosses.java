@@ -26,6 +26,13 @@ public class Bosses {
         this.plugin = plugin;
     }
 
+    public static Bosses init(){
+        Bosses bosses = new Bosses(Royals.inst);
+        bosses.initBosses();
+
+        return bosses;
+    }
+
     public void initBosses(){
         zhambie = new Zhambie(plugin);
         skalatan = new Skalatan(plugin);

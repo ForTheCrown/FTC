@@ -15,6 +15,7 @@ import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.EnumChatFormat;
 
 import java.util.Collection;
+import java.util.UUID;
 
 public class CommandPay extends CrownCommandBuilder {
 
@@ -63,23 +64,24 @@ public class CommandPay extends CrownCommandBuilder {
     }
 
     private int pay(CrownUser user, Collection<CrownUser> targets, int amount) throws CommandSyntaxException {
-        if(amount > bals.get(user.getUniqueId())) throw FtcExceptionProvider.CANNOT_AFFORD_TRANSACTION.create(Balances.getFormatted(amount));
+        UUID id = user.getUniqueId();
+        if(!bals.canAfford(id, amount)) throw FtcExceptionProvider.cannotAfford(amount);
 
         byte paidAmount = 0;
 
         for (CrownUser target: targets){
             if(user.equals(target)){
-                if(targets.size() == 1) throw UserType.NO_USERS_FOUND.create();
+                if(targets.size() == 1) throw FtcExceptionProvider.create("You cannot pay yourself");
                 continue;
             }
 
-            if(bals.get(user.getUniqueId()) < amount){
+            if(!bals.canAfford(id, amount)){
                 user.sendMessage(new ChatComponentText("You cannot afford that").a(EnumChatFormat.GRAY));
                 break;
             }
 
             bals.add(target.getUniqueId(), amount, false);
-            bals.add(user.getUniqueId(), -amount, false);
+            bals.add(id, -amount, false);
 
             user.sendMessage(
                     Component.text("You've paid ")

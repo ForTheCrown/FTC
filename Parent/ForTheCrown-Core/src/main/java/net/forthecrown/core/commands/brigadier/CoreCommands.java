@@ -1,11 +1,10 @@
 package net.forthecrown.core.commands.brigadier;
 
 import net.forthecrown.core.FtcCore;
+import net.forthecrown.core.api.Announcer;
 import net.forthecrown.core.clickevent.ClickEventCommand;
 import net.forthecrown.core.commands.*;
-import net.forthecrown.core.commands.brigadier.types.ComVarArgument;
-import net.forthecrown.core.commands.brigadier.types.PetType;
-import net.forthecrown.core.commands.brigadier.types.UserType;
+import net.forthecrown.core.commands.brigadier.types.*;
 import net.forthecrown.core.commands.emotes.*;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Rank;
@@ -19,33 +18,29 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import java.util.logging.Level;
+
 public final class CoreCommands {
 
     public static final EnumArgument<Branch> BRANCH = EnumArgument.of(Branch.class);
     public static final EnumArgument<Rank> RANK = EnumArgument.of(Rank.class);
 
     private static CommandDispatcher dispatcher;
-    private final FtcCore plugin;
 
-    public CoreCommands(FtcCore plugin){
-        this.plugin = plugin;
-        dispatcher = ((CraftServer) plugin.getServer()).getServer().getCommandDispatcher();
+    private CoreCommands(){}
 
-        registerArguments();
-        loadCommands();
-    }
+    public static void init(){
+        dispatcher = ((CraftServer) FtcCore.getInstance().getServer()).getServer().getCommandDispatcher();
 
-    public FtcCore getPlugin() {
-        return plugin;
-    }
-
-    public void registerArguments(){
+        //ArgumentType registration
         RoyalArguments.register(PetType.class, VanillaArgumentType.WORD);
         RoyalArguments.register(UserType.class, VanillaArgumentType.custom(ArgumentScoreholder::b));
         RoyalArguments.register(ComVarArgument.class, VanillaArgumentType.WORD);
-    }
+        RoyalArguments.register(SignActionType.class, VanillaArgumentType.WORD);
+        RoyalArguments.register(SignPreconditionType.class, VanillaArgumentType.WORD);
 
-    public void loadCommands(){
+        //Command loading
+
         //admin commands
         new CommandKingMaker();
         new CommandBroadcast();
@@ -110,14 +105,14 @@ public final class CoreCommands {
         new EmoteHug();
         new EmotePog();
 
-        plugin.getLogger().info("All commands registered");
+        Announcer.log(Level.INFO, "All commands registered");
     }
 
     /**
      * Resends all the commands packets, for stuff like the permissions and the test() method
      * @param p The player to resend the packets to
      */
-    public void resendCommandPackets(Player p){
+    public static void resendCommandPackets(Player p){
         CraftPlayer player = (CraftPlayer) p;
         getServerCommands().a(player.getHandle());
     }
@@ -126,7 +121,7 @@ public final class CoreCommands {
      * Resends command packets for every player on the server
      * @see CoreCommands#resendCommandPackets(Player)
      */
-    public void resendAllCommandPackets(){
+    public static void resendAllCommandPackets(){
         for (Player p: Bukkit.getOnlinePlayers()){
             resendCommandPackets(p);
         }

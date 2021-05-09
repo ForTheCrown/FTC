@@ -22,6 +22,10 @@ HeadChestLocation4:
 ChosenHead: 'empty'
 PlayerWhoSoldHeadAlready: []
 
+Auctions:
+  ExpirationTime: 604800000
+  PickUpTime: 259200000
+
 TreasureLoc:
   world: world
   x: 0

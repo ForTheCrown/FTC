@@ -70,9 +70,4 @@ public class ComVar<T>/* implements ConfigurationSerializable */ {
     public String getName() {
         return name;
     }
-
-    /*@Override
-    public @NotNull Map<String, Object> serialize() {
-        return null;
-    }*/
 }

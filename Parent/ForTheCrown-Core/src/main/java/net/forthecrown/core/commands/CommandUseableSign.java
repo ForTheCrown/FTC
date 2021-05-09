@@ -1,30 +1,30 @@
 package net.forthecrown.core.commands;
 
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownSign;
-import net.forthecrown.core.commands.brigadier.CoreCommands;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
 import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
-import net.forthecrown.core.enums.Branch;
-import net.forthecrown.core.enums.Rank;
+import net.forthecrown.core.commands.brigadier.types.SignActionType;
+import net.forthecrown.core.commands.brigadier.types.SignPreconditionType;
 import net.forthecrown.core.types.signs.SignAction;
 import net.forthecrown.core.types.signs.SignManager;
+import net.forthecrown.core.types.signs.SignPrecondition;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.EnumArgument;
+import net.forthecrown.grenadier.types.pos.Position;
+import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Player;
-
-import java.util.function.BiConsumer;
 
 public class CommandUseableSign extends CrownCommandBuilder {
 
@@ -35,249 +35,204 @@ public class CommandUseableSign extends CrownCommandBuilder {
         register();
     }
 
-    private static final EnumArgument<SignAction.Action> enumType = EnumArgument.of(SignAction.Action.class);
-
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("create")
-                        .then(actionEditArg((c, type) -> {
-                            try {
-                                if(type == null) throw FtcExceptionProvider.create("Null action not allowed on creation");
+                .then(argument("location", PositionArgument.position())
+                        .then(argument("create")
+                                .executes(c -> {
+                                    CommandSource source = c.getSource();
+                                    Location l = c.getArgument("location", Position.class).getLocation(source);
 
-                                Player player = getPlayerSender(c);
-                                Block block = player.getTargetBlock(5);
+                                    if(!(l.getBlock().getState() instanceof Sign)) throw FtcExceptionProvider.create("Block is not sign");
+                                    if(SignManager.isInteractableSign(l.getBlock())) throw FtcExceptionProvider.create("Block is already an interactable sign");
 
-                                if(block == null || !(block.getState() instanceof Sign))
-                                    throw FtcExceptionProvider.create("You must be looking at a sign");
-
-                                if(SignManager.isInteractableSign(block))
-                                    throw FtcExceptionProvider.create("The sign is already an interactable sign");
-
-                                SignManager.createSign((Sign) block.getState(), type);
-                                broadcastAdmin(c, "Making interactable sign");
-                            } catch (Exception e){
-                                e.printStackTrace();
-                            }
-                            return 0;
-                        }))
-                )
-                .then(argument("edit")
-                        .then(argument("sendCooldown")
-                                .then(argument("bool", BoolArgumentType.bool())
-                                        .executes(c -> {
-                                            Player player = getPlayerSender(c);
-                                            CrownSign sign = getSign(player);
-
-                                            boolean value = c.getArgument("bool", Boolean.class);
-                                            sign.setSendCooldownMessage(value);
-
-                                            broadcastAdmin(c, "Sign will send cooldown messages: " + value);
-                                            return 0;
-                                        })
-                                )
-                        )
-                        .then(argument("sendFail")
-                                .then(argument("bool", BoolArgumentType.bool())
-                                        .executes(c -> {
-                                            Player player = getPlayerSender(c);
-                                            CrownSign sign = getSign(player);
-
-                                            boolean value = c.getArgument("bool", Boolean.class);
-                                            sign.setFailSendMessage(value);
-
-                                            broadcastAdmin(c, "Sign will send failure messages: " + value);
-                                            return 0;
-                                        })
-                                )
+                                    SignManager.createSign((Sign) l.getBlock().getState());
+                                    c.getSource().sendAdmin("Creating interactable sign");
+                                    return 0;
+                                })
                         )
 
-                        .then(argument("actions")
-                                .then(argument("add")
-                                        .then(actionEditArg((c, type) -> {
-                                            Player player = getPlayerSender(c);
-                                            CrownSign sign = getSign(player);
-                                            sign.addAction(type);
-
-                                            broadcastAdmin(c, "Added action " + type.getAction().toString().toLowerCase());
-                                            return 0;
-                                        }))
-                                )
-                                .then(argument("remove")
-                                        .then(argument("index", IntegerArgumentType.integer(0))
+                        .then(argument("edit")
+                                .then(argument("actions")
+                                        .then(argument("list")
                                                 .executes(c -> {
-                                                    Player player = getPlayerSender(c);
-                                                    CrownSign sign = getSign(player);
-                                                    int index = c.getArgument("index", Integer.class);
+                                                    CrownSign sign = getSign(c);
 
-                                                    sign.removeAction(index);
-                                                    broadcastAdmin(c, "Removing action");
+                                                    int index = 0;
+                                                    TextComponent.Builder builder = Component.text().append(Component.text("Sign actions:"));
+
+                                                    for (SignAction p: sign.getActions()){
+                                                        builder.append(Component.newline());
+                                                        builder.append(Component.text(index + ") " + p.asString()));
+                                                        index++;
+                                                    }
+
+                                                    c.getSource().sendMessage(builder.build());
+                                                    return 0;
+                                                })
+                                        )
+
+                                        .then(argument("remove")
+                                                .then(argument("index", IntegerArgumentType.integer(0))
+                                                        .executes(c -> {
+                                                            CrownSign sign = getSign(c);
+                                                            int index = c.getArgument("index", Integer.class);
+
+                                                            sign.removeAction(index);
+
+                                                            c.getSource().sendAdmin("Removed action with index " + index);
+                                                            return 0;
+                                                        })
+                                                )
+                                        )
+
+                                        .then(argument("add")
+                                                .then(argument("type", SignActionType.action())
+                                                        .then(argument("toParse", StringArgumentType.greedyString())
+                                                                .suggests((c, b) -> {
+                                                                    try {
+                                                                        return c.getArgument("type", SignAction.class).getSuggestions(c, b);
+                                                                    } catch (CommandSyntaxException ignored) {}
+                                                                    return Suggestions.empty();
+                                                                })
+
+                                                                .executes(c -> {
+                                                                    CrownSign sign = getSign(c);
+                                                                    SignAction action = c.getArgument("type", SignAction.class);
+                                                                    String toParse = c.getArgument("toParse", String.class);
+
+                                                                    action.parse(c, new StringReader(toParse));
+                                                                    sign.addAction(action);
+
+                                                                    c.getSource().sendAdmin("Successfully added action");
+                                                                    return 0;
+                                                                })
+                                                        )
+                                                )
+                                        )
+
+                                        .then(argument("clear")
+                                                .executes(c -> {
+                                                    CrownSign sign = getSign(c);
+                                                    sign.clearActions();
+
+                                                    c.getSource().sendAdmin("Cleared actions");
                                                     return 0;
                                                 })
                                         )
                                 )
 
-                                .then(argument("list")
-                                        .executes(c -> {
-                                            Player player = getPlayerSender(c);
-                                            CrownSign sign = getSign(player);
-
-                                            player.sendMessage(Component.text("actions: " + sign.getActions().toString()));
-                                            return 0;
-                                        })
-                                )
-                                .then(argument("clear")
-                                        .executes(c -> {
-                                            Player player = getPlayerSender(c);
-                                            CrownSign sign = getSign(player);
-
-                                            sign.clearActions();
-
-                                            broadcastAdmin(c, "Clearing actions list");
-                                            return 0;
-                                        })
-                                )
-                        )
-
-                        .then(argument("preconditions")
-                                .then(preconditionArgument(IntPrecondition.COOLDOWN))
-                                .then(preconditionArgument(IntPrecondition.REQUIRED_BALANCE))
-                                .then(preconditionArgument(IntPrecondition.REQUIRED_GEMS))
-
-                                .then(argument("required_rank")
-                                        .executes(c -> {
-                                            Player player = getPlayerSender(c);
-                                            CrownSign sign = getSign(player);
-
-                                            sign.setRequiredRank(null);
-                                            broadcastAdmin(c,"Required rank set to none");
-                                            return 0;
-                                        })
-
-                                        .then(argument("rank", CoreCommands.RANK)
+                                .then(argument("preconditions")
+                                        .then(argument("list")
                                                 .executes(c -> {
-                                                    Player player = getPlayerSender(c);
-                                                    CrownSign sign = getSign(player);
-                                                    Rank rank = c.getArgument("rank", Rank.class);
+                                                    CrownSign sign = getSign(c);
 
-                                                    sign.setRequiredRank(rank);
+                                                    int index = 0;
+                                                    TextComponent.Builder builder = Component.text().append(Component.text("Sign preconditions:"));
 
-                                                    broadcastAdmin(c, "Set required rank to " + rank.getPrefix());
+                                                    for (SignPrecondition p: sign.getPreconditions()){
+                                                        builder.append(Component.newline());
+                                                        builder.append(Component.text(index + ") " + p.asString()));
+                                                        index++;
+                                                    }
+
+                                                    c.getSource().sendMessage(builder.build());
+                                                    return 0;
+                                                })
+                                        )
+
+                                        .then(argument("remove")
+                                                .then(argument("name", StringArgumentType.word())
+                                                        .suggests((c, b) -> {
+                                                            try {
+                                                                return CommandSource.suggestMatching(b, getSign(c).getPreconditionTypes());
+                                                            } catch (CommandSyntaxException ignored) {}
+                                                            return Suggestions.empty();
+                                                        })
+
+                                                        .executes(c -> {
+                                                            CrownSign sign = getSign(c);
+                                                            String index = c.getArgument("index", String.class);
+
+                                                            sign.removePrecondition(index);
+
+                                                            c.getSource().sendAdmin("Removed precondition with index " + index);
+                                                            return 0;
+                                                        })
+                                                )
+                                        )
+
+                                        .then(argument("add")
+                                                .then(argument("type", SignPreconditionType.precondition())
+                                                        .then(argument("toParse", StringArgumentType.greedyString())
+                                                                .suggests((c, b) -> {
+                                                                    try {
+                                                                        return c.getArgument("type", SignPrecondition.class).getSuggestions(c, b);
+                                                                    } catch (CommandSyntaxException ignored) {}
+                                                                    return Suggestions.empty();
+                                                                })
+
+                                                                .executes(c -> {
+                                                                    CrownSign sign = getSign(c);
+                                                                    SignPrecondition p = c.getArgument("type", SignPrecondition.class);
+
+                                                                    String toParse = c.getArgument("toParse", String.class);
+                                                                    p.parse(toParse);
+
+                                                                    sign.addPrecondition(p);
+
+                                                                    c.getSource().sendAdmin("Successfully added precondition");
+                                                                    return 0;
+                                                                })
+                                                        )
+                                                )
+                                        )
+
+                                        .then(argument("clear")
+                                                .executes(c -> {
+                                                    CrownSign sign = getSign(c);
+                                                    sign.clearPreconditions();
+
+                                                    c.getSource().sendAdmin("Cleared sign preconditions");
                                                     return 0;
                                                 })
                                         )
                                 )
 
-                                .then(argument("required_branch")
-                                        .executes(c -> {
-                                            Player player = getPlayerSender(c);
-                                            CrownSign sign = getSign(player);
-
-                                            sign.setRequiredBranch(null);
-                                            broadcastAdmin(c,"Required branch set to none");
-                                            return 0;
-                                        })
-
-                                        .then(argument("branch", CoreCommands.BRANCH)
+                                .then(argument("sendFail")
+                                        .then(argument("bool", BoolArgumentType.bool())
                                                 .executes(c -> {
-                                                    Player player = getPlayerSender(c);
-                                                    CrownSign sign = getSign(player);
-                                                    Branch branch = c.getArgument("branch", Branch.class);
+                                                    CrownSign sign = getSign(c);
+                                                    boolean bool = c.getArgument("bool", Boolean.class);
 
-                                                    sign.setRequiredBranch(branch);
+                                                    sign.setSendFail(bool);
 
-                                                    broadcastAdmin(c.getSource(), "Set required branch to " + branch.getName());
-                                                    return 0;
-                                                })
-                                        )
-                                )
-
-                                .then(argument("required_permission")
-                                        .executes(c -> {
-                                            Player player = getPlayerSender(c);
-                                            CrownSign sign = getSign(player);
-
-                                            sign.setRequiredPermission(null);
-                                            broadcastAdmin(c.getSource(),"Required permission set to none");
-                                            return 0;
-                                        })
-
-                                        .then(argument("permission", StringArgumentType.word())
-                                                .executes(c -> {
-                                                    Player player = getPlayerSender(c);
-                                                    CrownSign sign = getSign(player);
-                                                    String permission = c.getArgument("permission", String.class);
-
-                                                    sign.setRequiredPermission(permission);
-
-                                                    broadcastAdmin(c.getSource(), "Set required permission to " + permission);
+                                                    c.getSource().sendAdmin("Sign will send failure messages: " + bool);
                                                     return 0;
                                                 })
                                         )
                                 )
                         )
-                )
-                .then(argument("remove")
-                        .executes(c -> {
-                            Player player = getPlayerSender(c);
-                            CrownSign sign = getSign(player);
 
-                            sign.delete();
+                        .then(argument("remove")
+                                .executes(c -> {
+                                    CrownSign sign = getSign(c);
 
-                            broadcastAdmin(c.getSource(), "Deleting sign");
-                            return 0;
-                        })
+                                    sign.delete();
+
+                                    c.getSource().sendAdmin("Deleting interactable sign");
+                                    return 0;
+                                })
+                        )
                 );
     }
 
-    private CrownSign getSign(Player player) throws CommandSyntaxException {
-        Block block = player.getTargetBlock(5);
+    private CrownSign getSign(CommandContext<CommandSource> c) throws CommandSyntaxException {
+        Location l = c.getArgument("location", Position.class).getLocation(c.getSource());
+        Block b = l.getBlock();
+        if(!SignManager.isInteractableSign(b)) throw FtcExceptionProvider.create("Specified location is not an interactable sign");
 
-        if(!SignManager.isInteractableSign(block)) throw FtcExceptionProvider.create("You must be looking at an interactable sign");
-        return SignManager.getSign(block.getLocation());
-    }
-
-    private RequiredArgumentBuilder<CommandSource , SignAction.Action> actionEditArg(ActionCommand command){
-        return argument("action", enumType)
-                .then(argument("toParse", StringArgumentType.greedyString())
-                        .executes(c -> {
-                            SignAction.Action action = c.getArgument("action", SignAction.Action.class);
-                            SignAction type = action.get();
-                            type.parse(c.getArgument("toParse", String.class));
-
-                            return command.run(c, type);
-                        })
-                );
-    }
-
-    private interface ActionCommand{
-        int run(CommandContext<CommandSource> c, SignAction type) throws CommandSyntaxException;
-    }
-
-    private LiteralArgumentBuilder<CommandSource> preconditionArgument(IntPrecondition precondition){
-        return argument(precondition.toString().toLowerCase())
-                .then(argument("amount", IntegerArgumentType.integer())
-                        .executes(c -> {
-                            Player player = getPlayerSender(c);
-                            CrownSign sign = getSign(player);
-                            int amount = c.getArgument("amount", Integer.class);
-
-                            precondition.consumer.accept(sign, amount);
-
-                            broadcastAdmin(c.getSource(), "Changed precondition " + precondition.toString().toLowerCase() + " to " + amount);
-                            return 0;
-                        })
-                );
-    }
-
-    public enum IntPrecondition {
-        COOLDOWN (CrownSign::setCooldown),
-        REQUIRED_BALANCE (CrownSign::setRequiredBal),
-        REQUIRED_GEMS (CrownSign::setRequiredGems);
-
-        private final BiConsumer<CrownSign, Integer> consumer;
-        IntPrecondition(BiConsumer<CrownSign, Integer> consumer){
-            this.consumer = consumer;
-        }
+        return SignManager.getSign(b.getLocation());
     }
 }

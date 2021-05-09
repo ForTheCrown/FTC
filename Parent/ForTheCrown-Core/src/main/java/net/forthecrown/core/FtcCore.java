@@ -38,7 +38,7 @@ import java.util.logging.Level;
 public final class FtcCore extends JavaPlugin {
 
     //Hacky way of determining if we're on the test server or not
-    public static final ComVar<Boolean> inDebugMode = ComVars.set("sv_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
+    public static final ComVar<Boolean> inDebugMode = ComVars.set("core_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
 
     //Not public cuz API, I don't want this value getting changed
     private static FtcCore          instance;
@@ -57,15 +57,13 @@ public final class FtcCore extends JavaPlugin {
     private static ComVar<Byte>     hoppersInOneChunk;
 
     //C R O W N
-    private static CrownBroadcaster json_announcer;
+    private static CrownBroadcaster announcer;
     private static CrownBalances    balFile;
     private static CrownBlackMarket bm;
-    private static CrownWorldGuard  crownWG;
     private static CrownUserManager userManager;
-    private static CoreCommands     brigadier;
 
-    private static final Map<Material, ComVar<Short>>   defaultItemPrices = new HashMap<>();
-    public static final Set<ArmorStandLeaderboard>      LEADERBOARDS = new HashSet<>();
+    private static final Map<Material, ComVar<Short>>   defaultItemPrices   = new HashMap<>();
+    public static final Set<ArmorStandLeaderboard>      LEADERBOARDS        = new HashSet<>();
     public static LuckPerms                             LUCK_PERMS;
     public static NamespacedKey                         SHOP_KEY;
 
@@ -77,11 +75,13 @@ public final class FtcCore extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
 
-        json_announcer = new CrownBroadcaster();
+        announcer = new CrownBroadcaster();
         balFile = new CrownBalances(this);
         bm = new CrownBlackMarket(this);
-        brigadier = new CoreCommands(this);
         userManager = new CrownUserManager(this);
+
+        SignManager.init();
+        CoreCommands.init();
 
         SHOP_KEY = new NamespacedKey(this, "signshop");
 
@@ -91,8 +91,7 @@ public final class FtcCore extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        crownWG = new CrownWorldGuard(this);
-        crownWG.registerFlags();
+        CrownWorldGuard.init();
     }
 
     @Override
@@ -173,13 +172,13 @@ public final class FtcCore extends JavaPlugin {
         prefix = getConfig().getString("Prefix");
         discord = getConfig().getString("Discord");
 
-        maxMoneyAmount = ComVars.set("sv_maxMoneyAmount", ComVarType.INTEGER, getConfig().getInt("MaxMoneyAmount"));
-        branchSwapCooldown = ComVars.set("sv_branchSwapInterval", ComVarType.LONG, getConfig().getLong("BranchSwapCooldown"));
-        taxesEnabled = ComVars.set("sv_taxesEnabled", ComVarType.BOOLEAN, getConfig().getBoolean("Taxes"));
-        userDataResetInterval = ComVars.set("sv_userEarningsResetInterval", ComVarType.LONG, getConfig().getLong("UserDataResetInterval"));
-        logAdminShop = ComVars.set("sv_log_admin", ComVarType.BOOLEAN, getConfig().getBoolean("Shops.log-admin-purchases"));
-        logNormalShop = ComVars.set("sv_log_normal", ComVarType.BOOLEAN, getConfig().getBoolean("Shops.log-normal-purchases"));
-        hoppersInOneChunk = ComVars.set("sv_maxHoppersPerChunk", ComVarType.BYTE, (byte) getConfig().getInt("HoppersInOneChunk"));
+        maxMoneyAmount = ComVars.set("core_maxMoneyAmount", ComVarType.INTEGER, getConfig().getInt("MaxMoneyAmount"));
+        branchSwapCooldown = ComVars.set("core_branchSwapInterval", ComVarType.LONG, getConfig().getLong("BranchSwapCooldown"));
+        taxesEnabled = ComVars.set("core_taxesEnabled", ComVarType.BOOLEAN, getConfig().getBoolean("Taxes"));
+        userDataResetInterval = ComVars.set("core_userEarningsResetInterval", ComVarType.LONG, getConfig().getLong("UserDataResetInterval"));
+        logAdminShop = ComVars.set("core_log_admin", ComVarType.BOOLEAN, getConfig().getBoolean("Shops.log-admin-purchases"));
+        logNormalShop = ComVars.set("core_log_normal", ComVarType.BOOLEAN, getConfig().getBoolean("Shops.log-normal-purchases"));
+        hoppersInOneChunk = ComVars.set("core_maxHoppersPerChunk", ComVarType.BYTE, (byte) getConfig().getInt("HoppersInOneChunk"));
 
         loadDefaultItemPrices();
 
@@ -285,7 +284,7 @@ public final class FtcCore extends JavaPlugin {
         return instance;
     }
     public static Announcer getAnnouncer(){
-        return json_announcer;
+        return announcer;
     }
     public static Balances getBalances(){
         return balFile;
@@ -295,11 +294,5 @@ public final class FtcCore extends JavaPlugin {
     }
     public static UserManager getUserManager() {
         return userManager;
-    }
-    public static CoreCommands getRoyalBrigadier(){
-        return brigadier;
-    }
-    public static CrownWorldGuard getCrownWorldGuard() {
-        return crownWG;
     }
 }

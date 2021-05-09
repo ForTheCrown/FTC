@@ -54,8 +54,8 @@ public class Zhambie extends DungeonBoss<Husk> {
             husk.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
             husk.setHealth(health);
             husk.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(25.0);
-            husk.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1.0F);
-            husk.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(15.0F + context.getModifier());
+            husk.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(.9F);
+            husk.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(context.getBossDamage(20));
             husk.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.31F);;
 
             husk.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 999999, 1, false, false));
@@ -106,6 +106,8 @@ public class Zhambie extends DungeonBoss<Husk> {
             equipment.setHelmetDropChance(0);
             equipment.setChestplateDropChance(0);
             equipment.setBootsDropChance(0);
+            equipment.setItemInMainHandDropChance(0);
+            equipment.setItemInOffHandDropChance(0);
 
             zhelper.setAdult();
             zhelper.getWorld().playSound(zhelper.getLocation(), Sound.ENTITY_ZOMBIE_INFECT, 0.7f, 1.0f);

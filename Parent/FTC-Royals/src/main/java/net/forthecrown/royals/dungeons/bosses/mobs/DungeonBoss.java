@@ -56,7 +56,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
         this.bossRoom = bossRoom;
         this.requiredToSpawn = requiredItems;
         this.updaterDelay = updaterDelay;
-        Bosses.BY_NAME.put(name, this);
+        Bosses.BY_NAME.put(name.toLowerCase().replaceAll(" ", "_"), this);
     }
 
     protected abstract T onSummon(BossFightContext context);

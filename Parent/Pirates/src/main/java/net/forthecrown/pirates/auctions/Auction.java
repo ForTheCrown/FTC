@@ -86,4 +86,8 @@ public interface Auction extends CrownSerializer<Pirates> {
     Map<UUID, Integer> getBids();
 
     boolean isDeleted();
+
+    void setFreeForAll(long freeForAll);
+
+    long getFreeForAll();
 }

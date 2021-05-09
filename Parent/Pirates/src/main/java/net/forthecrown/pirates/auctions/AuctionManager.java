@@ -31,7 +31,6 @@ public final class AuctionManager {
     public static final Component REGULAR_LABEL = LABEL_COMPONENT.color(NamedTextColor.GREEN);
     public static final Component ADMIN_LABEL = LABEL_COMPONENT.color(NamedTextColor.AQUA);
     public static final Component WAITING_FOR_ITEM_CLAIM_LABEL = LABEL_COMPONENT.color(NamedTextColor.YELLOW);
-    public static final long EXPIRY_DURATION = 604800000L; // 2 weeks or so
 
     public static NamespacedKey AUCTION_KEY;
 
@@ -98,7 +97,9 @@ public final class AuctionManager {
     public static TextComponent getPriceLine(@Nullable Integer bid){
         String price = "NONE";
         if(bid != null && bid != -1) price = bid.toString();
-        return Component.text("Top Bid: ").color(NamedTextColor.GRAY).append(Component.text("$" + price).color(NamedTextColor.BLACK));
+        return Component.text("Top Bid: ")
+                .color(NamedTextColor.GRAY)
+                .append(Component.text("$" + price).color(NamedTextColor.BLACK));
     }
 
     public static Set<String> getAuctionNames(){

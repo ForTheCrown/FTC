@@ -51,7 +51,7 @@ public interface DoomEvent extends CrownEvent<ArenaEntry> {
             return;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(MayMain.inst, () -> {
+        Bukkit.getScheduler().runTask(MayMain.inst, () -> {
             ArenaEntry entry = new ArenaEntry(player);
             entry.arena().start();
             entry.regEvents(MayMain.inst);

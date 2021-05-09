@@ -50,8 +50,8 @@ public abstract class CommandEmote extends CrownCommandBuilder {
                             if(recipient.equals(sender)) return executeSelf(sender);
 
                             //If anyone's got emotes disabled, stop em
-                            if(!sender.allowsEmotes()) throw FtcExceptionProvider.SENDER_EMOTE_DISABLED.create();
-                            if(!recipient.allowsEmotes()) throw FtcExceptionProvider.TARGET_EMOTE_DISABLED.create(recipient.getName());
+                            if(!sender.allowsEmotes()) throw FtcExceptionProvider.senderEmoteDisabled();
+                            if(!recipient.allowsEmotes()) throw FtcExceptionProvider.targetEmoteDisabled(recipient.getName());
 
                             if(execute(sender, recipient) >= 0 && !sender.hasPermission("ftc.admin")) Cooldown.add(sender, cooldownCategory, cooldownTime);
                             return 0;

@@ -50,12 +50,12 @@ public class CoreListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getBlock().getType() != Material.HOPPER) return;
-        int hopperAmount = event.getBlock().getChunk().getTileEntities(block -> block.getType() == Material.HOPPER, true).size();
         if(FtcCore.getHoppersInOneChunk() == -1) return;
+        int hopperAmount = event.getBlock().getChunk().getTileEntities(block -> block.getType() == Material.HOPPER, true).size();
         if(hopperAmount <= FtcCore.getHoppersInOneChunk()) return;
 
         event.setCancelled(true);
-        event.getPlayer().sendMessage(Component.text("Too many hoppers (Max 45)").color(NamedTextColor.RED));
+        event.getPlayer().sendMessage(Component.text("Too many hoppers (Max " + FtcCore.getHoppersInOneChunk() + ")").color(NamedTextColor.RED));
     }
 
     //Entity death by crown weapon

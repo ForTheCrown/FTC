@@ -19,6 +19,13 @@ public class RoyalEnchants {
         this.plugin = plugin;
     }
 
+    public static RoyalEnchants init(){
+        RoyalEnchants e = new RoyalEnchants(Royals.inst);
+        e.registerEnchantments();
+
+        return e;
+    }
+
     public void registerEnchantments(){
         try {
             Field f = Enchantment.class.getDeclaredField("acceptingNew");

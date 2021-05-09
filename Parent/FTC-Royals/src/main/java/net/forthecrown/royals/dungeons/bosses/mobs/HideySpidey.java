@@ -60,7 +60,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
 
             spidey.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(25);
             spidey.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
-            spidey.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(context.getBossHealth(11));
+            spidey.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(context.getBossDamage(11));
             spidey.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.28 + (context.getModifier()/20));
 
             Pathfinder pathfinder = spidey.getPathfinder();

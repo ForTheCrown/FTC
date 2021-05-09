@@ -2,17 +2,17 @@ package net.forthecrown.mayevent.command;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.commands.brigadier.BrigadierCommand;
 import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.exceptions.CrownCommandException;
-import net.forthecrown.core.commands.brigadier.types.TargetSelectorType;
+import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.mayevent.ArenaEntry;
 import net.forthecrown.mayevent.DoomEvent;
 import net.forthecrown.mayevent.MayMain;
 import net.forthecrown.mayevent.MayUtils;
 import net.forthecrown.mayevent.arena.EventArena;
 import net.forthecrown.mayevent.guns.HitScanWeapon;
-import net.minecraft.server.v1_16_R3.CommandListenerWrapper;
 import org.bukkit.entity.Player;
 
 import static net.forthecrown.core.api.Announcer.debug;
@@ -27,24 +27,24 @@ public class CommandMayEvent extends CrownCommandBuilder {
     }
 
     @Override
-    protected void registerCommand(BrigadierCommand command) {
+    protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("updatelb")
                         .executes(c -> {
                             MayMain.leaderboard.update();
 
-                            adminMessage(c, "Updating Leaderboard");
+                            broadcastAdmin(c, "Updating Leaderboard");
                             return 0;
                         })
                 )
 
                 .then(argument("enter")
-                        .then(argument("player", TargetSelectorType.player())
+                        .then(argument("player", EntityArgument.player())
                                 .executes(c -> {
-                                    Player selected = TargetSelectorType.getPlayer(c, "player");
+                                    Player selected = EntityArgument.getPlayer(c, "player");
                                     if(DoomEvent.ENTRIES.containsKey(selected)){
                                         MayMain.inst.getLogger().warning(selected.getName() + " entered the portal but was still in the entries list");
-                                        throw new CrownCommandException("What? You're already in the event!?!?");
+                                        throw FtcExceptionProvider.create("What? You're already in the event!?!?");
                                     }
 
                                     MayMain.event.start(selected);
@@ -59,7 +59,7 @@ public class CommandMayEvent extends CrownCommandBuilder {
 
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
-                                    if(!DoomEvent.ENTRIES.containsKey(player)) throw new CrownCommandException("Gotta be in the event, honey");
+                                    if(!DoomEvent.ENTRIES.containsKey(player)) throw FtcExceptionProvider.create("Gotta be in the event, honey");
 
                                     HitScanWeapon weapon = WeaponArgType.getGun(c, "gunName");
                                     MayUtils.dropItem(player.getLocation().add(2, 0, 0), weapon.item(), false);
@@ -73,7 +73,7 @@ public class CommandMayEvent extends CrownCommandBuilder {
                 .then(argument("info")
                         .executes(c -> {
                             Player player = getPlayerSender(c);
-                            if(!DoomEvent.ENTRIES.containsKey(player)) throw new CrownCommandException("Gotta be in the event for that one cutie");
+                            if(!DoomEvent.ENTRIES.containsKey(player)) throw FtcExceptionProvider.create("Gotta be in the event for that one cutie");
 
                             ArenaEntry entry = DoomEvent.ENTRIES.get(player);
                             EventArena arena = entry.arena();
@@ -110,9 +110,9 @@ public class CommandMayEvent extends CrownCommandBuilder {
                 .then(argument("complete").executes(c -> endEvent(c, true)));
     }
 
-    public int endEvent(CommandContext<CommandListenerWrapper> c, boolean complete) throws CommandSyntaxException {
+    public int endEvent(CommandContext<CommandSource> c, boolean complete) throws CommandSyntaxException {
         Player player = getPlayerSender(c);
-        if(!DoomEvent.ENTRIES.containsKey(player)) throw new CrownCommandException("You're not in the event");
+        if(!DoomEvent.ENTRIES.containsKey(player)) throw FtcExceptionProvider.create("You're not in the event");
 
         DoomEvent event = MayMain.event;
         ArenaEntry entry = DoomEvent.ENTRIES.get(player);

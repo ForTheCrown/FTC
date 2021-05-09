@@ -108,4 +108,12 @@ public interface Balances extends CrownSerializer<FtcCore> {
      * @return The balance message
      */
     String getWithCurrency(UUID id);
+
+    /**
+     * Checks if the given user can afford losing the given amount
+     * @param id The UUID of the user
+     * @param amount the amount to check
+     * @return Whether they can afford losing that amount
+     */
+    boolean canAfford(UUID id, int amount);
 }

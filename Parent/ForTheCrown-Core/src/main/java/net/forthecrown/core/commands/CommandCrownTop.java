@@ -17,7 +17,7 @@ public class CommandCrownTop extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
-            CrownUtils.showLeaderboard(getPlayerSender(c), "crown");
+            CrownUtils.showLeaderboard(c.getSource().asPlayer(), "crown");
             return 0;
         });
     }

@@ -61,6 +61,11 @@ public class ArmorStandLeaderboard {
         create();
     }
 
+    public void update(Map<String, Integer> scores){
+        setList(scores);
+        create();
+    }
+
     /**
      * Destroys any preexisting leaderboards at the specified location and then creates
      * a new leaderboard
@@ -106,7 +111,7 @@ public class ArmorStandLeaderboard {
         return result;
     }
 
-    private void createStand(String name, Location loc){
+    private static void createStand(String name, Location loc){
         ArmorStand stand = loc.getWorld().spawn(loc, ArmorStand.class);
         stand.customName(ComponentUtils.convertString(name));
         stand.setCustomNameVisible(true);

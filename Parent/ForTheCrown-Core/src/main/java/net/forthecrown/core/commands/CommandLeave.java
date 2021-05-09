@@ -32,7 +32,7 @@ public class CommandLeave extends CrownCommandBuilder {
 
                 Pair<Location, Function<Player, Boolean>> par = e.getValue();
                 if(par.getSecond().apply(player)) player.teleport(par.getFirst());
-                break;
+                return 0;
             }
             return 0;
         });

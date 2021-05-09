@@ -35,7 +35,7 @@ public enum Rank {
     JARL ("<Jarl>", Branch.VIKINGS, "donator-tier-3"),
 
     //non branch ranks
-    DEFAULT ("DEFAULT", Branch.DEFAULT, "default"),
+    DEFAULT("DEFAULT", Branch.DEFAULT, "default"),
     LEGEND("&#dfdfdf[&#fff147Legend&#dfdfdf] &r", Branch.DEFAULT, "legend");
 
     private final String tabPrefix;

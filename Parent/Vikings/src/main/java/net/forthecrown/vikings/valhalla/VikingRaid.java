@@ -1,101 +1,68 @@
 package net.forthecrown.vikings.valhalla;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.forthecrown.core.api.Nameable;
+import com.google.gson.JsonPrimitive;
+import net.forthecrown.core.CrownBoundingBox;
 import net.forthecrown.core.serialization.JsonSerializable;
-import net.forthecrown.vikings.Vikings;
-import net.forthecrown.vikings.valhalla.generation.RaidAreaCreator;
+import net.forthecrown.vikings.valhalla.creation.RaidGenerator;
 import org.bukkit.Location;
-import org.bukkit.event.HandlerList;
 
-import static net.forthecrown.core.utils.JsonUtils.deserializeLocation;
-import static net.forthecrown.core.utils.JsonUtils.serializeLocation;
+import static net.forthecrown.core.utils.JsonUtils.*;
 
-public class VikingRaid implements Nameable, JsonSerializable {
+public class VikingRaid implements JsonSerializable {
 
     private final String name;
-    private final Location location;
-    private final RaidAreaCreator generator;
-    private final Vikings main;
+    private final Location start_location;
+    private final RaidGenerator generator;
 
-    private boolean active;
-    public RaidParty currentParty;
-    private RaidListener listener;
+    private CrownBoundingBox region;
 
-    //deserializes
-    public VikingRaid(Vikings main, JsonObject json){
-        this.main = main;
-
-        name = json.get("name").getAsString();
-        location = deserializeLocation(json.get("location").getAsJsonObject());
-
-        generator = new RaidAreaCreator(this, json.get("generator").getAsJsonObject());
-    }
-
-    //creates
-    public VikingRaid(String name, Location location, Vikings main){
-        this.location = location;
+    public VikingRaid (String name, Location start_location){
         this.name = name;
-        this.main = main;
-
-        this.generator = new RaidAreaCreator(this);
+        this.start_location = start_location;
+        this.generator = new RaidGenerator(this);
     }
 
-    public void init(RaidParty party){
-        if(active) return;
-        active = true;
-        currentParty = party;
+    public VikingRaid(JsonObject json){
+        this.name = json.get("name").getAsString();
+        this.start_location = deserializeLocation(json.get("start_location").getAsJsonObject());
+        this.generator = new RaidGenerator(json.get("generator"), this);
 
-        //Make raid area
-        generator.create();
-
-        //tp players in
-        party.forEach(plr -> plr.teleport(location));
-
-        //Register raid listener
-        listener = new RaidListener(this, party, main);
-        main.getServer().getPluginManager().registerEvents(listener, main);
+        JsonElement raid_region = json.get("region");
+        if(raid_region != null && !raid_region.isJsonNull()) this.region = deserializeBoundingBox(raid_region.getAsJsonObject());
     }
 
-    public void end(EndCause cause){
-        if(!active) return;
-        active = false;
-
-        HandlerList.unregisterAll(listener);
-        listener = null;
+    public CrownBoundingBox getRegion() {
+        return region;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    public Location getLocation() {
-        return location;
-    }
-
-    public RaidAreaCreator getGenerator() {
+    public RaidGenerator getGenerator() {
         return generator;
     }
 
-    public boolean isActive() {
-        return active;
+    public Location getStartLocation() {
+        return start_location;
+    }
+
+    public void setRegion(CrownBoundingBox region) {
+        this.region = region;
     }
 
     @Override
-    public JsonObject serialize(){
-        JsonObject result = new JsonObject();
+    public JsonElement serialize() {
+        JsonObject json = new JsonObject();
 
-        result.addProperty("name", name);
-        result.add("location", serializeLocation(getLocation()));
-        result.add("generator", getGenerator().serialize());
+        json.add("name", new JsonPrimitive(name));
+        json.add("startLocation", serializeLocation(start_location));
+        json.add("generator", generator.serialize());
 
-        return result;
-    }
+        if(region != null) json.add("region", serializeBoundingBox(region));
 
-    public static enum EndCause{
-        PLUGIN,
-        LOSS,
-        SUCCESS
+        return json;
     }
 }

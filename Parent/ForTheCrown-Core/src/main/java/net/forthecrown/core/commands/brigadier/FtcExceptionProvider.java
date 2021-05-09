@@ -5,6 +5,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.utils.CrownUtils;
 import net.md_5.bungee.api.ChatColor;
 
@@ -30,5 +31,21 @@ public interface FtcExceptionProvider {
 
     static CommandSyntaxException createWithContext(String message, StringReader reader){
         return GENERIC.createWithContext(reader, CrownUtils.translateHexCodes(message));
+    }
+
+    static CommandSyntaxException cannotAfford(int amount){
+        return CANNOT_AFFORD_TRANSACTION.create(Balances.getFormatted(amount));
+    }
+
+    static CommandSyntaxException cannotAfford(){
+        return CANNOT_AFFORD_INFOLESS.create();
+    }
+
+    static CommandSyntaxException senderEmoteDisabled(){
+        return SENDER_EMOTE_DISABLED.create();
+    }
+
+    static CommandSyntaxException targetEmoteDisabled(String name){
+        return TARGET_EMOTE_DISABLED.create(name);
     }
 }

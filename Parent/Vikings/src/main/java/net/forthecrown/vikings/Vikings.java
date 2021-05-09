@@ -16,7 +16,7 @@ public final class Vikings extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        handler = new RaidManager(this);
+        handler = RaidManager.init();
 
         getServer().getPluginManager().registerEvents(new VikingListener(), this);
 

@@ -16,7 +16,6 @@ public class BossFightContext implements Predicate<Player> {
     private final float finalModifier;
     private final DungeonBoss<?> boss;
 
-    //+1 per each in player's inv
     private int enchants = 0;
     private int armorAmount = 0;
 
@@ -25,7 +24,7 @@ public class BossFightContext implements Predicate<Player> {
         players = boss.getBossRoom().getPlayers().stream().filter(this).collect(Collectors.toList());
 
         calculateBase();
-        float initialMod = Math.max(1, (float) (enchants + armorAmount) / (players.size() < 2 ? 25 : 20));
+        float initialMod = Math.max(1, (float) ((enchants / 3 * 2) + armorAmount) / (players.size() < 2 ? 20 : 17));
         finalModifier = Math.min(initialMod, 5);
     }
 
@@ -70,7 +69,9 @@ public class BossFightContext implements Predicate<Player> {
     }
 
     public double getBossDamage(double initialDamage){
-        return Math.ceil(initialDamage + finalModifier);
+        final double damage = (finalModifier / 3) * initialDamage;
+
+        return Math.ceil(damage + finalModifier);
     }
 
     @Override
