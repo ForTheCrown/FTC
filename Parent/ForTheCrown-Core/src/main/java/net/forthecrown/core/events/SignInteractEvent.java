@@ -6,7 +6,7 @@ import net.forthecrown.core.api.ShopManager;
 import net.forthecrown.core.api.SignShop;
 import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.events.customevents.SignShopUseEvent;
-import net.forthecrown.core.types.signs.SignManager;
+import net.forthecrown.core.types.interactable.UseablesManager;
 import net.forthecrown.core.utils.Cooldown;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -46,9 +46,9 @@ public class SignInteractEvent implements Listener {
 
             //Call the event
             new SignShopUseEvent(shop, UserManager.getUser(player), player, FtcCore.getBalances()).callEvent();
-        } else if(SignManager.isInteractableSign(event.getClickedBlock())){
+        } else if(UseablesManager.isInteractableSign(event.getClickedBlock())){
             try {
-                SignManager.getSign(event.getClickedBlock().getLocation()).interact(event.getPlayer());
+                UseablesManager.getSign(event.getClickedBlock().getLocation()).interact(event.getPlayer());
             } catch (NullPointerException ignored) {}
         }
     }

@@ -50,7 +50,12 @@ public final class CoreCommands {
         new CommandHologram();
         new CommandComVar();
         new CommandGift();
-        new CommandUseableSign();
+        new CommandInteractable();
+
+        //VVV Because essentials is shite
+        new CommandItemName();
+        new CommandLore();
+        new CommandSign();
 
         if(FtcCore.inDebugMode.getValue(false)){
             new CommandTestCore();

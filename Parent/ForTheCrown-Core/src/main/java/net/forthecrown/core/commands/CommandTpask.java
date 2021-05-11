@@ -35,11 +35,7 @@ public class CommandTpask extends CrownCommandBuilder {
      * - /tpask [player]
      *
      * Permissions used:
-     * - ftc.tpa
-     *
-     * Referenced other classes:
-     * - FtcCore
-     * - (Essentials)
+     * - ftc.commands.tpa
      *
      * Main Author: Botul
      * Edit by: Wout

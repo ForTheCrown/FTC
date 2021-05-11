@@ -61,8 +61,7 @@ public class CommandBalanceTop extends CrownCommandBuilder {
 
     //Send the message
     private void sendBaltopMessage(CommandSender sender, @Nonnegative int page){
-        List<Component> baltopList = getBaltopList();
-        Collections.reverse(baltopList);
+        List<Component> baltopList = getSortedBalances();
         if(page > 0) page--;
 
         final TextComponent border = Component.text("------").color(NamedTextColor.GRAY).decoration(TextDecoration.STRIKETHROUGH, TextDecoration.State.TRUE);
@@ -80,7 +79,8 @@ public class CommandBalanceTop extends CrownCommandBuilder {
                     .append(baltopList.get(index))
                     .append(Component.newline());
         }
-        text.append(border)
+        text
+                .append(border)
                 .append(Component.text(" Page " +  (page+1) + "/" + maxPage + " ").color(NamedTextColor.YELLOW))
                 .append(border);
 
@@ -89,34 +89,24 @@ public class CommandBalanceTop extends CrownCommandBuilder {
         sender.sendMessage(text);
     }
 
-    //Gets the formatted list of balances, in descending order
-    private List<Component> getBaltopList(){
-        Map<UUID, Integer> map = getSortedBalances();
-        List<Component> list = new ArrayList<>();
-
-        for(UUID id : getSortedBalances().keySet()){
-            OfflinePlayer player = Bukkit.getOfflinePlayer(id);
-            if(player == null || player.getName() == null) continue;
-
-            list.add(Component.text()
-                    .append(Component.text(player.getName()))
-                    .append(Component.text(" - "))
-                    .append(Balances.formatted(map.get(id)).color(NamedTextColor.YELLOW))
-                    .build());
-
-        }
-        return list;
-    }
-
-    //Gets a sorted list of balances, descending order
-    private Map<UUID, Integer> getSortedBalances(){
+    //Gets a sorted list of balances, descending order, and formats it into components
+    private List<Component> getSortedBalances(){
         List<Map.Entry<UUID, Integer>> list = new ArrayList<>(FtcCore.getBalances().getBalanceMap().entrySet());
         list.sort(Map.Entry.comparingByValue());
 
-        Map<UUID, Integer> result = new LinkedHashMap<>();
+        List<Component> sortedList = new ArrayList<>();
         for (Map.Entry<UUID, Integer> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
+            OfflinePlayer player = Bukkit.getOfflinePlayer(entry.getKey());
+            if(player == null || player.getName() == null) continue;
+
+            sortedList.add(Component.text()
+                    .append(Component.text(player.getName()))
+                    .append(Component.text(" - "))
+                    .append(Balances.formatted(entry.getValue()).color(NamedTextColor.YELLOW))
+                    .build());
         }
-        return result;
+
+        Collections.reverse(sortedList);
+        return sortedList;
     }
 }

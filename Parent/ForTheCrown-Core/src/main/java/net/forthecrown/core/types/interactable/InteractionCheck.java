@@ -1,6 +1,7 @@
-package net.forthecrown.core.types.signs;
+package net.forthecrown.core.types.interactable;
 
 import com.google.gson.JsonElement;
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -14,8 +15,8 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
-public interface SignPrecondition extends JsonSerializable, Predicate<Player>, SuggestionProvider<CommandSource> {
-    void parse(String input) throws CommandSyntaxException;
+public interface InteractionCheck extends JsonSerializable, Predicate<Player>, SuggestionProvider<CommandSource> {
+    void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException;
     void parse(JsonElement json) throws CommandSyntaxException;
 
     String getRegistrationName();

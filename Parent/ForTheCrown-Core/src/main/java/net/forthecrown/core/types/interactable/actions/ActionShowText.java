@@ -1,4 +1,4 @@
-package net.forthecrown.core.types.signs.actions;
+package net.forthecrown.core.types.interactable.actions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -6,7 +6,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
-import net.forthecrown.core.types.signs.SignAction;
+import net.forthecrown.core.types.interactable.InteractionAction;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -14,7 +14,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.entity.Player;
 
-public class SignActionShowText implements SignAction {
+public class ActionShowText implements InteractionAction {
     private static final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
     private Component component;
 
@@ -61,7 +61,7 @@ public class SignActionShowText implements SignAction {
 
     @Override
     public String toString() {
-        return "SignShowText{" + "component=" + serializer.serialize(component) + '}';
+        return getClass().getSimpleName() + "{" + "component=" + serializer.serialize(component) + '}';
     }
 
     @Override
@@ -70,7 +70,7 @@ public class SignActionShowText implements SignAction {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        SignActionShowText text = (SignActionShowText) o;
+        ActionShowText text = (ActionShowText) o;
 
         return new EqualsBuilder()
                 .append(component, text.component)

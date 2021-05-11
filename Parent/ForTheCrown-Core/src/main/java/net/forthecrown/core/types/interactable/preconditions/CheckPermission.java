@@ -1,12 +1,13 @@
-package net.forthecrown.core.types.signs.preconditions;
+package net.forthecrown.core.types.interactable.preconditions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.types.signs.SignPrecondition;
+import net.forthecrown.core.types.interactable.InteractionCheck;
 import net.forthecrown.core.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
@@ -17,17 +18,17 @@ import org.bukkit.permissions.Permission;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SignCheckPermission implements SignPrecondition {
+public class CheckPermission implements InteractionCheck {
     private String permission;
 
     @Override
-    public void parse(String input) throws CommandSyntaxException {
-        permission = input;
+    public void parse(CommandContext<CommandSource> c, StringReader reader) throws CommandSyntaxException {
+        permission = reader.readUnquotedString();
     }
 
     @Override
     public void parse(JsonElement json) throws CommandSyntaxException {
-        parse(json.getAsString());
+        permission = json.getAsString();
     }
 
     @Override
@@ -37,7 +38,7 @@ public class SignCheckPermission implements SignPrecondition {
 
     @Override
     public String asString() {
-        return "SignCheckPermission{permission=" + permission + "}";
+        return getClass().getSimpleName() + "{permission=" + permission + "}";
     }
 
     @Override

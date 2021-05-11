@@ -1,30 +1,28 @@
-package net.forthecrown.core.types.signs.preconditions;
+package net.forthecrown.core.types.interactable.preconditions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.Balances;
 import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
-import net.forthecrown.core.types.signs.SignPrecondition;
+import net.forthecrown.core.types.interactable.InteractionCheck;
+import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-public class SignCheckNumber implements SignPrecondition {
+public class CheckNumber implements InteractionCheck {
     private final boolean checkBal;
     private int amount;
 
-    public SignCheckNumber(boolean checkBal) { this.checkBal = checkBal; }
+    public CheckNumber(boolean checkBal) { this.checkBal = checkBal; }
 
     @Override
-    public void parse(String input) throws CommandSyntaxException {
-        try {
-            amount = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            throw FtcExceptionProvider.create("Couldn't parse integer: " + input);
-        }
+    public void parse(CommandContext<CommandSource> c, StringReader reader) throws CommandSyntaxException {
+        amount = reader.readInt();
     }
 
     @Override
@@ -39,7 +37,7 @@ public class SignCheckNumber implements SignPrecondition {
 
     @Override
     public String asString() {
-        return "SignCheckNumber{" + "checks=" + (checkBal ? "balance" : "gems") + ",amount=" + amount + "}";
+        return getClass().getSimpleName() + "{" + "checks=" + (checkBal ? "balance" : "gems") + ",amount=" + amount + "}";
     }
 
     @Override

@@ -415,7 +415,8 @@ public class FtcUser extends AbstractSerializer<FtcCore> implements CrownUser {
 
     @Override
     public Short getItemPrice(Material item){
-        return itemPrices.getOrDefault(item, FtcCore.getItemPrice(item));
+        short price = itemPrices.getOrDefault(item, FtcCore.getItemPrice(item));
+        return price > FtcCore.getItemPrice(item) ? FtcCore.getItemPrice(item) : price;
     }
     @Override
     public void setItemPrice(Material item, short price){

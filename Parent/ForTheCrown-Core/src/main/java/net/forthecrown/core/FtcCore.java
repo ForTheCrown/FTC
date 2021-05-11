@@ -10,7 +10,7 @@ import net.forthecrown.core.events.*;
 import net.forthecrown.core.types.CrownBalances;
 import net.forthecrown.core.types.CrownBlackMarket;
 import net.forthecrown.core.types.CrownBroadcaster;
-import net.forthecrown.core.types.signs.SignManager;
+import net.forthecrown.core.types.interactable.UseablesManager;
 import net.forthecrown.core.types.user.CrownUserManager;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.MapUtils;
@@ -80,7 +80,7 @@ public final class FtcCore extends JavaPlugin {
         bm = new CrownBlackMarket(this);
         userManager = new CrownUserManager(this);
 
-        SignManager.init();
+        UseablesManager.init();
         CoreCommands.init();
 
         SHOP_KEY = new NamespacedKey(this, "signshop");
@@ -196,7 +196,7 @@ public final class FtcCore extends JavaPlugin {
 
     public static void saveFTC(){
         ShopManager.save();
-        SignManager.saveAll();
+        UseablesManager.saveAll();
         getUserManager().save();
         getUserManager().saveUsers();
         getBalances().save();

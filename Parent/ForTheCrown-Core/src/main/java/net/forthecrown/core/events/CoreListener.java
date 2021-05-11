@@ -4,6 +4,7 @@ import net.forthecrown.core.CrownWeapons;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.inventories.SellShop;
+import net.forthecrown.core.types.interactable.UseablesManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -38,6 +39,12 @@ public class CoreListener implements Listener {
     @EventHandler
     public void onServerShopNpcUse(PlayerInteractEntityEvent event){
         if(event.getHand() != EquipmentSlot.HAND) return;
+        if(UseablesManager.isInteractableEntity(event.getRightClicked())){
+            try {
+                UseablesManager.getEntity(event.getRightClicked()).interact(event.getPlayer());
+            } catch (NullPointerException ignored) {}
+        }
+
         if(event.getRightClicked().getType() != EntityType.WANDERING_TRADER) return;
         LivingEntity trader = (LivingEntity) event.getRightClicked();
 
@@ -64,7 +71,7 @@ public class CoreListener implements Listener {
         if(event.getEntity().getKiller() == null) return;
         Player player = event.getEntity().getKiller();
         ItemStack item = player.getInventory().getItemInMainHand();
-        if(item == null) return;
+        if(item == null || item.getType() == Material.AIR) return;
 
         if(!CrownWeapons.isLegacyWeapon(item) && !CrownWeapons.isCrownWeapon(item)) return;
         EntityDamageEvent event2 = event.getEntity().getLastDamageCause();

@@ -1,6 +1,7 @@
 package net.forthecrown.vikings.valhalla.creation;
 
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 
 public class RaidWorldCreator {
     private final World example_world;
@@ -14,7 +15,11 @@ public class RaidWorldCreator {
     }
 
     public void copyWorlds(){
+        WorldCreator creator = new WorldCreator("world_raids_actual")
+                .generator("VoidGenerator")
+                .copy(example_world);
 
+        creator.createWorld();
     }
 
     public void unloadRaidWorld(){

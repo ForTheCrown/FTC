@@ -1,20 +1,32 @@
 package net.forthecrown.vikings.valhalla.utils;
 
-import net.forthecrown.vikings.valhalla.RaidBattle;
-
-import java.util.function.Consumer;
-
 public class TriggerableEvent {
 
     private final String name;
-    private final Consumer<RaidBattle> onExecute;
+    private final TriggerExecutor onExecute;
     private final TriggerType type;
     private final TriggerCaller caller;
 
-    public TriggerableEvent(String name, TriggerType type, TriggerCaller caller, Consumer<RaidBattle> onExecute){
+    public TriggerableEvent(String name, TriggerType type, TriggerCaller caller, TriggerExecutor onExecute){
         this.name = name;
         this.type = type;
         this.caller = caller;
         this.onExecute = onExecute;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public TriggerExecutor getOnExecute() {
+        return onExecute;
+    }
+
+    public TriggerType getType() {
+        return type;
+    }
+
+    public TriggerCaller getCaller() {
+        return caller;
     }
 }

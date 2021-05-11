@@ -1,5 +1,5 @@
 name: Vikings
-version: @version@
+version: $semver.buildMeta
 main: net.forthecrown.vikings.Vikings
 api-version: 1.16
 depend:

@@ -7,13 +7,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.types.signs.SignAction;
-import net.forthecrown.core.types.signs.SignManager;
+import net.forthecrown.core.types.interactable.InteractionAction;
+import net.forthecrown.core.types.interactable.UseablesManager;
 import net.forthecrown.grenadier.CommandSource;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SignActionType implements ArgumentType<SignAction> {
+public class SignActionType implements ArgumentType<InteractionAction> {
     private static final SignActionType INSTANCE = new SignActionType();
     private SignActionType() {}
 
@@ -24,12 +24,12 @@ public class SignActionType implements ArgumentType<SignAction> {
     }
 
     @Override
-    public SignAction parse(StringReader reader) throws CommandSyntaxException {
+    public InteractionAction parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
         String name = reader.readUnquotedString();
 
         try {
-            return SignManager.getAction(name);
+            return UseablesManager.getAction(name);
         } catch (NullPointerException e){
             reader.setCursor(cursor);
             throw UNKNOWN_ACTION.createWithContext(reader, name);
@@ -38,6 +38,6 @@ public class SignActionType implements ArgumentType<SignAction> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(builder, SignManager.getActions());
+        return CommandSource.suggestMatching(builder, UseablesManager.getActions());
     }
 }

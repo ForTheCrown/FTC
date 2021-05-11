@@ -7,13 +7,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.types.signs.SignManager;
-import net.forthecrown.core.types.signs.SignPrecondition;
+import net.forthecrown.core.types.interactable.UseablesManager;
+import net.forthecrown.core.types.interactable.InteractionCheck;
 import net.forthecrown.grenadier.CommandSource;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SignPreconditionType implements ArgumentType<SignPrecondition> {
+public class SignPreconditionType implements ArgumentType<InteractionCheck> {
     private static final SignPreconditionType INSTANCE = new SignPreconditionType();
     private SignPreconditionType() {}
 
@@ -24,12 +24,12 @@ public class SignPreconditionType implements ArgumentType<SignPrecondition> {
     }
 
     @Override
-    public SignPrecondition parse(StringReader reader) throws CommandSyntaxException {
+    public InteractionCheck parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
         String name = reader.readUnquotedString();
 
         try {
-            return SignManager.getPrecondition(name);
+            return UseablesManager.getPrecondition(name);
         } catch (NullPointerException e){
             reader.setCursor(cursor);
             throw UNKNOWN_PRECONDITION.createWithContext(reader, name);
@@ -38,6 +38,6 @@ public class SignPreconditionType implements ArgumentType<SignPrecondition> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(builder, SignManager.getPreconditions());
+        return CommandSource.suggestMatching(builder, UseablesManager.getPreconditions());
     }
 }

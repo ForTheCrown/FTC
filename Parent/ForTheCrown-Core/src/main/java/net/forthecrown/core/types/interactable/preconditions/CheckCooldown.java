@@ -1,13 +1,15 @@
-package net.forthecrown.core.types.signs.preconditions;
+package net.forthecrown.core.types.interactable.preconditions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
-import net.forthecrown.core.types.signs.SignPrecondition;
+import net.forthecrown.core.types.interactable.InteractionCheck;
 import net.forthecrown.core.utils.CrownUtils;
 import net.forthecrown.core.utils.MapUtils;
+import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -16,17 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class SignCheckCooldown implements SignPrecondition {
+public class CheckCooldown implements InteractionCheck {
     private final Map<UUID, Long> onCooldown = new HashMap<>();
     private int tickDuration;
 
     @Override
-    public void parse(String input) throws CommandSyntaxException {
-        try {
-            tickDuration = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            throw FtcExceptionProvider.create("Couldn't parse integer: " + input);
-        }
+    public void parse(CommandContext<CommandSource> c, StringReader reader) throws CommandSyntaxException {
+        tickDuration = reader.readInt();
     }
 
     @Override

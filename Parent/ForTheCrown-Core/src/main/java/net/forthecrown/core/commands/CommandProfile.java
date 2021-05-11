@@ -141,8 +141,8 @@ public class CommandProfile extends CrownCommandBuilder {
     private Component adminInfo(CrownUser sender, CrownUser profile){
         if(!sender.hasPermission(getPermission() + ".bypass")) return Component.empty();
 
-        return Component.text("\nAdmin Info:")
-                .color(NamedTextColor.YELLOW)
-                .append(line("Ranks", ListUtils.join(profile.getAvailableRanks(), Rank::toString), true));
+        return Component.text("\n")
+                .append(Component.text("\nAdmin Info:").color(NamedTextColor.YELLOW))
+                .append(line("• Ranks", ListUtils.join(profile.getAvailableRanks(), r -> r.name().toLowerCase()), true));
     }
 }

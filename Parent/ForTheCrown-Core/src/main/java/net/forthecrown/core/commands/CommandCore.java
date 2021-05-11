@@ -23,7 +23,8 @@ import net.forthecrown.core.datafixers.UserAndBalanceUpdater;
 import net.forthecrown.core.enums.Branch;
 import net.forthecrown.core.enums.Pet;
 import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.types.signs.SignManager;
+import net.forthecrown.core.types.CrownBroadcaster;
+import net.forthecrown.core.types.interactable.UseablesManager;
 import net.forthecrown.core.types.user.FtcUserAlt;
 import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.core.utils.CrownUtils;
@@ -104,7 +105,7 @@ public class CommandCore extends CrownCommandBuilder {
                         .then(saveReloadArg(SaveReloadPart.USERS, true))
                         .then(saveReloadArg(SaveReloadPart.USER_MANAGER, true))
                         .then(saveReloadArg(SaveReloadPart.SHOPS, true))
-                        .then(saveReloadArg(SaveReloadPart.SIGN_MANAGER, true))
+                        .then(saveReloadArg(SaveReloadPart.INTERACTABLES, true))
                 )
                 .then(literal("reload")
                         .executes(c -> saveOrReloadAll(c.getSource(), false)) //Reload all
@@ -117,7 +118,7 @@ public class CommandCore extends CrownCommandBuilder {
                         .then(saveReloadArg(SaveReloadPart.USERS, false))
                         .then(saveReloadArg(SaveReloadPart.USER_MANAGER, false))
                         .then(saveReloadArg(SaveReloadPart.SHOPS, false))
-                        .then(saveReloadArg(SaveReloadPart.SIGN_MANAGER, false))
+                        .then(saveReloadArg(SaveReloadPart.INTERACTABLES, false))
                 )
 
                 //Everything relating to a specific user
@@ -428,6 +429,20 @@ public class CommandCore extends CrownCommandBuilder {
                                             return 0;
                                         })
 
+                                        .then(argument("set")
+                                                .then(argument("rankToSet", CoreCommands.RANK)
+                                                        .executes(c -> {
+                                                            CrownUser user = getUser(c);
+                                                            Rank rank = c.getArgument("rankToSet", Rank.class);
+
+                                                            user.setRank(rank, true);
+
+                                                            c.getSource().sendAdmin("Set rank of " + user.getName() + " to " + rank.getPrefix());
+                                                            return 0;
+                                                        })
+                                                )
+                                        )
+
                                         .then(literal("list")
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
@@ -519,6 +534,7 @@ public class CommandCore extends CrownCommandBuilder {
                                     for (Component comp: announcer.getAnnouncements()){
                                         announcer.announce(comp);
                                     }
+                                    announcer.announce(CrownBroadcaster.secretAnnouncement());
 
                                     broadcastAdmin(c.getSource(), "All announcements have been broadcast");
                                     return 0;
@@ -675,9 +691,9 @@ public class CommandCore extends CrownCommandBuilder {
     }
 
     private enum SaveReloadPart {
-        SIGN_MANAGER("Sign Manager", b -> {
-           if(b) SignManager.saveAll();
-           else SignManager.reloadAll();
+        INTERACTABLES("Interactable Manager", b -> {
+           if(b) UseablesManager.saveAll();
+           else UseablesManager.reloadAll();
         }),
         ANNOUNCER ("Announcer", (b) -> {
             if(b) FtcCore.getAnnouncer().save();

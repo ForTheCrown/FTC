@@ -1,4 +1,4 @@
-package net.forthecrown.core.types.signs;
+package net.forthecrown.core.types.interactable;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface SignAction extends JsonSerializable, SuggestionProvider<CommandSource> {
+public interface InteractionAction extends JsonSerializable, SuggestionProvider<CommandSource> {
 
     void parse(JsonElement json) throws CommandSyntaxException;
     void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException;

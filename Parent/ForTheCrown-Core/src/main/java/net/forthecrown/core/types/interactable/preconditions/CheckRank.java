@@ -1,4 +1,4 @@
-package net.forthecrown.core.types.signs.preconditions;
+package net.forthecrown.core.types.interactable.preconditions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.api.UserManager;
 import net.forthecrown.core.commands.brigadier.CoreCommands;
 import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.types.signs.SignPrecondition;
+import net.forthecrown.core.types.interactable.InteractionCheck;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,17 +18,17 @@ import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SignCheckRank implements SignPrecondition {
+public class CheckRank implements InteractionCheck {
     private Rank rank;
 
     @Override
-    public void parse(String input) throws CommandSyntaxException {
-        rank = CoreCommands.RANK.parse(new StringReader(input));
+    public void parse(CommandContext<CommandSource> c, StringReader reader) throws CommandSyntaxException {
+        rank = CoreCommands.RANK.parse(reader);
     }
 
     @Override
     public void parse(JsonElement json) throws CommandSyntaxException {
-        parse(json.getAsString());
+        parse(null, new StringReader(json.getAsString()));
     }
 
     @Override
@@ -38,7 +38,7 @@ public class SignCheckRank implements SignPrecondition {
 
     @Override
     public String asString() {
-        return  "SignCheckRank{rank=" + rank.name().toLowerCase() + "}";
+        return getClass().getSimpleName() + "{rank=" + rank.name().toLowerCase() + "}";
     }
 
     @Override

@@ -1,4 +1,4 @@
-package net.forthecrown.core.types.signs.actions;
+package net.forthecrown.core.types.interactable.actions;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.types.signs.SignAction;
+import net.forthecrown.core.types.interactable.InteractionAction;
 import net.forthecrown.core.utils.JsonUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.WorldArgument;
@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SignActionTeleport implements SignAction {
+public class ActionTeleport implements InteractionAction {
     private Location location;
 
     @Override
@@ -50,7 +50,7 @@ public class SignActionTeleport implements SignAction {
 
     @Override
     public String asString() {
-        return "SignActionTeleport{location=" + location + "}";
+        return getClass().getSimpleName() + "{location=" + location + "}";
     }
 
     @Override
@@ -63,7 +63,7 @@ public class SignActionTeleport implements SignAction {
         int index = builder.getRemaining().indexOf(' ');
         if(index == -1) return WorldArgument.world().listSuggestions(context, builder);
 
-        builder = builder.createOffset(builder.getInput().length() + index + 1);
+        builder = builder.createOffset(builder.getInput().length() + index);
         return PositionArgument.position().listSuggestions(context, builder);
     }
 }

@@ -137,7 +137,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
 
         //Boss spawning
         if(name.contains("Spawn ")){
-            Bosses.BY_NAME.get(name.replaceAll("Spawn ", "").trim()).attemptSpawn(player);
+            Bosses.BY_NAME.get(name.replaceAll("Spawn ", "").toLowerCase().trim()).attemptSpawn(player);
             return;
         }
 

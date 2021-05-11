@@ -1,4 +1,4 @@
-package net.forthecrown.core.types.signs.actions;
+package net.forthecrown.core.types.interactable.actions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -8,17 +8,17 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.FtcCore;
 import net.forthecrown.core.api.CrownUser;
 import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.types.signs.SignAction;
+import net.forthecrown.core.types.interactable.InteractionAction;
 import net.forthecrown.grenadier.CommandSource;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.entity.Player;
 
-public class SignActionRemoveThing implements SignAction {
+public class ActionRemoveThing implements InteractionAction {
     private final boolean fromBal;
     private int amount;
 
-    public SignActionRemoveThing(boolean fromBal) {
+    public ActionRemoveThing(boolean fromBal) {
         this.fromBal = fromBal;
     }
 
@@ -48,7 +48,7 @@ public class SignActionRemoveThing implements SignAction {
 
     @Override
     public String asString() {
-        return toString();
+        return  getClass().getSimpleName() + "{removesfrom=" + (fromBal ? "balance" : "gems") + ",amount=" + amount + "}";
     }
 
     @Override
@@ -61,7 +61,7 @@ public class SignActionRemoveThing implements SignAction {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SignActionRemoveThing thing = (SignActionRemoveThing) o;
+        ActionRemoveThing thing = (ActionRemoveThing) o;
 
         return new EqualsBuilder()
                 .append(fromBal, thing.fromBal)

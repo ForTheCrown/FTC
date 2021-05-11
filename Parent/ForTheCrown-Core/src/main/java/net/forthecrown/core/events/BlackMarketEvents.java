@@ -23,6 +23,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -78,7 +79,7 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
         else if(customName.contains("Edward")){
             if(!bm.isAllowedToBuyEnchant(player)) throw new CrownException(player, "-&eYou've already purchased from me today, scram!&r-");
             if(!bm.enchantAvailable()) throw new CrownException(player, "-&eUnfortunately, my good sir, I don't have anything to sell you at this moment&r-");
-            doEdwardStuff(user, bm);
+            doEdwardStuff(user, bm, event.getRightClicked());
         }
         else if(customName.contains("Ramun")) player.openInventory(bm.getParrotInventory());
 
@@ -88,11 +89,14 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
 
     }
 
-    private void doEdwardStuff(CrownUser user, BlackMarket bm){
+    private void doEdwardStuff(CrownUser user, BlackMarket bm, Entity edward){
         user.sendMessage(
                 Component.text()
                         .color(NamedTextColor.GRAY)
-                        .append(Component.text("Edward").color(NamedTextColor.YELLOW))
+                        .append(Component.text("Edward")
+                                .color(NamedTextColor.YELLOW)
+                                .hoverEvent(edward)
+                        )
                         .append(Component.text(" is currently selling "))
                         .append(bm.getEnchantment().getEnchantment().displayName(bm.getEnchantment().getLevel()).color(NamedTextColor.YELLOW))
                         .append(Component.text(" for "))

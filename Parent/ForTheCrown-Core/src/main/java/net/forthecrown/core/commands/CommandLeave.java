@@ -10,11 +10,11 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class CommandLeave extends CrownCommandBuilder {
 
-    private final static Map<CrownBoundingBox, Pair<Location, Function<Player, Boolean>>> ALLOWED_USAGE_AREAS = new HashMap<>();
+    private final static Map<CrownBoundingBox, Pair<Location, Predicate<Player>>> ALLOWED_USAGE_AREAS = new HashMap<>();
 
     public CommandLeave(){
         super("leave", FtcCore.getInstance());
@@ -27,18 +27,18 @@ public class CommandLeave extends CrownCommandBuilder {
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
             Player player = getPlayerSender(c);
-            for (Map.Entry<CrownBoundingBox, Pair<Location, Function<Player, Boolean>>> e: ALLOWED_USAGE_AREAS.entrySet()){
+            for (Map.Entry<CrownBoundingBox, Pair<Location, Predicate<Player>>> e: ALLOWED_USAGE_AREAS.entrySet()){
                 if(!e.getKey().contains(player.getLocation())) continue;
 
-                Pair<Location, Function<Player, Boolean>> par = e.getValue();
-                if(par.getSecond().apply(player)) player.teleport(par.getFirst());
+                Pair<Location, Predicate<Player>> par = e.getValue();
+                if(par.getSecond().test(player)) player.teleport(par.getFirst());
                 return 0;
             }
             return 0;
         });
     }
 
-    public static void add(CrownBoundingBox box, Location exitLocation, Function<Player, Boolean> onExit){
+    public static void add(CrownBoundingBox box, Location exitLocation, Predicate<Player> onExit){
         ALLOWED_USAGE_AREAS.put(box, new Pair<>(exitLocation, onExit));
     }
 
