@@ -1,11 +1,17 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.exceptions.CannotAffordTransaction;
-import net.forthecrown.core.exceptions.CrownException;
+import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.CrownException;
+import net.forthecrown.emperor.clickevent.ClickEventManager;
+import net.forthecrown.emperor.clickevent.ClickEventTask;
+import net.forthecrown.emperor.economy.Balances;
+import net.forthecrown.emperor.economy.CannotAffordTransactionException;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.user.enums.Rank;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -27,12 +33,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class PirateEvents implements Listener {
+public class PirateEvents implements Listener, ClickEventTask {
 
     private final Pirates main;
+    private final String npcID;
 
     public PirateEvents(Pirates main){
         this.main = main;
+        npcID = ClickEventManager.registerClickEvent(this);
     }
 
     @EventHandler
@@ -66,11 +74,24 @@ public class PirateEvents implements Listener {
                 main.grapplingHook.openLevelSelector(player);
             } else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Ben")){
                 if(!user.getAvailableRanks().contains(Rank.PIRATE)) throw new CrownException(user, "&eBen &7only trusts real pirates!");
-                if(FtcCore.getBalances().get(player.getUniqueId()) < 50000) throw new CannotAffordTransaction(player);
+                if(CrownCore.getBalances().get(player.getUniqueId()) < 50000) throw new CannotAffordTransactionException(player);
 
-                FtcCore.getBalances().add(player.getUniqueId(), -50000);
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gh give " + player.getName() + " 50");
-                user.sendMessage("&7You bought a grappling hook from &eBen &7for &e50,000 Rhines");
+                ClickEventManager.allowCommandUsage(player, true);
+
+                Component text = Component.text("Would you like to ")
+                        .color(NamedTextColor.GRAY)
+                        .append(
+                                Component.text("[Buy] ")
+                                        .color(NamedTextColor.AQUA)
+                                        .clickEvent(ClickEventManager.getClickEvent(npcID))
+                                        .hoverEvent(HoverEvent.showText(Component.text("Click me!")))
+                        )
+                        .append(Component.text("a "))
+                        .append(Component.text("50 use ").color(NamedTextColor.YELLOW))
+                        .append(Component.text("Grappling Hook for "))
+                        .append(Balances.formatted(50000).color(NamedTextColor.YELLOW));
+
+                player.sendMessage(text);
             }
 
         }
@@ -147,5 +168,24 @@ public class PirateEvents implements Listener {
             event.setDroppedExp(0);
             parrots.remove(event.getEntity().getUniqueId());
         }
+    }
+
+    @Override
+    public void run(Player player, String[] strings) throws CrownException {
+        CrownUser user = UserManager.getUser(player);
+
+        if(!user.getAvailableRanks().contains(Rank.PIRATE)) throw new CrownException(user, "&eBen &7only trusts real pirates!");
+        if(CrownCore.getBalances().get(player.getUniqueId()) < 50000) throw new CannotAffordTransactionException(player);
+
+        CrownCore.getBalances().add(player.getUniqueId(), -50000);
+
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gh give " + player.getName() + " 50");
+        player.sendMessage(
+                Component.text("You bought a grappling hook from ")
+                        .color(NamedTextColor.GRAY)
+                        .append(Component.text("Ben ").color(NamedTextColor.YELLOW))
+                        .append(Component.text("for "))
+                        .append(Balances.formatted(50000).color(NamedTextColor.YELLOW))
+        );
     }
 }

@@ -1,15 +1,15 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.CrownWeapons;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.clickevent.ClickEventHandler;
-import net.forthecrown.core.clickevent.ClickEventTask;
-import net.forthecrown.core.enums.Branch;
-import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.utils.Cooldown;
-import net.forthecrown.core.utils.CrownItems;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.emperor.clickevent.ClickEventManager;
+import net.forthecrown.emperor.clickevent.ClickEventTask;
+import net.forthecrown.emperor.inventory.CrownItems;
+import net.forthecrown.emperor.inventory.CrownWeapons;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.user.enums.Branch;
+import net.forthecrown.emperor.user.enums.Rank;
+import net.forthecrown.emperor.utils.ChatFormatter;
+import net.forthecrown.emperor.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -36,7 +36,7 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
     private final String clickID;
 
     public NpcSmithEvent(){
-        clickID = ClickEventHandler.registerClickEvent(this);
+        clickID = ClickEventManager.registerClickEvent(this);
     }
 
     @EventHandler
@@ -51,21 +51,21 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
 
         Player player = event.getPlayer();
         Cooldown.add(player, 20);
-        ClickEventHandler.allowCommandUsage(player, true);
+        ClickEventManager.allowCommandUsage(player, true);
 
         TextComponent message3 = Component.text("[Captain's Cutlass]")
                 .color(NamedTextColor.GOLD)
-                .clickEvent(ClickEvent.runCommand(ClickEventHandler.getCommand(clickID, "cutlass")))
+                .clickEvent(ClickEvent.runCommand(ClickEventManager.getCommand(clickID, "cutlass")))
                 .hoverEvent(HoverEvent.showText(Component.text("Click me!")));
 
         TextComponent message2 = Component.text("[Join Pirates]")
                 .color(NamedTextColor.YELLOW)
-                .clickEvent(ClickEvent.runCommand(ClickEventHandler.getCommand(clickID, "join")))
+                .clickEvent(ClickEvent.runCommand(ClickEventManager.getCommand(clickID, "join")))
                 .hoverEvent(HoverEvent.showText(Component.text("Click me!")));
 
         TextComponent message1 = Component.text("[Info about Pirates]")
                 .color(NamedTextColor.YELLOW)
-                .clickEvent(ClickEvent.runCommand(ClickEventHandler.getCommand(clickID, "info")))
+                .clickEvent(ClickEvent.runCommand(ClickEventManager.getCommand(clickID, "info")))
                 .hoverEvent(HoverEvent.showText(Component.text("Click me!")));
 
         player.sendMessage(ChatColor.GOLD + "--" + ChatColor.WHITE + " Aye mate, what can I do for ya? " + ChatColor.GOLD + "--");
@@ -102,8 +102,8 @@ public class NpcSmithEvent implements ClickEventTask, Listener {
             ItemMeta meta = sword.getItemMeta();
             meta.displayName(CrownItems.BASE_CUTLASS.getItemMeta().displayName());
             List<String> lores = meta.getLore();
-            lores.set(2, CrownUtils.translateHexCodes("&#917558The bearer of this cutlass bows to no laws, to no king,"));
-            lores.set(3, CrownUtils.translateHexCodes("&#917558its wielder leads their crew towards everlasting riches."));
+            lores.set(2, ChatFormatter.translateHexCodes("&#917558The bearer of this cutlass bows to no laws, to no king,"));
+            lores.set(3, ChatFormatter.translateHexCodes("&#917558its wielder leads their crew towards everlasting riches."));
             meta.setLore(lores);
             sword.setItemMeta(meta);
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);

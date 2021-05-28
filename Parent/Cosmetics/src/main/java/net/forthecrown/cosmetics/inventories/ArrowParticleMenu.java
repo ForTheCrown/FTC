@@ -1,9 +1,9 @@
 package net.forthecrown.cosmetics.inventories;
 
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.utils.CrownItems;
 import net.forthecrown.cosmetics.Cosmetics;
+import net.forthecrown.emperor.inventory.CrownItems;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

@@ -1,7 +1,7 @@
 package net.forthecrown.pirates.auctions;
 
-import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.core.api.Announcer;
+import net.forthecrown.emperor.Announcer;
+import net.forthecrown.emperor.utils.CrownBoundingBox;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.pirates.commands.CommandAuction;
 import net.kyori.adventure.text.Component;

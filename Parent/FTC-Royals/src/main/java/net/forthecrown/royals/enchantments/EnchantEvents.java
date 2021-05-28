@@ -1,6 +1,6 @@
 package net.forthecrown.royals.enchantments;
 
-import net.forthecrown.core.utils.Cooldown;
+import net.forthecrown.emperor.utils.Cooldown;
 import net.forthecrown.royals.Royals;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;

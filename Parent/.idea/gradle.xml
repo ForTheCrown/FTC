@@ -9,12 +9,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/Emperor" />
             <option value="$PROJECT_DIR$/FTC-Cosmetics" />
             <option value="$PROJECT_DIR$/FTC-Pirates" />
-            <option value="$PROJECT_DIR$/FTC-RandomFeatures" />
             <option value="$PROJECT_DIR$/FTC-Royals" />
             <option value="$PROJECT_DIR$/FTC-Vikings" />
-            <option value="$PROJECT_DIR$/ForTheCrown-Core" />
           </set>
         </option>
       </GradleProjectSettings>
@@ -33,15 +32,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/FTC-Royals" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/ForTheCrown-Core" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/ForTheCrown-Core" />
           </set>
         </option>
       </GradleProjectSettings>

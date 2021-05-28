@@ -2,12 +2,6 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="11">
-      <module name="BrigadierTest" target="1.8" />
-      <module name="BrigadierTest.main" target="1.8" />
-      <module name="BrigadierTest.test" target="1.8" />
-      <module name="FTCCore" target="1.8" />
-      <module name="FTCCore.main" target="1.8" />
-      <module name="FTCCore.test" target="1.8" />
       <module name="Parent.Cosmetics" target="1.8" />
       <module name="Parent.Cosmetics.main" target="1.8" />
       <module name="Parent.Cosmetics.test" target="1.8" />

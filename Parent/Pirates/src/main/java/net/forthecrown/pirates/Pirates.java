@@ -1,15 +1,15 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.commands.CommandLeave;
-import net.forthecrown.core.comvars.ComVar;
-import net.forthecrown.core.comvars.ComVars;
-import net.forthecrown.core.comvars.types.ComVarType;
-import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.commands.CommandLeave;
+import net.forthecrown.emperor.comvars.ComVar;
+import net.forthecrown.emperor.comvars.ComVars;
+import net.forthecrown.emperor.comvars.types.ComVarType;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.user.enums.Rank;
+import net.forthecrown.emperor.utils.CrownBoundingBox;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.grenadier.RoyalArguments;
 import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.pirates.auctions.Auction;
@@ -170,17 +170,17 @@ public final class Pirates extends JavaPlugin implements Listener {
 
         double moneyDecider = Math.random();
         if (moneyDecider <= 0.6) {
-            FtcCore.getBalances().add(player.getUniqueId(), 5000, false);
+            CrownCore.getBalances().add(player.getUniqueId(), 5000, false);
             player.sendMessage(ChatColor.GRAY + "You've found a treasure with " + ChatColor.YELLOW + "5,000 rhines" + ChatColor.GRAY + " inside.");
             Bukkit.dispatchCommand(getServer().getConsoleSender(), "crate givekey " + player.getName() + " lootbox1 1");
         }
         else if (moneyDecider > 0.6 && moneyDecider <= 0.9) {
-            FtcCore.getBalances().add(player.getUniqueId(), 10000, false);
+            CrownCore.getBalances().add(player.getUniqueId(), 10000, false);
             player.sendMessage(ChatColor.GRAY + "You've found a treasure with " + ChatColor.YELLOW + "10,000 rhines" + ChatColor.GRAY + " inside.");
             Bukkit.dispatchCommand(getServer().getConsoleSender(), "crate givekey " + player.getName() + " lootbox1 2");
         }
         else {
-            FtcCore.getBalances().add(player.getUniqueId(), 20000, false);
+            CrownCore.getBalances().add(player.getUniqueId(), 20000, false);
             player.sendMessage(ChatColor.GRAY + "You've found a treasure with " + ChatColor.YELLOW + "20,000 rhines" + ChatColor.GRAY + " inside.");
             Bukkit.dispatchCommand(getServer().getConsoleSender(), "crate givekey " + player.getName() + " lootbox1 3");
         }
@@ -365,7 +365,7 @@ public final class Pirates extends JavaPlugin implements Listener {
     }
 
     void giveReward(Player player) {
-        FtcCore.getBalances().add(player.getUniqueId(), 10000, false);
+        CrownCore.getBalances().add(player.getUniqueId(), 10000, false);
         player.sendMessage(ChatColor.GRAY + "You've received " + ChatColor.GOLD + "10,000 rhines" + ChatColor.GRAY + " from " + ChatColor.YELLOW + "Wilhelm" + ChatColor.GRAY + ".");
         givePP(player, 2);
     }

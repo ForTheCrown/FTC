@@ -1,7 +1,7 @@
 package net.forthecrown.royals.dungeons.bosses.mobs;
 
 import com.destroystokyo.paper.entity.Pathfinder;
-import net.forthecrown.core.utils.ItemStackBuilder;
+import net.forthecrown.emperor.utils.ItemStackBuilder;
 import net.forthecrown.royals.RoyalUtils;
 import net.forthecrown.royals.Royals;
 import net.forthecrown.royals.dungeons.DungeonAreas;

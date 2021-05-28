@@ -1,7 +1,7 @@
 package net.forthecrown.royals.dungeons;
 
-import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.emperor.utils.CrownBoundingBox;
+import net.forthecrown.emperor.utils.CrownUtils;
 import org.bukkit.World;
 
 public class DungeonAreas {

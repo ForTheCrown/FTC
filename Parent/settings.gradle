@@ -1,7 +1,6 @@
 rootProject.name = 'Parent'
-include 'ForTheCrown-Core'
+include 'Emperor'
 include 'FTC-Royals'
 include 'FTC-Vikings'
 include 'FTC-Pirates'
 include 'FTC-Cosmetics'
-include 'FTC-RandomFeatures'

@@ -4,11 +4,12 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.utils.Cooldown;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.utils.Cooldown;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.minecraft.server.v1_16_R3.ChatComponentText;
+import net.minecraft.server.v1_16_R3.ChatMessageType;
 import net.minecraft.server.v1_16_R3.EnumChatFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -44,6 +45,7 @@ public class PlayerRidingManager implements Listener {
     @EventHandler
     public void playerRightClickPlayer(PlayerInteractEntityEvent event) {
         if(event.getHand() == EquipmentSlot.OFF_HAND) return;
+        if(CrownUtils.checkItemNotEmpty(event.getPlayer().getInventory().getItemInMainHand())) return;
         if(event.getPlayer().getWorld().equals(CrownUtils.WORLD_VOID)) return;
         if(event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
         if(!(event.getRightClicked() instanceof Player)) return;
@@ -83,12 +85,20 @@ public class PlayerRidingManager implements Listener {
         Material oneAbovePlayer = loc.add(0, 2, 0).getBlock().getType();
         Material twoAbovePlayer = loc.add(0, 3, 0).getBlock().getType();
 
-        if(oneAbovePlayer.isSolid() || twoAbovePlayer.isSolid()){
-            user.sendMessage(new ChatComponentText("Cannot ride player here").a(EnumChatFormat.GRAY));
+        if(!isAllowedBlock(oneAbovePlayer) || !isAllowedBlock(twoAbovePlayer)){
+            user.sendMessage(new ChatComponentText("Cannot ride player here").a(EnumChatFormat.GRAY), ChatMessageType.GAME_INFO);
             return false;
         }
 
         return true;
+    }
+
+    private boolean isAllowedBlock(Material material){
+        if(material.isAir()) return true;
+        if(material.isEmpty()) return true;
+        if(!material.isSolid()) return true;
+
+        return false;
     }
 
     /*@EventHandler

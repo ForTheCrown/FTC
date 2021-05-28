@@ -1,7 +1,7 @@
 package net.forthecrown.royals.enchantments;
 
-import net.forthecrown.core.utils.ComponentUtils;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.emperor.utils.ChatUtils;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -29,7 +29,7 @@ public abstract class CrownEnchant extends Enchantment {
 
     @Override
     public @NotNull Component displayName(int level) {
-        return ComponentUtils.convertString(getName() + (level <= 1 ? "" : (" " + CrownUtils.arabicToRoman(level))))
+        return ChatUtils.convertString(getName() + (level <= 1 ? "" : (" " + CrownUtils.arabicToRoman(level))))
                 .color(NamedTextColor.GRAY)
                 .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
     }

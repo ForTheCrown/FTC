@@ -1,0 +1,7 @@
+name: FTCCore
+version: @version@
+main: net.forthecrown.core.Main
+api-version: 1.16
+loadbefore: [ Essentials ]
+depend: [ RoyalGrenadier, WorldGuard, LuckPerms, TAB ]
+authors: [ Wout, Botul ]

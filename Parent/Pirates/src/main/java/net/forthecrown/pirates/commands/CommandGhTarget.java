@@ -3,7 +3,7 @@ package net.forthecrown.pirates.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.PositionArgument;

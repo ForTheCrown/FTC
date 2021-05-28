@@ -1,13 +1,13 @@
 package net.forthecrown.cosmetics;
 
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.exceptions.CannotAffordTransaction;
-import net.forthecrown.core.utils.ComponentUtils;
 import net.forthecrown.cosmetics.inventories.ArrowParticleMenu;
 import net.forthecrown.cosmetics.inventories.CustomInventory;
 import net.forthecrown.cosmetics.inventories.DeathParticleMenu;
 import net.forthecrown.cosmetics.inventories.EmoteMenu;
+import net.forthecrown.emperor.economy.CannotAffordTransactionException;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.utils.ChatUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -27,9 +27,9 @@ public class CosmeticEvents implements Listener {
         this.main = main;
     }
 
-    private void doArrowParticleStuff(Particle particle, Player player, CrownUser user, int gemCost) throws CannotAffordTransaction {
+    private void doArrowParticleStuff(Particle particle, Player player, CrownUser user, int gemCost) throws CannotAffordTransactionException {
         if(!user.getParticleArrowAvailable().contains(particle)){
-            if(user.getGems() < gemCost) throw new CannotAffordTransaction(player);
+            if(user.getGems() < gemCost) throw new CannotAffordTransactionException(player);
             user.addGems(-gemCost);
 
             List<Particle> set = user.getParticleArrowAvailable();
@@ -39,9 +39,9 @@ public class CosmeticEvents implements Listener {
         user.setArrowParticle(particle);
     }
 
-    private void doDeathParticleStuff(String effect, Player player, CrownUser user, int gemCost) throws CannotAffordTransaction {
+    private void doDeathParticleStuff(String effect, Player player, CrownUser user, int gemCost) throws CannotAffordTransactionException {
         if(!user.getParticleDeathAvailable().contains(effect)){
-            if(user.getGems() < gemCost) throw new CannotAffordTransaction(player);
+            if(user.getGems() < gemCost) throw new CannotAffordTransactionException(player);
             user.addGems(-gemCost);
 
             List<String> asd = user.getParticleDeathAvailable();
@@ -52,7 +52,7 @@ public class CosmeticEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerClickItemInInv(InventoryClickEvent event) throws CannotAffordTransaction {
+    public void onPlayerClickItemInInv(InventoryClickEvent event) throws CannotAffordTransactionException {
         if(!(event.getInventory().getHolder() instanceof CustomInventory)) return;
         if(event.isShiftClick()) event.setCancelled(true);
         if (event.getClickedInventory() instanceof PlayerInventory) return;
@@ -61,7 +61,7 @@ public class CosmeticEvents implements Listener {
         Player player = (Player) event.getWhoClicked();
         CrownUser user = UserManager.getUser(player);
         int slot = event.getSlot();
-        String title = ComponentUtils.getString(event.getView().title());
+        String title = ChatUtils.getString(event.getView().title());
 
         if (title.contains("osmetics")) {
             switch (slot) {

@@ -1,8 +1,8 @@
 package net.forthecrown.royals.dungeons.bosses.mobs;
 
-import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.utils.CrownBoundingBox;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.royals.RoyalUtils;
 import net.forthecrown.royals.Royals;
 import net.forthecrown.royals.dungeons.bosses.BossFightContext;
@@ -157,7 +157,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
     protected void giveRewards(@Nullable String achievement, @NotNull ItemStack reward, @NotNull BossFightContext context){
         for (Player p: context.getPlayers()){
             if(!getBossRoom().contains(p)) continue;
-            if(FtcCore.getUserManager().isAltForAny(p.getUniqueId(), context.getPlayers())) continue;
+            if(CrownCore.getUserManager().isAltForAny(p.getUniqueId(), context.getPlayers())) continue;
 
 
             if(!CrownUtils.isNullOrBlank(achievement)) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only " + achievement);

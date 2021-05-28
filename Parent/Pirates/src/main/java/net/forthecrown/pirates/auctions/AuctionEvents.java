@@ -1,11 +1,11 @@
 package net.forthecrown.pirates.auctions;
 
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.enums.Branch;
-import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.utils.ComponentUtils;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.emperor.CrownException;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.user.enums.Branch;
+import net.forthecrown.emperor.utils.ChatFormatter;
+import net.forthecrown.emperor.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -43,7 +43,7 @@ public class AuctionEvents implements Listener {
         Sign sign = (Sign) event.getClickedBlock().getState();
         if(!sign.getPersistentDataContainer().has(AuctionManager.AUCTION_KEY, PersistentDataType.BYTE)) return;
 
-        String line3 = ComponentUtils.getString(sign.line(3));
+        String line3 = ChatUtils.getString(sign.line(3));
 
         Player p = event.getPlayer();
         Auction auction = AuctionManager.getAuction(sign.getLocation());
@@ -88,14 +88,14 @@ public class AuctionEvents implements Listener {
                         .hoverEvent(auction.getOwner().asHoverEvent())
                         .clickEvent(ClickEvent.suggestCommand("/w " + auction.getOwner().getName())))
                 .append(Component.text(", Item: "))
-                .append(Component.text(item.getAmount() + " " + CrownUtils.getItemNormalName(item)).color(NamedTextColor.YELLOW).hoverEvent(item.asHoverEvent()))
+                .append(Component.text(item.getAmount() + " " + ChatFormatter.getItemNormalName(item)).color(NamedTextColor.YELLOW).hoverEvent(item.asHoverEvent()))
                 .build();
 
         TextComponent expireMessage = Component.text().color(NamedTextColor.GRAY)
                 .append(Component.text("The auction will expire in "))
-                .append(Component.text(CrownUtils.convertMillisIntoTime(auction.getExpiresAt() - System.currentTimeMillis()))
+                .append(Component.text(ChatFormatter.convertMillisIntoTime(auction.getExpiresAt() - System.currentTimeMillis()))
                         .hoverEvent(HoverEvent.showText(
-                                Component.text("Expires on the " + CrownUtils.getDateFromMillis(auction.getExpiresAt()))
+                                Component.text("Expires on the " + ChatFormatter.getDateFromMillis(auction.getExpiresAt()))
                         )))
                 .build();
 

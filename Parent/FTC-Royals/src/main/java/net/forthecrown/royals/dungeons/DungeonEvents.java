@@ -1,17 +1,18 @@
 package net.forthecrown.royals.dungeons;
 
-import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.clickevent.ClickEventHandler;
-import net.forthecrown.core.clickevent.ClickEventTask;
-import net.forthecrown.core.enums.Branch;
-import net.forthecrown.core.enums.Rank;
-import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.utils.Cooldown;
-import net.forthecrown.core.utils.CrownItems;
-import net.forthecrown.core.utils.CrownUtils;
-import net.forthecrown.core.utils.ItemStackBuilder;
+import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.CrownException;
+import net.forthecrown.emperor.clickevent.ClickEventManager;
+import net.forthecrown.emperor.clickevent.ClickEventTask;
+import net.forthecrown.emperor.inventory.CrownItems;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.user.enums.Branch;
+import net.forthecrown.emperor.user.enums.Rank;
+import net.forthecrown.emperor.utils.ChatFormatter;
+import net.forthecrown.emperor.utils.Cooldown;
+import net.forthecrown.emperor.utils.CrownUtils;
+import net.forthecrown.emperor.utils.ItemStackBuilder;
 import net.forthecrown.royals.RoyalUtils;
 import net.forthecrown.royals.Royals;
 import net.forthecrown.royals.dungeons.bosses.BossItems;
@@ -56,7 +57,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
 
     public DungeonEvents(Royals plugin) {
         this.plugin = plugin;
-        this.id = ClickEventHandler.registerClickEvent(this);
+        this.id = ClickEventManager.registerClickEvent(this);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -105,19 +106,19 @@ public class DungeonEvents implements Listener, ClickEventTask {
             if(!villager.getCustomName().contains("Diego")) return;
             Player player = event.getPlayer();
 
-            ClickEventHandler.allowCommandUsage(event.getPlayer(), true, false);
+            ClickEventManager.allowCommandUsage(event.getPlayer(), true, false);
             TextComponent component = Component.text()
                     .append(Component.text("Hello, what can I do for ya?").color(NamedTextColor.YELLOW))
                     .append(Component.newline())
                     .append(Component.text("[Claim Royal Sword]")
                             .color(NamedTextColor.AQUA)
-                            .clickEvent(ClickEvent.runCommand(ClickEventHandler.getCommand(id, "sword")))
+                            .clickEvent(ClickEvent.runCommand(ClickEventManager.getCommand(id, "sword")))
                             .hoverEvent(CrownItems.BASE_ROYAL_SWORD.asHoverEvent())
                     )
                     .append(Component.text(" or "))
                     .append(Component.text("[Claim Trident]")
                             .color(NamedTextColor.AQUA)
-                            .clickEvent(ClickEvent.runCommand(ClickEventHandler.getCommand(id, "trident")))
+                            .clickEvent(ClickEvent.runCommand(ClickEventManager.getCommand(id, "trident")))
                             .hoverEvent(FORK.asHoverEvent())
                     )
                     .build();
@@ -137,7 +138,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
 
         //Boss spawning
         if(name.contains("Spawn ")){
-            Bosses.BY_NAME.get(name.replaceAll("Spawn ", "").toLowerCase().trim()).attemptSpawn(player);
+            Bosses.BY_NAME.get(name.replaceAll("Spawn ", "").replaceAll(" ", "_").toLowerCase().trim()).attemptSpawn(player);
             return;
         }
 
@@ -163,14 +164,14 @@ public class DungeonEvents implements Listener, ClickEventTask {
         switch (name){
             case "Right Click Me!":
                 player.sendMessage(Component.text()
-                        .append(FtcCore.prefix().color(NamedTextColor.AQUA))
+                        .append(CrownCore.prefix().color(NamedTextColor.AQUA))
                         .append(Component.text("Right clicking this will show you a list of items needed to spawn the level's boss"))
                         .build()
                 );
                 break;
             case "Right Click to Spawn":
                 player.sendMessage(Component.text()
-                        .append(FtcCore.prefix().color(NamedTextColor.AQUA))
+                        .append(CrownCore.prefix().color(NamedTextColor.AQUA))
                         .append(Component.text("If you have all the required items, using this, will spawn the boss"))
                         .build()
                 );
@@ -191,7 +192,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
             case "Hidden Mummy Ingot":
                 if(Cooldown.contains(player, "Dungeons_Mummy_Ingot")) return;
                 Cooldown.add(player, "Dungeons_Mummy_Ingot", 5*20*60);
-                player.sendMessage(CrownUtils.translateHexCodes("&7You got the &eHidden Mummy Ingot"));
+                player.sendMessage(ChatFormatter.translateHexCodes("&7You got the &eHidden Mummy Ingot"));
                 player.getInventory().addItem(Zhambie.mummyIngot());
                 break;
         }

@@ -1,14 +1,14 @@
 package net.forthecrown.pirates.auctions;
 
-import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.Balances;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.exceptions.CrownException;
-import net.forthecrown.core.serialization.AbstractSerializer;
-import net.forthecrown.core.utils.ComponentUtils;
-import net.forthecrown.core.utils.CrownUtils;
-import net.forthecrown.core.utils.MapUtils;
+import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.CrownException;
+import net.forthecrown.emperor.economy.Balances;
+import net.forthecrown.emperor.serialization.AbstractSerializer;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.utils.ChatFormatter;
+import net.forthecrown.emperor.utils.ChatUtils;
+import net.forthecrown.emperor.utils.MapUtils;
 import net.forthecrown.pirates.Pirates;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -212,7 +212,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
         expiresAt = System.currentTimeMillis() + Pirates.getAuctionExpirationTime();
 
-        Component itemName = ComponentUtils.convertString(CrownUtils.getItemNormalName(item));
+        Component itemName = ChatUtils.convertString(ChatFormatter.getItemNormalName(item));
         if(item.getItemMeta().hasDisplayName()) itemName = item.getItemMeta().displayName();
 
         getSign().line(1, Component.text(item.getAmount()));
@@ -240,7 +240,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
         if (user.getPlayer().getInventory().firstEmpty() == -1) throw new CrownException(user, "Your inventory is full!");
 
-        Balances bals = FtcCore.getBalances();
+        Balances bals = CrownCore.getBalances();
 
         if(!highestBidder.equals(owner)){
             bals.add(owner.getUniqueId(), getHighestBid(), false);
@@ -359,7 +359,7 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
 
         final int originalValue = value;
         if(bids.containsKey(user.getUniqueId())) value = value - bids.get(user.getUniqueId());
-        FtcCore.getBalances().add(user.getUniqueId(), -value);
+        CrownCore.getBalances().add(user.getUniqueId(), -value);
 
         bids.put(user.getUniqueId(), originalValue);
     }
@@ -389,20 +389,20 @@ public class PirateAuction extends AbstractSerializer<Pirates> implements Auctio
     private Component willBeMadeAvailableInMessage(){
         return Component.text("Auction will be made free for all in: " )
                 .color(NamedTextColor.GRAY)
-                .append(Component.text(CrownUtils.convertMillisIntoTime(freeForAll - System.currentTimeMillis())).color(NamedTextColor.GOLD));
+                .append(Component.text(ChatFormatter.convertMillisIntoTime(freeForAll - System.currentTimeMillis())).color(NamedTextColor.GOLD));
     }
 
     @Override
     public void giveBalancesToLosers(boolean toHighestBidder){
         if(bids == null) return;
 
-        Balances bals = FtcCore.getBalances();
+        Balances bals = CrownCore.getBalances();
         for (UUID id: bids.keySet()){
             if(!toHighestBidder && id.equals(getHighestBidder().getUniqueId())) continue;
 
             int amount = bids.get(id);
 
-            UserManager.getUser(id).sendMessage("&6$ &7You received &e" + CrownUtils.decimalizeNumber(amount) + " Rhines&7 from your bid on &e" + getName());
+            UserManager.getUser(id).sendMessage("&6$ &7You received &e" + ChatFormatter.decimalizeNumber(amount) + " Rhines&7 from your bid on &e" + getName());
             bals.add(id, amount, false);
         }
     }

@@ -1,6 +1,6 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.utils.CrownRandom;
+import net.forthecrown.emperor.utils.CrownRandom;
 import org.bukkit.*;
 import org.bukkit.entity.Shulker;
 import org.bukkit.persistence.PersistentDataType;
@@ -17,9 +17,12 @@ public class TreasureShulker {
     }
 
     public Location findRandLocation(){
-        final int x = random.intInRange(-1970, 1970);
-        final int y = random.intInRange(40, 50);
-        final int z = random.intInRange(-1970, 1970);
+        int x = random.intInRange(250, 1970);
+        int y = random.intInRange(40, 50);
+        int z = random.intInRange(250, 1970);
+
+        if(random.nextBoolean()) x = -x;
+        if(random.nextBoolean()) z = -z;
 
         main.getConfig().set("TreasureLoc.x", x);
         main.getConfig().set("TreasureLoc.y", y);

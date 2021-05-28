@@ -2,10 +2,12 @@ package net.forthecrown.pirates.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.types.PetType;
-import net.forthecrown.core.enums.Pet;
+import net.forthecrown.emperor.commands.arguments.PetType;
+import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.enums.Branch;
+import net.forthecrown.emperor.user.enums.Pet;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
@@ -22,7 +24,7 @@ public class CommandParrot extends CrownCommandBuilder {
     public CommandParrot(){
         super("parrot", Pirates.inst);
 
-        setPermission(null);
+        setPermission((String) null);
         register();
     }
 
@@ -42,6 +44,8 @@ public class CommandParrot extends CrownCommandBuilder {
 
     private int setParrot(CommandContext<CommandSource> c, boolean silent) throws CommandSyntaxException {
         CrownUser user = getUserSender(c);
+        if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.create("Only Pirates can use this");
+
         List<Pet> pets = user.getPets();
         Pet pet = PetType.getPetIfOwned(c, "parrot");
 

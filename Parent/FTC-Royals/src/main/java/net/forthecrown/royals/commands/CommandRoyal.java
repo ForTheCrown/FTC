@@ -3,9 +3,9 @@ package net.forthecrown.royals.commands;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.commands.brigadier.CrownCommandBuilder;
-import net.forthecrown.core.commands.brigadier.FtcExceptionProvider;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
+import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
@@ -118,7 +118,7 @@ public class CommandRoyal extends CrownCommandBuilder {
                                             Player player = getPlayerSender(c);
                                             player.getInventory().addItem(boss.item());
 
-                                            broadcastAdmin(c.getSource(), "Giving " + CrownUtils.normalEnum(boss) + " apple");
+                                            broadcastAdmin(c.getSource(), "Giving " + ChatFormatter.normalEnum(boss) + " apple");
                                             return 0;
                                         })
                                 )

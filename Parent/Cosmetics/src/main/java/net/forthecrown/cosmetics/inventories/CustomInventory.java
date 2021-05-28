@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics.inventories;
 
-import net.forthecrown.core.utils.CrownItems;
+import net.forthecrown.emperor.inventory.CrownItems;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;

@@ -1,0 +1,61 @@
+package net.forthecrown.emperor.commands;
+
+import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.Permissions;
+import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.arguments.UserType;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.enums.CrownGameMode;
+import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.GameModeArgument;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.GameMode;
+
+public class CommandGameMode extends CrownCommandBuilder {
+    public CommandGameMode(){
+        super("gm", CrownCore.inst());
+
+        setPermission(Permissions.GAMEMODES);
+        setAliases("gamemode");
+        register();
+    }
+
+    @Override
+    protected void createCommand(BrigadierCommand command) {
+        command
+                .then(argument("gamemode", GameModeArgument.gameMode())
+                        .executes(c -> {
+                            CrownUser user = getUserSender(c);
+                            GameMode gameMode = c.getArgument("gamemode", GameMode.class);
+
+                            user.getPlayer().setGameMode(gameMode);
+                            user.updateFlying();
+                            user.sendMessage(adminMsg(user, gameMode));
+                            return 0;
+                        })
+
+                        .then(argument("user", UserType.onlineUser())
+                                .executes(c -> {
+                                    CrownUser user = UserType.getUser(c, "user");
+                                    GameMode gameMode = c.getArgument("gamemode", GameMode.class);
+
+                                    user.getPlayer().setGameMode(gameMode);
+                                    user.updateFlying();
+                                    c.getSource().sendAdmin(adminMsg(user, gameMode));
+                                    return 0;
+                                })
+                        )
+                );
+    }
+
+    private Component adminMsg(CrownUser user, GameMode gameMode){
+        TranslatableComponent name = CrownGameMode.wrap(gameMode).title().color(NamedTextColor.GOLD);
+        return Component.text("Set ")
+                .color(NamedTextColor.GRAY)
+                .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
+                .append(Component.text("'s gamemode to "))
+                .append(name);
+    }
+}

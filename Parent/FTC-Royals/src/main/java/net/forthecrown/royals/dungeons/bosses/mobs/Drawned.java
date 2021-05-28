@@ -1,6 +1,6 @@
 package net.forthecrown.royals.dungeons.bosses.mobs;
 
-import net.forthecrown.core.utils.ItemStackBuilder;
+import net.forthecrown.emperor.utils.ItemStackBuilder;
 import net.forthecrown.royals.RoyalUtils;
 import net.forthecrown.royals.Royals;
 import net.forthecrown.royals.dungeons.DungeonAreas;
@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class Drawned extends DungeonBoss<Drowned> {
 
-    private Set<Guardian> guardians = new HashSet<>();
+    private final Set<Guardian> guardians = new HashSet<>();
 
     public Drawned(Royals plugin) {
         super(plugin, "Drawned", new Location(DungeonAreas.WORLD, -123.5, 25.5, 38.5), (short) 300, DungeonAreas.DRAWNED_ROOM,

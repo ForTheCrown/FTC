@@ -1,8 +1,8 @@
 package net.forthecrown.royals;
 
-import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.core.utils.CrownItems;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.emperor.inventory.CrownItems;
+import net.forthecrown.emperor.utils.ChatFormatter;
+import net.forthecrown.emperor.utils.CrownBoundingBox;
 import net.forthecrown.royals.dungeons.bosses.mobs.DungeonBoss;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
@@ -45,7 +45,7 @@ public class RoyalUtils {
                     Component.text()
                             .hoverEvent(i.asHoverEvent())
                             .append(Component.text("- " + i.getAmount() + " "))
-                            .append(i.getItemMeta().hasDisplayName() ? i.getItemMeta().displayName().color(NamedTextColor.DARK_AQUA) : Component.text(CrownUtils.normalEnum(i.getType())).color(NamedTextColor.DARK_AQUA))
+                            .append(i.getItemMeta().hasDisplayName() ? i.getItemMeta().displayName().color(NamedTextColor.DARK_AQUA) : Component.text(ChatFormatter.normalEnum(i.getType())).color(NamedTextColor.DARK_AQUA))
             );
         }
         return text;

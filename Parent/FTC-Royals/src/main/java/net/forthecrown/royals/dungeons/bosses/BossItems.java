@@ -1,6 +1,6 @@
 package net.forthecrown.royals.dungeons.bosses;
 
-import net.forthecrown.core.utils.ItemStackBuilder;
+import net.forthecrown.emperor.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;

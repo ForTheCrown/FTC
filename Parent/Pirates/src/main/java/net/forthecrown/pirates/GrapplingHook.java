@@ -1,11 +1,12 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.FtcCore;
-import net.forthecrown.core.api.Announcer;
-import net.forthecrown.core.api.CrownUser;
-import net.forthecrown.core.api.UserManager;
-import net.forthecrown.core.inventories.CustomInventoryHolder;
-import net.forthecrown.core.utils.Cooldown;
+import net.forthecrown.emperor.Announcer;
+import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.inventory.CrownItems;
+import net.forthecrown.emperor.inventory.CustomInventoryHolder;
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -157,12 +158,13 @@ public class GrapplingHook implements Listener {
                         switch (armorStandsFile.getInt(ghArmorStandID + ".StandClass")) {
                             case 2:
                                 player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You have recieved " + ChatColor.GOLD  + "25,000 Rhines " + ChatColor.GRAY + "for completing all levels in a biome.");
-                                FtcCore.getBalances().add(player.getUniqueId(), 25000, false);
+                                CrownCore.getBalances().add(player.getUniqueId(), 25000, false);
                                 main.givePP(player, 5);
                                 break;
                             case 3:
-                                player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You have recieved " + ChatColor.GOLD + "25,000 Rhines " + ChatColor.GRAY + "for completing all the Grappling Hook levels!");
-                                FtcCore.getBalances().add(player.getUniqueId(), 25000, false);
+                                player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You have recieved " + ChatColor.GOLD + "50,000 Rhines and the Captain's Cutlass " + ChatColor.GRAY + "for completing all the Grappling Hook levels!");
+                                CrownCore.getBalances().add(player.getUniqueId(), 50000, false);
+                                player.getInventory().addItem(CrownItems.BASE_CUTLASS.clone());
                                 main.givePP(player, 25);
                                 break;
                             default:
