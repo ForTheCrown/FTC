@@ -4,7 +4,7 @@ Us robotbois working together.
 benis lol
 welcome to the pit of trash... :D
 
-Us? It's just me here :,(
+Us? It's just me here :,( haha lonely
 
 
 
