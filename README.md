@@ -10,9 +10,9 @@ Us? It's just me here :,( haha lonely
 
 <pre>
 Todo for 1.17 Reset
-• Switch user serialization to Json
-• Switch signshop serialization to Json
-• Switch blackmarket serialization to json
+• Switch User serialization from using a AbstractSerializer to a UserJsonSerializer so serialization occurrs externally not internally, relative to the class
+• Do the same thing with SignShop serialization as above, external serializer
+• Switch blackmarket serialization to json, internal
 • CrownItems: Move NBT tags from DataContainer into tags, aka stop using Bukkit's PersistentDataContainer
 
 Structure:
