@@ -10,12 +10,12 @@ public class TeleportRequest {
     private final CrownUser sender;
     private final CrownUser receiver;
     private final boolean tpaHere;
-    private final BukkitRunnable expiry;
+    public final BukkitRunnable expiry;
 
     public TeleportRequest(CrownUser sender, CrownUser receiver, boolean tpaHere) {
         this.sender = sender;
         this.receiver = receiver;
-        this.tpaHere = tpaHere;
+        this.tpaHere = !tpaHere;
 
         expiry = new BukkitRunnable() {
             @Override
@@ -34,12 +34,13 @@ public class TeleportRequest {
         CrownUser noTp = tpaHere ? receiver : sender;
 
         tp.createTeleport(noTp::getLocation, true, UserTeleport.Type.TPA).start(true);
-        noTp.sendMessage(
+        sender.sendMessage(
                 Component.text()
                         .color(NamedTextColor.YELLOW)
-                        .append(tp.displayName().color(NamedTextColor.GOLD))
+                        .append(receiver.nickDisplayName().color(NamedTextColor.GOLD))
                         .append(Component.text(" accepted your tpa request."))
         );
+        receiver.sendMessage(Component.text("Accepted tpa request").color(NamedTextColor.GRAY));
 
         stop();
     }
@@ -48,7 +49,7 @@ public class TeleportRequest {
         sender.sendMessage(
                 Component.text()
                         .color(NamedTextColor.GRAY)
-                        .append(receiver.displayName().color(NamedTextColor.GOLD))
+                        .append(receiver.nickDisplayName().color(NamedTextColor.GOLD))
                         .append(Component.text(" denied your tpa request"))
         );
         receiver.sendMessage(Component.text("Tpa request denied").color(NamedTextColor.GRAY));
@@ -66,7 +67,7 @@ public class TeleportRequest {
         receiver.sendMessage(
                 Component.text()
                         .color(NamedTextColor.GRAY)
-                        .append(sender.displayName().color(NamedTextColor.GOLD))
+                        .append(sender. nickDisplayName().color(NamedTextColor.GOLD))
                         .append(Component.text(" cancelled his tpa request"))
         );
 

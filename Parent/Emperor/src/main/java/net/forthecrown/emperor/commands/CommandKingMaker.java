@@ -64,7 +64,7 @@ public class CommandKingMaker extends CrownCommandBuilder {
 
     private int makeKing(CommandContext<CommandSource> c, boolean isQueen) throws CommandSyntaxException {
         Kingship kingship = CrownCore.getKingship();
-        if(kingship.get() != null) throw FtcExceptionProvider.create("There already is a king");
+        if(kingship.getUniqueId() != null) throw FtcExceptionProvider.create("There already is a king");
 
         CrownUser king = UserType.getUser(c, "player");
 

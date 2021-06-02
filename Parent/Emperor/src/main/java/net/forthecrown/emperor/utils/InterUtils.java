@@ -1,6 +1,5 @@
 package net.forthecrown.emperor.utils;
 
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -11,14 +10,15 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.commands.arguments.ActionArgType;
 import net.forthecrown.emperor.commands.arguments.CheckArgType;
+import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.useables.Actionable;
 import net.forthecrown.emperor.useables.Preconditionable;
 import net.forthecrown.emperor.useables.UsageAction;
 import net.forthecrown.emperor.useables.UsageCheck;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.item.ItemArgument;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -28,22 +28,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class InterUtils {
     public static boolean isUsingFlag(StringReader reader){
         return reader.peek() == '-';
-    }
-
-    public static JsonObject serializeChecks(Map<Key, UsageCheck> checks){
-        JsonObject json = new JsonObject();
-
-        for (Map.Entry<Key, UsageCheck> e: checks.entrySet()){
-            json.add(e.getKey().asString(), e.getValue().serialize());
-        }
-
-        return json;
     }
 
     public static LiteralArgumentBuilder<CommandSource> literal(String name){
@@ -146,7 +135,7 @@ public class InterUtils {
 
                 .then(literal("remove")
                         .then(argument("key", CheckArgType.precondition())
-                                .suggests((c, b) -> CommandSource.suggestMatching(b, p.apply(c).getStringCheckTypes()))
+                                .suggests((c, b) -> CompletionProvider.suggestMatching(b, p.apply(c).getStringCheckTypes()))
 
                                 .executes(c -> {
                                     Preconditionable sign = p.apply(c);
@@ -224,10 +213,10 @@ public class InterUtils {
     }
 
     public static CompletableFuture<Suggestions> listItems(CommandContext<CommandSource> c, SuggestionsBuilder builder){
-        if(builder.getRemaining().startsWith("-")) return CommandSource.suggestMatching(builder, Arrays.asList("-heldItem"));
+        if(builder.getRemaining().startsWith("-")) return CompletionProvider.suggestMatching(builder, Arrays.asList("-heldItem"));
 
         int index = builder.getRemaining().indexOf(' ');
-        if(index == -1) return CommandSource.suggestMatching(builder, Arrays.asList("1", "8", "16", "32", "64"));
+        if(index == -1) return CompletionProvider.suggestMatching(builder, Arrays.asList("1", "8", "16", "32", "64"));
 
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ') + 1);
         return ItemArgument.itemStack().listSuggestions(c, builder);

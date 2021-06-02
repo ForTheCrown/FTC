@@ -2,6 +2,7 @@ package net.forthecrown.pirates.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.arguments.PetType;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
@@ -24,7 +25,7 @@ public class CommandParrot extends CrownCommandBuilder {
     public CommandParrot(){
         super("parrot", Pirates.inst);
 
-        setPermission((String) null);
+        setPermission(Permissions.DEFAULT);
         register();
     }
 

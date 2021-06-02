@@ -2,6 +2,9 @@ package net.forthecrown.emperor.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.Permissions;
+import net.forthecrown.emperor.admin.MuteStatus;
+import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -14,7 +17,7 @@ public class CommandAfk extends CrownCommandBuilder {
         super("afk", CrownCore.inst());
 
         setDescription("Marks or un-marks you as AFK");
-        setPermission((String) null);
+        setPermission(Permissions.DEFAULT);
         register();
     }
 
@@ -22,6 +25,20 @@ public class CommandAfk extends CrownCommandBuilder {
     protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> afk(getUserSender(c), null))
+
+                .then(argument("-other")
+                        .requires(s -> s.hasPermission(Permissions.CORE_ADMIN))
+
+                        .then(argument("user", UserType.onlineUser())
+                                .requires(s -> s.hasPermission(Permissions.CORE_ADMIN))
+
+                                .executes(c -> afk(
+                                        UserType.getUser(c, "user"),
+                                        null
+                                ))
+                        )
+                )
+
                 .then(argument("msg", StringArgumentType.greedyString())
                         .executes(c -> afk(
                                 getUserSender(c),
@@ -37,6 +54,8 @@ public class CommandAfk extends CrownCommandBuilder {
         Component userMsg;
         Component broadcastMsg;
 
+        MuteStatus status = CrownCore.getPunishmentManager().checkMuteSilent(user.getUniqueId());
+
         if(afk){
             userMsg = Component.translatable("unafk.self").color(NamedTextColor.GRAY);
             broadcastMsg = Component.translatable("unafk.others", user.nickDisplayName()).color(NamedTextColor.GRAY);
@@ -46,7 +65,7 @@ public class CommandAfk extends CrownCommandBuilder {
             ).color(NamedTextColor.GRAY);
 
             broadcastMsg = Component.translatable("afk.others", user.nickDisplayName(),
-                    hasMessage ? Component.text(": " + message) : Component.empty())
+                    hasMessage && status.maySpeak ? Component.text(": " + message) : Component.empty())
                     .color(NamedTextColor.GRAY);
         }
 
@@ -54,7 +73,7 @@ public class CommandAfk extends CrownCommandBuilder {
         user.setAfk(!afk);
 
         Bukkit.getOnlinePlayers().stream()
-                .filter(p -> !p.getUniqueId().equals(user.getUniqueId()))
+                .filter(plr -> !plr.getUniqueId().equals(user.getUniqueId()))
                 .forEach(p -> p.sendMessage(broadcastMsg));
         return 0;
     }

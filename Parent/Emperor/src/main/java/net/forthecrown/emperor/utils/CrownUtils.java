@@ -1,11 +1,12 @@
 package net.forthecrown.emperor.utils;
 
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -27,6 +28,7 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.bukkit.Bukkit.getServer;
@@ -133,8 +135,35 @@ public final class CrownUtils {
         return Bukkit.getOnlinePlayers();
     }
 
-    public static Comparator<CrownUser> getUselessComparator(){
-        return (user, user1) -> Integer.compare(1, 2);
+    private static final List<String> emojiSuggestions = ((Supplier<List<String>>) () -> {
+        List<String> emojiList = new ArrayList<>();
+
+        emojiList.add(":shrug:");
+        emojiList.add(":ughcry:");
+        emojiList.add(":hug:");
+        emojiList.add(":hugcry:");
+        emojiList.add(":bear:");
+        emojiList.add(":smooch:");
+        emojiList.add(":why:");
+        emojiList.add(":tableflip:");
+        emojiList.add(":tableput:");
+        emojiList.add(":pretty:");
+        emojiList.add(":sparkle:");
+        emojiList.add(":blush:");
+        emojiList.add(":sad:");
+        emojiList.add(":pleased:");
+        emojiList.add(":fedup:");
+
+        return emojiList;
+    }).get();
+
+    public static CompletableFuture<Suggestions> suggeestPlayernamesAndEmotes(CommandContext<CommandSource> c, SuggestionsBuilder builder){
+        builder = builder.createOffset(builder.getInput().lastIndexOf(' ')+1);
+
+        CompletionProvider.suggestPlayerNames(builder);
+        if(!c.getSource().hasPermission(Permissions.DONATOR_3)) return builder.buildFuture();
+
+        return CompletionProvider.suggestMatching(builder, emojiSuggestions);
     }
 
     public static boolean checkItemNotEmpty(ItemStack itemStack){

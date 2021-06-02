@@ -1,6 +1,7 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.utils.Cooldown;
 import net.forthecrown.emperor.utils.CrownRandom;
@@ -28,7 +29,7 @@ public class CommandWild extends CrownCommandBuilder {
     public CommandWild(){
         super("wild", CrownCore.inst());
 
-        setPermission((String) null);
+        setPermission(Permissions.DEFAULT);
         setDescription("Puts you in the wild, only available in the Resource World");
 
         register();

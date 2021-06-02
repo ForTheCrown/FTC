@@ -27,8 +27,7 @@ public enum CrownGameMode {
             case ADVENTURE: return ADVENTURE;
             case SPECTATOR: return SPECTATOR;
 
-            default:
-                throw new IllegalStateException("Unexpected value: " + bukkit);
+            default: throw new IllegalStateException("Unexpected value: " + bukkit);
         }
     }
 

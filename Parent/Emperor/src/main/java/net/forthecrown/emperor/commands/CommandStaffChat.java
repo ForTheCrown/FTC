@@ -10,7 +10,7 @@ import net.forthecrown.emperor.admin.StaffChat;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.utils.ChatFormatter;
-import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -91,6 +91,6 @@ public class CommandStaffChat extends CrownCommandBuilder {
             argList.add(p.getName());
         }
 
-        return CommandSource.suggestMatching(builder, argList);
+        return CompletionProvider.suggestMatching(builder, argList);
     }
 }

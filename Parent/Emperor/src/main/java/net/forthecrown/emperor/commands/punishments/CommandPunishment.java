@@ -65,7 +65,7 @@ public class CommandPunishment extends CrownCommandBuilder {
 
                     PunishmentRecord record = manager.punish(user.getUniqueId(), PunishmentType.BAN, source, reason, -1);
 
-                    if(user.isOnline()) user.getPlayer().kick(ChatFormatter.formatBanMessage(record));
+                    if(user.isOnline()) user.getPlayer().kick(ChatFormatter.banMessage(record));
 
                     /*BanList list = Bukkit.getBanList(BanList.Type.NAME);
                     list.addBan(user.getName(), reason, null, source.textName());*/

@@ -47,7 +47,7 @@ public class CommandVanish extends CrownCommandBuilder {
         boolean vanished = user.isVanished();
 
         if(joinLeaveMsg){
-            Component message = vanished ? ChatFormatter.formatJoinMessage(user) : ChatFormatter.formatLeaveMessage(user);
+            Component message = vanished ? ChatFormatter.joinMessage(user) : ChatFormatter.formatLeaveMessage(user);
             CrownCore.getAnnouncer().announceToAllRaw(message);
         }
 

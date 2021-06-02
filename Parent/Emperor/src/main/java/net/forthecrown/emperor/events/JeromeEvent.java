@@ -1,5 +1,6 @@
 package net.forthecrown.emperor.events;
 
+import net.forthecrown.emperor.CrownException;
 import net.forthecrown.emperor.clickevent.ClickEventManager;
 import net.forthecrown.emperor.clickevent.ClickEventTask;
 import net.forthecrown.emperor.inventory.CrownItems;
@@ -119,6 +120,8 @@ public class JeromeEvent implements Listener, ClickEventTask {
                 sword = stack;
                 break;
             }
+
+            if(sword == null) throw new CrownException(player, "&7You must have a Captain's Cutlass");
 
             sword.setType(Material.GOLDEN_SWORD);
 

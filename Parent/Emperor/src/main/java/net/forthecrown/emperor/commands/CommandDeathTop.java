@@ -1,6 +1,7 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -10,7 +11,7 @@ public class CommandDeathTop extends CrownCommandBuilder {
     public CommandDeathTop(){
         super("deathtop", CrownCore.inst());
 
-        setPermission((String) null);
+        setPermission(Permissions.DEFAULT);
         setDescription("Shows the players with the most deaths");
 
         register();

@@ -1,68 +1,46 @@
 package net.forthecrown.vikings.valhalla;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.CrownBoundingBox;
-import net.forthecrown.core.serialization.JsonSerializable;
-import net.forthecrown.vikings.valhalla.creation.RaidGenerator;
+import net.forthecrown.emperor.utils.CrownBoundingBox;
+import net.forthecrown.vikings.valhalla.data.RaidGenerationData;
 import org.bukkit.Location;
 
-import static net.forthecrown.core.utils.JsonUtils.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-public class VikingRaid implements JsonSerializable {
+public class VikingRaid {
 
-    private final String name;
-    private final Location start_location;
-    private final RaidGenerator generator;
+    public final String name;
+    private final Location startLocation;
+    public final CrownBoundingBox region;
 
-    private CrownBoundingBox region;
+    public RaidGenerationData generatorData;
+    public Map<UUID, Integer> scoreMap = new HashMap<>();
 
-    public VikingRaid (String name, Location start_location){
+    public VikingRaid(String name, Location startLocation, CrownBoundingBox box) {
         this.name = name;
-        this.start_location = start_location;
-        this.generator = new RaidGenerator(this);
+        this.startLocation = startLocation;
+        this.region = box;
     }
 
-    public VikingRaid(JsonObject json){
-        this.name = json.get("name").getAsString();
-        this.start_location = deserializeLocation(json.get("start_location").getAsJsonObject());
-        this.generator = new RaidGenerator(json.get("generator"), this);
-
-        JsonElement raid_region = json.get("region");
-        if(raid_region != null && !raid_region.isJsonNull()) this.region = deserializeBoundingBox(raid_region.getAsJsonObject());
+    public RaidGenerationData getGeneratorData() {
+        if(generatorData == null) return generatorData = new RaidGenerationData(this);
+        return generatorData;
     }
 
-    public CrownBoundingBox getRegion() {
-        return region;
+    public void setScore(UUID id, Integer score){
+        scoreMap.put(id, score);
     }
 
-    public String getName() {
-        return name;
+    public void removeScore(UUID id){
+        scoreMap.remove(id);
     }
 
-    public RaidGenerator getGenerator() {
-        return generator;
+    public boolean hasScore(UUID id){
+        return scoreMap.containsKey(id);
     }
 
     public Location getStartLocation() {
-        return start_location;
-    }
-
-    public void setRegion(CrownBoundingBox region) {
-        this.region = region;
-    }
-
-    @Override
-    public JsonElement serialize() {
-        JsonObject json = new JsonObject();
-
-        json.add("name", new JsonPrimitive(name));
-        json.add("startLocation", serializeLocation(start_location));
-        json.add("generator", generator.serialize());
-
-        if(region != null) json.add("region", serializeBoundingBox(region));
-
-        return json;
+        return startLocation.clone();
     }
 }

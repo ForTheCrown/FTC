@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.nbt.NBT;
-import net.forthecrown.emperor.nbt.NbtGetter;
+import net.forthecrown.emperor.nbt.NbtHandler;
 import net.forthecrown.emperor.useables.UsageCheck;
 import net.forthecrown.emperor.utils.InterUtils;
 import net.forthecrown.grenadier.CommandSource;
@@ -35,7 +35,7 @@ public class CheckHasItem implements UsageCheck {
     @Override
     public void parse(JsonElement json) throws CommandSyntaxException {
         try {
-            item = NbtGetter.itemFromNBT(NBT.of(MojangsonParser.parse(json.getAsString())));
+            item = NbtHandler.itemFromNBT(NBT.of(MojangsonParser.parse(json.getAsString())));
         } catch (RuntimeException e) {
             item = null;
             e.printStackTrace();
@@ -64,7 +64,7 @@ public class CheckHasItem implements UsageCheck {
 
     @Override
     public JsonElement serialize() {
-        return new JsonPrimitive(NbtGetter.ofItem(item).serialize());
+        return new JsonPrimitive(NbtHandler.ofItem(item).serialize());
     }
 
     @Override

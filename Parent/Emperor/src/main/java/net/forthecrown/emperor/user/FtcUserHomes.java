@@ -9,14 +9,31 @@ import java.util.Map;
 import java.util.Set;
 
 public class FtcUserHomes implements UserHomes {
-    public final Map<String, Location> homes = new HashMap<>();
+    public Map<String, Location> homes = new HashMap<>();
     private final FtcUser owner;
 
     public FtcUserHomes(FtcUser user){
         this.owner = user;
+
+        checkOverLimit();
+    }
+
+    public void checkOverLimit(){ //Remove homes until under limit
+        if(owner.isOp()) return;
+
+        homes.entrySet().removeIf(e -> check());
+    }
+
+    private boolean check(){
+        int max = owner.getHighestTierRank().tier.maxHomes;
+        int current = size();
+
+        return max < current;
     }
 
     public void saveInto(ConfigurationSection section){
+        checkOverLimit();
+
         for (Map.Entry<String, Location> e: homes.entrySet()){
             section.set(e.getKey(), e.getValue());
         }
@@ -27,6 +44,8 @@ public class FtcUserHomes implements UserHomes {
         for (String s: section.getKeys(false)){
             homes.put(s, section.getLocation(s));
         }
+
+        checkOverLimit();
     }
 
     @Override
@@ -46,16 +65,23 @@ public class FtcUserHomes implements UserHomes {
 
     @Override
     public boolean canMakeMore(){
-        return owner.getHighestTierRank().tier.maxHomes >= size();
+        if(owner.isOp()) return true;
+
+        int currentHomes = size();
+        int maxHomes = owner.getHighestTierRank().tier.maxHomes;
+
+        return currentHomes <= maxHomes;
     }
 
     @Override
     public boolean isEmpty() {
+        checkOverLimit();
         return homes.isEmpty();
     }
 
     @Override
     public Map<String, Location> getHomes() {
+        checkOverLimit();
         return homes;
     }
 
@@ -66,11 +92,13 @@ public class FtcUserHomes implements UserHomes {
 
     @Override
     public Set<String> getHomeNames(){
+        checkOverLimit();
         return homes.keySet();
     }
 
     @Override
     public Collection<Location> getHomeLocations(){
+        checkOverLimit();
         return homes.values();
     }
 

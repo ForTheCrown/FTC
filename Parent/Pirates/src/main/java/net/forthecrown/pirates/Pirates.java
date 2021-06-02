@@ -9,6 +9,7 @@ import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.user.enums.Rank;
 import net.forthecrown.emperor.utils.CrownBoundingBox;
+import net.forthecrown.emperor.utils.CrownRandom;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.grenadier.RoyalArguments;
 import net.forthecrown.grenadier.VanillaArgumentType;
@@ -36,6 +37,7 @@ import java.util.*;
 
 /**
  * This is such a mess, holy fuck
+ * Half the stuff in this class shouldn't be in this class. Classes were invented for a reason
  */
 public final class Pirates extends JavaPlugin implements Listener {
 
@@ -63,7 +65,7 @@ public final class Pirates extends JavaPlugin implements Listener {
                 YamlConfiguration yaml = YamlConfiguration.loadConfiguration(offlineWithParrots);
                 yaml.createSection("Players");
                 yaml.set("Players", new ArrayList<String>());
-                saveyaml(yaml, offlineWithParrots);
+                saveYaml(yaml, offlineWithParrots);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -136,7 +138,7 @@ public final class Pirates extends JavaPlugin implements Listener {
 
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(offlineWithParrots);
         yaml.set("Players", players);
-        saveyaml(yaml, offlineWithParrots);
+        saveYaml(yaml, offlineWithParrots);
     }
 
     public static AuctionManager getAuctionManager() {
@@ -214,14 +216,12 @@ public final class Pirates extends JavaPlugin implements Listener {
         givePP(player, 1);
     }
 
-
-    @SuppressWarnings("deprecation")
     public void givePP(Player player, int toadd) {
-        Objective pp = Bukkit.getServer().getScoreboardManager().getMainScoreboard().getObjective("PiratePoints");
-        Score ppp = pp.getScore(player);
+        Objective pp = getServer().getScoreboardManager().getMainScoreboard().getObjective("PiratePoints");
+        Score ppp = pp.getScore(player.getName());
         ppp.setScore(ppp.getScore() + toadd);
 
-        CrownUser user = UserManager.getUser(player.getUniqueId());
+        CrownUser user = UserManager.getUser(player);
 
         if (ppp.getScore() == 1) player.sendMessage(ChatColor.GRAY + "[FTC] You now have " + ChatColor.YELLOW + ppp.getScore() + ChatColor.GRAY + " Pirate point.");
         else {
@@ -256,8 +256,6 @@ public final class Pirates extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.WHITE + "You can now select the tag in " + ChatColor.YELLOW + "/rank" + ChatColor.WHITE + " now.");
             }
         }
-
-        //updateLeaderBoard();
     }
 
 
@@ -353,8 +351,10 @@ public final class Pirates extends JavaPlugin implements Listener {
             if(l.getBlock().getType() != Material.CHEST) throw new NullPointerException(l.toString() + " is not a chest");
         }
 
-        int slot = CrownUtils.getRandomNumberInRange(0, 26);
-        Location chosenLoc = chestLocs[CrownUtils.getRandomNumberInRange(0, 3)];
+        CrownRandom random = new CrownRandom();
+
+        int slot = random.intInRange(0, 26);
+        Location chosenLoc = chestLocs[random.intInRange(0, 3)];
 
         ItemStack chosenItem = ((Chest) Bukkit.getWorld("world").getBlockAt(chosenLoc).getState()).getInventory().getContents()[slot];
         return Objects.requireNonNullElseGet(chosenItem, () -> new ItemStack(Material.STONE));
@@ -364,32 +364,32 @@ public final class Pirates extends JavaPlugin implements Listener {
         return new Location(Bukkit.getWorld(getConfig().getString(section + ".world")), getConfig().getInt(section + ".x"), getConfig().getInt(section + ".y"), getConfig().getInt(section + ".z"));
     }
 
-    void giveReward(Player player) {
+    public void giveReward(Player player) {
         CrownCore.getBalances().add(player.getUniqueId(), 10000, false);
         player.sendMessage(ChatColor.GRAY + "You've received " + ChatColor.GOLD + "10,000 rhines" + ChatColor.GRAY + " from " + ChatColor.YELLOW + "Wilhelm" + ChatColor.GRAY + ".");
         givePP(player, 2);
     }
 
-
-    @SuppressWarnings("deprecation")
-    boolean checkIfInvContainsHead(PlayerInventory inv) {
+    public boolean checkIfInvContainsHead(PlayerInventory inv) {
         int size = 36;
 
         for (int i = 0; i < size; i++) {
             ItemStack invItem = inv.getItem(i);
-            if (invItem != null) {
-                if (invItem.getType() == Material.PLAYER_HEAD) {
-                    if (invItem.hasItemMeta() && ((SkullMeta) invItem.getItemMeta()).getOwner().equalsIgnoreCase(getConfig().getString("ChosenHead"))) {
-                        invItem.setAmount(invItem.getAmount()-1);
-                        return true;
-                    }
-                }
+            if (invItem == null) continue;
+            if (invItem.getType() != Material.PLAYER_HEAD) continue;
+            if(!invItem.hasItemMeta()) continue;
+
+            SkullMeta meta = (SkullMeta) invItem.getItemMeta();
+            if(meta.getOwningPlayer() == null) continue;
+
+            if (invItem.hasItemMeta() && ((SkullMeta) invItem.getItemMeta()).getOwner().equalsIgnoreCase(getConfig().getString("ChosenHead"))) {
+                invItem.setAmount(invItem.getAmount()-1);
+                return true;
             }
         }
 
         return false;
     }
-
 
     public List<String> getTopPlayers(Objective objective, int top) {
         List<String> unsortedResult = new ArrayList<>();
@@ -439,18 +439,7 @@ public final class Pirates extends JavaPlugin implements Listener {
         return sortedResult;
     }
 
-	/*@SuppressWarnings("deprecation")
-	@EventHandler
-	public void parrotCarrierLogsOut(PlayerQuitEvent event) {
-		if (parrots.containsValue(event.getPlayer().getUniqueId()))
-		{
-			parrots.remove(event.getPlayer().getShoulderEntityLeft().getUniqueId());
-			event.getPlayer().setShoulderEntityLeft(null);
-
-		}
-	}*/
-
-    public void saveyaml(FileConfiguration yaml, File file) {
+    public void saveYaml(FileConfiguration yaml, File file) {
         try {
             yaml.save(file);
         } catch (IOException e) {

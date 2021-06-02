@@ -7,6 +7,7 @@ import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.data.DirectMessage;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.royalgrenadier.source.CommandSources;
@@ -25,6 +26,8 @@ public class CommandReply extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.then(argument("message", StringArgumentType.greedyString())
+                .suggests(CrownUtils::suggeestPlayernamesAndEmotes)
+
                 .executes(c -> {
                     CrownUser user = getUserSender(c);
 

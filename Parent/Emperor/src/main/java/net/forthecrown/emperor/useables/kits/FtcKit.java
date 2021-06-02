@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.nbt.NbtGetter;
+import net.forthecrown.emperor.nbt.NbtHandler;
 import net.forthecrown.emperor.useables.CheckableBase;
 import net.forthecrown.emperor.useables.UsageCheck;
 import net.forthecrown.emperor.utils.ChatFormatter;
@@ -131,7 +131,7 @@ public class FtcKit extends CheckableBase implements Kit{
 
         JsonArray itemArray = new JsonArray();
         for (ItemStack i: items){
-            itemArray.add(new JsonPrimitive(NbtGetter.ofItem(i).serialize()));
+            itemArray.add(new JsonPrimitive(NbtHandler.ofItem(i).serialize()));
         }
 
         json.add("items", itemArray);

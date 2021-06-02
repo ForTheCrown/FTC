@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class CheckCooldown implements UsageCheck {
     public static final Key KEY = Key.key(CrownCore.getNamespace(), "cooldown");
@@ -69,13 +70,14 @@ public class CheckCooldown implements UsageCheck {
 
     @Override
     public boolean test(Player player) {
-        if(!onCooldown.containsKey(player.getUniqueId())){
-            onCooldown.put(player.getUniqueId(), System.currentTimeMillis() + (tickDuration * 50));
-            return true;
-        }
+        if(!onCooldown.containsKey(player.getUniqueId())) return true;
 
         long until = onCooldown.get(player.getUniqueId());
-        if(System.currentTimeMillis() > until) onCooldown.remove(player.getUniqueId());
+
+        if(System.currentTimeMillis() > until){
+            onCooldown.remove(player.getUniqueId());
+            return true;
+        }
         return false;
     }
 
@@ -95,6 +97,11 @@ public class CheckCooldown implements UsageCheck {
 
         result.add("onCooldown", array);
         return result;
+    }
+
+    @Override
+    public Consumer<Player> onSuccess() {
+        return plr -> onCooldown.put(plr.getUniqueId(), (tickDuration * 50) + System.currentTimeMillis());
     }
 
     public int getTickDuration() {

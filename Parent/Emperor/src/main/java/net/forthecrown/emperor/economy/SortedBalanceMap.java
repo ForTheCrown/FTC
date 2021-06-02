@@ -1,5 +1,7 @@
 package net.forthecrown.emperor.economy;
 
+import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -60,10 +62,17 @@ public class SortedBalanceMap implements BalanceMap {
 
         BalEntry entry = getEntry(index);
         OfflinePlayer player = Bukkit.getOfflinePlayer(entry.getUniqueId());
-        if(player == null || player.getName() == null) return null;
+        if(player == null || player.getName() == null){
+            remove(entry.getUniqueId());
+            return null;
+        }
+        CrownUser user = UserManager.getUser(player);
+        Component displayName = user.nickDisplayName();
+
+        user.unloadIfNotOnline();
 
         return Component.text()
-                .append(Component.text(player.getName()))
+                .append(displayName)
                 .append(Component.text(" - "))
                 .append(Balances.formatted(entry.getValue()).color(NamedTextColor.YELLOW))
                 .build();

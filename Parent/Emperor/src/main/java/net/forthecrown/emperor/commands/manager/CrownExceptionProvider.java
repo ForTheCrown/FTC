@@ -46,4 +46,5 @@ public class CrownExceptionProvider {
 
     static final TranslatableExceptionType BLOCKED_PLAYER =             new TranslatableExceptionType("user.blocked");
     static final TranslatableExceptionType INV_FULL =                   new TranslatableExceptionType("commands.invFull");
+    static final TranslatableExceptionType NO_DEF_HOME =                new TranslatableExceptionType("homes.noDefaultHome");
 }

@@ -8,6 +8,7 @@ import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.economy.BlackMarket;
 import net.forthecrown.emperor.economy.CannotAffordTransactionException;
 import net.forthecrown.emperor.economy.DailyEnchantment;
+import net.forthecrown.emperor.events.handler.CrownEventExecutor;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.user.enums.Branch;
@@ -56,42 +57,43 @@ public class BlackMarketEvents implements Listener, ClickEventTask {
     }
 
     @EventHandler
-    public void onBlackMarketUse(PlayerInteractEntityEvent event) throws CrownException {
-        if(event.getRightClicked().getType() != EntityType.VILLAGER) return;
-        if(event.getHand() != EquipmentSlot.HAND) return;
-        Villager villie = (Villager) event.getRightClicked();
+    public void onBlackMarketUse(PlayerInteractEntityEvent event1) throws CrownException {
+        if(event1.getRightClicked().getType() != EntityType.VILLAGER) return;
+        if(event1.getHand() != EquipmentSlot.HAND) return;
+        Villager villie = (Villager) event1.getRightClicked();
         if(!villie.isInvulnerable()) return;
         if(villie.getCustomName() == null) return;
         if(!villie.getCustomName().contains("George") && !villie.getCustomName().contains("Otto") && !villie.getCustomName().contains("Herbert") &&
                 !villie.getCustomName().contains("Edward") && !villie.getCustomName().contains("Ramun")) return;
 
-        event.setCancelled(true);
+        event1.setCancelled(true);
 
-        if(Cooldown.contains(event.getPlayer())) return;
-        Cooldown.add(event.getPlayer(), 20);
+        if(Cooldown.contains(event1.getPlayer())) return;
+        Cooldown.add(event1.getPlayer(), 20);
 
-        Player player = event.getPlayer();
-        BlackMarket bm = CrownCore.getBlackMarket();
-        CrownUser user = UserManager.getUser(player.getUniqueId());
+        CrownEventExecutor.handlePlayer(event1, event -> {
+            Player player = event.getPlayer();
+            BlackMarket bm = CrownCore.getBlackMarket();
+            CrownUser user = UserManager.getUser(player.getUniqueId());
 
-        if(user.getBranch() != Branch.PIRATES) throw new CrownException(player, "&e" + villie.getCustomName() + " only trusts real pirates");
+            if(user.getBranch() != Branch.PIRATES) throw new CrownException(player, "&e" + villie.getCustomName() + " only trusts real pirates");
 
-        String customName = villie.getCustomName();
+            String customName = villie.getCustomName();
 
-        if(customName.contains("George")) player.openInventory(bm.getMiningInventory(user));
-        else if(customName.contains("Otto")) player.openInventory(bm.getDropInventory(user));
-        else if(customName.contains("Herbert")) player.openInventory(bm.getFarmingInventory(user));
-        else if(customName.contains("Edward")){
-            if(!bm.isAllowedToBuyEnchant(player)) throw new CrownException(player, "-&eYou've already purchased from me today, scram!&r-");
-            if(!bm.enchantAvailable()) throw new CrownException(player, "-&eUnfortunately, my good sir, I don't have anything to sell you at this moment&r-");
-            doEdwardStuff(user, bm, event.getRightClicked());
-        }
-        else if(customName.contains("Ramun")) player.openInventory(bm.getParrotInventory());
+            if(customName.contains("George")) player.openInventory(bm.getMiningInventory(user));
+            else if(customName.contains("Otto")) player.openInventory(bm.getDropInventory(user));
+            else if(customName.contains("Herbert")) player.openInventory(bm.getFarmingInventory(user));
+            else if(customName.contains("Edward")){
+                if(!bm.isAllowedToBuyEnchant(player)) throw new CrownException(player, "-&eYou've already purchased from me today, scram!&r-");
+                if(!bm.enchantAvailable()) throw new CrownException(player, "-&eUnfortunately, my good sir, I don't have anything to sell you at this moment&r-");
+                doEdwardStuff(user, bm, event.getRightClicked());
+            }
+            else if(customName.contains("Ramun")) player.openInventory(bm.getParrotInventory());
 
-        if(!customName.contains("Edward")){
-            CrownCore.inst().getServer().getPluginManager().registerEvents(new BmSubClass1(player), CrownCore.inst());
-        }
-
+            if(!customName.contains("Edward")){
+                CrownCore.inst().getServer().getPluginManager().registerEvents(new BmSubClass1(player), CrownCore.inst());
+            }
+        });
     }
 
     private void doEdwardStuff(CrownUser user, BlackMarket bm, Entity edward){

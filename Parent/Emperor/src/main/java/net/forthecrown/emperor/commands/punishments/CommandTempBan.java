@@ -68,7 +68,7 @@ public class CommandTempBan extends CrownCommandBuilder implements TempPunisher 
         if(entry != null && entry.checkPunished(PunishmentType.BAN)) throw FtcExceptionProvider.create("User has already been banned");
 
         PunishmentRecord record = manager.punish(user.getUniqueId(), PunishmentType.BAN, source, reason, length);
-        if(user.isOnline()) user.getPlayer().kick(ChatFormatter.formatBanMessage(record));
+        if(user.isOnline()) user.getPlayer().kick(ChatFormatter.banMessage(record));
 
         list.addBan(user.getName(), reason, new Date(length + System.currentTimeMillis()), source.textName());
 

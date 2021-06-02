@@ -11,17 +11,18 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 
 public class CommandSpecificGameMode extends CrownCommandBuilder {
     private final CrownGameMode gameMode;
-    public CommandSpecificGameMode(@NotNull String name, CrownGameMode mode, String... aliases) {
+    public CommandSpecificGameMode(@NotNull String name, Permission permission, CrownGameMode mode, String... aliases) {
         super(name, CrownCore.inst());
 
         this.aliases = aliases;
         this.gameMode = mode;
 
-        setPermission(Permissions.GAMEMODES);
+        setPermission(permission);
         register();
     }
 
@@ -31,6 +32,8 @@ public class CommandSpecificGameMode extends CrownCommandBuilder {
                 .executes(c -> doStuff(getUserSender(c), c.getSource(), false))
 
                 .then(argument("user", UserType.onlineUser())
+                        .requires(s -> s.hasPermission(Permissions.GAMEMODES))
+
                         .executes(c -> doStuff(
                                 UserType.getUser(c, "user"),
                                 c.getSource(),
@@ -66,9 +69,9 @@ public class CommandSpecificGameMode extends CrownCommandBuilder {
     }
 
     public static void init(){
-        new CommandSpecificGameMode("survival", CrownGameMode.SURVIVAL, "gms");
-        new CommandSpecificGameMode("creative", CrownGameMode.CREATIVE, "gmc");
-        new CommandSpecificGameMode("spectator", CrownGameMode.SPECTATOR, "gmsp");
-        new CommandSpecificGameMode("adventure", CrownGameMode.ADVENTURE, "gma");
+        new CommandSpecificGameMode("survival", Permissions.HELPER, CrownGameMode.SURVIVAL, "gms");
+        new CommandSpecificGameMode("creative", Permissions.CORE_ADMIN, CrownGameMode.CREATIVE, "gmc");
+        new CommandSpecificGameMode("spectator", Permissions.HELPER, CrownGameMode.SPECTATOR, "gmsp");
+        new CommandSpecificGameMode("adventure", Permissions.CORE_ADMIN, CrownGameMode.ADVENTURE, "gma");
     }
 }

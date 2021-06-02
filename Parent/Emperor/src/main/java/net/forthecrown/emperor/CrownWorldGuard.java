@@ -24,7 +24,7 @@ public final class CrownWorldGuard {
             registry.register(SHOP_CREATION);
             registry.register(TRAPDOOR_USE);
 
-            CrownCore.logger().info("Core's flags registered");
+            System.out.println("Core's flags registered");
         } catch (FlagConflictException e){
             e.printStackTrace();
         }

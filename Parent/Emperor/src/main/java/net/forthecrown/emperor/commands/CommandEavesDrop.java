@@ -12,7 +12,7 @@ public class CommandEavesDrop extends CrownCommandBuilder {
     public CommandEavesDrop(){
         super("eavesdrop", CrownCore.inst());
 
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.EAVESDROP);
         register();
     }
 

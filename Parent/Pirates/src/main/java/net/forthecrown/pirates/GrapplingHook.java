@@ -164,7 +164,8 @@ public class GrapplingHook implements Listener {
                             case 3:
                                 player.sendMessage(ChatColor.GOLD + "[FTC] " + ChatColor.GRAY + "You have recieved " + ChatColor.GOLD + "50,000 Rhines and the Captain's Cutlass " + ChatColor.GRAY + "for completing all the Grappling Hook levels!");
                                 CrownCore.getBalances().add(player.getUniqueId(), 50000, false);
-                                player.getInventory().addItem(CrownItems.BASE_CUTLASS.clone());
+
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> player.getInventory().addItem(CrownItems.BASE_CUTLASS.clone()), 5);
                                 main.givePP(player, 25);
                                 break;
                             default:

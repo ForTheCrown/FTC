@@ -35,7 +35,7 @@ public class SignShopUseEvent extends Event implements Cancellable {
         return shop;
     }
 
-    public CrownUser getCustomer() {
+    public CrownUser getUser() {
         return customer;
     }
 
@@ -64,13 +64,13 @@ public class SignShopUseEvent extends Event implements Cancellable {
     }
 
     public void addOwnerBalance(Integer amount){
-        if(!getCustomer().getUniqueId().equals(getOwner().getPlayer())) bals.add(getOwner().getUniqueId(), amount, true);
+        if(!getUser().getUniqueId().equals(getOwner().getPlayer())) bals.add(getOwner().getUniqueId(), amount, true);
         else bals.add(shop.getOwner(), amount);
     }
 
     public void addCustomerBalance(Integer amount){
-        if(!getCustomer().getUniqueId().equals(getOwner().getPlayer())) bals.add(getCustomer().getUniqueId(), amount, true);
-        else bals.add(getCustomer().getUniqueId(), amount);
+        if(!getUser().getUniqueId().equals(getOwner().getPlayer())) bals.add(getUser().getUniqueId(), amount, true);
+        else bals.add(getUser().getUniqueId(), amount);
     }
 
     public CrownUser getOwner(){

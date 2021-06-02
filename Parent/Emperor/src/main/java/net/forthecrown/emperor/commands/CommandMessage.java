@@ -4,12 +4,13 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
+import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
-import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.user.data.DirectMessage;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.royalgrenadier.source.CommandSources;
@@ -30,6 +31,8 @@ public class CommandMessage extends CrownCommandBuilder {
         command.
                 then(argument("user", UserType.onlineUser())
                         .then(argument("message", StringArgumentType.greedyString())
+                                .suggests(CrownUtils::suggeestPlayernamesAndEmotes)
+
                                 .executes(c -> {
                                     CommandSource source = c.getSource();
                                     CrownUser user = UserType.getUser(c, "user");

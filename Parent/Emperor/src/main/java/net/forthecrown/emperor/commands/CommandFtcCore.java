@@ -256,6 +256,38 @@ public class CommandFtcCore extends CrownCommandBuilder {
                                         )
                                 )
 
+                                .then(literal("afk")
+                                        .executes(c -> {
+                                            CrownUser user = getUser(c);
+
+                                            c.getSource().sendMessage(
+                                                    Component.text()
+                                                            .append(user.displayName())
+                                                            .append(Component.text(" is AFK: "))
+                                                            .append(Component.text(user.isAfk()))
+                                                            .build()
+                                            );
+                                            return 0;
+                                        })
+
+                                        .then(argument("bool", BoolArgumentType.bool())
+                                                .executes(c -> {
+                                                    CrownUser user = getUser(c);
+                                                    boolean bool = c.getArgument("bool", Boolean.class);
+
+                                                    user.setAfk(bool);
+
+                                                    c.getSource().sendMessage(
+                                                            Component.text("Set ")
+                                                                    .append(user.displayName())
+                                                                    .append(Component.text(" afk: "))
+                                                                    .append(Component.text(bool))
+                                                    );
+                                                    return 0;
+                                                })
+                                        )
+                                )
+
                                 .then(literal("arrowparticle")
                                         .executes(c -> {
                                             CrownUser u = getUser(c);

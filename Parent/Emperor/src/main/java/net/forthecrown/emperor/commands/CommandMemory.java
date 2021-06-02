@@ -18,7 +18,7 @@ public class CommandMemory extends CrownCommandBuilder {
     public CommandMemory(){
         super("memory", CrownCore.inst());
 
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.HELPER);
         register();
     }
 

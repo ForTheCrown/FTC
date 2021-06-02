@@ -466,8 +466,12 @@ public interface CrownUser extends CrownSerializer<CrownCore>, CommandSender, Ho
      */
     void onLeave();
 
+    default void unloadIfNotOnline(){
+        if(!isOnline()) unload();
+    }
+
     default ClickEvent asClickEvent(){
-        return ClickEvent.suggestCommand("/tell " + getName() + " ");
+        return isOnline() ? ClickEvent.suggestCommand("/tell " + getName() + " ") : ClickEvent.runCommand("/profile " + getName());
     }
 
     default Component displayName(){

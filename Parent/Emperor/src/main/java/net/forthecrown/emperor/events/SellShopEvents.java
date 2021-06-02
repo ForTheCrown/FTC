@@ -4,7 +4,7 @@ import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.economy.SellShop;
 import net.forthecrown.emperor.events.custom.SellShopUseEvent;
-import net.forthecrown.emperor.nbt.NbtGetter;
+import net.forthecrown.emperor.nbt.NbtHandler;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.user.data.SoldMaterialData;
@@ -67,7 +67,8 @@ public class SellShopEvents implements Listener {
             try {
                 sellAmountInt = Integer.parseInt(displayName.replaceAll("[\\D]", "").trim());
             } catch (Exception e){
-                sellAmountInt = -1;
+                if(displayName.contains("stack")) sellAmountInt = 64;
+                else sellAmountInt = -1;
             }
             SellAmount newAmount = SellAmount.fromInt((byte) sellAmountInt);
             user.setSellAmount(newAmount);
@@ -139,7 +140,7 @@ public class SellShopEvents implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSellShopUse(SellShopUseEvent event){
-        CrownUser seller = event.getSeller();
+        CrownUser seller = event.getUser();
         Material toSell = event.getItem();
 
         int sellAmount = seller.getSellAmount().getValue();
@@ -177,7 +178,7 @@ public class SellShopEvents implements Listener {
         short price;
 
         if(event.getShop().getCurrentMenu() == SellShop.Menu.MINING_BLOCKS){
-            String orig = NbtGetter.ofItemTags(event.getClickedItem()).getString("ingot");
+            String orig = NbtHandler.ofItemTags(event.getClickedItem()).getString("ingot");
             toSell = Material.valueOf(orig);
 
             data = seller.getMatData(toSell);

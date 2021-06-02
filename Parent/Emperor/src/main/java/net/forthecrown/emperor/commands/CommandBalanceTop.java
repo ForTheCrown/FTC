@@ -7,6 +7,7 @@ import net.forthecrown.emperor.economy.BalanceMap;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -75,13 +76,33 @@ public class CommandBalanceTop extends CrownCommandBuilder {
                     .append(entryText)
                     .append(Component.newline());
         }
+
+        Component pageAscending = page + 1 == BaltopType.MAX ? Component.empty() : Component.text("> ")
+                .decorate(TextDecoration.BOLD)
+                .clickEvent(ClickEvent.runCommand("/baltop " + (page + 2)))
+                .hoverEvent(Component.text("Next page"));
+
+        Component pageDescending = page == 0 ? Component.empty() : Component.text(" <")
+                .decorate(TextDecoration.BOLD)
+                .clickEvent(ClickEvent.runCommand("/baltop " + page))
+                .hoverEvent(Component.text("Last page"));
+
+        Component footerMessage = Component.text()
+                .color(NamedTextColor.YELLOW)
+                .append(pageDescending)
+                .append(Component.space())
+                .append(Component.translatable("economy.baltop.footer", Component.text((page+1) + "/" + BaltopType.MAX)))
+                .append(Component.space())
+                .append(pageAscending)
+                .build();
+
         text
                 .append(border)
-                .append(Component.translatable("economy.baltop.footer", Component.text((page+1) + "/" + BaltopType.MAX)).color(NamedTextColor.YELLOW))
+                .append(footerMessage)
                 .append(border);
 
-        //ngl, now that this is just sending one message that's appended together, there's no weird 1 frame thing where
+        // ngl, now that this is just sending one message that's appended together, there's no weird 1 frame thing where
         // the text gets sent line by line lol. It just comes out as one :D
-        sender.sendMessage(text);
+        sender.sendMessage(text.build());
     }
 }

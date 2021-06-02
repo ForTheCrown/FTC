@@ -83,7 +83,7 @@ public class PlayerRidingManager implements Listener {
 
         Location loc = ridden.getLocation();
         Material oneAbovePlayer = loc.add(0, 2, 0).getBlock().getType();
-        Material twoAbovePlayer = loc.add(0, 3, 0).getBlock().getType();
+        Material twoAbovePlayer = loc.add(0, 1, 0).getBlock().getType();
 
         if(!isAllowedBlock(oneAbovePlayer) || !isAllowedBlock(twoAbovePlayer)){
             user.sendMessage(new ChatComponentText("Cannot ride player here").a(EnumChatFormat.GRAY), ChatMessageType.GAME_INFO);

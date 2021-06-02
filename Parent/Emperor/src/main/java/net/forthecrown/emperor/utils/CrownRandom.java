@@ -34,7 +34,10 @@ public class CrownRandom extends Random {
     }
 
     public <T> T pickRandomEntry(Collection<T> from){
-        return new ArrayList<>(from).get(intInRange(0, from.size()));
+        if(from.size() == 0) return null;
+        if(from.size() == 1) return new ArrayList<>(from).get(0);
+
+        return new ArrayList<>(from).get(intInRange(0, from.size()-1));
     }
 
     private <T> boolean attemptAdding(Collection<T> to, T value){

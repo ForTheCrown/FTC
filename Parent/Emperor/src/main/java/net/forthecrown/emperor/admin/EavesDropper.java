@@ -8,6 +8,7 @@ import net.forthecrown.emperor.utils.ChatFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -16,6 +17,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Predicate;
 
 public class EavesDropper {
+    public static Component PREFIX = Component.text()
+            .color(NamedTextColor.GOLD)
+            .append(Component.text("["))
+            .append(Component.text("EavesDrop").color(NamedTextColor.YELLOW))
+            .append(Component.text("] "))
+            .build();
+
     public static void send(Component text, Permission permission, @Nullable Predicate<CrownUser> toSkip){
         Component formatted = format(text);
 
@@ -28,7 +36,7 @@ public class EavesDropper {
 
     public static Component format(Component initial){
         return Component.text()
-                .append(Component.text("[EavesDrop] ").color(NamedTextColor.DARK_GRAY))
+                .append(PREFIX)
                 .append(initial)
                 .build();
     }
@@ -39,7 +47,7 @@ public class EavesDropper {
         send(Component.text()
                 .append(
                         Component.text()
-                                .color(NamedTextColor.GRAY)
+                                .color(NamedTextColor.YELLOW)
                                 .append(Component.text(status.edPrefix))
                                 .append(user.displayName())
                                 .append(Component.text(" > ").decorate(TextDecoration.BOLD))
@@ -58,12 +66,12 @@ public class EavesDropper {
                 .append(DirectMessage.getHeader(
                         message.senderDisplayName(),
                         message.receiverDisplayName(),
-                        NamedTextColor.GRAY
+                        NamedTextColor.YELLOW
                 ))
                 .append(Component.text(" "))
                 .append(message.getFormattedText())
                 .build(),
-                Permissions.EAVESDROP,
+                Permissions.EAVESDROP_DM,
                 u -> u.getName().equalsIgnoreCase(message.getReceiver().textName()) || u.getName().equalsIgnoreCase(message.getSender().textName())
         );
     }
@@ -71,6 +79,8 @@ public class EavesDropper {
     public static void reportSignPlacement(Player player, Location location, Component... lines){
         if(lines.length < 4) throw new IllegalStateException("Not enough sign lines");
         if(player.hasPermission(Permissions.EAVESDROP_ADMIN)) return;
+        if(isSignEmpty(lines)) return;
+
         CrownUser user = UserManager.getUser(player);
         Component border = Component.text("------------------").decorate(TextDecoration.STRIKETHROUGH).color(NamedTextColor.GRAY);
 
@@ -102,5 +112,15 @@ public class EavesDropper {
                 Permissions.EAVESDROP_SIGNS,
                 u -> u.getName().equalsIgnoreCase(player.getName())
         );
+    }
+
+    public static boolean isSignEmpty(Component[] lines){
+        byte emptyLines = 0;
+
+        for (Component c: lines){
+            emptyLines += PlainComponentSerializer.plain().serialize(c).isBlank() ? 1 : 0;
+        }
+
+        return emptyLines <= 4;
     }
 }

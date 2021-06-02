@@ -16,6 +16,7 @@ import org.bukkit.inventory.PlayerInventory;
 import java.util.List;
 import java.util.function.Predicate;
 
+//Lot of extensions huh :|
 public interface Kit extends JsonSerializable, Preconditionable, Predicate<Player>, SilentPredicate<Player>, Nameable, Keyed, HoverEventSource<Component>, Deleteable {
     boolean attemptItemGiving(Player player);
     void giveItems(Player player);
@@ -23,7 +24,7 @@ public interface Kit extends JsonSerializable, Preconditionable, Predicate<Playe
     default Component displayName(){
         return Component.text(getName())
                 .hoverEvent(this)
-                .clickEvent(ClickEvent.suggestCommand("/kit " + getName()));
+                .clickEvent(ClickEvent.runCommand("/kit " + getName()));
     }
 
     List<ItemStack> getItems();

@@ -1,9 +1,14 @@
 package net.forthecrown.emperor.events;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import net.forthecrown.emperor.Announcer;
 import net.forthecrown.emperor.CrownCore;
@@ -19,12 +24,14 @@ import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.BlockState;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
@@ -51,7 +58,11 @@ public class CoreListener implements Listener {
         if(!event.getPlayer().hasPlayedBefore() || CrownCore.inDebugMode()){
             user.getPlayer().teleport(CrownCore.getServerSpawn());
 
-            Component welcomeMsg = Component.translatable("user.firstJoin", user.nickDisplayName()).color(NamedTextColor.YELLOW);
+            Component welcomeMsg = Component.translatable("user.firstJoin", user.nickDisplayName())
+                    .hoverEvent(Component.text("Click to welcome them!"))
+                    .clickEvent(ClickEvent.runCommand("Welcome " + user.getNickOrName() + '!'))
+                    .color(NamedTextColor.YELLOW);
+
             CrownCore.getAnnouncer().announceRaw(welcomeMsg);
 
             //Give join kit
@@ -60,7 +71,7 @@ public class CoreListener implements Listener {
         } else user.sendMessage(Component.translatable("server.welcomeBack").color(NamedTextColor.GOLD));
 
         if(user.isVanished()) event.joinMessage(null);
-        else event.joinMessage(ChatFormatter.formatJoinMessage(user));
+        else event.joinMessage(ChatFormatter.joinMessage(user));
 
         UserManager.updateVanishedFromPerspective(user);
         Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), user::onJoinLater, 1);
@@ -86,7 +97,7 @@ public class CoreListener implements Listener {
             Announcer.debug(2);
             event.disallow(
                     AsyncPlayerPreLoginEvent.Result.KICK_BANNED,
-                    ChatFormatter.formatBanMessage(entry.getCurrent(PunishmentType.BAN))
+                    ChatFormatter.banMessage(entry.getCurrent(PunishmentType.BAN))
             );
             event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
         }
@@ -162,16 +173,23 @@ public class CoreListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        BlockState state = event.getClickedBlock().getState();
-        if(!(state instanceof TrapDoor)) return;
+        Block block = event.getClickedBlock();
+        BlockData data = event.getClickedBlock().getBlockData();
+        if(!(data instanceof TrapDoor)) return;
 
-        Location weLoc = BukkitAdapter.adapt(state.getLocation());
+        Location weLoc = BukkitAdapter.adapt(block.getLocation());
+        LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
 
-        RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
-        boolean canBypass = WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(WorldGuardPlugin.inst().wrapPlayer(event.getPlayer()), BukkitAdapter.adapt(state.getWorld()));
-        if(!query.testState(weLoc, null, CrownWorldGuard.TRAPDOOR_USE) && !canBypass){
+        WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
+        RegionQuery query = platform.getRegionContainer().createQuery();
+        boolean canBypass = platform.getSessionManager().hasBypass(wgPlayer, BukkitAdapter.adapt(block.getWorld()));
+
+        if(!query.testState(weLoc, wgPlayer, CrownWorldGuard.TRAPDOOR_USE) && !canBypass){
+            ApplicableRegionSet set = platform.getRegionContainer().get(BukkitAdapter.adapt(block.getWorld())).getApplicableRegions(BlockVector3.at(weLoc.getBlockX(), weLoc.getBlockY(), weLoc.getBlockZ()));
+
+            for (ProtectedRegion region: set) if(region.isMember(wgPlayer)) return;
+
             event.setCancelled(true);
-
             event.getPlayer().sendMessage(
                     Component.text()
                             .append(Component.text("Hey!").style(Style.style(NamedTextColor.RED, TextDecoration.BOLD)))

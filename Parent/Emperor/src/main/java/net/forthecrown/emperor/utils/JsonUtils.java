@@ -3,7 +3,7 @@ package net.forthecrown.emperor.utils;
 import com.google.gson.*;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.nbt.NBT;
-import net.forthecrown.emperor.nbt.NbtGetter;
+import net.forthecrown.emperor.nbt.NbtHandler;
 import net.minecraft.server.v1_16_R3.MojangsonParser;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -13,6 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -84,6 +86,35 @@ public class JsonUtils {
         return result;
     }
 
+    public static <K, V> JsonObject serializeMap(Map<K, V> map, Function<Map.Entry<K, V>, Pair<String, JsonElement>> function){
+        Validate.notNull(map, "Map was null");
+        Validate.notNull(function, "Function was null");
+
+        JsonObject json = new JsonObject();
+
+        for (Map.Entry<K, V> e: map.entrySet()){
+            Pair<String, JsonElement> element = function.apply(e);
+            if(element == null) continue;
+
+            json.add(element.first, element.second);
+        }
+
+        return json;
+    }
+
+    public static <K, V> Map<K, V> deserializeMap(JsonObject json, Function<Map.Entry<String, JsonElement>, Pair<K, V>> function){
+        Map<K, V> result = new HashMap<>();
+
+        for (Map.Entry<String, JsonElement> e: json.entrySet()){
+            Pair<K, V> pair = function.apply(e);
+            if(pair == null) continue;
+
+            result.put(pair.first, pair.second);
+        }
+
+        return result;
+    }
+
     public static <T extends Enum<T>> T parseEnum(Class<T> clazz, JsonElement element){
         if(element == null || element.isJsonNull()) return null;
         return Enum.valueOf(clazz, element.getAsString().toUpperCase());
@@ -94,6 +125,6 @@ public class JsonUtils {
     }
 
     public static ItemStack deserializeItem(JsonElement json) throws CommandSyntaxException {
-        return NbtGetter.itemFromNBT(NBT.of(MojangsonParser.parse(json.getAsString())));
+        return NbtHandler.itemFromNBT(NBT.of(MojangsonParser.parse(json.getAsString())));
     }
 }

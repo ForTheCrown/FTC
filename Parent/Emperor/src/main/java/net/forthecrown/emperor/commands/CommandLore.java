@@ -9,6 +9,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
@@ -38,10 +40,17 @@ public class CommandLore extends CrownCommandBuilder {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("set")
-                        .then(compOrStringArg(argument("loreIndex", IntegerArgumentType.integer(0)), (c, l) -> set(c, c.getArgument("loreIndex", Integer.class), l)))
+                        .then(compOrStringArg(
+                                argument("loreIndex", IntegerArgumentType.integer(0)),
+                                (c, b) -> Suggestions.empty(),
+                                (c, l) -> set(c, c.getArgument("loreIndex", Integer.class), l)))
                 )
 
-                .then(compOrStringArg(argument("add"), this::add))
+                .then(compOrStringArg(
+                        argument("add"),
+                        (c, b) -> Suggestions.empty(),
+                        this::add
+                ))
 
                 .then(argument("clear")
                         .executes(c -> {
@@ -104,9 +113,11 @@ public class CommandLore extends CrownCommandBuilder {
         if(itemStack == null || itemStack.getType() == Material.AIR) throw FtcExceptionProvider.create("You must be holding an item");
     }
 
-    public static <T extends ArgumentBuilder<CommandSource, T>> T compOrStringArg(T arg, ComponentCommand runnable){
+    public static <T extends ArgumentBuilder<CommandSource, T>> T compOrStringArg(T arg, SuggestionProvider<CommandSource> s, ComponentCommand runnable){
         return arg
                 .then(arg("string", StringArgumentType.greedyString())
+                        .suggests(s)
+
                         .executes(c -> runnable.run(c, ChatUtils.convertString(c.getArgument("string", String.class))))
                 )
 

@@ -141,15 +141,16 @@ public class CommandProfile extends CrownCommandBuilder {
                 .build() : Component.empty();
     }
 
-    private Component adminInfo(CrownUser sender, CrownUser profile){
+    private Component adminInfo(CrownUser sender, CrownUser profile1){
         if(!sender.hasPermission(getPerm() + ".bypass")) return Component.empty();
+        FtcUser profile = (FtcUser) profile1;
 
         PunishmentManager list = CrownCore.getPunishmentManager();
-
         PunishmentEntry entry = list.getEntry(profile.getUniqueId());
-        if(entry == null) return Component.empty();
 
-        return Component.text("\n")
+        Component punishmentDisplay = entry == null ? Component.empty() : Component.newline().append(entry.display());
+
+        return Component.newline()
                 .append(Component.text("\nAdmin Info:").color(NamedTextColor.YELLOW))
                 .append(line(" Ranks", ListUtils.join(profile.getAvailableRanks(), r -> r.name().toLowerCase()), true))
 
@@ -157,10 +158,11 @@ public class CommandProfile extends CrownCommandBuilder {
                 .append(timeSinceOnlineOrOnlineTime(profile))
 
                 .append(Component.newline())
-                .append(line(" IP", Component.text(((FtcUser) profile).ip), true))
+                .append(line(" IP", Component.text(profile.ip + ""), true))
 
-                .append(Component.newline())
-                .append(entry.display());
+                .append(line(profile.isOnline() ? " Location" : " Last seen", ChatFormatter.clickableLocationMessage(profile.getLocation(), true), true))
+
+                .append(punishmentDisplay);
     }
 
     private Component timeSinceOnlineOrOnlineTime(CrownUser user){

@@ -138,6 +138,10 @@ public class UserTeleport extends BukkitRunnable {
         return interruptMessage;
     }
 
+    public Type getType() {
+        return type;
+    }
+
     public UserTeleport setStartMessage(Component startMessage) {
         this.startMessage = startMessage;
         return this;

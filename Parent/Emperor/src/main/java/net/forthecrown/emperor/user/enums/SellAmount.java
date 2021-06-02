@@ -11,14 +11,17 @@ import org.jetbrains.annotations.Nullable;
  * @see SellShop
  */
 public enum SellAmount implements JsonSerializable {
-    PER_64 ((byte) 64),
-    PER_16 ((byte) 16),
-    PER_1 ((byte) 1),
-    ALL ((byte) 1);
+    PER_64 ((byte) 64, "Sell per stack"),
+    PER_16 ((byte) 16, "Sell per 16"),
+    PER_1 ((byte) 1, "Sell per 1"),
+    ALL ((byte) 1, "Sell all");
 
     public final byte value;
-    SellAmount(byte i) {
+    public final String text;
+
+    SellAmount(byte i, String text) {
         this.value = i;
+        this.text = text;
     }
 
     /**

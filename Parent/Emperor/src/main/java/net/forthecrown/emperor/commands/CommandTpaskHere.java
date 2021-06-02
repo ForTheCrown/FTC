@@ -8,6 +8,7 @@ import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.data.TeleportRequest;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import static net.forthecrown.emperor.commands.CommandTpask.*;
 
@@ -50,7 +51,7 @@ public class CommandTpaskHere extends CrownCommandBuilder {
 
                     target.sendMessage(
                             Component.text()
-                                    .append(player.nickDisplayName())
+                                    .append(player.nickDisplayName().color(NamedTextColor.YELLOW))
                                     .append(Component.text(" has requested that you teleport to them "))
                                     .append(acceptButton(player))
                                     .append(denyButton(player))

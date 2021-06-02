@@ -1,19 +1,18 @@
 package net.forthecrown.emperor.events;
 
-import net.forthecrown.emperor.Announcer;
-import net.forthecrown.emperor.BranchFlag;
-import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.CrownWorldGuard;
+import net.forthecrown.emperor.*;
 import net.forthecrown.emperor.economy.Balances;
+import net.forthecrown.emperor.economy.BrokenShopException;
 import net.forthecrown.emperor.economy.shops.ShopInventory;
 import net.forthecrown.emperor.economy.shops.ShopType;
 import net.forthecrown.emperor.economy.shops.SignShop;
 import net.forthecrown.emperor.events.custom.SignShopUseEvent;
-import net.forthecrown.emperor.economy.BrokenShopException;
-import net.forthecrown.emperor.CrownException;
-import net.forthecrown.emperor.user.enums.Branch;
+import net.forthecrown.emperor.events.handler.CrownEventExecutor;
+import net.forthecrown.emperor.events.handler.ExceptionedEvent;
 import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.enums.Branch;
 import net.forthecrown.emperor.utils.ChatFormatter;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -26,12 +25,33 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.logging.Level;
 
-public class ShopTransactionEvent implements Listener {
+public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShopUseEvent> {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onShopUse(SignShopUseEvent event) throws CrownException {
+        CrownEventExecutor.handleSignShop(event, this);
+    }
+
+    private void sendInvMessage(CrownUser owner, SignShop shop){
+        if(shop.getType().isAdmin) return;
+
+        //If no good, then no go
+        if ((shop.getType() != ShopType.BUY_SHOP || !shop.getInventory().isEmpty()) && (shop.getType() != ShopType.SELL_SHOP || !shop.getInventory().isFull()))
+            return;
+
+        Location l = shop.getLocation();
+        Component builder = Component.text("Your shop at ")
+                .color(NamedTextColor.GRAY)
+                .append(ChatFormatter.prettyLocationMessage(l, false).color(NamedTextColor.YELLOW))
+                .append(Component.text(shop.getType() == ShopType.BUY_SHOP ? " is out of stock" : " is full"));
+
+        owner.sendMessage(builder);
+    }
+
+    @Override
+    public void onEvent(SignShopUseEvent event) throws RoyalCommandException {
         Player player = event.getPlayer();
-        CrownUser customer = event.getCustomer();
+        CrownUser customer = event.getUser();
         CrownUser owner = event.getOwner();
 
         SignShop shop = event.getShop();
@@ -123,7 +143,8 @@ public class ShopTransactionEvent implements Listener {
                 event.setCustomerBalance(event.getCustomerBalance() - shop.getPrice());
 
                 if(shop.getType().isAdmin && CrownCore.logAdminShopUsage()){
-                    Announcer.log(Level.INFO,
+                    Announcer.log(
+                            Level.INFO,
                             customer.getName() + " bought " + example.getAmount() + " " + ChatFormatter.getItemNormalName(example) + " at an admin shop, location: " + shop.getName());
                 } else if(CrownCore.logNormalShopUsage()){
                     Announcer.log(Level.INFO,
@@ -193,24 +214,8 @@ public class ShopTransactionEvent implements Listener {
             default:
                 throw new IllegalStateException("Unexpected value: " + shop.getType());
         }
-        
+
         shopInv.checkStock();
         sendInvMessage(owner, shop);
-    }
-
-    private void sendInvMessage(CrownUser owner, SignShop shop){
-        if(shop.getType().isAdmin) return;
-
-        //If no good, then no go
-        if ((shop.getType() != ShopType.BUY_SHOP || !shop.getInventory().isEmpty()) && (shop.getType() != ShopType.SELL_SHOP || !shop.getInventory().isFull()))
-            return;
-
-        Location l = shop.getLocation();
-        Component builder = Component.text("Your shop at ")
-                .color(NamedTextColor.GRAY)
-                .append(ChatFormatter.prettyLocationMessage(l, false).color(NamedTextColor.YELLOW))
-                .append(Component.text(shop.getType() == ShopType.BUY_SHOP ? " is out of stock" : " is full"));
-
-        owner.sendMessage(builder);
     }
 }

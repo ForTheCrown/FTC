@@ -18,7 +18,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 
 import java.util.Collection;
 
@@ -35,8 +34,6 @@ public class CommandTeleport extends CrownCommandBuilder {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("entity", EntityArgument.multipleEntities())
-                        .requires(s -> s.hasPermission(Permissions.CORE_ADMIN))
-
                         .then(argument("entity_to", EntityArgument.entity())
                                 .executes(c -> {
                                     Entity entity = EntityArgument.getPlayer(c, "entity_to");
@@ -57,28 +54,6 @@ public class CommandTeleport extends CrownCommandBuilder {
                                     return teleport(entities, location, ChatFormatter.clickableLocationMessage(location, false), c.getSource());
                                 })
                         )
-                )
-
-                .then(argument("entity", EntityArgument.entity())
-                        .executes(c -> {
-                            CrownUser user = getUserSender(c);
-                            Entity entity = EntityArgument.getEntity(c, "entity");
-
-                            Component display = CrownUtils.entityDisplayName(entity);
-                            if(entity instanceof Player) display = UserManager.getUser(entity.getUniqueId()).nickDisplayName();
-                            if(user.isTeleporting()) throw FtcExceptionProvider.create("You are already teleporting");
-
-                            user.createTeleport(entity::getLocation, false, true, UserTeleport.Type.TELEPORT)
-                                    .start(false);
-
-                            c.getSource().sendAdmin(
-                                    Component.text("Teleported ")
-                                            .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
-                                            .append(Component.text(" to "))
-                                            .append(display.color(NamedTextColor.YELLOW))
-                            );
-                            return 0;
-                        })
                 )
 
                 .then(argument("location", PositionArgument.position())

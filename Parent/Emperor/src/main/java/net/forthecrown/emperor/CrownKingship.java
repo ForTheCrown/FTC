@@ -36,7 +36,7 @@ public class CrownKingship extends AbstractJsonSerializer<CrownCore> implements 
     }
 
     @Override
-    public UUID get() {
+    public UUID getUniqueId() {
         return id;
     }
 

@@ -10,7 +10,7 @@ import net.forthecrown.emperor.admin.PunishmentEntry;
 import net.forthecrown.emperor.admin.PunishmentManager;
 import net.forthecrown.emperor.admin.record.PunishmentRecord;
 import net.forthecrown.emperor.admin.record.PunishmentType;
-import net.forthecrown.emperor.datafixers.EssUserToFTC;
+import net.forthecrown.emperor.datafixers.EssToFTC;
 import net.forthecrown.emperor.events.AfkListener;
 import net.forthecrown.emperor.serialization.AbstractSerializer;
 import net.forthecrown.emperor.user.data.SoldMaterialData;
@@ -65,6 +65,8 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
 
     private final UUID base;
     private String name;
+    private String lastOnlineName;
+    public List<String> previousNames = new ArrayList<>();
     private Component nickname;
 
     public final FtcUserDataContainer dataContainer;
@@ -125,13 +127,6 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         if(fileDoesntExist) addDefaults();
         else reload();
         if(shouldResetEarnings()) resetEarnings();
-
-        if(EssUserToFTC.hasEssData(this)){
-            EssUserToFTC ess = EssUserToFTC.of(this);
-
-            ess.convert();
-            ess.complete();
-        }
 
         net.forthecrown.emperor.user.UserManager.LOADED_USERS.put(base, this);
         permsCheck();
@@ -202,16 +197,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
             }
         }
 
-        if(isOnline() && name != null && !name.equals(getPlayer().getName())){ //transfers all scores to new player name if player name changes
-            Scoreboard scoreboard = getPlayer().getScoreboard();
-            for (Objective obj : scoreboard.getObjectives()){
-                if(!obj.getScore(name).isScoreSet()) continue;
-
-                obj.getScore(getPlayer().getName()).setScore(obj.getScore(name).getScore());
-                obj.getScore(name).setScore(0);
-            }
-            name = getPlayer().getName();
-        }
+        //updateName();
 
         if(totalEarnings < 0) totalEarnings = 0;
 
@@ -286,6 +272,19 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         getFile().set("BlockedUsers", interactions.save());
 
         if(!dataContainer.isEmpty()) getFile().createSection("DataContainer", dataContainer.serialize());
+    }
+
+    public void updateName(){
+        if(isOnline() && name != null && !name.equals(getPlayer().getName())){ //transfers all scores to new player name if player name changes
+            Scoreboard scoreboard = getPlayer().getScoreboard();
+            for (Objective obj : scoreboard.getObjectives()){
+                if(!obj.getScore(name).isScoreSet()) continue;
+
+                obj.getScore(getPlayer().getName()).setScore(obj.getScore(name).getScore());
+                obj.getScore(name).setScore(0);
+            }
+            name = getPlayer().getName();
+        }
     }
 
     @Override
@@ -662,7 +661,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
 
     @Override
     public boolean isKing() {
-        if(CrownCore.getKingship() != null) return CrownCore.getKingship().equals(getUniqueId());
+        if(CrownCore.getKingship().getUniqueId() != null) return CrownCore.getKingship().getUniqueId().equals(getUniqueId());
         return false;
     }
 
@@ -869,6 +868,13 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
 
     @Override
     public void onJoinLater(){
+        if(EssToFTC.hasEssData(this)){
+            EssToFTC ess = EssToFTC.of(this);
+
+            ess.convert();
+            ess.complete();
+        }
+
         updateFlying();
         afk = false;
 
@@ -910,7 +916,6 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
             text.append(Component.newline());
         }
 
-        text.append(Component.text("Type: User")).append(Component.newline());
         text.append(Component.text(getUniqueId().toString()));
         return HoverEvent.showText(text.build());
     }

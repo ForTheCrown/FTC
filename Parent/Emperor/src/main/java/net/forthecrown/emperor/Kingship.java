@@ -39,7 +39,7 @@ public interface Kingship extends Nameable, CrownSerializer<CrownCore> {
 
     boolean hasKing();
 
-    UUID get();
+    UUID getUniqueId();
     void set(@Nullable UUID uuid);
 
     boolean isFemale();

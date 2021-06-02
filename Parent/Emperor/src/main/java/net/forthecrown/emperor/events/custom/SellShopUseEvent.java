@@ -37,7 +37,7 @@ public class SellShopUseEvent extends Event implements Cancellable {
         this.sellAmount = seller.getSellAmount();
     }
 
-    public CrownUser getSeller() {
+    public CrownUser getUser() {
         return seller;
     }
 

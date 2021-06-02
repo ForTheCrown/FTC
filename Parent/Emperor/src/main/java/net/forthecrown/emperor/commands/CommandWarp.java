@@ -53,11 +53,12 @@ public class CommandWarp extends CrownCommandBuilder {
                                     user.createTeleport(warp::getDestination, true, true, UserTeleport.Type.WARP)
                                             .start(true);
 
-                                    c.getSource().sendAdmin(
+                                    c.getSource().sendMessage(
                                             Component.text("Warping ")
-                                                    .append(user.nickDisplayName())
+                                                    .color(NamedTextColor.GRAY)
+                                                    .append(user.nickDisplayName().color(NamedTextColor.GOLD))
                                                     .append(Component.text(" to "))
-                                                    .append(warp.displayName())
+                                                    .append(warp.displayName().color(NamedTextColor.YELLOW))
                                     );
                                     return 0;
                                 })

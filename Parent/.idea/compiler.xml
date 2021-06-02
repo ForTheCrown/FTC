@@ -17,6 +17,7 @@
       <module name="Parent.Vikings" target="1.8" />
       <module name="Parent.Vikings.main" target="1.8" />
       <module name="Parent.Vikings.test" target="1.8" />
+      <module name="Repopulator" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

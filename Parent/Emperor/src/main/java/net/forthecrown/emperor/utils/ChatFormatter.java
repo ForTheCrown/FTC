@@ -9,6 +9,7 @@ import net.forthecrown.emperor.admin.record.PunishmentType;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.events.ChatEvents;
 import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.FtcUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.user.enums.Rank;
 import net.kyori.adventure.text.Component;
@@ -23,7 +24,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -101,7 +101,7 @@ public class ChatFormatter {
 
         message = ChatUtils.convertString(strMessage);
 
-        TextColor playerColor = inSenateWorld ? NamedTextColor.YELLOW : TextColor.color(217, 217, 217);
+        TextColor playerColor = inSenateWorld ? NamedTextColor.YELLOW : TextColor.color(240, 240, 240);
         if(staffChat) playerColor = NamedTextColor.GRAY;
 
         return Component.text()
@@ -114,15 +114,30 @@ public class ChatFormatter {
                 .build();
     }
 
-    public static Component formatJoinMessage(CrownUser user){
-        return Component.translatable("multiplayer.player.joined", user.coloredNickDisplayName()).color(NamedTextColor.YELLOW);
+    public static Component joinMessage(CrownUser user){
+        return Component.translatable("multiplayer.player.joined", user.coloredNickDisplayName())
+                .hoverEvent(Component.text("Click to say hello!"))
+                .clickEvent(ClickEvent.runCommand("Hey " + user.getNickOrName() + '!'))
+                .color(NamedTextColor.YELLOW);
+    }
+
+    public static Component newNameJoinMessage(CrownUser user1){
+        FtcUser user = (FtcUser) user1;
+
+        return Component.translatable("multiplayer.player.joined.renamed",
+                user.coloredNickDisplayName(),
+                Component.text(user.previousNames.get(user.previousNames.size()-1))
+        )
+                .hoverEvent(Component.text("Click to say hello!"))
+                .clickEvent(ClickEvent.runCommand("Hey " + user.getNickOrName() + '!'))
+                .color(NamedTextColor.YELLOW);
     }
 
     public static Component formatLeaveMessage(CrownUser user){
         return Component.translatable("multiplayer.player.left", user.coloredNickDisplayName()).color(NamedTextColor.YELLOW);
     }
 
-    public static Component formatBanMessage(PunishmentRecord record){
+    public static Component banMessage(PunishmentRecord record){
         Validate.isTrue(record.type == PunishmentType.BAN, "Given record was not a ban record");
 
         TextComponent.Builder builder = Component.text()
@@ -243,8 +258,7 @@ public class ChatFormatter {
     }
 
     public static String formatEmojis(String string){ //replaces every emoji in the given string
-        String message = string;
-        message = message
+        return string
                 .replaceAll(":shrug:", "¯\\\\_(ツ)_/¯")
                 .replaceAll(":ughcry:", "(ಥ﹏ಥ)")
                 .replaceAll(":hug:", "༼ つ ◕_◕ ༽つ")
@@ -260,8 +274,6 @@ public class ChatFormatter {
                 .replaceAll(":sad:", "(._. )")
                 .replaceAll(":pleased:", "(ᵔᴥᵔ)")
                 .replaceAll(":fedup:", "(¬_¬)");
-
-        return message;
     }
 
     public static String timeFromMillisMinusTime(long millis){
@@ -301,10 +313,7 @@ public class ChatFormatter {
         if(CrownCore.getMaxNickLength() < nick.length()) throw FtcExceptionProvider.nickTooLong(nick.length());
 
         if(!CrownCore.allowOtherPlayerNameNicks()){
-            for (OfflinePlayer p: Bukkit.getOfflinePlayers()){
-                if(p.getName() == null) continue;
-                if(p.getName().equalsIgnoreCase(nick)) throw FtcExceptionProvider.create("Nickname cannot be the name of another player");
-            }
+            if(Bukkit.getOfflinePlayerIfCached(nick) != null) throw FtcExceptionProvider.create("Nickname cannot be the name of another player");
         }
     }
 }

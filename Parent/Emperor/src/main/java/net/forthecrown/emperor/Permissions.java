@@ -12,6 +12,7 @@ public class Permissions {
 
     public static final Permission EAVESDROP_ADMIN =    register("ftc.eavesdrop.admin");
     public static final Permission EAVESDROP =          register("ftc.eavesdrop");
+    public static final Permission EAVESDROP_DM =       register("ftc.eavesdrop.dm");
     public static final Permission EAVESDROP_SIGNS =    register("ftc.eavesdrop.signs");
     public static final Permission EAVESDROP_MUTED =    register("ftc.eavesdrop.muted");
 
@@ -82,6 +83,8 @@ public class Permissions {
     public static final Permission HOME_OTHERS =        register(COMMAND_PREFIX + "home.others");
 
     public static final Permission BECOME_BARON =       register(COMMAND_PREFIX + "becomebaron");
+
+    public static final Permission DEFAULT =            register("ftc.default");
 
     /**
      * Registers a string permission

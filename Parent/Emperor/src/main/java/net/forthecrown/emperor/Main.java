@@ -62,6 +62,7 @@ public final class Main extends JavaPlugin implements CrownCore {
     static ComVar<Byte>             maxNickLength;
     static ComVar<Short>            nearRadius;
     static ComVar<Short>            hoppersInOneChunk;
+    static ComVar<Boolean>          allowOtherPlayerNicks;
     static ComVar<Boolean>          taxesEnabled;
     static ComVar<Boolean>          logAdminShop;
     static ComVar<Boolean>          logNormalShop;
@@ -72,7 +73,6 @@ public final class Main extends JavaPlugin implements CrownCore {
     static ComVar<Integer>          baronPrice;
     static ComVar<Long>             userDataResetInterval;// 5356800000L aka 2 months, by default
     static ComVar<Long>             branchSwapCooldown;// 172800000 aka 2 days, by default
-    static ComVar<Boolean>          allowOtherPlayerNicks;
 
     static CrownBalances            balances;
     static CrownBroadcaster         announcer;

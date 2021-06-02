@@ -5,10 +5,7 @@ import net.forthecrown.emperor.admin.MuteStatus;
 import net.forthecrown.emperor.user.data.TeleportRequest;
 import net.forthecrown.emperor.utils.ListUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class FtcUserInteractions implements UserInteractions {
 
@@ -94,9 +91,7 @@ public class FtcUserInteractions implements UserInteractions {
     public void clearOutgoing(){ doClearStuff(outgoing); }
 
     private void doClearStuff(List<TeleportRequest> requestMap){
-        for (TeleportRequest e: requestMap){
-            e.stop();
-        }
+        new ArrayList<>(requestMap).forEach(TeleportRequest::stop);
         requestMap.clear();
     }
 

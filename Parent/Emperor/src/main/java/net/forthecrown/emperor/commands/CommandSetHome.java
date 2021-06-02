@@ -25,6 +25,22 @@ public class CommandSetHome extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
+                .executes(c -> {
+                    CrownUser user = getUserSender(c);
+                    UserHomes homes = user.getHomes();
+                    String name = CommandHome.DEFAULT;
+                    Location loc = user.getLocation();
+
+                    if(homes.contains(name)) throw FtcExceptionProvider.create("You already have a home with this name");
+                    if(!homes.canMakeMore()) throw FtcExceptionProvider.create("Cannot create more homes (Over limit of " + user.getHighestTierRank().tier.maxHomes + ")");
+
+                    homes.set(name, loc);
+                    user.sendMessage(
+                            Component.text("Set default home").color(NamedTextColor.YELLOW)
+                    );
+                    return 0;
+                })
+
                 .then(argument("name", StringArgumentType.word())
                         .executes(c -> {
                             CrownUser user = getUserSender(c);

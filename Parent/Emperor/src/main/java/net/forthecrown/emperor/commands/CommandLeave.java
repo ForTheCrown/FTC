@@ -1,5 +1,6 @@
 package net.forthecrown.emperor.commands;
 
+import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.utils.CrownBoundingBox;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
@@ -19,7 +20,7 @@ public class CommandLeave extends CrownCommandBuilder {
     public CommandLeave(){
         super("leave", CrownCore.inst());
 
-        setPermission((String) null);
+        setPermission(Permissions.DEFAULT);
         setDescription("I'm out :D");
 
         register();

@@ -8,6 +8,7 @@ import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.economy.CannotAffordTransactionException;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.user.enums.Branch;
 import net.forthecrown.emperor.user.enums.Rank;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -89,13 +90,16 @@ public class PirateEvents implements Listener, ClickEventTask {
                         .append(Component.text("a "))
                         .append(Component.text("50 use ").color(NamedTextColor.YELLOW))
                         .append(Component.text("Grappling Hook for "))
-                        .append(Balances.formatted(50000).color(NamedTextColor.YELLOW));
+                        .append(Balances.formatted(50000).color(NamedTextColor.YELLOW))
+                        .append(Component.text("?"));
 
                 player.sendMessage(text);
             }
 
         }
         else if (event.getRightClicked().getType() == EntityType.SHULKER) {
+            if(user.getBranch() != Branch.PIRATES) throw new CrownException(user, "&eOnly pirates can use this! &6Join the pirates");
+
             Shulker treasureShulker = (Shulker) event.getRightClicked();
             if (!treasureShulker.getPersistentDataContainer().has(TreasureShulker.KEY, PersistentDataType.BYTE)) return;
             if (main.getConfig().getStringList("PlayerWhoFoundTreasureAlready").contains(player.getUniqueId().toString())) player.sendMessage(ChatColor.GRAY + "You've already opened this treasure today.");
@@ -137,7 +141,7 @@ public class PirateEvents implements Listener, ClickEventTask {
             event.getPlayer().setShoulderEntityLeft(null);
             players.remove(event.getPlayer().getUniqueId().toString());
             yaml.set("Players", players);
-            main.saveyaml(yaml, main.offlineWithParrots);
+            main.saveYaml(yaml, main.offlineWithParrots);
         }
     }
 

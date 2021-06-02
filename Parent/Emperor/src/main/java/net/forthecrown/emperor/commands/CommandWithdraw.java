@@ -50,7 +50,7 @@ public class CommandWithdraw extends CrownCommandBuilder {
         int totalAmount = amount * itemAmount;
 
         if(totalAmount > bals.get(user.getUniqueId())) throw FtcExceptionProvider.cannotAfford(totalAmount);
-        if(user.getPlayer().getInventory().firstEmpty() == -1) throw FtcExceptionProvider.create("Your inventory is full! No space for coins!");
+        if(user.getPlayer().getInventory().firstEmpty() == -1) throw FtcExceptionProvider.inventoryFull();
 
         Component text = Component.text(". Total value: ")
                 .color(NamedTextColor.GRAY)

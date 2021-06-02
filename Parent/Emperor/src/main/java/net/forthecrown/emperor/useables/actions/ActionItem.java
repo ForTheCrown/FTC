@@ -9,7 +9,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.nbt.NbtGetter;
+import net.forthecrown.emperor.nbt.NbtHandler;
 import net.forthecrown.emperor.useables.UsageAction;
 import net.forthecrown.emperor.utils.InterUtils;
 import net.forthecrown.emperor.utils.JsonUtils;
@@ -65,7 +65,7 @@ public class ActionItem implements UsageAction {
     public JsonElement serialize() {
         if (item == null) return JsonNull.INSTANCE;
 
-        return new JsonPrimitive(NbtGetter.ofItem(item).serialize());
+        return new JsonPrimitive(NbtHandler.ofItem(item).serialize());
     }
 
     @Override

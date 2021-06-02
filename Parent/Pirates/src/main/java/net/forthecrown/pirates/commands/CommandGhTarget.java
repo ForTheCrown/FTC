@@ -83,7 +83,7 @@ public class CommandGhTarget extends CrownCommandBuilder {
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(Pirates.inst.grapplingHook.getArmorStandFile());
         String section = "Stand_" + id;
         yaml.createSection(section, sectionMap);
-        Pirates.inst.saveyaml(yaml, Pirates.inst.grapplingHook.getArmorStandFile());
+        Pirates.inst.saveYaml(yaml, Pirates.inst.grapplingHook.getArmorStandFile());
 
         ArmorStand ghEStandTarget = location.getWorld().spawn(location, ArmorStand.class);
 

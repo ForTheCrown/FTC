@@ -9,11 +9,14 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/CrownNBT" />
             <option value="$PROJECT_DIR$/Emperor" />
             <option value="$PROJECT_DIR$/FTC-Cosmetics" />
             <option value="$PROJECT_DIR$/FTC-Pirates" />
             <option value="$PROJECT_DIR$/FTC-Royals" />
             <option value="$PROJECT_DIR$/FTC-Vikings" />
+            <option value="$PROJECT_DIR$/NBT" />
+            <option value="$PROJECT_DIR$/Repopulation" />
           </set>
         </option>
       </GradleProjectSettings>

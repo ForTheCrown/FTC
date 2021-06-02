@@ -7,18 +7,22 @@ import org.bukkit.command.CommandSender;
 /**
  * A type of exception that just sends a message to a specified player
  * <p>Incompatible with Brigadier, still usable in events tho lol</p>
- * <p>It shouldn't appear in console either, since suppression is set to true</p>
  */
 public class CrownException extends RuntimeException {
 
     private final String message;
+    private final CommandSender sender;
+
     public CrownException(CommandSender sender, String message) {
         super(ChatFormatter.translateHexCodes(message));
+
         this.message = ChatFormatter.translateHexCodes(message);
-        sendMessage(sender, this.message);
+        this.sender = sender;
+
+        sendMessage(getMessage());
     }
 
-    public void sendMessage(CommandSender sender, String message){
+    public void sendMessage(String message){
         sender.sendMessage(ChatUtils.convertString(message));
     }
 
@@ -29,6 +33,10 @@ public class CrownException extends RuntimeException {
     @Override
     public String getMessage(){
         return message;
+    }
+
+    public CommandSender getSender() {
+        return sender;
     }
 
     @Override

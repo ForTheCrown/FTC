@@ -3,14 +3,17 @@ package net.forthecrown.emperor.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 
@@ -29,7 +32,24 @@ public class CommandSign extends CrownCommandBuilder {
                         .then(argument("index", IntegerArgumentType.integer(1, 4))
                                 .suggests(suggestMatching("1", "2", "3", "4"))
 
-                                .then(CommandLore.compOrStringArg(argument("set"), this::set))
+                                .then(CommandLore.compOrStringArg(
+                                        argument("set"),
+
+                                        (c, b) -> {
+                                            try {
+                                                Sign sign = get(c);
+                                                int line = c.getArgument("index", Integer.class);
+                                                if(line < 0 || line > 4) return Suggestions.empty();
+
+                                                String lineText = LegacyComponentSerializer.legacyAmpersand().serialize(sign.line(line-1));
+
+                                                return CompletionProvider.suggestMatching(b, lineText);
+                                            } catch (CommandSyntaxException ignored) {}
+                                            return Suggestions.empty();
+                                        },
+
+                                        this::set
+                                ))
 
                                 .then(argument("clear")
                                         .executes(c -> set(c, Component.empty()))

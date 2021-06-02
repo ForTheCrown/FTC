@@ -1,16 +1,22 @@
 package net.forthecrown.emperor.commands.manager;
 
+import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.utils.ChatFormatter;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+
+import static net.forthecrown.emperor.commands.manager.CrownExceptionProvider.*;
 
 public interface FtcExceptionProvider {
     static CommandSyntaxException create(String messasge){
-        return CrownExceptionProvider.GENERIC.create(ChatFormatter.translateHexCodes(messasge));
+        return GENERIC.create(ChatFormatter.translateHexCodes(messasge));
     }
 
     static CommandSyntaxException createWithContext(String message, String input, int cursor){
@@ -21,114 +27,126 @@ public interface FtcExceptionProvider {
     }
 
     static CommandSyntaxException createWithContext(String message, StringReader reader){
-        return CrownExceptionProvider.GENERIC.createWithContext(reader, ChatFormatter.translateHexCodes(message));
+        return GENERIC.createWithContext(reader, ChatFormatter.translateHexCodes(message));
     }
 
-    static CommandSyntaxException cannotAfford(int amount){
-        return CrownExceptionProvider.CANNOT_AFFORD_TRANSACTION.create(Balances.formatted(amount));
+    static RoyalCommandException translatable(String key, ComponentLike... args){
+        return new TranslatableExceptionType(key).create(args);
     }
 
-    static CommandSyntaxException cannotAfford(){
-        return CrownExceptionProvider.CANNOT_AFFORD_INFOLESS.create();
+    static RoyalCommandException translatableWithContext(String key, ImmutableStringReader context, ComponentLike... args){
+        return new TranslatableExceptionType(key).createWithContext(context, args);
     }
 
-    static CommandSyntaxException senderTpaDisabled(){
-        return CrownExceptionProvider.SENDER_TPA_DISABLED.create();
+    static RoyalCommandException cannotAfford(int amount){
+        return CANNOT_AFFORD_TRANSACTION.create(Balances.formatted(amount));
     }
 
-    static CommandSyntaxException targetTpaDisabled(CrownUser user){
-        return CrownExceptionProvider.TARGET_TPA_DISABLED.create(user.nickDisplayName());
+    static RoyalCommandException cannotAfford(){
+        return CANNOT_AFFORD_INFOLESS.create();
     }
 
-    static CommandSyntaxException senderEmoteDisabled(){
-        return CrownExceptionProvider.SENDER_EMOTE_DISABLED.create();
+    static RoyalCommandException senderTpaDisabled(){
+        return SENDER_TPA_DISABLED.create();
     }
 
-    static CommandSyntaxException targetEmoteDisabled(CrownUser name){
-        return CrownExceptionProvider.TARGET_EMOTE_DISABLED.create(name.nickDisplayName());
+    static RoyalCommandException targetTpaDisabled(CrownUser user){
+        return TARGET_TPA_DISABLED.create(user.nickDisplayName());
     }
 
-    static CommandSyntaxException cannotTeleport(){
-        return CrownExceptionProvider.CANNOT_TELEPORT.create();
+    static RoyalCommandException senderEmoteDisabled(){
+        return SENDER_EMOTE_DISABLED.create();
     }
 
-    static CommandSyntaxException noTpRequest(){
-        return CrownExceptionProvider.NO_TP_REQUESTS_INFOLESS.create();
+    static RoyalCommandException targetEmoteDisabled(CrownUser name){
+        return TARGET_EMOTE_DISABLED.create(name.nickDisplayName());
     }
 
-    static CommandSyntaxException noIncomingTP(CrownUser user){
-        return CrownExceptionProvider.NO_TP_INCOMING.create(user.nickDisplayName());
+    static RoyalCommandException cannotTeleport(){
+        return CANNOT_TELEPORT.create();
     }
 
-    static CommandSyntaxException noOutgoingTP(CrownUser user){
-        return CrownExceptionProvider.NO_TP_OUTGOING.create(user.nickDisplayName());
+    static RoyalCommandException noTpRequest(){
+        return NO_TP_REQUESTS_INFOLESS.create();
     }
 
-    static CommandSyntaxException cannotTpToSelf(){
-        return CrownExceptionProvider.CANNOT_TP_TO_SELF.create();
+    static RoyalCommandException noIncomingTP(CrownUser user){
+        return NO_TP_INCOMING.create(user.nickDisplayName());
+    }
+
+    static RoyalCommandException noOutgoingTP(CrownUser user){
+        return NO_TP_OUTGOING.create(user.nickDisplayName());
+    }
+
+    static RoyalCommandException cannotTpToSelf(){
+        return CANNOT_TP_TO_SELF.create();
     }
 
     static CommandSyntaxException cannotMute(CrownUser user){
-        return CrownExceptionProvider.CANNOT_MUTE.create(user);
+        return CANNOT_MUTE.create(user);
     }
 
-    static CommandSyntaxException noReplyTargets(){
-        return CrownExceptionProvider.NO_REPLY_TARGETS.create();
+    static RoyalCommandException noReplyTargets(){
+        return NO_REPLY_TARGETS.create();
     }
 
-    static CommandSyntaxException nickTooLong(int length){
-        return CrownExceptionProvider.NICK_TOO_LONG.create(Component.text(length), Component.text(CrownCore.getMaxNickLength()));
+    static RoyalCommandException nickTooLong(int length){
+        return NICK_TOO_LONG.create(Component.text(length), Component.text(CrownCore.getMaxNickLength()));
     }
 
     static CommandSyntaxException cannotBan(CrownUser user){
-        return CrownExceptionProvider.CANNOT_BAN.create(user);
+        return CANNOT_BAN.create(user);
     }
 
     static CommandSyntaxException cannotKick(CrownUser user){
-        return CrownExceptionProvider.CANNOT_KICK.create(user);
+        return CANNOT_KICK.create(user);
     }
     
     static CommandSyntaxException cannotJail(CrownUser user){
-        return CrownExceptionProvider.CANNOT_JAIL.create(user);
+        return CANNOT_JAIL.create(user);
     }
 
-    static CommandSyntaxException mustHoldItem(){
-        return CrownExceptionProvider.MUST_BE_HOLDING_ITEM.create();
+    static RoyalCommandException mustHoldItem(){
+        return MUST_BE_HOLDING_ITEM.create();
     }
 
-    static CommandSyntaxException requestAlreadySent(CrownUser target){
-        return CrownExceptionProvider.ALREADY_SENT.create(target.nickDisplayName());
+    static RoyalCommandException requestAlreadySent(CrownUser target){
+        return ALREADY_SENT.create(target.nickDisplayName());
     }
 
-    static CommandSyntaxException noReturnLoc(){
-        return CrownExceptionProvider.NO_RETURN.create();
+    static RoyalCommandException noReturnLoc(){
+        return NO_RETURN.create();
     }
 
-    static CommandSyntaxException alreadyBaron(){
-        return CrownExceptionProvider.ALREADY_BARON.create();
+    static RoyalCommandException alreadyBaron(){
+        return ALREADY_BARON.create();
     }
 
-    static CommandSyntaxException holdingCoins(){
-        return CrownExceptionProvider.HOLDING_COINS.create();
+    static RoyalCommandException holdingCoins(){
+        return HOLDING_COINS.create();
     }
 
-    static CommandSyntaxException blockedPlayer(CrownUser user){
-        return CrownExceptionProvider.BLOCKED_PLAYER.create(user.nickDisplayName());
+    static RoyalCommandException blockedPlayer(CrownUser user){
+        return BLOCKED_PLAYER.create(user.nickDisplayName());
     }
 
-    static CommandSyntaxException senderPayDisabled(){
-        return CrownExceptionProvider.SENDER_PAY_DISABLED.create();
+    static RoyalCommandException senderPayDisabled(){
+        return SENDER_PAY_DISABLED.create();
     }
 
-    static CommandSyntaxException targetPayDisabled(CrownUser user){
-        return CrownExceptionProvider.TARGET_PAY_DISABLED.create(user.nickDisplayName());
+    static RoyalCommandException targetPayDisabled(CrownUser user){
+        return TARGET_PAY_DISABLED.create(user.nickDisplayName());
     }
 
-    static CommandSyntaxException cannotPaySelf(){
-        return CrownExceptionProvider.CANNOT_PAY_SELF.create();
+    static RoyalCommandException cannotPaySelf(){
+        return CANNOT_PAY_SELF.create();
     }
 
-    static CommandSyntaxException inventoryFull(){
-        return CrownExceptionProvider.INV_FULL.create();
+    static RoyalCommandException inventoryFull(){
+        return INV_FULL.create();
+    }
+    
+    static RoyalCommandException noDefaultHome(){
+        return NO_DEF_HOME.create();
     }
 }

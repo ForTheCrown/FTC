@@ -34,15 +34,10 @@ public class AfkListener implements Listener {
 
         user.setAfk(false);
 
-        Component userMsg = Component.text("You are no longer AFK")
+        Component userMsg = Component.translatable("unafk.self")
                 .color(NamedTextColor.GRAY);
 
-        Component broadcastMsg = Component.text()
-                .color(NamedTextColor.GRAY)
-                .append(Component.text("* "))
-                .append(user.nickDisplayName())
-                .append(Component.text(" is no longer afk"))
-                .build();
+        Component broadcastMsg = Component.translatable("unafk.others", user.nickDisplayName()).color(NamedTextColor.GRAY);
 
 
         user.sendMessage(userMsg);

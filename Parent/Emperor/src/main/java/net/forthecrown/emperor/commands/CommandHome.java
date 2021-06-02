@@ -5,7 +5,9 @@ import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.arguments.HomeParseResult;
 import net.forthecrown.emperor.commands.arguments.HomeType;
+import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.user.UserHomes;
 import net.forthecrown.emperor.user.data.UserTeleport;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -13,6 +15,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 
 public class CommandHome extends CrownCommandBuilder {
+    public static final String DEFAULT = "home";
+
     public CommandHome(){
         super("home", CrownCore.inst());
 
@@ -25,6 +29,19 @@ public class CommandHome extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
+                .executes(c -> {
+                    CrownUser user = getUserSender(c);
+                    UserHomes homes = user.getHomes();
+                    if(!homes.contains(DEFAULT)) throw FtcExceptionProvider.noDefaultHome();
+
+                    Location l = homes.get(DEFAULT);
+
+                    user.createTeleport(() -> l, true, UserTeleport.Type.HOME)
+                            .setCompleteMessage(Component.text("Teleporting home").color(NamedTextColor.GRAY))
+                            .start(true);
+                    return 0;
+                })
+
                 .then(argument("home", HomeType.home())
                         .executes(c -> {
                             CrownUser user = getUserSender(c);

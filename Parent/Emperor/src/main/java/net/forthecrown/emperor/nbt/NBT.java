@@ -5,7 +5,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.v1_16_R3.MojangsonParser;
+import net.minecraft.server.v1_16_R3.NBTBase;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagList;
 
 import java.util.Set;
 import java.util.UUID;
@@ -39,6 +41,10 @@ public class NBT {
 
     public int size(){
         return tag.e();
+    }
+
+    public void put(String name, NBTBase nbt){
+        tag.set(name, nbt);
     }
 
     public void put(String name, NBT tags){
@@ -99,6 +105,14 @@ public class NBT {
 
     public void setArray(String name, long[] longPenish){
         tag.a(name, longPenish);
+    }
+
+    public NBTBase get(String name){
+        return tag.get(name);
+    }
+
+    public NBTTagList getAsList(String name){
+        return (NBTTagList) tag.get(name);
     }
 
     public byte getByte(String s){

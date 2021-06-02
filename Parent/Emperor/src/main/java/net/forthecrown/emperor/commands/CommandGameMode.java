@@ -4,6 +4,7 @@ import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.arguments.UserType;
+import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.enums.CrownGameMode;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -17,7 +18,7 @@ public class CommandGameMode extends CrownCommandBuilder {
     public CommandGameMode(){
         super("gm", CrownCore.inst());
 
-        setPermission(Permissions.GAMEMODES);
+        setPermission(Permissions.HELPER);
         setAliases("gamemode");
         register();
     }
@@ -30,13 +31,19 @@ public class CommandGameMode extends CrownCommandBuilder {
                             CrownUser user = getUserSender(c);
                             GameMode gameMode = c.getArgument("gamemode", GameMode.class);
 
-                            user.getPlayer().setGameMode(gameMode);
+                            if(!user.hasPermission(Permissions.GAMEMODES)){
+                                if(gameMode == GameMode.CREATIVE || gameMode == GameMode.ADVENTURE) throw FtcExceptionProvider.create("You do not have permission to use this");
+                            }
+
+                            user.setGameMode(CrownGameMode.wrap(gameMode));
                             user.updateFlying();
                             user.sendMessage(adminMsg(user, gameMode));
                             return 0;
                         })
 
                         .then(argument("user", UserType.onlineUser())
+                                .requires(s -> s.hasPermission(Permissions.GAMEMODES))
+
                                 .executes(c -> {
                                     CrownUser user = UserType.getUser(c, "user");
                                     GameMode gameMode = c.getArgument("gamemode", GameMode.class);

@@ -5,6 +5,7 @@ import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.arguments.HomeParseResult;
 import net.forthecrown.emperor.commands.arguments.HomeType;
+import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserHomes;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -18,6 +19,7 @@ public class CommandDelHome extends CrownCommandBuilder {
 
         setPermission(Permissions.HOME);
         setDescription("Deletes a home");
+        setAliases("removehome", "remhome", "yeethome");
 
         register();
     }
@@ -25,6 +27,18 @@ public class CommandDelHome extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
+                .executes(c -> {
+                    CrownUser user = getUserSender(c);
+                    UserHomes homes = user.getHomes();
+
+                    if(!homes.contains(CommandHome.DEFAULT)) throw FtcExceptionProvider.noDefaultHome();
+
+                    homes.remove(CommandHome.DEFAULT);
+
+                    user.sendMessage(Component.translatable("homes.deleted", Component.text(CommandHome.DEFAULT).color(NamedTextColor.GOLD)).color(NamedTextColor.YELLOW));
+                    return 0;
+                })
+
                 .then(argument("home", HomeType.home())
                         .executes(c -> {
                             CrownUser user = getUserSender(c);

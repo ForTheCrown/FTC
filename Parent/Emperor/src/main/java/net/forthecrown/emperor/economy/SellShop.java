@@ -5,7 +5,7 @@ import net.forthecrown.emperor.events.SellShopEvents;
 import net.forthecrown.emperor.inventory.CrownItems;
 import net.forthecrown.emperor.inventory.CustomInventoryHolder;
 import net.forthecrown.emperor.nbt.NBT;
-import net.forthecrown.emperor.nbt.NbtGetter;
+import net.forthecrown.emperor.nbt.NbtHandler;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.enums.SellAmount;
 import net.forthecrown.emperor.user.UserManager;
@@ -177,10 +177,10 @@ public class SellShop {
         int price = getItemPrice(ingot) * 9;
 
         ItemStack result = createSellItem(material, price, CrownCore.getItemPrice(ingot) * 9, user.getSellAmount());
-        NBT nbt = NbtGetter.ofItemTags(result);
+        NBT nbt = NbtHandler.ofItemTags(result);
         nbt.put("ingot", ingot.toString());
 
-        return NbtGetter.applyTags(result, nbt);
+        return NbtHandler.applyTags(result, nbt);
     }
 
     private ItemStack makeSellItem(Material material){
@@ -195,7 +195,7 @@ public class SellShop {
         final Style style = Style.style(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
         boolean thing = sellAmount == SellAmount.ALL;
 
-        ItemStackBuilder builder = new ItemStackBuilder(material)
+        ItemStackBuilder builder = new ItemStackBuilder(material, sellAmount.value)
                 .addLore(Component.text("Value: " + Balances.getFormatted(price) + " per item").style(style));
 
         if(price < origPrice) builder.addLore(Component.text("Original price: " + Balances.getFormatted(origPrice)).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE).color(NamedTextColor.GRAY));
@@ -233,23 +233,7 @@ public class SellShop {
 
     private ItemStack getSellAmountPane(SellAmount paneToGet){
         String[] asd = {"&7Set the amount of items you", "&7will sell per click"};
-        ItemStack toReturn;
-        switch (paneToGet){
-            case ALL:
-                toReturn = CrownItems.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell all", asd);
-                break;
-            case PER_1:
-                toReturn = CrownItems.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell 1", asd);
-                break;
-            case PER_16:
-                toReturn = CrownItems.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell per 16", asd);
-                break;
-            case PER_64:
-                toReturn = CrownItems.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, "Sell per 64", asd);
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + paneToGet);
-        }
+        ItemStack toReturn = CrownItems.makeItem(Material.BLACK_STAINED_GLASS_PANE, paneToGet.value, true, paneToGet.text, asd);
 
         if(user.getSellAmount() == paneToGet) toReturn.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
         return toReturn;

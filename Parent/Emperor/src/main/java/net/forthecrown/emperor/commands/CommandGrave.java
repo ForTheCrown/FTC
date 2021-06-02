@@ -1,6 +1,7 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
@@ -12,7 +13,7 @@ public class CommandGrave extends CrownCommandBuilder {
     public CommandGrave(){
         super("grave", CrownCore.inst());
 
-        setPermission((String) null);
+        setPermission(Permissions.DEFAULT);
         setDescription("Gives you the items in your grave");
 
         register();
