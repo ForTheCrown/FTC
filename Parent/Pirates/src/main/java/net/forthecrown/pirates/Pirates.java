@@ -99,8 +99,6 @@ public final class Pirates extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(events, this);
         getServer().getPluginManager().registerEvents(new BaseEgg(), this);
         getServer().getPluginManager().registerEvents(new NpcSmithEvent(), this);
-
-        updateDate();
     }
 
     @Override
@@ -109,6 +107,9 @@ public final class Pirates extends JavaPlugin implements Listener {
 
         auctionExpirationTime = ComVars.set("pr_auctionExpirationTime", ComVarType.LONG, getConfig().getLong("Auctions.ExpirationTime"));
         auctionPickUpTime = ComVars.set("pr_auctionPickupTime", ComVarType.LONG, getConfig().getLong("Auctions.PickUpTime"));
+
+        Calendar cal = Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE);
+        if (cal.get(Calendar.DAY_OF_WEEK) != getConfig().getInt("Day")) updateDate();
     }
 
     public static long getAuctionPickUpTime(){
@@ -146,19 +147,15 @@ public final class Pirates extends JavaPlugin implements Listener {
     }
 
     public void updateDate() {
-        Calendar cal = Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE);
-
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-            if (cal.get(Calendar.DAY_OF_WEEK) == getConfig().getInt("Day")) return;
-
+            Calendar cal = Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE);
             getConfig().set("Day", cal.get(Calendar.DAY_OF_WEEK));
+
             ItemStack chosenItem = getRandomHeadFromChest();
             getConfig().set("ChosenHead", ((SkullMeta) chosenItem.getItemMeta()).getPlayerProfile().getName());
 
-            List<String> temp = getConfig().getStringList("PlayerWhoSoldHeadAlready");
-            temp.clear();
-            getConfig().set("PlayerWhoSoldHeadAlready", temp);
-            getConfig().set("PlayerWhoFoundTreasureAlready", temp);
+            getConfig().set("PlayerWhoSoldHeadAlready", new ArrayList<>());
+            getConfig().set("PlayerWhoFoundTreasureAlready", new ArrayList<>());
 
             shulker.killOld();
             shulker.spawn();

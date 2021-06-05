@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands.emotes;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
@@ -18,7 +18,7 @@ import javax.annotation.Nonnegative;
  * The class to make the handling of emotes easier
  * <p>Here the return value actually matters. If the returned value is below 0, they don't get added to the cooldown</p>
  */
-public abstract class CommandEmote extends CrownCommandBuilder {
+public abstract class CommandEmote extends FtcCommand {
 
     protected final int cooldownTime;
     protected final String cooldownMessage;

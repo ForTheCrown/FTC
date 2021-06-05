@@ -8,7 +8,7 @@ import net.forthecrown.emperor.admin.record.PunishmentRecord;
 import net.forthecrown.emperor.admin.record.PunishmentType;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.events.JailListener;
-import net.forthecrown.emperor.serialization.AbstractJsonSerializer;
+import net.forthecrown.emperor.serializer.AbstractJsonSerializer;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;

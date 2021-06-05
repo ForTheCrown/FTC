@@ -98,10 +98,11 @@ public class PirateEvents implements Listener, ClickEventTask {
 
         }
         else if (event.getRightClicked().getType() == EntityType.SHULKER) {
-            if(user.getBranch() != Branch.PIRATES) throw new CrownException(user, "&eOnly pirates can use this! &6Join the pirates");
-
             Shulker treasureShulker = (Shulker) event.getRightClicked();
+
             if (!treasureShulker.getPersistentDataContainer().has(TreasureShulker.KEY, PersistentDataType.BYTE)) return;
+            if(user.getBranch() != Branch.PIRATES) throw new CrownException(user, "&eOnly pirates can use this! &6Join the pirates in Questmoor");
+
             if (main.getConfig().getStringList("PlayerWhoFoundTreasureAlready").contains(player.getUniqueId().toString())) player.sendMessage(ChatColor.GRAY + "You've already opened this treasure today.");
             else {
                 main.giveTreasure(player);

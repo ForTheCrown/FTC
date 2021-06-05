@@ -2,13 +2,13 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public class HelpFindPost extends CrownCommandBuilder {
+public class HelpFindPost extends FtcCommand {
     public HelpFindPost() {
         super("findpost", CrownCore.inst());
 
@@ -31,10 +31,6 @@ public class HelpFindPost extends CrownCommandBuilder {
      * - /findpole
      * - /findpost
      *
-     * Referenced other classes:
-     * - FtcCore: FtcCore.getPrefix
-     * - Posthelp
-     *
      * Author: Wout
      */
 
@@ -54,7 +50,7 @@ public class HelpFindPost extends CrownCommandBuilder {
                 return 0;
             }
             else if (loc.getWorld().getName().contains("world_")) {
-                player.sendMessage(ChatColor.RED + "You are currently not in the world with regions!");
+                player.sendMessage(ChatColor.RED + "You are not currently in the world with regions!");
                 player.sendMessage(ChatColor.GRAY + "Type " + ChatColor.YELLOW + "/posthelp" + ChatColor.GRAY + " for more help.");
                 return 0;
             }

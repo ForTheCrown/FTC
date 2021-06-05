@@ -79,11 +79,11 @@ public final class Main extends JavaPlugin implements CrownCore {
     static CrownBlackMarket         blackMarket;
     static CrownKingship            kingship;
 
-    static CrownUsablesManager usablesManager;
+    static CrownUsablesManager      usablesManager;
     static CrownShopManager         shopManager;
-    static CrownPunishmentManager punishmentManager;
-    static CrownUserManager userManager;
-    static CrownJailManager jailManager;
+    static CrownPunishmentManager   punishmentManager;
+    static CrownUserManager         userManager;
+    static CrownJailManager         jailManager;
 
     static ServerRules rules;
 

@@ -4,7 +4,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.arguments.PetType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.enums.Branch;
@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class CommandParrot extends CrownCommandBuilder {
+public class CommandParrot extends FtcCommand {
 
     public CommandParrot(){
         super("parrot", Pirates.inst);

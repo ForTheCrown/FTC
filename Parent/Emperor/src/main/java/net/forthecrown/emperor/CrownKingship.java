@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.emperor.serialization.AbstractJsonSerializer;
+import net.forthecrown.emperor.serializer.AbstractJsonSerializer;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import org.jetbrains.annotations.Nullable;

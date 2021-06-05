@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.economy.SellShop;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
@@ -11,11 +11,10 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-public class CommandShop extends CrownCommandBuilder {
+public class CommandShop extends FtcCommand {
 
     public CommandShop(){
         super("shop", CrownCore.inst());
@@ -48,14 +47,14 @@ public class CommandShop extends CrownCommandBuilder {
                 .then(arg(SellShop.Menu.MINING_BLOCKS))
                 .then(arg(SellShop.Menu.CROPS))
 
-                .then(argument("web")
+                .then(literal("web")
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
-                            user.sendMessage("&7Our webstore:");
+                            user.sendMessage(Component.translatable("commands.shop.web", NamedTextColor.GRAY));
 
                             TextComponent text = Component.text("https://for-the-crown.tebex.io/").color(NamedTextColor.AQUA)
                                     .clickEvent(ClickEvent.openUrl("https://for-the-crown.tebex.io/"))
-                                    .hoverEvent(HoverEvent.showText(Component.text("Opens the server's webstore")));
+                                    .hoverEvent(Component.translatable("commands.shop.web.hover"));
 
                             user.sendMessage(text);
                             return 0;
@@ -72,6 +71,6 @@ public class CommandShop extends CrownCommandBuilder {
     }
 
     private LiteralArgumentBuilder<CommandSource> arg(SellShop.Menu menu){
-        return argument(menu.toString().toLowerCase()).executes(cmd(menu));
+        return literal(menu.toString().toLowerCase()).executes(cmd(menu));
     }
 }

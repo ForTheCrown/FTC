@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.commands.arguments.KitType;
 import net.forthecrown.emperor.useables.kits.Kit;
@@ -20,7 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandKitEdit extends CrownCommandBuilder {
+public class CommandKitEdit extends FtcCommand {
     public CommandKitEdit(){
         super("kitedit", CrownCore.inst());
 
@@ -31,7 +31,7 @@ public class CommandKitEdit extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("create")
+                .then(literal("create")
                         .then(argument("name", StringArgumentType.word())
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
@@ -59,7 +59,7 @@ public class CommandKitEdit extends CrownCommandBuilder {
                 .then(argument("kit", KitType.kit())
                         .suggests((c, b) -> KitType.kit().listSuggestions(c, b, true))
 
-                        .then(argument("delete")
+                        .then(literal("delete")
                                 .executes(c -> {
                                     Kit kit = get(c);
                                     kit.delete();
@@ -69,7 +69,7 @@ public class CommandKitEdit extends CrownCommandBuilder {
                                 })
                         )
 
-                        .then(argument("give")
+                        .then(literal("give")
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
                                     Kit kit = get(c);

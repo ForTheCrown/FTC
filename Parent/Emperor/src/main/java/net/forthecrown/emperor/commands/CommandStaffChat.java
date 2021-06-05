@@ -7,7 +7,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.admin.StaffChat;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class CommandStaffChat extends CrownCommandBuilder {
+public class CommandStaffChat extends FtcCommand {
 
     public CommandStaffChat(){
         super("staffchat", CrownCore.inst());

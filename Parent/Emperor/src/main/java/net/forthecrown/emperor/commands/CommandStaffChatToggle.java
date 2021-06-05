@@ -4,7 +4,7 @@ import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.admin.StaffChat;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public class CommandStaffChatToggle extends CrownCommandBuilder {
+public class CommandStaffChatToggle extends FtcCommand {
 
     public CommandStaffChatToggle(){
         super("staffchattoggle", CrownCore.inst());
@@ -29,7 +29,6 @@ public class CommandStaffChatToggle extends CrownCommandBuilder {
      * 			Command description:
      * ----------------------------------------
      * Toggles a players every message going to staffchat
-     *
      *
      * Valid usages of command:
      * - /staffchattoggle
@@ -58,7 +57,7 @@ public class CommandStaffChatToggle extends CrownCommandBuilder {
                     return 0;
                 })
 
-                .then(argument("visible")
+                .then(literal("visible")
                         .executes(c -> {
                             Player player = c.getSource().asPlayer();
                             Set<Player> set = StaffChat.ignoring;

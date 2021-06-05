@@ -2,13 +2,13 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-public class CommandSuicide extends CrownCommandBuilder {
+public class CommandSuicide extends FtcCommand {
     public CommandSuicide(){
         super("suicide", CrownCore.inst());
 
@@ -26,7 +26,7 @@ public class CommandSuicide extends CrownCommandBuilder {
 
                     player.setHealth(0);
                     player.sendMessage(
-                            Component.text("Committing suicide :(")
+                            Component.translatable("commands.suicide")
                                     .color(NamedTextColor.GRAY)
                     );
                     return 0;

@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.commands.arguments.WarpType;
 import net.forthecrown.emperor.useables.warps.Warp;
@@ -12,7 +12,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandWarp extends CrownCommandBuilder {
+public class CommandWarp extends FtcCommand {
 
     public CommandWarp(){
         super("warp", CrownCore.inst());
@@ -34,9 +34,7 @@ public class CommandWarp extends CrownCommandBuilder {
                             if(user.checkTeleporting() && warp.test(user.getPlayer())){
                                 user.createTeleport(warp::getDestination, true, UserTeleport.Type.WARP)
                                         .setCompleteMessage(
-                                                Component.text("Warping to ")
-                                                        .color(NamedTextColor.GRAY)
-                                                        .append(warp.displayName().color(NamedTextColor.GOLD))
+                                                Component.translatable("warps.to", warp.displayName().color(NamedTextColor.GOLD)).color(NamedTextColor.GRAY)
                                         )
                                         .start(true);
                             }

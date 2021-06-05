@@ -4,11 +4,12 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.inventory.CrownItems;
 import net.forthecrown.emperor.user.CrownUser;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -17,7 +18,7 @@ import org.bukkit.Material;
 
 import javax.annotation.Nonnegative;
 
-public class CommandWithdraw extends CrownCommandBuilder {
+public class CommandWithdraw extends FtcCommand {
 
     public CommandWithdraw(){
         super("withdraw", CrownCore.inst());
@@ -52,18 +53,19 @@ public class CommandWithdraw extends CrownCommandBuilder {
         if(totalAmount > bals.get(user.getUniqueId())) throw FtcExceptionProvider.cannotAfford(totalAmount);
         if(user.getPlayer().getInventory().firstEmpty() == -1) throw FtcExceptionProvider.inventoryFull();
 
-        Component text = Component.text(". Total value: ")
+        Component text = Component.translatable("economy.withdraw.total", Balances.formatted(totalAmount).color(NamedTextColor.YELLOW))
+                .color(NamedTextColor.GRAY);
+
+        Component message = Component.translatable("economy.withdraw",
+                Component.text(itemAmount + " coin" + CrownUtils.addAnS(itemAmount)),
+                Balances.formatted(amount).color(NamedTextColor.GOLD)
+        )
                 .color(NamedTextColor.GRAY)
-                .append(Balances.formatted(totalAmount).color(NamedTextColor.YELLOW));
+                .append(itemAmount > 1 ? Component.space().append(text) : Component.empty());
 
         bals.add(user.getUniqueId(), -totalAmount, false);
         user.getPlayer().getInventory().addItem(CrownItems.getCoins(amount, itemAmount));
-        user.sendMessage(
-                Component.text("You got " + itemAmount + " coin" + (itemAmount > 1 ? "s" : "") + " that's worth ")
-                        .color(NamedTextColor.GRAY)
-                        .append(Balances.formatted(amount).color(NamedTextColor.GOLD))
-                        .append(itemAmount > 1 ? text : Component.empty())
-        );
+        user.sendMessage(message);
         return 0;
     }
 }

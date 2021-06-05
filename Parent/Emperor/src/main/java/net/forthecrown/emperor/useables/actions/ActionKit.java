@@ -26,7 +26,6 @@ public class ActionKit implements UsageAction {
 
     @Override
     public void parse(JsonElement json) throws CommandSyntaxException {
-
         parse(new StringReader(json.getAsString()));
     }
 

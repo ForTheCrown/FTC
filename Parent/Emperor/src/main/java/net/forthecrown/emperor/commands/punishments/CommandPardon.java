@@ -9,7 +9,7 @@ import net.forthecrown.emperor.admin.PunishmentEntry;
 import net.forthecrown.emperor.admin.PunishmentManager;
 import net.forthecrown.emperor.admin.StaffChat;
 import net.forthecrown.emperor.admin.record.PunishmentType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
@@ -26,7 +26,7 @@ import org.bukkit.Bukkit;
 
 import java.util.UUID;
 
-public class CommandPardon extends CrownCommandBuilder {
+public class CommandPardon extends FtcCommand {
     public CommandPardon(){
         super("pardon_ftc", CrownCore.inst());
 
@@ -38,7 +38,7 @@ public class CommandPardon extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("ban")
+                .then(literal("ban")
                         .requires(s -> s.hasPermission(Permissions.POLICE))
 
                         .then(argument("name", StringArgumentType.word())
@@ -67,7 +67,7 @@ public class CommandPardon extends CrownCommandBuilder {
                 )
 
                 .then(argument("user", UserType.user())
-                        .then(argument("softmute")
+                        .then(literal("softmute")
                                 .executes(c -> {
                                     CrownUser user = user(c);
                                     PunishmentManager manager = CrownCore.getPunishmentManager();
@@ -86,7 +86,7 @@ public class CommandPardon extends CrownCommandBuilder {
                                 })
                         )
 
-                        .then(argument("jail")
+                        .then(literal("jail")
                                 .executes(c -> {
                                     CrownUser user = user(c);
                                     PunishmentManager manager = CrownCore.getPunishmentManager();
@@ -104,7 +104,7 @@ public class CommandPardon extends CrownCommandBuilder {
                                 })
                         )
 
-                        .then(argument("mute")
+                        .then(literal("mute")
                                 .requires(s -> s.hasPermission(Permissions.POLICE))
 
                                 .executes(c -> {

@@ -12,5 +12,5 @@ public interface Actionable {
 
     void clearActions();
 
-    <T extends UsageAction> T getAction(Key key, Class<T> clazz);
+    <T extends UsageAction> T getAction(Key key, Class<T> clazz) throws ClassCastException;
 }

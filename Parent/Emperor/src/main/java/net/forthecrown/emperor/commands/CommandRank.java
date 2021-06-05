@@ -1,7 +1,7 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.events.RankGuiUseEvent;
 import net.forthecrown.emperor.inventory.RankInventory;
 import net.forthecrown.emperor.user.UserManager;
@@ -9,7 +9,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class CommandRank extends CrownCommandBuilder {
+public class CommandRank extends FtcCommand {
 
     public CommandRank(){
         super("rank", CrownCore.inst());

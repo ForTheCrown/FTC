@@ -1,6 +1,6 @@
 package net.forthecrown.emperor;
 
-import net.forthecrown.emperor.serialization.CrownSerializer;
+import net.forthecrown.emperor.serializer.CrownSerializer;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.emperor.utils.ChatUtils;
 import net.kyori.adventure.text.Component;

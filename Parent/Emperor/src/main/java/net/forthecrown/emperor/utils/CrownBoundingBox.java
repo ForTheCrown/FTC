@@ -1,5 +1,6 @@
 package net.forthecrown.emperor.utils;
 
+import net.minecraft.server.v1_16_R3.StructureBoundingBox;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -53,6 +54,10 @@ public class CrownBoundingBox extends BoundingBox implements Iterable<Block> {
     }
 
     public static CrownBoundingBox of(BoundingBox box, World world){
+        return new CrownBoundingBox(world, box.getMinX(), box.getMinY(), box.getMinZ(), box.getMaxX(), box.getMaxY(), box.getMaxZ());
+    }
+
+    public static CrownBoundingBox of(StructureBoundingBox box, World world){
         return new CrownBoundingBox(world, box.getMinX(), box.getMinY(), box.getMinZ(), box.getMaxX(), box.getMaxY(), box.getMaxZ());
     }
 
@@ -151,6 +156,19 @@ public class CrownBoundingBox extends BoundingBox implements Iterable<Block> {
         }
 
         return blocks;
+    }
+
+    @Override
+    public String toString() {
+        return "CrownBoundingBox{" +
+                "world=" + world +
+                ",minX=" + getMinX() +
+                ",minY=" + getMinY() +
+                ",minZ=" + getMinZ() +
+                ",maxX=" + getMaxX() +
+                ",maxY=" + getMaxY() +
+                ",maxZ=" + getMaxZ() +
+                '}';
     }
 
     @Override

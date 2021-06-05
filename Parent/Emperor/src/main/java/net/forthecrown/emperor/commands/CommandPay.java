@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.commands.arguments.UserType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.user.CrownUser;
@@ -18,7 +18,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.List;
 import java.util.UUID;
 
-public class CommandPay extends CrownCommandBuilder {
+public class CommandPay extends FtcCommand {
 
     private final int maxMoneyAmount;
 

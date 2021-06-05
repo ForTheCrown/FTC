@@ -1,7 +1,7 @@
 package net.forthecrown.pirates.auctions;
 
 import net.forthecrown.emperor.CrownException;
-import net.forthecrown.emperor.serialization.CrownSerializer;
+import net.forthecrown.emperor.serializer.CrownSerializer;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.pirates.Pirates;
 import org.bukkit.Location;

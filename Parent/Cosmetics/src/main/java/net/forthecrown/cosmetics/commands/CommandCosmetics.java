@@ -2,11 +2,11 @@ package net.forthecrown.cosmetics.commands;
 
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
-public class CommandCosmetics extends CrownCommandBuilder {
+public class CommandCosmetics extends FtcCommand {
 
     public CommandCosmetics(){
         super("cosmetics", Cosmetics.plugin);

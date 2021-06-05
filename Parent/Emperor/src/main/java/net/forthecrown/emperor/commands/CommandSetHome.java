@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserHomes;
@@ -12,7 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 
-public class CommandSetHome extends CrownCommandBuilder {
+public class CommandSetHome extends FtcCommand {
     public CommandSetHome(){
         super("sethome", CrownCore.inst());
 
@@ -31,13 +31,11 @@ public class CommandSetHome extends CrownCommandBuilder {
                     String name = CommandHome.DEFAULT;
                     Location loc = user.getLocation();
 
-                    if(homes.contains(name)) throw FtcExceptionProvider.create("You already have a home with this name");
-                    if(!homes.canMakeMore()) throw FtcExceptionProvider.create("Cannot create more homes (Over limit of " + user.getHighestTierRank().tier.maxHomes + ")");
+                    if(homes.contains(name)) throw FtcExceptionProvider.homeNameInUse();
+                    if(!homes.canMakeMore()) throw FtcExceptionProvider.overHomeLimit(user);
 
                     homes.set(name, loc);
-                    user.sendMessage(
-                            Component.text("Set default home").color(NamedTextColor.YELLOW)
-                    );
+                    user.sendMessage(Component.translatable("homes.setDefault").color(NamedTextColor.YELLOW));
                     return 0;
                 })
 
@@ -48,14 +46,13 @@ public class CommandSetHome extends CrownCommandBuilder {
                             String name = StringArgumentType.getString(c, "name");
                             Location loc = user.getLocation();
 
-                            if(homes.contains(name)) throw FtcExceptionProvider.create("You already have a home with this name");
-                            if(!homes.canMakeMore()) throw FtcExceptionProvider.create("Cannot create more homes (Over limit of " + user.getHighestTierRank().tier.maxHomes + ")");
+                            if(homes.contains(name)) throw FtcExceptionProvider.homeNameInUse();
+                            if(!homes.canMakeMore()) throw FtcExceptionProvider.overHomeLimit(user);
 
                             homes.set(name, loc);
                             user.sendMessage(
-                                    Component.text("Created home called ")
+                                    Component.translatable("homes.set", Component.text(name).color(NamedTextColor.GOLD))
                                             .color(NamedTextColor.YELLOW)
-                                            .append(Component.text(name).color(NamedTextColor.GOLD))
                             );
                             return 0;
                         })

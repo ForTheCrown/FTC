@@ -37,9 +37,7 @@ import java.util.logging.Logger;
  * Main class that looks nice and does all the api stuff
  */
 public interface CrownCore extends Plugin, Namespaced {
-    static CrownCore inst(){
-        return Main.inst;
-    }
+    static CrownCore inst(){ return Main.inst; }
 
     static UserManager getUserManager(){ return Main.userManager; }
     static PunishmentManager getPunishmentManager() { return Main.punishmentManager; }

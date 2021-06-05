@@ -8,7 +8,7 @@ import net.forthecrown.emperor.comvars.ComVars;
 import net.forthecrown.emperor.comvars.types.ComVarType;
 import net.forthecrown.emperor.events.ChatEvents;
 import net.forthecrown.emperor.inventory.CrownItems;
-import net.forthecrown.emperor.serialization.AbstractJsonSerializer;
+import net.forthecrown.emperor.serializer.AbstractJsonSerializer;
 import net.forthecrown.emperor.user.enums.Rank;
 import net.forthecrown.emperor.utils.ChatUtils;
 import net.kyori.adventure.text.Component;

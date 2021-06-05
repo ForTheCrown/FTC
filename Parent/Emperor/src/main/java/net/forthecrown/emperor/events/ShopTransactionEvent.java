@@ -40,10 +40,8 @@ public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShop
             return;
 
         Location l = shop.getLocation();
-        Component builder = Component.text("Your shop at ")
-                .color(NamedTextColor.GRAY)
-                .append(ChatFormatter.prettyLocationMessage(l, false).color(NamedTextColor.YELLOW))
-                .append(Component.text(shop.getType() == ShopType.BUY_SHOP ? " is out of stock" : " is full"));
+        Component specification = Component.translatable("shops." + (shop.getType().buyType ? "out" : "full"));
+        Component builder = Component.translatable("shops.stockWarning", ChatFormatter.prettyLocationMessage(l, false), specification);
 
         owner.sendMessage(builder);
     }

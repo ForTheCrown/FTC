@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.utils.ChatUtils;
 import net.forthecrown.grenadier.CommandSource;
@@ -14,7 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class CommandItemName extends CrownCommandBuilder {
+public class CommandItemName extends FtcCommand {
     public CommandItemName(){
         super("itemname", CrownCore.inst());
 
@@ -28,7 +28,7 @@ public class CommandItemName extends CrownCommandBuilder {
                 .then(argument("name", StringArgumentType.greedyString())
                         .executes(c -> rename(c.getSource(), ChatUtils.convertString(c.getArgument("name", String.class))))
                 )
-                .then(argument("-component")
+                .then(literal("-component")
                         .then(argument("cName", ComponentArgument.component())
                                 .executes(c -> rename(c.getSource(), c.getArgument("cName", Component.class)))
                         )

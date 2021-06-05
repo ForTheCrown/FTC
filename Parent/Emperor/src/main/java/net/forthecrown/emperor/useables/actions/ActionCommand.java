@@ -11,6 +11,7 @@ import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.useables.UsageAction;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.kyori.adventure.key.Key;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -73,7 +74,7 @@ public class ActionCommand implements UsageAction {
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         int index = builder.getRemaining().indexOf(' ');
-        if(index == -1) return CommandSource.suggestMatching(builder, Bukkit.getCommandMap().getKnownCommands().keySet());
+        if(index == -1) return CompletionProvider.suggestMatching(builder, Bukkit.getCommandMap().getKnownCommands().keySet());
 
         String cmd = builder.getRemaining().substring(0, index).trim();
         Command command = Bukkit.getCommandMap().getCommand(cmd);

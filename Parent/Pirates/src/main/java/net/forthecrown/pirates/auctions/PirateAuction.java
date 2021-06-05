@@ -3,7 +3,7 @@ package net.forthecrown.pirates.auctions;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.CrownException;
 import net.forthecrown.emperor.economy.Balances;
-import net.forthecrown.emperor.serialization.AbstractSerializer;
+import net.forthecrown.emperor.serializer.AbstractSerializer;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.utils.ChatFormatter;

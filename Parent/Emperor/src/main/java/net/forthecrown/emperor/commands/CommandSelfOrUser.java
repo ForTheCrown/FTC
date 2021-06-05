@@ -4,7 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.arguments.UserType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.utils.CrownUtils;
@@ -21,7 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.permissions.Permission;
 
-public class CommandSelfOrUser extends CrownCommandBuilder {
+public class CommandSelfOrUser extends FtcCommand {
     private final CommandFunction function;
     private CommandSelfOrUser(String name, Permission perm, CommandFunction function, String... aliases){
         super(name, CrownCore.inst());

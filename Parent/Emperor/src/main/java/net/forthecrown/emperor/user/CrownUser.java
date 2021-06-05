@@ -3,8 +3,8 @@ package net.forthecrown.emperor.user;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.user.data.SoldMaterialData;
 import net.forthecrown.emperor.utils.Nameable;
-import net.forthecrown.emperor.serialization.CrownSerializer;
-import net.forthecrown.emperor.serialization.Deleteable;
+import net.forthecrown.emperor.serializer.CrownSerializer;
+import net.forthecrown.emperor.serializer.Deleteable;
 import net.forthecrown.emperor.user.enums.Branch;
 import net.forthecrown.emperor.user.enums.CrownGameMode;
 import net.forthecrown.emperor.user.enums.Pet;
@@ -471,19 +471,19 @@ public interface CrownUser extends CrownSerializer<CrownCore>, CommandSender, Ho
     }
 
     default ClickEvent asClickEvent(){
-        return isOnline() ? ClickEvent.suggestCommand("/tell " + getName() + " ") : ClickEvent.runCommand("/profile " + getName());
+        return ClickEvent.runCommand("/" + (isOnline() ? "tell " + getName() + " " : "profile " + getName()));
     }
 
     default Component displayName(){
         return Component.text(getName())
                 .hoverEvent(this)
-                .clickEvent(isOnline() ? asClickEvent() : null);
+                .clickEvent(asClickEvent());
     }
 
     default Component nickDisplayName(){
         return Component.text(getNickOrName())
                 .hoverEvent(this)
-                .clickEvent(isOnline() ? asClickEvent() : null);
+                .clickEvent(asClickEvent());
     }
 
     default Component  coloredNickDisplayName(){

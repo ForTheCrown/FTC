@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.utils.ChatFormatter;
@@ -11,7 +11,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandNickname extends CrownCommandBuilder {
+public class CommandNickname extends FtcCommand {
     public CommandNickname(){
         super("nickname", CrownCore.inst());
 

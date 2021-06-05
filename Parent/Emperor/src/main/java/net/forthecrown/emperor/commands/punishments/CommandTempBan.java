@@ -10,7 +10,7 @@ import net.forthecrown.emperor.admin.StaffChat;
 import net.forthecrown.emperor.admin.record.PunishmentRecord;
 import net.forthecrown.emperor.admin.record.PunishmentType;
 import net.forthecrown.emperor.commands.arguments.UserType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.utils.ChatFormatter;
@@ -25,7 +25,7 @@ import org.bukkit.command.ConsoleCommandSender;
 
 import java.util.Date;
 
-public class CommandTempBan extends CrownCommandBuilder implements TempPunisher {
+public class CommandTempBan extends FtcCommand implements TempPunisher {
     public CommandTempBan(){
         super("tempban", CrownCore.inst());
 

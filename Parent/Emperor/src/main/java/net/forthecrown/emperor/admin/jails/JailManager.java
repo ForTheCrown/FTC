@@ -2,7 +2,7 @@ package net.forthecrown.emperor.admin.jails;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.registry.Registry;
-import net.forthecrown.emperor.serialization.CrownSerializer;
+import net.forthecrown.emperor.serializer.CrownSerializer;
 import org.bukkit.Location;
 
 /**

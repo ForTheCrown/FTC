@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.serialization.AbstractJsonSerializer;
+import net.forthecrown.emperor.serializer.AbstractJsonSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;

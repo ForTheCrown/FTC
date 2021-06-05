@@ -3,7 +3,8 @@ package net.forthecrown.emperor.commands.punishments;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.CoreCommands;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.commands.arguments.JailType;
 import net.forthecrown.emperor.commands.arguments.UserType;
@@ -23,7 +24,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 
-public class CommandJail extends CrownCommandBuilder implements GenericPunisher {
+public class CommandJail extends FtcCommand implements GenericPunisher {
     public CommandJail(){
         super("jail", CrownCore.inst());
 
@@ -66,7 +67,10 @@ public class CommandJail extends CrownCommandBuilder implements GenericPunisher 
         long punishTime = lengthTranslate(length);
         manager.punish(user.getUniqueId(), PunishmentType.JAIL, source, null, punishTime, jail.asString());
 
-        if(user.isOnline()) Bukkit.getPluginManager().registerEvents(new JailListener(user.getPlayer(), jails.get(jail)), CrownCore.inst());
+        if(user.isOnline()){
+            CoreCommands.resendCommandPackets(user.getPlayer());
+            Bukkit.getPluginManager().registerEvents(new JailListener(user.getPlayer(), jails.get(jail)), CrownCore.inst());
+        }
 
         StaffChat.sendCommand(
                 source,

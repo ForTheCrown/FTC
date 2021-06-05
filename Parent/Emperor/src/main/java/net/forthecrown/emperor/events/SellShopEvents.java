@@ -217,14 +217,18 @@ public class SellShopEvents implements Listener {
                         .append(message)
         );
 
-        CrownCore.logger().info(seller.getName() + ChatUtils.PLAIN_SERIALIZER.serialize(message));
+        Bukkit.getConsoleSender().sendMessage(
+                Component.text()
+                        .append(seller.name())
+                        .append(Component.space())
+                        .append(message)
+                        .build()
+        );
 
         int comparison1 = data.getPrice();
 
         //if the price dropped
         if(comparison1 < comparison0){
-            //seller.sendMessage("&7Your price for " + s + " has dropped to " + Balances.getFormatted(comparison1));
-
             seller.sendMessage(
                     Component.text("Your price for ")
                             .color(NamedTextColor.GRAY)
@@ -232,6 +236,7 @@ public class SellShopEvents implements Listener {
                             .append(Component.text(" has dropped to "))
                             .append(Balances.formatted(comparison1))
             );
+
             reloadInventory();
         }
     }

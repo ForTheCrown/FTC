@@ -66,6 +66,7 @@ public class SortedBalanceMap implements BalanceMap {
             remove(entry.getUniqueId());
             return null;
         }
+
         CrownUser user = UserManager.getUser(player);
         Component displayName = user.nickDisplayName();
 

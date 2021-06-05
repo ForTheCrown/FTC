@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
@@ -10,7 +10,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandSudo extends CrownCommandBuilder {
+public class CommandSudo extends FtcCommand {
     public CommandSudo(){
         super("sudo", CrownCore.inst());
 

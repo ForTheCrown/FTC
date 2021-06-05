@@ -1,10 +1,10 @@
 package net.forthecrown.pirates.commands;
 
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
 
-public class CommandPirate extends CrownCommandBuilder {
+public class CommandPirate extends FtcCommand {
     public CommandPirate() {
         super("pirate", Pirates.inst);
 
@@ -18,7 +18,6 @@ public class CommandPirate extends CrownCommandBuilder {
                 .then(argument("reload")
                         .executes(c -> {
                             Pirates.inst.reloadConfig();
-                            Pirates.inst.updateDate();
                             Pirates.getAuctionManager().reloadAuctions();
                             broadcastAdmin(c.getSource(), "Pirate config reloaded.");
                             return 0;

@@ -13,7 +13,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.utils.ChatUtils;
 import net.forthecrown.grenadier.CommandSource;
@@ -27,7 +27,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandLore extends CrownCommandBuilder {
+public class CommandLore extends FtcCommand {
     public CommandLore() {
         super("lore", CrownCore.inst());
 
@@ -39,7 +39,7 @@ public class CommandLore extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("set")
+                .then(literal("set")
                         .then(compOrStringArg(
                                 argument("loreIndex", IntegerArgumentType.integer(0)),
                                 (c, b) -> Suggestions.empty(),
@@ -47,12 +47,12 @@ public class CommandLore extends CrownCommandBuilder {
                 )
 
                 .then(compOrStringArg(
-                        argument("add"),
+                        literal("add"),
                         (c, b) -> Suggestions.empty(),
                         this::add
                 ))
 
-                .then(argument("clear")
+                .then(literal("clear")
                         .executes(c -> {
                             ItemStack item = c.getSource().asPlayer().getInventory().getItemInMainHand();
                             checkItem(item);

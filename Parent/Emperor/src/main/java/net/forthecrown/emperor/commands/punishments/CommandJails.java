@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.JailType;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.emperor.utils.CrownUtils;
@@ -19,7 +19,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 
-public class CommandJails extends CrownCommandBuilder {
+public class CommandJails extends FtcCommand {
     public CommandJails(){
         super("jails", CrownCore.inst());
 
@@ -30,7 +30,7 @@ public class CommandJails extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("create")
+                .then(literal("create")
                         .then(argument("name", StringArgumentType.word())
                                 .executes(c -> createJail(
                                         getPlayerSender(c).getLocation(),
@@ -65,7 +65,7 @@ public class CommandJails extends CrownCommandBuilder {
                 )
 
                 .then(argument("jail", JailType.jail())
-                        .then(argument("location")
+                        .then(literal("location")
                                 .executes(c -> {
                                     CommandSource source = c.getSource();
                                     Key key = get(c);
@@ -100,7 +100,7 @@ public class CommandJails extends CrownCommandBuilder {
                                 )
                         )
 
-                        .then(argument("delete")
+                        .then(literal("delete")
                                 .executes(c -> {
                                     CommandSource source = c.getSource();
                                     Key key = get(c);

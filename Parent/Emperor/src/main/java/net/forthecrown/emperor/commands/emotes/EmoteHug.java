@@ -2,13 +2,10 @@ package net.forthecrown.emperor.commands.emotes;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.user.CrownUser;
-import net.forthecrown.emperor.utils.ChatUtils;
 import net.forthecrown.emperor.utils.Cooldown;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -25,17 +22,25 @@ public class EmoteHug extends CommandEmote {
     @Override
     protected int execute(CrownUser user, CrownUser recipient) {
         if(Cooldown.contains(recipient, "Emote_Hug_Received")){
-            user.sendMessage("&e" + recipient.getName() + " &7has already received some love lol");
+            user.sendMessage("&e" + recipient.getNickOrName() + " &7has already received some love lol");
             return -1;
         }
 
         //Do the hugging
-        TextComponent hugClick = ChatUtils.convertString(ChatColor.RED + "❤ " + ChatColor.YELLOW + user.getName() + ChatColor.RESET + " hugged you" + ChatColor.YELLOW + " ʕっ•ᴥ•ʔっ" + ChatColor.RED + " ❤")
-                .clickEvent(ClickEvent.runCommand("/hug " + user.getName()))
-                .hoverEvent(HoverEvent.showText(Component.text("Hug them back ❤")));
+        Component hugClick = Component.text()
+                .append(Component.text("❤ ").color(NamedTextColor.RED))
+                .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
+                .append(Component.text(" hugged you "))
+                .append(Component.text(" ʕっ•ᴥ•ʔっ").color(NamedTextColor.YELLOW))
+                .append(Component.text(" ❤").color(NamedTextColor.RED))
+
+                .clickEvent(ClickEvent.runCommand("/" + getName() + " " + user.getName()))
+                .hoverEvent(Component.text("Hug them back ❤"))
+
+                .build();
 
         recipient.sendMessage(hugClick);
-        user.sendMessage("&c❤ &7You hugged &e" + recipient.getName() + " ʕっ•ᴥ•ʔっ &c❤");
+        user.sendMessage("&c❤ &7You hugged &e" + recipient.getNickOrName() + " ʕっ•ᴥ•ʔっ &c❤");
 
         if(recipient.getPlayer().getGameMode() != GameMode.SPECTATOR){
             Cooldown.add(recipient, "Emote_Hug_Received", 10*20);

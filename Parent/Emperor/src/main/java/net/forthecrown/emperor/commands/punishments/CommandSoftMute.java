@@ -7,7 +7,7 @@ import net.forthecrown.emperor.admin.MuteStatus;
 import net.forthecrown.emperor.admin.PunishmentManager;
 import net.forthecrown.emperor.admin.record.PunishmentType;
 import net.forthecrown.emperor.commands.arguments.UserType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.utils.ChatFormatter;
@@ -18,7 +18,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.ConsoleCommandSender;
 
-public class CommandSoftMute extends CrownCommandBuilder implements TempPunisher {
+public class CommandSoftMute extends FtcCommand implements TempPunisher {
     public CommandSoftMute() {
         super("softmute", CrownCore.inst());
 

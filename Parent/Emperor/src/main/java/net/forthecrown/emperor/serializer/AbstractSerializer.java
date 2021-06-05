@@ -1,4 +1,5 @@
-package net.forthecrown.emperor.serialization;
+package net.forthecrown.emperor.serializer;
+
 import net.forthecrown.emperor.CrownCore;
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.file.YamlConfiguration;

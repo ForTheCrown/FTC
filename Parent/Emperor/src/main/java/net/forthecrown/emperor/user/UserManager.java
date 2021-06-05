@@ -2,7 +2,7 @@ package net.forthecrown.emperor.user;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.serialization.CrownSerializer;
+import net.forthecrown.emperor.serializer.CrownSerializer;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.emperor.utils.ListUtils;
 import org.apache.commons.lang.Validate;

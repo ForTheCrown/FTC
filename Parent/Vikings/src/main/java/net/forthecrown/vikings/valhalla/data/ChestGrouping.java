@@ -4,8 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.emperor.utils.BlockPos;
 import net.forthecrown.emperor.utils.CrownUtils;
-import net.forthecrown.vikings.BlockPos;
 import net.kyori.adventure.key.Key;
 
 import java.util.ArrayList;

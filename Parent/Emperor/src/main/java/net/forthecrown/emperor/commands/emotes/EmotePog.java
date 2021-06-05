@@ -1,17 +1,18 @@
 package net.forthecrown.emperor.commands.emotes;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.emperor.Announcer;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.utils.Cooldown;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
-public class EmotePog extends CrownCommandBuilder {
+public class EmotePog extends FtcCommand {
 
     public EmotePog(){
         super("pog", CrownCore.inst());
@@ -42,9 +43,14 @@ public class EmotePog extends CrownCommandBuilder {
     }
 
     private static void poggers(CrownUser user, @Nullable String message){
-        String text = ChatColor.YELLOW + user.getName() + ChatColor.GRAY + " PogChamped" + ChatColor.RESET;
-        if(message != null && !message.isBlank()) text += ": " + message;
-        Announcer.ac(text);
+        Component cMessage = Component.text()
+                .color(NamedTextColor.GRAY)
+                .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
+                .append(Component.text(" PogChamped"))
+                .append(CrownUtils.isNullOrBlank(message) ? Component.empty() : Component.text(": ").append(Component.text(message).color(NamedTextColor.WHITE)))
+                .build();
+
+        CrownCore.getAnnouncer().announceToAllRaw(cMessage);
         Cooldown.add(user, "Core_Emote_Pog", 3*20);
     }
 }

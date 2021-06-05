@@ -1,7 +1,7 @@
 package net.forthecrown.emperor.economy;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.serialization.CrownSerializer;
+import net.forthecrown.emperor.serializer.CrownSerializer;
 import net.forthecrown.emperor.user.CrownUser;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;

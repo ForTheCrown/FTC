@@ -1,10 +1,10 @@
 package net.forthecrown.pirates.commands;
 
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
 
-public class CommandUpdateLeaderboard extends CrownCommandBuilder {
+public class CommandUpdateLeaderboard extends FtcCommand {
     public CommandUpdateLeaderboard(){
         super("updatelb", Pirates.inst);
         register();

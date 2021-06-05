@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
@@ -12,7 +12,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandSpeed extends CrownCommandBuilder {
+public class CommandSpeed extends FtcCommand {
     public CommandSpeed(){
         super("speed", CrownCore.inst());
 
@@ -49,7 +49,7 @@ public class CommandSpeed extends CrownCommandBuilder {
                         )
                 )
 
-                .then(argument("query")
+                .then(literal("query")
                         .executes(c -> querySpeed(getUserSender(c), c.getSource(), fly))
 
                         .then(argument("user", UserType.onlineUser())

@@ -2,17 +2,15 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.arguments.UserType;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.data.TeleportRequest;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 import static net.forthecrown.emperor.commands.CommandTpask.*;
 
-public class CommandTpaskHere extends CrownCommandBuilder {
+public class CommandTpaskHere extends FtcCommand {
 
     public CommandTpaskHere(){
         super("tpaskhere", CrownCore.inst());
@@ -48,15 +46,7 @@ public class CommandTpaskHere extends CrownCommandBuilder {
                     checkPreconditions(player, target, true);
 
                     player.sendMessage(cancelRequest(target));
-
-                    target.sendMessage(
-                            Component.text()
-                                    .append(player.nickDisplayName().color(NamedTextColor.YELLOW))
-                                    .append(Component.text(" has requested that you teleport to them "))
-                                    .append(acceptButton(player))
-                                    .append(denyButton(player))
-                                    .build()
-                    );
+                    target.sendMessage(tpaMessage("tpa.request.here", player));
 
                     player.getInteractions().handleTeleport(new TeleportRequest(player, target, true));
                     return 0;

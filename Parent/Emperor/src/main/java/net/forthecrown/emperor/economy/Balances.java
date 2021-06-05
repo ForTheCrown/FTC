@@ -1,7 +1,7 @@
 package net.forthecrown.emperor.economy;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.serialization.CrownSerializer;
+import net.forthecrown.emperor.serializer.CrownSerializer;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.kyori.adventure.text.Component;
 

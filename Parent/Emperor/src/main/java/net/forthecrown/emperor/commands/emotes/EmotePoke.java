@@ -5,7 +5,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -29,15 +28,22 @@ public class EmotePoke extends CommandEmote {
     @Override
     protected int execute(CrownUser sender, CrownUser recipient) {
         int pokeOwieInt = (int)(Math.random()*pokeOwies.size()); //The random int that determines what body part they'll poke lol
-        sender.sendMessage("You poked " + ChatColor.YELLOW + recipient.getName() + "'s " + ChatColor.RESET + pokeOwies.get(pokeOwieInt));
+        String pokedPart = pokeOwies.get(pokeOwieInt);
+
+        sender.sendMessage(
+                Component.text("You poked ")
+                        .append(recipient.nickDisplayName().color(NamedTextColor.YELLOW))
+                        .append(Component.text("'s "))
+                        .append(Component.text(pokedPart))
+        );
 
         if(recipient.getPlayer().getGameMode() != GameMode.SPECTATOR){
             Player target = recipient.getPlayer();
-            Location targetLoc = recipient.getPlayer().getLocation();
+            Location targetLoc = recipient.getLocation();
 
             recipient.sendMessage(Component.text()
                     .append(sender.nickDisplayName().color(NamedTextColor.YELLOW))
-                    .append(Component.text(" poked your " + pokeOwies.get(pokeOwieInt)))
+                    .append(Component.text(" poked your " + pokedPart))
                     .clickEvent(ClickEvent.runCommand("/poke " + sender.getName()))
                     .hoverEvent(HoverEvent.showText(Component.text("Poke them back :D")))
                     .build()

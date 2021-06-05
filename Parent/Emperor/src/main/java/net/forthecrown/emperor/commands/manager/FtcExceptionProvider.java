@@ -149,4 +149,28 @@ public interface FtcExceptionProvider {
     static RoyalCommandException noDefaultHome(){
         return NO_DEF_HOME.create();
     }
+
+    static RoyalCommandException emptyGrave(){
+        return EMPTY_GRAVE.create();
+    }
+
+    static RoyalCommandException homeNameInUse(){
+        return HOME_NAME_IN_USE.create();
+    }
+
+    static RoyalCommandException overHomeLimit(CrownUser user){
+        return OVER_HOME_LIMIT.create(Component.text(user.getHighestTierRank().tier.maxHomes));
+    }
+
+    static RoyalCommandException noNearbyPlayers(){
+        return NO_ONE_NEARBY.create();
+    }
+
+    static RoyalCommandException cannotIgnoreSelf(){
+        return IGNORE_SELF_NO.create();
+    }
+
+    static RoyalCommandException noHomesToList(){
+        return NO_HOMES.create();
+    }
 }

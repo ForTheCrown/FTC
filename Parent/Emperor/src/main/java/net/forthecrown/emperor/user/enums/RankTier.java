@@ -1,7 +1,7 @@
 package net.forthecrown.emperor.user.enums;
 
 import com.google.gson.JsonElement;
-import net.forthecrown.emperor.serialization.JsonSerializable;
+import net.forthecrown.emperor.serializer.JsonSerializable;
 import net.forthecrown.emperor.utils.JsonUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;

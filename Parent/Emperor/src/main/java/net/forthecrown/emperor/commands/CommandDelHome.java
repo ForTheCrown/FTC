@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.HomeParseResult;
 import net.forthecrown.emperor.commands.arguments.HomeType;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
@@ -13,7 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 
-public class CommandDelHome extends CrownCommandBuilder {
+public class CommandDelHome extends FtcCommand {
     public CommandDelHome(){
         super("delhome", CrownCore.inst());
 

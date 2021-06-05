@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
@@ -19,7 +19,7 @@ import org.bukkit.Location;
 
 import java.util.Map;
 
-public class CommandHomeList extends CrownCommandBuilder {
+public class CommandHomeList extends FtcCommand {
     public CommandHomeList(){
         super("homelist", CrownCore.inst());
 
@@ -52,7 +52,7 @@ public class CommandHomeList extends CrownCommandBuilder {
     }
 
     private int listHomes(UserHomes homes, CommandSource source, boolean self) throws CommandSyntaxException {
-        if(homes.isEmpty()) throw FtcExceptionProvider.create("You have no homes to list");
+        if(homes.isEmpty()) throw FtcExceptionProvider.noHomesToList();
 
         TextComponent.Builder builder = Component.text()
                 .color(NamedTextColor.YELLOW)

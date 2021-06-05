@@ -3,12 +3,12 @@ package net.forthecrown.emperor.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.ComponentArgument;
 import net.kyori.adventure.text.Component;
 
-public class CommandBroadcast extends CrownCommandBuilder {
+public class CommandBroadcast extends FtcCommand {
 
     public CommandBroadcast(){
         super("broadcast", CrownCore.inst());
@@ -45,7 +45,7 @@ public class CommandBroadcast extends CrownCommandBuilder {
                             return 0;
                         })
                 )
-                .then(argument("-component")
+                .then(literal("-component")
                         .then(argument("componentAnnouncement", ComponentArgument.component())
                                 .executes(c -> {
                                     CrownCore.getAnnouncer().announce(c.getArgument("componentAnnouncement", Component.class));

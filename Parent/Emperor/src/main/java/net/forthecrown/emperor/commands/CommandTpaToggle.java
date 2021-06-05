@@ -2,13 +2,13 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandTpaToggle extends CrownCommandBuilder {
+public class CommandTpaToggle extends FtcCommand {
     public CommandTpaToggle(){
         super("tpatoggle", CrownCore.inst());
 
@@ -25,8 +25,8 @@ public class CommandTpaToggle extends CrownCommandBuilder {
             boolean allows = user.allowsTPA();
             allows = !allows;
 
-            if(allows) user.sendMessage(Component.text("Now allowing tpa's").color(NamedTextColor.YELLOW));
-            else user.sendMessage(Component.text("Now ignoring tpa's").color(NamedTextColor.GRAY));
+            if(allows) user.sendMessage(Component.translatable("tpa.toggle.on").color(NamedTextColor.YELLOW));
+            else user.sendMessage(Component.translatable("tpa.toggle.off").color(NamedTextColor.GRAY));
 
             user.setAllowsTPA(allows);
             return 0;

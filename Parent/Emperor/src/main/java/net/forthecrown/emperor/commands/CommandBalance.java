@@ -1,7 +1,7 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.user.CrownUser;
@@ -10,7 +10,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandBalance extends CrownCommandBuilder {
+public class CommandBalance extends FtcCommand {
 
     public CommandBalance() {
         super("balance", CrownCore.inst());
@@ -38,9 +38,7 @@ public class CommandBalance extends CrownCommandBuilder {
     protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> showBal(c.getSource(), getUserSender(c)))
-
                 .then(argument("player", UserType.user()) //Player is checking someone else's balance
-
                         .executes(c -> showBal(c.getSource(), UserType.getUser(c, "player")))
                 );
     }
@@ -53,16 +51,6 @@ public class CommandBalance extends CrownCommandBuilder {
         Component text = senderIsUser ?
                 Component.translatable("user.valueQuery.self", formatted) :
                 Component.translatable("user.valueQuery.other", user.nickDisplayName().color(NamedTextColor.YELLOW), formatted);
-
-                /*
-                Component.text()
-                .color(NamedTextColor.GRAY)
-                .append(Component.text("$ ").color(NamedTextColor.GOLD))
-                .append((senderIsUser ? Component.text("You") : user.nickDisplayName()).color(NamedTextColor.YELLOW))
-                .append(Component.text(" currently" + (senderIsUser ? " have " : " has ")))
-                .append(balances.withCurrency(user.getUniqueId()).color(NamedTextColor.GOLD))
-                .build();
-                * */
 
         sender.sendMessage(text.color(NamedTextColor.GRAY));
         return 0;

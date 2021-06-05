@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.useables.warps.Warp;
 import net.forthecrown.emperor.registry.WarpRegistry;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 
-public class CommandWarpList extends CrownCommandBuilder {
+public class CommandWarpList extends FtcCommand {
     public CommandWarpList(){
         super("warplist", CrownCore.inst());
 
@@ -30,7 +30,8 @@ public class CommandWarpList extends CrownCommandBuilder {
             Player player = c.getSource().asPlayer();
 
             TextComponent.Builder builder = Component.text()
-                    .append(Component.text("Warps:").color(NamedTextColor.GRAY))
+                    .append(Component.translatable("warps.warps").color(NamedTextColor.GRAY))
+                    .append(Component.text(":").color(NamedTextColor.GRAY))
                     .color(NamedTextColor.GOLD);
 
             WarpRegistry registry = CrownCore.getWarpRegistry();

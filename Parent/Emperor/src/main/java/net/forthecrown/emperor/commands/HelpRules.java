@@ -2,10 +2,10 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
-public class HelpRules extends CrownCommandBuilder {
+public class HelpRules extends FtcCommand {
     public HelpRules(){
         super("rules", CrownCore.inst());
 

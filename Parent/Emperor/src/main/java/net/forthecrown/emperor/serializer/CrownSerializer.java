@@ -1,4 +1,4 @@
-package net.forthecrown.emperor.serialization;
+package net.forthecrown.emperor.serializer;
 
 import org.bukkit.plugin.Plugin;
 

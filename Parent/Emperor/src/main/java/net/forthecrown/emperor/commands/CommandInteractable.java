@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.useables.Usable;
 import net.forthecrown.emperor.useables.UsableEntity;
@@ -24,7 +24,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-public class CommandInteractable extends CrownCommandBuilder {
+public class CommandInteractable extends FtcCommand {
 
     public CommandInteractable(){
         super("interactable", CrownCore.inst());
@@ -37,9 +37,9 @@ public class CommandInteractable extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("sign")
+                .then(literal("sign")
                         .then(argument("location", PositionArgument.position())
-                                .then(argument("create")
+                                .then(literal("create")
                                         .executes(c -> {
                                             CommandSource source = c.getSource();
                                             Location l = c.getArgument("location", Position.class).getLocation(source);
@@ -57,9 +57,9 @@ public class CommandInteractable extends CrownCommandBuilder {
                                 .then(removeArg(this::getSign))
                         )
                 )
-                .then(argument("entity")
+                .then(literal("entity")
                         .then(argument("selector", EntityArgument.entity())
-                                .then(argument("create")
+                                .then(literal("create")
                                         .executes(c -> {
                                             CommandSource source = c.getSource();
                                             Entity entity = c.getArgument("selector", EntitySelector.class).getEntity(source);
@@ -81,11 +81,11 @@ public class CommandInteractable extends CrownCommandBuilder {
     }
 
     private LiteralArgumentBuilder<CommandSource> editArg(InterUtils.BrigadierFunction<Usable> supplier){
-        return argument("edit")
+        return literal("edit")
                 .then(InterUtils.actionsArguments(supplier::apply))
                 .then(InterUtils.checksArguments(supplier::apply))
 
-                .then(argument("sendFail")
+                .then(literal("sendFail")
                         .then(argument("bool", BoolArgumentType.bool())
                                 .executes(c -> {
                                     Usable sign = supplier.apply(c);
@@ -101,7 +101,7 @@ public class CommandInteractable extends CrownCommandBuilder {
     }
 
     private LiteralArgumentBuilder<CommandSource> removeArg(InterUtils.BrigadierFunction<Usable> supplier){
-        return argument("remove")
+        return literal("remove")
                 .executes(c -> {
                     Usable interactable = supplier.apply(c);
 

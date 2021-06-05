@@ -2,12 +2,12 @@ package net.forthecrown.emperor.clickevent;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.entity.Player;
 
-public class ClickEventCommand extends CrownCommandBuilder {
+public class ClickEventCommand extends FtcCommand {
 
     public ClickEventCommand(){
         super("npcconverse", CrownCore.inst());

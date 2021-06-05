@@ -1,5 +1,6 @@
 package net.forthecrown.emperor.user;
 
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +19,7 @@ public interface Grave {
     /**
      * Attempts to give the grave's items back to the owner
      */
-    void giveItems();
+    void giveItems() throws RoyalCommandException;
 
     /**
      * Gets whether the grave is empty

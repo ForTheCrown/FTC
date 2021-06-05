@@ -2,14 +2,14 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.data.UserTeleport;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 
-public class CommandTop extends CrownCommandBuilder {
+public class CommandTop extends FtcCommand {
     public CommandTop(){
         super("top", CrownCore.inst());
 

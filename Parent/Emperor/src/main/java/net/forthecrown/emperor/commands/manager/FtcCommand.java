@@ -1,7 +1,6 @@
 package net.forthecrown.emperor.commands.manager;
 
 import com.mojang.brigadier.LiteralMessage;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -30,8 +29,8 @@ import java.util.UUID;
  * because I can't be arsed to remove them from commands that already have them
  * </p>
  */
-public abstract class CrownCommandBuilder extends AbstractCommand {
-    protected CrownCommandBuilder(@NotNull String name, @NotNull Plugin plugin) {
+public abstract class FtcCommand extends AbstractCommand {
+    protected FtcCommand(@NotNull String name, @NotNull Plugin plugin) {
         super(name, plugin);
 
         permissionMessage = ChatColor.WHITE + "Unknown command. Type \"/help\" for help";
@@ -58,10 +57,6 @@ public abstract class CrownCommandBuilder extends AbstractCommand {
 
     protected CrownUser getUserSender(CommandContext<CommandSource> c) throws CommandSyntaxException {
         return UserManager.getUser(getPlayerSender(c));
-    }
-
-    protected LiteralArgumentBuilder<CommandSource> argument(String name){
-        return literal(name);
     }
 
     protected static void broadcastAdmin(CommandSource source, String message){

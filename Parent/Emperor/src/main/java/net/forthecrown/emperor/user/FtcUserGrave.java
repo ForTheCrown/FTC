@@ -1,6 +1,7 @@
 package net.forthecrown.emperor.user;
 
-import net.md_5.bungee.api.ChatColor;
+import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import org.apache.commons.lang.Validate;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ public class FtcUserGrave implements Grave {
     }
 
     @Override
-    public void giveItems(){
+    public void giveItems() throws RoyalCommandException {
         if(!user.isOnline()) throw new UserNotOnlineException(user);
 
         int freeSpace = 0;
@@ -33,10 +34,7 @@ public class FtcUserGrave implements Grave {
             freeSpace++;
         }
 
-        if(freeSpace < getItems().size()){
-            getUser().sendMessage(ChatColor.RED + "[FTC] " + ChatColor.GRAY + "You don't have enough space in your inventory.");
-            return;
-        }
+        if(freeSpace < getItems().size()) throw FtcExceptionProvider.inventoryFull();
 
         for (ItemStack i: getItems()){
             getUser().getPlayer().getInventory().addItem(i);

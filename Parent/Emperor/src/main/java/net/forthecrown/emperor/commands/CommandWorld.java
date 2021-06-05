@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.data.UserTeleport;
@@ -12,7 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.World;
 
-public class CommandWorld extends CrownCommandBuilder {
+public class CommandWorld extends FtcCommand {
     public CommandWorld(){
         super("world", CrownCore.inst());
 

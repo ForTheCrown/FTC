@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.emperor.serialization.JsonSerializable;
+import net.forthecrown.emperor.serializer.JsonSerializable;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Keyed;
 import org.bukkit.entity.Player;

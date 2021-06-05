@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands;
 import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.utils.CrownBoundingBox;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.utils.Pair;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Location;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class CommandLeave extends CrownCommandBuilder {
+public class CommandLeave extends FtcCommand {
 
     private final static Map<CrownBoundingBox, Pair<Location, Predicate<Player>>> ALLOWED_USAGE_AREAS = new HashMap<>();
 

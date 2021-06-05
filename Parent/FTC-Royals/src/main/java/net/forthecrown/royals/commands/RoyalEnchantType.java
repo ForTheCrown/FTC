@@ -10,6 +10,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.types.EnchantArgumentImpl;
 import net.forthecrown.royals.enchantments.CrownEnchant;
 import net.forthecrown.royals.enchantments.RoyalEnchants;
+import net.kyori.adventure.text.Component;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
@@ -39,7 +40,7 @@ public class RoyalEnchantType implements ArgumentType<CrownEnchant> {
                 return RoyalEnchants.healingBlock();
 
             default:
-                throw EnchantArgumentImpl.UNKNOWN_ENCHANTMENT.createWithContext(reader, name);
+                throw EnchantArgumentImpl.UNKNOWN_ENCHANTMENT.createWithContext(reader, Component.text(name));
         }
     }
 

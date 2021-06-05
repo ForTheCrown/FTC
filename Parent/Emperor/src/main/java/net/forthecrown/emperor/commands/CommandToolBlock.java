@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
@@ -13,7 +13,7 @@ import org.bukkit.permissions.Permission;
 
 import java.util.function.UnaryOperator;
 
-public class CommandToolBlock extends CrownCommandBuilder {
+public class CommandToolBlock extends FtcCommand {
     private final UtilityBlockFunction function;
     private final UnaryOperator<Component> adminMessageFunc;
     private final Permission othersPerm;

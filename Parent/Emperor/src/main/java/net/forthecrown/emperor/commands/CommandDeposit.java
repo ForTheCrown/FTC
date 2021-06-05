@@ -1,7 +1,7 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.utils.ChatUtils;
@@ -14,7 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class CommandDeposit extends CrownCommandBuilder {
+public class CommandDeposit extends FtcCommand {
 
     public CommandDeposit(){
         super("deposit", CrownCore.inst());

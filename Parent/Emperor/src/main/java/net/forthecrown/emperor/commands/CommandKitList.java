@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.useables.kits.Kit;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 
-public class CommandKitList extends CrownCommandBuilder {
+public class CommandKitList extends FtcCommand {
     public CommandKitList(){
         super("kitlist", CrownCore.inst());
 
@@ -30,7 +30,8 @@ public class CommandKitList extends CrownCommandBuilder {
                     Player player = getPlayerSender(c);
 
                     TextComponent.Builder builder = Component.text()
-                            .append(Component.text("Kits:").color(NamedTextColor.GRAY))
+                            .append(Component.translatable("kits.kits").color(NamedTextColor.GRAY))
+                            .append(Component.text(":").color(NamedTextColor.GRAY))
                             .color(NamedTextColor.GOLD);
 
                     Collection<Kit> kits = c.getSource().hasPermission(Permissions.KIT_ADMIN) ?

@@ -4,7 +4,7 @@ import net.forthecrown.emperor.Announcer;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.economy.BalanceMap;
 import net.forthecrown.emperor.economy.SortedBalanceMap;
-import net.forthecrown.emperor.serialization.AbstractSerializer;
+import net.forthecrown.emperor.serializer.AbstractSerializer;
 import net.forthecrown.emperor.utils.MapUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

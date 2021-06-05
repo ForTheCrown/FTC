@@ -4,22 +4,19 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.emperor.commands.manager.UserCommandExceptionType;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.emperor.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.grenadier.types.selectors.EntitySelector;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.royalgrenadier.types.selector.EntityArgumentImpl;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.v1_16_R3.ArgumentParserSelector;
 import net.minecraft.server.v1_16_R3.ICompletionProvider;
 import org.bukkit.entity.Player;
@@ -34,13 +31,9 @@ public class UserType implements ArgumentType<UserParseResult> {
     public static final UserType USERS = new UserType(true, true);
     public static final UserType ONLINE_USER = new UserType(false, false);
 
-    public static final DynamicCommandExceptionType UNKNOWN_USER = new DynamicCommandExceptionType(o -> () -> "Unkown player: " + o);
-    public static final SimpleCommandExceptionType NO_USERS_FOUND = new SimpleCommandExceptionType(() -> "No players found");
-    public static final UserCommandExceptionType USER_NOT_ONLINE = new UserCommandExceptionType(
-            u -> u.nickDisplayName()
-                    .color(NamedTextColor.DARK_GRAY)
-                    .append(Component.text(" is not online.").color(NamedTextColor.GRAY))
-    );
+    public static final TranslatableExceptionType UNKNOWN_USER = new TranslatableExceptionType("user.parse.unknown");
+    public static final TranslatableExceptionType NO_USERS_FOUND = new TranslatableExceptionType("user.parse.nonFound");
+    public static final TranslatableExceptionType USER_NOT_ONLINE = new TranslatableExceptionType("user.parse.notOnline");
 
     public static UserType user(){
         return USER;
@@ -89,12 +82,12 @@ public class UserType implements ArgumentType<UserParseResult> {
         String name = reader.readUnquotedString();
         UUID id = CrownUtils.uuidFromName(name);
 
-        if(id == null) throw UNKNOWN_USER.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), name);
+        if(id == null) throw UNKNOWN_USER.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), Component.text(name));
 
         CrownUser result = UserManager.getUser(id);
         if(!result.isOnline() && !allowOffline){
             result.unload();
-            throw USER_NOT_ONLINE.create(result);
+            throw USER_NOT_ONLINE.create(result.nickDisplayName());
         }
 
         return new UserParseResult(result, allowOffline);

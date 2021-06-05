@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.inventory.CrownItems;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -11,7 +11,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class HelpBank extends CrownCommandBuilder {
+public class HelpBank extends FtcCommand {
 
     public HelpBank(){
         super("bank", CrownCore.inst());

@@ -10,7 +10,6 @@ import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
-import net.forthecrown.emperor.Announcer;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.CrownWorldGuard;
 import net.forthecrown.emperor.admin.EavesDropper;
@@ -88,20 +87,17 @@ public class CoreListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
-        Announcer.debug(1);
         PunishmentManager manager = CrownCore.getPunishmentManager();
         PunishmentEntry entry = manager.getEntry(event.getUniqueId());
 
         if(entry == null) return;
         if(entry.checkPunished(PunishmentType.BAN)){
-            Announcer.debug(2);
             event.disallow(
                     AsyncPlayerPreLoginEvent.Result.KICK_BANNED,
                     ChatFormatter.banMessage(entry.getCurrent(PunishmentType.BAN))
             );
             event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
         }
-        Announcer.debug(3);
     }
 
     @EventHandler

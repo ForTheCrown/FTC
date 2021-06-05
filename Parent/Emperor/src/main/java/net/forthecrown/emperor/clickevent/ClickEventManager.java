@@ -2,6 +2,7 @@ package net.forthecrown.emperor.clickevent;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.CrownException;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.Bukkit;
@@ -62,7 +63,10 @@ public final class ClickEventManager {
         ClickEventTask task = registeredClickEvents.get(id);
         try {
             task.run(player, args);
-        } catch (CrownException ignored) {}
+        } catch (CrownException ignored) {
+        } catch (RoyalCommandException e) {
+            player.sendMessage(e.formattedText());
+        }
     }
 
     public static boolean isRegistered(String id){

@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Bukkit;
@@ -14,7 +14,7 @@ import org.bukkit.permissions.Permission;
 
 import java.util.function.Function;
 
-public class CommandDumbThing extends CrownCommandBuilder {
+public class CommandDumbThing extends FtcCommand {
 
     private final Function<Player, Integer> func;
 
@@ -59,7 +59,7 @@ public class CommandDumbThing extends CrownCommandBuilder {
 
         new CommandDumbThing("kittycannon",
                 Permissions.DONATOR_3,
-                "Shoots a kitten at people, like some sort of crazed Discord Mod",
+                "Shoots a kitten at people",
                 player -> {
                     Location l = player.getLocation();
 

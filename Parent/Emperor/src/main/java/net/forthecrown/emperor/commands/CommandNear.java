@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
@@ -20,7 +20,7 @@ import org.bukkit.Location;
 
 import java.util.List;
 
-public class CommandNear extends CrownCommandBuilder {
+public class CommandNear extends FtcCommand {
 
     public CommandNear(){
         super("near", CrownCore.inst());
@@ -78,11 +78,14 @@ public class CommandNear extends CrownCommandBuilder {
         if(source.isPlayer()){
             players.remove(UserManager.getUser(source.asPlayer()));
 
-            if(players.isEmpty()) throw FtcExceptionProvider.create("No nearby players");
+            if(players.isEmpty()) throw FtcExceptionProvider.noNearbyPlayers();
         }
 
         TextComponent.Builder builder = Component.text()
-                .append(Component.text("Nearby players: ").color(NamedTextColor.GOLD));
+                .append(Component.translatable("commands.near")
+                        .color(NamedTextColor.GOLD)
+                        .append(Component.text(": "))
+                );
 
 
         for (CrownUser u: players){

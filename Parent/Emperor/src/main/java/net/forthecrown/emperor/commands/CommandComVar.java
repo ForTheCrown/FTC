@@ -4,13 +4,13 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.ComVarArgument;
 import net.forthecrown.emperor.comvars.ComVar;
 import net.forthecrown.emperor.comvars.ComVars;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
-public class CommandComVar extends CrownCommandBuilder {
+public class CommandComVar extends FtcCommand {
 
     public CommandComVar(){
         super("comvar", CrownCore.inst());

@@ -6,7 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.Announcer;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.WarpType;
 import net.forthecrown.emperor.useables.warps.Warp;
 import net.forthecrown.emperor.user.CrownUser;
@@ -20,7 +20,7 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 
-public class CommandWarpEdit extends CrownCommandBuilder {
+public class CommandWarpEdit extends FtcCommand {
     public CommandWarpEdit(){
         super("warpedit", CrownCore.inst());
 
@@ -31,7 +31,7 @@ public class CommandWarpEdit extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("create")
+                .then(literal("create")
                         .then(argument("name", StringArgumentType.word())
                                 .executes(c -> createWarp(
                                         c.getSource(),
@@ -52,7 +52,7 @@ public class CommandWarpEdit extends CrownCommandBuilder {
                 .then(argument("warp", WarpType.warp())
                         .suggests((c, b) -> WarpType.warp().listSuggestions(c, b, true))
 
-                        .then(argument("destination")
+                        .then(literal("destination")
                                 .executes(c -> moveDest(
                                         c.getSource(),
                                         get(c),
@@ -67,7 +67,7 @@ public class CommandWarpEdit extends CrownCommandBuilder {
                                 )
                         )
 
-                        .then(argument("goto")
+                        .then(literal("goto")
                                 .executes(c -> {
                                     CrownUser user = getUserSender(c);
                                     Warp warp = get(c);
@@ -80,7 +80,7 @@ public class CommandWarpEdit extends CrownCommandBuilder {
 
                         .then(InterUtils.checksArguments(this::get))
 
-                        .then(argument("delete")
+                        .then(literal("delete")
                                 .executes(c -> {
                                     Warp warp = get(c);
                                     warp.delete();

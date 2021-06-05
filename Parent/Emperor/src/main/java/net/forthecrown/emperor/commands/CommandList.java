@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -13,11 +13,11 @@ import org.bukkit.Bukkit;
 
 import java.util.Collection;
 
-public class CommandList extends CrownCommandBuilder {
+public class CommandList extends FtcCommand {
     public CommandList(){
-        super("playerlist", CrownCore.inst());
+        super("flist", CrownCore.inst());
 
-        setAliases("list");
+        setAliases("list", "elist", "playerlist");
         setPermission(Permissions.HELPER);
         register();
     }

@@ -28,6 +28,7 @@ public class Permissions {
 
     public static final Permission STAFF_CHAT =         register("ftc.staffchat");
     public static final Permission CORE_ADMIN =         register("ftc.admin");
+    public static final Permission SHOP_ADMIN =         register("ftc.shops.admin");
     public static final Permission GAMEMODES =          register("ftc.gamemodes");
     public static final Permission KING_MAKER =         register("ftc.kingmaker");
     public static final Permission IGNORE_CHAT_CASE =   register("ftc.chatcaseignore");
@@ -42,6 +43,9 @@ public class Permissions {
 
     public static final Permission KIT =                register(COMMAND_PREFIX + "kit");
     public static final Permission KIT_ADMIN =          register(COMMAND_PREFIX + "kit.admin");
+
+    public static final Permission PROFILE =            register(COMMAND_PREFIX + "profile");
+    public static final Permission PROFILE_BYPASS =     register(COMMAND_PREFIX + "profile.bypass");
 
     public static final Permission BACK =               register(COMMAND_PREFIX + "back");
 

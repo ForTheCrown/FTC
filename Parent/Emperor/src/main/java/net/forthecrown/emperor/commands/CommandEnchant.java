@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -13,7 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
-public class CommandEnchant extends CrownCommandBuilder {
+public class CommandEnchant extends FtcCommand {
     public CommandEnchant(){
         super("enchant", CrownCore.inst());
 
@@ -32,7 +32,7 @@ public class CommandEnchant extends CrownCommandBuilder {
                                     int level = c.getArgument("level", Integer.class);
 
                                     ItemStack inHand = user.getPlayer().getInventory().getItemInMainHand();
-                                    if(inHand == null || inHand.getType() == Material.AIR) throw FtcExceptionProvider.create("You must be holding an item");
+                                    if(inHand == null || inHand.getType() == Material.AIR) throw FtcExceptionProvider.mustHoldItem();
 
                                     inHand.addUnsafeEnchantment(ench, level);
                                     c.getSource().sendAdmin(Component.text("Enchanted item in main hand"));

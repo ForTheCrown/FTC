@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.serialization.AbstractJsonSerializer;
+import net.forthecrown.emperor.serializer.AbstractJsonSerializer;
 import net.forthecrown.emperor.useables.warps.FtcWarp;
 import net.forthecrown.emperor.useables.warps.Warp;
 import net.forthecrown.emperor.utils.ChatUtils;

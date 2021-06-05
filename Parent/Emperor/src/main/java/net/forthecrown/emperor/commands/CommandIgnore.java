@@ -1,7 +1,7 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.user.CrownUser;
@@ -10,7 +10,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandIgnore extends CrownCommandBuilder {
+public class CommandIgnore extends FtcCommand {
     public CommandIgnore(){
         super("ignore", CrownCore.inst());
 
@@ -28,7 +28,7 @@ public class CommandIgnore extends CrownCommandBuilder {
                             CrownUser user = getUserSender(c);
                             CrownUser target = UserType.getUser(c, "user");
 
-                            if(target.equals(user)) throw FtcExceptionProvider.create("You cannot ignore yourself");
+                            if(target.equals(user)) throw FtcExceptionProvider.cannotIgnoreSelf();
 
                             UserInteractions userInt = user.getInteractions();
 
@@ -36,17 +36,15 @@ public class CommandIgnore extends CrownCommandBuilder {
 
                             if(alreadyIgnoring){
                                 user.sendMessage(
-                                        Component.text("No longer ignoring ")
+                                        Component.translatable("user.ignore.remove", target.nickDisplayName().color(NamedTextColor.GOLD))
                                                 .color(NamedTextColor.YELLOW)
-                                                .append(target.nickDisplayName().color(NamedTextColor.GOLD))
                                 );
 
                                 userInt.removeBlocked(target.getUniqueId());
                             } else {
                                 user.sendMessage(
-                                        Component.text("Ignoring ")
+                                        Component.translatable("user.ignore.add", target.nickDisplayName().color(NamedTextColor.YELLOW))
                                                 .color(NamedTextColor.GRAY)
-                                                .append(target.nickDisplayName().color(NamedTextColor.YELLOW))
                                 );
 
                                 userInt.addBlocked(target.getUniqueId());

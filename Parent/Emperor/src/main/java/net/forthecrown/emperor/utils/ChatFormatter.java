@@ -117,8 +117,17 @@ public class ChatFormatter {
     public static Component joinMessage(CrownUser user){
         return Component.translatable("multiplayer.player.joined", user.coloredNickDisplayName())
                 .hoverEvent(Component.text("Click to say hello!"))
-                .clickEvent(ClickEvent.runCommand("Hey " + user.getNickOrName() + '!'))
+                .clickEvent(ClickEvent.runCommand(hello() + user.getNickOrName() + '!'))
                 .color(NamedTextColor.YELLOW);
+    }
+
+    private static String hello(){
+        int c_int = CrownUtils.getRandomNumberInRange(0, 2);
+
+        if(c_int == 0) return "Hey ";
+        if(c_int == 1) return "Hello ";
+
+        return "Hi ";
     }
 
     public static Component newNameJoinMessage(CrownUser user1){
@@ -244,8 +253,8 @@ public class ChatFormatter {
 
     public static Component clickableLocationMessage(Location l, boolean includeWorld){
         return prettyLocationMessage(l, includeWorld)
-                .hoverEvent(Component.text("Click to teleport"))
-                .clickEvent(ClickEvent.runCommand("/tp " + l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ()));
+                .hoverEvent(Component.text("Click to teleport!"))
+                .clickEvent(ClickEvent.runCommand("/tp_exact " + l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ() + " " + l.getPitch() + " " + l.getYaw() + " " + l.getWorld().getName()));
     }
 
     public static Component itemMessage(ItemStack itemStack){
@@ -273,7 +282,8 @@ public class ChatFormatter {
                 .replaceAll(":blush:", "(▰˘◡˘▰)")
                 .replaceAll(":sad:", "(._. )")
                 .replaceAll(":pleased:", "(ᵔᴥᵔ)")
-                .replaceAll(":fedup:", "(¬_¬)");
+                .replaceAll(":fedup:", "(¬_¬)")
+                .replaceAll(":reallysad:", "◉︵◉");
     }
 
     public static String timeFromMillisMinusTime(long millis){

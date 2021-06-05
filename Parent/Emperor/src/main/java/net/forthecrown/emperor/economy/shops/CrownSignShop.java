@@ -2,7 +2,7 @@ package net.forthecrown.emperor.economy.shops;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.inventory.CrownItems;
-import net.forthecrown.emperor.serialization.AbstractSerializer;
+import net.forthecrown.emperor.serializer.AbstractSerializer;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;

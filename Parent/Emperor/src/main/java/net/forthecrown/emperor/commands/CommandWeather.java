@@ -1,7 +1,7 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
@@ -9,7 +9,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
 
-public class CommandWeather extends CrownCommandBuilder {
+public class CommandWeather extends FtcCommand {
     public CommandWeather(){
         super("weather", CrownCore.inst());
 

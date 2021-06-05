@@ -20,9 +20,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.function.BiFunction;
 
 public class ActionChangeScore implements UsageAction {
-    public static final Key ADD_KEY = Key.key(CrownCore.getNamespace(), "add_score");
-    public static final Key REMOVE_KEY = Key.key(CrownCore.getNamespace(), "remove_score");
-    public static final Key SET_KEY = Key.key(CrownCore.getNamespace(), "set_score");
+    public static final Key ADD_KEY = Key.key(CrownCore.inst(), "add_score");
+    public static final Key REMOVE_KEY = Key.key(CrownCore.inst(), "remove_score");
+    public static final Key SET_KEY = Key.key(CrownCore.inst(), "set_score");
 
     private final Action action;
     private Objective objective;

@@ -1,5 +1,6 @@
 package net.forthecrown.emperor.user;
 
+import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import io.papermc.paper.adventure.AdventureComponent;
 import me.neznamy.tab.api.EnumProperty;
 import me.neznamy.tab.api.TABAPI;
@@ -12,7 +13,7 @@ import net.forthecrown.emperor.admin.record.PunishmentRecord;
 import net.forthecrown.emperor.admin.record.PunishmentType;
 import net.forthecrown.emperor.datafixers.EssToFTC;
 import net.forthecrown.emperor.events.AfkListener;
-import net.forthecrown.emperor.serialization.AbstractSerializer;
+import net.forthecrown.emperor.serializer.AbstractSerializer;
 import net.forthecrown.emperor.user.data.SoldMaterialData;
 import net.forthecrown.emperor.user.data.UserTeleport;
 import net.forthecrown.emperor.user.enums.*;
@@ -126,10 +127,8 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
 
         if(fileDoesntExist) addDefaults();
         else reload();
-        if(shouldResetEarnings()) resetEarnings();
 
         net.forthecrown.emperor.user.UserManager.LOADED_USERS.put(base, this);
-        permsCheck();
 
         if(isOnline()) handle = getOnlineHandle().getHandle();
     }
@@ -197,7 +196,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
             }
         }
 
-        //updateName();
+        updateName();
 
         if(totalEarnings < 0) totalEarnings = 0;
 
@@ -232,7 +231,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         getFile().set("LastLocation", entityLocation);
         getFile().set("AllowsTPA", allowsTPA);
         getFile().set("EavesDropping", listeningToEavesdropper);
-        getFile().set("NickName", nickname == null ? null : ChatUtils.getString(nickname));
+        getFile().set("NickName", nickname == null ? null : ChatUtils.getPlainString(nickname));
         getFile().set("Flying", flying);
         getFile().set("GodMode", godmode);
         getFile().set("Vanished", vanished);
@@ -245,7 +244,6 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         getFile().set("TotalEarnings", getTotalEarnings());
 
         getFile().set("TimeStamps.NextResetTime", getNextResetTime());
-        getFile().set("TimeStamps.LastLoad", System.currentTimeMillis());
         if(!canSwapBranch) getFile().set("TimeStamps.NextBranchSwap", nextBranchSwapAllowed);
         else getFile().set("TimeStamps.NextBranchSwap", null);
 
@@ -710,18 +708,12 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         return dataContainer;
     }
 
-    //---------------------------
-    // The following methods are inherited from CommandSender
-    // Cuz CommandSender still had these methods, but no code for them
-    //---------------------------
-
     @Nonnull
     @Override
     public Spigot spigot() {
         checkOnline();
         return getOnlineHandle().spigot();
     }
-
 
     @Override
     public boolean isPermissionSet(@Nonnull String name) {
@@ -856,6 +848,8 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         interactions.clearOutgoing();
 
         if(lastTeleport != null) lastTeleport.interrupt(false);
+
+        getFile().set("TimeStamps.LastLoad", System.currentTimeMillis());
         unload();
     }
 
@@ -881,6 +875,11 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         if(!hasPermission(Permissions.CORE_ADMIN)) godmode = false;
         updateGodMode();
         updateAfk();
+
+        permsCheck();
+        if(shouldResetEarnings()) resetEarnings();
+
+        getFile().set("TimeStamps.LastLoad", System.currentTimeMillis());
 
         PunishmentManager manager = CrownCore.getPunishmentManager();
         PunishmentEntry entry = manager.getEntry(getUniqueId());
@@ -953,6 +952,9 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
     @Override
     public UserTeleport createTeleport(Supplier<Location> destination, boolean tell, boolean bypassCooldown, UserTeleport.Type type){
         checkOnline();
+
+        CraftPlayerProfile
+
         if(lastTeleport != null) lastTeleport.interrupt(tell);
         return lastTeleport = new UserTeleport(this, destination, bypassCooldown, type);
     }

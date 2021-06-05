@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -17,7 +17,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 
-public class CommandSign extends CrownCommandBuilder {
+public class CommandSign extends FtcCommand {
     public CommandSign(){
         super("sign", CrownCore.inst());
 
@@ -33,7 +33,7 @@ public class CommandSign extends CrownCommandBuilder {
                                 .suggests(suggestMatching("1", "2", "3", "4"))
 
                                 .then(CommandLore.compOrStringArg(
-                                        argument("set"),
+                                        literal("set"),
 
                                         (c, b) -> {
                                             try {
@@ -51,7 +51,7 @@ public class CommandSign extends CrownCommandBuilder {
                                         this::set
                                 ))
 
-                                .then(argument("clear")
+                                .then(literal("clear")
                                         .executes(c -> set(c, Component.empty()))
                                 )
                         )

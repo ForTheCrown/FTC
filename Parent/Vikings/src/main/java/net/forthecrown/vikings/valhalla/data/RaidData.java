@@ -1,6 +1,6 @@
 package net.forthecrown.vikings.valhalla.data;
 
-import net.forthecrown.emperor.serialization.JsonSerializable;
+import net.forthecrown.emperor.serializer.JsonSerializable;
 import net.forthecrown.vikings.valhalla.active.BattleBuilder;
 import net.forthecrown.vikings.valhalla.active.RaidParty;
 

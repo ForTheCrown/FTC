@@ -14,13 +14,15 @@ import net.forthecrown.emperor.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
-import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+
+import static net.forthecrown.royalgrenadier.GrenadierUtils.correctCursorReader;
 
 public class HomeType implements ArgumentType<HomeParseResult> {
     private static final HomeType HOME = new HomeType();
@@ -47,12 +49,12 @@ public class HomeType implements ArgumentType<HomeParseResult> {
             String homeName = reader.readUnquotedString();
 
             UUID id = CrownUtils.uuidFromName(name);
-            if(id == null) throw UserType.UNKNOWN_USER.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), name);
+            if(id == null) throw UserType.UNKNOWN_USER.createWithContext(correctCursorReader(reader, cursor), Component.text(name));
 
-            return new HomeParseResult(GrenadierUtils.correctCursorReader(reader, cursor), id, homeName);
+            return new HomeParseResult(correctCursorReader(reader, cursor), id, homeName);
         }
 
-        return new HomeParseResult(GrenadierUtils.correctCursorReader(reader, cursor), name);
+        return new HomeParseResult(correctCursorReader(reader, cursor), name);
     }
 
     @Override

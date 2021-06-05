@@ -43,6 +43,7 @@ public final class CrownUtils {
 
     public static final World WORLD = Objects.requireNonNull(Bukkit.getWorld("world"));
     public static final World WORLD_VOID = Objects.requireNonNull(Bukkit.getWorld("world_void"));
+    public static final World WORLD_END = Objects.requireNonNull(Bukkit.getWorld("world_the_end"));
 
     private CrownUtils() {}
 

@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -11,7 +11,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 
-public class CommandSetSpawn extends CrownCommandBuilder {
+public class CommandSetSpawn extends FtcCommand {
     public CommandSetSpawn(){
         super("setspawn", CrownCore.inst());
 
@@ -23,7 +23,7 @@ public class CommandSetSpawn extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("world")
+                .then(literal("world")
                         .executes(c -> setWorldSpawn(getPlayerSender(c).getLocation(), c.getSource()))
 
                         .then(argument("loc", PositionArgument.position())
@@ -34,7 +34,7 @@ public class CommandSetSpawn extends CrownCommandBuilder {
                         )
                 )
 
-                .then(argument("server")
+                .then(literal("server")
                         .executes(c -> setServerSpawn(getPlayerSender(c).getLocation(), c.getSource()))
 
                         .then(argument("loc", PositionArgument.position())

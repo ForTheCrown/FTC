@@ -5,11 +5,11 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.arguments.UserType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.economy.shops.ShopType;
@@ -29,7 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class CommandEditShop extends CrownCommandBuilder {
+public class CommandEditShop extends FtcCommand {
 
     public CommandEditShop(){
         super("editshop", CrownCore.inst());
@@ -80,7 +80,6 @@ public class CommandEditShop extends CrownCommandBuilder {
 
     private final Component usageMessage;
     private final int maxMoney;
-    private static final SimpleCommandExceptionType EXCEPTION = new SimpleCommandExceptionType(() -> ChatFormatter.translateHexCodes("&7You must be looking at a sign shop you own"));
 
     @Override
     protected void createCommand(BrigadierCommand command) {
@@ -90,10 +89,10 @@ public class CommandEditShop extends CrownCommandBuilder {
                     return 0;
                 })
 
-                .then(argument("buy").executes(c -> setType(c, false)))
-                .then(argument("sell").executes(c -> setType(c, true)))
+                .then(literal("buy").executes(c -> setType(c, false)))
+                .then(literal("sell").executes(c -> setType(c, true)))
 
-                .then(argument("price")
+                .then(literal("price")
                         .then(argument("price_actual", IntegerArgumentType.integer(0, maxMoney/2))
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
@@ -103,10 +102,7 @@ public class CommandEditShop extends CrownCommandBuilder {
                                     shop.setPrice(price);
 
                                     player.sendMessage(
-                                            Component.text("Shop price set to: ")
-                                                    .color(NamedTextColor.GRAY)
-                                                    .append(Balances.formatted(price))
-                                                    .append(Component.text("."))
+                                            Component.translatable("shops.edit.price", Balances.formatted(price)).color(NamedTextColor.GRAY)
                                     );
 
                                     updateShop(shop);
@@ -114,7 +110,7 @@ public class CommandEditShop extends CrownCommandBuilder {
                                 })
                         )
                 )
-                .then(argument("amount")
+                .then(literal("amount")
                         .then(argument("amount_actual", IntegerArgumentType.integer(1))
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
@@ -126,6 +122,7 @@ public class CommandEditShop extends CrownCommandBuilder {
                                     if(amount > exampleItem.getMaxStackSize()){
                                         StringReader reader = new StringReader(c.getInput());
                                         reader.setCursor(c.getInput().indexOf(amount + ""));
+
                                         throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.integerTooHigh().createWithContext(reader, amount, exampleItem.getMaxStackSize());
                                     }
 
@@ -133,7 +130,7 @@ public class CommandEditShop extends CrownCommandBuilder {
                                     shop.getInventory().setExampleItem(exampleItem);
 
                                     player.sendMessage(
-                                            Component.text("Shop item amount set to " + amount + ".")
+                                            Component.translatable("shops.edit.amount", Component.text(amount))
                                                     .color(NamedTextColor.GRAY)
                                     );
 
@@ -142,7 +139,7 @@ public class CommandEditShop extends CrownCommandBuilder {
                                 })
                         )
                 )
-                .then(argument("transfer")
+                .then(literal("transfer")
                         .then(argument("player_transfer", UserType.USER)
 
                                 .executes(c -> {
@@ -150,28 +147,19 @@ public class CommandEditShop extends CrownCommandBuilder {
                                     SignShop shop = getShop(user.getPlayer());
                                     CrownUser transferTo = UserType.getUser(c, "player_transfer");
 
-                                    if(user.equals(transferTo)) throw FtcExceptionProvider.create("Cannot transfer to yourself");
+                                    if(user.equals(transferTo) && !user.hasPermission(Permissions.SHOP_ADMIN)) throw FtcExceptionProvider.translatable("shops.edit.transferToSelf");
 
                                     shop.setOwner(transferTo.getUniqueId());
 
                                     user.sendMessage(
-                                            Component.text("Shop transferred to ")
-                                                    .color(NamedTextColor.GRAY)
-                                                    .append(transferTo.nickDisplayName().color(NamedTextColor.YELLOW))
+                                            Component.translatable("shops.edit.transferred", transferTo.nickDisplayName().color(NamedTextColor.YELLOW)).color(NamedTextColor.GRAY)
                                     );
 
                                     transferTo.sendMessage(
-                                            Component.text()
-                                                    .color(NamedTextColor.GRAY)
-                                                    .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
-                                                    .append(Component.text(" has transferred a shop to you"))
-                                                    .append(Component.newline())
-                                                    .append(Component.text("Located at: ")
-                                                            .append(ChatFormatter.prettyLocationMessage(shop.getLocation(), false)
-                                                                    .color(NamedTextColor.GOLD)
-                                                            )
-                                                    )
-                                                    .build()
+                                            Component.translatable("shops.edit.transferred.receiver",
+                                                    user.nickDisplayName().color(NamedTextColor.YELLOW),
+                                                    ChatFormatter.prettyLocationMessage(shop.getLocation(), false).color(NamedTextColor.GOLD)
+                                            ).color(NamedTextColor.GRAY)
                                     );
 
                                     updateShop(shop);
@@ -179,7 +167,7 @@ public class CommandEditShop extends CrownCommandBuilder {
                                 })
                         )
                 )
-                .then(argument("line")
+                .then(literal("line")
                         .then(argument("line_actual", IntegerArgumentType.integer(2, 3))
                                 .suggests(suggestMatching("2", "3"))
 
@@ -203,9 +191,7 @@ public class CommandEditShop extends CrownCommandBuilder {
                                             sign.update();
 
                                             user.sendMessage(
-                                                    Component.text("Line " + line + " set to: ")
-                                                            .color(NamedTextColor.GRAY)
-                                                            .append(empty ? Component.text("empty") : component.color(NamedTextColor.WHITE))
+                                                    Component.translatable("shops.edit.line", NamedTextColor.GRAY, Component.text(line), (empty ? Component.text("empty") : component))
                                             );
 
                                             updateShop(shop);
@@ -236,12 +222,7 @@ public class CommandEditShop extends CrownCommandBuilder {
         ShopType to = sell ? (type.isAdmin ? ShopType.ADMIN_SELL_SHOP : ShopType.SELL_SHOP) : (type.isAdmin ? ShopType.ADMIN_BUY_SHOP : ShopType.BUY_SHOP);
         shop.setType(to);
 
-        player.sendMessage(
-                Component.text("This shop is now a ")
-                        .color(NamedTextColor.GRAY)
-                        .append(to.inStockLabel())
-                        .append(Component.text(" shop."))
-        );
+        player.sendMessage(Component.translatable("shops.edit.type", to.inStockLabel()).color(NamedTextColor.GRAY));
 
         updateShop(shop);
         return 0;
@@ -249,10 +230,10 @@ public class CommandEditShop extends CrownCommandBuilder {
 
     private SignShop getShop(Player player) throws CommandSyntaxException {
         Block block = player.getTargetBlock(5);
-        if(block == null || !(block.getState() instanceof Sign)) throw EXCEPTION.create();
+        if(block == null || !(block.getState() instanceof Sign)) throw FtcExceptionProvider.translatable("commands.lookingAtShop");
 
         SignShop result = CrownCore.getShopManager().getShop(block.getLocation());
-        if(result == null || !result.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) throw EXCEPTION.create();
+        if(result == null || !result.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) throw FtcExceptionProvider.translatable("commands.lookingAtShop");
         return result;
     }
 

@@ -19,5 +19,5 @@ public interface Preconditionable {
         return ListUtils.convertToSet(getCheckTypes(), Key::asString);
     }
 
-    <T extends UsageCheck> T getCheck(Key key, Class<T> clazz);
+    <T extends UsageCheck> T getCheck(Key key, Class<T> clazz) throws ClassCastException;
 }

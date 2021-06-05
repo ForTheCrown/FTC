@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands.punishments;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.admin.MuteStatus;
@@ -17,7 +17,7 @@ import net.forthecrown.grenadier.types.TimeArgument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandMute extends CrownCommandBuilder implements TempPunisher {
+public class CommandMute extends FtcCommand implements TempPunisher {
     public CommandMute(){
         super("mute", CrownCore.inst());
 

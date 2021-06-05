@@ -3,6 +3,9 @@ package net.forthecrown.emperor.commands.emotes;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.utils.Cooldown;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 
@@ -35,8 +38,21 @@ public class EmoteJingle extends CommandEmote {
 
     @Override
     protected int execute(CrownUser sender, CrownUser recipient) {
-        sender.sendMessage("You've sent " + ChatColor.YELLOW + recipient.getName() + ChatColor.RESET + " a sick Christmas beat!");
-        recipient.sendMessage("You've received jingle vibes from " + ChatColor.YELLOW + sender.getName() + ChatColor.RESET + "!");
+        sender.sendMessage(
+                Component.text("You've sent ")
+                        .append(recipient.nickDisplayName().color(NamedTextColor.YELLOW))
+                        .append(Component.text(" a sick Christmas beat!"))
+        );
+
+        recipient.sendMessage(
+                Component.text("You've received jingle vibes from ")
+
+                        .clickEvent(ClickEvent.runCommand("/" + getName() + " " + sender.getName()))
+                        .hoverEvent(Component.text("Send them some jingles back! :D"))
+
+                        .append(sender.nickDisplayName().color(NamedTextColor.YELLOW))
+                        .append(Component.text("!"))
+        );
 
         jingle(recipient);
         return 0;

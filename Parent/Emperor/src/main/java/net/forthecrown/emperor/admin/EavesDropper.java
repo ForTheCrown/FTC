@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -18,7 +19,7 @@ import java.util.function.Predicate;
 
 public class EavesDropper {
     public static Component PREFIX = Component.text()
-            .color(NamedTextColor.GOLD)
+            .color(NamedTextColor.DARK_GRAY)
             .append(Component.text("["))
             .append(Component.text("EavesDrop").color(NamedTextColor.YELLOW))
             .append(Component.text("] "))
@@ -32,6 +33,7 @@ public class EavesDropper {
             if(!u.isEavesDropping() || !u.hasPermission(permission)) return;
             u.sendMessage(formatted);
         });
+        Bukkit.getConsoleSender().sendMessage(formatted);
     }
 
     public static Component format(Component initial){

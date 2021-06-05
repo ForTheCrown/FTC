@@ -17,7 +17,7 @@ import net.forthecrown.emperor.commands.arguments.PetType;
 import net.forthecrown.emperor.commands.arguments.UserParseResult;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.commands.manager.CoreCommands;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.datafixers.ShopTagUpdater;
 import net.forthecrown.emperor.datafixers.UserAndBalanceUpdater;
@@ -56,7 +56,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import java.io.IOException;
 import java.util.List;
 
-public class CommandFtcCore extends CrownCommandBuilder {
+public class CommandFtcCore extends FtcCommand {
 
     public CommandFtcCore(){
         super("ftccore", CrownCore.inst());
@@ -456,7 +456,7 @@ public class CommandFtcCore extends CrownCommandBuilder {
                                             return 0;
                                         })
 
-                                        .then(argument("set")
+                                        .then(literal("set")
                                                 .then(argument("rankToSet", CoreCommands.RANK)
                                                         .executes(c -> {
                                                             CrownUser user = getUser(c);
@@ -571,7 +571,7 @@ public class CommandFtcCore extends CrownCommandBuilder {
                 .then(literal("datafix")
                         .then(literal("shops")
                                 .executes(c -> {
-                                    CrownCommandBuilder.broadcastAdmin(c.getSource(), "Running DataFixer");
+                                    FtcCommand.broadcastAdmin(c.getSource(), "Running DataFixer");
                                     try {
                                         new ShopTagUpdater(CrownCore.inst()).begin().complete();
                                     } catch (IOException e){
@@ -584,7 +584,7 @@ public class CommandFtcCore extends CrownCommandBuilder {
                         )
                         .then(literal("users")
                                 .executes(c -> {
-                                    CrownCommandBuilder.broadcastAdmin(c.getSource(), "Running data fixer");
+                                    FtcCommand.broadcastAdmin(c.getSource(), "Running data fixer");
 
                                     try {
                                         new UserAndBalanceUpdater(CrownCore.inst()).begin().complete();
@@ -625,8 +625,8 @@ public class CommandFtcCore extends CrownCommandBuilder {
                         .then(weaponArg("cutlass", CrownItems.BASE_CUTLASS))
                         .then(weaponArg("viking_axe", CrownItems.BASE_VIKING_AXE))
 
-                        .then(argument("voteticket").executes(c -> giveTicket(false, getPlayerSender(c))))
-                        .then(argument("eliteticket").executes(c -> giveTicket(true, getPlayerSender(c))))
+                        .then(literal("voteticket").executes(c -> giveTicket(false, getPlayerSender(c))))
+                        .then(literal("eliteticket").executes(c -> giveTicket(true, getPlayerSender(c))))
                 );
     }
 

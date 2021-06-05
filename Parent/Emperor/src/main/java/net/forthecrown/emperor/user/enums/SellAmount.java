@@ -1,7 +1,7 @@
 package net.forthecrown.emperor.user.enums;
 
 import com.google.gson.JsonElement;
-import net.forthecrown.emperor.serialization.JsonSerializable;
+import net.forthecrown.emperor.serializer.JsonSerializable;
 import net.forthecrown.emperor.utils.JsonUtils;
 import net.forthecrown.emperor.economy.SellShop;
 import org.jetbrains.annotations.Nullable;

@@ -9,17 +9,19 @@ import net.forthecrown.emperor.admin.StaffChat;
 import net.forthecrown.emperor.admin.record.PunishmentRecord;
 import net.forthecrown.emperor.admin.record.PunishmentType;
 import net.forthecrown.emperor.commands.arguments.UserType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.emperor.utils.ChatUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.BanList;
+import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.permissions.Permission;
 
-public class CommandPunishment extends CrownCommandBuilder {
+public class CommandPunishment extends FtcCommand {
 
     private final Punisher punisher;
     public CommandPunishment(String name, Permission perm, Punisher punisher, String... aliases){
@@ -67,8 +69,8 @@ public class CommandPunishment extends CrownCommandBuilder {
 
                     if(user.isOnline()) user.getPlayer().kick(ChatFormatter.banMessage(record));
 
-                    /*BanList list = Bukkit.getBanList(BanList.Type.NAME);
-                    list.addBan(user.getName(), reason, null, source.textName());*/
+                    BanList list = Bukkit.getBanList(BanList.Type.NAME);
+                    list.addBan(user.getName(), reason, null, source.textName());
 
                     StaffChat.sendCommand(
                             source,
@@ -97,7 +99,7 @@ public class CommandPunishment extends CrownCommandBuilder {
                                     .append(reason != null ? Component.text(", reason: " + reason).color(NamedTextColor.GOLD) : Component.empty())
                     );
                     return 0;
-                }
+                }, "kick"
         );
     }
 }

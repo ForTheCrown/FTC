@@ -2,7 +2,7 @@ package net.forthecrown.emperor.registry;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.serialization.CrownSerializer;
+import net.forthecrown.emperor.serializer.CrownSerializer;
 import net.forthecrown.emperor.useables.kits.Kit;
 import net.forthecrown.grenadier.CommandSource;
 import org.bukkit.entity.Player;

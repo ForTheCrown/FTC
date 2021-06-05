@@ -1,11 +1,11 @@
 package net.forthecrown.emperor.commands.emotes;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
-public class EmoteToggle extends CrownCommandBuilder {
+public class EmoteToggle extends FtcCommand {
 
     public EmoteToggle(){
         super("toggleemotes", CrownCore.inst());
@@ -26,7 +26,6 @@ public class EmoteToggle extends CrownCommandBuilder {
      *  - jingle
      *  - scare
      *  - hug
-     *
      *
      * Valid usages of command:
      * - /toggleemotes

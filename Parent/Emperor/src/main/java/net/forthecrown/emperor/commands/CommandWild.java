@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.utils.Cooldown;
 import net.forthecrown.emperor.utils.CrownRandom;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -24,7 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
 
-public class CommandWild extends CrownCommandBuilder {
+public class CommandWild extends FtcCommand {
 
     public CommandWild(){
         super("wild", CrownCore.inst());

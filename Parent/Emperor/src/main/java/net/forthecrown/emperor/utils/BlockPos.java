@@ -1,11 +1,12 @@
-package net.forthecrown.vikings;
+package net.forthecrown.emperor.utils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.sk89q.worldedit.math.BlockVector3;
-import net.forthecrown.emperor.serialization.JsonSerializable;
+import net.forthecrown.emperor.serializer.JsonSerializable;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -13,15 +14,22 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 public class BlockPos implements JsonSerializable {
-    private int x;
-    private int y;
-    private int z;
+    public int x;
+    public int y;
+    public int z;
 
     public BlockPos(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
+
+    public BlockPos(int x, int z) {
+        this.x = x;
+        this.z = z;
+    }
+
+    public BlockPos() {}
 
     public static BlockPos of(Block block){
         return new BlockPos(block.getX(), block.getY(), block.getZ());
@@ -82,7 +90,15 @@ public class BlockPos implements JsonSerializable {
         final int y = face.getModY() * amount;
         final int z = face.getModZ() * amount;
 
-        return new BlockPos(x, y, z);
+        return new BlockPos(x + this.x, y + this.y, z + this.z);
+    }
+
+    public Block getBlock(World world){
+        return world.getBlockAt(x, y, z);
+    }
+
+    public Material getMaterial(World world){
+        return getBlock(world).getType();
     }
 
     public Location toLoc(World world){

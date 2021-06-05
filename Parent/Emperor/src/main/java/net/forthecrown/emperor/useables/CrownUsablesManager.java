@@ -2,7 +2,7 @@ package net.forthecrown.emperor.useables;
 
 import net.forthecrown.emperor.registry.ActionRegistry;
 import net.forthecrown.emperor.registry.CheckRegistry;
-import net.forthecrown.emperor.serialization.AbstractJsonSerializer;
+import net.forthecrown.emperor.serializer.AbstractJsonSerializer;
 import net.forthecrown.emperor.useables.actions.*;
 import net.forthecrown.emperor.useables.preconditions.*;
 import org.bukkit.Location;

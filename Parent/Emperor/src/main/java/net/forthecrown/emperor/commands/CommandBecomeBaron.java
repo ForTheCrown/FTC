@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.user.CrownUser;
@@ -14,7 +14,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandBecomeBaron extends CrownCommandBuilder {
+public class CommandBecomeBaron extends FtcCommand {
     public CommandBecomeBaron() {
         super("becomebaron", CrownCore.inst());
 
@@ -70,7 +70,7 @@ public class CommandBecomeBaron extends CrownCommandBuilder {
                     p.sendMessage(message);
                     return 0;
                 })
-                .then(argument("confirm")
+                .then(literal("confirm")
                         .executes(c -> {
                             CrownUser p = getUserSender(c);
                             int baronPrice = CrownCore.getBaronPrice();

@@ -1,7 +1,6 @@
 package net.forthecrown.emperor.commands.manager;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import net.forthecrown.emperor.Announcer;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.clickevent.ClickEventCommand;
 import net.forthecrown.emperor.commands.*;
@@ -29,7 +28,7 @@ import java.util.logging.Level;
 
 public final class CoreCommands {
 
-    public static final Map<String, CrownCommandBuilder> BY_NAME = new HashMap<>();
+    public static final Map<String, FtcCommand> BY_NAME = new HashMap<>();
     public static final EnumArgument<Branch> BRANCH = EnumArgument.of(Branch.class);
     public static final EnumArgument<Rank> RANK = EnumArgument.of(Rank.class);
 
@@ -70,6 +69,7 @@ public final class CoreCommands {
         new CommandInteractable();
         new CommandSudo();
         new CommandSetSpawn();
+        new CommandTeleportExact();
 
         //Admin utility
         new CommandSpeed();
@@ -163,7 +163,7 @@ public final class CoreCommands {
         new CommandKitList();
 
         //message commands
-        new CommandMessage();
+        new CommandTell();
         new CommandReply();
 
         //Click event command
@@ -190,7 +190,7 @@ public final class CoreCommands {
 
         new HelpHelp();
 
-        Announcer.log(Level.INFO, "All commands loaded and registered");
+        CrownCore.logger().log(Level.INFO, "All commands loaded and registered");
     }
 
     /**

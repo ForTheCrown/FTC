@@ -3,7 +3,7 @@ package net.forthecrown.emperor.admin.record;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.emperor.serialization.JsonSerializable;
+import net.forthecrown.emperor.serializer.JsonSerializable;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.emperor.utils.JsonUtils;

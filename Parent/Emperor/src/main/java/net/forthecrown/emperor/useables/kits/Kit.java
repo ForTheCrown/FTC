@@ -2,8 +2,8 @@ package net.forthecrown.emperor.useables.kits;
 
 import net.forthecrown.emperor.utils.Nameable;
 import net.forthecrown.emperor.utils.SilentPredicate;
-import net.forthecrown.emperor.serialization.Deleteable;
-import net.forthecrown.emperor.serialization.JsonSerializable;
+import net.forthecrown.emperor.serializer.Deleteable;
+import net.forthecrown.emperor.serializer.JsonSerializable;
 import net.forthecrown.emperor.useables.Preconditionable;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;

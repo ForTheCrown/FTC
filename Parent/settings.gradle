@@ -4,7 +4,5 @@ include 'FTC-Royals'
 include 'FTC-Vikings'
 include 'FTC-Pirates'
 include 'FTC-Cosmetics'
-include 'NBT'
-include 'CrownNBT'
 include 'Repopulation'
 

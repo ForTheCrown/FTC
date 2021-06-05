@@ -5,7 +5,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -37,7 +36,11 @@ public class EmoteBonk extends CommandEmote {
         Location loc = recipient.getPlayer().getLocation();
         loc.setPitch(loc.getPitch() + 20F);
 
-        sender.sendMessage("You bonked " + ChatColor.YELLOW + recipient.getName() + ChatColor.RESET + "!");
+        sender.sendMessage(
+                Component.text("You bonked")
+                        .append(recipient.nickDisplayName().color(NamedTextColor.YELLOW))
+                        .append(Component.text("!"))
+        );
 
         recipient.sendMessage(Component.text()
                 .append(sender.nickDisplayName().color(NamedTextColor.YELLOW))

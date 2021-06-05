@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.arguments.KitType;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.useables.kits.Kit;
@@ -12,7 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-public class CommandKit extends CrownCommandBuilder {
+public class CommandKit extends FtcCommand {
 
     public CommandKit(){
         super("kit", CrownCore.inst());
@@ -33,9 +33,8 @@ public class CommandKit extends CrownCommandBuilder {
 
                             if(kit.attemptItemGiving(player)){
                                 player.sendMessage(
-                                        Component.text("Received kit ")
+                                        Component.translatable("kits.got", kit.displayName().color(NamedTextColor.GOLD))
                                                 .color(NamedTextColor.GRAY)
-                                                .append(kit.displayName().color(NamedTextColor.GOLD))
                                 );
                             }
                             return 0;

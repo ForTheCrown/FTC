@@ -2,6 +2,9 @@ package net.forthecrown.emperor.commands.emotes;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.user.CrownUser;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -18,8 +21,22 @@ public class EmoteScare extends CommandEmote {
 
     @Override
     protected int execute(CrownUser sender, CrownUser recipient) {
-        sender.sendMessage("You scared " + ChatColor.YELLOW + recipient.getName() + ChatColor.RESET + "!");
-        recipient.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.RESET + " scared you!");
+        sender.sendMessage(
+                Component.text("You scared ")
+                        .append(recipient.nickDisplayName().color(NamedTextColor.YELLOW))
+                        .append(Component.text("!"))
+        );
+
+        recipient.sendMessage(
+                Component.text()
+                        .append(sender.nickDisplayName().color(NamedTextColor.YELLOW))
+                        .append(Component.text(" scared you!"))
+
+                        .clickEvent(ClickEvent.runCommand("/scare " + sender.getName()))
+                        .hoverEvent(Component.text("Scare them back! :D"))
+
+                        .build()
+        );
 
         scare(recipient.getPlayer());
         return 0;

@@ -1,8 +1,8 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
 import net.forthecrown.emperor.commands.arguments.BaltopType;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.economy.BalanceMap;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -15,7 +15,7 @@ import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nonnegative;
 
-public class CommandBalanceTop extends CrownCommandBuilder {
+public class CommandBalanceTop extends FtcCommand {
     public CommandBalanceTop() {
         super("balancetop", CrownCore.inst());
 
@@ -41,21 +41,14 @@ public class CommandBalanceTop extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .executes(c -> { //No args -> show first page
-                    sendBaltopMessage(c.getSource().asBukkit(), 0);
-                    return 0;
-                })
+                .executes(c -> sendBaltopMessage(c.getSource().asBukkit(), 0))
                 .then(argument("page", BaltopType.BALTOP)
-                        .executes(c -> { //Page number given -> show that page
-                            Integer soup = c.getArgument("page", Integer.class); //Delicious soup
-                            sendBaltopMessage(c.getSource().asBukkit(), soup);
-                            return 0;
-                        })
+                        .executes(c -> sendBaltopMessage(c.getSource().asBukkit(), c.getArgument("page", Integer.class)))
                 );
     }
 
     //Send the message
-    private void sendBaltopMessage(CommandSender sender, @Nonnegative int page){
+    private int sendBaltopMessage(CommandSender sender, @Nonnegative int page){
         BalanceMap balMap = CrownCore.getBalances().getMap();
 
         final TextComponent border = Component.text(" --------- ").style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
@@ -72,7 +65,8 @@ public class CommandBalanceTop extends CrownCommandBuilder {
             Component entryText = balMap.getPrettyDisplay(index);
             if(entryText == null) continue;
 
-            text.append(Component.text((index+1) + ") ").color(NamedTextColor.GOLD))
+            text
+                    .append(Component.text((index+1) + ") ").color(NamedTextColor.GOLD))
                     .append(entryText)
                     .append(Component.newline());
         }
@@ -101,8 +95,7 @@ public class CommandBalanceTop extends CrownCommandBuilder {
                 .append(footerMessage)
                 .append(border);
 
-        // ngl, now that this is just sending one message that's appended together, there's no weird 1 frame thing where
-        // the text gets sent line by line lol. It just comes out as one :D
         sender.sendMessage(text.build());
+        return 0;
     }
 }

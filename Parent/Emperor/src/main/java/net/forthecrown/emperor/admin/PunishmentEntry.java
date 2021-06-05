@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
-import net.forthecrown.emperor.serialization.JsonSerializable;
+import net.forthecrown.emperor.serializer.JsonSerializable;
 import net.forthecrown.emperor.admin.record.PunishmentRecord;
 import net.forthecrown.emperor.admin.record.PunishmentType;
 import net.forthecrown.emperor.utils.JsonUtils;

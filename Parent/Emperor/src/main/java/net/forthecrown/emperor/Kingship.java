@@ -1,6 +1,6 @@
 package net.forthecrown.emperor;
 
-import net.forthecrown.emperor.serialization.CrownSerializer;
+import net.forthecrown.emperor.serializer.CrownSerializer;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.utils.ChatUtils;
 import net.forthecrown.emperor.utils.Nameable;

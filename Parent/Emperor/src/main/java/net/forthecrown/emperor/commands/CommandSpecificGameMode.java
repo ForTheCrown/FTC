@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.arguments.UserType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.enums.CrownGameMode;
 import net.forthecrown.grenadier.CommandSource;
@@ -14,7 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 
-public class CommandSpecificGameMode extends CrownCommandBuilder {
+public class CommandSpecificGameMode extends FtcCommand {
     private final CrownGameMode gameMode;
     public CommandSpecificGameMode(@NotNull String name, Permission permission, CrownGameMode mode, String... aliases) {
         super(name, CrownCore.inst());

@@ -1,13 +1,13 @@
 package net.forthecrown.pirates.commands;
 
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-public class CommandGhShowName extends CrownCommandBuilder {
+public class CommandGhShowName extends FtcCommand {
 
     public CommandGhShowName() {
         super("GHTargetShowName", Pirates.inst);

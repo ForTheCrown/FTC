@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands.punishments;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.admin.StaffChat;
 import net.forthecrown.emperor.utils.ChatUtils;
 import net.forthecrown.grenadier.CommandSource;
@@ -14,7 +14,7 @@ import org.bukkit.Bukkit;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CommandKickAll extends CrownCommandBuilder {
+public class CommandKickAll extends FtcCommand {
     public CommandKickAll(){
         super("kickall", CrownCore.inst());
 

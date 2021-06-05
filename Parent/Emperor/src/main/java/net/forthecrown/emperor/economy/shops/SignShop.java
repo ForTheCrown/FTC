@@ -2,7 +2,7 @@ package net.forthecrown.emperor.economy.shops;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.utils.Nameable;
-import net.forthecrown.emperor.serialization.CrownSerializer;
+import net.forthecrown.emperor.serializer.CrownSerializer;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;

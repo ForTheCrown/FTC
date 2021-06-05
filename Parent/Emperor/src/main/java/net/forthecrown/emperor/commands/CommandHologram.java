@@ -3,7 +3,7 @@ package net.forthecrown.emperor.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -20,7 +20,7 @@ import org.bukkit.persistence.PersistentDataType;
 import javax.annotation.Nullable;
 import java.util.Collection;
 
-public class CommandHologram extends CrownCommandBuilder {
+public class CommandHologram extends FtcCommand {
 
     public CommandHologram(){
         super("hologram", CrownCore.inst());
@@ -49,7 +49,7 @@ public class CommandHologram extends CrownCommandBuilder {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("remove")
+                .then(literal("remove")
                         .then(argument("holograms", EntityArgument.multipleEntities())
                                 .executes(c -> {
                                     Collection<Entity> entities = EntityArgument.getEntities(c, "holograms");
@@ -62,13 +62,13 @@ public class CommandHologram extends CrownCommandBuilder {
                                         removed++;
                                     }
 
-                                    CrownCommandBuilder.broadcastAdmin(c.getSource(), "Removed " + removed + " holograms");
+                                    FtcCommand.broadcastAdmin(c.getSource(), "Removed " + removed + " holograms");
                                     return removed;
                                 })
                         )
                 )
 
-                .then(argument("create")
+                .then(literal("create")
                         .then(argument("text", StringArgumentType.greedyString())
                                 .executes(c -> {
                                     Player p = getPlayerSender(c);
@@ -109,8 +109,8 @@ public class CommandHologram extends CrownCommandBuilder {
         }
 
         if(source != null){
-            CrownCommandBuilder.broadcastAdmin(source, "Created hologram(s) named:");
-            CrownCommandBuilder.broadcastAdmin(source, input.replaceAll("\\{NL}", "\n"));
+            FtcCommand.broadcastAdmin(source, "Created hologram(s) named:");
+            FtcCommand.broadcastAdmin(source, input.replaceAll("\\{NL}", "\n"));
         }
     }
 }

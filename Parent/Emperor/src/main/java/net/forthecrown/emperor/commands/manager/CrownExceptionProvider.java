@@ -5,8 +5,16 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.kyori.adventure.text.Component;
 
+/**
+ * Class for storing exception constants
+ */
 public class CrownExceptionProvider {
     static final DynamicCommandExceptionType GENERIC =                  new DynamicCommandExceptionType(o -> new LiteralMessage(o.toString()));
+
+    static final UserCommandExceptionType CANNOT_MUTE =                 new UserCommandExceptionType(u -> Component.text("Cannot mute ").append(u.displayName()));
+    static final UserCommandExceptionType CANNOT_BAN =                  new UserCommandExceptionType(u -> Component.text("Cannot ban ").append(u.displayName()));
+    static final UserCommandExceptionType CANNOT_KICK =                 new UserCommandExceptionType(u -> Component.text("Cannot kick ").append(u.displayName()));
+    static final UserCommandExceptionType CANNOT_JAIL =                 new UserCommandExceptionType(u -> Component.text("Cannot jail ").append(u.displayName()));
 
     static final TranslatableExceptionType NO_REPLY_TARGETS =           new TranslatableExceptionType("commands.noReply");
 
@@ -31,11 +39,6 @@ public class CrownExceptionProvider {
     static final TranslatableExceptionType NO_TP_OUTGOING =             new TranslatableExceptionType("commands.noTpOutgoing");
     static final TranslatableExceptionType ALREADY_SENT =               new TranslatableExceptionType("commands.tpaAlreadySent");
 
-    static final UserCommandExceptionType CANNOT_MUTE =                 new UserCommandExceptionType(u -> Component.text("Cannot mute ").append(u.displayName()));
-    static final UserCommandExceptionType CANNOT_BAN =                  new UserCommandExceptionType(u -> Component.text("Cannot ban ").append(u.displayName()));
-    static final UserCommandExceptionType CANNOT_KICK =                 new UserCommandExceptionType(u -> Component.text("Cannot kick ").append(u.displayName()));
-    static final UserCommandExceptionType CANNOT_JAIL =                 new UserCommandExceptionType(u -> Component.text("Cannot jail ").append(u.displayName()));
-
     static final TranslatableExceptionType NICK_TOO_LONG =              new TranslatableExceptionType("commands.nickTooLong");
 
     static final TranslatableExceptionType MUST_BE_HOLDING_ITEM =       new TranslatableExceptionType("commands.mustHoldItem");
@@ -44,7 +47,15 @@ public class CrownExceptionProvider {
     static final TranslatableExceptionType ALREADY_BARON =              new TranslatableExceptionType("commands.alreadyBaron");
     static final TranslatableExceptionType HOLDING_COINS =              new TranslatableExceptionType("commands.holdCoins");
 
-    static final TranslatableExceptionType BLOCKED_PLAYER =             new TranslatableExceptionType("user.blocked");
     static final TranslatableExceptionType INV_FULL =                   new TranslatableExceptionType("commands.invFull");
+    static final TranslatableExceptionType NO_ONE_NEARBY =              new TranslatableExceptionType("commands.noOneNearby");
+
+    static final TranslatableExceptionType BLOCKED_PLAYER =             new TranslatableExceptionType("user.blocked");
+    static final TranslatableExceptionType EMPTY_GRAVE =                new TranslatableExceptionType("user.grave.empty");
+    static final TranslatableExceptionType IGNORE_SELF_NO =             new TranslatableExceptionType("user.cannotIgnoreSelf");
+
+    static final TranslatableExceptionType NO_HOMES =                   new TranslatableExceptionType("homes.noneToList");
     static final TranslatableExceptionType NO_DEF_HOME =                new TranslatableExceptionType("homes.noDefaultHome");
+    static final TranslatableExceptionType HOME_NAME_IN_USE =           new TranslatableExceptionType("homes.nameInUse");
+    static final TranslatableExceptionType OVER_HOME_LIMIT =            new TranslatableExceptionType("homes.overLimit");
 }

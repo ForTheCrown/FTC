@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.CrownException;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.user.CrownUser;
@@ -40,7 +40,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class CommandAuction extends CrownCommandBuilder {
+public class CommandAuction extends FtcCommand {
 
     public CommandAuction(){
         super("auction", Pirates.inst);

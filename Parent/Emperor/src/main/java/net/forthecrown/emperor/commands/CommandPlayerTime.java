@@ -1,10 +1,10 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
-public class CommandPlayerTime extends CrownCommandBuilder {
+public class CommandPlayerTime extends FtcCommand {
     public CommandPlayerTime(){
         super("playertime", CrownCore.inst());
 

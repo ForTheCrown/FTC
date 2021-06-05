@@ -5,7 +5,7 @@ import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.admin.jails.JailManager;
 import net.forthecrown.emperor.admin.record.PunishmentRecord;
 import net.forthecrown.emperor.admin.record.PunishmentType;
-import net.forthecrown.emperor.serialization.CrownSerializer;
+import net.forthecrown.emperor.serializer.CrownSerializer;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import org.bukkit.command.CommandSender;

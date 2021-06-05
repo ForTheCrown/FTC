@@ -2,7 +2,7 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.commands.arguments.UserType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -14,7 +14,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.concurrent.CompletableFuture;
 
-public class CommandSkull extends CrownCommandBuilder {
+public class CommandSkull extends FtcCommand {
     public CommandSkull(){
         super("skull", CrownCore.inst());
 

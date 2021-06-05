@@ -2,13 +2,13 @@ package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.data.UserTeleport;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
-public class CommandBack extends CrownCommandBuilder {
+public class CommandBack extends FtcCommand {
     public CommandBack(){
         super("back", CrownCore.inst());
 

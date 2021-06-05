@@ -7,9 +7,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.pirates.auctions.Auction;
 import net.forthecrown.pirates.auctions.AuctionManager;
+import net.forthecrown.royalgrenadier.GrenadierUtils;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -25,20 +26,17 @@ public class AuctionArgument implements ArgumentType<Auction> {
 
     @Override
     public Auction parse(StringReader reader) throws CommandSyntaxException {
-        int cusror = reader.getCursor();
+        int cursor = reader.getCursor();
         String name = reader.readUnquotedString();
 
         Auction auction = AuctionManager.getAuction(name);
-        if(auction == null){
-            reader.setCursor(cusror);
-            throw UNKNOWN_AUCTION.createWithContext(reader, name);
-        }
+        if(auction == null) throw UNKNOWN_AUCTION.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), name);
 
         return auction;
     }
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(builder, AuctionManager.getAuctionNames());
+        return CompletionProvider.suggestMatching(builder, AuctionManager.getAuctionNames());
     }
 }

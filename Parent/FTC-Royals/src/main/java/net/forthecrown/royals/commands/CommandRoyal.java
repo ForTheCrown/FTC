@@ -3,7 +3,7 @@ package net.forthecrown.royals.commands;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.grenadier.CommandSource;
@@ -28,7 +28,7 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandRoyal extends CrownCommandBuilder {
+public class CommandRoyal extends FtcCommand {
 
     public CommandRoyal(){
         super("royals", Royals.inst);

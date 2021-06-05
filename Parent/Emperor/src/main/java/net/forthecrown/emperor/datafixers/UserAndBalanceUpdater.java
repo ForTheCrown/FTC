@@ -49,6 +49,7 @@ public class UserAndBalanceUpdater implements DataFixer<UUID> {
             File f = new File(userDir.getPath() + File.separator + player.getUniqueId() + ".yml");
             boolean fileExists = f.exists();
 
+            //This specific fucking UUID man
             if(!f.getName().contains("1d0e75b1-1930-373a-9b77-ae89ac735ec1")){
                 if(!inBalances && !fileExists) continue;
                 if(inBalances && fileExists) continue;

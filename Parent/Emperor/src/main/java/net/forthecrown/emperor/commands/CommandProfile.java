@@ -1,10 +1,11 @@
 package net.forthecrown.emperor.commands;
 
 import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.admin.PunishmentEntry;
 import net.forthecrown.emperor.admin.PunishmentManager;
 import net.forthecrown.emperor.commands.arguments.UserType;
-import net.forthecrown.emperor.commands.manager.CrownCommandBuilder;
+import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.FtcUser;
 import net.forthecrown.emperor.user.enums.Branch;
@@ -20,7 +21,7 @@ import org.bukkit.Statistic;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
-public class CommandProfile extends CrownCommandBuilder {
+public class CommandProfile extends FtcCommand {
 
     public CommandProfile(){
         super("profile", CrownCore.inst());
@@ -30,6 +31,7 @@ public class CommandProfile extends CrownCommandBuilder {
 
         setAliases("playerprofile", "gameprofile");
         setDescription("Displays a user's profile information");
+        setPermission(Permissions.PROFILE);
 
         register();
     }
@@ -71,7 +73,7 @@ public class CommandProfile extends CrownCommandBuilder {
 
         //If the profile isn't public and you don't have bypass permissions
         if(!self && !profile.isProfilePublic()){
-            if(!user.hasPermission(getPermission() + ".bypass")){
+            if(!user.hasPermission(Permissions.PROFILE_BYPASS)){
                 user.sendMessage(profile.getName() + " profile is not public");
                 return;
             }
@@ -102,7 +104,7 @@ public class CommandProfile extends CrownCommandBuilder {
                 .append(line("Branch", profile.getBranch().getName(), profile.getBranch() != Branch.DEFAULT))
                 .append(line("Rank", profile.getRank().prefix(), profile.getRank() != Rank.DEFAULT))
 
-                .append(line("Allowed to swap branches in", timeThing(profile), !profile.getCanSwapBranch() && (self || user.hasPermission(getPermission() + ".bypass"))))
+                .append(line("Allowed to swap branches in", timeThing(profile), !profile.getCanSwapBranch() && (self || user.hasPermission(Permissions.PROFILE_BYPASS))))
                 .append(line("Play time", ChatFormatter.decimalizeNumber(playTime) + " hours", playTime > 0))
 
                 .append(line("Pirate Points", score.getScore() + "", score.isScoreSet() && score.getScore() != 0))
@@ -142,7 +144,7 @@ public class CommandProfile extends CrownCommandBuilder {
     }
 
     private Component adminInfo(CrownUser sender, CrownUser profile1){
-        if(!sender.hasPermission(getPerm() + ".bypass")) return Component.empty();
+        if(!sender.hasPermission(Permissions.PROFILE_BYPASS)) return Component.empty();
         FtcUser profile = (FtcUser) profile1;
 
         PunishmentManager list = CrownCore.getPunishmentManager();
