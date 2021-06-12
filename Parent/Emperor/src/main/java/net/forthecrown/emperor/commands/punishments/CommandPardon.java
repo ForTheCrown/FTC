@@ -8,6 +8,7 @@ import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.admin.PunishmentEntry;
 import net.forthecrown.emperor.admin.PunishmentManager;
 import net.forthecrown.emperor.admin.StaffChat;
+import net.forthecrown.emperor.admin.jails.JailManager;
 import net.forthecrown.emperor.admin.record.PunishmentType;
 import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
@@ -90,10 +91,12 @@ public class CommandPardon extends FtcCommand {
                                 .executes(c -> {
                                     CrownUser user = user(c);
                                     PunishmentManager manager = CrownCore.getPunishmentManager();
+                                    JailManager jails = manager.getJailManager();
 
                                     if(!manager.checkJailed(user.getPlayer())) throw FtcExceptionProvider.create(user.getName() + " is not jailed");
 
                                     manager.pardon(user.getUniqueId(), PunishmentType.JAIL);
+                                    if(user.isOnline()) jails.getJailListener(user.getPlayer()).release();
 
                                     StaffChat.sendCommand(
                                             c.getSource(),

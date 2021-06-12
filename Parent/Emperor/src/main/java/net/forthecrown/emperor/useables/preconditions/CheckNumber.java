@@ -18,8 +18,8 @@ import org.bukkit.entity.Player;
 import java.util.function.Consumer;
 
 public class CheckNumber implements UsageCheck {
-    public static final Key BAL_KEY = Key.key(CrownCore.getNamespace(), "required_balance");
-    public static final Key GEM_KEY = Key.key(CrownCore.getNamespace(), "required_gems");
+    public static final Key BAL_KEY = Key.key(CrownCore.inst(), "required_balance");
+    public static final Key GEM_KEY = Key.key(CrownCore.inst(), "required_gems");
 
     private final boolean checkBal;
     private int amount;
@@ -55,7 +55,7 @@ public class CheckNumber implements UsageCheck {
     }
 
     @Override
-    public Component getFailMessage() {
+    public Component failMessage() {
         return Component.text("You need at least ")
                 .color(NamedTextColor.GRAY)
                 .append((checkBal ? Balances.formatted(amount) : Component.text(amount + " Gem" + (amount == 1 ? "" : "s"))).color(NamedTextColor.GOLD))

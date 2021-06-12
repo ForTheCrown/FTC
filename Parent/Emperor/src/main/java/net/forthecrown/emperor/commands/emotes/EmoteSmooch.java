@@ -1,7 +1,6 @@
 package net.forthecrown.emperor.commands.emotes;
 
 import net.forthecrown.emperor.user.CrownUser;
-import net.forthecrown.emperor.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -26,21 +25,30 @@ public class EmoteSmooch extends CommandEmote {
 
     @Override
     protected int execute(CrownUser sender, CrownUser recipient) {
-        Location loc = recipient.getLocation();
+        Location loc = sender.getLocation();
 
         sender.sendMessage(
                 Component.text()
                         .append(Component.text("❤").color(NamedTextColor.RED))
-                        .append(Component.text("You smooched "))
+                        .append(Component.text(" You smooched "))
                         .append(recipient.nickDisplayName().color(NamedTextColor.YELLOW))
                         .append(Component.text(" "))
                         .append(Component.text("❤").color(NamedTextColor.RED))
                         .build()
         );
 
-        TextComponent text = ChatUtils.convertString("&c❤ &e" + sender.getNickOrName() + " &rsmooched you! &r( ^ 3^) &c❤")
+        TextComponent text = Component.text()
+                .append(Component.text("❤").color(NamedTextColor.RED))
+                .append(Component.space())
+                .append(sender.nickDisplayName().color(NamedTextColor.YELLOW))
+                .append(Component.text(" smooched you!"))
+                .append(Component.space())
+                .append(Component.text("❤").color(NamedTextColor.RED))
+
                 .clickEvent(ClickEvent.runCommand("/mwah " + sender.getName()))
-                .hoverEvent(HoverEvent.showText(Component.text("Click to smooch them back")));
+                .hoverEvent(HoverEvent.showText(Component.text("Click to smooch them back")))
+
+                .build();
 
         recipient.sendMessage(text);
 

@@ -59,7 +59,7 @@ public class CommandAuction extends FtcCommand {
         Balances bals = CrownCore.getBalances();
 
         command
-                .then(argument("save")
+                .then(literal("save")
                         .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c -> {
@@ -68,7 +68,7 @@ public class CommandAuction extends FtcCommand {
                             return 0;
                         })
                 )
-                .then(argument("reload")
+                .then(literal("reload")
                         .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c -> {
@@ -78,7 +78,7 @@ public class CommandAuction extends FtcCommand {
                         })
                 )
 
-                .then(argument("create")
+                .then(literal("create")
                         .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .then(argument("name", StringArgumentType.word())
@@ -104,7 +104,7 @@ public class CommandAuction extends FtcCommand {
         .then(argument(AUCTION_ARG, AuctionArgument.auction())
                 .suggests(suggestMatching(AuctionManager.getAuctionNames()))
 
-                .then(argument("expire")
+                .then(literal("expire")
                         .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c -> {
@@ -121,7 +121,7 @@ public class CommandAuction extends FtcCommand {
                         })
                 )
 
-                .then(argument("force_free_for_all")
+                .then(literal("force_free_for_all")
                         .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c -> {
@@ -137,7 +137,7 @@ public class CommandAuction extends FtcCommand {
                         })
                 )
 
-                .then(argument("delete")
+                .then(literal("delete")
                         .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c ->{
@@ -148,7 +148,7 @@ public class CommandAuction extends FtcCommand {
                         })
                 )
 
-                .then(argument("bid")
+                .then(literal("bid")
                         .then(argument("amount", IntegerArgumentType.integer(1, 1000000))
                                 .executes(c -> {
                                     CrownUser user = getUserExecutor(c);
@@ -168,7 +168,7 @@ public class CommandAuction extends FtcCommand {
                                 })
                         )
                 )
-                .then(argument("claim")
+                .then(literal("claim")
                         .then(argument("startingBid", IntegerArgumentType.integer(1, 500000))
                                 .executes(c -> {
                                     CrownUser user = getUserExecutor(c);

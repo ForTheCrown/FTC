@@ -1,7 +1,6 @@
 package net.forthecrown.emperor.useables.preconditions;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -12,6 +11,7 @@ import net.forthecrown.emperor.nbt.NBT;
 import net.forthecrown.emperor.nbt.NbtHandler;
 import net.forthecrown.emperor.useables.UsageCheck;
 import net.forthecrown.emperor.utils.InterUtils;
+import net.forthecrown.emperor.utils.JsonUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -23,7 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.concurrent.CompletableFuture;
 
 public class CheckHasItem implements UsageCheck {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "has_item");
+    public static final Key KEY = Key.key(CrownCore.inst(), "has_item");
 
     private ItemStack item;
 
@@ -53,7 +53,7 @@ public class CheckHasItem implements UsageCheck {
     }
 
     @Override
-    public Component getFailMessage() {
+    public Component failMessage() {
         return Component.text("You don't have the required item").color(NamedTextColor.GRAY);
     }
 
@@ -64,7 +64,7 @@ public class CheckHasItem implements UsageCheck {
 
     @Override
     public JsonElement serialize() {
-        return new JsonPrimitive(NbtHandler.ofItem(item).serialize());
+        return JsonUtils.serializeItem(item);
     }
 
     @Override

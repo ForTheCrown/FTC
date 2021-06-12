@@ -153,7 +153,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer<CrownCore> i
         for (UsageCheck p: checks.values()){
             if(!p.test(player)){
                 if(sendFail){
-                    Component failMsg = p.getPersonalizedFailMessage(player);
+                    Component failMsg = p.personalizedFailMessage(player);
                     if(failMsg != null) player.sendMessage(failMsg);
                 }
                 return false;

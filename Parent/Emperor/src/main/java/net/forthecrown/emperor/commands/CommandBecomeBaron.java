@@ -82,6 +82,7 @@ public class CommandBecomeBaron extends FtcCommand {
 
                             p.addRank(Rank.BARON);
                             p.addRank(Rank.BARONESS);
+                            p.setBaron(true);
 
                             Component text = Component.text()
                                     .append(Component.translatable("commands.becomeBaron.congrats").color(NamedTextColor.GOLD))

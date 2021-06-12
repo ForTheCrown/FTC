@@ -64,8 +64,8 @@ public class UserType implements ArgumentType<UserParseResult> {
         return user;
     }
 
-    private final boolean allowMultiple;
-    private final boolean allowOffline;
+    public final boolean allowMultiple;
+    public final boolean allowOffline;
     public UserType(boolean allowMultiple, boolean allowOffline){
         this.allowMultiple = allowMultiple;
         this.allowOffline = allowOffline;

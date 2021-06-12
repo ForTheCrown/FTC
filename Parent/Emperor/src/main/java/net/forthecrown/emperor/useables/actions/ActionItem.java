@@ -23,8 +23,8 @@ import org.bukkit.inventory.ItemStack;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionItem implements UsageAction {
-    public static final Key ADD_KEY = Key.key(CrownCore.getNamespace(), "give_item");
-    public static final Key REMOVE_KEY = Key.key(CrownCore.getNamespace(), "remove_item");
+    public static final Key ADD_KEY = Key.key(CrownCore.inst(), "give_item");
+    public static final Key REMOVE_KEY = Key.key(CrownCore.inst(), "remove_item");
 
     private final boolean add;
     private ItemStack item;

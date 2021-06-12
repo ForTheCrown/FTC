@@ -9,6 +9,7 @@ import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 
@@ -56,7 +57,10 @@ public class CommandAfk extends FtcCommand {
 
         if(afk){
             userMsg = Component.translatable("unafk.self").color(NamedTextColor.GRAY);
-            broadcastMsg = Component.translatable("unafk.others", user.nickDisplayName()).color(NamedTextColor.GRAY);
+            broadcastMsg = Component.translatable("unafk.others", user.nickDisplayName())
+                    .hoverEvent(Component.text("Click to welcome them back!"))
+                    .clickEvent(ClickEvent.runCommand("Welcome back!"))
+                    .color(NamedTextColor.GRAY);
         } else {
             MuteStatus status = CrownCore.getPunishmentManager().checkMuteSilent(user.getUniqueId());
 

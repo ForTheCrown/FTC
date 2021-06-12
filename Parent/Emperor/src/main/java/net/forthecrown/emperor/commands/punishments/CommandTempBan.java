@@ -63,6 +63,7 @@ public class CommandTempBan extends FtcCommand implements TempPunisher {
 
         PunishmentManager manager = CrownCore.getPunishmentManager();
         BanList list = Bukkit.getBanList(BanList.Type.NAME);
+        long until = lengthTranslate(length);
 
         PunishmentEntry entry = manager.getEntry(user.getUniqueId());
         if(entry != null && entry.checkPunished(PunishmentType.BAN)) throw FtcExceptionProvider.create("User has already been banned");
@@ -70,7 +71,7 @@ public class CommandTempBan extends FtcCommand implements TempPunisher {
         PunishmentRecord record = manager.punish(user.getUniqueId(), PunishmentType.BAN, source, reason, length);
         if(user.isOnline()) user.getPlayer().kick(ChatFormatter.banMessage(record));
 
-        list.addBan(user.getName(), reason, new Date(length + System.currentTimeMillis()), source.textName());
+        list.addBan(user.getName(), reason, new Date(until), source.textName());
 
         StaffChat.sendCommand(
                 source,

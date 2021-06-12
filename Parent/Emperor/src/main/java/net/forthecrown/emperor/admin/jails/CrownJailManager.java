@@ -4,11 +4,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.events.JailListener;
 import net.forthecrown.emperor.serializer.AbstractJsonSerializer;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.emperor.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -16,6 +18,7 @@ import java.util.*;
 public class CrownJailManager extends AbstractJsonSerializer<CrownCore> implements JailManager {
 
     private final Map<Key, Location> jails = new HashMap<>();
+    private final Map<Player, JailListener> onlineInJail = new HashMap<>();
 
     public CrownJailManager(){
         super("jails", CrownCore.inst());
@@ -89,5 +92,20 @@ public class CrownJailManager extends AbstractJsonSerializer<CrownCore> implemen
     @Override
     public Collection<Location> getEntries() {
         return jails.values();
+    }
+
+    @Override
+    public JailListener getJailListener(Player player){
+        return onlineInJail.get(player);
+    }
+
+    @Override
+    public void addJailListener(JailListener listener) {
+        onlineInJail.put(listener.player, listener);
+    }
+
+    @Override
+    public void removeJailListener(JailListener listener) {
+        onlineInJail.remove(listener.player);
     }
 }

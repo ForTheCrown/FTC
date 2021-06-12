@@ -1,6 +1,5 @@
 package net.forthecrown.emperor.user;
 
-import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import io.papermc.paper.adventure.AdventureComponent;
 import me.neznamy.tab.api.EnumProperty;
 import me.neznamy.tab.api.TABAPI;
@@ -181,6 +180,8 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         if(homesSection != null) homes.loadFrom(homesSection);
         else homes.clear();
 
+        interactions.loadMarriages(getFile().getConfigurationSection("Marriage"));
+
         matData.clear();
         ConfigurationSection matSection = getFile().getConfigurationSection("AmountEarned");
         if(matSection != null){
@@ -270,6 +271,10 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         getFile().set("BlockedUsers", interactions.save());
 
         if(!dataContainer.isEmpty()) getFile().createSection("DataContainer", dataContainer.serialize());
+
+        Map<String, Object> marriages = interactions.serializeMarriages();
+        if(marriages == null) getFile().set("Marriage", null);
+        else getFile().createSection("Marriage", marriages);
     }
 
     public void updateName(){
@@ -849,6 +854,10 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
 
         if(lastTeleport != null) lastTeleport.interrupt(false);
 
+        if(CrownCore.getPunishmentManager().checkJailed(getPlayer())){
+            CrownCore.getJailManager().getJailListener(getPlayer()).unreg();
+        }
+
         getFile().set("TimeStamps.LastLoad", System.currentTimeMillis());
         unload();
     }
@@ -856,7 +865,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
     @Override
     public void onJoin(){
         this.handle = getOnlineHandle().getHandle();
-        this.ip = getPlayer().getAddress().toString();
+        this.ip = getPlayer().getAddress().getHostString();
         updateVanished();
     }
 
@@ -875,6 +884,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         if(!hasPermission(Permissions.CORE_ADMIN)) godmode = false;
         updateGodMode();
         updateAfk();
+        updateDisplayName();
 
         permsCheck();
         if(shouldResetEarnings()) resetEarnings();
@@ -946,14 +956,12 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
 
     @Override
     public UserTeleport createTeleport(Supplier<Location> destination, boolean tell, UserTeleport.Type type){
-        return createTeleport(destination, tell, hasPermission("ftc.teleports.bypass"), type);
+        return createTeleport(destination, tell, hasPermission(Permissions.TP_BYPASS), type);
     }
 
     @Override
     public UserTeleport createTeleport(Supplier<Location> destination, boolean tell, boolean bypassCooldown, UserTeleport.Type type){
         checkOnline();
-
-        CraftPlayerProfile
 
         if(lastTeleport != null) lastTeleport.interrupt(tell);
         return lastTeleport = new UserTeleport(this, destination, bypassCooldown, type);

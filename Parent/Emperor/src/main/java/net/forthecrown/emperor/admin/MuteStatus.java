@@ -7,6 +7,7 @@ public enum MuteStatus {
 
     public final String edPrefix;
     public final boolean maySpeak;
+
     MuteStatus(String s, boolean maySpeak) {
         this.edPrefix = s;
         this.maySpeak = maySpeak;

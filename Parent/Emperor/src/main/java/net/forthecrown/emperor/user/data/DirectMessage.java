@@ -9,6 +9,7 @@ import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.emperor.utils.ChatUtils;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -40,33 +41,12 @@ public class DirectMessage {
         return receiver;
     }
 
-    public Component senderDisplayName(){
-        try {
-            if(sender.isPlayer()){
-                CrownUser user = UserManager.getUser(sender.asPlayer());
-
-                return user.nickDisplayName();
-            }
-        } catch (CommandSyntaxException ignored) {}
-
-        return sender.displayName();
-    }
-
-    public Component receiverDisplayName(){
-        try {
-            if(receiver.isPlayer()){
-                CrownUser user = UserManager.getUser(receiver.asPlayer());
-
-                return user.nickDisplayName();
-            }
-        } catch (CommandSyntaxException ignored) {}
-
-        return receiver.displayName();
-    }
+    public Component senderDisplayName(){ return CrownUtils.sourceDisplayName(sender); }
+    public Component receiverDisplayName(){ return CrownUtils.sourceDisplayName(receiver); }
 
     public Component getSenderHeader(){
         return getHeader(
-                Component.text("me").color(NamedTextColor.YELLOW),
+                Component.translatable("user.message.me").color(NamedTextColor.YELLOW),
                 receiverDisplayName().color(NamedTextColor.YELLOW),
                 NamedTextColor.GOLD
         );
@@ -75,7 +55,7 @@ public class DirectMessage {
     public Component getReceiverHeader(){
         return getHeader(
                 senderDisplayName().color(NamedTextColor.YELLOW),
-                Component.text("me").color(NamedTextColor.YELLOW),
+                Component.translatable("user.message.me").color(NamedTextColor.YELLOW),
                 NamedTextColor.GOLD
         );
     }
@@ -113,7 +93,7 @@ public class DirectMessage {
                     CrownUser user = UserManager.getUser(receiver.asPlayer());
                     user.setLastMessage(sender);
 
-                    if(user.isAfk()) sender.sendMessage(Component.text("This person is afk and might not see your message").color(NamedTextColor.YELLOW));
+                    if(user.isAfk()) sender.sendMessage(Component.translatable("user.message.afk").color(NamedTextColor.YELLOW));
                 } catch (CommandSyntaxException ignored) {}
             }
         }

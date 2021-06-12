@@ -115,7 +115,7 @@ public class ChatFormatter {
     }
 
     public static Component joinMessage(CrownUser user){
-        return Component.translatable("multiplayer.player.joined", user.coloredNickDisplayName())
+        return Component.translatable("multiplayer.player.joined", user.nickDisplayName().color(getJoinColor(user)))
                 .hoverEvent(Component.text("Click to say hello!"))
                 .clickEvent(ClickEvent.runCommand(hello() + user.getNickOrName() + '!'))
                 .color(NamedTextColor.YELLOW);
@@ -134,7 +134,7 @@ public class ChatFormatter {
         FtcUser user = (FtcUser) user1;
 
         return Component.translatable("multiplayer.player.joined.renamed",
-                user.coloredNickDisplayName(),
+                user.nickDisplayName().color(getJoinColor(user)),
                 Component.text(user.previousNames.get(user.previousNames.size()-1))
         )
                 .hoverEvent(Component.text("Click to say hello!"))
@@ -143,7 +143,7 @@ public class ChatFormatter {
     }
 
     public static Component formatLeaveMessage(CrownUser user){
-        return Component.translatable("multiplayer.player.left", user.coloredNickDisplayName()).color(NamedTextColor.YELLOW);
+        return Component.translatable("multiplayer.player.left", user.nickDisplayName().color(getJoinColor(user))).color(NamedTextColor.YELLOW);
     }
 
     public static Component banMessage(PunishmentRecord record){
@@ -169,7 +169,7 @@ public class ChatFormatter {
         return builder.build();
     }
 
-    public static TextColor getUserColor(CrownUser user){
+    public static TextColor getJoinColor(CrownUser user){
         Rank r = user.getHighestTierRank();
 
         if(r.getTier().shouldUseColor()) return r.getTier().color;
@@ -283,7 +283,7 @@ public class ChatFormatter {
                 .replaceAll(":sad:", "(._. )")
                 .replaceAll(":pleased:", "(ᵔᴥᵔ)")
                 .replaceAll(":fedup:", "(¬_¬)")
-                .replaceAll(":reallysad:", "◉︵◉");
+                .replaceAll(":reallysad:", "(◉︵◉ )");
     }
 
     public static String timeFromMillisMinusTime(long millis){

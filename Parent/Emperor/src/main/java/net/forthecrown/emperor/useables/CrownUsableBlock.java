@@ -7,18 +7,18 @@ import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.emperor.utils.JsonUtils;
 import org.bukkit.Location;
-import org.bukkit.block.Sign;
+import org.bukkit.block.TileState;
 
-public class CrownUsableSign extends AbstractUsable implements UsableSign {
+public class CrownUsableBlock extends AbstractUsable implements UsableBlock {
     private final Location location;
 
-    public CrownUsableSign(Location location, boolean create){
+    public CrownUsableBlock(Location location, boolean create){
         super(CrownUtils.locationToFilename(location), "signs", !create);
         this.location = location;
 
         if(!fileExists && !create) throw new IllegalStateException(fileName + " doesn't exist");
 
-        CrownCore.getUsablesManager().addSign(this);
+        CrownCore.getUsablesManager().addBlock(this);
         reload();
     }
 
@@ -51,16 +51,16 @@ public class CrownUsableSign extends AbstractUsable implements UsableSign {
     }
 
     @Override
-    public Sign getSign() {
-        return (Sign) location.getBlock().getState();
+    public TileState getSign() {
+        return (TileState) location.getBlock().getState();
     }
 
     @Override
     public void delete() {
         deleteFile();
 
-        CrownCore.getUsablesManager().removeSign(this);
-        Sign sign = getSign();
+        CrownCore.getUsablesManager().removeBlock(this);
+        TileState sign = getSign();
         sign.getPersistentDataContainer().remove(UsablesManager.USABLE_KEY);
         sign.update();
     }

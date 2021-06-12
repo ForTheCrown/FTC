@@ -40,7 +40,7 @@ public class CommandRoyal extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("spawndummy")
+                .then(literal("spawndummy")
                         .executes(c -> {
                             Player player = getPlayerSender(c);
                             RoyalUtils.spawnDummy(player.getLocation());
@@ -53,8 +53,8 @@ public class CommandRoyal extends FtcCommand {
                                 })
                         )
                 )
-                .then(argument("updateLegacy")
-                        .then(argument("apple")
+                .then(literal("updateLegacy")
+                        .then(literal("apple")
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
                                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -74,7 +74,7 @@ public class CommandRoyal extends FtcCommand {
                                     return 0;
                                 })
                         )
-                        .then(argument("item")
+                        .then(literal("item")
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
                                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -98,7 +98,7 @@ public class CommandRoyal extends FtcCommand {
                         )
                 )
 
-                .then(argument("enchant")
+                .then(literal("enchant")
                         .then(argument("legacy", BoolArgumentType.bool())
                                 .then(argument("enchantment", RoyalEnchantType.ENCHANT)
                                         .executes(c -> enchantItemInHand(c,
@@ -109,8 +109,8 @@ public class CommandRoyal extends FtcCommand {
                         )
                 )
 
-                .then(argument("debug")
-                        .then(argument("apples")
+                .then(literal("debug")
+                        .then(literal("apples")
                                 .then(argument("boss", EnumArgument.of(BossItems.class))
                                         .executes(c -> {
                                             BossItems boss = c.getArgument("boss", BossItems.class);
@@ -125,7 +125,7 @@ public class CommandRoyal extends FtcCommand {
                         )
 
                         .then(argument(bossArg, BossArgument.boss())
-                                .then(argument("spawn")
+                                .then(literal("spawn")
                                         .executes(c -> {
                                             DungeonBoss<?> boss = BossArgument.getBoss(c, bossArg);
 
@@ -134,7 +134,7 @@ public class CommandRoyal extends FtcCommand {
                                             return 0;
                                         })
                                 )
-                                .then(argument("kill")
+                                .then(literal("kill")
                                         .executes(c -> {
                                             DungeonBoss<?> boss = BossArgument.getBoss(c, bossArg);
                                             if(!boss.isAlive()) throw FtcExceptionProvider.create("Boss isn't alive");
@@ -144,7 +144,7 @@ public class CommandRoyal extends FtcCommand {
                                             return 0;
                                         })
                                 )
-                                .then(argument("giveitems")
+                                .then(literal("giveitems")
                                         .executes(c -> {
                                             Player player = getPlayerSender(c);
                                             DungeonBoss<?> boss = BossArgument.getBoss(c, bossArg);
@@ -159,7 +159,7 @@ public class CommandRoyal extends FtcCommand {
                                             return 0;
                                         })
                                 )
-                                .then(argument("context")
+                                .then(literal("context")
                                         .executes(c -> {
                                             DungeonBoss<?> boss = BossArgument.getBoss(c, bossArg);
                                             if(!boss.isAlive()) throw FtcExceptionProvider.create("Boss has not been spawned");
@@ -175,7 +175,7 @@ public class CommandRoyal extends FtcCommand {
                                             return 0;
                                         })
                                 )
-                                .then(argument("attemptSpawn")
+                                .then(literal("attemptSpawn")
                                         .executes(c -> {
                                             Player player = getPlayerSender(c);
                                             DungeonBoss<?> boss = BossArgument.getBoss(c, bossArg);

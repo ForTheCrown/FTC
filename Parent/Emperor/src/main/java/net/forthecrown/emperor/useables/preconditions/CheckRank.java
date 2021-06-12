@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.CompletableFuture;
 
 public class CheckRank implements UsageCheck {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "required_rank");
+    public static final Key KEY = Key.key(CrownCore.inst(), "required_rank");
 
     private Rank rank;
 
@@ -46,7 +46,7 @@ public class CheckRank implements UsageCheck {
     }
 
     @Override
-    public Component getFailMessage() {
+    public Component failMessage() {
         return Component.text("You need the ")
                 .color(NamedTextColor.GRAY)
                 .append(rank.prefix())

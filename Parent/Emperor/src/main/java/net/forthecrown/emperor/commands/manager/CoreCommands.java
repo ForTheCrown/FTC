@@ -6,6 +6,7 @@ import net.forthecrown.emperor.clickevent.ClickEventCommand;
 import net.forthecrown.emperor.commands.*;
 import net.forthecrown.emperor.commands.arguments.*;
 import net.forthecrown.emperor.commands.emotes.*;
+import net.forthecrown.emperor.commands.marriage.*;
 import net.forthecrown.emperor.commands.punishments.*;
 import net.forthecrown.emperor.user.enums.Branch;
 import net.forthecrown.emperor.user.enums.Rank;
@@ -84,6 +85,7 @@ public final class CoreCommands {
         new CommandTop();
         new CommandMemory();
         new CommandSkull();
+        new CommandMakeAward();
         CommandSpecificGameMode.init();
 
         //Policing commands
@@ -110,6 +112,7 @@ public final class CoreCommands {
         new CommandSuicide();
         new CommandAfk();
         new CommandList();
+        new CommandMe();
 
         CommandDumbThing.init();
         CommandToolBlock.init();
@@ -168,6 +171,15 @@ public final class CoreCommands {
 
         //Click event command
         new ClickEventCommand();
+
+        //Marriage commands ¬_¬
+        new CommandDivorce();
+        new CommandMarriageAccept();
+        new CommandMarriageDeny();
+        new CommandMarriageChat();
+        new CommandMarriageChatToggle();
+        new CommandMarry();
+        new CommandMarryToggle();
 
         //Home commands
         new CommandHome();

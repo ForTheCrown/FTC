@@ -6,6 +6,7 @@ import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 
@@ -29,7 +30,7 @@ public class HomeParseResult {
         this.user = null;
     }
 
-    public Location getHome(CommandSource source, boolean ignorePerms) throws CommandSyntaxException{
+    public Location getHome(CommandSource source, boolean ignorePerms) throws CommandSyntaxException {
         if(user != null){
             if(!ignorePerms && !source.hasPermission(Permissions.HOME_OTHERS)) throw exception();
 
@@ -48,7 +49,7 @@ public class HomeParseResult {
         return l;
     }
 
-    private CommandSyntaxException exception(){
+    private RoyalCommandException exception(){
         return HomeType.UNKNOWN_HOME.createWithContext(reader, Component.text(reader.getRemaining()));
     }
 

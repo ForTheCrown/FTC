@@ -34,6 +34,10 @@ public class CommandSetHome extends FtcCommand {
                     if(homes.contains(name)) throw FtcExceptionProvider.homeNameInUse();
                     if(!homes.canMakeMore()) throw FtcExceptionProvider.overHomeLimit(user);
 
+                    if(!user.hasPermission(Permissions.WORLD_BYPASS)){
+                        if(CommandTpask.isNonAcceptedWorld(loc.getWorld())) throw FtcExceptionProvider.cannotSetHomeHere();
+                    }
+
                     homes.set(name, loc);
                     user.sendMessage(Component.translatable("homes.setDefault").color(NamedTextColor.YELLOW));
                     return 0;
@@ -48,6 +52,10 @@ public class CommandSetHome extends FtcCommand {
 
                             if(homes.contains(name)) throw FtcExceptionProvider.homeNameInUse();
                             if(!homes.canMakeMore()) throw FtcExceptionProvider.overHomeLimit(user);
+
+                            if(!user.hasPermission(Permissions.WORLD_BYPASS)){
+                                if(CommandTpask.isNonAcceptedWorld(loc.getWorld())) throw FtcExceptionProvider.cannotSetHomeHere();
+                            }
 
                             homes.set(name, loc);
                             user.sendMessage(

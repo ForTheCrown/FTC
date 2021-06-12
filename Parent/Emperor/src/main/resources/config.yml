@@ -14,6 +14,7 @@ OnJoinKit: 'noobs'
 MaxNickLength: 16
 NearRadius: 200
 AllowOtherPlayerNicks: false
+MarriageStatusCooldown: 259200000
 
 ServerSpawn:
   ==: org.bukkit.Location

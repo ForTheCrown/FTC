@@ -2,6 +2,8 @@ package net.forthecrown.emperor.user;
 
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +27,7 @@ public class FtcUserGrave implements Grave {
     }
 
     @Override
-    public void giveItems() throws RoyalCommandException {
+    public void giveItems() throws RoyalCommandException, UserNotOnlineException {
         if(!user.isOnline()) throw new UserNotOnlineException(user);
 
         int freeSpace = 0;
@@ -40,7 +42,7 @@ public class FtcUserGrave implements Grave {
             getUser().getPlayer().getInventory().addItem(i);
         }
 
-        getUser().sendMessage("&7You retrieved all the items from your grave.");
+        getUser().sendMessage(Component.translatable("user.grave.gotItems").color(NamedTextColor.GRAY));
         items.clear();
     }
 

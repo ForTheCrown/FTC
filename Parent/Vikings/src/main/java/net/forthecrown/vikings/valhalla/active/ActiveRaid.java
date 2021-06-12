@@ -2,6 +2,7 @@ package net.forthecrown.vikings.valhalla.active;
 
 import net.forthecrown.emperor.utils.CrownRandom;
 import net.forthecrown.vikings.valhalla.VikingRaid;
+import org.bukkit.World;
 
 public class ActiveRaid {
 
@@ -9,6 +10,7 @@ public class ActiveRaid {
     private final RaidParty party;
     private final TriggerContainer container;
     private final RaidDifficulty difficulty;
+    private final World world;
 
     private final CrownRandom random;
 
@@ -16,13 +18,15 @@ public class ActiveRaid {
                       RaidParty party,
                       TriggerContainer container,
                       CrownRandom random,
-                      RaidDifficulty difficulty
+                      RaidDifficulty difficulty,
+                      World world
     ) {
         this.raid = raid;
         this.party = party;
         this.container = container;
         this.random = random;
         this.difficulty = difficulty;
+        this.world = world;
 
         container.raid = this;
     }

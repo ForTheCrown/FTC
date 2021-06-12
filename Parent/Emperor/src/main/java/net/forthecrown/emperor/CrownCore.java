@@ -150,6 +150,10 @@ public interface CrownCore extends Plugin, Namespaced {
         return Main.onFirstJoinKit.getValue();
     }
 
+    static long getMarriageCooldown(){
+        return Main.marriageCooldown.getValue(259200000L);
+    }
+
     static Location getServerSpawn(){
         return Main.serverSpawn;
     }
@@ -175,10 +179,6 @@ public interface CrownCore extends Plugin, Namespaced {
 
     static String getDiscord(){
         return ChatFormatter.translateHexCodes(Main.discord);
-    }
-
-    static Namespaced getNamespace(){
-        return inst();
     }
 
     static Component prefix(){

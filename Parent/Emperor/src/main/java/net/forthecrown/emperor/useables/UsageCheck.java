@@ -23,7 +23,7 @@ public interface UsageCheck extends JsonSerializable, Predicate<Player>, Suggest
 
     String asString();
 
-    Component getFailMessage();
+    Component failMessage();
 
     @Override
     default CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
@@ -34,7 +34,7 @@ public interface UsageCheck extends JsonSerializable, Predicate<Player>, Suggest
         return null;
     }
 
-    default Component getPersonalizedFailMessage(Player player){
-        return getFailMessage();
+    default Component personalizedFailMessage(Player player){
+        return failMessage();
     }
 }

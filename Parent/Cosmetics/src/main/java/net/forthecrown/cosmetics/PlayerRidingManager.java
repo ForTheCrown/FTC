@@ -45,7 +45,7 @@ public class PlayerRidingManager implements Listener {
     @EventHandler
     public void playerRightClickPlayer(PlayerInteractEntityEvent event) {
         if(event.getHand() == EquipmentSlot.OFF_HAND) return;
-        if(CrownUtils.checkItemNotEmpty(event.getPlayer().getInventory().getItemInMainHand())) return;
+        if(!CrownUtils.isItemEmpty(event.getPlayer().getInventory().getItemInMainHand())) return;
         if(event.getPlayer().getWorld().equals(CrownUtils.WORLD_VOID)) return;
         if(event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
         if(!(event.getRightClicked() instanceof Player)) return;
@@ -76,6 +76,8 @@ public class PlayerRidingManager implements Listener {
     }
 
     public boolean canRide(CrownUser user, CrownUser ridden){
+        if(user.getPlayer().isSneaking()) return false;
+
         if(!user.allowsRidingPlayers() || !ridden.allowsRidingPlayers()){
             user.sendMessage("&7You both have to allow riding players");
             return false;

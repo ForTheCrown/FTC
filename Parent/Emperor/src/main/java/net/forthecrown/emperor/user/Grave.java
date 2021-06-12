@@ -19,7 +19,7 @@ public interface Grave {
     /**
      * Attempts to give the grave's items back to the owner
      */
-    void giveItems() throws RoyalCommandException;
+    void giveItems() throws RoyalCommandException, UserNotOnlineException;
 
     /**
      * Gets whether the grave is empty

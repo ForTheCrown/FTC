@@ -45,6 +45,7 @@ public class CommandStaffChat extends FtcCommand {
         emojiList.add(":sad:");
         emojiList.add(":pleased:");
         emojiList.add(":fedup:");
+        emojiList.add(":reallysad:");
     }
 
     private final static List<String> emojiList = new ArrayList<>();

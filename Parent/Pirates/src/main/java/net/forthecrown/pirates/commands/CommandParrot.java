@@ -39,7 +39,7 @@ public class CommandParrot extends FtcCommand {
                 })
                 .then(argument("parrot", PetType.PET)
                         .executes(c -> setParrot(c, false))
-                        .then(argument("silent").executes(c -> setParrot(c, true)))
+                        .then(literal("silent").executes(c -> setParrot(c, true)))
                 );
     }
 

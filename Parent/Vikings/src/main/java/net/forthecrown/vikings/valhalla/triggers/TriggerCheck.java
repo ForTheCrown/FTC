@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.emperor.serialization.JsonSerializable;
+import net.forthecrown.emperor.serializer.JsonSerializable;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.vikings.valhalla.active.ActiveRaid;
 import net.kyori.adventure.key.Keyed;
@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface TriggerCheck<E extends Event> extends JsonSerializable, SuggestionProvider<CommandSource>, Keyed {
     void deserialize(JsonElement element) throws CommandSyntaxException;
-    void parse(StringReader reader) throws CommandSyntaxException;
+    void parse(StringReader reader, CommandSource source) throws CommandSyntaxException;
 
     boolean check(Player player, ActiveRaid raid, E event);
 

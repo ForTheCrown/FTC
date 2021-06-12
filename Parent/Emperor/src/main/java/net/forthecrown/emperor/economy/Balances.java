@@ -3,6 +3,7 @@ package net.forthecrown.emperor.economy;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.serializer.CrownSerializer;
 import net.forthecrown.emperor.utils.ChatFormatter;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
@@ -26,7 +27,7 @@ public interface Balances extends CrownSerializer<CrownCore> {
      * @return The message, will look like: "1,000,000 Rhines"
      */
     static String getFormatted(int amount){
-        return ChatFormatter.decimalizeNumber(amount) + " Rhine" + (amount == 1 ? "" : "s");
+        return ChatFormatter.decimalizeNumber(amount) + " Rhine" + CrownUtils.addAnS(amount);
     }
 
     /**

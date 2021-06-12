@@ -62,7 +62,7 @@ public class PetType implements ArgumentType<Pet> {
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, boolean ignorePerms){
-        if(ignorePerms) return CommandSource.suggestMatching(builder, ListUtils.arrayToCollection(Pet.values(), p -> p.name().toLowerCase()));
+        if(ignorePerms) return CompletionProvider.suggestMatching(builder, ListUtils.arrayToCollection(Pet.values(), p -> p.name().toLowerCase()));
 
         if(context.getSource() instanceof CommandSource){
             CrownUser user;

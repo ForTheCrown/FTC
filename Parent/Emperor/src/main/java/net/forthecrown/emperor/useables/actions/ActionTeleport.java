@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionTeleport implements UsageAction {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "teleport_user");
+    public static final Key KEY = Key.key(CrownCore.inst(), "teleport_user");
 
     private Location location;
 

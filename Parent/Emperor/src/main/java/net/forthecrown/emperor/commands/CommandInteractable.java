@@ -10,7 +10,7 @@ import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.useables.Usable;
 import net.forthecrown.emperor.useables.UsableEntity;
-import net.forthecrown.emperor.useables.UsableSign;
+import net.forthecrown.emperor.useables.UsableBlock;
 import net.forthecrown.emperor.utils.InterUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -20,7 +20,7 @@ import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.grenadier.types.selectors.EntitySelector;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -37,17 +37,17 @@ public class CommandInteractable extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(literal("sign")
+                .then(literal("block")
                         .then(argument("location", PositionArgument.position())
                                 .then(literal("create")
                                         .executes(c -> {
                                             CommandSource source = c.getSource();
                                             Location l = c.getArgument("location", Position.class).getLocation(source);
 
-                                            if(!(l.getBlock().getState() instanceof Sign)) throw FtcExceptionProvider.create("Block is not sign");
+                                            if(!(l.getBlock().getState() instanceof TileState)) throw FtcExceptionProvider.create("Block is not sign");
                                             if(CrownCore.getUsablesManager().isInteractableSign(l.getBlock())) throw FtcExceptionProvider.create("Block is already an interactable sign");
 
-                                            CrownCore.getUsablesManager().createSign((Sign) l.getBlock().getState());
+                                            CrownCore.getUsablesManager().createSign((TileState) l.getBlock().getState());
                                             c.getSource().sendAdmin("Creating interactable sign");
                                             return 0;
                                         })
@@ -119,11 +119,11 @@ public class CommandInteractable extends FtcCommand {
         return CrownCore.getUsablesManager().getEntity(entity);
     }
 
-    private UsableSign getSign(CommandContext<CommandSource> c) throws CommandSyntaxException {
+    private UsableBlock getSign(CommandContext<CommandSource> c) throws CommandSyntaxException {
         Location l = c.getArgument("location", Position.class).getLocation(c.getSource());
         Block b = l.getBlock();
         if(!CrownCore.getUsablesManager().isInteractableSign(b)) throw FtcExceptionProvider.create("Specified location is not an interactable sign");
 
-        return CrownCore.getUsablesManager().getSign(b.getLocation());
+        return CrownCore.getUsablesManager().getBlock(b.getLocation());
     }
 }

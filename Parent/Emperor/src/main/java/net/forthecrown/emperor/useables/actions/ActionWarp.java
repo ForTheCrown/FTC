@@ -22,7 +22,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionWarp implements UsageAction {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "warp");
+    public static final Key KEY = Key.key(CrownCore.inst(), "warp");
 
     private Key warpKey;
 

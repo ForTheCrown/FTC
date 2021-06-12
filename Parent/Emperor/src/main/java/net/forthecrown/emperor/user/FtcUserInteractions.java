@@ -4,12 +4,22 @@ import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.admin.MuteStatus;
 import net.forthecrown.emperor.user.data.TeleportRequest;
 import net.forthecrown.emperor.utils.ListUtils;
+import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class FtcUserInteractions implements UserInteractions {
 
     public final FtcUser user;
+
+    public UUID lastMarriageRequest;
+    public UUID waitingFinish;
+    public UUID marriedTo;
+    public long lastMarriageStatusChange;
+    public boolean acceptingProposals;
+    public boolean marriageChatToggled;
+
     public Set<UUID> blocked;
 
     private final List<TeleportRequest> incoming = new ArrayList<>();
@@ -25,6 +35,38 @@ public class FtcUserInteractions implements UserInteractions {
 
     public List<String> save(){
         return ListUtils.convertToList(blocked, UUID::toString);
+    }
+
+    public Map<String, Object> serializeMarriages(){
+        Map<String, Object> result = new HashMap<>();
+
+        if(marriageChatToggled) result.put("MarriageChat", true);
+        if(!acceptingProposals) result.put("AcceptingProposals", false);
+        if(marriedTo != null) result.put("MarriedTo", marriedTo.toString());
+        if(lastMarriageStatusChange != 0) result.put("LastMarriageAction", lastMarriageStatusChange);
+
+        return result.isEmpty() ? null : result;
+    }
+
+    public void loadMarriages(@Nullable ConfigurationSection section){
+        if(section == null){
+            marriageChatToggled = false;
+            acceptingProposals = true;
+            lastMarriageStatusChange = 0L;
+            marriedTo = null;
+            lastMarriageRequest = null;
+            waitingFinish = null;
+            return;
+        }
+
+        marriageChatToggled = section.getBoolean("MarriageChat", false);
+        acceptingProposals = section.getBoolean("AcceptingProposals", true);
+
+        String marriedToString = section.getString("MarriedTo");
+        if(marriedToString == null) this.marriedTo = null;
+        else this.marriedTo = UUID.fromString(marriedToString);
+
+        lastMarriageStatusChange = section.getLong("LastMarriageAction", 0L);
     }
 
     @Override
@@ -143,12 +185,77 @@ public class FtcUserInteractions implements UserInteractions {
     @Override
     public TeleportRequest firstIncoming(){
         if(incoming.size() < 1) return null;
-        return incoming.get(0);
+        return incoming.get(incoming.size()-1);
     }
 
     @Override
     public TeleportRequest firstOutgoing(){
         if(outgoing.size() < 1) return null;
-        return outgoing.get(0);
+        return outgoing.get(incoming.size()-1);
+    }
+
+    @Override
+    public UUID getMarriedTo() {
+        return marriedTo;
+    }
+
+    @Override
+    public void setMarriedTo(UUID marriedTo) {
+        this.marriedTo = marriedTo;
+    }
+
+    @Override
+    public long getLastMarriageStatusChange() {
+        return lastMarriageStatusChange;
+    }
+
+    @Override
+    public void setLastMarriageStatusChange(long lastMarriageStatusChange) {
+        this.lastMarriageStatusChange = lastMarriageStatusChange;
+    }
+
+    @Override
+    public boolean canChangeMarriageStatus(){
+        return (lastMarriageStatusChange + CrownCore.getMarriageCooldown()) <= System.currentTimeMillis();
+    }
+
+    @Override
+    public UUID getLastMarriageRequest() {
+        return lastMarriageRequest;
+    }
+
+    @Override
+    public void setLastMarriageRequest(UUID lastMarriageRequest) {
+        this.lastMarriageRequest = lastMarriageRequest;
+    }
+
+    @Override
+    public boolean isAcceptingProposals() {
+        return acceptingProposals;
+    }
+
+    @Override
+    public void setAcceptingProposals(boolean acceptingProposals) {
+        this.acceptingProposals = acceptingProposals;
+    }
+
+    @Override
+    public UUID getWaitingFinish() {
+        return waitingFinish;
+    }
+
+    @Override
+    public void setWaitingFinish(UUID waitingFinish) {
+        this.waitingFinish = waitingFinish;
+    }
+
+    @Override
+    public boolean isMarriageChatToggled() {
+        return marriageChatToggled;
+    }
+
+    @Override
+    public void setMarriageChatToggled(boolean marriageChatToggled) {
+        this.marriageChatToggled = marriageChatToggled;
     }
 }

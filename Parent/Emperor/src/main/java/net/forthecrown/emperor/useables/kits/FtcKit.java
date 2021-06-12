@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
-public class FtcKit extends CheckableBase implements Kit{
+public class FtcKit extends CheckableBase implements Kit {
     private List<ItemStack> items = new ArrayList<>();
     private final Key key;
 
@@ -74,7 +74,7 @@ public class FtcKit extends CheckableBase implements Kit{
         List<Consumer<Player>> onSuccess = new ArrayList<>();
         for (UsageCheck c: checks.values()){
             if(!c.test(player)){
-                Component m = c.getPersonalizedFailMessage(player);
+                Component m = c.personalizedFailMessage(player);
                 if(m != null) player.sendMessage(m);
                 return false;
             }

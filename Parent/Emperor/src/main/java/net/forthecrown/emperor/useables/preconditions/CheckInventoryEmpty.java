@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckInventoryEmpty implements UsageCheck {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "inventory_empty");
+    public static final Key KEY = Key.key(CrownCore.inst(), "inventory_empty");
 
     @Override
     public void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException {}
@@ -33,7 +33,7 @@ public class CheckInventoryEmpty implements UsageCheck {
     }
 
     @Override
-    public Component getFailMessage() {
+    public Component failMessage() {
         return Component.text("You need to have an empty inventory").color(NamedTextColor.GRAY);
     }
 

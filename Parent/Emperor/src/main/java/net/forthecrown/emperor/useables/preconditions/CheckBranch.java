@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.CompletableFuture;
 
 public class CheckBranch implements UsageCheck {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "required_branch");
+    public static final Key KEY = Key.key(CrownCore.inst(), "required_branch");
 
     private Branch branch;
 
@@ -46,7 +46,7 @@ public class CheckBranch implements UsageCheck {
     }
 
     @Override
-    public Component getFailMessage() {
+    public Component failMessage() {
         return Component.text("You need to be a ")
                 .color(NamedTextColor.GRAY)
                 .append(Component.text(branch.getSingularName()).color(NamedTextColor.GOLD))

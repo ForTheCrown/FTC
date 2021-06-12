@@ -37,7 +37,7 @@ public class EmoteBonk extends CommandEmote {
         loc.setPitch(loc.getPitch() + 20F);
 
         sender.sendMessage(
-                Component.text("You bonked")
+                Component.text("You bonked ")
                         .append(recipient.nickDisplayName().color(NamedTextColor.YELLOW))
                         .append(Component.text("!"))
         );

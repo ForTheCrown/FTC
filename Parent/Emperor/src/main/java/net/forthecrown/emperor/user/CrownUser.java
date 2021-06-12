@@ -1,17 +1,12 @@
 package net.forthecrown.emperor.user;
 
 import net.forthecrown.emperor.CrownCore;
-import net.forthecrown.emperor.user.data.SoldMaterialData;
-import net.forthecrown.emperor.utils.Nameable;
 import net.forthecrown.emperor.serializer.CrownSerializer;
 import net.forthecrown.emperor.serializer.Deleteable;
-import net.forthecrown.emperor.user.enums.Branch;
-import net.forthecrown.emperor.user.enums.CrownGameMode;
-import net.forthecrown.emperor.user.enums.Pet;
-import net.forthecrown.emperor.user.enums.Rank;
-import net.forthecrown.emperor.user.enums.SellAmount;
+import net.forthecrown.emperor.user.data.SoldMaterialData;
 import net.forthecrown.emperor.user.data.UserTeleport;
-import net.forthecrown.emperor.utils.ChatFormatter;
+import net.forthecrown.emperor.user.enums.*;
+import net.forthecrown.emperor.utils.Nameable;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -24,7 +19,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
@@ -49,7 +46,7 @@ public interface CrownUser extends CrownSerializer<CrownCore>, CommandSender, Ho
      * <p>Will return null if the player is not online</p>
      * @return The player with the same UUID as the user
      */
-    Player getPlayer();
+    Player getPlayer() throws UserNotOnlineException;
 
     /**
      * Gets the offlinePlayer tied to this user
@@ -471,7 +468,7 @@ public interface CrownUser extends CrownSerializer<CrownCore>, CommandSender, Ho
     }
 
     default ClickEvent asClickEvent(){
-        return ClickEvent.runCommand("/" + (isOnline() ? "tell " + getName() + " " : "profile " + getName()));
+        return ClickEvent.suggestCommand("/" + (isOnline() ? "tell " + getName() + " " : "profile " + getName()));
     }
 
     default Component displayName(){
@@ -487,7 +484,7 @@ public interface CrownUser extends CrownSerializer<CrownCore>, CommandSender, Ho
     }
 
     default Component  coloredNickDisplayName(){
-        return nickDisplayName().color(ChatFormatter.getUserColor(this));
+        return nickDisplayName().color(getHighestTierRank().tier.color);
     }
 
     default boolean hasNickname(){

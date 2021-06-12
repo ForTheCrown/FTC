@@ -15,7 +15,7 @@ public class CommandPirate extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("reload")
+                .then(literal("reload")
                         .executes(c -> {
                             Pirates.inst.reloadConfig();
                             Pirates.getAuctionManager().reloadAuctions();
@@ -23,7 +23,7 @@ public class CommandPirate extends FtcCommand {
                             return 0;
                         })
                 )
-                .then(argument("spawnShulker")
+                .then(literal("spawnShulker")
                         .executes(c -> {
                             Pirates.inst.shulker.spawn();
                             broadcastAdmin(c.getSource(), "Spawning Treasure Shulker");

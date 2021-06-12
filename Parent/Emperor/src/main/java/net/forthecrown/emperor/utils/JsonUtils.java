@@ -127,4 +127,8 @@ public class JsonUtils {
     public static ItemStack deserializeItem(JsonElement json) throws CommandSyntaxException {
         return NbtHandler.itemFromNBT(NBT.of(MojangsonParser.parse(json.getAsString())));
     }
+
+    public static JsonElement serializeItem(ItemStack itemStack){
+        return new JsonPrimitive(NbtHandler.ofItem(itemStack).serialize());
+    }
 }

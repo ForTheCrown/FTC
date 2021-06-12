@@ -14,10 +14,12 @@ public class Permissions {
     public static final Permission EAVESDROP =          register("ftc.eavesdrop");
     public static final Permission EAVESDROP_DM =       register("ftc.eavesdrop.dm");
     public static final Permission EAVESDROP_SIGNS =    register("ftc.eavesdrop.signs");
+    public static final Permission EAVESDROP_MARRIAGE = register("ftc.eavesdrop.marriage");
     public static final Permission EAVESDROP_MUTED =    register("ftc.eavesdrop.muted");
 
     public static final Permission HELPER =             register("ftc.helper");
     public static final Permission POLICE =             register("ftc.police");
+
     public static final Permission MUTE_BYPASS =        register("ftc.mute.bypass");
     public static final Permission KICK_BYPASS =        register("ftc.kick.bypass");
     public static final Permission BAN_BYPASS =         register("ftc.ban.bypass");
@@ -37,6 +39,12 @@ public class Permissions {
     public static final Permission DONATOR_1 =          register("ftc.donator1");
     public static final Permission DONATOR_2 =          register("ftc.donator2");
     public static final Permission DONATOR_3 =          register("ftc.donator3");
+
+    public static final Permission TP_BYPASS =          register("ftc.teleports.bypass");
+    public static final Permission WORLD_BYPASS =       register("ftc.teleports.worldbypass");
+
+    public static final Permission MARRY =              register("ftc.marry");
+    public static final Permission MARRY_PEOPLE =       register("ftc.marry.others"); //Make 2 people marry each other.
 
     public static final Permission WARP =               register(COMMAND_PREFIX + "warp");
     public static final Permission WARP_ADMIN =         register(COMMAND_PREFIX + "warp.admin");

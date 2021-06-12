@@ -24,7 +24,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.concurrent.CompletableFuture;
 
 public class CheckInWorld implements UsageCheck {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "in_world");
+    public static final Key KEY = Key.key(CrownCore.inst(), "in_world");
 
     private World world;
 
@@ -44,7 +44,7 @@ public class CheckInWorld implements UsageCheck {
     }
 
     @Override
-    public Component getFailMessage() {
+    public Component failMessage() {
         return Component.text("You cannot use this in this world")
                 .color(NamedTextColor.GRAY);
     }

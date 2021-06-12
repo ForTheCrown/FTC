@@ -27,6 +27,10 @@ public class CommandBack extends FtcCommand {
                     if(!user.checkTeleporting()) return 0;
                     if(user.getLastLocation() == null) throw FtcExceptionProvider.noReturnLoc();
 
+                    if(!user.hasPermission(Permissions.WORLD_BYPASS) && CommandTpask.isNonAcceptedWorld(user.getLastLocation().getWorld())){
+                        throw FtcExceptionProvider.cannotReturn();
+                    }
+
                     user.createTeleport(user::getLastLocation, true, UserTeleport.Type.BACK).start(true);
                     return 0;
                 });

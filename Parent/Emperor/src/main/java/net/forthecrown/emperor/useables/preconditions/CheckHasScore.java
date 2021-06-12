@@ -24,7 +24,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.concurrent.CompletableFuture;
 
 public class CheckHasScore implements UsageCheck {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "has_score");
+    public static final Key KEY = Key.key(CrownCore.inst(), "has_score");
 
     private Objective objective;
     private int amount;
@@ -57,7 +57,7 @@ public class CheckHasScore implements UsageCheck {
     }
 
     @Override
-    public Component getFailMessage() {
+    public Component failMessage() {
         return Component.text("You aren't able to use this");
     }
 

@@ -3,10 +3,7 @@ package net.forthecrown.vikings.valhalla;
 import com.google.gson.*;
 import net.forthecrown.emperor.utils.CrownBoundingBox;
 import net.forthecrown.emperor.utils.Pair;
-import net.forthecrown.vikings.valhalla.data.LootData;
-import net.forthecrown.vikings.valhalla.data.MobData;
-import net.forthecrown.vikings.valhalla.data.RaidGenerationData;
-import net.forthecrown.vikings.valhalla.data.WorldData;
+import net.forthecrown.vikings.valhalla.data.*;
 import org.bukkit.Location;
 
 import java.lang.reflect.Type;
@@ -44,6 +41,7 @@ public class RaidSerializer implements JsonSerializer<VikingRaid>, JsonDeseriali
             if(gen.has("lootData")) generation.lootData = new LootData(gen.get("lootData"));
             if(gen.has("worldData")) generation.worldData = new WorldData(gen.get("worldData"));
             if(gen.has("mobData")) generation.mobData = new MobData(gen.get("mobData"));
+            if(gen.has("triggerData")) generation.triggerData = new TriggerData(gen.get("triggerData"));
         }
 
         return result;
@@ -72,6 +70,7 @@ public class RaidSerializer implements JsonSerializer<VikingRaid>, JsonDeseriali
         if(data.lootData != null) gen.add("lootData", data.lootData.serialize());
         if(data.worldData != null) gen.add("worldData", data.worldData.serialize());
         if(data.mobData != null) gen.add("mobData", data.mobData.serialize());
+        if(data.triggerData != null) gen.add("triggerData", data.triggerData.serialize());
 
         json.add("generationData", gen);
         return json;

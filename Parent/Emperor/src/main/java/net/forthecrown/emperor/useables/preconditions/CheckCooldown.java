@@ -7,6 +7,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.emperor.CrownCore;
+import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.useables.UsageCheck;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.emperor.utils.MapUtils;
@@ -22,7 +23,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class CheckCooldown implements UsageCheck {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "cooldown");
+    public static final Key KEY = Key.key(CrownCore.inst(), "cooldown");
 
     private final Map<UUID, Long> onCooldown = new HashMap<>();
     private int tickDuration;
@@ -30,6 +31,11 @@ public class CheckCooldown implements UsageCheck {
     @Override
     public void parse(CommandContext<CommandSource> c, StringReader reader) throws CommandSyntaxException {
         tickDuration = reader.readInt();
+
+        if(tickDuration < 1){
+            reader.setCursor(0);
+            throw FtcExceptionProvider.createWithContext("Cooldown duration cannot be less than 1 tick", reader);
+        }
     }
 
     @Override
@@ -56,12 +62,12 @@ public class CheckCooldown implements UsageCheck {
     }
 
     @Override
-    public Component getFailMessage() {
+    public Component failMessage() {
         return null;
     }
 
     @Override
-    public Component getPersonalizedFailMessage(Player player) {
+    public Component personalizedFailMessage(Player player) {
         return tickDuration > 2400 ? Component.text("You cannot use this for ")
                 .color(NamedTextColor.GRAY)
                 .append(Component.text(ChatFormatter.convertMillisIntoTime(onCooldown.get(player.getUniqueId()) - System.currentTimeMillis())).color(NamedTextColor.GOLD))
@@ -91,6 +97,8 @@ public class CheckCooldown implements UsageCheck {
 
         if(!MapUtils.isNullOrEmpty(onCooldown)){
             for (Map.Entry<UUID, Long> e: onCooldown.entrySet()){
+                if(e.getValue() <= System.currentTimeMillis()) continue;
+
                 array.add(e.getKey().toString(), new JsonPrimitive(e.getValue()));
             }
         }
@@ -108,7 +116,9 @@ public class CheckCooldown implements UsageCheck {
         return tickDuration;
     }
 
-    public void setTickDuration(int tickDuration) {
+    public void setTickDuration(int tickDuration) throws AssertionError {
+        assert tickDuration > 0 : "Cooldown duration cannot be less than 1 tick";
+
         this.tickDuration = tickDuration;
     }
 

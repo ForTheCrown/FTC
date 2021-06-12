@@ -2,13 +2,11 @@ package net.forthecrown.vikings.valhalla.triggers.checks;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.emperor.utils.CrownBoundingBox;
+import net.forthecrown.emperor.utils.JsonUtils;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.vikings.VikingUtils;
 import net.forthecrown.vikings.Vikings;
 import net.forthecrown.vikings.valhalla.active.ActiveRaid;
 import net.forthecrown.vikings.valhalla.triggers.TriggerCheck;
@@ -17,11 +15,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.concurrent.CompletableFuture;
-
 public class CheckBoundingBox implements TriggerCheck<PlayerMoveEvent> {
-    public static final Key ENTER_KEY = Key.key(Vikings.namespaced(), "enter_region");
-    public static final Key EXIT_KEY = Key.key(Vikings.namespaced(), "exit_region");
+    public static final Key ENTER_KEY = Key.key(Vikings.inst, "enter_region");
+    public static final Key EXIT_KEY = Key.key(Vikings.inst, "exit_region");
 
     private CrownBoundingBox box;
     private final boolean exit;
@@ -32,12 +28,12 @@ public class CheckBoundingBox implements TriggerCheck<PlayerMoveEvent> {
 
     @Override
     public void deserialize(JsonElement element) throws CommandSyntaxException {
-
+        this.box = JsonUtils.deserializeBoundingBox(element.getAsJsonObject());
     }
 
     @Override
-    public void parse(StringReader reader) throws CommandSyntaxException {
-
+    public void parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
+        this.box = VikingUtils.parseRegion(reader, source);
     }
 
     @Override
@@ -46,13 +42,8 @@ public class CheckBoundingBox implements TriggerCheck<PlayerMoveEvent> {
     }
 
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return PositionArgument.position().listSuggestions(context, builder);
-    }
-
-    @Override
     public JsonElement serialize() {
-        return null;
+        return JsonUtils.serializeBoundingBox(box);
     }
 
     @Override

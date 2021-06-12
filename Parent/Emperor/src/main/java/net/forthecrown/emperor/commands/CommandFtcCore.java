@@ -19,6 +19,7 @@ import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.commands.manager.CoreCommands;
 import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
+import net.forthecrown.emperor.commands.marriage.CommandMarry;
 import net.forthecrown.emperor.datafixers.ShopTagUpdater;
 import net.forthecrown.emperor.datafixers.UserAndBalanceUpdater;
 import net.forthecrown.emperor.economy.BalanceMap;
@@ -26,10 +27,7 @@ import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.economy.SortedBalanceMap;
 import net.forthecrown.emperor.inventory.CrownItems;
 import net.forthecrown.emperor.inventory.CrownWeapons;
-import net.forthecrown.emperor.user.CrownUser;
-import net.forthecrown.emperor.user.CrownUserAlt;
-import net.forthecrown.emperor.user.FtcUserAlt;
-import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.user.*;
 import net.forthecrown.emperor.user.data.UserTeleport;
 import net.forthecrown.emperor.user.enums.Branch;
 import net.forthecrown.emperor.user.enums.Pet;
@@ -46,10 +44,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
@@ -109,6 +111,30 @@ public class CommandFtcCore extends FtcCommand {
                                     .start(true);
 
                             user.sendMessage(Component.text("Going to spawn").color(NamedTextColor.GRAY));
+                            return 0;
+                        })
+                )
+
+                .then(literal("marriagePriest")
+                        .executes(c -> {
+                            CrownUser user = getUserSender(c);
+                            Location location = user.getLocation();
+
+                            location.getWorld().spawn(location, Villager.class, villie -> {
+                                villie.setProfession(Villager.Profession.CLERIC);
+                                villie.setVillagerType(Villager.Type.PLAINS);
+                                villie.setVillagerLevel(5);
+
+                                villie.setInvulnerable(true);
+                                villie.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
+
+                                villie.customName(Component.text("Father Ted").color(NamedTextColor.AQUA));
+                                villie.setCustomNameVisible(true);
+
+                                villie.getPersistentDataContainer().set(CommandMarry.KEY, PersistentDataType.BYTE, (byte) 1);
+                            });
+
+                            c.getSource().sendAdmin(Component.text("Spawned marriage priest"));
                             return 0;
                         })
                 )
@@ -183,6 +209,78 @@ public class CommandFtcCore extends FtcCommand {
                                                     um.removeEntry(user.getUniqueId());
 
                                                     broadcastAdmin(c.getSource(), user.getName() + " is no longer an alt");
+                                                    return 0;
+                                                })
+                                        )
+                                )
+
+                                .then(literal("married")
+                                        .executes(c -> {
+                                            CrownUser user = getUser(c);
+                                            UserInteractions inter = user.getInteractions();
+
+                                            if(inter.getMarriedTo() == null) throw FtcExceptionProvider.create(user.getName() + " is not married");
+
+                                            c.getSource().sendMessage(
+                                                    Component.text()
+                                                            .append(user.displayName())
+                                                            .append(Component.text(" is married to "))
+                                                            .append(UserManager.getUser(inter.getMarriedTo()).displayName())
+                                                            .append(Component.text("."))
+                                                            .build()
+                                            );
+                                            return 0;
+                                        })
+
+                                        .then(literal("resetCooldown")
+                                                .executes(c -> {
+                                                    CrownUser user = getUser(c);
+                                                    user.getInteractions().setLastMarriageStatusChange(0L);
+
+                                                    c.getSource().sendAdmin(
+                                                            Component.text("Reset cooldown of ")
+                                                                    .append(user.displayName())
+                                                    );
+                                                    return 0;
+                                                })
+                                        )
+
+                                        .then(literal("divorce")
+                                                .executes(c -> {
+                                                    CrownUser user = getUser(c);
+
+                                                    if(user.getInteractions().getMarriedTo() == null) throw FtcExceptionProvider.create("User is not married");
+
+                                                    CrownUser spouse = UserManager.getUser(user.getInteractions().getMarriedTo());
+
+                                                    spouse.getInteractions().setMarriedTo(null);
+                                                    user.getInteractions().setMarriedTo(null);
+
+                                                    c.getSource().sendAdmin(
+                                                            Component.text("Made ")
+                                                                    .append(user.displayName())
+                                                                    .append(Component.text(" divorce"))
+                                                    );
+                                                    return 0;
+                                                })
+                                        )
+
+                                        .then(argument("target", UserType.user())
+                                                .executes(c -> {
+                                                    CrownUser user = getUser(c);
+                                                    CrownUser target = UserType.getUser(c, "target");
+
+                                                    if(user.getUniqueId().equals(target.getUniqueId())) throw FtcExceptionProvider.create("Cannot make people marry themselves lol");
+
+                                                    user.getInteractions().setMarriedTo(target.getUniqueId());
+                                                    target.getInteractions().setMarriedTo(user.getUniqueId());
+
+                                                    c.getSource().sendAdmin(
+                                                            Component.text("Married ")
+                                                                    .append(user.displayName())
+                                                                    .append(Component.text(" to "))
+                                                                    .append(target.displayName())
+                                                    );
                                                     return 0;
                                                 })
                                         )

@@ -1,6 +1,7 @@
 package net.forthecrown.emperor.commands.manager;
 
 import com.mojang.brigadier.LiteralMessage;
+import com.mojang.brigadier.Message;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -11,6 +12,7 @@ import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.economy.Balances;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.utils.Pair;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.royalgrenadier.source.CommandSources;
@@ -33,9 +35,9 @@ public abstract class FtcCommand extends AbstractCommand {
     protected FtcCommand(@NotNull String name, @NotNull Plugin plugin) {
         super(name, plugin);
 
-        permissionMessage = ChatColor.WHITE + "Unknown command. Type \"/help\" for help";
-        permission = Permissions.register(Permissions.COMMAND_PREFIX + name);
-        description = "An FTC command";
+        setPermissionMessage(ChatColor.WHITE + "Unknown command. Type \"/help\" for help");
+        setDescription("An FTC command");
+        setPermission(Permissions.COMMAND_PREFIX + name);
 
         CoreCommands.BY_NAME.put(name, this);
     }
@@ -77,7 +79,7 @@ public abstract class FtcCommand extends AbstractCommand {
             if(!c.getSource().isPlayer()) return Suggestions.empty();
             UUID id = getPlayerSender(c).getUniqueId();
 
-            if(bals.canAfford(id, 1)) b.suggest(bals.get(id), new LiteralMessage("Your entire balance"));
+            suggestIf(id, new Pair<>(bals.get(id), new LiteralMessage("Your entire balance")), b);
 
             suggestIf(id, 1, b);
             suggestIf(id, 10, b);
@@ -94,6 +96,11 @@ public abstract class FtcCommand extends AbstractCommand {
     }
 
     private void suggestIf(UUID id, int amount, SuggestionsBuilder builder){
-        if(bals.canAfford(id, amount) && (amount + "").toLowerCase().startsWith(builder.getRemaining().toLowerCase())) builder.suggest(amount);
+        suggestIf(id, new Pair<>(amount, null), builder);
+    }
+
+    private void suggestIf(UUID id, Pair<Integer, Message> pair, SuggestionsBuilder builder){
+        int amount = pair.getFirst();
+        if(bals.canAfford(id, amount) && (amount + "").toLowerCase().startsWith(builder.getRemaining().toLowerCase())) builder.suggest(amount, pair.getSecond());
     }
 }

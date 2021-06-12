@@ -18,15 +18,16 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class JailListener implements Listener {
 
-    private final Player player;
-    private final Location jail;
-    private final PunishmentRecord record;
+    public final Player player;
+    public final Location jail;
+    public final PunishmentRecord record;
 
     public JailListener(Player player, Location jail){
         this.player = player;
         this.jail = jail;
 
         record = CrownCore.getPunishmentManager().getEntry(player.getUniqueId()).getCurrent(PunishmentType.JAIL);
+        CrownCore.getJailManager().addJailListener(this);
 
         checkDistance();
     }
@@ -37,7 +38,17 @@ public class JailListener implements Listener {
         if(System.currentTimeMillis() < record.expiresAt) return;
         CrownCore.getPunishmentManager().checkJailed(player);
 
+        release();
+    }
+
+    public void unreg(){
         HandlerList.unregisterAll(this);
+        CrownCore.getJailManager().removeJailListener(this);
+    }
+
+    public void release(){
+        unreg();
+
         UserManager.getUser(player).createTeleport(() -> CrownUtils.LOCATION_HAZELGUARD, false, true, UserTeleport.Type.OTHER)
                 .start(false);
     }

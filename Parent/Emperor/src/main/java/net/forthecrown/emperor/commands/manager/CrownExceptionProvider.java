@@ -58,4 +58,16 @@ public class CrownExceptionProvider {
     static final TranslatableExceptionType NO_DEF_HOME =                new TranslatableExceptionType("homes.noDefaultHome");
     static final TranslatableExceptionType HOME_NAME_IN_USE =           new TranslatableExceptionType("homes.nameInUse");
     static final TranslatableExceptionType OVER_HOME_LIMIT =            new TranslatableExceptionType("homes.overLimit");
+
+    static final TranslatableExceptionType CANNOT_TPA =                 new TranslatableExceptionType("tpa.no");
+    static final TranslatableExceptionType CANNOT_TPA_HERE =            new TranslatableExceptionType("tpa.noHere");
+    static final TranslatableExceptionType CANNOT_RETURN =              new TranslatableExceptionType("commands.cannotReturn");
+    static final TranslatableExceptionType CANNOT_TP_HOME =             new TranslatableExceptionType("homes.badWorld");
+    static final TranslatableExceptionType CANNOT_SET_HOME =            new TranslatableExceptionType("homes.cannotSetHere");
+
+    static final TranslatableExceptionType MARRIED_SENDER =             new TranslatableExceptionType("marriage.alreadyMarried.sender");
+    static final TranslatableExceptionType MARRIED_TARGET =             new TranslatableExceptionType("marriage.alreadyMarried.target");
+    static final TranslatableExceptionType MARRIAGE_CANNOT_CHANGE =     new TranslatableExceptionType("marriage.cannotChange.sender");
+    static final TranslatableExceptionType MARRIAGE_CANNOT_CHANGE_T =   new TranslatableExceptionType("marriage.cannotChange.target");
+    static final TranslatableExceptionType NOT_MARRIED =                new TranslatableExceptionType("marriage.notMarried");
 }

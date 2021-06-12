@@ -50,7 +50,6 @@ public final class Main extends JavaPlugin implements CrownCore {
     //Hacky way of determining if we're on the test server or not
     public static final ComVar<Boolean> inDebugMode = ComVars.set("core_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
 
-    //These feel barren without access modifiers lol
     static Main                     inst;
 
     static String                   prefix = "&6[FTC]&r  ";
@@ -62,6 +61,9 @@ public final class Main extends JavaPlugin implements CrownCore {
     static ComVar<Byte>             maxNickLength;
     static ComVar<Short>            nearRadius;
     static ComVar<Short>            hoppersInOneChunk;
+    static ComVar<Long>             marriageCooldown;
+    static ComVar<Long>             userDataResetInterval;// 5356800000L aka 2 months, by default
+    static ComVar<Long>             branchSwapCooldown;// 172800000 aka 2 days, by default
     static ComVar<Boolean>          allowOtherPlayerNicks;
     static ComVar<Boolean>          taxesEnabled;
     static ComVar<Boolean>          logAdminShop;
@@ -71,8 +73,6 @@ public final class Main extends JavaPlugin implements CrownCore {
     static ComVar<Integer>          tpaExpiryTime;
     static ComVar<Integer>          startRhines;
     static ComVar<Integer>          baronPrice;
-    static ComVar<Long>             userDataResetInterval;// 5356800000L aka 2 months, by default
-    static ComVar<Long>             branchSwapCooldown;// 172800000 aka 2 days, by default
 
     static CrownBalances            balances;
     static CrownBroadcaster         announcer;
@@ -85,7 +85,7 @@ public final class Main extends JavaPlugin implements CrownCore {
     static CrownUserManager         userManager;
     static CrownJailManager         jailManager;
 
-    static ServerRules rules;
+    static ServerRules              rules;
 
     static CrownWarpRegistry        warpRegistry;
     static CrownKitRegistry         kitRegistry;
@@ -177,6 +177,8 @@ public final class Main extends JavaPlugin implements CrownCore {
         pm.registerEvents(new MobHealthBar(), this);
         pm.registerEvents(new SmokeBomb(), this);
         pm.registerEvents(new InteractableEvents(), this);
+
+        pm.registerEvents(new MarriageListener(), this);
     }
 
     @Override
@@ -203,6 +205,7 @@ public final class Main extends JavaPlugin implements CrownCore {
         getConfig().set("BaronPrice", baronPrice.getValue());
         getConfig().set("NearRadius", nearRadius.getValue());
         getConfig().set("ServerSpawn", serverSpawn);
+        getConfig().set("MarriageStatusCooldown", marriageCooldown.getValue());
 
         for (Material m: defaultItemPrices.keySet()){
             getConfig().set("DefaultPrices." + m.toString(), defaultItemPrices.get(m).getValue((short) 2));
@@ -234,6 +237,7 @@ public final class Main extends JavaPlugin implements CrownCore {
         allowOtherPlayerNicks = ComVars.set("core_allowOtherPlayerNicks",     ComVarType.BOOLEAN,     getConfig().getBoolean("AllowOtherPlayerNicks"));
         baronPrice = ComVars.set(           "core_baronPrice",                ComVarType.INTEGER,     getConfig().getInt("BaronPrice"));
         nearRadius = ComVars.set(           "core_nearRadius",                ComVarType.SHORT,       (short) getConfig().getInt("NearRadius"));
+        marriageCooldown = ComVars.set(     "core_marriageCooldown",          ComVarType.LONG,        getConfig().getLong("MarriageStatusCooldown"));
 
         serverSpawn = getConfig().getLocation("ServerSpawn", new Location(CrownUtils.WORLD_VOID, 153.5, 5, 353.5, 90, 0));
 

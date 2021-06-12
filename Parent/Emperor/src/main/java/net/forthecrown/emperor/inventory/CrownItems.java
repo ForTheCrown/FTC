@@ -149,7 +149,7 @@ public final class CrownItems {
     public static ItemStack getCoins(int amount, int itemAmount){
         return new ItemStackBuilder(Material.SUNFLOWER, itemAmount)
                 .setName(Component.text("Rhines").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
-                .addLore(Component.text("Worth ").append(Balances.formatted(amount)).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false))
+                .addLore(Component.text("Worth ").append(Component.text(Balances.getFormatted(amount))).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false))
                 .addLore(Component.text("Minted in the year " + CrownUtils.arabicToRoman(CrownUtils.worldTimeToYears(CrownUtils.WORLD)) + ".").style(NON_ITALIC_DARK_GRAY))
                 .addLore(s())
                 .build();

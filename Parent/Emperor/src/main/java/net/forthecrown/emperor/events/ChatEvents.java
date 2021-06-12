@@ -8,9 +8,12 @@ import net.forthecrown.emperor.admin.StaffChat;
 import net.forthecrown.emperor.admin.EavesDropper;
 import net.forthecrown.emperor.admin.PunishmentManager;
 import net.forthecrown.emperor.admin.MuteStatus;
+import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserInteractions;
 import net.forthecrown.emperor.user.UserManager;
+import net.forthecrown.emperor.user.data.MarriageMessage;
 import net.forthecrown.emperor.utils.ChatFormatter;
+import net.forthecrown.emperor.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -79,5 +82,15 @@ public class ChatEvents implements Listener {
 
             return inter.isBlockedPlayer(player.getUniqueId());
         });
+
+        CrownUser user = UserManager.getUser(player);
+        UserInteractions inter = user.getInteractions();
+
+        if(inter.isMarriageChatToggled()){
+            event.recipients().clear();
+
+            new MarriageMessage(user, UserManager.getUser(inter.getMarriedTo()), ChatUtils.getString(event.message()))
+                    .complete();
+        }
     }
 }

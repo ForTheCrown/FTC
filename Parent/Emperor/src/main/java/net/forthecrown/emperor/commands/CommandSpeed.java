@@ -76,12 +76,15 @@ public class CommandSpeed extends FtcCommand {
     }
 
     private int querySpeed(CrownUser user, CommandSource source, boolean fly){
-        float value = fly ? user.getPlayer().getFlySpeed() : user.getPlayer().getWalkSpeed();
+        float realValue = fly ? user.getPlayer().getFlySpeed() : user.getPlayer().getWalkSpeed();
+        float value = realValue * (fly ? 0.1f : 0.2f);
         source.sendMessage(
                 Component.text((fly ? "Fly" : "Walk") + "ing speed of ")
                         .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
                         .append(Component.text(" is "))
-                        .append(Component.text(user.getPlayer().getFlySpeed()).color(NamedTextColor.YELLOW))
+                        .append(Component.text(value).color(NamedTextColor.YELLOW))
+                        .append(Component.text(", actual is "))
+                        .append(Component.text(value).color(NamedTextColor.YELLOW))
         );
         return 0;
     }

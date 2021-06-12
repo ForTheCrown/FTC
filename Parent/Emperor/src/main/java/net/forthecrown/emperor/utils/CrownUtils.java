@@ -108,7 +108,7 @@ public final class CrownUtils {
             reader.skip();
             return Key.key(first, reader.readUnquotedString());
         }
-        return Key.key(CrownCore.getNamespace(), first);
+        return Key.key(CrownCore.inst(), first);
     }
 
     public static CompletableFuture<Suggestions> suggestKeys(SuggestionsBuilder builder, Iterable<Key> keys){
@@ -154,11 +154,12 @@ public final class CrownUtils {
         emojiList.add(":sad:");
         emojiList.add(":pleased:");
         emojiList.add(":fedup:");
+        emojiList.add(":reallysad:");
 
         return emojiList;
     }).get();
 
-    public static CompletableFuture<Suggestions> suggeestPlayernamesAndEmotes(CommandContext<CommandSource> c, SuggestionsBuilder builder){
+    public static CompletableFuture<Suggestions> suggestPlayernamesAndEmotes(CommandContext<CommandSource> c, SuggestionsBuilder builder){
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ')+1);
 
         CompletionProvider.suggestPlayerNames(builder);
@@ -167,8 +168,8 @@ public final class CrownUtils {
         return CompletionProvider.suggestMatching(builder, emojiSuggestions);
     }
 
-    public static boolean checkItemNotEmpty(ItemStack itemStack){
-        return itemStack != null && itemStack.getType() != Material.AIR;
+    public static boolean isItemEmpty(ItemStack itemStack){
+        return itemStack == null || itemStack.getType() == Material.AIR;
     }
 
     public static Component entityDisplayName(Entity entity){

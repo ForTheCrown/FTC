@@ -16,8 +16,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.entity.Player;
 
 public class ActionRemoveNumber implements UsageAction {
-    public static final Key BAL_KEY = Key.key(CrownCore.getNamespace(), "remove_balance");
-    public static final Key GEM_KEY = Key.key(CrownCore.getNamespace(), "remove_gems");
+    public static final Key BAL_KEY = Key.key(CrownCore.inst(), "remove_balance");
+    public static final Key GEM_KEY = Key.key(CrownCore.inst(), "remove_gems");
 
     private final boolean fromBal;
     private int amount;

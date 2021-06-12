@@ -3,6 +3,7 @@ package net.forthecrown.emperor.events;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.forthecrown.emperor.user.CrownUser;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -37,7 +38,10 @@ public class AfkListener implements Listener {
         Component userMsg = Component.translatable("unafk.self")
                 .color(NamedTextColor.GRAY);
 
-        Component broadcastMsg = Component.translatable("unafk.others", user.nickDisplayName()).color(NamedTextColor.GRAY);
+        Component broadcastMsg = Component.translatable("unafk.others", user.nickDisplayName())
+                .hoverEvent(Component.text("Click to welcome them back!"))
+                .clickEvent(ClickEvent.runCommand("Welcome back!"))
+                .color(NamedTextColor.GRAY);
 
 
         user.sendMessage(userMsg);

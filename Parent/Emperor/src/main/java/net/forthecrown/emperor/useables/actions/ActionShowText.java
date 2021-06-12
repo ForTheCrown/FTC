@@ -17,7 +17,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.entity.Player;
 
 public class ActionShowText implements UsageAction {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "show_text");
+    public static final Key KEY = Key.key(CrownCore.inst(), "show_text");
 
     private static final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
     private Component component;

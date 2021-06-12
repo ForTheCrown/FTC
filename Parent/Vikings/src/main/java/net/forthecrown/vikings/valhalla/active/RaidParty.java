@@ -1,5 +1,6 @@
 package net.forthecrown.vikings.valhalla.active;
 
+import com.google.common.collect.ImmutableList;
 import net.forthecrown.vikings.valhalla.VikingRaid;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
@@ -15,6 +16,13 @@ public class RaidParty {
 
     public RaidParty(VikingRaid raid) {
         this.raid = raid;
+    }
+
+    public void start(){
+        BattleBuilder builder = new BattleBuilder(this);
+        activeRaid = builder.build();
+
+
     }
 
     public boolean hasStarted(){
@@ -33,5 +41,9 @@ public class RaidParty {
 
     public void remove(Player player){
         participants.remove(player);
+    }
+
+    public List<Player> getParticipants() {
+        return ImmutableList.copyOf(participants);
     }
 }

@@ -19,7 +19,7 @@ public class CrownMessages implements Keyed {
     private final Key key;
 
     public CrownMessages(){
-        key = Key.key(CrownCore.getNamespace(), "messages");
+        key = Key.key(CrownCore.inst(), "messages");
         registry = TranslationRegistry.create(key);
         registry.defaultLocale(Locale.ENGLISH);
 

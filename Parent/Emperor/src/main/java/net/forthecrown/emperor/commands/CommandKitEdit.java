@@ -4,16 +4,16 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
+import net.forthecrown.emperor.commands.arguments.KitType;
 import net.forthecrown.emperor.commands.manager.FtcCommand;
 import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
-import net.forthecrown.emperor.commands.arguments.KitType;
 import net.forthecrown.emperor.useables.kits.Kit;
+import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.emperor.utils.InterUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,12 +36,12 @@ public class CommandKitEdit extends FtcCommand {
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
                                     String name = c.getArgument("name", String.class);
-                                    Key key = Key.key(CrownCore.getNamespace(), name);
+                                    Key key = CrownUtils.parseKey(name);
 
                                     List<ItemStack> items = new ArrayList<>();
 
                                     for (ItemStack i: player.getInventory()){
-                                        if(i == null || i.getType() == Material.AIR) continue;
+                                        if(CrownUtils.isItemEmpty(i)) continue;
                                         items.add(i);
                                     }
 

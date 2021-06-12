@@ -4,15 +4,15 @@ import net.forthecrown.emperor.CrownCore;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Entity;
 
 public interface UsablesManager {
     NamespacedKey USABLE_KEY = new NamespacedKey(CrownCore.inst(), "useableSign");
 
-    UsableSign getSign(Location l);
+    UsableBlock getBlock(Location l);
 
-    UsableSign createSign(Sign l);
+    UsableBlock createSign(TileState l);
 
     UsableEntity getEntity(Entity entity);
 
@@ -27,8 +27,8 @@ public interface UsablesManager {
     void saveAll();
 
     void addEntity(UsableEntity entity);
-    void addSign(UsableSign sign);
+    void addBlock(UsableBlock sign);
 
     void removeEntity(UsableEntity entity);
-    void removeSign(UsableSign sign);
+    void removeBlock(UsableBlock sign);
 }

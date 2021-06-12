@@ -29,7 +29,7 @@ public class CommandTeleportExact extends FtcCommand {
         command
                 .then(argument("pos", PositionArgument.position())
                         .then(argument("pitch", FloatArgumentType.floatArg(-90, 90))
-                                .then(argument("yaw", FloatArgumentType.floatArg(-180, 180))
+                                .then(argument("yaw", FloatArgumentType.floatArg(-360, 360))
                                         .then(argument("world", WorldArgument.world())
                                                 .executes(c -> {
                                                     CrownUser user = getUserSender(c);

@@ -40,4 +40,30 @@ public interface UserInteractions extends SocialInteractionsService {
     TeleportRequest firstIncoming();
 
     TeleportRequest firstOutgoing();
+
+    UUID getMarriedTo();
+
+    void setMarriedTo(UUID marriedTo);
+
+    long getLastMarriageStatusChange();
+
+    void setLastMarriageStatusChange(long lastMarriageStatusChange);
+
+    boolean canChangeMarriageStatus();
+
+    UUID getLastMarriageRequest();
+
+    void setLastMarriageRequest(UUID lastMarriageRequest);
+
+    boolean isAcceptingProposals();
+
+    void setAcceptingProposals(boolean acceptingProposals);
+
+    UUID getWaitingFinish();
+
+    void setWaitingFinish(UUID waitingFinish);
+
+    boolean isMarriageChatToggled();
+
+    void setMarriageChatToggled(boolean marriageChatToggled);
 }

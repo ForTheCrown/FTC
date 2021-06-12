@@ -4,6 +4,7 @@ import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.user.data.DirectMessage;
+import net.forthecrown.emperor.user.data.MarriageMessage;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,29 +19,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Predicate;
 
 public class EavesDropper {
-    public static Component PREFIX = Component.text()
-            .color(NamedTextColor.DARK_GRAY)
-            .append(Component.text("["))
-            .append(Component.text("EavesDrop").color(NamedTextColor.YELLOW))
-            .append(Component.text("] "))
-            .build();
 
-    public static void send(Component text, Permission permission, @Nullable Predicate<CrownUser> toSkip){
-        Component formatted = format(text);
+    public static void send(Component text, Permission permission, @Nullable Predicate<CrownUser> toSkip, boolean log){
 
         UserManager.getOnlineUsers().forEach(u -> {
             if(toSkip != null && toSkip.test(u)) return;
             if(!u.isEavesDropping() || !u.hasPermission(permission)) return;
-            u.sendMessage(formatted);
+            u.sendMessage(text);
         });
-        Bukkit.getConsoleSender().sendMessage(formatted);
-    }
-
-    public static Component format(Component initial){
-        return Component.text()
-                .append(PREFIX)
-                .append(initial)
-                .build();
+        if(log) Bukkit.getConsoleSender().sendMessage(text);
     }
 
     public static void reportMuted(Component text, Player player, MuteStatus status){
@@ -58,7 +45,8 @@ public class EavesDropper {
                 .append(text)
                 .build(),
                 Permissions.EAVESDROP_MUTED,
-                u -> u.getName().equalsIgnoreCase(player.getName())
+                u -> u.getName().equalsIgnoreCase(player.getName()),
+                true
         );
     }
 
@@ -74,7 +62,27 @@ public class EavesDropper {
                 .append(message.getFormattedText())
                 .build(),
                 Permissions.EAVESDROP_DM,
-                u -> u.getName().equalsIgnoreCase(message.getReceiver().textName()) || u.getName().equalsIgnoreCase(message.getSender().textName())
+                u -> u.getName().equalsIgnoreCase(message.getReceiver().textName()) || u.getName().equalsIgnoreCase(message.getSender().textName()),
+                false
+        );
+    }
+
+    public static void reportMarriageDM(MarriageMessage message){
+        send(
+                Component.text()
+                        .append(Component.text(message.getStatus().edPrefix))
+                        .append(MarriageMessage.PREFIX)
+                        .append(message.getSender().nickDisplayName())
+                        .append(MarriageMessage.POINTER)
+                        .append(message.getFormatted())
+                        .build(),
+
+                Permissions.EAVESDROP_MARRIAGE,
+                u -> {
+                    if(u.getName().contains(message.getSender().getName())) return true;
+                    return u.getName().contains(message.getRecipient().getName());
+                },
+                false
         );
     }
 
@@ -112,7 +120,8 @@ public class EavesDropper {
                         .build(),
 
                 Permissions.EAVESDROP_SIGNS,
-                u -> u.getName().equalsIgnoreCase(player.getName())
+                u -> u.getName().equalsIgnoreCase(player.getName()),
+                false
         );
     }
 
@@ -123,6 +132,6 @@ public class EavesDropper {
             emptyLines += PlainComponentSerializer.plain().serialize(c).isBlank() ? 1 : 0;
         }
 
-        return emptyLines <= 4;
+        return emptyLines >= 4;
     }
 }

@@ -53,7 +53,7 @@ public class CommandNickname extends FtcCommand {
 
                                     user.setNickname(nickname);
 
-                                    c.getSource().sendAdmin(
+                                    c.getSource().sendMessage(
                                             nickname == null ?
                                                     Component.text("Cleared ")
                                                             .append(user.displayName())

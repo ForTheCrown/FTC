@@ -21,7 +21,7 @@ import org.bukkit.permissions.Permission;
 import java.util.concurrent.CompletableFuture;
 
 public class CheckPermission implements UsageCheck {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "required_permission");
+    public static final Key KEY = Key.key(CrownCore.inst(), "required_permission");
     private String permission;
 
     @Override
@@ -45,7 +45,7 @@ public class CheckPermission implements UsageCheck {
     }
 
     @Override
-    public Component getFailMessage() {
+    public Component failMessage() {
         return Component.text("You don't have permission to use this.").color(NamedTextColor.GRAY);
     }
 

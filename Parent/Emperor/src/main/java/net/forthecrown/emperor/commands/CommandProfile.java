@@ -6,20 +6,25 @@ import net.forthecrown.emperor.admin.PunishmentEntry;
 import net.forthecrown.emperor.admin.PunishmentManager;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.commands.manager.FtcCommand;
+import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.FtcUser;
+import net.forthecrown.emperor.user.UserManager;
 import net.forthecrown.emperor.user.enums.Branch;
 import net.forthecrown.emperor.user.enums.Rank;
 import net.forthecrown.emperor.utils.ChatFormatter;
 import net.forthecrown.emperor.utils.ChatUtils;
 import net.forthecrown.emperor.utils.ListUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Statistic;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
+
+import java.util.Date;
 
 public class CommandProfile extends FtcCommand {
 
@@ -68,15 +73,12 @@ public class CommandProfile extends FtcCommand {
                 );
     }
 
-    public void sendProfileMessage(CrownUser profile, CrownUser user){
+    public void sendProfileMessage(CrownUser profile, CrownUser user) throws RoyalCommandException {
         boolean self = profile.equals(user);
 
         //If the profile isn't public and you don't have bypass permissions
         if(!self && !profile.isProfilePublic()){
-            if(!user.hasPermission(Permissions.PROFILE_BYPASS)){
-                user.sendMessage(profile.getName() + " profile is not public");
-                return;
-            }
+            if(!user.hasPermission(Permissions.PROFILE_BYPASS)) throw FtcExceptionProvider.translatable("commands.profileNotPublic", profile.nickDisplayName());
         }
 
         String header = "&6&m----&e " + (self ? "Your" : (profile.getNickOrName() + "'s")) + " player profile &6&m----";
@@ -87,6 +89,8 @@ public class CommandProfile extends FtcCommand {
 
         Objective crown = profile.getScoreboard().getObjective("crown");
         Score crownScr = crown.getScore(profile.getName());
+
+        Component marriedTo = marriedMessage(profile);
 
         //Footer size roughly lines up with header size
         StringBuilder footer = new StringBuilder();
@@ -106,6 +110,7 @@ public class CommandProfile extends FtcCommand {
 
                 .append(line("Allowed to swap branches in", timeThing(profile), !profile.getCanSwapBranch() && (self || user.hasPermission(Permissions.PROFILE_BYPASS))))
                 .append(line("Play time", ChatFormatter.decimalizeNumber(playTime) + " hours", playTime > 0))
+                .append(line("Married to", marriedTo, marriedTo != null))
 
                 .append(line("Pirate Points", score.getScore() + "", score.isScoreSet() && score.getScore() != 0))
                 .append(line("Crown score", crownScr.getScore() + "", crownScr.isScoreSet() && crownScr.getScore() > 0))
@@ -167,6 +172,13 @@ public class CommandProfile extends FtcCommand {
                 .append(punishmentDisplay);
     }
 
+    private Component marriedMessage(CrownUser user){
+        if(user.getInteractions().getMarriedTo() == null) return null;
+
+        return UserManager.getUser(user.getInteractions().getMarriedTo())
+                .nickDisplayName();
+    }
+
     private Component timeSinceOnlineOrOnlineTime(CrownUser user){
         if(user.isOnline()){
             return Component.text(" Has been online for ")
@@ -175,6 +187,7 @@ public class CommandProfile extends FtcCommand {
         } else {
             return Component.text(" Last online ")
                     .color(NamedTextColor.YELLOW)
+                    .hoverEvent(Component.text(new Date(user.getOfflinePlayer().getLastLogin()).toString()))
                     .append(ChatFormatter.millisIntoTime(System.currentTimeMillis() - user.getOfflinePlayer().getLastLogin()).color(NamedTextColor.WHITE))
                     .append(Component.text(" ago"));
         }

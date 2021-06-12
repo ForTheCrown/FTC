@@ -31,7 +31,7 @@ public class CommandTell extends FtcCommand {
         command.
                 then(argument("user", UserType.onlineUser())
                         .then(argument("message", StringArgumentType.greedyString())
-                                .suggests(CrownUtils::suggeestPlayernamesAndEmotes)
+                                .suggests(CrownUtils::suggestPlayernamesAndEmotes)
 
                                 .executes(c -> {
                                     CommandSource source = c.getSource();

@@ -83,7 +83,7 @@ public class InterUtils {
                                                 .suggests((c, b) -> {
                                                     try {
                                                         return ActionArgType.getAction(c, "type").getSuggestions(c, b);
-                                                    } catch (CommandSyntaxException ignored) {}
+                                                    } catch (Exception ignored) {}
                                                     return Suggestions.empty();
                                                 })
 
@@ -155,7 +155,7 @@ public class InterUtils {
                                         .suggests((c, b) -> {
                                             try {
                                                 return CheckArgType.getCheck(c, "type").getSuggestions(c, b);
-                                            } catch (CommandSyntaxException ignored) {}
+                                            } catch (Exception ignored) {}
                                             return Suggestions.empty();
                                         })
 
@@ -209,14 +209,12 @@ public class InterUtils {
         ItemStack main = player.getInventory().getItemInMainHand();
         if(main == null || main.getType() == Material.AIR) throw FtcExceptionProvider.create("You must be holding an item");
 
-        return main;
+        return main.clone();
     }
 
     public static CompletableFuture<Suggestions> listItems(CommandContext<CommandSource> c, SuggestionsBuilder builder){
-        if(builder.getRemaining().startsWith("-")) return CompletionProvider.suggestMatching(builder, Arrays.asList("-heldItem"));
-
         int index = builder.getRemaining().indexOf(' ');
-        if(index == -1) return CompletionProvider.suggestMatching(builder, Arrays.asList("1", "8", "16", "32", "64"));
+        if(index == -1) return CompletionProvider.suggestMatching(builder, Arrays.asList("1", "8", "16", "32", "64", "-heldItem"));
 
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ') + 1);
         return ItemArgument.itemStack().listSuggestions(c, builder);

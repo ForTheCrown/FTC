@@ -5,7 +5,6 @@ import net.forthecrown.emperor.CrownCore;
 import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.arguments.UserType;
 import net.forthecrown.emperor.commands.manager.FtcCommand;
-import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.user.CrownUser;
 import net.forthecrown.emperor.user.UserInteractions;
 import net.forthecrown.emperor.user.data.TeleportRequest;
@@ -15,6 +14,9 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.World;
+
+import static net.forthecrown.emperor.commands.manager.FtcExceptionProvider.*;
 
 public class CommandTpask extends FtcCommand {
 
@@ -74,19 +76,30 @@ public class CommandTpask extends FtcCommand {
     }
 
     public static void checkPreconditions(CrownUser sender, CrownUser to, boolean tpaHere) throws CommandSyntaxException {
-        if(sender.equals(to)) throw FtcExceptionProvider.cannotTpToSelf();
+        if(sender.equals(to)) throw cannotTpToSelf();
 
-        if(!sender.allowsTPA()) throw FtcExceptionProvider.senderTpaDisabled();
-        if(!to.allowsTPA()) throw FtcExceptionProvider.targetTpaDisabled(to);
+        if(!sender.allowsTPA()) throw senderTpaDisabled();
+        if(!to.allowsTPA()) throw targetTpaDisabled(to);
 
         UserInteractions i = sender.getInteractions();
-        if(i.getOutgoing(to) != null) throw FtcExceptionProvider.requestAlreadySent(sender);
+        UserInteractions iTo = to.getInteractions();
+        if(i.getOutgoing(to) != null || iTo.getIncoming(sender) != null) throw requestAlreadySent(to);
 
-        if(!tpaHere && !sender.canTeleport()) throw FtcExceptionProvider.cannotTeleport();
+        if(!sender.hasPermission(Permissions.WORLD_BYPASS)){
+            if(tpaHere){ if(isNonAcceptedWorld(sender.getWorld())) throw cannotTpaHere(); }
+            else if(isNonAcceptedWorld(to.getWorld())) throw cannotTpaTo(to);
+        }
+
+        if(!tpaHere && !sender.canTeleport()) throw cannotTeleport();
+    }
+
+    public static boolean isNonAcceptedWorld(World world){
+        String name = world.getName();
+        return name.contains("senate") || name.contains("void") || name.contains("raids");
     }
 
     public static TextComponent acceptButton(CrownUser target){
-        return Component.text("[✔] ")
+        return Component.text("[✔]")
                 .color(NamedTextColor.YELLOW)
                 .hoverEvent(Component.translatable("tpa.button.accept"))
                 .clickEvent(ClickEvent.runCommand("/tpaccept " + target.getName()));

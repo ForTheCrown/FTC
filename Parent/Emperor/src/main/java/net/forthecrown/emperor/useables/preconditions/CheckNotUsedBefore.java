@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class CheckNotUsedBefore implements UsageCheck {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "not_used_before");
+    public static final Key KEY = Key.key(CrownCore.inst(), "not_used_before");
 
     private final List<UUID> list = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public class CheckNotUsedBefore implements UsageCheck {
     }
 
     @Override
-    public Component getFailMessage() {
+    public Component failMessage() {
         return Component.text("You have already used this").color(NamedTextColor.GRAY);
     }
 

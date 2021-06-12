@@ -20,7 +20,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionKit implements UsageAction {
-    public static final Key KEY = Key.key(CrownCore.getNamespace(), "give_kit");
+    public static final Key KEY = Key.key(CrownCore.inst(), "give_kit");
 
     private Key kitKey;
 

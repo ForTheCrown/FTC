@@ -7,7 +7,7 @@ import net.forthecrown.emperor.useables.actions.*;
 import net.forthecrown.emperor.useables.preconditions.*;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class CrownUsablesManager implements UsablesManager {
-    final Map<Location, CrownUsableSign> signs = new HashMap<>();
+    final Map<Location, CrownUsableBlock> signs = new HashMap<>();
     final Map<UUID, CrownUsableEntity> entities = new HashMap<>();
 
     public void registerDefaults(ActionRegistry aRegistry, CheckRegistry cRegistry){
@@ -54,25 +54,27 @@ public class CrownUsablesManager implements UsablesManager {
         cRegistry.register(CheckNotUsedBefore.KEY, CheckNotUsedBefore::new);
         cRegistry.register(CheckInWorld.KEY, CheckInWorld::new);
         cRegistry.register(CheckHasScore.KEY, CheckHasScore::new);
+        cRegistry.register(CheckNeverUsed.KEY, CheckNeverUsed::new);
+        cRegistry.register(CheckHasAllItems.KEY, CheckHasAllItems::new);
     }
 
     @Override
-    public UsableSign getSign(Location l){
+    public UsableBlock getBlock(Location l){
         if(signs.containsKey(l)) return signs.get(l);
 
         try {
-            return new CrownUsableSign(l, false);
+            return new CrownUsableBlock(l, false);
         } catch (IllegalStateException e) {
             return null;
         }
     }
 
     @Override
-    public UsableSign createSign(Sign l){
+    public UsableBlock createSign(TileState l){
         l.getPersistentDataContainer().set(USABLE_KEY, PersistentDataType.BYTE, (byte) 1);
         l.update();
 
-        return new CrownUsableSign(l.getLocation(), true);
+        return new CrownUsableBlock(l.getLocation(), true);
     }
 
     @Override
@@ -95,8 +97,8 @@ public class CrownUsablesManager implements UsablesManager {
     @Override
     public boolean isInteractableSign(Block block){
         if(block == null) return false;
-        if (!(block.getState() instanceof Sign)) return false;
-        return isInteractable((Sign) block.getState());
+        if (!(block.getState() instanceof TileState)) return false;
+        return isInteractable((TileState) block.getState());
     }
 
     @Override
@@ -127,8 +129,8 @@ public class CrownUsablesManager implements UsablesManager {
     }
 
     @Override
-    public void addSign(UsableSign sign) {
-        signs.put(sign.getLocation(), (CrownUsableSign) sign);
+    public void addBlock(UsableBlock sign) {
+        signs.put(sign.getLocation(), (CrownUsableBlock) sign);
     }
 
     @Override
@@ -137,7 +139,7 @@ public class CrownUsablesManager implements UsablesManager {
     }
 
     @Override
-    public void removeSign(UsableSign sign) {
+    public void removeBlock(UsableBlock sign) {
         signs.remove(sign.getLocation());
     }
 }

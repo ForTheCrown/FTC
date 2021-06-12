@@ -18,7 +18,9 @@ public class CommandMemory extends FtcCommand {
     public CommandMemory(){
         super("memory", CrownCore.inst());
 
+        setAliases("mem");
         setPermission(Permissions.HELPER);
+
         register();
     }
 

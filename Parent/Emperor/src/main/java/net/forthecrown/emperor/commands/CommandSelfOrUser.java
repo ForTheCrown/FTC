@@ -130,7 +130,7 @@ public class CommandSelfOrUser extends FtcCommand {
                 Permissions.REPAIR,
                 (user, source, self) -> {
                     ItemStack item = user.getPlayer().getInventory().getItemInMainHand();
-                    CrownUtils.checkItemNotEmpty(item);
+                    if(CrownUtils.isItemEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
 
                     if(!(item.getItemMeta() instanceof Damageable)) throw FtcExceptionProvider.create("Given is not repairable");
                     Damageable meta = (Damageable) item.getItemMeta();

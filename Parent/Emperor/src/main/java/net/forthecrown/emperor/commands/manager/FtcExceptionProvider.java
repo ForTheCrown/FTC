@@ -173,4 +173,44 @@ public interface FtcExceptionProvider {
     static RoyalCommandException noHomesToList(){
         return NO_HOMES.create();
     }
+
+    static RoyalCommandException cannotReturn(){
+        return CANNOT_RETURN.create();
+    }
+
+    static RoyalCommandException cannotTpaTo(CrownUser user){
+        return CANNOT_TPA.create(user.nickDisplayName());
+    }
+
+    static RoyalCommandException cannotTpaHere(){
+        return CANNOT_TPA_HERE.create();
+    }
+
+    static RoyalCommandException badWorldHome(String name){
+        return CANNOT_TP_HOME.create(Component.text(name));
+    }
+
+    static RoyalCommandException cannotSetHomeHere(){
+        return CANNOT_SET_HOME.create();
+    }
+
+    static RoyalCommandException cannotChangeMarriageStatus(){
+        return MARRIAGE_CANNOT_CHANGE.create();
+    }
+
+    static RoyalCommandException cannotChangeMarriageStatusTarget(CrownUser user){
+        return MARRIAGE_CANNOT_CHANGE_T.create(user.nickDisplayName());
+    }
+
+    static RoyalCommandException senderAlreadyMarried(){
+        return MARRIED_SENDER.create();
+    }
+
+    static RoyalCommandException targetAlreadyMarried(CrownUser user){
+        return MARRIED_TARGET.create(user.nickDisplayName());
+    }
+
+    static RoyalCommandException notMarried(){
+        return NOT_MARRIED.create();
+    }
 }

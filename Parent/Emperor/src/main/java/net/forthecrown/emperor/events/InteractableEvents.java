@@ -64,7 +64,7 @@ public class InteractableEvents implements Listener {
         Cooldown.add(player, cooldownCategory, 10);
 
         try {
-            if(manager.isInteractableSign(block)) manager.getSign(block.getLocation()).interact(player);
+            if(manager.isInteractableSign(block)) manager.getBlock(block.getLocation()).interact(player);
         } catch (NullPointerException ignored) {}
     }
 }

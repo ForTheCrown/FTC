@@ -8,6 +8,7 @@ import net.forthecrown.emperor.Permissions;
 import net.forthecrown.emperor.commands.arguments.CommandHelpType;
 import net.forthecrown.emperor.commands.manager.CoreCommands;
 import net.forthecrown.emperor.commands.manager.FtcCommand;
+import net.forthecrown.emperor.commands.manager.FtcExceptionProvider;
 import net.forthecrown.emperor.utils.CrownUtils;
 import net.forthecrown.emperor.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
@@ -45,44 +46,47 @@ public class HelpHelp extends FtcCommand {
                 .then(argument("page", CommandHelpType.HELP_TYPE)
                               .executes(c -> sendHelp(getSender(c), c.getArgument("page", Integer.class), c.getInput()))
                 )
-                .then(argument("command", StringArgumentType.word())
-                        .executes(c -> {
-                            String cmd = c.getArgument("command", String.class);
-                            CommandSource source = c.getSource();
 
-                            if(CoreCommands.BY_NAME.containsKey(cmd)){
-                                FtcCommand lookup = CoreCommands.BY_NAME.get(cmd);
+                .then(literal("specific")
+                        .then(argument("command", StringArgumentType.word())
+                                .executes(c -> {
+                                    String cmd = c.getArgument("command", String.class);
+                                    CommandSource source = c.getSource();
 
-                                source.sendMessage(
-                                        commandMessage(
-                                                lookup.getName(),
-                                                lookup.getPerm(),
-                                                lookup.getAliases(),
-                                                lookup.getDescription(),
-                                                "FTC",
-                                                source.hasPermission(Permissions.CORE_ADMIN)
-                                        )
-                                );
-                                return 0;
-                            }
+                                    if(CoreCommands.BY_NAME.containsKey(cmd)){
+                                        FtcCommand lookup = CoreCommands.BY_NAME.get(cmd);
 
-                            if(!source.hasPermission(Permissions.CORE_ADMIN)){
-                                source.sendMessage(Component.translatable("commands.generic.permission", NamedTextColor.RED));
-                            }
+                                        source.sendMessage(
+                                                commandMessage(
+                                                        lookup.getName(),
+                                                        lookup.getPerm(),
+                                                        lookup.getAliases(),
+                                                        lookup.getDescription(),
+                                                        "FTC",
+                                                        source.hasPermission(Permissions.CORE_ADMIN)
+                                                )
+                                        );
+                                        return 0;
+                                    }
 
-                            Command lookup = Bukkit.getCommandMap().getCommand(cmd);
+                                    if(!source.hasPermission(Permissions.CORE_ADMIN)){
+                                        source.sendMessage(Component.translatable("commands.generic.permission", NamedTextColor.RED));
+                                        return 0;
+                                    }
 
+                                    Command lookup = Bukkit.getCommandMap().getCommand(cmd);
+                                    if(lookup == null) throw FtcExceptionProvider.create("No command with that name exists");
 
-                            source.sendMessage(commandMessage(lookup.getName(),
-                                    lookup.getPermission(),
-                                    lookup.getAliases().toArray(String[]::new),
-                                    lookup.getDescription(),
-                                    ((lookup instanceof PluginIdentifiableCommand) ? ((PluginIdentifiableCommand) lookup).getPlugin().getName() : null),
-                                    true
-                            ));
-                            return 0;
-                        })
-                );
+                                    source.sendMessage(commandMessage(lookup.getName(),
+                                            lookup.getPermission(),
+                                            lookup.getAliases().toArray(String[]::new),
+                                            lookup.getDescription(),
+                                            ((lookup instanceof PluginIdentifiableCommand) ? ((PluginIdentifiableCommand) lookup).getPlugin().getName() : null),
+                                            true
+                                    ));
+                                    return 0;
+                                })
+                ));
     }
 
     private Component commandMessage(String label, String permission, String[] aliases, String description, String plugin, boolean showDetails){

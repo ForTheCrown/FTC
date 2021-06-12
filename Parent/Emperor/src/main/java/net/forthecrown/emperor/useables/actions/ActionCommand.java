@@ -23,8 +23,8 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionCommand implements UsageAction {
-    public static final Key CONSOLE_KEY = Key.key(CrownCore.getNamespace(), "command_console");
-    public static final Key USER_KEY = Key.key(CrownCore.getNamespace(), "command_user");
+    public static final Key CONSOLE_KEY = Key.key(CrownCore.inst(), "command_console");
+    public static final Key USER_KEY = Key.key(CrownCore.inst(), "command_user");
 
     private String command;
     private final boolean console;
