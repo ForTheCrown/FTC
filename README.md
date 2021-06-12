@@ -14,6 +14,7 @@ Todo for 1.17 Reset
 • Do the same thing with SignShop serialization as above, external serializer
 • Switch blackmarket serialization to json, internal
 • CrownItems: Move NBT tags from DataContainer into tags, aka stop using Bukkit's PersistentDataContainer
+• Refactor seperate modules into one plugin.
 
 Structure:
 • Parent
