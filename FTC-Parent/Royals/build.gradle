@@ -1,0 +1,28 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+}
+
+group 'net.forthecrown'
+version '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+
+    maven { url = 'https://papermc.io/repo/repository/maven-public/' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public/' }
+}
+
+dependencies {
+    //compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
+
+    implementation files("C:/Users/ander/Desktop/ThePitOfTrash/FTC/FTC-Parent/Core/build/libs/Core-1.6.28-SNAPSHOT.jar")
+    implementation files("C:/Users/ander/Desktop/ThePitOfTrash/FTC/FTC-Parent/Squire/build/libs/Squire-1.0.0-SNAPSHOT.jar")
+    implementation files('C:/Users/ander/Desktop/ThePitOfTrash/RoyalGrenadier/build/libs/RoyalGrenadier-1.0.5-SNAPSHOT.jar')
+    implementation files("C:/Users/ander/Desktop/ThePitOfTrash/Paper/Paper-Server/target/paper-1.16.5.jar")
+}
+
+processResources{
+    filter(ReplaceTokens, tokens: [version: version])
+}

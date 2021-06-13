@@ -1,8 +1,0 @@
-rootProject.name = 'Parent'
-include 'Emperor'
-include 'FTC-Royals'
-include 'FTC-Vikings'
-include 'FTC-Pirates'
-include 'FTC-Cosmetics'
-include 'Repopulation'
-

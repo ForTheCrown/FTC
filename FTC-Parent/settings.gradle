@@ -1,0 +1,8 @@
+rootProject.name = 'FTC-Parent'
+include 'Core'
+include 'Cosmetics'
+include 'Royals'
+include 'Squire'
+include 'Pirates'
+include 'Vikings'
+
