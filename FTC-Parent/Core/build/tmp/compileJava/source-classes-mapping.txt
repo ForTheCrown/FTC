@@ -1,0 +1,708 @@
+net/forthecrown/core/commands/CommandWarpList.java
+ net.forthecrown.core.commands.CommandWarpList
+net/forthecrown/core/events/ShopDestroyEvent.java
+ net.forthecrown.core.events.ShopDestroyEvent
+net/forthecrown/core/events/AfkListener.java
+ net.forthecrown.core.events.AfkListener
+net/forthecrown/core/useables/preconditions/CheckHasAllItems.java
+ net.forthecrown.core.useables.preconditions.CheckHasAllItems
+net/forthecrown/core/economy/SellShop.java
+ net.forthecrown.core.economy.SellShop
+ net.forthecrown.core.economy.SellShop$1
+ net.forthecrown.core.economy.SellShop$Menu
+net/forthecrown/core/commands/CommandComVar.java
+ net.forthecrown.core.commands.CommandComVar
+net/forthecrown/core/useables/CheckableBase.java
+ net.forthecrown.core.useables.CheckableBase
+net/forthecrown/core/commands/CommandTpCancel.java
+ net.forthecrown.core.commands.CommandTpCancel
+net/forthecrown/core/commands/CommandShop.java
+ net.forthecrown.core.commands.CommandShop
+net/forthecrown/core/utils/ItemStackBuilder.java
+ net.forthecrown.core.utils.ItemStackBuilder
+net/forthecrown/core/utils/CrownRandom.java
+ net.forthecrown.core.utils.CrownRandom
+net/forthecrown/core/commands/arguments/UserType.java
+ net.forthecrown.core.commands.arguments.UserType
+net/forthecrown/core/admin/jails/CrownJailManager.java
+ net.forthecrown.core.admin.jails.CrownJailManager
+net/forthecrown/core/commands/CommandCrownTop.java
+ net.forthecrown.core.commands.CommandCrownTop
+net/forthecrown/core/commands/CommandStaffChatToggle.java
+ net.forthecrown.core.commands.CommandStaffChatToggle
+net/forthecrown/core/commands/HelpMap.java
+ net.forthecrown.core.commands.HelpMap
+net/forthecrown/core/registry/CrownWarpRegistry.java
+ net.forthecrown.core.registry.CrownWarpRegistry
+net/forthecrown/core/commands/CommandWild.java
+ net.forthecrown.core.commands.CommandWild
+net/forthecrown/core/comvars/ComVars.java
+ net.forthecrown.core.comvars.ComVars
+net/forthecrown/core/datafixers/DataFixer.java
+ net.forthecrown.core.datafixers.DataFixer
+net/forthecrown/core/CrownMessages.java
+ net.forthecrown.core.CrownMessages
+net/forthecrown/core/events/SignInteractEvent.java
+ net.forthecrown.core.events.SignInteractEvent
+ net.forthecrown.core.events.SignInteractEvent$SignShopInteractSubClass
+net/forthecrown/core/economy/shops/ShopType.java
+ net.forthecrown.core.economy.shops.ShopType
+net/forthecrown/core/commands/CommandSudo.java
+ net.forthecrown.core.commands.CommandSudo
+net/forthecrown/core/commands/HelpHelp.java
+ net.forthecrown.core.commands.HelpHelp
+net/forthecrown/core/utils/Nameable.java
+ net.forthecrown.core.utils.Nameable
+net/forthecrown/core/commands/marriage/CommandMarry.java
+ net.forthecrown.core.commands.marriage.CommandMarry
+net/forthecrown/core/CrownException.java
+ net.forthecrown.core.CrownException
+net/forthecrown/core/events/custom/SellShopUseEvent.java
+ net.forthecrown.core.events.custom.SellShopUseEvent
+net/forthecrown/core/user/CrownUserManager.java
+ net.forthecrown.core.user.CrownUserManager
+net/forthecrown/core/commands/CommandFtcCore.java
+ net.forthecrown.core.commands.CommandFtcCore
+ net.forthecrown.core.commands.CommandFtcCore$SaveReloadPart
+net/forthecrown/core/useables/kits/Kit.java
+ net.forthecrown.core.useables.kits.Kit
+net/forthecrown/core/Kingship.java
+ net.forthecrown.core.Kingship
+net/forthecrown/core/useables/AbstractUsable.java
+ net.forthecrown.core.useables.AbstractUsable
+net/forthecrown/core/economy/shops/CrownSignShop.java
+ net.forthecrown.core.economy.shops.CrownSignShop
+net/forthecrown/core/admin/PunishmentManager.java
+ net.forthecrown.core.admin.PunishmentManager
+net/forthecrown/core/commands/CommandAfk.java
+ net.forthecrown.core.commands.CommandAfk
+net/forthecrown/core/commands/CommandHome.java
+ net.forthecrown.core.commands.CommandHome
+net/forthecrown/core/user/UserHomes.java
+ net.forthecrown.core.user.UserHomes
+net/forthecrown/core/useables/preconditions/CheckInventoryEmpty.java
+ net.forthecrown.core.useables.preconditions.CheckInventoryEmpty
+net/forthecrown/core/commands/arguments/PetType.java
+ net.forthecrown.core.commands.arguments.PetType
+net/forthecrown/core/utils/SilentPredicate.java
+ net.forthecrown.core.utils.SilentPredicate
+net/forthecrown/core/registry/Registry.java
+ net.forthecrown.core.registry.Registry
+net/forthecrown/core/commands/CommandDelHome.java
+ net.forthecrown.core.commands.CommandDelHome
+net/forthecrown/core/crownevents/package-info.java
+ net.forthecrown.core.crownevents.package-info
+net/forthecrown/core/commands/HelpBank.java
+ net.forthecrown.core.commands.HelpBank
+net/forthecrown/core/serializer/AbstractSerializer.java
+ net.forthecrown.core.serializer.AbstractSerializer
+net/forthecrown/core/commands/HelpPost.java
+ net.forthecrown.core.commands.HelpPost
+net/forthecrown/core/commands/marriage/CommandMarriageAccept.java
+ net.forthecrown.core.commands.marriage.CommandMarriageAccept
+net/forthecrown/core/datafixers/ShopTagUpdater.java
+ net.forthecrown.core.datafixers.ShopTagUpdater
+net/forthecrown/core/registry/ActionRegistry.java
+ net.forthecrown.core.registry.ActionRegistry
+net/forthecrown/core/commands/HelpAuction.java
+ net.forthecrown.core.commands.HelpAuction
+net/forthecrown/core/commands/CommandPay.java
+ net.forthecrown.core.commands.CommandPay
+net/forthecrown/core/utils/InterUtils.java
+ net.forthecrown.core.utils.InterUtils
+ net.forthecrown.core.utils.InterUtils$BrigadierFunction
+net/forthecrown/core/useables/warps/FtcWarp.java
+ net.forthecrown.core.useables.warps.FtcWarp
+net/forthecrown/core/commands/arguments/CommandHelpType.java
+ net.forthecrown.core.commands.arguments.CommandHelpType
+net/forthecrown/core/crownevents/reporters/ReporterFactory.java
+ net.forthecrown.core.crownevents.reporters.ReporterFactory
+net/forthecrown/core/commands/CommandBack.java
+ net.forthecrown.core.commands.CommandBack
+net/forthecrown/core/admin/StaffChat.java
+ net.forthecrown.core.admin.StaffChat
+net/forthecrown/core/admin/jails/JailManager.java
+ net.forthecrown.core.admin.jails.JailManager
+net/forthecrown/core/admin/CrownPunishmentManager.java
+ net.forthecrown.core.admin.CrownPunishmentManager
+net/forthecrown/core/comvars/types/ComVarType.java
+ net.forthecrown.core.comvars.types.ComVarType
+ net.forthecrown.core.comvars.types.ComVarType$PrimitiveComVarType
+net/forthecrown/core/admin/ServerRules.java
+ net.forthecrown.core.admin.ServerRules
+net/forthecrown/core/inventory/RankInventory.java
+ net.forthecrown.core.inventory.RankInventory
+ net.forthecrown.core.inventory.RankInventory$1
+net/forthecrown/core/commands/punishments/CommandTempBan.java
+ net.forthecrown.core.commands.punishments.CommandTempBan
+net/forthecrown/core/commands/arguments/JailType.java
+ net.forthecrown.core.commands.arguments.JailType
+net/forthecrown/core/commands/emotes/EmoteHug.java
+ net.forthecrown.core.commands.emotes.EmoteHug
+ net.forthecrown.core.commands.emotes.EmoteHug$HugTick
+net/forthecrown/core/registry/WarpRegistry.java
+ net.forthecrown.core.registry.WarpRegistry
+net/forthecrown/core/serializer/AbstractJsonSerializer.java
+ net.forthecrown.core.serializer.AbstractJsonSerializer
+net/forthecrown/core/commands/marriage/CommandMarryToggle.java
+ net.forthecrown.core.commands.marriage.CommandMarryToggle
+net/forthecrown/core/serializer/CrownSerializer.java
+ net.forthecrown.core.serializer.CrownSerializer
+net/forthecrown/core/datafixers/EssToFTC.java
+ net.forthecrown.core.datafixers.EssToFTC
+net/forthecrown/core/utils/loot/LiteralLootTable.java
+ net.forthecrown.core.utils.loot.LiteralLootTable
+net/forthecrown/core/user/FtcUserHomes.java
+ net.forthecrown.core.user.FtcUserHomes
+net/forthecrown/core/utils/MapUtils.java
+ net.forthecrown.core.utils.MapUtils
+net/forthecrown/core/utils/BlockPos.java
+ net.forthecrown.core.utils.BlockPos
+net/forthecrown/core/comvars/types/KeyComVarType.java
+ net.forthecrown.core.comvars.types.KeyComVarType
+net/forthecrown/core/commands/CommandProfilePrivate.java
+ net.forthecrown.core.commands.CommandProfilePrivate
+net/forthecrown/core/commands/CommandPlayerTime.java
+ net.forthecrown.core.commands.CommandPlayerTime
+net/forthecrown/core/user/data/DirectMessage.java
+ net.forthecrown.core.user.data.DirectMessage
+net/forthecrown/core/commands/punishments/CommandPardon.java
+ net.forthecrown.core.commands.punishments.CommandPardon
+net/forthecrown/core/useables/UsablesManager.java
+ net.forthecrown.core.useables.UsablesManager
+net/forthecrown/core/utils/loot/CrownWeightedLootTable.java
+ net.forthecrown.core.utils.loot.CrownWeightedLootTable
+net/forthecrown/core/user/enums/Pet.java
+ net.forthecrown.core.user.enums.Pet
+net/forthecrown/core/commands/CommandTop.java
+ net.forthecrown.core.commands.CommandTop
+net/forthecrown/core/commands/punishments/Punisher.java
+ net.forthecrown.core.commands.punishments.Punisher
+net/forthecrown/core/economy/BlackMarket.java
+ net.forthecrown.core.economy.BlackMarket
+net/forthecrown/core/commands/arguments/ComVarArgument.java
+ net.forthecrown.core.commands.arguments.ComVarArgument
+net/forthecrown/core/datafixers/UserAndBalanceUpdater.java
+ net.forthecrown.core.datafixers.UserAndBalanceUpdater
+net/forthecrown/core/commands/emotes/EmotePog.java
+ net.forthecrown.core.commands.emotes.EmotePog
+net/forthecrown/core/commands/CommandGetPos.java
+ net.forthecrown.core.commands.CommandGetPos
+net/forthecrown/core/useables/actions/ActionRemoveNumber.java
+ net.forthecrown.core.useables.actions.ActionRemoveNumber
+net/forthecrown/core/commands/CommandEavesDrop.java
+ net.forthecrown.core.commands.CommandEavesDrop
+net/forthecrown/core/registry/CheckRegistry.java
+ net.forthecrown.core.registry.CheckRegistry
+net/forthecrown/core/commands/emotes/EmotePoke.java
+ net.forthecrown.core.commands.emotes.EmotePoke
+net/forthecrown/core/commands/CommandSpeed.java
+ net.forthecrown.core.commands.CommandSpeed
+net/forthecrown/core/user/FtcUser.java
+ net.forthecrown.core.user.FtcUser
+net/forthecrown/core/utils/Cooldown.java
+ net.forthecrown.core.utils.Cooldown
+net/forthecrown/core/commands/CommandVanish.java
+ net.forthecrown.core.commands.CommandVanish
+net/forthecrown/core/commands/punishments/CommandSoftMute.java
+ net.forthecrown.core.commands.punishments.CommandSoftMute
+net/forthecrown/core/commands/punishments/CommandPunishment.java
+ net.forthecrown.core.commands.punishments.CommandPunishment
+net/forthecrown/core/user/UserDataContainer.java
+ net.forthecrown.core.user.UserDataContainer
+net/forthecrown/core/useables/preconditions/CheckNeverUsed.java
+ net.forthecrown.core.useables.preconditions.CheckNeverUsed
+net/forthecrown/core/crownevents/InEventListener.java
+ net.forthecrown.core.crownevents.InEventListener
+net/forthecrown/core/commands/CommandLeave.java
+ net.forthecrown.core.commands.CommandLeave
+net/forthecrown/core/user/UserNotOnlineException.java
+ net.forthecrown.core.user.UserNotOnlineException
+net/forthecrown/core/commands/emotes/EmoteToggle.java
+ net.forthecrown.core.commands.emotes.EmoteToggle
+net/forthecrown/core/commands/CommandRank.java
+ net.forthecrown.core.commands.CommandRank
+net/forthecrown/core/chat/Emotes.java
+ net.forthecrown.core.chat.Emotes
+net/forthecrown/core/useables/UsageAction.java
+ net.forthecrown.core.useables.UsageAction
+net/forthecrown/core/events/JeromeEvent.java
+ net.forthecrown.core.events.JeromeEvent
+net/forthecrown/core/useables/CrownUsableEntity.java
+ net.forthecrown.core.useables.CrownUsableEntity
+net/forthecrown/core/useables/CrownUsablesManager.java
+ net.forthecrown.core.useables.CrownUsablesManager
+net/forthecrown/core/crownevents/ObjectiveLeaderboard.java
+ net.forthecrown.core.crownevents.ObjectiveLeaderboard
+net/forthecrown/core/user/data/UserTeleport.java
+ net.forthecrown.core.user.data.UserTeleport
+ net.forthecrown.core.user.data.UserTeleport$Type
+net/forthecrown/core/useables/Preconditionable.java
+ net.forthecrown.core.useables.Preconditionable
+net/forthecrown/core/Announcer.java
+ net.forthecrown.core.Announcer
+ net.forthecrown.core.Announcer$DebugLevel
+net/forthecrown/core/CrownWorldGuard.java
+ net.forthecrown.core.CrownWorldGuard
+net/forthecrown/core/clickevent/ClickEventManager.java
+ net.forthecrown.core.clickevent.ClickEventManager
+net/forthecrown/core/clickevent/ClickEventCommand.java
+ net.forthecrown.core.clickevent.ClickEventCommand
+net/forthecrown/core/commands/CommandHologram.java
+ net.forthecrown.core.commands.CommandHologram
+net/forthecrown/core/utils/CrownUtils.java
+ net.forthecrown.core.utils.CrownUtils
+ net.forthecrown.core.utils.CrownUtils$RomanNumeral
+net/forthecrown/core/commands/arguments/CheckArgType.java
+ net.forthecrown.core.commands.arguments.CheckArgType
+net/forthecrown/core/useables/actions/ActionItem.java
+ net.forthecrown.core.useables.actions.ActionItem
+net/forthecrown/core/commands/CommandStaffChat.java
+ net.forthecrown.core.commands.CommandStaffChat
+net/forthecrown/core/commands/CommandBecomeBaron.java
+ net.forthecrown.core.commands.CommandBecomeBaron
+net/forthecrown/core/commands/CommandGameMode.java
+ net.forthecrown.core.commands.CommandGameMode
+net/forthecrown/core/useables/actions/ActionChangeScore.java
+ net.forthecrown.core.useables.actions.ActionChangeScore
+ net.forthecrown.core.useables.actions.ActionChangeScore$1
+ net.forthecrown.core.useables.actions.ActionChangeScore$Action
+ net.forthecrown.core.useables.actions.ActionChangeScore$IntBiOperator
+net/forthecrown/core/commands/arguments/UserParseResult.java
+ net.forthecrown.core.commands.arguments.UserParseResult
+net/forthecrown/core/commands/CommandNear.java
+ net.forthecrown.core.commands.CommandNear
+net/forthecrown/core/commands/CommandDeathTop.java
+ net.forthecrown.core.commands.CommandDeathTop
+net/forthecrown/core/utils/JsonUtils.java
+ net.forthecrown.core.utils.JsonUtils
+net/forthecrown/core/commands/CommandTpaToggle.java
+ net.forthecrown.core.commands.CommandTpaToggle
+net/forthecrown/core/chat/ChatFormatter.java
+ net.forthecrown.core.chat.ChatFormatter
+net/forthecrown/core/useables/actions/ActionKit.java
+ net.forthecrown.core.useables.actions.ActionKit
+net/forthecrown/core/useables/preconditions/CheckNotUsedBefore.java
+ net.forthecrown.core.useables.preconditions.CheckNotUsedBefore
+net/forthecrown/core/commands/manager/FtcCommand.java
+ net.forthecrown.core.commands.manager.FtcCommand
+net/forthecrown/core/useables/Actionable.java
+ net.forthecrown.core.useables.Actionable
+net/forthecrown/core/commands/manager/UserCommandExceptionType.java
+ net.forthecrown.core.commands.manager.UserCommandExceptionType
+net/forthecrown/core/commands/CommandTeleportExact.java
+ net.forthecrown.core.commands.CommandTeleportExact
+net/forthecrown/core/commands/CommandTpDeny.java
+ net.forthecrown.core.commands.CommandTpDeny
+net/forthecrown/core/events/handler/ExceptionedEvent.java
+ net.forthecrown.core.events.handler.ExceptionedEvent
+net/forthecrown/core/commands/emotes/EmoteScare.java
+ net.forthecrown.core.commands.emotes.EmoteScare
+net/forthecrown/core/commands/CommandIgnore.java
+ net.forthecrown.core.commands.CommandIgnore
+net/forthecrown/core/registry/CrownKitRegistry.java
+ net.forthecrown.core.registry.CrownKitRegistry
+net/forthecrown/core/economy/SortedBalanceMap.java
+ net.forthecrown.core.economy.SortedBalanceMap
+net/forthecrown/core/commands/marriage/CommandMarriageDeny.java
+ net.forthecrown.core.commands.marriage.CommandMarriageDeny
+net/forthecrown/core/commands/CommandMe.java
+ net.forthecrown.core.commands.CommandMe
+net/forthecrown/core/events/RankGuiUseEvent.java
+ net.forthecrown.core.events.RankGuiUseEvent
+net/forthecrown/core/crownevents/entries/SingleEntry.java
+ net.forthecrown.core.crownevents.entries.SingleEntry
+net/forthecrown/core/events/MobHealthBar.java
+ net.forthecrown.core.events.MobHealthBar
+ net.forthecrown.core.events.MobHealthBar$1
+net/forthecrown/core/PeriodicalSaver.java
+ net.forthecrown.core.PeriodicalSaver
+net/forthecrown/core/economy/DailyEnchantment.java
+ net.forthecrown.core.economy.DailyEnchantment
+net/forthecrown/core/commands/CommandSetHome.java
+ net.forthecrown.core.commands.CommandSetHome
+net/forthecrown/core/registry/CrownActionRegistry.java
+ net.forthecrown.core.registry.CrownActionRegistry
+net/forthecrown/core/user/CrownUser.java
+ net.forthecrown.core.user.CrownUser
+net/forthecrown/core/CrownBroadcaster.java
+ net.forthecrown.core.CrownBroadcaster
+ net.forthecrown.core.CrownBroadcaster$1
+net/forthecrown/core/events/ShopTransactionEvent.java
+ net.forthecrown.core.events.ShopTransactionEvent
+ net.forthecrown.core.events.ShopTransactionEvent$1
+net/forthecrown/core/commands/arguments/KeyType.java
+ net.forthecrown.core.commands.arguments.KeyType
+net/forthecrown/core/events/SellShopEvents.java
+ net.forthecrown.core.events.SellShopEvents
+ net.forthecrown.core.events.SellShopEvents$1
+net/forthecrown/core/events/custom/SignShopUseEvent.java
+ net.forthecrown.core.events.custom.SignShopUseEvent
+net/forthecrown/core/registry/CrownRegistry.java
+ net.forthecrown.core.registry.CrownRegistry
+net/forthecrown/core/economy/BalanceMap.java
+ net.forthecrown.core.economy.BalanceMap
+ net.forthecrown.core.economy.BalanceMap$BalEntry
+net/forthecrown/core/useables/preconditions/CheckNumber.java
+ net.forthecrown.core.useables.preconditions.CheckNumber
+net/forthecrown/core/BranchFlag.java
+ net.forthecrown.core.BranchFlag
+net/forthecrown/core/commands/CommandItemName.java
+ net.forthecrown.core.commands.CommandItemName
+net/forthecrown/core/chat/ChatUtils.java
+ net.forthecrown.core.chat.ChatUtils
+net/forthecrown/core/user/FtcUserInteractions.java
+ net.forthecrown.core.user.FtcUserInteractions
+net/forthecrown/core/crownevents/reporters/CrownEventReporter.java
+ net.forthecrown.core.crownevents.reporters.CrownEventReporter
+net/forthecrown/core/user/data/MarriageMessage.java
+ net.forthecrown.core.user.data.MarriageMessage
+net/forthecrown/core/commands/CommandKit.java
+ net.forthecrown.core.commands.CommandKit
+net/forthecrown/core/crownevents/EventTimer.java
+ net.forthecrown.core.crownevents.EventTimer
+ net.forthecrown.core.crownevents.EventTimer$1
+ net.forthecrown.core.crownevents.EventTimer$2
+net/forthecrown/core/useables/Usable.java
+ net.forthecrown.core.useables.Usable
+net/forthecrown/core/economy/CrownBalances.java
+ net.forthecrown.core.economy.CrownBalances
+net/forthecrown/core/commands/CommandTpaCancel.java
+ net.forthecrown.core.commands.CommandTpaCancel
+net/forthecrown/core/registry/CrownCheckRegistry.java
+ net.forthecrown.core.registry.CrownCheckRegistry
+net/forthecrown/core/events/handler/CrownEventExecutor.java
+ net.forthecrown.core.events.handler.CrownEventExecutor
+net/forthecrown/core/utils/BlackMarketUtils.java
+ net.forthecrown.core.utils.BlackMarketUtils
+net/forthecrown/core/commands/CommandTell.java
+ net.forthecrown.core.commands.CommandTell
+net/forthecrown/core/commands/CommandGrave.java
+ net.forthecrown.core.commands.CommandGrave
+net/forthecrown/core/user/enums/CrownGameMode.java
+ net.forthecrown.core.user.enums.CrownGameMode
+ net.forthecrown.core.user.enums.CrownGameMode$1
+net/forthecrown/core/inventory/CrownWeapons.java
+ net.forthecrown.core.inventory.CrownWeapons
+ net.forthecrown.core.inventory.CrownWeapons$Weapon
+net/forthecrown/core/crownevents/entries/TimerEntry.java
+ net.forthecrown.core.crownevents.entries.TimerEntry
+net/forthecrown/core/useables/preconditions/CheckHasScore.java
+ net.forthecrown.core.useables.preconditions.CheckHasScore
+net/forthecrown/core/useables/actions/ActionCommand.java
+ net.forthecrown.core.useables.actions.ActionCommand
+net/forthecrown/core/commands/emotes/EmoteJingle.java
+ net.forthecrown.core.commands.emotes.EmoteJingle
+net/forthecrown/core/useables/CrownUsableBlock.java
+ net.forthecrown.core.useables.CrownUsableBlock
+net/forthecrown/core/utils/Triple.java
+ net.forthecrown.core.utils.Triple
+net/forthecrown/core/comvars/ParseFunction.java
+ net.forthecrown.core.comvars.ParseFunction
+net/forthecrown/core/commands/CommandTpaskHere.java
+ net.forthecrown.core.commands.CommandTpaskHere
+net/forthecrown/core/commands/CommandKitEdit.java
+ net.forthecrown.core.commands.CommandKitEdit
+net/forthecrown/core/commands/arguments/BaltopType.java
+ net.forthecrown.core.commands.arguments.BaltopType
+net/forthecrown/core/user/UserInteractions.java
+ net.forthecrown.core.user.UserInteractions
+net/forthecrown/core/economy/shops/SignShop.java
+ net.forthecrown.core.economy.shops.SignShop
+net/forthecrown/core/commands/CommandHomeList.java
+ net.forthecrown.core.commands.CommandHomeList
+net/forthecrown/core/economy/shops/ShopManager.java
+ net.forthecrown.core.economy.shops.ShopManager
+net/forthecrown/core/commands/CommandWarp.java
+ net.forthecrown.core.commands.CommandWarp
+net/forthecrown/core/commands/CommandTestCore.java
+ net.forthecrown.core.commands.CommandTestCore
+net/forthecrown/core/utils/loot/CrownLootTable.java
+ net.forthecrown.core.utils.loot.CrownLootTable
+net/forthecrown/core/utils/Pair.java
+ net.forthecrown.core.utils.Pair
+net/forthecrown/core/commands/HelpDiscord.java
+ net.forthecrown.core.commands.HelpDiscord
+net/forthecrown/core/user/data/SoldMaterialData.java
+ net.forthecrown.core.user.data.SoldMaterialData
+net/forthecrown/core/events/CoreListener.java
+ net.forthecrown.core.events.CoreListener
+net/forthecrown/core/commands/CommandList.java
+ net.forthecrown.core.commands.CommandList
+net/forthecrown/core/user/enums/RankTier.java
+ net.forthecrown.core.user.enums.RankTier
+net/forthecrown/core/events/InteractableEvents.java
+ net.forthecrown.core.events.InteractableEvents
+net/forthecrown/core/commands/CommandEditShop.java
+ net.forthecrown.core.commands.CommandEditShop
+ net.forthecrown.core.commands.CommandEditShop$1
+net/forthecrown/core/commands/manager/CoreCommands.java
+ net.forthecrown.core.commands.manager.CoreCommands
+net/forthecrown/core/commands/CommandInteractable.java
+ net.forthecrown.core.commands.CommandInteractable
+net/forthecrown/core/commands/punishments/CommandKickAll.java
+ net.forthecrown.core.commands.punishments.CommandKickAll
+net/forthecrown/core/registry/BaseRegistry.java
+ net.forthecrown.core.registry.BaseRegistry
+net/forthecrown/core/commands/HelpRules.java
+ net.forthecrown.core.commands.HelpRules
+net/forthecrown/core/user/FtcUserAlt.java
+ net.forthecrown.core.user.FtcUserAlt
+net/forthecrown/core/useables/preconditions/CheckInWorld.java
+ net.forthecrown.core.useables.preconditions.CheckInWorld
+net/forthecrown/core/events/ChatEvents.java
+ net.forthecrown.core.events.ChatEvents
+net/forthecrown/core/events/JailListener.java
+ net.forthecrown.core.events.JailListener
+net/forthecrown/core/user/data/TeleportRequest.java
+ net.forthecrown.core.user.data.TeleportRequest
+ net.forthecrown.core.user.data.TeleportRequest$1
+net/forthecrown/core/admin/record/PunishmentType.java
+ net.forthecrown.core.admin.record.PunishmentType
+net/forthecrown/core/commands/CommandSetSpawn.java
+ net.forthecrown.core.commands.CommandSetSpawn
+net/forthecrown/core/commands/CommandSuicide.java
+ net.forthecrown.core.commands.CommandSuicide
+net/forthecrown/core/crownevents/ArmorStandLeaderboard.java
+ net.forthecrown.core.crownevents.ArmorStandLeaderboard
+ net.forthecrown.core.crownevents.ArmorStandLeaderboard$Order
+net/forthecrown/core/commands/emotes/EmoteBonk.java
+ net.forthecrown.core.commands.emotes.EmoteBonk
+net/forthecrown/core/user/enums/Rank.java
+ net.forthecrown.core.user.enums.Rank
+net/forthecrown/core/nbt/NbtHandler.java
+ net.forthecrown.core.nbt.NbtHandler
+net/forthecrown/core/commands/CommandKitList.java
+ net.forthecrown.core.commands.CommandKitList
+net/forthecrown/core/commands/arguments/KitType.java
+ net.forthecrown.core.commands.arguments.KitType
+net/forthecrown/core/nbt/NBT.java
+ net.forthecrown.core.nbt.NBT
+net/forthecrown/core/events/GraveListener.java
+ net.forthecrown.core.events.GraveListener
+net/forthecrown/core/useables/preconditions/CheckRank.java
+ net.forthecrown.core.useables.preconditions.CheckRank
+net/forthecrown/core/commands/CommandNickname.java
+ net.forthecrown.core.commands.CommandNickname
+net/forthecrown/core/registry/KitRegistry.java
+ net.forthecrown.core.registry.KitRegistry
+net/forthecrown/core/commands/punishments/CommandMute.java
+ net.forthecrown.core.commands.punishments.CommandMute
+net/forthecrown/core/commands/CommandProfile.java
+ net.forthecrown.core.commands.CommandProfile
+net/forthecrown/core/useables/preconditions/CheckBranch.java
+ net.forthecrown.core.useables.preconditions.CheckBranch
+net/forthecrown/core/useables/preconditions/CheckPermission.java
+ net.forthecrown.core.useables.preconditions.CheckPermission
+net/forthecrown/core/commands/CommandTpDenyAll.java
+ net.forthecrown.core.commands.CommandTpDenyAll
+net/forthecrown/core/useables/preconditions/CheckCooldown.java
+ net.forthecrown.core.useables.preconditions.CheckCooldown
+net/forthecrown/core/useables/actions/ActionShowText.java
+ net.forthecrown.core.useables.actions.ActionShowText
+net/forthecrown/core/useables/actions/ActionWarp.java
+ net.forthecrown.core.useables.actions.ActionWarp
+net/forthecrown/core/commands/CommandPayToggle.java
+ net.forthecrown.core.commands.CommandPayToggle
+net/forthecrown/core/commands/CommandBalanceTop.java
+ net.forthecrown.core.commands.CommandBalanceTop
+net/forthecrown/core/events/BlackMarketEvents.java
+ net.forthecrown.core.events.BlackMarketEvents
+ net.forthecrown.core.events.BlackMarketEvents$1
+ net.forthecrown.core.events.BlackMarketEvents$BmSubClass1
+net/forthecrown/core/commands/emotes/CommandEmote.java
+ net.forthecrown.core.commands.emotes.CommandEmote
+net/forthecrown/core/useables/warps/Warp.java
+ net.forthecrown.core.useables.warps.Warp
+net/forthecrown/core/utils/loot/WeightedLootTable.java
+ net.forthecrown.core.utils.loot.WeightedLootTable
+net/forthecrown/core/comvars/package-info.java
+ net.forthecrown.core.comvars.package-info
+net/forthecrown/core/inventory/CustomInventoryHolder.java
+ net.forthecrown.core.inventory.CustomInventoryHolder
+net/forthecrown/core/commands/CommandKingMaker.java
+ net.forthecrown.core.commands.CommandKingMaker
+net/forthecrown/core/economy/BrokenShopException.java
+ net.forthecrown.core.economy.BrokenShopException
+net/forthecrown/core/commands/CommandBalance.java
+ net.forthecrown.core.commands.CommandBalance
+net/forthecrown/core/user/Grave.java
+ net.forthecrown.core.user.Grave
+net/forthecrown/core/admin/PunishmentEntry.java
+ net.forthecrown.core.admin.PunishmentEntry
+net/forthecrown/core/utils/BoundingBoxIterator.java
+ net.forthecrown.core.utils.BoundingBoxIterator
+net/forthecrown/core/economy/CrownDailyEnchantment.java
+ net.forthecrown.core.economy.CrownDailyEnchantment
+net/forthecrown/core/commands/CommandWorld.java
+ net.forthecrown.core.commands.CommandWorld
+net/forthecrown/core/commands/CommandSkull.java
+ net.forthecrown.core.commands.CommandSkull
+net/forthecrown/core/crownevents/reporters/EventReporter.java
+ net.forthecrown.core.crownevents.reporters.EventReporter
+net/forthecrown/core/commands/CommandTeleport.java
+ net.forthecrown.core.commands.CommandTeleport
+net/forthecrown/core/user/enums/SellAmount.java
+ net.forthecrown.core.user.enums.SellAmount
+net/forthecrown/core/useables/preconditions/CheckHasItem.java
+ net.forthecrown.core.useables.preconditions.CheckHasItem
+net/forthecrown/core/user/FtcUserDataContainer.java
+ net.forthecrown.core.user.FtcUserDataContainer
+net/forthecrown/core/commands/CommandBroadcast.java
+ net.forthecrown.core.commands.CommandBroadcast
+net/forthecrown/core/events/AsyncTeleportListener.java
+ net.forthecrown.core.events.AsyncTeleportListener
+net/forthecrown/core/commands/CommandSpecificGameMode.java
+ net.forthecrown.core.commands.CommandSpecificGameMode
+net/forthecrown/core/useables/kits/FtcKit.java
+ net.forthecrown.core.useables.kits.FtcKit
+net/forthecrown/core/admin/MuteStatus.java
+ net.forthecrown.core.admin.MuteStatus
+net/forthecrown/core/serializer/JsonSerializable.java
+ net.forthecrown.core.serializer.JsonSerializable
+net/forthecrown/core/commands/CommandSelfOrUser.java
+ net.forthecrown.core.commands.CommandSelfOrUser
+ net.forthecrown.core.commands.CommandSelfOrUser$CommandFunction
+net/forthecrown/core/serializer/Deleteable.java
+ net.forthecrown.core.serializer.Deleteable
+net/forthecrown/core/commands/manager/FtcExceptionProvider.java
+ net.forthecrown.core.commands.manager.FtcExceptionProvider
+net/forthecrown/core/useables/UsageCheck.java
+ net.forthecrown.core.useables.UsageCheck
+net/forthecrown/core/commands/CommandMemory.java
+ net.forthecrown.core.commands.CommandMemory
+net/forthecrown/core/user/CrownUserAlt.java
+ net.forthecrown.core.user.CrownUserAlt
+net/forthecrown/core/commands/manager/CrownExceptionProvider.java
+ net.forthecrown.core.commands.manager.CrownExceptionProvider
+net/forthecrown/core/user/enums/Branch.java
+ net.forthecrown.core.user.enums.Branch
+net/forthecrown/core/economy/CannotAffordTransactionException.java
+ net.forthecrown.core.economy.CannotAffordTransactionException
+net/forthecrown/core/commands/CommandWithdraw.java
+ net.forthecrown.core.commands.CommandWithdraw
+net/forthecrown/core/economy/CrownBlackMarket.java
+ net.forthecrown.core.economy.CrownBlackMarket
+net/forthecrown/core/commands/HelpFindPost.java
+ net.forthecrown.core.commands.HelpFindPost
+net/forthecrown/core/commands/CommandGift.java
+ net.forthecrown.core.commands.CommandGift
+net/forthecrown/core/inventory/CrownItems.java
+ net.forthecrown.core.inventory.CrownItems
+net/forthecrown/core/economy/Balances.java
+ net.forthecrown.core.economy.Balances
+net/forthecrown/core/useables/UsableBase.java
+ net.forthecrown.core.useables.UsableBase
+net/forthecrown/core/commands/CommandSign.java
+ net.forthecrown.core.commands.CommandSign
+net/forthecrown/core/commands/punishments/CommandJail.java
+ net.forthecrown.core.commands.punishments.CommandJail
+net/forthecrown/core/economy/shops/CrownShopInventory.java
+ net.forthecrown.core.economy.shops.CrownShopInventory
+net/forthecrown/core/clickevent/ClickEventTask.java
+ net.forthecrown.core.clickevent.ClickEventTask
+net/forthecrown/core/useables/actions/ActionTeleport.java
+ net.forthecrown.core.useables.actions.ActionTeleport
+net/forthecrown/core/admin/record/PunishmentRecord.java
+ net.forthecrown.core.admin.record.PunishmentRecord
+net/forthecrown/core/commands/punishments/TempPunisher.java
+ net.forthecrown.core.commands.punishments.TempPunisher
+net/forthecrown/core/commands/punishments/CommandJails.java
+ net.forthecrown.core.commands.punishments.CommandJails
+net/forthecrown/core/commands/emotes/EmoteSmooch.java
+ net.forthecrown.core.commands.emotes.EmoteSmooch
+net/forthecrown/core/commands/marriage/CommandMarriageChat.java
+ net.forthecrown.core.commands.marriage.CommandMarriageChat
+net/forthecrown/core/commands/CommandDeposit.java
+ net.forthecrown.core.commands.CommandDeposit
+net/forthecrown/core/CrownCore.java
+ net.forthecrown.core.CrownCore
+net/forthecrown/core/useables/UsableEntity.java
+ net.forthecrown.core.useables.UsableEntity
+net/forthecrown/core/events/MarriageListener.java
+ net.forthecrown.core.events.MarriageListener
+net/forthecrown/core/Permissions.java
+ net.forthecrown.core.Permissions
+net/forthecrown/core/commands/CommandTpask.java
+ net.forthecrown.core.commands.CommandTpask
+net/forthecrown/core/commands/HelpShop.java
+ net.forthecrown.core.commands.HelpShop
+net/forthecrown/core/commands/punishments/GenericPunisher.java
+ net.forthecrown.core.commands.punishments.GenericPunisher
+net/forthecrown/core/commands/arguments/NbtType.java
+ net.forthecrown.core.commands.arguments.NbtType
+net/forthecrown/core/commands/CommandGems.java
+ net.forthecrown.core.commands.CommandGems
+net/forthecrown/core/Main.java
+ net.forthecrown.core.Main
+net/forthecrown/core/events/SmokeBomb.java
+ net.forthecrown.core.events.SmokeBomb
+net/forthecrown/core/commands/CommandToolBlock.java
+ net.forthecrown.core.commands.CommandToolBlock
+ net.forthecrown.core.commands.CommandToolBlock$UtilityBlockFunction
+net/forthecrown/core/commands/CommandWeather.java
+ net.forthecrown.core.commands.CommandWeather
+net/forthecrown/core/commands/CommandEnchant.java
+ net.forthecrown.core.commands.CommandEnchant
+net/forthecrown/core/commands/HelpSpawn.java
+ net.forthecrown.core.commands.HelpSpawn
+net/forthecrown/core/commands/arguments/ActionArgType.java
+ net.forthecrown.core.commands.arguments.ActionArgType
+net/forthecrown/core/commands/CommandLore.java
+ net.forthecrown.core.commands.CommandLore
+ net.forthecrown.core.commands.CommandLore$ComponentCommand
+net/forthecrown/core/admin/EavesDropper.java
+ net.forthecrown.core.admin.EavesDropper
+net/forthecrown/core/economy/shops/ShopInventory.java
+ net.forthecrown.core.economy.shops.ShopInventory
+net/forthecrown/core/commands/CommandReply.java
+ net.forthecrown.core.commands.CommandReply
+net/forthecrown/core/commands/CommandWarpEdit.java
+ net.forthecrown.core.commands.CommandWarpEdit
+net/forthecrown/core/commands/CommandMakeAward.java
+ net.forthecrown.core.commands.CommandMakeAward
+net/forthecrown/core/CrownKingship.java
+ net.forthecrown.core.CrownKingship
+net/forthecrown/core/comvars/types/ComponentComVarType.java
+ net.forthecrown.core.comvars.types.ComponentComVarType
+net/forthecrown/core/commands/CommandProfilePublic.java
+ net.forthecrown.core.commands.CommandProfilePublic
+net/forthecrown/core/user/UserManager.java
+ net.forthecrown.core.user.UserManager
+net/forthecrown/core/events/ShopCreateEvent.java
+ net.forthecrown.core.events.ShopCreateEvent
+ net.forthecrown.core.events.ShopCreateEvent$SignShopSubClass1
+net/forthecrown/core/crownevents/entries/PlayerEntry.java
+ net.forthecrown.core.crownevents.entries.PlayerEntry
+net/forthecrown/core/crownevents/CrownEvent.java
+ net.forthecrown.core.crownevents.CrownEvent
+net/forthecrown/core/economy/shops/CrownShopManager.java
+ net.forthecrown.core.economy.shops.CrownShopManager
+net/forthecrown/core/crownevents/entries/EventEntry.java
+ net.forthecrown.core.crownevents.entries.EventEntry
+net/forthecrown/core/useables/UsableBlock.java
+ net.forthecrown.core.useables.UsableBlock
+net/forthecrown/core/crownevents/entries/TeamEntry.java
+ net.forthecrown.core.crownevents.entries.TeamEntry
+net/forthecrown/core/commands/marriage/CommandMarriageChatToggle.java
+ net.forthecrown.core.commands.marriage.CommandMarriageChatToggle
+net/forthecrown/core/commands/CommandTpaAccept.java
+ net.forthecrown.core.commands.CommandTpaAccept
+net/forthecrown/core/commands/CommandDumbThing.java
+ net.forthecrown.core.commands.CommandDumbThing
+net/forthecrown/core/commands/marriage/CommandDivorce.java
+ net.forthecrown.core.commands.marriage.CommandDivorce
+net/forthecrown/core/commands/arguments/HomeParseResult.java
+ net.forthecrown.core.commands.arguments.HomeParseResult
+net/forthecrown/core/user/FtcUserGrave.java
+ net.forthecrown.core.user.FtcUserGrave
+net/forthecrown/core/commands/arguments/WarpType.java
+ net.forthecrown.core.commands.arguments.WarpType
+net/forthecrown/core/utils/ListUtils.java
+ net.forthecrown.core.utils.ListUtils
+net/forthecrown/core/commands/arguments/HomeType.java
+ net.forthecrown.core.commands.arguments.HomeType
+net/forthecrown/core/comvars/ComVar.java
+ net.forthecrown.core.comvars.ComVar
+net/forthecrown/core/utils/CrownBoundingBox.java
+ net.forthecrown.core.utils.CrownBoundingBox

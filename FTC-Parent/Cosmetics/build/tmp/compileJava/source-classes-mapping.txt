@@ -1,0 +1,18 @@
+net/forthecrown/cosmetics/PlayerRidingManager.java
+ net.forthecrown.cosmetics.PlayerRidingManager
+net/forthecrown/cosmetics/PlayerRider.java
+ net.forthecrown.cosmetics.PlayerRider
+net/forthecrown/cosmetics/Cosmetics.java
+ net.forthecrown.cosmetics.Cosmetics
+net/forthecrown/cosmetics/CosmeticEvents.java
+ net.forthecrown.cosmetics.CosmeticEvents
+net/forthecrown/cosmetics/inventories/CustomInventory.java
+ net.forthecrown.cosmetics.inventories.CustomInventory
+net/forthecrown/cosmetics/inventories/ArrowParticleMenu.java
+ net.forthecrown.cosmetics.inventories.ArrowParticleMenu
+net/forthecrown/cosmetics/inventories/EmoteMenu.java
+ net.forthecrown.cosmetics.inventories.EmoteMenu
+net/forthecrown/cosmetics/inventories/DeathParticleMenu.java
+ net.forthecrown.cosmetics.inventories.DeathParticleMenu
+net/forthecrown/cosmetics/commands/CommandCosmetics.java
+ net.forthecrown.cosmetics.commands.CommandCosmetics

@@ -1,0 +1,84 @@
+Prefix: '&6[FTC]&r '
+Discord: 'Join our discord server:&b https://discord.gg/wXjHNdp'
+StartRhines: 100
+BaronPrice: 500000
+MaxMoneyAmount: 50000000
+UserDataResetInterval: 5356800000
+BranchSwapCooldown: 172800000
+Taxes: false
+HoppersInOneChunk: 64
+TeleportTickDelay: 60
+TeleportCooldown: 60
+TpaExpiryTime: 2400
+OnJoinKit: 'noobs'
+MaxNickLength: 16
+NearRadius: 200
+AllowOtherPlayerNicks: false
+MarriageStatusCooldown: 259200000
+
+ServerSpawn:
+  ==: org.bukkit.Location
+  world: world
+  x: 153.5
+  y: 5
+  z: 353.5
+  pitch: 0
+  yaw: 90
+
+Shops:
+  log-admin-purchases: true
+  log-normal-purchases: false
+
+System:
+  save-on-disable: true
+  save-periodically: true
+  save-interval-mins: 60
+  run-deleter-on-startup: true
+
+DefaultPrices:
+  ROTTEN_FLESH: 2
+  BONE: 5
+  ARROW: 5
+  STRING: 2
+  SPIDER_EYE: 5
+  LEATHER: 10
+  GUNPOWDER: 5
+  BLAZE_ROD: 5
+  SLIME_BALL: 4
+  COD: 3
+  INK_SAC: 5
+
+  BAMBOO: 2
+  KELP: 2
+  CACTUS: 2
+  MELON: 4
+  VINE: 10
+  SUGAR_CANE: 2
+  POTATO: 4
+  WHEAT: 10
+  CARROT: 4
+  PUMPKIN: 3
+  BEETROOT_SEEDS: 3
+  BEETROOT: 5
+  SWEET_BERRIES: 7
+  CHORUS_FRUIT: 10
+  WHEAT_SEEDS: 3
+
+  LAPIS_LAZULI: 10
+  DIAMOND: 400
+  EMERALD: 25
+  COAL: 10
+  QUARTZ: 8
+  IRON_INGOT: 5
+  GOLD_INGOT: 7
+  REDSTONE: 10
+  STONE: 2
+  COBBLESTONE: 2
+  GRAVEL: 2
+  SAND: 2
+  ANDESITE: 5
+  DIORITE: 5
+  GRANITE: 5
+  DIRT: 2
+  SANDSTONE: 2
+  NETHERRACK: 2

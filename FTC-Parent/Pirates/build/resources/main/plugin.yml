@@ -1,0 +1,7 @@
+name: Pirate
+version: 1.0.0-SNAPSHOT
+main: net.forthecrown.pirates.Pirates
+api-version: 1.16
+authors: [ Wout ]
+depend:
+  - FTCCore
