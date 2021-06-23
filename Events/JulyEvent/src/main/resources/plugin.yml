@@ -1,0 +1,5 @@
+name: JulyEvent
+version: @version@
+main: net.forthecrown.julyevent.JulyMain
+api-version: 1.16
+authors: [ Ants ]

@@ -1,15 +1,15 @@
 package net.forthecrown.pirates;
 
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.clickevent.ClickEventManager;
-import net.forthecrown.core.clickevent.ClickEventTask;
+import net.forthecrown.commands.clickevent.ClickEventManager;
+import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.inventory.CrownWeapons;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.user.enums.Branch;
-import net.forthecrown.core.user.enums.Rank;
-import net.forthecrown.core.utils.Cooldown;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.enums.Branch;
+import net.forthecrown.user.enums.Rank;
+import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;

@@ -2,14 +2,15 @@ package net.forthecrown.pirates;
 
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.CrownException;
-import net.forthecrown.core.clickevent.ClickEventManager;
-import net.forthecrown.core.clickevent.ClickEventTask;
-import net.forthecrown.core.economy.Balances;
-import net.forthecrown.core.economy.CannotAffordTransactionException;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.user.enums.Branch;
-import net.forthecrown.core.user.enums.Rank;
+import net.forthecrown.commands.clickevent.ClickEventManager;
+import net.forthecrown.commands.clickevent.ClickEventTask;
+import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.CannotAffordTransactionException;
+import net.forthecrown.core.events.handler.CrownEventExecutor;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.enums.Branch;
+import net.forthecrown.user.enums.Rank;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,74 +46,76 @@ public class PirateEvents implements Listener, ClickEventTask {
     }
 
     @EventHandler
-    public void onPlayerClick(PlayerInteractEntityEvent event) throws CrownException {
-        if(!event.getHand().equals(EquipmentSlot.HAND)) return;
+    public void onPlayerClick(PlayerInteractEntityEvent event1) throws CrownException {
+        if(!event1.getHand().equals(EquipmentSlot.HAND)) return;
 
-        Player player = event.getPlayer();
-        CrownUser user = UserManager.getUser(player.getUniqueId());
-        if (event.getRightClicked().getType() == EntityType.VILLAGER) {
-            if (event.getRightClicked().getName().contains(ChatColor.GOLD + "Wilhelm")) {
-                event.setCancelled(true);
+        CrownEventExecutor.handlePlayer(event1, event -> {
+            Player player = event.getPlayer();
+            CrownUser user = UserManager.getUser(player.getUniqueId());
+            if (event.getRightClicked().getType() == EntityType.VILLAGER) {
+                if (event.getRightClicked().getName().contains(ChatColor.GOLD + "Wilhelm")) {
+                    event.setCancelled(true);
 
-                if (main.getConfig().getStringList("PlayerWhoSoldHeadAlready").contains(player.getUniqueId().toString())) {
-                    player.sendMessage(ChatColor.GRAY + "You've already sold a " + main.getConfig().getString("ChosenHead") + ChatColor.GRAY + " head today.");
-                    return;
+                    if (main.getConfig().getStringList("PlayerWhoSoldHeadAlready").contains(player.getUniqueId().toString())) {
+                        player.sendMessage(ChatColor.GRAY + "You've already sold a " + main.getConfig().getString("ChosenHead") + ChatColor.GRAY + " head today.");
+                        return;
+                    }
+
+                    if (main.checkIfInvContainsHead(event.getPlayer().getInventory())) {
+                        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
+                        main.giveReward(player);
+                        List<String> temp = main.getConfig().getStringList("PlayerWhoSoldHeadAlready");
+                        temp.add(player.getUniqueId().toString());
+                        main.getConfig().set("PlayerWhoSoldHeadAlready", temp);
+                        main.saveConfig();
+                    }
+                    else {
+                        player.sendMessage(ChatColor.GOLD + "{FTC} " + ChatColor.RESET + "Bring Wilhelm a " + main.getConfig().getString("ChosenHead") + ChatColor.RESET + " head for a reward.");
+                    }
+                } else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Jack")) {
+                    event.setCancelled(true);
+                    main.grapplingHook.openLevelSelector(player);
+                } else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Ben")){
+                    if(!user.getAvailableRanks().contains(Rank.PIRATE)) throw new CrownException(user, "&eBen &7only trusts real pirates!");
+                    if(CrownCore.getBalances().get(player.getUniqueId()) < 50000) throw new CannotAffordTransactionException(player);
+
+                    ClickEventManager.allowCommandUsage(player, true);
+
+                    Component text = Component.text("Would you like to ")
+                            .color(NamedTextColor.GRAY)
+                            .append(
+                                    Component.text("[Buy] ")
+                                            .color(NamedTextColor.AQUA)
+                                            .clickEvent(ClickEventManager.getClickEvent(npcID))
+                                            .hoverEvent(HoverEvent.showText(Component.text("Click me!")))
+                            )
+                            .append(Component.text("a "))
+                            .append(Component.text("50 use ").color(NamedTextColor.YELLOW))
+                            .append(Component.text("Grappling Hook for "))
+                            .append(Balances.formatted(50000).color(NamedTextColor.YELLOW))
+                            .append(Component.text("?"));
+
+                    player.sendMessage(text);
                 }
-                if (main.checkIfInvContainsHead(event.getPlayer().getInventory())) {
-                    //player.getWorld().playEffect(event.getRightClicked().getLocation(), Effect.VILLAGER_PLANT_GROW, 1);
-                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
-                    main.giveReward(player);
-                    List<String> temp = main.getConfig().getStringList("PlayerWhoSoldHeadAlready");
-                    temp.add(player.getUniqueId().toString());
-                    main.getConfig().set("PlayerWhoSoldHeadAlready", temp);
-                    main.saveConfig();
-                }
+
+            }
+            else if (event.getRightClicked().getType() == EntityType.SHULKER) {
+                Shulker treasureShulker = (Shulker) event.getRightClicked();
+
+                if (!treasureShulker.getPersistentDataContainer().has(TreasureShulker.KEY, PersistentDataType.BYTE)) return;
+                if(user.getBranch() != Branch.PIRATES) throw new CrownException(user, "&eOnly pirates can use this! &6Join the pirates in Questmoor");
+
+                if (main.getConfig().getStringList("PlayerWhoFoundTreasureAlready").contains(player.getUniqueId().toString())) player.sendMessage(ChatColor.GRAY + "You've already opened this treasure today.");
                 else {
-                    player.sendMessage(ChatColor.GOLD + "{FTC} " + ChatColor.RESET + "Bring Wilhelm a " + main.getConfig().getString("ChosenHead") + ChatColor.RESET + " head for a reward.");
+                    main.giveTreasure(player);
+                    List<String> temp = main.getConfig().getStringList("PlayerWhoFoundTreasureAlready");
+                    temp.add(player.getUniqueId().toString());
+                    main.getConfig().set("PlayerWhoFoundTreasureAlready", temp);
+                    main.saveConfig();
+                    main.shulker.relocate();
                 }
-            } else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Jack")) {
-                event.setCancelled(true);
-                main.grapplingHook.openLevelSelector(player);
-            } else if (event.getRightClicked().getName().contains(ChatColor.YELLOW + "Ben")){
-                if(!user.getAvailableRanks().contains(Rank.PIRATE)) throw new CrownException(user, "&eBen &7only trusts real pirates!");
-                if(CrownCore.getBalances().get(player.getUniqueId()) < 50000) throw new CannotAffordTransactionException(player);
-
-                ClickEventManager.allowCommandUsage(player, true);
-
-                Component text = Component.text("Would you like to ")
-                        .color(NamedTextColor.GRAY)
-                        .append(
-                                Component.text("[Buy] ")
-                                        .color(NamedTextColor.AQUA)
-                                        .clickEvent(ClickEventManager.getClickEvent(npcID))
-                                        .hoverEvent(HoverEvent.showText(Component.text("Click me!")))
-                        )
-                        .append(Component.text("a "))
-                        .append(Component.text("50 use ").color(NamedTextColor.YELLOW))
-                        .append(Component.text("Grappling Hook for "))
-                        .append(Balances.formatted(50000).color(NamedTextColor.YELLOW))
-                        .append(Component.text("?"));
-
-                player.sendMessage(text);
             }
-
-        }
-        else if (event.getRightClicked().getType() == EntityType.SHULKER) {
-            Shulker treasureShulker = (Shulker) event.getRightClicked();
-
-            if (!treasureShulker.getPersistentDataContainer().has(TreasureShulker.KEY, PersistentDataType.BYTE)) return;
-            if(user.getBranch() != Branch.PIRATES) throw new CrownException(user, "&eOnly pirates can use this! &6Join the pirates in Questmoor");
-
-            if (main.getConfig().getStringList("PlayerWhoFoundTreasureAlready").contains(player.getUniqueId().toString())) player.sendMessage(ChatColor.GRAY + "You've already opened this treasure today.");
-            else {
-                main.giveTreasure(player);
-                List<String> temp = main.getConfig().getStringList("PlayerWhoFoundTreasureAlready");
-                temp.add(player.getUniqueId().toString());
-                main.getConfig().set("PlayerWhoFoundTreasureAlready", temp);
-                main.saveConfig();
-                main.shulker.relocate();
-            }
-        }
+        });
     }
 
     @EventHandler

@@ -1,27 +1,29 @@
 package net.forthecrown.pirates;
 
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.commands.CommandLeave;
-import net.forthecrown.core.comvars.ComVar;
-import net.forthecrown.core.comvars.ComVars;
-import net.forthecrown.core.comvars.types.ComVarType;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.user.enums.Rank;
-import net.forthecrown.core.utils.CrownBoundingBox;
-import net.forthecrown.core.utils.CrownRandom;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.commands.CommandLeave;
+import net.forthecrown.comvars.ComVar;
+import net.forthecrown.comvars.ComVars;
+import net.forthecrown.comvars.types.ComVarType;
+import net.forthecrown.crownevents.ObjectiveLeaderboard;
+import net.forthecrown.economy.Balances;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.enums.Rank;
+import net.forthecrown.utils.CrownBoundingBox;
+import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.RoyalArguments;
 import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.pirates.auctions.Auction;
 import net.forthecrown.pirates.auctions.AuctionManager;
 import net.forthecrown.pirates.commands.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -49,8 +51,10 @@ public final class Pirates extends JavaPlugin implements Listener {
 
     private static ComVar<Long> auctionExpirationTime;
     private static ComVar<Long> auctionPickUpTime;
-
+    public static ObjectiveLeaderboard leaderboard;
     private static AuctionManager auctionManager;
+
+    public static final Location LEADERBOARD_LOC = new Location(CrownUtils.WORLD, -639.0, 65.5, 3830.5, 90, 0);
 
     public void onEnable() {
         inst = this;
@@ -97,8 +101,15 @@ public final class Pirates extends JavaPlugin implements Listener {
 
         //events
         getServer().getPluginManager().registerEvents(events, this);
-        getServer().getPluginManager().registerEvents(new BaseEgg(), this);
         getServer().getPluginManager().registerEvents(new NpcSmithEvent(), this);
+
+        leaderboard = new ObjectiveLeaderboard(
+                "Pirate Points leaderboard",
+                Bukkit.getScoreboardManager().getMainScoreboard().getObjective("PiratePoints"),
+                LEADERBOARD_LOC
+        );
+
+        leaderboard.update();
     }
 
     @Override
@@ -168,21 +179,31 @@ public final class Pirates extends JavaPlugin implements Listener {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
 
         double moneyDecider = Math.random();
+
+        int wonAmount;
+        int lootBoxKeys;
+
         if (moneyDecider <= 0.6) {
-            CrownCore.getBalances().add(player.getUniqueId(), 5000, false);
-            player.sendMessage(ChatColor.GRAY + "You've found a treasure with " + ChatColor.YELLOW + "5,000 rhines" + ChatColor.GRAY + " inside.");
-            Bukkit.dispatchCommand(getServer().getConsoleSender(), "crate givekey " + player.getName() + " lootbox1 1");
+            wonAmount = 5000;
+            lootBoxKeys = 1;
         }
         else if (moneyDecider > 0.6 && moneyDecider <= 0.9) {
-            CrownCore.getBalances().add(player.getUniqueId(), 10000, false);
-            player.sendMessage(ChatColor.GRAY + "You've found a treasure with " + ChatColor.YELLOW + "10,000 rhines" + ChatColor.GRAY + " inside.");
-            Bukkit.dispatchCommand(getServer().getConsoleSender(), "crate givekey " + player.getName() + " lootbox1 2");
+            wonAmount = 10000;
+            lootBoxKeys = 2;
         }
         else {
-            CrownCore.getBalances().add(player.getUniqueId(), 20000, false);
-            player.sendMessage(ChatColor.GRAY + "You've found a treasure with " + ChatColor.YELLOW + "20,000 rhines" + ChatColor.GRAY + " inside.");
-            Bukkit.dispatchCommand(getServer().getConsoleSender(), "crate givekey " + player.getName() + " lootbox1 3");
+            wonAmount = 20000;
+            lootBoxKeys = 3;
         }
+
+        CrownCore.getBalances().add(player.getUniqueId(), wonAmount, false);
+        Bukkit.dispatchCommand(getServer().getConsoleSender(), "crate givekey " + player.getName() + " lootbox1 " + lootBoxKeys);
+        player.sendMessage(
+                Component.text("You've found a treasure with ")
+                        .color(NamedTextColor.GRAY)
+                        .append(Balances.formatted(wonAmount).color(NamedTextColor.YELLOW))
+                        .append(Component.text(" inside."))
+        );
 
         List<ItemStack> commonItems = getItems(((Chest) Bukkit.getWorld("world").getBlockAt(
                 new Location(Bukkit.getWorld(getConfig().getString("TreasureCommonLoot.world")), getConfig().getInt("TreasureCommonLoot.x"), getConfig().getInt("TreasureCommonLoot.y"), getConfig().getInt("TreasureCommonLoot.z"))).getState()));
@@ -195,18 +216,9 @@ public final class Pirates extends JavaPlugin implements Listener {
             double random = Math.random();
             ItemStack chosenItem;
 
-            if (random <= 0.6) {
-                chosenItem = getItemFromList(commonItems);
-                //Bukkit.broadcastMessage("Common: " + chosenItem.getType().toString().toLowerCase());
-            }
-            else if (random > 0.6 && random <= 0.9) {
-                chosenItem = getItemFromList(rareItems);
-                //Bukkit.broadcastMessage("Rare: " + chosenItem.getType().toString().toLowerCase());
-            }
-            else {
-                chosenItem = getItemFromList(specialItems);
-                //Bukkit.broadcastMessage("Special: " + chosenItem.getType().toString().toLowerCase());
-            }
+            if (random <= 0.6) chosenItem = getItemFromList(commonItems);
+            else if (random > 0.6 && random <= 0.9) chosenItem = getItemFromList(rareItems);
+            else chosenItem = getItemFromList(specialItems);
 
             player.getInventory().addItem(chosenItem);
         }
@@ -253,66 +265,6 @@ public final class Pirates extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.WHITE + "You can now select the tag in " + ChatColor.YELLOW + "/rank" + ChatColor.WHITE + " now.");
             }
         }
-    }
-
-
-    private void spawnLeaderboard(int amount) {
-        removeLeaderboard();
-        List<String> top = getTopPlayers(Bukkit.getServer().getScoreboardManager().getMainScoreboard().getObjective("PiratePoints"), amount);
-        double distanceBetween = 0.27;
-
-        for (int i = 0; i < top.size(); i++) {
-            spawnArmorStand(getLeaderboardLoc(), distanceBetween*i, top.get(top.size()-i-1), true);
-        }
-
-        spawnArmorStand(getLeaderboardLoc(), distanceBetween*top.size(), ChatColor.GOLD + "---------=o=O=o=---------", false);
-        spawnArmorStand(getLeaderboardLoc(), distanceBetween*(top.size()+1), ChatColor.WHITE + "Pirate Points Leaderboard", false);
-        spawnArmorStand(getLeaderboardLoc(), -distanceBetween, ChatColor.GOLD + "---------=o=O=o=---------", false);
-    }
-
-    private void spawnArmorStand(Location loc, double d, String text, boolean isScoreStand) {
-        ArmorStand armorstand = loc.getWorld().spawn(loc.add(0, d, 0), ArmorStand.class);
-        armorstand.setGravity(false);
-        armorstand.setVisible(false);
-        armorstand.setCustomName(text);
-        armorstand.setCustomNameVisible(true);
-        getAllLeaderboardArmorstands().add(armorstand);
-        if (isScoreStand) getLeaderBoardArmorStands().add(armorstand);
-    }
-
-    private void removeLeaderboard() {
-        for (ArmorStand armorstand : getAllLeaderboardArmorstands()) {
-            armorstand.remove();
-        }
-        allLeaderboardArmorstands.clear();
-        for (Entity ent : getLeaderboardLoc().getWorld().getNearbyEntities(getLeaderboardLoc(), 0.1, 5, 0.1)) {
-            if (ent instanceof ArmorStand) ent.remove();
-        }
-    }
-
-
-    private final List<ArmorStand> leaderboardArmorstands = new ArrayList<>();
-    public List<ArmorStand> getLeaderBoardArmorStands() {
-        return leaderboardArmorstands;
-    }
-    private final List<ArmorStand> allLeaderboardArmorstands = new ArrayList<>();
-    public List<ArmorStand> getAllLeaderboardArmorstands() {
-        return allLeaderboardArmorstands;
-    }
-
-    public Location getLeaderboardLoc() {
-        return new Location(Bukkit.getWorld("world"), -639.0, 70, 3830.5, 90, 0); // TODO UPDATE?
-    }
-
-    public void updateLeaderBoard() {
-        removeLeaderboard();
-        spawnLeaderboard(5);
-		/*List<String> top = getTopPlayers(Bukkit.getServer().getScoreboardManager().getMainScoreboard().getObjective("PiratePoints"), getLeaderBoardArmorStands().size());
-		for (int i = 0; i < top.size(); i++)
-		{
-			getLeaderBoardArmorStands().get(i).setCustomName( top.get(top.size()-i-1));
-		}*/
-
     }
 
     private List<ItemStack> getItems(Chest chest) {

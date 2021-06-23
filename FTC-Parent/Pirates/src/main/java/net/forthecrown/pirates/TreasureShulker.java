@@ -1,6 +1,6 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.utils.CrownRandom;
+import net.forthecrown.utils.CrownRandom;
 import org.bukkit.*;
 import org.bukkit.entity.Shulker;
 import org.bukkit.persistence.PersistentDataType;
