@@ -1,6 +1,6 @@
 package net.forthecrown.core.admin;
 
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;

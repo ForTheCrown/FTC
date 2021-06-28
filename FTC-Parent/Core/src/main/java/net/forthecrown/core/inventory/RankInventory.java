@@ -1,8 +1,8 @@
 package net.forthecrown.core.inventory;
 
-import net.forthecrown.core.user.enums.Branch;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.enums.Rank;
+import net.forthecrown.user.enums.Branch;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.enums.Rank;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;

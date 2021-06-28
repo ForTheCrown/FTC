@@ -1,12 +1,12 @@
-package net.forthecrown.pirates.commands;
+package net.forthecrown.commands;
 
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.pirates.Pirates;
 
 public class CommandUpdateLeaderboard extends FtcCommand {
     public CommandUpdateLeaderboard(){
-        super("updatelb", Pirates.inst);
+        super("updatelb", CrownCore.inst());
         register();
     }
 

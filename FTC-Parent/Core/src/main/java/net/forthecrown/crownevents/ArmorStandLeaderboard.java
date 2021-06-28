@@ -1,6 +1,6 @@
-package net.forthecrown.core.crownevents;
+package net.forthecrown.crownevents;
 
-import net.forthecrown.utils.CrownBoundingBox;
+import net.forthecrown.utils.math.CrownBoundingBox;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Main;
 import net.forthecrown.commands.CommandHologram;

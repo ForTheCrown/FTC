@@ -1,16 +1,15 @@
 package net.forthecrown.utils.loot;
 
 import com.google.gson.JsonObject;
+import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.JsonUtils;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * An easy to create loottable to use in-game
@@ -23,12 +22,16 @@ public class LiteralLootTable implements CrownLootTable {
     public LiteralLootTable(NamespacedKey key, ItemStack... items){
         this.key = key;
         this.items = Arrays.asList(items);
+    }
 
+    public LiteralLootTable(NamespacedKey key, Collection<ItemStack> items){
+        this.key = key;
+        this.items = new ArrayList<>(items);
     }
 
     @Override
-    public @NotNull Collection<ItemStack> populateLoot(@NotNull Random random, @NotNull LootContext context) {
-        return items;
+    public @NotNull Collection<ItemStack> populateLoot(@NotNull CrownRandom random, @NotNull LootContext context, int maxItems) {
+        return random.pickRandomEntries(items, maxItems);
     }
 
     @Override
@@ -51,7 +54,17 @@ public class LiteralLootTable implements CrownLootTable {
     }
 
     @Override
+    public int getMaxItems() {
+        return items.size();
+    }
+
+    @Override
     public JsonObject serialize() {
-        return null;
+        JsonObject json = new JsonObject();
+
+        json.addProperty("key", key.asString());
+        json.add("items", JsonUtils.writeCollection(items, JsonUtils::writeItem));
+
+        return json;
     }
 }

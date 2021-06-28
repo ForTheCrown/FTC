@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables.preconditions;
+package net.forthecrown.useables.preconditions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -9,9 +9,9 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.CoreCommands;
-import net.forthecrown.core.useables.UsageCheck;
-import net.forthecrown.core.user.enums.Branch;
-import net.forthecrown.core.user.UserManager;
+import net.forthecrown.useables.UsageCheck;
+import net.forthecrown.user.enums.Branch;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;

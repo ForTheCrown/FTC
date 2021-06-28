@@ -1,4 +1,4 @@
-package net.forthecrown.core.registry;
+package net.forthecrown.registry;
 
 import net.forthecrown.useables.UsageAction;
 import net.kyori.adventure.key.Key;

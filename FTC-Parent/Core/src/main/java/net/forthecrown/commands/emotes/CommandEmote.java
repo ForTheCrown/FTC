@@ -6,9 +6,9 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.utils.Cooldown;
+import net.forthecrown.utils.Cooldown;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +54,9 @@ public abstract class CommandEmote extends FtcCommand {
                             if(!sender.allowsEmotes()) throw FtcExceptionProvider.senderEmoteDisabled();
                             if(!recipient.allowsEmotes()) throw FtcExceptionProvider.targetEmoteDisabled(recipient);
 
-                            if(execute(sender, recipient) >= 0 && !sender.hasPermission(Permissions.CORE_ADMIN)) Cooldown.add(sender, cooldownCategory, cooldownTime);
+                            if(execute(sender, recipient) >= 0 && !sender.hasPermission(Permissions.EMOTE_IGNORE)){
+                                Cooldown.add(sender, cooldownCategory, cooldownTime);
+                            }
                             return 0;
                         })
                 );

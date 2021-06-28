@@ -1,4 +1,4 @@
-package net.forthecrown.core.crownevents;
+package net.forthecrown.crownevents;
 
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.user.CrownUser;

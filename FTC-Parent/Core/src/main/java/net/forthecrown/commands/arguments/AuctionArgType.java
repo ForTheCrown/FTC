@@ -9,18 +9,18 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.economy.auctions.Auction;
-import net.forthecrown.economy.auctions.AuctionManager;
+import net.forthecrown.pirates.AuctionManager;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 
 import java.util.concurrent.CompletableFuture;
 
-public class AuctionType implements ArgumentType<Auction> {
-    private AuctionType() {}
-    public static final AuctionType AUCTION = new AuctionType();
+public class AuctionArgType implements ArgumentType<Auction> {
+    private AuctionArgType() {}
+    public static final AuctionArgType AUCTION = new AuctionArgType();
 
     public static final DynamicCommandExceptionType UNKNOWN_AUCTION = new DynamicCommandExceptionType(o -> () -> "Unknown Auction: " + o);
 
-    public static AuctionType auction(){
+    public static AuctionArgType auction(){
         return AUCTION;
     }
 

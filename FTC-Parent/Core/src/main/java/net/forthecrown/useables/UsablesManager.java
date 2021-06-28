@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables;
+package net.forthecrown.useables;
 
 import net.forthecrown.core.CrownCore;
 import org.bukkit.Location;

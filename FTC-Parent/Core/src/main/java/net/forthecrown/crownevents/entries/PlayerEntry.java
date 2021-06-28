@@ -1,6 +1,6 @@
-package net.forthecrown.core.crownevents.entries;
+package net.forthecrown.crownevents.entries;
 
-import net.forthecrown.core.crownevents.InEventListener;
+import net.forthecrown.crownevents.InEventListener;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import org.bukkit.entity.Player;

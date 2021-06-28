@@ -1,12 +1,11 @@
-package net.forthecrown.core.useables;
+package net.forthecrown.useables;
 
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.serializer.CrownSerializer;
-import net.forthecrown.core.serializer.Deleteable;
+import net.forthecrown.serializer.CrownSerializer;
+import net.forthecrown.serializer.Deletable;
 import org.bukkit.Location;
 import org.bukkit.block.TileState;
 
-public interface UsableBlock extends CrownSerializer<CrownCore>, Deleteable, Usable {
+public interface UsableBlock extends CrownSerializer, Deletable, Usable {
     Location getLocation();
     TileState getSign();
 }

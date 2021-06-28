@@ -1,4 +1,4 @@
-package net.forthecrown.core.economy.shops;
+package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.CrownCore;
 import net.kyori.adventure.text.Component;

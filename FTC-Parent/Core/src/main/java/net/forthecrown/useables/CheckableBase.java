@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables;
+package net.forthecrown.useables;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -43,12 +43,12 @@ public abstract class CheckableBase implements Preconditionable {
 
     @Override
     public void addCheck(UsageCheck precondition) {
-        checks.put(precondition.key(), precondition);
+        checks.put(CrownUtils.checkNotBukkit(precondition.key()), precondition);
     }
 
     @Override
     public void removeCheck(Key name) {
-        checks.remove(name);
+        checks.remove(CrownUtils.checkNotBukkit(name));
     }
 
     @Override
@@ -63,6 +63,7 @@ public abstract class CheckableBase implements Preconditionable {
 
     @Override
     public <T extends UsageCheck> T getCheck(Key key, Class<T> clazz) {
+        key = CrownUtils.checkNotBukkit(key);
         if(!checks.containsKey(key)) return null;
 
         UsageCheck c = checks.get(key);

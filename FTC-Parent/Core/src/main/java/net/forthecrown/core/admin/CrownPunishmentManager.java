@@ -6,9 +6,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.core.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.events.JailListener;
-import net.forthecrown.core.serializer.AbstractJsonSerializer;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.events.dynamic.JailListener;
+import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -22,11 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class CrownPunishmentManager extends AbstractJsonSerializer<CrownCore> implements PunishmentManager {
+public class CrownPunishmentManager extends AbstractJsonSerializer implements PunishmentManager {
     private final Map<UUID, PunishmentEntry> entries = new HashMap<>();
 
     public CrownPunishmentManager() {
-        super("punishments", CrownCore.inst());
+        super("punishments");
 
         reload();
         CrownCore.logger().info("PunishmentManager loaded");

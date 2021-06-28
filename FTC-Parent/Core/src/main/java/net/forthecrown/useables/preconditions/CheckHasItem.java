@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables.preconditions;
+package net.forthecrown.useables.preconditions;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.core.useables.UsageCheck;
+import net.forthecrown.useables.UsageCheck;
 import net.forthecrown.utils.InterUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.grenadier.CommandSource;
@@ -64,7 +64,7 @@ public class CheckHasItem implements UsageCheck {
 
     @Override
     public JsonElement serialize() {
-        return JsonUtils.serializeItem(item);
+        return JsonUtils.writeItem(item);
     }
 
     @Override

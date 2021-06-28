@@ -5,7 +5,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import net.forthecrown.core.user.enums.Branch;
+import net.forthecrown.user.enums.Branch;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 

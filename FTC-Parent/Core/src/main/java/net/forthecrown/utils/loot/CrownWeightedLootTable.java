@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
@@ -15,21 +16,21 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CrownWeightedLootTable implements WeightedLootTable {
 
     private final NamespacedKey key;
     private final ImmutableMap<ItemStack, Integer> items;
     private final int totalWeight;
+    private final int maxItemsToGive;
 
-    public CrownWeightedLootTable(NamespacedKey key, Map<ItemStack, Integer> items) {
+    public CrownWeightedLootTable(NamespacedKey key, Map<ItemStack, Integer> items, int maxItemsToGive) {
         this.key = key;
         this.items = ImmutableMap.copyOf(items);
         this.totalWeight = countItemWeights();
+        this.maxItemsToGive = maxItemsToGive;
     }
 
     public CrownWeightedLootTable(JsonElement element){
@@ -37,6 +38,7 @@ public class CrownWeightedLootTable implements WeightedLootTable {
 
         Key temp = CrownUtils.parseKey(json.get("key").getAsString());
         this.key = new NamespacedKey(temp.namespace(), temp.value());
+        this.maxItemsToGive = json.get("maxToGive").getAsInt();
 
         Map<ItemStack, Integer> tempMap = new HashMap<>();
         JsonArray array = json.getAsJsonArray("items");
@@ -46,7 +48,7 @@ public class CrownWeightedLootTable implements WeightedLootTable {
                 JsonObject itemEntry = e.getAsJsonObject();
 
                 int weight = itemEntry.get("weight").getAsInt();
-                ItemStack item = JsonUtils.deserializeItem(itemEntry.get("item"));
+                ItemStack item = JsonUtils.readItem(itemEntry.get("item"));
 
                 tempMap.put(item, weight);
             } catch (CommandSyntaxException e1){
@@ -69,13 +71,17 @@ public class CrownWeightedLootTable implements WeightedLootTable {
     }
 
     @Override
-    public @NotNull Collection<ItemStack> populateLoot(@NotNull Random random, @NotNull LootContext context) {
+    public @NotNull Collection<ItemStack> populateLoot(@NotNull CrownRandom random, @NotNull LootContext context, int maxItems) {
         return null;
     }
 
     @Override
     public void fillInventory(@NotNull Inventory inventory, @NotNull Random random, @NotNull LootContext context) {
+        List<ItemStack> items = new ArrayList<>(populateLoot(random, context));
 
+        AtomicInteger index = new AtomicInteger();
+        random.ints(items.size(), 0, inventory.getSize()-1)
+                .forEach(i -> inventory.setItem(i, items.get(index.getAndIncrement())));
     }
 
     @Override
@@ -84,8 +90,18 @@ public class CrownWeightedLootTable implements WeightedLootTable {
     }
 
     @Override
+    public int getMaxItems() {
+        return items.size();
+    }
+
+    @Override
     public int getTotalWeight() {
         return totalWeight;
+    }
+
+    @Override
+    public int getMaxItemsToGive() {
+        return maxItemsToGive;
     }
 
     @Override
@@ -97,6 +113,7 @@ public class CrownWeightedLootTable implements WeightedLootTable {
     public JsonObject serialize() {
         JsonObject json = new JsonObject();
 
+        json.add("maxToGive", new JsonPrimitive(maxItemsToGive));
         json.add("key", new JsonPrimitive(key.asString()));
 
         JsonArray array = new JsonArray();
@@ -104,7 +121,7 @@ public class CrownWeightedLootTable implements WeightedLootTable {
             JsonObject itemEntry = new JsonObject();
 
             itemEntry.add("weight", new JsonPrimitive(e.getValue()));
-            itemEntry.add("item", JsonUtils.serializeItem(e.getKey()));
+            itemEntry.add("item", JsonUtils.writeItem(e.getKey()));
 
             array.add(itemEntry);
         }

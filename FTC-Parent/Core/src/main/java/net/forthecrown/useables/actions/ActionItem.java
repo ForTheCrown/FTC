@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables.actions;
+package net.forthecrown.useables.actions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.core.useables.UsageAction;
+import net.forthecrown.useables.UsageAction;
 import net.forthecrown.utils.InterUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.grenadier.CommandSource;
@@ -33,7 +33,7 @@ public class ActionItem implements UsageAction {
 
     @Override
     public void parse(JsonElement json) throws CommandSyntaxException {
-        item = JsonUtils.deserializeItem(json);
+        item = JsonUtils.readItem(json);
     }
 
     @Override

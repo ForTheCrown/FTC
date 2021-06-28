@@ -1,4 +1,4 @@
-package net.forthecrown.core.comvars.types;
+package net.forthecrown.comvars.types;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -10,8 +10,9 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.comvars.ParseFunction;
+import net.forthecrown.comvars.ParseFunction;
 import net.forthecrown.grenadier.CommandSource;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
@@ -56,7 +57,7 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource> {
         private final Function<T, JsonElement> serializationFunc;
         private final Class<T> clazz;
 
-        public PrimitiveComVarType(Class<T> clazz, ParseFunction<T> fromString, Function<T, JsonElement> json){
+        private PrimitiveComVarType(Class<T> clazz, ParseFunction<T> fromString, Function<T, JsonElement> json){
             this.fromString = fromString;
             this.clazz = clazz;
             this.serializationFunc = json;
@@ -79,6 +80,22 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource> {
         @Override
         public JsonElement serialize(@Nullable T value) {
             return value == null ? JsonNull.INSTANCE : serializationFunc.apply(value);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            PrimitiveComVarType<?> type = (PrimitiveComVarType<?>) o;
+            return clazz.equals(type.clazz);
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder(17, 37)
+                    .append(clazz)
+                    .toHashCode();
         }
     }
 }

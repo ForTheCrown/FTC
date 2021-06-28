@@ -1,10 +1,10 @@
 package net.forthecrown.user;
 
-import net.forthecrown.core.Announcer;
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.economy.BalanceMap;
-import net.forthecrown.core.economy.SortedBalanceMap;
-import net.forthecrown.serializer.AbstractSerializer;
+import net.forthecrown.economy.BalanceMap;
+import net.forthecrown.economy.SortedBalanceMap;
+import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.utils.MapUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,13 +16,16 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
-public final class CrownUserManager extends AbstractSerializer<CrownCore> implements UserManager {
+public final class CrownUserManager extends AbstractYamlSerializer implements UserManager {
+
+    public static final Map<UUID, FtcUser> LOADED_USERS = new HashMap<>();
+    public static final Map<UUID, FtcUserAlt> LOADED_ALTS = new HashMap<>();
 
     private Map<UUID, UUID> alts = new HashMap<>();
     private final CrownCore core;
 
     public CrownUserManager(){
-        super("usermanager", CrownCore.inst());
+        super("usermanager");
 
         this.core = CrownCore.inst();
         reload();

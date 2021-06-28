@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables;
+package net.forthecrown.useables;
 
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.key.Key;

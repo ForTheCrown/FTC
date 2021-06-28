@@ -1,14 +1,17 @@
-package net.forthecrown.core.economy;
+package net.forthecrown.economy;
 
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.IntSupplier;
 
 public interface BalanceMap {
 
-    int getDefaultAmount();
+    IntSupplier getDefaultAmount();
 
     boolean contains(UUID id);
 
@@ -25,6 +28,8 @@ public interface BalanceMap {
     int getIndex(UUID id);
 
     int size();
+
+    void clear();
 
     void put(UUID id, int amount);
 
@@ -61,6 +66,34 @@ public interface BalanceMap {
         @Override
         public int compareTo(@NotNull BalanceMap.BalEntry o) {
             return Integer.compare(bal, o.bal);
+        }
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "{" +
+                    "id=" + id +
+                    ",bal=" + bal +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+
+            if (o == null || getClass() != o.getClass()) return false;
+
+            BalEntry entry = (BalEntry) o;
+
+            return new EqualsBuilder()
+                    .append(id, entry.id)
+                    .isEquals();
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder(17, 37)
+                    .append(id)
+                    .toHashCode();
         }
     }
 }

@@ -3,8 +3,7 @@ package net.forthecrown.core.admin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.serializer.AbstractJsonSerializer;
+import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,13 +14,13 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerRules extends AbstractJsonSerializer<CrownCore> {
+public class ServerRules extends AbstractJsonSerializer {
 
     private final List<Component> rules = new ArrayList<>();
     private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 
     public ServerRules(){
-        super("rules", CrownCore.inst());
+        super("rules");
 
         if(!fileExists) reload();
         reload();

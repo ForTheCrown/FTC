@@ -4,11 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.serializer.JsonSerializable;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.core.utils.JsonUtils;
+import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -117,8 +117,8 @@ public class PunishmentEntry implements JsonSerializable {
         JsonObject json = new JsonObject();
 
         json.add("uuid", new JsonPrimitive(id.toString()));
-        json.add("current", JsonUtils.serializeCollection(current.values(), PunishmentRecord::serialize));
-        json.add("records", JsonUtils.serializeCollection(records, PunishmentRecord::serialize));
+        json.add("current", JsonUtils.writeCollection(current.values(), PunishmentRecord::serialize));
+        json.add("records", JsonUtils.writeCollection(records, PunishmentRecord::serialize));
 
         return json;
     }

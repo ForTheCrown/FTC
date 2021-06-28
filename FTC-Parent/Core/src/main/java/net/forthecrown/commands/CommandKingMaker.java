@@ -3,12 +3,12 @@ package net.forthecrown.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.Kingship;
+import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -21,6 +21,7 @@ public class CommandKingMaker extends FtcCommand {
 
         setDescription("This command is used to assign and unassign a king or queen");
         setPermission(Permissions.KING_MAKER);
+
         register();
     }
 
@@ -47,7 +48,7 @@ public class CommandKingMaker extends FtcCommand {
                 })
                 .then(literal("remove")
                         .executes(c ->{
-                            if(CrownCore.getKingship() == null) throw FtcExceptionProvider.create("There is already no king");
+                            if(CrownCore.getKingship().getUniqueId() == null) throw FtcExceptionProvider.create("There is already no king");
 
                             CrownCore.getKingship().set(null);
                             c.getSource().sendMessage("King has been removed");

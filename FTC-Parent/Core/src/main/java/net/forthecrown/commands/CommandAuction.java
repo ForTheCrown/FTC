@@ -1,9 +1,10 @@
-package net.forthecrown.pirates.commands;
+package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.arguments.AuctionArgType;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -15,7 +16,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.economy.auctions.Auction;
-import net.forthecrown.economy.auctions.AuctionManager;
+import net.forthecrown.pirates.AuctionManager;
 import net.forthecrown.economy.auctions.CrownAuction;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -43,7 +44,7 @@ import java.util.UUID;
 public class CommandAuction extends FtcCommand {
 
     public CommandAuction(){
-        super("auction", Pirates.inst);
+        super("auction");
 
         setDescription("The primary command used for interacting with AuctionSigns");
         setAliases("au");
@@ -101,7 +102,7 @@ public class CommandAuction extends FtcCommand {
                                 })
                         )
         )
-        .then(argument(AUCTION_ARG, AuctionArgument.auction())
+        .then(argument(AUCTION_ARG, AuctionArgType.auction())
                 .suggests(suggestMatching(AuctionManager.getAuctionNames()))
 
                 .then(literal("expire")
@@ -174,14 +175,14 @@ public class CommandAuction extends FtcCommand {
                                     CrownUser user = getUserExecutor(c);
                                     Auction auction = auctionFromArg(c);
 
-                                    if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.create("&7You must be a pirate to claim an auction");
+                                    if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.notPirate();
                                     if(!isAllowedToOwn(c.getSource())) throw FtcExceptionProvider.create("&7You aren't allowed to own more than one auction at a time");
                                     if(claimedClaiming.contains(auction.getName())) throw FtcExceptionProvider.create("&7Someone is already claiming this Auction");
                                     if(auction.isClaimed()) throw FtcExceptionProvider.create("&7" + auction.getName() + " is already claimed by " + auction.getOwner().getName());
 
-                                    Pirates.inst.getServer().getPluginManager().registerEvents(
+                                    Bukkit.getPluginManager().registerEvents(
                                             new AuctionClaiming(user, auction, c.getArgument("startingBid", Integer.class)),
-                                            Pirates.inst);
+                                            CrownCore.inst());
                                     return 0;
                                 })
                         )

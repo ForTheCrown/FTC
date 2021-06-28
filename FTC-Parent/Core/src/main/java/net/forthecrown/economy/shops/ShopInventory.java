@@ -1,4 +1,4 @@
-package net.forthecrown.core.economy.shops;
+package net.forthecrown.economy.shops;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;

@@ -13,9 +13,12 @@ import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.JoinInfo;
-import net.forthecrown.core.datafixers.EssToFTC;
-import net.forthecrown.core.events.AfkListener;
-import net.forthecrown.serializer.AbstractSerializer;
+import net.forthecrown.events.dynamic.AfkListener;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.royalgrenadier.source.CommandSources;
+import net.forthecrown.serializer.AbstractYamlSerializer;
+import net.forthecrown.user.data.EssToFTC;
 import net.forthecrown.user.data.SoldMaterialData;
 import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.user.enums.*;
@@ -23,9 +26,6 @@ import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.MapUtils;
-import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.royalgrenadier.GrenadierUtils;
-import net.forthecrown.royalgrenadier.source.CommandSources;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
@@ -42,16 +42,17 @@ import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.util.Tristate;
-import net.minecraft.server.v1_16_R3.*;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
+import net.minecraft.Util;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.protocol.game.ClientboundChatPacket;
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.v1_16_R3.CraftOfflinePlayer;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.CraftOfflinePlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
@@ -72,62 +73,63 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 
-public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser {
+public class FtcUser extends AbstractYamlSerializer implements CrownUser {
 
     private final UUID base;
     private String name;
-    private String lastOnlineName;
+
+    public String lastOnlineName;
     public List<String> previousNames = new ArrayList<>();
-    private Component nickname;
+    public Component nickname;
 
     public final FtcUserDataContainer dataContainer;
     public final FtcUserInteractions interactions;
     public final FtcUserGrave grave;
     public final FtcUserHomes homes;
 
-    private Rank currentRank;
-    private Set<Rank> ranks;
-    private Branch branch;
+    public Rank currentRank;
+    public Set<Rank> ranks;
+    public Branch branch;
 
-    private List<Pet> pets;
-    private Particle particleArrowActive;
-    private List<Particle> particleArrowAvailable;
-    private String particleDeathActive;
-    private List<String> particleDeathAvailable;
+    public List<Pet> pets;
+    public Particle particleArrowActive;
+    public List<Particle> particleArrowAvailable;
+    public String particleDeathActive;
+    public List<String> particleDeathAvailable;
 
     private int gems;
-    private boolean canSwapBranch = true;
-    private boolean allowsEmotes = true;
-    private boolean allowsRidingPlayers = true;
-    private boolean publicProfile = true;
-    private boolean allowsTPA = true;
-    private boolean acceptsPay = true;
-    private boolean listeningToEavesdropper = false;
-    private boolean vanished = false;
-    private boolean afk = false;
-    private boolean flying = false;
-    private boolean godmode = false;
-    private long totalEarnings;
-    private long nextResetTime;
-    private long nextBranchSwapAllowed;
+    public boolean canSwapBranch = true;
+    public boolean allowsEmotes = true;
+    public boolean allowsRidingPlayers = true;
+    public boolean publicProfile = true;
+    public boolean allowsTPA = true;
+    public boolean acceptsPay = true;
+    public boolean listeningToEavesdropper = false;
+    public boolean vanished = false;
+    public boolean afk = false;
+    public boolean flying = false;
+    public boolean godmode = false;
+    public long totalEarnings;
+    public long nextResetTime;
+    public long nextBranchSwapAllowed;
     public String ip;
 
-    private Map<Material, SoldMaterialData> matData = new HashMap<>();
+    public Map<Material, SoldMaterialData> matData = new HashMap<>();
     public SellAmount sellAmount;
 
     private Location entityLocation;
 
-    private EntityPlayer handle;
+    private ServerPlayer handle;
 
-    private Location lastLocation;
+    public Location lastLocation;
     public UserTeleport lastTeleport;
     public AfkListener afkListener;
-    private long nextAllowedTeleport = 0;
+    public long nextAllowedTeleport = 0;
 
     private CommandSender lastMessage;
 
     public FtcUser(@NotNull UUID base){
-        super(base.toString(), "playerdata", CrownCore.inst());
+        super(base.toString(), "playerdata");
         this.base = base;
 
         dataContainer = new FtcUserDataContainer(this, getFile());
@@ -138,7 +140,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         if(fileDoesntExist) addDefaults();
         else reload();
 
-        net.forthecrown.user.UserManager.LOADED_USERS.put(base, this);
+        CrownUserManager.LOADED_USERS.put(base, this);
 
         if(isOnline()) handle = getOnlineHandle().getHandle();
     }
@@ -304,7 +306,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
     @Override
     public void unload(){
         save();
-        net.forthecrown.user.UserManager.LOADED_USERS.remove(this.getUniqueId());
+        CrownUserManager.LOADED_USERS.remove(this.getUniqueId());
         handle = null;
     }
 
@@ -322,7 +324,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         return (CraftOfflinePlayer) Bukkit.getOfflinePlayer(base);
     }
 
-    public EntityPlayer getHandle() {
+    public ServerPlayer getHandle() {
         if(!isOnline()) return null;
         if(handle == null) handle = getOnlineHandle().getHandle();
         return handle;
@@ -636,25 +638,25 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
     }
 
     @Override
-        public void sendMessage(IChatBaseComponent message){
-        sendMessage(message, ChatMessageType.CHAT);
+        public void sendMessage(net.minecraft.network.chat.Component message){
+        sendMessage(message, ChatType.CHAT);
     }
 
     @Override
-    public void sendMessage(UUID id, IChatBaseComponent message){
-        sendMessage(id, message, ChatMessageType.CHAT);
+    public void sendMessage(UUID id, net.minecraft.network.chat.Component message){
+        sendMessage(id, message, ChatType.CHAT);
     }
 
     @Override
-    public void sendMessage(IChatBaseComponent message, ChatMessageType type){
+    public void sendMessage(net.minecraft.network.chat.Component message, ChatType type){
         if(!isOnline()) return;
-        getHandle().playerConnection.sendPacket(new PacketPlayOutChat(message, type, SystemUtils.b));
+        getHandle().connection.send(new ClientboundChatPacket(message, type, Util.NIL_UUID));
     }
 
     @Override
-    public void sendMessage(UUID id, IChatBaseComponent message, ChatMessageType type){
+    public void sendMessage(UUID id, net.minecraft.network.chat.Component message, ChatType type){
         if(!isOnline()) return;
-        getHandle().playerConnection.sendPacket(new PacketPlayOutChat(message, type, id));
+        getHandle().connection.send(new ClientboundChatPacket(message, type, id));
     }
 
     @Nonnull
@@ -842,13 +844,13 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
     @Override
     public Location getLocation() {
         if(!isOnline()) return entityLocation;
-        return new Location(getHandle().world.getWorld(), getHandle().locX(), getHandle().locY(), getHandle().locZ(), getHandle().getBukkitYaw(), getHandle().pitch);
+        return new Location(getHandle().level.getWorld(), getHandle().getX(), getHandle().getY(), getHandle().getZ(), getHandle().getBukkitYaw(), getHandle().getXRot());
     }
 
     @Override
     public World getWorld() {
         if(!isOnline()) return entityLocation.getWorld();
-        return getHandle().world.getWorld();
+        return getHandle().level.getWorld();
     }
 
     @Override
@@ -1055,7 +1057,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
     @Override
     public CommandSource getLastMessage() {
         if(lastMessage == null) return null;
-        CommandListenerWrapper wrapper = GrenadierUtils.senderToWrapper(lastMessage);
+        CommandSourceStack wrapper = GrenadierUtils.senderToWrapper(lastMessage);
 
         return CommandSources.getOrCreate(wrapper, null);
     }
@@ -1086,8 +1088,7 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
         checkOnline();
 
         TabPlayer tPlayer = TABAPI.getPlayer(getUniqueId());
-        if(nickname == null) tPlayer.setValuePermanently(EnumProperty.CUSTOMTABNAME, getName());
-        else tPlayer.setValuePermanently(EnumProperty.CUSTOMTABNAME, ChatUtils.getString(nickname));
+        tPlayer.setValuePermanently(EnumProperty.CUSTOMTABNAME, getNickOrName());
     }
 
     @Override
@@ -1131,12 +1132,12 @@ public class FtcUser extends AbstractSerializer<CrownCore> implements CrownUser 
 
         TabPlayer tPlayer = TABAPI.getPlayer(getUniqueId());
         if(afk){
-            tPlayer.setValuePermanently(EnumProperty.TABSUFFIX, ChatColor.GRAY + " [AFK]");
+            tPlayer.setValueTemporarily(EnumProperty.TABSUFFIX, ChatColor.GRAY + " [AFK]");
             afkListener = new AfkListener(this);
             Bukkit.getPluginManager().registerEvents(afkListener, CrownCore.inst());
         }
         else {
-            tPlayer.setValuePermanently(EnumProperty.TABSUFFIX, "");
+            tPlayer.removeTemporaryValue(EnumProperty.TABSUFFIX);
 
             if(afkListener != null) {
                 HandlerList.unregisterAll(afkListener);

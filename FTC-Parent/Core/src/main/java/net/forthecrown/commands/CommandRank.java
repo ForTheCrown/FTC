@@ -2,9 +2,9 @@ package net.forthecrown.commands;
 
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.events.RankGuiUseEvent;
+import net.forthecrown.events.dynamic.RankGuiUseEvent;
 import net.forthecrown.core.inventory.RankInventory;
-import net.forthecrown.core.user.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

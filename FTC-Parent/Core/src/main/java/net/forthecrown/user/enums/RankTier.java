@@ -33,6 +33,6 @@ public enum RankTier implements Comparable<RankTier>, JsonSerializable {
 
     @Override
     public JsonElement serialize() {
-        return JsonUtils.serializeEnum(this);
+        return JsonUtils.writeEnum(this);
     }
 }

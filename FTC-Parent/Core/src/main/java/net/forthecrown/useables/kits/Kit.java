@@ -1,10 +1,10 @@
-package net.forthecrown.core.useables.kits;
+package net.forthecrown.useables.kits;
 
 import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.SilentPredicate;
-import net.forthecrown.core.serializer.Deleteable;
-import net.forthecrown.core.serializer.JsonSerializable;
-import net.forthecrown.core.useables.Preconditionable;
+import net.forthecrown.serializer.Deletable;
+import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.useables.Preconditionable;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -17,7 +17,11 @@ import java.util.List;
 import java.util.function.Predicate;
 
 //Lot of extensions huh :|
-public interface Kit extends JsonSerializable, Preconditionable, Predicate<Player>, SilentPredicate<Player>, Nameable, Keyed, HoverEventSource<Component>, Deleteable {
+public interface Kit extends
+        JsonSerializable, Preconditionable, Predicate<Player>,
+        SilentPredicate<Player>, Nameable, Keyed,
+        HoverEventSource<Component>, Deletable
+{
     boolean attemptItemGiving(Player player);
     void giveItems(Player player);
 

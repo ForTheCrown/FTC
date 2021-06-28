@@ -1,4 +1,4 @@
-package net.forthecrown.core.economy;
+package net.forthecrown.economy;
 
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.serializer.CrownSerializer;
@@ -11,7 +11,7 @@ import java.util.UUID;
 /**
  * Represents the ingame balances held by the players
  */
-public interface Balances extends CrownSerializer<CrownCore> {
+public interface Balances extends CrownSerializer {
 
     /**
      * Gets the Balanaces instance
@@ -31,16 +31,15 @@ public interface Balances extends CrownSerializer<CrownCore> {
     }
 
     /**
-     * Same thing as getFormatted but for components
-     * @param amount
-     * @return
+     * Same thing as getFormatted but for components, is also translatable
+     * @param amount The amount to format
+     * @return A formatted, translatable, component
      */
     static Component formatted(int amount){
-        if (amount == 1 || amount == -1){
-            return Component.text(ChatFormatter.decimalizeNumber(amount) + " ").append(Component.translatable("economy.currency.singular"));
-        }
-
-        return Component.text(ChatFormatter.decimalizeNumber(amount) + " ").append(Component.translatable("economy.currency.multiple"));
+        return Component.text()
+                .content(ChatFormatter.decimalizeNumber(amount) + " ")
+                .append(Component.translatable("economy.currency." + (amount == 1 || amount == -1 ? "singular" : "multiple")))
+                .build();
     }
 
     /**

@@ -1,4 +1,4 @@
-package net.forthecrown.core.comvars;
+package net.forthecrown.comvars;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

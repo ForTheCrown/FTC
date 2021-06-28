@@ -110,6 +110,11 @@ public class FtcUserInteractions implements UserInteractions {
     }
 
     @Override
+    public boolean telemetryAllowed() {
+        return false;
+    }
+
+    @Override
     public boolean isBlockedPlayer(UUID uuid) {
         return blocked.contains(uuid);
     }

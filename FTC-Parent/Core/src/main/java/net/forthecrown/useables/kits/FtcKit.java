@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables.kits;
+package net.forthecrown.useables.kits;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -7,8 +7,8 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.core.useables.CheckableBase;
-import net.forthecrown.core.useables.UsageCheck;
+import net.forthecrown.useables.CheckableBase;
+import net.forthecrown.useables.UsageCheck;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
@@ -42,7 +42,7 @@ public class FtcKit extends CheckableBase implements Kit {
 
         JsonArray itemArray = json.getAsJsonArray("items");
         for (JsonElement e: itemArray){
-            items.add(JsonUtils.deserializeItem(e));
+            items.add(JsonUtils.readItem(e));
         }
 
         reloadChecksFrom(json);

@@ -6,20 +6,18 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.utils.CrownUtils;
-import net.forthecrown.core.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.grenadier.types.selectors.EntitySelector;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.royalgrenadier.types.selector.EntityArgumentImpl;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
-import net.minecraft.server.v1_16_R3.ArgumentParserSelector;
-import net.minecraft.server.v1_16_R3.ICompletionProvider;
-import org.bukkit.entity.Player;
+import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 
 import java.util.Collection;
 import java.util.List;
@@ -100,17 +98,13 @@ public class UserType implements ArgumentType<UserParseResult> {
             reader.setCursor(builder.getStart());
 
             CommandSource source = (CommandSource) context.getSource();
-            ArgumentParserSelector parser = new ArgumentParserSelector(reader, true);
+            EntitySelectorParser parser = new EntitySelectorParser(reader, true);
 
             try {
                 parser.parse();
             } catch (CommandSyntaxException ignored) {}
 
-            return parser.a(builder, b -> {
-                Collection<String> collection = ListUtils.convert(CrownUtils.getVisiblePlayers(source), Player::getName);
-                ICompletionProvider.b(collection, b);
-            });
-
+            return parser.fillSuggestions(builder, CompletionProvider::suggestPlayerNames);
         } else return Suggestions.empty();
     }
 

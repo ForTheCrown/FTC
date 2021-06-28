@@ -8,19 +8,18 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.core.user.UserManager;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.user.UserManager;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -41,17 +40,13 @@ public final class CrownUtils {
     public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 200.5, 70, 1000.5);
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
 
-    public static final World WORLD = Objects.requireNonNull(Bukkit.getWorld("world"));
-    public static final World WORLD_VOID = Objects.requireNonNull(Bukkit.getWorld("world_void"));
-    public static final World WORLD_END = Objects.requireNonNull(Bukkit.getWorld("world_the_end"));
-
     private CrownUtils() {}
 
     public static int worldTimeToYears(World world){
         return (int) ((world.getFullTime()/1000)/24)/365;
     }
 
-    public static Integer getRandomNumberInRange(int min, int max) {
+    public static Integer randomIntInRange(int min, int max) {
         return new CrownRandom().intInRange(min, max);
     }
 
@@ -111,6 +106,11 @@ public final class CrownUtils {
         return Key.key(CrownCore.inst(), first);
     }
 
+    public static Key checkNotBukkit(Key key){
+        if(!(key instanceof NamespacedKey)) return key;
+        return Key.key(key.namespace(), key.value());
+    }
+
     public static CompletableFuture<Suggestions> suggestKeys(SuggestionsBuilder builder, Iterable<Key> keys){
         return CompletionProvider.suggestKeys(builder, keys);
     }
@@ -151,13 +151,27 @@ public final class CrownUtils {
         return itemStack == null || itemStack.getType() == Material.AIR;
     }
 
+    public static boolean isInRange(int check, int min, int max){
+        if(check < min) return false;
+        return check <= max;
+    }
+
     public static Component entityDisplayName(Entity entity){
-        return ChatUtils.vanillaToAdventure(((CraftEntity) entity).getHandle().getScoreboardDisplayName());
+        return ChatUtils.vanillaToAdventure(((CraftEntity) entity).getHandle().getDisplayName());
     }
 
     public static Component sourceDisplayName(CommandSource source){
         if(source.isPlayer()) return UserManager.getUser(source.textName()).nickDisplayName();
         return source.displayName();
+    }
+
+    public static Player fromAudience(Audience audience){
+        if(audience instanceof Player) return (Player) audience;
+        return null;
+    }
+
+    public static void clearEffects(LivingEntity player){
+        player.getActivePotionEffects().forEach(e -> player.removePotionEffect(e.getType()));
     }
 
     /*

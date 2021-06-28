@@ -1,8 +1,7 @@
-package net.forthecrown.core.economy.shops;
+package net.forthecrown.economy.shops;
 
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.utils.Nameable;
 import net.forthecrown.serializer.CrownSerializer;
+import net.forthecrown.utils.Nameable;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -15,7 +14,7 @@ import java.util.UUID;
 /**
  * Represents a sign shop lol
  */
-public interface SignShop extends CrownSerializer<CrownCore>, InventoryHolder, Nameable {
+public interface SignShop extends CrownSerializer, InventoryHolder, Nameable {
 
     /**
      * Gets the file name of the shop

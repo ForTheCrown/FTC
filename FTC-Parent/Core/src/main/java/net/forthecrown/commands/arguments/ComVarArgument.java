@@ -7,8 +7,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.comvars.ComVar;
-import net.forthecrown.core.comvars.ComVars;
+import net.forthecrown.comvars.ComVar;
+import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
@@ -33,7 +33,7 @@ public class ComVarArgument implements ArgumentType<ComVar<?>> {
         int cursor = reader.getCursor();
         String name = reader.readUnquotedString();
 
-        ComVar<?> result = ComVars.getVar(name);
+        ComVar<?> result = ComVarRegistry.getVar(name);
         if(result == null) throw UNKNOWN_VAR.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), name);
 
         return result;
@@ -41,6 +41,6 @@ public class ComVarArgument implements ArgumentType<ComVar<?>> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CompletionProvider.suggestMatching(builder, ComVars.getVariables());
+        return CompletionProvider.suggestMatching(builder, ComVarRegistry.getVariables());
     }
 }

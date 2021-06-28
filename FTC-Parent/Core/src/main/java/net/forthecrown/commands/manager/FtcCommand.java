@@ -9,10 +9,10 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.economy.Balances;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.utils.Pair;
+import net.forthecrown.economy.Balances;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.Pair;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.royalgrenadier.source.CommandSources;
@@ -41,6 +41,8 @@ public abstract class FtcCommand extends AbstractCommand {
 
         CoreCommands.BY_NAME.put(name, this);
     }
+
+    protected FtcCommand(String name){ this(name, CrownCore.inst()); }
 
     @Override
     public boolean test(CommandSource source) {

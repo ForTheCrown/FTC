@@ -3,7 +3,7 @@ package net.forthecrown.core.inventory;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

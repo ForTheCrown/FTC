@@ -1,4 +1,4 @@
-package net.forthecrown.pirates.commands;
+package net.forthecrown.commands;
 
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;

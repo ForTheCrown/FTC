@@ -7,10 +7,11 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.utils.CrownBoundingBox;
-import net.forthecrown.core.utils.ListUtils;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.enums.CrownGameMode;
+import net.forthecrown.utils.math.CrownBoundingBox;
+import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -26,7 +27,7 @@ public class CommandNear extends FtcCommand {
         super("near", CrownCore.inst());
 
         setAliases("nearby");
-        setPermission(Permissions.DONATOR_2);
+        setPermission(Permissions.NEARBY);
         setDescription("Shows nearby players");
 
         register();
@@ -89,6 +90,8 @@ public class CommandNear extends FtcCommand {
 
 
         for (CrownUser u: players){
+            if(u.getGameMode() == CrownGameMode.SPECTATOR || u.hasPermission(Permissions.NEARBY_IGNORE)) continue;
+
             builder
                     .append(u.nickDisplayName().color(u.getHighestTierRank().tier.color))
                     .append(Component.text(" (" + dist(u.getLocation(), box.getCenterLocation()) + ")").color(NamedTextColor.GRAY))

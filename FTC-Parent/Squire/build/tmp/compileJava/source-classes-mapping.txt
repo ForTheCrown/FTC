@@ -1,18 +1,32 @@
+net/forthecrown/squire/repopulation/PopUtils.java
+ net.forthecrown.squire.repopulation.PopUtils
 net/forthecrown/squire/enchantment/HealingBlock.java
  net.forthecrown.squire.enchantment.HealingBlock
-net/forthecrown/squire/enchantment/DolphinSwimmer.java
- net.forthecrown.squire.enchantment.DolphinSwimmer
-net/forthecrown/squire/enchantment/RoyalEnchants.java
- net.forthecrown.squire.enchantment.RoyalEnchants
+net/forthecrown/squire/repopulation/impl/VillageRepopulator.java
+ net.forthecrown.squire.repopulation.impl.VillageRepopulator
 net/forthecrown/squire/enchantment/NMSEnchant.java
  net.forthecrown.squire.enchantment.NMSEnchant
-net/forthecrown/squire/enchantment/RoyalEnchant.java
- net.forthecrown.squire.enchantment.RoyalEnchant
 net/forthecrown/squire/Squire.java
  net.forthecrown.squire.Squire
 net/forthecrown/squire/enchantment/StrongAim.java
  net.forthecrown.squire.enchantment.StrongAim
+net/forthecrown/squire/repopulation/impl/AbstractRepopulator.java
+ net.forthecrown.squire.repopulation.impl.AbstractRepopulator
 net/forthecrown/squire/SquireMain.java
  net.forthecrown.squire.SquireMain
+net/forthecrown/squire/repopulation/Repopulator.java
+ net.forthecrown.squire.repopulation.Repopulator
+net/forthecrown/squire/repopulation/impl/EndRepopulator.java
+ net.forthecrown.squire.repopulation.impl.EndRepopulator
 net/forthecrown/squire/enchantment/PoisonCrit.java
  net.forthecrown.squire.enchantment.PoisonCrit
+net/forthecrown/squire/repopulation/ChunkScan.java
+ net.forthecrown.squire.repopulation.ChunkScan
+net/forthecrown/squire/enchantment/DolphinSwimmer.java
+ net.forthecrown.squire.enchantment.DolphinSwimmer
+net/forthecrown/squire/enchantment/RoyalEnchants.java
+ net.forthecrown.squire.enchantment.RoyalEnchants
+net/forthecrown/squire/enchantment/RoyalEnchant.java
+ net.forthecrown.squire.enchantment.RoyalEnchant
+net/forthecrown/squire/repopulation/Repopulators.java
+ net.forthecrown.squire.repopulation.Repopulators

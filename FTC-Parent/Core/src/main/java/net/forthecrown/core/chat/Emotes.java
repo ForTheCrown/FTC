@@ -42,10 +42,10 @@ public class Emotes implements SuggestionProvider<CommandSource> {
     }
 
     public String format(String input, @Nullable CommandSender source, boolean ignorePerms){
-        if (!ignorePerms && source != null && source.hasPermission(Permissions.DONATOR_3)) return input;
-
-        for (Map.Entry<String, String> e: emoteMap.entrySet()) {
-            input = input.replaceAll(e.getKey(), e.getValue());
+        if(ignorePerms || source == null || source.hasPermission(Permissions.DONATOR_3)){
+            for (Map.Entry<String, String> e: emoteMap.entrySet()) {
+                input = input.replaceAll(e.getKey(), e.getValue());
+            }
         }
 
         return input;

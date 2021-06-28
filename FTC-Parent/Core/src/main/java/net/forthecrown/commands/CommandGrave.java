@@ -4,8 +4,8 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.Grave;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.Grave;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandGrave extends FtcCommand {

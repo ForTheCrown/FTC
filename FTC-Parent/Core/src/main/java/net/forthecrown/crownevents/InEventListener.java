@@ -1,6 +1,6 @@
-package net.forthecrown.core.crownevents;
+package net.forthecrown.crownevents;
 
-import net.forthecrown.core.crownevents.entries.EventEntry;
+import net.forthecrown.crownevents.entries.EventEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;

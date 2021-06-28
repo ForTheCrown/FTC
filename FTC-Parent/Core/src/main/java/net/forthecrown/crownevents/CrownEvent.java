@@ -1,6 +1,6 @@
-package net.forthecrown.core.crownevents;
+package net.forthecrown.crownevents;
 
-import net.forthecrown.core.crownevents.entries.EventEntry;
+import net.forthecrown.crownevents.entries.EventEntry;
 import org.bukkit.entity.Player;
 
 import java.time.Month;

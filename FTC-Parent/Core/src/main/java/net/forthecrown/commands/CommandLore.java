@@ -59,6 +59,7 @@ public class CommandLore extends FtcCommand {
 
                             ItemMeta meta = item.getItemMeta();
                             meta.lore(new ArrayList<>());
+                            item.setItemMeta(meta);
 
                             c.getSource().sendAdmin("Cleared item lore");
                             return 0;

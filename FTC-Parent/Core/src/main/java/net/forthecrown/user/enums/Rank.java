@@ -109,6 +109,6 @@ public enum Rank implements JsonSerializable {
 
     @Override
     public JsonElement serialize() {
-        return JsonUtils.serializeEnum(this);
+        return JsonUtils.writeEnum(this);
     }
 }

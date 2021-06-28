@@ -1,4 +1,4 @@
-package net.forthecrown.core.registry;
+package net.forthecrown.registry;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -20,11 +20,11 @@ import org.bukkit.entity.Player;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public class CrownWarpRegistry extends AbstractJsonSerializer<CrownCore> implements WarpRegistry {
+public class CrownWarpRegistry extends AbstractJsonSerializer implements WarpRegistry {
     private final Map<Key, FtcWarp> warps = new HashMap<>();
 
     public CrownWarpRegistry(){
-        super("warps", CrownCore.inst());
+        super("warps");
 
         reload();
         CrownCore.logger().info("Warps loaded");
@@ -84,11 +84,13 @@ public class CrownWarpRegistry extends AbstractJsonSerializer<CrownCore> impleme
 
     @Override
     public Warp get(Key key) {
+        key = CrownUtils.checkNotBukkit(key);
         return warps.get(key);
     }
 
     @Override
     public Warp register(Key key, Location raw) {
+        key = CrownUtils.checkNotBukkit(key);
         FtcWarp warp = new FtcWarp(key, raw);
         warps.put(key, warp);
         return warp;
@@ -96,6 +98,7 @@ public class CrownWarpRegistry extends AbstractJsonSerializer<CrownCore> impleme
 
     @Override
     public void remove(Key key) {
+        key = CrownUtils.checkNotBukkit(key);
         warps.remove(key);
     }
 
@@ -106,6 +109,7 @@ public class CrownWarpRegistry extends AbstractJsonSerializer<CrownCore> impleme
 
     @Override
     public boolean contains(Key key) {
+        key = CrownUtils.checkNotBukkit(key);
         return warps.containsKey(key);
     }
 

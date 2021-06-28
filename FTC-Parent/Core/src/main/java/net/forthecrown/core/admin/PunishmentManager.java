@@ -5,7 +5,7 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.admin.jails.JailManager;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.core.serializer.CrownSerializer;
+import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import org.bukkit.command.CommandSender;
@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.UUID;
 
-public interface PunishmentManager extends CrownSerializer<CrownCore> {
+public interface PunishmentManager extends CrownSerializer {
     MuteStatus checkMute(CommandSender sender);
 
     PunishmentEntry getEntry(UUID id);

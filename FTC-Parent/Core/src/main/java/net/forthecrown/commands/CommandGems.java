@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
