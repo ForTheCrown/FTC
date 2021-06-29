@@ -1,4 +1,4 @@
-package net.forthecrown.cosmetics.custominvs;
+package net.forthecrown.cosmetics.custominvs.borders;
 
 import net.forthecrown.core.inventory.CrownItems;
 import org.bukkit.Material;

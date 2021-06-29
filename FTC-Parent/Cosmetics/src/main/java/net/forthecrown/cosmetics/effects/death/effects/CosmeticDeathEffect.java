@@ -1,8 +1,9 @@
-package net.forthecrown.cosmetics.inventories.effects.death;
+package net.forthecrown.cosmetics.effects.death.effects;
 
 import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.cosmetics.custominvs.ClickableOption;
-import net.forthecrown.cosmetics.inventories.effects.CosmeticEffect;
+import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
+import net.forthecrown.cosmetics.effects.death.DeathEvent;
+import net.forthecrown.cosmetics.effects.CosmeticEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.Listener;

@@ -1,4 +1,4 @@
-package net.forthecrown.cosmetics.inventories;
+package net.forthecrown.cosmetics.effects.emote;
 
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.user.CrownUser;

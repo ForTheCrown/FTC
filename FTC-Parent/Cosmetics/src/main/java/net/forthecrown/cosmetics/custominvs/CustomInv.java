@@ -1,7 +1,8 @@
 package net.forthecrown.cosmetics.custominvs;
 
-import net.kyori.adventure.text.TextComponent;
-import org.bukkit.Bukkit;
+import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.cosmetics.custominvs.borders.Border;
+import net.forthecrown.cosmetics.custominvs.options.Option;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
@@ -12,36 +13,26 @@ import java.util.Map;
 
 public class CustomInv implements InventoryHolder {
 
-    private int size = 27;
-
-    private final Inventory inv;
-    private final Border invBorder;
-    private final Map<Integer, Option> invSlots;
+    private CrownUser userWhoIsInInv;
+    private Inventory inv;
+    private Border invBorder;
+    private Map<Integer, Option> invSlots;
     public final static Listener listener = new InvClickListener();
 
-    @Override
-    public @NotNull Inventory getInventory() {
+    public CustomInv() {}
+
+    void setUser(CrownUser user) { this.userWhoIsInInv = user; }
+    void setInv(@NotNull Inventory inv) { this.inv = inv; }
+    void setInvBorder(Border invBorder) { this.invBorder = invBorder; }
+    void setInvSlots(Map<Integer, Option> slots) { this.invSlots = slots; }
+
+    public CrownUser getUser() { return this.userWhoIsInInv; }
+
+    public final int getSize() { return this.inv.getSize(); }
+    public final Inventory getInventory() {
         return this.inv;
     }
 
-    public CustomInv(@NotNull int size, TextComponent title, @NotNull Border invBorder, @NotNull Map<Integer, Option> invSlots) {
-        this.invSlots = invSlots;
-        this.invBorder = invBorder;
-
-        this.inv = createInv(size, title);
-    }
-
-    private Inventory createInv(int size, TextComponent title) {
-        Inventory result;
-        if (title == null) result = Bukkit.createInventory(this, size);
-        else result = Bukkit.createInventory(this, size, title);
-
-        for (Map.Entry<Integer, Option> optionSlot : invSlots.entrySet())
-            result.setItem(optionSlot.getKey(), optionSlot.getValue().getItem());
-
-        invBorder.applyBorder(result);
-        return result;
-    }
 
     public void handleClick(HumanEntity clicker, int slot) {
         if (invBorder.isOnBorder(slot)) invBorder.handleClick(clicker);

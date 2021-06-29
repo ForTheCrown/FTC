@@ -1,8 +1,10 @@
-package net.forthecrown.cosmetics.inventories.effects.death;
+package net.forthecrown.cosmetics.effects.death;
 
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.core.user.UserManager;
-import net.forthecrown.cosmetics.inventories.DeathParticleMenu;
+import net.forthecrown.cosmetics.effects.Vault;
+import net.forthecrown.cosmetics.effects.death.effects.CosmeticDeathEffect;
+import net.forthecrown.cosmetics.effects.death.effects.None;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -25,7 +27,7 @@ public class DeathEvent implements Listener {
     }
 
     private static CosmeticDeathEffect getEffectFromParticleName(String name) {
-        for(CosmeticDeathEffect effect : DeathParticleMenu.getDeathEffects()) {
+        for(CosmeticDeathEffect effect : Vault.getDeathEffects()) {
             if (effect.getEffectName().equals(name)) return effect;
         }
         return new None();

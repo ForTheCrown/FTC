@@ -1,5 +1,6 @@
-package net.forthecrown.cosmetics.custominvs;
+package net.forthecrown.cosmetics.custominvs.options;
 
+import net.forthecrown.cosmetics.custominvs.SlotClickHandler;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;

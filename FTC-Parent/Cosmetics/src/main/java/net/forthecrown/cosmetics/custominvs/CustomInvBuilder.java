@@ -1,15 +1,26 @@
 package net.forthecrown.cosmetics.custominvs;
 
+import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.cosmetics.custominvs.borders.Border;
+import net.forthecrown.cosmetics.custominvs.options.Option;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.inventory.Inventory;
 
 import java.util.Map;
 
 public class CustomInvBuilder {
+    private CrownUser user;
     private int size = 27;
     private TextComponent title;
     private Border invBorder;
     private Map<Integer, Option> invSlots = Map.of();
+
+    public CustomInvBuilder setUser(CrownUser user) {
+        this.user = user;
+        return this;
+    }
 
     public CustomInvBuilder setSize(int size) {
         this.size = size;
@@ -43,7 +54,22 @@ public class CustomInvBuilder {
 
 
     public CustomInv build() {
-        return new CustomInv(this.size, this.title, this.invBorder, this.invSlots);
+        CustomInv result = new CustomInv();
+        Inventory inventory;
+
+        if (this.title == null) inventory = Bukkit.createInventory(result, this.size);
+        else inventory = Bukkit.createInventory(result, this.size, this.title);
+
+        for (Map.Entry<Integer, Option> optionSlot : this.invSlots.entrySet())
+            inventory.setItem(optionSlot.getKey(), optionSlot.getValue().getItem());
+
+        this.invBorder.applyBorder(inventory);
+
+        result.setInv(inventory);
+        result.setInvBorder(this.invBorder);
+        result.setInvSlots(this.invSlots);
+        result.setUser(user);
+        return result;
     }
 
 

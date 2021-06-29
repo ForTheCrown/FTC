@@ -1,8 +1,8 @@
-package net.forthecrown.cosmetics.inventories;
+package net.forthecrown.cosmetics.effects;
 
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.cosmetics.inventories.effects.death.*;
+import net.forthecrown.cosmetics.effects.death.effects.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -16,9 +16,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class MainCosmeticsMenu extends CustomMenu {
+public class MainCosmeticsMenu extends CosmeticMenu {
 
-    private static final Map<Integer, CosmeticDeathEffect> deathEffectSlots = Map.of(
+    private static final Map<Integer, Option> menuSlots = Map.of(
             10, new Soul(),
             11, new Totem(),
             12, new Explosion(),
@@ -39,7 +39,7 @@ public class MainCosmeticsMenu extends CustomMenu {
             .append(Component.text("osmetics"))
             .build(); }
 
-    @Override
+
     int getSize() { return 54; }
 
 

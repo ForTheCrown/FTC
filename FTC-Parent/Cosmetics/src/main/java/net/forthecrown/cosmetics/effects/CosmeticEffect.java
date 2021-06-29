@@ -1,7 +1,7 @@
-package net.forthecrown.cosmetics.inventories.effects;
+package net.forthecrown.cosmetics.effects;
 
 import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.cosmetics.custominvs.ClickableOption;
+import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 

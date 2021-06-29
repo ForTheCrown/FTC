@@ -1,4 +1,4 @@
-package net.forthecrown.cosmetics.inventories.effects.death;
+package net.forthecrown.cosmetics.effects.death.effects;
 
 import net.forthecrown.core.inventory.CrownItems;
 import net.md_5.bungee.api.ChatColor;

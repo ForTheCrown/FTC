@@ -1,4 +1,4 @@
-package net.forthecrown.cosmetics.custominvs;
+package net.forthecrown.cosmetics.custominvs.options;
 
 import net.forthecrown.cosmetics.Cosmetics;
 import org.bukkit.Bukkit;
