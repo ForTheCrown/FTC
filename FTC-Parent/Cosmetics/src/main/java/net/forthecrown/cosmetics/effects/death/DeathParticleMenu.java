@@ -22,7 +22,7 @@ public class DeathParticleMenu implements CosmeticMenu {
     private final Map<Integer, Option> deathEffectSlots;
 
     public DeathParticleMenu(CrownUser user) {
-        deathEffectSlots = Map.of(
+        this.deathEffectSlots = Map.of(
                 10, Vault.soul.getClickableOption(user),
                 11, Vault.totem.getClickableOption(user),
                 12, Vault.explosion.getClickableOption(user),
@@ -32,7 +32,7 @@ public class DeathParticleMenu implements CosmeticMenu {
     }
 
 
-    private Option getReturnItem() {
+    private Option getReturnOption() {
         ClickableOption returnOption = new ClickableOption();
         returnOption.setCooldown(0);
         returnOption.setActionOnClick(() -> {
@@ -42,19 +42,17 @@ public class DeathParticleMenu implements CosmeticMenu {
         return returnOption;
     }
 
-    private CustomInv buildInventory(CrownUser user) {
+    @Override
+    public CustomInv buildInventory(CrownUser user) {
         CustomInvBuilder invBuilder = new CustomInvBuilder();
-
-        CustomInv result = invBuilder
+        return invBuilder
                 .setUser(user)
                 .setSize(this.getSize())
                 .setTitle(this.getTitle())
                 .setInvBorder(new GenericBorder())
                 .addOptions(deathEffectSlots)
-                .addOption(4, getReturnItem())
+                .addOption(4, getReturnOption())
                 .build();
-
-        return result;
     }
 
     @Override

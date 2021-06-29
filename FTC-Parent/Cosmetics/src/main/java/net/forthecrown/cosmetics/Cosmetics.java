@@ -4,20 +4,11 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
-import net.forthecrown.core.inventory.CrownItems;
-import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.commands.CommandCosmetics;
 import net.forthecrown.cosmetics.custominvs.CustomInv;
 import net.forthecrown.cosmetics.effects.arrow.ArrowParticleMenu;
 import net.forthecrown.cosmetics.effects.death.effects.CosmeticDeathEffect;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.List;
 
 public final class Cosmetics extends JavaPlugin {
 
@@ -67,41 +58,6 @@ public final class Cosmetics extends JavaPlugin {
 
     public static PlayerRidingManager getRideManager() {
         return rideManager;
-    }
-
-    public Inventory getMainCosmeticInventory(CrownUser user) {
-        CustomInventory cinv = new CustomInventory(54, ChatColor.BOLD + "C" + ChatColor.RESET + "osmetics", true, false);
-        Inventory inv = cinv.getInventory();
-
-        inv.setItem(20, CrownItems.makeItem(Material.BOW, 1, true, ChatColor.YELLOW + "Arrow Particle Trails", "", ChatColor.GRAY + "Upgrade your arrows with fancy particle", ChatColor.GRAY + "trails as they fly through the air!"));
-        inv.setItem(22, CrownItems.makeItem(Material.TOTEM_OF_UNDYING, 1, true, ChatColor.YELLOW + "Emotes", "", ChatColor.GRAY + "Poking, smooching, bonking and more", ChatColor.GRAY + "to interact with your friends."));
-        inv.setItem(24, CrownItems.makeItem(Material.SKELETON_SKULL, 1, true, ChatColor.YELLOW + "Death Particles", "", ChatColor.GRAY + "Make your deaths more spectacular by", ChatColor.GRAY + "exploding into pretty particles!"));
-
-        if (user.allowsRidingPlayers()) {
-            inv.setItem(40, CrownItems.makeItem(Material.SADDLE, 1, true,ChatColor.YELLOW + "You can ride other players!", "",
-                    ChatColor.GRAY + "Right-click someone to jump on top of them.",
-                    ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
-                    ChatColor.GRAY + "Click to disable this feature."));
-        }
-        else {
-            inv.setItem(40, CrownItems.makeItem(Material.BARRIER, 1, true, ChatColor.YELLOW + "You've disabled riding other players.", "",
-                    ChatColor.GRAY + "Right-click someone to jump on top of them.",
-                    ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
-                    ChatColor.GRAY + "Click to enable this feature."));
-        }
-
-        int gems = user.getGems();
-        try {
-            ItemStack item = inv.getItem(cinv.getHeadItemSlot());
-            ItemMeta meta = item.getItemMeta();
-            List<String> lore = meta.getLore();
-            lore.set(1, ChatColor.GRAY + "You have " + ChatColor.GOLD + gems + ChatColor.GRAY + " Gems.");
-            meta.setLore(lore);
-            item.setItemMeta(meta);
-            inv.setItem(cinv.getHeadItemSlot(), item);
-        } catch (Exception ignored) {}
-
-        return inv;
     }
 
 

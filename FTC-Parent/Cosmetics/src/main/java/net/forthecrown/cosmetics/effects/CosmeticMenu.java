@@ -1,5 +1,6 @@
 package net.forthecrown.cosmetics.effects;
 
+import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.custominvs.CustomInv;
 import net.kyori.adventure.text.TextComponent;
 
@@ -9,6 +10,8 @@ import net.kyori.adventure.text.TextComponent;
  * Normal methods can be overridden.
  */
 public interface CosmeticMenu {
+
+    CustomInv buildInventory(CrownUser user);
 
     CustomInv getCustomInv();
 

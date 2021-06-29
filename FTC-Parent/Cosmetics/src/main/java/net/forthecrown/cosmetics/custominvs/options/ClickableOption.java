@@ -24,11 +24,14 @@ public class ClickableOption extends Option {
     public void handleClick(HumanEntity user) {
         UUID id = user.getUniqueId();
         if (!isOnCooldown.contains(id)) {
-            isOnCooldown.add(id);
-            getAction().run();
-            Bukkit.getScheduler().scheduleSyncDelayedTask(Cosmetics.getPlugin(), () -> {
-                isOnCooldown.remove(id);
-            }, getCooldown());
+            if (getCooldown() == 0) getAction().run();
+            else {
+                isOnCooldown.add(id);
+                getAction().run();
+                Bukkit.getScheduler().scheduleSyncDelayedTask(Cosmetics.getPlugin(), () -> {
+                    isOnCooldown.remove(id);
+                }, getCooldown());
+            }
         }
     }
 }

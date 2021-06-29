@@ -2,87 +2,95 @@ package net.forthecrown.cosmetics.effects;
 
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.cosmetics.effects.death.effects.*;
+import net.forthecrown.cosmetics.custominvs.CustomInv;
+import net.forthecrown.cosmetics.custominvs.CustomInvBuilder;
+import net.forthecrown.cosmetics.custominvs.borders.GenericBorder;
+import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
+import net.forthecrown.cosmetics.custominvs.options.Option;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
-public class MainCosmeticsMenu extends CosmeticMenu {
+public class MainCosmeticsMenu implements CosmeticMenu {
 
-    private static final Map<Integer, Option> menuSlots = Map.of(
-            10, new Soul(),
-            11, new Totem(),
-            12, new Explosion(),
-            13, new EnderRing(),
-            31, new None()
-    );
-
-    public static Collection<CosmeticDeathEffect> getDeathEffects() { return deathEffectSlots.values(); }
+    private final CustomInv inv;
+    private final Map<Integer, Option> menuSlots;
 
     public MainCosmeticsMenu(CrownUser user) {
-        setUser(user);
-        setInv(buildInventory());
+        this.menuSlots = Map.of(
+                20, Vault.getArrowMenu(user),
+                22, Vault.getEmoteMenu(user),
+                24, Vault.getDeathMenu(user)
+        );
+        this.inv = buildInventory(user);
+    }
+
+    private Option getHeaderOption(CrownUser user) {
+        Option result = new Option();
+        result.setItem(CrownItems.makeItem(Material.NETHER_STAR, 1, true,
+                ChatColor.YELLOW + "Menu",
+                ChatColor.DARK_GRAY + "ulala",
+                ChatColor.GRAY + "You have " + ChatColor.GOLD + user.getGems() + ChatColor.GRAY + " Gems."));
+        return result;
+    }
+
+    private ClickableOption getRideOption(CrownUser user) {
+        ClickableOption option = new ClickableOption();
+        option.setCooldown(0);
+        option.setActionOnClick(() -> {
+//            TODO: toggle to allowRiding
+        });
+        ItemStack item;
+        if (user.allowsRidingPlayers())
+            item = CrownItems.makeItem(Material.SADDLE, 1, true,
+                ChatColor.YELLOW + "You can ride other players!",
+                "",
+                ChatColor.GRAY + "Right-click someone to jump on top of them.",
+                ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
+                ChatColor.GRAY + "Click to disable this feature.");
+        else
+            item = CrownItems.makeItem(Material.BARRIER, 1, true,
+                ChatColor.YELLOW + "You've disabled riding other players.",
+                "",
+                ChatColor.GRAY + "Right-click someone to jump on top of them.",
+                ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
+                ChatColor.GRAY + "Click to enable this feature.");
+        return option;
     }
 
     @Override
-    TextComponent getInventoryTitle() { return Component.text()
-            .append(Component.text("C").decorate(TextDecoration.BOLD))
-            .append(Component.text("osmetics"))
-            .build(); }
+    public CustomInv buildInventory(CrownUser user) {
+        CustomInvBuilder invBuilder = new CustomInvBuilder();
 
-
-    int getSize() { return 54; }
-
-
-    public ItemStack getReturnItem() {
-        return CrownItems.makeItem(Material.PAPER, 1, true, ChatColor.YELLOW + "< Go Back");
+        return invBuilder
+                .setUser(user)
+                .setSize(this.getSize())
+                .setTitle(this.getTitle())
+                .setInvBorder(new GenericBorder())
+                .addOptions(menuSlots)
+                .addOption(4, getHeaderOption(user))
+                .addOption(40, getRideOption(user))
+                .build();
     }
 
     @Override
-    Inventory buildInventory() {
-        //header: true, returner: false
-        Inventory inv = getBaseInventory();
-
-        inv.setItem(20, CrownItems.makeItem(Material.BOW, 1, true, ChatColor.YELLOW + "Arrow Particle Trails", "", ChatColor.GRAY + "Upgrade your arrows with fancy particle", ChatColor.GRAY + "trails as they fly through the air!"));
-        inv.setItem(22, CrownItems.makeItem(Material.TOTEM_OF_UNDYING, 1, true, ChatColor.YELLOW + "Emotes", "", ChatColor.GRAY + "Poking, smooching, bonking and more", ChatColor.GRAY + "to interact with your friends."));
-        inv.setItem(24, CrownItems.makeItem(Material.SKELETON_SKULL, 1, true, ChatColor.YELLOW + "Death Particles", "", ChatColor.GRAY + "Make your deaths more spectacular by", ChatColor.GRAY + "exploding into pretty particles!"));
-
-        if (user.allowsRidingPlayers()) {
-            inv.setItem(40, CrownItems.makeItem(Material.SADDLE, 1, true,ChatColor.YELLOW + "You can ride other players!", "",
-                    ChatColor.GRAY + "Right-click someone to jump on top of them.",
-                    ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
-                    ChatColor.GRAY + "Click to disable this feature."));
-        }
-        else {
-            inv.setItem(40, CrownItems.makeItem(Material.BARRIER, 1, true, ChatColor.YELLOW + "You've disabled riding other players.", "",
-                    ChatColor.GRAY + "Right-click someone to jump on top of them.",
-                    ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
-                    ChatColor.GRAY + "Click to enable this feature."));
-        }
-
-        int gems = user.getGems();
-        try {
-            ItemStack item = inv.getItem(cinv.getHeadItemSlot());
-            ItemMeta meta = item.getItemMeta();
-            List<String> lore = meta.getLore();
-            lore.set(1, ChatColor.GRAY + "You have " + ChatColor.GOLD + gems + ChatColor.GRAY + " Gems.");
-            meta.setLore(lore);
-            item.setItemMeta(meta);
-            inv.setItem(cinv.getHeadItemSlot(), item);
-        } catch (Exception ignored) {}
-
-        return inv;
+    public CustomInv getCustomInv() {
+        return this.inv;
     }
 
+    @Override
+    public int getSize() { return 54; }
 
+    @Override
+    public TextComponent getTitle() {
+        return Component.text()
+                .append(Component.text("C").decorate(TextDecoration.BOLD))
+                .append(Component.text("osmetics")).build();
+    }
 
 }
