@@ -1,6 +1,7 @@
 package net.forthecrown.cosmetics.custominvs;
 
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 
 public class Option implements SlotClickHandler {
@@ -10,5 +11,5 @@ public class Option implements SlotClickHandler {
     public void setItem(ItemStack item) { this.item = item; }
 
     @Override
-    public void handleClick() {}
+    public void handleClick(HumanEntity clicker) {}
 }

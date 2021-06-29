@@ -1,6 +1,7 @@
 package net.forthecrown.cosmetics.inventories.effects.death;
 
 import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.cosmetics.custominvs.ClickableOption;
 import net.forthecrown.cosmetics.inventories.effects.CosmeticEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,7 +20,6 @@ public abstract class CosmeticDeathEffect implements CosmeticEffect {
 
     public abstract void activateEffect(Location loc);
 
-
     @Override
     public final boolean isCurrentActiveEffect(CrownUser user) {
         return user.getParticleDeathAvailable().contains(getEffectName());
@@ -30,6 +30,23 @@ public abstract class CosmeticDeathEffect implements CosmeticEffect {
         return user.getDeathParticle() != null && user.getDeathParticle().contains(getEffectName());
     }
 
-    public void setItemOwned(ItemStack item) { item.setType(Material.GRAY_DYE); }
+    public void setItemOwned(ItemStack item) { item.setType(Material.ORANGE_DYE); }
 
+    public ClickableOption getClickableOption(CrownUser user) {
+        ClickableOption option = new ClickableOption();
+        // Clicking
+        option.setCooldown(0);
+        option.setActionOnClick(() -> {
+            // TODO: Buy effect or set it as active
+            System.out.println("Clicked on + " + getEffectName());
+        });
+
+        // Item to display
+        ItemStack item = getEffectItem();
+        if (isOwnedBy(user)) setItemOwned(item);
+        if (isCurrentActiveEffect(user)) addGlow(item);
+        option.setItem(item);
+
+        return option;
+    }
 }

@@ -23,5 +23,5 @@ public class None extends CosmeticDeathEffect {
     }
 
     @Override
-    public void setItemOwned(ItemStack item) { return; }
+    public void setItemOwned(ItemStack item) { }
 }

@@ -36,7 +36,15 @@ public class CustomInvBuilder {
         return this;
     }
 
+    public CustomInvBuilder addOptions(Map<Integer, Option> options) {
+        this.invSlots.putAll(options);
+        return this;
+    }
+
+
     public CustomInv build() {
         return new CustomInv(this.size, this.title, this.invBorder, this.invSlots);
     }
+
+
 }

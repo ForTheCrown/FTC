@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public abstract class GenericBorder extends Border {
+public class GenericBorder extends Border {
 
     @Override
     public List<Integer> calculateBorderSlots() {

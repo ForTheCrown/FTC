@@ -2,6 +2,7 @@ package net.forthecrown.cosmetics.custominvs;
 
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -10,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 public class CustomInv implements InventoryHolder {
+
+    private int size = 27;
 
     private final Inventory inv;
     private final Border invBorder;
@@ -40,8 +43,9 @@ public class CustomInv implements InventoryHolder {
         return result;
     }
 
-    public void handleClick(int slot) {
-        if (invBorder.isOnBorder(slot)) invBorder.handleClick();
-        else if (invSlots.containsKey(slot)) invSlots.get(slot).handleClick();
+    public void handleClick(HumanEntity clicker, int slot) {
+        if (invBorder.isOnBorder(slot)) invBorder.handleClick(clicker);
+        else if (invSlots.containsKey(slot)) invSlots.get(slot).handleClick(clicker);
     }
+
 }

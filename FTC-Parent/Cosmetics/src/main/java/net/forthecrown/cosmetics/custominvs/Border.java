@@ -1,6 +1,7 @@
 package net.forthecrown.cosmetics.custominvs;
 
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -34,5 +35,5 @@ public abstract class Border implements SlotClickHandler {
         }
     }
 
-    public void handleClick() {}
+    public void handleClick(HumanEntity user) {}
 }

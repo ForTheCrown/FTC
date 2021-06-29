@@ -1,5 +1,7 @@
 package net.forthecrown.cosmetics.custominvs;
 
+import org.bukkit.entity.HumanEntity;
+
 public interface SlotClickHandler {
-    void handleClick();
+    void handleClick(HumanEntity clicker);
 }

@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
 public class EnderRing extends CosmeticDeathEffect {
+
     @Override
     public String getEffectName() {
         return "ENDER_RING";

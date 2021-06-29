@@ -16,7 +16,7 @@ public class InvClickListener implements Listener {
         if (event.getClickedInventory() instanceof PlayerInventory) return;
 
         CustomInv clickedInv = (CustomInv) event.getInventory().getHolder();
-        clickedInv.handleClick(event.getSlot());
+        clickedInv.handleClick(event.getWhoClicked(), event.getSlot());
     }
 
 }

@@ -7,9 +7,8 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.commands.CommandCosmetics;
+import net.forthecrown.cosmetics.custominvs.CustomInv;
 import net.forthecrown.cosmetics.inventories.ArrowParticleMenu;
-import net.forthecrown.cosmetics.inventories.DeathParticleMenu;
-import net.forthecrown.cosmetics.inventories.effects.CosmeticEffect;
 import net.forthecrown.cosmetics.inventories.effects.death.CosmeticDeathEffect;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
@@ -25,9 +24,8 @@ public final class Cosmetics extends JavaPlugin {
     public static StateFlag PLAYER_RIDING_ALLOWED;
     private static PlayerRidingManager rideManager;
 
-    // Ensures only 1 Cosmetics object exists (multithreading?)
     private static Cosmetics plugin = null;
-    public static final Cosmetics getPlugin() {
+    public static synchronized Cosmetics getPlugin() {
         if (plugin == null) plugin = new Cosmetics();
         return plugin;
     }
@@ -44,6 +42,7 @@ public final class Cosmetics extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CosmeticEvents(), this);
         getServer().getPluginManager().registerEvents(new ArrowParticleMenu(), this);
         getServer().getPluginManager().registerEvents(CosmeticDeathEffect.listener, this);
+        getServer().getPluginManager().registerEvents(CustomInv.listener, this);
 
         // Command
         new CommandCosmetics();

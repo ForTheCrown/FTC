@@ -5,7 +5,6 @@ import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.inventories.effects.death.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
@@ -31,7 +30,7 @@ public class MainCosmeticsMenu extends CustomMenu {
 
     public MainCosmeticsMenu(CrownUser user) {
         setUser(user);
-        setInv(makeInventory());
+        setInv(buildInventory());
     }
 
     @Override
@@ -44,13 +43,12 @@ public class MainCosmeticsMenu extends CustomMenu {
     int getSize() { return 54; }
 
 
-    @Override
     public ItemStack getReturnItem() {
         return CrownItems.makeItem(Material.PAPER, 1, true, ChatColor.YELLOW + "< Go Back");
     }
 
     @Override
-    Inventory makeInventory() {
+    Inventory buildInventory() {
         //header: true, returner: false
         Inventory inv = getBaseInventory();
 
