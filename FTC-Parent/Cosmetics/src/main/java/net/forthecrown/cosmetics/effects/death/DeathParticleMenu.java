@@ -32,7 +32,7 @@ public class DeathParticleMenu implements CosmeticMenu {
     }
 
 
-    public Option getReturnItem() {
+    private Option getReturnItem() {
         ClickableOption returnOption = new ClickableOption();
         returnOption.setCooldown(0);
         returnOption.setActionOnClick(() -> {
@@ -42,7 +42,7 @@ public class DeathParticleMenu implements CosmeticMenu {
         return returnOption;
     }
 
-    CustomInv buildInventory(CrownUser user) {
+    private CustomInv buildInventory(CrownUser user) {
         CustomInvBuilder invBuilder = new CustomInvBuilder();
 
         CustomInv result = invBuilder

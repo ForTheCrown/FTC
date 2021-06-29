@@ -11,6 +11,8 @@ import net.kyori.adventure.text.TextComponent;
 public interface CosmeticMenu {
 
     CustomInv getCustomInv();
+
     TextComponent getTitle();
+
     int getSize();
 }
