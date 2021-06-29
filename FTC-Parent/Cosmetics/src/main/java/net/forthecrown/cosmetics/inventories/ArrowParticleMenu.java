@@ -100,7 +100,7 @@ public class ArrowParticleMenu implements Listener {
     }
 
     private void addParticleToArrow(Entity projectile, Particle particle, double speed) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Cosmetics.plugin, () -> {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Cosmetics.getPlugin(), () -> {
             projectile.getWorld().spawnParticle(particle, projectile.getLocation(), 1, 0, 0, 0, speed);
             if (!(projectile.isOnGround() || projectile.isDead())) addParticleToArrow(projectile, particle, speed);
         }, 1);

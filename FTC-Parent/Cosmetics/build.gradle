@@ -19,9 +19,9 @@ dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT'
 
-    implementation files("C:/Users/ander/Desktop/ThePitOfTrash/FTC/FTC-Parent/Core/build/libs/Core-1.6.28-SNAPSHOT.jar")
-    implementation files('C:/Users/ander/Desktop/ThePitOfTrash/RoyalGrenadier/build/libs/RoyalGrenadier-1.0.5-SNAPSHOT.jar')
-    implementation files("C:/Users/ander/Desktop/ThePitOfTrash/Paper/Paper-Server/target/paper-1.16.5.jar")
+    implementation files('C:\\wvh\\Java\\Servers\\MainServer\\plugins\\Core-1.6.28-SNAPSHOT.jar')
+    implementation files('C:\\wvh\\Java\\Servers\\MainServer\\plugins\\RoyalGrenadier-1.0.5-SNAPSHOT.jar')
+    implementation files("C:\\wvh\\Java\\SpigotPaper\\paper-1.16.5.jar")
 }
 
 processResources{

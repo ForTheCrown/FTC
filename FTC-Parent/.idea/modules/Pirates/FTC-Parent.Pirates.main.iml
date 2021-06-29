@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.system.module.type="sourceSet" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="minecraft" name="Minecraft">
+      <configuration>
+        <autoDetectTypes>
+          <platformType>PAPER</platformType>
+        </autoDetectTypes>
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/../../../Pirates/build/classes/java/main" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../Pirates/src/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Pirates/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../Pirates/src/main/resources" type="java-resource" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/ander/Desktop/ThePitOfTrash/FTC/FTC-Parent/Core/build/libs/Core-1.6.28-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/ander/Desktop/ThePitOfTrash/RoyalGrenadier/build/libs/RoyalGrenadier-1.0.5-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Users/ander/Desktop/ThePitOfTrash/Paper/Paper-Server/target/paper-1.16.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+  </component>
+</module>

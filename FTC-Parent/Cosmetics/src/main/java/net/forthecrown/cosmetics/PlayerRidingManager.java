@@ -26,16 +26,14 @@ import java.util.Set;
 
 public class PlayerRidingManager implements Listener {
 
-    private final Cosmetics main;
     final Set<PlayerRider> riders;
 
     static final Location RETREAT_LOCATION = new Location(Bukkit.getWorld("world"), 200.5, 71, 1000.5);
 
-    PlayerRidingManager(Cosmetics main){
-        this.main = main;
+    PlayerRidingManager(){
 
         this.riders = new HashSet<>();
-        main.getServer().getPluginManager().registerEvents(this, main);
+        Cosmetics.getPlugin().getServer().getPluginManager().registerEvents(this, Cosmetics.getPlugin());
     }
 
     public Set<PlayerRider> getRiders() {
@@ -71,7 +69,7 @@ public class PlayerRidingManager implements Listener {
         }
 
         PlayerRider riderM = new PlayerRider(rider, riddenPlayer);
-        main.getServer().getPluginManager().registerEvents(riderM, main);
+        Cosmetics.getPlugin().getServer().getPluginManager().registerEvents(riderM, Cosmetics.getPlugin());
         riders.add(riderM);
     }
 
@@ -102,6 +100,13 @@ public class PlayerRidingManager implements Listener {
 
         return false;
     }
+
+    public void stopAllRiding() {
+        Set<PlayerRider> riders = getRiders();
+        for (PlayerRider r: riders)
+            r.stopRiding();
+    }
+
 
     /*@EventHandler
     public void playerDismountFromPlayer(EntityDismountEvent event) {

@@ -8,8 +8,9 @@ import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.commands.CommandCosmetics;
 import net.forthecrown.cosmetics.inventories.ArrowParticleMenu;
-import net.forthecrown.cosmetics.inventories.CustomInventory;
 import net.forthecrown.cosmetics.inventories.DeathParticleMenu;
+import net.forthecrown.cosmetics.inventories.effects.CosmeticEffect;
+import net.forthecrown.cosmetics.inventories.effects.death.CosmeticDeathEffect;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -18,36 +19,31 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
-import java.util.Set;
 
 public final class Cosmetics extends JavaPlugin {
 
     public static StateFlag PLAYER_RIDING_ALLOWED;
+    private static PlayerRidingManager rideManager;
 
-    public static Cosmetics plugin;
-    private static PlayerRidingManager rider;
-
-    /*public static final Set<Particle> ACCEPTED_ARROW_PARTICLES = new HashSet<>(Arrays.asList(
-            Particle.FLAME, Particle.SNOWBALL, Particle.SNEEZE,
-            Particle.HEART, Particle.DAMAGE_INDICATOR, Particle.DRIPPING_HONEY,
-            Particle.CAMPFIRE_COSY_SMOKE, Particle.SOUL, Particle.FIREWORKS_SPARK));
-
-    public static final Set<String> ACCEPTED_DEATH_PARTICLES = new HashSet<>(
-            Arrays.asList("SOUL", "TOTEM", "EXPLOSION", "ENDER_RING"));*/
+    // Ensures only 1 Cosmetics object exists (multithreading?)
+    private static Cosmetics plugin = null;
+    public static final Cosmetics getPlugin() {
+        if (plugin == null) plugin = new Cosmetics();
+        return plugin;
+    }
+    private Cosmetics() {}
 
     public void onEnable() {
-        plugin = this;
-
         // Config
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
 
-        rider = new PlayerRidingManager(this);
+        rideManager = new PlayerRidingManager();
 
         // Events
-        getServer().getPluginManager().registerEvents(new CosmeticEvents(this), this);
+        getServer().getPluginManager().registerEvents(new CosmeticEvents(), this);
         getServer().getPluginManager().registerEvents(new ArrowParticleMenu(), this);
-        getServer().getPluginManager().registerEvents(new DeathParticleMenu(), this);
+        getServer().getPluginManager().registerEvents(CosmeticDeathEffect.listener, this);
 
         // Command
         new CommandCosmetics();
@@ -55,11 +51,7 @@ public final class Cosmetics extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Set<PlayerRider> riders = getRider().riders;
-
-        for (PlayerRider r: riders){
-            r.stopRiding();
-        }
+        getRideManager().stopAllRiding();
     }
 
     @Override
@@ -74,8 +66,8 @@ public final class Cosmetics extends JavaPlugin {
         }
     }
 
-    public static PlayerRidingManager getRider() {
-        return rider;
+    public static PlayerRidingManager getRideManager() {
+        return rideManager;
     }
 
     public Inventory getMainCosmeticInventory(CrownUser user) {
@@ -112,4 +104,13 @@ public final class Cosmetics extends JavaPlugin {
 
         return inv;
     }
+
+
+    /*public static final Set<Particle> ACCEPTED_ARROW_PARTICLES = new HashSet<>(Arrays.asList(
+            Particle.FLAME, Particle.SNOWBALL, Particle.SNEEZE,
+            Particle.HEART, Particle.DAMAGE_INDICATOR, Particle.DRIPPING_HONEY,
+            Particle.CAMPFIRE_COSY_SMOKE, Particle.SOUL, Particle.FIREWORKS_SPARK));
+
+    public static final Set<String> ACCEPTED_DEATH_PARTICLES = new HashSet<>(
+            Arrays.asList("SOUL", "TOTEM", "EXPLOSION", "ENDER_RING"));*/
 }

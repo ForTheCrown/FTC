@@ -5,7 +5,7 @@ import net.forthecrown.core.economy.CannotAffordTransactionException;
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.core.user.UserManager;
 import net.forthecrown.cosmetics.inventories.ArrowParticleMenu;
-import net.forthecrown.cosmetics.inventories.CustomInventory;
+import net.forthecrown.cosmetics.inventories.CustomMenu;
 import net.forthecrown.cosmetics.inventories.DeathParticleMenu;
 import net.forthecrown.cosmetics.inventories.EmoteMenu;
 import net.md_5.bungee.api.ChatColor;
@@ -21,11 +21,6 @@ import org.bukkit.inventory.PlayerInventory;
 import java.util.List;
 
 public class CosmeticEvents implements Listener {
-
-    private final Cosmetics main;
-    CosmeticEvents(Cosmetics main){
-        this.main = main;
-    }
 
     private void doArrowParticleStuff(Particle particle, Player player, CrownUser user, int gemCost) throws CannotAffordTransactionException {
         if(!user.getParticleArrowAvailable().contains(particle)){
@@ -53,7 +48,7 @@ public class CosmeticEvents implements Listener {
 
     @EventHandler
     public void onPlayerClickItemInInv(InventoryClickEvent event) throws CannotAffordTransactionException {
-        if(!(event.getInventory().getHolder() instanceof CustomInventory)) return;
+        if(!(event.getInventory().getHolder() instanceof CustomMenu)) return;
         if(event.isShiftClick()) event.setCancelled(true);
         if (event.getClickedInventory() instanceof PlayerInventory) return;
         event.setCancelled(true);
@@ -83,7 +78,7 @@ public class CosmeticEvents implements Listener {
                 case 40:
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
                     user.setAllowsRidingPlayers(!user.allowsRidingPlayers());
-                    player.openInventory(main.getMainCosmeticInventory(user));
+                    player.openInventory(Cosmetics.getPlugin().getMainCosmeticInventory(user));
             }
         }
 
@@ -98,7 +93,7 @@ public class CosmeticEvents implements Listener {
 
             switch (slot) {
                 case 4:
-                    player.openInventory(main.getMainCosmeticInventory(user));
+                    player.openInventory(Cosmetics.getPlugin().getMainCosmeticInventory(user));
                     break;
                 case 10:
                     doArrowParticleStuff(Particle.FLAME, player, user, gemCost);
@@ -157,7 +152,7 @@ public class CosmeticEvents implements Listener {
 
             switch (slot) {
                 case 4:
-                    player.openInventory(main.getMainCosmeticInventory(user));
+                    player.openInventory(Cosmetics.getPlugin().getMainCosmeticInventory(user));
                     break;
                 case 10:
                     doDeathParticleStuff("SOUL", player, user, gemCost);
@@ -191,11 +186,11 @@ public class CosmeticEvents implements Listener {
 
             switch(slot) {
                 case 4:
-                    player.openInventory(main.getMainCosmeticInventory(user));
+                    player.openInventory(Cosmetics.getPlugin().getMainCosmeticInventory(user));
                     break;
                 case 31:
                     Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "sudo " + player.getName() + " toggleemotes");
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> player.openInventory(em.getInv()), 3);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Cosmetics.getPlugin(), () -> player.openInventory(em.getInv()), 3);
                     break;
                 default:
                     return;
