@@ -1,7 +1,7 @@
 package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.text.Component;

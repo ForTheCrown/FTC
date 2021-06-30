@@ -1,7 +1,7 @@
 package net.forthecrown.events.dynamic;
 
 import net.forthecrown.core.CrownException;
-import net.forthecrown.core.inventory.RankInventory;
+import net.forthecrown.inventory.RankInventory;
 import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.enums.Rank;

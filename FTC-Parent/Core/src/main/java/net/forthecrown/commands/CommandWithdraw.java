@@ -7,7 +7,7 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.economy.Balances;
-import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;

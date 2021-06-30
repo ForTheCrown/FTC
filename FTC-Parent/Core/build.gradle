@@ -34,13 +34,13 @@ dependencies {
 
     //Comment out the dependencies you're not using. Easier for both of us
 
-    compileOnly files('C:\\wvh\\Java\\SpigotPaper\\Paper-Server-1.17-R0.1-SNAPSHOT-mojang-mapped.jar')
+    /*compileOnly files('C:\\wvh\\Java\\SpigotPaper\\Paper-Server-1.17-R0.1-SNAPSHOT-mojang-mapped.jar')
     compileOnly files('C:\\wvh\\Java\\Servers\\MainServer\\plugins\\RoyalGrenadier-1.1.0-SNAPSHOT.jar')
-    compileOnly files('C:\\Users\\Wout\\IdeaProjects\\FTC\\FTC-Parent\\Squire\\build\\libs\\Squire-1.1.0-SNAPSHOT-all.jar')
+    compileOnly files('C:\\Users\\Wout\\IdeaProjects\\FTC\\FTC-Parent\\Squire\\build\\libs\\Squire-1.1.0-SNAPSHOT-all.jar')*/
 
-    /*compileOnly files("D:/GitHubRepos/Paper/Paper-Server/build/libs/Paper-Server-1.17-R0.1-SNAPSHOT-mojang-mapped.jar")
+    compileOnly files("D:/GitHubRepos/Paper/Paper-Server/build/libs/Paper-Server-1.17-R0.1-SNAPSHOT-mojang-mapped.jar")
     compileOnly files('D:/GitHubRepos/RoyalGrenadier/build/libs/RoyalGrenadier-1.1.0-SNAPSHOT-mojang-mapped.jar')
-    compileOnly files("D:/GitHubRepos/FTC/FTC-Parent/Squire/build/libs/Squire-1.1.0-SNAPSHOT-all.jar")*/
+    compileOnly files("D:/GitHubRepos/FTC/FTC-Parent/Squire/build/libs/Squire-1.1.0-SNAPSHOT-all.jar")
 }
 
 processResources {

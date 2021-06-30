@@ -15,6 +15,7 @@ public final class CrownWgFlags {
 
     public static final StateFlag SHOP_CREATION = new StateFlag("shop-creation", true);
     public static final StateFlag TRAPDOOR_USE = new StateFlag("trapdoor-use", true);
+    public static final StateFlag RIDING_ALLOWED = new StateFlag("player-riding", true);
 
     public static void init(){
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
@@ -23,6 +24,7 @@ public final class CrownWgFlags {
             registry.register(SHOP_USAGE_FLAG);
             registry.register(SHOP_CREATION);
             registry.register(TRAPDOOR_USE);
+            registry.register(RIDING_ALLOWED);
 
             System.out.println("Core's flags registered");
         } catch (FlagConflictException e){

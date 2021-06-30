@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.events.dynamic.BmSellItemListener;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.squire.Squire;

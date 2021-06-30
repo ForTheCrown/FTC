@@ -2,8 +2,8 @@ package net.forthecrown.economy;
 
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.events.dynamic.SellShopEvents;
-import net.forthecrown.core.inventory.CrownItems;
-import net.forthecrown.core.inventory.CustomInventoryHolder;
+import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.CustomInventoryHolder;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.user.CrownUser;

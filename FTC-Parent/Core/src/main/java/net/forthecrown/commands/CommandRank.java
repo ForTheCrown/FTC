@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.events.dynamic.RankGuiUseEvent;
-import net.forthecrown.core.inventory.RankInventory;
+import net.forthecrown.inventory.RankInventory;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Bukkit;

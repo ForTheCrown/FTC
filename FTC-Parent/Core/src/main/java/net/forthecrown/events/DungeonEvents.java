@@ -5,7 +5,7 @@ import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.Bosses;

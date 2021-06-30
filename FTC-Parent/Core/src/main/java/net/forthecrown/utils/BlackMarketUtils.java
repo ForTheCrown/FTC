@@ -1,7 +1,7 @@
 package net.forthecrown.utils;
 
-import net.forthecrown.core.inventory.CrownItems;
-import net.forthecrown.core.inventory.CustomInventoryHolder;
+import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.CustomInventoryHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryType;

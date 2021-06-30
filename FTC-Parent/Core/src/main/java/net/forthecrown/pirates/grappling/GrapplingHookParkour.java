@@ -1,7 +1,7 @@
 package net.forthecrown.pirates.grappling;
 
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.user.CrownUser;

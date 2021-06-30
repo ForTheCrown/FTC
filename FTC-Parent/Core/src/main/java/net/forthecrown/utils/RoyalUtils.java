@@ -1,7 +1,7 @@
 package net.forthecrown.utils;
 
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.math.CrownBoundingBox;

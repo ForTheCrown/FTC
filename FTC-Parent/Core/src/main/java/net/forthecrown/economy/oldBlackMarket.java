@@ -2,8 +2,8 @@
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.inventory.CrownItems;
-import net.forthecrown.core.inventory.CustomInventoryHolder;
+import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.CustomInventoryHolder;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.blackmarket.BlackMarket;
 import net.forthecrown.economy.CrownDailyEnchantment;

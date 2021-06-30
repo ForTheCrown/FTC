@@ -1,7 +1,7 @@
 package net.forthecrown.events;
 
 import net.forthecrown.core.chat.Announcer;
-import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.Grave;
 import net.forthecrown.user.UserManager;

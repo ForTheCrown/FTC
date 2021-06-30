@@ -1,7 +1,7 @@
 package net.forthecrown.events.dynamic;
 
-import net.forthecrown.core.inventory.builder.BuiltInventory;
-import net.forthecrown.core.inventory.builder.InventoryAction;
+import net.forthecrown.inventory.builder.BuiltInventory;
+import net.forthecrown.inventory.builder.InventoryAction;
 import net.forthecrown.user.UserManager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

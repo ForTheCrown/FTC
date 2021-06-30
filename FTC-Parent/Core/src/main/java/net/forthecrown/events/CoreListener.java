@@ -18,7 +18,7 @@ import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.economy.SellShop;
-import net.forthecrown.core.inventory.CrownWeapons;
+import net.forthecrown.inventory.CrownWeapons;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.user.CrownUser;

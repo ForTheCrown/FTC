@@ -7,7 +7,7 @@ import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.comvars.types.ComVarType;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.user.enums.Rank;
 import net.forthecrown.utils.Worlds;

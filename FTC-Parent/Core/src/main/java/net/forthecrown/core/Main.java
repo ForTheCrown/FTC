@@ -12,6 +12,7 @@ import net.forthecrown.core.chat.CrownMessages;
 import net.forthecrown.core.chat.Emotes;
 import net.forthecrown.core.chat.JoinInfo;
 import net.forthecrown.core.kingship.CrownKingship;
+import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.CrownBalances;
@@ -127,6 +128,7 @@ public final class Main extends JavaPlugin implements CrownCore {
         instantiateModule(Pirates::init);
         instantiateModule(Bosses::init);
         instantiateModule(Events::init);
+        instantiateModule(Cosmetics::init);
 
         if(getConfig().getBoolean("System.run-deleter-on-startup")) userManager.checkAllUserDatas();
     }
@@ -162,6 +164,8 @@ public final class Main extends JavaPlugin implements CrownCore {
         });
         CrownUserManager.LOADED_USERS.clear();
         CrownUserManager.LOADED_ALTS.clear();
+
+        Cosmetics.shutDown();
     }
 
     @Override
