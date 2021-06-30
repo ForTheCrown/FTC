@@ -1,18 +1,18 @@
 package net.forthecrown.core.chat;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.core.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.events.ChatEvents;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.FtcUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.user.enums.Rank;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.FtcUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.enums.Rank;
+import net.forthecrown.utils.Worlds;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -44,6 +44,17 @@ import java.util.regex.Pattern;
 public class ChatFormatter {
     private static final DecimalFormat DECIMAL_FORMAT;
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
+
+    /* If you wanna welcome someone, just welcome them, this is dumb
+    public static String[] RANDOM_AFK_GREETINGS = {
+            "Wb!", "wb", "wb!", "welcome back", "Welcome back!", "hey"
+    };
+
+    public static String[] RANDOM_GREETINGS = {
+            "hey", "hi", "wb", "hello", "hiya", "heyo", "yo",           //Incorrect spelling
+            "Hey!", "Hi!", "Welcome back!", "Hello!", "Heyo!", "Yo!",   //Grammar good :D
+            "Hey %s!", "Hello %s!", "Hi %s!"                            //Formattable
+    };*/
 
     static {
         DECIMAL_FORMAT = new DecimalFormat("#.##");
@@ -79,11 +90,11 @@ public class ChatFormatter {
         return capitalizeWord.trim();
     }
 
-    public static Component formatChat(Player source, Component displayName, Component message){
+    public static Component formatChat(Player source, Component displayName, Component message, Audience audience){
         CrownUser user = UserManager.getUser(source);
 
         String strMessage = ChatUtils.getString(message);
-        boolean inSenateWorld = source.getWorld().equals(ChatEvents.SENATE_WORLD);
+        boolean inSenateWorld = source.getWorld().equals(Worlds.SENATE);
         boolean staffChat = StaffChat.toggledPlayers.contains(source);
 
         if(source.hasPermission(Permissions.DONATOR_2) || inSenateWorld || staffChat) strMessage = translateHexCodes(strMessage);
@@ -119,18 +130,18 @@ public class ChatFormatter {
     public static Component joinMessage(CrownUser user){
         return Component.translatable("multiplayer.player.joined", user.nickDisplayName().color(getJoinColor(user)))
                 .hoverEvent(Component.text("Click to say hello!"))
-                .clickEvent(ClickEvent.runCommand(hello() + user.getNickOrName() + '!'))
+                //.clickEvent(ClickEvent.runCommand(hello(user.getNickOrName())))
                 .color(NamedTextColor.YELLOW);
     }
 
-    private static String hello(){
-        int c_int = CrownUtils.getRandomNumberInRange(0, 2);
-
-        if(c_int == 0) return "Hey ";
-        if(c_int == 1) return "Hello ";
-
-        return "Hi ";
+    /*private static String hello(String nickOrName){
+        int randomIndex = CrownUtils.getRandomNumberInRange(0, RANDOM_GREETINGS.length-1);
+        return String.format(RANDOM_GREETINGS[randomIndex], nickOrName);
     }
+
+    public static ClickEvent unAfkClickEvent(){
+        return ClickEvent.runCommand(RANDOM_AFK_GREETINGS[CrownUtils.getRandomNumberInRange(0, RANDOM_AFK_GREETINGS.length-1)]);
+    }*/
 
     public static Component newNameJoinMessage(CrownUser user1){
         FtcUser user = (FtcUser) user1;

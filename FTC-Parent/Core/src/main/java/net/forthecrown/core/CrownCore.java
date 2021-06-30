@@ -1,21 +1,21 @@
 package net.forthecrown.core;
 
+import net.forthecrown.comvars.ComVar;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.JailManager;
-import net.forthecrown.core.comvars.ComVar;
-import net.forthecrown.core.economy.Balances;
-import net.forthecrown.core.economy.BlackMarket;
-import net.forthecrown.core.economy.shops.ShopManager;
-import net.forthecrown.core.registry.ActionRegistry;
-import net.forthecrown.core.registry.CheckRegistry;
-import net.forthecrown.core.registry.KitRegistry;
-import net.forthecrown.core.registry.WarpRegistry;
-import net.forthecrown.core.chat.Emotes;
-import net.forthecrown.core.useables.UsablesManager;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.utils.MapUtils;
+import net.forthecrown.core.chat.*;
+import net.forthecrown.core.kingship.Kingship;
+import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.shops.ShopManager;
+import net.forthecrown.pirates.Pirates;
+import net.forthecrown.registry.ActionRegistry;
+import net.forthecrown.registry.CheckRegistry;
+import net.forthecrown.registry.KitRegistry;
+import net.forthecrown.registry.WarpRegistry;
+import net.forthecrown.useables.UsablesManager;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.MapUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Namespaced;
 import net.kyori.adventure.text.Component;
@@ -25,6 +25,7 @@ import net.luckperms.api.LuckPerms;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -48,7 +49,6 @@ public interface CrownCore extends Plugin, Namespaced {
 
     static Announcer getAnnouncer(){ return Main.announcer; }
     static Balances getBalances(){ return Main.balances; }
-    static BlackMarket getBlackMarket(){ return Main.blackMarket; }
     static Kingship getKingship(){ return Main.kingship; }
     static LuckPerms getLuckPerms() { return Main.luckPerms; }
 
@@ -59,6 +59,7 @@ public interface CrownCore extends Plugin, Namespaced {
 
     static CrownMessages getMessages() { return Main.messages; }
     static ServerRules getRules() { return Main.rules; }
+    static JoinInfo getJoinInfo() { return Main.joinInfo; }
     static Emotes getEmotes() { return Main.emotes; }
 
     static Logger logger() { return Main.logger; }
@@ -73,7 +74,6 @@ public interface CrownCore extends Plugin, Namespaced {
         Main.userManager.saveUsers();
 
         Main.balances.save();
-        Main.blackMarket.save();
 
         Main.warpRegistry.save();
         Main.kitRegistry.save();
@@ -84,76 +84,123 @@ public interface CrownCore extends Plugin, Namespaced {
         Main.shopManager.save();
         Main.usablesManager.saveAll();
 
+        Pirates.getParkour().getData().save();
+        Pirates.getTreasure().save();
+        Pirates.getPirateEconomy().save();
+        Pirates.getParrotTracker().save();
+
+        Main.joinInfo.save();
+
         Main.inst.saveConfig();
         logger().log(Level.INFO, "FTC-Core saved");
     }
 
     static short getHoppersInOneChunk() {
-        return Main.hoppersInOneChunk.getValue((short) 256);
+        return ComVars.hoppersInOneChunk.getValue((short) 256);
     }
 
     static long getUserDataResetInterval(){
-        return Main.userDataResetInterval.getValue(5356800000L);
+        return ComVars.userDataResetInterval.getValue(5356800000L);
     }
 
     static boolean areTaxesEnabled(){
-        return Main.taxesEnabled.getValue(false);
+        return ComVars.taxesEnabled.getValue(false);
     }
 
     static Integer getMaxMoneyAmount(){
-        return Main.maxMoneyAmount.getValue(50000000);
+        return ComVars.maxMoneyAmount.getValue(50000000);
     }
 
     static long getBranchSwapCooldown() {
-        return Main.branchSwapCooldown.getValue(172800000L);
+        return ComVars.branchSwapCooldown.getValue(172800000L);
     }
 
     static boolean logAdminShopUsage(){
-        return Main.logAdminShop.getValue(true);
+        return ComVars.logAdminShop.getValue(true);
     }
 
     static boolean logNormalShopUsage(){
-        return Main.logNormalShop.getValue(false);
+        return ComVars.logNormalShop.getValue(false);
     }
 
     static int getTpTickDelay(){
-        return Main.tpTickDelay.getValue(60);
+        return ComVars.tpTickDelay.getValue(60);
     }
 
     static int getTpCooldown(){
-        return Main.tpCooldown.getValue(60);
+        return ComVars.tpCooldown.getValue(60);
     }
 
     static int getTpaExpiryTime(){
-        return Main.tpaExpiryTime.getValue(2400);
+        return ComVars.tpaExpiryTime.getValue(2400);
     }
 
     static int getStartRhines(){
-        return Main.startRhines.getValue(100);
+        return ComVars.startRhines.getValue(100);
     }
 
     static byte getMaxNickLength(){
-        return Main.maxNickLength.getValue((byte) 16);
+        return ComVars.maxNickLength.getValue((byte) 16);
     }
 
     static boolean allowOtherPlayerNameNicks(){
-        return Main.allowOtherPlayerNicks.getValue(false);
+        return ComVars.allowOtherPlayerNicks.getValue(false);
     }
 
     static int getBaronPrice(){
-        return Main.baronPrice.getValue(500000);
+        return ComVars.baronPrice.getValue(500000);
     }
 
     static short getNearRadius(){
-        return Main.nearRadius.getValue((short) 200);
+        return ComVars.nearRadius.getValue((short) 200);
     }
 
     static Key onFirstJoinKit(){
-        return Main.onFirstJoinKit.getValue();
+        return ComVars.onFirstJoinKit.getValue();
     }
 
     static long getMarriageCooldown(){
-        return Main.marriageCooldown.getValue(259200000L);
+        return ComVars.marriageCooldown.getValue(259200000L);
+    }
+
+    static long getAuctionExpirationTime(){
+        return ComVars.auctionExpirationTime.getValue(604800000L);
+    }
+
+    static long getAuctionPickupTime(){
+        return ComVars.auctionPickupTime.getValue(259200000L);
+    }
+
+    static World getTreasureWorld(){
+        return ComVars.treasureWorld.getValue();
+    }
+
+    static int getGhSpecialReward(){
+        return ComVars.ghSpecialReward.getValue(25000);
+    }
+
+    static int getGhFinalReward(){
+        return ComVars.ghFinalReward.getValue(50000);
+    }
+
+    static boolean isEventActive(){
+        return ComVars.crownEventActive.getValue(false);
+    }
+
+    static boolean isEventTimed(){
+        return ComVars.crownEventIsTimed.getValue(false);
+    }
+
+    static int getTreasureMaxPrize(){
+        return ComVars.maxTreasurePrize.getValue(50000);
+    }
+
+    static int getTreasureMinPrize(){
+        return ComVars.minTreasurePrize.getValue(10000);
+    }
+
+    static int getMaxBossDifficulty(){
+        return ComVars.maxBossDifficulty.getValue((byte) 5);
     }
 
     static Location getServerSpawn(){
@@ -186,6 +233,6 @@ public interface CrownCore extends Plugin, Namespaced {
     static Component prefix(){
         return Component.text(ChatColor.stripColor(getPrefix()))
                 .color(NamedTextColor.GOLD)
-                .hoverEvent(HoverEvent.showText(Component.text("For The Crown :D, tell Botul you found this text lol").color(NamedTextColor.YELLOW)));
+                .hoverEvent(HoverEvent.showText(Component.text("For The Crown").color(NamedTextColor.YELLOW)));
     }
 }

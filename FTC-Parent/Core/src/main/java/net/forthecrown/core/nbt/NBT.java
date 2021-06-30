@@ -4,115 +4,111 @@ import com.google.gson.JsonElement;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
-import net.minecraft.server.v1_16_R3.MojangsonParser;
-import net.minecraft.server.v1_16_R3.NBTBase;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
-import net.minecraft.server.v1_16_R3.NBTTagList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.TagParser;
 
 import java.util.Set;
 import java.util.UUID;
 
 public class NBT {
 
-    public static NBT of(NBTTagCompound tag){
+    public static NBT of(CompoundTag tag){
         return new NBT(tag);
     }
 
     public static NBT empty(){
-        return new NBT(new NBTTagCompound());
+        return new NBT(new CompoundTag());
     }
 
     public static NBT fromJson(JsonElement element){
         try {
-            return of(MojangsonParser.parse(element.getAsString()));
+            return of(TagParser.parseTag(element.getAsString()));
         } catch (CommandSyntaxException e){
             throw new IllegalStateException(e.getMessage());
         }
     }
 
-    final NBTTagCompound tag;
-    private NBT(NBTTagCompound tag){
+    final CompoundTag tag;
+    private NBT(CompoundTag tag){
         this.tag = tag;
     }
 
     public Set<String> getKeys(){
-        return tag.getKeys();
+        return tag.getAllKeys();
     }
 
     public int size(){
-        return tag.e();
+        return tag.size();
     }
 
-    public void put(String name, NBTBase nbt){
-        tag.set(name, nbt);
+    public void put(String name, Tag nbt){
+        tag.put(name, nbt);
     }
 
     public void put(String name, NBT tags){
-        this.tag.set(name, tags.tag);
+        this.tag.put(name, tags.tag);
     }
 
     public void put(String name, byte b){
-        tag.setByte(name, b);
+        tag.putByte(name, b);
     }
 
     public void put(String name, short s){
-        tag.setShort(name, s);
+        tag.putShort(name, s);
     }
 
     public void put(String name, int s){
-        tag.setInt(name, s);
+        tag.putInt(name, s);
     }
 
     public void put(String name, long l){
-        tag.setLong(name, l);
+        tag.putLong(name, l);
     }
 
     public void put(String name, float f){
-        tag.setFloat(name, f);
+        tag.putFloat(name, f);
     }
 
     public void put(String name, double d){
-        tag.setDouble(name, d);
+        tag.putDouble(name, d);
     }
 
     public void put(String name, String s){
-        tag.setString(name, s);
+        tag.putString(name, s);
     }
 
     public void put(String name, boolean b){
-        tag.setBoolean(name, b);
+        tag.putBoolean(name, b);
     }
 
     public void put(String name, UUID id){
-        tag.setUUID(name, id);
+        tag.putUUID(name, id);
     }
 
     public UUID getUUID(String name){
-        return tag.a(name);
+        return tag.getUUID(name);
     }
 
     public boolean hasUUID(String name){
-        return tag.b(name);
+        return tag.hasUUID(name);
     }
 
     public void setArray(String name, byte[] bytes){
-        tag.setByteArray(name, bytes);
+        tag.putByteArray(name, bytes);
     }
 
     public void setArray(String name, int[] ints){
-        tag.setIntArray(name, ints);
+        tag.putIntArray(name, ints);
     }
 
     public void setArray(String name, long[] longPenish){
-        tag.a(name, longPenish);
+        tag.putLongArray(name, longPenish);
     }
 
-    public NBTBase get(String name){
+    public Tag get(String name){
         return tag.get(name);
-    }
-
-    public NBTTagList getAsList(String name){
-        return (NBTTagList) tag.get(name);
     }
 
     public byte getByte(String s){
@@ -172,30 +168,26 @@ public class NBT {
     }
 
     public boolean has(String s){
-        return tag.hasKey(s);
-    }
-
-    public Component getPrettyDisplay(String s, int i){
-        return PaperAdventure.asAdventure(tag.a(s, i));
-    }
-
-    public Component getPrettyDisplay(){
-        return PaperAdventure.asAdventure(tag.getNbtPrettyComponent());
+        return tag.contains(s);
     }
 
     public NBT merge(NBT tags){
-        return of(this.tag.a(tags.tag));
+        return of(tag.merge(tags.tag));
     }
 
     public NBT clone(){
-        return of(tag.clone());
+        return of(tag.copy());
     }
 
-    public NBTTagCompound getNMS() {
+    public CompoundTag getNMS() {
         return tag;
     }
 
     public String serialize() {
         return tag.toString();
+    }
+
+    public Component display(){
+        return PaperAdventure.asAdventure(NbtUtils.toPrettyComponent(tag));
     }
 }

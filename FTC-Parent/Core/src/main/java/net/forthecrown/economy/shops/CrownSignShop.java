@@ -1,8 +1,8 @@
-package net.forthecrown.core.economy.shops;
+package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.inventory.CrownItems;
-import net.forthecrown.serializer.AbstractSerializer;
+import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class CrownSignShop extends AbstractSerializer<CrownCore> implements SignShop {
+public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
 
     private final Location location;
     private final Block block;
@@ -34,7 +34,7 @@ public class CrownSignShop extends AbstractSerializer<CrownCore> implements Sign
 
     //used by getSignShop
     public CrownSignShop(Location location) throws NullPointerException {
-        super(CrownUtils.locationToFilename(location), "shopdata", true, CrownCore.inst());
+        super(CrownUtils.locationToFilename(location), "shopdata", true);
 
         //file doesn't exist there for go fuck yourself
         if (fileDoesntExist) throw new NullPointerException("Could not load shop file! Named, " + fileName);
@@ -50,7 +50,8 @@ public class CrownSignShop extends AbstractSerializer<CrownCore> implements Sign
 
     //used by createSignShop
     public CrownSignShop(Location location, ShopType shopType, Integer price, UUID shopOwner) {
-        super(CrownUtils.locationToFilename(location), "shopdata", false, CrownCore.inst());
+        super(CrownUtils.locationToFilename(location), "shopdata", false);
+
         this.location = location;
         this.block = location.getBlock();
         this.type = shopType;

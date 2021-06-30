@@ -1,17 +1,17 @@
-package net.forthecrown.pirates.commands;
+package net.forthecrown.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.PetType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.Branch;
-import net.forthecrown.user.enums.Pet;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.enums.Branch;
+import net.forthecrown.user.enums.Pet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
@@ -23,7 +23,7 @@ import java.util.List;
 public class CommandParrot extends FtcCommand {
 
     public CommandParrot(){
-        super("parrot", Pirates.inst);
+        super("parrot");
 
         setPermission(Permissions.DEFAULT);
         register();
@@ -45,7 +45,7 @@ public class CommandParrot extends FtcCommand {
 
     private int setParrot(CommandContext<CommandSource> c, boolean silent) throws CommandSyntaxException {
         CrownUser user = getUserSender(c);
-        if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.create("Only Pirates can use this");
+        if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.notPirate();
 
         List<Pet> pets = user.getPets();
         Pet pet = PetType.getPetIfOwned(c, "parrot");
@@ -69,7 +69,7 @@ public class CommandParrot extends FtcCommand {
         parrot.setVariant(pet.getVariant());
         parrot.setSilent(silent);
 
-        Pirates.inst.events.parrots.put(parrot.getUniqueId(), player.getUniqueId());
+        Pirates.getParrotTracker().add(player.getUniqueId());
 
         player.setShoulderEntityLeft(parrot);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1.0f);
@@ -84,7 +84,7 @@ public class CommandParrot extends FtcCommand {
     private void removeOldParrot(Player player, Parrot parrot) {
         player.setShoulderEntityLeft(null);
         if (parrot != null) {
-            Pirates.inst.events.parrots.remove(parrot.getUniqueId());
+            Pirates.getParrotTracker().remove(player.getUniqueId());
             parrot.remove();
         }
     }

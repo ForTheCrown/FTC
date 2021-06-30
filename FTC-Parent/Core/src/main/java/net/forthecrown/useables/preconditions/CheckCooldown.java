@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables.preconditions;
+package net.forthecrown.useables.preconditions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -8,7 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.useables.UsageCheck;
+import net.forthecrown.useables.UsageCheck;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.utils.MapUtils;
 import net.forthecrown.grenadier.CommandSource;

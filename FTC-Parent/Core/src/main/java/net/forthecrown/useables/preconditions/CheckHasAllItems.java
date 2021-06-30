@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables.preconditions;
+package net.forthecrown.useables.preconditions;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.useables.UsageCheck;
+import net.forthecrown.useables.UsageCheck;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -49,7 +49,7 @@ public class CheckHasAllItems implements UsageCheck {
         items.clear();
 
         for (JsonElement e: json.getAsJsonArray()){
-            items.add(JsonUtils.deserializeItem(e));
+            items.add(JsonUtils.readItem(e));
         }
     }
 
@@ -76,7 +76,7 @@ public class CheckHasAllItems implements UsageCheck {
 
     @Override
     public JsonElement serialize() {
-        return JsonUtils.serializeCollection(items, JsonUtils::serializeItem);
+        return JsonUtils.writeCollection(items, JsonUtils::writeItem);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables;
+package net.forthecrown.useables;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -75,6 +75,7 @@ public abstract class UsableBase extends CheckableBase implements Actionable, Pr
 
     @Override
     public <T extends UsageAction> T getAction(Key key, Class<T> clazz) {
+        key = CrownUtils.checkNotBukkit(key);
         for (UsageAction a: actions){
             if(!a.key().equals(key)) continue;
             if(!clazz.isAssignableFrom(a.getClass())) continue;

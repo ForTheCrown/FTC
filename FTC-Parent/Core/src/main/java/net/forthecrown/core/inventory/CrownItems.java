@@ -1,11 +1,12 @@
 package net.forthecrown.core.inventory;
 
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.Kingship;
-import net.forthecrown.core.economy.Balances;
+import net.forthecrown.core.kingship.Kingship;
+import net.forthecrown.economy.Balances;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.core.utils.CrownUtils;
-import net.forthecrown.core.utils.ItemStackBuilder;
+import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -37,7 +38,7 @@ public final class CrownItems {
 
     public static final NamespacedKey ITEM_KEY = new NamespacedKey(CrownCore.inst(), "crownitem");
 
-    public static final ItemStack BASE_ROYAL_SWORD = makeRoyalWeapon(Material.GOLDEN_SWORD, Component.text("-")
+    private static final ItemStack BASE_ROYAL_SWORD = makeRoyalWeapon(Material.GOLDEN_SWORD, Component.text("-")
                     .color(NamedTextColor.GOLD)
                     .append(Component.text("Royal Sword")
                             .color(NamedTextColor.YELLOW)
@@ -47,20 +48,20 @@ public final class CrownItems {
             Component.text("The bearer of this weapon has proven themselves,").color(NamedTextColor.GOLD),
             Component.text("to the Crown...").color(NamedTextColor.GOLD));
 
-    public static final ItemStack BASE_CUTLASS = makeRoyalWeapon(Material.NETHERITE_SWORD,
+    private static final ItemStack BASE_CUTLASS = makeRoyalWeapon(Material.NETHERITE_SWORD,
             ChatUtils.convertString("&#917558-&#D1C8BA&lCaptain's Cutlass&#917558-"),
             ChatUtils.convertString("&#917558The bearer of this cutlass bows to no laws, to no king,"),
             ChatUtils.convertString("&#917558its wielder leads their crew towards everlasting riches.")
     );
 
-    public static final ItemStack BASE_VIKING_AXE = makeRoyalWeapon(Material.IRON_AXE,
+    private static final ItemStack BASE_VIKING_AXE = makeRoyalWeapon(Material.IRON_AXE,
             ChatUtils.convertString("Viking axe"),
             ChatUtils.convertString("Vikings axe, do big damage"),
             ChatUtils.convertString(":DDDDD")
     );
 
-    public static final ItemStack VOTE_TICKET;
-    public static final ItemStack ELITE_VOTE_TICKET;
+    private static final ItemStack VOTE_TICKET;
+    private static final ItemStack ELITE_VOTE_TICKET;
 
     static {
         final Component border = Component.text("-----------------------------").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
@@ -101,6 +102,26 @@ public final class CrownItems {
                 );
         ELITE_VOTE_TICKET.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 2);
         ELITE_VOTE_TICKET.getItemMeta().getPersistentDataContainer().set(ITEM_KEY, PersistentDataType.BYTE, (byte) 1);
+    }
+
+    public static ItemStack voteTicket(){
+        return VOTE_TICKET.clone();
+    }
+
+    public static ItemStack eliteVoteTicket(){
+        return ELITE_VOTE_TICKET.clone();
+    }
+
+    public static ItemStack royalSword(){
+        return BASE_ROYAL_SWORD.clone();
+    }
+
+    public static ItemStack cutlass(){
+        return BASE_CUTLASS.clone();
+    }
+
+    public static ItemStack vikingAxe(){
+        return BASE_VIKING_AXE.clone();
     }
 
     private static ItemStack makeRoyalWeapon(Material material, Component name, Component lore2, Component lore3){
@@ -146,17 +167,18 @@ public final class CrownItems {
     }
 
     public static final Style NON_ITALIC_DARK_GRAY = Style.style(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
+    public static final Style NON_ITALIC_WHITE = Style.style(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
     public static ItemStack getCoins(int amount, int itemAmount){
         return new ItemStackBuilder(Material.SUNFLOWER, itemAmount)
                 .setName(Component.text("Rhines").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
                 .addLore(Component.text("Worth ").append(Component.text(Balances.getFormatted(amount))).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false))
-                .addLore(Component.text("Minted in the year " + CrownUtils.arabicToRoman(CrownUtils.worldTimeToYears(CrownUtils.WORLD)) + ".").style(NON_ITALIC_DARK_GRAY))
+                .addLore(Component.text("Minted in the year " + CrownUtils.arabicToRoman(CrownUtils.worldTimeToYears(Worlds.NORMAL)) + ".").style(NON_ITALIC_DARK_GRAY))
                 .addLore(s())
                 .build();
     }
 
     private static Component s(){
-        Kingship kingship = Kingship.inst();
+        Kingship kingship = CrownCore.getKingship();
         if(!kingship.hasKing()) return Component.text("During the Interregnum").color(NamedTextColor.DARK_GRAY);
 
         return Component.text("During the reign of ")

@@ -1,4 +1,4 @@
-package net.forthecrown.core.crownevents;
+package net.forthecrown.crownevents;
 
 import org.bukkit.Location;
 import org.bukkit.scoreboard.Objective;

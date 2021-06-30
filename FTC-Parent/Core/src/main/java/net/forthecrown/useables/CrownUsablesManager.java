@@ -1,10 +1,10 @@
-package net.forthecrown.core.useables;
+package net.forthecrown.useables;
 
-import net.forthecrown.core.registry.ActionRegistry;
-import net.forthecrown.core.registry.CheckRegistry;
-import net.forthecrown.core.serializer.AbstractJsonSerializer;
-import net.forthecrown.core.useables.actions.*;
-import net.forthecrown.core.useables.preconditions.*;
+import net.forthecrown.registry.ActionRegistry;
+import net.forthecrown.registry.CheckRegistry;
+import net.forthecrown.serializer.AbstractJsonSerializer;
+import net.forthecrown.useables.actions.*;
+import net.forthecrown.useables.preconditions.*;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;

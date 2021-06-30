@@ -1,10 +1,11 @@
-package net.forthecrown.economy.blackmarket;
+package net.forthecrown.economy.pirates;
 
-import net.forthecrown.economy.blackmarket.merchants.EnchantMerchant;
-import net.forthecrown.economy.blackmarket.merchants.MaterialMerchant;
+import net.forthecrown.economy.pirates.merchants.*;
 import net.forthecrown.serializer.CrownSerializer;
 
 public interface PirateEconomy extends CrownSerializer {
+    boolean shouldUpdateDate();
+
     void updateDate();
 
     EnchantMerchant getEnchantMerchant();
@@ -15,5 +16,13 @@ public interface PirateEconomy extends CrownSerializer {
 
     MaterialMerchant getCropsMerchant();
 
+    HeadMerchant getHeadMerchant();
+
+    ParrotMerchant getParrotMerchant();
+
     int getMaxEarnings();
+
+    void setMaxEarnings(int maxEarnings);
+
+    UsablePirateNpc getNpcById(String id);
 }

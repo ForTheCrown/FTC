@@ -16,10 +16,7 @@ import java.util.*;
 /**
  * Represents the class manages users and their ALT accounts
  */
-public interface UserManager extends CrownSerializer<CrownCore> {
-
-    Map<UUID, FtcUser> LOADED_USERS = new HashMap<>();
-    Map<UUID, FtcUserAlt> LOADED_ALTS = new HashMap<>();
+public interface UserManager extends CrownSerializer {
 
     /**
      * Gets the current instance of the UserManager
@@ -55,7 +52,7 @@ public interface UserManager extends CrownSerializer<CrownCore> {
      */
     static CrownUser getUser(@NotNull UUID base) {
         Validate.notNull(base, "UUID cannot be null");
-        if(LOADED_USERS.containsKey(base)) return LOADED_USERS.get(base);
+        if(CrownUserManager.LOADED_USERS.containsKey(base)) return CrownUserManager.LOADED_USERS.get(base);
         return inst().isAlt(base) ? new FtcUserAlt(base, inst().getMain(base)) : new FtcUser(base);
     }
 
@@ -73,7 +70,7 @@ public interface UserManager extends CrownSerializer<CrownCore> {
      * @return The currently loaded users
      */
     static Collection<CrownUser> getLoadedUsers(){
-        return new ArrayList<>(LOADED_USERS.values());
+        return new ArrayList<>(CrownUserManager.LOADED_USERS.values());
     }
 
     /**

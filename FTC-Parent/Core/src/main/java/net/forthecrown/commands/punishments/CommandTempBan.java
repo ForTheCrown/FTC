@@ -12,7 +12,7 @@ import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;

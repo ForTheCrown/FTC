@@ -1,7 +1,7 @@
 name: FTCCore
-version: 1.6.28-SNAPSHOT
+version: 2.0.0-SNAPSHOT
 main: net.forthecrown.core.Main
-api-version: 1.16
-loadbefore: [ OpenInv ]
+api-version: 1.17
+loadbefore: [ OpenInv, GriefPrevention ]
 depend: [ RoyalGrenadier, WorldGuard, LuckPerms, TAB ]
 authors: [ Botul ]

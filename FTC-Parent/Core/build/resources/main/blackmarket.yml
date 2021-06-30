@@ -91,8 +91,6 @@ Price_Per_Item:
     knockback: 35000
     projectile_protection: 20000
     fire_aspect: 50000
-    luck_of_the_sea: 14000
-    lure: 12000
     punch: 17500
     frost_walker: 25000
     power: 70000
@@ -101,11 +99,7 @@ Price_Per_Item:
     soul_speed: 17500
     efficiency: 28000
     fortune: 55000
-    aqua_affinity: 25000
-    depth_strider: 18000
-    flame: 25000
     blast_protection: 20000
-    sweeping: 25000
 AlreadyChosenEnchants: []
 Day: 1
 MaxEarnings: 50000

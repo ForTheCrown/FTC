@@ -5,9 +5,9 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserInteractions;
-import net.forthecrown.core.user.data.TeleportRequest;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserInteractions;
+import net.forthecrown.user.data.TeleportRequest;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -95,7 +95,10 @@ public class CommandTpask extends FtcCommand {
 
     public static boolean isNonAcceptedWorld(World world){
         String name = world.getName();
-        return name.contains("senate") || name.contains("void") || name.contains("raids");
+        return name.contains("senate")
+                || name.contains("void")
+                || name.contains("raids")
+                || name.contains("event");
     }
 
     public static TextComponent acceptButton(CrownUser target){

@@ -2,11 +2,10 @@ package net.forthecrown.core.admin.jails;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.events.JailListener;
-import net.forthecrown.core.serializer.AbstractJsonSerializer;
-import net.forthecrown.core.utils.CrownUtils;
-import net.forthecrown.core.utils.JsonUtils;
+import net.forthecrown.events.dynamic.JailListener;
+import net.forthecrown.serializer.AbstractJsonSerializer;
+import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -14,21 +13,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class CrownJailManager extends AbstractJsonSerializer<CrownCore> implements JailManager {
+public class CrownJailManager extends AbstractJsonSerializer implements JailManager {
 
     private final Map<Key, Location> jails = new HashMap<>();
     private final Map<Player, JailListener> onlineInJail = new HashMap<>();
 
     public CrownJailManager(){
-        super("jails", CrownCore.inst());
-
+        super("jails");
         reload();
     }
 
     @Override
     protected void save(JsonObject json) {
         for (Map.Entry<Key, Location> e: jails.entrySet()){
-            json.add(e.getKey().asString(), JsonUtils.serializeLocation(e.getValue()));
+            json.add(e.getKey().asString(), JsonUtils.writeLocation(e.getValue()));
         }
     }
 
@@ -38,7 +36,7 @@ public class CrownJailManager extends AbstractJsonSerializer<CrownCore> implemen
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
             Key key = CrownUtils.parseKey(e.getKey());
-            Location loc = JsonUtils.deserializeLocation(e.getValue().getAsJsonObject());
+            Location loc = JsonUtils.readLocation(e.getValue().getAsJsonObject());
 
             jails.put(key, loc);
         }

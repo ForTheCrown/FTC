@@ -5,8 +5,8 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.data.TeleportRequest;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.data.TeleportRequest;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandTpaAccept extends FtcCommand {

@@ -46,6 +46,11 @@ public final class Permissions {
     public static final Permission MARRY =              register("ftc.marry");
     public static final Permission MARRY_PEOPLE =       register("ftc.marry.others"); //Make 2 people marry each other.
 
+    public static final Permission EMOTE_IGNORE =       register("ftc.emotes.cooldown.ignore");
+
+    public static final Permission NEARBY =             register(COMMAND_PREFIX + "near");
+    public static final Permission NEARBY_IGNORE =      register(COMMAND_PREFIX + "near.ignore");
+
     public static final Permission WARP =               register(COMMAND_PREFIX + "warp");
     public static final Permission WARP_ADMIN =         register(COMMAND_PREFIX + "warp.admin");
 
@@ -95,6 +100,8 @@ public final class Permissions {
     public static final Permission HOME_OTHERS =        register(COMMAND_PREFIX + "home.others");
 
     public static final Permission BECOME_BARON =       register(COMMAND_PREFIX + "becomebaron");
+
+    public static final Permission IGNORE =             register(COMMAND_PREFIX + "ignore");
 
     public static final Permission DEFAULT =            register("ftc.default");
 

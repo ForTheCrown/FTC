@@ -1,19 +1,18 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
-import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 
-public class CommandAfk extends FtcCommand {
+public class    CommandAfk extends FtcCommand {
     public CommandAfk(){
         super("afk", CrownCore.inst());
 
@@ -59,7 +58,7 @@ public class CommandAfk extends FtcCommand {
             userMsg = Component.translatable("unafk.self").color(NamedTextColor.GRAY);
             broadcastMsg = Component.translatable("unafk.others", user.nickDisplayName())
                     .hoverEvent(Component.text("Click to welcome them back!"))
-                    .clickEvent(ClickEvent.runCommand("Welcome back!"))
+                    //.clickEvent(ChatFormatter.unAfkClickEvent())
                     .color(NamedTextColor.GRAY);
         } else {
             MuteStatus status = CrownCore.getPunishmentManager().checkMuteSilent(user.getUniqueId());

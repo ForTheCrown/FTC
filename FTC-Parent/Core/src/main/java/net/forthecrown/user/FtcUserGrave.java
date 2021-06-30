@@ -15,7 +15,7 @@ import java.util.List;
 public class FtcUserGrave implements Grave {
 
     private final FtcUser user;
-    private List<ItemStack> items = new ArrayList<>();
+    public List<ItemStack> items = new ArrayList<>();
 
     FtcUserGrave(FtcUser user){
         this.user = user;

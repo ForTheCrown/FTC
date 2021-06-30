@@ -2,14 +2,12 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.economy.SellShop;
-import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.economy.SellShop;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -49,18 +47,19 @@ public class CommandShop extends FtcCommand {
 
                 .then(literal("web")
                         .executes(c -> {
-                            CrownUser user = getUserSender(c);
-                            user.sendMessage(Component.translatable("commands.shop.web", NamedTextColor.GRAY));
-
-                            TextComponent text = Component.text("https://for-the-crown.tebex.io/").color(NamedTextColor.AQUA)
-                                    .clickEvent(ClickEvent.openUrl("https://for-the-crown.tebex.io/"))
-                                    .hoverEvent(Component.translatable("commands.shop.web.hover"));
-
-                            user.sendMessage(text);
+                            c.getSource().sendMessage(WEB_MESSAGE);
                             return 0;
                         })
                 );
     }
+
+    public static final Component WEB_MESSAGE = Component.text()
+            .append(Component.translatable("commands.shop.web", NamedTextColor.GRAY))
+            .append(Component.newline())
+            .append(Component.text("https://for-the-crown.tebex.io/").color(NamedTextColor.AQUA)
+                    .clickEvent(ClickEvent.openUrl("https://for-the-crown.tebex.io/"))
+                    .hoverEvent(Component.translatable("commands.shop.web.hover")))
+            .build();
 
     private Command<CommandSource> cmd(SellShop.Menu menu){
         return c -> {

@@ -1,10 +1,10 @@
 package net.forthecrown.core.admin;
 
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.user.data.DirectMessage;
-import net.forthecrown.core.user.data.MarriageMessage;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.data.DirectMessage;
+import net.forthecrown.user.data.MarriageMessage;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,14 +20,23 @@ import java.util.function.Predicate;
 
 public class EavesDropper {
 
+    public static Component PREFIX = Component.text("[")
+            .color(NamedTextColor.GRAY)
+            .append(Component.text("ED").color(NamedTextColor.DARK_GRAY))
+            .append(Component.text("] "));
+
     public static void send(Component text, Permission permission, @Nullable Predicate<CrownUser> toSkip, boolean log){
+        Component formatted = Component.text()
+                .append(PREFIX)
+                .append(text)
+                .build();
 
         UserManager.getOnlineUsers().forEach(u -> {
             if(toSkip != null && toSkip.test(u)) return;
             if(!u.isEavesDropping() || !u.hasPermission(permission)) return;
-            u.sendMessage(text);
+            u.sendMessage(formatted);
         });
-        if(log) Bukkit.getConsoleSender().sendMessage(text);
+        if(log) Bukkit.getConsoleSender().sendMessage(formatted);
     }
 
     public static void reportMuted(Component text, Player player, MuteStatus status){
@@ -56,7 +65,7 @@ public class EavesDropper {
                 .append(DirectMessage.getHeader(
                         message.senderDisplayName(),
                         message.receiverDisplayName(),
-                        NamedTextColor.YELLOW
+                        NamedTextColor.GRAY
                 ))
                 .append(Component.text(" "))
                 .append(message.getFormattedText())
@@ -71,7 +80,7 @@ public class EavesDropper {
         send(
                 Component.text()
                         .append(Component.text(message.getStatus().edPrefix))
-                        .append(MarriageMessage.PREFIX)
+                        .append(MarriageMessage.PREFIX.color(NamedTextColor.WHITE))
                         .append(message.getSender().nickDisplayName())
                         .append(Component.text(" -> "))
                         .append(message.getRecipient().nickDisplayName())

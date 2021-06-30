@@ -70,4 +70,6 @@ public class CrownExceptionProvider {
     static final TranslatableExceptionType MARRIAGE_CANNOT_CHANGE =     new TranslatableExceptionType("marriage.cannotChange.sender");
     static final TranslatableExceptionType MARRIAGE_CANNOT_CHANGE_T =   new TranslatableExceptionType("marriage.cannotChange.target");
     static final TranslatableExceptionType NOT_MARRIED =                new TranslatableExceptionType("marriage.notMarried");
+
+    static final TranslatableExceptionType NOT_PIRATE =                 new TranslatableExceptionType("pirates.exclusive");
 }

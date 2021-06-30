@@ -1,28 +1,61 @@
 package net.forthecrown.pirates.grappling;
 
 import com.google.gson.JsonElement;
-import net.forthecrown.serializer.JsonSerializable;
-import org.apache.commons.lang.Validate;
-import org.bukkit.entity.Player;
+import com.google.gson.JsonObject;
+import net.forthecrown.serializer.AbstractJsonSerializer;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-public class GhParkour implements JsonSerializable {
+public class GhParkourData extends AbstractJsonSerializer {
 
-    private Map<String, GhLevelEndData> levelEnds = new HashMap<>();
-    private static final String cooldownCategory = "Pirates_GH_end";
+    private final Map<String, GhLevelData> levels = new HashMap<>();
 
+    protected GhParkourData() {
+        super("parkour_data");
 
-    public void use(Player player, String id){
-        GhLevelEndData data = levelEnds.get(id);
-        Validate.notNull(data, "Invalid ID");
+        reload();
+    }
 
+    public GhLevelData get(String s){
+        return levels.get(s);
+    }
 
+    public void set(String s, GhLevelData data){
+        levels.put(s, data);
+    }
+
+    public void removeAllFor(UUID id){
+        levels.values().forEach(data -> data.removeCompleted(id));
+    }
+
+    public Set<String> keySet() {
+        return levels.keySet();
+    }
+
+    public Collection<GhLevelData> values() {
+        return levels.values();
+    }
+
+    public Set<Map.Entry<String, GhLevelData>> entrySet() {
+        return levels.entrySet();
     }
 
     @Override
-    public JsonElement serialize() {
-        return null;
+    protected void save(JsonObject json) {
+        levels.values().forEach(d -> json.add(d.getName(), d.serialize()));
+    }
+
+    @Override
+    protected void reload(JsonObject json) {
+        levels.clear();
+
+        for (Map.Entry<String, JsonElement> e: json.entrySet()){
+            levels.put(e.getKey(), new GhLevelData(e.getValue()));
+        }
+    }
+
+    @Override
+    protected JsonObject createDefaults(JsonObject json) {
+        return json;
     }
 }

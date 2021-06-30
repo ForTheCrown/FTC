@@ -1,7 +1,7 @@
-package net.forthecrown.core.crownevents.reporters;
+package net.forthecrown.crownevents.reporters;
 
-import net.forthecrown.core.Announcer;
-import net.forthecrown.core.crownevents.CrownEvent;
+import net.forthecrown.core.chat.Announcer;
+import net.forthecrown.crownevents.CrownEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 

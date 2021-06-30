@@ -1,6 +1,6 @@
-package net.forthecrown.core.comvars;
+package net.forthecrown.comvars;
 
-import net.forthecrown.core.comvars.types.ComVarType;
+import net.forthecrown.comvars.types.ComVarType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,7 +10,7 @@ import java.util.function.Consumer;
  * The class representing a CommandVariable
  * <p>
  * A type must always be specified. You probably won't have to worry about that though, as the only place this is constructed
- * is in the {@link ComVars} class, where this stuff gets done for you :)
+ * is in the {@link ComVarRegistry} class, where this stuff gets done for you :)
  * </p>
  * @param <T> The type stored by the variable, can be an int, String or whatever you want it to be
  */
@@ -22,10 +22,6 @@ public class ComVar<T>/* implements ConfigurationSerializable */ {
 
     ComVar(ComVarType<T> type, String name, T value){
         this.value = value;
-        this.type = type;
-        this.name = name;
-    }
-    ComVar(ComVarType<T> type, String name){
         this.type = type;
         this.name = name;
     }

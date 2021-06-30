@@ -1,4 +1,4 @@
-package net.forthecrown.core.economy;
+package net.forthecrown.economy;
 
 import net.forthecrown.core.CrownException;
 import org.bukkit.command.CommandSender;

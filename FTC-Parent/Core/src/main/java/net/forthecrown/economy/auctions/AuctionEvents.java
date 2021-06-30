@@ -1,8 +1,9 @@
-package net.forthecrown.pirates.auctions;
+package net.forthecrown.economy.auctions;
 
 import net.forthecrown.core.CrownException;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.pirates.AuctionManager;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Branch;

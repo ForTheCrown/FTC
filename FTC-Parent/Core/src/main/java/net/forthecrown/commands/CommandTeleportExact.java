@@ -5,8 +5,8 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.data.UserTeleport;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.WorldArgument;
@@ -28,7 +28,7 @@ public class CommandTeleportExact extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("pos", PositionArgument.position())
-                        .then(argument("pitch", FloatArgumentType.floatArg(-90, 90))
+                        .then(argument("pitch", FloatArgumentType.floatArg(-180, 180))
                                 .then(argument("yaw", FloatArgumentType.floatArg(-360, 360))
                                         .then(argument("world", WorldArgument.world())
                                                 .executes(c -> {

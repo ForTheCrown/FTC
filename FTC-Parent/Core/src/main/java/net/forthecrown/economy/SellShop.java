@@ -1,7 +1,7 @@
-package net.forthecrown.core.economy;
+package net.forthecrown.economy;
 
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.events.SellShopEvents;
+import net.forthecrown.events.dynamic.SellShopEvents;
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.inventory.CustomInventoryHolder;
 import net.forthecrown.core.nbt.NBT;
@@ -40,15 +40,14 @@ public class SellShop {
     }
 
     public Inventory open(Menu menu){
-        switch (menu){
-            case CROPS: return cropsMenu();
-            case DROPS: return dropsMenu();
-            case MINING: return miningMenu();
-            case MINING_BLOCKS: return miningBlocksMenu();
-            case MAIN: return mainMenu();
-            case DECIDING: return decidingMenu();
-            default: throw new IllegalStateException("Unexpected value: " + menu);
-        }
+        return switch (menu) {
+            case CROPS -> cropsMenu();
+            case DROPS -> dropsMenu();
+            case MINING -> miningMenu();
+            case MINING_BLOCKS -> miningBlocksMenu();
+            case MAIN -> mainMenu();
+            case DECIDING -> decidingMenu();
+        };
     }
 
     public Inventory dropsMenu(){

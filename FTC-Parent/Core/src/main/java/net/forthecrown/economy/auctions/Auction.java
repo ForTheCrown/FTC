@@ -1,9 +1,8 @@
-package net.forthecrown.pirates.auctions;
+package net.forthecrown.economy.auctions;
 
 import net.forthecrown.core.CrownException;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.pirates.Pirates;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
@@ -12,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 import java.util.UUID;
 
-public interface Auction extends CrownSerializer<Pirates> {
+public interface Auction extends CrownSerializer {
 
     void delete();
 

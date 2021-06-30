@@ -6,11 +6,11 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserInteractions;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.user.data.MarriageMessage;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserInteractions;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.data.MarriageMessage;
+import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandMarriageChat extends FtcCommand {

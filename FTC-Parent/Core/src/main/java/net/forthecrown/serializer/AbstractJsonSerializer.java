@@ -2,7 +2,7 @@ package net.forthecrown.serializer;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.bukkit.plugin.Plugin;
+import net.forthecrown.core.CrownCore;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -14,41 +14,38 @@ import java.util.logging.Logger;
 
 /**
  * A class for easily serializing things into Json
- * @param <T> The plugin into which this will place the file
  */
-public abstract class AbstractJsonSerializer<T extends Plugin> implements CrownSerializer<T> {
+public abstract class AbstractJsonSerializer implements CrownSerializer {
 
     private File file;
 
     protected final String fileName;
     private final String directory;
     private final String fullFileDirectory;
-    protected final T plugin;
     protected final Logger logger;
     private final boolean stopIfFileDoesntExist;
 
     protected boolean fileExists;
     protected boolean deleted = false;
 
-    protected AbstractJsonSerializer(@NotNull String fileName, String directory, @NotNull T plugin){
-        this(fileName, directory, false, plugin);
+    protected AbstractJsonSerializer(@NotNull String fileName, String directory){
+        this(fileName, directory, false);
     }
-    protected AbstractJsonSerializer(@NotNull String fileName, @NotNull T plugin){
-        this(fileName, null, false, plugin);
+    protected AbstractJsonSerializer(@NotNull String fileName){
+        this(fileName, null, false);
     }
-    protected AbstractJsonSerializer(String fileName, String directory, boolean stopIfFileDoesntExist, T plugin) {
+    protected AbstractJsonSerializer(String fileName, String directory, boolean stopIfFileDoesntExist) {
         this.fileName = fileName.endsWith(".json") ? fileName : fileName + ".json";
         this.directory = directory;
-        this.plugin = plugin;
-        this.logger = plugin.getLogger();
         this.stopIfFileDoesntExist = stopIfFileDoesntExist;
+        this.logger = CrownCore.logger();
 
         this.fullFileDirectory = (directory == null ? "" : directory + File.separator) + this.fileName;
         load();
     }
 
     private void load(){
-        file = new File(plugin.getDataFolder() + File.separator + fullFileDirectory);
+        file = new File(CrownCore.dataFolder() + File.separator + fullFileDirectory);
         fileExists = file.exists();
 
         if(!fileExists){
@@ -110,10 +107,6 @@ public abstract class AbstractJsonSerializer<T extends Plugin> implements CrownS
      * @return The Json the defaults were added to
      */
     protected abstract JsonObject createDefaults(final JsonObject json);
-
-    public T getPlugin() {
-        return plugin;
-    }
 
     protected void delete(){
         if(!file.delete()) logger.log(Level.WARNING, "Couldn't delete file named " + fileName);

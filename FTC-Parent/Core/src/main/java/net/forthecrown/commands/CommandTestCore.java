@@ -1,12 +1,11 @@
 package net.forthecrown.commands;
 
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.FtcUser;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
 
 public class CommandTestCore extends FtcCommand {
 
@@ -30,7 +29,6 @@ public class CommandTestCore extends FtcCommand {
             u.sendMessage("-Beginning test-");
             //Use this command to test things lol
             //This is as close as I currently know how to get to actual automatic test
-            FtcUser user = (FtcUser) u;
 
             u.sendMessage("-Test finished-");
             return 0;

@@ -1,10 +1,10 @@
 package net.forthecrown.commands;
 
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.utils.CrownBoundingBox;
+import net.forthecrown.utils.math.CrownBoundingBox;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.utils.Pair;
+import net.forthecrown.utils.Pair;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

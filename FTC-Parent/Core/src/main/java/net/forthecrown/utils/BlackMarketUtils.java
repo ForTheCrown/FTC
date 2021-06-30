@@ -1,66 +1,48 @@
 package net.forthecrown.utils;
 
-import net.forthecrown.core.comvars.ComVar;
-import net.forthecrown.core.comvars.ComVars;
-import net.forthecrown.core.comvars.types.ComVarType;
+import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.core.inventory.CustomInventoryHolder;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.enchantments.Enchantment;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.Score;
 
 /**
  * BlackMarketUtils, not API
  */
 public class BlackMarketUtils {
-    public static Map<Material, ComVar<Short>> pricesFromConfig(ConfigurationSection section, String name) {
-        Map<Material, ComVar<Short>> returnVal = new HashMap<>();
-        for (String s : section.getKeys(false)) {
-            returnVal.put(
-                    Material.valueOf(s.toUpperCase()),
-                    ComVars.set(
-                            "bm_price_" + name + "_" + s.toLowerCase(),
-                            ComVarType.SHORT,
-                            (short) section.getInt(s)
-                    )
-            );
-        }
-        return returnVal;
-    }
+    private static final ItemStack borderItem = CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
 
-    public static Map<Enchantment, ComVar<Integer>> enchantsFromConfig(ConfigurationSection section) {
-        Map<Enchantment, ComVar<Integer>> result = new HashMap<>();
-        for (String s : section.getKeys(false)) {
-            result.put(
-                    enchFromString(s),
-                    ComVars.set(
-                            "bm_price_ench_" + s.toLowerCase(),
-                            ComVarType.INTEGER,
-                            section.getInt(s)
-                    )
-            );
-        }
-        return result;
-    }
+    public static Inventory getBaseInventory(String name, ItemStack header){
+        CustomInventoryHolder holder = new CustomInventoryHolder(name, InventoryType.CHEST);
+        Inventory base = holder.getInventory();
 
-    public static Enchantment enchFromString(String s){
-        return Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase()));
-    }
+        base.setItem(4, header);
 
-    public static String enchToSerializable(Enchantment e){
-        return e.getKey().getKey().toLowerCase();
-    }
+        for (int i = 0; i < 27; i++){
+            if(i == 4) i++;
+            if(i == 10) i += 7;
 
-    public static <T> T getRandomEntry(List<T> from, List<T> notAllowed, CrownRandom random){
-        T t = from.get(random.nextInt(from.size()));
-
-        while(notAllowed.contains(t)){
-            t = from.get(random.nextInt(from.size()));
+            base.setItem(i, borderItem);
         }
 
-        return t;
+        return base;
+    }
+
+    public static Score getPiratePointScore(String name){
+        return Bukkit.getScoreboardManager().getMainScoreboard().getObjective("PiratePoints").getScore(name);
+    }
+
+    public static boolean isInvalidItem(ItemStack item, InventoryView header){
+        return CrownUtils.isItemEmpty(item)
+                || item.getType() == borderItem.getType()
+                || item.equals(header.getTopInventory().getItem(4));
+    }
+
+    public static ItemStack borderItem(){
+        return borderItem.clone();
     }
 }

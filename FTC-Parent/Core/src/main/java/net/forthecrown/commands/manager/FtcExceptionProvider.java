@@ -4,8 +4,8 @@ import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.economy.Balances;
-import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.economy.Balances;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
@@ -212,5 +212,9 @@ public interface FtcExceptionProvider {
 
     static RoyalCommandException notMarried(){
         return NOT_MARRIED.create();
+    }
+
+    static RoyalCommandException notPirate(){
+        return NOT_PIRATE.create(Component.text("/visit Questmoor"));
     }
 }

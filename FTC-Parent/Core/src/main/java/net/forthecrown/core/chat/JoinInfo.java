@@ -2,20 +2,19 @@ package net.forthecrown.core.chat;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.serializer.AbstractJsonSerializer;
+import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
-public class ServerNews extends AbstractJsonSerializer<CrownCore> {
+public class JoinInfo extends AbstractJsonSerializer {
 
     private Component news;
     private boolean shouldShow = false;
 
     private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 
-    public ServerNews(){
-        super("news", CrownCore.inst());
+    public JoinInfo(){
+        super("join_info");
 
         news = Component.empty();
         reload();

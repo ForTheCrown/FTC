@@ -7,7 +7,7 @@ import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandStaffChat extends FtcCommand {

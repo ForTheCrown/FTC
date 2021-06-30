@@ -1,38 +1,100 @@
-package net.forthecrown.economy.blackmarket.merchants;
+package net.forthecrown.economy.pirates.merchants;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.economy.blackmarket.DailyEnchantment;
-import net.forthecrown.economy.blackmarket.EnchantmentData;
+import net.forthecrown.commands.clickevent.ClickEventManager;
+import net.forthecrown.commands.clickevent.ClickEventTask;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.CrownException;
+import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.pirates.DailyEnchantment;
+import net.forthecrown.economy.pirates.EnchantmentData;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.pirates.Pirates;
+import net.forthecrown.events.dynamic.BmEnchantListener;
+import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.JsonUtils;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class EnchantMerchant implements BlackMarketMerchant {
+import static net.forthecrown.utils.BlackMarketUtils.getBaseInventory;
+
+public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
+    public static final Key KEY = Squire.createPiratesKey("enchants");
 
     private Map<Enchantment, EnchantmentData> data;
 
     private final List<UUID> boughtEnchant = new ArrayList<>();
     private final List<Enchantment> alreadyPicked = new ArrayList<>();
+    private final String npcID;
 
     private final DailyEnchantment daily;
     public EnchantMerchant() {
         this.daily = new DailyEnchantment();
+
+        npcID = ClickEventManager.registerClickEvent(this);
     }
 
     @Override
     public Inventory createInventory(CrownUser user) {
-        return null;
+        return createInventory(user, true, null);
+    }
+
+    public Inventory createInventory(CrownUser user, boolean accepting, ItemStack userItem){
+        final ItemStack rod = CrownItems.makeItem(Material.END_ROD, 1, true, "&7-");
+        rod.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
+        final ItemStack purpleGlass = CrownItems.makeItem(Material.PURPLE_STAINED_GLASS_PANE, 1 ,true, "&7-");
+        final ItemStack border = CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
+
+        Inventory inv = getBaseInventory("Black Market: Enchants", rod);
+
+        inv.setItem(10, border);
+        inv.setItem(16, border);
+
+        inv.setItem(12, rod);
+        inv.setItem(14, rod);
+        inv.setItem(22, rod);
+
+        inv.setItem(0, purpleGlass);
+        inv.setItem(8, purpleGlass);
+        inv.setItem(18, purpleGlass);
+        inv.setItem(26, purpleGlass);
+
+        ItemStack acceptingOrDenying = getAcceptButton();
+        if(!accepting) acceptingOrDenying = getDenyButton();
+        inv.setItem(13, acceptingOrDenying);
+
+        if(userItem != null) inv.setItem(11, userItem);
+
+        inv.setItem(15, getCoolEnchant());
+
+        return inv;
     }
 
     @Override
@@ -86,6 +148,32 @@ public class EnchantMerchant implements BlackMarketMerchant {
         daily.update(dailyData, random);
 
         if(day == 1 || day == 0) alreadyPicked.clear();
+
+        alreadyPicked.add(dailyData.getEnchantment());
+    }
+
+    public ItemStack getAcceptButton(){
+        return CrownItems.makeItem(Material.LIME_STAINED_GLASS_PANE, 1, true, ChatColor.GREEN + "[Accept and Pay]",
+                "&7Enchant the item for " + ChatFormatter.decimalizeNumber(daily.getPrice()) + " Rhines");
+    }
+
+    public ItemStack getDenyButton(){
+        return CrownItems.makeItem(Material.RED_STAINED_GLASS_PANE, 1, true, ChatColor.RED + "[Cannot accept]",
+                "&7Cannot accept enchantment!");
+    }
+
+    private ItemStack getCoolEnchant(){
+        ItemStack item = CrownItems.makeItem(Material.ENCHANTED_BOOK, 1, false, null,
+                Component.text("Value: ")
+                        .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                        .append(Balances.formatted(daily.getPrice())
+                                .color(NamedTextColor.YELLOW)
+                        )
+                        .append(Component.text("."))
+                        .color(NamedTextColor.GOLD));
+        item.addUnsafeEnchantment(daily.getEnchantment(), daily.getLevel());
+
+        return item;
     }
 
     @Override
@@ -93,11 +181,64 @@ public class EnchantMerchant implements BlackMarketMerchant {
         JsonObject json = new JsonObject();
 
         json.add("daily", daily.serialize());
-        json.add("enchants", JsonUtils.serializeCollection(data.values(), EnchantmentData::serialize));
+        json.add("enchants", JsonUtils.writeCollection(data.values(), EnchantmentData::serialize));
 
-        if(!boughtEnchant.isEmpty()) json.add("alreadyBought", JsonUtils.serializeCollection(boughtEnchant, id -> new JsonPrimitive(id.toString())));
-        if(!alreadyPicked.isEmpty()) json.add("alreadyPicked", JsonUtils.serializeCollection(alreadyPicked, ench -> new JsonPrimitive(ench.getKey().asString())));
+        if(!boughtEnchant.isEmpty()) json.add("alreadyBought", JsonUtils.writeCollection(boughtEnchant, id -> new JsonPrimitive(id.toString())));
+        if(!alreadyPicked.isEmpty()) json.add("alreadyPicked", JsonUtils.writeCollection(alreadyPicked, ench -> new JsonPrimitive(ench.getKey().asString())));
 
         return json;
+    }
+
+    @Override
+    public void onUse(CrownUser user, Entity edward) {
+        user.sendMessage(
+                Component.translatable("pirates.enchants.selling",
+                        Component.text("Edward")
+                                .hoverEvent(edward)
+                                .color(NamedTextColor.YELLOW),
+                        daily.getEnchantment().displayName(daily.getLevel()).color(NamedTextColor.YELLOW),
+                        Balances.formatted(daily.getPrice()).color(NamedTextColor.GOLD)
+                )
+        );
+
+        ClickEventManager.allowCommandUsage(user.getPlayer(), true);
+
+        Component text = Component.translatable("pirates.enchants.button").color(NamedTextColor.AQUA)
+                .clickEvent(ClickEvent.runCommand(ClickEventManager.getCommand(npcID)))
+                .hoverEvent(HoverEvent.showText(Component.translatable("pirates.enchants.button.hover")));
+
+        Component text1 = Component.translatable("pirates.enchants.proposal")
+                .color(NamedTextColor.GRAY)
+                .append(Component.space())
+                .append(text);
+
+        user.sendMessage(text1);
+    }
+
+    @Override
+    public @NotNull Key key() {
+        return KEY;
+    }
+
+    public DailyEnchantment getDaily() {
+        return daily;
+    }
+
+    public boolean isAllowedToBuy(UUID id){
+        return boughtEnchant.contains(id);
+    }
+
+    public void setAllowedToBuy(UUID id, boolean allowed){
+        if(allowed) boughtEnchant.remove(id);
+        else boughtEnchant.add(id);
+    }
+
+    @Override
+    public void run(Player player, String[] args) throws CrownException, RoyalCommandException {
+        if(Pirates.getPirateEconomy().getEnchantMerchant().isAllowedToBuy(player.getUniqueId())) {
+            player.openInventory(Pirates.getPirateEconomy().getEnchantMerchant().createInventory(UserManager.getUser(player)));
+
+            Bukkit.getPluginManager().registerEvents(new BmEnchantListener(player), CrownCore.inst());
+        }
     }
 }

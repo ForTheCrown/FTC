@@ -1,4 +1,4 @@
-package net.forthecrown.pirates.commands;
+package net.forthecrown.commands;
 
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -6,7 +6,7 @@ import net.forthecrown.pirates.Pirates;
 
 public class CommandPirate extends FtcCommand {
     public CommandPirate() {
-        super("pirate", Pirates.inst);
+        super("pirate");
 
         setPermission("ftc.pirates.admin");
         register();
@@ -17,8 +17,9 @@ public class CommandPirate extends FtcCommand {
         command
                 .then(literal("reload")
                         .executes(c -> {
-                            Pirates.inst.reloadConfig();
-                            Pirates.getAuctionManager().reloadAuctions();
+                            Pirates.getTreasure().reload();
+                            Pirates.getParkour().getData().reload();
+                            Pirates.getAuctions().reloadAuctions();
                             broadcastAdmin(c.getSource(), "Pirate config reloaded.");
                             return 0;
                         })
@@ -26,7 +27,7 @@ public class CommandPirate extends FtcCommand {
 
                 .then(literal("spawnShulker")
                         .executes(c -> {
-                            Pirates.inst.shulker.spawn();
+                            Pirates.getTreasure().relocate();
                             broadcastAdmin(c.getSource(), "Spawning Treasure Shulker");
                             return 0;
                         })

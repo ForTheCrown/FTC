@@ -1,5 +1,4 @@
-package net.forthecrown.core.crownevents;
-/*
+/**
  * Some basic API stuff for hosting CrownEvents
  *
  * InEventListener
@@ -19,3 +18,4 @@ package net.forthecrown.core.crownevents;
  * I usually make the complete method call the end method, since they can have overlapping functions
  *
  */
+package net.forthecrown.crownevents;

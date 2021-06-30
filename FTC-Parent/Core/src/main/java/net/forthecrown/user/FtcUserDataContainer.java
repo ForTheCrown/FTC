@@ -3,7 +3,6 @@ package net.forthecrown.user;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -25,20 +24,20 @@ public class FtcUserDataContainer implements ConfigurationSerializable, UserData
     }
 
     @Override
-    public void set(Plugin key, ConfigurationSection section){
-        data.put(key.getDescription().getName(), section);
+    public void set(String key, ConfigurationSection section){
+        data.put(key, section);
     }
 
     @Nonnull
     @Override
-    public ConfigurationSection get(Plugin key){
-        return data.getOrDefault(key.getDescription().getName(), createSection(key));
+    public ConfigurationSection get(String key){
+        return data.getOrDefault(key, createSection(key));
     }
 
     @Nonnull
     @Override
-    public ConfigurationSection createSection(Plugin key){
-        return configuration.getConfigurationSection("DataContainer").createSection(key.getDescription().getName());
+    public ConfigurationSection createSection(String key){
+        return configuration.getConfigurationSection("DataContainer").createSection(key);
     }
 
     @Override
@@ -47,8 +46,8 @@ public class FtcUserDataContainer implements ConfigurationSerializable, UserData
     }
 
     @Override
-    public void remove(Plugin key){
-        data.remove(key.getDescription().getName());
+    public void remove(String key){
+        data.remove(key);
     }
 
     @Nonnull

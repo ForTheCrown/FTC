@@ -7,14 +7,16 @@ import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.FtcUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.user.enums.Branch;
-import net.forthecrown.core.user.enums.Rank;
+import net.forthecrown.crownevents.EventTimer;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.FtcUser;
+import net.forthecrown.user.UserInteractions;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.enums.Branch;
+import net.forthecrown.user.enums.Rank;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.core.utils.ListUtils;
+import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.Component;
@@ -96,6 +98,7 @@ public class CommandProfile extends FtcCommand {
         Objective crown = profile.getScoreboard().getObjective("crown");
         Score crownScr = crown.getScore(profile.getName());
 
+        Component scrDisplay = Component.text(CrownCore.isEventTimed() ? EventTimer.getTimerCounter(crownScr.getScore()).toString() : crownScr.getScore() + "");
         Component marriedTo = marriedMessage(profile);
 
         //Footer size roughly lines up with header size
@@ -119,7 +122,7 @@ public class CommandProfile extends FtcCommand {
                 .append(line("Married to", marriedTo, marriedTo != null))
 
                 .append(line("Pirate Points", score.getScore() + "", score.isScoreSet() && score.getScore() != 0))
-                .append(line("Crown score", crownScr.getScore() + "", crownScr.isScoreSet() && crownScr.getScore() > 0))
+                .append(line("Crown score", scrDisplay, crownScr.isScoreSet() && crownScr.getScore() > 0 && CrownCore.isEventActive()))
 
                 .append(line("Gems", profile.getGems() + "", profile.getGems() > 0))
                 .append(line("Balance", CrownCore.getBalances().withCurrency(profile.getUniqueId()), true))
@@ -161,6 +164,7 @@ public class CommandProfile extends FtcCommand {
 
         Component locMessage = profile.getLocation() == null ? null : ChatFormatter.clickableLocationMessage(profile.getLocation(), true);
         Component punishmentDisplay = entry == null ? Component.empty() : Component.newline().append(entry.display(false));
+        Component marriageCooldown = marriageCooldown(profile.interactions);
 
         return Component.newline()
                 .append(Component.text("\nAdmin Info:").color(NamedTextColor.YELLOW))
@@ -170,11 +174,12 @@ public class CommandProfile extends FtcCommand {
                 .append(timeSinceOnlineOrOnlineTime(profile))
 
                 .append(Component.newline())
-                .append(line(" IP", profile.ip, true))
+                .append(line(" IP", profile.ip, profile.ip != null))
                 .append(line(" AllowsEmotes", profile.allowsEmotes() + "", true))
                 .append(line(" AllowsProposals", profile.getInteractions().acceptingProposals() + "", true))
                 .append(line(" ProfilePublic", profile.isProfilePublic() + "", true))
 
+                .append(line(" MarriageCooldown", marriageCooldown, marriageCooldown != null))
                 .append(line(profile.isOnline() ? " Location" : " Last seen", locMessage, locMessage != null))
 
                 .append(punishmentDisplay);
@@ -185,6 +190,14 @@ public class CommandProfile extends FtcCommand {
 
         return UserManager.getUser(user.getInteractions().getMarriedTo())
                 .nickDisplayName();
+    }
+
+    private static Component marriageCooldown(UserInteractions interactions){
+        if(interactions.canChangeMarriageStatus()) return null;
+
+        long time = interactions.getLastMarriageStatusChange();
+        return Component.text(ChatFormatter.getDateFromMillis(time))
+                .hoverEvent(Component.text(new Date(time).toString()));
     }
 
     private static Component timeSinceOnlineOrOnlineTime(CrownUser user){

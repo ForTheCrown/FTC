@@ -1,4 +1,4 @@
-package net.forthecrown.core.registry;
+package net.forthecrown.registry;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -7,12 +7,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.useables.kits.FtcKit;
 import net.forthecrown.useables.kits.Kit;
+import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.ListUtils;
-import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
 import net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -20,11 +21,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public class CrownKitRegistry extends AbstractJsonSerializer<CrownCore> implements KitRegistry {
+public class CrownKitRegistry extends AbstractJsonSerializer implements KitRegistry {
     private final Map<Key, FtcKit> kits = new HashMap<>();
 
     public CrownKitRegistry(){
-        super("kits", CrownCore.inst());
+        super("kits");
 
         reload();
         CrownCore.logger().info("Kits loaded");
@@ -52,11 +53,13 @@ public class CrownKitRegistry extends AbstractJsonSerializer<CrownCore> implemen
 
     @Override
     public Kit get(Key key) {
+        key = CrownUtils.checkNotBukkit(key);
         return kits.get(key);
     }
 
     @Override
     public Kit register(Key key, List<ItemStack> raw) {
+        key = CrownUtils.checkNotBukkit(key);
         FtcKit kit = new FtcKit(key, raw);
         kits.put(key, kit);
 
@@ -65,6 +68,7 @@ public class CrownKitRegistry extends AbstractJsonSerializer<CrownCore> implemen
 
     @Override
     public void remove(Key key) {
+        key = CrownUtils.checkNotBukkit(key);
         kits.remove(key);
     }
 
@@ -75,6 +79,7 @@ public class CrownKitRegistry extends AbstractJsonSerializer<CrownCore> implemen
 
     @Override
     public boolean contains(Key key) {
+        key = CrownUtils.checkNotBukkit(key);
         return kits.containsKey(key);
     }
 

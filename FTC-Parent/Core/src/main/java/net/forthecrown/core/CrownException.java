@@ -1,7 +1,9 @@
 package net.forthecrown.core;
 
-import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -10,21 +12,23 @@ import org.bukkit.command.CommandSender;
  */
 public class CrownException extends RuntimeException {
 
-    private final String message;
+    private final Component message;
     private final CommandSender sender;
 
     public CrownException(CommandSender sender, String message) {
-        super(ChatFormatter.translateHexCodes(message));
+        this(sender, ChatUtils.convertString(message));
+    }
 
-        this.message = ChatFormatter.translateHexCodes(message);
+    public CrownException(CommandSender sender, Component message) {
+        super(ChatUtils.getString(message));
+
+        this.message = message;
         this.sender = sender;
 
-        sendMessage(getMessage());
+        sendMessage(message);
     }
 
-    public void sendMessage(String message){
-        sender.sendMessage(ChatUtils.convertString(message));
-    }
+    public void sendMessage(Component message){ sender.sendMessage(message); }
 
     @Override
     public void printStackTrace(){
@@ -32,6 +36,10 @@ public class CrownException extends RuntimeException {
 
     @Override
     public String getMessage(){
+        return ChatUtils.getString(message);
+    }
+
+    public Component getComponentMessage(){
         return message;
     }
 
@@ -42,5 +50,13 @@ public class CrownException extends RuntimeException {
     @Override
     public Throwable fillInStackTrace(){
         return null;
+    }
+
+    public static CrownException translatable(CommandSender sender, String key, ComponentLike... args){
+        return new CrownException(sender, Component.translatable(key, args));
+    }
+
+    public static CrownException translatable(CommandSender sender, String key, TextColor color, ComponentLike... args){
+        return new CrownException(sender, Component.translatable(key, color, args));
     }
 }

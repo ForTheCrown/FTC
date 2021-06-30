@@ -1,7 +1,7 @@
 package net.forthecrown.user.data;
 
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.events.AsyncTeleportListener;
+import net.forthecrown.events.dynamic.AsyncTeleportListener;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.core.chat.ChatFormatter;

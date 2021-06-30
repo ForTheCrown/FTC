@@ -1,4 +1,4 @@
-package net.forthecrown.economy.blackmarket;
+package net.forthecrown.economy.pirates;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,7 +15,7 @@ public class DailyEnchantment implements JsonSerializable {
 
     public DailyEnchantment() {}
 
-    public void deserialize(JsonElement element){
+    public void deserialize(JsonElement element) {
         JsonObject json = element.getAsJsonObject();
 
         this.enchantment = Enchantment.getByKey(NamespacedKey.fromString(json.get("enchantment").getAsString()));

@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables;
+package net.forthecrown.useables;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -33,7 +33,7 @@ public class CrownUsableBlock extends AbstractUsable implements UsableBlock {
 
     @Override
     protected JsonObject createDefaults(JsonObject json) {
-        json.add("location", JsonUtils.serializeLocation(location));
+        json.add("location", JsonUtils.writeLocation(location));
         json.add("preconditions", new JsonObject());
         json.add("actions", new JsonArray());
 

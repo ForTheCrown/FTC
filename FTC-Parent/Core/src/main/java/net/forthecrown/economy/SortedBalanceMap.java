@@ -1,4 +1,4 @@
-package net.forthecrown.core.economy;
+package net.forthecrown.economy;
 
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
@@ -11,17 +11,18 @@ import org.bukkit.OfflinePlayer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.IntSupplier;
 
 public class SortedBalanceMap implements BalanceMap {
     private final List<BalEntry> entries = new ArrayList<>();
-    private final int defaultAmount;
+    private final IntSupplier defaultAmount;
 
-    public SortedBalanceMap(int defaultAmount){
+    public SortedBalanceMap(IntSupplier defaultAmount){
         this.defaultAmount = defaultAmount;
     }
 
     @Override
-    public int getDefaultAmount() {
+    public IntSupplier getDefaultAmount() {
         return defaultAmount;
     }
 
@@ -41,7 +42,7 @@ public class SortedBalanceMap implements BalanceMap {
     @Override
     public int get(UUID id){
         int index = getIndex(id);
-        if(index == -1) return defaultAmount;
+        if(index == -1) return defaultAmount.getAsInt();
 
         return entries.get(index).getValue();
     }
@@ -95,6 +96,11 @@ public class SortedBalanceMap implements BalanceMap {
     @Override
     public int size(){
         return entries.size();
+    }
+
+    @Override
+    public void clear(){
+        entries.clear();
     }
 
     @Override
@@ -177,8 +183,7 @@ public class SortedBalanceMap implements BalanceMap {
         return ListUtils.convertToList(entries, BalEntry::getValue);
     }
 
-    List<BalEntry> getEntries(){
+    List<BalEntry> getEntries() {
         return new ArrayList<>(entries);
     }
-
 }

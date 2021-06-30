@@ -3,10 +3,10 @@ package net.forthecrown.core.admin.record;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.serializer.JsonSerializable;
+import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.utils.CrownUtils;
-import net.forthecrown.core.utils.JsonUtils;
+import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -42,7 +42,7 @@ public class PunishmentRecord implements JsonSerializable, ComponentLike {
     public PunishmentRecord(JsonElement element){
         JsonObject json = element.getAsJsonObject();
 
-        type = JsonUtils.parseEnum(PunishmentType.class, json.get("type"));
+        type = JsonUtils.readEnum(PunishmentType.class, json.get("type"));
         punisher = json.get("punisher").getAsString();
         date = json.get("date").getAsLong();
 

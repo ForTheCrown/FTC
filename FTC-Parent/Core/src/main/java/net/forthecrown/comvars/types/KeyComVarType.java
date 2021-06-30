@@ -1,4 +1,4 @@
-package net.forthecrown.core.comvars.types;
+package net.forthecrown.comvars.types;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;

@@ -2,9 +2,9 @@ package net.forthecrown.commands.arguments;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.core.utils.ListUtils;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.selectors.EntitySelector;
 import org.bukkit.entity.Player;

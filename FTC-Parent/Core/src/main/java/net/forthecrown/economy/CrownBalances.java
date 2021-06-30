@@ -1,8 +1,8 @@
-package net.forthecrown.core.economy;
+package net.forthecrown.economy;
 
-import net.forthecrown.core.Announcer;
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.serializer.AbstractSerializer;
+import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.kyori.adventure.text.Component;
@@ -11,12 +11,12 @@ import org.bukkit.Bukkit;
 import java.util.*;
 import java.util.logging.Level;
 
-public class CrownBalances extends AbstractSerializer<CrownCore> implements Balances {
+public class CrownBalances extends AbstractYamlSerializer implements Balances {
 
-    private SortedBalanceMap balanceMap = new SortedBalanceMap(CrownCore.getStartRhines()); //this is how all the balances are stored, in a private Map
+    private SortedBalanceMap balanceMap = new SortedBalanceMap(CrownCore::getStartRhines); //this is how all the balances are stored, in a private Map
 
     public CrownBalances() {
-        super("balance", CrownCore.inst());
+        super("balance");
 
         reload();
         CrownCore.logger().info("Balances loaded");
@@ -24,15 +24,22 @@ public class CrownBalances extends AbstractSerializer<CrownCore> implements Bala
 
     @Override
     public synchronized void saveFile(){
-        for (BalanceMap.BalEntry e: balanceMap.getEntries()){
-            if(e.getValue() == 100) continue;
+        Set<UUID> alreadySerialized = new HashSet<>();
+        int defAmount = CrownCore.getStartRhines();
 
+        for (BalanceMap.BalEntry e: balanceMap.getEntries()){
+            if(alreadySerialized.contains(e.getUniqueId())) continue;
+            if(e.getValue() == defAmount) continue;
+
+            alreadySerialized.add(e.getUniqueId());
             getFile().set(e.getUniqueId().toString(), e.getValue());
         }
     }
 
     @Override
     public synchronized void reloadFile(){
+        balanceMap.clear();
+
         for(String string : getFile().getKeys(true)){
             UUID id;
             try {

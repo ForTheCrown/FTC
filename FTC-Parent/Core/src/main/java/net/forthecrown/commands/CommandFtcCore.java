@@ -10,9 +10,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.adventure.PaperAdventure;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import net.forthecrown.core.Announcer;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.PetType;
 import net.forthecrown.commands.arguments.UserParseResult;
 import net.forthecrown.commands.arguments.UserType;
@@ -20,30 +17,31 @@ import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
-import net.forthecrown.core.datafixers.ShopTagUpdater;
-import net.forthecrown.core.datafixers.UserAndBalanceUpdater;
-import net.forthecrown.core.economy.BalanceMap;
-import net.forthecrown.core.economy.Balances;
-import net.forthecrown.core.economy.SortedBalanceMap;
+import net.forthecrown.core.chat.Announcer;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.Permissions;
+import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.inventory.CrownWeapons;
-import net.forthecrown.core.user.*;
-import net.forthecrown.core.user.data.UserTeleport;
-import net.forthecrown.core.user.enums.Branch;
-import net.forthecrown.core.user.enums.Pet;
-import net.forthecrown.core.user.enums.Rank;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.utils.CrownUtils;
-import net.forthecrown.core.utils.ListUtils;
+import net.forthecrown.economy.BalanceMap;
+import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.SortedBalanceMap;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.ComponentArgument;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.ParticleArgument;
+import net.forthecrown.pirates.Pirates;
+import net.forthecrown.user.*;
+import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.enums.Branch;
+import net.forthecrown.user.enums.Pet;
+import net.forthecrown.user.enums.Rank;
+import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.server.v1_16_R3.ChatComponentText;
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
+import net.minecraft.network.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -56,7 +54,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.io.IOException;
 import java.util.List;
 
 public class CommandFtcCore extends FtcCommand {
@@ -559,7 +556,7 @@ public class CommandFtcCore extends FtcCommand {
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
 
-                                                    IChatBaseComponent component = new ChatComponentText(user.getName() + "'s pets: " +
+                                                    net.minecraft.network.chat.Component component = new TextComponent(user.getName() + "'s pets: " +
                                                             ListUtils.join(user.getPets(), pet -> pet.toString().toLowerCase())
                                                     );
 
@@ -714,36 +711,6 @@ public class CommandFtcCore extends FtcCommand {
                         )
                 )
 
-                .then(literal("datafix")
-                        .then(literal("shops")
-                                .executes(c -> {
-                                    FtcCommand.broadcastAdmin(c.getSource(), "Running DataFixer");
-                                    try {
-                                        new ShopTagUpdater(CrownCore.inst()).begin().complete();
-                                    } catch (IOException e){
-                                        e.printStackTrace();
-                                    }
-
-                                    broadcastAdmin(c.getSource(), "Datafixer complete");
-                                    return 0;
-                                })
-                        )
-                        .then(literal("users")
-                                .executes(c -> {
-                                    FtcCommand.broadcastAdmin(c.getSource(), "Running data fixer");
-
-                                    try {
-                                        new UserAndBalanceUpdater(CrownCore.inst()).begin().complete();
-                                    } catch (Exception e){
-                                        e.printStackTrace();
-                                    }
-
-                                    broadcastAdmin(c.getSource(), "Datafixer complete");
-                                    return 0;
-                                })
-                        )
-                )
-
                 .then(literal("item")
                         .then(literal("crown")
                                 .then(argument("level", IntegerArgumentType.integer(1, 6))
@@ -767,9 +734,9 @@ public class CommandFtcCore extends FtcCommand {
                                 )
                                 .executes(c -> giveCoins(getPlayerSender(c), 100))
                         )
-                        .then(weaponArg("royalsword", CrownItems.BASE_ROYAL_SWORD))
-                        .then(weaponArg("cutlass", CrownItems.BASE_CUTLASS))
-                        .then(weaponArg("viking_axe", CrownItems.BASE_VIKING_AXE))
+                        .then(weaponArg("royalsword", CrownItems.royalSword()))
+                        .then(weaponArg("cutlass", CrownItems.cutlass()))
+                        .then(weaponArg("viking_axe", CrownItems.vikingAxe()))
 
                         .then(literal("voteticket").executes(c -> giveTicket(false, getPlayerSender(c))))
                         .then(literal("eliteticket").executes(c -> giveTicket(true, getPlayerSender(c))))
@@ -820,8 +787,8 @@ public class CommandFtcCore extends FtcCommand {
 
     private int giveTicket(boolean elite, Player player){
         try {
-            if(elite) player.getInventory().addItem(CrownItems.ELITE_VOTE_TICKET);
-            else player.getInventory().addItem(CrownItems.VOTE_TICKET);
+            if(elite) player.getInventory().addItem(CrownItems.eliteVoteTicket());
+            else player.getInventory().addItem(CrownItems.voteTicket());
         } catch (Exception e){
             player.sendMessage("Inventory full");
             return 0;
@@ -872,6 +839,18 @@ public class CommandFtcCore extends FtcCommand {
     }
 
     private enum SaveReloadPart {
+        GRAPPLING_HOOK ("Grappling Hook", b -> {
+            if(b) Pirates.getParkour().getData().reload();
+            else Pirates.getParkour().getData().save();
+        }),
+        PARROT_TRACKER ("Parrot Tracker", b -> {
+            if(b) Pirates.getParrotTracker().reload();
+            else Pirates.getParrotTracker().save();
+        }),
+        TREASURE_SHULKER ("Treasure Shulker", b -> {
+            if(b) Pirates.getTreasure().reload();
+            else Pirates.getTreasure().save();
+        }),
         JOIN_INFO ("Join info", b -> {
             if(!b) CrownCore.getJoinInfo().reload();
             else CrownCore.getJoinInfo().save();
@@ -920,8 +899,8 @@ public class CommandFtcCore extends FtcCommand {
             else CrownCore.getShopManager().reload();
         }),
         BLACK_MARKET ("Black Market", b -> {
-            if(b) CrownCore.getBlackMarket().save();
-            else CrownCore.getBlackMarket().reload();
+            if(b) Pirates.getPirateEconomy().save();
+            else Pirates.getPirateEconomy().reload();
         }),
         CONFIG ("Main Config", b -> {
             if(b) CrownCore.inst().saveConfig();

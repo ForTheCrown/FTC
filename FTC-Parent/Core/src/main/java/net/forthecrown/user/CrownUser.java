@@ -1,8 +1,7 @@
 package net.forthecrown.user;
 
-import net.forthecrown.core.CrownCore;
 import net.forthecrown.serializer.CrownSerializer;
-import net.forthecrown.serializer.Deleteable;
+import net.forthecrown.serializer.Deletable;
 import net.forthecrown.user.data.SoldMaterialData;
 import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.user.enums.*;
@@ -11,8 +10,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
-import net.minecraft.server.v1_16_R3.ChatMessageType;
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
+import net.minecraft.network.chat.ChatType;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,11 +26,11 @@ import java.util.function.Supplier;
  * Represents a user's profile, all their ranks, effects and such
  */
 public interface CrownUser extends
-        CrownSerializer<CrownCore>,
+        CrownSerializer,
         CommandSender,
         HoverEventSource<Component>,
         Nameable,
-        Deleteable
+        Deletable
 {
 
     /**
@@ -367,23 +365,23 @@ public interface CrownUser extends
      * Sends the user a chat message
      * @param message The NMS component to send
      */
-    void sendMessage(IChatBaseComponent message);
+    void sendMessage(net.minecraft.network.chat.Component message);
 
     /**
      * No clue, appears to work the same as sendMessage(IChatBaseComponent message);
      * @param id ??????
      * @param message The NMS component to send
      */
-    void sendMessage(UUID id, IChatBaseComponent message);
+    void sendMessage(UUID id, net.minecraft.network.chat.Component message);
 
     /**
      * Sends the user an NMS component message
      * @param message The message to send
      * @param type The type to send, note: SYSTEM and CHAT are the same, GAME_INFO is action bar
      */
-    void sendMessage(IChatBaseComponent message, ChatMessageType type);
+    void sendMessage(net.minecraft.network.chat.Component message, ChatType type);
 
-    void sendMessage(UUID id, IChatBaseComponent message, ChatMessageType type);
+    void sendMessage(UUID id, net.minecraft.network.chat.Component message, ChatType type);
 
     /**
      * Gets if the user is online

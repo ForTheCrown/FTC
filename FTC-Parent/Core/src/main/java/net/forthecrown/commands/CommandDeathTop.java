@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandDeathTop extends FtcCommand {

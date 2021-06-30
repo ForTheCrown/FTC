@@ -1,26 +1,27 @@
 package net.forthecrown.commands.manager;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.*;
 import net.forthecrown.commands.arguments.*;
 import net.forthecrown.commands.clickevent.ClickEventCommand;
 import net.forthecrown.commands.emotes.*;
+import net.forthecrown.commands.help.*;
 import net.forthecrown.commands.marriage.*;
 import net.forthecrown.commands.punishments.*;
-import net.forthecrown.core.user.enums.Branch;
-import net.forthecrown.core.user.enums.Rank;
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.RoyalArguments;
 import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.royalgrenadier.RoyalArgumentsImpl;
-import net.minecraft.server.v1_16_R3.ArgumentMinecraftKeyRegistered;
-import net.minecraft.server.v1_16_R3.ArgumentNBTTag;
-import net.minecraft.server.v1_16_R3.ArgumentScoreholder;
-import net.minecraft.server.v1_16_R3.CommandDispatcher;
+import net.forthecrown.user.enums.Branch;
+import net.forthecrown.user.enums.Rank;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.NbtTagArgument;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.ScoreHolderArgument;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -33,19 +34,19 @@ public final class CoreCommands {
     public static final EnumArgument<Branch> BRANCH = EnumArgument.of(Branch.class);
     public static final EnumArgument<Rank> RANK = EnumArgument.of(Rank.class);
 
-    private static CommandDispatcher dispatcher;
+    private static Commands dispatcher;
 
     private CoreCommands(){}
 
     public static void init(){
-        dispatcher = ((CraftServer) CrownCore.inst().getServer()).getServer().getCommandDispatcher();
+        dispatcher = ((CraftServer) CrownCore.inst().getServer()).getServer().getCommands();
 
-        VanillaArgumentType key = VanillaArgumentType.custom(ArgumentMinecraftKeyRegistered::a);
+        VanillaArgumentType key = VanillaArgumentType.custom(ResourceLocationArgument::id);
 
         //ArgumentType registration
-        RoyalArgumentsImpl.register(NbtType.class, ArgumentNBTTag::a, true);
+        RoyalArgumentsImpl.register(NbtType.class, NbtTagArgument::nbtTag, true);
         RoyalArguments.register(BaltopType.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, BaltopType.MAX)));
-        RoyalArguments.register(UserType.class, VanillaArgumentType.custom(ArgumentScoreholder::b));
+        RoyalArguments.register(UserType.class, VanillaArgumentType.custom(ScoreHolderArgument::scoreHolders));
         RoyalArguments.register(ComVarArgument.class, VanillaArgumentType.WORD);
         RoyalArguments.register(PetType.class, VanillaArgumentType.WORD);
         RoyalArguments.register(ActionArgType.class, key);
@@ -114,6 +115,7 @@ public final class CoreCommands {
         new CommandList();
         new CommandMe();
         new CommandVolleyBall();
+        new CommandParrot();
 
         CommandDumbThing.init();
         CommandToolBlock.init();
@@ -212,7 +214,7 @@ public final class CoreCommands {
      */
     public static void resendCommandPackets(Player p){
         CraftPlayer player = (CraftPlayer) p;
-        getServerCommands().a(player.getHandle());
+        getServerCommands().sendCommands(player.getHandle());
     }
 
     /**
@@ -231,7 +233,7 @@ public final class CoreCommands {
      * <p>The actual dispatcher is in the returned class</p>
      * @return The server's commands class
      */
-    public static CommandDispatcher getServerCommands() {
+    public static Commands getServerCommands() {
         return dispatcher;
     }
 }

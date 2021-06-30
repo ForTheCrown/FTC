@@ -1,2 +1,7 @@
-package net.forthecrown.pirates.grappling;public class GhType {
+package net.forthecrown.pirates.grappling;
+
+public enum GhType {
+    NORMAL,
+    SPECIAL,
+    END;
 }

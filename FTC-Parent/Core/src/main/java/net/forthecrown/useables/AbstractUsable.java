@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables;
+package net.forthecrown.useables;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.serializer.AbstractJsonSerializer;
+import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -15,14 +15,14 @@ import org.bukkit.entity.Player;
 import java.util.*;
 import java.util.function.Consumer;
 
-public abstract class AbstractUsable extends AbstractJsonSerializer<CrownCore> implements Usable {
+public abstract class AbstractUsable extends AbstractJsonSerializer implements Usable {
 
     protected final List<UsageAction> actions = new ArrayList<>();
     protected final Map<Key, UsageCheck> checks = new HashMap<>();
     protected boolean sendFail;
 
     protected AbstractUsable(String fileName, String directory, boolean stopIfFileDoesntExist) {
-        super(fileName, directory, stopIfFileDoesntExist, CrownCore.inst());
+        super(fileName, directory, stopIfFileDoesntExist);
     }
 
     protected void deleteFile(){
@@ -119,12 +119,12 @@ public abstract class AbstractUsable extends AbstractJsonSerializer<CrownCore> i
 
     @Override
     public void addCheck(UsageCheck precondition) {
-        checks.put(precondition.key(), precondition);
+        checks.put(CrownUtils.checkNotBukkit(precondition.key()), precondition);
     }
 
     @Override
     public void removeCheck(Key name) {
-        checks.remove(name);
+        checks.remove(CrownUtils.checkNotBukkit(name));
     }
 
     @Override
@@ -169,6 +169,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer<CrownCore> i
 
     @Override
     public <T extends UsageAction> T getAction(Key key, Class<T> clazz) {
+        key = CrownUtils.checkNotBukkit(key);
         for (UsageAction a: actions){
             if(!a.key().equals(key)) continue;
             if(!clazz.isAssignableFrom(a.getClass())) continue;
@@ -180,6 +181,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer<CrownCore> i
 
     @Override
     public <T extends UsageCheck> T getCheck(Key key, Class<T> clazz) {
+        key = CrownUtils.checkNotBukkit(key);
         if(!checks.containsKey(key)) return null;
 
         UsageCheck c = checks.get(key);

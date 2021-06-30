@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables;
+package net.forthecrown.useables;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.serializer.JsonSerializable;
+import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;

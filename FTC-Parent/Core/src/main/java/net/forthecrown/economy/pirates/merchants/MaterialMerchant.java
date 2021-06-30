@@ -1,30 +1,66 @@
-package net.forthecrown.economy.blackmarket.merchants;
+package net.forthecrown.economy.pirates.merchants;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.inventory.CrownItems;
+import net.forthecrown.events.dynamic.BmSellItemListener;
+import net.forthecrown.pirates.Pirates;
+import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.BlackMarketUtils;
 import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.ItemStackBuilder;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class MaterialMerchant implements BlackMarketMerchant {
+public class MaterialMerchant implements BlackMarketMerchant {
+    public static final Key DROPS_KEY = Squire.createPiratesKey("drops");
+    public static final Key CROPS_KEY = Squire.createPiratesKey("crops");
+    public static final Key MINING_KEY = Squire.createPiratesKey("mining");
 
-    protected final Map<Material, Short> prices = new HashMap<>();
-    protected final Map<Material, Integer> earned = new HashMap<>();
-    protected List<Material> chosenItems = new ArrayList<>();
+    public static final ItemStack DROPS_HEADER = makeHeaderItem(Material.ROTTEN_FLESH, "Drops");
+    public static final ItemStack CROPS_HEADER = makeHeaderItem(Material.OAK_SAPLING, "Crops");
+    public static final ItemStack MINING_HEADER = makeHeaderItem(Material.IRON_PICKAXE, "Mining");
+
+    private final Map<Material, Short> prices = new HashMap<>();
+    private final Map<Material, Integer> earned = new HashMap<>();
+    private List<Material> chosenItems = new ArrayList<>();
+
+    private final String name;
+
+    public MaterialMerchant(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public Inventory createInventory(CrownUser user) {
+        Inventory inv = BlackMarketUtils.getBaseInventory("Black market: " + name, header());
+
+        int i = 11;
+        for (Material stack: chosenItems) {
+            inv.setItem(i, makeSellableItem(stack, user));
+            i++;
+        }
+
+        return inv;
+    }
 
     @Override
     public void load(JsonElement element) {
@@ -37,8 +73,12 @@ public abstract class MaterialMerchant implements BlackMarketMerchant {
         }
 
         chosenItems.clear();
-        for (JsonElement e: json.getAsJsonArray("chosen")){
-            chosenItems.add(Material.valueOf(e.getAsString().toUpperCase()));
+        for (Map.Entry<String, JsonElement> e: json.getAsJsonObject("chosen").entrySet()){
+            Material mat = Material.valueOf(e.getKey().toUpperCase());
+            chosenItems.add(mat);
+
+            int earned = e.getValue().getAsInt();
+            if(earned > 0) this.earned.put(mat, earned);
         }
     }
 
@@ -56,8 +96,8 @@ public abstract class MaterialMerchant implements BlackMarketMerchant {
         prices.forEach((m, p) -> priceJson.add(m.name().toLowerCase(), new JsonPrimitive(p)));
         json.add("prices", priceJson);
 
-        JsonArray array = new JsonArray();
-        chosenItems.forEach(m -> array.add(m.name().toLowerCase()));
+        JsonObject array = new JsonObject();
+        chosenItems.forEach(m -> array.addProperty(m.name().toLowerCase(), earned.containsKey(m) ? 0 : earned.get(m)));
         json.add("chosen", array);
 
         return json;
@@ -80,7 +120,7 @@ public abstract class MaterialMerchant implements BlackMarketMerchant {
     }
 
     public boolean isSoldOut(Material material){
-        return getEarned(material) >= CrownCore.getPirateEconomy().getMaxEarnings();
+        return getEarned(material) >= Pirates.getPirateEconomy().getMaxEarnings();
     }
 
     protected ItemStack makeSellableItem(Material material, CrownUser user){
@@ -98,5 +138,36 @@ public abstract class MaterialMerchant implements BlackMarketMerchant {
         }
 
         return item;
+    }
+
+    protected ItemStack header(){
+        return switch (name){
+            case "Drops" -> DROPS_HEADER;
+            case "Crops" -> CROPS_HEADER;
+            default -> MINING_HEADER;
+        };
+    }
+
+    private static ItemStack makeHeaderItem(Material material, String name){
+        return new ItemStackBuilder(material)
+                .setName(Component.text(name).style(Style.style(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false)))
+                .build();
+    }
+
+    @Override
+    public void onUse(CrownUser user, Entity entity) {
+        BmSellItemListener listener = new BmSellItemListener(user.getPlayer(), this);
+        Bukkit.getPluginManager().registerEvents(listener, CrownCore.inst());
+
+        user.getPlayer().openInventory(createInventory(user));
+    }
+
+    @Override
+    public @NotNull Key key() {
+        return switch (name){
+            case "Drops" -> DROPS_KEY;
+            case "Crops" -> CROPS_KEY;
+            default -> MINING_KEY;
+        };
     }
 }

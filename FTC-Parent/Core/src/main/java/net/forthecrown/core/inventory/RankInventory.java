@@ -1,9 +1,9 @@
 package net.forthecrown.core.inventory;
 
-import net.forthecrown.core.user.enums.Branch;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.enums.Rank;
 import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.enums.Branch;
+import net.forthecrown.user.enums.Rank;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -21,13 +21,11 @@ public class RankInventory {
     }
 
     public Inventory getUsersRankGUI(){
-        switch (user.getBranch()){
-            case PIRATES: return getPiratesGUI();
-            case VIKINGS: return getVikingsGUI();
-            case ROYALS:
-            case DEFAULT: return getRoyalsGUI();
-            default: throw new IllegalStateException("Unexpected value: " + user.getRank().getRankBranch());
-        }
+        return switch (user.getBranch()) {
+            case PIRATES -> getPiratesGUI();
+            case VIKINGS -> getVikingsGUI();
+            case ROYALS, DEFAULT -> getRoyalsGUI();
+        };
     }
 
     public Inventory getRoyalsGUI(){

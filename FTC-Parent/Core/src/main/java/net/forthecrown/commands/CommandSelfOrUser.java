@@ -1,18 +1,17 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.utils.CrownUtils;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.event.inventory.InventoryType;
@@ -29,8 +28,6 @@ public class CommandSelfOrUser extends FtcCommand {
         this.permission = perm;
         this.aliases = aliases;
         this.function = function;
-
-        EntityPlayer player;
 
         register();
     }
@@ -75,7 +72,7 @@ public class CommandSelfOrUser extends FtcCommand {
                 Permissions.HEAL,
                 (user, source, self) -> {
                     user.getPlayer().setHealth(user.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-                    user.getPlayer().getActivePotionEffects().clear();
+                    CrownUtils.clearEffects(user.getPlayer());
 
                     source.sendAdmin(Component.text("Healing ")
                             .color(NamedTextColor.YELLOW)

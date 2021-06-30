@@ -6,8 +6,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
 
 /**
  * Utility functions relating to Components, mostly string converters lol
@@ -29,16 +28,16 @@ public final class ChatUtils {
         return convertString(text, true);
     }
 
-    public static IChatBaseComponent stringToVanilla(String text, boolean translateColors){
-        return IChatBaseComponent.ChatSerializer.a(GsonComponentSerializer.gson().serialize(convertString(text, translateColors)));
+    public static net.minecraft.network.chat.Component stringToVanilla(String text, boolean translateColors){
+        return net.minecraft.network.chat.Component.Serializer.fromJson(GsonComponentSerializer.gson().serialize(convertString(text, translateColors)));
     }
 
-    public static IChatBaseComponent stringToVanilla(String text){
+    public static net.minecraft.network.chat.Component stringToVanilla(String text){
         return stringToVanilla(text, true);
     }
 
-    public static IChatBaseComponent adventureToVanilla(Component text){
-        return IChatBaseComponent.ChatSerializer.a(GsonComponentSerializer.gson().serialize(text));
+    public static net.minecraft.network.chat.Component adventureToVanilla(Component text){
+        return net.minecraft.network.chat.Component.Serializer.fromJson(GsonComponentSerializer.gson().serialize(text));
     }
 
     public static String getString(Component tex){
@@ -49,15 +48,15 @@ public final class ChatUtils {
         return PLAIN_SERIALIZER.serialize(text);
     }
 
-    public static String getString(IChatBaseComponent component){
+    public static String getString(net.minecraft.network.chat.Component component){
         return CraftChatMessage.fromComponent(component);
     }
 
-    public static IChatBaseComponent fromJson(String json){
-        return IChatBaseComponent.ChatSerializer.a(json);
+    public static net.minecraft.network.chat.Component fromJson(String json){
+        return net.minecraft.network.chat.Component.Serializer.fromJson(json);
     }
 
-    public static Component vanillaToAdventure(IChatBaseComponent component){
-        return GsonComponentSerializer.gson().deserialize(IChatBaseComponent.ChatSerializer.a(component));
+    public static Component vanillaToAdventure(net.minecraft.network.chat.Component component){
+        return GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(component));
     }
 }

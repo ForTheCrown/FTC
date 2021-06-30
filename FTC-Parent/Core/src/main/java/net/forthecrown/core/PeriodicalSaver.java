@@ -1,19 +1,19 @@
 package net.forthecrown.core;
 
-import net.forthecrown.core.comvars.ComVar;
-import net.forthecrown.core.comvars.ComVars;
-import net.forthecrown.core.comvars.types.ComVarType;
+import net.forthecrown.comvars.ComVar;
+import net.forthecrown.comvars.ComVarRegistry;
+import net.forthecrown.comvars.types.ComVarType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Class which saves the FTC-Core in the interval given in the core_autoSaveIntervalMins comvar
  */
-public class PeriodicalSaver extends BukkitRunnable {
+public final class PeriodicalSaver extends BukkitRunnable {
     private final CrownCore core;
     private static final ComVar<Long> interval;
 
     static {
-        interval = ComVars.set("core_autoSaveIntervalMins", ComVarType.LONG, CrownCore.inst().getConfig().getLong("System.save-interval-mins"));
+        interval = ComVarRegistry.set("core_autoSaveIntervalMins", ComVarType.LONG, CrownCore.inst().getConfig().getLong("System.save-interval-mins"));
     }
 
     PeriodicalSaver(CrownCore core){

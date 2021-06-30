@@ -5,8 +5,8 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserHomes;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserHomes;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -37,6 +37,8 @@ public class CommandSetHome extends FtcCommand {
                     if(!user.hasPermission(Permissions.WORLD_BYPASS)){
                         if(CommandTpask.isNonAcceptedWorld(loc.getWorld())) throw FtcExceptionProvider.cannotSetHomeHere();
                     }
+
+                    user.getPlayer().setBedSpawnLocation(loc);
 
                     homes.set(name, loc);
                     user.sendMessage(Component.translatable("homes.setDefault").color(NamedTextColor.YELLOW));

@@ -1,12 +1,12 @@
-package net.forthecrown.core.useables.warps;
+package net.forthecrown.useables.warps;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.useables.CheckableBase;
-import net.forthecrown.core.useables.UsageCheck;
+import net.forthecrown.useables.CheckableBase;
+import net.forthecrown.useables.UsageCheck;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
@@ -31,7 +31,7 @@ public class FtcWarp extends CheckableBase implements Warp {
         JsonObject json = element.getAsJsonObject();
 
         this.key = CrownUtils.parseKey(json.get("key").getAsString());
-        this.location = JsonUtils.deserializeLocation(json.getAsJsonObject("location"));
+        this.location = JsonUtils.readLocation(json.getAsJsonObject("location"));
         reloadChecksFrom(json);
     }
 
@@ -90,7 +90,7 @@ public class FtcWarp extends CheckableBase implements Warp {
         JsonObject result = new JsonObject();
 
         result.add("key", new JsonPrimitive(key.asString()));
-        result.add("location", JsonUtils.serializeLocation(location));
+        result.add("location", JsonUtils.writeLocation(location));
 
         saveChecksInto(result);
         return result;

@@ -3,7 +3,7 @@ package net.forthecrown.user.enums;
 import com.google.gson.JsonElement;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.JsonUtils;
-import net.forthecrown.core.economy.SellShop;
+import net.forthecrown.economy.SellShop;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -52,6 +52,6 @@ public enum SellAmount implements JsonSerializable {
 
     @Override
     public JsonElement serialize() {
-        return JsonUtils.serializeEnum(this);
+        return JsonUtils.writeEnum(this);
     }
 }

@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables.preconditions;
+package net.forthecrown.useables.preconditions;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
@@ -9,14 +9,14 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.core.useables.UsageCheck;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.useables.UsageCheck;
 import net.forthecrown.utils.InterUtils;
 import net.forthecrown.utils.JsonUtils;
-import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.server.v1_16_R3.MojangsonParser;
+import net.minecraft.nbt.TagParser;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -35,7 +35,7 @@ public class CheckHasItem implements UsageCheck {
     @Override
     public void parse(JsonElement json) throws CommandSyntaxException {
         try {
-            item = NbtHandler.itemFromNBT(NBT.of(MojangsonParser.parse(json.getAsString())));
+            item = NbtHandler.itemFromNBT(NBT.of(TagParser.parseTag(json.getAsString())));
         } catch (RuntimeException e) {
             item = null;
             e.printStackTrace();
@@ -64,7 +64,7 @@ public class CheckHasItem implements UsageCheck {
 
     @Override
     public JsonElement serialize() {
-        return JsonUtils.serializeItem(item);
+        return JsonUtils.writeItem(item);
     }
 
     @Override

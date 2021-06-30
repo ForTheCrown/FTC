@@ -6,8 +6,8 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.ComVarArgument;
-import net.forthecrown.core.comvars.ComVar;
-import net.forthecrown.core.comvars.ComVars;
+import net.forthecrown.comvars.ComVar;
+import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandComVar extends FtcCommand {
@@ -57,7 +57,7 @@ public class CommandComVar extends FtcCommand {
                             ComVar<?> var = c.getArgument("var", ComVar.class);
                             String toParse = c.getArgument("value", String.class);
 
-                            ComVars.parseVar(var.getName(), toParse);
+                            ComVarRegistry.parseVar(var.getName(), toParse);
                             broadcastAdmin(c.getSource(), "Set " + var.getName() + " to " + var.toString());
                             return 0;
                         })

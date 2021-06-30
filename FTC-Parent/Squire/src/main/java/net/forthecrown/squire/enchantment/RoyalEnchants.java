@@ -1,7 +1,7 @@
 package net.forthecrown.squire.enchantment;
 
 import net.forthecrown.squire.Squire;
-import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.core.Registry;
 import org.bukkit.enchantments.Enchantment;
 
 import java.lang.reflect.Field;
@@ -29,7 +29,7 @@ public class RoyalEnchants {
     }
 
     public <T extends RoyalEnchant> T register(final T enchant){
-        IRegistry.a(IRegistry.ENCHANTMENT, enchant.getKey().asString(), enchant.getHandle());
+        Registry.register(Registry.ENCHANTMENT, enchant.getKey().asString(), enchant.getHandle());
         org.bukkit.enchantments.Enchantment.registerEnchantment(enchant);
 
         Squire.inst().getLogger().info("Registered enchantment: " + enchant.getKey().asString());

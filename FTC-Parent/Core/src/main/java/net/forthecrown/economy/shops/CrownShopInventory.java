@@ -1,6 +1,6 @@
-package net.forthecrown.core.economy.shops;
+package net.forthecrown.economy.shops;
 
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryCustom;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 

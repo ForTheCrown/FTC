@@ -5,7 +5,9 @@ import net.forthecrown.core.CrownException;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.Balances;
-import net.forthecrown.serializer.AbstractSerializer;
+import net.forthecrown.pirates.AuctionManager;
+import net.forthecrown.pirates.Pirates;
+import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.MapUtils;
@@ -28,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class PirateAuction extends AbstractSerializer implements Auction {
+public class CrownAuction extends AbstractYamlSerializer implements Auction {
 
     private String name;
     private final Sign sign;
@@ -49,7 +51,7 @@ public class PirateAuction extends AbstractSerializer implements Auction {
     private boolean canBeClaimedByAnyone = false;
 
     //gets
-    public PirateAuction(Location location) {
+    public CrownAuction(Location location) {
         super("auction_" + location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "auctions", true);
 
         if (fileDoesntExist) throw new NullPointerException(getFile().getName() + " doesn't exist, throwing exception");
@@ -58,19 +60,19 @@ public class PirateAuction extends AbstractSerializer implements Auction {
         this.location = location;
 
         reload();
-        AuctionManager.AUCTIONS.put(name, this);
+        Pirates.getAuctions().addAuction(this);
     }
 
 
     //creates
-    public PirateAuction(Location location, String name){
+    public CrownAuction(Location location, String name){
         super("auction_" + location.getWorld().getName() + "_" + location.getBlockX() + "_" + location.getBlockY() + "_" + location.getBlockZ(), "auctions", false);
 
         this.name = name;
         this.location = location;
         this.sign = (Sign) location.getBlock().getState();
 
-        AuctionManager.AUCTIONS.put(name, this);
+        Pirates.getAuctions().addAuction(this);
 
         getFile().set("Name", name);
         super.save(false);
@@ -160,7 +162,7 @@ public class PirateAuction extends AbstractSerializer implements Auction {
             giveBalancesToLosers(true);
         }
 
-        Pirates.getAuctionManager().removeAuction(this);
+        Pirates.getAuctions().removeAuction(this);
     }
 
     @Override
@@ -207,7 +209,7 @@ public class PirateAuction extends AbstractSerializer implements Auction {
         this.adminAuction = admin;
         this.bids = new HashMap<>();
 
-        expiresAt = System.currentTimeMillis() + Pirates.getAuctionExpirationTime();
+        expiresAt = System.currentTimeMillis() + CrownCore.getAuctionExpirationTime();
 
         Component itemName = ChatUtils.convertString(ChatFormatter.getItemNormalName(item));
         if(item.getItemMeta().hasDisplayName()) itemName = item.getItemMeta().displayName();
@@ -227,7 +229,7 @@ public class PirateAuction extends AbstractSerializer implements Auction {
                             .color(NamedTextColor.YELLOW)
                             .append(Component.text("Auction winner: " + getHighestBidder().getName())
                                     .color(NamedTextColor.GRAY)
-                                    .hoverEvent(highestBidder.asHoverEvent())
+                                    .hoverEvent(getHighestBidder().asHoverEvent())
                             )
                             .append(Component.newline())
                             .append(willBeMadeAvailableInMessage())
@@ -240,8 +242,8 @@ public class PirateAuction extends AbstractSerializer implements Auction {
         Balances bals = CrownCore.getBalances();
 
         if(!highestBidder.equals(owner)){
-            bals.add(owner.getUniqueId(), getHighestBid(), false);
-            owner.sendMessage("&6$ &7You've received &e" + Balances.getFormatted(highestBid) + " &7from &e" + getName() + "&7 by &e" + user.getName());
+            bals.add(owner, getHighestBid(), false);
+            getOwner().sendMessage("&6$ &7You've received &e" + Balances.getFormatted(highestBid) + " &7from &e" + getName() + "&7 by &e" + user.getName());
         }
 
         user.getPlayer().getInventory().addItem(getItem());
@@ -302,12 +304,12 @@ public class PirateAuction extends AbstractSerializer implements Auction {
 
     @Override
     public CrownUser getHighestBidder() {
-        return highestBidder;
+        return UserManager.getUser(highestBidder);
     }
 
     @Override
     public void setHighestBidder(CrownUser highestBidder) {
-        this.highestBidder = highestBidder;
+        this.highestBidder = highestBidder.getUniqueId();
     }
 
     @Override
@@ -325,12 +327,12 @@ public class PirateAuction extends AbstractSerializer implements Auction {
 
     @Override
     public CrownUser getOwner() {
-        return owner;
+        return UserManager.getUser(owner);
     }
 
     @Override
     public void setOwner(CrownUser owner) {
-        this.owner = owner;
+        this.owner = owner.getUniqueId();
     }
 
     @Override
@@ -371,7 +373,7 @@ public class PirateAuction extends AbstractSerializer implements Auction {
             setWaitingForItemClaim(true);
             getSign().line(0, AuctionManager.WAITING_FOR_ITEM_CLAIM_LABEL);
             updateSign();
-            freeForAll = System.currentTimeMillis() + Pirates.getAuctionPickUpTime();
+            freeForAll = System.currentTimeMillis() + CrownCore.getAuctionPickupTime();
             giveBalancesToLosers(false);
             return false;
         }

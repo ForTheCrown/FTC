@@ -2,7 +2,7 @@ package net.forthecrown.commands.manager;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandExceptionType;
-import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.Component;
 

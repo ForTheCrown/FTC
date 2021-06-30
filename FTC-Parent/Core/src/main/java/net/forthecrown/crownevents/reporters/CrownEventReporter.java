@@ -1,6 +1,6 @@
-package net.forthecrown.core.crownevents.reporters;
+package net.forthecrown.crownevents.reporters;
 
-import net.forthecrown.core.crownevents.CrownEvent;
+import net.forthecrown.crownevents.CrownEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.io.*;

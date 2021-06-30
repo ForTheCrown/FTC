@@ -9,13 +9,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
 
 public interface WeightedLootTable extends CrownLootTable {
-    @Override
-    @NotNull Collection<ItemStack> populateLoot(@NotNull Random random, @NotNull LootContext context);
 
     @Override
     void fillInventory(@NotNull Inventory inventory, @NotNull Random random, @NotNull LootContext context);
@@ -24,6 +21,7 @@ public interface WeightedLootTable extends CrownLootTable {
     @NotNull NamespacedKey getKey();
 
     int getTotalWeight();
+    int getMaxItemsToGive();
 
     Map<ItemStack, Integer> getItems();
 
@@ -34,8 +32,8 @@ public interface WeightedLootTable extends CrownLootTable {
     @Override
     JsonObject serialize();
 
-    static WeightedLootTable of(Key key, Map<ItemStack, Integer> items){
-        return new CrownWeightedLootTable(new NamespacedKey(key.namespace(), key.value()), items);
+    static WeightedLootTable of(Key key, Map<ItemStack, Integer> items, int maxItems){
+        return new CrownWeightedLootTable(new NamespacedKey(key.namespace(), key.value()), items, maxItems);
     }
 
     static WeightedLootTable deserialize(JsonElement json){

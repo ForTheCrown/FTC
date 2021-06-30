@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables.actions;
+package net.forthecrown.useables.actions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -6,9 +6,9 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.useables.UsageAction;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
+import net.forthecrown.useables.UsageAction;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import org.apache.commons.lang.builder.EqualsBuilder;

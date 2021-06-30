@@ -1,4 +1,4 @@
-package net.forthecrown.core.useables.preconditions;
+package net.forthecrown.useables.preconditions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -6,9 +6,10 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.economy.Balances;
-import net.forthecrown.core.useables.UsageCheck;
-import net.forthecrown.core.user.UserManager;
+import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.economy.Balances;
+import net.forthecrown.useables.UsageCheck;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -58,13 +59,13 @@ public class CheckNumber implements UsageCheck {
     public Component failMessage() {
         return Component.text("You need at least ")
                 .color(NamedTextColor.GRAY)
-                .append((checkBal ? Balances.formatted(amount) : Component.text(amount + " Gem" + (amount == 1 ? "" : "s"))).color(NamedTextColor.GOLD))
+                .append((checkBal ? Balances.formatted(amount) : ChatFormatter.queryGems(amount)).color(NamedTextColor.GOLD))
                 .append(Component.text(" to use this."));
     }
 
     @Override
     public boolean test(Player player) {
-        if (checkBal) return CrownCore.getBalances().canAfford(player.getUniqueId(), amount);
+        if(checkBal) return CrownCore.getBalances().canAfford(player.getUniqueId(), amount);
 
         return UserManager.getUser(player).getGems() >= amount;
     }
