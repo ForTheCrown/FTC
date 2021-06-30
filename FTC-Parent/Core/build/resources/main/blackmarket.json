@@ -1,0 +1,241 @@
+{
+    "day": 1,
+    "maxEarnings": 500000,
+    "enchants": {
+        "daily": {
+            "enchantment": "minecraft:sharpness",
+            "level": 7,
+            "price": 200000
+        },
+        "enchants": [
+            {
+                "enchantment": "minecraft:smite",
+                "maxLevel": 7,
+                "pricePerLevel": 7500
+            },
+            {
+                "enchantment": "minecraft:sharpness",
+                "maxLevel": 7,
+                "pricePerLevel": 20000
+            },
+            {
+                "enchantment": "minecraft:bane_of_arthropods",
+                "maxLevel": 7,
+                "pricePerLevel": 7500
+            },
+            {
+                "enchantment": "minecraft:imapling",
+                "maxLevel": 7,
+                "pricePerLevel": 12500
+            },
+            {
+                "enchantment": "minecraft:soul_speed",
+                "maxLevel": 5,
+                "pricePerLevel": 17500
+            },
+            {
+                "enchantment": "minecraft:efficiency",
+                "maxLevel": 7,
+                "pricePerLevel": 28000
+            },
+            {
+                "enchantment": "minecraft:thorns",
+                "maxLevel": 7,
+                "pricePerLevel": 25000
+            },
+            {
+                "enchantment": "minecraft:fortune",
+                "maxLevel": 6,
+                "pricePerLevel": 55000
+            },
+            {
+                "enchantment": "minecraft:piercing",
+                "maxLevel": 6,
+                "pricePerLevel": 15000
+            },
+            {
+                "enchantment": "minecraft:fire_protection",
+                "maxLevel": 7,
+                "pricePerLevel": 20000
+            },
+            {
+                "enchantment": "minecraft:smite",
+                "maxLevel": 7,
+                "pricePerLevel": 7500
+            },
+            {
+                "enchantment": "minecraft:unbreaking",
+                "maxLevel": 5,
+                "pricePerLevel": 20000
+            },
+            {
+                "enchantment": "minecraft:feather_falling",
+                "maxLevel": 7,
+                "pricePerLevel": 20000
+            },
+            {
+                "enchantment": "minecraft:respiration",
+                "maxLevel": 5,
+                "pricePerLevel": 20000
+            },
+            {
+                "enchantment": "minecraft:protection",
+                "maxLevel": 6,
+                "pricePerLevel": 30000
+            },
+            {
+                "enchantment": "minecraft:knockback",
+                "maxLevel": 5,
+                "pricePerLevel": 35000
+            },
+            {
+                "enchantment": "minecraft:projectile_protection",
+                "maxLevel": 5,
+                "pricePerLevel": 20000
+            },
+            {
+                "enchantment": "minecraft:fire_aspect",
+                "maxLevel": 5,
+                "pricePerLevel": 50000
+            },
+            {
+                "enchantment": "minecraft:punch",
+                "maxLevel": 6,
+                "pricePerLevel": 17500
+            },
+            {
+                "enchantment": "minecraft:frost_walker",
+                "maxLevel": 6,
+                "pricePerLevel": 25000
+            },
+            {
+                "enchantment": "minecraft:power",
+                "maxLevel": 6,
+                "pricePerLevel": 70000
+            },
+            {
+                "enchantment": "minecraft:blast_protection",
+                "maxLevel": 6,
+                "pricePerLevel": 20000
+            },
+            {
+                "enchantment": "minecraft:sweeping",
+                "maxLevel": 7,
+                "pricePerLevel": 25000
+            }
+        ]
+    },
+    "mining": {
+        "chosen": {},
+        "prices": {
+            "diamond": 450,
+            "redstone": 15,
+            "cobblestone": 3,
+            "coal": 15,
+            "redstone_ore": 10,
+            "gold_ingot": 8,
+            "gravel": 3,
+            "basalt": 5,
+            "lantern": 7,
+            "netherite_scrap": 1000,
+            "torch": 5,
+            "coal_ore": 10,
+            "quartz": 10,
+            "emerald": 25,
+            "granite": 5,
+            "sand": 3,
+            "lapis_lazuli": 15,
+            "blackstone": 3,
+            "dirt": 3,
+            "diorite": 5,
+            "iron_ore": 10,
+            "netherrack": 2,
+            "iron_ingot": 6,
+            "flint": 10,
+            "andesite": 5,
+            "stone": 3
+        }
+    },
+    "crops": {
+        "chosen": {},
+        "prices": {
+          "VINE": 10,
+          "OAK_SAPLING": 4,
+          "APPLE": 10,
+          "CARROT": 5,
+          "MELON": 5,
+          "CRIMSON_FUNGUS": 4,
+          "WHEAT_SEEDS": 4,
+          "WITHER_ROSE": 3,
+          "DARK_OAK_SAPLING": 5,
+          "ACACIA_SAPLING": 4,
+          "BIRCH_SAPLING": 4,
+          "JUNGLE_SAPLING": 4,
+          "POTATO": 5,
+          "BAMBOO": 3,
+          "CACTUS": 4,
+          "CRIMSON_ROOTS": 4,
+          "SUGAR_CANE": 3,
+          "PUMPKIN": 3,
+          "WHEAT": 11,
+          "WARPED_ROOTS": 4,
+          "WARPED_FUNGUS": 4,
+          "BEETROOT_SEEDS": 5,
+          "BEETROOT": 7,
+          "SWEET_BERRIES": 8,
+          "CHORUS_FRUIT": 10,
+          "KELP": 3,
+          "SPRUCE_SAPLING": 3
+      }
+    },
+    "drops": {
+        "chosen": {},
+        "prices": {
+          "ROTTEN_FLESH": 3,
+          "PORKCHOP": 8,
+          "MAGMA_CREAM": 5,
+          "SPIDER_EYE": 6,
+          "FEATHER": 5,
+          "GUNPOWDER": 6,
+          "ARROW": 6,
+          "BLAZE_ROD": 6,
+          "CHICKEN": 5,
+          "SLIME_BALL": 5,
+          "COD": 3,
+          "STRING": 3,
+          "RABBIT": 15,
+          "LEATHER": 11,
+          "BONE": 6,
+          "MUTTON": 8
+      }
+    },
+    "heads": {
+        "ppReward": 2,
+        "moneyReward": 10000,
+        "chests": [
+            {
+                "x": -674,
+                "y": 59,
+                "z": 3853
+            },
+            {
+                "x": -674,
+                "y": 59,
+                "z": 3854
+            },
+            {
+                "x": -674,
+                "y": 59,
+                "z": 3855
+            },
+            {
+                "x": -674,
+                "y": 59,
+                "z": 3856
+            }
+        ],
+        "alreadyChosen": [],
+        "alreadySold": [],
+        "head": "{Name: \"Guardian\", Properties: {textures: [{Value: \"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTJiYTM0NDE2NjcwNDU0YjFhMjA0OTZmODBiOTM5ODUyOWY0OTAwM2ZjNjEzZWI5MzAyNDhlYTliNWQxYTM5MSJ9fX0=\"}]}, Id: [I; 315814816, -1478801991, -1911738820, -775456178]}"
+    }
+}
