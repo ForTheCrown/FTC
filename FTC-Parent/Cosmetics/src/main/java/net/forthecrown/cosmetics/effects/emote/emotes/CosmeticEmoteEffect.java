@@ -1,16 +1,11 @@
-package net.forthecrown.cosmetics.effects.death.effects;
+package net.forthecrown.cosmetics.effects.emote.emotes;
 
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
 import net.forthecrown.cosmetics.effects.CosmeticEffect;
-import net.forthecrown.cosmetics.effects.death.DeathEvent;
-import org.bukkit.Location;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class CosmeticDeathEffect implements CosmeticEffect {
-
-    public static final Listener listener = new DeathEvent();
+public abstract class CosmeticEmoteEffect implements CosmeticEffect {
 
     @Override
     public abstract String getEffectName();
@@ -18,17 +13,15 @@ public abstract class CosmeticDeathEffect implements CosmeticEffect {
     @Override
     public abstract ItemStack getEffectItem();
 
-    public abstract void activateEffect(Location loc);
-
-    @Override
-    public final boolean isCurrentActiveEffect(CrownUser user) {
-        return user.getDeathParticle() != null && user.getDeathParticle().contains(getEffectName());
-    }
+    public abstract String getPermission();
 
     @Override
     public final boolean isOwnedBy(CrownUser user) {
-        return user.getParticleDeathAvailable().contains(getEffectName());
+        return user.hasPermission(getPermission());
     }
+
+    @Override
+    public final boolean isCurrentActiveEffect(CrownUser user) { return false; }
 
     public ClickableOption getClickableOption(CrownUser user) {
         ClickableOption option = new ClickableOption();
@@ -42,7 +35,6 @@ public abstract class CosmeticDeathEffect implements CosmeticEffect {
         // Item to display
         ItemStack item = getEffectItem();
         if (isOwnedBy(user)) setItemOwned(item);
-        if (isCurrentActiveEffect(user)) addGlow(item);
         option.setItem(item);
 
         return option;

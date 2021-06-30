@@ -2,108 +2,69 @@ package net.forthecrown.cosmetics.effects.arrow;
 
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.cosmetics.Cosmetics;
+import net.forthecrown.cosmetics.custominvs.CustomInv;
+import net.forthecrown.cosmetics.custominvs.CustomInvBuilder;
+import net.forthecrown.cosmetics.custominvs.borders.GenericBorder;
+import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
+import net.forthecrown.cosmetics.custominvs.options.Option;
+import net.forthecrown.cosmetics.effects.CosmeticMenu;
+import net.forthecrown.cosmetics.effects.Vault;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
-public class ArrowParticleMenu implements Listener {
+import java.util.Map;
 
-    private final Inventory inv;
-    private CrownUser user;
+public class ArrowParticleMenu implements CosmeticMenu {
+
+    private final CustomInv inv;
+    private final Map<Integer, Option> arrowEffectSlots;
 
     public ArrowParticleMenu(CrownUser user) {
-        CustomInventory cinv = new CustomInventory(36, "Arrow Effects", false, true);
-        cinv.setHeadItemSlot(0);
-        cinv.setReturnItemSlot(4);
-
-        this.inv = cinv.getInventory();
-        this.user = user;
+        this.arrowEffectSlots = Map.of(
+                10, Vault.flame.getClickableOption(user),
+                11, Vault.snowball.getClickableOption(user),
+                12, Vault.sneeze.getClickableOption(user),
+                13, Vault.heart.getClickableOption(user),
+                14, Vault.damageIndicator.getClickableOption(user),
+                15, Vault.drippingHoney.getClickableOption(user),
+                16, Vault.campfireCozySmoke.getClickableOption(user),
+                19, Vault.arrowSoul.getClickableOption(user),
+                20, Vault.fireworkSpark.getClickableOption(user),
+                31, Vault.arrowNone.getClickableOption(user));
+        this.inv = buildInventory(user);
     }
 
-    public ArrowParticleMenu(){
-        inv = null;
+    private Option getReturnOption() {
+        ClickableOption returnOption = new ClickableOption();
+        returnOption.setCooldown(0);
+        returnOption.setActionOnClick(() -> {
+            // TODO: go back to main cosmetic menu
+        });
+        returnOption.setItem(CrownItems.makeItem(Material.PAPER, 1, true, ChatColor.YELLOW + "< Go Back"));
+        return returnOption;
     }
 
-
-    public Inventory getInv() {
-        return makeInventory();
+    @Override
+    public CustomInv buildInventory(CrownUser user) {
+        CustomInvBuilder invBuilder = new CustomInvBuilder();
+        return invBuilder
+                .setUser(user)
+                .setSize(this.getSize())
+                .setTitle(this.getTitle())
+                .setInvBorder(new GenericBorder())
+                .addOptions(arrowEffectSlots)
+                .addOption(4, getReturnOption())
+                .build();
     }
+    
+    @Override
+    public CustomInv getCustomInv() { return this.inv; }
 
+    @Override
+    public TextComponent getTitle() { return Component.text(" Arrow Effects"); }
 
-    private Inventory makeInventory() {
-        Inventory result = this.inv;
-
-        ItemStack noEffect = CrownItems.makeItem(Material.BARRIER, 1, true, ChatColor.GOLD + "No effect", ChatColor.GRAY + "Click to go back to default arrows", ChatColor.GRAY + "without any effects.");
-
-        ItemStack flame = getEffectItem(Particle.FLAME, "&eFlame", ChatColor.GRAY + "Works perfectly with flame arrows.", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
-        ItemStack snow = getEffectItem(Particle.SNOWBALL, "&eSnowy", ChatColor.GRAY + "To stay in the Christmas spirit!", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
-        ItemStack sneeze = getEffectItem(Particle.SNEEZE, "&eSneeze", ChatColor.GRAY + "Cover the place in that juicy snot.", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
-        ItemStack lovetab = getEffectItem(Particle.HEART, "&eCupid's Arrows", ChatColor.GRAY + "Time to do some matchmaking...", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
-        ItemStack evillove = getEffectItem(Particle.DAMAGE_INDICATOR, "&eCupid's Evil Twin", ChatColor.GRAY + "Time to undo some matchmaking...", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
-        ItemStack honeytrail = getEffectItem(Particle.DRIPPING_HONEY, "&eSticky Trail", ChatColor.GRAY + "For those who enjoy looking at the trail lol", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
-        ItemStack smoke = getEffectItem(Particle.CAMPFIRE_COSY_SMOKE, "&eSmoke", "&7Pretend to be a cannon.", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
-        ItemStack souls = getEffectItem(Particle.SOUL, "&eSouls", "&7Scary souls escaping from your arrow.", "", ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
-        ItemStack firework = getEffectItem(Particle.FIREWORKS_SPARK, "&eFirework", "&7Almost as if you're using a crossbow.", "" , "&7Click to purchase for &61000 &7Gems");
-
-        if(user.getArrowParticle() == null) noEffect.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
-
-        result.setItem(10, flame);
-        result.setItem(11, snow);
-        result.setItem(12, sneeze);
-        result.setItem(13, lovetab);
-        result.setItem(14, evillove);
-        result.setItem(15, honeytrail);
-        result.setItem(16, smoke);
-
-        result.setItem(19, souls);
-        result.setItem(20, firework);
-
-        result.setItem(31, noEffect);
-
-        return result;
-    }
-
-    private ItemStack getEffectItem(Particle effect, String name, String... desc){
-        ItemStack shit = CrownItems.makeItem(Material.GRAY_DYE, 1, true, name, desc);
-        if(user.getArrowParticle() != null && user.getArrowParticle() == effect) shit.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
-        if(user.getParticleArrowAvailable().contains(effect)) shit.setType(Material.ORANGE_DYE);
-        return shit;
-    }
-
-    @EventHandler
-    public void onPlayerShootsBow(EntityShootBowEvent event) {
-        if (event.getEntity().getType() != EntityType.PLAYER) return;
-
-        Player player = (Player) event.getEntity();
-        user = UserManager.getUser(player.getUniqueId());
-        Particle activeArrowParticle = user.getArrowParticle();
-        if(activeArrowParticle == null) return;
-
-        double speed = 0;
-        if (activeArrowParticle == Particle.FIREWORKS_SPARK) speed = 0.1;
-        else if (activeArrowParticle == Particle.CAMPFIRE_COSY_SMOKE) speed = 0.005;
-        else if (activeArrowParticle == Particle.SNOWBALL) speed = 0.1;
-
-        addParticleToArrow(event.getProjectile(), activeArrowParticle, speed);
-    }
-
-    private void addParticleToArrow(Entity projectile, Particle particle, double speed) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Cosmetics.getPlugin(), () -> {
-            projectile.getWorld().spawnParticle(particle, projectile.getLocation(), 1, 0, 0, 0, speed);
-            if (!(projectile.isOnGround() || projectile.isDead())) addParticleToArrow(projectile, particle, speed);
-        }, 1);
-
-    }
+    @Override
+    public int getSize() { return 36; }
 }

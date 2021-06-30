@@ -1,33 +1,37 @@
-package net.forthecrown.cosmetics.effects.death.effects;
+package net.forthecrown.cosmetics.effects.arrow.effects;
 
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
 import net.forthecrown.cosmetics.effects.CosmeticEffect;
-import net.forthecrown.cosmetics.effects.death.DeathEvent;
-import org.bukkit.Location;
+import net.forthecrown.cosmetics.effects.arrow.ArrowEvent;
+import org.bukkit.Particle;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class CosmeticDeathEffect implements CosmeticEffect {
+public abstract class CosmeticArrowEffect implements CosmeticEffect {
 
-    public static final Listener listener = new DeathEvent();
+    public static final Listener listener = new ArrowEvent();
 
     @Override
-    public abstract String getEffectName();
+    public String getEffectName() {
+        return getParticle().name();
+    }
 
     @Override
     public abstract ItemStack getEffectItem();
 
-    public abstract void activateEffect(Location loc);
+    public abstract double getParticleSpeed();
+
+    public abstract Particle getParticle();
 
     @Override
     public final boolean isCurrentActiveEffect(CrownUser user) {
-        return user.getDeathParticle() != null && user.getDeathParticle().contains(getEffectName());
+        return user.getArrowParticle() != null && user.getArrowParticle().name().contains(getEffectName());
     }
 
     @Override
     public final boolean isOwnedBy(CrownUser user) {
-        return user.getParticleDeathAvailable().contains(getEffectName());
+        return user.getParticleArrowAvailable().contains(getEffectName());
     }
 
     public ClickableOption getClickableOption(CrownUser user) {

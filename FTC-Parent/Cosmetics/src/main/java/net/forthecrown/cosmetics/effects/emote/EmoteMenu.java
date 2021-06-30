@@ -2,63 +2,85 @@ package net.forthecrown.cosmetics.effects.emote;
 
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.user.CrownUser;
+import net.forthecrown.cosmetics.custominvs.CustomInv;
+import net.forthecrown.cosmetics.custominvs.CustomInvBuilder;
+import net.forthecrown.cosmetics.custominvs.borders.GenericBorder;
+import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
+import net.forthecrown.cosmetics.custominvs.options.Option;
+import net.forthecrown.cosmetics.effects.CosmeticMenu;
+import net.forthecrown.cosmetics.effects.Vault;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
-public class EmoteMenu {
+import java.util.Map;
 
-    private Inventory inv;
-    private final CrownUser user;
+public class EmoteMenu implements CosmeticMenu {
+
+    private final CustomInv inv;
+    private final Map<Integer, Option> emoteSlots;
 
     public EmoteMenu(CrownUser user) {
-        CustomInventory cinv = new CustomInventory(36, "Emotes", false, true);
-        cinv.setHeadItemSlot(0);
-        cinv.setReturnItemSlot(4);
-
-        this.inv = cinv.getInventory();
-        this.user = user;
+        this.emoteSlots = Map.of(
+                12, Vault.bonk.getClickableOption(user),
+                13, Vault.mwah.getClickableOption(user),
+                14, Vault.poke.getClickableOption(user),
+                21, Vault.scare.getClickableOption(user),
+                22, Vault.jingle.getClickableOption(user),
+                23, Vault.hug.getClickableOption(user));
+        this.inv = buildInventory(user);
     }
 
-
-    public Inventory getInv() {
-        return makeInventory();
+    private Option getReturnOption() {
+        ClickableOption returnOption = new ClickableOption();
+        returnOption.setCooldown(0);
+        returnOption.setActionOnClick(() -> {
+            // TODO: go back to main cosmetic menu
+        });
+        returnOption.setItem(CrownItems.makeItem(Material.PAPER, 1, true, ChatColor.YELLOW + "< Go Back"));
+        return returnOption;
     }
 
-
-    private Inventory makeInventory() {
-        Inventory result = this.inv;
-        boolean noEmoter = !user.allowsEmotes();
-
-        ItemStack noEmote;
-        if (noEmoter) noEmote = CrownItems.makeItem(Material.BARRIER, 1, true, ChatColor.GOLD + "Emotes Disabled", ChatColor.GRAY + "Right-click to enable sending and receiving emotes.");
-        else noEmote = CrownItems.makeItem(Material.STRUCTURE_VOID, 1, true, ChatColor.GOLD + "Emotes Enabled", ChatColor.GRAY + "Right-click to disable sending and receiving emotes.");
-        noEmote.addUnsafeEnchantment(Enchantment.CHANNELING, 0);
-
-        ItemStack bonk = CrownItems.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/bonk", ChatColor.GRAY + "Bonk.");
-        ItemStack mwah = CrownItems.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/mwah", ChatColor.GRAY + "Shower your friends with love.");
-        ItemStack poke = CrownItems.makeItem(Material.ORANGE_DYE, 1, true, ChatColor.YELLOW + "/poke", ChatColor.GRAY + "Poking someone makes them jump back a bit.");
-
-        ItemStack hug = CrownItems.makeItem(Material.GRAY_DYE, 1 , true, ChatColor.YELLOW + "/hug", ChatColor.GRAY + "Hug people :D");
-
-        ItemStack scare = CrownItems.makeItem(Material.GRAY_DYE, 1, true, ChatColor.YELLOW + "/scare", ChatColor.GRAY + "Can be earned around Halloween.");
-        ItemStack jingle = CrownItems.makeItem(Material.GRAY_DYE, 1, true, ChatColor.YELLOW + "/jingle", ChatColor.GRAY + "Can be earned around Christmas.");
-        if (user.getPlayer().hasPermission("ftc.emotes.scare")) scare.setType(Material.ORANGE_DYE);
-        if (user.getPlayer().hasPermission("ftc.emotes.jingle")) jingle.setType(Material.ORANGE_DYE);
-        if (user.hasPermission("ftc.emotes.hug")) hug.setType(Material.ORANGE_DYE);
-
-        result.setItem(12, bonk);
-        result.setItem(13, mwah);
-        result.setItem(14, poke);
-
-        result.setItem(21, scare);
-        result.setItem(22, jingle);
-        result.setItem(23, hug);
-
-        result.setItem(31, noEmote);
-
-        return result;
+    private Option getToggleEmoteOption(CrownUser user) {
+        boolean emoter = user.allowsEmotes();
+        ClickableOption toggleEmoteOption = new ClickableOption();
+        toggleEmoteOption.setCooldown(5);
+        toggleEmoteOption.setActionOnClick(() -> {
+            // TODO: Message? Item toggle?
+            user.setAllowsEmotes(!emoter);
+        });
+        if (emoter) toggleEmoteOption.setItem(CrownItems.makeItem(
+                Material.STRUCTURE_VOID, 1, true,
+                ChatColor.GOLD + "Emotes Enabled",
+                ChatColor.GRAY + "Right-click to disable sending and receiving emotes."));
+        else toggleEmoteOption.setItem(CrownItems.makeItem(
+                Material.BARRIER, 1, true,
+                ChatColor.GOLD + "Emotes Disabled",
+                ChatColor.GRAY + "Right-click to enable sending and receiving emotes."));
+        return toggleEmoteOption;
     }
+
+    @Override
+    public CustomInv buildInventory(CrownUser user) {
+        CustomInvBuilder invBuilder = new CustomInvBuilder();
+        return invBuilder
+                .setUser(user)
+                .setSize(this.getSize())
+                .setTitle(this.getTitle())
+                .setInvBorder(new GenericBorder())
+                .addOptions(emoteSlots)
+                .addOption(4, getReturnOption())
+                .addOption(31, getToggleEmoteOption(user))
+                .build();
+    }
+
+    @Override
+    public CustomInv getCustomInv() { return this.inv; }
+
+    @Override
+    public TextComponent getTitle() { return Component.text("Emotes"); }
+
+    @Override
+    public int getSize() { return 36; }
 }

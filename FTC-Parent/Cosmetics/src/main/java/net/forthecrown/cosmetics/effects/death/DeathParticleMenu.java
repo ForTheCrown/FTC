@@ -23,11 +23,11 @@ public class DeathParticleMenu implements CosmeticMenu {
 
     public DeathParticleMenu(CrownUser user) {
         this.deathEffectSlots = Map.of(
-                10, Vault.soul.getClickableOption(user),
+                10, Vault.deathSoul.getClickableOption(user),
                 11, Vault.totem.getClickableOption(user),
                 12, Vault.explosion.getClickableOption(user),
                 13, Vault.enderRing.getClickableOption(user),
-                31, Vault.none.getClickableOption(user));
+                31, Vault.deathNone.getClickableOption(user));
         this.inv = buildInventory(user);
     }
 

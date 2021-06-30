@@ -3,7 +3,9 @@ package net.forthecrown.cosmetics.effects;
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
+import net.forthecrown.cosmetics.effects.arrow.effects.*;
 import net.forthecrown.cosmetics.effects.death.effects.*;
+import net.forthecrown.cosmetics.effects.emote.emotes.*;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 
@@ -59,16 +61,41 @@ public abstract class Vault {
 
 
     // Death Effects
-    public static final CosmeticDeathEffect soul = new Soul();
-    public static final CosmeticDeathEffect totem = new Totem();
-    public static final CosmeticDeathEffect explosion = new Explosion();
+    public static final CosmeticDeathEffect deathNone = new DeathNone();
+    public static final CosmeticDeathEffect deathSoul = new DeathSoul();
     public static final CosmeticDeathEffect enderRing = new EnderRing();
-    public static final CosmeticDeathEffect none = new None();
+    public static final CosmeticDeathEffect explosion = new Explosion();
+    public static final CosmeticDeathEffect totem = new Totem();
 
-    private static final Set<CosmeticDeathEffect> deathEffects = Set.of(soul, totem, explosion, enderRing, none);
+    private static final Set<CosmeticDeathEffect> deathEffects = Set.of(deathNone, deathSoul, enderRing, explosion, totem);
     public static Collection<CosmeticDeathEffect> getDeathEffects() { return deathEffects; }
 
+
     // Arrow Effects
+    public static final CosmeticArrowEffect arrowNone = new ArrowNone();
+    public static final CosmeticArrowEffect arrowSoul = new ArrowSoul();
+    public static final CosmeticArrowEffect campfireCozySmoke = new CampfireCozySmoke();
+    public static final CosmeticArrowEffect damageIndicator = new DamageIndicator();
+    public static final CosmeticArrowEffect drippingHoney = new DrippingHoney();
+    public static final CosmeticArrowEffect fireworkSpark = new FireworksSpark();
+    public static final CosmeticArrowEffect flame = new Flame();
+    public static final CosmeticArrowEffect heart = new Heart();
+    public static final CosmeticArrowEffect sneeze = new Sneeze();
+    public static final CosmeticArrowEffect snowball = new Snowball();
+
+    private static final Set<CosmeticArrowEffect> arrowEffects = Set.of(
+            arrowNone, arrowSoul, campfireCozySmoke, damageIndicator, drippingHoney,
+            fireworkSpark, flame, heart, sneeze, snowball);
+    public static Collection<CosmeticArrowEffect> getArrowEffects() { return arrowEffects; }
 
     // Emotes
+    public static final CosmeticEmoteEffect bonk = new Bonk();
+    public static final CosmeticEmoteEffect hug = new Hug();
+    public static final CosmeticEmoteEffect jingle = new Jingle();
+    public static final CosmeticEmoteEffect mwah = new Mwah();
+    public static final CosmeticEmoteEffect poke = new Poke();
+    public static final CosmeticEmoteEffect scare = new Scare();
+
+    private static final Set<CosmeticEmoteEffect> emotes = Set.of(bonk, hug, jingle, mwah, poke, scare);
+    public static Collection<CosmeticEmoteEffect> getEmotes() { return emotes; }
 }

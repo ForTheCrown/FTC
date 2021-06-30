@@ -66,7 +66,6 @@ public class MainCosmeticsMenu implements CosmeticMenu {
     @Override
     public CustomInv buildInventory(CrownUser user) {
         CustomInvBuilder invBuilder = new CustomInvBuilder();
-
         return invBuilder
                 .setUser(user)
                 .setSize(this.getSize())

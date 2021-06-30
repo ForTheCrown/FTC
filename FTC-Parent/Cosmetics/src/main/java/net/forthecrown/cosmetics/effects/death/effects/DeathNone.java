@@ -6,14 +6,14 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-public class None extends CosmeticDeathEffect {
+public class DeathNone extends CosmeticDeathEffect {
     @Override
     public String getEffectName() {
         return "none";
     }
 
     @Override
-    public void activateEffect(Location loc) { return; }
+    public void activateEffect(Location loc) {}
 
     @Override
     public ItemStack getEffectItem() {

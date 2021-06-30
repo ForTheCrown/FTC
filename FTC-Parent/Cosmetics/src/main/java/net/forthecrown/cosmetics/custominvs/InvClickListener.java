@@ -10,10 +10,13 @@ public class InvClickListener implements Listener {
     @EventHandler
     public static void onPlayerClickItemInInv(InventoryClickEvent event) {
         if(!(event.getInventory().getHolder() instanceof CustomInv)) return;
-        event.setCancelled(true);
+        if(event.isShiftClick()) event.setCancelled(true);
 
         // Don't handle click in the player's own inventory
         if (event.getClickedInventory() instanceof PlayerInventory) return;
+
+        event.setCancelled(true);
+        if(event.getCurrentItem() == null) return;
 
         CustomInv clickedInv = (CustomInv) event.getInventory().getHolder();
         clickedInv.handleClick(event.getWhoClicked(), event.getSlot());

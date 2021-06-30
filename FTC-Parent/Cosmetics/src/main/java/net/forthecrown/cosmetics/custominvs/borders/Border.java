@@ -24,13 +24,14 @@ public abstract class Border implements SlotClickHandler {
     abstract public ItemStack getBorderItem();
 
     public final boolean isOnBorder(int slot) {
-        return getBorderSlots().contains(slot);
+        return borderSlots.contains(slot);
     }
 
     public final void applyBorder(@NotNull Inventory inv) {
+        setSize(inv.getSize());
         ItemStack borderItem = getBorderItem();
 
-        for (int slot : getBorderSlots()) {
+        for (int slot : borderSlots) {
             if (inv.getItem(slot) == null || inv.getItem(slot).getType() == Material.AIR)
                 inv.setItem(slot, borderItem);
         }

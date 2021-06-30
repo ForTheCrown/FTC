@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class ClickableOption extends Option {
 
-    private Runnable actionOnClick;
+    private Runnable actionOnClick; // TODO: wrapperclass so custom errors work
     private int cd = 0;
     private Set<UUID> isOnCooldown = Set.of();
 

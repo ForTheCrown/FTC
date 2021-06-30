@@ -6,7 +6,7 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import net.forthecrown.cosmetics.commands.CommandCosmetics;
 import net.forthecrown.cosmetics.custominvs.CustomInv;
-import net.forthecrown.cosmetics.effects.arrow.ArrowParticleMenu;
+import net.forthecrown.cosmetics.effects.arrow.effects.CosmeticArrowEffect;
 import net.forthecrown.cosmetics.effects.death.effects.CosmeticDeathEffect;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -31,9 +31,10 @@ public final class Cosmetics extends JavaPlugin {
 
         // Events
         getServer().getPluginManager().registerEvents(new CosmeticEvents(), this);
-        getServer().getPluginManager().registerEvents(new ArrowParticleMenu(), this);
         getServer().getPluginManager().registerEvents(CosmeticDeathEffect.listener, this);
-        getServer().getPluginManager().registerEvents(CustomInv.listener, this);
+        getServer().getPluginManager().registerEvents(CosmeticArrowEffect.listener, this);
+        getServer().getPluginManager().registerEvents(CustomInv.listener, this); // TODO: move to core
+
 
         // Command
         new CommandCosmetics();

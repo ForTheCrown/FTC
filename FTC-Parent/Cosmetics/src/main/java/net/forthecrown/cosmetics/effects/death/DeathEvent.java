@@ -4,7 +4,7 @@ import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.core.user.UserManager;
 import net.forthecrown.cosmetics.effects.Vault;
 import net.forthecrown.cosmetics.effects.death.effects.CosmeticDeathEffect;
-import net.forthecrown.cosmetics.effects.death.effects.None;
+import net.forthecrown.cosmetics.effects.death.effects.DeathNone;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -30,6 +30,6 @@ public class DeathEvent implements Listener {
         for(CosmeticDeathEffect effect : Vault.getDeathEffects()) {
             if (effect.getEffectName().equals(name)) return effect;
         }
-        return new None();
+        return new DeathNone();
     }
 }

@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.inventory.ItemStack;
 
-public class Soul extends CosmeticDeathEffect {
+public class DeathSoul extends CosmeticDeathEffect {
     @Override
     public String getEffectName() {
         return "SOUL";
