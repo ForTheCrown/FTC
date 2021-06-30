@@ -19,9 +19,9 @@ dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT'
 
-    compileOnly files('C:\\wvh\\Java\\SpigotPaper\\Paper-Server-1.17-R0.1-SNAPSHOT-mojang-mapped.jar')
-    compileOnly files('C:\\wvh\\Java\\Servers\\MainServer\\plugins\\RoyalGrenadier-1.1.0-SNAPSHOT.jar')
-    compileOnly files('C:\\Users\\Wout\\IdeaProjects\\FTC\\FTC-Parent\\Squire\\build\\libs\\Squire-1.1.0-SNAPSHOT-all.jar')
+    compileOnly files('C:/wvh/Java/SpigotPaper/Paper-Server-1.17-R0.1-SNAPSHOT-mojang-mapped.jar')
+    compileOnly files('C:/wvh/Java/Servers/MainServer/plugins/RoyalGrenadier-1.1.0-SNAPSHOT.jar')
+    compileOnly files('C:/Users/Wout/IdeaProjects/FTC/FTC-Parent/Squire/build/libs/Squire-1.1.0-SNAPSHOT-all.jar')
 }
 
 processResources{
