@@ -51,8 +51,8 @@ public class PlayerRider implements Listener {
         seat.remove();
 
         HandlerList.unregisterAll(this);
-        Bukkit.getScheduler().runTaskLater(Cosmetics.plugin, this::preventBadLocation, 5);
-        Cosmetics.getRider().riders.remove(this);
+        Bukkit.getScheduler().runTaskLater(Cosmetics.getPlugin(), this::preventBadLocation, 5);
+        Cosmetics.getRideManager().riders.remove(this);
     }
 
     private void preventBadLocation(){
