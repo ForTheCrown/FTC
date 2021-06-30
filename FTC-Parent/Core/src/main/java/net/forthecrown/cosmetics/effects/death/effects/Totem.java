@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics.effects.death.effects;
 
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.inventory.CrownItems;
-import net.forthecrown.cosmetics.Cosmetics;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
@@ -18,7 +18,7 @@ public class Totem extends CosmeticDeathEffect {
         double y = loc.getY()+1;
         double z = loc.getZ();
         for (int i = 0; i < 20; i++) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(Cosmetics.getPlugin(), () -> {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> {
                 for (int i1 = 0; i1 < 2; i1++) {
                     loc.getWorld().spawnParticle(Particle.TOTEM, x, y, z, 5, 0, 0, 0, 0.4);
                 }
