@@ -20,6 +20,10 @@ public interface CosmeticMenu {
 
     int getSize();
 
+
+    static void openSilent(CosmeticMenu menu, CrownUser user) {
+        user.getPlayer().openInventory(menu.getCustomInv().getInventory());
+    }
     static void open(CosmeticMenu menu, CrownUser user) {
         user.getPlayer().playSound(user.getPlayer().getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
         user.getPlayer().openInventory(menu.getCustomInv().getInventory());
