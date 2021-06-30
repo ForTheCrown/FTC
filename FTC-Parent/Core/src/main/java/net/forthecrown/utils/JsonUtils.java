@@ -13,14 +13,12 @@ import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class JsonUtils {
-    public static JsonElement writeLocation(Location location){
+    public static JsonObject writeLocation(Location location){
         JsonObject result = new JsonObject();
         result.addProperty("world", location.getWorld().getName());
 
@@ -28,20 +26,20 @@ public class JsonUtils {
         result.addProperty("y", location.getY());
         result.addProperty("z", location.getZ());
 
-        result.addProperty("pitch", location.getPitch());
-        result.addProperty("yaw", location.getYaw());
+        if(location.getPitch() != 0f) result.addProperty("pitch", location.getPitch());
+        if(location.getYaw() != 0f) result.addProperty("yaw", location.getYaw());
 
         return result;
     }
 
-    public static Location readLocation(JsonObject jsonObject){
-        World world = Objects.requireNonNull(Bukkit.getWorld(jsonObject.get("world").getAsString()));
-        double x = jsonObject.get("x").getAsDouble();
-        double y = jsonObject.get("y").getAsDouble();
-        double z = jsonObject.get("z").getAsDouble();
+    public static Location readLocation(JsonObject json){
+        World world = Objects.requireNonNull(Bukkit.getWorld(json.get("world").getAsString()));
+        double x = json.get("x").getAsDouble();
+        double y = json.get("y").getAsDouble();
+        double z = json.get("z").getAsDouble();
 
-        float pitch = jsonObject.get("pitch").getAsFloat();
-        float yaw = jsonObject.get("yaw").getAsFloat();
+        float pitch = json.has("pitch") ? json.get("pitch").getAsFloat() : 0f;
+        float yaw = json.has("yaw") ? json.get("yaw").getAsFloat() : 0f;
 
         return new Location(world, x, y, z, pitch, yaw);
     }
@@ -68,6 +66,7 @@ public class JsonUtils {
         double minX = json.get("minX").getAsDouble();
         double minY = json.get("minY").getAsDouble();
         double minZ = json.get("minZ").getAsDouble();
+
         double maxX = json.get("maxX").getAsDouble();
         double maxY = json.get("maxY").getAsDouble();
         double maxZ = json.get("maxZ").getAsDouble();
@@ -85,6 +84,15 @@ public class JsonUtils {
             result.add(converter.apply(t));
         }
         return result;
+    }
+
+    public static void readList(JsonElement element, Consumer<JsonElement> adder){
+        JsonArray array = element.getAsJsonArray();
+        array.forEach(adder);
+    }
+
+    public static <T> List<T> readList(JsonElement element, Function<JsonElement, T> function){
+        return ListUtils.fromIterable(element.getAsJsonArray(), function);
     }
 
     public static <K, V> JsonObject writeMap(Map<K, V> map, Function<Map.Entry<K, V>, Pair<String, JsonElement>> function){
@@ -129,7 +137,7 @@ public class JsonUtils {
         return NbtHandler.itemFromNBT(NBT.of(TagParser.parseTag(json.getAsString())));
     }
 
-    public static JsonElement writeItem(ItemStack itemStack){
+    public static JsonPrimitive writeItem(ItemStack itemStack){
         return new JsonPrimitive(NbtHandler.ofItem(itemStack).serialize());
     }
 }

@@ -15,10 +15,24 @@ MaxNickLength: 16
 NearRadius: 200
 AllowOtherPlayerNicks: false
 MarriageStatusCooldown: 259200000
+CrownEventActive: false
+EventScoreIsTimer: false
+MaxBossDifficulty: 5
 
 MiniGameRegion:
   ChickenLevitation: 5
   ChickenLevitationTime: 10
+
+Auctions:
+  ExpirationTime: 604800000
+  PickUpTime: 259200000
+
+Pirates:
+  TreasureWorld: world_resource
+  SpecialReward: 25000
+  FinalReward: 50000
+  MaxTreasurePrize: 10000
+  MinTreasurePrize: 50000
 
 ServerSpawn:
   ==: org.bukkit.Location

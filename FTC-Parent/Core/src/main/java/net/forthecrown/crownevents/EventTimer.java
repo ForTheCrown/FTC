@@ -1,10 +1,10 @@
 package net.forthecrown.crownevents;
 
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.core.chat.ChatUtils;
-import net.minecraft.server.v1_16_R3.ChatMessageType;
+import net.minecraft.network.chat.ChatType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -144,7 +144,7 @@ public class EventTimer {
     }
 
     private void sendActionBar(String message){
-        user.sendMessage(ChatUtils.stringToVanilla(String.format(format, message)), ChatMessageType.GAME_INFO);
+        user.sendMessage(ChatUtils.stringToVanilla(String.format(format, message)), ChatType.GAME_INFO);
     }
 
     @Override

@@ -9,7 +9,6 @@ import org.bukkit.NamespacedKey;
 public class Pirates {
     public static final NamespacedKey SHULKER_KEY = Squire.createPiratesKey("treasure_shulker");
     public static final NamespacedKey GH_STAND_KEY = Squire.createPiratesKey("level_end_stand");
-    public static final NamespacedKey TREASURE_LOOT_TABLE = Squire.createPiratesKey("treasure_loot");
     public static final NamespacedKey BM_MERCHANT = Squire.createPiratesKey("black_market_merchant");
 
     static TreasureShulker shulker;
@@ -30,5 +29,5 @@ public class Pirates {
     public static GrapplingHookParkour getParkour() { return ghParkour; }
     public static TreasureShulker getTreasure() { return shulker; }
     public static ParrotTracker getParrotTracker() { return parrotTracker; }
-    public static AuctionManager getAuctionManager() { return auctionManager; }
+    public static AuctionManager getAuctions() { return auctionManager; }
 }

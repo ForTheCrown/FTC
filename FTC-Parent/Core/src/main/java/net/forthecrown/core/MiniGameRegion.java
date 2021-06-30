@@ -8,5 +8,4 @@ public interface MiniGameRegion {
     static int chickenLevitationTime(){
         return ComVars.chickenLevitationTime.getValue(10);
     }
-
 }

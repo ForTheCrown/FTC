@@ -7,7 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-public class RewardChecker {
+public class RankReward {
     public static void checkNeedsCoolRank(Player player, long time){
         if(EventConstants.CROWN.getScoreboard().getEntries().size() < 5) return;
         CrownUser user = UserManager.getUser(player);

@@ -29,6 +29,7 @@ public class EventBuilder {
     private final ParkourEntry entry;
     private final Location minLoc;
     private final Location barrierLoc;
+    private int xCord = 0;
 
     public EventBuilder(Player player) {
         this.player = player;
@@ -38,7 +39,6 @@ public class EventBuilder {
             JulyMain.event.end(ParkourEvent.ENTRIES.get(p));
         });
 
-        int xCord = 0;
         while(ParkourEvent.IN_USE_TRACKS.get(xCord)){
             xCord++;
         }
@@ -46,6 +46,8 @@ public class EventBuilder {
         this.minLoc = new Location(EVENT_WORLD, xCord * DISTANCE_BETWEEN, 70, 1500, PRACTISE.getYaw(), PRACTISE.getPitch());
         this.barrierLoc = BARRIER_OFFSET.apply(minLoc);
         this.entry = new ParkourEntry(player, timer, xCord);
+
+        ParkourEvent.IN_USE_TRACKS.set(xCord, true);
 
         OnTrackListener listener = entry.inEventListener();
         listener.register(JulyMain.inst);
@@ -163,6 +165,7 @@ public class EventBuilder {
     public void cancel(){
         Bukkit.getScheduler().cancelTask(countdownID);
         ParkourEvent.WAITING_FOR_START.remove(player);
+        ParkourEvent.IN_USE_TRACKS.set(xCord, false);
 
         player.getInventory().clear();
         player.teleport(LOBBY);

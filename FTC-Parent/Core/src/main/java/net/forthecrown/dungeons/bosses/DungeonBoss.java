@@ -196,8 +196,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
             }
         }
 
-        ItemStack[] toRemove = new ItemStack[items.size()];
-        inv.removeItemAnySlot(items.toArray(toRemove));
+        inv.removeItemAnySlot(items.toArray(ItemStack[]::new));
         summon();
     }
 }

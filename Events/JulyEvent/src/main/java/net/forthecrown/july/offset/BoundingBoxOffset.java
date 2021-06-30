@@ -18,9 +18,9 @@ public class BoundingBoxOffset {
         this(EventConstants.minLoc(), box);
     }
 
-    public BoundingBoxOffset(Location defMinLoc, BoundingBox box){
-        this.minOffset = BlockOffset.of(defMinLoc, box.getMin().toLocation(defMinLoc.getWorld()));
-        this.maxOffset = BlockOffset.of(defMinLoc, box.getMax().toLocation(defMinLoc.getWorld()));
+    public BoundingBoxOffset(Location minLoc, BoundingBox box){
+        this.minOffset = BlockOffset.of(minLoc, box.getMin().toLocation(minLoc.getWorld()));
+        this.maxOffset = BlockOffset.of(minLoc, box.getMax().toLocation(minLoc.getWorld()));
     }
 
     public BlockOffset getMinOffset() {

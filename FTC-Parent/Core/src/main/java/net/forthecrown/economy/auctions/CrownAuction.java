@@ -60,7 +60,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
         this.location = location;
 
         reload();
-        Pirates.getAuctionManager().addAuction(this);
+        Pirates.getAuctions().addAuction(this);
     }
 
 
@@ -72,7 +72,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
         this.location = location;
         this.sign = (Sign) location.getBlock().getState();
 
-        Pirates.getAuctionManager().addAuction(this);
+        Pirates.getAuctions().addAuction(this);
 
         getFile().set("Name", name);
         super.save(false);
@@ -162,7 +162,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
             giveBalancesToLosers(true);
         }
 
-        Pirates.getAuctionManager().removeAuction(this);
+        Pirates.getAuctions().removeAuction(this);
     }
 
     @Override

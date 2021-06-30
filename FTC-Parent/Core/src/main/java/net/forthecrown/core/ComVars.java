@@ -41,8 +41,8 @@ public final class ComVars {
     static ComVar<Integer>          baronPrice;
     static ComVar<Integer>          chickenLevitation;
     static ComVar<Integer>          chickenLevitationTime;
-    static ComVar<Integer>          ghspecialReward;
-    static ComVar<Integer>          ghfinalReward;
+    static ComVar<Integer>          ghSpecialReward;
+    static ComVar<Integer>          ghFinalReward;
     static ComVar<Integer>          maxMoneyAmount;
     static ComVar<Integer>          maxTreasurePrize;
     static ComVar<Integer>          minTreasurePrize;
@@ -77,8 +77,8 @@ public final class ComVars {
         baronPrice = register(              "core_baronPrice",                  ComVarType.INTEGER,         config.getInt("BaronPrice"));
         chickenLevitation = register(       "core_chickenLevitation",           ComVarType.INTEGER,         config.getInt("MiniGameRegion.ChickenLevitation"));
         chickenLevitationTime = register(   "core_chickenLevitation_time",      ComVarType.INTEGER,         config.getInt("MiniGameRegion.ChickenLevitationTime"));
-        ghspecialReward = register(         "pr_gh_specialReward",              ComVarType.INTEGER,         config.getInt("Pirates.SpecialReward"));
-        ghfinalReward = register(           "pr_gh_finalReward",                ComVarType.INTEGER,         config.getInt("Pirates.FinalReward"));
+        ghSpecialReward = register(         "pr_gh_specialReward",              ComVarType.INTEGER,         config.getInt("Pirates.SpecialReward"));
+        ghFinalReward = register(           "pr_gh_finalReward",                ComVarType.INTEGER,         config.getInt("Pirates.FinalReward"));
         maxTreasurePrize = register(        "pr_maxTreasurePrize",              ComVarType.INTEGER,         config.getInt("Pirates.MaxTreasurePrize"));
         minTreasurePrize = register(        "pr_minTreasurePrize",              ComVarType.INTEGER,         config.getInt("Pirates.MinTreasurePrize"));
 
@@ -114,8 +114,8 @@ public final class ComVars {
         config.set("Auctions.PickUpTime",                   auctionPickupTime.getValue());
         config.set("Pirates.MaxTreasurePrize",              maxTreasurePrize.getValue());
         config.set("Pirates.MinTreasurePrize",              minTreasurePrize.getValue());
-        config.set("Pirates.FinalReward",                   ghfinalReward.getValue());
-        config.set("Pirates.SpecialReward",                 ghspecialReward.getValue());
+        config.set("Pirates.FinalReward",                   ghFinalReward.getValue());
+        config.set("Pirates.SpecialReward",                 ghSpecialReward.getValue());
         config.set("MaxBossDifficulty",                     maxBossDifficulty.getValue());
     }
 }

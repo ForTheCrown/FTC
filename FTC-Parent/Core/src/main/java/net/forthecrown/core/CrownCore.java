@@ -176,11 +176,11 @@ public interface CrownCore extends Plugin, Namespaced {
     }
 
     static int getGhSpecialReward(){
-        return ComVars.ghspecialReward.getValue(25000);
+        return ComVars.ghSpecialReward.getValue(25000);
     }
 
     static int getGhFinalReward(){
-        return ComVars.ghfinalReward.getValue(50000);
+        return ComVars.ghFinalReward.getValue(50000);
     }
 
     static boolean isEventActive(){

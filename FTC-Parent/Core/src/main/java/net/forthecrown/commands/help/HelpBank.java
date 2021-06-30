@@ -39,7 +39,7 @@ public class HelpBank extends FtcCommand {
                     .append(Component.newline())
                     .append(Component.text("To enter the bank, you need a "))
                     .append(Component.text("[Bank Ticket]")
-                            .hoverEvent(CrownItems.VOTE_TICKET.asHoverEvent())
+                            .hoverEvent(CrownItems.voteTicket().asHoverEvent())
                             .color(NamedTextColor.AQUA))
                     .append(Component.text(" earned by voting for the server with"))
                     .append(Component.text(" /vote.")

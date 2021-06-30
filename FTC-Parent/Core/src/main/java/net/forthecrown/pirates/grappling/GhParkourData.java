@@ -11,7 +11,7 @@ public class GhParkourData extends AbstractJsonSerializer {
     private final Map<String, GhLevelData> levels = new HashMap<>();
 
     protected GhParkourData() {
-        super("gh_parkour_data");
+        super("parkour_data");
 
         reload();
     }

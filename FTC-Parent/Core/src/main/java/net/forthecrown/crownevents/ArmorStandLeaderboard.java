@@ -117,6 +117,7 @@ public class ArmorStandLeaderboard {
         stand.customName(ChatUtils.convertString(name));
         stand.setCustomNameVisible(true);
         stand.setRemoveWhenFarAway(false);
+        stand.setPersistent(true);
         stand.setInvisible(true);
         stand.setGravity(false);
         stand.setInvulnerable(true);

@@ -72,6 +72,7 @@ public class OnTrackListener extends InEventListener<ParkourEntry> implements Li
         elytraLoops = ELYTRA_LOOPS.apply(minLoc);
         elytraFallbackAllowTrigger = ELYTRA_ALLOW.apply(minLoc);
 
+        elytraFallbackAllowed = false;
         finishedLoops = new boolean[ELYTRA_TRIGGERS.size()];
 
         finish = END_REGION.apply(minLoc);
@@ -83,8 +84,6 @@ public class OnTrackListener extends InEventListener<ParkourEntry> implements Li
         reachedCheckpoint = false;
 
         resetTrack();
-
-        elytraFallbackAllowed = false;
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -135,12 +134,12 @@ public class OnTrackListener extends InEventListener<ParkourEntry> implements Li
         CrownUser user = UserManager.getUser(player);
         int worth = GemItems.getWorth(item);
 
-        if(worth == EventConstants.GEM_SECRET_VALUE && !Cooldown.contains(player, "Event_GemCooldown")){
-            Cooldown.add(player, "Event_GemCooldown", 72000);
+        if(worth == EventConstants.GEM_SECRET_VALUE && !Cooldown.contains(player, "Event_GemCooldown_Secret")){
+            Cooldown.add(player, "Event_GemCooldown_Secret", 72000);
         }
 
-        if(!Cooldown.contains(player, "Event_GemCooldown_Secret")){
-            Cooldown.add(player, "Event_GemCooldown_Secret", 72000);
+        if(!Cooldown.contains(player, "Event_GemCooldown")){
+            Cooldown.add(player, "Event_GemCooldown", 72000);
         }
 
         user.getPlayer().sendMessage(

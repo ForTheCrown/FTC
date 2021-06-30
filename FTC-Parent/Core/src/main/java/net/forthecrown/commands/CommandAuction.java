@@ -5,19 +5,19 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.AuctionArgType;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.CrownException;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.CrownException;
 import net.forthecrown.economy.Balances;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.Branch;
+import net.forthecrown.economy.auctions.Auction;
+import net.forthecrown.economy.auctions.CrownAuction;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.pirates.Pirates;
-import net.forthecrown.economy.auctions.Auction;
 import net.forthecrown.pirates.AuctionManager;
-import net.forthecrown.economy.auctions.CrownAuction;
+import net.forthecrown.pirates.Pirates;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.enums.Branch;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -64,7 +64,7 @@ public class CommandAuction extends FtcCommand {
                         .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c -> {
-                            Pirates.getAuctionManager().saveAuctions();
+                            Pirates.getAuctions().saveAuctions();
                             broadcastAdmin(c.getSource(), "All auctions saved");
                             return 0;
                         })
@@ -73,7 +73,7 @@ public class CommandAuction extends FtcCommand {
                         .requires(c -> c.hasPermission(getPermission() + ".admin"))
 
                         .executes(c -> {
-                            Pirates.getAuctionManager().reloadAuctions();
+                            Pirates.getAuctions().reloadAuctions();
                             broadcastAdmin(c.getSource(), "All auctions reloaded");
                             return 0;
                         })

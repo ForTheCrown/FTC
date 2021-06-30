@@ -6,15 +6,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public final class ListUtils {
     private ListUtils() {}
 
     public static <F, T> Collection<T> convert(@NotNull Collection<F> from, @NotNull Function<F, T> converter){
+        return convertToList(from, converter);
+    }
+
+    public static <F, T> Set<T> convertToSet(@NotNull Collection<F> from, @NotNull Function<F, T> converter){
+        return new HashSet<>(convertToList(from, converter));
+    }
+
+    public static <F, T> List<T> convertToList(@NotNull Collection<F> from, @NotNull Function<F, T> converter){
         Validate.notNull(from, "collection was null");
         Validate.notNull(converter, "Converter was null");
 
-        Collection<T> convert = new ArrayList<>();
+        List<T> convert = new ArrayList<>();
 
         for (F o: from){
             convert.add(converter.apply(o));
@@ -22,16 +31,19 @@ public final class ListUtils {
         return convert;
     }
 
-    public static <F, T> Set<T> convertToSet(@NotNull Collection<F> from, @NotNull Function<F, T> converter){
-        return new HashSet<>(convert(from, converter));
-    }
-
-    public static <F, T> List<T> convertToList(@NotNull Collection<F> from, @NotNull Function<F, T> converter){
-        return new ArrayList<>(convert(from, converter));
-    }
-
     public static <F, T> Collection<T> arrayToCollection(@NotNull F[] from, @NotNull Function<F, T> converter){
-        return convert(Arrays.asList(from), converter);
+        return convertToList(Arrays.asList(from), converter);
+    }
+
+    public static <F, T> T[] convertArray(F[] from, IntFunction<T[]> arrayCreator, Function<F, T> function){
+        T[] result = arrayCreator.apply(from.length);
+
+        for (int i = 0; i < from.length; i++){
+            if(from[i] == null) continue;
+            result[i] = function.apply(from[i]);
+        }
+
+        return result;
     }
 
     public static <F, T> List<T> fromIterable(Iterable<F> from, Function<F, T> converter){

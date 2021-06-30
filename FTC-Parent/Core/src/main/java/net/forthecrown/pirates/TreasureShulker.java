@@ -1,6 +1,8 @@
 package net.forthecrown.pirates;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.economy.Balances;
@@ -34,10 +36,8 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.persistence.PersistentDataType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 public class TreasureShulker extends AbstractJsonSerializer {
@@ -52,6 +52,8 @@ public class TreasureShulker extends AbstractJsonSerializer {
 
     private Location location;
     private UUID currentID;
+
+    private final Set<UUID> alreadyFound = new HashSet<>();
 
     private final CrownRandom random = new CrownRandom();
 
@@ -69,6 +71,10 @@ public class TreasureShulker extends AbstractJsonSerializer {
         json.add("commonLoot", commonLoot.serialize());
         json.add("rareLoot", rareLoot.serialize());
         json.add("specialLoot", specialLoot.serialize());
+
+        if(!alreadyFound.isEmpty()){
+            json.add("alreadyFound", JsonUtils.writeCollection(alreadyFound, id -> new JsonPrimitive(id.toString())));
+        }
     }
 
     @Override
@@ -79,6 +85,11 @@ public class TreasureShulker extends AbstractJsonSerializer {
         this.commonLoot = WeightedLootTable.deserialize(json.get("commonLoot"));
         this.rareLoot = WeightedLootTable.deserialize(json.get("rareLoot"));
         this.specialLoot = WeightedLootTable.deserialize(json.get("specialLoot"));
+
+        alreadyFound.clear();
+        if(json.has("alreadyFound")){
+            JsonUtils.readList(json.get("alreadyFound"), (Consumer<JsonElement>) e -> alreadyFound.add(UUID.fromString(e.getAsString())));
+        }
     }
 
     public CrownRandom getRandom() {
@@ -128,6 +139,14 @@ public class TreasureShulker extends AbstractJsonSerializer {
                 s.remove();
             });
         }
+    }
+
+    public boolean hasAlreadyFound(UUID id){
+        return alreadyFound.contains(id);
+    }
+
+    public void find(UUID id){
+        alreadyFound.add(id);
     }
 
     public Loot createLoot(Player player, Entity interacted){
@@ -217,6 +236,11 @@ public class TreasureShulker extends AbstractJsonSerializer {
         public boolean giveRewards(Player player){
             if(!hasSpaceForItems(player.getInventory())){
                 player.sendMessage(Component.translatable("commands.invFull").color(NamedTextColor.RED));
+                return false;
+            }
+
+            if(Pirates.getTreasure().hasAlreadyFound(player.getUniqueId())){
+                player.sendMessage(Component.translatable("pirates.treasure.alreadyFound", NamedTextColor.GRAY));
                 return false;
             }
 

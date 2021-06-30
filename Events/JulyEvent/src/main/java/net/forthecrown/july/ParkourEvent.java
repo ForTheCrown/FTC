@@ -5,7 +5,7 @@ import net.forthecrown.core.crownevents.EventTimer;
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.july.items.EventItems;
 import net.forthecrown.july.listener.OnTrackListener;
-import net.forthecrown.july.rewards.RewardChecker;
+import net.forthecrown.july.rewards.RankReward;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -81,7 +81,7 @@ public class ParkourEvent implements CrownEvent<ParkourEntry> {
         EventTimer timer = entry.timer();
         if(!timer.wasStopped()) timer.stop();
 
-        IN_USE_TRACKS.set(entry.bitSetIndex(), false);
+        IN_USE_TRACKS.set(entry.arenaIndex(), false);
         JulyMain.updateLb();
         JulyMain.reporter.logExit(entry.player());
     }
@@ -104,7 +104,7 @@ public class ParkourEvent implements CrownEvent<ParkourEntry> {
             message.append(Component.text("New high score!").style(Style.style(NamedTextColor.AQUA, TextDecoration.BOLD)));
         } else message.append(Component.text("Better luck next time.").color(NamedTextColor.YELLOW));
 
-        RewardChecker.checkNeedsCoolRank(entry.player(), timeTaken);
+        RankReward.checkNeedsCoolRank(entry.player(), timeTaken);
         JulyMain.reporter.logAction(user.getPlayer(), "Exited the event, time: " + EventTimer.getTimerCounter(timeTaken));
 
         user.addGems(GEM_COMPLETION);

@@ -95,7 +95,10 @@ public class CommandTpask extends FtcCommand {
 
     public static boolean isNonAcceptedWorld(World world){
         String name = world.getName();
-        return name.contains("senate") || name.contains("void") || name.contains("raids");
+        return name.contains("senate")
+                || name.contains("void")
+                || name.contains("raids")
+                || name.contains("event");
     }
 
     public static TextComponent acceptButton(CrownUser target){

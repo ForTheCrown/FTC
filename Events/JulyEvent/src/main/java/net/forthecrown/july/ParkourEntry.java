@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 public class ParkourEntry extends PlayerEntry<ParkourEntry> {
     private final EventTimer timer;
-    private final int bitSetIndex;
+    private final int arenaIndex;
 
     long startTime;
 
@@ -15,7 +15,7 @@ public class ParkourEntry extends PlayerEntry<ParkourEntry> {
         super(user, new OnTrackListener(user, false));
 
         this.timer = timer;
-        this.bitSetIndex = bitSetIndex;
+        this.arenaIndex = bitSetIndex;
 
         inEventListener.setEntry(this);
     }
@@ -28,8 +28,8 @@ public class ParkourEntry extends PlayerEntry<ParkourEntry> {
         return startTime;
     }
 
-    public int bitSetIndex() {
-        return bitSetIndex;
+    public int arenaIndex() {
+        return arenaIndex;
     }
 
     @Override

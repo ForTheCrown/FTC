@@ -50,7 +50,9 @@ public class PirateEvents implements Listener {
                 if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.notPirate();
 
                 TreasureShulker shulker = Pirates.getTreasure();
-                shulker.createLoot(player, event.getRightClicked()).giveRewards(player);
+                if(shulker.createLoot(player, event.getRightClicked()).giveRewards(player)){
+                    shulker.find(user.getUniqueId());
+                }
             });
         }
     }
