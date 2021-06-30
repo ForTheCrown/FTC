@@ -8,6 +8,7 @@ import net.forthecrown.cosmetics.custominvs.borders.GenericBorder;
 import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
 import net.forthecrown.cosmetics.custominvs.options.Option;
 import net.forthecrown.cosmetics.effects.CosmeticMenu;
+import net.forthecrown.cosmetics.effects.MainCosmeticsMenu;
 import net.forthecrown.cosmetics.effects.Vault;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -32,13 +33,11 @@ public class DeathParticleMenu implements CosmeticMenu {
     }
 
 
-    private Option getReturnOption() {
+    private Option getReturnOption(CrownUser user) {
         ClickableOption returnOption = new ClickableOption();
         returnOption.setCooldown(0);
-        returnOption.setActionOnClick(() -> {
-            // TODO: go back to main cosmetic menu
-        });
         returnOption.setItem(CrownItems.makeItem(Material.PAPER, 1, true, ChatColor.YELLOW + "< Go Back"));
+        returnOption.setActionOnClick(() -> CosmeticMenu.open(new MainCosmeticsMenu(user), user));
         return returnOption;
     }
 
@@ -51,7 +50,7 @@ public class DeathParticleMenu implements CosmeticMenu {
                 .setTitle(this.getTitle())
                 .setInvBorder(new GenericBorder())
                 .addOptions(deathEffectSlots)
-                .addOption(4, getReturnOption())
+                .addOption(4, getReturnOption(user))
                 .build();
     }
 

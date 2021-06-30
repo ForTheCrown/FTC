@@ -7,6 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public class DeathNone extends CosmeticDeathEffect {
+
+    @Override
+    public int getGemCost() { return 0; }
+
     @Override
     public String getEffectName() {
         return "none";
@@ -16,7 +20,7 @@ public class DeathNone extends CosmeticDeathEffect {
     public void activateEffect(Location loc) {}
 
     @Override
-    public ItemStack getEffectItem() {
+    public ItemStack getEffectItem(boolean ignored) {
         return CrownItems.makeItem(Material.BARRIER, 1, true,
                 "&eNo effect",
                 ChatColor.GRAY + "Click to go back to default dying", ChatColor.GRAY + "without any effects.");

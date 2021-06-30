@@ -30,7 +30,7 @@ public final class Cosmetics extends JavaPlugin {
         rideManager = new PlayerRidingManager();
 
         // Events
-        getServer().getPluginManager().registerEvents(new CosmeticEvents(), this);
+        //getServer().getPluginManager().registerEvents(new CosmeticEvents(), this);
         getServer().getPluginManager().registerEvents(CosmeticDeathEffect.listener, this);
         getServer().getPluginManager().registerEvents(CosmeticArrowEffect.listener, this);
         getServer().getPluginManager().registerEvents(CustomInv.listener, this); // TODO: move to core

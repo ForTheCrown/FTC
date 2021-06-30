@@ -16,11 +16,11 @@ public class FireworksSpark extends CosmeticArrowEffect {
     }
 
     @Override
-    public ItemStack getEffectItem() {
+    public ItemStack getEffectItem(boolean isOwned) {
         return CrownItems.makeItem(Material.GRAY_DYE, 1, true,
                 "&eFirework",
                 "&7Almost as if you're using a crossbow.",
                 "" ,
-                "&7Click to purchase for &61000 &7Gems");
+                getPurchaseLine(isOwned));
     }
 }

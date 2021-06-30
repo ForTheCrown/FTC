@@ -9,21 +9,22 @@ import java.util.UUID;
 
 public class ClickableOption extends Option {
 
-    private Runnable actionOnClick; // TODO: wrapperclass so custom errors work
+    private ClickAction actionOnClick;
     private int cd = 0;
     private Set<UUID> isOnCooldown = Set.of();
 
-    public Runnable getAction() { return this.actionOnClick; }
-    public void setActionOnClick(Runnable action) { this.actionOnClick = action; }
+    public ClickAction getAction() { return this.actionOnClick; }
+    public void setActionOnClick(ClickAction action) { this.actionOnClick = action; }
 
     public int getCooldown() { return this.cd; }
     public void setCooldown(int cd) { this.cd = cd; }
 
 
     @Override
-    public void handleClick(HumanEntity user) {
-        UUID id = user.getUniqueId();
+    public void handleClick(HumanEntity human) {
+        UUID id = human.getUniqueId();
         if (!isOnCooldown.contains(id)) {
+            //CrownUser user = UserManager.getUser(id);
             if (getCooldown() == 0) getAction().run();
             else {
                 isOnCooldown.add(id);

@@ -1,52 +1,10 @@
 package net.forthecrown.cosmetics;
 
-import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.core.economy.CannotAffordTransactionException;
-import net.forthecrown.core.user.CrownUser;
-import net.forthecrown.core.user.UserManager;
-import net.forthecrown.cosmetics.effects.arrow.ArrowParticleMenu;
-import net.forthecrown.cosmetics.effects.CustomMenu;
-import net.forthecrown.cosmetics.effects.death.DeathParticleMenu;
-import net.forthecrown.cosmetics.effects.emote.EmoteMenu;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.PlayerInventory;
-
-import java.util.List;
 
 public class CosmeticEvents implements Listener {
 
-    private void doArrowParticleStuff(Particle particle, Player player, CrownUser user, int gemCost) throws CannotAffordTransactionException {
-        if(!user.getParticleArrowAvailable().contains(particle)){
-            if(user.getGems() < gemCost) throw new CannotAffordTransactionException(player);
-            user.addGems(-gemCost);
-
-            List<Particle> set = user.getParticleArrowAvailable();
-            set.add(particle);
-            user.setParticleArrowAvailable(set);
-        }
-        user.setArrowParticle(particle);
-    }
-
-    private void doDeathParticleStuff(String effect, Player player, CrownUser user, int gemCost) throws CannotAffordTransactionException {
-        if(!user.getParticleDeathAvailable().contains(effect)){
-            if(user.getGems() < gemCost) throw new CannotAffordTransactionException(player);
-            user.addGems(-gemCost);
-
-            List<String> asd = user.getParticleDeathAvailable();
-            asd.add(effect);
-            user.setParticleDeathAvailable(asd);
-        }
-        user.setDeathParticle(effect);
-    }
-
-    @EventHandler
+    /*@EventHandler
     public void onPlayerClickItemInInv(InventoryClickEvent event) throws CannotAffordTransactionException {
         if(!(event.getInventory().getHolder() instanceof CustomMenu)) return;
         if(event.isShiftClick()) event.setCancelled(true);
@@ -198,5 +156,5 @@ public class CosmeticEvents implements Listener {
 
             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
         }
-    }
+    }*/
 }

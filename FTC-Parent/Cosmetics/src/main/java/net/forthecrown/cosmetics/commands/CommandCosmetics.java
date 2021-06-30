@@ -9,7 +9,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 public class CommandCosmetics extends FtcCommand {
 
     public CommandCosmetics(){
-        super("cosmetics", Cosmetics.plugin);
+        super("cosmetics", Cosmetics.z);
 
         setPermission(Permissions.DEFAULT);
         register();

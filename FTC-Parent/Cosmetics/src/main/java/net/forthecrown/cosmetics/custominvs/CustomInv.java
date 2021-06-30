@@ -39,4 +39,11 @@ public class CustomInv implements InventoryHolder {
         else if (invSlots.containsKey(slot)) invSlots.get(slot).handleClick(clicker);
     }
 
+    public void updateOption(int slot, Option newOption) {
+        if (invSlots.containsKey(slot)) {
+            invSlots.replace(slot, newOption);
+            inv.setItem(slot, newOption.getItem());
+        }
+    }
+
 }

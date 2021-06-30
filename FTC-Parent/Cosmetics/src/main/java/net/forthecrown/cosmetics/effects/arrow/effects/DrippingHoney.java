@@ -17,11 +17,11 @@ public class DrippingHoney extends CosmeticArrowEffect {
     }
 
     @Override
-    public ItemStack getEffectItem() {
+    public ItemStack getEffectItem(boolean isOwned) {
         return CrownItems.makeItem(Material.GRAY_DYE, 1, true,
                 "&eSticky Trail",
                 ChatColor.GRAY + "For those who enjoy looking at the trail lol",
                 "",
-                ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
+                getPurchaseLine(isOwned));
     }
 }

@@ -22,11 +22,11 @@ public class Flame extends CosmeticArrowEffect {
     }
 
     @Override
-    public ItemStack getEffectItem() {
+    public ItemStack getEffectItem(boolean isOwned) {
         return CrownItems.makeItem(Material.GRAY_DYE, 1, true,
                 "&eFlame",
                 ChatColor.GRAY + "Works perfectly with flame arrows.",
                 "",
-                ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
+                getPurchaseLine(isOwned));
     }
 }

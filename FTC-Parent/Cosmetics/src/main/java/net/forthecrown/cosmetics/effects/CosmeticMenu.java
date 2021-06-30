@@ -3,6 +3,7 @@ package net.forthecrown.cosmetics.effects;
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.custominvs.CustomInv;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Sound;
 
 /**
  * Final methods can not be overridden.
@@ -18,4 +19,9 @@ public interface CosmeticMenu {
     TextComponent getTitle();
 
     int getSize();
+
+    static void open(CosmeticMenu menu, CrownUser user) {
+        user.getPlayer().playSound(user.getPlayer().getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
+        user.getPlayer().openInventory(menu.getCustomInv().getInventory());
+    }
 }

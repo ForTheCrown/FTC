@@ -3,8 +3,11 @@ package net.forthecrown.cosmetics.effects;
 import net.forthecrown.core.inventory.CrownItems;
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
+import net.forthecrown.cosmetics.effects.arrow.ArrowParticleMenu;
 import net.forthecrown.cosmetics.effects.arrow.effects.*;
+import net.forthecrown.cosmetics.effects.death.DeathParticleMenu;
 import net.forthecrown.cosmetics.effects.death.effects.*;
+import net.forthecrown.cosmetics.effects.emote.EmoteMenu;
 import net.forthecrown.cosmetics.effects.emote.emotes.*;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
@@ -20,42 +23,39 @@ public abstract class Vault {
     public static ClickableOption getArrowMenu(CrownUser user) {
         ClickableOption option = new ClickableOption();
         option.setCooldown(menuCooldown);
-        option.setActionOnClick(() -> {
-            // TODO: navigate to arrowMenu
-        });
         option.setItem(CrownItems.makeItem(Material.BOW, 1, true,
                 ChatColor.YELLOW + "Arrow Particle Trails",
                 "",
                 ChatColor.GRAY + "Upgrade your arrows with fancy particle",
                 ChatColor.GRAY + "trails as they fly through the air!"));
+
+        option.setActionOnClick(() -> CosmeticMenu.open(new ArrowParticleMenu(user), user));
         return option;
     }
 
     public static ClickableOption getDeathMenu(CrownUser user) {
         ClickableOption option = new ClickableOption();
         option.setCooldown(menuCooldown);
-        option.setActionOnClick(() -> {
-            // TODO: navigate to deathMenu
-        });
         option.setItem(CrownItems.makeItem(Material.SKELETON_SKULL, 1, true,
                 ChatColor.YELLOW + "Death Particles",
                 "",
                 ChatColor.GRAY + "Make your deaths more spectacular by",
                 ChatColor.GRAY + "exploding into pretty particles!"));
+
+        option.setActionOnClick(() -> CosmeticMenu.open(new DeathParticleMenu(user), user));
         return option;
     }
 
     public static ClickableOption getEmoteMenu(CrownUser user) {
         ClickableOption option = new ClickableOption();
         option.setCooldown(menuCooldown);
-        option.setActionOnClick(() -> {
-            // TODO: navigate to emoteMenu
-        });
         option.setItem(CrownItems.makeItem(Material.TOTEM_OF_UNDYING, 1, true,
                 ChatColor.YELLOW + "Emotes",
                 "",
                 ChatColor.GRAY + "Poking, smooching, bonking and more",
                 ChatColor.GRAY + "to interact with your friends."));
+
+        option.setActionOnClick(() -> CosmeticMenu.open(new EmoteMenu(user), user));
         return option;
     }
 

@@ -29,13 +29,13 @@ public class EnderRing extends CosmeticDeathEffect {
     }
 
     @Override
-    public ItemStack getEffectItem() {
+    public ItemStack getEffectItem(boolean isOwned) {
         return CrownItems.makeItem(Material.GRAY_DYE, 1, true,
                 "&eEnder Ring",
                 ChatColor.GRAY + "Ender particles doing ring stuff.",
                 "",
                 ChatColor.GRAY + "Makes you scream like an enderman lol",
                 "",
-                ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
+                getPurchaseLine(isOwned));
     }
 }

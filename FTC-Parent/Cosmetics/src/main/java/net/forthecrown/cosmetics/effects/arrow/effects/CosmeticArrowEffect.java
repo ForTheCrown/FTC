@@ -1,16 +1,23 @@
 package net.forthecrown.cosmetics.effects.arrow.effects;
 
+import net.forthecrown.core.economy.CannotAffordTransactionException;
 import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
 import net.forthecrown.cosmetics.effects.CosmeticEffect;
 import net.forthecrown.cosmetics.effects.arrow.ArrowEvent;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 public abstract class CosmeticArrowEffect implements CosmeticEffect {
 
     public static final Listener listener = new ArrowEvent();
+
+    @Override
+    public int getGemCost() { return 1000; }
 
     @Override
     public String getEffectName() {
@@ -18,7 +25,7 @@ public abstract class CosmeticArrowEffect implements CosmeticEffect {
     }
 
     @Override
-    public abstract ItemStack getEffectItem();
+    public abstract ItemStack getEffectItem(boolean isOwned);
 
     public abstract double getParticleSpeed();
 
@@ -39,12 +46,22 @@ public abstract class CosmeticArrowEffect implements CosmeticEffect {
         // Clicking
         option.setCooldown(0);
         option.setActionOnClick(() -> {
-            // TODO: Buy effect or set it as active
-            System.out.println("Clicked on + " + getEffectName());
+            user.getPlayer().playSound(user.getPlayer().getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1f);
+
+            if(!user.getParticleArrowAvailable().contains(getParticle())){
+                if(user.getGems() < getGemCost()) throw new CannotAffordTransactionException(user.getPlayer());
+                user.addGems(-getGemCost());
+
+                List<Particle> set = user.getParticleArrowAvailable();
+                set.add(getParticle());
+                user.setParticleArrowAvailable(set);
+            }
+            user.setArrowParticle(getParticle());
+            // TODO: update view
         });
 
         // Item to display
-        ItemStack item = getEffectItem();
+        ItemStack item = getEffectItem(isOwnedBy(user));
         if (isOwnedBy(user)) setItemOwned(item);
         if (isCurrentActiveEffect(user)) addGlow(item);
         option.setItem(item);

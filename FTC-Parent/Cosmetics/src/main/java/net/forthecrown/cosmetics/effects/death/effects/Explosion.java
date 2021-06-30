@@ -19,11 +19,11 @@ public class Explosion extends CosmeticDeathEffect {
     }
 
     @Override
-    public ItemStack getEffectItem() {
+    public ItemStack getEffectItem(boolean isOwned) {
         return CrownItems.makeItem(Material.GRAY_DYE, 1, true,
                 "&eCreeper",
                 ChatColor.GRAY + "Always wanted to know what it feels like...",
                 "",
-                ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
+                getPurchaseLine(isOwned));
     }
 }

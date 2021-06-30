@@ -5,6 +5,7 @@ import net.forthecrown.core.user.CrownUser;
 import net.forthecrown.cosmetics.custominvs.CustomInv;
 import net.forthecrown.cosmetics.custominvs.CustomInvBuilder;
 import net.forthecrown.cosmetics.custominvs.borders.GenericBorder;
+import net.forthecrown.cosmetics.custominvs.options.ClickAction;
 import net.forthecrown.cosmetics.custominvs.options.ClickableOption;
 import net.forthecrown.cosmetics.custominvs.options.Option;
 import net.kyori.adventure.text.Component;
@@ -30,6 +31,7 @@ public class MainCosmeticsMenu implements CosmeticMenu {
         this.inv = buildInventory(user);
     }
 
+
     private Option getHeaderOption(CrownUser user) {
         Option result = new Option();
         result.setItem(CrownItems.makeItem(Material.NETHER_STAR, 1, true,
@@ -39,29 +41,27 @@ public class MainCosmeticsMenu implements CosmeticMenu {
         return result;
     }
 
-    private ClickableOption getRideOption(CrownUser user) {
+    private ClickableOption getRideOption(CrownUser user, int slot) {
         ClickableOption option = new ClickableOption();
         option.setCooldown(0);
-        option.setActionOnClick(() -> {
-//            TODO: toggle to allowRiding
+        option.setItem(user.allowsRidingPlayers() ? allowsRidingItem : deniesRidingItem);
+        option.setActionOnClick(new ClickAction() {
+            @Override
+            public void run() {
+                boolean newOpinion = !user.allowsRidingPlayers();
+                user.setAllowsRidingPlayers(newOpinion);
+
+                ClickableOption newOption = new ClickableOption();
+                newOption.setCooldown(0);
+                newOption.setItem(newOpinion ? allowsRidingItem : deniesRidingItem);
+                newOption.setActionOnClick(this);
+
+                getCustomInv().updateOption(slot, newOption);
+            }
         });
-        ItemStack item;
-        if (user.allowsRidingPlayers())
-            item = CrownItems.makeItem(Material.SADDLE, 1, true,
-                ChatColor.YELLOW + "You can ride other players!",
-                "",
-                ChatColor.GRAY + "Right-click someone to jump on top of them.",
-                ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
-                ChatColor.GRAY + "Click to disable this feature.");
-        else
-            item = CrownItems.makeItem(Material.BARRIER, 1, true,
-                ChatColor.YELLOW + "You've disabled riding other players.",
-                "",
-                ChatColor.GRAY + "Right-click someone to jump on top of them.",
-                ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
-                ChatColor.GRAY + "Click to enable this feature.");
         return option;
     }
+
 
     @Override
     public CustomInv buildInventory(CrownUser user) {
@@ -73,7 +73,7 @@ public class MainCosmeticsMenu implements CosmeticMenu {
                 .setInvBorder(new GenericBorder())
                 .addOptions(menuSlots)
                 .addOption(4, getHeaderOption(user))
-                .addOption(40, getRideOption(user))
+                .addOption(40, getRideOption(user, 40))
                 .build();
     }
 
@@ -92,4 +92,17 @@ public class MainCosmeticsMenu implements CosmeticMenu {
                 .append(Component.text("osmetics")).build();
     }
 
+    private static final ItemStack allowsRidingItem = CrownItems.makeItem(Material.SADDLE, 1, true,
+            ChatColor.YELLOW + "You can ride other players!",
+            "",
+            ChatColor.GRAY + "Right-click someone to jump on top of them.",
+            ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
+            ChatColor.GRAY + "Click to disable this feature.");
+
+    private static final ItemStack deniesRidingItem = CrownItems.makeItem(Material.BARRIER, 1, true,
+            ChatColor.YELLOW + "You've disabled riding other players.",
+            "",
+            ChatColor.GRAY + "Right-click someone to jump on top of them.",
+            ChatColor.GRAY + "Shift-Right-click someone to kick them off.", "",
+            ChatColor.GRAY + "Click to enable this feature.");
 }

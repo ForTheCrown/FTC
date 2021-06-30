@@ -9,6 +9,9 @@ import org.bukkit.inventory.ItemStack;
 public class ArrowNone extends CosmeticArrowEffect {
 
     @Override
+    public int getGemCost() { return 0; }
+
+    @Override
     public double getParticleSpeed() { return 0; }
 
     @Override
@@ -22,7 +25,7 @@ public class ArrowNone extends CosmeticArrowEffect {
     }
 
     @Override
-    public ItemStack getEffectItem() {
+    public ItemStack getEffectItem(boolean ignored) {
         return CrownItems.makeItem(Material.BARRIER, 1, true,
                 ChatColor.GOLD + "No effect",
                 ChatColor.GRAY + "Click to go back to default arrows",

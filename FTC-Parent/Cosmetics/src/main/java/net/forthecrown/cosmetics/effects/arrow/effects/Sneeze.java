@@ -17,11 +17,11 @@ public class Sneeze extends CosmeticArrowEffect {
     }
 
     @Override
-    public ItemStack getEffectItem() {
+    public ItemStack getEffectItem(boolean isOwned) {
         return CrownItems.makeItem(Material.GRAY_DYE, 1, true,
                 "&eSneeze",
                 ChatColor.GRAY + "Cover the place in that juicy snot.",
                 "",
-                ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "1000" + ChatColor.GRAY + " gems.");
+                getPurchaseLine(isOwned));
     }
 }

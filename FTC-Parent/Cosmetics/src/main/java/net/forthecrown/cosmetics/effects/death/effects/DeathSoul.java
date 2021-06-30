@@ -9,6 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.inventory.ItemStack;
 
 public class DeathSoul extends CosmeticDeathEffect {
+
     @Override
     public String getEffectName() {
         return "SOUL";
@@ -26,11 +27,11 @@ public class DeathSoul extends CosmeticDeathEffect {
     }
 
     @Override
-    public ItemStack getEffectItem() {
+    public ItemStack getEffectItem(boolean isOwned) {
         return CrownItems.makeItem(Material.GRAY_DYE, 1, true,
                 "&eSouls",
                 ChatColor.GRAY + "Scary souls escaping from your body.",
                 "",
-                ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
+                getPurchaseLine(isOwned));
     }
 }

@@ -8,9 +8,14 @@ import org.bukkit.inventory.ItemStack;
 public abstract class CosmeticEmoteEffect implements CosmeticEffect {
 
     @Override
+    public int getGemCost() { return 0; }
+
+    @Override
     public abstract String getEffectName();
 
     @Override
+    public ItemStack getEffectItem(boolean ignored) { return getEffectItem(); }
+
     public abstract ItemStack getEffectItem();
 
     public abstract String getPermission();
@@ -27,10 +32,7 @@ public abstract class CosmeticEmoteEffect implements CosmeticEffect {
         ClickableOption option = new ClickableOption();
         // Clicking
         option.setCooldown(0);
-        option.setActionOnClick(() -> {
-            // TODO: Buy effect or set it as active
-            System.out.println("Clicked on + " + getEffectName());
-        });
+        option.setActionOnClick(() -> {}); // Clicking on emote doesn't do anything
 
         // Item to display
         ItemStack item = getEffectItem();

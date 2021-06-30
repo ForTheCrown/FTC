@@ -28,11 +28,11 @@ public class Totem extends CosmeticDeathEffect {
     }
 
     @Override
-    public ItemStack getEffectItem() {
+    public ItemStack getEffectItem(boolean isOwned) {
         return CrownItems.makeItem(Material.GRAY_DYE, 1, true,
                 "&eFaulty Totem",
                 ChatColor.GRAY + "The particles are there, but you still die?",
                 "",
-                ChatColor.GRAY + "Click to purchase for " + ChatColor.GOLD + "2000" + ChatColor.GRAY + " gems.");
+                getPurchaseLine(isOwned));
     }
 }
