@@ -3,6 +3,7 @@ package net.forthecrown.july.command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.commands.manager.FtcCommand;
+import net.forthecrown.core.user.UserManager;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
@@ -13,6 +14,7 @@ import net.forthecrown.july.ParkourEntry;
 import net.forthecrown.july.ParkourEvent;
 import net.forthecrown.july.items.EventItems;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
@@ -137,6 +139,11 @@ public class CommandJulyEvent extends FtcCommand {
                         .then(argument("target", EntityArgument.player())
                                 .executes(c -> {
                                     Player player = getPlayer(c);
+
+                                    if(UserManager.inst().isAlt(player.getUniqueId())){
+                                        player.sendMessage(Component.text("Alt accounts cannot earn tickets").color(NamedTextColor.GRAY));
+                                        return 0;
+                                    }
 
                                     player.getInventory().addItem(EventItems.ticket());
 

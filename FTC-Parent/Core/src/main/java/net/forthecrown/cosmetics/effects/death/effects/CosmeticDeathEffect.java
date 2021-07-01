@@ -1,19 +1,15 @@
 package net.forthecrown.cosmetics.effects.death.effects;
 
 import net.forthecrown.cosmetics.effects.CosmeticEffect;
-import net.forthecrown.cosmetics.effects.death.DeathEvent;
 import net.forthecrown.inventory.custom.options.ClickableOption;
 import net.forthecrown.user.CrownUser;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 public abstract class CosmeticDeathEffect implements CosmeticEffect {
-
-    public static final Listener listener = new DeathEvent();
 
     @Override
     public int getGemCost() { return 2000; }

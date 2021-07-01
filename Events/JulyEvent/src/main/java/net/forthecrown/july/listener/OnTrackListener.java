@@ -96,8 +96,17 @@ public class OnTrackListener extends InEventListener<ParkourEntry> implements Li
         }
 
         if(elytraFallbackAllowed && elytraFailZone.contains(player.getLocation().toVector())) player.teleport(elytraFallbackLoc);
-        if(elytraFallbackAllowTrigger.contains(player)) elytraFallbackAllowed = true;
-        if(checkPoint2.contains(player)) reachedCheckpoint = true;
+
+        if(elytraFallbackAllowTrigger.contains(player)){
+            if(!elytraFallbackAllowed) player.sendMessage(Component.text("Reached checkpoint!").color(NamedTextColor.GRAY));
+            elytraFallbackAllowed = true;
+        }
+
+        if(checkPoint2.contains(player)){
+            if(!reachedCheckpoint) player.sendMessage(Component.text("Reached checkpoint!").color(NamedTextColor.GRAY));
+            reachedCheckpoint = true;
+        }
+
         if(loopTriggers != null) checkElytraCollision();
 
         checkOnTrack();

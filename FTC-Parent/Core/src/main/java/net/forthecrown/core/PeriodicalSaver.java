@@ -21,7 +21,7 @@ public final class PeriodicalSaver extends BukkitRunnable {
     }
 
     public void start(){
-        final long inter = interval.getValue() * 60 * 20;
+        final long inter = interval.getValue(60L) * 60 * 20;
 
         runTaskTimerAsynchronously(core, inter, inter);
     }

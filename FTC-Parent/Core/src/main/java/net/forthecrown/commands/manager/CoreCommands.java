@@ -19,8 +19,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.NbtTagArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
+import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -39,7 +39,7 @@ public final class CoreCommands {
     private CoreCommands(){}
 
     public static void init(){
-        dispatcher = ((CraftServer) CrownCore.inst().getServer()).getServer().getCommands();
+        dispatcher = MinecraftServer.getServer().vanillaCommandDispatcher;
 
         VanillaArgumentType key = VanillaArgumentType.custom(ResourceLocationArgument::id);
 

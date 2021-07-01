@@ -55,11 +55,8 @@ public final class CrownUtils {
     }
 
     public static UUID uuidFromName(String playerName){
-        try {
-            // ?? return Bukkit.getOfflinePlayerIfCached(playerName).getUniqueId();
-            // check line 82, 109, 114 too
-            return Bukkit.getOfflinePlayer(playerName).getUniqueId();
-        } catch (NullPointerException ignored) { return null; }
+        OfflinePlayer player = Bukkit.getOfflinePlayerIfCached(playerName);
+        return player == null ? null : player.getUniqueId();
     }
 
     public static String addAnS(int amount){
@@ -79,8 +76,7 @@ public final class CrownUtils {
                 .build();
 
         Scoreboard scoreboard = getServer().getScoreboardManager().getNewScoreboard();
-        // ?? Objective newObj = scoreboard.registerNewObjective(player.getName(), "dummy", displayName);
-        Objective newObj = scoreboard.registerNewObjective(player.getName(), "dummy", String.valueOf(displayName));
+        Objective newObj = scoreboard.registerNewObjective(player.getName(), "dummy", displayName);
 
         for(String name : objective.getScoreboard().getEntries()) {
             if(!objective.getScore(name).isScoreSet() || objective.getScore(name).getScore() == 0) continue;
@@ -106,12 +102,11 @@ public final class CrownUtils {
             reader.skip();
             return Key.key(first, reader.readUnquotedString());
         }
-        // ?? return Key.key(CrownCore.inst(), first);
-        return Key.key(CrownCore.inst().getName(), first);
+        return Key.key(CrownCore.inst(), first);
     }
 
     public static Key checkNotBukkit(Key key){
-        // ?? if(!(key instanceof NamespacedKey)) return key;
+        if(!(key instanceof NamespacedKey)) return key;
         return Key.key(key.namespace(), key.value());
     }
 
@@ -127,7 +122,6 @@ public final class CrownUtils {
         if(source.isPlayer()){
             try {
                 Player player = source.asPlayer();
-
                 List<Player> returnVal = new ArrayList<>();
 
                 for (Player p : Bukkit.getOnlinePlayers()){

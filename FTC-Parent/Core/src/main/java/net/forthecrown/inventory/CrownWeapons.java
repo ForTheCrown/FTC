@@ -7,7 +7,6 @@ import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -70,41 +69,25 @@ public class CrownWeapons {
         //This is dumb and repetitive, but I couldn't think of a better way of doing this :(
         //Rank II -> case 3. aka gets you the Rank III requirements not the Rank II requirements
         //Found that out too late, and couldn't be arsed to change the cases
-        switch (rank){
-            case 1:
-                weapon.setNewGoal(EntityType.ZOMBIE, (short) 1000);
-                break;
-            case 2:
-                weapon.setNewGoal(EntityType.SKELETON, (short) 1000);
-                break;
-            case 3:
-                weapon.setNewGoal(EntityType.SNOWMAN, (short) 100);
-                break;
-            case 4:
-                weapon.setNewGoal(EntityType.CREEPER, (short) 1000);
-                break;
-            case 5:
+        switch (rank) {
+            case 1 -> weapon.setNewGoal(EntityType.ZOMBIE, (short) 1000);
+            case 2 -> weapon.setNewGoal(EntityType.SKELETON, (short) 1000);
+            case 3 -> weapon.setNewGoal(EntityType.SNOWMAN, (short) 100);
+            case 4 -> weapon.setNewGoal(EntityType.CREEPER, (short) 1000);
+            case 5 -> {
                 weapon.setNewGoal(EntityType.BLAZE, (short) 1000);
                 player.sendMessage(Component.text("Looting IV was added to your Sword.").color(NamedTextColor.GRAY));
                 weapon.item().addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 4);
-                break;
-            case 6:
-                weapon.setNewGoal(EntityType.ENDERMAN, (short) 1000);
-                break;
-            case 7:
-                weapon.setNewGoal(EntityType.GHAST, (short) 50);
-                break;
-            case 8:
-                weapon.setNewGoal(EntityType.AREA_EFFECT_CLOUD, (short) 10);
-                break;
-            case 9:
-                weapon.setNewGoal(EntityType.WITHER, (short) 3);
-                break;
-            case 10:
+            }
+            case 6 -> weapon.setNewGoal(EntityType.ENDERMAN, (short) 1000);
+            case 7 -> weapon.setNewGoal(EntityType.GHAST, (short) 50);
+            case 8 -> weapon.setNewGoal(EntityType.AREA_EFFECT_CLOUD, (short) 10);
+            case 9 -> weapon.setNewGoal(EntityType.WITHER, (short) 3);
+            case 10 -> {
                 weapon.item().addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 5);
                 player.sendMessage(Component.text("Looting V was added to your Sword.").color(NamedTextColor.GRAY));
                 weapon.setNewGoal(null, (short) -1);
-                break;
+            }
         }
         //Effects
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1.2f);
@@ -138,10 +121,10 @@ public class CrownWeapons {
             this.item = item;
             List<Component> lore = Objects.requireNonNull(item.lore());
             byte[] loreLines = rankAndGoalLine(lore);
-            rank = (byte) CrownUtils.romanToArabic(PlainComponentSerializer.plain().serialize(lore.get(loreLines[0])).replaceAll("Rank ", ""));
+            rank = (byte) CrownUtils.romanToArabic(ChatUtils.plainText(lore.get(loreLines[0])).replaceAll("Rank ", ""));
 
             Component lore5 = item.lore().get(loreLines[1]);
-            String parseFrom = PlainComponentSerializer.plain().serialize(lore5).toLowerCase().replaceAll("men", "mans");
+            String parseFrom = ChatUtils.plainText(lore5).toLowerCase().replaceAll("men", "mans");
 
             if(parseFrom.contains("max rank")){
                 goal = -1;
@@ -166,7 +149,7 @@ public class CrownWeapons {
             byte[] result = new byte[2];
 
             for (int i = 0; i < lore.size(); i++){
-                String s = PlainComponentSerializer.plain().serialize(lore.get(i)).toLowerCase();
+                String s = ChatUtils.plainText(lore.get(i)).toLowerCase();
 
                 if(s.contains("rank ") && !s.contains("donators") && !s.contains("up")) result[0] = (byte) i;
                 if(s.contains("max rank.") || s.contains("to rank up")) result[1] = (byte) i;

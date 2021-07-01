@@ -245,7 +245,7 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
         getFile().set("LastLocation", entityLocation);
         getFile().set("AllowsTPA", allowsTPA);
         getFile().set("EavesDropping", listeningToEavesdropper);
-        getFile().set("NickName", nickname == null ? null : ChatUtils.getPlainString(nickname));
+        getFile().set("NickName", nickname == null ? null : ChatUtils.plainText(nickname));
         getFile().set("Flying", flying);
         getFile().set("GodMode", godmode);
         getFile().set("Vanished", vanished);
@@ -650,13 +650,13 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
     @Override
     public void sendMessage(net.minecraft.network.chat.Component message, ChatType type){
         if(!isOnline()) return;
-        getHandle().connection.send(new ClientboundChatPacket(message, type, Util.NIL_UUID));
+        sendMessage(Util.NIL_UUID, message, type);
     }
 
     @Override
     public void sendMessage(UUID id, net.minecraft.network.chat.Component message, ChatType type){
         if(!isOnline()) return;
-        getHandle().connection.send(new ClientboundChatPacket(message, type, id));
+        getHandle().connection.connection.send(new ClientboundChatPacket(message, type, id));
     }
 
     @Nonnull
@@ -844,13 +844,13 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
     @Override
     public Location getLocation() {
         if(!isOnline()) return entityLocation;
-        return new Location(getHandle().level.getWorld(), getHandle().getX(), getHandle().getY(), getHandle().getZ(), getHandle().getBukkitYaw(), getHandle().getXRot());
+        return new Location(getHandle().getLevel().getWorld(), getHandle().getX(), getHandle().getY(), getHandle().getZ(), getHandle().getBukkitYaw(), getHandle().getXRot());
     }
 
     @Override
     public World getWorld() {
         if(!isOnline()) return entityLocation.getWorld();
-        return getHandle().level.getWorld();
+        return getHandle().getLevel().getWorld();
     }
 
     @Override

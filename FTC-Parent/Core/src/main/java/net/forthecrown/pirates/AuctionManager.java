@@ -7,6 +7,7 @@ import net.forthecrown.economy.auctions.Auction;
 import net.forthecrown.economy.auctions.AuctionEvents;
 import net.forthecrown.economy.auctions.CrownAuction;
 import net.forthecrown.squire.Squire;
+import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.math.CrownBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -38,7 +39,7 @@ public final class AuctionManager {
 
     public static NamespacedKey AUCTION_KEY;
 
-    public static final CrownBoundingBox AUCTION_AREA = new CrownBoundingBox(Bukkit.getWorld("world"), -657, 49, 3848, -616, 21, 3810);
+    public static final CrownBoundingBox AUCTION_AREA = new CrownBoundingBox(Worlds.NORMAL, -657, 49, 3848, -616, 21, 3810);
 
     public AuctionManager(){
         Bukkit.getPluginManager().registerEvents(new AuctionEvents(), CrownCore.inst());

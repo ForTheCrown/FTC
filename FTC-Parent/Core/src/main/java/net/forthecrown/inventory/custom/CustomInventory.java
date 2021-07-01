@@ -17,7 +17,7 @@ public class CustomInventory implements InventoryHolder {
     private Inventory inv;
     private Border invBorder;
     private Map<Integer, Option> invSlots;
-    public final static Listener listener = new InvClickListener();
+    public final static Listener LISTENER = new InvClickListener();
 
     public CustomInventory() {}
 

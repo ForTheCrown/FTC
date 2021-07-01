@@ -2,9 +2,12 @@ package net.forthecrown.events;
 
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.CrownException;
+import net.forthecrown.cosmetics.effects.arrow.ArrowEvent;
+import net.forthecrown.cosmetics.effects.death.DeathEvent;
 import net.forthecrown.events.custom.SellShopUseEvent;
 import net.forthecrown.events.custom.SignShopUseEvent;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.inventory.custom.InvClickListener;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -42,6 +45,10 @@ public class Events {
 
         register(new DungeonEvents());
         register(new EnchantEvents());
+
+        register(new DeathEvent());
+        register(new ArrowEvent());
+        register(new InvClickListener());
     }
 
     private static void register(Listener listener){

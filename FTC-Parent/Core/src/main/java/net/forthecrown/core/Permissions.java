@@ -44,7 +44,6 @@ public final class Permissions {
     public static final Permission WORLD_BYPASS =       register("ftc.teleports.worldbypass");
 
     public static final Permission MARRY =              register("ftc.marry");
-    public static final Permission MARRY_PEOPLE =       register("ftc.marry.others"); //Make 2 people marry each other.
 
     public static final Permission EMOTE_IGNORE =       register("ftc.emotes.cooldown.ignore");
 

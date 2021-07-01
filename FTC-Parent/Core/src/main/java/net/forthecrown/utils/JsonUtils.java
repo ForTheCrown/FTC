@@ -86,13 +86,9 @@ public class JsonUtils {
         return result;
     }
 
-    public static void readList(JsonElement element, Consumer<JsonElement> adder){
+    public static <T> void readList(JsonElement element, Function<JsonElement, T> func, Consumer<T> adder){
         JsonArray array = element.getAsJsonArray();
-        array.forEach(adder);
-    }
-
-    public static <T> List<T> readList(JsonElement element, Function<JsonElement, T> function){
-        return ListUtils.fromIterable(element.getAsJsonArray(), function);
+        array.forEach(e -> adder.accept(func.apply(e)));
     }
 
     public static <K, V> JsonObject writeMap(Map<K, V> map, Function<Map.Entry<K, V>, Pair<String, JsonElement>> function){

@@ -20,42 +20,42 @@ public class CrownUsablesManager implements UsablesManager {
     final Map<Location, CrownUsableBlock> signs = new HashMap<>();
     final Map<UUID, CrownUsableEntity> entities = new HashMap<>();
 
-    public void registerDefaults(ActionRegistry aRegistry, CheckRegistry cRegistry){
+    public void registerDefaults(ActionRegistry actions, CheckRegistry checks){
         //Actions
-        aRegistry.register(ActionCommand.USER_KEY, () -> new ActionCommand(false));
-        aRegistry.register(ActionCommand.CONSOLE_KEY, () -> new ActionCommand(true));
+        actions.register(ActionCommand.USER_KEY, () -> new ActionCommand(false));
+        actions.register(ActionCommand.CONSOLE_KEY, () -> new ActionCommand(true));
 
-        aRegistry.register(ActionRemoveNumber.BAL_KEY, () -> new ActionRemoveNumber(true));
-        aRegistry.register(ActionRemoveNumber.GEM_KEY, () -> new ActionRemoveNumber(false));
+        actions.register(ActionRemoveNumber.BAL_KEY, () -> new ActionRemoveNumber(true));
+        actions.register(ActionRemoveNumber.GEM_KEY, () -> new ActionRemoveNumber(false));
 
-        aRegistry.register(ActionItem.ADD_KEY, () -> new ActionItem(true));
-        aRegistry.register(ActionItem.REMOVE_KEY, () -> new ActionItem(false));
+        actions.register(ActionItem.ADD_KEY, () -> new ActionItem(true));
+        actions.register(ActionItem.REMOVE_KEY, () -> new ActionItem(false));
 
-        aRegistry.register(ActionChangeScore.REMOVE_KEY, () -> new ActionChangeScore(ActionChangeScore.Action.DECREMENT));
-        aRegistry.register(ActionChangeScore.ADD_KEY, () -> new ActionChangeScore(ActionChangeScore.Action.INCREMENT));
-        aRegistry.register(ActionChangeScore.SET_KEY, () -> new ActionChangeScore(ActionChangeScore.Action.SET));
+        actions.register(ActionChangeScore.REMOVE_KEY, () -> new ActionChangeScore(ActionChangeScore.Action.DECREMENT));
+        actions.register(ActionChangeScore.ADD_KEY, () -> new ActionChangeScore(ActionChangeScore.Action.INCREMENT));
+        actions.register(ActionChangeScore.SET_KEY, () -> new ActionChangeScore(ActionChangeScore.Action.SET));
 
-        aRegistry.register(ActionShowText.KEY, ActionShowText::new);
-        aRegistry.register(ActionTeleport.KEY, ActionTeleport::new);
-        aRegistry.register(ActionKit.KEY, ActionKit::new);
-        aRegistry.register(ActionWarp.KEY, ActionWarp::new);
+        actions.register(ActionShowText.KEY, ActionShowText::new);
+        actions.register(ActionTeleport.KEY, ActionTeleport::new);
+        actions.register(ActionKit.KEY, ActionKit::new);
+        actions.register(ActionWarp.KEY, ActionWarp::new);
 
         //Preconditions
-        cRegistry.register(CheckHasItem.KEY, CheckHasItem::new);
-        cRegistry.register(CheckInventoryEmpty.KEY, CheckInventoryEmpty::new);
+        checks.register(CheckNumber.BAL_KEY, () -> new CheckNumber(true));
+        checks.register(CheckNumber.GEM_KEY, () -> new CheckNumber(false));
 
-        cRegistry.register(CheckNumber.BAL_KEY, () -> new CheckNumber(true));
-        cRegistry.register(CheckNumber.GEM_KEY, () -> new CheckNumber(false));
-
-        cRegistry.register(CheckRank.KEY, CheckRank::new);
-        cRegistry.register(CheckBranch.KEY, CheckBranch::new);
-        cRegistry.register(CheckPermission.KEY, CheckPermission::new);
-        cRegistry.register(CheckCooldown.KEY, CheckCooldown::new);
-        cRegistry.register(CheckNotUsedBefore.KEY, CheckNotUsedBefore::new);
-        cRegistry.register(CheckInWorld.KEY, CheckInWorld::new);
-        cRegistry.register(CheckHasScore.KEY, CheckHasScore::new);
-        cRegistry.register(CheckNeverUsed.KEY, CheckNeverUsed::new);
-        cRegistry.register(CheckHasAllItems.KEY, CheckHasAllItems::new);
+        checks.register(CheckHasItem.KEY, CheckHasItem::new);
+        checks.register(CheckInventoryEmpty.KEY, CheckInventoryEmpty::new);
+        checks.register(CheckRank.KEY, CheckRank::new);
+        checks.register(CheckBranch.KEY, CheckBranch::new);
+        checks.register(CheckPermission.KEY, CheckPermission::new);
+        checks.register(CheckCooldown.KEY, CheckCooldown::new);
+        checks.register(CheckNotUsedBefore.KEY, CheckNotUsedBefore::new);
+        checks.register(CheckInWorld.KEY, CheckInWorld::new);
+        checks.register(CheckHasScore.KEY, CheckHasScore::new);
+        checks.register(CheckNeverUsed.KEY, CheckNeverUsed::new);
+        checks.register(CheckHasAllItems.KEY, CheckHasAllItems::new);
+        checks.register(CheckIsNotAlt.KEY, CheckIsNotAlt::new);
     }
 
     @Override

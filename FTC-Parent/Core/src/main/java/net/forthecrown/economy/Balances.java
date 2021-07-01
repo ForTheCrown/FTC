@@ -1,8 +1,7 @@
 package net.forthecrown.economy;
 
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
 
@@ -12,14 +11,6 @@ import java.util.UUID;
  * Represents the ingame balances held by the players
  */
 public interface Balances extends CrownSerializer {
-
-    /**
-     * Gets the Balanaces instance
-     * @return The Balances instance
-     */
-    static Balances inst(){
-        return CrownCore.getBalances();
-    }
 
     /**
      * Gets a formatted currency messaage

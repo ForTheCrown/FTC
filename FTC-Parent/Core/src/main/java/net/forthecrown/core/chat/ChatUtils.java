@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
 
 /**
@@ -18,7 +18,7 @@ public final class ChatUtils {
             .hexColors()
             .build();
 
-    public static final PlainComponentSerializer PLAIN_SERIALIZER = PlainComponentSerializer.plain();
+    public static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     public static TextComponent convertString(String text, boolean translateColors){
         return SERIALIZER.deserialize(translateColors ? ChatFormatter.translateHexCodes(text) : text);
@@ -40,11 +40,11 @@ public final class ChatUtils {
         return net.minecraft.network.chat.Component.Serializer.fromJson(GsonComponentSerializer.gson().serialize(text));
     }
 
-    public static String getString(Component tex){
+    public static String getString(Component tex) {
         return PaperAdventure.LEGACY_SECTION_UXRC.serialize(tex);
     }
 
-    public static String getPlainString(Component text){
+    public static String plainText(Component text){
         return PLAIN_SERIALIZER.serialize(text);
     }
 

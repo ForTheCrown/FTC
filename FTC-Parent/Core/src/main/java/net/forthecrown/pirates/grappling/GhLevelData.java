@@ -75,11 +75,8 @@ public class GhLevelData implements JsonSerializable {
         this.selectorMat = JsonUtils.readEnum(Material.class, json.get("selectorMat"));
         this.index = json.get("index").getAsByte();
 
-        if(json.has("nextHooks")) this.nextHooks = json.get("nextHooks").getAsInt();
-        else this.nextHooks = -1;
-
-        if(json.has("nextDistance")) this.nextDistance = json.get("nextDistance").getAsInt();
-        else this.nextDistance = -1;
+        this.nextHooks = json.has("nextHooks") ? json.get("nextHooks").getAsInt() : -1;
+        this.nextDistance = json.has("nextDistance") ? json.get("nextDistance").getAsInt() : -1;
 
         GhType type = JsonUtils.readEnum(GhType.class, json.get("type"));
         if(type == null) this.type = GhType.NORMAL;

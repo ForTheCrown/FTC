@@ -1,6 +1,5 @@
 package net.forthecrown.pirates;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.CrownCore;
@@ -37,7 +36,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 public class TreasureShulker extends AbstractJsonSerializer {
@@ -88,7 +86,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
 
         alreadyFound.clear();
         if(json.has("alreadyFound")){
-            JsonUtils.readList(json.get("alreadyFound"), (Consumer<JsonElement>) e -> alreadyFound.add(UUID.fromString(e.getAsString())));
+            JsonUtils.readList(json.get("alreadyFound"), e -> UUID.fromString(e.getAsString()) , alreadyFound::add);
         }
     }
 
@@ -125,6 +123,11 @@ public class TreasureShulker extends AbstractJsonSerializer {
     }
 
     public void kill(){
+        if(currentID == null && location == null){
+            CrownCore.logger().warning("Tried to kill treasure shulker, but both location and id were null");
+            return;
+        }
+
         if(currentID != null){
             Entity entity = Bukkit.getEntity(currentID);
             if(entity == null) return;
@@ -133,12 +136,10 @@ public class TreasureShulker extends AbstractJsonSerializer {
             return;
         }
 
-        if(location != null){
-            location.getNearbyEntitiesByType(Shulker.class, 1).forEach(s -> {
-                if(!s.getPersistentDataContainer().has(Pirates.SHULKER_KEY, PersistentDataType.BYTE)) return;
-                s.remove();
-            });
-        }
+        location.getNearbyEntitiesByType(Shulker.class, 1).forEach(s -> {
+            if(!s.getPersistentDataContainer().has(Pirates.SHULKER_KEY, PersistentDataType.BYTE)) return;
+            s.remove();
+        });
     }
 
     public boolean hasAlreadyFound(UUID id){

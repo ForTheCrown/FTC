@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
  * I'll be honest, I don't know why this exists anymore lol
  * But I know I'm using it lol
  */
+@Deprecated
 public class CustomInventoryHolder implements InventoryHolder {
 
     private final Inventory inv;

@@ -1,6 +1,7 @@
 package net.forthecrown.july;
 
 import com.google.common.collect.ImmutableList;
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.commands.CommandLeave;
 import net.forthecrown.core.comvars.ComVar;
 import net.forthecrown.core.comvars.ComVars;
@@ -42,6 +43,8 @@ public final class JulyMain extends JavaPlugin {
         reporter = ReporterFactory.of(this, event);
 
         new CommandJulyEvent();
+
+        CrownCore.getCheckRegistry().register(CheckIsNotAlt.KEY, CheckIsNotAlt::new);
 
         BlockEffects.init();
 

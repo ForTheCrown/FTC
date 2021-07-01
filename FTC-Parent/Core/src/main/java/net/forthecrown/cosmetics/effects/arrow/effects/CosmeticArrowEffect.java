@@ -1,19 +1,15 @@
 package net.forthecrown.cosmetics.effects.arrow.effects;
 
 import net.forthecrown.cosmetics.effects.CosmeticEffect;
-import net.forthecrown.cosmetics.effects.arrow.ArrowEvent;
 import net.forthecrown.inventory.custom.options.ClickableOption;
 import net.forthecrown.user.CrownUser;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 public abstract class CosmeticArrowEffect implements CosmeticEffect {
-
-    public static final Listener listener = new ArrowEvent();
 
     @Override
     public int getGemCost() { return 1000; }

@@ -93,17 +93,8 @@ public final class Main extends JavaPlugin implements CrownCore {
 
         luckPerms = LuckPermsProvider.get();
 
-        getConfig().options().copyDefaults(true);
         saveDefaultConfig();
-
-        logger = getLogger();
-        announcer = new CrownBroadcaster();
-
-        messages = new CrownMessages();
-        messages.load();
-
-        emotes = new Emotes();
-        emotes.registerEmotes();
+        getConfig().options().copyDefaults(true);
 
         joinInfo = new JoinInfo();
 
@@ -114,9 +105,6 @@ public final class Main extends JavaPlugin implements CrownCore {
         jailManager = new CrownJailManager();
         kingship = new CrownKingship();
         rules = new ServerRules();
-
-        actionRegistry = new CrownActionRegistry();
-        checkRegistry = new CrownCheckRegistry();
 
         usablesManager = new CrownUsablesManager();
         usablesManager.registerDefaults(actionRegistry, checkRegistry);
@@ -143,6 +131,18 @@ public final class Main extends JavaPlugin implements CrownCore {
 
     @Override
     public void onLoad() {
+        logger = getLogger();
+        announcer = new CrownBroadcaster();
+
+        messages = new CrownMessages();
+        messages.load();
+
+        emotes = new Emotes();
+        emotes.registerEmotes();
+
+        actionRegistry = new CrownActionRegistry();
+        checkRegistry = new CrownCheckRegistry();
+
         CrownWgFlags.init();
     }
 
@@ -192,7 +192,8 @@ public final class Main extends JavaPlugin implements CrownCore {
 
         ComVars.reload(config);
 
-        serverSpawn = config.getLocation("ServerSpawn", new Location(Worlds.VOID, 153.5, 5, 353.5, 90, 0));
+        Location defSpawnLoc = new Location(Worlds.VOID, 153.5, 5, 353.5, 90, 0);
+        serverSpawn = config.getLocation("ServerSpawn", defSpawnLoc);
 
         loadDefaultItemPrices();
 

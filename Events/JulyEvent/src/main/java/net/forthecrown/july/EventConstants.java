@@ -49,7 +49,7 @@ public class EventConstants {
     public static final int GEM_SECRET_VALUE = 100;
     public static final int GEM_PATH_VALUE = 10;
 
-    public static final long FAST_TIME = (long) (1.333333f * 60 * 1000);//One minute and 20 seconds
+    public static final long FAST_TIME = 85000L;                        //One minute and 25 seconds
     public static final long SLOW_TIME = 3 * 60 * 1000;                 //Three minutes
 
     public static final FireworkEffect COOL_EFFECT = FireworkEffect.builder()
