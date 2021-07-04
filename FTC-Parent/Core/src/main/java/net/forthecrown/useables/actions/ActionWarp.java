@@ -53,7 +53,7 @@ public class ActionWarp implements UsageAction {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{key=" + String.valueOf(warpKey) + "}";
+        return key().asString() + "{key=" + String.valueOf(warpKey) + "}";
     }
 
     @Override

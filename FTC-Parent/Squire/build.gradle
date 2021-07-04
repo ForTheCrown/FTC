@@ -19,8 +19,8 @@ repositories {
 dependencies {
     implementation 'org.jetbrains:annotations:19.0.0'
 
-    //compileOnly files("D:/GitHubRepos/Paper/Paper-Server/build/libs/Paper-Server-1.17-R0.1-SNAPSHOT-mojang-mapped.jar")
-    compileOnly files('C:\\wvh\\Java\\SpigotPaper\\Paper-Server-1.17-R0.1-SNAPSHOT-mojang-mapped.jar')
+    compileOnly files("D:/GitHubRepos/Paper/Paper-Server/build/libs/Paper-Server-1.17-R0.1-SNAPSHOT-mojang-mapped.jar")
+    //compileOnly files('C:\\wvh\\Java\\SpigotPaper\\Paper-Server-1.17-R0.1-SNAPSHOT-mojang-mapped.jar')
     implementation('com.github.Querz:NBT:6.1')
 }
 

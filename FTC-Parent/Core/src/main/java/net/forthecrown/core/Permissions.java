@@ -10,12 +10,12 @@ import org.bukkit.plugin.PluginManager;
 public final class Permissions {
     public static final String COMMAND_PREFIX = "ftc.commands.";
 
-    public static final Permission EAVESDROP_ADMIN =    register("ftc.eavesdrop.admin");
     public static final Permission EAVESDROP =          register("ftc.eavesdrop");
     public static final Permission EAVESDROP_DM =       register("ftc.eavesdrop.dm");
     public static final Permission EAVESDROP_SIGNS =    register("ftc.eavesdrop.signs");
-    public static final Permission EAVESDROP_MARRIAGE = register("ftc.eavesdrop.marriage");
+    public static final Permission EAVESDROP_ADMIN =    register("ftc.eavesdrop.admin");
     public static final Permission EAVESDROP_MUTED =    register("ftc.eavesdrop.muted");
+    public static final Permission EAVESDROP_MARRIAGE = register("ftc.eavesdrop.marriage");
 
     public static final Permission HELPER =             register("ftc.helper");
     public static final Permission POLICE =             register("ftc.police");
@@ -30,11 +30,12 @@ public final class Permissions {
 
     public static final Permission STAFF_CHAT =         register("ftc.staffchat");
     public static final Permission CORE_ADMIN =         register("ftc.admin");
-    public static final Permission SHOP_ADMIN =         register("ftc.shops.admin");
     public static final Permission GAMEMODES =          register("ftc.gamemodes");
     public static final Permission KING_MAKER =         register("ftc.kingmaker");
     public static final Permission IGNORE_CHAT_CASE =   register("ftc.chatcaseignore");
     public static final Permission BROADCAST =          register("ftc.broadcast");
+
+    public static final Permission SHOP_ADMIN =         register("ftc.shops.admin");
 
     public static final Permission DONATOR_1 =          register("ftc.donator1");
     public static final Permission DONATOR_2 =          register("ftc.donator2");
@@ -46,6 +47,10 @@ public final class Permissions {
     public static final Permission MARRY =              register("ftc.marry");
 
     public static final Permission EMOTE_IGNORE =       register("ftc.emotes.cooldown.ignore");
+    public static final Permission EMOTES =             register("ftc.emotes");
+    public static final Permission EMOTE_JINGLE =       register("ftc.emotes.jingle");
+    public static final Permission EMOTE_POG =          register("ftc.emotes.pog");
+    public static final Permission EMOTE_SCARE =        register("ftc.emotes.scare");
 
     public static final Permission NEARBY =             register(COMMAND_PREFIX + "near");
     public static final Permission NEARBY_IGNORE =      register(COMMAND_PREFIX + "near.ignore");

@@ -1,5 +1,6 @@
 package net.forthecrown.pirates;
 
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.economy.pirates.CrownPirateEconomy;
 import net.forthecrown.economy.pirates.PirateEconomy;
 import net.forthecrown.pirates.grappling.GrapplingHookParkour;
@@ -21,8 +22,18 @@ public class Pirates {
         pirateEconomy = new CrownPirateEconomy();
         shulker = new TreasureShulker();
         ghParkour = new GrapplingHookParkour();
-        parrotTracker = new ParrotTracker();
         auctionManager = new AuctionManager();
+        parrotTracker = new ParrotTracker();
+
+        CrownCore.logger().info("Pirates loaded");
+    }
+
+    public static void shutDown(){
+        pirateEconomy.save();
+        shulker.save();
+        ghParkour.getData().save();
+        parrotTracker.save();
+        auctionManager.saveAuctions();
     }
 
     public static PirateEconomy getPirateEconomy() { return pirateEconomy; }

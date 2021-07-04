@@ -45,7 +45,7 @@ public class CheckNotUsedBefore implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{}";
+        return key().asString();
     }
 
     @Override

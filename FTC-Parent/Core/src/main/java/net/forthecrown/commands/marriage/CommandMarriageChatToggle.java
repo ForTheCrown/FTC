@@ -49,7 +49,7 @@ public class CommandMarriageChatToggle extends FtcCommand {
 
                     if(inter.getMarriedTo() == null) throw FtcExceptionProvider.notMarried();
 
-                    boolean toggled = !inter.marriageChatToggled();
+                    boolean toggled = !inter.mChatToggled();
 
                     if(toggled){
                         CrownUser spouse = UserManager.getUser(inter.getMarriedTo());
@@ -58,7 +58,7 @@ public class CommandMarriageChatToggle extends FtcCommand {
 
                     String key = "marriage.chat." + (toggled ? "on" : "off");
 
-                    inter.setMarriageChatToggled(toggled);
+                    inter.setMChatToggled(toggled);
                     user.sendMessage(
                             Component.translatable(key).color(NamedTextColor.YELLOW)
                     );

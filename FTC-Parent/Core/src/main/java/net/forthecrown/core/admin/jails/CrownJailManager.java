@@ -2,6 +2,7 @@ package net.forthecrown.core.admin.jails;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.events.dynamic.JailListener;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.utils.CrownUtils;
@@ -21,6 +22,8 @@ public class CrownJailManager extends AbstractJsonSerializer implements JailMana
     public CrownJailManager(){
         super("jails");
         reload();
+
+        CrownCore.logger().info("Jails loaded");
     }
 
     @Override
@@ -90,17 +93,17 @@ public class CrownJailManager extends AbstractJsonSerializer implements JailMana
     }
 
     @Override
-    public JailListener getJailListener(Player player){
+    public JailListener getListener(Player player){
         return onlineInJail.get(player);
     }
 
     @Override
-    public void addJailListener(JailListener listener) {
+    public void addListener(JailListener listener) {
         onlineInJail.put(listener.player, listener);
     }
 
     @Override
-    public void removeJailListener(JailListener listener) {
+    public void removeListener(JailListener listener) {
         onlineInJail.remove(listener.player);
     }
 }

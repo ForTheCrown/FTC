@@ -1,0 +1,3 @@
+java -jar SpecialSource.jar -i Core-2.0.0-SNAPSHOT-mojang-mapped.jar -o Core-s1.jar --srg-in moj-obf.txt --reverse -l -L
+java -jar SpecialSource.jar -i Core-s1.jar -o Core-s2.jar --srg-in obf-spigot.csrg -l -L
+java -jar SpecialSource.jar -i Core-s2.jar -o ForTheCrown-Plugin.jar --srg-in spigot-spigot-fields.csrg --reverse -l -L

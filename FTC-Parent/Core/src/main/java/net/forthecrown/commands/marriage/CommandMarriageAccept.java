@@ -46,14 +46,14 @@ public class CommandMarriageAccept extends FtcCommand {
                             CrownUser target = UserType.getUser(c, "user");
                             UserInteractions inter = user.getInteractions();
 
-                            if(inter.getLastMarriageRequest() == null || !inter.getLastMarriageRequest().equals(target.getUniqueId())){
+                            if(inter.getLastProposal() == null || !inter.getLastProposal().equals(target.getUniqueId())){
                                 throw FtcExceptionProvider.translatable("marriage.noRequest", user.nickDisplayName());
                             }
 
                             inter.setWaitingFinish(target.getUniqueId());
                             target.getInteractions().setWaitingFinish(user.getUniqueId());
 
-                            inter.setLastMarriageRequest(null);
+                            inter.setLastProposal(null);
 
                             user.sendMessage(
                                     Component.translatable("marriage.request.accepted.target",

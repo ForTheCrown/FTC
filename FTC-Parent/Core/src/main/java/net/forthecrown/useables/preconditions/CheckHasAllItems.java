@@ -55,7 +55,7 @@ public class CheckHasAllItems implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + '{' + "items=" + items.toString() + '}';
+        return key().asString() + '{' + "items=" + items.toString() + '}';
     }
 
     @Override

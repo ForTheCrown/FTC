@@ -1,11 +1,10 @@
 package net.forthecrown.economy.pirates;
 
 import net.forthecrown.economy.pirates.merchants.*;
+import net.forthecrown.registry.Registry;
 import net.forthecrown.serializer.CrownSerializer;
 
 public interface PirateEconomy extends CrownSerializer {
-    boolean shouldUpdateDate();
-
     void updateDate();
 
     EnchantMerchant getEnchantMerchant();
@@ -20,9 +19,13 @@ public interface PirateEconomy extends CrownSerializer {
 
     ParrotMerchant getParrotMerchant();
 
+    GrapplingHookMerchant getGhMerchant();
+
     int getMaxEarnings();
 
     void setMaxEarnings(int maxEarnings);
 
     UsablePirateNpc getNpcById(String id);
+
+    Registry<UsablePirateNpc> getNpcRegistry();
 }

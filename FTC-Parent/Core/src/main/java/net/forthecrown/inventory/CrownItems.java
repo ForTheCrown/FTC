@@ -10,6 +10,7 @@ import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.Validate;
@@ -62,6 +63,9 @@ public final class CrownItems {
 
     private static final ItemStack VOTE_TICKET;
     private static final ItemStack ELITE_VOTE_TICKET;
+
+    public static final Style NON_ITALIC_DARK_GRAY = Style.style(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
+    public static final Style NON_ITALIC_WHITE = Style.style(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
 
     static {
         final Component border = Component.text("-----------------------------").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
@@ -166,8 +170,6 @@ public final class CrownItems {
         return result;
     }
 
-    public static final Style NON_ITALIC_DARK_GRAY = Style.style(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
-    public static final Style NON_ITALIC_WHITE = Style.style(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
     public static ItemStack getCoins(int amount, int itemAmount){
         return new ItemStackBuilder(Material.SUNFLOWER, itemAmount)
                 .setName(Component.text("Rhines").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
@@ -185,6 +187,10 @@ public final class CrownItems {
                 .style(NON_ITALIC_DARK_GRAY)
                 .append(Component.text(kingship.isFemale() ? "Queen " : "King "))
                 .append(kingship.name());
+    }
+
+    public static Style nonItalic(TextColor color){
+        return Style.style(color).decoration(TextDecoration.ITALIC, false);
     }
 
     public static ItemStack makeCrown(int level, String owner){
@@ -241,7 +247,8 @@ public final class CrownItems {
         return result;
     }
 
-    //String to component conversion ¬_¬
+    //Strings are outdated, use Components
+    @Deprecated
     public static ItemStack makeItem(@NotNull Material material, @Nonnegative int amount, boolean hideFlags, String name, String... lores){
         Validate.notNull(material, "Material cannot be null");
 
@@ -249,8 +256,7 @@ public final class CrownItems {
         if(name != null){
             name_c = Component.text()
                     .append(ChatUtils.convertString(name))
-                    .color(NamedTextColor.WHITE)
-                    .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                    .style(NON_ITALIC_WHITE)
                     .build();
         }
 
@@ -261,8 +267,7 @@ public final class CrownItems {
                 if(CrownUtils.isNullOrBlank(lores[i])) lore[i] = Component.text("");
                 else lore[i] = Component.text()
                         .append(ChatUtils.convertString(lores[i]))
-                        .color(NamedTextColor.WHITE)
-                        .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                        .style(NON_ITALIC_WHITE)
                         .build();
             }
         }

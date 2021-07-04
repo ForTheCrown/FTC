@@ -38,7 +38,7 @@ public class RoyalUtils {
     public static TextComponent itemRequiredMessage(DungeonBoss<?> boss){
         TextComponent text = Component.text()
                 .color(NamedTextColor.AQUA)
-                .append(Component.text("To spawn the boss in this level you need:"))
+                .append(Component.translatable("dungeons.neededItems"))
                 .build();
         for (ItemStack i: boss.getSpawningItems()){
             text = text.append(Component.newline());

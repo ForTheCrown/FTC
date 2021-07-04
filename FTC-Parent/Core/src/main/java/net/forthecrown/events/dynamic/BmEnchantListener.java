@@ -16,6 +16,7 @@ import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -36,6 +37,7 @@ public class BmEnchantListener extends AbstractInvListener implements Listener {
         if(event1.getClickedInventory() instanceof PlayerInventory) return;
         if(event1.getSlot() != 11) event1.setCancelled(true);
         if(event1.getSlot() == 11 && (event1.getAction() == InventoryAction.PICKUP_ALL || event1.getAction() == InventoryAction.SWAP_WITH_CURSOR)) return;
+
         if(event1.getCurrentItem() == null) return;
 
         ItemStack toCheck = event1.getClickedInventory().getItem(11);
@@ -97,5 +99,24 @@ public class BmEnchantListener extends AbstractInvListener implements Listener {
             if(enchantment.conflictsWith(e)) return false;
         }
         return enchantment.canEnchantItem(toEnchant);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if(!event.getPlayer().equals(player)) return;
+        if(event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
+
+        ItemStack item = event.getInventory().getItem(11);
+        if(item != null){
+            PlayerInventory inventory = player.getInventory();
+
+            try {
+                inventory.addItem(item);
+            } catch (Exception e){
+                player.getWorld().dropItem(player.getLocation(), item);
+            }
+        }
+
+        HandlerList.unregisterAll(this);
     }
 }

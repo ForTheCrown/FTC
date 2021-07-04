@@ -1,6 +1,7 @@
 package net.forthecrown.useables.actions;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -54,11 +55,11 @@ public class ActionTeleport implements UsageAction {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{location=" + location + "}";
+        return key().asString() + "{location=" + location + "}";
     }
 
     @Override
-    public JsonElement serialize() {
+    public JsonObject serialize() {
         return JsonUtils.writeLocation(location);
     }
 

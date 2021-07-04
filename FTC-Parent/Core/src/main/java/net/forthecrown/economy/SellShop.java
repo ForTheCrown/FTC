@@ -1,24 +1,26 @@
 package net.forthecrown.economy;
 
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.events.dynamic.SellShopEvents;
-import net.forthecrown.inventory.CrownItems;
-import net.forthecrown.inventory.CustomInventoryHolder;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
+import net.forthecrown.events.dynamic.SellShopEvents;
+import net.forthecrown.inventory.CustomInventoryHolder;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.SellAmount;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.user.enums.SellAmount;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import static net.forthecrown.inventory.CrownItems.makeItem;
 
 /**
  * The sellshop, where players can sell their items
@@ -36,7 +38,7 @@ public class SellShop {
     public SellShop(CrownUser base){
         user = base;
 
-        CrownCore.inst().getServer().getPluginManager().registerEvents(new SellShopEvents(base.getPlayer(), this), CrownCore.inst());
+        Bukkit.getPluginManager().registerEvents(new SellShopEvents(base.getPlayer(), this), CrownCore.inst());
     }
 
     public Inventory open(Menu menu){
@@ -53,7 +55,7 @@ public class SellShop {
     public Inventory dropsMenu(){
         current = Menu.DROPS;
         Inventory inv = getBaseInventory("Mob Drops Shop Menu");
-        inv.setItem(4, CrownItems.makeItem(Material.ROTTEN_FLESH, 1, true, "&bDrops"));
+        inv.setItem(4, makeItem(Material.ROTTEN_FLESH, 1, true, "&bDrops"));
 
         inv.setItem(20, makeSellItem(Material.ROTTEN_FLESH));
         inv.setItem(21, makeSellItem(Material.BONE));
@@ -73,7 +75,7 @@ public class SellShop {
     public Inventory cropsMenu(){
         current = Menu.CROPS;
         Inventory inv = getBaseInventory("Farming Items Shop Menu");
-        inv.setItem(4, CrownItems.makeItem(Material.OAK_SAPLING, 1, true, "&bFarming"));
+        inv.setItem(4, makeItem(Material.OAK_SAPLING, 1, true, "&bFarming"));
 
         inv.setItem(20, makeSellItem(Material.BAMBOO));
         inv.setItem(21, makeSellItem(Material.KELP));
@@ -97,7 +99,7 @@ public class SellShop {
     public Inventory miningMenu(){
         current = Menu.MINING;
         Inventory inv = getBaseInventory("Mining Items Shop Menu");
-        inv.setItem(4, CrownItems.makeItem(Material.IRON_PICKAXE, 1, true, "&bMining"));
+        inv.setItem(4, makeItem(Material.IRON_PICKAXE, 1, true, "&bMining"));
 
         inv.setItem(11, makeSellItem(Material.LAPIS_LAZULI));
         inv.setItem(12, makeSellItem(Material.QUARTZ));
@@ -120,7 +122,7 @@ public class SellShop {
         inv.setItem(34, makeSellItem(Material.SANDSTONE));
         inv.setItem(25, makeSellItem(Material.NETHERRACK));
 
-        inv.setItem(8, CrownItems.makeItem(Material.IRON_BLOCK, 1, true, "&bBlocks menu"));
+        inv.setItem(8, makeItem(Material.IRON_BLOCK, 1, true, "&bBlocks menu"));
         return inv;
     }
 
@@ -145,12 +147,12 @@ public class SellShop {
         current = Menu.MAIN;
         Inventory inv = new CustomInventoryHolder("FTC Shop", 27).getInventory();
 
-        inv.setItem(11, CrownItems.makeItem(Material.GOLD_BLOCK, 1, true, "&e-Item Shop-", "&7Sell vanilla items."));
-        inv.setItem(15, CrownItems.makeItem(Material.EMERALD_BLOCK, 1, true, "&e-Web store-", "&7Online server shop."));
+        inv.setItem(11, makeItem(Material.GOLD_BLOCK, 1, true, "&e-Item Shop-", "&7Sell vanilla items."));
+        inv.setItem(15, makeItem(Material.EMERALD_BLOCK, 1, true, "&e-Web store-", "&7Online server shop."));
 
         for(int i = 0; i < 10; i++){
-            inv.setItem(i, CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
-            inv.setItem(i+17, CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
+            inv.setItem(i, makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
+            inv.setItem(i+17, makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
         }
 
         return inv;
@@ -160,13 +162,13 @@ public class SellShop {
         current = Menu.DECIDING;
         Inventory inv = new CustomInventoryHolder("FTC Shop", 27).getInventory();
 
-        inv.setItem(11, CrownItems.makeItem(Material.OAK_SAPLING, 1, true, "&bFarming", "&7Crops and other farmable items."));
-        inv.setItem(13, CrownItems.makeItem(Material.IRON_PICKAXE, 1, true, "&bMining", "&7Ores and common blocks."));
-        inv.setItem(15, CrownItems.makeItem(Material.ROTTEN_FLESH, 1, true, "&bDrops", "&7Common mobdrops."));
+        inv.setItem(11, makeItem(Material.OAK_SAPLING, 1, true, "&bFarming", "&7Crops and other farmable items."));
+        inv.setItem(13, makeItem(Material.IRON_PICKAXE, 1, true, "&bMining", "&7Ores and common blocks."));
+        inv.setItem(15, makeItem(Material.ROTTEN_FLESH, 1, true, "&bDrops", "&7Common mobdrops."));
 
         for(int i = 0; i < 10; i++){
-            inv.setItem(i, CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
-            inv.setItem(i+17, CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
+            inv.setItem(i, makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
+            inv.setItem(i+17, makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-"));
         }
 
         return inv;
@@ -210,10 +212,10 @@ public class SellShop {
     private Inventory getBaseInventory(String menuName){
         CustomInventoryHolder holder = new CustomInventoryHolder(menuName, 54);
         Inventory inv = holder.getInventory();
-        inv.setItem(0, CrownItems.makeItem(Material.PAPER, 1, true, "&e< Previous page"));
+        inv.setItem(0, makeItem(Material.PAPER, 1, true, "&e< Previous page"));
 
         //add glass panes
-        final ItemStack border = CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
+        final ItemStack border = makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
         for (int i = 1; i < 54; i++){
             if(i == 4) i++;
             if(i == 10 || i == 19 || i == 28 || i == 37) i += 8;
@@ -232,7 +234,7 @@ public class SellShop {
 
     private ItemStack getSellAmountPane(SellAmount paneToGet){
         String[] asd = {"&7Set the amount of items you", "&7will sell per click"};
-        ItemStack toReturn = CrownItems.makeItem(Material.BLACK_STAINED_GLASS_PANE, paneToGet.value, true, paneToGet.text, asd);
+        ItemStack toReturn = makeItem(Material.BLACK_STAINED_GLASS_PANE, paneToGet.value, true, paneToGet.text, asd);
 
         if(user.getSellAmount() == paneToGet) toReturn.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
         return toReturn;

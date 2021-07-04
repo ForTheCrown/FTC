@@ -44,7 +44,7 @@ public class CheckNumber implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{" + "checks=" + (checkBal ? "balance" : "gems") + ",amount=" + amount + "}";
+        return key().asString() + "{" + ",amount=" + amount + "}";
     }
 
     @Override

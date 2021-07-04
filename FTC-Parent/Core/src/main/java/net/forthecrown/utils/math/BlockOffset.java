@@ -67,6 +67,16 @@ public class BlockOffset implements JsonSerializable {
         return min.clone().add(xOffset, yOffset, zOffset);
     }
 
+    public Location apply(Location min, float yaw, float pitch){
+        return new Location(
+                min.getWorld(),
+                xOffset + min.getX(),
+                yOffset + min.getY(),
+                zOffset + min.getZ(),
+                yaw, pitch
+        );
+    }
+
     public Vector apply(Vector vector){
         return new Vector(vector.getX() + xOffset, vector.getY() + yOffset, vector.getZ() + zOffset);
     }

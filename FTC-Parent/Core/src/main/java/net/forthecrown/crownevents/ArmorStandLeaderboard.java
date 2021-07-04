@@ -112,7 +112,7 @@ public class ArmorStandLeaderboard {
         return result;
     }
 
-    private static void createStand(String name, Location loc){
+    private static void createStand(String name, Location loc) {
         ArmorStand stand = loc.getWorld().spawn(loc, ArmorStand.class);
         stand.customName(ChatUtils.convertString(name));
         stand.setCustomNameVisible(true);

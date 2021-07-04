@@ -9,6 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.useables.warps.Warp;
+import net.forthecrown.utils.SuggestionUtils;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
@@ -46,7 +47,7 @@ public class WarpType implements ArgumentType<Key> {
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, boolean ignoreChecks){
-        if(ignoreChecks) return CrownUtils.suggestKeys(builder, CrownCore.getWarpRegistry().getKeys());
+        if(ignoreChecks) return SuggestionUtils.suggestKeys(builder, CrownCore.getWarpRegistry().getKeys());
 
         try {
             return CrownCore.getWarpRegistry().getSuggestions((CommandContext<CommandSource>) context, builder);

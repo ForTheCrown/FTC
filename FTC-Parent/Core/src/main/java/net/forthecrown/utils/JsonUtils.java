@@ -20,7 +20,8 @@ import java.util.function.Function;
 public class JsonUtils {
     public static JsonObject writeLocation(Location location){
         JsonObject result = new JsonObject();
-        result.addProperty("world", location.getWorld().getName());
+
+        if(location.getWorld() != null) result.addProperty("world", location.getWorld().getName());
 
         result.addProperty("x", location.getX());
         result.addProperty("y", location.getY());
@@ -33,7 +34,11 @@ public class JsonUtils {
     }
 
     public static Location readLocation(JsonObject json){
-        World world = Objects.requireNonNull(Bukkit.getWorld(json.get("world").getAsString()));
+        World world;
+
+        if(json.has("world")) world = Objects.requireNonNull(Bukkit.getWorld(json.get("world").getAsString()));
+        else world = null;
+
         double x = json.get("x").getAsDouble();
         double y = json.get("y").getAsDouble();
         double z = json.get("z").getAsDouble();

@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics.effects;
 
 import net.forthecrown.inventory.CrownItems;
-import net.forthecrown.inventory.custom.CustomInvBuilder;
+import net.forthecrown.inventory.custom.CustomInventoryBuilder;
 import net.forthecrown.inventory.custom.CustomInventory;
 import net.forthecrown.inventory.custom.borders.GenericBorder;
 import net.forthecrown.inventory.custom.options.ClickAction;
@@ -65,12 +65,12 @@ public class MainCosmeticsMenu implements CosmeticMenu {
 
     @Override
     public CustomInventory buildInventory(CrownUser user) {
-        CustomInvBuilder invBuilder = new CustomInvBuilder();
+        CustomInventoryBuilder invBuilder = new CustomInventoryBuilder();
         return invBuilder
                 .setUser(user)
                 .setSize(this.getSize())
                 .setTitle(this.getTitle())
-                .setInvBorder(new GenericBorder())
+                .setInvBorder(new GenericBorder().setSize(getSize()))
                 .addOptions(menuSlots)
                 .addOption(4, getHeaderOption(user))
                 .addOption(40, getRideOption(user, 40))

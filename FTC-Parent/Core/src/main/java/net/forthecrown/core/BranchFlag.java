@@ -1,12 +1,9 @@
 package net.forthecrown.core;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import net.forthecrown.user.enums.Branch;
-import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
 public class BranchFlag extends Flag<Branch> {
@@ -41,12 +38,5 @@ public class BranchFlag extends Flag<Branch> {
         } catch (Exception e){
             return "none";
         }
-    }
-
-    public static Branch queryFlag(Location interacting, BranchFlag flag){
-        return WorldGuard.getInstance()
-                .getPlatform()
-                .getRegionContainer().createQuery()
-                .queryValue(BukkitAdapter.adapt(interacting), null, flag);
     }
 }

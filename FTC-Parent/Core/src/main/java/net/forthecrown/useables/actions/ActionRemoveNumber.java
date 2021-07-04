@@ -52,7 +52,7 @@ public class ActionRemoveNumber implements UsageAction {
 
     @Override
     public String asString() {
-        return  getClass().getSimpleName() + "{removesfrom=" + (fromBal ? "balance" : "gems") + ",amount=" + amount + "}";
+        return key().asString() + "{amount=" + amount + "}";
     }
 
     @Override

@@ -14,7 +14,5 @@ public class SquireMain extends JavaPlugin implements Squire {
 
         enchants = new RoyalEnchants();
         enchants.registerEnchants();
-
-        //repopulators = new Repopulators(getLogger());
     }
 }

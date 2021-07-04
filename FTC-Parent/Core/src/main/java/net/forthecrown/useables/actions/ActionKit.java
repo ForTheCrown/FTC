@@ -52,7 +52,7 @@ public class ActionKit implements UsageAction {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{key= " + kitKey + "}";
+        return key().asString() + "{key= " + kitKey + "}";
     }
 
     @Override

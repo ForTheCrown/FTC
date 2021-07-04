@@ -4,8 +4,10 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.CrownWgFlags;
+import net.forthecrown.core.WgFlags;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Cooldown;
@@ -23,22 +25,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class PlayerRidingManager implements Listener {
 
-    final Set<PlayerRider> riders;
+    private final ObjectSet<PlayerRider> riders;
 
     static final Location RETREAT_LOCATION = new Location(Bukkit.getWorld("world"), 200.5, 71, 1000.5);
 
     PlayerRidingManager(){
 
-        this.riders = new HashSet<>();
+        this.riders = new ObjectArraySet<>();
         Bukkit.getPluginManager().registerEvents(this, CrownCore.inst());
     }
 
-    public Set<PlayerRider> getRiders() {
+    public ObjectSet<PlayerRider> getRiders() {
         return riders;
     }
 
@@ -65,21 +66,21 @@ public class PlayerRidingManager implements Listener {
         //WorldGuard stuffs
         LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(rider);
         ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(wgPlayer.getLocation());
-        if(!set.testState(wgPlayer, CrownWgFlags.RIDING_ALLOWED)){
+        if(!set.testState(wgPlayer, WgFlags.RIDING_ALLOWED)){
             user.sendMessage("&c&lHey! &7You can't ride players here.");
             return;
         }
 
         PlayerRider riderM = new PlayerRider(rider, riddenPlayer);
         Bukkit.getPluginManager().registerEvents(riderM, CrownCore.inst());
-        riders.add(riderM);
+        addRider(riderM);
     }
 
     public boolean canRide(CrownUser user, CrownUser ridden){
         if(user.getPlayer().isSneaking()) return false;
 
         if(!user.allowsRidingPlayers() || !ridden.allowsRidingPlayers()){
-            user.sendMessage("&7You both have to allow riding players");
+            user.sendMessage(Component.translatable("user.bothAllowRiding", NamedTextColor.GRAY));
             return false;
         }
 
@@ -109,83 +110,39 @@ public class PlayerRidingManager implements Listener {
             r.stopRiding();
     }
 
-
-    /*@EventHandler
-    public void playerDismountFromPlayer(EntityDismountEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Entity mount = event.getDismounted();
-            if (isSlimySeat(mount)) {
-                // Stop riding stuff
-                mount.leaveVehicle();
-
-                // Stop carrying stuff
-                mount.eject();
-                mount.remove();
-            }
+    public PlayerRider getByRider(Player player){
+        for (PlayerRider r: riders){
+            if(r.rider.equals(player)) return r;
         }
+
+        return null;
     }
 
-    @EventHandler
-    public void playerCarryingPlayerLogout(PlayerQuitEvent event) {
-        // Player leaves with something riding him:
-        event.getPlayer().eject();
-        Location loc = event.getPlayer().getLocation();
-        for (Entity nearbyEntity : loc.getWorld().getNearbyEntities(loc, 0.1, 2, 0.1)) {
-            if (isSlimySeat(nearbyEntity)) {
-                nearbyEntity.eject();
-                nearbyEntity.remove();
-            }
+    public PlayerRider getByRidden(Player player){
+        for (PlayerRider r: riders){
+            if(r.ridden.equals(player)) return r;
         }
-        // Player leaves while riding something
-        if (event.getPlayer().isInsideVehicle()) {
-            if (isSlimySeat(event.getPlayer().getVehicle())) {
-                event.getPlayer().getVehicle().remove();
-                event.getPlayer().leaveVehicle();
-            }
-        }
+
+        return null;
     }
 
-    @EventHandler
-    public void playerCarryingPlayerDies(PlayerDeathEvent event) {
-        // Player leaves with something riding him:
-        event.getEntity().eject();
-        Location loc = event.getEntity().getLocation();
-        for (Entity nearbyEntity : loc.getWorld().getNearbyEntities(loc, 0.1, 2, 0.1)) {
-            if (isSlimySeat(nearbyEntity)) {
-                nearbyEntity.eject();
-                nearbyEntity.remove();
-            }
-        }
-        // Player leaves while riding something
-        if (event.getEntity().isInsideVehicle()) {
-            if (isSlimySeat(event.getEntity().getVehicle())) {
-                event.getEntity().getVehicle().remove();
-                event.getEntity().leaveVehicle();
-            }
-        }
+    public boolean isBeingRidden(Player player){
+        return getByRidden(player) != null;
     }
 
-    public boolean isSlimySeat(Entity entity) {
-        return (entity.getType() == EntityType.SLIME
-                && entity.getCustomName() != null
-                && entity.getCustomName().contains(ChatColor.GREEN + "slimy"));
+    public boolean isRiding(Player player){
+        return getByRider(player) != null;
     }
 
-    @EventHandler
-    public void playerLaunchOtherPlayer(PlayerInteractEntityEvent event) {
-        if (event.getHand().equals(EquipmentSlot.HAND)) {
-            if ((!event.getPlayer().getPassengers().isEmpty()) && event.getPlayer().isSneaking() && event.getPlayer().getLocation().getPitch() <= (-75)) {
-                //Set<Entity> playerPassengers = new HashSet<>();
-                for (Entity passenger : event.getPlayer().getPassengers()) {
-                    if (isSlimySeat(passenger)) {
-                        passenger.leaveVehicle();
-                        passenger.eject();
-                        passenger.remove();
-                    }
-                }
-                event.getPlayer().eject();
-            }
-        }
-    }*/
+    public boolean riddenOrRider(Player player){
+        return isRiding(player) || isBeingRidden(player);
+    }
 
+    public void addRider(PlayerRider rider){
+        riders.add(rider);
+    }
+
+    public void removeRider(PlayerRider rider){
+        riders.remove(rider);
+    }
 }

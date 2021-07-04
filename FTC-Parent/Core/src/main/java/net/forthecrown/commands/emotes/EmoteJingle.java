@@ -1,6 +1,7 @@
 package net.forthecrown.commands.emotes;
 
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
@@ -19,6 +20,8 @@ public class EmoteJingle extends CommandEmote {
         super("jingle", 6*20, ChatColor.GRAY + "You jingle too often lol" + "\n" + ChatColor.DARK_GRAY + "This only works every 6 seconds.");
 
         setDescription("Plays a christmas song. :)");
+        setPermission(Permissions.EMOTE_JINGLE);
+
         register();
     }
 

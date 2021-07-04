@@ -41,7 +41,7 @@ public class CheckPermission implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{permission=" + permission + "}";
+        return key().asString() + "{permission=" + permission + "}";
     }
 
     @Override

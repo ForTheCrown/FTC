@@ -4,6 +4,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -35,6 +36,8 @@ public class Emotes implements SuggestionProvider<CommandSource> {
         register("pleased", "(ᵔᴥᵔ)");
         register("fedup", "(¬_¬)");
         register("reallysad", "(◉︵◉ )");
+
+        CrownCore.logger().info("Default emotes loaded");
     }
 
     private void register(String key, String emote){

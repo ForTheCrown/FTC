@@ -169,6 +169,6 @@ public class MarriageListener implements Listener, ClickEventTask {
 
     private Component giveItAWeek(){
         return CrownUtils.randomIntInRange(0, 1000) != 1 ? Component.empty() :
-                Component.text(" I give it a week :)").color(NamedTextColor.GRAY);
+                Component.text(" I give it a week").color(NamedTextColor.GRAY);
     }
 }

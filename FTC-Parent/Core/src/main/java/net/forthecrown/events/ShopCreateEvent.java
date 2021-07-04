@@ -6,14 +6,15 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.CrownException;
-import net.forthecrown.core.CrownWgFlags;
+import net.forthecrown.core.Permissions;
+import net.forthecrown.core.WgFlags;
+import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.shops.ShopInventory;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.economy.shops.ShopType;
 import net.forthecrown.economy.shops.SignShop;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -35,63 +36,65 @@ import org.bukkit.persistence.PersistentDataType;
 public class ShopCreateEvent implements Listener {
 
     @EventHandler(ignoreCancelled = true)
-    public void onSignShopCreate(SignChangeEvent event) throws CrownException {
-        if(ChatUtils.getString(event.line(0)).isBlank()) return;
+    public void onSignShopCreate(SignChangeEvent event1) throws CrownException {
+        Events.handle(event1.getPlayer(), event1, event -> {
+            if(ChatUtils.getString(event.line(0)).isBlank()) return;
 
-        Player player = event.getPlayer();
+            Player player = event.getPlayer();
 
-        String line0 = ChatUtils.getString(event.line(0));
-        String line1 = ChatUtils.getString(event.line(1));
-        String line2 = ChatUtils.getString(event.line(2));
-        String line3 = ChatUtils.getString(event.line(3));
+            String line0 = ChatUtils.getString(event.line(0));
+            String line1 = ChatUtils.getString(event.line(1));
+            String line2 = ChatUtils.getString(event.line(2));
+            String line3 = ChatUtils.getString(event.line(3));
 
-        ShopType shopType;
-        switch (line0.toLowerCase()){
-            default: return; //switch statement to set the shop's type, basically that's it
+            ShopType shopType;
+            switch (line0.toLowerCase()){
+                default: return; //switch statement to set the shop's type, basically that's it
 
-            case "-[buy]-":
-            case "=[buy]=":
-            case "(buy)":
-            case "[buy]":
-                if(player.hasPermission("ftc.signshop.admincreate") && player.getGameMode() == GameMode.CREATIVE) shopType = ShopType.ADMIN_BUY_SHOP;
-                else shopType = ShopType.BUY_SHOP;
-                break;
+                case "-[buy]-":
+                case "=[buy]=":
+                case "(buy)":
+                case "[buy]":
+                    if(player.hasPermission(Permissions.SHOP_ADMIN) && player.getGameMode() == GameMode.CREATIVE) shopType = ShopType.ADMIN_BUY_SHOP;
+                    else shopType = ShopType.BUY_SHOP;
+                    break;
 
-            case "-[sell]-":
-            case "=[sell]=":
-            case "(sell)":
-            case "[sell]":
-                if(player.hasPermission("ftc.signshop.admincreate") && player.getGameMode() == GameMode.CREATIVE) shopType = ShopType.ADMIN_SELL_SHOP;
-                else shopType = ShopType.SELL_SHOP;
-                break;
-        }
+                case "-[sell]-":
+                case "=[sell]=":
+                case "(sell)":
+                case "[sell]":
+                    if(player.hasPermission(Permissions.SHOP_ADMIN) && player.getGameMode() == GameMode.CREATIVE) shopType = ShopType.ADMIN_SELL_SHOP;
+                    else shopType = ShopType.SELL_SHOP;
+                    break;
+            }
 
-        if(line3.isBlank()) throw new CrownException(player, "&7The last line must contain a price!");
+            if(line3.isBlank()) throw new CrownException(player, "&7The last line must contain a price!");
 
-        Sign sign = (Sign) event.getBlock().getState();
-        String lastLine = line3.toLowerCase().replaceAll("[\\D]", "").trim();
+            Sign sign = (Sign) event.getBlock().getState();
+            String lastLine = line3.toLowerCase().replaceAll("[\\D]", "").trim();
 
-        int price;
-        try {
-            price = Integer.parseInt(lastLine);
-        } catch (Exception e){ throw new CrownException(player, "&7The last line must contain numbers!"); }
+            int price;
+            try {
+                price = Integer.parseInt(lastLine);
+            } catch (Exception e){ throw new CrownException(player, "&7The last line must contain numbers!"); }
 
-        if(line2.isBlank() && line1.isBlank()) throw new CrownException(player, "&7You must provide a description of the shop's items");
+            if(line2.isBlank() && line1.isBlank()) throw new CrownException(player, "&7You must provide a description of the shop's items");
 
-        //WorldGuard flag check
-        LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-        ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(wgPlayer.getLocation());
-        if(!set.testState(wgPlayer, CrownWgFlags.SHOP_CREATION) && !player.hasPermission("ftc.admin")) throw new CrownException(player, "&c&lHey! &7Shop creation is disabled here");
+            //WorldGuard flag check
+            LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+            ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(wgPlayer.getLocation());
+            if(!set.testState(wgPlayer, WgFlags.SHOP_CREATION) && !player.hasPermission("ftc.admin")) throw new CrownException(player, "&c&lHey! &7Shop creation is disabled here");
 
-        SignShop shop = CrownCore.getShopManager().createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
+            SignShop shop = CrownCore.getShopManager().createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
 
-        player.openInventory(shop.getExampleInventory());
-        CrownCore.inst().getServer().getPluginManager().registerEvents(new SignShopSubClass1(player, shop), CrownCore.inst());
+            player.openInventory(shop.getExampleInventory());
+            CrownCore.inst().getServer().getPluginManager().registerEvents(new SignShopSubClass1(player, shop), CrownCore.inst());
 
-        if(shopType == ShopType.BUY_SHOP) event.line(0, shopType.outOfStockLabel());
-        else event.line(0, shopType.inStockLabel());
+            if(shopType == ShopType.BUY_SHOP) event.line(0, shopType.outOfStockLabel());
+            else event.line(0, shopType.inStockLabel());
 
-        event.line(3, Component.text(ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + price)); //idk, I thought putting ALL_CODES would make triggering events involving the shops harder
+            event.line(3, Component.text(ChatColor.DARK_GRAY + "Price: " + ChatColor.RESET + "$" + price)); //idk, I thought putting ALL_CODES would make triggering events involving the shops harder
+        });
     }
 
     public class SignShopSubClass1 implements Listener{

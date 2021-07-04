@@ -10,9 +10,15 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.comvars.ParseFunction;
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.CommandSource;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.Keyed;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
@@ -27,21 +33,26 @@ import java.util.function.Function;
  * @see ComponentComVarType
  * @param <T> The type of the var, can be an int, string or any custom type
  */
-public interface ComVarType<T> extends SuggestionProvider<CommandSource> {
-    ComVarType<Long> LONG = new PrimitiveComVarType<>(Long.class, StringReader::readLong, JsonPrimitive::new);
-    ComVarType<Double> DOUBLE = new PrimitiveComVarType<>(Double.class, StringReader::readDouble, JsonPrimitive::new);
-    ComVarType<Float> FLOAT = new PrimitiveComVarType<>(Float.class, StringReader::readFloat, JsonPrimitive::new);
-    ComVarType<Integer> INTEGER = new PrimitiveComVarType<>(Integer.class, StringReader::readInt, JsonPrimitive::new);
-    ComVarType<Short> SHORT = new PrimitiveComVarType<>(Short.class, r -> (short) r.readInt(), JsonPrimitive::new);
-    ComVarType<Byte> BYTE = new PrimitiveComVarType<>(Byte.class, r -> (byte) r.readInt(), JsonPrimitive::new);
-    ComVarType<Boolean> BOOLEAN = new PrimitiveComVarType<>(Boolean.class, StringReader::readBoolean, JsonPrimitive::new);
-    ComVarType<String> STRING = new PrimitiveComVarType<>(String.class, StringReader::getRemaining, JsonPrimitive::new);
-    ComVarType<Character> CHAR = new PrimitiveComVarType<>(Character.class, StringReader::read, JsonPrimitive::new);
+public interface ComVarType<T> extends SuggestionProvider<CommandSource>, Keyed, ParseFunction<T> {
+    ComVarType<Long> LONG = new PrimitiveComVarType<>(Long.class,           StringReader::readLong,         JsonPrimitive::new,     JsonElement::getAsLong);
+    ComVarType<Double> DOUBLE = new PrimitiveComVarType<>(Double.class,     StringReader::readDouble,       JsonPrimitive::new,     JsonElement::getAsDouble);
+    ComVarType<Float> FLOAT = new PrimitiveComVarType<>(Float.class,        StringReader::readFloat,        JsonPrimitive::new,     JsonElement::getAsFloat);
+    ComVarType<Integer> INTEGER = new PrimitiveComVarType<>(Integer.class,  StringReader::readInt,          JsonPrimitive::new,     JsonElement::getAsInt);
+    ComVarType<Short> SHORT = new PrimitiveComVarType<>(Short.class,        r -> (short) r.readInt(),       JsonPrimitive::new,     JsonElement::getAsShort);
+    ComVarType<Byte> BYTE = new PrimitiveComVarType<>(Byte.class,           r -> (byte) r.readInt(),        JsonPrimitive::new,     JsonElement::getAsByte);
+    ComVarType<Boolean> BOOLEAN = new PrimitiveComVarType<>(Boolean.class,  StringReader::readBoolean,      JsonPrimitive::new,     JsonElement::getAsBoolean);
+    ComVarType<String> STRING = new PrimitiveComVarType<>(String.class,     StringReader::getRemaining,     JsonPrimitive::new,     JsonElement::getAsString);
+    ComVarType<Character> CHAR = new PrimitiveComVarType<>(Character.class, StringReader::read,             JsonPrimitive::new,     JsonElement::getAsCharacter);
 
-    T fromString(StringReader input) throws CommandSyntaxException;
     String asString(@Nullable T value);
 
+    default Component display(@Nullable T value){
+        if(value == null) return Component.text("null");
+        return Component.text(asString(value));
+    }
+
     JsonElement serialize(@Nullable T value);
+    T deserialize(JsonElement element);
 
     @Override
     default CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> c, SuggestionsBuilder b){
@@ -55,16 +66,22 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource> {
     class PrimitiveComVarType<T> implements ComVarType<T> {
         private final ParseFunction<T> fromString;
         private final Function<T, JsonElement> serializationFunc;
+        private final Function<JsonElement, T> deserializationFunc;
         private final Class<T> clazz;
+        private final Key key;
 
-        private PrimitiveComVarType(Class<T> clazz, ParseFunction<T> fromString, Function<T, JsonElement> json){
+        private PrimitiveComVarType(Class<T> clazz, ParseFunction<T> fromString, Function<T, JsonElement> json, Function<JsonElement, T> func){
             this.fromString = fromString;
             this.clazz = clazz;
             this.serializationFunc = json;
+            deserializationFunc = func;
+            key = CrownCore.coreKey(clazz.getSimpleName().toLowerCase() + "_type");
+
+            ComVarRegistry.getTypeRegistry().register(key, this);
         }
 
         @Override
-        public T fromString(StringReader input) throws CommandSyntaxException {
+        public T parse(StringReader input) throws CommandSyntaxException {
             try {
                 return fromString.parse(input);
             } catch (RuntimeException e){
@@ -83,6 +100,11 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource> {
         }
 
         @Override
+        public T deserialize(JsonElement element) {
+            return deserializationFunc.apply(element);
+        }
+
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -96,6 +118,11 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource> {
             return new HashCodeBuilder(17, 37)
                     .append(clazz)
                     .toHashCode();
+        }
+
+        @Override
+        public @NotNull Key key() {
+            return key;
         }
     }
 }

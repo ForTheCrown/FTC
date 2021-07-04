@@ -6,16 +6,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.pirates.DailyEnchantment;
 import net.forthecrown.economy.pirates.EnchantmentData;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
-import net.forthecrown.pirates.Pirates;
 import net.forthecrown.events.dynamic.BmEnchantListener;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.pirates.Pirates;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
@@ -23,7 +24,6 @@ import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -38,17 +38,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static net.forthecrown.utils.BlackMarketUtils.getBaseInventory;
 
 public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
     public static final Key KEY = Squire.createPiratesKey("enchants");
 
-    private Map<Enchantment, EnchantmentData> data;
+    private final Map<Enchantment, EnchantmentData> data = new HashMap<>();
 
     private final List<UUID> boughtEnchant = new ArrayList<>();
     private final List<Enchantment> alreadyPicked = new ArrayList<>();
@@ -204,7 +201,7 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
         ClickEventManager.allowCommandUsage(user.getPlayer(), true);
 
         Component text = Component.translatable("pirates.enchants.button").color(NamedTextColor.AQUA)
-                .clickEvent(ClickEvent.runCommand(ClickEventManager.getCommand(npcID)))
+                .clickEvent(ClickEventManager.getClickEvent(npcID))
                 .hoverEvent(HoverEvent.showText(Component.translatable("pirates.enchants.button.hover")));
 
         Component text1 = Component.translatable("pirates.enchants.proposal")
@@ -225,7 +222,7 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
     }
 
     public boolean isAllowedToBuy(UUID id){
-        return boughtEnchant.contains(id);
+        return !boughtEnchant.contains(id);
     }
 
     public void setAllowedToBuy(UUID id, boolean allowed){
@@ -236,9 +233,11 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
     @Override
     public void run(Player player, String[] args) throws CrownException, RoyalCommandException {
         if(Pirates.getPirateEconomy().getEnchantMerchant().isAllowedToBuy(player.getUniqueId())) {
-            player.openInventory(Pirates.getPirateEconomy().getEnchantMerchant().createInventory(UserManager.getUser(player)));
+            player.openInventory(createInventory(UserManager.getUser(player)));
 
             Bukkit.getPluginManager().registerEvents(new BmEnchantListener(player), CrownCore.inst());
+        } else {
+            throw FtcExceptionProvider.translatable("pirates.enchants.alreadyBought", NamedTextColor.YELLOW);
         }
     }
 }

@@ -32,6 +32,7 @@ public class KeyType implements ArgumentType<Key> {
 
         String initial = reader.readUnquotedString();
         if(reader.canRead() && reader.peek() == ':'){
+            reader.skip();
             String value = reader.readUnquotedString();
 
             try {

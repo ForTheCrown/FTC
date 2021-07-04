@@ -7,17 +7,15 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.useables.UsageAction;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.types.scoreboard.ObjectiveArgumentImpl;
+import net.forthecrown.useables.UsageAction;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.function.BiFunction;
 
 public class ActionChangeScore implements UsageAction {
     public static final Key ADD_KEY = Key.key(CrownCore.inst(), "add_score");
@@ -71,9 +69,8 @@ public class ActionChangeScore implements UsageAction {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{" +
-                "action=" + action.name().toLowerCase() +
-                ",amount=" + amount +
+        return key().asString() + "{" +
+                "amount=" + amount +
                 ",objective=" + objective.getName() +
                 "}";
     }
@@ -90,13 +87,11 @@ public class ActionChangeScore implements UsageAction {
 
     @Override
     public @NonNull Key key() {
-        switch (action){
-            case DECREMENT: return REMOVE_KEY;
-            case SET: return SET_KEY;
-            case INCREMENT: return ADD_KEY;
-
-            default: throw new IllegalStateException("Unexpected value: " + action);
-        }
+        return switch (action) {
+            case DECREMENT -> REMOVE_KEY;
+            case SET -> SET_KEY;
+            case INCREMENT -> ADD_KEY;
+        };
     }
 
     public Action getAction() {
@@ -119,7 +114,8 @@ public class ActionChangeScore implements UsageAction {
         this.amount = amount;
     }
 
-    public interface IntBiOperator extends BiFunction<Integer, Integer, Integer> {
+    public interface IntBiOperator {
+        int apply(int score, int amount);
     }
 
     public enum Action {

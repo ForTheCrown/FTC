@@ -18,6 +18,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
 
 public class CommandSelfOrUser extends FtcCommand {
@@ -130,12 +131,15 @@ public class CommandSelfOrUser extends FtcCommand {
                     if(CrownUtils.isItemEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
 
                     if(!(item.getItemMeta() instanceof Damageable)) throw FtcExceptionProvider.create("Given is not repairable");
-                    Damageable meta = (Damageable) item.getItemMeta();
+                    ItemMeta meta = item.getItemMeta();
 
-                    meta.setDamage(item.getType().getMaxDurability());
+                    Damageable damageable = (Damageable) meta;
+                    damageable.setDamage(0);
+
+                    item.setItemMeta(meta);
 
                     source.sendAdmin(
-                            Component.text("Repaired item held by")
+                            Component.text("Repaired item held by ")
                                     .color(NamedTextColor.YELLOW)
                                     .append(user.nickDisplayName().color(NamedTextColor.GOLD))
                     );

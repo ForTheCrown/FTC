@@ -9,4 +9,6 @@ public interface ActionRegistry extends Registry<Supplier<UsageAction>> {
     default UsageAction getAction(Key key){
         return get(key).get();
     }
+
+    boolean isAccepting();
 }

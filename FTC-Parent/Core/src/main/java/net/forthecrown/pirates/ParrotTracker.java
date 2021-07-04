@@ -2,6 +2,7 @@ package net.forthecrown.pirates;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.utils.JsonUtils;
 import org.bukkit.entity.Entity;
@@ -21,6 +22,7 @@ public class ParrotTracker extends AbstractJsonSerializer implements Iterable<UU
         super("parrot_tracker");
 
         reload();
+        CrownCore.logger().info("Parrot Tracker loaded");
     }
 
     @Override
@@ -31,6 +33,8 @@ public class ParrotTracker extends AbstractJsonSerializer implements Iterable<UU
     @Override
     protected void reload(JsonObject json) {
         withParrots.clear();
+        if(!json.has("withParrots")) return;
+
         json.getAsJsonArray("withParrots").forEach(e -> withParrots.add(UUID.fromString(e.getAsString())));
     }
 
@@ -44,7 +48,9 @@ public class ParrotTracker extends AbstractJsonSerializer implements Iterable<UU
 
         Entity ent = player.getShoulderEntityLeft();
         player.setShoulderEntityLeft(null);
-        ent.remove();
+
+        if(ent != null) ent.remove();
+
         remove(player.getUniqueId());
     }
 

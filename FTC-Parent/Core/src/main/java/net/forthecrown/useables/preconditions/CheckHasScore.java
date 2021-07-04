@@ -53,7 +53,7 @@ public class CheckHasScore implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{objective=" + objective.getName() + ",amount=" + amount + "}";
+        return key().asString() + "{objective=" + objective.getName() + ",amount=" + amount + "}";
     }
 
     @Override

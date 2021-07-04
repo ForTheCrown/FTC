@@ -5,9 +5,13 @@ import com.google.gson.JsonNull;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.comvars.ComVarRegistry;
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.types.ComponentArgument;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -15,16 +19,15 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ComponentComVarType implements ComVarType<Component> {
 
-    /**
-     * The instance of the component type
-     */
     public static final ComVarType<Component> COMPONENT_TYPE = new ComponentComVarType();
+    private final Key key = CrownCore.coreKey("component_type");
 
-    //Only the class itself may construct this
-    private ComponentComVarType() {}
+    private ComponentComVarType() {
+        ComVarRegistry.getTypeRegistry().register(key, this);
+    }
 
     @Override
-    public Component fromString(StringReader input) throws CommandSyntaxException {
+    public Component parse(StringReader input) throws CommandSyntaxException {
         try {
             return ComponentArgument.component().parse(input);
         } catch (Exception e){
@@ -40,5 +43,16 @@ public class ComponentComVarType implements ComVarType<Component> {
     @Override
     public JsonElement serialize(@Nullable Component value) {
         return value == null ? JsonNull.INSTANCE : GsonComponentSerializer.gson().serializeToTree(value);
+    }
+
+    @Override
+    public Component deserialize(JsonElement element) {
+        if(element == null || element.isJsonNull()) return null;
+        return GsonComponentSerializer.gson().deserializeFromTree(element);
+    }
+
+    @Override
+    public @NotNull Key key() {
+        return key;
     }
 }

@@ -53,7 +53,7 @@ import java.util.logging.Logger;
 public final class Main extends JavaPlugin implements CrownCore {
 
     //Hacky way of determining if we're on the test server or not
-    public static final ComVar<Boolean> inDebugMode = ComVarRegistry.set("core_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
+    public static ComVar<Boolean> inDebugMode;
 
     static Main                     inst;
 
@@ -81,6 +81,7 @@ public final class Main extends JavaPlugin implements CrownCore {
     static ServerRules              rules;
     static JoinInfo                 joinInfo;
     static Emotes                   emotes;
+    static DayUpdate                dayUpdate;
     static Logger                   logger;
 
     static final Map<Material, ComVar<Short>> defaultItemPrices = new HashMap<>();
@@ -89,8 +90,6 @@ public final class Main extends JavaPlugin implements CrownCore {
 
     @Override
     public void onEnable() {
-        inst = this;
-
         luckPerms = LuckPermsProvider.get();
 
         saveDefaultConfig();
@@ -109,19 +108,29 @@ public final class Main extends JavaPlugin implements CrownCore {
         usablesManager = new CrownUsablesManager();
         usablesManager.registerDefaults(actionRegistry, checkRegistry);
 
+        checkRegistry.setAccepting(false);
+        actionRegistry.setAccepting(false);
+
         warpRegistry = new CrownWarpRegistry();
         kitRegistry = new CrownKitRegistry();
 
-        instantiateModule(CoreCommands::init);
-        instantiateModule(Pirates::init);
-        instantiateModule(Bosses::init);
-        instantiateModule(Events::init);
-        instantiateModule(Cosmetics::init);
+        announcer.doBroadcasts();
+
+        moduleRunnable(CoreCommands::init);
+        moduleRunnable(Events::init);
+
+        moduleRunnable(Pirates::init);
+        moduleRunnable(Bosses::init);
+        moduleRunnable(Cosmetics::init);
+
+        dayUpdate.checkDay();
 
         if(getConfig().getBoolean("System.run-deleter-on-startup")) userManager.checkAllUserDatas();
+
+        logger.info("FTC startup completed");
     }
 
-    private void instantiateModule(Runnable runnable){
+    private void moduleRunnable(Runnable runnable){
         try {
             runnable.run();
         } catch (Throwable e){
@@ -131,6 +140,9 @@ public final class Main extends JavaPlugin implements CrownCore {
 
     @Override
     public void onLoad() {
+        inst = this;
+        inDebugMode = ComVarRegistry.set("core_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
+
         logger = getLogger();
         announcer = new CrownBroadcaster();
 
@@ -143,7 +155,10 @@ public final class Main extends JavaPlugin implements CrownCore {
         actionRegistry = new CrownActionRegistry();
         checkRegistry = new CrownCheckRegistry();
 
-        CrownWgFlags.init();
+        actionRegistry.setAccepting(true);
+        checkRegistry.setAccepting(true);
+
+        WgFlags.init();
     }
 
     @Override
@@ -156,7 +171,9 @@ public final class Main extends JavaPlugin implements CrownCore {
         for (ArmorStandLeaderboard a: LEADERBOARDS) a.destroy();
         for (LivingEntity e: MobHealthBar.NAMES.keySet()) e.customName(MobHealthBar.NAMES.getOrDefault(e, null));
 
-        Bosses.killAll();
+        moduleRunnable(Bosses::shutDown);
+        moduleRunnable(Cosmetics::shutDown);
+        moduleRunnable(Pirates::shutDown);
 
         CrownUserManager.LOADED_USERS.forEach((i, u) -> {
             if(!u.isOnline()) return;
@@ -164,8 +181,6 @@ public final class Main extends JavaPlugin implements CrownCore {
         });
         CrownUserManager.LOADED_USERS.clear();
         CrownUserManager.LOADED_ALTS.clear();
-
-        Cosmetics.shutDown();
     }
 
     @Override
@@ -195,6 +210,8 @@ public final class Main extends JavaPlugin implements CrownCore {
         Location defSpawnLoc = new Location(Worlds.VOID, 153.5, 5, 353.5, 90, 0);
         serverSpawn = config.getLocation("ServerSpawn", defSpawnLoc);
 
+        dayUpdate = new DayUpdate((byte) config.getInt("Day"));
+
         loadDefaultItemPrices();
 
         if(saver != null){
@@ -221,7 +238,7 @@ public final class Main extends JavaPlugin implements CrownCore {
             //defaultItemPrices.put(mat, (short) itemPrices.getInt(s));
             defaultItemPrices.put(mat,
                     ComVarRegistry.set(
-                            "sellshop_price_" + s.toLowerCase(),
+                            "sellshop_" + s.toLowerCase(),
                             ComVarType.SHORT,
                             (short) itemPrices.getInt(s)
                     )

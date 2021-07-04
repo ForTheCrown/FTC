@@ -49,7 +49,7 @@ public class CheckHasItem implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{item=" + item + "}";
+        return key().asString() + "{item=" + item + "}";
     }
 
     @Override

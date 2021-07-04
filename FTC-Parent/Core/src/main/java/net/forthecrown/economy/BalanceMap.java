@@ -38,9 +38,9 @@ public interface BalanceMap {
     @Override
     String toString();
 
-    List<UUID> getKeys();
+    List<UUID> keySet();
 
-    List<Integer> getValues();
+    List<Integer> values();
 
     class BalEntry implements Comparable<BalanceMap.BalEntry> {
         private final UUID id;

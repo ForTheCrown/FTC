@@ -1,16 +1,16 @@
 package net.forthecrown.events.dynamic;
 
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.SellShop;
 import net.forthecrown.events.custom.SellShopUseEvent;
-import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.SoldMaterialData;
 import net.forthecrown.user.enums.SellAmount;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -119,22 +119,12 @@ public class SellShopEvents implements Listener {
         if(sellShop.getCurrentMenu() == null) return;
 
         //reloads the inventory, cuz changing the lores of all the items is a pain too great to even imagine
-        switch (sellShop.getCurrentMenu()){
-            case DROPS:
-                player.openInventory(sellShop.dropsMenu());
-                return;
-            case CROPS:
-                player.openInventory(sellShop.cropsMenu());
-                return;
-            case MINING:
-                player.openInventory(sellShop.miningMenu());
-                return;
-            case MINING_BLOCKS:
-                player.openInventory(sellShop.miningBlocksMenu());
-                return;
-
-            default:
-                player.openInventory(sellShop.decidingMenu());
+        switch (sellShop.getCurrentMenu()) {
+            case DROPS -> player.openInventory(sellShop.dropsMenu());
+            case CROPS -> player.openInventory(sellShop.cropsMenu());
+            case MINING -> player.openInventory(sellShop.miningMenu());
+            case MINING_BLOCKS -> player.openInventory(sellShop.miningBlocksMenu());
+            default -> player.openInventory(sellShop.decidingMenu());
         }
     }
 

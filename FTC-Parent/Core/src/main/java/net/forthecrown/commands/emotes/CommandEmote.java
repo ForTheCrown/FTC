@@ -27,7 +27,7 @@ public abstract class CommandEmote extends FtcCommand {
     protected CommandEmote(@NotNull String name, @Nonnegative int cooldownTime, @NotNull String cooldownMessage) {
         super(name, CrownCore.inst());
 
-        setPermission("ftc.emotes." + name);
+        setPermission(Permissions.EMOTES);
 
         this.cooldownCategory = "Core_Emote_" + name;
         this.cooldownMessage = cooldownMessage;

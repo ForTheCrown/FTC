@@ -7,7 +7,7 @@ import net.forthecrown.cosmetics.effects.death.DeathEvent;
 import net.forthecrown.events.custom.SellShopUseEvent;
 import net.forthecrown.events.custom.SignShopUseEvent;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
-import net.forthecrown.inventory.custom.InvClickListener;
+import net.forthecrown.inventory.custom.CustomInventoryClickListener;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -26,7 +26,6 @@ public class Events {
 
         register(new CoreListener());
         register(new GraveListener());
-        register(new ChatEvents());
 
         register(new ShopCreateEvent());
         register(new SignInteractEvent());
@@ -48,7 +47,9 @@ public class Events {
 
         register(new DeathEvent());
         register(new ArrowEvent());
-        register(new InvClickListener());
+        register(new CustomInventoryClickListener());
+
+        register(new InventoryBuilderListener());
     }
 
     private static void register(Listener listener){

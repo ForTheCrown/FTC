@@ -6,6 +6,8 @@ import net.forthecrown.serializer.JsonSerializable;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 
+import java.util.Objects;
+
 public class EnchantmentData implements JsonSerializable {
     private final Enchantment enchantment;
     private byte maxLevel;
@@ -14,9 +16,21 @@ public class EnchantmentData implements JsonSerializable {
     public EnchantmentData(JsonElement element){
         JsonObject json = element.getAsJsonObject();
 
-        this.enchantment = Enchantment.getByKey(NamespacedKey.fromString(json.get("enchantment").getAsString()));
+        String str = json.get("enchantment").getAsString();
+        this.enchantment = Objects.requireNonNull(
+                Enchantment.getByKey(
+                        NamespacedKey.fromString(str)
+                )
+        );
+
         this.maxLevel = json.get("maxLevel").getAsByte();
         this.pricePerLevel = json.get("pricePerLevel").getAsInt();
+    }
+
+    public EnchantmentData(Enchantment enchantment, byte maxLevel, int pricePerLevel) {
+        this.enchantment = enchantment;
+        this.maxLevel = maxLevel;
+        this.pricePerLevel = pricePerLevel;
     }
 
     public Enchantment getEnchantment() {

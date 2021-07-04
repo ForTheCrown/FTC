@@ -1,0 +1,14 @@
+Drop the latest build of the Core into this folder, rename it to "Core".
+Then run remap.bat and ForTheCrown-Plugin.jar will be the final product.
+Rename that and you're done.
+
+Manual instructions just in case:
+
+Mojang to Obfuscated:
+    java -jar SpecialSource.jar -i CORE_JAR.jar -o CORE_JAR-s1.jar --srg-in moj-obf.txt --reverse -l -L
+
+Obfuscated to Spigot:
+    java -jar SpecialSource.jar -i CORE_JAR-s1.jar -o CORE_JAR-s2.jar --srg-in obf-spigot.csrg -l -L
+
+Obfuscated Fields to Spigot:
+    java -jar SpecialSource.jar -i CORE_JAR-s2.jar -o FTC-VERSION-spigot-mapped.jar --srg-in spigot-spigot-fields.csrg --reverse -l -L

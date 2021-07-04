@@ -10,19 +10,25 @@ import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.CrownWgFlags;
-import net.forthecrown.core.admin.EavesDropper;
-import net.forthecrown.core.admin.PunishmentEntry;
-import net.forthecrown.core.admin.PunishmentManager;
+import net.forthecrown.core.Permissions;
+import net.forthecrown.core.WgFlags;
+import net.forthecrown.core.admin.*;
 import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.SellShop;
 import net.forthecrown.inventory.CrownWeapons;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.user.data.MarriageMessage;
+import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -55,7 +61,7 @@ public class CoreListener implements Listener {
         CrownUser user = UserManager.getUser(event.getPlayer());
         user.onJoin();
 
-        if(!event.getPlayer().hasPlayedBefore() || CrownCore.inDebugMode()){
+        if(!event.getPlayer().hasPlayedBefore()){
             user.getPlayer().teleport(CrownCore.getServerSpawn());
 
             Component welcomeMsg = Component.translatable("user.firstJoin", user.nickDisplayName())
@@ -185,7 +191,7 @@ public class CoreListener implements Listener {
         RegionQuery query = platform.getRegionContainer().createQuery();
         boolean canBypass = platform.getSessionManager().hasBypass(wgPlayer, BukkitAdapter.adapt(block.getWorld()));
 
-        if(!query.testState(weLoc, wgPlayer, CrownWgFlags.TRAPDOOR_USE) && !canBypass){
+        if(!query.testState(weLoc, wgPlayer, WgFlags.TRAPDOOR_USE) && !canBypass){
             ApplicableRegionSet set = platform.getRegionContainer().get(BukkitAdapter.adapt(block.getWorld())).getApplicableRegions(BlockVector3.at(weLoc.getBlockX(), weLoc.getBlockY(), weLoc.getBlockZ()));
 
             for (ProtectedRegion region: set) if(region.isMember(wgPlayer)) return;
@@ -197,6 +203,89 @@ public class CoreListener implements Listener {
                             .append(Component.text(" You can't do that here!").color(NamedTextColor.GRAY))
                             .build()
             );
+        }
+    }
+
+
+    @EventHandler
+    public void onPlayerChat(AsyncChatEvent event) {
+        event.renderer(ChatFormatter::formatChat);
+
+        PunishmentManager punishments = CrownCore.getPunishmentManager();
+        Player player = event.getPlayer();
+        MuteStatus status = punishments.checkMute(player);
+
+        if(status != MuteStatus.NONE){
+            event.viewers().removeIf(a -> {
+                Player p = CrownUtils.fromAudience(a);
+                if(p == null) return false;
+
+                return !punishments.isSoftmuted(p.getUniqueId());
+            });
+            EavesDropper.reportMuted(event.message(), player, status);
+
+            if(status == MuteStatus.HARD) event.setCancelled(true); //Completely cancel if they are hardmuted, checkMute sends them mute message
+            return;
+        }
+
+        if (StaffChat.toggledPlayers.contains(player)) {
+            if(StaffChat.ignoring.contains(player)){
+                player.sendMessage(Component.text("You are ignoring staff chat, do '/sct visible' to use it again").color(NamedTextColor.RED));
+                event.setCancelled(true);
+                return;
+            }
+
+            event.viewers().removeIf(a -> {
+                Player p = CrownUtils.fromAudience(a);
+                if(p == null) return false;
+
+                return  !p.hasPermission(Permissions.STAFF_CHAT) || StaffChat.ignoring.contains(p);
+            });
+            return;
+        }
+
+        if(player.getWorld().equals(Worlds.SENATE)){
+            event.viewers().removeIf(a -> {
+                Player p = CrownUtils.fromAudience(a);
+                if(p == null) return false;
+
+                return !p.getWorld().equals(Worlds.SENATE);
+            });
+            return;
+        } else event.viewers().removeIf(a -> {
+            Player p = CrownUtils.fromAudience(a);
+            if(p == null) return false;
+
+            return p.getWorld().equals(Worlds.SENATE);
+        });
+
+        //Remove ignored
+        event.viewers().removeIf(a -> {
+            Player p = CrownUtils.fromAudience(a);
+            if(p == null) return false;
+
+            UserInteractions inter = UserManager.getUser(p).getInteractions();
+
+            return inter.isBlockedPlayer(player.getUniqueId());
+        });
+
+        CrownUser user = UserManager.getUser(player);
+        UserInteractions inter = user.getInteractions();
+
+        if(inter.mChatToggled()){
+            event.viewers().clear();
+
+            CrownUser target = UserManager.getUser(inter.getMarriedTo());
+            if(!target.isOnline()){
+                user.sendMessage(
+                        Component.translatable(UserType.USER_NOT_ONLINE.getTranslationKey(), target.nickDisplayName())
+                                .color(NamedTextColor.RED)
+                );
+                return;
+            }
+
+            new MarriageMessage(user, UserManager.getUser(inter.getMarriedTo()), ChatUtils.getString(event.message()))
+                    .complete();
         }
     }
 }

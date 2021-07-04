@@ -179,7 +179,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
     public void attemptSpawn(Player player){
         Validate.notNull(player, "Player is null");
         if(isAlive()){
-            player.sendMessage(Component.text("The boss has already been spawned").color(NamedTextColor.GRAY));
+            player.sendMessage(Component.translatable("dungeons.alreadySpawned").color(NamedTextColor.GRAY));
             return;
         }
 
@@ -190,7 +190,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
             ItemStack i = it.clone();
 
             if(!inv.containsAtLeast(i, i.getAmount())){
-                player.sendMessage(Component.text("Not enough items to spawn the boss").color(NamedTextColor.GRAY));
+                player.sendMessage(Component.translatable("dungeons.notEnoughItems").color(NamedTextColor.GRAY));
                 player.sendMessage(RoyalUtils.itemRequiredMessage(this));
                 return;
             }

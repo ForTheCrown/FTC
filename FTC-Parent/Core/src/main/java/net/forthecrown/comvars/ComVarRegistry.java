@@ -3,6 +3,8 @@ package net.forthecrown.comvars;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.comvars.types.ComVarType;
+import net.forthecrown.registry.BaseRegistry;
+import net.forthecrown.registry.Registry;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +17,7 @@ import java.util.Set;
  */
 public class ComVarRegistry {
     private static final Map<String, ComVar<?>> COM_VARS = new HashMap<>();
+    private static final Registry<ComVarType<?>> TYPE_REGISTRY = new BaseRegistry<>();
 
     public static <T> ComVar<T> set(@NotNull String name, @NotNull ComVarType<T> type, T value){
         validate(name, type);
@@ -23,12 +26,12 @@ public class ComVarRegistry {
         if(alreadyExists && !COM_VARS.get(name).getType().equals(type)) throw new IllegalArgumentException("Mismatch between provided var type and already existing var type");
 
         ComVar<T> entry = alreadyExists ? ((ComVar<T>) COM_VARS.get(name)).update(value) : new ComVar<>(type, name, value);
-        return setRaw(name, entry);
+        return setRaw(entry);
     }
 
     public static <T> void parseVar(String name, String input) throws CommandSyntaxException {
         ComVar<T> type = (ComVar<T>) COM_VARS.get(name);
-        T value = type.getType().fromString(new StringReader(input));
+        T value = type.getType().parse(new StringReader(input));
         set(name, type.getType(), value);
     }
 
@@ -45,11 +48,10 @@ public class ComVarRegistry {
         return getRaw(name, type).getValue();
     }
 
-    public static <T> ComVar<T> setRaw(String name, ComVar<T> variable){
+    public static <T> ComVar<T> setRaw(ComVar<T> variable) {
         Validate.notNull(variable, "Variable was null");
-        Validate.notNull(name, "Name was null");
 
-        COM_VARS.put(name, variable);
+        COM_VARS.put(variable.getName(), variable);
         return variable;
     }
 
@@ -85,6 +87,10 @@ public class ComVarRegistry {
     public static void remove(@NotNull String name){
         Validate.notNull(name, "Name was null");
         COM_VARS.remove(name);
+    }
+
+    public static Registry<ComVarType<?>> getTypeRegistry() {
+        return TYPE_REGISTRY;
     }
 
     private static void validate(String name, ComVarType<?> type){

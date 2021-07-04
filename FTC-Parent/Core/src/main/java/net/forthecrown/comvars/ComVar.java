@@ -1,6 +1,7 @@
 package net.forthecrown.comvars;
 
 import net.forthecrown.comvars.types.ComVarType;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +15,7 @@ import java.util.function.Consumer;
  * </p>
  * @param <T> The type stored by the variable, can be an int, String or whatever you want it to be
  */
-public class ComVar<T>/* implements ConfigurationSerializable */ {
+public class ComVar<T> {
     private T value;
     private final ComVarType<T> type;
     private final String name;
@@ -24,6 +25,10 @@ public class ComVar<T>/* implements ConfigurationSerializable */ {
         this.value = value;
         this.type = type;
         this.name = name;
+    }
+
+    public Component prettyDisplay(){
+        return type.display(value);
     }
 
     public @Nullable T getValue() {

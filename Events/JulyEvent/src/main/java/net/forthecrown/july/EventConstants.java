@@ -82,15 +82,15 @@ public class EventConstants {
     );
 
     public static final ImmutableList<GemSpawnData> GEM_SPAWN_DATA = ImmutableList.of(
-            new GemSpawnData(GEM_SECRET_VALUE, true, false, -21, 125, 8),
-            new GemSpawnData(GEM_SECRET_VALUE, true, true, -52, 130, -186),
-            new GemSpawnData(GEM_SECRET_VALUE, true, false, -74, 113, -137),
-            new GemSpawnData(GEM_SECRET_VALUE, true, true, -31, 140, -83),
-            new GemSpawnData(GEM_SECRET_VALUE, true, false, -41, 90, -121),
-            new GemSpawnData(GEM_SECRET_VALUE, true, true, -54, 105, -182),
-            new GemSpawnData(GEM_SECRET_VALUE, true, false, -21, 128, -30),
-            new GemSpawnData(GEM_SECRET_VALUE, true, true, -191, 213, -154),
-            new GemSpawnData(GEM_SECRET_VALUE, true, false, -31, 126, -137),
+            new GemSpawnData(GEM_SECRET_VALUE, true, true, -21, 125, 8),
+            new GemSpawnData(GEM_SECRET_VALUE, true, true,-52, 130, -186),
+            new GemSpawnData(GEM_SECRET_VALUE, true, true, -74, 113, -137),
+            new GemSpawnData(GEM_SECRET_VALUE, true, true,-31, 140, -83),
+            new GemSpawnData(GEM_SECRET_VALUE, true, true, -41, 90, -121),
+            new GemSpawnData(GEM_SECRET_VALUE, true, true,-54, 105, -182),
+            new GemSpawnData(GEM_SECRET_VALUE, true, true, -21, 128, -30),
+            new GemSpawnData(GEM_SECRET_VALUE, true, true,-191, 213, -154),
+            new GemSpawnData(GEM_SECRET_VALUE, true, true, -31, 126, -137),
 
             new GemSpawnData(GEM_PATH_VALUE,true, -34, 94, 107),
             new GemSpawnData(GEM_PATH_VALUE,false, -34, 93, 91),

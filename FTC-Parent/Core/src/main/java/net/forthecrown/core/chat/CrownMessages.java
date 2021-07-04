@@ -70,7 +70,9 @@ public class CrownMessages implements Keyed {
 
     public void reload(){
         GlobalTranslator.get().removeSource(registry);
+
         registry = TranslationRegistry.create(key);
+        registry.defaultLocale(Locale.ENGLISH);
 
         ensureDirectoryExists();
         ensureDefaultExists();

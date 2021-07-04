@@ -1,5 +1,4 @@
 {
-    "day": 1,
     "maxEarnings": 500000,
     "enchants": {
         "daily": {
@@ -24,7 +23,7 @@
                 "pricePerLevel": 7500
             },
             {
-                "enchantment": "minecraft:imapling",
+                "enchantment": "minecraft:impaling",
                 "maxLevel": 7,
                 "pricePerLevel": 12500
             },
@@ -208,6 +207,11 @@
           "BONE": 6,
           "MUTTON": 8
       }
+    },
+    "ghMerchant": {
+        "uses": 75,
+        "price": 50000,
+        "disabled": true
     },
     "heads": {
         "ppReward": 2,

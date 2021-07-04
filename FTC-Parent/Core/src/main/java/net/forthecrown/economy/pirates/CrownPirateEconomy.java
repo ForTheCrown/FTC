@@ -1,27 +1,18 @@
 package net.forthecrown.economy.pirates;
 
 import com.google.common.io.Files;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonWriter;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.economy.pirates.merchants.*;
 import net.forthecrown.registry.BaseRegistry;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.key.Key;
 
 import java.io.*;
-import java.util.Calendar;
 
 public class CrownPirateEconomy implements PirateEconomy {
-    private static final Gson GSON = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
-
     private final CrownRandom random;
 
     private final EnchantMerchant enchantMerchant;
@@ -30,14 +21,16 @@ public class CrownPirateEconomy implements PirateEconomy {
     private final MaterialMerchant miningMerchant;
     private final MaterialMerchant dropsMerchant;
     private final MaterialMerchant cropsMerchant;
+    private final GrapplingHookMerchant ghMerchant;
 
     public final Registry<UsablePirateNpc> byId = new BaseRegistry<>();
 
     private int maxEarnings = 500000;
-    private byte day = 0;
 
     public CrownPirateEconomy(){
         this.random = new CrownRandom();
+
+        CrownCore.getDayUpdate().addListener(this::updateDate);
 
         this.enchantMerchant = new EnchantMerchant();
         this.headMerchant = new HeadMerchant();
@@ -45,8 +38,10 @@ public class CrownPirateEconomy implements PirateEconomy {
         this.miningMerchant = new MaterialMerchant("Mining");
         this.dropsMerchant = new MaterialMerchant("Drops");
         this.cropsMerchant = new MaterialMerchant("Crops");
+        this.ghMerchant = new GrapplingHookMerchant();
 
         registerMerchants();
+        reload();
     }
 
     private void registerMerchants(){
@@ -56,22 +51,16 @@ public class CrownPirateEconomy implements PirateEconomy {
         byId.register(miningMerchant.key(), miningMerchant);
         byId.register(dropsMerchant.key(), dropsMerchant);
         byId.register(cropsMerchant.key(), cropsMerchant);
-    }
-
-    @Override
-    public boolean shouldUpdateDate(){
-        return day != Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK);
+        byId.register(ghMerchant.key(), ghMerchant);
     }
 
     @Override
     public void updateDate(){
-        this.day = (byte) Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK);
-
         byId.getEntries().forEach(usable -> {
             if(!(usable instanceof BlackMarketMerchant)) return;
 
             BlackMarketMerchant merchant = (BlackMarketMerchant) usable;
-            merchant.update(random, day);
+            merchant.update(random, CrownCore.getDayUpdate().getDay());
         });
     }
 
@@ -79,13 +68,13 @@ public class CrownPirateEconomy implements PirateEconomy {
         JsonObject json = new JsonObject();
 
         json.addProperty("maxEarnings", maxEarnings);
-        json.addProperty("day", day);
 
         json.add("enchants", enchantMerchant.serialize());
         json.add("mining", miningMerchant.serialize());
         json.add("crops", cropsMerchant.serialize());
         json.add("drops", dropsMerchant.serialize());
         json.add("heads", headMerchant.serialize());
+        json.add("ghMerchant", ghMerchant.serialize());
 
         try {
             setJson(json);
@@ -104,7 +93,6 @@ public class CrownPirateEconomy implements PirateEconomy {
         }
 
         maxEarnings = json.get("maxEarnings").getAsInt();
-        day = json.get("day").getAsByte();
 
         enchantMerchant.load(json.get("enchants"));
         miningMerchant.load(json.get("mining"));
@@ -112,7 +100,7 @@ public class CrownPirateEconomy implements PirateEconomy {
         dropsMerchant.load(json.get("drops"));
         headMerchant.load(json.get("heads"));
 
-        if(shouldUpdateDate()) updateDate();
+        if(json.has("ghMerchant")) ghMerchant.load(json.get("ghMerchant"));
     }
 
     private JsonObject getJson() throws IOException {
@@ -127,10 +115,9 @@ public class CrownPirateEconomy implements PirateEconomy {
     private void setJson(JsonObject json) throws IOException {
         File file = getFile();
 
-        FileWriter fWriter = new FileWriter(file);
-        JsonWriter writer = new JsonWriter(fWriter);
-
-        GSON.toJson(json, writer);
+        FileWriter writer = new FileWriter(file);
+        writer.write(json.toString());
+        writer.close();
     }
 
     private File getFile() throws IOException {
@@ -151,6 +138,7 @@ public class CrownPirateEconomy implements PirateEconomy {
     @Override public MaterialMerchant getCropsMerchant() { return cropsMerchant; }
     @Override public HeadMerchant getHeadMerchant() { return headMerchant; }
     @Override public ParrotMerchant getParrotMerchant() { return parrotMerchant; }
+    @Override public GrapplingHookMerchant getGhMerchant() { return ghMerchant; }
 
     @Override
     public int getMaxEarnings() {
@@ -165,5 +153,10 @@ public class CrownPirateEconomy implements PirateEconomy {
     @Override
     public UsablePirateNpc getNpcById(String id){
         return byId.get(Key.key(id));
+    }
+
+    @Override
+    public Registry<UsablePirateNpc> getNpcRegistry() {
+        return byId;
     }
 }

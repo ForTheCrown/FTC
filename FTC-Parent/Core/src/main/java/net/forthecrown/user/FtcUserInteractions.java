@@ -225,12 +225,12 @@ public class FtcUserInteractions implements UserInteractions {
     }
 
     @Override
-    public UUID getLastMarriageRequest() {
+    public UUID getLastProposal() {
         return lastMarriageRequest;
     }
 
     @Override
-    public void setLastMarriageRequest(UUID lastMarriageRequest) {
+    public void setLastProposal(UUID lastMarriageRequest) {
         this.lastMarriageRequest = lastMarriageRequest;
     }
 
@@ -255,12 +255,12 @@ public class FtcUserInteractions implements UserInteractions {
     }
 
     @Override
-    public boolean marriageChatToggled() {
+    public boolean mChatToggled() {
         return marriageChatToggled;
     }
 
     @Override
-    public void setMarriageChatToggled(boolean marriageChatToggled) {
+    public void setMChatToggled(boolean marriageChatToggled) {
         this.marriageChatToggled = marriageChatToggled;
     }
 }

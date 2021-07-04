@@ -54,9 +54,9 @@ public interface UserInteractions extends SocialInteractionsService {
 
     boolean canChangeMarriageStatus();
 
-    UUID getLastMarriageRequest();
+    UUID getLastProposal();
 
-    void setLastMarriageRequest(UUID lastMarriageRequest);
+    void setLastProposal(UUID lastMarriageRequest);
 
     boolean acceptingProposals();
 
@@ -66,7 +66,12 @@ public interface UserInteractions extends SocialInteractionsService {
 
     void setWaitingFinish(UUID waitingFinish);
 
-    boolean marriageChatToggled();
+    boolean mChatToggled();
 
-    void setMarriageChatToggled(boolean marriageChatToggled);
+    void setMChatToggled(boolean marriageChatToggled);
+
+    default CrownUser marriedToUser(){
+        if(getMarriedTo() == null) return null;
+        return UserManager.getUser(getMarriedTo());
+    }
 }

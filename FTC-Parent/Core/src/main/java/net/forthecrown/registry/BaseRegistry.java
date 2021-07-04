@@ -2,6 +2,8 @@ package net.forthecrown.registry;
 
 import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.key.Key;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -53,5 +55,30 @@ public class BaseRegistry<V> implements Registry<V> {
     @Override
     public Collection<V> getEntries() {
         return entries.values();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BaseRegistry<?> registry = (BaseRegistry<?>) o;
+
+        return new EqualsBuilder()
+                .append(getEntries(), registry.getEntries())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getEntries())
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return entries.toString();
     }
 }

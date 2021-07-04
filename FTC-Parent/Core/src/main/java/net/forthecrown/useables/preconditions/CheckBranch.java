@@ -42,7 +42,7 @@ public class CheckBranch implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{branch=" + branch.getName() + "}";
+        return key().asString() + "{branch=" + branch.getName() + "}";
     }
 
     @Override

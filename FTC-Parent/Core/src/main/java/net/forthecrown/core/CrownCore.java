@@ -8,7 +8,6 @@ import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.shops.ShopManager;
-import net.forthecrown.pirates.Pirates;
 import net.forthecrown.registry.ActionRegistry;
 import net.forthecrown.registry.CheckRegistry;
 import net.forthecrown.registry.KitRegistry;
@@ -28,6 +27,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.io.File;
 import java.io.InputStream;
@@ -41,31 +41,34 @@ import java.util.logging.Logger;
 public interface CrownCore extends Plugin, Namespaced {
     static CrownCore inst(){ return Main.inst; }
 
-    static UserManager getUserManager(){ return Main.userManager; }
     static PunishmentManager getPunishmentManager() { return Main.punishmentManager; }
+    static UsablesManager getUsablesManager() { return Main.usablesManager; }
     static JailManager getJailManager() { return Main.jailManager; }
     static ShopManager getShopManager() { return Main.shopManager; }
-    static UsablesManager getUsablesManager() { return Main.usablesManager; }
+    static UserManager getUserManager(){ return Main.userManager; }
 
+    static LuckPerms getLuckPerms() { return Main.luckPerms; }
     static Announcer getAnnouncer(){ return Main.announcer; }
     static Balances getBalances(){ return Main.balances; }
     static Kingship getKingship(){ return Main.kingship; }
-    static LuckPerms getLuckPerms() { return Main.luckPerms; }
 
-    static WarpRegistry getWarpRegistry() { return Main.warpRegistry; }
-    static KitRegistry getKitRegistry() { return Main.kitRegistry; }
     static ActionRegistry getActionRegistry() { return Main.actionRegistry; }
     static CheckRegistry getCheckRegistry() { return Main.checkRegistry; }
+    static WarpRegistry getWarpRegistry() { return Main.warpRegistry; }
+    static KitRegistry getKitRegistry() { return Main.kitRegistry; }
 
     static CrownMessages getMessages() { return Main.messages; }
-    static ServerRules getRules() { return Main.rules; }
+    static DayUpdate getDayUpdate() { return Main.dayUpdate; }
     static JoinInfo getJoinInfo() { return Main.joinInfo; }
+    static ServerRules getRules() { return Main.rules; }
     static Emotes getEmotes() { return Main.emotes; }
 
     static Logger logger() { return Main.logger; }
     static File dataFolder() { return inst().getDataFolder(); }
     static FileConfiguration config() { return inst().getConfig(); }
     static InputStream resource(String name) { return inst().getResource(name); }
+    static void saveResource(boolean replace, String name) { inst().saveResource(name, replace); }
+    static PluginDescriptionFile description() { return inst().getDescription(); }
 
     static void saveFTC(){
         Main.kingship.save();
@@ -83,11 +86,6 @@ public interface CrownCore extends Plugin, Namespaced {
 
         Main.shopManager.save();
         Main.usablesManager.saveAll();
-
-        Pirates.getParkour().getData().save();
-        Pirates.getTreasure().save();
-        Pirates.getPirateEconomy().save();
-        Pirates.getParrotTracker().save();
 
         Main.joinInfo.save();
 
@@ -234,5 +232,9 @@ public interface CrownCore extends Plugin, Namespaced {
         return Component.text(ChatColor.stripColor(getPrefix()))
                 .color(NamedTextColor.GOLD)
                 .hoverEvent(HoverEvent.showText(Component.text("For The Crown").color(NamedTextColor.YELLOW)));
+    }
+
+    static Key coreKey(String value){
+        return Key.key(inst(), value);
     }
 }

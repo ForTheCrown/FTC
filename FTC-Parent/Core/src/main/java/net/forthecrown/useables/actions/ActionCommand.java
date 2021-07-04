@@ -86,7 +86,7 @@ public class ActionCommand implements UsageAction {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() +  "{" + "command='" + command + '\'' + ", executor=" + (console ? "console" : "user") + '}';
+        return key().asString() +  "{" + "command='" + command + '\'' + '}';
     }
 
     @Override

@@ -10,7 +10,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.DirectMessage;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.SuggestionUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.royalgrenadier.source.CommandSources;
@@ -31,7 +31,7 @@ public class CommandTell extends FtcCommand {
         command.
                 then(argument("user", UserType.onlineUser())
                         .then(argument("message", StringArgumentType.greedyString())
-                                .suggests((c, b) -> CrownUtils.suggestPlayernamesAndEmotes(c, b, false))
+                                .suggests((c, b) -> SuggestionUtils.suggestPlayernamesAndEmotes(c, b, false))
 
                                 .executes(c -> {
                                     CommandSource source = c.getSource();

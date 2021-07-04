@@ -13,7 +13,7 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
 
     private final Int2ObjectMap<InventoryOption> options = new Int2ObjectOpenHashMap<>();
 
-    private InventoryAction onClose;
+    private InventoryCloseAction onClose;
     private InventoryAction onOpen;
 
     public InventoryBuilder(int size, Component title) {
@@ -52,11 +52,11 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
         return this;
     }
 
-    public InventoryAction onClose() {
+    public InventoryCloseAction onClose() {
         return onClose;
     }
 
-    public InventoryBuilder onClose(InventoryAction onClose) {
+    public InventoryBuilder onClose(InventoryCloseAction onClose) {
         this.onClose = onClose;
         return this;
     }
@@ -72,6 +72,10 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
 
     @Override
     public BuiltInventory build() {
-        return new BuiltInventory(options, title, size, onClose, onOpen);
+        return new BuiltInventory(
+                options,
+                title, size,
+                onClose, onOpen
+        );
     }
 }

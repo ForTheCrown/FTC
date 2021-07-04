@@ -11,6 +11,7 @@ import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.useables.warps.FtcWarp;
 import net.forthecrown.useables.warps.Warp;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.utils.SuggestionUtils;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
@@ -79,7 +80,7 @@ public class CrownWarpRegistry extends AbstractJsonSerializer implements WarpReg
             }
 
             return builder.buildFuture();
-        } else return CrownUtils.suggestKeys(builder, getKeys());
+        } else return SuggestionUtils.suggestKeys(builder, getKeys());
     }
 
     @Override

@@ -29,7 +29,7 @@ public class CrownPunishmentManager extends AbstractJsonSerializer implements Pu
         super("punishments");
 
         reload();
-        CrownCore.logger().info("PunishmentManager loaded");
+        CrownCore.logger().info("Punishment Manager loaded");
     }
 
     @Override

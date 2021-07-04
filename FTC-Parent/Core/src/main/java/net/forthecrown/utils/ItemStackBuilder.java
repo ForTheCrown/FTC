@@ -2,7 +2,6 @@ package net.forthecrown.utils;
 
 import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
-import org.apache.logging.log4j.core.util.Builder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -22,7 +21,7 @@ import java.util.*;
 /**
  * A class for building item stacks
  */
-public class ItemStackBuilder implements Builder<ItemStack> {
+public class ItemStackBuilder {
 
     private final Material material;
     private Component name = null;
@@ -112,7 +111,7 @@ public class ItemStackBuilder implements Builder<ItemStack> {
     }
 
     public ItemStackBuilder setLore(Collection<String> lores, boolean translateColors){
-        return setLore(ListUtils.convertToList(lores, ChatUtils::convertString));
+        return setLore(ListUtils.convertToList(lores, s -> ChatUtils.convertString(s, translateColors)));
     }
 
     public ItemStackBuilder addLore(Component lore) {
@@ -183,7 +182,6 @@ public class ItemStackBuilder implements Builder<ItemStack> {
         return unbreakable;
     }
 
-    @Override
     public ItemStack build() {
         ItemStack result = new ItemStack(material, amount);
         ItemMeta meta = result.getItemMeta();

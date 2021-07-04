@@ -1,6 +1,7 @@
 package net.forthecrown.commands.emotes;
 
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -16,6 +17,8 @@ public class EmoteScare extends CommandEmote {
         super("scare", 30*20, ChatColor.GRAY + "You scare people too often lol" + "\n" + ChatColor.DARK_GRAY + "This only works every 30 seconds.");
 
         setDescription("description: Scares another player.");
+        setPermission(Permissions.EMOTE_SCARE);
+
         register();
     }
 

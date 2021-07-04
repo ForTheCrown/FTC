@@ -1,8 +1,10 @@
 package net.forthecrown.commands;
 
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
+import net.forthecrown.pirates.TreasureShulker;
 
 public class CommandPirate extends FtcCommand {
     public CommandPirate() {
@@ -29,6 +31,15 @@ public class CommandPirate extends FtcCommand {
                         .executes(c -> {
                             Pirates.getTreasure().relocate();
                             broadcastAdmin(c.getSource(), "Spawning Treasure Shulker");
+                            return 0;
+                        })
+                )
+
+                .then(literal("shulker_where")
+                        .executes(c -> {
+                            TreasureShulker shulker = Pirates.getTreasure();
+
+                            c.getSource().sendMessage(ChatFormatter.clickableLocationMessage(shulker.getLocation(), true));
                             return 0;
                         })
                 );

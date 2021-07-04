@@ -42,7 +42,7 @@ public class CheckRank implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{rank=" + rank.name().toLowerCase() + "}";
+        return key().asString() + "{rank=" + rank.name().toLowerCase() + "}";
     }
 
     @Override

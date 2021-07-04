@@ -1,24 +1,15 @@
 package net.forthecrown.utils;
 
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.Permissions;
-import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.user.UserManager;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +18,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static org.bukkit.Bukkit.getServer;
@@ -88,6 +78,8 @@ public final class CrownUtils {
         Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> player.setScoreboard(mainScoreboard), 300L);
     }
 
+    //This is bad, underscores SHOULD NOT be used in file names with locations, world names can get caught up in it.
+    //Need to use spaces instead
     public static String locationToFilename(Location l){
         return l.getWorld().getName() + "_" + l.getBlockX() + "_" + l.getBlockY() + "_" + l.getBlockZ();
     }
@@ -110,14 +102,6 @@ public final class CrownUtils {
         return Key.key(key.namespace(), key.value());
     }
 
-    public static CompletableFuture<Suggestions> suggestKeys(SuggestionsBuilder builder, Iterable<Key> keys){
-        return CompletionProvider.suggestKeys(builder, keys);
-    }
-
-    public static CompletableFuture<Suggestions> suggestKeysNoNamespace(SuggestionsBuilder builder, Iterable<Key> keys){
-        return CompletionProvider.suggestMatching(builder, ListUtils.fromIterable(keys, Key::value));
-    }
-
     public static Collection<? extends Player> getVisiblePlayers(CommandSource source){
         if(source.isPlayer()){
             try {
@@ -134,17 +118,6 @@ public final class CrownUtils {
         return Bukkit.getOnlinePlayers();
     }
 
-    public static CompletableFuture<Suggestions> suggestPlayernamesAndEmotes(CommandContext<CommandSource> c, SuggestionsBuilder builder, boolean ignorePerms){
-        builder = builder.createOffset(builder.getInput().lastIndexOf(' ')+1);
-
-        CompletionProvider.suggestPlayerNames(builder);
-        if(c.getSource().hasPermission(Permissions.DONATOR_3) || ignorePerms){
-            return CrownCore.getEmotes().getSuggestions(c, builder, ignorePerms);
-        }
-
-        return builder.buildFuture();
-    }
-
     public static boolean isItemEmpty(ItemStack itemStack){
         return itemStack == null || itemStack.getType() == Material.AIR;
     }
@@ -152,15 +125,6 @@ public final class CrownUtils {
     public static boolean isInRange(int check, int min, int max){
         if(check < min) return false;
         return check <= max;
-    }
-
-    public static Component entityDisplayName(Entity entity){
-        return ChatUtils.vanillaToAdventure(((CraftEntity) entity).getHandle().getDisplayName());
-    }
-
-    public static Component sourceDisplayName(CommandSource source){
-        if(source.isPlayer()) return UserManager.getUser(source.textName()).nickDisplayName();
-        return source.displayName();
     }
 
     public static Player fromAudience(Audience audience){

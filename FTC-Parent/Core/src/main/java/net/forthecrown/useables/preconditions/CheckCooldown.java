@@ -58,7 +58,7 @@ public class CheckCooldown implements UsageCheck {
 
     @Override
     public String asString() {
-        return "SignCheckCooldown{" + "duration=" + tickDuration + "}";
+        return key().asString() + '{' + "duration=" + tickDuration + '}';
     }
 
     @Override

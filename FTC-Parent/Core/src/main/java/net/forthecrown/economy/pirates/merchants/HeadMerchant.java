@@ -91,7 +91,10 @@ public class HeadMerchant implements BlackMarketMerchant {
     @Override
     public void update(CrownRandom random, byte day) {
         BlockPos pos = chests[random.intInRange(0, chests.length)];
-        Inventory inv = ((Chest) pos.getBlock(Worlds.NORMAL)).getBlockInventory();
+
+        Chest chest = pos.stateAs(Worlds.NORMAL);
+        Inventory inv = chest.getBlockInventory();
+
         alreadySold.clear();
 
         ItemStack item;
@@ -142,7 +145,7 @@ public class HeadMerchant implements BlackMarketMerchant {
     @Override
     public void onUse(CrownUser user, Entity entity) {
         if(alreadySold.contains(user.getUniqueId())){
-            user.sendMessage(Component.translatable("pirates.heads.alreadySold", headDisplayName()));
+            user.sendMessage(Component.translatable("pirates.heads.alreadySold", NamedTextColor.GRAY, headDisplayName()));
             return;
         }
 
@@ -171,15 +174,16 @@ public class HeadMerchant implements BlackMarketMerchant {
         user.sendMessage(
                 Component.text()
                         .color(NamedTextColor.YELLOW)
-                        .append(Component.translatable("pirates.heads.sold", headDisplayName().color(NamedTextColor.YELLOW)))
+                        .append(Component.translatable("pirates.heads.sold", headDisplayName().color(NamedTextColor.GOLD)))
                         .append(Component.newline())
                         .append(Component.translatable(
                                 "pirates.heads.reward",
-                                Balances.formatted(getMoneyReward()).color(NamedTextColor.YELLOW),
-                                Component.text(getPiratePointReward() + " Pirate Point" + CrownUtils.addAnS(getPiratePointReward())).color(NamedTextColor.YELLOW),
-                                Component.text(pp.getScore()).color(NamedTextColor.YELLOW)
+                                Balances.formatted(getMoneyReward()).color(NamedTextColor.GOLD),
+                                Component.text(getPiratePointReward() + " Pirate Point" + CrownUtils.addAnS(getPiratePointReward())).color(NamedTextColor.GOLD),
+                                Component.text(pp.getScore()).color(NamedTextColor.GOLD)
                         ))
         );
+        alreadySold.add(user.getUniqueId());
     }
 
     @Override

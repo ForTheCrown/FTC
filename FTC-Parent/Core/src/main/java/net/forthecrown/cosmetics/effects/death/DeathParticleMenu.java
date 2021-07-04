@@ -5,7 +5,7 @@ import net.forthecrown.cosmetics.effects.CosmeticMenu;
 import net.forthecrown.cosmetics.effects.MainCosmeticsMenu;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.inventory.custom.CustomInventory;
-import net.forthecrown.inventory.custom.CustomInvBuilder;
+import net.forthecrown.inventory.custom.CustomInventoryBuilder;
 import net.forthecrown.inventory.custom.borders.GenericBorder;
 import net.forthecrown.inventory.custom.options.ClickableOption;
 import net.forthecrown.inventory.custom.options.Option;
@@ -43,7 +43,7 @@ public class DeathParticleMenu implements CosmeticMenu {
 
     @Override
     public CustomInventory buildInventory(CrownUser user) {
-        CustomInvBuilder invBuilder = new CustomInvBuilder();
+        CustomInventoryBuilder invBuilder = new CustomInventoryBuilder();
         return invBuilder
                 .setUser(user)
                 .setSize(this.getSize())

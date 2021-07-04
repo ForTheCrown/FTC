@@ -15,7 +15,7 @@ public class EmoteBonk extends CommandEmote {
     public EmoteBonk(){
         super("bonk", 3*20, "&7You bonk people too often lol");
 
-        setPermission("ftc.emotes");
+        setDescription("Bonks a player");
         register();
     }
 

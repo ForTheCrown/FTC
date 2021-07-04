@@ -71,7 +71,8 @@ public final class CoreCommands {
         new CommandInteractable();
         new CommandSudo();
         new CommandSetSpawn();
-        new CommandTeleportExact();
+        new CommandRoyals();
+        new CommandPirate();
 
         //Admin utility
         new CommandSpeed();
@@ -87,6 +88,8 @@ public final class CoreCommands {
         new CommandMemory();
         new CommandSkull();
         new CommandMakeAward();
+        new CommandBlackMarketNpc();
+        new CommandTeleportExact();
         CommandSpecificGameMode.init();
 
         //Policing commands
@@ -116,6 +119,7 @@ public final class CoreCommands {
         new CommandMe();
         new CommandVolleyBall();
         new CommandParrot();
+        new CommandCosmetics();
 
         CommandDumbThing.init();
         CommandToolBlock.init();

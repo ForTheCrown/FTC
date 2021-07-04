@@ -9,6 +9,7 @@ import net.forthecrown.commands.arguments.ComVarArgument;
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.kyori.adventure.text.Component;
 
 public class CommandComVar extends FtcCommand {
 
@@ -40,7 +41,11 @@ public class CommandComVar extends FtcCommand {
                 .executes(c -> { //Just var name -> show var value
                     ComVar<?> var = c.getArgument("var", ComVar.class);
 
-                    c.getSource().sendMessage(var.getName() + ": " + var.toString());
+                    Component display = Component.text(var.getName())
+                            .append(Component.text(": "))
+                            .append(var.prettyDisplay());
+
+                    c.getSource().sendMessage(display);
                     return 0;
                 })
 

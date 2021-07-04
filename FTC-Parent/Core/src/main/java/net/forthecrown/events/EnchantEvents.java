@@ -106,7 +106,7 @@ public class EnchantEvents implements Listener {
             event.getPlayer().getInventory().getItemInMainHand().setItemMeta((ItemMeta) dmg);
         }
 
-        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 120, 1), true);
+        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 120, 1));
         event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_AMBIENT, 1f, 1.5f);
     }
 
@@ -118,7 +118,7 @@ public class EnchantEvents implements Listener {
         new StrongAimScheduler((Arrow) event.getProjectile());
     }
 
-    public class StrongAimScheduler implements Runnable{
+    public class StrongAimScheduler implements Runnable {
         private final Arrow arrow;
         private final int loopID;
 

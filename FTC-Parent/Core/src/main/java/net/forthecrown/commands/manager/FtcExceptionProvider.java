@@ -4,13 +4,14 @@ import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.economy.Balances;
-import net.forthecrown.user.CrownUser;
 import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.economy.Balances;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.format.TextColor;
 
 import static net.forthecrown.commands.manager.CrownExceptionProvider.*;
 
@@ -32,6 +33,10 @@ public interface FtcExceptionProvider {
 
     static RoyalCommandException translatable(String key, ComponentLike... args){
         return new TranslatableExceptionType(key).create(args);
+    }
+
+    static RoyalCommandException translatable(String key, TextColor color, ComponentLike... args){
+        return new TranslatableExceptionType(key).create(color, args);
     }
 
     static RoyalCommandException translatableWithContext(String key, ImmutableStringReader context, ComponentLike... args){

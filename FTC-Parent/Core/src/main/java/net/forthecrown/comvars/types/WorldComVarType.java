@@ -5,16 +5,25 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.comvars.ComVarRegistry;
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.types.WorldArgument;
+import net.kyori.adventure.key.Key;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class WorldComVarType implements ComVarType<World> {
     public static final ComVarType<World> WORLD = new WorldComVarType();
-    private WorldComVarType() {}
+    private final Key key = CrownCore.coreKey("world_type");
+
+    private WorldComVarType() {
+        ComVarRegistry.getTypeRegistry().register(key, this);
+    }
 
     @Override
-    public World fromString(StringReader input) throws CommandSyntaxException {
+    public World parse(StringReader input) throws CommandSyntaxException {
         return WorldArgument.world().parse(input);
     }
 
@@ -26,5 +35,16 @@ public class WorldComVarType implements ComVarType<World> {
     @Override
     public JsonElement serialize(@Nullable World value) {
         return value == null ? JsonNull.INSTANCE : new JsonPrimitive(value.getName());
+    }
+
+    @Override
+    public World deserialize(JsonElement element) {
+        if(element == null || element.isJsonNull()) return null;
+        return Bukkit.getWorld(element.getAsString());
+    }
+
+    @Override
+    public @NotNull Key key() {
+        return key;
     }
 }

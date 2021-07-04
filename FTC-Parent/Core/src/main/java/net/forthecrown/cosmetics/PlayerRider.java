@@ -53,7 +53,7 @@ public class PlayerRider implements Listener {
 
         HandlerList.unregisterAll(this);
         Bukkit.getScheduler().runTaskLater(CrownCore.inst(), this::preventBadLocation, 5);
-        Cosmetics.getRideManager().riders.remove(this);
+        Cosmetics.getRideManager().removeRider(this);
     }
 
     private void preventBadLocation(){

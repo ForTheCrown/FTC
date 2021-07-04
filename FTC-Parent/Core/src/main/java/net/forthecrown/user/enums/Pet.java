@@ -78,7 +78,7 @@ public enum Pet implements JsonSerializable {
     }
 
     public Component requirementDisplay(){
-        Component needed = requiresRank() ? required.noEndSpacePrefix() : Balances.formatted(requiredBal);
+        Component needed = requiresRank() ? required.noEndSpacePrefix() : Component.text(Balances.getFormatted(requiredBal));
 
         return Component.text()
                 .color(NamedTextColor.YELLOW)

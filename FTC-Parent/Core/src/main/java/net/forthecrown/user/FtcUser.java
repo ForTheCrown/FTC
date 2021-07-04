@@ -47,6 +47,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.protocol.game.ClientboundChatPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
@@ -844,13 +845,15 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
     @Override
     public Location getLocation() {
         if(!isOnline()) return entityLocation;
-        return new Location(getHandle().getLevel().getWorld(), getHandle().getX(), getHandle().getY(), getHandle().getZ(), getHandle().getBukkitYaw(), getHandle().getXRot());
+        Entity entity = getHandle(); //Inheritance mapping is a bitch, I wish it would peg me instead of ripping me to pieces with a hacksaw
+
+        return new Location(entity.level.getWorld(), entity.getX(), entity.getY(), entity.getZ(), entity.getBukkitYaw(), entity.getXRot());
     }
 
     @Override
     public World getWorld() {
         if(!isOnline()) return entityLocation.getWorld();
-        return getHandle().getLevel().getWorld();
+        return ((Entity) getHandle()).level.getWorld();
     }
 
     @Override
@@ -868,7 +871,7 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
         if(lastTeleport != null) lastTeleport.interrupt(false);
 
         if(CrownCore.getPunishmentManager().checkJailed(getPlayer())){
-            CrownCore.getJailManager().getJailListener(getPlayer()).unreg();
+            CrownCore.getJailManager().getListener(getPlayer()).unreg();
         }
 
         getFile().set("TimeStamps.LastLoad", System.currentTimeMillis());

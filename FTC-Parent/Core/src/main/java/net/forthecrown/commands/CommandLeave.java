@@ -22,6 +22,7 @@ public class CommandLeave extends FtcCommand {
 
         setPermission(Permissions.DEFAULT);
         setDescription("I'm out :D");
+        setAliases("exit");
 
         register();
     }

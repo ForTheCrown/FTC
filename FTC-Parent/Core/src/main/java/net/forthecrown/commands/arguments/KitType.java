@@ -9,6 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.useables.kits.Kit;
+import net.forthecrown.utils.SuggestionUtils;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
@@ -46,7 +47,7 @@ public class KitType implements ArgumentType<Key> {
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, boolean ignoreChecks){
-        if(ignoreChecks) return CrownUtils.suggestKeys(builder, CrownCore.getKitRegistry().getKeys());
+        if(ignoreChecks) return SuggestionUtils.suggestKeys(builder, CrownCore.getKitRegistry().getKeys());
 
         try {
             return CrownCore.getKitRegistry().getSuggestions((CommandContext<CommandSource>) context, builder);

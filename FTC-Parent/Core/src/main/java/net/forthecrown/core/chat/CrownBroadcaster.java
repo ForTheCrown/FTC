@@ -35,10 +35,9 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
         super("announcer");
 
         reload();
-        doBroadcasts();
 
         delay.setOnUpdate(val -> start());
-        CrownCore.logger().info("Broadcaster enabled");
+        CrownCore.logger().info("Announcer loaded");
     }
 
 
@@ -65,7 +64,8 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
         }
     }
 
-    private void doBroadcasts(){
+    public void doBroadcasts(){
+        CrownCore.logger().info("Starting announcer");
         broadcaster = new BukkitRunnable() {
             int counter = 0;
 

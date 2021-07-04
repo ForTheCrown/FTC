@@ -31,7 +31,7 @@ public class CheckNeverUsed implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + '{' + "used=" + used + '}';
+        return key().asString() + '{' + "used=" + used + '}';
     }
 
     @Override

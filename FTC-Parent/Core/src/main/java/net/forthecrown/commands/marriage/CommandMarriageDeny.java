@@ -43,10 +43,10 @@ public class CommandMarriageDeny extends FtcCommand {
                     CrownUser user = getUserSender(c);
                     UserInteractions inter = user.getInteractions();
 
-                    if(inter.getLastMarriageRequest() == null) throw FtcExceptionProvider.translatable("marriage.noRequest");
+                    if(inter.getLastProposal() == null) throw FtcExceptionProvider.translatable("marriage.noRequest");
 
-                    CrownUser lastRequest = UserManager.getUser(inter.getLastMarriageRequest());
-                    inter.setLastMarriageRequest(null);
+                    CrownUser lastRequest = UserManager.getUser(inter.getLastProposal());
+                    inter.setLastProposal(null);
 
                     if(lastRequest.isOnline()){
                         lastRequest.sendMessage(

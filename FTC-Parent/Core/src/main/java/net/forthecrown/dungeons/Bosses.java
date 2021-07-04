@@ -21,24 +21,17 @@ public class Bosses {
     private static HideySpidey hideySpidey;
     private static Drawned drawned;
 
-    static Bosses instance;
-
     private Bosses(){
     }
 
     public static void init(){
-        instance = new Bosses();
-        instance.initBosses();
-    }
-
-    public void initBosses(){
         zhambie = new Zhambie();
         skalatan = new Skalatan();
         hideySpidey = new HideySpidey();
         drawned = new Drawned();
     }
 
-    public static void killAll() {
+    public static void shutDown() {
         zhambie.kill(true);
         skalatan.kill(true);
         hideySpidey.kill(true);

@@ -7,7 +7,6 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,6 +17,7 @@ import java.util.Set;
  * <p>Cooldowns are divided into categories</p>
  */
 public final class Cooldown {
+    public static final String GENERAL = "general";
 
     private static final Map<String, Set<CommandSender>> COOLDOWN_MAP = new HashMap<>();
 
@@ -40,14 +40,18 @@ public final class Cooldown {
     }
 
     public static void add(@NotNull CommandSender sender, @Nonnegative int timeInTicks){
-        add(sender, "general", timeInTicks);
+        add(sender, GENERAL, timeInTicks);
+    }
+
+    public static void add(@NotNull CommandSender sender){
+        add(sender, GENERAL, -1);
     }
 
     public static void add(@NotNull CommandSender sender, @NotNull String category){
-        add(sender, category, null);
+        add(sender, category, -1);
     }
 
-    public static void add(@NotNull CommandSender sender, @NotNull String category, @Nullable @Nonnegative Integer timeInTicks){
+    public static void add(@NotNull CommandSender sender, @NotNull String category, int timeInTicks){
         Validate.notNull(sender, "Sender was null");
         Validate.notNull(category, "Category was null");
 
@@ -57,13 +61,13 @@ public final class Cooldown {
         set.add(sender);
         COOLDOWN_MAP.put(category, set);
 
-        if(timeInTicks != null){
+        if(timeInTicks != -1){
             Bukkit.getScheduler().runTaskLater(CrownCore.inst(), () -> remove(sender, category), timeInTicks);
         }
     }
 
     public static void remove(@NotNull CommandSender sender){
-        remove(sender, "general");
+        remove(sender, GENERAL);
     }
 
     public static void remove(@NotNull CommandSender sender, @NotNull String category){

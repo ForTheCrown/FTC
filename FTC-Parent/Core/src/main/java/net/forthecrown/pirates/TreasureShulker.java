@@ -1,5 +1,6 @@
 package net.forthecrown.pirates;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.CrownCore;
@@ -10,8 +11,8 @@ import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.JsonUtils;
+import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.loot.CrownLootTable;
-import net.forthecrown.utils.loot.WeightedLootTable;
 import net.forthecrown.utils.math.BlockPos;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -19,10 +20,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
@@ -59,6 +57,8 @@ public class TreasureShulker extends AbstractJsonSerializer {
         super("treasure_shulker");
 
         reload();
+        CrownCore.getDayUpdate().addListener(this::relocate);
+        CrownCore.logger().info("Treasure Shulker loaded");
     }
 
     @Override
@@ -78,11 +78,14 @@ public class TreasureShulker extends AbstractJsonSerializer {
     @Override
     protected void reload(JsonObject json) {
         this.location = JsonUtils.readLocation(json.getAsJsonObject("loc"));
-        this.currentID = UUID.fromString(json.get("currentID").getAsString());
 
-        this.commonLoot = WeightedLootTable.deserialize(json.get("commonLoot"));
-        this.rareLoot = WeightedLootTable.deserialize(json.get("rareLoot"));
-        this.specialLoot = WeightedLootTable.deserialize(json.get("specialLoot"));
+        JsonElement element = json.get("currentID");
+        if(element != null && !element.isJsonNull()) this.currentID = UUID.fromString(element.getAsString());
+        else currentID = null;
+
+        this.commonLoot = CrownLootTable.deserialize(json.get("commonLoot"));
+        this.rareLoot = CrownLootTable.deserialize(json.get("rareLoot"));
+        this.specialLoot = CrownLootTable.deserialize(json.get("specialLoot"));
 
         alreadyFound.clear();
         if(json.has("alreadyFound")){
@@ -95,22 +98,15 @@ public class TreasureShulker extends AbstractJsonSerializer {
     }
 
     public void relocate(){
-        Entity entity = Bukkit.getEntity(currentID);
-        if(entity == null){
-            spawn();
-            return;
-        }
-
-        moveLocToRandom();
-
-        Block block = location.getBlock();
-        if(!block.getType().isAir()) block.setType(Material.AIR);
-
-        entity.teleport(location);
+        kill();
+        spawn();
     }
 
     public void spawn(){
         moveLocToRandom();
+
+        Block block = location.getBlock();
+        if(!block.getType().isAir()) block.setType(Material.AIR);
 
         CrownCore.getTreasureWorld().spawn(location, Shulker.class, shulker -> {
             currentID = shulker.getUniqueId();
@@ -119,6 +115,9 @@ public class TreasureShulker extends AbstractJsonSerializer {
 
             shulker.setPersistent(true);
             shulker.setRemoveWhenFarAway(false);
+
+            shulker.setAI(false);
+            shulker.setColor(DyeColor.GRAY);
         });
     }
 
@@ -185,6 +184,14 @@ public class TreasureShulker extends AbstractJsonSerializer {
         this.location = new Location(CrownCore.getTreasureWorld(), x, y, z);
     }
 
+    public Location getLocation() {
+        return location.clone();
+    }
+
+    public UUID getCurrentID() {
+        return currentID;
+    }
+
     @Override
     protected JsonObject createDefaults(JsonObject json) {
         moveLocToRandom();
@@ -192,22 +199,21 @@ public class TreasureShulker extends AbstractJsonSerializer {
 
         json.add("specialLoot", lootTableFromChest(
                 new BlockPos(-674, 59, 3847),
-                location.getWorld(),
+                Worlds.NORMAL,
                 specialKey
         ).serialize());
 
         json.add("rareLoot", lootTableFromChest(
                 new BlockPos(-674, 59, 3848),
-                location.getWorld(),
+                Worlds.NORMAL,
                 rareKey
         ).serialize());
 
         json.add("commonLoot", lootTableFromChest(
                 new BlockPos(-674, 59, 3849),
-                location.getWorld(),
+                Worlds.NORMAL,
                 commonKey
         ).serialize());
-
 
         return json;
     }

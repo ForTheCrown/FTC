@@ -7,14 +7,17 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Rank;
+import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -26,9 +29,12 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,18 +106,7 @@ public class ChatFormatter {
         if(source.hasPermission(Permissions.DONATOR_2) || inSenateWorld || staffChat) strMessage = translateHexCodes(strMessage);
         if(source.hasPermission(Permissions.DONATOR_3) || inSenateWorld || staffChat) strMessage = CrownCore.getEmotes().format(strMessage, source, true);
 
-        if(strMessage.length() > 8 && !source.hasPermission(Permissions.IGNORE_CHAT_CASE)){
-            int upCastCharNumber = 0;
-            for(int i = 0; i < strMessage.length(); i++){
-                if(Character.isUpperCase(strMessage.charAt(i))) upCastCharNumber++;
-            }
-            if(upCastCharNumber > (strMessage.length()/2)) {
-                strMessage = StringUtils.capitalize(strMessage.toLowerCase());
-                strMessage += "!";
-                source.sendMessage(Component.text("Refrain from using all caps messages.").color(NamedTextColor.RED));
-            }
-        }
-
+        strMessage = checkUppercase(source, strMessage);
         message = ChatUtils.convertString(strMessage);
 
         TextColor playerColor = inSenateWorld ? NamedTextColor.YELLOW : TextColor.color(240, 240, 240);
@@ -125,6 +120,26 @@ public class ChatFormatter {
                 ))
                 .append(message)
                 .build();
+    }
+
+    public static String checkUppercase(CommandSender source, String input){
+        if(input.length() > 8 && !source.hasPermission(Permissions.IGNORE_CHAT_CASE)){
+            int upCastCharNumber = 0;
+            for(int i = 0; i < input.length(); i++){
+                if(Character.isUpperCase(input.charAt(i))) upCastCharNumber++;
+            }
+            if(upCastCharNumber > (input.length()/2)) {
+                input = StringUtils.capitalize(input.toLowerCase());
+                input += "!";
+
+                if(!Cooldown.contains(source, "uppercase_warning")){
+                    source.sendMessage(Component.translatable("user.allCaps").color(NamedTextColor.GRAY));
+                    Cooldown.add(source, "uppercase_warning", 1800); //1 and a half mins
+                }
+            }
+        }
+
+        return input;
     }
 
     public static Component joinMessage(CrownUser user){
@@ -322,5 +337,34 @@ public class ChatFormatter {
         if(!CrownCore.allowOtherPlayerNameNicks()){
             if(Bukkit.getOfflinePlayerIfCached(nick) != null) throw FtcExceptionProvider.create("Nickname cannot be the name of another player");
         }
+    }
+
+    public static Component entityDisplayName(Entity entity){
+        Component name = entity.customName() == null ? translatableEntityName(entity.getType()) : entity.customName();
+        assert name != null;
+
+        Team team = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(entity.getUniqueId().toString());
+        if(team != null) name = formatTeamName(name, team);
+
+        return name;
+    }
+
+    public static TranslatableComponent translatableEntityName(EntityType entity){
+        return Component.translatable(Bukkit.getUnsafe().getTranslationKey(entity));
+    }
+
+    public static Component formatTeamName(Component initialName, Team team){
+        return Component.text()
+                .append(team.prefix())
+                .append(Component.space())
+                .append(initialName.color(team.color()))
+                .append(Component.space())
+                .append(team.suffix())
+                .build();
+    }
+
+    public static Component sourceDisplayName(CommandSource source){
+        if(source.isPlayer()) return UserManager.getUser(source.textName()).nickDisplayName();
+        return source.displayName();
     }
 }

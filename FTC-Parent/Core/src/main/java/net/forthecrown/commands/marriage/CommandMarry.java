@@ -57,7 +57,7 @@ public class CommandMarry extends FtcCommand {
                             if(!uInter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
                             if(!tInter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(target);
 
-                            tInter.setLastMarriageRequest(user.getUniqueId());
+                            tInter.setLastProposal(user.getUniqueId());
 
                             Component acceptButton = Component.text("[Accept]")
                                     .color(NamedTextColor.GREEN)

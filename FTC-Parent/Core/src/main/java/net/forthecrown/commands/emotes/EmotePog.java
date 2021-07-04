@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.CrownUtils;
@@ -18,7 +19,8 @@ public class EmotePog extends FtcCommand {
         super("pog", CrownCore.inst());
 
         setAliases("pgo", "poggers", "pogchamp", "pogo");
-        setPermission("ftc.emotes.pog");
+        setPermission(Permissions.EMOTE_POG);
+
         register();
     }
 

@@ -8,7 +8,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 public class JoinInfo extends AbstractJsonSerializer {
 
-    private Component news;
+    private Component info;
     private boolean shouldShow = false;
 
     private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
@@ -16,12 +16,12 @@ public class JoinInfo extends AbstractJsonSerializer {
     public JoinInfo(){
         super("join_info");
 
-        news = Component.empty();
+        info = Component.empty();
         reload();
     }
 
     public Component display(){
-        return news;
+        return info;
     }
 
     public boolean shouldShow() {
@@ -33,19 +33,19 @@ public class JoinInfo extends AbstractJsonSerializer {
     }
 
     public void setDisplay(Component news) {
-        this.news = news;
+        this.info = news;
     }
 
     @Override
     protected void save(JsonObject json) {
         json.add("shouldShow", new JsonPrimitive(shouldShow));
-        json.add("news", serializer.serializeToTree(news));
+        json.add("info", serializer.serializeToTree(info));
     }
 
     @Override
     protected void reload(JsonObject json) {
         this.shouldShow = json.get("shouldShow").getAsBoolean();
-        this.news = serializer.deserializeFromTree(json.get("news"));
+        this.info = serializer.deserializeFromTree(json.get("info"));
     }
 
     @Override

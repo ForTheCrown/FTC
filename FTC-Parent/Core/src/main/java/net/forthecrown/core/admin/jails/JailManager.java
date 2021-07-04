@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
  * Stores all the jail locations and names
  */
 public interface JailManager extends CrownSerializer, Registry<Location>{
-    JailListener getJailListener(Player player);
-    void addJailListener(JailListener listener);
-    void removeJailListener(JailListener listener);
+    JailListener getListener(Player player);
+    void addListener(JailListener listener);
+    void removeListener(JailListener listener);
 }

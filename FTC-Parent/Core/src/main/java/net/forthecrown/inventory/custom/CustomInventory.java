@@ -1,10 +1,10 @@
 package net.forthecrown.inventory.custom;
 
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.inventory.custom.borders.Border;
 import net.forthecrown.inventory.custom.options.Option;
 import net.forthecrown.user.CrownUser;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,6 @@ public class CustomInventory implements InventoryHolder {
     private Inventory inv;
     private Border invBorder;
     private Map<Integer, Option> invSlots;
-    public final static Listener LISTENER = new InvClickListener();
 
     public CustomInventory() {}
 
@@ -35,6 +34,7 @@ public class CustomInventory implements InventoryHolder {
 
 
     public void handleClick(HumanEntity clicker, int slot) {
+        Announcer.debug("slot: " + slot);
         if (invBorder.isOnBorder(slot)) invBorder.handleClick(clicker);
         else if (invSlots.containsKey(slot)) invSlots.get(slot).handleClick(clicker);
     }

@@ -27,7 +27,7 @@ public class JailListener implements Listener {
         this.jail = jail;
 
         record = CrownCore.getPunishmentManager().getEntry(player.getUniqueId()).getCurrent(PunishmentType.JAIL);
-        CrownCore.getJailManager().addJailListener(this);
+        CrownCore.getJailManager().addListener(this);
 
         checkDistance();
     }
@@ -43,7 +43,7 @@ public class JailListener implements Listener {
 
     public void unreg(){
         HandlerList.unregisterAll(this);
-        CrownCore.getJailManager().removeJailListener(this);
+        CrownCore.getJailManager().removeListener(this);
     }
 
     public void release(){

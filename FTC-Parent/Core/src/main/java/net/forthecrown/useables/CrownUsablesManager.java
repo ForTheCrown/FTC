@@ -1,5 +1,6 @@
 package net.forthecrown.useables;
 
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.registry.ActionRegistry;
 import net.forthecrown.registry.CheckRegistry;
 import net.forthecrown.serializer.AbstractJsonSerializer;
@@ -28,6 +29,9 @@ public class CrownUsablesManager implements UsablesManager {
         actions.register(ActionRemoveNumber.BAL_KEY, () -> new ActionRemoveNumber(true));
         actions.register(ActionRemoveNumber.GEM_KEY, () -> new ActionRemoveNumber(false));
 
+        actions.register(ActionAddNumber.BAL_KEY, () -> new ActionAddNumber(true));
+        actions.register(ActionAddNumber.GEM_KEY, () -> new ActionAddNumber(false));
+
         actions.register(ActionItem.ADD_KEY, () -> new ActionItem(true));
         actions.register(ActionItem.REMOVE_KEY, () -> new ActionItem(false));
 
@@ -39,6 +43,8 @@ public class CrownUsablesManager implements UsablesManager {
         actions.register(ActionTeleport.KEY, ActionTeleport::new);
         actions.register(ActionKit.KEY, ActionKit::new);
         actions.register(ActionWarp.KEY, ActionWarp::new);
+
+        CrownCore.logger().info("Default actions registered");
 
         //Preconditions
         checks.register(CheckNumber.BAL_KEY, () -> new CheckNumber(true));
@@ -56,6 +62,8 @@ public class CrownUsablesManager implements UsablesManager {
         checks.register(CheckNeverUsed.KEY, CheckNeverUsed::new);
         checks.register(CheckHasAllItems.KEY, CheckHasAllItems::new);
         checks.register(CheckIsNotAlt.KEY, CheckIsNotAlt::new);
+
+        CrownCore.logger().info("Default checks registered");
     }
 
     @Override

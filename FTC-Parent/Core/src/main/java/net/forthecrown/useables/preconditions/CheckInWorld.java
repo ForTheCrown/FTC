@@ -40,7 +40,7 @@ public class CheckInWorld implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{world=" + (world == null ? "null" : world.getName()) + "}";
+        return key().asString() + "{world=" + (world == null ? "null" : world.getName()) + "}";
     }
 
     @Override

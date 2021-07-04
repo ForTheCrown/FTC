@@ -1,8 +1,6 @@
 package net.forthecrown.inventory.builder;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.events.dynamic.InventoryBuilderListener;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
@@ -20,13 +18,13 @@ public class BuiltInventory implements InventoryHolder {
     private final Component title;
     private final int size;
 
-    private final InventoryAction onClose;
+    private final InventoryCloseAction onClose;
     private final InventoryAction onOpen;
 
     public BuiltInventory(Int2ObjectMap<InventoryOption> options,
                           Component title,
                           int size,
-                          InventoryAction onClose,
+                          InventoryCloseAction onClose,
                           InventoryAction onOpen
     ) {
         this.options = options;
@@ -42,21 +40,23 @@ public class BuiltInventory implements InventoryHolder {
     }
 
     public boolean hasOption(int slot){
-        return options.containsKey(slot);
+        return getOptions().containsKey(slot);
     }
 
     public InventoryOption getOption(int slot){
-        return options.get(slot);
+        return getOptions().get(slot);
     }
 
     public void run(Player player, InventoryClickEvent event){
-        InventoryOption option = options.get(event.getSlot());
+        InventoryOption option = getOptions().get(event.getSlot());
         if(option == null) return;
 
-        ClickContext context = new ClickContext(player, event.getSlot(), event.getCursor());
+        ClickContext context = new ClickContext(player, event.getSlot(), event.getCursor(), event.getClick());
 
         try {
             option.run(UserManager.getUser(player), context);
+
+            if(context.shouldReload()) open(player);
         } catch (RoyalCommandException e){
             player.sendMessage(e.formattedText());
         }
@@ -67,29 +67,28 @@ public class BuiltInventory implements InventoryHolder {
     }
 
     public void open(CrownUser user){
-        if(onOpen != null) onOpen.run(user);
+        if(getOnOpen() != null) getOnOpen().run(user);
 
         Inventory inventory = createInventory(user);
         user.getPlayer().openInventory(inventory);
-
-        Bukkit.getPluginManager().registerEvents(new InventoryBuilderListener(this, user.getPlayer()), CrownCore.inst());
     }
 
     public Inventory createInventory(CrownUser user){
         Inventory inv = Bukkit.createInventory(this, size, title);
-
-        for (InventoryOption o: options.values()){
-            o.place(inv, user);
-        }
+        getOptions().values().forEach(o -> o.place(inv, user));
 
         return inv;
     }
 
-    public InventoryAction getOnClose() {
+    public InventoryCloseAction getOnClose() {
         return onClose;
     }
 
     public InventoryAction getOnOpen() {
         return onOpen;
+    }
+
+    public Int2ObjectMap<InventoryOption> getOptions() {
+        return options;
     }
 }

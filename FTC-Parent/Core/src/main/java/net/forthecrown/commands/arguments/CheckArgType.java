@@ -9,6 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.useables.UsageCheck;
+import net.forthecrown.utils.SuggestionUtils;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
@@ -46,6 +47,6 @@ public class CheckArgType implements ArgumentType<Key> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CrownUtils.suggestKeys(builder, CrownCore.getCheckRegistry().getKeys());
+        return SuggestionUtils.suggestKeys(builder, CrownCore.getCheckRegistry().getKeys());
     }
 }

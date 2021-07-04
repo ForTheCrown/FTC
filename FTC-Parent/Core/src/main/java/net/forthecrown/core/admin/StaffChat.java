@@ -1,6 +1,6 @@
 package net.forthecrown.core.admin;
 
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -33,7 +33,7 @@ public class StaffChat {
     public static void send(@NotNull CommandSource sender, @NotNull Component message, boolean cmd){
         Validate.notNull(sender, "Sender was null");
 
-        Component senderText = CrownUtils.sourceDisplayName(sender);
+        Component senderText = ChatFormatter.sourceDisplayName(sender);
         //Staff chat format component
         TextComponent text = Component.text()
                 .append(senderText.color(NamedTextColor.GRAY))
@@ -47,7 +47,7 @@ public class StaffChat {
     public static void sendCommand(CommandSource source, Component msg){
         send(
                 Component.text()
-                        .append(CrownUtils.sourceDisplayName(source).color(NamedTextColor.GRAY))
+                        .append(ChatFormatter.sourceDisplayName(source).color(NamedTextColor.GRAY))
                         .append(Component.text(": ").style(Style.style(NamedTextColor.DARK_GRAY)))
                         .append(msg)
                         .build()

@@ -18,8 +18,7 @@ public class EmotePoke extends CommandEmote {
     public EmotePoke(){
         super("poke", 5*20, "You poke people too often lol");
 
-        setPermission("ftc.emotes");
-        setDescription("Pokes another player.");
+        setDescription("Pokes a player.");
         register();
     }
 

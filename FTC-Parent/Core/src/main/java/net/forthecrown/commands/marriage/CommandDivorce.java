@@ -77,12 +77,12 @@ public class CommandDivorce extends FtcCommand {
                             if(!spouse.getInteractions().canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(spouse);
 
                             inter.setMarriedTo(null);
-                            inter.setMarriageChatToggled(false);
+                            inter.setMChatToggled(false);
                             inter.setLastMarriageStatusChange(System.currentTimeMillis());
 
                             UserInteractions tInter = spouse.getInteractions();
 
-                            tInter.setMarriageChatToggled(false);
+                            tInter.setMChatToggled(false);
                             tInter.setMarriedTo(null);
                             tInter.setLastMarriageStatusChange(System.currentTimeMillis());
 

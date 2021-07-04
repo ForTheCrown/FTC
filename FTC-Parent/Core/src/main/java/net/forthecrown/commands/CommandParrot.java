@@ -67,6 +67,7 @@ public class CommandParrot extends FtcCommand {
     private void makeParrot(Pet pet, Player player, boolean silent) {
         Parrot parrot = player.getWorld().spawn(player.getLocation(), Parrot.class);
         parrot.setVariant(pet.getVariant());
+        parrot.setOwner(player);
         parrot.setSilent(silent);
 
         Pirates.getParrotTracker().add(player.getUniqueId());

@@ -9,4 +9,6 @@ public interface CheckRegistry extends Registry<Supplier<UsageCheck>> {
     default UsageCheck getCheck(Key key){
         return get(key).get();
     }
+
+    boolean isAccepting();
 }

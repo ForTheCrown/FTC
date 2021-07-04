@@ -96,7 +96,7 @@ public class CommandPardon extends FtcCommand {
                                     if(!manager.checkJailed(user.getPlayer())) throw FtcExceptionProvider.create(user.getName() + " is not jailed");
 
                                     manager.pardon(user.getUniqueId(), PunishmentType.JAIL);
-                                    if(user.isOnline()) jails.getJailListener(user.getPlayer()).release();
+                                    if(user.isOnline()) jails.getListener(user.getPlayer()).release();
 
                                     StaffChat.sendCommand(
                                             c.getSource(),

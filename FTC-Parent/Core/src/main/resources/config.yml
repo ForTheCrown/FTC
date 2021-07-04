@@ -18,6 +18,7 @@ MarriageStatusCooldown: 259200000
 CrownEventActive: false
 EventScoreIsTimer: false
 MaxBossDifficulty: 5
+Day: 1
 
 MiniGameRegion:
   ChickenLevitation: 5

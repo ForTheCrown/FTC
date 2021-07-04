@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Same as ArmorStandLeaderboard, except this one is linked to an objective
  */
-public class ObjectiveLeaderboard extends ArmorStandLeaderboard{
+public class ObjectiveLeaderboard extends ArmorStandLeaderboard {
 
     private Objective objective;
 

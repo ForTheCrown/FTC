@@ -7,7 +7,6 @@ import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -39,8 +38,8 @@ public class DirectMessage {
         return receiver;
     }
 
-    public Component senderDisplayName(){ return CrownUtils.sourceDisplayName(sender); }
-    public Component receiverDisplayName(){ return CrownUtils.sourceDisplayName(receiver); }
+    public Component senderDisplayName(){ return ChatFormatter.sourceDisplayName(sender); }
+    public Component receiverDisplayName(){ return ChatFormatter.sourceDisplayName(receiver); }
 
     public Component getSenderHeader(){
         return getHeader(

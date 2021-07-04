@@ -14,7 +14,11 @@ public abstract class Border implements SlotClickHandler {
     // This size of the inventory this border belongs to
     private int size = 27;
     public final int getSize() { return this.size; }
-    public final void setSize(int size) { this.size = size; }
+
+    public final Border setSize(int size) {
+        this.size = size;
+        return this;
+    }
 
     // The inventory slots occupied by the border
     private List<Integer> borderSlots = calculateBorderSlots();

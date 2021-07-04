@@ -30,7 +30,7 @@ public class RoyalEnchants {
 
     public <T extends RoyalEnchant> T register(final T enchant){
         Registry.register(Registry.ENCHANTMENT, enchant.getKey().asString(), enchant.getHandle());
-        org.bukkit.enchantments.Enchantment.registerEnchantment(enchant);
+        if(Enchantment.getByKey(enchant.getKey()) == null) Enchantment.registerEnchantment(enchant);
 
         Squire.inst().getLogger().info("Registered enchantment: " + enchant.getKey().asString());
         return enchant;

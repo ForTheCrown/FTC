@@ -65,7 +65,7 @@ public class ActionShowText implements UsageAction {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" + "component=" + serializer.serialize(component) + '}';
+        return key().asString() + "{" + "component=" + serializer.serialize(component) + '}';
     }
 
     @Override

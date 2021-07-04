@@ -29,6 +29,7 @@ public final class CrownUserManager extends AbstractYamlSerializer implements Us
 
         this.core = CrownCore.inst();
         reload();
+        CrownCore.logger().info("User manager loaded");
     }
 
     @Override

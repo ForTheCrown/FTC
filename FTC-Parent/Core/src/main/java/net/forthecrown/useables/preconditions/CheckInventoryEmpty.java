@@ -29,7 +29,7 @@ public class CheckInventoryEmpty implements UsageCheck {
 
     @Override
     public String asString() {
-        return getClass().getSimpleName() + "{}";
+        return key().asString();
     }
 
     @Override

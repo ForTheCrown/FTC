@@ -75,7 +75,7 @@ public class ActionItem implements UsageAction {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" + "action=" + (add ? "give" : "remove") + ",item=" + item + '}';
+        return key().asString() + "{" + ",item=" + item + '}';
     }
 
     @Override

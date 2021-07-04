@@ -19,6 +19,7 @@ public class EmoteSmooch extends CommandEmote {
         setAliases("smooch", "kiss");
         setPermission("ftc.emotes");
         setDescription("Kisses another player.");
+
         register();
     }
 

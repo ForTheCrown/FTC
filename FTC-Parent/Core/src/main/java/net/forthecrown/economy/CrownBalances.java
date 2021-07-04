@@ -25,15 +25,21 @@ public class CrownBalances extends AbstractYamlSerializer implements Balances {
     @Override
     public synchronized void saveFile(){
         Set<UUID> alreadySerialized = new HashSet<>();
+        Set<UUID> toRemove = new HashSet<>();
         int defAmount = CrownCore.getStartRhines();
 
-        for (BalanceMap.BalEntry e: balanceMap.getEntries()){
-            if(alreadySerialized.contains(e.getUniqueId())) continue;
+        for (BalanceMap.BalEntry e: balanceMap.entrySet()){
+            if(alreadySerialized.contains(e.getUniqueId())){
+                toRemove.add(e.getUniqueId());
+                continue;
+            }
             if(e.getValue() == defAmount) continue;
 
             alreadySerialized.add(e.getUniqueId());
             getFile().set(e.getUniqueId().toString(), e.getValue());
         }
+
+        if(!toRemove.isEmpty()) toRemove.forEach(balanceMap::remove);
     }
 
     @Override
@@ -45,7 +51,7 @@ public class CrownBalances extends AbstractYamlSerializer implements Balances {
             try {
                 id = UUID.fromString(string);
             } catch (Exception e){
-                Announcer.log(Level.WARNING, string + " is not a valid UUID, reload() in Balance");
+                CrownCore.logger().warning(string + " is not a valid UUID, reload() in Balance");
                 continue;
             }
 

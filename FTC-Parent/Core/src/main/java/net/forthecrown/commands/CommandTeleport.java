@@ -8,7 +8,6 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
@@ -40,7 +39,7 @@ public class CommandTeleport extends FtcCommand {
                                     Entity entity = EntityArgument.getPlayer(c, "entity_to");
                                     Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
 
-                                    Component display = CrownUtils.entityDisplayName(entity);
+                                    Component display = ChatFormatter.entityDisplayName(entity);
                                     if(entity.getType() == EntityType.PLAYER) display = UserManager.getUser(entity.getUniqueId()).nickDisplayName();
 
                                     return teleport(entities, entity.getLocation(), display, c.getSource());
@@ -62,7 +61,7 @@ public class CommandTeleport extends FtcCommand {
                             CrownUser user = getUserSender(c);
                             Entity entity = EntityArgument.getEntity(c, "entity");
 
-                            Component display = CrownUtils.entityDisplayName(entity);
+                            Component display = ChatFormatter.entityDisplayName(entity);
                             if(entity instanceof Player) display = UserManager.getUser(entity.getUniqueId()).nickDisplayName();
                             if(user.isTeleporting()) throw FtcExceptionProvider.create("You are already teleporting");
 
@@ -130,7 +129,7 @@ public class CommandTeleport extends FtcCommand {
 
     public Component entOrUserDisplayName(Entity entity){
         if(entity.getType() == EntityType.PLAYER) return UserManager.getUser(entity.getUniqueId()).nickDisplayName();
-        return CrownUtils.entityDisplayName(entity);
+        return ChatFormatter.entityDisplayName(entity);
     }
 
     public Component entDisplay(Collection<Entity> entities){

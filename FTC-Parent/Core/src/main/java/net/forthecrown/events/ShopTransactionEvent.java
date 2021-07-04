@@ -35,8 +35,9 @@ public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShop
         if(shop.getType().isAdmin) return;
 
         //If no good, then no go
-        if ((shop.getType() != ShopType.BUY_SHOP || !shop.getInventory().isEmpty()) && (shop.getType() != ShopType.SELL_SHOP || !shop.getInventory().isFull()))
+        if ((shop.getType() != ShopType.BUY_SHOP || !shop.getInventory().isEmpty()) && (shop.getType() != ShopType.SELL_SHOP || !shop.getInventory().isFull())) {
             return;
+        }
 
         Location l = shop.getLocation();
         Component specification = Component.translatable("shops." + (shop.getType().buyType ? "out" : "full"));
@@ -65,8 +66,8 @@ public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShop
             }
 
             //WorldGuard checks
-            Branch allowedOwner = BranchFlag.queryFlag(shop.getLocation(), CrownWgFlags.SHOP_OWNERSHIP_FLAG);
-            Branch allowedUser = BranchFlag.queryFlag(shop.getLocation(), CrownWgFlags.SHOP_USAGE_FLAG);
+            Branch allowedOwner = WgFlags.query(shop.getLocation(), WgFlags.SHOP_OWNERSHIP_FLAG);
+            Branch allowedUser = WgFlags.query(shop.getLocation(), WgFlags.SHOP_USAGE_FLAG);
             if(allowedOwner != null && owner.getBranch() != Branch.DEFAULT && !shop.getType().isAdmin && allowedOwner != owner.getBranch()){
                 event.setCancelled(true);
                 throw CrownException.translatable(customer, "shops.wrongOwner", NamedTextColor.GRAY, Component.text(allowedOwner.getName()));

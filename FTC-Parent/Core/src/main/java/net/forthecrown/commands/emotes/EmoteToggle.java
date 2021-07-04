@@ -2,6 +2,7 @@ package net.forthecrown.commands.emotes;
 
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
@@ -10,7 +11,7 @@ public class EmoteToggle extends FtcCommand {
     public EmoteToggle(){
         super("toggleemotes", CrownCore.inst());
 
-        setPermission("ftc.emotes");
+        setPermission(Permissions.EMOTES);
         register();
     }
 
