@@ -1,4 +1,4 @@
-Drop the latest build of the Core into this folder, rename it to "Core".
+Drop the latest build of the Core into this folder
 Then run remap.bat and ForTheCrown-Plugin.jar will be the final product.
 Rename that and you're done.
 
