@@ -1,20 +1,17 @@
 package net.forthecrown.user;
 
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.economy.BalanceMap;
-import net.forthecrown.economy.SortedBalanceMap;
 import net.forthecrown.serializer.AbstractYamlSerializer;
+import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.UserJsonSerializer;
+import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.MapUtils;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
 
 public final class CrownUserManager extends AbstractYamlSerializer implements UserManager {
 
@@ -111,44 +108,38 @@ public final class CrownUserManager extends AbstractYamlSerializer implements Us
     }
 
     private void log(String s){
-        Announcer.log(Level.INFO, s);
+        CrownCore.logger().info(s);
     }
 
-    public void checkAllUserDatas(){
-        File file = new File(core.getDataFolder().getPath() + File.separator + "playerdata");
-        if(!file.isDirectory()) return;
-
+    public void runUserDeletionCheck(){
         int amount = 0;
-        for (File f: file.listFiles()){
-            FileConfiguration config = YamlConfiguration.loadConfiguration(f);
-            if(config.getLong("TimeStamps.LastLoad") == 0){
+        for (File f: UserJsonSerializer.USER_DIR.listFiles()){
+            try {
+                JsonBuf json = JsonBuf.of(JsonUtils.readFile(f));
+                JsonBuf timeStamps = json.getBuf("timeStamps");
 
-                config.set("TimeStamps.LastLoad", System.currentTimeMillis());
+                UUID id;
                 try {
-                    config.save(f);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    id = UUID.fromString(f.getName().replaceAll(".json", ""));
+                } catch (Exception ignored){
+                    continue;
                 }
 
-                continue;
-            }
+                long lastLoad = timeStamps.getLong("lastLoad");
 
-            if((System.currentTimeMillis() - config.getLong("TimeStamps.LastLoad") > CrownCore.getUserDataResetInterval())){
-                if(!f.delete()) CrownCore.inst().getLogger().log(Level.WARNING, "Couldn't delete file named " + f.getName());
-                else log("Deleted file of user " + f.getName() + ". File was last loaded more than 2 months ago");
-                resetBalance(f.getName().replaceAll(".yml", ""));
+                if (System.currentTimeMillis() - lastLoad <= CrownCore.getUserResetInterval()) continue;
 
+                //Is older and has been untouched for the entire interval, yeet it
+                f.delete();
+                CrownCore.getBalances().getMap().remove(id);
+
+                log("Deleting data of " + id);
                 amount++;
+            } catch (IOException e){
+                e.printStackTrace();
             }
         }
+
         log("All user data files have been checked for deletion. Deleted " + amount + " files.");
     }
-
-    private void resetBalance(String toUUID){
-        UUID id = UUID.fromString(toUUID);
-        BalanceMap map = CrownCore.getBalances().getMap();
-        map.remove(id);
-        CrownCore.getBalances().setMap((SortedBalanceMap) map);
-    }
-
 }

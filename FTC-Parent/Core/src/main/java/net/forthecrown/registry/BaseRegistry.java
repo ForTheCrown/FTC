@@ -1,15 +1,24 @@
 package net.forthecrown.registry;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.key.Key;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
 public class BaseRegistry<V> implements Registry<V> {
-    private final Map<Key, V> entries = new HashMap<>();
+    private final Object2ObjectMap<Key, V> entries = new Object2ObjectOpenHashMap<>();
+    private final Key key;
+
+    public BaseRegistry(Key key) {
+        this.key = CrownUtils.checkNotBukkit(key);
+    }
 
     @NotNull
     @Override
@@ -37,7 +46,7 @@ public class BaseRegistry<V> implements Registry<V> {
     }
 
     @Override
-    public Set<Key> getKeys() {
+    public Set<Key> keySet() {
         return entries.keySet();
     }
 
@@ -53,8 +62,23 @@ public class BaseRegistry<V> implements Registry<V> {
     }
 
     @Override
-    public Collection<V> getEntries() {
+    public Collection<V> values() {
         return entries.values();
+    }
+
+    @Override
+    public int size() {
+        return entries.size();
+    }
+
+    @Override
+    public void clear() {
+        entries.clear();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return entries.isEmpty();
     }
 
     @Override
@@ -66,19 +90,24 @@ public class BaseRegistry<V> implements Registry<V> {
         BaseRegistry<?> registry = (BaseRegistry<?>) o;
 
         return new EqualsBuilder()
-                .append(getEntries(), registry.getEntries())
+                .append(values(), registry.values())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(getEntries())
+                .append(values())
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return entries.toString();
+    }
+
+    @Override
+    public @NotNull Key key() {
+        return key;
     }
 }

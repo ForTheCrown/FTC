@@ -5,9 +5,9 @@ import com.google.gson.JsonNull;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.types.ComponentArgument;
+import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -23,7 +23,7 @@ public class ComponentComVarType implements ComVarType<Component> {
     private final Key key = CrownCore.coreKey("component_type");
 
     private ComponentComVarType() {
-        ComVarRegistry.getTypeRegistry().register(key, this);
+        Registries.COMVAR_TYPES.register(key, this);
     }
 
     @Override

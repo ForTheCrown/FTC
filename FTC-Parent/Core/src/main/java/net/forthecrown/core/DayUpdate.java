@@ -22,6 +22,7 @@ public class DayUpdate {
 
     public void update(){
         CrownCore.logger().info("Updating date");
+        setDay((byte) Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK));
 
         listeners.forEach(r -> {
             try {
@@ -31,8 +32,6 @@ public class DayUpdate {
                 e.printStackTrace();
             }
         });
-
-        setDay((byte) Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK));
     }
 
     public void addListener(Runnable runnable){
@@ -45,6 +44,7 @@ public class DayUpdate {
 
     public void setDay(byte day) {
         this.day = day;
+        CrownCore.config().set("Day", day);
     }
 
     public List<Runnable> getListeners() {

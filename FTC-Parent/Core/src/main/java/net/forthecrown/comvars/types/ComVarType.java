@@ -10,10 +10,10 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.comvars.ParseFunction;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
@@ -77,7 +77,7 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource>, Keyed,
             deserializationFunc = func;
             key = CrownCore.coreKey(clazz.getSimpleName().toLowerCase() + "_type");
 
-            ComVarRegistry.getTypeRegistry().register(key, this);
+            Registries.COMVAR_TYPES.register(key, this);
         }
 
         @Override

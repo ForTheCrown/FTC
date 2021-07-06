@@ -3,93 +3,79 @@ package net.forthecrown.useables.actions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.useables.UsageAction;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-public class ActionRemoveNumber implements UsageAction {
+public class ActionRemoveNumber implements UsageAction<ActionRemoveNumber.ActionInstance> {
     public static final Key BAL_KEY = Key.key(CrownCore.inst(), "remove_balance");
     public static final Key GEM_KEY = Key.key(CrownCore.inst(), "remove_gems");
 
     private final boolean fromBal;
-    private int amount;
 
     public ActionRemoveNumber(boolean fromBal) {
         this.fromBal = fromBal;
     }
 
     @Override
-    public void parse(JsonElement json) throws CommandSyntaxException {
-        amount = json.getAsInt();
+    public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
+        return new ActionInstance(fromBal, reader.readInt());
     }
 
     @Override
-    public void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException {
-        amount = reader.readInt();
+    public ActionInstance deserialize(JsonElement element) throws CommandSyntaxException {
+        return new ActionInstance(fromBal, element.getAsInt());
     }
 
     @Override
-    public void onInteract(Player player) {
-        if (fromBal) CrownCore.getBalances().add(player.getUniqueId(), -amount);
-        else {
-            CrownUser user = UserManager.getUser(player);
-            user.setGems(user.getGems() - amount);
-        }
+    public JsonElement serialize(ActionInstance value) {
+        return new JsonPrimitive(value.getAmount());
     }
 
     @Override
-    public Key key() {
+    public @NotNull Key key() {
         return fromBal ? BAL_KEY : GEM_KEY;
     }
 
-    @Override
-    public String asString() {
-        return key().asString() + "{amount=" + amount + "}";
-    }
+    public static class ActionInstance implements UsageActionInstance {
+        private final boolean fromBal;
+        private final int amount;
 
-    @Override
-    public JsonElement serialize() {
-        return new JsonPrimitive(amount);
-    }
+        public ActionInstance(boolean fromBal, int amount) {
+            this.fromBal = fromBal;
+            this.amount = amount;
+        }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        @Override
+        public void onInteract(Player player) {
+            if (fromBal) CrownCore.getBalances().add(player.getUniqueId(), -amount);
+            else {
+                CrownUser user = UserManager.getUser(player);
+                user.setGems(user.getGems() - amount);
+            }
+        }
 
-        ActionRemoveNumber thing = (ActionRemoveNumber) o;
+        @Override
+        public Key typeKey() {
+            return fromBal ? BAL_KEY : GEM_KEY;
+        }
 
-        return new EqualsBuilder()
-                .append(fromBal, thing.fromBal)
-                .append(amount, thing.amount)
-                .isEquals();
-    }
+        @Override
+        public String asString() {
+            return typeKey().asString() + "{amount=" + amount + "}";
+        }
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(fromBal)
-                .append(amount)
-                .toHashCode();
-    }
+        public int getAmount() {
+            return amount;
+        }
 
-    public int getAmount() {
-        return amount;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
-
-    public boolean isFromBal() {
-        return fromBal;
+        public boolean isFromBal() {
+            return fromBal;
+        }
     }
 }

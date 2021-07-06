@@ -47,7 +47,7 @@ public class KitType implements ArgumentType<Key> {
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, boolean ignoreChecks){
-        if(ignoreChecks) return SuggestionUtils.suggestKeys(builder, CrownCore.getKitRegistry().getKeys());
+        if(ignoreChecks) return SuggestionUtils.suggestRegistry(builder, CrownCore.getKitRegistry());
 
         try {
             return CrownCore.getKitRegistry().getSuggestions((CommandContext<CommandSource>) context, builder);

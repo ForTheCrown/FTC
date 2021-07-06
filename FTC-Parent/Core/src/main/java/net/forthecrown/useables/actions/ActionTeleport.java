@@ -1,83 +1,75 @@
 package net.forthecrown.useables.actions;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.useables.UsageAction;
-import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.WorldArgument;
-import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.CompletableFuture;
-
-public class ActionTeleport implements UsageAction {
+public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance> {
     public static final Key KEY = Key.key(CrownCore.inst(), "teleport_user");
 
-    private Location location;
-
     @Override
-    public void parse(JsonElement json) throws CommandSyntaxException {
-        location = JsonUtils.readLocation(json.getAsJsonObject());
+    public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
+        Location location = PositionArgument.position().parse(reader).getLocation(source);
+
+        if(reader.canRead() && reader.peek() == ' '){
+            reader.skipWhitespace();
+
+            World world = WorldArgument.world().parse(reader);
+            location.setWorld(world);
+        }
+
+        return new ActionInstance(location);
     }
 
     @Override
-    public void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException {
-        World world = WorldArgument.world().parse(reader);
-        reader.skipWhitespace();
-        Position pos = PositionArgument.position().parse(reader);
-
-        Location l = pos.getLocation(context.getSource());
-        l.setWorld(world);
-
-        location = l;
+    public ActionInstance deserialize(JsonElement element) throws CommandSyntaxException {
+        return new ActionInstance(JsonUtils.readLocation(element.getAsJsonObject()));
     }
 
     @Override
-    public void onInteract(Player player) {
-        player.teleport(location);
+    public JsonElement serialize(ActionInstance value) {
+        return JsonUtils.writeLocation(value.getLocation());
     }
 
     @Override
-    public Key key() {
+    public @NotNull Key key() {
         return KEY;
     }
 
-    @Override
-    public String asString() {
-        return key().asString() + "{location=" + location + "}";
-    }
+    public static class ActionInstance implements UsageActionInstance {
+        private final Location location;
 
-    @Override
-    public JsonObject serialize() {
-        return JsonUtils.writeLocation(location);
-    }
+        public ActionInstance(Location location) {
+            this.location = location;
+        }
 
-    @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        int index = builder.getRemaining().indexOf(' ');
-        if(index == -1) return WorldArgument.world().listSuggestions(context, builder);
+        @Override
+        public void onInteract(Player player) {
+            player.teleport(location);
+        }
 
-        builder = builder.createOffset(builder.getInput().length() + index);
-        return PositionArgument.position().listSuggestions(context, builder);
-    }
+        @Override
+        public Key typeKey() {
+            return KEY;
+        }
 
+        @Override
+        public String asString() {
+            return typeKey().asString() + "{location=" + location + "}";
+        }
 
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
+        public Location getLocation() {
+            return location;
+        }
     }
 }

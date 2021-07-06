@@ -18,6 +18,6 @@ public enum GhBiome {
     }
 
     public Component displayName(){
-        return Component.text(ChatFormatter.capitalizeWords(name().toLowerCase().replaceAll("_", " ")));
+        return Component.text(ChatFormatter.normalEnum(this));
     }
 }

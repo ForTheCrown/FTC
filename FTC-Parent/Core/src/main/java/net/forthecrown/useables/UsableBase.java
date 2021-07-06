@@ -5,8 +5,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.InterUtils;
 import net.kyori.adventure.key.Key;
 
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import java.util.List;
 
 public abstract class UsableBase extends CheckableBase implements Actionable, Preconditionable{
 
-    protected final List<UsageAction> actions = new ArrayList<>();
+    protected final List<UsageActionInstance> actions = new ArrayList<>();
 
     protected UsableBase(){}
 
@@ -23,10 +25,10 @@ public abstract class UsableBase extends CheckableBase implements Actionable, Pr
 
         JsonArray array = new JsonArray();
 
-        for (UsageAction a: getActions()){
+        for (UsageActionInstance a: getActions()){
             JsonObject object = new JsonObject();
-            object.add("type", new JsonPrimitive(a.key().asString()));
-            object.add("value", a.serialize());
+            object.add("type", new JsonPrimitive(a.typeKey().asString()));
+            object.add("value", InterUtils.writeAction(a));
 
             array.add(object);
         }
@@ -42,19 +44,18 @@ public abstract class UsableBase extends CheckableBase implements Actionable, Pr
         if(actionsElement == null || !actionsElement.isJsonArray()) return;
 
         for (JsonElement e: actionsElement.getAsJsonArray()){
-            JsonObject j = e.getAsJsonObject();
-            UsageAction action = CrownCore.getActionRegistry().getAction(CrownUtils.parseKey(j.get("type").getAsString()));
+            JsonBuf j = JsonBuf.of(e.getAsJsonObject());
 
             try {
-                action.parse(j.get("value"));
-            } catch (CommandSyntaxException ignored) {}
-
-            actions.add(action);
+                addAction(InterUtils.readAction(j.getString("type"), j.get("value")));
+            } catch (CommandSyntaxException exception) {
+                exception.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void addAction(UsageAction action) {
+    public void addAction(UsageActionInstance action) {
         actions.add(action);
     }
 
@@ -64,7 +65,7 @@ public abstract class UsableBase extends CheckableBase implements Actionable, Pr
     }
 
     @Override
-    public List<UsageAction> getActions() {
+    public List<UsageActionInstance> getActions() {
         return actions;
     }
 
@@ -74,10 +75,10 @@ public abstract class UsableBase extends CheckableBase implements Actionable, Pr
     }
 
     @Override
-    public <T extends UsageAction> T getAction(Key key, Class<T> clazz) {
+    public <T extends UsageActionInstance> T getAction(Key key, Class<T> clazz) {
         key = CrownUtils.checkNotBukkit(key);
-        for (UsageAction a: actions){
-            if(!a.key().equals(key)) continue;
+        for (UsageActionInstance a: actions){
+            if(!a.typeKey().equals(key)) continue;
             if(!clazz.isAssignableFrom(a.getClass())) continue;
             return (T) a;
         }

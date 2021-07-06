@@ -3,19 +3,25 @@ package net.forthecrown.useables;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.forthecrown.useables.preconditions.UsageCheckInstance;
 import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.InterUtils;
 import net.kyori.adventure.key.Key;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class CheckableBase implements Preconditionable {
-    protected Map<Key, UsageCheck> checks = new HashMap<>();
+    protected final Object2ObjectMap<Key, UsageCheckInstance> checks = new Object2ObjectOpenHashMap<>();
 
     protected void saveChecksInto(JsonObject json){
         JsonObject preconditions = new JsonObject();
-        for (UsageCheck p: getChecks()){
-            preconditions.add(p.key().asString(), p.serialize());
+        for (UsageCheckInstance p: getChecks()){
+            preconditions.add(p.typeKey().asString(), InterUtils.writeCheck(p));
         }
         json.add("preconditions", preconditions);
     }
@@ -25,25 +31,19 @@ public abstract class CheckableBase implements Preconditionable {
         JsonElement precons = json.get("preconditions");
         if(precons != null && precons.isJsonObject()){
             for (Map.Entry<String, JsonElement> e: precons.getAsJsonObject().entrySet()){
-                UsageCheck pre = CrownCore.getCheckRegistry().getCheck(CrownUtils.parseKey(e.getKey()));
-
-                try {
-                    pre.parse(e.getValue());
-                } catch (CommandSyntaxException ignored) {}
-
-                checks.put(pre.key(), pre);
+                addCheck(InterUtils.readCheck(e.getKey(), e.getValue()));
             }
         }
     }
 
     @Override
-    public List<UsageCheck> getChecks() {
+    public List<UsageCheckInstance> getChecks() {
         return new ArrayList<>(checks.values());
     }
 
     @Override
-    public void addCheck(UsageCheck precondition) {
-        checks.put(CrownUtils.checkNotBukkit(precondition.key()), precondition);
+    public void addCheck(UsageCheckInstance precondition) {
+        checks.put(CrownUtils.checkNotBukkit(precondition.typeKey()), precondition);
     }
 
     @Override
@@ -62,11 +62,11 @@ public abstract class CheckableBase implements Preconditionable {
     }
 
     @Override
-    public <T extends UsageCheck> T getCheck(Key key, Class<T> clazz) {
+    public <T extends UsageCheckInstance> T getCheck(Key key, Class<T> clazz) {
         key = CrownUtils.checkNotBukkit(key);
         if(!checks.containsKey(key)) return null;
 
-        UsageCheck c = checks.get(key);
+        UsageCheckInstance c = checks.get(key);
         if(!clazz.isAssignableFrom(c.getClass())) return null;
         return (T) c;
     }

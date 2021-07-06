@@ -9,6 +9,8 @@ import net.forthecrown.comvars.types.ComVarType;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.serializer.AbstractJsonSerializer;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Rank;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
@@ -76,9 +78,10 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
                         .append(getAnnouncements().get(counter))
                         .build();
 
-                for (Player player : Bukkit.getOnlinePlayers()) {
+                for (CrownUser player : UserManager.getOnlineUsers()) {
                     // Don't broadcast info messages to players in the Senate.
                     if (player.getWorld().equals(Worlds.SENATE)) continue;
+                    if (player.ignoringBroadcasts()) continue;
 
                     player.sendMessage(broadcast);
                     if (player.getWorld().getName().equalsIgnoreCase("world_resource")){
@@ -90,7 +93,7 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
                 else counter++;
             }
         };
-        broadcaster.runTaskTimer(CrownCore.inst(), 500, delay.getValue());
+        broadcaster.runTaskTimer(CrownCore.inst(), 500, getDelay());
     }
 
     @Override
@@ -100,7 +103,7 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
 
     @Override
     public void setDelay(short delay) {
-        this.delay.setValue(delay);
+        this.delay.update(delay);
     }
 
     @Override

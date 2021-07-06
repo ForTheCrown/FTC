@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
@@ -35,9 +34,9 @@ public class BmEnchantListener extends AbstractInvListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event1) {
         if(!event1.getWhoClicked().equals(player)) return;
         if(event1.getClickedInventory() instanceof PlayerInventory) return;
-        if(event1.getSlot() != 11) event1.setCancelled(true);
-        if(event1.getSlot() == 11 && (event1.getAction() == InventoryAction.PICKUP_ALL || event1.getAction() == InventoryAction.SWAP_WITH_CURSOR)) return;
+        if(event1.getSlot() == 11) return;
 
+        event1.setCancelled(true);
         if(event1.getCurrentItem() == null) return;
 
         ItemStack toCheck = event1.getClickedInventory().getItem(11);

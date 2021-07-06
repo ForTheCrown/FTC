@@ -1,11 +1,6 @@
 package net.forthecrown.useables;
 
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.registry.ActionRegistry;
-import net.forthecrown.registry.CheckRegistry;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.useables.actions.*;
-import net.forthecrown.useables.preconditions.*;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
@@ -20,51 +15,6 @@ import java.util.UUID;
 public class CrownUsablesManager implements UsablesManager {
     final Map<Location, CrownUsableBlock> signs = new HashMap<>();
     final Map<UUID, CrownUsableEntity> entities = new HashMap<>();
-
-    public void registerDefaults(ActionRegistry actions, CheckRegistry checks){
-        //Actions
-        actions.register(ActionCommand.USER_KEY, () -> new ActionCommand(false));
-        actions.register(ActionCommand.CONSOLE_KEY, () -> new ActionCommand(true));
-
-        actions.register(ActionRemoveNumber.BAL_KEY, () -> new ActionRemoveNumber(true));
-        actions.register(ActionRemoveNumber.GEM_KEY, () -> new ActionRemoveNumber(false));
-
-        actions.register(ActionAddNumber.BAL_KEY, () -> new ActionAddNumber(true));
-        actions.register(ActionAddNumber.GEM_KEY, () -> new ActionAddNumber(false));
-
-        actions.register(ActionItem.ADD_KEY, () -> new ActionItem(true));
-        actions.register(ActionItem.REMOVE_KEY, () -> new ActionItem(false));
-
-        actions.register(ActionChangeScore.REMOVE_KEY, () -> new ActionChangeScore(ActionChangeScore.Action.DECREMENT));
-        actions.register(ActionChangeScore.ADD_KEY, () -> new ActionChangeScore(ActionChangeScore.Action.INCREMENT));
-        actions.register(ActionChangeScore.SET_KEY, () -> new ActionChangeScore(ActionChangeScore.Action.SET));
-
-        actions.register(ActionShowText.KEY, ActionShowText::new);
-        actions.register(ActionTeleport.KEY, ActionTeleport::new);
-        actions.register(ActionKit.KEY, ActionKit::new);
-        actions.register(ActionWarp.KEY, ActionWarp::new);
-
-        CrownCore.logger().info("Default actions registered");
-
-        //Preconditions
-        checks.register(CheckNumber.BAL_KEY, () -> new CheckNumber(true));
-        checks.register(CheckNumber.GEM_KEY, () -> new CheckNumber(false));
-
-        checks.register(CheckHasItem.KEY, CheckHasItem::new);
-        checks.register(CheckInventoryEmpty.KEY, CheckInventoryEmpty::new);
-        checks.register(CheckRank.KEY, CheckRank::new);
-        checks.register(CheckBranch.KEY, CheckBranch::new);
-        checks.register(CheckPermission.KEY, CheckPermission::new);
-        checks.register(CheckCooldown.KEY, CheckCooldown::new);
-        checks.register(CheckNotUsedBefore.KEY, CheckNotUsedBefore::new);
-        checks.register(CheckInWorld.KEY, CheckInWorld::new);
-        checks.register(CheckHasScore.KEY, CheckHasScore::new);
-        checks.register(CheckNeverUsed.KEY, CheckNeverUsed::new);
-        checks.register(CheckHasAllItems.KEY, CheckHasAllItems::new);
-        checks.register(CheckIsNotAlt.KEY, CheckIsNotAlt::new);
-
-        CrownCore.logger().info("Default checks registered");
-    }
 
     @Override
     public UsableBlock getBlock(Location l){

@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class CrownJailManager extends AbstractJsonSerializer implements JailManager {
+    private static final Key KEY = CrownCore.coreKey("jails");
 
     private final Map<Key, Location> jails = new HashMap<>();
     private final Map<Player, JailListener> onlineInJail = new HashMap<>();
@@ -73,7 +74,7 @@ public class CrownJailManager extends AbstractJsonSerializer implements JailMana
     }
 
     @Override
-    public Set<Key> getKeys() {
+    public Set<Key> keySet() {
         return jails.keySet();
     }
 
@@ -88,7 +89,7 @@ public class CrownJailManager extends AbstractJsonSerializer implements JailMana
     }
 
     @Override
-    public Collection<Location> getEntries() {
+    public Collection<Location> values() {
         return jails.values();
     }
 
@@ -105,5 +106,25 @@ public class CrownJailManager extends AbstractJsonSerializer implements JailMana
     @Override
     public void removeListener(JailListener listener) {
         onlineInJail.remove(listener.player);
+    }
+
+    @Override
+    public int size() {
+        return jails.size();
+    }
+
+    @Override
+    public void clear() {
+        jails.clear();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return jails.isEmpty();
+    }
+
+    @Override
+    public @NotNull Key key() {
+        return KEY;
     }
 }

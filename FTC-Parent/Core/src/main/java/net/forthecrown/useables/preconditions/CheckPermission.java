@@ -3,72 +3,69 @@ package net.forthecrown.useables.preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.useables.UsageCheck;
-import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.CompletableFuture;
-
-public class CheckPermission implements UsageCheck {
+public class CheckPermission implements UsageCheck<CheckPermission.CheckInstance> {
     public static final Key KEY = Key.key(CrownCore.inst(), "required_permission");
-    private String permission;
 
     @Override
-    public void parse(CommandContext<CommandSource> c, StringReader reader) throws CommandSyntaxException {
-        permission = reader.readUnquotedString();
+    public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
+        return new CheckInstance(reader.readUnquotedString());
     }
 
     @Override
-    public void parse(JsonElement json) throws CommandSyntaxException {
-        permission = json.getAsString();
+    public CheckInstance deserialize(JsonElement element) throws CommandSyntaxException {
+        return new CheckInstance(element.getAsString());
     }
 
     @Override
-    public Key key() {
+    public JsonElement serialize(CheckInstance value) {
+        return new JsonPrimitive(value.getPermission());
+    }
+
+    @Override
+    public @NotNull Key key() {
         return KEY;
     }
 
-    @Override
-    public String asString() {
-        return key().asString() + "{permission=" + permission + "}";
-    }
+    public static class CheckInstance implements UsageCheckInstance {
 
-    @Override
-    public Component failMessage() {
-        return Component.text("You don't have permission to use this.").color(NamedTextColor.GRAY);
-    }
+        private final String perm;
 
-    @Override
-    public boolean test(Player player) {
-        return player.hasPermission(permission);
-    }
+        public CheckInstance(String perm){
+            this.perm = perm;
+        }
 
-    @Override
-    public JsonElement serialize() {
-        return new JsonPrimitive(permission);
-    }
+        public String getPermission() {
+            return perm;
+        }
 
-    @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return CommandSource.suggestMatching(builder, ListUtils.convert(Bukkit.getPluginManager().getPermissions(), Permission::getName));
-    }
+        @Override
+        public String asString() {
+            return typeKey().asString() + '{' + "perm=" + perm + '}';
+        }
 
-    public void setPermission(String permission) {
-        this.permission = permission;
-    }
+        @Override
+        public Component failMessage() {
+            return Component.text("You don't have permission to use this")
+                    .color(NamedTextColor.GRAY);
+        }
 
-    public String getPermission() {
-        return permission;
+        @Override
+        public @NotNull Key typeKey() {
+            return KEY;
+        }
+
+        @Override
+        public boolean test(Player player) {
+            return player.hasPermission(perm);
+        }
     }
 }

@@ -80,7 +80,7 @@ public class CrownWarpRegistry extends AbstractJsonSerializer implements WarpReg
             }
 
             return builder.buildFuture();
-        } else return SuggestionUtils.suggestKeys(builder, getKeys());
+        } else return SuggestionUtils.suggestRegistry(builder, this);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class CrownWarpRegistry extends AbstractJsonSerializer implements WarpReg
     }
 
     @Override
-    public Set<Key> getKeys() {
+    public Set<Key> keySet() {
         return warps.keySet();
     }
 
@@ -120,7 +120,7 @@ public class CrownWarpRegistry extends AbstractJsonSerializer implements WarpReg
     }
 
     @Override
-    public Collection<Warp> getEntries() {
+    public Collection<Warp> values() {
         return new ArrayList<>(warps.values());
     }
 }

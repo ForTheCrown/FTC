@@ -3,8 +3,6 @@ package net.forthecrown.comvars;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.comvars.types.ComVarType;
-import net.forthecrown.registry.BaseRegistry;
-import net.forthecrown.registry.Registry;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +15,6 @@ import java.util.Set;
  */
 public class ComVarRegistry {
     private static final Map<String, ComVar<?>> COM_VARS = new HashMap<>();
-    private static final Registry<ComVarType<?>> TYPE_REGISTRY = new BaseRegistry<>();
 
     public static <T> ComVar<T> set(@NotNull String name, @NotNull ComVarType<T> type, T value){
         validate(name, type);
@@ -87,10 +84,6 @@ public class ComVarRegistry {
     public static void remove(@NotNull String name){
         Validate.notNull(name, "Name was null");
         COM_VARS.remove(name);
-    }
-
-    public static Registry<ComVarType<?>> getTypeRegistry() {
-        return TYPE_REGISTRY;
     }
 
     private static void validate(String name, ComVarType<?> type){

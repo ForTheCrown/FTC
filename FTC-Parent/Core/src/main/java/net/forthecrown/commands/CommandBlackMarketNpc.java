@@ -37,7 +37,7 @@ public class CommandBlackMarketNpc extends FtcCommand {
         command
                 .then(argument("target", EntityArgument.entity())
                         .then(argument("key", KeyType.key("ftccore"))
-                                .suggests((c, b) -> CompletionProvider.suggestKeys(b, Pirates.getPirateEconomy().getNpcRegistry().getKeys()))
+                                .suggests((c, b) -> CompletionProvider.suggestKeys(b, Pirates.getPirateEconomy().getNpcRegistry().keySet()))
 
                                 .executes(c -> {
                                     Entity entity = EntityArgument.getEntity(c, "target");

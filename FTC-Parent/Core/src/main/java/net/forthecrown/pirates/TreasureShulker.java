@@ -29,7 +29,6 @@ import org.bukkit.entity.Shulker;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootTable;
 import org.bukkit.persistence.PersistentDataType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -235,8 +234,8 @@ public class TreasureShulker extends AbstractJsonSerializer {
         Collection<ItemStack> items;
         int rhineReward;
 
-        public Loot(Player player, Location location, CrownRandom random, LootTable lootTable){
-            this.items = lootTable.populateLoot(random, new LootContext.Builder(location).killer(player).build());
+        public Loot(Player player, Location location, CrownRandom random, CrownLootTable lootTable){
+            this.items = lootTable.populateLoot(random, new LootContext.Builder(location).killer(player).build(), 5);
             this.rhineReward = random.intInRange(CrownCore.getTreasureMinPrize(), CrownCore.getTreasureMaxPrize());
         }
 

@@ -47,7 +47,7 @@ public class WarpType implements ArgumentType<Key> {
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, boolean ignoreChecks){
-        if(ignoreChecks) return SuggestionUtils.suggestKeys(builder, CrownCore.getWarpRegistry().getKeys());
+        if(ignoreChecks) return SuggestionUtils.suggestRegistry(builder, CrownCore.getWarpRegistry());
 
         try {
             return CrownCore.getWarpRegistry().getSuggestions((CommandContext<CommandSource>) context, builder);

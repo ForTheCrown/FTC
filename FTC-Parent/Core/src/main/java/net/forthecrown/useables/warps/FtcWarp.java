@@ -6,7 +6,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.useables.CheckableBase;
-import net.forthecrown.useables.UsageCheck;
+import net.forthecrown.useables.preconditions.UsageCheckInstance;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
@@ -57,7 +57,7 @@ public class FtcWarp extends CheckableBase implements Warp {
 
     @Override
     public boolean testSilent(Player player) {
-        for (UsageCheck c: checks.values()){
+        for (UsageCheckInstance c: checks.values()){
             if(!c.test(player)) return false;
         }
         return true;
@@ -66,9 +66,9 @@ public class FtcWarp extends CheckableBase implements Warp {
     @Override
     public boolean test(Player player) {
         List<Consumer<Player>> onSuccess = new ArrayList<>();
-        for (UsageCheck c: checks.values()){
+        for (UsageCheckInstance c: checks.values()){
             if(!c.test(player)){
-                if(c.personalizedFailMessage(player) != null) player.sendMessage(c.personalizedFailMessage(player));
+                if(c.personalizedMessage(player) != null) player.sendMessage(c.personalizedMessage(player));
                 return false;
             }
 

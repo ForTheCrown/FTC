@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.JsonUtils;
@@ -44,16 +43,12 @@ public class CrownWeightedLootTable implements WeightedLootTable {
         JsonArray array = json.getAsJsonArray("items");
 
         for (JsonElement e: array){
-            try {
-                JsonObject itemEntry = e.getAsJsonObject();
+            JsonObject itemEntry = e.getAsJsonObject();
 
-                int weight = itemEntry.get("weight").getAsInt();
-                ItemStack item = JsonUtils.readItem(itemEntry.get("item"));
+            int weight = itemEntry.get("weight").getAsInt();
+            ItemStack item = JsonUtils.readItem(itemEntry.get("item"));
 
-                tempMap.put(item, weight);
-            } catch (CommandSyntaxException e1){
-                throw new IllegalStateException("Invalid item in items list");
-            }
+            tempMap.put(item, weight);
         }
 
         this.items = ImmutableMap.copyOf(tempMap);

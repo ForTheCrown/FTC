@@ -133,12 +133,12 @@ public class MarriageListener implements Listener, ClickEventTask {
             if(awaitingFinishSet.contains(target.getUniqueId())){
                 inter.setMarriedTo(target.getUniqueId());
                 inter.setWaitingFinish(null);
-                inter.setLastMarriageStatusChange(System.currentTimeMillis());
+                inter.setLastMarriageChange(System.currentTimeMillis());
 
                 UserInteractions tInter = target.getInteractions();
                 tInter.setMarriedTo(user.getUniqueId());
                 tInter.setWaitingFinish(null);
-                tInter.setLastMarriageStatusChange(System.currentTimeMillis());
+                tInter.setLastMarriageChange(System.currentTimeMillis());
 
                 target.sendMessage(
                         Component.translatable("marriage.priestText.married", user.nickDisplayName().color(NamedTextColor.YELLOW)).color(NamedTextColor.GOLD)

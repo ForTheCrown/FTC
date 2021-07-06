@@ -50,12 +50,14 @@ public class GhParkourData extends AbstractJsonSerializer {
         levels.clear();
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
-            levels.put(e.getKey(), new GhLevelData(e.getValue()));
+            levels.put(e.getKey(), new GhLevelData(e.getKey(), e.getValue()));
         }
     }
 
     @Override
     protected JsonObject createDefaults(JsonObject json) {
+        
+
         return json;
     }
 }

@@ -7,12 +7,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.useables.UsageAction;
-import net.forthecrown.utils.SuggestionUtils;
-import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.registry.Registries;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.useables.actions.UsageAction;
+import net.forthecrown.utils.SuggestionUtils;
 import net.kyori.adventure.key.Key;
 
 import java.util.concurrent.CompletableFuture;
@@ -27,17 +26,17 @@ public class ActionArgType implements ArgumentType<Key> {
         return INSTANCE;
     }
 
-    public static UsageAction getAction(CommandContext<CommandSource> c, String argument){
-        return CrownCore.getActionRegistry().getAction(c.getArgument(argument, Key.class));
+    public static UsageAction<?> getAction(CommandContext<CommandSource> c, String argument){
+        return Registries.USAGE_ACTIONS.get(c.getArgument(argument, Key.class));
     }
 
     @Override
     public Key parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
-        Key key = CrownUtils.parseKey(reader);
+        Key key = KeyType.ftc().parse(reader);
 
         try {
-            CrownCore.getActionRegistry().getAction(key);
+            Registries.USAGE_ACTIONS.get(key).key();
         } catch (NullPointerException e){
             throw UNKNOWN_ACTION.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), key.asString());
         }
@@ -47,6 +46,6 @@ public class ActionArgType implements ArgumentType<Key> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return SuggestionUtils.suggestKeys(builder, CrownCore.getActionRegistry().getKeys());
+        return SuggestionUtils.suggestRegistry(builder, Registries.USAGE_ACTIONS);
     }
 }

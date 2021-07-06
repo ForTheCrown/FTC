@@ -1,17 +1,21 @@
 package net.forthecrown.user;
 
-import net.forthecrown.serializer.CrownSerializer;
+import net.forthecrown.core.chat.Announcer;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.serializer.Deletable;
 import net.forthecrown.user.data.SoldMaterialData;
+import net.forthecrown.user.data.UserProperty;
 import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.user.enums.*;
 import net.forthecrown.utils.Nameable;
-import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
 import net.minecraft.network.chat.ChatType;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
@@ -26,12 +30,15 @@ import java.util.function.Supplier;
  * Represents a user's profile, all their ranks, effects and such
  */
 public interface CrownUser extends
-        CrownSerializer,
         CommandSender,
         HoverEventSource<Component>,
         Nameable,
         Deletable
 {
+
+    void reload();
+
+    void save();
 
     /**
      * Saves and then unloads the file
@@ -116,7 +123,7 @@ public interface CrownUser extends
      * Gets if the user is allowed to swap branches
      * @return Whether the user is allowed to swap branches
      */
-    boolean getCanSwapBranch();
+    boolean canSwapBranch();
 
     /**
      * Sets if the user is allowed to swap branches
@@ -172,66 +179,33 @@ public interface CrownUser extends
      */
     void removePet(Pet pet);
 
-    /**
-     * Gets the user's currently active arrow particle
-     * @return The user's active arrow particle
-     */
-    Particle getArrowParticle();
+    boolean hasProperty(UserProperty property);
 
-    /**
-     * Sets the user's active arrow particle
-     * @param particleArrowActive The new arrow particle
-     */
-    void setArrowParticle(Particle particleArrowActive);
+    void addProperty(UserProperty property);
 
-    /**
-     * Gets all arrow particles available to the user
-     * @return All the user's arrow particles
-     */
-    List<Particle> getParticleArrowAvailable();
+    void removeProperty(UserProperty property);
 
-    /**
-     * Sets the particles the player has access to
-     * @param particleArrowAvailable The new list
-     */
-    void setParticleArrowAvailable(List<Particle> particleArrowAvailable);
+    void setProperty(boolean add, UserProperty property);
 
-    /**
-     * Gets the effect / particle that will appear when the user dies
-     * <p>It's stored as a string because DeathParticle has both effects and particles in it, and I couldn't be bothered splitting them up</p>
-     * @return The user's death particle
-     */
-    String getDeathParticle();
+    default boolean ignoringBroadcasts(){
+        return hasProperty(UserProperty.IGNORING_BROADCASTS);
+    }
 
-    /**
-     * Sets the user's death particle
-     * @param particleDeathActive The new death particle
-     */
-    void setDeathParticle(String particleDeathActive);
-
-    /**
-     * Gets all the user's available death particles
-     * @return The user's death particles
-     */
-    List<String> getParticleDeathAvailable();
-
-    /**
-     * Sets the user's available death particles
-     * @param particleDeathAvailable The new list of death particles
-     */
-    void setParticleDeathAvailable(List<String> particleDeathAvailable);
+    default void setIgnoringBroadcasts(boolean ignoring){
+        setProperty(ignoring, UserProperty.IGNORING_BROADCASTS);
+    }
 
     /**
      * Gets if the user allows player riding
      * @return Whether the user can be ride and be ridden or not
      */
-    boolean allowsRidingPlayers();
+    boolean allowsRiding();
 
     /**
      * Sets if the player can ride and be ridden ;)
      * @param allowsRidingPlayers
      */
-    void setAllowsRidingPlayers(boolean allowsRidingPlayers);
+    void setAllowsRiding(boolean allowsRidingPlayers);
 
     /**
      * Gets the user's gem amount
@@ -506,6 +480,8 @@ public interface CrownUser extends
     default Rank getHighestTierRank(){
         Rank highest = null;
 
+        Announcer.debug(getAvailableRanks());
+
         for (Rank r: getAvailableRanks()){
             if(highest == null){
                 highest = r;
@@ -585,6 +561,8 @@ public interface CrownUser extends
     void setGodMode(boolean godMode);
 
     void updateGodMode();
+
+    CosmeticData getCosmeticData();
 
     UserInteractions getInteractions();
 

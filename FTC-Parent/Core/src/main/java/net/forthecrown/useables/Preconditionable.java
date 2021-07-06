@@ -1,5 +1,6 @@
 package net.forthecrown.useables;
 
+import net.forthecrown.useables.preconditions.UsageCheckInstance;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.key.Key;
 
@@ -7,9 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 public interface Preconditionable {
-    List<UsageCheck> getChecks();
+    List<UsageCheckInstance> getChecks();
 
-    void addCheck(UsageCheck precondition);
+    void addCheck(UsageCheckInstance precondition);
     void removeCheck(Key name);
     void clearChecks();
 
@@ -19,5 +20,5 @@ public interface Preconditionable {
         return ListUtils.convertToSet(getCheckTypes(), Key::asString);
     }
 
-    <T extends UsageCheck> T getCheck(Key key, Class<T> clazz) throws ClassCastException;
+    <T extends UsageCheckInstance> T getCheck(Key key, Class<T> clazz) throws ClassCastException;
 }

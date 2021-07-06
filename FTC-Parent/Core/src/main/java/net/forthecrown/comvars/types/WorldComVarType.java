@@ -5,9 +5,9 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.types.WorldArgument;
+import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -19,7 +19,7 @@ public class WorldComVarType implements ComVarType<World> {
     private final Key key = CrownCore.coreKey("world_type");
 
     private WorldComVarType() {
-        ComVarRegistry.getTypeRegistry().register(key, this);
+        Registries.COMVAR_TYPES.register(key, this);
     }
 
     @Override

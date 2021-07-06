@@ -86,7 +86,7 @@ public final class ClickEventManager {
     }
 
     public static void allowCommandUsage(Player player, boolean allow){
-        allowCommandUsage(player, allow, true);
+        allowCommandUsage(player, allow, false);
     }
 
     public static String getCommand(String id, String... args){

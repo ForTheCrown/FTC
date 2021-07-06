@@ -89,7 +89,7 @@ public class JackEvent implements Listener {
                 GhLevelData data = parkour.getData().get("Stand_" + index);
                 assert data != null : "Data was null";
 
-                dest = data.getExitDest().toLoc(player.getWorld());
+                dest = data.getExitDest().toLoc(player.getWorld()).toCenterLocation();
                 data.giveHook(player);
             }
 

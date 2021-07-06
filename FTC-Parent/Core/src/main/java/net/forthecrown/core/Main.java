@@ -20,11 +20,13 @@ import net.forthecrown.economy.shops.CrownShopManager;
 import net.forthecrown.events.Events;
 import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.pirates.Pirates;
-import net.forthecrown.registry.CrownActionRegistry;
-import net.forthecrown.registry.CrownCheckRegistry;
 import net.forthecrown.registry.CrownKitRegistry;
 import net.forthecrown.registry.CrownWarpRegistry;
+import net.forthecrown.registry.Registries;
+import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.useables.CrownUsablesManager;
+import net.forthecrown.useables.actions.UsageActions;
+import net.forthecrown.useables.preconditions.UsageChecks;
 import net.forthecrown.user.CrownUserManager;
 import net.forthecrown.utils.Worlds;
 import net.luckperms.api.LuckPerms;
@@ -47,6 +49,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import static net.forthecrown.utils.CrownUtils.safeRunnable;
+
 /**
  * Main class that does all the dirty internal stuff
  */
@@ -64,6 +68,7 @@ public final class Main extends JavaPlugin implements CrownCore {
     static CrownBalances            balances;
     static CrownBroadcaster         announcer;
     static CrownKingship            kingship;
+    static UserJsonSerializer       userSerializer;
 
     static CrownUsablesManager      usablesManager;
     static CrownShopManager         shopManager;
@@ -73,8 +78,6 @@ public final class Main extends JavaPlugin implements CrownCore {
 
     static CrownWarpRegistry        warpRegistry;
     static CrownKitRegistry         kitRegistry;
-    static CrownActionRegistry      actionRegistry;
-    static CrownCheckRegistry       checkRegistry;
 
     static Location                 serverSpawn;
     static CrownMessages            messages;
@@ -98,6 +101,8 @@ public final class Main extends JavaPlugin implements CrownCore {
         joinInfo = new JoinInfo();
 
         balances = new CrownBalances();
+        userSerializer = new UserJsonSerializer();
+
         shopManager = new CrownShopManager();
         userManager = new CrownUserManager();
         punishmentManager = new CrownPunishmentManager();
@@ -106,36 +111,29 @@ public final class Main extends JavaPlugin implements CrownCore {
         rules = new ServerRules();
 
         usablesManager = new CrownUsablesManager();
-        usablesManager.registerDefaults(actionRegistry, checkRegistry);
 
-        checkRegistry.setAccepting(false);
-        actionRegistry.setAccepting(false);
+        safeRunnable(UsageChecks::init);
+        safeRunnable(UsageActions::init);
 
         warpRegistry = new CrownWarpRegistry();
         kitRegistry = new CrownKitRegistry();
 
         announcer.doBroadcasts();
 
-        moduleRunnable(CoreCommands::init);
-        moduleRunnable(Events::init);
+        safeRunnable(CoreCommands::init);
+        safeRunnable(Events::init);
 
-        moduleRunnable(Pirates::init);
-        moduleRunnable(Bosses::init);
-        moduleRunnable(Cosmetics::init);
+        safeRunnable(Pirates::init);
+        safeRunnable(Bosses::init);
+        safeRunnable(Cosmetics::init);
 
         dayUpdate.checkDay();
 
-        if(getConfig().getBoolean("System.run-deleter-on-startup")) userManager.checkAllUserDatas();
+        if(getConfig().getBoolean("System.run-deleter-on-startup")) userManager.runUserDeletionCheck();
+
+        Registries.COMVAR_TYPES.close();
 
         logger.info("FTC startup completed");
-    }
-
-    private void moduleRunnable(Runnable runnable){
-        try {
-            runnable.run();
-        } catch (Throwable e){
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -152,12 +150,6 @@ public final class Main extends JavaPlugin implements CrownCore {
         emotes = new Emotes();
         emotes.registerEmotes();
 
-        actionRegistry = new CrownActionRegistry();
-        checkRegistry = new CrownCheckRegistry();
-
-        actionRegistry.setAccepting(true);
-        checkRegistry.setAccepting(true);
-
         WgFlags.init();
     }
 
@@ -171,9 +163,9 @@ public final class Main extends JavaPlugin implements CrownCore {
         for (ArmorStandLeaderboard a: LEADERBOARDS) a.destroy();
         for (LivingEntity e: MobHealthBar.NAMES.keySet()) e.customName(MobHealthBar.NAMES.getOrDefault(e, null));
 
-        moduleRunnable(Bosses::shutDown);
-        moduleRunnable(Cosmetics::shutDown);
-        moduleRunnable(Pirates::shutDown);
+        safeRunnable(Bosses::shutDown);
+        safeRunnable(Cosmetics::shutDown);
+        safeRunnable(Pirates::shutDown);
 
         CrownUserManager.LOADED_USERS.forEach((i, u) -> {
             if(!u.isOnline()) return;
@@ -188,6 +180,7 @@ public final class Main extends JavaPlugin implements CrownCore {
         FileConfiguration config = getConfig();
 
         config.set("ServerSpawn", serverSpawn);
+
         ComVars.save(config);
 
         for (Material m: defaultItemPrices.keySet()){

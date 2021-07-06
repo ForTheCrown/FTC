@@ -73,7 +73,7 @@ public class CrownKitRegistry extends AbstractJsonSerializer implements KitRegis
     }
 
     @Override
-    public Set<Key> getKeys() {
+    public Set<Key> keySet() {
         return kits.keySet();
     }
 
@@ -89,7 +89,7 @@ public class CrownKitRegistry extends AbstractJsonSerializer implements KitRegis
     }
 
     @Override
-    public Collection<Kit> getEntries() {
+    public Collection<Kit> values() {
         return new ArrayList<>(kits.values());
     }
 

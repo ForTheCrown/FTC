@@ -1,107 +1,82 @@
 package net.forthecrown.useables.actions;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.useables.UsageAction;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.utils.InterUtils;
 import net.forthecrown.utils.JsonUtils;
-import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.CompletableFuture;
-
-public class ActionItem implements UsageAction {
+public class ActionItem implements UsageAction<ActionItem.ActionInstance> {
     public static final Key ADD_KEY = Key.key(CrownCore.inst(), "give_item");
     public static final Key REMOVE_KEY = Key.key(CrownCore.inst(), "remove_item");
 
     private final boolean add;
-    private ItemStack item;
 
-    public ActionItem(boolean add){ this.add = add; }
-
-    @Override
-    public void parse(JsonElement json) throws CommandSyntaxException {
-        item = JsonUtils.readItem(json);
+    public ActionItem(boolean add){
+        this.add = add;
     }
 
     @Override
-    public void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException {
-        item = InterUtils.parseGivenItem(context, reader);
+    public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
+        return new ActionInstance(InterUtils.parseGivenItem(source, reader), add);
     }
 
     @Override
-    public void onInteract(Player player) {
-        if (item == null) return;
-
-        if(add){
-            if (player.getInventory().firstEmpty() == -1) player.getWorld().dropItem(player.getLocation(), item.clone());
-            else player.getInventory().addItem(item.clone());
-        } else player.getInventory().removeItemAnySlot(item);
+    public ActionInstance deserialize(JsonElement element) throws CommandSyntaxException {
+        return new ActionInstance(JsonUtils.readItem(element), add);
     }
 
     @Override
-    public Key key() {
+    public JsonElement serialize(ActionInstance value) {
+        return JsonUtils.writeItem(value.getItem());
+    }
+
+    @Override
+    public @NotNull Key key() {
         return add ? ADD_KEY : REMOVE_KEY;
     }
 
-    @Override
-    public String asString() {
-        return toString();
-    }
+    public static class ActionInstance implements UsageActionInstance {
+        private final ItemStack item;
+        private final boolean add;
 
-    @Override
-    public JsonElement serialize() {
-        if (item == null) return JsonNull.INSTANCE;
+        public ActionInstance(ItemStack item, boolean add) {
+            this.item = item;
+            this.add = add;
+        }
 
-        return new JsonPrimitive(NbtHandler.ofItem(item).serialize());
-    }
+        public boolean isAdd() {
+            return add;
+        }
 
-    @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return InterUtils.listItems(context, builder);
-    }
+        @Override
+        public void onInteract(Player player) {
+            if (item == null) return;
 
-    @Override
-    public String toString() {
-        return key().asString() + "{" + ",item=" + item + '}';
-    }
+            if(add){
+                if (player.getInventory().firstEmpty() == -1) player.getWorld().dropItem(player.getLocation(), item.clone());
+                else player.getInventory().addItem(item.clone());
+            } else player.getInventory().removeItemAnySlot(item);
+        }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        @Override
+        public Key typeKey() {
+            return add ? ADD_KEY : REMOVE_KEY;
+        }
 
-        ActionItem item1 = (ActionItem) o;
+        @Override
+        public String asString() {
+            return typeKey().asString() + "{" + ",item=" + item + '}';
+        }
 
-        return new EqualsBuilder()
-                .append(item, item1.item)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(item)
-                .toHashCode();
-    }
-
-    public ItemStack getItem() {
-        return item;
-    }
-
-    public void setItem(ItemStack item) {
-        this.item = item;
+        public ItemStack getItem() {
+            return item;
+        }
     }
 }

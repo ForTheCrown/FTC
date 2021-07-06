@@ -97,7 +97,7 @@ public class MaterialMerchant implements BlackMarketMerchant {
         json.add("prices", priceJson);
 
         JsonObject array = new JsonObject();
-        chosenItems.forEach(m -> array.addProperty(m.name().toLowerCase(), earned.containsKey(m) ? 0 : earned.get(m)));
+        chosenItems.forEach(m -> array.addProperty(m.name().toLowerCase(), earned.getOrDefault(m, 0)));
         json.add("chosen", array);
 
         return json;

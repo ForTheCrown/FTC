@@ -8,7 +8,7 @@ import org.bukkit.block.TileState;
 import org.bukkit.entity.Entity;
 
 public interface UsablesManager {
-    NamespacedKey USABLE_KEY = new NamespacedKey(CrownCore.inst(), "useableSign");
+    NamespacedKey USABLE_KEY = new NamespacedKey(CrownCore.inst(), "useablesign");
 
     UsableBlock getBlock(Location l);
 

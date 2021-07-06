@@ -7,6 +7,7 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.registry.CrownRegistry;
 import net.kyori.adventure.key.Key;
 
 import java.util.concurrent.CompletableFuture;
@@ -14,8 +15,8 @@ import java.util.concurrent.CompletableFuture;
 public final class SuggestionUtils {
     private SuggestionUtils() {}
 
-    public static CompletableFuture<Suggestions> suggestKeys(SuggestionsBuilder builder, Iterable<Key> keys){
-        return CompletionProvider.suggestKeys(builder, keys);
+    public static CompletableFuture<Suggestions> suggestRegistry(SuggestionsBuilder builder, CrownRegistry<?,?> registry){
+        return CompletionProvider.suggestKeys(builder, registry.keySet());
     }
 
     public static CompletableFuture<Suggestions> suggestKeysNoNamespace(SuggestionsBuilder builder, Iterable<Key> keys){

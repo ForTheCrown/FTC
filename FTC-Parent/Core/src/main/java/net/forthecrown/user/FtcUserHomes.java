@@ -1,5 +1,11 @@
 package net.forthecrown.user;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonDeserializable;
+import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.utils.JsonUtils;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -8,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class FtcUserHomes implements UserHomes {
+public class FtcUserHomes implements UserHomes, JsonSerializable, JsonDeserializable {
     public Map<String, Location> homes = new HashMap<>();
     private final FtcUser owner;
 
@@ -115,5 +121,30 @@ public class FtcUserHomes implements UserHomes {
     @Override
     public Location get(String name){
         return homes.get(name);
+    }
+
+    @Override
+    public JsonObject serialize() {
+        if(homes.isEmpty()) return null;
+
+        JsonBuf json = JsonBuf.empty();
+
+        for (Map.Entry<String, Location> e: homes.entrySet()){
+            json.addLocation(e.getKey(), e.getValue());
+        }
+
+        return json.nullIfEmpty();
+    }
+
+    @Override
+    public void deserialize(JsonElement element) {
+        homes.clear();
+
+        if(element == null) return;
+        JsonObject json = element.getAsJsonObject();
+
+        for (Map.Entry<String, JsonElement> e: json.entrySet()){
+            homes.put(e.getKey(), JsonUtils.readLocation(e.getValue().getAsJsonObject()));
+        }
     }
 }

@@ -1,0 +1,38 @@
+package net.forthecrown.cosmetics.options;
+
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.builder.ClickContext;
+import net.forthecrown.inventory.builder.options.InventoryOption;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.ItemStackBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
+
+public class CosmeticHeader implements InventoryOption {
+    @Override
+    public int getSlot() {
+        return 4;
+    }
+
+    @Override
+    public void place(Inventory inventory, CrownUser user) {
+        ItemStackBuilder builder = new ItemStackBuilder(Material.NETHER_STAR, 1)
+                .setName(Component.text("Menu").style(CrownItems.nonItalic(NamedTextColor.YELLOW)))
+                .addLore(Component.empty())
+                .addLore(
+                        Component.text("You have ")
+                                .style(CrownItems.nonItalic(NamedTextColor.GRAY))
+                                .append(Component.text(user.getGems() + " Gems").style(CrownItems.nonItalic(NamedTextColor.GOLD)))
+                                .append(Component.text("."))
+                );
+
+        inventory.setItem(getSlot(), builder.build());
+    }
+
+    @Override
+    public void onClick(CrownUser user, ClickContext context) throws RoyalCommandException {
+    }
+}

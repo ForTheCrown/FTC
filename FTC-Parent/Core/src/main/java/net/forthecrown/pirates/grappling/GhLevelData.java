@@ -66,10 +66,10 @@ public class GhLevelData implements JsonSerializable {
         this.index = (byte) Pirates.getParkour().getData().entrySet().size();
     }
 
-    public GhLevelData(JsonElement element) {
+    public GhLevelData(String name, JsonElement element) {
         JsonObject json = element.getAsJsonObject();
 
-        this.name = json.get("name").getAsString();
+        this.name = name;
         this.exitDest = BlockPos.of(json.get("exitDest"));
         this.biome = JsonUtils.readEnum(GhBiome.class, json.get("biome"));
         this.selectorMat = JsonUtils.readEnum(Material.class, json.get("selectorMat"));

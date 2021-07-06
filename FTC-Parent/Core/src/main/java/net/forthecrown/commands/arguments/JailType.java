@@ -45,6 +45,6 @@ public class JailType implements ArgumentType<Key> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return SuggestionUtils.suggestKeysNoNamespace(builder, CrownCore.getJailManager().getKeys());
+        return SuggestionUtils.suggestKeysNoNamespace(builder, CrownCore.getJailManager().keySet());
     }
 }

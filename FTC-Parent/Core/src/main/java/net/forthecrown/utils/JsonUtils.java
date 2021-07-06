@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.utils.math.CrownBoundingBox;
+import net.kyori.adventure.key.Key;
 import net.minecraft.nbt.TagParser;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -13,6 +14,10 @@ import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -134,11 +139,47 @@ public class JsonUtils {
         return anum == null ? JsonNull.INSTANCE : new JsonPrimitive(anum.name().toLowerCase());
     }
 
-    public static ItemStack readItem(JsonElement json) throws CommandSyntaxException {
-        return NbtHandler.itemFromNBT(NBT.of(TagParser.parseTag(json.getAsString())));
+    public static ItemStack readItem(JsonElement json) {
+        try {
+            return NbtHandler.itemFromNBT(NBT.of(TagParser.parseTag(json.getAsString())));
+        } catch (CommandSyntaxException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static JsonPrimitive writeItem(ItemStack itemStack){
         return new JsonPrimitive(NbtHandler.ofItem(itemStack).serialize());
+    }
+
+    public static JsonPrimitive writeKey(Key key){
+        return new JsonPrimitive(key.asString());
+    }
+
+    public static Key readKey(JsonElement element){
+        return CrownUtils.parseKey(element.getAsString());
+    }
+
+    public static UUID readUUID(JsonElement element){
+        return UUID.fromString(element.getAsString());
+    }
+
+    public static JsonPrimitive writeUUID(UUID id){
+        return new JsonPrimitive(id.toString());
+    }
+
+    public static void writeFile(JsonObject json, File f) throws IOException {
+        FileWriter writer = new FileWriter(f);
+        writer.write(json.toString());
+        writer.close();
+    }
+
+    public static JsonObject readFile(File file) throws IOException {
+        FileReader reader = new FileReader(file);
+        JsonParser parser = new JsonParser();
+        JsonObject json = parser.parse(reader).getAsJsonObject();
+        reader.close();
+
+        return json;
     }
 }

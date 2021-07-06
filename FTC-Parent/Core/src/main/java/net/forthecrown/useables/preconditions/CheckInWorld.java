@@ -1,7 +1,6 @@
 package net.forthecrown.useables.preconditions;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
@@ -9,9 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.useables.UsageCheck;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -19,66 +16,69 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
-public class CheckInWorld implements UsageCheck {
+public class CheckInWorld implements UsageCheck<CheckInWorld.CheckInstance> {
     public static final Key KEY = Key.key(CrownCore.inst(), "in_world");
 
-    private World world;
-
     @Override
-    public void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException {
-        world = WorldArgument.world().parse(reader);
+    public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
+        World world = WorldArgument.world().parse(reader);
+        return new CheckInstance(world);
     }
 
     @Override
-    public void parse(JsonElement json) throws CommandSyntaxException {
-        world = Bukkit.getWorld(json.getAsString());
+    public CheckInstance deserialize(JsonElement element) throws CommandSyntaxException {
+        return new CheckInstance(Bukkit.getWorld(element.getAsString()));
     }
 
     @Override
-    public String asString() {
-        return key().asString() + "{world=" + (world == null ? "null" : world.getName()) + "}";
+    public JsonElement serialize(CheckInstance value) {
+        return new JsonPrimitive(value.getWorld().getName());
     }
 
     @Override
-    public Component failMessage() {
-        return Component.text("You cannot use this in this world")
-                .color(NamedTextColor.GRAY);
-    }
-
-    @Override
-    public boolean test(Player player) {
-        if(world == null){
-            CrownCore.logger().warning("Null world in checkable");
-            return false;
-        }
-
-        return player.getWorld().equals(world);
-    }
-
-    @Override
-    public JsonElement serialize() {
-        return world == null ? JsonNull.INSTANCE : new JsonPrimitive(world.getName());
+    public @NotNull Key key() {
+        return KEY;
     }
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return CompletionProvider.suggestWorlds(builder);
+        return WorldArgument.world().listSuggestions(context, builder);
     }
 
-    @Override
-    public @NonNull Key key() {
-        return KEY;
-    }
+    public static class CheckInstance implements UsageCheckInstance {
+        private final World world;
 
-    public World getWorld() {
-        return world;
-    }
+        public CheckInstance(World world) {
+            this.world = world;
+        }
 
-    public void setWorld(World world) {
-        this.world = world;
+        public World getWorld() {
+            return world;
+        }
+
+        @Override
+        public String asString() {
+            return typeKey().asString() + '{' + "world=" + world.getName() + '}';
+        }
+
+        @Override
+        public Component failMessage() {
+            return Component.text("You cannot use this in this world")
+                    .color(NamedTextColor.GRAY);
+        }
+
+        @Override
+        public @NotNull Key typeKey() {
+            return KEY;
+        }
+
+        @Override
+        public boolean test(Player player) {
+            return player.getWorld().equals(world);
+        }
     }
 }

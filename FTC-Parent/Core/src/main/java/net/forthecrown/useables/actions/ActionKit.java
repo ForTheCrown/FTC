@@ -1,80 +1,72 @@
 package net.forthecrown.useables.actions;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.arguments.KitType;
-import net.forthecrown.useables.UsageAction;
-import net.forthecrown.useables.kits.Kit;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.useables.kits.Kit;
+import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.CompletableFuture;
-
-public class ActionKit implements UsageAction {
+public class ActionKit implements UsageAction<ActionKit.ActionInstance> {
     public static final Key KEY = Key.key(CrownCore.inst(), "give_kit");
 
-    private Key kitKey;
-
     @Override
-    public void parse(JsonElement json) throws CommandSyntaxException {
-        parse(new StringReader(json.getAsString()));
+    public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
+        Kit kit = CrownCore.getKitRegistry().get(KitType.kit().parse(reader));
+
+        return new ActionInstance(kit.key());
     }
 
     @Override
-    public void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException {
-        parse(reader);
-    }
-
-    public void parse(StringReader reader) throws CommandSyntaxException {
-        Kit kit = CrownCore.getKitRegistry().get(CrownUtils.parseKey(reader));
-        this.kitKey = kit.key();
+    public ActionInstance deserialize(JsonElement element) throws CommandSyntaxException {
+        return new ActionInstance(JsonUtils.readKey(element));
     }
 
     @Override
-    public void onInteract(Player player) {
-        Kit kit = CrownCore.getKitRegistry().get(kitKey);
-        if(kit == null){
-            CrownCore.logger().warning("Null kit in action!");
-            return;
-        }
-
-        kit.attemptItemGiving(player);
+    public JsonElement serialize(ActionInstance value) {
+        return JsonUtils.writeKey(value.getKitKey());
     }
 
     @Override
-    public String asString() {
-        return key().asString() + "{key= " + kitKey + "}";
-    }
-
-    @Override
-    public JsonElement serialize() {
-        return new JsonPrimitive(kitKey.value());
-    }
-
-    @Override
-    public @NonNull Key key() {
+    public @NotNull Key key() {
         return KEY;
     }
 
-    @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return KitType.kit().listSuggestions(context, builder, true);
-    }
+    public static class ActionInstance implements UsageActionInstance {
+        private final Key kitKey;
 
-    public Key getKitKey() {
-        return kitKey;
-    }
+        public ActionInstance(Key kitKey) {
+            this.kitKey = kitKey;
+        }
 
-    public void setKitKey(Key kitKey) {
-        this.kitKey = kitKey;
+        @Override
+        public void onInteract(Player player) {
+            Kit kit = CrownCore.getKitRegistry().get(kitKey);
+            if(kit == null){
+                CrownCore.logger().warning("Null kit in action!");
+                return;
+            }
+
+            kit.attemptItemGiving(player);
+        }
+
+        @Override
+        public String asString() {
+            return typeKey().asString() + "{key= " + kitKey + "}";
+        }
+
+        @Override
+        public @NonNull Key typeKey() {
+            return KEY;
+        }
+        public Key getKitKey() {
+            return kitKey;
+        }
     }
 }

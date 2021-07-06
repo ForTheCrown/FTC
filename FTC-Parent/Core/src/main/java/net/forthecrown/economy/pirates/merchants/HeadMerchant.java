@@ -90,7 +90,7 @@ public class HeadMerchant implements BlackMarketMerchant {
 
     @Override
     public void update(CrownRandom random, byte day) {
-        BlockPos pos = chests[random.intInRange(0, chests.length)];
+        BlockPos pos = chests[random.intInRange(0, chests.length-1)];
 
         Chest chest = pos.stateAs(Worlds.NORMAL);
         Inventory inv = chest.getBlockInventory();
@@ -101,7 +101,7 @@ public class HeadMerchant implements BlackMarketMerchant {
         boolean validPick = false;
 
         while(!validPick){
-            item = inv.getItem(random.intInRange(0, inv.getSize()));
+            item = inv.getItem(random.intInRange(0, inv.getSize()-1));
             if(item == null) continue;
 
             SkullMeta meta = (SkullMeta) item.getItemMeta();

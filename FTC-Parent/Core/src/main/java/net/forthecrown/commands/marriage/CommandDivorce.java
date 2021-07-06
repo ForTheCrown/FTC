@@ -78,13 +78,13 @@ public class CommandDivorce extends FtcCommand {
 
                             inter.setMarriedTo(null);
                             inter.setMChatToggled(false);
-                            inter.setLastMarriageStatusChange(System.currentTimeMillis());
+                            inter.setLastMarriageChange(System.currentTimeMillis());
 
                             UserInteractions tInter = spouse.getInteractions();
 
                             tInter.setMChatToggled(false);
                             tInter.setMarriedTo(null);
-                            tInter.setLastMarriageStatusChange(System.currentTimeMillis());
+                            tInter.setLastMarriageChange(System.currentTimeMillis());
 
                             user.sendMessage(Component.translatable("marriage.divorce", spouse.nickDisplayName().color(NamedTextColor.GOLD)).color(NamedTextColor.YELLOW));
 

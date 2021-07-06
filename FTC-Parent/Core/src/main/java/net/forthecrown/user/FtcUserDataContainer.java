@@ -1,9 +1,11 @@
 package net.forthecrown.user;
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.jetbrains.annotations.NotNull;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.forthecrown.serializer.JsonDeserializable;
+import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.utils.CrownUtils;
+import net.kyori.adventure.key.Key;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -12,32 +14,24 @@ import java.util.Map;
 /**
  * Allows other plugins to store data in a user's file.
  */
-public class FtcUserDataContainer implements ConfigurationSerializable, UserDataContainer {
+public class FtcUserDataContainer implements JsonSerializable, JsonDeserializable, UserDataContainer {
 
-    private final YamlConfiguration configuration;
-    private Map<String, ConfigurationSection> data = new HashMap<>();
+    private final Map<Key, JsonElement> data = new HashMap<>();
     private final FtcUser user;
 
-    FtcUserDataContainer(FtcUser user, YamlConfiguration configuration){
-        this.configuration = configuration;
+    FtcUserDataContainer(FtcUser user){
         this.user = user;
     }
 
     @Override
-    public void set(String key, ConfigurationSection section){
+    public void set(Key key, JsonElement section){
         data.put(key, section);
     }
 
     @Nonnull
     @Override
-    public ConfigurationSection get(String key){
-        return data.getOrDefault(key, createSection(key));
-    }
-
-    @Nonnull
-    @Override
-    public ConfigurationSection createSection(String key){
-        return configuration.getConfigurationSection("DataContainer").createSection(key);
+    public JsonElement get(Key key){
+        return data.get(key);
     }
 
     @Override
@@ -46,8 +40,13 @@ public class FtcUserDataContainer implements ConfigurationSerializable, UserData
     }
 
     @Override
-    public void remove(String key){
+    public void remove(Key key){
         data.remove(key);
+    }
+
+    @Override
+    public boolean has(Key key) {
+        return data.containsKey(key);
     }
 
     @Nonnull
@@ -56,19 +55,27 @@ public class FtcUserDataContainer implements ConfigurationSerializable, UserData
         return user;
     }
 
-    public void deserialize(ConfigurationSection section){
-        Map<String, ConfigurationSection> tempMap = new HashMap<>();
-        for (String s: section.getKeys(false)){
-            try {
-                tempMap.put(s, section.getConfigurationSection(s));
-            } catch (Exception ignored) {}
+    @Override
+    public JsonObject serialize() {
+        if(data.isEmpty()) return null;
+
+        JsonObject json = new JsonObject();
+
+        for (Map.Entry<Key, JsonElement> e: data.entrySet()){
+            json.add(e.getKey().asString(), e.getValue());
         }
 
-        data = tempMap;
+        return json;
     }
 
     @Override
-    public @NotNull Map<String, Object> serialize() {
-        return new HashMap<>(data);
+    public void deserialize(JsonElement element) {
+        data.clear();
+        if(element == null) return;
+        JsonObject json = element.getAsJsonObject();
+
+        for (Map.Entry<String, JsonElement> e: json.entrySet()){
+            data.put(CrownUtils.parseKey(e.getKey()), e.getValue());
+        }
     }
 }

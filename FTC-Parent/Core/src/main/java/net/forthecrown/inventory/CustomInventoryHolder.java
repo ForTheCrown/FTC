@@ -16,20 +16,25 @@ import javax.annotation.Nonnull;
 public class CustomInventoryHolder implements InventoryHolder {
 
     private final Inventory inv;
+
+    @Deprecated
     public CustomInventoryHolder(String title, int size){
         inv = Bukkit.createInventory(this, size, ChatUtils.convertString(title));
     }
 
+    @Deprecated
     public CustomInventoryHolder(String title, InventoryType type){
         inv = Bukkit.createInventory(this, type, ChatUtils.convertString(title));
     }
 
+    @Deprecated
     public CustomInventoryHolder(){
         inv = Bukkit.createInventory(this, InventoryType.CHEST);
     }
 
     @Nonnull
     @Override
+    @Deprecated
     public Inventory getInventory() {
         return inv;
     }

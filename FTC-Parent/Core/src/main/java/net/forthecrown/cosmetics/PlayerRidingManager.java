@@ -37,6 +37,8 @@ public class PlayerRidingManager implements Listener {
 
         this.riders = new ObjectArraySet<>();
         Bukkit.getPluginManager().registerEvents(this, CrownCore.inst());
+
+        CrownCore.logger().info("Player Riding Manager loaded");
     }
 
     public ObjectSet<PlayerRider> getRiders() {
@@ -79,7 +81,7 @@ public class PlayerRidingManager implements Listener {
     public boolean canRide(CrownUser user, CrownUser ridden){
         if(user.getPlayer().isSneaking()) return false;
 
-        if(!user.allowsRidingPlayers() || !ridden.allowsRidingPlayers()){
+        if(!user.allowsRiding() || !ridden.allowsRiding()){
             user.sendMessage(Component.translatable("user.bothAllowRiding", NamedTextColor.GRAY));
             return false;
         }

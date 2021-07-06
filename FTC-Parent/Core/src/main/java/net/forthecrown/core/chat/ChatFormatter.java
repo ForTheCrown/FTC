@@ -354,10 +354,17 @@ public class ChatFormatter {
     }
 
     public static Component formatTeamName(Component initialName, Team team){
+        TextColor color;
+        try { //tEaM cOloRs mUsT hAvE hEX vAlUeS, what a fucking retarded place to throw an exception, in a getter
+            color = team.color();
+        } catch (IllegalStateException e){
+            color = NamedTextColor.WHITE;
+        }
+
         return Component.text()
                 .append(team.prefix())
                 .append(Component.space())
-                .append(initialName.color(team.color()))
+                .append(initialName.color(color))
                 .append(Component.space())
                 .append(team.suffix())
                 .build();

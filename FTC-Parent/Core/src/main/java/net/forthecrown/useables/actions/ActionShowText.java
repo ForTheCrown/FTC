@@ -1,98 +1,66 @@
 package net.forthecrown.useables.actions;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.useables.UsageAction;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.ComponentArgument;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-public class ActionShowText implements UsageAction {
+public class ActionShowText implements UsageAction<ActionShowText.ActionInstance> {
     public static final Key KEY = Key.key(CrownCore.inst(), "show_text");
-
     private static final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
-    private Component component;
 
     @Override
-    public void parse(JsonElement json) throws CommandSyntaxException {
-        try {
-            component = serializer.deserializeFromTree(json);
-        } catch (Exception e) {
-            component = null;
-        }
+    public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
+        return new ActionInstance(ComponentArgument.component().parse(reader));
     }
 
     @Override
-    public void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException {
-        try {
-            component = serializer.deserialize(reader.getString());
-        } catch (Exception e) {
-            throw FtcExceptionProvider.create(e.getMessage());
-        }
+    public ActionInstance deserialize(JsonElement element) throws CommandSyntaxException {
+        return new ActionInstance(serializer.deserializeFromTree(element));
     }
 
     @Override
-    public void onInteract(Player player) {
-        if (component == null) return;
-        player.sendMessage(component);
+    public JsonElement serialize(ActionInstance value) {
+        return serializer.serializeToTree(value.getComponent());
     }
 
     @Override
-    public Key key() {
+    public @NotNull Key key() {
         return KEY;
     }
 
-    @Override
-    public String asString() {
-        return toString();
-    }
+    public static class ActionInstance implements UsageActionInstance {
+        private final Component component;
 
-    @Override
-    public JsonElement serialize() {
-        if (component == null) return new JsonObject();
+        public ActionInstance(Component component) {
+            this.component = component;
+        }
 
-        return serializer.serializeToTree(component);
-    }
+        @Override
+        public void onInteract(Player player) {
+            if (component == null) return;
+            player.sendMessage(component);
+        }
 
-    @Override
-    public String toString() {
-        return key().asString() + "{" + "component=" + serializer.serialize(component) + '}';
-    }
+        @Override
+        public Key typeKey() {
+            return KEY;
+        }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
+        @Override
+        public String asString() {
+            return typeKey().asString() + "{" + "component=" + serializer.serialize(component) + '}';
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ActionShowText text = (ActionShowText) o;
-
-        return new EqualsBuilder()
-                .append(component, text.component)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(component)
-                .toHashCode();
-    }
-
-    public Component getComponent() {
-        return component;
-    }
-
-    public void setComponent(Component component) {
-        this.component = component;
+        public Component getComponent() {
+            return component;
+        }
     }
 }

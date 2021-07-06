@@ -1,7 +1,12 @@
 package net.forthecrown.user;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.serializer.JsonDeserializable;
+import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;
@@ -12,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FtcUserGrave implements Grave {
+public class FtcUserGrave implements Grave, JsonSerializable, JsonDeserializable {
 
     private final FtcUser user;
     public List<ItemStack> items = new ArrayList<>();
@@ -72,5 +77,29 @@ public class FtcUserGrave implements Grave {
     @Override
     public List<ItemStack> getItems(){
         return items;
+    }
+
+    @Override
+    public JsonArray serialize() {
+        if(items.isEmpty()) return null;
+
+        JsonArray array = new JsonArray();
+
+        for (ItemStack i: items){
+            array.add(JsonUtils.writeItem(i));
+        }
+
+        return array;
+    }
+
+    @Override
+    public void deserialize(JsonElement element) {
+        items.clear();
+
+        if(element == null) return;
+        JsonArray array = element.getAsJsonArray();
+        array.forEach(e -> {
+            items.add(JsonUtils.readItem(e));
+        });
     }
 }

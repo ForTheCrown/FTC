@@ -51,6 +51,7 @@ public final class Permissions {
     public static final Permission EMOTE_JINGLE =       register("ftc.emotes.jingle");
     public static final Permission EMOTE_POG =          register("ftc.emotes.pog");
     public static final Permission EMOTE_SCARE =        register("ftc.emotes.scare");
+    public static final Permission EMOTE_HUG =          register("ftc.emotes.hug");
 
     public static final Permission NEARBY =             register(COMMAND_PREFIX + "near");
     public static final Permission NEARBY_IGNORE =      register(COMMAND_PREFIX + "near.ignore");

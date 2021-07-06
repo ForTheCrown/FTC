@@ -1,13 +1,11 @@
 package net.forthecrown.serializer;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.utils.JsonUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,9 +68,7 @@ public abstract class AbstractJsonSerializer implements CrownSerializer {
         else json = createDefaults(json);
 
         try {
-            FileWriter writer = new FileWriter(file);
-            writer.write(json.toString());
-            writer.close();
+            JsonUtils.writeFile(json, file);
             fileExists = true;
         } catch (IOException e){
             e.printStackTrace();
@@ -88,10 +84,7 @@ public abstract class AbstractJsonSerializer implements CrownSerializer {
         }
 
         try {
-            FileReader reader = new FileReader(file);
-            JsonParser parser = new JsonParser();
-            JsonObject json = parser.parse(reader).getAsJsonObject();
-            reader.close();
+            JsonObject json = JsonUtils.readFile(file);
             reload(json);
         } catch (IOException e){
             e.printStackTrace();

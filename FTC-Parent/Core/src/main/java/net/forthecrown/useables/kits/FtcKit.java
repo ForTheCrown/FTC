@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.useables.CheckableBase;
-import net.forthecrown.useables.UsageCheck;
+import net.forthecrown.useables.preconditions.UsageCheckInstance;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
@@ -72,9 +72,9 @@ public class FtcKit extends CheckableBase implements Kit {
     @Override
     public boolean test(Player player) {
         List<Consumer<Player>> onSuccess = new ArrayList<>();
-        for (UsageCheck c: checks.values()){
+        for (UsageCheckInstance c: checks.values()){
             if(!c.test(player)){
-                Component m = c.personalizedFailMessage(player);
+                Component m = c.personalizedMessage(player);
                 if(m != null) player.sendMessage(m);
                 return false;
             }
@@ -116,7 +116,7 @@ public class FtcKit extends CheckableBase implements Kit {
 
     @Override
     public boolean testSilent(Player player) {
-        for (UsageCheck c: checks.values()){
+        for (UsageCheckInstance c: checks.values()){
             if(!c.test(player)) return false;
         }
 

@@ -190,6 +190,7 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
     public void onUse(CrownUser user, Entity edward) {
         user.sendMessage(
                 Component.translatable("pirates.enchants.selling",
+                        NamedTextColor.GRAY,
                         Component.text("Edward")
                                 .hoverEvent(edward)
                                 .color(NamedTextColor.YELLOW),

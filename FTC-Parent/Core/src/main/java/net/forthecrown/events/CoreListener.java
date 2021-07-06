@@ -275,6 +275,18 @@ public class CoreListener implements Listener {
         if(inter.mChatToggled()){
             event.viewers().clear();
 
+            if(inter.getMarriedTo() == null){
+                user.sendMessage(
+                        Component.text()
+                                .append(Component.translatable("marriage.notMarried").color(NamedTextColor.RED))
+                                .append(Component.newline())
+                                .append(Component.text("How do you even have marriage chat enabled lol").color(NamedTextColor.GRAY))
+                );
+
+                inter.setMChatToggled(false);
+                return;
+            }
+
             CrownUser target = UserManager.getUser(inter.getMarriedTo());
             if(!target.isOnline()){
                 user.sendMessage(

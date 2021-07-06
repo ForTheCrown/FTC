@@ -8,10 +8,9 @@ import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.shops.ShopManager;
-import net.forthecrown.registry.ActionRegistry;
-import net.forthecrown.registry.CheckRegistry;
 import net.forthecrown.registry.KitRegistry;
 import net.forthecrown.registry.WarpRegistry;
+import net.forthecrown.serializer.UserSerializer;
 import net.forthecrown.useables.UsablesManager;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.MapUtils;
@@ -51,9 +50,8 @@ public interface CrownCore extends Plugin, Namespaced {
     static Announcer getAnnouncer(){ return Main.announcer; }
     static Balances getBalances(){ return Main.balances; }
     static Kingship getKingship(){ return Main.kingship; }
+    static UserSerializer getUserSerializer() { return Main.userSerializer; }
 
-    static ActionRegistry getActionRegistry() { return Main.actionRegistry; }
-    static CheckRegistry getCheckRegistry() { return Main.checkRegistry; }
     static WarpRegistry getWarpRegistry() { return Main.warpRegistry; }
     static KitRegistry getKitRegistry() { return Main.kitRegistry; }
 
@@ -97,7 +95,7 @@ public interface CrownCore extends Plugin, Namespaced {
         return ComVars.hoppersInOneChunk.getValue((short) 256);
     }
 
-    static long getUserDataResetInterval(){
+    static long getUserResetInterval(){
         return ComVars.userDataResetInterval.getValue(5356800000L);
     }
 

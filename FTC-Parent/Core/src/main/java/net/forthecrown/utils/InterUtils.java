@@ -1,5 +1,6 @@
 package net.forthecrown.utils;
 
+import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -13,10 +14,13 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.arguments.ActionArgType;
 import net.forthecrown.commands.arguments.CheckArgType;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.registry.Registries;
 import net.forthecrown.useables.Actionable;
 import net.forthecrown.useables.Preconditionable;
-import net.forthecrown.useables.UsageAction;
-import net.forthecrown.useables.UsageCheck;
+import net.forthecrown.useables.actions.UsageAction;
+import net.forthecrown.useables.actions.UsageActionInstance;
+import net.forthecrown.useables.preconditions.UsageCheck;
+import net.forthecrown.useables.preconditions.UsageCheckInstance;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.item.ItemArgument;
@@ -52,7 +56,7 @@ public class InterUtils {
                                     int index = 0;
                                     TextComponent.Builder builder = Component.text().append(Component.text("Interaction actions:"));
 
-                                    for (UsageAction action: sign.getActions()){
+                                    for (UsageActionInstance action: sign.getActions()){
                                         builder.append(Component.newline());
                                         builder.append(Component.text(index + ") " + action.asString()));
                                         index++;
@@ -89,11 +93,11 @@ public class InterUtils {
 
                                                 .executes(c -> {
                                                     Actionable sign = p.apply(c);
-                                                    UsageAction action = ActionArgType.getAction(c, "type");
+                                                    UsageAction<?> action = ActionArgType.getAction(c, "type");
                                                     String toParse = c.getArgument("toParse", String.class);
 
-                                                    action.parse(c, new StringReader(toParse));
-                                                    sign.addAction(action);
+                                                    UsageActionInstance instance = action.parse(new StringReader(toParse), c.getSource());
+                                                    sign.addAction(instance);
 
                                                     c.getSource().sendAdmin("Successfully added action");
                                                     return 0;
@@ -122,7 +126,7 @@ public class InterUtils {
                             int index = 0;
                             TextComponent.Builder builder = Component.text().append(Component.text("Interaction checks:"));
 
-                            for (UsageCheck pa: sign.getChecks()){
+                            for (UsageCheckInstance pa: sign.getChecks()){
                                 builder.append(Component.newline());
                                 builder.append(Component.text(index + ") " + pa.asString()));
                                 index++;
@@ -161,12 +165,11 @@ public class InterUtils {
 
                                         .executes(c -> {
                                             Preconditionable sign = p.apply(c);
-                                            UsageCheck pa = CheckArgType.getCheck(c, "type");
-
+                                            UsageCheck<?> pa = CheckArgType.getCheck(c, "type");
                                             String toParse = c.getArgument("toParse", String.class);
-                                            pa.parse(c, new StringReader(toParse));
 
-                                            sign.addCheck(pa);
+                                            UsageCheckInstance instance = pa.parse(new StringReader(toParse), c.getSource());
+                                            sign.addCheck(instance);
 
                                             c.getSource().sendAdmin("Successfully added check");
                                             return 0;
@@ -193,19 +196,19 @@ public class InterUtils {
         return ItemArgument.itemStack().parse(reader).create(amount, true);
     }
 
-    public static ItemStack parseGivenItem(CommandContext<CommandSource> c, StringReader reader) throws CommandSyntaxException {
+    public static ItemStack parseGivenItem(CommandSource c, StringReader reader) throws CommandSyntaxException {
         if(isUsingFlag(reader)) return getReferencedItem(c, reader);
 
         return parseItem(reader);
     }
 
-    public static ItemStack getReferencedItem(CommandContext<CommandSource> c, StringReader reader) throws CommandSyntaxException {
+    public static ItemStack getReferencedItem(CommandSource c, StringReader reader) throws CommandSyntaxException {
         if(!isUsingFlag(reader)) return null;
 
         String reed = reader.readUnquotedString();
         if(!reed.contains("heldItem")) throw FtcExceptionProvider.createWithContext("Invalid flag: " + reed, reader);
 
-        Player player = c.getSource().asPlayer();
+        Player player = c.asPlayer();
         ItemStack main = player.getInventory().getItemInMainHand();
         if(main == null || main.getType() == Material.AIR) throw FtcExceptionProvider.create("You must be holding an item");
 
@@ -222,5 +225,29 @@ public class InterUtils {
 
     public interface BrigadierFunction<F> {
         F apply(CommandContext<CommandSource> from) throws CommandSyntaxException;
+    }
+
+    public static JsonElement writeAction(UsageActionInstance instance){
+        UsageAction type = Registries.USAGE_ACTIONS.get(instance.typeKey());
+
+        return type.serialize(instance);
+    }
+
+    public static UsageActionInstance readAction(String strKey, JsonElement element) throws CommandSyntaxException {
+        Key key = CrownUtils.parseKey(strKey);
+
+        return (UsageActionInstance) Registries.USAGE_ACTIONS.get(key).deserialize(element);
+    }
+
+    public static JsonElement writeCheck(UsageCheckInstance instance){
+        UsageCheck type = Registries.USAGE_CHECKS.get(instance.typeKey());
+
+        return type.serialize(instance);
+    }
+
+    public static UsageCheckInstance readCheck(String strKey, JsonElement element) throws CommandSyntaxException {
+        Key key = CrownUtils.parseKey(strKey);
+
+        return (UsageCheckInstance) Registries.USAGE_CHECKS.get(key).deserialize(element);
     }
 }

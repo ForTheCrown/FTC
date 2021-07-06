@@ -32,7 +32,6 @@ public class CustomInventory implements InventoryHolder {
         return this.inv;
     }
 
-
     public void handleClick(HumanEntity clicker, int slot) {
         Announcer.debug("slot: " + slot);
         if (invBorder.isOnBorder(slot)) invBorder.handleClick(clicker);

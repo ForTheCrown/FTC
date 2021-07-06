@@ -1,5 +1,6 @@
 package net.forthecrown.core.chat;
 
+import com.google.gson.JsonElement;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -17,6 +18,8 @@ public final class ChatUtils {
             .extractUrls()
             .hexColors()
             .build();
+
+    public static final GsonComponentSerializer GSON = GsonComponentSerializer.gson();
 
     public static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
@@ -54,6 +57,14 @@ public final class ChatUtils {
 
     public static net.minecraft.network.chat.Component fromJson(String json){
         return net.minecraft.network.chat.Component.Serializer.fromJson(json);
+    }
+
+    public static JsonElement toJson(Component component){
+        return GSON.serializeToTree(component);
+    }
+
+    public static Component fromJson(JsonElement element){
+        return GSON.deserializeFromTree(element);
     }
 
     public static Component vanillaToAdventure(net.minecraft.network.chat.Component component){

@@ -2,9 +2,13 @@ package net.forthecrown.inventory.builder;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.forthecrown.inventory.builder.options.InventoryOption;
+import net.forthecrown.inventory.builder.options.InventoryRunnable;
+import net.forthecrown.inventory.builder.options.SimpleOption;
 import net.kyori.adventure.text.Component;
 import org.apache.logging.log4j.core.util.Builder;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class InventoryBuilder implements Builder<BuiltInventory> {
 
@@ -38,7 +42,7 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
         return this;
     }
 
-    public InventoryBuilder addOption(int slot, ItemStack item, InventoryRunnable runnable){
+    public InventoryBuilder addOption(int slot, ItemStack item, @Nullable InventoryRunnable runnable){
         return addOption(new SimpleOption(slot, item, runnable));
     }
 
@@ -47,7 +51,7 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
         return this;
     }
 
-    public InventoryBuilder addOptions(Iterable<InventoryOption> options){
+    public InventoryBuilder addOptions(Iterable<? extends InventoryOption> options){
         for (InventoryOption o: options) addOption(o);
         return this;
     }

@@ -1,6 +1,7 @@
 package net.forthecrown.commands.emotes;
 
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
@@ -16,6 +17,8 @@ public class EmoteHug extends CommandEmote {
         super("hug", 20*3, "&c❤ &7You're too nice of a person &c❤");
 
         setDescription("Hugs a player");
+        setPermission(Permissions.EMOTE_HUG);
+
         register();
     }
 

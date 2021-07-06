@@ -1,26 +1,31 @@
 package net.forthecrown.user;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.admin.MuteStatus;
+import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonDeserializable;
+import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.user.data.TeleportRequest;
 import net.forthecrown.utils.ListUtils;
-import org.bukkit.configuration.ConfigurationSection;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class FtcUserInteractions implements UserInteractions {
+public class FtcUserInteractions implements UserInteractions, JsonSerializable, JsonDeserializable {
 
     public final FtcUser user;
 
     public UUID lastMarriageRequest;
     public UUID waitingFinish;
     public UUID marriedTo;
-    public long lastMarriageStatusChange;
+    public long lastMarriageChange;
     public boolean acceptingProposals;
     public boolean marriageChatToggled;
 
-    public Set<UUID> blocked;
+    public Set<UUID> blocked = new HashSet<>();
+    public Set<UUID> seperated = new HashSet<>();
 
     private final List<TeleportRequest> incoming = new ArrayList<>();
     private final List<TeleportRequest> outgoing = new ArrayList<>();
@@ -35,38 +40,6 @@ public class FtcUserInteractions implements UserInteractions {
 
     public List<String> save(){
         return ListUtils.convertToList(blocked, UUID::toString);
-    }
-
-    public Map<String, Object> serializeMarriages(){
-        Map<String, Object> result = new HashMap<>();
-
-        if(marriageChatToggled) result.put("MarriageChat", true);
-        if(!acceptingProposals) result.put("AcceptingProposals", false);
-        if(marriedTo != null) result.put("MarriedTo", marriedTo.toString());
-        if(lastMarriageStatusChange != 0) result.put("LastMarriageAction", lastMarriageStatusChange);
-
-        return result.isEmpty() ? null : result;
-    }
-
-    public void loadMarriages(@Nullable ConfigurationSection section){
-        if(section == null){
-            marriageChatToggled = false;
-            acceptingProposals = true;
-            lastMarriageStatusChange = 0L;
-            marriedTo = null;
-            lastMarriageRequest = null;
-            waitingFinish = null;
-            return;
-        }
-
-        marriageChatToggled = section.getBoolean("MarriageChat", false);
-        acceptingProposals = section.getBoolean("AcceptingProposals", true);
-
-        String marriedToString = section.getString("MarriedTo");
-        if(marriedToString == null) this.marriedTo = null;
-        else this.marriedTo = UUID.fromString(marriedToString);
-
-        lastMarriageStatusChange = section.getLong("LastMarriageAction", 0L);
     }
 
     @Override
@@ -116,7 +89,12 @@ public class FtcUserInteractions implements UserInteractions {
 
     @Override
     public boolean isBlockedPlayer(UUID uuid) {
-        return blocked.contains(uuid);
+        return blocked.contains(uuid) || seperated.contains(uuid);
+    }
+
+    @Override
+    public boolean isSeparatedPlayer(UUID id){
+        return seperated.contains(id);
     }
 
     @Override
@@ -210,18 +188,18 @@ public class FtcUserInteractions implements UserInteractions {
     }
 
     @Override
-    public long getLastMarriageStatusChange() {
-        return lastMarriageStatusChange;
+    public long getLastMarriageChange() {
+        return lastMarriageChange;
     }
 
     @Override
-    public void setLastMarriageStatusChange(long lastMarriageStatusChange) {
-        this.lastMarriageStatusChange = lastMarriageStatusChange;
+    public void setLastMarriageChange(long lastMarriageChange) {
+        this.lastMarriageChange = lastMarriageChange;
     }
 
     @Override
     public boolean canChangeMarriageStatus(){
-        return (lastMarriageStatusChange + CrownCore.getMarriageCooldown()) <= System.currentTimeMillis();
+        return (lastMarriageChange + CrownCore.getMarriageCooldown()) <= System.currentTimeMillis();
     }
 
     @Override
@@ -262,5 +240,59 @@ public class FtcUserInteractions implements UserInteractions {
     @Override
     public void setMChatToggled(boolean marriageChatToggled) {
         this.marriageChatToggled = marriageChatToggled;
+    }
+
+    @Override
+    public JsonObject serialize() {
+        JsonBuf json = JsonBuf.empty();
+
+        if(marriageChatToggled) json.add("marriageChat", true);
+        if(!acceptingProposals) json.add("acceptingProposals", false);
+        if(marriedTo != null) json.addUUID("marriedTo", marriedTo);
+        if(lastMarriageChange != 0) json.add("lastMarriage", lastMarriageChange);
+
+        if(!blocked.isEmpty()){
+            JsonArray array = new JsonArray();
+            blocked.forEach(id -> array.add(id.toString()));
+
+            json.add("blocked", array);
+        }
+
+        if(!seperated.isEmpty()){
+            JsonArray array = new JsonArray();
+            seperated.forEach(id -> array.add(id.toString()));
+
+            json.add("separated", array);
+        }
+
+        return json.nullIfEmpty();
+    }
+
+    @Override
+    public void deserialize(JsonElement element) {
+        seperated.clear();
+        blocked.clear();
+
+        marriageChatToggled = false;
+        acceptingProposals = true;
+        lastMarriageChange = 0L;
+        marriedTo = null;
+        lastMarriageRequest = null;
+        waitingFinish = null;
+
+        if(element == null) return;
+        JsonBuf json = JsonBuf.of(element.getAsJsonObject());
+
+        marriageChatToggled = json.getBool("marriageChat");
+        acceptingProposals = json.getBool("acceptingProposals");
+
+        marriedTo = json.getUUID("marriedTo");
+        lastMarriageChange = json.getLong("lastMarriage");
+
+        Collection<UUID> blockedIDs = json.getList("blocked", e -> UUID.fromString(e.getAsString()));
+        if(blockedIDs != null) blocked.addAll(blockedIDs);
+
+        Collection<UUID> separatedIDs = json.getList("separated", e -> UUID.fromString(e.getAsString()));
+        if(separatedIDs != null) seperated.addAll(separatedIDs);
     }
 }

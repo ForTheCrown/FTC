@@ -17,15 +17,13 @@ import net.forthecrown.events.dynamic.AfkListener;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.royalgrenadier.source.CommandSources;
-import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.user.data.EssToFTC;
 import net.forthecrown.user.data.SoldMaterialData;
+import net.forthecrown.user.data.UserProperty;
 import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.user.enums.*;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.CrownUtils;
-import net.forthecrown.utils.ListUtils;
-import net.forthecrown.utils.MapUtils;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
@@ -48,15 +46,14 @@ import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.protocol.game.ClientboundChatPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.craftbukkit.v1_17_R1.CraftOfflinePlayer;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -72,12 +69,11 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.logging.Level;
 
-public class FtcUser extends AbstractYamlSerializer implements CrownUser {
+public class FtcUser implements CrownUser {
 
     private final UUID base;
-    private String name;
+    public String name;
 
     public String lastOnlineName;
     public List<String> previousNames = new ArrayList<>();
@@ -87,59 +83,49 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
     public final FtcUserInteractions interactions;
     public final FtcUserGrave grave;
     public final FtcUserHomes homes;
+    public final FtcUserCosmeticData cosmeticData;
 
-    public Rank currentRank;
-    public Set<Rank> ranks;
-    public Branch branch;
+    public Rank currentRank = Rank.DEFAULT;
+    public Set<Rank> ranks = new HashSet<>();
+    public Branch branch = Branch.DEFAULT;
 
-    public List<Pet> pets;
-    public Particle particleArrowActive;
-    public List<Particle> particleArrowAvailable;
-    public String particleDeathActive;
-    public List<String> particleDeathAvailable;
+    public List<Pet> pets = new ArrayList<>();
 
-    private int gems;
-    public boolean canSwapBranch = true;
-    public boolean allowsEmotes = true;
-    public boolean allowsRidingPlayers = true;
-    public boolean publicProfile = true;
-    public boolean allowsTPA = true;
-    public boolean acceptsPay = true;
-    public boolean listeningToEavesdropper = false;
-    public boolean vanished = false;
+    private int gems = 0;
+
+    public final Set<UserProperty> properties = new HashSet<>();
+
     public boolean afk = false;
-    public boolean flying = false;
-    public boolean godmode = false;
-    public long totalEarnings;
-    public long nextResetTime;
-    public long nextBranchSwapAllowed;
+    public long totalEarnings = 0L;
+    public long nextResetTime = 0L;
+    public long lastLoad = 0L;
+    public long nextAllowedBranchSwap = 0L;
     public String ip;
 
     public Map<Material, SoldMaterialData> matData = new HashMap<>();
-    public SellAmount sellAmount;
+    public SellAmount sellAmount = SellAmount.PER_1;
 
-    private Location entityLocation;
+    public Location entityLocation;
 
     private ServerPlayer handle;
 
     public Location lastLocation;
     public UserTeleport lastTeleport;
     public AfkListener afkListener;
-    public long nextAllowedTeleport = 0;
+    public long nextAllowedTeleport = 0L;
 
     private CommandSender lastMessage;
 
     public FtcUser(@NotNull UUID base){
-        super(base.toString(), "playerdata");
         this.base = base;
 
-        dataContainer = new FtcUserDataContainer(this, getFile());
-        grave = new FtcUserGrave(this);
+        dataContainer = new FtcUserDataContainer(this);
         interactions = new FtcUserInteractions(this);
+        cosmeticData = new FtcUserCosmeticData(this);
         homes = new FtcUserHomes(this);
+        grave = new FtcUserGrave(this);
 
-        if(fileDoesntExist) addDefaults();
-        else reload();
+        reload();
 
         CrownUserManager.LOADED_USERS.put(base, this);
 
@@ -147,148 +133,14 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
     }
 
     @Override
-    protected void reloadFile(){
-        name = getFile().getString("PlayerName");
-        setRank(Rank.valueOf(getFile().getString("CurrentRank")), false);
-        setBranch(Branch.valueOf(getFile().getString("Branch")));
-        setCanSwapBranch(getFile().getBoolean("CanSwapBranch"), false);
-        setPets(ListUtils.convertToList(getFile().getStringList("Pets"), str -> Pet.valueOf(str.toUpperCase())));
-        setDeathParticle(getFile().getString("DeathParticle"));
-        setParticleDeathAvailable(getFile().getStringList("ParticleDeathAvailable"));
-        setAllowsRidingPlayers(getFile().getBoolean("AllowsRidingPlayers"));
-        setGems(getFile().getInt("Gems"));
-        setAllowsEmotes(getFile().getBoolean("AllowsEmotes"));
-        setTotalEarnings(getFile().getLong("TotalEarnings"));
-        setSellAmount(SellAmount.valueOf(getFile().getString("SellAmount").toUpperCase()));
-        setProfilePublic(getFile().getBoolean("ProfilePublic", true));
-        entityLocation = getFile().getLocation("LastLocation");
-        allowsTPA = getFile().getBoolean("AllowsTPA", true);
-        listeningToEavesdropper = getFile().getBoolean("EavesDropping", false);
-        vanished = getFile().getBoolean("Vanished", false);
-        flying = getFile().getBoolean("Flying", false);
-        godmode = getFile().getBoolean("GodMode", false);
-        ip = getFile().getString("IPAddress");
-        acceptsPay = getFile().getBoolean("AcceptsPay", true);
-
-        String nick = getFile().getString("NickName");
-        if(nick != null) this.nickname = ChatUtils.convertString(nick);
-        else this.nickname = null;
-
-        setNextResetTime(getFile().getLong("TimeStamps.NextResetTime"));
-
-        nextBranchSwapAllowed = getFile().getLong("TimeStamps.NextBranchSwap");
-        if(nextBranchSwapAllowed != 0) checkBranchSwapping();
-
-        if(!getFile().getString("ArrowParticle").contains("none")) setArrowParticle(Particle.valueOf(getFile().getString("ArrowParticle")));
-        else setArrowParticle(null);
-
-        if(getFile().getList("AvailableRanks") != null){
-            setAvailableRanks(ListUtils.convertToSet(getFile().getStringList("AvailableRanks"), Rank::valueOf));
-        } else setAvailableRanks(new HashSet<>());
-
-        if(getFile().getList("ArrowParticleAvailable") != null){
-            setParticleArrowAvailable(ListUtils.convertToList(getFile().getStringList("ArrowParticleAvailable"), Particle::valueOf));
-        } else setParticleDeathAvailable(new ArrayList<>());
-
-        ConfigurationSection homesSection = getFile().getConfigurationSection("Homes");
-        if(homesSection != null) homes.loadFrom(homesSection);
-        else homes.clear();
-
-        interactions.loadMarriages(getFile().getConfigurationSection("Marriage"));
-
-        matData.clear();
-        ConfigurationSection matSection = getFile().getConfigurationSection("AmountEarned");
-        if(matSection != null){
-            for (String s: matSection.getKeys(false)){
-                Material m = Material.valueOf(s.toUpperCase());
-                int amountSold = matSection.getInt(s);
-
-                SoldMaterialData data = new SoldMaterialData(m);
-                data.setEarned(amountSold);
-                data.recalculate();
-
-                setMatData(data);
-            }
-        }
-
+    public void reload(){
+        CrownCore.getUserSerializer().deserialize(this);
         updateName();
-
-        if(totalEarnings < 0) totalEarnings = 0;
-
-        interactions.reload(getFile().getStringList("BlockedUsers"));
-
-        ConfigurationSection dataSec = getFile().getConfigurationSection("DataContainer");
-        if(dataSec == null) dataSec = getFile().createSection("DataContainer");
-        dataContainer.deserialize(dataSec);
-
-        try {
-            List<ItemStack> lists = (List<ItemStack>) getFile().getList("Grave");
-            grave.setItems(lists);
-        } catch (Exception ignored){}
     }
 
     @Override
-    protected void saveFile(){
-        if(deleted) return;
-
-        getFile().set("PlayerName", getName());
-        getFile().set("CurrentRank", getRank().toString());
-        getFile().set("Branch", getBranch().toString());
-        getFile().set("CanSwapBranch", getCanSwapBranch());
-        getFile().set("DeathParticle", getDeathParticle());
-        getFile().set("ParticleDeathAvailable", getParticleDeathAvailable());
-        getFile().set("AllowsRidingPlayers", allowsRidingPlayers());
-        getFile().set("Gems", getGems());
-        getFile().set("SellAmount", getSellAmount().toString());
-        getFile().set("AllowsEmotes", allowsEmotes());
-        getFile().set("ProfilePublic", isProfilePublic());
-        getFile().set("Grave", grave.getItems());
-        getFile().set("LastLocation", entityLocation);
-        getFile().set("AllowsTPA", allowsTPA);
-        getFile().set("EavesDropping", listeningToEavesdropper);
-        getFile().set("NickName", nickname == null ? null : ChatUtils.plainText(nickname));
-        getFile().set("Flying", flying);
-        getFile().set("GodMode", godmode);
-        getFile().set("Vanished", vanished);
-        getFile().set("IPAddress", ip);
-        getFile().set("AcceptsPay", acceptsPay);
-
-        getFile().set("Pets", ListUtils.convert(getPets(), Pet::toString));
-
-        if(totalEarnings < 0) totalEarnings = 0;
-        getFile().set("TotalEarnings", getTotalEarnings());
-
-        getFile().set("TimeStamps.NextResetTime", getNextResetTime());
-        if(!canSwapBranch) getFile().set("TimeStamps.NextBranchSwap", nextBranchSwapAllowed);
-        else getFile().set("TimeStamps.NextBranchSwap", null);
-
-        if(getArrowParticle() == null) getFile().set("ArrowParticle", "none");
-        else getFile().set("ArrowParticle", getArrowParticle().toString());
-
-        if(getAvailableRanks().size() > 0) getFile().set("AvailableRanks", ListUtils.convertToList(getAvailableRanks(), Rank::toString));
-        if(getParticleArrowAvailable().size() > 0) getFile().set("ArrowParticleAvailable", ListUtils.convertToList(getParticleArrowAvailable(), Particle::toString));
-
-        if(!MapUtils.isNullOrEmpty(matData)){
-            Map<String, Object> serialized = new HashMap<>();
-
-            for (SoldMaterialData d: matData.values()){
-                if(d.getEarned() <= 0) continue;
-                serialized.put(d.getMaterial().name().toLowerCase(), d.getEarned());
-            }
-
-            getFile().createSection("AmountEarned", serialized);
-        } else getFile().set("AmountEarned", null);
-
-        if(!homes.isEmpty()) homes.saveInto(getFile().createSection("Homes"));
-        else getFile().set("Homes", null);
-
-        getFile().set("BlockedUsers", interactions.save());
-
-        if(!dataContainer.isEmpty()) getFile().createSection("DataContainer", dataContainer.serialize());
-
-        Map<String, Object> marriages = interactions.serializeMarriages();
-        if(marriages == null) getFile().set("Marriage", null);
-        else getFile().createSection("Marriage", marriages);
+    public void save(){
+        CrownCore.getUserSerializer().serialize(this);
     }
 
     public void updateName(){
@@ -406,17 +258,17 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
     }
 
     @Override
-    public boolean getCanSwapBranch() {
+    public boolean canSwapBranch() {
         checkBranchSwapping();
-        return canSwapBranch;
+        return !hasProperty(UserProperty.CANNOT_SWAP_BRANCH);
     }
 
     @Override
     public void setCanSwapBranch(boolean canSwapBranch, boolean addToCooldown) {
-        this.canSwapBranch = canSwapBranch;
+        setProperty(!canSwapBranch, UserProperty.CANNOT_SWAP_BRANCH);
 
-        if(addToCooldown) nextBranchSwapAllowed = System.currentTimeMillis() + CrownCore.getBranchSwapCooldown();
-        else nextBranchSwapAllowed = 0;
+        if(addToCooldown) nextAllowedBranchSwap = System.currentTimeMillis() + CrownCore.getBranchSwapCooldown();
+        else nextAllowedBranchSwap = 0;
     }
 
     @Override
@@ -430,47 +282,33 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
     }
 
     @Override
-    public Particle getArrowParticle() {
-        return particleArrowActive;
-    }
-    @Override
-    public void setArrowParticle(Particle particleArrowActive) {
-        this.particleArrowActive = particleArrowActive;
+    public boolean hasProperty(UserProperty property){
+        return properties.contains(property);
     }
 
     @Override
-    public List<Particle> getParticleArrowAvailable() {
-        return particleArrowAvailable;
-    }
-    @Override
-    public void setParticleArrowAvailable(List<Particle> particleArrowAvailable) {
-        this.particleArrowAvailable = particleArrowAvailable;
+    public void addProperty(UserProperty property){
+        properties.add(property);
     }
 
     @Override
-    public String getDeathParticle() {
-        return particleDeathActive;
-    }
-    @Override
-    public void setDeathParticle(String particleDeathActive) {
-        this.particleDeathActive = particleDeathActive;
+    public void removeProperty(UserProperty property){
+        properties.remove(property);
     }
 
     @Override
-    public List<String> getParticleDeathAvailable() {
-        return particleDeathAvailable;
+    public void setProperty(boolean add, UserProperty property){
+        if(add) properties.add(property);
+        else properties.remove(property);
+    }
+
+    @Override
+    public boolean allowsRiding() {
+        return !hasProperty(UserProperty.FORBIDS_RIDING);
     }
     @Override
-    public void setParticleDeathAvailable(List<String> particleDeathAvailable) {
-        this.particleDeathAvailable = particleDeathAvailable;
-    }
-    @Override
-    public boolean allowsRidingPlayers() {
-        return allowsRidingPlayers;
-    }
-    @Override
-    public void setAllowsRidingPlayers(boolean allowsRidingPlayers) {
-        this.allowsRidingPlayers = allowsRidingPlayers;
+    public void setAllowsRiding(boolean allows) {
+        setProperty(!allows, UserProperty.FORBIDS_RIDING);
     }
 
     @Override
@@ -488,11 +326,11 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
 
     @Override
     public boolean allowsEmotes() {
-        return allowsEmotes;
+        return !hasProperty(UserProperty.FORBIDS_EMOTES);
     }
     @Override
     public void setAllowsEmotes(boolean allowsEmotes) {
-        this.allowsEmotes = allowsEmotes;
+        setProperty(!allowsEmotes, UserProperty.FORBIDS_EMOTES);
     }
 
     @Override
@@ -573,7 +411,7 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
         matData.clear();
         setTotalEarnings(0);
 
-        nextResetTime = System.currentTimeMillis() + CrownCore.getUserDataResetInterval();
+        nextResetTime = System.currentTimeMillis() + CrownCore.getUserResetInterval();
         System.out.println(getName() + " earnings reset, next reset in: " + (((((getNextResetTime() - System.currentTimeMillis())/1000)/60)/60)/24) + " days");
         save();
     }
@@ -709,17 +547,17 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
 
     @Override
     public void delete() {
-        super.delete();
+        CrownCore.getUserSerializer().delete(this);
     }
 
     @Override
     public boolean isProfilePublic() {
-        return publicProfile;
+        return !hasProperty(UserProperty.PROFILE_PRIVATE);
     }
 
     @Override
     public void setProfilePublic(boolean publicProfile) {
-        this.publicProfile = publicProfile;
+        setProperty(!publicProfile, UserProperty.PROFILE_PRIVATE);
     }
 
     @Override
@@ -823,12 +661,12 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
 
     @Override
     public long getNextAllowedBranchSwap() {
-        return nextBranchSwapAllowed;
+        return nextAllowedBranchSwap;
     }
 
     @Override
     public boolean performBranchSwappingCheck(){
-        if(getCanSwapBranch()) return true;
+        if(canSwapBranch()) return true;
 
         final long timUntil = getNextAllowedBranchSwap() - System.currentTimeMillis();
 
@@ -874,7 +712,7 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
             CrownCore.getJailManager().getListener(getPlayer()).unreg();
         }
 
-        getFile().set("TimeStamps.LastLoad", System.currentTimeMillis());
+        lastLoad = System.currentTimeMillis();
         unload();
     }
 
@@ -900,7 +738,7 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
         updateFlying();
         afk = false;
 
-        if(!hasPermission(Permissions.CORE_ADMIN)) godmode = false;
+        if(!hasPermission(Permissions.CORE_ADMIN)) setGodMode(false);
         updateGodMode();
         updateAfk();
         updateDisplayName();
@@ -908,7 +746,7 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
         permsCheck();
         if(shouldResetEarnings()) resetEarnings();
 
-        getFile().set("TimeStamps.LastLoad", System.currentTimeMillis());
+        lastLoad = System.currentTimeMillis();
 
         PunishmentManager manager = CrownCore.getPunishmentManager();
         PunishmentEntry entry = manager.getEntry(getUniqueId());
@@ -935,7 +773,7 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
                     .append(Component.newline());
         }
 
-        if(interactions.marriedTo != null && publicProfile){
+        if(interactions.marriedTo != null && isProfilePublic()){
             text
                     .append(Component.text("Married to: ").append(net.forthecrown.user.UserManager.getUser(interactions.marriedTo).nickOrName()))
                     .append(Component.newline());
@@ -1039,22 +877,22 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
 
     @Override
     public boolean allowsTPA() {
-        return allowsTPA;
+        return !hasProperty(UserProperty.FORBIDS_TPA);
     }
 
     @Override
     public void setAllowsTPA(boolean allowsTPA) {
-        this.allowsTPA = allowsTPA;
+        setProperty(!allowsTPA, UserProperty.FORBIDS_TPA);
     }
 
     @Override
     public boolean isEavesDropping() {
-        return listeningToEavesdropper;
+        return hasProperty(UserProperty.LISTENING_TO_EAVESDROPPER);
     }
 
     @Override
-    public void setEavesDropping(boolean listeningToSocialSpy) {
-        this.listeningToEavesdropper = listeningToSocialSpy;
+    public void setEavesDropping(boolean listening) {
+        setProperty(listening, UserProperty.LISTENING_TO_EAVESDROPPER);
     }
 
     @Override
@@ -1107,12 +945,12 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
 
     @Override
     public boolean isVanished() {
-        return vanished;
+        return hasProperty(UserProperty.VANISHED);
     }
 
     @Override
     public void setVanished(boolean vanished) {
-        this.vanished = vanished;
+        setProperty(vanished, UserProperty.VANISHED);
 
         if(isOnline()) updateVanished();
     }
@@ -1175,19 +1013,19 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
             if(u.hasPermission(Permissions.VANISH_SEE)) continue;
             if(u.equals(this)) continue;
 
-            if(vanished) u.getPlayer().hidePlayer(CrownCore.inst(), getPlayer());
+            if(isVanished()) u.getPlayer().hidePlayer(CrownCore.inst(), getPlayer());
             else u.getPlayer().showPlayer(CrownCore.inst(), getPlayer());
         }
     }
 
     @Override
     public boolean isFlying() {
-        return flying;
+        return hasProperty(UserProperty.FLYING);
     }
 
     @Override
     public void setFlying(boolean flying) {
-        this.flying = flying;
+        setProperty(flying, UserProperty.FLYING);
 
         if(isOnline()) updateFlying();
     }
@@ -1196,18 +1034,18 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
     public void updateFlying() {
         checkOnline();
 
-        boolean fly = getGameMode().canFly || flying;
+        boolean fly = getGameMode().canFly || isFlying();
         getPlayer().setAllowFlight(fly);
     }
 
     @Override
     public boolean godMode() {
-        return godmode;
+        return hasProperty(UserProperty.GOD_MODE);
     }
 
     @Override
     public void setGodMode(boolean godMode) {
-        this.godmode = godMode;
+        setProperty(godMode, UserProperty.GOD_MODE);
 
         if(isOnline()) updateGodMode();
     }
@@ -1216,12 +1054,17 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
     public void updateGodMode() {
         checkOnline();
 
-        if(godmode){
+        if(godMode()){
             getPlayer().setHealth(getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
             getPlayer().setFoodLevel(20);
         }
 
-        getPlayer().setInvulnerable(godmode);
+        getPlayer().setInvulnerable(godMode());
+    }
+
+    @Override
+    public CosmeticData getCosmeticData() {
+        return cosmeticData;
     }
 
     @Override
@@ -1231,12 +1074,12 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
 
     @Override
     public boolean allowsPaying(){
-        return acceptsPay;
+        return !hasProperty(UserProperty.FORBIDS_PAY);
     }
 
     @Override
     public void setAllowsPay(boolean acceptsPay) {
-        this.acceptsPay = acceptsPay;
+        setProperty(!acceptsPay, UserProperty.FORBIDS_PAY);
     }
 
     @Override
@@ -1315,14 +1158,25 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUniqueId(), currentRank, getCanSwapBranch(), getPets(), particleArrowActive, particleDeathActive, allowsRidingPlayers, getGems(), allowsEmotes, getSellAmount(), getTotalEarnings());
+        return new HashCodeBuilder(17, 37)
+                .append(base)
+                .append(getBranch())
+                .append(getGems())
+                .append(properties)
+                .append(isAfk())
+                .append(getTotalEarnings())
+                .append(getNextResetTime())
+                .append(lastLoad)
+                .append(getNextAllowedBranchSwap())
+                .append(nextAllowedTeleport)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
         return getClass().getName() + "{" +
                 "base=" + base +
-                ", name='" + name + '\'' +
+                ",name='" + name + '\'' +
                 '}';
     }
 
@@ -1335,19 +1189,19 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
             addRank(Rank.BARONESS, false);
         }
 
-        if(getPlayer().hasPermission("ftc.donator3") && (!hasRank(Rank.PRINCE) || !hasRank(Rank.ADMIRAL))){
+        if(getPlayer().hasPermission(Permissions.DONATOR_3) && (!hasRank(Rank.PRINCE) || !hasRank(Rank.ADMIRAL))){
             addRank(Rank.PRINCE, true);
             addRank(Rank.PRINCESS, false);
             addRank(Rank.ADMIRAL, false);
         }
 
-        if(getPlayer().hasPermission("ftc.donator2") && (!hasRank(Rank.DUKE) || !hasRank(Rank.CAPTAIN))){
+        if(getPlayer().hasPermission(Permissions.DONATOR_2) && (!hasRank(Rank.DUKE) || !hasRank(Rank.CAPTAIN))){
             addRank(Rank.DUKE, true);
             addRank(Rank.DUCHESS, false);
             addRank(Rank.CAPTAIN, false);
         }
 
-        if(getPlayer().hasPermission("ftc.donator1") && !hasRank(Rank.LORD)){
+        if(getPlayer().hasPermission(Permissions.DONATOR_1) && !hasRank(Rank.LORD)){
             addRank(Rank.LORD, true);
             addRank(Rank.LADY, false);
         }
@@ -1358,37 +1212,7 @@ public class FtcUser extends AbstractYamlSerializer implements CrownUser {
     }
 
     private void checkBranchSwapping(){
-        if(canSwapBranch) return; //If you're already allowed to swap branches then who cares lol
-        if(nextBranchSwapAllowed == 0 || nextBranchSwapAllowed > System.currentTimeMillis()) return; //0 means no cooldown, I think
-
-        canSwapBranch = true;
-        CrownCore.inst().getLogger().log(Level.INFO, getName() + "'s branch swapping allowed: " + canSwapBranch);
-    }
-
-    private void addDefaults(){
-        getFile().addDefault("PlayerName", getName());
-        getFile().addDefault("CurrentRank", Rank.DEFAULT.toString());
-        getFile().addDefault("AvailableRanks", new ArrayList<>(Collections.singleton(Rank.DEFAULT.toString())));
-        getFile().addDefault("CanSwapBranch", true);
-        getFile().addDefault("Branch", Branch.DEFAULT.toString());
-        getFile().addDefault("Pets", new ArrayList<>());
-        getFile().addDefault("ArrowParticle", "none");
-        getFile().addDefault("ArrowParticleAvailable", new ArrayList<>());
-        getFile().addDefault("DeathParticle", "none");
-        getFile().addDefault("DeathParticleAvailable", new ArrayList<>());
-        getFile().addDefault("AllowsRidingPlayers", true);
-        getFile().addDefault("Gems", 0);
-        getFile().addDefault("AllowsEmotes", true);
-        getFile().addDefault("SellAmount", SellAmount.PER_1.toString());
-        getFile().addDefault("TotalEarnings", 0);
-        getFile().addDefault("ProfilePublic", true);
-
-        getFile().addDefault("TimeStamps.NextResetTime", System.currentTimeMillis() + CrownCore.getUserDataResetInterval());
-        getFile().addDefault("TimeStamps.LastLoad", System.currentTimeMillis());
-        getFile().options().copyDefaults(true);
-
-        super.save(false);
-        reload();
+        setProperty(nextAllowedBranchSwap != 0 && nextAllowedBranchSwap <= System.currentTimeMillis(), UserProperty.CANNOT_SWAP_BRANCH);
     }
 
 }

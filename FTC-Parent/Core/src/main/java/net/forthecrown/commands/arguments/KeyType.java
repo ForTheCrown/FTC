@@ -10,6 +10,7 @@ import net.kyori.adventure.key.Key;
 
 public class KeyType implements ArgumentType<Key> {
     private static final KeyType MINECRAFT_INSTANCE = new KeyType(Key.MINECRAFT_NAMESPACE);
+    private static final KeyType FTC_INSTANCE = new KeyType("ftccore");
 
     public static final TranslatableExceptionType INVALID = new TranslatableExceptionType("argument.id.invalid");
 
@@ -20,6 +21,10 @@ public class KeyType implements ArgumentType<Key> {
 
     public static KeyType minecraftDefault(){
         return MINECRAFT_INSTANCE;
+    }
+
+    public static KeyType ftc(){
+        return FTC_INSTANCE;
     }
 
     public static KeyType key(String defaultNamespace){

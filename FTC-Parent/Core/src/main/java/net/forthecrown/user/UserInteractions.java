@@ -20,6 +20,8 @@ public interface UserInteractions extends SocialInteractionsService {
     void addBlocked(UUID id);
     void removeBlocked(UUID id);
 
+    boolean isSeparatedPlayer(UUID id);
+
     void handleTeleport(TeleportRequest request);
 
     void receiveTeleport(TeleportRequest request);
@@ -48,9 +50,9 @@ public interface UserInteractions extends SocialInteractionsService {
 
     void setMarriedTo(UUID marriedTo);
 
-    long getLastMarriageStatusChange();
+    long getLastMarriageChange();
 
-    void setLastMarriageStatusChange(long lastMarriageStatusChange);
+    void setLastMarriageChange(long lastMarriageChange);
 
     boolean canChangeMarriageStatus();
 

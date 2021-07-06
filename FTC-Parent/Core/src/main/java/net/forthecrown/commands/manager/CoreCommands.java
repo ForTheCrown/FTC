@@ -73,6 +73,8 @@ public final class CoreCommands {
         new CommandSetSpawn();
         new CommandRoyals();
         new CommandPirate();
+        new CommandDataFix();
+        new CommandCosmeticEffects();
 
         //Admin utility
         new CommandSpeed();
@@ -120,6 +122,8 @@ public final class CoreCommands {
         new CommandVolleyBall();
         new CommandParrot();
         new CommandCosmetics();
+        new CommandToggleRiding();
+        new CommandIgnoreAC();
 
         CommandDumbThing.init();
         CommandToolBlock.init();
@@ -196,12 +200,6 @@ public final class CoreCommands {
 
         //emotes
         new EmoteToggle();
-        new EmoteBonk();
-        new EmoteSmooch();
-        new EmotePoke();
-        new EmoteScare();
-        new EmoteJingle();
-        new EmoteHug();
         new EmotePog();
 
         CommandHelpType.MAX = Math.round(((float) CoreCommands.BY_NAME.size())/10);

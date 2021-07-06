@@ -1,7 +1,12 @@
 package net.forthecrown.inventory.builder;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.inventory.builder.options.InventoryOption;
+import net.forthecrown.inventory.builder.options.OptionPriority;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
@@ -54,7 +59,7 @@ public class BuiltInventory implements InventoryHolder {
         ClickContext context = new ClickContext(player, event.getSlot(), event.getCursor(), event.getClick());
 
         try {
-            option.run(UserManager.getUser(player), context);
+            option.onClick(UserManager.getUser(player), context);
 
             if(context.shouldReload()) open(player);
         } catch (RoyalCommandException e){
@@ -75,7 +80,20 @@ public class BuiltInventory implements InventoryHolder {
 
     public Inventory createInventory(CrownUser user){
         Inventory inv = Bukkit.createInventory(this, size, title);
-        getOptions().values().forEach(o -> o.place(inv, user));
+
+        ObjectList<InventoryOption> lows = new ObjectArrayList<>();
+        ObjectList<InventoryOption> mids = new ObjectArrayList<>();
+        ObjectList<InventoryOption> highs = new ObjectArrayList<>();
+
+        for (InventoryOption o: options.values()){
+            if(o.getPriority() == OptionPriority.LOW) lows.add(o);
+            else if(o.getPriority() == OptionPriority.MID) mids.add(o);
+            else highs.add(o);
+        }
+
+        lows.forEach(o -> o.place(inv, user));
+        mids.forEach(o -> o.place(inv, user));
+        highs.forEach(o -> o.place(inv, user));
 
         return inv;
     }
@@ -89,6 +107,6 @@ public class BuiltInventory implements InventoryHolder {
     }
 
     public Int2ObjectMap<InventoryOption> getOptions() {
-        return options;
+        return Int2ObjectMaps.unmodifiable(options);
     }
 }

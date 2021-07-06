@@ -36,7 +36,7 @@ public class CommandWarpList extends FtcCommand {
 
             WarpRegistry registry = CrownCore.getWarpRegistry();
             Collection<Warp> warps = player.hasPermission(Permissions.WARP_ADMIN) ?
-                    registry.getEntries() : registry.getUseableWarpsFor(player);
+                    registry.values() : registry.getUseableWarpsFor(player);
 
             for (Warp w: warps){
                 builder

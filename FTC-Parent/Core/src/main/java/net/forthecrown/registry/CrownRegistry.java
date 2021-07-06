@@ -13,15 +13,15 @@ public interface CrownRegistry<T, R> {
 
     void remove(Key key);
 
-    Set<Key> getKeys();
+    Set<Key> keySet();
 
     default Set<String> getStringKeys(){
-        return ListUtils.convertToSet(getKeys(), Key::value);
+        return ListUtils.convertToSet(keySet(), Key::value);
     }
 
     boolean contains(Key key);
 
     boolean contains(T value);
 
-    Collection<T> getEntries();
+    Collection<T> values();
 }

@@ -117,7 +117,7 @@ public class CommandProfile extends FtcCommand {
                 .append(line("Branch", profile.getBranch().getName(), profile.getBranch() != Branch.DEFAULT))
                 .append(line("Rank", profile.getRank().prefix(), profile.getRank() != Rank.DEFAULT))
 
-                .append(line("Allowed to swap branches in", timeThing(profile), !profile.getCanSwapBranch() && (self || user.hasPermission(Permissions.PROFILE_BYPASS))))
+                .append(line("Allowed to swap branches in", timeThing(profile), !profile.canSwapBranch() && (self || user.hasPermission(Permissions.PROFILE_BYPASS))))
                 .append(line("Play time", ChatFormatter.decimalizeNumber(playTime) + " hours", playTime > 0))
                 .append(line("Married to", marriedTo, marriedTo != null))
 
@@ -195,7 +195,7 @@ public class CommandProfile extends FtcCommand {
     private static Component marriageCooldown(UserInteractions interactions){
         if(interactions.canChangeMarriageStatus()) return null;
 
-        long time = interactions.getLastMarriageStatusChange();
+        long time = interactions.getLastMarriageChange();
         return Component.text(ChatFormatter.getDateFromMillis(time))
                 .hoverEvent(Component.text(new Date(time).toString()));
     }

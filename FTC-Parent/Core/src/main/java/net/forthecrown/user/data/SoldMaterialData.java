@@ -1,9 +1,12 @@
 package net.forthecrown.user.data;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.serializer.JsonSerializable;
 import org.bukkit.Material;
 
-public class SoldMaterialData {
+public class SoldMaterialData implements JsonSerializable {
 
     private final Material material;
     private int earned;
@@ -51,5 +54,11 @@ public class SoldMaterialData {
 
     public boolean isPriceSet(){
         return getPrice() != CrownCore.getItemPrice(material);
+    }
+
+    @Override
+    public JsonElement serialize() {
+        if(earned < 1) return null;
+        return new JsonPrimitive(earned);
     }
 }

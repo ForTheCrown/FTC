@@ -3,7 +3,6 @@ package net.forthecrown.utils.loot;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.CrownUtils;
@@ -58,11 +57,7 @@ public interface CrownLootTable extends LootTable, JsonSerializable {
         List<ItemStack> items = new ArrayList<>();
 
         for (JsonElement e: array){
-            try {
-                items.add(JsonUtils.readItem(e));
-            } catch (CommandSyntaxException exception) {
-                exception.printStackTrace();
-            }
+            items.add(JsonUtils.readItem(e));
         }
 
         return of(key, items);

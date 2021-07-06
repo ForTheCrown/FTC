@@ -38,7 +38,7 @@ public class CommandInteractable extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(literal("block")
-                        .then(argument("location", PositionArgument.position())
+                        .then(argument("location", PositionArgument.blockPos())
                                 .then(literal("create")
                                         .executes(c -> {
                                             CommandSource source = c.getSource();

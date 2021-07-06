@@ -17,12 +17,10 @@ import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.inventory.CrownItems;
-import net.forthecrown.inventory.CrownWeapons;
 import net.forthecrown.economy.BalanceMap;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.SortedBalanceMap;
@@ -30,7 +28,8 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.ComponentArgument;
 import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.grenadier.types.ParticleArgument;
+import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.CrownWeapons;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.user.*;
 import net.forthecrown.user.data.UserTeleport;
@@ -44,7 +43,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.network.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -53,8 +51,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
-
-import java.util.List;
 
 public class CommandFtcCore extends FtcCommand {
 
@@ -280,7 +276,7 @@ public class CommandFtcCore extends FtcCommand {
                                         .then(literal("resetCooldown")
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
-                                                    user.getInteractions().setLastMarriageStatusChange(0L);
+                                                    user.getInteractions().setLastMarriageChange(0L);
 
                                                     c.getSource().sendAdmin(
                                                             Component.text("Reset cooldown of ")
@@ -428,106 +424,6 @@ public class CommandFtcCore extends FtcCommand {
                                                     );
                                                     return 0;
                                                 })
-                                        )
-                                )
-
-                                .then(literal("arrowparticle")
-                                        .executes(c -> {
-                                            CrownUser u = getUser(c);
-                                            c.getSource().sendMessage(u.getName() + "'s ArrowParticles as a List.toString cuz I'm lazy");
-                                            c.getSource().sendMessage(u.getParticleArrowAvailable().toString());
-                                            return 0;
-                                        })
-
-                                        .then(literal("unset")
-                                                .executes(c -> {
-                                                    CrownUser u = getUser(c);
-                                                    u.setArrowParticle(null);
-                                                    broadcastAdmin(c.getSource(), "unset");
-                                                    return 0;
-                                                })
-                                        )
-                                        .then(literal("set")
-                                                .then(argument("activeParticle", ParticleArgument.particle())
-                                                        .executes(c -> {
-                                                            CrownUser u = getUser(c);
-                                                            Particle p = c.getArgument("activeParticle", Particle.class);
-
-                                                            u.setArrowParticle(p);
-                                                            broadcastAdmin(c.getSource(), "Set " + p.toString() + " as " + u.getName() + "'s active ArrowParticle");;
-                                                            return 0;
-                                                        })
-                                                )
-                                        )
-                                        .then(literal("add")
-                                                .then(argument("arrowParticle", ParticleArgument.particle())
-                                                        .executes(c -> {
-                                                            CrownUser u = getUser(c);
-                                                            Particle particle = c.getArgument("activeParticle", Particle.class);
-
-                                                            List<Particle> partList = u.getParticleArrowAvailable();
-                                                            partList.add(particle);
-                                                            u.setParticleArrowAvailable(partList);
-
-                                                            broadcastAdmin(c.getSource(), "Added " + particle.toString() + " to " + u.getName() + "'s Arrow Particles");
-                                                            return 0;
-                                                        })
-                                                )
-                                        )
-                                        .then(literal("remove")
-                                                .then(argument("rArrowParticle", ParticleArgument.particle())
-                                                        .executes(c -> {
-                                                            CrownUser u = getUser(c);
-                                                            Particle particle = c.getArgument("activeParticle", Particle.class);
-
-                                                            List<Particle> partList = u.getParticleArrowAvailable();
-                                                            partList.remove(particle);
-                                                            u.setParticleArrowAvailable(partList);
-
-                                                            broadcastAdmin(c.getSource(), "Removed " + particle.toString() + " from " + u.getName() + "'s Arrow Particles");
-                                                            return 0;
-                                                        })
-                                                )
-                                        )
-                                )
-
-                                .then(literal("deathparticle")
-                                        .executes(c -> {
-                                            CrownUser u = getUser(c);
-                                            c.getSource().sendMessage(u.getName() + "'s DeathParticles as a List.toString cuz I'm lazy");
-                                            c.getSource().sendMessage(u.getParticleDeathAvailable().toString());
-                                            return 0;
-                                        })
-
-                                        .then(literal("add")
-                                                .then(argument("particle", StringArgumentType.word())
-                                                        .executes(c -> {
-                                                            CrownUser u = getUser(c);
-                                                            String toAdd = c.getArgument("particle", String.class);
-
-                                                            List<String> list = u.getParticleDeathAvailable();
-                                                            list.add(toAdd);
-                                                            u.setParticleDeathAvailable(list);
-
-                                                            broadcastAdmin(c.getSource(), "Added " + toAdd + " to " + u.getName() + "'s Death Particles");
-                                                            return 0;
-                                                        })
-                                                )
-                                        )
-                                        .then(literal("remove")
-                                                .then(argument("rParticle", StringArgumentType.word())
-                                                        .executes(c -> {
-                                                            CrownUser u = getUser(c);
-                                                            String toRemove = c.getArgument("rParticle", String.class);
-
-                                                            List<String> list = u.getParticleDeathAvailable();
-                                                            list.remove(toRemove);
-                                                            u.setParticleDeathAvailable(list);
-
-                                                            broadcastAdmin(c.getSource(), "Removed " + toRemove + " from " + u.getName() + "'s Death Particles");
-                                                            return 0;
-                                                        })
-                                                )
                                         )
                                 )
 
