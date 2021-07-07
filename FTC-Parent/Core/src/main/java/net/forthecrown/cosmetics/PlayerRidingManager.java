@@ -34,7 +34,6 @@ public class PlayerRidingManager implements Listener {
     static final Location RETREAT_LOCATION = new Location(Bukkit.getWorld("world"), 200.5, 71, 1000.5);
 
     PlayerRidingManager(){
-
         this.riders = new ObjectArraySet<>();
         Bukkit.getPluginManager().registerEvents(this, CrownCore.inst());
 

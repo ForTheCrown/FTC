@@ -1,6 +1,5 @@
 package net.forthecrown.inventory.custom;
 
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.inventory.custom.borders.Border;
 import net.forthecrown.inventory.custom.options.Option;
 import net.forthecrown.user.CrownUser;
@@ -33,7 +32,6 @@ public class CustomInventory implements InventoryHolder {
     }
 
     public void handleClick(HumanEntity clicker, int slot) {
-        Announcer.debug("slot: " + slot);
         if (invBorder.isOnBorder(slot)) invBorder.handleClick(clicker);
         else if (invSlots.containsKey(slot)) invSlots.get(slot).handleClick(clicker);
     }

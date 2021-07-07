@@ -2,7 +2,7 @@ package net.forthecrown.cosmetics;
 
 import net.forthecrown.cosmetics.arrows.ArrowEffects;
 import net.forthecrown.cosmetics.deaths.DeathEffects;
-import net.forthecrown.cosmetics.emotes.Emotes;
+import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
 import net.forthecrown.cosmetics.options.*;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.inventory.builder.BuiltInventory;
@@ -58,7 +58,7 @@ public abstract class CosmeticConstants {
                             .addLore(Component.text("Poking, smooching, bonking and more").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
                             .addLore(Component.text("to interact with friends!").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
                             .build(),
-                    (user, context) -> Emotes.getInventory().open(user)
+                    (user, context) -> CosmeticEmotes.getInventory().open(user)
             )
             .addOption(24,
                     new ItemStackBuilder(Material.SKELETON_SKULL)
@@ -71,7 +71,7 @@ public abstract class CosmeticConstants {
             )
             .build();
 
-    public static final SimpleOption GO_BACK = new SimpleOption (
+    public static final SimpleOption GO_BACK = new SimpleOption(
             4,
             new ItemStackBuilder(Material.PAPER, 1)
                     .setName(Component.text("< Go back").style(CrownItems.nonItalic(NamedTextColor.YELLOW)))

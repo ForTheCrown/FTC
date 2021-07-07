@@ -9,7 +9,7 @@ import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.CrownJailManager;
 import net.forthecrown.core.chat.CrownBroadcaster;
 import net.forthecrown.core.chat.CrownMessages;
-import net.forthecrown.core.chat.Emotes;
+import net.forthecrown.core.chat.ChatEmotes;
 import net.forthecrown.core.chat.JoinInfo;
 import net.forthecrown.core.kingship.CrownKingship;
 import net.forthecrown.cosmetics.Cosmetics;
@@ -83,7 +83,7 @@ public final class Main extends JavaPlugin implements CrownCore {
     static CrownMessages            messages;
     static ServerRules              rules;
     static JoinInfo                 joinInfo;
-    static Emotes                   emotes;
+    static ChatEmotes               emotes;
     static DayUpdate                dayUpdate;
     static Logger                   logger;
 
@@ -147,7 +147,7 @@ public final class Main extends JavaPlugin implements CrownCore {
         messages = new CrownMessages();
         messages.load();
 
-        emotes = new Emotes();
+        emotes = new ChatEmotes();
         emotes.registerEmotes();
 
         WgFlags.init();

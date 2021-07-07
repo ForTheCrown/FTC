@@ -1,5 +1,6 @@
 package net.forthecrown.crownevents;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -14,8 +15,8 @@ public class ObjectiveLeaderboard extends ArmorStandLeaderboard {
 
     private Objective objective;
 
-    public ObjectiveLeaderboard(String title, Objective list, Location location) {
-        super(title, convertToMap(list), location);
+    public ObjectiveLeaderboard(Objective list, Location location, Component... title) {
+        super(convertToMap(list), location, title);
 
         this.objective = list;
     }

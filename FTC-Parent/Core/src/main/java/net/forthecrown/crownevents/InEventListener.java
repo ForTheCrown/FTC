@@ -1,25 +1,18 @@
 package net.forthecrown.crownevents;
 
-import net.forthecrown.crownevents.entries.EventEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-public abstract class InEventListener<T extends EventEntry<T>> implements Listener {
+public interface InEventListener extends Listener {
 
-    protected T entry;
-
-    public final void setEntry(T entry){
-        if(this.entry != null) throw new IllegalStateException("Cannot redefine entry");
-        this.entry = entry;
-    }
-
-    public final void register(Plugin plugin){
+    default void register(Plugin plugin){
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public final void unregister(){
+    default void unregister(){
         HandlerList.unregisterAll(this);
     }
+
 }

@@ -17,6 +17,7 @@ public final class ComVars {
 
     static ComVar<Byte>             maxNickLength;
     static ComVar<Byte>             maxBossDifficulty;
+    static ComVar<Byte>             maxTreasureItems;
 
     static ComVar<Short>            nearRadius;
     static ComVar<Short>            hoppersInOneChunk;
@@ -52,6 +53,7 @@ public final class ComVars {
     static void reload(Configuration config){
         maxNickLength = register(           "core_maxNickLength",               ComVarType.BYTE,            (byte) config.getInt("MaxNickLength"));
         maxBossDifficulty = register(       "royals_maxBossDif",                ComVarType.BYTE,            (byte) config.getInt("MaxBossDifficulty"));
+        maxTreasureItems = register(        "pr_maxTreasureItems",              ComVarType.BYTE,            (byte) config.getInt("Pirates.MaxTreasureItems"));
 
         nearRadius = register(              "core_nearRadius",                  ComVarType.SHORT,           (short) config.getInt("NearRadius"));
         hoppersInOneChunk = register(       "core_maxHoppersPerChunk",          ComVarType.SHORT,           (short) config.getInt("HoppersInOneChunk"));
@@ -116,6 +118,7 @@ public final class ComVars {
         config.set("Pirates.MinTreasurePrize",              minTreasurePrize.getValue());
         config.set("Pirates.FinalReward",                   ghFinalReward.getValue());
         config.set("Pirates.SpecialReward",                 ghSpecialReward.getValue());
+        config.set("Pirates.MaxTreasureItems",              maxTreasureItems.getValue());
         config.set("MaxBossDifficulty",                     maxBossDifficulty.getValue());
     }
 }

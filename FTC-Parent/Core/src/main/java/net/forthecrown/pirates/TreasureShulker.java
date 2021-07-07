@@ -235,7 +235,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
         int rhineReward;
 
         public Loot(Player player, Location location, CrownRandom random, CrownLootTable lootTable){
-            this.items = lootTable.populateLoot(random, new LootContext.Builder(location).killer(player).build(), 5);
+            this.items = lootTable.populateLoot(random, new LootContext.Builder(location).killer(player).build(), CrownCore.getMaxTreasureItems());
             this.rhineReward = random.intInRange(CrownCore.getTreasureMinPrize(), CrownCore.getTreasureMaxPrize());
         }
 

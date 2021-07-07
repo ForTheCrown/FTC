@@ -22,7 +22,9 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class JsonUtils {
+public final class JsonUtils {
+    private JsonUtils() {}
+
     public static JsonObject writeLocation(Location location){
         JsonObject result = new JsonObject();
 

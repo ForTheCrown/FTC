@@ -4,7 +4,7 @@ import net.forthecrown.comvars.types.ComVarType;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.AbstractDeathEffect;
-import net.forthecrown.cosmetics.emotes.Emote;
+import net.forthecrown.cosmetics.emotes.CosmeticEmote;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.preconditions.UsageCheck;
 import net.kyori.adventure.key.Key;
@@ -12,7 +12,7 @@ import net.kyori.adventure.key.Key;
 public interface Registries {
     Registry<Registry<?>> MASTER_REGISTRY = new BaseRegistry<>(CrownCore.coreKey("master_registry"));
 
-    CloseableRegistry<Emote> EMOTES = createCloseable("emotes");
+    CloseableRegistry<CosmeticEmote> EMOTES = createCloseable("emotes");
     CloseableRegistry<AbstractDeathEffect> DEATH_EFFECTS = createCloseable("death_effects");
     CloseableRegistry<ArrowEffect> ARROW_EFFECTS = createCloseable("arrow_effects");
 

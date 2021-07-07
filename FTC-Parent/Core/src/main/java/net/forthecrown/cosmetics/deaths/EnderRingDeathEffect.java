@@ -9,7 +9,7 @@ public class EnderRingDeathEffect extends AbstractDeathEffect {
     EnderRingDeathEffect() {
         super(14, "Ender Ring",
                 Component.text("Ender particles doing ring stuff. "),
-                Component.text("Makes you scream like an enderman.")
+                Component.text("Makes you scream like an Enderman.")
         );
     }
 

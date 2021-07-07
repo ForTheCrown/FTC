@@ -1,6 +1,5 @@
 package net.forthecrown.cosmetics.arrows;
 
-import com.google.gson.JsonElement;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
@@ -12,7 +11,6 @@ import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -126,11 +124,6 @@ public class ArrowEffect implements CosmeticEffect {
     @Override
     public @NotNull Key key() {
         return key;
-    }
-
-    @Override
-    public JsonElement serialize() {
-        return JsonUtils.writeKey(key());
     }
 
     public String toString(){

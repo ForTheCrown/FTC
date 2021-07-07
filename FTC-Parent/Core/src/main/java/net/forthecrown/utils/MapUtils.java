@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 public final class MapUtils {
-
     private MapUtils() {}
 
     public static <T, K, V> Map<K, T> convertValues(Map<K, V> map, Function<V, T> converter){

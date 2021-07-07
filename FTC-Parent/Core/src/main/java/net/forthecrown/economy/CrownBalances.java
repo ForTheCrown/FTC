@@ -1,14 +1,15 @@
 package net.forthecrown.economy;
 
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.chat.Announcer;
+import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class CrownBalances extends AbstractYamlSerializer implements Balances {
@@ -75,11 +76,6 @@ public class CrownBalances extends AbstractYamlSerializer implements Balances {
     }
 
     @Override
-    public synchronized String getDecimalized(UUID id){
-        return ChatFormatter.decimalizeNumber(get(id));
-    }
-
-    @Override
     public synchronized void set(UUID uuid, Integer amount){
         if(amount >= CrownCore.getMaxMoneyAmount()) Announcer.log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
 
@@ -92,18 +88,8 @@ public class CrownBalances extends AbstractYamlSerializer implements Balances {
     }
 
     @Override
-    public synchronized String getWithCurrency(UUID id) {
-        return Balances.getFormatted(get(id));
-    }
-
-    @Override
     public boolean canAfford(UUID id, int amount) {
         return get(id) >= amount;
-    }
-
-    @Override
-    public synchronized Component withCurrency(UUID id){
-        return Component.text(getWithCurrency(id));
     }
 
     @Override

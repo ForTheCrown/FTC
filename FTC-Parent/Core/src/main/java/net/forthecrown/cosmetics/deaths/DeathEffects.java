@@ -37,6 +37,4 @@ public class DeathEffects {
     public static BuiltInventory getInventory(){
         return INVENTORY;
     }
-
-
 }

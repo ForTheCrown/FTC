@@ -12,7 +12,7 @@ import java.util.Locale;
  * A basic CrownEvent interface
  * @param <T> The type of EventEntry this event accepts
  */
-public interface CrownEvent<T extends EventEntry<T>> {
+public interface CrownEvent<T extends EventEntry> {
 
     /**
      * Starts the Event for the specified player

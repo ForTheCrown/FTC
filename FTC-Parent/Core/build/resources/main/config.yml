@@ -32,6 +32,7 @@ Pirates:
   TreasureWorld: world_resource
   SpecialReward: 25000
   FinalReward: 50000
+  MaxTreasureItems: 5
   MaxTreasurePrize: 10000
   MinTreasurePrize: 50000
 

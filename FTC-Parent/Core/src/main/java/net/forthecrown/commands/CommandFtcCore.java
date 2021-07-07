@@ -330,7 +330,7 @@ public class CommandFtcCore extends FtcCommand {
                                 .then(literal("balance")
                                         .executes(c-> { //Shows the balance
                                             CrownUser user = getUser(c);
-                                            c.getSource().sendMessage(user.getName() + " has " + bals.getDecimalized(user.getUniqueId()) + " Rhines");
+                                            c.getSource().sendMessage(user.getName() + " has " + Balances.getFormatted(bals.get(user.getUniqueId())) + " Rhines");
                                             return 0;
                                         })
 
@@ -343,7 +343,7 @@ public class CommandFtcCore extends FtcCommand {
                                                             int amount = c.getArgument("sAmount", Integer.class);
                                                             bals.set(user.getUniqueId(), amount);
 
-                                                            broadcastAdmin(c.getSource(), "Set " + user.getName() + "'s balance to " + bals.getDecimalized(user.getUniqueId()));
+                                                            broadcastAdmin(c.getSource(), "Set " + user.getName() + "'s balance to " +Balances.getFormatted(bals.get(user.getUniqueId())));
                                                             return 0;
                                                         })
                                                 )
@@ -358,7 +358,7 @@ public class CommandFtcCore extends FtcCommand {
                                                             bals.add(user.getUniqueId(), amount, false);
 
                                                             broadcastAdmin(c.getSource(), "Added " + amount + " to " + user.getName() + "'s balance.");
-                                                            broadcastAdmin(c.getSource(), "Now has " + bals.getDecimalized(user.getUniqueId()));
+                                                            broadcastAdmin(c.getSource(), "Now has " + Balances.getFormatted(bals.get(user.getUniqueId())));
                                                             return 0;
                                                         })
                                                 )
@@ -373,7 +373,7 @@ public class CommandFtcCore extends FtcCommand {
                                                             bals.add(user.getUniqueId(), -amount, false);
 
                                                             broadcastAdmin(c.getSource(), "Removed " + amount + " from " + user.getName() + "'s balance.");
-                                                            broadcastAdmin(c.getSource(), "Now has " + bals.getDecimalized(user.getUniqueId()));
+                                                            broadcastAdmin(c.getSource(), "Now has " + Balances.getFormatted(bals.get(user.getUniqueId())));
                                                             return 0;
                                                         })
                                                 )

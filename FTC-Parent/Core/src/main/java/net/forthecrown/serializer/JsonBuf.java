@@ -18,6 +18,9 @@ import java.util.function.Function;
 
 import static net.forthecrown.utils.JsonUtils.*;
 
+/**
+ * A JSON Buffer because this shit is too verbose on its own
+ */
 public class JsonBuf {
 
     private final JsonObject json;
@@ -64,7 +67,7 @@ public class JsonBuf {
     }
 
     public UUID getUUID(String name){
-        if(!has(name)) return null;
+        if(missingOrNull(name)) return null;
         return UUID.fromString(getString(name));
     }
 

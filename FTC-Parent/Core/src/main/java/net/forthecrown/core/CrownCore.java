@@ -59,7 +59,7 @@ public interface CrownCore extends Plugin, Namespaced {
     static DayUpdate getDayUpdate() { return Main.dayUpdate; }
     static JoinInfo getJoinInfo() { return Main.joinInfo; }
     static ServerRules getRules() { return Main.rules; }
-    static Emotes getEmotes() { return Main.emotes; }
+    static ChatEmotes getEmotes() { return Main.emotes; }
 
     static Logger logger() { return Main.logger; }
     static File dataFolder() { return inst().getDataFolder(); }
@@ -197,6 +197,10 @@ public interface CrownCore extends Plugin, Namespaced {
 
     static int getMaxBossDifficulty(){
         return ComVars.maxBossDifficulty.getValue((byte) 5);
+    }
+
+    static byte getMaxTreasureItems(){
+        return ComVars.maxTreasureItems.getValue((byte) 5);
     }
 
     static Location getServerSpawn(){

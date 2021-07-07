@@ -22,7 +22,8 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class RoyalUtils {
+public final class RoyalUtils {
+    private RoyalUtils() {}
 
     public static final NamespacedKey PUNCHING_BAG_KEY = Squire.createRoyalKey("dummy");
     public static final Component DUNGEON_LORE = Component.text("Dungeon Item");

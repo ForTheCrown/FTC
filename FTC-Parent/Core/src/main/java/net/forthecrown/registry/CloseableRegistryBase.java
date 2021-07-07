@@ -23,19 +23,21 @@ public class CloseableRegistryBase<T> extends BaseRegistry<T> implements Closeab
 
     @Override
     public T register(Key key, T raw) {
-        Validate.isTrue(open, "Registry is no longer accepting registrations.");
+        validateOpen();
         return super.register(key, raw);
     }
 
     @Override
     public void remove(Key key) {
-        Validate.isTrue(open, "Registry is currently closed");
+        validateOpen();
         super.remove(key);
     }
 
     @Override
     public void clear() {
-        Validate.isTrue(open, "Registry is currently closed");
+        validateOpen();
         super.clear();
     }
+
+    private void validateOpen(){ Validate.isTrue(open, "Registry is currently closed"); }
 }

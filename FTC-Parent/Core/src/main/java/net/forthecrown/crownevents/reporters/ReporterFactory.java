@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class ReporterFactory {
 
-    public static EventReporter of(Plugin plugin, CrownEvent<?> event){
+    public static EventReporter of(Plugin plugin, CrownEvent event){
         File dir = getReportDirectory();
 
         File log = new File(dir, event.getName() + "_" + dir.list().length + ".txt");

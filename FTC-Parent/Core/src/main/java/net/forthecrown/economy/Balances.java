@@ -59,8 +59,6 @@ public interface Balances extends CrownSerializer {
      */
     void set(UUID uuid, Integer amount);
 
-    Component withCurrency(UUID id);
-
     /**
      * Adds to a players balance
      * @param uuid The UUID of the player
@@ -84,25 +82,11 @@ public interface Balances extends CrownSerializer {
     Integer getTax(UUID uuid);
 
     /**
-     * Returns a more readable version of a person's balance
-     * @param id The ID of the balance to get
-     * @return A more readable number, example: 1,000,000 instead of 1000000
-     */
-    String getDecimalized(UUID id);
-
-    /**
      * Sets a user's balance, ignoring the maximum balance limit
      * @param id The id of the balance to set
      * @param amount The amount to set the balance
      */
     void setUnlimited(UUID id, Integer amount);
-
-    /**
-     * Gets a balance string as: "AMOUNT Rhines" or "AMOUNT Rhine" if the amount is 1
-     * @param id The ID of the balance to get
-     * @return The balance message
-     */
-    String getWithCurrency(UUID id);
 
     /**
      * Checks if the given user can afford losing the given amount

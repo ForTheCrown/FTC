@@ -1,11 +1,11 @@
 package net.forthecrown.crownevents;
 
-import net.forthecrown.utils.math.CrownBoundingBox;
+import net.forthecrown.commands.CommandHologram;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Main;
-import net.forthecrown.commands.CommandHologram;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.utils.math.CrownBoundingBox;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -23,30 +23,25 @@ import java.util.Map;
  */
 public class ArmorStandLeaderboard {
 
-    private String title;
+    private Component[] title;
     private Order order;
     private Map<String, Integer> list;
     private byte size;
     private final Location location;
-    private String border;
+    private Component border;
     private boolean isTimerScore;
 
-    /**
-     * %pos for position
-     * %name for name
-     * %score for score lol
-     */
-    private String format;
+    private LeaderboardFormatter format;
 
-    public ArmorStandLeaderboard(String title, Map<String, Integer> list, Location location) {
+    public ArmorStandLeaderboard(Map<String, Integer> list, Location location, Component... title) {
         this.title = title;
         this.list = list;
         this.location = location;
 
         setOrder(Order.HIGH_TO_LOW);
         setSize((byte) 10);
-        setBorder("&e-----=o=O=o=-----");
-        setFormat("%pos. %name: %score");
+        setBorder(Component.text("-----=o=O=o=-----").color(NamedTextColor.YELLOW));
+        setFormat(LeaderboardFormatter.defaultFormat());
         setTimerScore(false);
 
         Main.LEADERBOARDS.add(this);
@@ -74,7 +69,7 @@ public class ArmorStandLeaderboard {
     public void create(){
         destroy();
         Location loc = getLocation().clone();
-        createStand(getTitle(), loc);
+        createTitleStands(loc);
         createStand(getBorder(), loc.subtract(0, 0.25, 0));
 
         Map<String, Integer> sorted = getSortedMap();
@@ -91,14 +86,19 @@ public class ArmorStandLeaderboard {
         createStand(getBorder(), loc.subtract(0, 0.25, 0));
     }
 
-    private String formatString(int pos, String name, int score){
+    private void createTitleStands(Location location){
+        location.add(0, 0.25, 0);
+        for (Component c: title){
+            location.subtract(0, 0.25, 0);
+            createStand(c, location);
+        }
+    }
+
+    private Component formatString(int pos, String name, int score){
         String scoreS = score + "";
         if(isTimerScore()) scoreS = EventTimer.getTimerCounter(score).toString();
 
-        return getFormat()
-                .replaceAll("%pos", pos + "")
-                .replaceAll("%name", name)
-                .replaceAll("%score", scoreS);
+        return getFormat().formatName(pos, name, scoreS);
     }
 
     private Map<String, Integer> getSortedMap(){
@@ -112,9 +112,9 @@ public class ArmorStandLeaderboard {
         return result;
     }
 
-    private static void createStand(String name, Location loc) {
+    private static void createStand(Component name, Location loc) {
         ArmorStand stand = loc.getWorld().spawn(loc, ArmorStand.class);
-        stand.customName(ChatUtils.convertString(name));
+        stand.customName(name);
         stand.setCustomNameVisible(true);
         stand.setRemoveWhenFarAway(false);
         stand.setPersistent(true);
@@ -150,11 +150,11 @@ public class ArmorStandLeaderboard {
         this.size = size;
     }
 
-    public String getTitle() {
-        return ChatFormatter.translateHexCodes(title);
+    public Component[] getTitle() {
+        return title;
     }
 
-    public void setTitle(@NotNull String title) {
+    public void setTitle(@NotNull Component... title) {
         Validate.notNull(title, "Title cannot be null");
         this.title = title;
     }
@@ -177,20 +177,20 @@ public class ArmorStandLeaderboard {
         this.list = list;
     }
 
-    public String getFormat() {
-        return ChatFormatter.translateHexCodes(format);
+    public LeaderboardFormatter getFormat() {
+        return format;
     }
 
-    public void setFormat(@NotNull String format) {
+    public void setFormat(@NotNull LeaderboardFormatter format) {
         Validate.notNull(format, "Format cannot be null");
         this.format = format;
     }
 
-    public String getBorder() {
-        return ChatFormatter.translateHexCodes(border);
+    public Component getBorder() {
+        return border;
     }
 
-    public void setBorder(@NotNull String border) {
+    public void setBorder(@NotNull Component border) {
         Validate.notNull(border, "Border cannot be null");
         this.border = border;
     }

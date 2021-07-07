@@ -3,7 +3,7 @@ package net.forthecrown.cosmetics;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.cosmetics.arrows.ArrowEffects;
 import net.forthecrown.cosmetics.deaths.DeathEffects;
-import net.forthecrown.cosmetics.emotes.Emotes;
+import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
 
 public final class Cosmetics {
 
@@ -14,7 +14,7 @@ public final class Cosmetics {
     public static void init(){
         rideManager = new PlayerRidingManager();
 
-        Emotes.init();
+        CosmeticEmotes.init();
         ArrowEffects.init();
         DeathEffects.init();
 

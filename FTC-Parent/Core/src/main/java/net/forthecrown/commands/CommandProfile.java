@@ -1,24 +1,25 @@
 package net.forthecrown.commands;
 
+import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
-import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.crownevents.EventTimer;
+import net.forthecrown.economy.Balances;
+import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.enums.Rank;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.ListUtils;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -125,7 +126,7 @@ public class CommandProfile extends FtcCommand {
                 .append(line("Crown score", scrDisplay, crownScr.isScoreSet() && crownScr.getScore() > 0 && CrownCore.isEventActive()))
 
                 .append(line("Gems", profile.getGems() + "", profile.getGems() > 0))
-                .append(line("Balance", CrownCore.getBalances().withCurrency(profile.getUniqueId()), true))
+                .append(line("Balance", Balances.formatted(CrownCore.getBalances().get(user.getUniqueId())), true))
 
                 .append(adminInfo(user, profile))
 

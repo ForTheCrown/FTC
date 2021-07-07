@@ -13,7 +13,9 @@ import org.bukkit.scoreboard.Score;
 /**
  * BlackMarketUtils, not API
  */
-public class BlackMarketUtils {
+public final class BlackMarketUtils {
+    private BlackMarketUtils() {}
+
     private static final ItemStack borderItem = CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
 
     public static Inventory getBaseInventory(String name, ItemStack header){
