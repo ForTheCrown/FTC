@@ -5,9 +5,14 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.ListUtils;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -149,4 +154,30 @@ public interface UserManager extends CrownSerializer {
      * @param alt
      */
     void removeEntry(UUID alt);
+
+    private static List<ServerPlayer> getSpectators() {
+        List<ServerPlayer> list = new ArrayList<>();
+
+        for (Player p: Bukkit.getOnlinePlayers()){
+            if(p.getGameMode() != GameMode.SPECTATOR) continue;
+            list.add(((CraftPlayer) p).getHandle());
+        }
+
+        return list;
+    }
+
+    static void updateSpectatorTab(){
+        ClientboundPlayerInfoPacket packet = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.UPDATE_GAME_MODE, getSpectators());
+        ListIterator<ClientboundPlayerInfoPacket.PlayerUpdate> iterator = packet.getEntries().listIterator();
+
+        while(iterator.hasNext()){
+            ClientboundPlayerInfoPacket.PlayerUpdate u = iterator.next();
+            iterator.set(new ClientboundPlayerInfoPacket.PlayerUpdate(u.getProfile(), u.getLatency(), GameType.SURVIVAL, u.getDisplayName()));
+        }
+
+        for (Player p: Bukkit.getOnlinePlayers()) {
+            if(p.getGameMode() == GameMode.SPECTATOR) continue;
+            ((CraftPlayer) p).getHandle().connection.connection.send(packet);
+        }
+    }
 }

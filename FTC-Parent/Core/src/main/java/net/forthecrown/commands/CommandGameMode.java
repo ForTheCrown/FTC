@@ -1,14 +1,14 @@
 package net.forthecrown.commands;
 
+import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.CrownGameMode;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.GameModeArgument;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.enums.CrownGameMode;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,14 +30,15 @@ public class CommandGameMode extends FtcCommand {
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
                             GameMode gameMode = c.getArgument("gamemode", GameMode.class);
+                            CrownGameMode wrapped = CrownGameMode.wrap(gameMode);
 
                             if(!user.hasPermission(Permissions.GAMEMODES)){
                                 if(gameMode == GameMode.CREATIVE || gameMode == GameMode.ADVENTURE) throw FtcExceptionProvider.create("You do not have permission to use this");
                             }
 
-                            user.setGameMode(CrownGameMode.wrap(gameMode));
+                            user.setGameMode(wrapped);
                             user.updateFlying();
-                            user.sendMessage(adminMsg(user, gameMode));
+                            user.sendMessage(adminMsg(user, wrapped));
                             return 0;
                         })
 
@@ -47,18 +48,19 @@ public class CommandGameMode extends FtcCommand {
                                 .executes(c -> {
                                     CrownUser user = UserType.getUser(c, "user");
                                     GameMode gameMode = c.getArgument("gamemode", GameMode.class);
+                                    CrownGameMode wrapped = CrownGameMode.wrap(gameMode);
 
-                                    user.getPlayer().setGameMode(gameMode);
+                                    user.setGameMode(wrapped);
                                     user.updateFlying();
-                                    c.getSource().sendAdmin(adminMsg(user, gameMode));
+                                    c.getSource().sendAdmin(adminMsg(user, wrapped));
                                     return 0;
                                 })
                         )
                 );
     }
 
-    private Component adminMsg(CrownUser user, GameMode gameMode){
-        TranslatableComponent name = CrownGameMode.wrap(gameMode).title().color(NamedTextColor.GOLD);
+    private Component adminMsg(CrownUser user, CrownGameMode gameMode){
+        TranslatableComponent name = gameMode.title().color(NamedTextColor.GOLD);
         return Component.text("Set ")
                 .color(NamedTextColor.GRAY)
                 .append(user.nickDisplayName().color(NamedTextColor.YELLOW))

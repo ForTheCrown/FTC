@@ -1,5 +1,6 @@
 package net.forthecrown.user;
 
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.serializer.Deletable;
@@ -21,7 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -31,9 +31,8 @@ import java.util.function.UnaryOperator;
  * Represents a user's profile, all their ranks, effects and such
  */
 public interface CrownUser extends
-        CommandSender,
+        CommandSender, Nameable,
         HoverEventSource<Component>,
-        Nameable,
         Deletable
 {
 
@@ -75,12 +74,6 @@ public interface CrownUser extends
      * @return The user's ranks
      */
     Set<Rank> getAvailableRanks();
-
-    /**
-     * Sets their ranks
-     * @param ranks The new rank Set
-     */
-    void setAvailableRanks(Set<Rank> ranks);
 
     /**
      * Checks if the user has a certain rank
@@ -153,13 +146,7 @@ public interface CrownUser extends
      * <p>The strings are arbitrary, don't try to guess them :(</p>
      * @return The list of pets belonging to the user
      */
-    List<Pet> getPets();
-
-    /**
-     * Sets the list of pets belonging to the user
-     * @param pets The new list of pets
-     */
-    void setPets(List<Pet> pets);
+    ObjectList<Pet> getPets();
 
     boolean onJoin();
 
@@ -366,6 +353,8 @@ public interface CrownUser extends
     void sendMessage(net.minecraft.network.chat.Component message, ChatType type);
 
     void sendMessage(UUID id, net.minecraft.network.chat.Component message, ChatType type);
+
+    void sendBlockableMessage(UUID id, Component message);
 
     /**
      * Gets if the user is online

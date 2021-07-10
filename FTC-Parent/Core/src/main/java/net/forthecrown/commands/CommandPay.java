@@ -39,9 +39,8 @@ public class CommandPay extends FtcCommand {
      * ----------------------------------------
      * Pays another player a set amount of money, removes the money from the player as well
      *
-     *
      * Valid usages of command:
-     * - /pay <player> <amount>
+     * - /pay <player> <amount> [message]
      *
      * Author: Botul
      */

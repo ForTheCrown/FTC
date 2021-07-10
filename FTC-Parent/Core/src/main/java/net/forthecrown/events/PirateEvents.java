@@ -68,6 +68,7 @@ public class PirateEvents implements Listener {
                 TreasureShulker shulker = Pirates.getTreasure();
                 if(shulker.createLoot(player, event.getRightClicked()).giveRewards(player)){
                     shulker.find(user.getUniqueId());
+                    shulker.relocate();
                 }
             });
         }

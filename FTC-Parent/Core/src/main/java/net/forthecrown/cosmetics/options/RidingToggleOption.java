@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics.options;
 
+import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
-import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.user.CrownUser;
@@ -23,18 +23,18 @@ public class RidingToggleOption implements InventoryOption {
 
         ItemStackBuilder builder = new ItemStackBuilder(allows ? Material.SADDLE : Material.BARRIER)
                 .addLore(Component.empty())
-                .addLore(Component.text("Right-click someone to jump on top of them.").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
-                .addLore(Component.text("Shift-right-click someone to kick them off.").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
+                .addLore(Component.text("Right-click someone to jump on top of them.").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
+                .addLore(Component.text("Shift-right-click someone to kick them off.").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
                 .addLore(Component.empty());
 
         if(allows){
             builder
-                    .setName(Component.text("You can ride other players!").style(CrownItems.nonItalic(NamedTextColor.YELLOW)))
-                    .addLore(Component.text("Click to disabled this feature.").style(CrownItems.nonItalic(NamedTextColor.GRAY)));
+                    .setName(Component.text("You can ride other players!").style(ChatFormatter.nonItalic(NamedTextColor.YELLOW)))
+                    .addLore(Component.text("Click to disabled this feature.").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)));
         } else {
             builder
-                    .setName(Component.text("You've disabled riding other players!").style(CrownItems.nonItalic(NamedTextColor.YELLOW)))
-                    .addLore(Component.text("Click to enable this feature.").style(CrownItems.nonItalic(NamedTextColor.GRAY)));
+                    .setName(Component.text("You've disabled riding other players!").style(ChatFormatter.nonItalic(NamedTextColor.YELLOW)))
+                    .addLore(Component.text("Click to enable this feature.").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)));
         }
 
         inventory.setItem(getSlot(), builder.build());

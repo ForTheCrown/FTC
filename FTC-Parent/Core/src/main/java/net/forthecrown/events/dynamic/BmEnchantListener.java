@@ -103,7 +103,7 @@ public class BmEnchantListener extends AbstractInvListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClose(InventoryCloseEvent event) {
         if(!event.getPlayer().equals(player)) return;
-        if(event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
+        if(event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW || event.getReason() == InventoryCloseEvent.Reason.PLUGIN) return;
 
         ItemStack item = event.getInventory().getItem(11);
         if(item != null){

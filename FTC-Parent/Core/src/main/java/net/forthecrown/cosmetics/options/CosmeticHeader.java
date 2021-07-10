@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics.options;
 
+import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
-import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.user.CrownUser;
@@ -20,12 +20,12 @@ public class CosmeticHeader implements InventoryOption {
     @Override
     public void place(Inventory inventory, CrownUser user) {
         ItemStackBuilder builder = new ItemStackBuilder(Material.NETHER_STAR, 1)
-                .setName(Component.text("Menu").style(CrownItems.nonItalic(NamedTextColor.YELLOW)))
+                .setName(Component.text("Menu").style(ChatFormatter.nonItalic(NamedTextColor.YELLOW)))
                 .addLore(Component.empty())
                 .addLore(
                         Component.text("You have ")
-                                .style(CrownItems.nonItalic(NamedTextColor.GRAY))
-                                .append(Component.text(user.getGems() + " Gems").style(CrownItems.nonItalic(NamedTextColor.GOLD)))
+                                .style(ChatFormatter.nonItalic(NamedTextColor.GRAY))
+                                .append(Component.text(user.getGems() + " Gems").style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
                                 .append(Component.text("."))
                 );
 

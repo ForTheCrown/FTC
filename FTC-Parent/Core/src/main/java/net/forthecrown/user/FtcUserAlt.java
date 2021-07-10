@@ -6,7 +6,6 @@ import net.forthecrown.user.enums.Pet;
 import net.forthecrown.user.enums.SellAmount;
 import org.bukkit.Material;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -39,11 +38,7 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
     @Override
     public Grave getGrave(){ return getMain().getGrave(); }
     @Override
-    public List<Pet> getPets() { return getMain().getPets(); }
-    @Override
     public boolean hasPet(Pet pet) { return getMain().hasPet(pet); }
-    @Override
-    public void setPets(List<Pet> pets) { getMain().setPets(pets); }
     @Override
     public void addPet(Pet pet) { getMain().addPet(pet); }
     @Override

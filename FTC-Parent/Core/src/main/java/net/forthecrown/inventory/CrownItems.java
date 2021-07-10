@@ -189,10 +189,6 @@ public final class CrownItems {
                 .append(kingship.name());
     }
 
-    public static Style nonItalic(TextColor color){
-        return Style.style(color).decoration(TextDecoration.ITALIC, false);
-    }
-
     public static ItemStack makeCrown(int level, String owner){
         String levelS = CrownUtils.arabicToRoman(level);
         ItemStack crown = makeItem(Material.GOLDEN_HELMET, 1, false, "&6-&e&lCrown&6-",

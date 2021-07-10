@@ -12,6 +12,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class DirectMessage {
     private final CommandSource sender;
     private final CommandSource receiver;
@@ -74,14 +76,21 @@ public class DirectMessage {
     public void complete(){
         EavesDropper.reportDM(this);
 
+        UUID senderID = null;
+        UUID receiverID = null;
+
         if(muteStatus == MuteStatus.NONE){
             if(receiver.isPlayer()){
                 CrownUser user = UserManager.getUser(receiver.asOrNull(Player.class));
                 user.setLastMessage(sender);
 
+                receiverID = user.getUniqueId();
+
                 if(sender.isPlayer()){
                     CrownUser senderUser = UserManager.getUser(sender.asOrNull(Player.class));
                     senderUser.setLastMessage(receiver);
+
+                    senderID = senderUser.getUniqueId();
 
                     if(user.getInteractions().isBlockedPlayer(senderUser.getUniqueId())){
                         sender.sendMessage(Component.translatable("user.message.cannot", NamedTextColor.GRAY, user.nickDisplayName().color(NamedTextColor.YELLOW)));
@@ -97,7 +106,7 @@ public class DirectMessage {
                     .append(Component.text(" "))
                     .append(formattedText)
                     .build();
-            receiver.sendMessage(receiverMessage);
+            receiver.sendMessage(receiverMessage, senderID);
         }
 
         if(muteStatus == MuteStatus.SOFT || muteStatus == MuteStatus.NONE){
@@ -107,7 +116,7 @@ public class DirectMessage {
                     .append(formattedText)
                     .build();
 
-            sender.sendMessage(senderMessage);
+            sender.sendMessage(senderMessage, receiverID);
         }
 
         receiver.onCommandComplete(null, muteStatus.maySpeak, 0);

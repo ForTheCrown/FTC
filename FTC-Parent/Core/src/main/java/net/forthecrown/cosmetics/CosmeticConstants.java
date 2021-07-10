@@ -1,10 +1,10 @@
 package net.forthecrown.cosmetics;
 
+import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.cosmetics.arrows.ArrowEffects;
 import net.forthecrown.cosmetics.deaths.DeathEffects;
 import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
 import net.forthecrown.cosmetics.options.*;
-import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.options.InventoryBorder;
 import net.forthecrown.inventory.builder.InventoryBuilder;
@@ -44,28 +44,28 @@ public abstract class CosmeticConstants {
             .addOption(HEADER)
             .addOption(20,
                     new ItemStackBuilder(Material.BOW)
-                            .setName(Component.text("Arrow Particle Trails").style(CrownItems.nonItalic(NamedTextColor.GOLD)))
+                            .setName(Component.text("Arrow Particle Trails").style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
                             .addLore(Component.empty())
-                            .addLore(Component.text("Upgrade your arrows with fancy particle").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
-                            .addLore(Component.text("trails as they fly through the air!").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
+                            .addLore(Component.text("Upgrade your arrows with fancy particle").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
+                            .addLore(Component.text("trails as they fly through the air!").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
                             .build(),
                     (user, context) -> ArrowEffects.getInventory().open(user)
             )
             .addOption(22,
                     new ItemStackBuilder(Material.TOTEM_OF_UNDYING)
-                            .setName(Component.text("Emotes").style(CrownItems.nonItalic(NamedTextColor.GOLD)))
+                            .setName(Component.text("Emotes").style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
                             .addLore(Component.empty())
-                            .addLore(Component.text("Poking, smooching, bonking and more").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
-                            .addLore(Component.text("to interact with friends!").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
+                            .addLore(Component.text("Poking, smooching, bonking and more").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
+                            .addLore(Component.text("to interact with friends!").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
                             .build(),
                     (user, context) -> CosmeticEmotes.getInventory().open(user)
             )
             .addOption(24,
                     new ItemStackBuilder(Material.SKELETON_SKULL)
-                            .setName(Component.text("Death Particles").style(CrownItems.nonItalic(NamedTextColor.GOLD)))
+                            .setName(Component.text("Death Particles").style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
                             .addLore(Component.empty())
-                            .addLore(Component.text("Make your death more spectacular by").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
-                            .addLore(Component.text("exploding into pretty particles!").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
+                            .addLore(Component.text("Make your death more spectacular by").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
+                            .addLore(Component.text("exploding into pretty particles!").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
                             .build(),
                     (user, context) -> DeathEffects.getInventory().open(user)
             )
@@ -74,8 +74,8 @@ public abstract class CosmeticConstants {
     public static final SimpleOption GO_BACK = new SimpleOption(
             4,
             new ItemStackBuilder(Material.PAPER, 1)
-                    .setName(Component.text("< Go back").style(CrownItems.nonItalic(NamedTextColor.YELLOW)))
-                    .addLore(Component.text("Back to the main menu").style(CrownItems.nonItalic(NamedTextColor.GRAY)))
+                    .setName(Component.text("< Go back").style(ChatFormatter.nonItalic(NamedTextColor.YELLOW)))
+                    .addLore(Component.text("Back to the main menu").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
                     .build(),
             (user, context) -> MAIN.open(user)
     );

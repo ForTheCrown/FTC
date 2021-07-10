@@ -8,7 +8,6 @@ import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.UserManager;
@@ -52,7 +51,7 @@ public class ChatFormatter {
     private static final DecimalFormat DECIMAL_FORMAT;
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
-    public static final Component AFK_SUFFIX = Component.text(" [AFK]").style(CrownItems.nonItalic(NamedTextColor.GRAY));
+    public static final Component AFK_SUFFIX = Component.text(" [AFK]").style(nonItalic(NamedTextColor.GRAY));
 
     /* If you wanna welcome someone, just welcome them, this is dumb
     public static String[] RANDOM_AFK_GREETINGS = {
@@ -376,5 +375,9 @@ public class ChatFormatter {
     public static Component sourceDisplayName(CommandSource source){
         if(source.isPlayer()) return UserManager.getUser(source.textName()).nickDisplayName();
         return source.displayName();
+    }
+
+    public static Style nonItalic(TextColor color){
+        return Style.style(color).decoration(TextDecoration.ITALIC, false);
     }
 }

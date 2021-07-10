@@ -5,30 +5,30 @@ import net.kyori.adventure.text.TranslatableComponent;
 import org.bukkit.GameMode;
 
 public enum CrownGameMode {
-    SURVIVAL ("gameMode.survival", GameMode.SURVIVAL, false),
-    CREATIVE ("gameMode.creative", GameMode.CREATIVE, true),
-    SPECTATOR ("gameMode.spectator", GameMode.SPECTATOR, true),
-    ADVENTURE ("gameMode.adventure", GameMode.ADVENTURE, false);
+    SURVIVAL ("gameMode.survival", GameMode.SURVIVAL, false, 0),
+    CREATIVE ("gameMode.creative", GameMode.CREATIVE, true, 1),
+    SPECTATOR ("gameMode.spectator", GameMode.SPECTATOR, true, 2),
+    ADVENTURE ("gameMode.adventure", GameMode.ADVENTURE, false, 3);
 
     public final String translationKey;
     public final GameMode bukkit;
     public final boolean canFly;
+    public final int id;
 
-    CrownGameMode(String translationKey, GameMode handle, boolean canFly){
+    CrownGameMode(String translationKey, GameMode handle, boolean canFly, int id){
         this.translationKey = translationKey;
         this.bukkit = handle;
         this.canFly = canFly;
+        this.id = id;
     }
 
     public static CrownGameMode wrap(GameMode bukkit){
-        switch (bukkit){
-            case CREATIVE: return CREATIVE;
-            case SURVIVAL: return SURVIVAL;
-            case ADVENTURE: return ADVENTURE;
-            case SPECTATOR: return SPECTATOR;
-
-            default: throw new IllegalStateException("Unexpected value: " + bukkit);
-        }
+        return switch (bukkit) {
+            case CREATIVE -> CREATIVE;
+            case SURVIVAL -> SURVIVAL;
+            case ADVENTURE -> ADVENTURE;
+            case SPECTATOR -> SPECTATOR;
+        };
     }
 
     public TranslatableComponent title(){

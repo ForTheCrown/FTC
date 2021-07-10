@@ -25,7 +25,7 @@ public class DailyEnchantment implements JsonSerializable {
 
     public void update(EnchantmentData data, CrownRandom random){
         this.enchantment = data.getEnchantment();
-        this.level = (byte) random.intInRange(enchantment.getMaxLevel(), data.getMaxLevel());
+        this.level = (byte) random.intInRange(enchantment.getMaxLevel()+1, data.getMaxLevel());
         this.price = level * data.getPricePerLevel();
     }
 

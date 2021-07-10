@@ -46,8 +46,8 @@ public class MarriageMessage {
             return;
         }
 
-        if(status == MuteStatus.NONE || status == MuteStatus.SOFT) sender.sendMessage(formatted);
-        if(status == MuteStatus.NONE) recipient.sendMessage(formatted);
+        if(status == MuteStatus.NONE || status == MuteStatus.SOFT) sender.sendBlockableMessage(recipient.getUniqueId(), formatted);
+        if(status == MuteStatus.NONE) recipient.sendBlockableMessage(sender.getUniqueId(), formatted);
     }
 
     public static Component format(Component displayName, Component message){

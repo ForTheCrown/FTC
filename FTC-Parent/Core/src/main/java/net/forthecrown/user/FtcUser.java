@@ -1,6 +1,7 @@
 package net.forthecrown.user;
 
 import io.papermc.paper.adventure.AdventureComponent;
+import it.unimi.dsi.fastutil.objects.*;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
@@ -76,7 +77,7 @@ public class FtcUser implements CrownUser {
     public String name;
 
     public String lastOnlineName;
-    public List<String> previousNames = new ArrayList<>();
+    public ObjectList<String> previousNames = new ObjectArrayList<>();
     public Component nickname;
     public Component currentPrefix;
 
@@ -87,15 +88,13 @@ public class FtcUser implements CrownUser {
     public final FtcUserCosmeticData cosmeticData;
 
     public Rank currentRank = Rank.DEFAULT;
-    public Set<Rank> ranks = new HashSet<>();
     public Branch branch = Branch.DEFAULT;
+    public ObjectSet<Rank> ranks = new ObjectOpenHashSet<>();
 
-    public List<Pet> pets = new ArrayList<>();
+    public final ObjectList<Pet> pets = new ObjectArrayList<>();
+    public final ObjectSet<UserProperty> properties = new ObjectOpenHashSet<>();
 
     private int gems = 0;
-
-    public final Set<UserProperty> properties = new HashSet<>();
-
     public boolean afk = false;
     public long totalEarnings = 0L;
     public long nextResetTime = 0L;
@@ -103,16 +102,16 @@ public class FtcUser implements CrownUser {
     public long nextAllowedBranchSwap = 0L;
     public String ip;
 
-    public Map<Material, SoldMaterialData> matData = new HashMap<>();
+    public Object2ObjectMap<Material, SoldMaterialData> matData = new Object2ObjectOpenHashMap<>();
     public SellAmount sellAmount = SellAmount.PER_1;
 
-    public Location entityLocation;
-
     private ServerPlayer handle;
-
-    public Location lastLocation;
-    public UserTeleport lastTeleport;
     public AfkListener afkListener;
+
+    public Location entityLocation;
+    public Location lastLocation;
+
+    public UserTeleport lastTeleport;
     public long nextAllowedTeleport = 0L;
 
     private CommandSender lastMessage;
@@ -215,11 +214,6 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public void setAvailableRanks(Set<Rank> ranks){
-        this.ranks = ranks;
-    }
-
-    @Override
     public boolean hasRank(Rank rank){
         return ranks.contains(rank);
     }
@@ -287,13 +281,8 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public List<Pet> getPets() {
+    public ObjectList<Pet> getPets() {
         return pets;
-    }
-
-    @Override
-    public void setPets(List<Pet> pets) {
-        this.pets = pets;
     }
 
     @Override
@@ -500,6 +489,12 @@ public class FtcUser implements CrownUser {
     public void sendMessage(UUID id, net.minecraft.network.chat.Component message, ChatType type){
         if(!isOnline()) return;
         sendPacket(new ClientboundChatPacket(message, type, id));
+    }
+
+    @Override
+    public void sendBlockableMessage(UUID id, Component message){
+        if(!isOnline()) return;
+        sendMessage(id, new AdventureComponent(message), ChatType.GAME_INFO);
     }
 
     @Nonnull
@@ -737,6 +732,8 @@ public class FtcUser implements CrownUser {
         permsCheck();
         if(shouldResetEarnings()) resetEarnings();
 
+        net.forthecrown.user.UserManager.updateSpectatorTab();
+
         lastLoad = System.currentTimeMillis();
 
         PunishmentManager manager = CrownCore.getPunishmentManager();
@@ -806,6 +803,7 @@ public class FtcUser implements CrownUser {
     @Override
     public Component listDisplayName(){
         return Component.text()
+                .style(ChatFormatter.nonItalic(NamedTextColor.WHITE))
                 .append(getCurrentPrefix())
                 .append(nickDisplayName())
                 .append(isAfk() ? ChatFormatter.AFK_SUFFIX : Component.empty())
@@ -1016,7 +1014,9 @@ public class FtcUser implements CrownUser {
     public void setGameMode(CrownGameMode gameMode) {
         checkOnline();
 
-        getPlayer().setGameMode(gameMode.bukkit);
+        getOnlineHandle().setGameMode(gameMode.bukkit);
+
+        net.forthecrown.user.UserManager.updateSpectatorTab();
     }
 
     @Override

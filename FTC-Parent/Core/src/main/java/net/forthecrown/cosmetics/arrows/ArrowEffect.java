@@ -6,7 +6,6 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.cosmetics.CosmeticConstants;
 import net.forthecrown.cosmetics.CosmeticEffect;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
-import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
@@ -69,10 +68,10 @@ public class ArrowEffect implements CosmeticEffect {
         boolean owned = user.getCosmeticData().hasArrow(this);
 
         ItemStackBuilder builder = new ItemStackBuilder(owned ? Material.ORANGE_DYE : Material.GRAY_DYE)
-                .setName(name().style(CrownItems.nonItalic(NamedTextColor.YELLOW)));
+                .setName(name().style(ChatFormatter.nonItalic(NamedTextColor.YELLOW)));
 
         for (Component c: description){
-            builder.addLore(c.style(CrownItems.nonItalic(NamedTextColor.GRAY)));
+            builder.addLore(c.style(ChatFormatter.nonItalic(NamedTextColor.GRAY)));
         }
 
         builder.addLore(Component.empty());
@@ -80,8 +79,8 @@ public class ArrowEffect implements CosmeticEffect {
         if(!owned){
             builder.addLore(
                     Component.text("Click to purchase for ")
-                            .style(CrownItems.nonItalic(NamedTextColor.GRAY))
-                            .append(Component.text(ChatFormatter.decimalizeNumber(CosmeticConstants.ARROW_PRICE) + " Gems").style(CrownItems.nonItalic(NamedTextColor.GOLD)))
+                            .style(ChatFormatter.nonItalic(NamedTextColor.GRAY))
+                            .append(Component.text(ChatFormatter.decimalizeNumber(CosmeticConstants.ARROW_PRICE) + " Gems").style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
             );
         }
 
