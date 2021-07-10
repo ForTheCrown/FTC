@@ -19,12 +19,10 @@ public final class CrownUserManager extends AbstractYamlSerializer implements Us
     public static final Map<UUID, FtcUserAlt> LOADED_ALTS = new HashMap<>();
 
     private Map<UUID, UUID> alts = new HashMap<>();
-    private final CrownCore core;
 
     public CrownUserManager(){
         super("usermanager");
 
-        this.core = CrownCore.inst();
         reload();
         CrownCore.logger().info("User manager loaded");
     }
@@ -47,6 +45,7 @@ public final class CrownUserManager extends AbstractYamlSerializer implements Us
     @Override
     public void saveUsers(){
         LOADED_USERS.values().forEach(FtcUser::save);
+        LOADED_USERS.entrySet().removeIf(entry -> !entry.getValue().isOnline());
     }
 
     @Override

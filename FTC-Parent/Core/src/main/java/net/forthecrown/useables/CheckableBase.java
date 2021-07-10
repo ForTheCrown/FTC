@@ -7,7 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
 import net.forthecrown.utils.CrownUtils;
-import net.forthecrown.utils.InterUtils;
+import net.forthecrown.utils.InteractionUtils;
 import net.kyori.adventure.key.Key;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public abstract class CheckableBase implements Preconditionable {
     protected void saveChecksInto(JsonObject json){
         JsonObject preconditions = new JsonObject();
         for (UsageCheckInstance p: getChecks()){
-            preconditions.add(p.typeKey().asString(), InterUtils.writeCheck(p));
+            preconditions.add(p.typeKey().asString(), InteractionUtils.writeCheck(p));
         }
         json.add("preconditions", preconditions);
     }
@@ -31,7 +31,7 @@ public abstract class CheckableBase implements Preconditionable {
         JsonElement precons = json.get("preconditions");
         if(precons != null && precons.isJsonObject()){
             for (Map.Entry<String, JsonElement> e: precons.getAsJsonObject().entrySet()){
-                addCheck(InterUtils.readCheck(e.getKey(), e.getValue()));
+                addCheck(InteractionUtils.readCheck(e.getKey(), e.getValue()));
             }
         }
     }

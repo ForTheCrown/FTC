@@ -30,11 +30,11 @@ public class BoundingBoxOffset {
         return maxOffset;
     }
 
-    public CrownBoundingBox apply(Location minLoc){
+    public CrownRegion apply(Location minLoc){
         Location min = minOffset.apply(minLoc);
         Location max = maxOffset.apply(minLoc);
 
-        return CrownBoundingBox.of(min, max);
+        return CrownRegion.of(min, max);
     }
 
     public BoundingBox apply(Vector vector){

@@ -5,6 +5,7 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.AbstractDeathEffect;
 import net.forthecrown.cosmetics.emotes.CosmeticEmote;
+import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.preconditions.UsageCheck;
 import net.kyori.adventure.key.Key;
@@ -20,6 +21,8 @@ public interface Registries {
     CloseableRegistry<UsageAction> USAGE_ACTIONS = createCloseable("usage_actions");
 
     CloseableRegistry<ComVarType<?>> COMVAR_TYPES = createCloseable("comvar_types");
+
+    CloseableRegistry<DungeonBoss<?>> DUNGEON_BOSSES = createCloseable("dungeon_bosses");
 
     static <T> CloseableRegistry<T> createCloseable(String strKey){
         Key key = CrownCore.coreKey(strKey);

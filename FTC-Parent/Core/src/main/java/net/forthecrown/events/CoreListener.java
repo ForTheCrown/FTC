@@ -30,7 +30,6 @@ import net.forthecrown.user.data.MarriageMessage;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -59,25 +58,23 @@ public class CoreListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         CrownUser user = UserManager.getUser(event.getPlayer());
-        user.onJoin();
+        boolean nameChanged = user.onJoin();
 
         if(!event.getPlayer().hasPlayedBefore()){
             user.getPlayer().teleport(CrownCore.getServerSpawn());
 
-            Component welcomeMsg = Component.translatable("user.firstJoin", user.nickDisplayName())
-                    .hoverEvent(Component.text("Click to welcome them!"))
-                    .clickEvent(ClickEvent.runCommand("Welcome " + user.getNickOrName() + '!'))
-                    .color(NamedTextColor.YELLOW);
-
+            Component welcomeMsg = Component.translatable("user.firstJoin", NamedTextColor.YELLOW, user.nickDisplayName());
             CrownCore.getAnnouncer().announceRaw(welcomeMsg);
 
             //Give join kit
             Kit kit = CrownCore.getKitRegistry().get(CrownCore.onFirstJoinKit());
             if(kit != null) kit.attemptItemGiving(event.getPlayer());
-        } else user.sendMessage(Component.translatable("server.welcomeBack").color(NamedTextColor.GOLD));
+        } else {
+            user.sendMessage(Component.translatable("server.welcomeBack").color(NamedTextColor.GOLD));
 
-        if(user.isVanished()) event.joinMessage(null);
-        else event.joinMessage(ChatFormatter.joinMessage(user));
+            if(user.isVanished()) event.joinMessage(null);
+            else event.joinMessage(nameChanged ? ChatFormatter.newNameJoinMessage(user) : ChatFormatter.joinMessage(user));
+        }
 
         Pirates.getParrotTracker().check(user.getPlayer());
 

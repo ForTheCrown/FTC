@@ -10,7 +10,7 @@ import net.forthecrown.cosmetics.deaths.AbstractDeathEffect;
 import net.forthecrown.grenadier.exceptions.MutableCommandExceptionType;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
-import net.forthecrown.utils.SuggestionUtils;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 
@@ -46,6 +46,6 @@ public class DeathEffectType implements ArgumentType<AbstractDeathEffect> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return SuggestionUtils.suggestRegistry(builder, Registries.DEATH_EFFECTS);
+        return FtcSuggestionProvider.suggestRegistry(builder, Registries.DEATH_EFFECTS);
     }
 }

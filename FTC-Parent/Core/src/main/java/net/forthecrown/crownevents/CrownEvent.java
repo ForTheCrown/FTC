@@ -1,6 +1,7 @@
 package net.forthecrown.crownevents;
 
 import net.forthecrown.crownevents.entries.EventEntry;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import org.bukkit.entity.Player;
 
 import java.time.Month;
@@ -19,7 +20,7 @@ public interface CrownEvent<T extends EventEntry> {
      * <p>Note: the start method should also create an event entry for the player</p>
      * @param player The player to start the event for
      */
-    void start(Player player);
+    void start(Player player) throws RoyalCommandException;
 
     /**
      * Method to call when ending an event

@@ -14,6 +14,9 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.arguments.ActionArgType;
 import net.forthecrown.commands.arguments.CheckArgType;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.types.item.ItemArgument;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.useables.Actionable;
 import net.forthecrown.useables.Preconditionable;
@@ -21,9 +24,6 @@ import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.useables.preconditions.UsageCheck;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
-import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.types.item.ItemArgument;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -34,54 +34,66 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
-public final class InterUtils {
-    private InterUtils() {}
+//DO NOT EDIT THIS CLASS, IF YOU DO, THE CODE WONT COMPILE
+//?????????????????????????
+public final class InteractionUtils {
+    private InteractionUtils() {}
 
     public static boolean isUsingFlag(StringReader reader){
         return reader.peek() == '-';
     }
 
     public static LiteralArgumentBuilder<CommandSource> literal(String name){
-        return LiteralArgumentBuilder.literal(name);
+        return (LiteralArgumentBuilder<CommandSource>) literal0(name);
+    }
+
+    public static LiteralArgumentBuilder<CommandSource> literal0(String name){
+        LiteralArgumentBuilder<CommandSource> result = LiteralArgumentBuilder.literal(name);
+        return result;
     }
 
     public static <T> RequiredArgumentBuilder<CommandSource, T> argument(String name, ArgumentType<T> type){
-        return RequiredArgumentBuilder.argument(name, type);
+        return (RequiredArgumentBuilder<CommandSource, T>) argument0(name, type);
+    }
+
+    public static <T> RequiredArgumentBuilder<CommandSource, T> argument0(String name, ArgumentType<T> type){
+        RequiredArgumentBuilder<CommandSource, T> result = RequiredArgumentBuilder.argument(name, type);
+        return result;
     }
 
     public static LiteralArgumentBuilder<CommandSource> actionsArguments(BrigadierFunction<Actionable> p){
         return literal("actions")
-                        .then(literal("list")
+                .then(literal("list")
+                        .executes(c -> {
+                            Actionable sign = p.apply(c);
+
+                            int index = 0;
+                            TextComponent.Builder builder = Component.text().append(Component.text("Interaction actions:"));
+
+                            for (UsageActionInstance action: sign.getActions()){
+                                builder.append(Component.newline());
+                                builder.append(Component.text(index + ") " + action.asString()));
+                                index++;
+                            }
+
+                            c.getSource().sendMessage(builder.build());
+                            return 0;
+                        })
+                )
+
+                .then(literal("remove")
+                        .then(argument("index", IntegerArgumentType.integer(0))
                                 .executes(c -> {
                                     Actionable sign = p.apply(c);
+                                    int index = c.getArgument("index", Integer.class);
 
-                                    int index = 0;
-                                    TextComponent.Builder builder = Component.text().append(Component.text("Interaction actions:"));
+                                    sign.removeAction(index);
 
-                                    for (UsageActionInstance action: sign.getActions()){
-                                        builder.append(Component.newline());
-                                        builder.append(Component.text(index + ") " + action.asString()));
-                                        index++;
-                                    }
-
-                                    c.getSource().sendMessage(builder.build());
+                                    c.getSource().sendAdmin("Removed action with index " + index);
                                     return 0;
                                 })
                         )
-
-                        .then(literal("remove")
-                                .then(argument("index", IntegerArgumentType.integer(0))
-                                        .executes(c -> {
-                                            Actionable sign = p.apply(c);
-                                            int index = c.getArgument("index", Integer.class);
-
-                                            sign.removeAction(index);
-
-                                            c.getSource().sendAdmin("Removed action with index " + index);
-                                            return 0;
-                                        })
-                                )
-                        )
+                )
 
                         .then(literal("add")
                                 .then(argument("type", ActionArgType.action())
@@ -93,30 +105,30 @@ public final class InterUtils {
                                                     return Suggestions.empty();
                                                 })
 
-                                                .executes(c -> {
-                                                    Actionable sign = p.apply(c);
-                                                    UsageAction<?> action = ActionArgType.getAction(c, "type");
-                                                    String toParse = c.getArgument("toParse", String.class);
+                                        .executes(c -> {
+                                            Actionable sign = p.apply(c);
+                                            UsageAction<?> action = ActionArgType.getAction(c, "type");
+                                            String toParse = c.getArgument("toParse", String.class);
 
-                                                    UsageActionInstance instance = action.parse(new StringReader(toParse), c.getSource());
-                                                    sign.addAction(instance);
+                                            UsageActionInstance instance = action.parse(new StringReader(toParse), c.getSource());
+                                            sign.addAction(instance);
 
-                                                    c.getSource().sendAdmin("Successfully added action");
-                                                    return 0;
-                                                })
-                                        )
+                                            c.getSource().sendAdmin("Successfully added action");
+                                            return 0;
+                                        })
                                 )
                         )
+                )
 
-                        .then(literal("clear")
-                                .executes(c -> {
-                                    Actionable sign = p.apply(c);
-                                    sign.clearActions();
+                .then(literal("clear")
+                        .executes(c -> {
+                            Actionable sign = p.apply(c);
+                            sign.clearActions();
 
-                                    c.getSource().sendAdmin("Cleared actions");
-                                    return 0;
-                                })
-                        );
+                            c.getSource().sendAdmin("Cleared actions");
+                            return 0;
+                        })
+                );
     }
 
     public static LiteralArgumentBuilder<CommandSource> checksArguments(BrigadierFunction<Preconditionable> p){
@@ -191,7 +203,7 @@ public final class InterUtils {
                 );
     }
 
-    public static ItemStack parseItem(StringReader reader) throws CommandSyntaxException{
+    public static ItemStack parseItem(StringReader reader) throws CommandSyntaxException {
         int amount = reader.readInt();
         reader.skipWhitespace();
 

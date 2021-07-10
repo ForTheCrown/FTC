@@ -11,7 +11,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsableEntity;
 import net.forthecrown.useables.UsableBlock;
-import net.forthecrown.utils.InterUtils;
+import net.forthecrown.utils.InteractionUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;
@@ -80,10 +80,10 @@ public class CommandInteractable extends FtcCommand {
                 );
     }
 
-    private LiteralArgumentBuilder<CommandSource> editArg(InterUtils.BrigadierFunction<Usable> supplier){
+    private LiteralArgumentBuilder<CommandSource> editArg(InteractionUtils.BrigadierFunction<Usable> supplier){
         return literal("edit")
-                .then(InterUtils.actionsArguments(supplier::apply))
-                .then(InterUtils.checksArguments(supplier::apply))
+                .then(InteractionUtils.actionsArguments(supplier::apply))
+                .then(InteractionUtils.checksArguments(supplier::apply))
 
                 .then(literal("sendFail")
                         .then(argument("bool", BoolArgumentType.bool())
@@ -100,7 +100,7 @@ public class CommandInteractable extends FtcCommand {
                 );
     }
 
-    private LiteralArgumentBuilder<CommandSource> removeArg(InterUtils.BrigadierFunction<Usable> supplier){
+    private LiteralArgumentBuilder<CommandSource> removeArg(InteractionUtils.BrigadierFunction<Usable> supplier){
         return literal("remove")
                 .executes(c -> {
                     Usable interactable = supplier.apply(c);

@@ -61,12 +61,6 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
     @Override
     public boolean isKing() { return getMain().isKing(); }
     @Override
-    public void setKing(boolean king, boolean setPrefix) { getMain().setKing(king, setPrefix); }
-    @Override
-    public void setKing(boolean king, boolean setPrefix, boolean isFemale) { getMain().setKing(king, setPrefix, isFemale); }
-    @Override
-    public void setKing(boolean king) { getMain().setKing(king); }
-    @Override
     public SellAmount getSellAmount() { return getMain().getSellAmount(); }
     @Override
     public void setSellAmount(SellAmount sellAmount) { getMain().setSellAmount(sellAmount); }

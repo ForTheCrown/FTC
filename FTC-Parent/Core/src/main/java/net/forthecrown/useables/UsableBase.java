@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.utils.CrownUtils;
-import net.forthecrown.utils.InterUtils;
+import net.forthecrown.utils.InteractionUtils;
 import net.kyori.adventure.key.Key;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public abstract class UsableBase extends CheckableBase implements Actionable, Pr
         for (UsageActionInstance a: getActions()){
             JsonObject object = new JsonObject();
             object.add("type", new JsonPrimitive(a.typeKey().asString()));
-            object.add("value", InterUtils.writeAction(a));
+            object.add("value", InteractionUtils.writeAction(a));
 
             array.add(object);
         }
@@ -47,7 +47,7 @@ public abstract class UsableBase extends CheckableBase implements Actionable, Pr
             JsonBuf j = JsonBuf.of(e.getAsJsonObject());
 
             try {
-                addAction(InterUtils.readAction(j.getString("type"), j.get("value")));
+                addAction(InteractionUtils.readAction(j.getString("type"), j.get("value")));
             } catch (CommandSyntaxException exception) {
                 exception.printStackTrace();
             }

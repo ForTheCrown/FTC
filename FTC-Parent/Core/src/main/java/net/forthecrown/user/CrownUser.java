@@ -1,7 +1,7 @@
 package net.forthecrown.user;
 
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.serializer.Deletable;
 import net.forthecrown.user.data.SoldMaterialData;
 import net.forthecrown.user.data.UserProperty;
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
  * Represents a user's profile, all their ranks, effects and such
@@ -51,6 +52,10 @@ public interface CrownUser extends
      * @return The User's UUID
      */
     UUID getUniqueId();
+
+    CommandSource getCommandSource(AbstractCommand command);
+
+    CommandSource getCommandSource();
 
     /**
      * Gets the player tied to this user
@@ -156,9 +161,25 @@ public interface CrownUser extends
      */
     void setPets(List<Pet> pets);
 
-    void onJoin();
+    boolean onJoin();
 
     void onJoinLater();
+
+    Component hoverEventText();
+
+    Component hoverEventText(UnaryOperator<Component> operator);
+
+    void updateDisplayName();
+
+    Component listDisplayName();
+
+    Component getCurrentPrefix();
+
+    void setCurrentPrefix(Component component);
+
+    void setLastOnlineName(String lastOnlineName);
+
+    String getLastOnlineName();
 
     /**
      * Checks if the user has the specified pet
@@ -319,17 +340,6 @@ public interface CrownUser extends
     void setBranch(Branch branch);
 
     /**
-     * Sets the user's TabPrefix, keep in mind, you do need a space at the end
-     * @param s The new prefix
-     */
-    void setTabPrefix(String s);
-
-    /**
-     * Clears the user's TabPrefix
-     */
-    void clearTabPrefix();
-
-    /**
      * Sends the user a message, works just like the sendMessage in Player, but it also translates hexcodes and '&amp;' chars as color codes
      * @param message The message to send to the user
      */
@@ -370,17 +380,6 @@ public interface CrownUser extends
      * @return Whether the user is the king or queen
      */
     boolean isKing();
-
-    void setKing(boolean king, boolean setPrefix);
-
-    void setKing(boolean king, boolean setPrefix, boolean isFemale);
-
-    /**
-     * Sets if the user is the king
-     * <p>Again, just does FtcCore.setKing and sets it to be getBase</p>
-     * @param king Whether the user is to be king
-     */
-    void setKing(boolean king);
 
     /**
      * Sends an array of messages to the user
@@ -480,8 +479,6 @@ public interface CrownUser extends
     default Rank getHighestTierRank(){
         Rank highest = null;
 
-        Announcer.debug(getAvailableRanks());
-
         for (Rank r: getAvailableRanks()){
             if(highest == null){
                 highest = r;
@@ -532,8 +529,6 @@ public interface CrownUser extends
 
     void setNickname(Component component);
 
-    void updateDisplayName();
-
     String getNickname();
 
     Component nickname();
@@ -546,9 +541,9 @@ public interface CrownUser extends
 
     void setAfk(boolean afk);
 
-    void updateAfk();
-
     void updateVanished();
+
+    void updateAfk();
 
     boolean isFlying();
 

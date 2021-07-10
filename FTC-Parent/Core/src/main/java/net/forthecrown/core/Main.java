@@ -7,10 +7,7 @@ import net.forthecrown.comvars.types.ComVarType;
 import net.forthecrown.core.admin.CrownPunishmentManager;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.CrownJailManager;
-import net.forthecrown.core.chat.CrownBroadcaster;
-import net.forthecrown.core.chat.CrownMessages;
-import net.forthecrown.core.chat.ChatEmotes;
-import net.forthecrown.core.chat.JoinInfo;
+import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.CrownKingship;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.crownevents.ArmorStandLeaderboard;
@@ -81,6 +78,7 @@ public final class Main extends JavaPlugin implements CrownCore {
 
     static Location                 serverSpawn;
     static CrownMessages            messages;
+    static CrownTabList             tabList;
     static ServerRules              rules;
     static JoinInfo                 joinInfo;
     static ChatEmotes               emotes;
@@ -112,6 +110,10 @@ public final class Main extends JavaPlugin implements CrownCore {
 
         usablesManager = new CrownUsablesManager();
 
+        safeRunnable(Pirates::init);
+        safeRunnable(Bosses::init);
+        safeRunnable(Cosmetics::init);
+
         safeRunnable(UsageChecks::init);
         safeRunnable(UsageActions::init);
 
@@ -122,10 +124,6 @@ public final class Main extends JavaPlugin implements CrownCore {
 
         safeRunnable(CoreCommands::init);
         safeRunnable(Events::init);
-
-        safeRunnable(Pirates::init);
-        safeRunnable(Bosses::init);
-        safeRunnable(Cosmetics::init);
 
         dayUpdate.checkDay();
 
@@ -149,6 +147,8 @@ public final class Main extends JavaPlugin implements CrownCore {
 
         emotes = new ChatEmotes();
         emotes.registerEmotes();
+
+        tabList = new CrownTabList();
 
         WgFlags.init();
     }

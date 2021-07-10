@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.math.BlockPos;
-import net.forthecrown.utils.math.CrownBoundingBox;
+import net.forthecrown.utils.math.CrownRegion;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -42,7 +42,7 @@ public class JsonBuf {
     }
 
     public <E extends Enum<E>> void addEnum(String name, E anum) {
-        json.add(name, writeEnum(anum));;
+        json.add(name, writeEnum(anum));
     }
 
     public <E extends Enum<E>> E getEnum(String name, Class<E> clazz){
@@ -79,11 +79,11 @@ public class JsonBuf {
         return get(name, JsonUtils::readKey);
     }
 
-    public void addRegion(String name, CrownBoundingBox box){
+    public void addRegion(String name, CrownRegion box){
         json.add(name, writeRegion(box));
     }
 
-    public CrownBoundingBox getRegion(String name){
+    public CrownRegion getRegion(String name){
         return get(name, e -> readRegion(e.getAsJsonObject()));
     }
 

@@ -8,7 +8,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.utils.InterUtils;
+import net.forthecrown.utils.InteractionUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -23,7 +23,7 @@ public class CheckHasItemType implements UsageCheck<CheckHasItemType.CheckInstan
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
-        return new CheckInstance(InterUtils.parseGivenItem(source, reader));
+        return new CheckInstance(InteractionUtils.parseGivenItem(source, reader));
     }
 
     @Override
@@ -43,7 +43,7 @@ public class CheckHasItemType implements UsageCheck<CheckHasItemType.CheckInstan
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return InterUtils.listItems(context, builder);
+        return InteractionUtils.listItems(context, builder);
     }
 
     public static class CheckInstance implements UsageCheckInstance {

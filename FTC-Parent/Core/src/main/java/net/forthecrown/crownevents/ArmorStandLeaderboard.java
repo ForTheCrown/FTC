@@ -3,7 +3,7 @@ package net.forthecrown.crownevents;
 import net.forthecrown.commands.CommandHologram;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Main;
-import net.forthecrown.utils.math.CrownBoundingBox;
+import net.forthecrown.utils.math.CrownRegion;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;
@@ -29,11 +29,12 @@ public class ArmorStandLeaderboard {
     private byte size;
     private final Location location;
     private Component border;
-    private boolean isTimerScore;
 
+    private ScoreFormatter scoreFormatter;
     private LeaderboardFormatter format;
 
     public ArmorStandLeaderboard(Map<String, Integer> list, Location location, Component... title) {
+        Validate.notNull(title);
         this.title = title;
         this.list = list;
         this.location = location;
@@ -41,8 +42,9 @@ public class ArmorStandLeaderboard {
         setOrder(Order.HIGH_TO_LOW);
         setSize((byte) 10);
         setBorder(Component.text("-----=o=O=o=-----").color(NamedTextColor.YELLOW));
+
         setFormat(LeaderboardFormatter.defaultFormat());
-        setTimerScore(false);
+        setScoreFormatter(ScoreFormatter.defaultFormat());
 
         Main.LEADERBOARDS.add(this);
         getLocation().getChunk().addPluginChunkTicket(CrownCore.inst());
@@ -86,7 +88,7 @@ public class ArmorStandLeaderboard {
         createStand(getBorder(), loc.subtract(0, 0.25, 0));
     }
 
-    private void createTitleStands(Location location){
+    protected void createTitleStands(Location location){
         location.add(0, 0.25, 0);
         for (Component c: title){
             location.subtract(0, 0.25, 0);
@@ -94,14 +96,11 @@ public class ArmorStandLeaderboard {
         }
     }
 
-    private Component formatString(int pos, String name, int score){
-        String scoreS = score + "";
-        if(isTimerScore()) scoreS = EventTimer.getTimerCounter(score).toString();
-
-        return getFormat().formatName(pos, name, scoreS);
+    protected Component formatString(int pos, String name, int score){
+        return getFormat().formatName(pos, name, getScoreFormatter().format(score));
     }
 
-    private Map<String, Integer> getSortedMap(){
+    protected Map<String, Integer> getSortedMap(){
         List<Map.Entry<String, Integer>> list = new ArrayList<>(getList().entrySet());
         list.sort(Map.Entry.comparingByValue());
         
@@ -112,7 +111,7 @@ public class ArmorStandLeaderboard {
         return result;
     }
 
-    private static void createStand(Component name, Location loc) {
+    protected static void createStand(Component name, Location loc) {
         ArmorStand stand = loc.getWorld().spawn(loc, ArmorStand.class);
         stand.customName(name);
         stand.setCustomNameVisible(true);
@@ -130,7 +129,7 @@ public class ArmorStandLeaderboard {
      */
     public void destroy(){
         Location l = getLocation().clone();
-        CrownBoundingBox area = new CrownBoundingBox(l.getWorld(), l.getX()+1, l.getY()+1, l.getZ()+1, l.getX()-1, l.getY()-(0.25*getSize()+1), l.getZ()-1);
+        CrownRegion area = new CrownRegion(l.getWorld(), l.getX()+1, l.getY()+1, l.getZ()+1, l.getX()-1, l.getY()-(0.25*getSize()+1), l.getZ()-1);
 
         for (ArmorStand stand : area.getEntitiesByType(ArmorStand.class)){
             if(!stand.getPersistentDataContainer().has(CommandHologram.HOLOGRAM_KEY, PersistentDataType.BYTE)) continue;
@@ -195,12 +194,13 @@ public class ArmorStandLeaderboard {
         this.border = border;
     }
 
-    public boolean isTimerScore() {
-        return isTimerScore;
+    public ScoreFormatter getScoreFormatter() {
+        return scoreFormatter;
     }
 
-    public void setTimerScore(boolean timerScore) {
-        isTimerScore = timerScore;
+    public void setScoreFormatter(@NotNull ScoreFormatter scoreFormatter) {
+        Validate.notNull(scoreFormatter);
+        this.scoreFormatter = scoreFormatter;
     }
 
     public enum Order{

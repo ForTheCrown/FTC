@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.utils.SuggestionUtils;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
@@ -45,6 +45,6 @@ public class JailType implements ArgumentType<Key> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return SuggestionUtils.suggestKeysNoNamespace(builder, CrownCore.getJailManager().keySet());
+        return FtcSuggestionProvider.suggestKeysNoNamespace(builder, CrownCore.getJailManager().keySet());
     }
 }

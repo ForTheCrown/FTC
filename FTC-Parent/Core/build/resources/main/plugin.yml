@@ -3,5 +3,5 @@ version: 2.0.0-SNAPSHOT
 main: net.forthecrown.core.Main
 api-version: 1.17
 loadbefore: [ OpenInv, GriefPrevention ]
-depend: [ RoyalGrenadier, WorldGuard, LuckPerms, TAB ]
+depend: [ RoyalGrenadier, WorldGuard, LuckPerms ]
 authors: [ Botul ]

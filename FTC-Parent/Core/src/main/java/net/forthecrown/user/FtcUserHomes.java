@@ -92,7 +92,7 @@ public class FtcUserHomes implements UserHomes, JsonSerializable, JsonDeserializ
     }
 
     @Override
-    public CrownUser getOwner() {
+    public CrownUser getUser() {
         return owner;
     }
 

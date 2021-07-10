@@ -126,7 +126,7 @@ public class CommandProfile extends FtcCommand {
                 .append(line("Crown score", scrDisplay, crownScr.isScoreSet() && crownScr.getScore() > 0 && CrownCore.isEventActive()))
 
                 .append(line("Gems", profile.getGems() + "", profile.getGems() > 0))
-                .append(line("Balance", Balances.formatted(CrownCore.getBalances().get(user.getUniqueId())), true))
+                .append(line("Balance", Balances.formatted(CrownCore.getBalances().get(profile.getUniqueId())), true))
 
                 .append(adminInfo(user, profile))
 
@@ -166,6 +166,13 @@ public class CommandProfile extends FtcCommand {
         Component locMessage = profile.getLocation() == null ? null : ChatFormatter.clickableLocationMessage(profile.getLocation(), true);
         Component punishmentDisplay = entry == null ? Component.empty() : Component.newline().append(entry.display(false));
         Component marriageCooldown = marriageCooldown(profile.interactions);
+        Component ignored = profile.interactions.blocked.isEmpty() ?
+                null :
+                Component.text(ListUtils.join(profile.interactions.blocked, id -> UserManager.getUser(id).getName()));
+
+        Component separated = profile.interactions.separated.isEmpty() ?
+                null :
+                Component.text(ListUtils.join(profile.interactions.separated, id -> UserManager.getUser(id).getName()));
 
         return Component.newline()
                 .append(Component.text("\nAdmin Info:").color(NamedTextColor.YELLOW))
@@ -173,12 +180,9 @@ public class CommandProfile extends FtcCommand {
 
                 .append(Component.newline())
                 .append(timeSinceOnlineOrOnlineTime(profile))
-
-                .append(Component.newline())
                 .append(line(" IP", profile.ip, profile.ip != null))
-                .append(line(" AllowsEmotes", profile.allowsEmotes() + "", true))
-                .append(line(" AllowsProposals", profile.getInteractions().acceptingProposals() + "", true))
-                .append(line(" ProfilePublic", profile.isProfilePublic() + "", true))
+                .append(line(" Ignored: ", ignored, ignored != null))
+                .append(line(" Separated", separated, separated != null))
 
                 .append(line(" MarriageCooldown", marriageCooldown, marriageCooldown != null))
                 .append(line(profile.isOnline() ? " Location" : " Last seen", locMessage, locMessage != null))
@@ -189,8 +193,7 @@ public class CommandProfile extends FtcCommand {
     private static Component marriedMessage(CrownUser user){
         if(user.getInteractions().getMarriedTo() == null) return null;
 
-        return UserManager.getUser(user.getInteractions().getMarriedTo())
-                .nickDisplayName();
+        return user.getInteractions().marriedToUser().nickDisplayName();
     }
 
     private static Component marriageCooldown(UserInteractions interactions){

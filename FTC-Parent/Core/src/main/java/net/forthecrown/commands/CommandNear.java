@@ -10,7 +10,7 @@ import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.CrownGameMode;
-import net.forthecrown.utils.math.CrownBoundingBox;
+import net.forthecrown.utils.math.CrownRegion;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -73,14 +73,14 @@ public class CommandNear extends FtcCommand {
     }
 
     private int showNearby(Location loc, int radius, CommandSource source) throws CommandSyntaxException {
-        CrownBoundingBox box = CrownBoundingBox.of(loc, radius);
+        CrownRegion box = CrownRegion.of(loc, radius);
         List<CrownUser> players = ListUtils.convertToList(box.getPlayers(), UserManager::getUser);
+        players.removeIf(user -> user.hasPermission(Permissions.CORE_ADMIN)
+                || user.getGameMode() == CrownGameMode.SPECTATOR
+                || user.getName().equalsIgnoreCase(source.textName())
+            );
 
-        if(source.isPlayer()){
-            players.remove(UserManager.getUser(source.asPlayer()));
-
-            if(players.isEmpty()) throw FtcExceptionProvider.noNearbyPlayers();
-        }
+        if(players.isEmpty()) throw FtcExceptionProvider.noNearbyPlayers();
 
         TextComponent.Builder builder = Component.text()
                 .append(Component.translatable("commands.near")
@@ -90,8 +90,6 @@ public class CommandNear extends FtcCommand {
 
 
         for (CrownUser u: players){
-            if(u.getGameMode() == CrownGameMode.SPECTATOR || u.hasPermission(Permissions.NEARBY_IGNORE)) continue;
-
             builder
                     .append(u.nickDisplayName().color(u.getHighestTierRank().tier.color))
                     .append(Component.text(" (" + dist(u.getLocation(), box.getCenterLocation()) + ")").color(NamedTextColor.GRAY))

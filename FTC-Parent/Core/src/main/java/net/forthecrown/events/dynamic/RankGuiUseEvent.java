@@ -76,7 +76,7 @@ public class RankGuiUseEvent implements Listener {
 
         if(clickedRank == Rank.DEFAULT){
             user.setRank(clickedRank, false);
-            if(!user.isKing()) user.clearTabPrefix();
+            if(!user.isKing()) user.setCurrentPrefix(null);
             user.sendMessage("&7Your rank is now the default rank.");
         }
         else{
@@ -86,16 +86,10 @@ public class RankGuiUseEvent implements Listener {
         }
 
         //reload inventory
-        switch (currentInvTitle){
-            case "Pirates":
-                player.openInventory(rankInv.getPiratesGUI());
-                break;
-            case "Royals":
-                player.openInventory(rankInv.getRoyalsGUI());
-                break;
-            case "Vikings":
-                player.openInventory(rankInv.getVikingsGUI());
-                break;
+        switch (currentInvTitle) {
+            case "Pirates" -> player.openInventory(rankInv.getPiratesGUI());
+            case "Royals" -> player.openInventory(rankInv.getRoyalsGUI());
+            case "Vikings" -> player.openInventory(rankInv.getVikingsGUI());
         }
     }
 

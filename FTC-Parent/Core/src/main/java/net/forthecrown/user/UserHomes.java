@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Represents everything about a user's homes
  */
-public interface UserHomes {
+public interface UserHomes extends UserAttachment {
     void clear();
 
     int size();
@@ -21,8 +21,6 @@ public interface UserHomes {
     boolean isEmpty();
 
     Map<String, Location> getHomes();
-
-    CrownUser getOwner();
 
     Set<String> getHomeNames();
 

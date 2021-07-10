@@ -12,6 +12,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.Pair;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
@@ -32,6 +33,9 @@ import java.util.UUID;
  * </p>
  */
 public abstract class FtcCommand extends AbstractCommand {
+
+    private String helpListName;
+
     protected FtcCommand(@NotNull String name, @NotNull Plugin plugin) {
         super(name, plugin);
 
@@ -104,5 +108,17 @@ public abstract class FtcCommand extends AbstractCommand {
     private void suggestIf(UUID id, Pair<Integer, Message> pair, SuggestionsBuilder builder){
         int amount = pair.getFirst();
         if(bals.canAfford(id, amount) && (amount + "").toLowerCase().startsWith(builder.getRemaining().toLowerCase())) builder.suggest(amount, pair.getSecond());
+    }
+
+    public void setHelpListName(String descriptionName) {
+        this.helpListName = descriptionName;
+    }
+
+    public String getHelpListName() {
+        return helpListName;
+    }
+
+    public String getHelpOrNormalName(){
+        return CrownUtils.isNullOrBlank(helpListName) ? getName() : getHelpListName();
     }
 }

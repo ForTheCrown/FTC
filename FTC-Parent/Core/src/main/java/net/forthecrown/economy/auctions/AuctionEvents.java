@@ -1,6 +1,7 @@
 package net.forthecrown.economy.auctions;
 
 import net.forthecrown.core.CrownException;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.pirates.AuctionManager;
@@ -33,7 +34,7 @@ public class AuctionEvents implements Listener {
 
         Auction auction = AuctionManager.getAuction(sign.getLocation());
         Validate.notNull(auction, "Auction is null :(");
-        if(!event.getPlayer().hasPermission("ftc.admin")) return;
+        if(!event.getPlayer().hasPermission(Permissions.CORE_ADMIN)) return;
 
         auction.delete();
     }

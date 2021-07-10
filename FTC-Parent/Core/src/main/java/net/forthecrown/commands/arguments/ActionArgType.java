@@ -11,7 +11,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.useables.actions.UsageAction;
-import net.forthecrown.utils.SuggestionUtils;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.kyori.adventure.key.Key;
 
 import java.util.concurrent.CompletableFuture;
@@ -46,6 +46,6 @@ public class ActionArgType implements ArgumentType<Key> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return SuggestionUtils.suggestRegistry(builder, Registries.USAGE_ACTIONS);
+        return FtcSuggestionProvider.suggestRegistry(builder, Registries.USAGE_ACTIONS);
     }
 }

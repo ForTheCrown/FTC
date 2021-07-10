@@ -2,16 +2,18 @@ package net.forthecrown.economy.pirates;
 
 import com.google.common.io.Files;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.economy.pirates.merchants.*;
 import net.forthecrown.registry.CloseableRegistry;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class CrownPirateEconomy implements PirateEconomy {
     private final CrownRandom random;
@@ -111,18 +113,13 @@ public class CrownPirateEconomy implements PirateEconomy {
     private JsonObject getJson() throws IOException {
         File file = getFile();
 
-        FileReader reader = new FileReader(file);
-        JsonParser parser = new JsonParser();
-
-        return parser.parse(reader).getAsJsonObject();
+        return JsonUtils.readFile(file);
     }
 
     private void setJson(JsonObject json) throws IOException {
         File file = getFile();
 
-        FileWriter writer = new FileWriter(file);
-        writer.write(json.toString());
-        writer.close();
+        JsonUtils.writeFile(json, file);
     }
 
     private File getFile() throws IOException {

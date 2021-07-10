@@ -16,7 +16,8 @@ public class CommandIgnore extends FtcCommand {
         super("ignore", CrownCore.inst());
 
         setPermission(Permissions.IGNORE);
-        setDescription("Makes you ignore another player");
+        setAliases("ignoreplayer", "unignore", "unignoreplayer", "block", "unblock");
+        setDescription("Makes you ignore/unignore another player");
 
         register();
     }
@@ -32,7 +33,6 @@ public class CommandIgnore extends FtcCommand {
                             if(target.equals(user)) throw FtcExceptionProvider.cannotIgnoreSelf();
 
                             UserInteractions userInt = user.getInteractions();
-
                             boolean alreadyIgnoring = userInt.isBlockedPlayer(target.getUniqueId());
 
                             if(alreadyIgnoring){

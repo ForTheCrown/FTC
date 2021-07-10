@@ -1,5 +1,6 @@
 package net.forthecrown.core.chat;
 
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -7,7 +8,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,7 +61,14 @@ public class ChatEmotes implements SuggestionProvider<CommandSource> {
 
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder, boolean ignorePerms) {
         if(context.getSource().hasPermission(Permissions.DONATOR_3) || ignorePerms){
-            return CompletionProvider.suggestMatching(builder, emoteMap.keySet());
+            String token = builder.getRemainingLowerCase();
+
+            for (Map.Entry<String, String> e: emoteMap.entrySet()){
+                if(!e.getKey().startsWith(token)) continue;
+                builder.suggest(e.getKey(), new LiteralMessage(e.getValue()));
+            }
+
+            return builder.buildFuture();
         }
 
         return Suggestions.empty();

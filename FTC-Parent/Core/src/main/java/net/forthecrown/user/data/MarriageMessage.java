@@ -19,7 +19,7 @@ public class MarriageMessage {
             .build();
 
     public static final Component POINTER = Component.text(" > ")
-            .color(NamedTextColor.YELLOW)
+            .color(TextColor.color(255, 158, 208))
             .decorate(TextDecoration.BOLD);
 
     private final CrownUser sender;
@@ -42,7 +42,7 @@ public class MarriageMessage {
         EavesDropper.reportMarriageDM(this);
 
         if(sender.getInteractions().isBlockedPlayer(recipient.getUniqueId())){
-            sender.sendMessage(Component.translatable("marriage.ignored").color(NamedTextColor.GOLD));
+            if(sender.getInteractions().isOnlyBlocked(recipient.getUniqueId())) sender.sendMessage(Component.translatable("marriage.ignored").color(NamedTextColor.GOLD));
             return;
         }
 

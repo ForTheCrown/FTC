@@ -4,14 +4,11 @@ import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.CrownException;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.inventory.CrownItems;
-import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.Bosses;
-import net.forthecrown.dungeons.bosses.Drawned;
+import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.bosses.Skalatan;
-import net.forthecrown.dungeons.bosses.Zhambie;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.squire.enchantment.RoyalEnchant;
 import net.forthecrown.squire.enchantment.RoyalEnchants;
 import net.forthecrown.user.CrownUser;
@@ -133,65 +130,21 @@ public class DungeonEvents implements Listener, ClickEventTask {
         if(Cooldown.contains(player)) return;
         Cooldown.add(player, 20);
 
-        //Boss spawning
-        if(name.contains("Spawn ")){
-            Bosses.BY_NAME.get(name.replaceAll("Spawn ", "").replaceAll(" ", "_").toLowerCase().trim()).attemptSpawn(player);
-            return;
-        }
-
-        //Level 4 artifactss
-        if(name.contains("Artifact")){
-            //Essentials kit signs can suck my [REDACTED]
-            Drawned.Artifacts artifacts = Drawned.Artifacts.valueOf(name.substring(0, name.indexOf(" ")).toUpperCase());
-            if(Cooldown.contains(player, "dungeons_" + artifacts.toString().toLowerCase() + "_artifact")) return;
-            Cooldown.add(player, "dungeons_" + artifacts.toString().toLowerCase() + "_artifact", 5*60*20);
-            player.getInventory().addItem(artifacts.item());
-            player.sendMessage(
-                    Component.text("You got the ")
-                    .color(NamedTextColor.GRAY)
-                    .append(slime.customName().color(NamedTextColor.YELLOW))
+        switch (name) {
+            case "Right Click Me!" -> player.sendMessage(Component.text()
+                    .append(CrownCore.prefix().color(NamedTextColor.AQUA))
+                    .append(Component.text("Right clicking this will show you a list of items needed to spawn the level's boss"))
+                    .build()
             );
-            return;
-
-            //Hidden -> -171.5 42, 84.5
-            //Nautilus -> -105.5 45 126.5
-            //Iron -> -110.5 46 140.5
-        }
-
-        switch (name){
-            case "Right Click Me!":
-                player.sendMessage(Component.text()
-                        .append(CrownCore.prefix().color(NamedTextColor.AQUA))
-                        .append(Component.text("Right clicking this will show you a list of items needed to spawn the level's boss"))
-                        .build()
-                );
-                break;
-            case "Right Click to Spawn":
-                player.sendMessage(Component.text()
-                        .append(CrownCore.prefix().color(NamedTextColor.AQUA))
-                        .append(Component.text("If you have all the required items, using this, will spawn the boss"))
-                        .build()
-                );
-                break;
-
-            case "Zombie Level Info":
-                player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.zhambie()));
-                break;
-            case "Skeleton Level Info":
-                player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.skalatan()));
-                break;
-            case "Water Level Info":
-                player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.drawned()));
-                break;
-            case "Spider Level Info":
-                player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.hideySpidey()));
-                break;
-            case "Hidden Mummy Ingot":
-                if(Cooldown.contains(player, "Dungeons_Mummy_Ingot")) return;
-                Cooldown.add(player, "Dungeons_Mummy_Ingot", 5*20*60);
-                player.sendMessage(ChatFormatter.translateHexCodes("&7You got the &eHidden Mummy Ingot"));
-                player.getInventory().addItem(Zhambie.mummyIngot());
-                break;
+            case "Right Click to Spawn" -> player.sendMessage(Component.text()
+                    .append(CrownCore.prefix().color(NamedTextColor.AQUA))
+                    .append(Component.text("If you have all the required items, using this, will spawn the boss"))
+                    .build()
+            );
+            case "Zombie Level Info" -> player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.zhambie()));
+            case "Skeleton Level Info" -> player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.skalatan()));
+            case "Water Level Info" -> player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.drawned()));
+            case "Spider Level Info" -> player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.hideySpidey()));
         }
     }
 

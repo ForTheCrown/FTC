@@ -2,16 +2,457 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="21478df4-cf5f-4c22-a0d4-c40987a94127" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/FTC.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FTC-Parent/.idea/libraries-with-intellij-classes.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FTC-Parent/Core/remapping/Core-2.0.0-SNAPSHOT-mojang-mapped.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/punishments/CommandSeparate.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/punishments/CommandSmite.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/chat/CrownTabList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/chat/TabList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/crownevents/CrownEventUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/crownevents/ScoreFormatter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/dungeons/usables/ActionGiveArtifact.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/dungeons/usables/ActionSpawnBoss.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/UserAttachment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/executionHistory/executionHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/javaCompile/classAnalysis.bin" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/javaCompile/classAnalysis.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/javaCompile/jarAnalysis.bin" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/javaCompile/jarAnalysis.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/javaCompile/javaCompile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/javaCompile/javaCompile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/javaCompile/taskHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/7.0.2/javaCompile/taskHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.gradle/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/.gradle/checksums/checksums.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/gradle.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/libraries-with-intellij-classes.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Core/FTC-Parent.Core.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Core/FTC-Parent.Core.test.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Cosmetics/FTC-Parent.Cosmetics.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Cosmetics/FTC-Parent.Cosmetics.test.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Pirates/FTC-Parent.Pirates.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Pirates/FTC-Parent.Pirates.test.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Royals/FTC-Parent.Royals.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Royals/FTC-Parent.Royals.test.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Squire/FTC-Parent.Squire.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Squire/FTC-Parent.Squire.test.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Vikings/FTC-Parent.Vikings.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/modules/Vikings/FTC-Parent.Vikings.test.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FTC-Parent/Cosmetics/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Cosmetics/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FTC-Parent/Cosmetics/build/resources/main/plugin.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/FTC-Parent/Cosmetics/src/main/java/net/forthecrown/cosmetics/Cosmetics.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Cosmetics/src/main/java/net/forthecrown/cosmetics/Cosmetics.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FTC-Parent/Cosmetics/src/main/java/net/forthecrown/cosmetics/PlayerRidingManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Cosmetics/src/main/java/net/forthecrown/cosmetics/PlayerRidingManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandAuction.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandAuction.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandHomeList.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandHomeList.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandIgnore.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandIgnore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandIgnoreList.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandIgnoreList.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandInteractable.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandInteractable.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandItemName.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandKingMaker.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandKit.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandKitEdit.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandKitList.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandLeave.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandList.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandLore$ComponentCommand.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandLore.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandMakeAward.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandMe.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandMemory.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandNear.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandNickname.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandParrot.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandPay.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandPayToggle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandPirate.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandPlayerTime.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandProfile.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandProfilePrivate.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandProfilePublic.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandRank.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandReply.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandSelfOrUser$CommandFunction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandSelfOrUser.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandSetHome.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandSetSpawn.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandShop.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandSign.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandSkull.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandSpecificGameMode.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandSpeed.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandStaffChat.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandStaffChatToggle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandSudo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandSuicide.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTeleport.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTeleportExact.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTell.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTestCore.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandToolBlock$UtilityBlockFunction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandToolBlock.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTop.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTpCancel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTpDeny.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTpDenyAll.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTpaAccept.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTpaCancel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTpaToggle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTpask.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandTpaskHere.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandVanish.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandVolleyBall.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandWarp.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandWarpEdit.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandWarpList.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandWeather.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandWild.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandWithdraw.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/CommandWorld.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/ActionArgType.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/ActionArgType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/CheckArgType.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/CheckArgType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/JailType.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/JailType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/KeyType.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/KeyType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/KitType.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/KitType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/UserType.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/UserType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/WarpType.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/arguments/WarpType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/emotes/CommandEmote.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/emotes/EmoteBonk.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/emotes/EmoteHug$HugTick.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/emotes/EmoteHug.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/emotes/EmoteJingle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/emotes/EmotePog.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/emotes/EmotePoke.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/emotes/EmoteScare.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/emotes/EmoteSmooch.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/emotes/EmoteToggle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/help/HelpAuction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/help/HelpBank.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/help/HelpDiscord.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/help/HelpFindPost.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/help/HelpHelp.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/help/HelpMap.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/help/HelpPost.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/help/HelpRules.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/help/HelpShop.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/help/HelpSpawn.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/manager/CoreCommands.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/manager/CrownExceptionProvider.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/manager/FtcCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/manager/FtcCommand.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/manager/FtcExceptionProvider.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/manager/UserCommandExceptionType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/marriage/CommandDivorce.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/marriage/CommandMarriageAccept.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/marriage/CommandMarriageChat.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/marriage/CommandMarriageChatToggle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/marriage/CommandMarriageDeny.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/marriage/CommandMarry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/marriage/CommandMarryToggle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/CommandJail.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/CommandJails.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/CommandKickAll.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/CommandMute.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/CommandPardon.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/CommandPunishment.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/CommandSoftMute.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/CommandTempBan.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/GenericPunisher.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/Punisher.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/commands/punishments/TempPunisher.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/comvars/ComVarRegistry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/comvars/types/ComponentComVarType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/comvars/types/KeyComVarType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/comvars/types/WorldComVarType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/ComVars.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/CrownCore.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/MiniGameRegion.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/PeriodicalSaver.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/Permissions.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/admin/CrownPunishmentManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/admin/EavesDropper.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/admin/PunishmentEntry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/admin/PunishmentManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/admin/ServerRules.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/admin/StaffChat.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/admin/jails/CrownJailManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/admin/jails/JailManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/admin/record/PunishmentRecord.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/admin/record/PunishmentType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/chat/Announcer$DebugLevel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/chat/Announcer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/chat/ChatFormatter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/chat/ChatUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/chat/CrownBroadcaster$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/chat/CrownBroadcaster.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/chat/CrownMessages.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/chat/JoinInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/kingship/CrownKingship.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/kingship/Kingship.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/core/nbt/NbtHandler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/ArmorStandLeaderboard$Order.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/ArmorStandLeaderboard.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/CrownEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/EventTimer$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/EventTimer$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/EventTimer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/InEventListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/ObjectiveLeaderboard.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/entries/EventEntry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/entries/SingleEntry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/reporters/CrownEventReporter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/reporters/EventReporter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/crownevents/reporters/ReporterFactory.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/BossFightContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/BossFightContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/BossItems.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/Bosses.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/DungeonAreas.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/bosses/Drawned$Artifacts.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/bosses/Drawned.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/bosses/DungeonBoss.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/bosses/DungeonBoss.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/bosses/HideySpidey$SpawnPart.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/bosses/HideySpidey.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/bosses/Skalatan$AttackState.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/bosses/Skalatan.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/dungeons/bosses/Zhambie.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/BrokenShopException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/CrownBalances.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/SellShop$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/SellShop$Menu.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/SellShop.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/SortedBalanceMap.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/SortedBalanceMap.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/auctions/AuctionEvents.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/auctions/CrownAuction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/pirates/CrownPirateEconomy.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/pirates/DailyEnchantment.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/pirates/EnchantmentData.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/pirates/PirateEconomy.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/pirates/merchants/BlackMarketMerchant.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/pirates/merchants/EnchantMerchant.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/pirates/merchants/HeadMerchant.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/pirates/merchants/MaterialMerchant.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/pirates/merchants/ParrotMerchant.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/pirates/merchants/UsablePirateNpc.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/shops/CrownShopInventory.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/shops/CrownShopManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/shops/CrownSignShop.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/economy/shops/ShopManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/CoreListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/DungeonEvents$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/DungeonEvents.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/EnchantEvents$StrongAimScheduler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/EnchantEvents.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/Events.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/ExceptionedEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/GraveListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/InteractableEvents.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/JackEvent$JackInvListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/JackEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/JeromeEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/MarriageListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/MobHealthBar$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/MobHealthBar.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/PirateEvents.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/ShopCreateEvent$SignShopSubClass1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/ShopCreateEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/ShopDestroyEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/ShopTransactionEvent$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/ShopTransactionEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/SignInteractEvent$SignShopInteractSubClass.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/SignInteractEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/SmokeBomb.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/VolleyBallListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/custom/SellShopUseEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/custom/SignShopUseEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/dynamic/AbstractInvListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/dynamic/BmEnchantListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/dynamic/BmParrotListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/dynamic/BmSellItemListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/dynamic/JailListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/dynamic/RankGuiUseEvent.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/dynamic/SellShopEvents$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/events/dynamic/SellShopEvents.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/AuctionManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/ParrotTracker.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/Pirates.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/TreasureShulker$Loot.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/TreasureShulker.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/grappling/GhLevelData$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/grappling/GhLevelData.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/grappling/GhLevelSelector.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/grappling/GhParkourData.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/grappling/GrapplingHookParkour$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/pirates/grappling/GrapplingHookParkour.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/registry/BaseRegistry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/registry/CrownKitRegistry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/registry/CrownRegistry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/registry/CrownWarpRegistry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/registry/KitRegistry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/registry/Registry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/registry/WarpRegistry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/serializer/AbstractJsonSerializer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/serializer/AbstractNbtSerializer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/serializer/AbstractYamlSerializer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/serializer/NbtCompoundLoadable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/serializer/NbtCompoundSavable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/serializer/NbtSerializable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/AbstractUsable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/Actionable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/CheckableBase.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/CrownUsableBlock.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/CrownUsableEntity.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/CrownUsablesManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/Usable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/UsableBase.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/UsableBlock.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/UsableEntity.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/UsablesManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/actions/ActionChangeScore$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/actions/ActionChangeScore$Action.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/actions/ActionChangeScore$IntBiOperator.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/actions/ActionChangeScore.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/actions/ActionCommand.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/actions/ActionItem.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/actions/ActionKit.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/actions/ActionRemoveNumber.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/actions/ActionShowText.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/actions/ActionTeleport.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/kits/FtcKit.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/preconditions/CheckInWorld.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/preconditions/CheckInventoryEmpty.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/preconditions/CheckNeverUsed.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/preconditions/CheckNotUsedBefore.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/preconditions/CheckNumber.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/preconditions/CheckPermission.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/useables/warps/FtcWarp.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/CrownUser.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/CrownUser.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/CrownUserAlt.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/CrownUserManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/FtcUser.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/FtcUser.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/FtcUserAlt.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/FtcUserHomes.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/FtcUserHomes.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/FtcUserInteractions.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/FtcUserInteractions.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/UserDataContainer.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/UserDataContainer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/UserHomes.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/UserHomes.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/UserInteractions.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/UserInteractions.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/UserManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/data/DirectMessage.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/data/EssToFTC.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/user/data/MarriageMessage.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/BlackMarketUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/Cooldown.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/CrownRandom.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/CrownUtils$RomanNumeral.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/CrownUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/InterUtils$BrigadierFunction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/InterUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/ItemStackBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/JsonUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/ListUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/MapUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/RoyalUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/Triple.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/Worlds.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/loot/CrownLootTable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/loot/CrownWeightedLootTable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/loot/LiteralLootTable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/loot/WeightedLootTable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/math/BlockOffset.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/math/BlockPos.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/math/BoundingBoxIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/math/BoundingBoxIterator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/math/BoundingBoxOffset.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/math/CrownBoundingBox.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/classes/java/main/net/forthecrown/utils/math/ImmutableBlockPos.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/resources/main/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/resources/main/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/resources/main/en_US.properties" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/resources/main/en_US.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/resources/main/plugin.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/build/tmp/compileJava/source-classes-mapping.txt" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/build/tmp/compileJava/source-classes-mapping.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/remapping/ForTheCrown-Plugin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/remapping/ForTheCrown-Plugin.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandHomeList.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandHomeList.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandIgnore.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandIgnore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandIgnoreList.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandIgnoreList.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandInteractable.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandInteractable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandKitEdit.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandKitEdit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandLeave.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandLeave.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandNear.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandNear.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandPirate.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandPirate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandProfile.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandProfile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandReply.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandReply.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandSetHome.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandSetHome.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandStaffChat.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandStaffChat.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandTeleportExact.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandTeleportExact.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandTell.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandTell.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandTestCore.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandTestCore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandWarpEdit.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/CommandWarpEdit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/ActionArgType.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/ActionArgType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/ArrowEffectType.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/ArrowEffectType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/CheckArgType.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/CheckArgType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/DeathEffectType.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/DeathEffectType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/DungeonBossArgument.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/DungeonBossArgument.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/JailType.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/JailType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/KeyType.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/KeyType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/KitType.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/KitType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/UserType.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/UserType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/WarpType.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/arguments/WarpType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/help/HelpHelp.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/help/HelpHelp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/manager/CoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/manager/CoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/manager/FtcCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/manager/FtcCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/marriage/CommandMarriageChat.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/marriage/CommandMarriageChat.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/CrownCore.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/CrownCore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/Permissions.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/Permissions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/chat/ChatEmotes.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/chat/ChatEmotes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/chat/ChatFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/chat/ChatFormatter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/chat/ChatUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/core/chat/ChatUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/cosmetics/CosmeticConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/cosmetics/CosmeticConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/crownevents/ArmorStandLeaderboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/crownevents/ArmorStandLeaderboard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/crownevents/CrownEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/crownevents/CrownEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/crownevents/LeaderboardFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/crownevents/LeaderboardFormatter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/crownevents/entries/MultiEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/crownevents/entries/MultiEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/dungeons/Bosses.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/dungeons/Bosses.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/dungeons/DungeonAreas.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/dungeons/DungeonAreas.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/dungeons/bosses/DungeonBoss.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/dungeons/bosses/DungeonBoss.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/economy/SortedBalanceMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/economy/SortedBalanceMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/economy/auctions/AuctionEvents.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/economy/auctions/AuctionEvents.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/economy/oldBlackMarket.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/economy/pirates/CrownPirateEconomy.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/economy/pirates/CrownPirateEconomy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/events/CoreListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/events/CoreListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/events/CosmeticsListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/events/CosmeticsListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/events/DungeonEvents.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/events/DungeonEvents.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/events/dynamic/RankGuiUseEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/events/dynamic/RankGuiUseEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/pirates/AuctionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/pirates/AuctionManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/pirates/Pirates.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/pirates/Pirates.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/registry/CrownWarpRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/registry/CrownWarpRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/registry/Registries.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/registry/Registries.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/serializer/JsonBuf.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/serializer/JsonBuf.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/serializer/UserJsonSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/serializer/UserJsonSerializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/useables/AbstractUsable.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/useables/AbstractUsable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/useables/CheckableBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/useables/CheckableBase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/useables/UsableBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/useables/UsableBase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/useables/actions/ActionItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/useables/actions/ActionItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/useables/preconditions/CheckHasItemType.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/useables/preconditions/CheckHasItemType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/CrownUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/CrownUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/CrownUserManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/CrownUserManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/FtcUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/FtcUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/FtcUserAlt.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/FtcUserAlt.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/FtcUserHomes.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/FtcUserHomes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/FtcUserInteractions.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/FtcUserInteractions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/UserDataContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/UserDataContainer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/UserHomes.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/UserHomes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/UserInteractions.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/UserInteractions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/data/DirectMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/data/DirectMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/data/MarriageMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/user/data/MarriageMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/InterUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/InteractionUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/JsonUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/JsonUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/RoyalUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/RoyalUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/SuggestionUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/commands/manager/FtcSuggestionProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/math/BoundingBoxIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/math/BoundingBoxIterator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/math/BoundingBoxOffset.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/math/BoundingBoxOffset.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/math/CrownBoundingBox.java" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/java/net/forthecrown/utils/math/CrownRegion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/resources/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/resources/en_US.properties" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/resources/en_US.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FTC-Parent/Core/src/main/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/FTC-Parent/Core/src/main/resources/plugin.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,9 +506,7 @@
         </option>
         <option name="vmOptions" />
       </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
       <method v="2" />
     </configuration>
     <configuration name="C:/Users/Wout/IdeaProjects/FTC/FTC-Parent/Cosmetics/build.gradle (2)" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
@@ -84,9 +523,7 @@
         </option>
         <option name="vmOptions" />
       </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
       <method v="2" />
     </configuration>
     <configuration name="C:/Users/Wout/IdeaProjects/FTC/FTC-Parent/Cosmetics/build.gradle" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
@@ -103,9 +540,7 @@
         </option>
         <option name="vmOptions" />
       </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
       <method v="2" />
     </configuration>
     <recent_temporary>
@@ -137,5 +572,12 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="740" y="279" key="FileChooserDialogImpl" timestamp="1625857866361">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="740" y="279" key="FileChooserDialogImpl/-1920.0.1920.1050/0.0.1920.1050@0.0.1920.1050" timestamp="1625857866361" />
   </component>
 </project>

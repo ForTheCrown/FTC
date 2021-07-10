@@ -8,7 +8,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.DirectMessage;
-import net.forthecrown.utils.SuggestionUtils;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.royalgrenadier.source.CommandSources;
@@ -27,7 +27,7 @@ public class CommandReply extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.then(argument("message", StringArgumentType.greedyString())
-                .suggests((c, b) -> SuggestionUtils.suggestPlayernamesAndEmotes(c, b, false))
+                .suggests((c, b) -> FtcSuggestionProvider.suggestPlayernamesAndEmotes(c, b, false))
 
                 .executes(c -> {
                     CrownUser user = getUserSender(c);

@@ -5,6 +5,7 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserHomes;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -25,47 +26,44 @@ public class CommandSetHome extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .executes(c -> {
-                    CrownUser user = getUserSender(c);
-                    UserHomes homes = user.getHomes();
-                    String name = CommandHome.DEFAULT;
-                    Location loc = user.getLocation();
-
-                    if(homes.contains(name)) throw FtcExceptionProvider.homeNameInUse();
-                    if(!homes.canMakeMore()) throw FtcExceptionProvider.overHomeLimit(user);
-
-                    if(!user.hasPermission(Permissions.WORLD_BYPASS)){
-                        if(CommandTpask.isNonAcceptedWorld(loc.getWorld())) throw FtcExceptionProvider.cannotSetHomeHere();
-                    }
-
-                    user.getPlayer().setBedSpawnLocation(loc);
-
-                    homes.set(name, loc);
-                    user.sendMessage(Component.translatable("homes.setDefault").color(NamedTextColor.YELLOW));
-                    return 0;
-                })
+                .executes(c -> attemptHomeSetting(new HomeCreationContext(getUserSender(c), CommandHome.DEFAULT)))
 
                 .then(argument("name", StringArgumentType.word())
-                        .executes(c -> {
-                            CrownUser user = getUserSender(c);
-                            UserHomes homes = user.getHomes();
-                            String name = StringArgumentType.getString(c, "name");
-                            Location loc = user.getLocation();
-
-                            if(homes.contains(name)) throw FtcExceptionProvider.homeNameInUse();
-                            if(!homes.canMakeMore()) throw FtcExceptionProvider.overHomeLimit(user);
-
-                            if(!user.hasPermission(Permissions.WORLD_BYPASS)){
-                                if(CommandTpask.isNonAcceptedWorld(loc.getWorld())) throw FtcExceptionProvider.cannotSetHomeHere();
-                            }
-
-                            homes.set(name, loc);
-                            user.sendMessage(
-                                    Component.translatable("homes.set", Component.text(name).color(NamedTextColor.GOLD))
-                                            .color(NamedTextColor.YELLOW)
-                            );
-                            return 0;
-                        })
+                        .executes(c -> attemptHomeSetting(new HomeCreationContext(
+                                getUserSender(c),
+                                StringArgumentType.getString(c, "name")
+                        )))
                 );
+    }
+
+
+    private int attemptHomeSetting(HomeCreationContext context) throws RoyalCommandException {
+        if(context.homes.contains(context.name)) throw FtcExceptionProvider.homeNameInUse();
+        if(!context.homes.canMakeMore()) throw FtcExceptionProvider.overHomeLimit(context.user);
+
+        if(!context.user.hasPermission(Permissions.WORLD_BYPASS)){
+            if(CommandTpask.isNonAcceptedWorld(context.loc.getWorld())) throw FtcExceptionProvider.cannotSetHomeHere();
+        }
+
+        context.homes.set(context.name, context.loc);
+        context.user.sendMessage(
+                Component.translatable("homes.set", Component.text(context.name).color(NamedTextColor.GOLD))
+                        .color(NamedTextColor.YELLOW)
+        );
+        return 0;
+    }
+
+    private static class HomeCreationContext {
+        private final CrownUser user;
+        private final UserHomes homes;
+        private final String name;
+        private final Location loc;
+
+        public HomeCreationContext(CrownUser user, String name) {
+            this.user = user;
+            this.homes = user.getHomes();
+            this.name = name;
+            this.loc = user.getLocation();
+        }
     }
 }

@@ -46,11 +46,12 @@ public interface CrownCore extends Plugin, Namespaced {
     static ShopManager getShopManager() { return Main.shopManager; }
     static UserManager getUserManager(){ return Main.userManager; }
 
+    static UserSerializer getUserSerializer() { return Main.userSerializer; }
     static LuckPerms getLuckPerms() { return Main.luckPerms; }
     static Announcer getAnnouncer(){ return Main.announcer; }
     static Balances getBalances(){ return Main.balances; }
     static Kingship getKingship(){ return Main.kingship; }
-    static UserSerializer getUserSerializer() { return Main.userSerializer; }
+    static TabList getTabList() { return Main.tabList; }
 
     static WarpRegistry getWarpRegistry() { return Main.warpRegistry; }
     static KitRegistry getKitRegistry() { return Main.kitRegistry; }

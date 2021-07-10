@@ -8,6 +8,7 @@ import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.UserManager;
@@ -50,6 +51,8 @@ import java.util.regex.Pattern;
 public class ChatFormatter {
     private static final DecimalFormat DECIMAL_FORMAT;
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
+
+    public static final Component AFK_SUFFIX = Component.text(" [AFK]").style(CrownItems.nonItalic(NamedTextColor.GRAY));
 
     /* If you wanna welcome someone, just welcome them, this is dumb
     public static String[] RANDOM_AFK_GREETINGS = {
@@ -144,7 +147,7 @@ public class ChatFormatter {
 
     public static Component joinMessage(CrownUser user){
         return Component.translatable("multiplayer.player.joined", user.nickDisplayName().color(getJoinColor(user)))
-                .hoverEvent(Component.text("Click to say hello!"))
+                //.hoverEvent(Component.text("Click to say hello!"))
                 //.clickEvent(ClickEvent.runCommand(hello(user.getNickOrName())))
                 .color(NamedTextColor.YELLOW);
     }
@@ -165,8 +168,8 @@ public class ChatFormatter {
                 user.nickDisplayName().color(getJoinColor(user)),
                 Component.text(user.previousNames.get(user.previousNames.size()-1))
         )
-                .hoverEvent(Component.text("Click to say hello!"))
-                .clickEvent(ClickEvent.runCommand("Hey " + user.getNickOrName() + '!'))
+                //.hoverEvent(Component.text("Click to say hello!"))
+                //.clickEvent(ClickEvent.runCommand("Hey " + user.getNickOrName() + '!'))
                 .color(NamedTextColor.YELLOW);
     }
 

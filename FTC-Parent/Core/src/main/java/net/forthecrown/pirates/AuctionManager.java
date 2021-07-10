@@ -8,7 +8,7 @@ import net.forthecrown.economy.auctions.AuctionEvents;
 import net.forthecrown.economy.auctions.CrownAuction;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.Worlds;
-import net.forthecrown.utils.math.CrownBoundingBox;
+import net.forthecrown.utils.math.CrownRegion;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -32,6 +32,7 @@ public final class AuctionManager {
 
     private static final String LABEL = "=[Auction]=";
     private static final Component LABEL_COMPONENT = Component.text(LABEL).style(Style.style(TextDecoration.BOLD));
+
     public static final Component UNCLAIMED_LABEL = LABEL_COMPONENT.color(NamedTextColor.DARK_RED);
     public static final Component REGULAR_LABEL = LABEL_COMPONENT.color(NamedTextColor.GREEN);
     public static final Component ADMIN_LABEL = LABEL_COMPONENT.color(NamedTextColor.AQUA);
@@ -39,14 +40,12 @@ public final class AuctionManager {
 
     public static NamespacedKey AUCTION_KEY;
 
-    public static final CrownBoundingBox AUCTION_AREA = new CrownBoundingBox(Worlds.NORMAL, -657, 49, 3848, -616, 21, 3810);
+    public static final CrownRegion AUCTION_AREA = new CrownRegion(Worlds.NORMAL, -657, 49, 3848, -616, 21, 3810);
 
     public AuctionManager(){
         Bukkit.getPluginManager().registerEvents(new AuctionEvents(), CrownCore.inst());
 
         AUCTION_KEY = Squire.createPiratesKey("auction");
-
-        loadAuctions();
         new CommandAuction();
     }
 

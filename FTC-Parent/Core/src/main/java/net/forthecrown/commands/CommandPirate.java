@@ -27,6 +27,15 @@ public class CommandPirate extends FtcCommand {
                         })
                 )
 
+                .then(literal("update_lb")
+                        .executes(c -> {
+                            Pirates.getLeaderboard().create();
+
+                            c.getSource().sendAdmin("Updated pirate leaderboard");
+                            return 0;
+                        })
+                )
+
                 .then(literal("spawnShulker")
                         .executes(c -> {
                             Pirates.getTreasure().relocate();

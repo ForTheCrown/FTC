@@ -8,6 +8,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
 import io.papermc.paper.adventure.PaperAdventure;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.forthecrown.commands.arguments.PetType;
@@ -25,6 +26,7 @@ import net.forthecrown.economy.BalanceMap;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.SortedBalanceMap;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.ComponentArgument;
 import net.forthecrown.grenadier.types.EnumArgument;
@@ -85,6 +87,19 @@ public class CommandFtcCore extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
+                .then(CommandLore.compOrStringArg(literal("tablist_score"),
+                        (c, b) -> CompletionProvider.suggestMatching(b,"Deaths", " Crown Score"),
+                        (c, field) -> {
+                            CrownCore.getTabList().setScore(field);
+
+                            c.getSource().sendAdmin(
+                                    Component.text("Set tab score field to ")
+                                            .append(field)
+                            );
+                            return 0;
+                        })
+                )
+
                 .then(literal("resetcrown") //Resets the crown objective, aka, destroys and re creates it
                         .executes(c -> {
                             Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -206,6 +221,20 @@ public class CommandFtcCore extends FtcCommand {
                                             return 0;
                                         })
                                 )
+
+                                .then(CommandLore.compOrStringArg(literal("prefix"), (c, b) -> Suggestions.empty(), (c, prefix) -> {
+                                    CrownUser user = getUser(c);
+
+                                    user.setCurrentPrefix(prefix);
+
+                                    c.getSource().sendMessage(
+                                            Component.text("Set ")
+                                                    .append(user.displayName())
+                                                    .append(Component.text("'s prefix to be "))
+                                                    .append(prefix)
+                                    );
+                                    return 0;
+                                }))
 
                                 //This alt shit can go fuck itself
                                 .then(literal("alt")

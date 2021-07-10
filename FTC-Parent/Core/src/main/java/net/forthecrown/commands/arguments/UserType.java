@@ -6,8 +6,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.grenadier.types.selectors.EntitySelector;
@@ -17,6 +17,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.CrownUtils;
 import net.kyori.adventure.text.Component;
+import net.minecraft.commands.arguments.ScoreHolderArgument;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 
 import java.util.Collection;
@@ -97,19 +98,28 @@ public class UserType implements ArgumentType<UserParseResult> {
             StringReader reader = new StringReader(builder.getInput());
             reader.setCursor(builder.getStart());
 
-            CommandSource source = (CommandSource) context.getSource();
             EntitySelectorParser parser = new EntitySelectorParser(reader, true);
 
             try {
                 parser.parse();
             } catch (CommandSyntaxException ignored) {}
 
-            return parser.fillSuggestions(builder, CompletionProvider::suggestPlayerNames);
+            return parser.fillSuggestions(builder, builder1 -> FtcSuggestionProvider.suggestPlayerNames((CommandSource) context.getSource(), builder1));
         } else return Suggestions.empty();
     }
 
     @Override
     public Collection<String> getExamples() {
         return EntityArgument.players().getExamples();
+    }
+
+    public ArgumentType<?> getHandle(){
+        if(!allowOffline){
+            if(allowMultiple) return net.minecraft.commands.arguments.EntityArgument.players();
+            else return net.minecraft.commands.arguments.EntityArgument.player();
+        }
+
+        if(allowMultiple) return ScoreHolderArgument.scoreHolder();
+        else return ScoreHolderArgument.scoreHolders();
     }
 }

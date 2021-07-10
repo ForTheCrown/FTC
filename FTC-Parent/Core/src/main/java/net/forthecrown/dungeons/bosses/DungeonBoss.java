@@ -1,11 +1,13 @@
 package net.forthecrown.dungeons.bosses;
 
+import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.dungeons.BossFightContext;
-import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.utils.RoyalUtils;
-import net.forthecrown.utils.math.CrownBoundingBox;
+import net.forthecrown.utils.math.CrownRegion;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;
@@ -33,13 +35,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class DungeonBoss<T extends Mob> implements Listener {
+public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
 
     protected static final ThreadLocalRandom random = ThreadLocalRandom.current();
 
     protected final Location spawnLocation;
-    protected final CrownBoundingBox bossRoom;
-    protected final Collection<ItemStack> requiredToSpawn;
+    protected final CrownRegion bossRoom;
+    protected final ImmutableList<ItemStack> requiredToSpawn;
+    protected final Key key;
+
     protected T bossEntity;
     protected BossBar bossBar;
     protected int loopID = 0;
@@ -48,12 +52,13 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
     private final short updaterDelay;
     protected BossFightContext context;
 
-    protected DungeonBoss(String name, Location spawnLocation, short updaterDelay, CrownBoundingBox bossRoom, Collection<ItemStack> requiredItems){
+    protected DungeonBoss(String name, Location spawnLocation, short updaterDelay, CrownRegion bossRoom, Collection<ItemStack> requiredItems){
         this.spawnLocation = spawnLocation;
         this.bossRoom = bossRoom;
-        this.requiredToSpawn = requiredItems;
+        this.requiredToSpawn = ImmutableList.copyOf(requiredItems);
         this.updaterDelay = updaterDelay;
-        Bosses.BY_NAME.put(name.toLowerCase().replaceAll(" ", "_"), this);
+
+        key = CrownCore.coreKey(name.toLowerCase().replaceAll(" ", "_"));
     }
 
     protected abstract T onSummon(BossFightContext context);
@@ -135,7 +140,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
         return alive;
     }
 
-    public CrownBoundingBox getBossRoom() {
+    public CrownRegion getBossRoom() {
         return bossRoom;
     }
 
@@ -143,12 +148,17 @@ public abstract class DungeonBoss<T extends Mob> implements Listener {
         return bossEntity;
     }
 
-    public Collection<ItemStack> getSpawningItems() {
+    public ImmutableList<ItemStack> getSpawningItems() {
         return requiredToSpawn;
     }
 
     public BossBar getBossBar() {
         return bossBar;
+    }
+
+    @Override
+    public @NotNull Key key() {
+        return key;
     }
 
     protected void giveRewards(@Nullable String achievement, @NotNull ItemStack reward, @NotNull BossFightContext context){

@@ -1,9 +1,6 @@
 package net.forthecrown.user;
 
 import io.papermc.paper.adventure.AdventureComponent;
-import me.neznamy.tab.api.EnumProperty;
-import me.neznamy.tab.api.TABAPI;
-import me.neznamy.tab.api.TabPlayer;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
@@ -13,8 +10,10 @@ import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.JoinInfo;
+import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.events.dynamic.AfkListener;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.royalgrenadier.source.CommandSources;
 import net.forthecrown.user.data.EssToFTC;
@@ -42,7 +41,9 @@ import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.util.Tristate;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundChatPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -65,7 +66,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -78,6 +78,7 @@ public class FtcUser implements CrownUser {
     public String lastOnlineName;
     public List<String> previousNames = new ArrayList<>();
     public Component nickname;
+    public Component currentPrefix;
 
     public final FtcUserDataContainer dataContainer;
     public final FtcUserInteractions interactions;
@@ -145,6 +146,8 @@ public class FtcUser implements CrownUser {
 
     public void updateName(){
         if(isOnline() && name != null && !name.equals(getPlayer().getName())){ //transfers all scores to new player name if player name changes
+            previousNames.add(name);
+
             Scoreboard scoreboard = getPlayer().getScoreboard();
             for (Objective obj : scoreboard.getObjectives()){
                 if(!obj.getScore(name).isScoreSet()) continue;
@@ -152,6 +155,7 @@ public class FtcUser implements CrownUser {
                 obj.getScore(getPlayer().getName()).setScore(obj.getScore(name).getScore());
                 obj.getScore(name).setScore(0);
             }
+
             name = getPlayer().getName();
         }
     }
@@ -181,6 +185,17 @@ public class FtcUser implements CrownUser {
         if(!isOnline()) return null;
         if(handle == null) handle = getOnlineHandle().getHandle();
         return handle;
+    }
+
+    @Override
+    public CommandSource getCommandSource(AbstractCommand command){
+        checkOnline();
+        return CommandSources.getOrCreate(getPlayer(), command);
+    }
+
+    @Override
+    public CommandSource getCommandSource(){
+        return getCommandSource(null);
     }
 
     @Override
@@ -254,7 +269,7 @@ public class FtcUser implements CrownUser {
     public void setRank(Rank rank, boolean setPrefix){
         currentRank = rank;
 
-        if(setPrefix && rank != Rank.DEFAULT) setTabPrefix(rank.getColorlessPrefix());
+        if(setPrefix && rank != Rank.DEFAULT) setCurrentPrefix(rank.prefix());
     }
 
     @Override
@@ -434,17 +449,6 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public void setTabPrefix(@Nullable String s){
-        if(CrownUtils.isNullOrBlank(s)) clearTabPrefix();
-        else Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tab player " + getName() + " tabprefix " + s);
-    }
-
-    @Override
-    public void clearTabPrefix(){
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tab player " + getName() + " tabprefix ");
-    }
-
-    @Override
     public void sendMessage(@Nonnull String message){
         if(!isOnline()) return;
         sendMessage(ChatUtils.stringToVanilla(message));
@@ -495,7 +499,7 @@ public class FtcUser implements CrownUser {
     @Override
     public void sendMessage(UUID id, net.minecraft.network.chat.Component message, ChatType type){
         if(!isOnline()) return;
-        getHandle().connection.connection.send(new ClientboundChatPacket(message, type, id));
+        sendPacket(new ClientboundChatPacket(message, type, id));
     }
 
     @Nonnull
@@ -518,31 +522,6 @@ public class FtcUser implements CrownUser {
     public boolean isKing() {
         if(CrownCore.getKingship().getUniqueId() != null) return CrownCore.getKingship().getUniqueId().equals(getUniqueId());
         return false;
-    }
-
-    @Override
-    public void setKing(boolean king, boolean setPrefix) {
-        setKing(king, setPrefix, false);
-    }
-
-    @Override
-    public void setKing(boolean king, boolean setPrefix, boolean isFemale) {
-        if(king){
-            if(setPrefix){
-                if(!isFemale) setTabPrefix("&l[&e&lKing&r&l] &r");
-                else setTabPrefix("&l[&e&lQueen&r&l] &r");
-            }
-            CrownCore.getKingship().set(getUniqueId());
-            return;
-        }
-
-        CrownCore.getKingship().set(null);
-        if(setPrefix) setTabPrefix(getRank() == Rank.DEFAULT ? "" : getRank().getColorlessPrefix());
-    }
-
-    @Override
-    public void setKing(boolean king) {
-        setKing(king, false, false);
     }
 
     @Override
@@ -717,10 +696,23 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public void onJoin(){
+    public boolean onJoin(){
         this.handle = getOnlineHandle().getHandle();
+        this.name = getOnlineHandle().getName();
+
+        if(!name.equalsIgnoreCase(lastOnlineName)){
+            lastOnlineName = name;
+            updateName();
+            return true;
+        }
+
+        if(isKing()) currentPrefix = CrownCore.getKingship().isFemale() ? Kingship.queenTitle() : Kingship.kingTitle();
+
+        getOnlineHandle().sendPlayerListHeader(CrownCore.getTabList().format());
+
         this.ip = getPlayer().getAddress().getHostString();
         updateVanished();
+        return false;
     }
 
     @Override
@@ -740,7 +732,6 @@ public class FtcUser implements CrownUser {
 
         if(!hasPermission(Permissions.CORE_ADMIN)) setGodMode(false);
         updateGodMode();
-        updateAfk();
         updateDisplayName();
 
         permsCheck();
@@ -762,7 +753,12 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public @NonNull HoverEvent<Component> asHoverEvent(@NonNull UnaryOperator<Component> op) {
+    public Component hoverEventText(){
+        return hoverEventText(UnaryOperator.identity());
+    }
+
+    @Override
+    public Component hoverEventText(UnaryOperator<Component> operator){
         TextComponent.Builder text = Component.text()
                 .append(name())
                 .append(Component.newline());
@@ -792,7 +788,53 @@ public class FtcUser implements CrownUser {
         }
 
         text.append(Component.text(getUniqueId().toString()));
-        return HoverEvent.showText(op.apply(text.build()));
+        return operator.apply(text.build());
+    }
+
+    @Override
+    public @NonNull HoverEvent<Component> asHoverEvent(@NonNull UnaryOperator<Component> op) {
+        return HoverEvent.showText(hoverEventText(op));
+    }
+
+    @Override
+    public void updateDisplayName(){
+        checkOnline();
+        Component displayName = listDisplayName();
+        getOnlineHandle().playerListName(displayName);
+    }
+
+    @Override
+    public Component listDisplayName(){
+        return Component.text()
+                .append(getCurrentPrefix())
+                .append(nickDisplayName())
+                .append(isAfk() ? ChatFormatter.AFK_SUFFIX : Component.empty())
+                .build();
+    }
+
+    @Override
+    public Component getCurrentPrefix(){
+        if(currentPrefix != null) return currentPrefix;
+        if(currentRank != Rank.DEFAULT) return currentRank.prefix();
+
+        return Component.empty();
+    }
+
+    @Override
+    public void setCurrentPrefix(Component component){
+        this.currentPrefix = component;
+
+        if(isOnline()) updateDisplayName();
+    }
+
+    @Override
+    public void setLastOnlineName(String lastOnlineName) {
+        this.lastOnlineName = lastOnlineName;
+    }
+
+    @Override
+    public String getLastOnlineName() {
+        return lastOnlineName;
     }
 
     @Override
@@ -912,7 +954,6 @@ public class FtcUser implements CrownUser {
     public void setNickname(String nick) {
         if(nick == null){
             this.nickname = null;
-            if(isOnline()) updateDisplayName();
         }
         else setNickname(ChatUtils.convertString(nick, false));
     }
@@ -920,16 +961,6 @@ public class FtcUser implements CrownUser {
     @Override
     public void setNickname(Component component){
         this.nickname = component;
-
-        if(isOnline()) updateDisplayName();
-    }
-
-    @Override
-    public void updateDisplayName(){
-        checkOnline();
-
-        TabPlayer tPlayer = TABAPI.getPlayer(getUniqueId());
-        tPlayer.setValuePermanently(EnumProperty.CUSTOMTABNAME, getNickOrName());
     }
 
     @Override
@@ -964,26 +995,9 @@ public class FtcUser implements CrownUser {
     public void setAfk(boolean afk) {
         this.afk = afk;
 
-        if(isOnline()) updateAfk();
-    }
-
-    @Override
-    public void updateAfk() {
-        checkOnline();
-
-        TabPlayer tPlayer = TABAPI.getPlayer(getUniqueId());
-        if(afk){
-            tPlayer.setValueTemporarily(EnumProperty.TABSUFFIX, ChatColor.GRAY + " [AFK]");
-            afkListener = new AfkListener(this);
-            Bukkit.getPluginManager().registerEvents(afkListener, CrownCore.inst());
-        }
-        else {
-            tPlayer.removeTemporaryValue(EnumProperty.TABSUFFIX);
-
-            if(afkListener != null) {
-                HandlerList.unregisterAll(afkListener);
-                afkListener = null;
-            }
+        if(isOnline()){
+            updateDisplayName();
+            updateAfk();
         }
     }
 
@@ -1015,6 +1029,19 @@ public class FtcUser implements CrownUser {
 
             if(isVanished()) u.getPlayer().hidePlayer(CrownCore.inst(), getPlayer());
             else u.getPlayer().showPlayer(CrownCore.inst(), getPlayer());
+        }
+    }
+
+    @Override
+    public void updateAfk(){
+        checkOnline();
+
+        if(afk){
+            afkListener = new AfkListener(this);
+            Bukkit.getPluginManager().registerEvents(afkListener, CrownCore.inst());
+        } else {
+            if(afkListener != null) HandlerList.unregisterAll(afkListener);
+            afkListener = null;
         }
     }
 
@@ -1215,4 +1242,9 @@ public class FtcUser implements CrownUser {
         setProperty(nextAllowedBranchSwap != 0 && nextAllowedBranchSwap <= System.currentTimeMillis(), UserProperty.CANNOT_SWAP_BRANCH);
     }
 
+    protected void sendPacket(Packet<?> packet){
+        checkOnline();
+        Connection connection = getHandle().connection.connection;
+        connection.send(packet);
+    }
 }

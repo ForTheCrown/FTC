@@ -20,7 +20,7 @@ public class KeyType implements ArgumentType<Key> {
         this.defaultNamespace = defaultNamespace;
     }
 
-    public static KeyType minecraftDefault(){
+    public static KeyType minecraft(){
         return MINECRAFT_INSTANCE;
     }
 

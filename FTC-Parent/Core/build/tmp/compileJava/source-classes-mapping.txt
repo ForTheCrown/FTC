@@ -1,162 +1,156 @@
-net/forthecrown/commands/arguments/BaltopType.java
- net.forthecrown.commands.arguments.BaltopType
+net/forthecrown/crownevents/TimerMessageFormatter.java
+ net.forthecrown.crownevents.TimerMessageFormatter
 net/forthecrown/economy/shops/ShopType.java
  net.forthecrown.economy.shops.ShopType
-net/forthecrown/useables/preconditions/CheckNotUsedBefore.java
- net.forthecrown.useables.preconditions.CheckNotUsedBefore
- net.forthecrown.useables.preconditions.CheckNotUsedBefore$CheckInstance
-net/forthecrown/events/dynamic/RankGuiUseEvent.java
- net.forthecrown.events.dynamic.RankGuiUseEvent
-net/forthecrown/commands/arguments/CommandHelpType.java
- net.forthecrown.commands.arguments.CommandHelpType
-net/forthecrown/events/InventoryBuilderListener.java
- net.forthecrown.events.InventoryBuilderListener
-net/forthecrown/useables/CrownUsableBlock.java
- net.forthecrown.useables.CrownUsableBlock
+net/forthecrown/crownevents/entries/MultiEntry.java
+ net.forthecrown.crownevents.entries.MultiEntry
+net/forthecrown/core/chat/TabList.java
+ net.forthecrown.core.chat.TabList
+net/forthecrown/useables/UsableBase.java
+ net.forthecrown.useables.UsableBase
+net/forthecrown/crownevents/reporters/ReporterFactory.java
+ net.forthecrown.crownevents.reporters.ReporterFactory
+net/forthecrown/utils/math/BlockPos.java
+ net.forthecrown.utils.math.BlockPos
+net/forthecrown/events/InteractableEvents.java
+ net.forthecrown.events.InteractableEvents
 net/forthecrown/serializer/JsonSerializable.java
  net.forthecrown.serializer.JsonSerializable
-net/forthecrown/useables/preconditions/CheckHasItemType.java
- net.forthecrown.useables.preconditions.CheckHasItemType
- net.forthecrown.useables.preconditions.CheckHasItemType$CheckInstance
-net/forthecrown/economy/CrownBalances.java
- net.forthecrown.economy.CrownBalances
-net/forthecrown/economy/shops/ShopInventory.java
- net.forthecrown.economy.shops.ShopInventory
+net/forthecrown/events/GraveListener.java
+ net.forthecrown.events.GraveListener
+net/forthecrown/commands/clickevent/ClickEventTask.java
+ net.forthecrown.commands.clickevent.ClickEventTask
+net/forthecrown/crownevents/InEventListener.java
+ net.forthecrown.crownevents.InEventListener
 net/forthecrown/events/ExceptionedEvent.java
  net.forthecrown.events.ExceptionedEvent
-net/forthecrown/core/chat/JoinInfo.java
- net.forthecrown.core.chat.JoinInfo
-net/forthecrown/utils/Worlds.java
- net.forthecrown.utils.Worlds
+net/forthecrown/commands/arguments/KitType.java
+ net.forthecrown.commands.arguments.KitType
+net/forthecrown/serializer/NbtSerializable.java
+ net.forthecrown.serializer.NbtSerializable
 net/forthecrown/core/CrownException.java
  net.forthecrown.core.CrownException
-net/forthecrown/dungeons/DungeonAreas.java
- net.forthecrown.dungeons.DungeonAreas
-net/forthecrown/useables/CheckableBase.java
- net.forthecrown.useables.CheckableBase
+net/forthecrown/useables/UsableEntity.java
+ net.forthecrown.useables.UsableEntity
+net/forthecrown/crownevents/CrownEvent.java
+ net.forthecrown.crownevents.CrownEvent
 net/forthecrown/comvars/types/ComponentComVarType.java
  net.forthecrown.comvars.types.ComponentComVarType
 net/forthecrown/utils/BranchFlag.java
  net.forthecrown.utils.BranchFlag
-net/forthecrown/dungeons/bosses/Zhambie.java
- net.forthecrown.dungeons.bosses.Zhambie
-net/forthecrown/utils/SilentPredicate.java
- net.forthecrown.utils.SilentPredicate
+net/forthecrown/useables/CrownUsableBlock.java
+ net.forthecrown.useables.CrownUsableBlock
+net/forthecrown/dungeons/DungeonAreas.java
+ net.forthecrown.dungeons.DungeonAreas
 net/forthecrown/utils/loot/CrownLootTable.java
  net.forthecrown.utils.loot.CrownLootTable
+net/forthecrown/dungeons/bosses/Zhambie.java
+ net.forthecrown.dungeons.bosses.Zhambie
+net/forthecrown/useables/actions/ActionAddNumber.java
+ net.forthecrown.useables.actions.ActionAddNumber
+ net.forthecrown.useables.actions.ActionAddNumber$ActionInstance
+net/forthecrown/comvars/package-info.java
+ net.forthecrown.comvars.package-info
 net/forthecrown/utils/ListUtils.java
  net.forthecrown.utils.ListUtils
-net/forthecrown/core/admin/StaffChat.java
- net.forthecrown.core.admin.StaffChat
+net/forthecrown/serializer/JsonBuf.java
+ net.forthecrown.serializer.JsonBuf
 net/forthecrown/serializer/CrownSerializer.java
  net.forthecrown.serializer.CrownSerializer
 net/forthecrown/user/data/SoldMaterialData.java
  net.forthecrown.user.data.SoldMaterialData
-net/forthecrown/commands/arguments/HomeType.java
- net.forthecrown.commands.arguments.HomeType
-net/forthecrown/commands/arguments/KeyType.java
- net.forthecrown.commands.arguments.KeyType
-net/forthecrown/dungeons/bosses/Drawned.java
- net.forthecrown.dungeons.bosses.Drawned
- net.forthecrown.dungeons.bosses.Drawned$Artifacts
 net/forthecrown/serializer/AbstractJsonSerializer.java
  net.forthecrown.serializer.AbstractJsonSerializer
 net/forthecrown/inventory/custom/SlotClickHandler.java
  net.forthecrown.inventory.custom.SlotClickHandler
-net/forthecrown/economy/SortedBalanceMap.java
- net.forthecrown.economy.SortedBalanceMap
-net/forthecrown/useables/preconditions/CheckInventoryEmpty.java
- net.forthecrown.useables.preconditions.CheckInventoryEmpty
-net/forthecrown/core/admin/PunishmentEntry.java
- net.forthecrown.core.admin.PunishmentEntry
-net/forthecrown/economy/shops/CrownShopInventory.java
- net.forthecrown.economy.shops.CrownShopInventory
+net/forthecrown/user/enums/Branch.java
+ net.forthecrown.user.enums.Branch
+net/forthecrown/commands/arguments/KeyType.java
+ net.forthecrown.commands.arguments.KeyType
+net/forthecrown/crownevents/LeaderboardFormatter.java
+ net.forthecrown.crownevents.LeaderboardFormatter
+net/forthecrown/useables/preconditions/CheckHasScoreType.java
+ net.forthecrown.useables.preconditions.CheckHasScoreType
+ net.forthecrown.useables.preconditions.CheckHasScoreType$CheckInstance
+net/forthecrown/crownevents/ScoreFormatter.java
+ net.forthecrown.crownevents.ScoreFormatter
 net/forthecrown/commands/clickevent/ClickEventManager.java
  net.forthecrown.commands.clickevent.ClickEventManager
-net/forthecrown/utils/math/BlockOffset.java
- net.forthecrown.utils.math.BlockOffset
 net/forthecrown/core/admin/CrownPunishmentManager.java
  net.forthecrown.core.admin.CrownPunishmentManager
-net/forthecrown/utils/InterUtils.java
- net.forthecrown.utils.InterUtils
- net.forthecrown.utils.InterUtils$BrigadierFunction
-net/forthecrown/events/JeromeEvent.java
- net.forthecrown.events.JeromeEvent
-net/forthecrown/commands/arguments/PetType.java
- net.forthecrown.commands.arguments.PetType
-net/forthecrown/registry/BaseRegistry.java
- net.forthecrown.registry.BaseRegistry
-net/forthecrown/utils/SuggestionUtils.java
- net.forthecrown.utils.SuggestionUtils
-net/forthecrown/useables/kits/FtcKit.java
- net.forthecrown.useables.kits.FtcKit
+net/forthecrown/useables/warps/Warp.java
+ net.forthecrown.useables.warps.Warp
+net/forthecrown/utils/Nameable.java
+ net.forthecrown.utils.Nameable
+net/forthecrown/useables/UsablesManager.java
+ net.forthecrown.useables.UsablesManager
+net/forthecrown/events/PirateEvents.java
+ net.forthecrown.events.PirateEvents
 net/forthecrown/pirates/ParrotTracker.java
  net.forthecrown.pirates.ParrotTracker
 net/forthecrown/utils/CrownUtils.java
  net.forthecrown.utils.CrownUtils
  net.forthecrown.utils.CrownUtils$RomanNumeral
+net/forthecrown/dungeons/bosses/Drawned.java
+ net.forthecrown.dungeons.bosses.Drawned
+ net.forthecrown.dungeons.bosses.Drawned$Artifacts
 net/forthecrown/core/chat/Announcer.java
  net.forthecrown.core.chat.Announcer
  net.forthecrown.core.chat.Announcer$DebugLevel
-net/forthecrown/utils/math/CrownBoundingBox.java
- net.forthecrown.utils.math.CrownBoundingBox
-net/forthecrown/commands/arguments/HomeParseResult.java
- net.forthecrown.commands.arguments.HomeParseResult
-net/forthecrown/inventory/CrownWeapons.java
- net.forthecrown.inventory.CrownWeapons
- net.forthecrown.inventory.CrownWeapons$Weapon
+net/forthecrown/events/SmokeBomb.java
+ net.forthecrown.events.SmokeBomb
 net/forthecrown/useables/actions/UsageAction.java
  net.forthecrown.useables.actions.UsageAction
 net/forthecrown/commands/arguments/ComVarArgument.java
  net.forthecrown.commands.arguments.ComVarArgument
-net/forthecrown/core/admin/jails/CrownJailManager.java
- net.forthecrown.core.admin.jails.CrownJailManager
-net/forthecrown/economy/shops/SignShop.java
- net.forthecrown.economy.shops.SignShop
+net/forthecrown/commands/manager/FtcSuggestionProvider.java
+ net.forthecrown.commands.manager.FtcSuggestionProvider
+net/forthecrown/utils/InteractionUtils.java
+ net.forthecrown.utils.InteractionUtils
+ net.forthecrown.utils.InteractionUtils$BrigadierFunction
+net/forthecrown/crownevents/reporters/CrownEventReporter.java
+ net.forthecrown.crownevents.reporters.CrownEventReporter
 net/forthecrown/inventory/custom/options/Option.java
  net.forthecrown.inventory.custom.options.Option
 net/forthecrown/dungeons/BossItems.java
  net.forthecrown.dungeons.BossItems
-net/forthecrown/commands/arguments/ActionArgType.java
- net.forthecrown.commands.arguments.ActionArgType
+net/forthecrown/commands/arguments/BaltopType.java
+ net.forthecrown.commands.arguments.BaltopType
 net/forthecrown/dungeons/bosses/DungeonBoss.java
  net.forthecrown.dungeons.bosses.DungeonBoss
-net/forthecrown/comvars/types/ComVarType.java
- net.forthecrown.comvars.types.ComVarType
- net.forthecrown.comvars.types.ComVarType$PrimitiveComVarType
-net/forthecrown/commands/arguments/RoyalEnchantType.java
- net.forthecrown.commands.arguments.RoyalEnchantType
-net/forthecrown/events/dynamic/JailListener.java
- net.forthecrown.events.dynamic.JailListener
-net/forthecrown/commands/arguments/WarpType.java
- net.forthecrown.commands.arguments.WarpType
-net/forthecrown/events/EnchantEvents.java
- net.forthecrown.events.EnchantEvents
- net.forthecrown.events.EnchantEvents$StrongAimScheduler
+net/forthecrown/economy/shops/SignShop.java
+ net.forthecrown.economy.shops.SignShop
+net/forthecrown/core/nbt/NbtHandler.java
+ net.forthecrown.core.nbt.NbtHandler
+net/forthecrown/commands/arguments/ActionArgType.java
+ net.forthecrown.commands.arguments.ActionArgType
+net/forthecrown/inventory/builder/InventoryCloseAction.java
+ net.forthecrown.inventory.builder.InventoryCloseAction
 net/forthecrown/comvars/ComVarRegistry.java
  net.forthecrown.comvars.ComVarRegistry
-net/forthecrown/useables/preconditions/SimpleCheckType.java
- net.forthecrown.useables.preconditions.SimpleCheckType
-net/forthecrown/serializer/AbstractNbtSerializer.java
- net.forthecrown.serializer.AbstractNbtSerializer
-net/forthecrown/events/MarriageListener.java
- net.forthecrown.events.MarriageListener
-net/forthecrown/crownevents/package-info.java
- net.forthecrown.crownevents.package-info
-net/forthecrown/useables/preconditions/UsageChecks.java
- net.forthecrown.useables.preconditions.UsageChecks
-net/forthecrown/inventory/custom/borders/Border.java
- net.forthecrown.inventory.custom.borders.Border
+net/forthecrown/registry/Registries.java
+ net.forthecrown.registry.Registries
+net/forthecrown/registry/CloseableRegistry.java
+ net.forthecrown.registry.CloseableRegistry
+net/forthecrown/inventory/SkullItems.java
+ net.forthecrown.inventory.SkullItems
+net/forthecrown/registry/CloseableRegistryBase.java
+ net.forthecrown.registry.CloseableRegistryBase
 net/forthecrown/useables/Preconditionable.java
  net.forthecrown.useables.Preconditionable
+net/forthecrown/inventory/custom/borders/Border.java
+ net.forthecrown.inventory.custom.borders.Border
+net/forthecrown/commands/arguments/JailType.java
+ net.forthecrown.commands.arguments.JailType
 net/forthecrown/useables/Actionable.java
  net.forthecrown.useables.Actionable
-net/forthecrown/utils/math/BoundingBoxIterator.java
- net.forthecrown.utils.math.BoundingBoxIterator
+net/forthecrown/useables/preconditions/CheckNotUsedBefore.java
+ net.forthecrown.useables.preconditions.CheckNotUsedBefore
+ net.forthecrown.useables.preconditions.CheckNotUsedBefore$CheckInstance
 net/forthecrown/economy/BrokenShopException.java
  net.forthecrown.economy.BrokenShopException
-net/forthecrown/core/ComVars.java
- net.forthecrown.core.ComVars
+net/forthecrown/useables/preconditions/UsageChecks.java
+ net.forthecrown.useables.preconditions.UsageChecks
 net/forthecrown/registry/CrownRegistry.java
  net.forthecrown.registry.CrownRegistry
 net/forthecrown/useables/preconditions/CheckInWorld.java
@@ -172,154 +166,164 @@ net/forthecrown/useables/Usable.java
  net.forthecrown.useables.Usable
 net/forthecrown/user/data/UserProperty.java
  net.forthecrown.user.data.UserProperty
-net/forthecrown/utils/math/ImmutableBlockPos.java
- net.forthecrown.utils.math.ImmutableBlockPos
-net/forthecrown/commands/arguments/NbtType.java
- net.forthecrown.commands.arguments.NbtType
-net/forthecrown/utils/math/BlockPos.java
- net.forthecrown.utils.math.BlockPos
-net/forthecrown/useables/preconditions/CheckRankType.java
- net.forthecrown.useables.preconditions.CheckRankType
- net.forthecrown.useables.preconditions.CheckRankType$CheckInstance
-net/forthecrown/useables/preconditions/CheckNumber.java
- net.forthecrown.useables.preconditions.CheckNumber
- net.forthecrown.useables.preconditions.CheckNumber$CheckInstance
+net/forthecrown/core/chat/ChatUtils.java
+ net.forthecrown.core.chat.ChatUtils
+net/forthecrown/commands/arguments/WarpType.java
+ net.forthecrown.commands.arguments.WarpType
+net/forthecrown/useables/actions/ActionRemoveNumber.java
+ net.forthecrown.useables.actions.ActionRemoveNumber
+ net.forthecrown.useables.actions.ActionRemoveNumber$ActionInstance
+net/forthecrown/registry/Registry.java
+ net.forthecrown.registry.Registry
+net/forthecrown/economy/shops/ShopManager.java
+ net.forthecrown.economy.shops.ShopManager
+net/forthecrown/dungeons/usables/ActionSpawnBoss.java
+ net.forthecrown.dungeons.usables.ActionSpawnBoss
+ net.forthecrown.dungeons.usables.ActionSpawnBoss$ActionInstance
+net/forthecrown/crownevents/CrownEventUtils.java
+ net.forthecrown.crownevents.CrownEventUtils
+net/forthecrown/economy/shops/CrownSignShop.java
+ net.forthecrown.economy.shops.CrownSignShop
 net/forthecrown/utils/Cooldown.java
  net.forthecrown.utils.Cooldown
 net/forthecrown/utils/loot/WeightedLootTable.java
  net.forthecrown.utils.loot.WeightedLootTable
+net/forthecrown/useables/preconditions/CheckRankType.java
+ net.forthecrown.useables.preconditions.CheckRankType
+ net.forthecrown.useables.preconditions.CheckRankType$CheckInstance
 net/forthecrown/utils/ItemStackBuilder.java
  net.forthecrown.utils.ItemStackBuilder
-net/forthecrown/events/MobHealthBar.java
- net.forthecrown.events.MobHealthBar
- net.forthecrown.events.MobHealthBar$1
 net/forthecrown/pirates/grappling/GhLevelData.java
  net.forthecrown.pirates.grappling.GhLevelData
  net.forthecrown.pirates.grappling.GhLevelData$1
-net/forthecrown/inventory/CustomInventoryHolder.java
- net.forthecrown.inventory.CustomInventoryHolder
+net/forthecrown/useables/actions/ActionItem.java
+ net.forthecrown.useables.actions.ActionItem
+ net.forthecrown.useables.actions.ActionItem$ActionInstance
 net/forthecrown/useables/actions/UsageActionInstance.java
  net.forthecrown.useables.actions.UsageActionInstance
-net/forthecrown/useables/preconditions/CheckIsNotAlt.java
- net.forthecrown.useables.preconditions.CheckIsNotAlt
-net/forthecrown/economy/shops/CrownSignShop.java
- net.forthecrown.economy.shops.CrownSignShop
-net/forthecrown/useables/actions/ActionRemoveNumber.java
- net.forthecrown.useables.actions.ActionRemoveNumber
- net.forthecrown.useables.actions.ActionRemoveNumber$ActionInstance
+net/forthecrown/events/InventoryBuilderListener.java
+ net.forthecrown.events.InventoryBuilderListener
+net/forthecrown/utils/math/ImmutableBlockPos.java
+ net.forthecrown.utils.math.ImmutableBlockPos
+net/forthecrown/inventory/CustomInventoryHolder.java
+ net.forthecrown.inventory.CustomInventoryHolder
 net/forthecrown/useables/preconditions/UsageCheckInstance.java
  net.forthecrown.useables.preconditions.UsageCheckInstance
-net/forthecrown/core/chat/ChatUtils.java
- net.forthecrown.core.chat.ChatUtils
-net/forthecrown/registry/Registry.java
- net.forthecrown.registry.Registry
-net/forthecrown/comvars/package-info.java
- net.forthecrown.comvars.package-info
-net/forthecrown/events/SignInteractEvent.java
- net.forthecrown.events.SignInteractEvent
- net.forthecrown.events.SignInteractEvent$SignShopInteractSubClass
+net/forthecrown/useables/actions/ActionChangeScore.java
+ net.forthecrown.useables.actions.ActionChangeScore
+ net.forthecrown.useables.actions.ActionChangeScore$1
+ net.forthecrown.useables.actions.ActionChangeScore$Action
+ net.forthecrown.useables.actions.ActionChangeScore$ActionInstance
+ net.forthecrown.useables.actions.ActionChangeScore$IntBiOperator
+net/forthecrown/useables/preconditions/CheckIsNotAlt.java
+ net.forthecrown.useables.preconditions.CheckIsNotAlt
+net/forthecrown/commands/arguments/NbtType.java
+ net.forthecrown.commands.arguments.NbtType
+net/forthecrown/crownevents/entries/EventEntry.java
+ net.forthecrown.crownevents.entries.EventEntry
 net/forthecrown/dungeons/Bosses.java
  net.forthecrown.dungeons.Bosses
 net/forthecrown/comvars/types/KeyComVarType.java
  net.forthecrown.comvars.types.KeyComVarType
-net/forthecrown/user/enums/RankTier.java
- net.forthecrown.user.enums.RankTier
 net/forthecrown/dungeons/BossFightContext.java
  net.forthecrown.dungeons.BossFightContext
-net/forthecrown/commands/arguments/CheckArgType.java
- net.forthecrown.commands.arguments.CheckArgType
 net/forthecrown/commands/arguments/DungeonBossArgument.java
  net.forthecrown.commands.arguments.DungeonBossArgument
+net/forthecrown/events/SignInteractEvent.java
+ net.forthecrown.events.SignInteractEvent
+ net.forthecrown.events.SignInteractEvent$SignShopInteractSubClass
+net/forthecrown/commands/arguments/CheckArgType.java
+ net.forthecrown.commands.arguments.CheckArgType
+net/forthecrown/utils/math/BoundingBoxIterator.java
+ net.forthecrown.utils.math.BoundingBoxIterator
 net/forthecrown/utils/CrownRandom.java
  net.forthecrown.utils.CrownRandom
 net/forthecrown/useables/kits/Kit.java
  net.forthecrown.useables.kits.Kit
-net/forthecrown/user/enums/CrownGameMode.java
- net.forthecrown.user.enums.CrownGameMode
- net.forthecrown.user.enums.CrownGameMode$1
-net/forthecrown/serializer/NbtSerializable.java
- net.forthecrown.serializer.NbtSerializable
+net/forthecrown/user/enums/RankTier.java
+ net.forthecrown.user.enums.RankTier
+net/forthecrown/useables/CrownUsableEntity.java
+ net.forthecrown.useables.CrownUsableEntity
 net/forthecrown/useables/actions/ActionTeleport.java
  net.forthecrown.useables.actions.ActionTeleport
  net.forthecrown.useables.actions.ActionTeleport$ActionInstance
-net/forthecrown/commands/arguments/JailType.java
- net.forthecrown.commands.arguments.JailType
+net/forthecrown/user/enums/CrownGameMode.java
+ net.forthecrown.user.enums.CrownGameMode
+ net.forthecrown.user.enums.CrownGameMode$1
 net/forthecrown/utils/JsonUtils.java
  net.forthecrown.utils.JsonUtils
-net/forthecrown/commands/arguments/KitType.java
- net.forthecrown.commands.arguments.KitType
-net/forthecrown/useables/actions/ActionItem.java
- net.forthecrown.useables.actions.ActionItem
- net.forthecrown.useables.actions.ActionItem$ActionInstance
+net/forthecrown/crownevents/ArmorStandLeaderboard.java
+ net.forthecrown.crownevents.ArmorStandLeaderboard
+ net.forthecrown.crownevents.ArmorStandLeaderboard$Order
+net/forthecrown/core/ComVars.java
+ net.forthecrown.core.ComVars
 net/forthecrown/cosmetics/PlayerRider.java
  net.forthecrown.cosmetics.PlayerRider
-net/forthecrown/serializer/AbstractYamlSerializer.java
- net.forthecrown.serializer.AbstractYamlSerializer
+net/forthecrown/serializer/AbstractNbtSerializer.java
+ net.forthecrown.serializer.AbstractNbtSerializer
 net/forthecrown/comvars/ComVar.java
  net.forthecrown.comvars.ComVar
-net/forthecrown/registry/CloseableRegistry.java
- net.forthecrown.registry.CloseableRegistry
-net/forthecrown/inventory/builder/InventoryCloseAction.java
- net.forthecrown.inventory.builder.InventoryCloseAction
-net/forthecrown/inventory/SkullItems.java
- net.forthecrown.inventory.SkullItems
+net/forthecrown/crownevents/package-info.java
+ net.forthecrown.crownevents.package-info
+net/forthecrown/useables/preconditions/SimpleCheckType.java
+ net.forthecrown.useables.preconditions.SimpleCheckType
+net/forthecrown/crownevents/reporters/EventReporter.java
+ net.forthecrown.crownevents.reporters.EventReporter
 net/forthecrown/inventory/builder/ClickContext.java
  net.forthecrown.inventory.builder.ClickContext
-net/forthecrown/useables/UsageType.java
- net.forthecrown.useables.UsageType
+net/forthecrown/serializer/AbstractYamlSerializer.java
+ net.forthecrown.serializer.AbstractYamlSerializer
 net/forthecrown/useables/preconditions/UsageCheck.java
  net.forthecrown.useables.preconditions.UsageCheck
 net/forthecrown/core/admin/record/PunishmentType.java
  net.forthecrown.core.admin.record.PunishmentType
-net/forthecrown/inventory/custom/options/ClickAction.java
- net.forthecrown.inventory.custom.options.ClickAction
-net/forthecrown/user/enums/Pet.java
- net.forthecrown.user.enums.Pet
-net/forthecrown/utils/MapUtils.java
- net.forthecrown.utils.MapUtils
-net/forthecrown/core/nbt/NbtHandler.java
- net.forthecrown.core.nbt.NbtHandler
+net/forthecrown/events/EnchantEvents.java
+ net.forthecrown.events.EnchantEvents
+ net.forthecrown.events.EnchantEvents$StrongAimScheduler
+net/forthecrown/events/dynamic/JailListener.java
+ net.forthecrown.events.dynamic.JailListener
+net/forthecrown/useables/UsageType.java
+ net.forthecrown.useables.UsageType
+net/forthecrown/comvars/types/ComVarType.java
+ net.forthecrown.comvars.types.ComVarType
+ net.forthecrown.comvars.types.ComVarType$PrimitiveComVarType
 net/forthecrown/core/nbt/NBT.java
  net.forthecrown.core.nbt.NBT
 net/forthecrown/utils/BlackMarketUtils.java
  net.forthecrown.utils.BlackMarketUtils
-net/forthecrown/user/enums/SellAmount.java
- net.forthecrown.user.enums.SellAmount
-net/forthecrown/useables/preconditions/CheckBranchType.java
- net.forthecrown.useables.preconditions.CheckBranchType
- net.forthecrown.useables.preconditions.CheckBranchType$CheckInstance
+net/forthecrown/commands/arguments/RoyalEnchantType.java
+ net.forthecrown.commands.arguments.RoyalEnchantType
+net/forthecrown/utils/math/CrownRegion.java
+ net.forthecrown.utils.math.CrownRegion
 net/forthecrown/useables/actions/ActionCommand.java
  net.forthecrown.useables.actions.ActionCommand
  net.forthecrown.useables.actions.ActionCommand$ActionInstance
-net/forthecrown/commands/manager/CoreCommands.java
- net.forthecrown.commands.manager.CoreCommands
+net/forthecrown/user/enums/SellAmount.java
+ net.forthecrown.user.enums.SellAmount
+net/forthecrown/utils/MapUtils.java
+ net.forthecrown.utils.MapUtils
+net/forthecrown/inventory/custom/options/ClickAction.java
+ net.forthecrown.inventory.custom.options.ClickAction
 net/forthecrown/useables/preconditions/CheckPermission.java
  net.forthecrown.useables.preconditions.CheckPermission
  net.forthecrown.useables.preconditions.CheckPermission$CheckInstance
-net/forthecrown/economy/pirates/EnchantmentData.java
- net.forthecrown.economy.pirates.EnchantmentData
-net/forthecrown/user/data/DirectMessage.java
- net.forthecrown.user.data.DirectMessage
-net/forthecrown/pirates/grappling/GhParkourData.java
- net.forthecrown.pirates.grappling.GhParkourData
-net/forthecrown/economy/auctions/AuctionEvents.java
- net.forthecrown.economy.auctions.AuctionEvents
+net/forthecrown/events/ShopDestroyEvent.java
+ net.forthecrown.events.ShopDestroyEvent
 net/forthecrown/dungeons/bosses/HideySpidey.java
  net.forthecrown.dungeons.bosses.HideySpidey
  net.forthecrown.dungeons.bosses.HideySpidey$SpawnPart
-net/forthecrown/events/SmokeBomb.java
- net.forthecrown.events.SmokeBomb
-net/forthecrown/events/ShopDestroyEvent.java
- net.forthecrown.events.ShopDestroyEvent
-net/forthecrown/events/DungeonEvents.java
- net.forthecrown.events.DungeonEvents
- net.forthecrown.events.DungeonEvents$1
+net/forthecrown/economy/pirates/EnchantmentData.java
+ net.forthecrown.economy.pirates.EnchantmentData
+net/forthecrown/pirates/grappling/GhParkourData.java
+ net.forthecrown.pirates.grappling.GhParkourData
+net/forthecrown/inventory/builder/options/OptionPriority.java
+ net.forthecrown.inventory.builder.options.OptionPriority
 net/forthecrown/registry/CrownWarpRegistry.java
  net.forthecrown.registry.CrownWarpRegistry
-net/forthecrown/useables/warps/Warp.java
- net.forthecrown.useables.warps.Warp
-net/forthecrown/utils/loot/CrownWeightedLootTable.java
- net.forthecrown.utils.loot.CrownWeightedLootTable
+net/forthecrown/registry/BaseRegistry.java
+ net.forthecrown.registry.BaseRegistry
+net/forthecrown/utils/math/BlockOffset.java
+ net.forthecrown.utils.math.BlockOffset
 net/forthecrown/serializer/Deletable.java
  net.forthecrown.serializer.Deletable
 net/forthecrown/useables/warps/FtcWarp.java
@@ -333,28 +337,29 @@ net/forthecrown/serializer/NbtCompoundSavable.java
  net.forthecrown.serializer.NbtCompoundSavable
 net/forthecrown/events/VolleyBallListener.java
  net.forthecrown.events.VolleyBallListener
-net/forthecrown/events/PirateEvents.java
- net.forthecrown.events.PirateEvents
-net/forthecrown/core/chat/CrownBroadcaster.java
- net.forthecrown.core.chat.CrownBroadcaster
- net.forthecrown.core.chat.CrownBroadcaster$1
+net/forthecrown/useables/preconditions/CheckInventoryEmpty.java
+ net.forthecrown.useables.preconditions.CheckInventoryEmpty
+net/forthecrown/core/admin/PunishmentEntry.java
+ net.forthecrown.core.admin.PunishmentEntry
 net/forthecrown/economy/shops/CrownShopManager.java
  net.forthecrown.economy.shops.CrownShopManager
 net/forthecrown/core/admin/MuteStatus.java
  net.forthecrown.core.admin.MuteStatus
-net/forthecrown/useables/UsablesManager.java
- net.forthecrown.useables.UsablesManager
+net/forthecrown/utils/loot/CrownWeightedLootTable.java
+ net.forthecrown.utils.loot.CrownWeightedLootTable
 net/forthecrown/useables/actions/UsageActions.java
  net.forthecrown.useables.actions.UsageActions
-net/forthecrown/economy/pirates/DailyEnchantment.java
- net.forthecrown.economy.pirates.DailyEnchantment
+net/forthecrown/core/chat/CrownTabList.java
+ net.forthecrown.core.chat.CrownTabList
 net/forthecrown/useables/preconditions/CheckHasAllItemsType.java
  net.forthecrown.useables.preconditions.CheckHasAllItemsType
  net.forthecrown.useables.preconditions.CheckHasAllItemsType$CheckInstance
-net/forthecrown/utils/Nameable.java
- net.forthecrown.utils.Nameable
+net/forthecrown/economy/shops/CrownShopInventory.java
+ net.forthecrown.economy.shops.CrownShopInventory
 net/forthecrown/core/MiniGameRegion.java
  net.forthecrown.core.MiniGameRegion
+net/forthecrown/core/admin/ServerRules.java
+ net.forthecrown.core.admin.ServerRules
 net/forthecrown/useables/actions/ActionKit.java
  net.forthecrown.useables.actions.ActionKit
  net.forthecrown.useables.actions.ActionKit$ActionInstance
@@ -362,26 +367,29 @@ net/forthecrown/core/DayUpdate.java
  net.forthecrown.core.DayUpdate
 net/forthecrown/core/admin/jails/JailManager.java
  net.forthecrown.core.admin.jails.JailManager
-net/forthecrown/events/CoreListener.java
- net.forthecrown.events.CoreListener
+net/forthecrown/events/DungeonEvents.java
+ net.forthecrown.events.DungeonEvents
+ net.forthecrown.events.DungeonEvents$1
 net/forthecrown/registry/WarpRegistry.java
  net.forthecrown.registry.WarpRegistry
-net/forthecrown/user/enums/Rank.java
- net.forthecrown.user.enums.Rank
-net/forthecrown/inventory/builder/options/OptionPriority.java
- net.forthecrown.inventory.builder.options.OptionPriority
+net/forthecrown/core/chat/CrownBroadcaster.java
+ net.forthecrown.core.chat.CrownBroadcaster
+ net.forthecrown.core.chat.CrownBroadcaster$1
 net/forthecrown/pirates/grappling/GhType.java
  net.forthecrown.pirates.grappling.GhType
-net/forthecrown/core/admin/ServerRules.java
- net.forthecrown.core.admin.ServerRules
-net/forthecrown/core/admin/record/PunishmentRecord.java
- net.forthecrown.core.admin.record.PunishmentRecord
-net/forthecrown/pirates/grappling/GhBiome.java
- net.forthecrown.pirates.grappling.GhBiome
+net/forthecrown/utils/SilentPredicate.java
+ net.forthecrown.utils.SilentPredicate
+net/forthecrown/useables/AbstractUsable.java
+ net.forthecrown.useables.AbstractUsable
+net/forthecrown/events/MarriageListener.java
+ net.forthecrown.events.MarriageListener
+net/forthecrown/useables/preconditions/CheckBranchType.java
+ net.forthecrown.useables.preconditions.CheckBranchType
+ net.forthecrown.useables.preconditions.CheckBranchType$CheckInstance
 net/forthecrown/serializer/JsonDeserializable.java
  net.forthecrown.serializer.JsonDeserializable
-net/forthecrown/events/InteractableEvents.java
- net.forthecrown.events.InteractableEvents
+net/forthecrown/economy/pirates/DailyEnchantment.java
+ net.forthecrown.economy.pirates.DailyEnchantment
 net/forthecrown/core/WgFlags.java
  net.forthecrown.core.WgFlags
 net/forthecrown/useables/preconditions/CheckNeverUsed.java
@@ -389,65 +397,122 @@ net/forthecrown/useables/preconditions/CheckNeverUsed.java
  net.forthecrown.useables.preconditions.CheckNeverUsed$CheckInstance
 net/forthecrown/utils/loot/LiteralLootTable.java
  net.forthecrown.utils.loot.LiteralLootTable
-net/forthecrown/pirates/TreasureShulker.java
- net.forthecrown.pirates.TreasureShulker
- net.forthecrown.pirates.TreasureShulker$Loot
-net/forthecrown/user/enums/Branch.java
- net.forthecrown.user.enums.Branch
+net/forthecrown/economy/SortedBalanceMap.java
+ net.forthecrown.economy.SortedBalanceMap
+net/forthecrown/commands/arguments/CommandHelpType.java
+ net.forthecrown.commands.arguments.CommandHelpType
 net/forthecrown/core/Permissions.java
  net.forthecrown.core.Permissions
 net/forthecrown/core/admin/PunishmentManager.java
  net.forthecrown.core.admin.PunishmentManager
-net/forthecrown/economy/Balances.java
- net.forthecrown.economy.Balances
-net/forthecrown/economy/shops/ShopManager.java
- net.forthecrown.economy.shops.ShopManager
+net/forthecrown/commands/arguments/HomeParseResult.java
+ net.forthecrown.commands.arguments.HomeParseResult
+net/forthecrown/inventory/CrownItems.java
+ net.forthecrown.inventory.CrownItems
 net/forthecrown/comvars/types/WorldComVarType.java
  net.forthecrown.comvars.types.WorldComVarType
 net/forthecrown/useables/actions/ActionShowText.java
  net.forthecrown.useables.actions.ActionShowText
  net.forthecrown.useables.actions.ActionShowText$ActionInstance
-net/forthecrown/inventory/CrownItems.java
- net.forthecrown.inventory.CrownItems
-net/forthecrown/utils/Pair.java
- net.forthecrown.utils.Pair
-net/forthecrown/events/ShopCreateEvent.java
- net.forthecrown.events.ShopCreateEvent
- net.forthecrown.events.ShopCreateEvent$SignShopSubClass1
-net/forthecrown/useables/UsableEntity.java
- net.forthecrown.useables.UsableEntity
 net/forthecrown/comvars/ParseFunction.java
  net.forthecrown.comvars.ParseFunction
+net/forthecrown/utils/Pair.java
+ net.forthecrown.utils.Pair
+net/forthecrown/commands/arguments/HomeType.java
+ net.forthecrown.commands.arguments.HomeType
+net/forthecrown/useables/CheckableBase.java
+ net.forthecrown.useables.CheckableBase
+net/forthecrown/utils/Worlds.java
+ net.forthecrown.utils.Worlds
+net/forthecrown/core/chat/JoinInfo.java
+ net.forthecrown.core.chat.JoinInfo
 net/forthecrown/utils/Triple.java
  net.forthecrown.utils.Triple
-net/forthecrown/registry/KitRegistry.java
- net.forthecrown.registry.KitRegistry
 net/forthecrown/inventory/custom/options/ClickableOption.java
  net.forthecrown.inventory.custom.options.ClickableOption
-net/forthecrown/events/GraveListener.java
- net.forthecrown.events.GraveListener
+net/forthecrown/registry/KitRegistry.java
+ net.forthecrown.registry.KitRegistry
 net/forthecrown/economy/BalanceMap.java
  net.forthecrown.economy.BalanceMap
  net.forthecrown.economy.BalanceMap$BalEntry
-net/forthecrown/pirates/grappling/GrapplingHookParkour.java
- net.forthecrown.pirates.grappling.GrapplingHookParkour
- net.forthecrown.pirates.grappling.GrapplingHookParkour$1
+net/forthecrown/economy/shops/ShopInventory.java
+ net.forthecrown.economy.shops.ShopInventory
 net/forthecrown/registry/CrownKitRegistry.java
  net.forthecrown.registry.CrownKitRegistry
 net/forthecrown/core/chat/CrownMessages.java
  net.forthecrown.core.chat.CrownMessages
 net/forthecrown/inventory/custom/borders/GenericBorder.java
  net.forthecrown.inventory.custom.borders.GenericBorder
-net/forthecrown/commands/clickevent/ClickEventTask.java
- net.forthecrown.commands.clickevent.ClickEventTask
+net/forthecrown/crownevents/ObjectiveLeaderboard.java
+ net.forthecrown.crownevents.ObjectiveLeaderboard
 net/forthecrown/commands/punishments/GenericPunisher.java
  net.forthecrown.commands.punishments.GenericPunisher
+net/forthecrown/dungeons/usables/ActionGiveArtifact.java
+ net.forthecrown.dungeons.usables.ActionGiveArtifact
+ net.forthecrown.dungeons.usables.ActionGiveArtifact$ActionInstance
 net/forthecrown/serializer/NbtCompoundLoadable.java
  net.forthecrown.serializer.NbtCompoundLoadable
-net/forthecrown/useables/CrownUsableEntity.java
- net.forthecrown.useables.CrownUsableEntity
+net/forthecrown/events/CustomInventoryClickListener.java
+ net.forthecrown.events.CustomInventoryClickListener
+net/forthecrown/core/admin/jails/CrownJailManager.java
+ net.forthecrown.core.admin.jails.CrownJailManager
+net/forthecrown/useables/preconditions/CheckHasItemType.java
+ net.forthecrown.useables.preconditions.CheckHasItemType
+ net.forthecrown.useables.preconditions.CheckHasItemType$CheckInstance
+net/forthecrown/events/JeromeEvent.java
+ net.forthecrown.events.JeromeEvent
+net/forthecrown/events/dynamic/RankGuiUseEvent.java
+ net.forthecrown.events.dynamic.RankGuiUseEvent
+net/forthecrown/pirates/grappling/GrapplingHookParkour.java
+ net.forthecrown.pirates.grappling.GrapplingHookParkour
+ net.forthecrown.pirates.grappling.GrapplingHookParkour$1
+net/forthecrown/commands/arguments/PetType.java
+ net.forthecrown.commands.arguments.PetType
+net/forthecrown/useables/kits/FtcKit.java
+ net.forthecrown.useables.kits.FtcKit
+net/forthecrown/events/CoreListener.java
+ net.forthecrown.events.CoreListener
+net/forthecrown/inventory/CrownWeapons.java
+ net.forthecrown.inventory.CrownWeapons
+ net.forthecrown.inventory.CrownWeapons$Weapon
+net/forthecrown/serializer/UserYamlToJson.java
+ net.forthecrown.serializer.UserYamlToJson
+ net.forthecrown.serializer.UserYamlToJson$YamlUserInstance
+net/forthecrown/pirates/TreasureShulker.java
+ net.forthecrown.pirates.TreasureShulker
+ net.forthecrown.pirates.TreasureShulker$Loot
+net/forthecrown/useables/preconditions/CheckNumber.java
+ net.forthecrown.useables.preconditions.CheckNumber
+ net.forthecrown.useables.preconditions.CheckNumber$CheckInstance
+net/forthecrown/user/data/DirectMessage.java
+ net.forthecrown.user.data.DirectMessage
+net/forthecrown/core/admin/StaffChat.java
+ net.forthecrown.core.admin.StaffChat
+net/forthecrown/events/MobHealthBar.java
+ net.forthecrown.events.MobHealthBar
+ net.forthecrown.events.MobHealthBar$1
+net/forthecrown/core/admin/record/PunishmentRecord.java
+ net.forthecrown.core.admin.record.PunishmentRecord
+net/forthecrown/events/ShopCreateEvent.java
+ net.forthecrown.events.ShopCreateEvent
+ net.forthecrown.events.ShopCreateEvent$SignShopSubClass1
+net/forthecrown/economy/auctions/AuctionEvents.java
+ net.forthecrown.economy.auctions.AuctionEvents
+net/forthecrown/useables/preconditions/CheckCooldownType.java
+ net.forthecrown.useables.preconditions.CheckCooldownType
+ net.forthecrown.useables.preconditions.CheckCooldownType$CheckInstance
 net/forthecrown/utils/RoyalUtils.java
  net.forthecrown.utils.RoyalUtils
+net/forthecrown/economy/Balances.java
+ net.forthecrown.economy.Balances
+net/forthecrown/economy/CrownBalances.java
+ net.forthecrown.economy.CrownBalances
+net/forthecrown/user/enums/Pet.java
+ net.forthecrown.user.enums.Pet
+net/forthecrown/pirates/grappling/GhBiome.java
+ net.forthecrown.pirates.grappling.GhBiome
+net/forthecrown/user/enums/Rank.java
+ net.forthecrown.user.enums.Rank
 net/forthecrown/economy/pirates/merchants/UsablePirateNpc.java
  net.forthecrown.economy.pirates.merchants.UsablePirateNpc
 net/forthecrown/commands/CommandTpaCancel.java
@@ -458,8 +523,6 @@ net/forthecrown/cosmetics/deaths/SoulDeathEffect.java
  net.forthecrown.cosmetics.deaths.SoulDeathEffect
 net/forthecrown/user/UserInteractions.java
  net.forthecrown.user.UserInteractions
-net/forthecrown/crownevents/entries/MultiEntry.java
- net.forthecrown.crownevents.entries.MultiEntry
 net/forthecrown/economy/pirates/CrownPirateEconomy.java
  net.forthecrown.economy.pirates.CrownPirateEconomy
 net/forthecrown/commands/help/HelpPost.java
@@ -468,8 +531,6 @@ net/forthecrown/commands/punishments/Punisher.java
  net.forthecrown.commands.punishments.Punisher
 net/forthecrown/commands/CommandDelHome.java
  net.forthecrown.commands.CommandDelHome
-net/forthecrown/crownevents/reporters/ReporterFactory.java
- net.forthecrown.crownevents.reporters.ReporterFactory
 net/forthecrown/events/Events.java
  net.forthecrown.events.Events
 net/forthecrown/commands/punishments/CommandMute.java
@@ -484,8 +545,6 @@ net/forthecrown/cosmetics/options/NoDeathOption.java
  net.forthecrown.cosmetics.options.NoDeathOption
 net/forthecrown/commands/help/HelpHelp.java
  net.forthecrown.commands.help.HelpHelp
-net/forthecrown/crownevents/InEventListener.java
- net.forthecrown.crownevents.InEventListener
 net/forthecrown/user/data/MarriageMessage.java
  net.forthecrown.user.data.MarriageMessage
 net/forthecrown/inventory/builder/options/SimpleOption.java
@@ -506,8 +565,6 @@ net/forthecrown/commands/CommandKit.java
  net.forthecrown.commands.CommandKit
 net/forthecrown/events/dynamic/AbstractInvListener.java
  net.forthecrown.events.dynamic.AbstractInvListener
-net/forthecrown/useables/AbstractUsable.java
- net.forthecrown.useables.AbstractUsable
 net/forthecrown/inventory/builder/options/InventoryPlacer.java
  net.forthecrown.inventory.builder.options.InventoryPlacer
 net/forthecrown/commands/punishments/CommandTempBan.java
@@ -524,21 +581,15 @@ net/forthecrown/commands/CommandTestCore.java
  net.forthecrown.commands.CommandTestCore
 net/forthecrown/commands/CommandDeathTop.java
  net.forthecrown.commands.CommandDeathTop
-net/forthecrown/commands/CommandFtcCore.java
- net.forthecrown.commands.CommandFtcCore
- net.forthecrown.commands.CommandFtcCore$SaveReloadPart
+net/forthecrown/commands/help/HelpAuction.java
+ net.forthecrown.commands.help.HelpAuction
 net/forthecrown/commands/emotes/EmoteScare.java
  net.forthecrown.commands.emotes.EmoteScare
 net/forthecrown/economy/auctions/Auction.java
  net.forthecrown.economy.auctions.Auction
-net/forthecrown/serializer/UserYamlToJson.java
- net.forthecrown.serializer.UserYamlToJson
- net.forthecrown.serializer.UserYamlToJson$YamlUserInstance
 net/forthecrown/inventory/RankInventory.java
  net.forthecrown.inventory.RankInventory
  net.forthecrown.inventory.RankInventory$1
-net/forthecrown/serializer/JsonBuf.java
- net.forthecrown.serializer.JsonBuf
 net/forthecrown/commands/marriage/CommandMarryToggle.java
  net.forthecrown.commands.marriage.CommandMarryToggle
 net/forthecrown/commands/CommandHomeList.java
@@ -549,14 +600,9 @@ net/forthecrown/commands/CommandGetPos.java
  net.forthecrown.commands.CommandGetPos
 net/forthecrown/commands/emotes/EmoteBonk.java
  net.forthecrown.commands.emotes.EmoteBonk
-net/forthecrown/useables/preconditions/CheckHasScoreType.java
- net.forthecrown.useables.preconditions.CheckHasScoreType
- net.forthecrown.useables.preconditions.CheckHasScoreType$CheckInstance
 net/forthecrown/events/JackEvent.java
  net.forthecrown.events.JackEvent
  net.forthecrown.events.JackEvent$JackInvListener
-net/forthecrown/crownevents/LeaderboardFormatter.java
- net.forthecrown.crownevents.LeaderboardFormatter
 net/forthecrown/commands/marriage/CommandMarriageChatToggle.java
  net.forthecrown.commands.marriage.CommandMarriageChatToggle
 net/forthecrown/commands/CommandTell.java
@@ -609,8 +655,6 @@ net/forthecrown/commands/CommandPay.java
  net.forthecrown.commands.CommandPay
 net/forthecrown/cosmetics/arrows/ArrowEffect.java
  net.forthecrown.cosmetics.arrows.ArrowEffect
-net/forthecrown/crownevents/reporters/CrownEventReporter.java
- net.forthecrown.crownevents.reporters.CrownEventReporter
 net/forthecrown/commands/CommandSetSpawn.java
  net.forthecrown.commands.CommandSetSpawn
 net/forthecrown/events/dynamic/AfkListener.java
@@ -625,12 +669,12 @@ net/forthecrown/commands/CommandVanish.java
  net.forthecrown.commands.CommandVanish
 net/forthecrown/commands/punishments/CommandKickAll.java
  net.forthecrown.commands.punishments.CommandKickAll
-net/forthecrown/registry/Registries.java
- net.forthecrown.registry.Registries
 net/forthecrown/commands/CommandDeposit.java
  net.forthecrown.commands.CommandDeposit
 net/forthecrown/commands/CommandToggleRiding.java
  net.forthecrown.commands.CommandToggleRiding
+net/forthecrown/commands/punishments/CommandSmite.java
+ net.forthecrown.commands.punishments.CommandSmite
 net/forthecrown/commands/CommandSpecificGameMode.java
  net.forthecrown.commands.CommandSpecificGameMode
 net/forthecrown/commands/CommandItemName.java
@@ -654,9 +698,6 @@ net/forthecrown/pirates/AuctionManager.java
  net.forthecrown.pirates.AuctionManager
 net/forthecrown/commands/marriage/CommandDivorce.java
  net.forthecrown.commands.marriage.CommandDivorce
-net/forthecrown/crownevents/ArmorStandLeaderboard.java
- net.forthecrown.crownevents.ArmorStandLeaderboard
- net.forthecrown.crownevents.ArmorStandLeaderboard$Order
 net/forthecrown/commands/CommandNickname.java
  net.forthecrown.commands.CommandNickname
 net/forthecrown/user/CrownUser.java
@@ -687,12 +728,6 @@ net/forthecrown/inventory/builder/InventoryAction.java
  net.forthecrown.inventory.builder.InventoryAction
 net/forthecrown/commands/CommandGhStand.java
  net.forthecrown.commands.CommandGhStand
-net/forthecrown/useables/actions/ActionChangeScore.java
- net.forthecrown.useables.actions.ActionChangeScore
- net.forthecrown.useables.actions.ActionChangeScore$1
- net.forthecrown.useables.actions.ActionChangeScore$Action
- net.forthecrown.useables.actions.ActionChangeScore$ActionInstance
- net.forthecrown.useables.actions.ActionChangeScore$IntBiOperator
 net/forthecrown/economy/pirates/merchants/HeadMerchant.java
  net.forthecrown.economy.pirates.merchants.HeadMerchant
 net/forthecrown/economy/SellShop.java
@@ -715,9 +750,6 @@ net/forthecrown/user/UserHomes.java
  net.forthecrown.user.UserHomes
 net/forthecrown/commands/emotes/CommandEmote.java
  net.forthecrown.commands.emotes.CommandEmote
-net/forthecrown/useables/actions/ActionAddNumber.java
- net.forthecrown.useables.actions.ActionAddNumber
- net.forthecrown.useables.actions.ActionAddNumber$ActionInstance
 net/forthecrown/cosmetics/emotes/CosmeticEmotes.java
  net.forthecrown.cosmetics.emotes.CosmeticEmotes
 net/forthecrown/commands/CommandWarpEdit.java
@@ -734,10 +766,10 @@ net/forthecrown/commands/CommandProfilePublic.java
  net.forthecrown.commands.CommandProfilePublic
 net/forthecrown/commands/CommandReply.java
  net.forthecrown.commands.CommandReply
-net/forthecrown/crownevents/entries/EventEntry.java
- net.forthecrown.crownevents.entries.EventEntry
 net/forthecrown/user/FtcUserCosmeticData.java
  net.forthecrown.user.FtcUserCosmeticData
+net/forthecrown/commands/punishments/CommandSeparate.java
+ net.forthecrown.commands.punishments.CommandSeparate
 net/forthecrown/crownevents/EventTimer.java
  net.forthecrown.crownevents.EventTimer
  net.forthecrown.crownevents.EventTimer$1
@@ -746,15 +778,14 @@ net/forthecrown/commands/CommandTpaAccept.java
  net.forthecrown.commands.CommandTpaAccept
 net/forthecrown/events/dynamic/AsyncTeleportListener.java
  net.forthecrown.events.dynamic.AsyncTeleportListener
+net/forthecrown/commands/CommandCrownTop.java
+ net.forthecrown.commands.CommandCrownTop
 net/forthecrown/cosmetics/Cosmetics.java
  net.forthecrown.cosmetics.Cosmetics
 net/forthecrown/core/kingship/CrownKingship.java
  net.forthecrown.core.kingship.CrownKingship
 net/forthecrown/cosmetics/deaths/DeathEffects.java
  net.forthecrown.cosmetics.deaths.DeathEffects
-net/forthecrown/useables/preconditions/CheckCooldownType.java
- net.forthecrown.useables.preconditions.CheckCooldownType
- net.forthecrown.useables.preconditions.CheckCooldownType$CheckInstance
 net/forthecrown/user/CrownUserManager.java
  net.forthecrown.user.CrownUserManager
 net/forthecrown/commands/CommandMakeAward.java
@@ -787,8 +818,6 @@ net/forthecrown/commands/CommandKitEdit.java
  net.forthecrown.commands.CommandKitEdit
 net/forthecrown/commands/CommandMe.java
  net.forthecrown.commands.CommandMe
-net/forthecrown/crownevents/reporters/EventReporter.java
- net.forthecrown.crownevents.reporters.EventReporter
 net/forthecrown/commands/CommandSuicide.java
  net.forthecrown.commands.CommandSuicide
 net/forthecrown/commands/punishments/CommandJails.java
@@ -881,6 +910,8 @@ net/forthecrown/user/FtcUserDataContainer.java
 net/forthecrown/commands/CommandLore.java
  net.forthecrown.commands.CommandLore
  net.forthecrown.commands.CommandLore$ComponentCommand
+net/forthecrown/user/UserAttachment.java
+ net.forthecrown.user.UserAttachment
 net/forthecrown/commands/manager/CrownExceptionProvider.java
  net.forthecrown.commands.manager.CrownExceptionProvider
 net/forthecrown/commands/CommandWorld.java
@@ -891,8 +922,6 @@ net/forthecrown/commands/CommandHome.java
  net.forthecrown.commands.CommandHome
 net/forthecrown/user/FtcUser.java
  net.forthecrown.user.FtcUser
-net/forthecrown/useables/UsableBase.java
- net.forthecrown.useables.UsableBase
 net/forthecrown/commands/CommandRoyals.java
  net.forthecrown.commands.CommandRoyals
 net/forthecrown/cosmetics/deaths/TotemDeathEffect.java
@@ -913,8 +942,6 @@ net/forthecrown/economy/pirates/merchants/BlackMarketMerchant.java
  net.forthecrown.economy.pirates.merchants.BlackMarketMerchant
 net/forthecrown/economy/pirates/merchants/ParrotMerchant.java
  net.forthecrown.economy.pirates.merchants.ParrotMerchant
-net/forthecrown/crownevents/CrownEvent.java
- net.forthecrown.crownevents.CrownEvent
 net/forthecrown/core/Main.java
  net.forthecrown.core.Main
 net/forthecrown/commands/CommandToolBlock.java
@@ -924,8 +951,6 @@ net/forthecrown/commands/help/HelpBank.java
  net.forthecrown.commands.help.HelpBank
 net/forthecrown/commands/CommandPlayerTime.java
  net.forthecrown.commands.CommandPlayerTime
-net/forthecrown/crownevents/TimerMessageFormatter.java
- net.forthecrown.crownevents.TimerMessageFormatter
 net/forthecrown/core/admin/EavesDropper.java
  net.forthecrown.core.admin.EavesDropper
 net/forthecrown/commands/CommandSudo.java
@@ -937,12 +962,9 @@ net/forthecrown/commands/CommandTpCancel.java
  net.forthecrown.commands.CommandTpCancel
 net/forthecrown/commands/CommandHologram.java
  net.forthecrown.commands.CommandHologram
-net/forthecrown/crownevents/ObjectiveLeaderboard.java
- net.forthecrown.crownevents.ObjectiveLeaderboard
 net/forthecrown/commands/CommandSetHome.java
  net.forthecrown.commands.CommandSetHome
-net/forthecrown/events/CustomInventoryClickListener.java
- net.forthecrown.events.CustomInventoryClickListener
+ net.forthecrown.commands.CommandSetHome$HomeCreationContext
 net/forthecrown/commands/emotes/EmotePog.java
  net.forthecrown.commands.emotes.EmotePog
 net/forthecrown/cosmetics/deaths/EnderRingDeathEffect.java
@@ -971,11 +993,10 @@ net/forthecrown/commands/CommandTpask.java
  net.forthecrown.commands.CommandTpask
 net/forthecrown/events/dynamic/BmParrotListener.java
  net.forthecrown.events.dynamic.BmParrotListener
-net/forthecrown/registry/CloseableRegistryBase.java
- net.forthecrown.registry.CloseableRegistryBase
 net/forthecrown/user/CrownUserAlt.java
  net.forthecrown.user.CrownUserAlt
-net/forthecrown/commands/help/HelpAuction.java
- net.forthecrown.commands.help.HelpAuction
-net/forthecrown/commands/CommandCrownTop.java
- net.forthecrown.commands.CommandCrownTop
+net/forthecrown/commands/manager/CoreCommands.java
+ net.forthecrown.commands.manager.CoreCommands
+net/forthecrown/commands/CommandFtcCore.java
+ net.forthecrown.commands.CommandFtcCore
+ net.forthecrown.commands.CommandFtcCore$SaveReloadPart

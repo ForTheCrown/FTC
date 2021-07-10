@@ -1,6 +1,5 @@
 package net.forthecrown.user;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.forthecrown.core.CrownCore;
@@ -9,6 +8,7 @@ import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.user.data.TeleportRequest;
+import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 
 import java.util.*;
@@ -21,11 +21,12 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
     public UUID waitingFinish;
     public UUID marriedTo;
     public long lastMarriageChange;
+
     public boolean acceptingProposals;
     public boolean marriageChatToggled;
 
     public Set<UUID> blocked = new HashSet<>();
-    public Set<UUID> seperated = new HashSet<>();
+    public Set<UUID> separated = new HashSet<>();
 
     private final List<TeleportRequest> incoming = new ArrayList<>();
     private final List<TeleportRequest> outgoing = new ArrayList<>();
@@ -68,6 +69,11 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
     }
 
     @Override
+    public boolean isOnlyBlocked(UUID uuid) {
+        return blocked.contains(uuid);
+    }
+
+    @Override
     public boolean serversAllowed() {
         return true;
     }
@@ -89,12 +95,22 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
 
     @Override
     public boolean isBlockedPlayer(UUID uuid) {
-        return blocked.contains(uuid) || seperated.contains(uuid);
+        return blocked.contains(uuid) || separated.contains(uuid);
     }
 
     @Override
     public boolean isSeparatedPlayer(UUID id){
-        return seperated.contains(id);
+        return separated.contains(id);
+    }
+
+    @Override
+    public void addSeparated(UUID uuid) {
+        separated.add(uuid);
+    }
+
+    @Override
+    public void removeSeparated(UUID id) {
+        separated.remove(id);
     }
 
     @Override
@@ -251,26 +267,15 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
         if(marriedTo != null) json.addUUID("marriedTo", marriedTo);
         if(lastMarriageChange != 0) json.add("lastMarriage", lastMarriageChange);
 
-        if(!blocked.isEmpty()){
-            JsonArray array = new JsonArray();
-            blocked.forEach(id -> array.add(id.toString()));
-
-            json.add("blocked", array);
-        }
-
-        if(!seperated.isEmpty()){
-            JsonArray array = new JsonArray();
-            seperated.forEach(id -> array.add(id.toString()));
-
-            json.add("separated", array);
-        }
+        if(!blocked.isEmpty()) json.addList("blocked", blocked, JsonUtils::writeUUID);
+        if(!separated.isEmpty()) json.addList("separated", separated, JsonUtils::writeUUID);
 
         return json.nullIfEmpty();
     }
 
     @Override
     public void deserialize(JsonElement element) {
-        seperated.clear();
+        separated.clear();
         blocked.clear();
 
         marriageChatToggled = false;
@@ -293,6 +298,6 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
         if(blockedIDs != null) blocked.addAll(blockedIDs);
 
         Collection<UUID> separatedIDs = json.getList("separated", e -> UUID.fromString(e.getAsString()));
-        if(separatedIDs != null) seperated.addAll(separatedIDs);
+        if(separatedIDs != null) separated.addAll(separatedIDs);
     }
 }

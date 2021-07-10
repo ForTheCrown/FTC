@@ -109,7 +109,15 @@ public class CheckCooldownType implements UsageCheck<CheckCooldownType.CheckInst
 
         @Override
         public boolean test(Player player) {
-            return !onCooldown.containsKey(player.getUniqueId());
+            if(!onCooldown.containsKey(player.getUniqueId())) return true;
+
+            long until = onCooldown.get(player.getUniqueId());
+
+            if(System.currentTimeMillis() > until){
+                onCooldown.remove(player.getUniqueId());
+                return true;
+            }
+            return false;
         }
 
         @Override

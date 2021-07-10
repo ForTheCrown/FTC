@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents information that can be stored in a user's data by other plugins
  */
-public interface UserDataContainer {
+public interface UserDataContainer extends UserAttachment {
 
     /**
      * Sets a plugin's section
@@ -37,10 +37,4 @@ public interface UserDataContainer {
     void remove(Key key);
 
     boolean has(Key key);
-
-    /**
-     * Gets the user that this container belongs to
-     * @return The owning user
-     */
-    @NotNull CrownUser getUser();
 }

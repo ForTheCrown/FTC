@@ -12,7 +12,7 @@ import net.forthecrown.useables.warps.Warp;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.utils.CrownUtils;
-import net.forthecrown.utils.InterUtils;
+import net.forthecrown.utils.InteractionUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;
@@ -78,7 +78,7 @@ public class CommandWarpEdit extends FtcCommand {
                                 })
                         )
 
-                        .then(InterUtils.checksArguments(this::get))
+                        .then(InteractionUtils.checksArguments(this::get))
 
                         .then(literal("delete")
                                 .executes(c -> {

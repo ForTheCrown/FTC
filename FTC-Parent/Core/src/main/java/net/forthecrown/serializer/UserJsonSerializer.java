@@ -3,6 +3,7 @@ package net.forthecrown.serializer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.FtcUser;
@@ -44,6 +45,7 @@ public class UserJsonSerializer implements UserSerializer {
     @Override
     public void serialize(FtcUser user) {
         if(deletedFiles.contains(user.getUniqueId())) return;
+        CrownCore.logger().info("Serializing " + user.getName());
 
         JsonBuf json = JsonBuf.empty();
 
@@ -67,6 +69,7 @@ public class UserJsonSerializer implements UserSerializer {
         if(user.totalEarnings > 0) json.add("totalEarnings", user.totalEarnings);
         if(user.getGems() != 0) json.add("gems", user.getGems());
         if(!user.pets.isEmpty()) json.addList("pets", user.pets);
+        if(user.currentPrefix != null) json.add("currentPrefix", ChatUtils.toJson(user.currentPrefix));
 
         //Properties
         if(!user.properties.isEmpty()) json.addList("properties", user.properties);
@@ -78,6 +81,9 @@ public class UserJsonSerializer implements UserSerializer {
         if(!user.canSwapBranch()) timeStamps.add("nextBranchSwap", user.nextAllowedBranchSwap);
 
         json.add("timeStamps", timeStamps);
+
+        //PrevNames
+        if(!user.previousNames.isEmpty()) json.addList("previousNames", user.previousNames, JsonPrimitive::new);
 
         //Last location, /back
         Location lastLoc = user.lastLocation;
@@ -128,11 +134,12 @@ public class UserJsonSerializer implements UserSerializer {
     @Override
     public void deserialize(FtcUser user) {
         if(deletedFiles.contains(user.getUniqueId())) return;
+        CrownCore.logger().info("Deserializing " + user.getName());
 
         JsonBuf json = readJson(user);
         if(json == null) return;
 
-        user.name = json.getString("name");
+        //Don't deserialize the actual name u dum dum
         user.lastOnlineName = json.getString("lastOnlineName");
         user.branch = json.getEnum("branch", Branch.class, Branch.DEFAULT);
         user.currentRank = json.getEnum("rank", Rank.class, Rank.DEFAULT);
@@ -153,6 +160,18 @@ public class UserJsonSerializer implements UserSerializer {
         user.nickname = null;
         if(json.has("nickname")){
             user.nickname = ChatUtils.fromJson(json.get("nickname"));
+        }
+
+        //Current Prefix
+        user.currentPrefix = null;
+        if(!json.missingOrNull("currentPrefix")){
+            user.currentPrefix = ChatUtils.fromJson(json.get("currentPrefix"));
+        }
+
+        //Previous names
+        user.previousNames.clear();
+        if(!json.missingOrNull("previousNames")) {
+            user.previousNames.addAll(json.getList("previousNames", JsonElement::getAsString));
         }
 
         //Pets

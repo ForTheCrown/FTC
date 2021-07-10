@@ -10,7 +10,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.MarriageMessage;
-import net.forthecrown.utils.SuggestionUtils;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandMarriageChat extends FtcCommand {
@@ -42,7 +42,7 @@ public class CommandMarriageChat extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("message", StringArgumentType.greedyString())
-                        .suggests((c, b) -> SuggestionUtils.suggestPlayernamesAndEmotes(c, b, false))
+                        .suggests((c, b) -> FtcSuggestionProvider.suggestPlayernamesAndEmotes(c, b, false))
 
                         .executes(c -> {
                             CrownUser user = getUserSender(c);

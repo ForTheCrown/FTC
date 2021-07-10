@@ -1,5 +1,6 @@
 package net.forthecrown.events;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.user.CosmeticData;
@@ -9,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -36,25 +38,32 @@ public class CosmeticsListener implements Listener {
         CosmeticData data = user.getCosmeticData();
         if(!data.hasActiveArrow()) return;
 
-        new ArrowScheduler((Arrow) event.getProjectile(), data.getActiveArrow());
+        new ArrowScheduler((Arrow) event.getProjectile(), user.getPlayer(), data.getActiveArrow());
     }
 
     public static class ArrowScheduler implements Runnable {
 
         private final int id;
         private final Arrow arrow;
-        private final ArrowEffect effect;
+        private final ParticleBuilder builder;
 
-        public ArrowScheduler(Arrow arrow, ArrowEffect effect){
+        public ArrowScheduler(Arrow arrow, Player player, ArrowEffect effect){
             this.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(CrownCore.inst(), this, 1, 1);
 
             this.arrow = arrow;
-            this.effect = effect;
+
+            builder = new ParticleBuilder(effect.getParticle())
+                    .location(arrow.getLocation())
+                    .allPlayers()
+                    .count(1).extra(0)
+                    .source(player)
+                    .spawn();
         }
 
         @Override
         public void run() {
-            arrow.getWorld().spawnParticle(effect.getParticle(), arrow.getLocation(), 1, 0, 0, 0, effect.getSlot());
+            builder.location(arrow.getLocation())
+                    .spawn();
 
             if(arrow.isDead() || arrow.isOnGround()){
                 Bukkit.getScheduler().cancelTask(id);

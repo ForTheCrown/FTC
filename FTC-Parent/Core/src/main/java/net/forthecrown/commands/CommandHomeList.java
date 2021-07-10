@@ -1,16 +1,15 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.Permissions;
+import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.UserHomes;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserHomes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -21,7 +20,7 @@ import java.util.Map;
 
 public class CommandHomeList extends FtcCommand {
     public CommandHomeList(){
-        super("homelist", CrownCore.inst());
+        super("homelist");
 
         setAliases("homes");
         setPermission(Permissions.HOME);
@@ -56,10 +55,10 @@ public class CommandHomeList extends FtcCommand {
 
         TextComponent.Builder builder = Component.text()
                 .color(NamedTextColor.YELLOW)
-                .append(homes.getOwner().coloredNickDisplayName())
-                .append(Component.text("'s homes: "));
+                .append(self ? Component.text("Your") : homes.getUser().coloredNickDisplayName())
+                .append(Component.text((self ? "" : "'s") + " homes: "));
 
-        String prefix = self ? "" : homes.getOwner().getName() + ":";
+        String prefix = self ? "" : homes.getUser().getName() + ":";
         for (Map.Entry<String, Location> e: homes.getHomes().entrySet()){
             builder
                     .append(Component.text("[" + e.getKey() + "] ")

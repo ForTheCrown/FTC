@@ -1,16 +1,16 @@
 package net.forthecrown.user.data;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.entity.Player;
 
 public class DirectMessage {
     private final CommandSource sender;
@@ -75,21 +75,29 @@ public class DirectMessage {
         EavesDropper.reportDM(this);
 
         if(muteStatus == MuteStatus.NONE){
+            if(receiver.isPlayer()){
+                CrownUser user = UserManager.getUser(receiver.asOrNull(Player.class));
+                user.setLastMessage(sender);
+
+                if(sender.isPlayer()){
+                    CrownUser senderUser = UserManager.getUser(sender.asOrNull(Player.class));
+                    senderUser.setLastMessage(receiver);
+
+                    if(user.getInteractions().isBlockedPlayer(senderUser.getUniqueId())){
+                        sender.sendMessage(Component.translatable("user.message.cannot", NamedTextColor.GRAY, user.nickDisplayName().color(NamedTextColor.YELLOW)));
+                        return;
+                    }
+                }
+
+                if(user.isAfk()) sender.sendMessage(Component.translatable("user.message.afk").color(NamedTextColor.YELLOW));
+            }
+
             Component receiverMessage = Component.text()
                     .append(getReceiverHeader())
                     .append(Component.text(" "))
                     .append(formattedText)
                     .build();
             receiver.sendMessage(receiverMessage);
-
-            if(receiver.isPlayer()){
-                try {
-                    CrownUser user = UserManager.getUser(receiver.asPlayer());
-                    user.setLastMessage(sender);
-
-                    if(user.isAfk()) sender.sendMessage(Component.translatable("user.message.afk").color(NamedTextColor.YELLOW));
-                } catch (CommandSyntaxException ignored) {}
-            }
         }
 
         if(muteStatus == MuteStatus.SOFT || muteStatus == MuteStatus.NONE){

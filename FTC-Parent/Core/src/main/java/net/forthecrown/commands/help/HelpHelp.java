@@ -161,7 +161,7 @@ public class HelpHelp extends FtcCommand {
             String description = c.getDescription();
 
             formatted.add(
-                    Component.text("/" + c.getName())
+                    Component.text("/" + c.getHelpOrNormalName())
                             .color(NamedTextColor.YELLOW)
                             .append(Component.text(": " + (CrownUtils.isNullOrBlank(description) ? "no description" : (description + (description.endsWith(".") ? "" : ".")))).color(NamedTextColor.WHITE))
                             .hoverEvent(aliasMessage(c.getAliases()))

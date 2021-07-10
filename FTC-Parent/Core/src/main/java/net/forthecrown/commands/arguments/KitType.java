@@ -7,12 +7,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.useables.kits.Kit;
-import net.forthecrown.utils.SuggestionUtils;
-import net.forthecrown.utils.CrownUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.useables.kits.Kit;
 import net.kyori.adventure.key.Key;
 
 import java.util.concurrent.CompletableFuture;
@@ -34,7 +33,7 @@ public class KitType implements ArgumentType<Key> {
     @Override
     public Key parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
-        Key key = CrownUtils.parseKey(reader);
+        Key key = KeyType.ftc().parse(reader);
 
         if(!CrownCore.getKitRegistry().contains(key)) throw UNKNOWN_KIT.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), key);
 
@@ -47,7 +46,7 @@ public class KitType implements ArgumentType<Key> {
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, boolean ignoreChecks){
-        if(ignoreChecks) return SuggestionUtils.suggestRegistry(builder, CrownCore.getKitRegistry());
+        if(ignoreChecks) return FtcSuggestionProvider.suggestRegistry(builder, CrownCore.getKitRegistry());
 
         try {
             return CrownCore.getKitRegistry().getSuggestions((CommandContext<CommandSource>) context, builder);

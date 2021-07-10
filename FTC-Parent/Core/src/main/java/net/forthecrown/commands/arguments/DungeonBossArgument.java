@@ -7,10 +7,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.dungeons.Bosses;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.registry.Registries;
+import net.kyori.adventure.key.Key;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -19,6 +20,7 @@ public class DungeonBossArgument implements ArgumentType<DungeonBoss<?>> {
     public static final DungeonBossArgument BOSS = new DungeonBossArgument();
 
     public static DynamicCommandExceptionType UNKNOWN_BOSS = new DynamicCommandExceptionType(o -> () -> "Unknown boss: " + o);
+    private final KeyType keyParser = KeyType.key("royals");
 
     public static DungeonBossArgument boss(){
         return BOSS;
@@ -31,12 +33,12 @@ public class DungeonBossArgument implements ArgumentType<DungeonBoss<?>> {
     @Override
     public DungeonBoss<?> parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
-        String name = reader.readUnquotedString();
+        Key key = keyParser.parse(reader);
 
-        DungeonBoss result = Bosses.BY_NAME.get(name);
+        DungeonBoss result = Registries.DUNGEON_BOSSES.get(key);
         if(result == null){
             reader.setCursor(cursor);
-            throw UNKNOWN_BOSS.createWithContext(reader, name);
+            throw UNKNOWN_BOSS.createWithContext(reader, key.asString());
         }
 
         return result;
@@ -44,6 +46,6 @@ public class DungeonBossArgument implements ArgumentType<DungeonBoss<?>> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CompletionProvider.suggestMatching(builder, Bosses.BY_NAME.keySet());
+        return FtcSuggestionProvider.suggestRegistry(builder, Registries.DUNGEON_BOSSES);
     }
 }

@@ -1,5 +1,7 @@
 package net.forthecrown.economy;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.ListUtils;
@@ -14,7 +16,7 @@ import java.util.UUID;
 import java.util.function.IntSupplier;
 
 public class SortedBalanceMap implements BalanceMap {
-    private final List<BalEntry> entries = new ArrayList<>();
+    private final ObjectList<BalEntry> entries = new ObjectArrayList<>(300);
     private final IntSupplier defaultAmount;
 
     public SortedBalanceMap(IntSupplier defaultAmount){

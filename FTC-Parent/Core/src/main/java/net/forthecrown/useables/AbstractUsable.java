@@ -12,7 +12,7 @@ import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
 import net.forthecrown.utils.CrownUtils;
-import net.forthecrown.utils.InterUtils;
+import net.forthecrown.utils.InteractionUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -44,7 +44,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
 
         JsonObject preconditions = new JsonObject();
         for (UsageCheckInstance p: getChecks()){
-            preconditions.add(p.typeKey().asString(), InterUtils.writeCheck(p));
+            preconditions.add(p.typeKey().asString(), InteractionUtils.writeCheck(p));
         }
         json.add("preconditions", preconditions);
 
@@ -53,7 +53,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
         for (UsageActionInstance a: getActions()){
             JsonObject object = new JsonObject();
             object.add("type", new JsonPrimitive(a.typeKey().asString()));
-            object.add("value", InterUtils.writeAction(a));
+            object.add("value", InteractionUtils.writeAction(a));
 
             array.add(object);
         }
@@ -69,7 +69,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
         if(precons != null && precons.isJsonObject()){
             for (Map.Entry<String, JsonElement> e: precons.getAsJsonObject().entrySet()){
                 try {
-                    addCheck(InterUtils.readCheck(e.getKey(), e.getValue()));
+                    addCheck(InteractionUtils.readCheck(e.getKey(), e.getValue()));
                 } catch (CommandSyntaxException exception) {
                     exception.printStackTrace();
                 }
@@ -84,7 +84,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
             JsonBuf j = JsonBuf.of(e.getAsJsonObject());
 
             try {
-                addAction(InterUtils.readAction(j.getString("type"), j.get("value")));
+                addAction(InteractionUtils.readAction(j.getString("type"), j.get("value")));
             } catch (CommandSyntaxException exception) {
                 exception.printStackTrace();
             }

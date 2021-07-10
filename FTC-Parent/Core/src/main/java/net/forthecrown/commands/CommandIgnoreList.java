@@ -22,9 +22,11 @@ public class CommandIgnoreList extends FtcCommand {
         setPermission(Permissions.IGNORE);
         setDescription("Displays all the ignored players");
         setAliases(
+                "blocked", "blockedplayers", "blockedlist",
                 "ignoring", "ignored",
                 "ignoredlist", "ignoredplayers",
-                "ignorelist", "ignores"
+                "ignorelist", "ignores",
+                "listignores", "listignored"
         );
 
         register();

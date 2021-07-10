@@ -1,5 +1,7 @@
 package net.forthecrown.crownevents.entries;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.UnmodifiableIterator;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,6 +13,9 @@ public abstract class MultiEntry implements EventEntry, Iterable<Player> {
 
     public MultiEntry(Collection<Player> initialPlayers){
         players.addAll(initialPlayers);
+    }
+
+    public MultiEntry() {
     }
 
     public int size() {
@@ -39,7 +44,11 @@ public abstract class MultiEntry implements EventEntry, Iterable<Player> {
 
     @NotNull
     @Override
-    public ListIterator<Player> iterator() {
-        return players.listIterator();
+    public UnmodifiableIterator<Player> iterator() {
+        return getPlayers().iterator();
+    }
+
+    public ImmutableList<Player> getPlayers(){
+        return ImmutableList.copyOf(players);
     }
 }

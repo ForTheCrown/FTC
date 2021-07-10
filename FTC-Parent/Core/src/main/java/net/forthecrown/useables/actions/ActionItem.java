@@ -5,7 +5,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.utils.InterUtils;
+import net.forthecrown.utils.InteractionUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
@@ -24,7 +24,7 @@ public class ActionItem implements UsageAction<ActionItem.ActionInstance> {
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
-        return new ActionInstance(InterUtils.parseGivenItem(source, reader), add);
+        return new ActionInstance(InteractionUtils.parseGivenItem(source, reader), add);
     }
 
     @Override

@@ -83,6 +83,14 @@ public abstract class CosmeticConstants {
 
     /* I'm sorry, I'm an asshole
 
+    I regret it, I threw aside all your code because I didn't want to take 20 mins to understand the structure of it
+    I'm sorry
+
+    If you see this message and want to take revenge on me, tell me, I'll destroy all the above code and
+    implement your version of it.
+
+    I've destroyed bigger things so dw lol, my friendship with you being a great example
+
 
 
 

@@ -2,17 +2,16 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.kingship.Kingship;
-import net.forthecrown.core.Permissions;
+import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.user.CrownUser;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.Permissions;
+import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 
 public class CommandKingMaker extends FtcCommand {
 
@@ -56,8 +55,6 @@ public class CommandKingMaker extends FtcCommand {
                         })
                 )
                 .then(argument("player", UserType.USER)
-                        .executes(c -> makeKing(c, false))
-
                         .then(literal("queen").executes(c -> makeKing(c, true)))
                         .then(literal("king").executes(c -> makeKing(c, false)))
                 );
@@ -72,14 +69,14 @@ public class CommandKingMaker extends FtcCommand {
         kingship.set(king.getUniqueId());
         kingship.setFemale(isQueen);
 
-        String prefix = "&l[&e&lKing&r&l] &r";
-        if(isQueen) prefix = "&l[&e&lQueen&r&l] &r";
-        Bukkit.dispatchCommand(c.getSource().asBukkit(), "tab player " + king.getName() + " tabprefix " + prefix);
+        Component prefix = isQueen ? Kingship.queenTitle() : Kingship.kingTitle();
+
+        king.setCurrentPrefix(prefix);
 
         c.getSource().sendAdmin(
                 king.displayName()
                         .append(Component.text(" is the new "))
-                        .append(isQueen ? Kingship.queenTitle() : Kingship.kingTitle())
+                        .append(prefix)
                         .append(Component.text(":D"))
         );
         return 0;

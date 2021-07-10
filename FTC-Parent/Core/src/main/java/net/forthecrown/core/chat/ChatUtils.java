@@ -20,7 +20,6 @@ public final class ChatUtils {
             .build();
 
     public static final GsonComponentSerializer GSON = GsonComponentSerializer.gson();
-
     public static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     public static TextComponent convertString(String text, boolean translateColors){

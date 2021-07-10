@@ -4,7 +4,7 @@ import com.google.gson.*;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.utils.math.CrownBoundingBox;
+import net.forthecrown.utils.math.CrownRegion;
 import net.kyori.adventure.key.Key;
 import net.minecraft.nbt.TagParser;
 import org.apache.commons.lang.Validate;
@@ -43,8 +43,10 @@ public final class JsonUtils {
     public static Location readLocation(JsonObject json){
         World world;
 
-        if(json.has("world")) world = Objects.requireNonNull(Bukkit.getWorld(json.get("world").getAsString()));
-        else world = null;
+        if(json.has("world")){
+            World gottenWorld = Bukkit.getWorld(json.get("world").getAsString());
+            world = gottenWorld == null ? Worlds.NORMAL : gottenWorld;
+        } else world = null;
 
         double x = json.get("x").getAsDouble();
         double y = json.get("y").getAsDouble();
@@ -56,7 +58,7 @@ public final class JsonUtils {
         return new Location(world, x, y, z, pitch, yaw);
     }
 
-    public static JsonObject writeRegion(CrownBoundingBox box){
+    public static JsonObject writeRegion(CrownRegion box){
         JsonObject json = new JsonObject();
 
         json.addProperty("world", box.getWorld().getName());
@@ -72,7 +74,7 @@ public final class JsonUtils {
         return json;
     }
 
-    public static CrownBoundingBox readRegion(JsonObject json){
+    public static CrownRegion readRegion(JsonObject json){
         World world = Objects.requireNonNull(Bukkit.getWorld(json.get("world").getAsString()));
 
         double minX = json.get("minX").getAsDouble();
@@ -83,7 +85,7 @@ public final class JsonUtils {
         double maxY = json.get("maxY").getAsDouble();
         double maxZ = json.get("maxZ").getAsDouble();
 
-        return new CrownBoundingBox(world, minX, minY, minZ, maxX, maxY, maxZ);
+        return new CrownRegion(world, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public static <T> JsonArray writeCollection(@NotNull Collection<T> collection, @NotNull Function<T, JsonElement> converter){

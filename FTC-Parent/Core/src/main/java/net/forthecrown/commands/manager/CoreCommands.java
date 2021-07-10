@@ -4,7 +4,8 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.forthecrown.commands.*;
 import net.forthecrown.commands.arguments.*;
 import net.forthecrown.commands.clickevent.ClickEventCommand;
-import net.forthecrown.commands.emotes.*;
+import net.forthecrown.commands.emotes.EmotePog;
+import net.forthecrown.commands.emotes.EmoteToggle;
 import net.forthecrown.commands.help.*;
 import net.forthecrown.commands.marriage.*;
 import net.forthecrown.commands.punishments.*;
@@ -12,13 +13,12 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.RoyalArguments;
 import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.royalgrenadier.RoyalArgumentsImpl;
+import net.forthecrown.royalgrenadier.arguments.RoyalArgumentsImpl;
 import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.enums.Rank;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.NbtTagArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
-import net.minecraft.commands.arguments.ScoreHolderArgument;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
@@ -44,13 +44,19 @@ public final class CoreCommands {
         VanillaArgumentType key = VanillaArgumentType.custom(ResourceLocationArgument::id);
 
         //ArgumentType registration
-        RoyalArgumentsImpl.register(NbtType.class, NbtTagArgument::nbtTag, true);
+        RoyalArgumentsImpl.register(NbtType.class, g -> NbtTagArgument.nbtTag(), true);
+        RoyalArgumentsImpl.register(UserType.class, UserType::getHandle, false);
+
         RoyalArguments.register(BaltopType.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, BaltopType.MAX)));
-        RoyalArguments.register(UserType.class, VanillaArgumentType.custom(ScoreHolderArgument::scoreHolders));
         RoyalArguments.register(ComVarArgument.class, VanillaArgumentType.WORD);
         RoyalArguments.register(PetType.class, VanillaArgumentType.WORD);
+
+        RoyalArguments.register(DeathEffectType.class, key);
+        RoyalArguments.register(ArrowEffectType.class, key);
+
         RoyalArguments.register(ActionArgType.class, key);
         RoyalArguments.register(CheckArgType.class, key);
+
         RoyalArguments.register(WarpType.class, key);
         RoyalArguments.register(KitType.class, key);
 
@@ -103,6 +109,8 @@ public final class CoreCommands {
         new CommandJails();
         new CommandPardon();
         new CommandTempBan();
+        new CommandSeparate();
+        new CommandSmite();
         CommandPunishment.init();
 
         //utility / misc commands
@@ -207,7 +215,7 @@ public final class CoreCommands {
 
         new HelpHelp();
 
-        CrownCore.logger().log(Level.INFO, "All commands loaded and registered");
+        CrownCore.logger().log(Level.INFO, "Commands loaded");
     }
 
     /**

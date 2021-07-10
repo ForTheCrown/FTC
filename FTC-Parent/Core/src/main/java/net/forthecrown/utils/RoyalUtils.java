@@ -4,7 +4,7 @@ import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.squire.Squire;
-import net.forthecrown.utils.math.CrownBoundingBox;
+import net.forthecrown.utils.math.CrownRegion;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -53,7 +53,7 @@ public final class RoyalUtils {
         return text;
     }
 
-    public static @Nullable Player getNearestVisiblePlayer(Location location, CrownBoundingBox inBox){
+    public static @Nullable Player getNearestVisiblePlayer(Location location, CrownRegion inBox){
         double lastDistance = Double.MAX_VALUE;
         Player result = null;
         for (Player p: inBox.getPlayers()){
@@ -75,7 +75,7 @@ public final class RoyalUtils {
         return result;
     }
 
-    public static @Nullable Player getOptimalTarget(LivingEntity e, CrownBoundingBox inBox){
+    public static @Nullable Player getOptimalTarget(LivingEntity e, CrownRegion inBox){
         Player result = getNearestVisiblePlayer(e.getEyeLocation(), inBox);
 
         if(e.getLastDamageCause() == null) return result;

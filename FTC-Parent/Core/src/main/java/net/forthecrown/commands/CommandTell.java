@@ -2,18 +2,17 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.Permissions;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.DirectMessage;
-import net.forthecrown.utils.SuggestionUtils;
-import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.royalgrenadier.source.CommandSources;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 
 public class CommandTell extends FtcCommand {
     public CommandTell(){
@@ -22,6 +21,7 @@ public class CommandTell extends FtcCommand {
         setAliases("emsg", "tell", "whisper", "w", "msg", "etell", "ewhisper", "pm", "dm", "t", "message");
         setPermission(Permissions.MESSAGE);
         setDescription("Sends a message to a player");
+        setHelpListName("msg");
 
         register();
     }
@@ -31,7 +31,7 @@ public class CommandTell extends FtcCommand {
         command.
                 then(argument("user", UserType.onlineUser())
                         .then(argument("message", StringArgumentType.greedyString())
-                                .suggests((c, b) -> SuggestionUtils.suggestPlayernamesAndEmotes(c, b, false))
+                                .suggests((c, b) -> FtcSuggestionProvider.suggestPlayernamesAndEmotes(c, b, false))
 
                                 .executes(c -> {
                                     CommandSource source = c.getSource();
@@ -45,7 +45,7 @@ public class CommandTell extends FtcCommand {
     }
 
     public int sendMsg(CommandSource from, CrownUser to, String message) throws CommandSyntaxException {
-        CommandSource receiver = CommandSources.getOrCreate(to.getPlayer(), this);
+        CommandSource receiver = to.getCommandSource(this);
 
         if(from.isPlayer()){
             CrownUser user = UserManager.getUser(from.asPlayer());
