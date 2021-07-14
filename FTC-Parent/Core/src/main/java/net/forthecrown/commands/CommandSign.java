@@ -28,7 +28,7 @@ public class CommandSign extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("pos", PositionArgument.position())
+                .then(argument("pos", PositionArgument.blockPos())
                         .then(argument("index", IntegerArgumentType.integer(1, 4))
                                 .suggests(suggestMatching("1", "2", "3", "4"))
 

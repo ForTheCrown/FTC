@@ -1,6 +1,6 @@
 package net.forthecrown.core;
 
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,13 +16,13 @@ public class DayUpdate {
     }
 
     public void checkDay(){
-        Calendar calendar = Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE);
+        Calendar calendar = Calendar.getInstance(FtcUtils.SERVER_TIME_ZONE);
         if(calendar.get(Calendar.DAY_OF_WEEK) != getDay()) update();
     }
 
     public void update(){
         CrownCore.logger().info("Updating date");
-        setDay((byte) Calendar.getInstance(CrownUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK));
+        setDay((byte) Calendar.getInstance(FtcUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK));
 
         listeners.forEach(r -> {
             try {

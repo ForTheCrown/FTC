@@ -1,16 +1,16 @@
 package net.forthecrown.inventory;
 
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.Validate;
@@ -129,7 +129,7 @@ public final class CrownItems {
     }
 
     private static ItemStack makeRoyalWeapon(Material material, Component name, Component lore2, Component lore3){
-        final Component border = Component.text("------------------------------").color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+        final Component border = Component.text("------------------------------").style(ChatFormatter.nonItalic(NamedTextColor.DARK_GRAY));
         return new ItemStackBuilder(material, 1)
                 .setFlags(ItemFlag.HIDE_ATTRIBUTES)
                 .setName(name.decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE))
@@ -174,7 +174,7 @@ public final class CrownItems {
         return new ItemStackBuilder(Material.SUNFLOWER, itemAmount)
                 .setName(Component.text("Rhines").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
                 .addLore(Component.text("Worth ").append(Component.text(Balances.getFormatted(amount))).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false))
-                .addLore(Component.text("Minted in the year " + CrownUtils.arabicToRoman(CrownUtils.worldTimeToYears(Worlds.NORMAL)) + ".").style(NON_ITALIC_DARK_GRAY))
+                .addLore(Component.text("Minted in the year " + FtcUtils.arabicToRoman(FtcUtils.worldTimeToYears(Worlds.OVERWORLD)) + ".").style(NON_ITALIC_DARK_GRAY))
                 .addLore(s())
                 .build();
     }
@@ -190,7 +190,7 @@ public final class CrownItems {
     }
 
     public static ItemStack makeCrown(int level, String owner){
-        String levelS = CrownUtils.arabicToRoman(level);
+        String levelS = FtcUtils.arabicToRoman(level);
         ItemStack crown = makeItem(Material.GOLDEN_HELMET, 1, false, "&6-&e&lCrown&6-",
                 "&7Rank " + levelS,
                 "&8--------------------------------",
@@ -260,7 +260,7 @@ public final class CrownItems {
         if(lores != null){
             lore = new Component[lores.length];
             for (int i = 0; i < lores.length; i++){
-                if(CrownUtils.isNullOrBlank(lores[i])) lore[i] = Component.text("");
+                if(FtcUtils.isNullOrBlank(lores[i])) lore[i] = Component.text("");
                 else lore[i] = Component.text()
                         .append(ChatUtils.convertString(lores[i]))
                         .style(NON_ITALIC_WHITE)

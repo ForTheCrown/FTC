@@ -3,7 +3,7 @@ package net.forthecrown.crownevents;
 import net.forthecrown.commands.CommandHologram;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Main;
-import net.forthecrown.utils.math.CrownRegion;
+import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;
@@ -129,7 +129,7 @@ public class ArmorStandLeaderboard {
      */
     public void destroy(){
         Location l = getLocation().clone();
-        CrownRegion area = new CrownRegion(l.getWorld(), l.getX()+1, l.getY()+1, l.getZ()+1, l.getX()-1, l.getY()-(0.25*getSize()+1), l.getZ()-1);
+        FtcRegion area = new FtcRegion(l.getWorld(), l.getX()+1, l.getY()+1, l.getZ()+1, l.getX()-1, l.getY()-(0.25*getSize()+1), l.getZ()-1);
 
         for (ArmorStand stand : area.getEntitiesByType(ArmorStand.class)){
             if(!stand.getPersistentDataContainer().has(CommandHologram.HOLOGRAM_KEY, PersistentDataType.BYTE)) continue;

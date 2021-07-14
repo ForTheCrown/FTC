@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -48,7 +48,7 @@ public class HomeType implements ArgumentType<HomeParseResult> {
 
             String homeName = reader.readUnquotedString();
 
-            UUID id = CrownUtils.uuidFromName(name);
+            UUID id = FtcUtils.uuidFromName(name);
             if(id == null) throw UserType.UNKNOWN_USER.createWithContext(correctCursorReader(reader, cursor), Component.text(name));
 
             return new HomeParseResult(correctCursorReader(reader, cursor), id, homeName);
@@ -69,7 +69,7 @@ public class HomeType implements ArgumentType<HomeParseResult> {
             if(remaining.contains(":")){
                 String name = remaining.substring(0, remaining.indexOf(':'));
 
-                UUID id = CrownUtils.uuidFromName(name);
+                UUID id = FtcUtils.uuidFromName(name);
                 if(id != null){
                     CrownUser user = UserManager.getUser(id);
 

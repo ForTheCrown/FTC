@@ -9,8 +9,8 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.user.enums.CrownGameMode;
-import net.forthecrown.utils.math.CrownRegion;
+import net.forthecrown.user.enums.FtcGameMode;
+import net.forthecrown.utils.math.FtcRegion;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -73,12 +73,12 @@ public class CommandNear extends FtcCommand {
     }
 
     private int showNearby(Location loc, int radius, CommandSource source) throws CommandSyntaxException {
-        CrownRegion box = CrownRegion.of(loc, radius);
+        FtcRegion box = FtcRegion.of(loc, radius);
         List<CrownUser> players = ListUtils.convertToList(box.getPlayers(), UserManager::getUser);
-        players.removeIf(user -> user.hasPermission(Permissions.CORE_ADMIN)
-                || user.getGameMode() == CrownGameMode.SPECTATOR
+        players.removeIf(user -> user.hasPermission(Permissions.NEARBY_IGNORE)
+                || user.getGameMode() == FtcGameMode.SPECTATOR
                 || user.getName().equalsIgnoreCase(source.textName())
-            );
+        );
 
         if(players.isEmpty()) throw FtcExceptionProvider.noNearbyPlayers();
 

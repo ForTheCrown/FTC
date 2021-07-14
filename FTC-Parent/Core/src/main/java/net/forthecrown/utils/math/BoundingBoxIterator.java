@@ -12,7 +12,7 @@ import java.util.NoSuchElementException;
 //World Edit's RegionIterator
 public class BoundingBoxIterator implements Iterator<Block> {
 
-    private final CrownRegion region;
+    private final FtcRegion region;
     private final int maxX;
     private final int maxY;
     private final int maxZ;
@@ -21,7 +21,7 @@ public class BoundingBoxIterator implements Iterator<Block> {
     private int nextY;
     private int nextZ;
 
-    public BoundingBoxIterator(CrownRegion box){
+    public BoundingBoxIterator(FtcRegion box){
         Validate.notNull(box);
         this.region = box;
 

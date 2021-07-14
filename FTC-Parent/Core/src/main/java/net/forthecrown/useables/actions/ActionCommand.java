@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -64,7 +64,7 @@ public class ActionCommand implements UsageAction<ActionCommand.ActionInstance> 
 
         @Override
         public void onInteract(Player player) {
-            if (CrownUtils.isNullOrBlank(command)) return;
+            if (FtcUtils.isNullOrBlank(command)) return;
 
             String cmd = command.replaceAll("%p", player.getName());
 

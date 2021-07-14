@@ -50,7 +50,7 @@ public class BmSellItemListener extends AbstractInvListener implements Listener 
         ItemStack toSellItem = new ItemStack(toSell, finalSell);
 
         if(!playerInventory.containsAtLeast(toSellItem, sellAmount)){
-            user.sendMessage(Component.translatable("economy.notEnoughItems", NamedTextColor.GRAY));
+            user.sendMessage(Component.translatable("economy.sellshop.noItems", NamedTextColor.GRAY));
             return;
         }
 

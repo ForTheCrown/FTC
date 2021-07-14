@@ -1,22 +1,20 @@
 package net.forthecrown.events;
 
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.CrownException;
 import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.CrownException;
+import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.CrownUtils;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
@@ -24,7 +22,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class MarriageListener implements Listener, ClickEventTask {
 
@@ -66,41 +66,12 @@ public class MarriageListener implements Listener, ClickEventTask {
             CrownUser user = UserManager.getUser(event.getPlayer());
             UserInteractions inter = user.getInteractions();
             if(inter.getMarriedTo() == null) return;
+            if(!user.getPlayer().isSneaking()) return;
 
             CrownUser target = UserManager.getUser(event.getRightClicked().getUniqueId());
             if(!inter.getMarriedTo().equals(target.getUniqueId())) return;
-            if(!user.getPlayer().isSneaking() || !target.getPlayer().isSneaking()) return;
 
-            user.sendMessage(
-                    Component.text()
-                            .append(Component.text("❤").color(NamedTextColor.RED))
-                            .append(Component.space())
-                            .append(Component.text("Smooched "))
-                            .append(target.nickDisplayName().color(NamedTextColor.YELLOW))
-                            .append(Component.space())
-                            .append(Component.text("❤").color(NamedTextColor.RED))
-                            .build()
-            );
-
-            target.sendMessage(
-                    Component.text()
-                            .append(Component.text("❤").color(NamedTextColor.RED))
-                            .append(Component.space())
-                            .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
-                            .append(Component.text(" smooched you!"))
-                            .append(Component.space())
-                            .append(Component.text("❤").color(NamedTextColor.RED))
-                            .build()
-            );
-
-            Location loc = user.getLocation();
-            Location targetLoc = target.getLocation();
-
-            targetLoc.getWorld().playSound(targetLoc, Sound.ENTITY_PUFFER_FISH_BLOW_UP, 3.0F, 2F);
-            targetLoc.getWorld().spawnParticle(Particle.HEART, targetLoc.getX(), targetLoc.getY()+1, targetLoc.getZ(), 5, 0.5, 0.5, 0.5);
-
-            loc.getWorld().spawnParticle(Particle.HEART, loc.getX(), loc.getY()+1, loc.getZ(), 5, 0.5, 0.5, 0.5);
-            loc.getWorld().playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_UP, 3.0F, 2F);
+            CosmeticEmotes.SMOOCH.getCommand().execute(user, target);
         }
     }
 
@@ -168,7 +139,7 @@ public class MarriageListener implements Listener, ClickEventTask {
     }
 
     private Component giveItAWeek(){
-        return CrownUtils.randomIntInRange(0, 1000) != 1 ? Component.empty() :
+        return FtcUtils.randomInRange(0, 1000) != 1 ? Component.empty() :
                 Component.text(" I give it a week").color(NamedTextColor.GRAY);
     }
 }

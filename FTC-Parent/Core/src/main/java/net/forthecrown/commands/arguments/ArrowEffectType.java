@@ -16,10 +16,15 @@ import net.kyori.adventure.text.Component;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Parses an arrow effect type from its key.
+ * <p>Only used in {@link net.forthecrown.commands.CommandCosmeticEffects}</p>
+ */
 public class ArrowEffectType implements ArgumentType<ArrowEffect> {
     private static final ArrowEffectType INSTANCE = new ArrowEffectType();
     private ArrowEffectType() {}
 
+    //Throw when parsing fails
     public static final MutableCommandExceptionType UNKNOWN_EFFECT = new MutableCommandExceptionType(o ->
             Component.text()
                     .append(Component.text("Invalid ArrowEffect: "))
@@ -27,8 +32,10 @@ public class ArrowEffectType implements ArgumentType<ArrowEffect> {
                     .build()
     );
 
+    //Key type to use to parse
     private final KeyType keyType = KeyType.ftc();
 
+    //Static instance getter, looks nicer than using the variable itself
     public static ArrowEffectType arrowEffect(){
         return INSTANCE;
     }

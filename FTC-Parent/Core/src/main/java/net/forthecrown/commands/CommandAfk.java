@@ -12,7 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 
-public class    CommandAfk extends FtcCommand {
+public class CommandAfk extends FtcCommand {
     public CommandAfk(){
         super("afk", CrownCore.inst());
 

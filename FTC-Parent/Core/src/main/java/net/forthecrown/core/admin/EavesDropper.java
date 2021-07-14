@@ -1,15 +1,15 @@
 package net.forthecrown.core.admin;
 
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.DirectMessage;
 import net.forthecrown.user.data.MarriageMessage;
-import net.forthecrown.core.chat.ChatFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -83,7 +83,7 @@ public class EavesDropper {
                         .append(MarriageMessage.PREFIX.color(NamedTextColor.WHITE))
                         .append(message.getSender().nickDisplayName())
                         .append(Component.text(" -> "))
-                        .append(message.getRecipient().nickDisplayName())
+                        .append(message.getReceiver().nickDisplayName())
                         .append(MarriageMessage.POINTER)
                         .append(message.getFormatted())
                         .build(),
@@ -91,7 +91,7 @@ public class EavesDropper {
                 Permissions.EAVESDROP_MARRIAGE,
                 u -> {
                     if(u.getName().contains(message.getSender().getName())) return true;
-                    return u.getName().contains(message.getRecipient().getName());
+                    return u.getName().contains(message.getReceiver().getName());
                 },
                 false
         );
@@ -140,7 +140,7 @@ public class EavesDropper {
         byte emptyLines = 0;
 
         for (Component c: lines){
-            emptyLines += PlainComponentSerializer.plain().serialize(c).isBlank() ? 1 : 0;
+            emptyLines += ChatUtils.plainText(c).isBlank() ? 1 : 0;
         }
 
         return emptyLines >= 4;

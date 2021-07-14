@@ -89,6 +89,7 @@ public final class ClickEventManager {
         allowCommandUsage(player, allow, false);
     }
 
+    @Deprecated
     public static String getCommand(String id, String... args){
         return "/npcconverse " + id + " " + String.join(" ", args);
     }

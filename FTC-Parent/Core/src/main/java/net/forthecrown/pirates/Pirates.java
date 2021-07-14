@@ -43,7 +43,7 @@ public class Pirates {
     private static void initLeaderboard(){
         leaderboard = new ObjectiveLeaderboard(
                 Bukkit.getScoreboardManager().getMainScoreboard().getObjective("PiratePoints"),
-                new Location(Worlds.NORMAL, -639, 71, 3830.5),
+                new Location(Worlds.OVERWORLD, -639, 71, 3830.5),
                 Component.text("Pirate Points Leaderboard")
         );
 
@@ -51,6 +51,7 @@ public class Pirates {
                 Component.text()
                         .append(Component.text(pos + ". "))
                         .append(Component.text(name).color(NamedTextColor.YELLOW))
+                        .append(Component.text(": "))
                         .append(score)
                         .build()
         );
@@ -66,6 +67,7 @@ public class Pirates {
         ghParkour.getData().save();
         parrotTracker.save();
         auctionManager.saveAuctions();
+        leaderboard.destroy();
     }
 
     public static PirateEconomy getPirateEconomy() { return pirateEconomy; }

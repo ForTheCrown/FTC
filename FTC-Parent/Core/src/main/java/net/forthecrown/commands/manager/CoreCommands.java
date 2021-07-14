@@ -239,7 +239,6 @@ public final class CoreCommands {
 
     /**
      * Gets the server's command class, that handles the all things related to commands, type name is misleading
-     * <p>MCCoderPack devs were dumb AF and called this a dispatcher</p>
      * <p>The actual dispatcher is in the returned class</p>
      * @return The server's commands class
      */

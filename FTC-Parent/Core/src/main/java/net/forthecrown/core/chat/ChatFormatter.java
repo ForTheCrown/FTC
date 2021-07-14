@@ -291,13 +291,19 @@ public class ChatFormatter {
                 .clickEvent(ClickEvent.runCommand("/tp_exact " + l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ() + " " + l.getPitch() + " " + l.getYaw() + " " + l.getWorld().getName()));
     }
 
-    public static Component itemMessage(ItemStack itemStack){
+    public static Component itemMessage(ItemStack itemStack, int amount){
         Validate.notNull(itemStack);
         return Component.text()
-                .append(Component.text(itemStack.getAmount()))
+                .hoverEvent(itemStack)
+                .append(Component.text(amount))
                 .append(Component.text(" "))
                 .append(itemName(itemStack))
                 .build();
+    }
+
+    public static Component itemMessage(ItemStack item) {
+        Validate.notNull(item);
+        return itemMessage(item, item.getAmount());
     }
 
     public static String timeFromMillisMinusTime(long millis){
@@ -346,7 +352,7 @@ public class ChatFormatter {
         assert name != null;
 
         Team team = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(entity.getUniqueId().toString());
-        if(team != null) name = formatTeamName(name, team);
+        if(team != null) name = formatForTeam(name, team);
 
         return name;
     }
@@ -355,7 +361,7 @@ public class ChatFormatter {
         return Component.translatable(Bukkit.getUnsafe().getTranslationKey(entity));
     }
 
-    public static Component formatTeamName(Component initialName, Team team){
+    public static Component formatForTeam(Component initialName, Team team){
         TextColor color;
         try { //tEaM cOloRs mUsT hAvE hEX vAlUeS, what a fucking retarded place to throw an exception, in a getter
             color = team.color();
@@ -363,12 +369,21 @@ public class ChatFormatter {
             color = NamedTextColor.WHITE;
         }
 
+        Component prefix = Component.empty();
+        Component suffix = Component.empty();
+
+        try {
+            prefix = team.prefix().append(Component.space());
+        } catch (IllegalStateException ignored) {}
+
+        try {
+            suffix = Component.space().append(team.suffix());
+        } catch (IllegalStateException ignored) {}
+
         return Component.text()
-                .append(team.prefix())
-                .append(Component.space())
+                .append(prefix)
                 .append(initialName.color(color))
-                .append(Component.space())
-                .append(team.suffix())
+                .append(suffix)
                 .build();
     }
 

@@ -8,7 +8,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.GameModeArgument;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.CrownGameMode;
+import net.forthecrown.user.enums.FtcGameMode;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,7 +30,7 @@ public class CommandGameMode extends FtcCommand {
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
                             GameMode gameMode = c.getArgument("gamemode", GameMode.class);
-                            CrownGameMode wrapped = CrownGameMode.wrap(gameMode);
+                            FtcGameMode wrapped = FtcGameMode.wrap(gameMode);
 
                             if(!user.hasPermission(Permissions.GAMEMODES)){
                                 if(gameMode == GameMode.CREATIVE || gameMode == GameMode.ADVENTURE) throw FtcExceptionProvider.create("You do not have permission to use this");
@@ -48,7 +48,7 @@ public class CommandGameMode extends FtcCommand {
                                 .executes(c -> {
                                     CrownUser user = UserType.getUser(c, "user");
                                     GameMode gameMode = c.getArgument("gamemode", GameMode.class);
-                                    CrownGameMode wrapped = CrownGameMode.wrap(gameMode);
+                                    FtcGameMode wrapped = FtcGameMode.wrap(gameMode);
 
                                     user.setGameMode(wrapped);
                                     user.updateFlying();
@@ -59,7 +59,7 @@ public class CommandGameMode extends FtcCommand {
                 );
     }
 
-    private Component adminMsg(CrownUser user, CrownGameMode gameMode){
+    private Component adminMsg(CrownUser user, FtcGameMode gameMode){
         TranslatableComponent name = gameMode.title().color(NamedTextColor.GOLD);
         return Component.text("Set ")
                 .color(NamedTextColor.GRAY)

@@ -40,8 +40,8 @@ public class CosmeticEmotes {
         ));
 
         INVENTORY = CosmeticConstants.baseInventory(36, Component.text("Emotes"), true)
-                .addOptions(Registries.EMOTES)
-                .addOption(CosmeticConstants.EMOTE_TOGGLE)
+                .addAll(Registries.EMOTES)
+                .add(CosmeticConstants.EMOTE_TOGGLE)
                 .build();
 
         Registries.EMOTES.close();

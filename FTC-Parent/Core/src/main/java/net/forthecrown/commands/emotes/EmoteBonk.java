@@ -32,7 +32,7 @@ public class EmoteBonk extends CommandEmote {
      */
 
     @Override
-    protected int execute(CrownUser sender, CrownUser recipient) {
+    public int execute(CrownUser sender, CrownUser recipient) {
         Location loc = recipient.getPlayer().getLocation();
         loc.setPitch(loc.getPitch() + 20F);
 
@@ -59,7 +59,7 @@ public class EmoteBonk extends CommandEmote {
     }
 
     @Override
-    protected int executeSelf(CrownUser user) {
+    public int executeSelf(CrownUser user) {
         user.sendMessage("Don't hurt yourself ❤");
         return 0;
     }

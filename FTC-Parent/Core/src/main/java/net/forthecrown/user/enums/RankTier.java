@@ -6,6 +6,9 @@ import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
+/**
+ * Represents a rank's tier
+ */
 public enum RankTier implements Comparable<RankTier>, JsonSerializable {
     NONE (1, -1, NamedTextColor.WHITE),
     FREE (2, 0, NamedTextColor.GRAY),
@@ -23,10 +26,19 @@ public enum RankTier implements Comparable<RankTier>, JsonSerializable {
         this.color = color;
     }
 
+    /**
+     * Returns whether the tier should use colors
+     * @return ^^^^
+     */
     public boolean shouldUseColor(){
         return this == TIER_2;
     }
 
+    /**
+     * Returns whether the given tier is lower than this tier
+     * @param tier The tier to check against
+     * @return Whether this tier is higher than the given tier
+     */
     public boolean isHigherTierThan(RankTier tier){
         return asByte > tier.asByte;
     }

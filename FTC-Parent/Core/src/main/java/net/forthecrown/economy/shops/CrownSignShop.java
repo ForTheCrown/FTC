@@ -3,7 +3,7 @@ package net.forthecrown.economy.shops;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.serializer.AbstractYamlSerializer;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -34,7 +34,7 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
 
     //used by getSignShop
     public CrownSignShop(Location location) throws NullPointerException {
-        super(CrownUtils.locationToFilename(location), "shopdata", true);
+        super(FtcUtils.locationToFilename(location), "shopdata", true);
 
         //file doesn't exist there for go fuck yourself
         if (fileDoesntExist) throw new NullPointerException("Could not load shop file! Named, " + fileName);
@@ -50,7 +50,7 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
 
     //used by createSignShop
     public CrownSignShop(Location location, ShopType shopType, Integer price, UUID shopOwner) {
-        super(CrownUtils.locationToFilename(location), "shopdata", false);
+        super(FtcUtils.locationToFilename(location), "shopdata", false);
 
         this.location = location;
         this.block = location.getBlock();

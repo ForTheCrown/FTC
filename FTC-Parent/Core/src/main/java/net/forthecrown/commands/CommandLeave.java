@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.utils.math.CrownRegion;
+import net.forthecrown.utils.math.FtcRegion;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.utils.Pair;
@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 
 public class CommandLeave extends FtcCommand {
 
-    private final static Map<CrownRegion, Pair<Location, Predicate<Player>>> ALLOWED_USAGE_AREAS = new HashMap<>();
+    private final static Map<FtcRegion, Pair<Location, Predicate<Player>>> ALLOWED_USAGE_AREAS = new HashMap<>();
 
     public CommandLeave(){
         super("leave", CrownCore.inst());
@@ -32,7 +32,7 @@ public class CommandLeave extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
             Player player = getPlayerSender(c);
-            for (Map.Entry<CrownRegion, Pair<Location, Predicate<Player>>> e: ALLOWED_USAGE_AREAS.entrySet()){
+            for (Map.Entry<FtcRegion, Pair<Location, Predicate<Player>>> e: ALLOWED_USAGE_AREAS.entrySet()){
                 if(!e.getKey().contains(player.getLocation())) continue;
 
                 Pair<Location, Predicate<Player>> par = e.getValue();
@@ -44,11 +44,11 @@ public class CommandLeave extends FtcCommand {
         });
     }
 
-    public static void add(CrownRegion box, Location exitLocation, Predicate<Player> onExit){
+    public static void add(FtcRegion box, Location exitLocation, Predicate<Player> onExit){
         ALLOWED_USAGE_AREAS.put(box, new Pair<>(exitLocation, onExit));
     }
 
-    public static void remove(CrownRegion box){
+    public static void remove(FtcRegion box){
         ALLOWED_USAGE_AREAS.remove(box);
     }
 }

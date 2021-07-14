@@ -5,7 +5,7 @@ import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.utils.RoyalUtils;
+import net.forthecrown.utils.DungeonUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -128,11 +128,11 @@ public class Drawned extends DungeonBoss<Drowned> {
     }
 
     public enum Artifacts{
-        IRON (RoyalUtils.makeDungeonItem(Material.IRON_NUGGET, 1, "Iron Artifact")),
-        ELDER (RoyalUtils.makeDungeonItem(Material.PRISMARINE_CRYSTALS, 1, "Elder Artifact")),
-        TURTLE (RoyalUtils.makeDungeonItem(Material.SCUTE, 1, "Turtle Artifact")),
-        NAUTILUS (RoyalUtils.makeDungeonItem(Material.NAUTILUS_SHELL, 1, "Nautilus Artifact")),
-        HIDDEN (RoyalUtils.makeDungeonItem(Material.QUARTZ, 1, "Hidden Artifact"));
+        IRON (DungeonUtils.makeDungeonItem(Material.IRON_NUGGET, 1, "Iron Artifact")),
+        ELDER (DungeonUtils.makeDungeonItem(Material.PRISMARINE_CRYSTALS, 1, "Elder Artifact")),
+        TURTLE (DungeonUtils.makeDungeonItem(Material.SCUTE, 1, "Turtle Artifact")),
+        NAUTILUS (DungeonUtils.makeDungeonItem(Material.NAUTILUS_SHELL, 1, "Nautilus Artifact")),
+        HIDDEN (DungeonUtils.makeDungeonItem(Material.QUARTZ, 1, "Hidden Artifact"));
 
         private final ItemStack item;
         Artifacts(ItemStack itemStack){

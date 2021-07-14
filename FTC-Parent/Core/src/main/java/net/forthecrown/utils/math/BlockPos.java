@@ -16,6 +16,9 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
+/**
+ * Represents the position of a block, aka just 3 integers
+ */
 public class BlockPos implements JsonSerializable, Cloneable, ImmutableBlockPos {
     public int x;
     public int y;

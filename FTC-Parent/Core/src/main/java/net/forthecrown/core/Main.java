@@ -13,6 +13,7 @@ import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.CrownBalances;
+import net.forthecrown.economy.ServerItemPriceMap;
 import net.forthecrown.economy.shops.CrownShopManager;
 import net.forthecrown.events.Events;
 import net.forthecrown.events.MobHealthBar;
@@ -30,9 +31,7 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -40,13 +39,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import static net.forthecrown.utils.CrownUtils.safeRunnable;
+import static net.forthecrown.utils.FtcUtils.safeRunnable;
 
 /**
  * Main class that does all the dirty internal stuff
@@ -80,12 +77,12 @@ public final class Main extends JavaPlugin implements CrownCore {
     static CrownMessages            messages;
     static CrownTabList             tabList;
     static ServerRules              rules;
+    static ServerItemPriceMap       prices;
     static JoinInfo                 joinInfo;
     static ChatEmotes               emotes;
     static DayUpdate                dayUpdate;
     static Logger                   logger;
 
-    static final Map<Material, ComVar<Short>> defaultItemPrices = new HashMap<>();
     public static final Set<ArmorStandLeaderboard> LEADERBOARDS = new HashSet<>();
     static LuckPerms luckPerms;
 
@@ -148,6 +145,7 @@ public final class Main extends JavaPlugin implements CrownCore {
         emotes = new ChatEmotes();
         emotes.registerEmotes();
 
+        prices = new ServerItemPriceMap();
         tabList = new CrownTabList();
 
         WgFlags.init();
@@ -167,10 +165,6 @@ public final class Main extends JavaPlugin implements CrownCore {
         safeRunnable(Cosmetics::shutDown);
         safeRunnable(Pirates::shutDown);
 
-        CrownUserManager.LOADED_USERS.forEach((i, u) -> {
-            if(!u.isOnline()) return;
-            u.setAfk(false);
-        });
         CrownUserManager.LOADED_USERS.clear();
         CrownUserManager.LOADED_ALTS.clear();
     }
@@ -182,10 +176,6 @@ public final class Main extends JavaPlugin implements CrownCore {
         config.set("ServerSpawn", serverSpawn);
 
         ComVars.save(config);
-
-        for (Material m: defaultItemPrices.keySet()){
-            getConfig().set("DefaultPrices." + m.toString(), defaultItemPrices.get(m).getValue((short) 2));
-        }
 
         super.saveConfig();
     }
@@ -205,8 +195,6 @@ public final class Main extends JavaPlugin implements CrownCore {
 
         dayUpdate = new DayUpdate((byte) config.getInt("Day"));
 
-        loadDefaultItemPrices();
-
         if(saver != null){
             try {
                 saver.cancel();
@@ -219,23 +207,6 @@ public final class Main extends JavaPlugin implements CrownCore {
         } else if (saver != null && !saver.isCancelled()){
             saver.cancel();
             saver = null;
-        }
-    }
-
-    private void loadDefaultItemPrices(){
-        ConfigurationSection itemPrices = getConfig().getConfigurationSection("DefaultPrices");
-
-        for(String s : itemPrices.getKeys(true)){
-            Material mat = Material.valueOf(s);
-
-            //defaultItemPrices.put(mat, (short) itemPrices.getInt(s));
-            defaultItemPrices.put(mat,
-                    ComVarRegistry.set(
-                            "sellshop_" + s.toLowerCase(),
-                            ComVarType.SHORT,
-                            (short) itemPrices.getInt(s)
-                    )
-            );
         }
     }
 

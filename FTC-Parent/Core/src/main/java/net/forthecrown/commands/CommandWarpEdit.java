@@ -11,7 +11,7 @@ import net.forthecrown.commands.arguments.WarpType;
 import net.forthecrown.useables.warps.Warp;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.UserTeleport;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.InteractionUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -93,7 +93,7 @@ public class CommandWarpEdit extends FtcCommand {
     }
 
     private int createWarp(CommandSource c, String name, Location location) throws CommandSyntaxException {
-        Warp warp = CrownCore.getWarpRegistry().register(CrownUtils.parseKey(name), location);
+        Warp warp = CrownCore.getWarpRegistry().register(FtcUtils.parseKey(name), location);
         c.sendAdmin(Component.text("Creating warp named ").append(warp.displayName()));
         return 0;
     }

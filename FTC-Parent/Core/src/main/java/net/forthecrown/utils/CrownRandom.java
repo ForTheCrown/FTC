@@ -4,6 +4,9 @@ import org.apache.commons.lang.Validate;
 
 import java.util.*;
 
+/**
+ * A random to provide some more methods for greater function
+ */
 public class CrownRandom extends Random {
     public CrownRandom() {}
     public CrownRandom(long seed) { super(seed); }

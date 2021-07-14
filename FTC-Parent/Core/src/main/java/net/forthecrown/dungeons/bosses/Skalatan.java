@@ -3,7 +3,7 @@ package net.forthecrown.dungeons.bosses;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.dungeons.BossItems;
-import net.forthecrown.utils.RoyalUtils;
+import net.forthecrown.utils.DungeonUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,15 +27,15 @@ public class Skalatan extends DungeonBoss<WitherSkeleton> {
 
     private AttackState attackState;
 
-    private static final ItemStack WITHER_GOO = RoyalUtils.makeDungeonItem(Material.BLACK_DYE, 30, "Wither Goo");
+    private static final ItemStack WITHER_GOO = DungeonUtils.makeDungeonItem(Material.BLACK_DYE, 30, "Wither Goo");
 
     public Skalatan() {
         super("Skalatan", new Location(Worlds.VOID, -103.5, 67, 184.5), (short) 100, DungeonAreas.SKALATAN_ROOM,
                 Arrays.asList(
                         WITHER_GOO,
-                        RoyalUtils.makeDungeonItem(Material.BONE, 30, "Floaty Bones"),
-                        RoyalUtils.makeDungeonItem(Material.BONE, 30, "Horse Bones"),
-                        RoyalUtils.makeDungeonItem(Material.BONE, 15, "Stray Bones")
+                        DungeonUtils.makeDungeonItem(Material.BONE, 30, "Floaty Bones"),
+                        DungeonUtils.makeDungeonItem(Material.BONE, 30, "Horse Bones"),
+                        DungeonUtils.makeDungeonItem(Material.BONE, 15, "Stray Bones")
                 )
         );
     }

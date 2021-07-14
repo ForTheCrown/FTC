@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.events.dynamic.JailListener;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
@@ -39,7 +39,7 @@ public class CrownJailManager extends AbstractJsonSerializer implements JailMana
         jails.clear();
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
-            Key key = CrownUtils.parseKey(e.getKey());
+            Key key = FtcUtils.parseKey(e.getKey());
             Location loc = JsonUtils.readLocation(e.getValue().getAsJsonObject());
 
             jails.put(key, loc);

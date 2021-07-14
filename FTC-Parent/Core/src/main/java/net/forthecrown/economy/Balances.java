@@ -2,7 +2,7 @@ package net.forthecrown.economy;
 
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.serializer.CrownSerializer;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
@@ -18,7 +18,16 @@ public interface Balances extends CrownSerializer {
      * @return The message, will look like: "1,000,000 Rhines"
      */
     static String getFormatted(int amount){
-        return ChatFormatter.decimalizeNumber(amount) + " Rhine" + CrownUtils.addAnS(amount);
+        return ChatFormatter.decimalizeNumber(amount) + " Rhine" + FtcUtils.addAnS(amount);
+    }
+
+    /**
+     * Same as formatted(int) except not translatable.
+     * @param amount The amount to format for
+     * @return The formatted message
+     */
+    static Component formattedNonTrans(int amount) {
+        return Component.text(getFormatted(amount));
     }
 
     /**

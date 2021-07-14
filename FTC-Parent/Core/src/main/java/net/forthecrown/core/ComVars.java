@@ -47,6 +47,7 @@ public final class ComVars {
     static ComVar<Integer>          maxMoneyAmount;
     static ComVar<Integer>          maxTreasurePrize;
     static ComVar<Integer>          minTreasurePrize;
+    static ComVar<Integer>          maxShopEarnings;
 
     private ComVars() {}
 
@@ -83,6 +84,7 @@ public final class ComVars {
         ghFinalReward = register(           "pr_gh_finalReward",                ComVarType.INTEGER,         config.getInt("Pirates.FinalReward"));
         maxTreasurePrize = register(        "pr_maxTreasurePrize",              ComVarType.INTEGER,         config.getInt("Pirates.MaxTreasurePrize"));
         minTreasurePrize = register(        "pr_minTreasurePrize",              ComVarType.INTEGER,         config.getInt("Pirates.MinTreasurePrize"));
+        maxShopEarnings = register(         "core_maxShopEarnings",             ComVarType.INTEGER,         config.getInt("MaxShopEarnings"));
 
         treasureWorld = register(           "pr_treasureWorld",                 WorldComVarType.WORLD,      Bukkit.getWorld(config.getString("Pirates.TreasureWorld")));
         onFirstJoinKit = register(          "core_onJoinKit",                   KeyComVarType.KEY,          Key.key(CrownCore.inst(), config.getString("OnJoinKit")));
@@ -120,5 +122,6 @@ public final class ComVars {
         config.set("Pirates.SpecialReward",                 ghSpecialReward.getValue());
         config.set("Pirates.MaxTreasureItems",              maxTreasureItems.getValue());
         config.set("MaxBossDifficulty",                     maxBossDifficulty.getValue());
+        config.set("MaxShopEarnings",                       maxShopEarnings.getValue());
     }
 }

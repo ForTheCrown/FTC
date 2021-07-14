@@ -4,7 +4,7 @@ import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.squire.Squire;
-import net.forthecrown.utils.math.CrownRegion;
+import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -22,8 +22,8 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public final class RoyalUtils {
-    private RoyalUtils() {}
+public final class DungeonUtils {
+    private DungeonUtils() {}
 
     public static final NamespacedKey PUNCHING_BAG_KEY = Squire.createRoyalKey("dummy");
     public static final Component DUNGEON_LORE = Component.text("Dungeon Item");
@@ -53,7 +53,7 @@ public final class RoyalUtils {
         return text;
     }
 
-    public static @Nullable Player getNearestVisiblePlayer(Location location, CrownRegion inBox){
+    public static @Nullable Player getNearestVisiblePlayer(Location location, FtcRegion inBox){
         double lastDistance = Double.MAX_VALUE;
         Player result = null;
         for (Player p: inBox.getPlayers()){
@@ -75,7 +75,7 @@ public final class RoyalUtils {
         return result;
     }
 
-    public static @Nullable Player getOptimalTarget(LivingEntity e, CrownRegion inBox){
+    public static @Nullable Player getOptimalTarget(LivingEntity e, FtcRegion inBox){
         Player result = getNearestVisiblePlayer(e.getEyeLocation(), inBox);
 
         if(e.getLastDamageCause() == null) return result;

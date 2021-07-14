@@ -1,19 +1,18 @@
 package net.forthecrown.core;
 
-import net.forthecrown.comvars.ComVar;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.JailManager;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.ItemPriceMap;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.registry.KitRegistry;
 import net.forthecrown.registry.WarpRegistry;
 import net.forthecrown.serializer.UserSerializer;
 import net.forthecrown.useables.UsablesManager;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.utils.MapUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Namespaced;
 import net.kyori.adventure.text.Component;
@@ -22,7 +21,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.LuckPerms;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -30,7 +28,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +49,7 @@ public interface CrownCore extends Plugin, Namespaced {
     static Balances getBalances(){ return Main.balances; }
     static Kingship getKingship(){ return Main.kingship; }
     static TabList getTabList() { return Main.tabList; }
+    static ItemPriceMap getPriceMap() { return Main.prices; }
 
     static WarpRegistry getWarpRegistry() { return Main.warpRegistry; }
     static KitRegistry getKitRegistry() { return Main.kitRegistry; }
@@ -87,6 +85,7 @@ public interface CrownCore extends Plugin, Namespaced {
         Main.usablesManager.saveAll();
 
         Main.joinInfo.save();
+        Main.prices.save();
 
         Main.inst.saveConfig();
         logger().log(Level.INFO, "FTC-Core saved");
@@ -204,6 +203,10 @@ public interface CrownCore extends Plugin, Namespaced {
         return ComVars.maxTreasureItems.getValue((byte) 5);
     }
 
+    static int getMaxShopEarnings() {
+        return ComVars.maxShopEarnings.getValue(500000);
+    }
+
     static Location getServerSpawn(){
         return Main.serverSpawn;
     }
@@ -218,13 +221,6 @@ public interface CrownCore extends Plugin, Namespaced {
 
     static boolean inDebugMode(){
         return Main.inDebugMode.getValue(false);
-    }
-
-    static Map<Material, Short> getItemPrices(){ //returns the default item Price Map
-        return MapUtils.convertValues(Main.defaultItemPrices, ComVar::getValue);
-    }
-    static Short getItemPrice(Material material){ //Returns the default price for an item
-        return Main.defaultItemPrices.get(material).getValue((short) 2);
     }
 
     static String getDiscord(){

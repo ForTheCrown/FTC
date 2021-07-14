@@ -33,8 +33,8 @@ public class ArrowEffects {
         FIREWORK = register(20, Particle.FIREWORKS_SPARK, "Firework", "Almost as if you're using a crossbow");
 
         INVENTORY = CosmeticConstants.baseInventory(36, Component.text("Arrow Effects"), true)
-                .addOptions(Registries.ARROW_EFFECTS)
-                .addOption(CosmeticConstants.NO_ARROW)
+                .addAll(Registries.ARROW_EFFECTS)
+                .add(CosmeticConstants.NO_ARROW)
                 .build();
 
         Registries.ARROW_EFFECTS.close();

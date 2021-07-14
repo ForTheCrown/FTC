@@ -21,43 +21,43 @@ import java.util.function.Predicate;
  * Like a regular BoundingBox, but it's tied to a world, so it has more operational abilities
  * And it can be iterated through
  */
-public class CrownRegion extends BoundingBox implements Iterable<Block> {
+public class FtcRegion extends BoundingBox implements Iterable<Block> {
 
     private final World world;
 
-    public CrownRegion(World world, double x1, double y1, double z1, double x2, double y2, double z2) {
+    public FtcRegion(World world, double x1, double y1, double z1, double x2, double y2, double z2) {
         super(x1, y1, z1, x2, y2, z2);
         this.world = world;
     }
 
-    public CrownRegion(Location loc1, Location loc2){
+    public FtcRegion(Location loc1, Location loc2){
         super(loc1.getX(), loc1.getY(), loc1.getZ(), loc2.getX(), loc2.getY(), loc2.getZ());
 
         if(!loc1.getWorld().equals(loc2.getWorld())) throw new IllegalArgumentException("Location 1 and Location 2 cannot have different worlds");
         this.world = loc1.getWorld();
     }
 
-    public static CrownRegion of(Block block){
-        return new CrownRegion(block.getWorld(), block.getX(), block.getY(), block.getZ(), block.getX()+1, block.getY()+1, block.getZ()+1);
+    public static FtcRegion of(Block block){
+        return new FtcRegion(block.getWorld(), block.getX(), block.getY(), block.getZ(), block.getX()+1, block.getY()+1, block.getZ()+1);
     }
 
-    public static CrownRegion of(Location location, double radius){
-        return new CrownRegion(location.clone().subtract(radius, radius, radius), location.clone().add(radius, radius, radius));
+    public static FtcRegion of(Location location, double radius){
+        return new FtcRegion(location.clone().subtract(radius, radius, radius), location.clone().add(radius, radius, radius));
     }
 
-    public static CrownRegion of(Location location, Location location1){
-        return new CrownRegion(location1, location);
+    public static FtcRegion of(Location location, Location location1){
+        return new FtcRegion(location1, location);
     }
 
-    public static CrownRegion of(Location location, double xRadius, double height, double zRadius){
-        return new CrownRegion(location.clone().subtract(xRadius, height, zRadius), location.clone().add(xRadius, height, zRadius));
+    public static FtcRegion of(Location location, double xRadius, double height, double zRadius){
+        return new FtcRegion(location.clone().subtract(xRadius, height, zRadius), location.clone().add(xRadius, height, zRadius));
     }
 
-    public static CrownRegion of(BoundingBox box, World world){
-        return new CrownRegion(world, box.getMinX(), box.getMinY(), box.getMinZ(), box.getMaxX(), box.getMaxY(), box.getMaxZ());
+    public static FtcRegion of(BoundingBox box, World world){
+        return new FtcRegion(world, box.getMinX(), box.getMinY(), box.getMinZ(), box.getMaxX(), box.getMaxY(), box.getMaxZ());
     }
 
-    public static CrownRegion of(World world){
+    public static FtcRegion of(World world){
         WorldBorder border = world.getWorldBorder();
         return of(border.getCenter(), border.getSize());
     }
@@ -107,12 +107,12 @@ public class CrownRegion extends BoundingBox implements Iterable<Block> {
         return getEntitiesByType(LivingEntity.class);
     }
 
-    public boolean contains(CrownRegion box){
+    public boolean contains(FtcRegion box){
         if(!getWorld().equals(box.getWorld())) return false;
         return super.contains(box);
     }
 
-    public boolean overlaps(CrownRegion box){
+    public boolean overlaps(FtcRegion box){
         if(!getWorld().equals(box.getWorld())) return false;
         return super.overlaps(box);
     }
@@ -135,7 +135,7 @@ public class CrownRegion extends BoundingBox implements Iterable<Block> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        CrownRegion that = (CrownRegion) o;
+        FtcRegion that = (FtcRegion) o;
         return getWorld().equals(that.getWorld());
     }
 
@@ -173,7 +173,7 @@ public class CrownRegion extends BoundingBox implements Iterable<Block> {
     }
 
     @Override
-    public @NotNull CrownRegion clone() {
+    public @NotNull FtcRegion clone() {
         return of(this, getWorld());
     }
 

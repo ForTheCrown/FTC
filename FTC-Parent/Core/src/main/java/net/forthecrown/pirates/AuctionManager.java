@@ -8,7 +8,7 @@ import net.forthecrown.economy.auctions.AuctionEvents;
 import net.forthecrown.economy.auctions.CrownAuction;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.Worlds;
-import net.forthecrown.utils.math.CrownRegion;
+import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -40,7 +40,7 @@ public final class AuctionManager {
 
     public static NamespacedKey AUCTION_KEY;
 
-    public static final CrownRegion AUCTION_AREA = new CrownRegion(Worlds.NORMAL, -657, 49, 3848, -616, 21, 3810);
+    public static final FtcRegion AUCTION_AREA = new FtcRegion(Worlds.OVERWORLD, -657, 49, 3848, -616, 21, 3810);
 
     public AuctionManager(){
         Bukkit.getPluginManager().registerEvents(new AuctionEvents(), CrownCore.inst());

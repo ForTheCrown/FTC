@@ -19,7 +19,7 @@ public interface Nameable {
      * @return ^^^^
      */
     default boolean hasName(){
-        return !CrownUtils.isNullOrBlank(getName());
+        return !FtcUtils.isNullOrBlank(getName());
     }
 
     /**

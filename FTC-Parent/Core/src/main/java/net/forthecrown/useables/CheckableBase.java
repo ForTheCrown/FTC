@@ -6,7 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.InteractionUtils;
 import net.kyori.adventure.key.Key;
 
@@ -43,12 +43,12 @@ public abstract class CheckableBase implements Preconditionable {
 
     @Override
     public void addCheck(UsageCheckInstance precondition) {
-        checks.put(CrownUtils.checkNotBukkit(precondition.typeKey()), precondition);
+        checks.put(FtcUtils.checkNotBukkit(precondition.typeKey()), precondition);
     }
 
     @Override
     public void removeCheck(Key name) {
-        checks.remove(CrownUtils.checkNotBukkit(name));
+        checks.remove(FtcUtils.checkNotBukkit(name));
     }
 
     @Override
@@ -63,7 +63,7 @@ public abstract class CheckableBase implements Preconditionable {
 
     @Override
     public <T extends UsageCheckInstance> T getCheck(Key key, Class<T> clazz) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         if(!checks.containsKey(key)) return null;
 
         UsageCheckInstance c = checks.get(key);

@@ -16,9 +16,9 @@ import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.enums.Rank;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.utils.RoyalUtils;
+import net.forthecrown.utils.DungeonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -56,11 +56,12 @@ public class DungeonEvents implements Listener, ClickEventTask {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if(event.getEntity().getPersistentDataContainer().has(RoyalUtils.PUNCHING_BAG_KEY, PersistentDataType.BYTE)) {
+        if(event.getEntity().getPersistentDataContainer().has(DungeonUtils.PUNCHING_BAG_KEY, PersistentDataType.BYTE)) {
             hitDummy((Husk) event.getEntity(), event.getDamage());
             return;
         }
-        if(CrownUtils.isNullOrBlank(event.getEntity().getCustomName())) return;
+
+        if(FtcUtils.isNullOrBlank(event.getEntity().getCustomName())) return;
         if(event.getEntity() instanceof WitherSkeleton && event.getEntity().getCustomName().contains("Josh") && DungeonAreas.DUNGEON_AREA.contains(event.getEntity())){
             ThreadLocalRandom random = ThreadLocalRandom.current();
             if(random.nextInt(4) > 0) return;
@@ -141,10 +142,10 @@ public class DungeonEvents implements Listener, ClickEventTask {
                     .append(Component.text("If you have all the required items, using this, will spawn the boss"))
                     .build()
             );
-            case "Zombie Level Info" -> player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.zhambie()));
-            case "Skeleton Level Info" -> player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.skalatan()));
-            case "Water Level Info" -> player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.drawned()));
-            case "Spider Level Info" -> player.sendMessage(RoyalUtils.itemRequiredMessage(Bosses.hideySpidey()));
+            case "Zombie Level Info" -> player.sendMessage(DungeonUtils.itemRequiredMessage(Bosses.zhambie()));
+            case "Skeleton Level Info" -> player.sendMessage(DungeonUtils.itemRequiredMessage(Bosses.skalatan()));
+            case "Water Level Info" -> player.sendMessage(DungeonUtils.itemRequiredMessage(Bosses.drawned()));
+            case "Spider Level Info" -> player.sendMessage(DungeonUtils.itemRequiredMessage(Bosses.hideySpidey()));
         }
     }
 

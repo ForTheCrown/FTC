@@ -15,7 +15,7 @@ import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.royalgrenadier.types.selector.EntityArgumentImpl;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
@@ -79,7 +79,7 @@ public class UserType implements ArgumentType<UserParseResult> {
 
         int cursor = reader.getCursor();
         String name = reader.readUnquotedString();
-        UUID id = CrownUtils.uuidFromName(name);
+        UUID id = FtcUtils.uuidFromName(name);
 
         if(id == null) throw UNKNOWN_USER.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), Component.text(name));
 

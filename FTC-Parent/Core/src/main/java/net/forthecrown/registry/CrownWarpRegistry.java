@@ -12,7 +12,7 @@ import net.forthecrown.useables.warps.FtcWarp;
 import net.forthecrown.useables.warps.Warp;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
@@ -56,7 +56,7 @@ public class CrownWarpRegistry extends AbstractJsonSerializer implements WarpReg
     }
 
     @Override
-    public List<Warp> getUseableWarpsFor(Player player) {
+    public List<Warp> getUsableFor(Player player) {
         List<Warp> result = new ArrayList<>();
 
         for (FtcWarp w: warps.values()){
@@ -85,13 +85,13 @@ public class CrownWarpRegistry extends AbstractJsonSerializer implements WarpReg
 
     @Override
     public Warp get(Key key) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         return warps.get(key);
     }
 
     @Override
     public Warp register(Key key, Location raw) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         FtcWarp warp = new FtcWarp(key, raw);
         warps.put(key, warp);
         return warp;
@@ -99,7 +99,7 @@ public class CrownWarpRegistry extends AbstractJsonSerializer implements WarpReg
 
     @Override
     public void remove(Key key) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         warps.remove(key);
     }
 
@@ -110,7 +110,7 @@ public class CrownWarpRegistry extends AbstractJsonSerializer implements WarpReg
 
     @Override
     public boolean contains(Key key) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         return warps.containsKey(key);
     }
 

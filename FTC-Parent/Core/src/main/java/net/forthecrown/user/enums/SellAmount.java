@@ -1,27 +1,30 @@
 package net.forthecrown.user.enums;
 
 import com.google.gson.JsonElement;
+import net.forthecrown.economy.selling.SellAmountItem;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.JsonUtils;
-import net.forthecrown.economy.SellShop;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Represents a player's sell amount in the
- * @see SellShop
+ * Represents a player's sell amount in the {@link net.forthecrown.economy.selling.SellShops}
+ * @see net.forthecrown.economy.selling.SellShops
  */
 public enum SellAmount implements JsonSerializable {
-    PER_64 ((byte) 64, "Sell per stack"),
-    PER_16 ((byte) 16, "Sell per 16"),
-    PER_1 ((byte) 1, "Sell per 1"),
-    ALL ((byte) 1, "Sell all");
+    PER_1 ((byte) 1, "Sell per 1", 17),
+    PER_16 ((byte) 16, "Sell per 16", 26),
+    PER_64 ((byte) 64, "Sell per stack", 35),
+    ALL ((byte) 1, "Sell all", 44);
 
     public final byte value;
     public final String text;
+    public final SellAmountItem invOption;
 
-    SellAmount(byte i, String text) {
+    SellAmount(byte i, String text, int slot) {
         this.value = i;
         this.text = text;
+        this.invOption = new SellAmountItem(this, slot);
     }
 
     /**
@@ -33,6 +36,10 @@ public enum SellAmount implements JsonSerializable {
      */
     public Byte getValue(){
         return value;
+    }
+
+    public Component loreThing(){
+        return Component.text(name().toLowerCase().replaceAll("per_", ""));
     }
 
     /**

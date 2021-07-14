@@ -38,12 +38,14 @@ public final class BlackMarketUtils {
         return Bukkit.getScoreboardManager().getMainScoreboard().getObjective("PiratePoints").getScore(name);
     }
 
+    //True if the item in a border item, the inventory header or null
     public static boolean isInvalidItem(ItemStack item, InventoryView header){
-        return CrownUtils.isItemEmpty(item)
+        return FtcUtils.isItemEmpty(item)
                 || item.getType() == borderItem.getType()
                 || item.equals(header.getTopInventory().getItem(4));
     }
 
+    //Return a clone of the original item, so modifications to this don't change the original
     public static ItemStack borderItem(){
         return borderItem.clone();
     }

@@ -13,7 +13,7 @@ import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.enums.Pet;
 import net.forthecrown.user.enums.Rank;
 import net.forthecrown.user.enums.SellAmount;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.MapUtils;
@@ -65,7 +65,7 @@ public class UserJsonSerializer implements UserSerializer {
 
         //Stuff
         if(user.hasNickname()) json.add("nickname", ChatUtils.toJson(user.nickname));
-        if(!CrownUtils.isNullOrBlank(user.ip)) json.add("ipAddress", user.ip);
+        if(!FtcUtils.isNullOrBlank(user.ip)) json.add("ipAddress", user.ip);
         if(user.totalEarnings > 0) json.add("totalEarnings", user.totalEarnings);
         if(user.getGems() != 0) json.add("gems", user.getGems());
         if(!user.pets.isEmpty()) json.addList("pets", user.pets);
@@ -198,8 +198,8 @@ public class UserJsonSerializer implements UserSerializer {
         }
 
         //Last known location
-        if(json.has("lastKnownLoc")){
-            user.entityLocation = json.getLocation("lastKnownLoc");
+        if(json.has("lastKnowLoc")){
+            user.entityLocation = json.getLocation("lastKnowLoc");
         }
 
         //User data type things

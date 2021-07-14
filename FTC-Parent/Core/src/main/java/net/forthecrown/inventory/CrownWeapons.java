@@ -3,7 +3,7 @@ package net.forthecrown.inventory;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -76,7 +76,12 @@ public class CrownWeapons {
             case 4 -> weapon.setNewGoal(EntityType.CREEPER, (short) 1000);
             case 5 -> {
                 weapon.setNewGoal(EntityType.BLAZE, (short) 1000);
-                player.sendMessage(Component.text("Looting IV was added to your Sword.").color(NamedTextColor.GRAY));
+                player.sendMessage(
+                        Component.translatable("weapon.enchantAdded",
+                                NamedTextColor.GRAY,
+                                Enchantment.LOOT_BONUS_MOBS.displayName(4)
+                        )
+                );
                 weapon.item().addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 4);
             }
             case 6 -> weapon.setNewGoal(EntityType.ENDERMAN, (short) 1000);
@@ -85,7 +90,12 @@ public class CrownWeapons {
             case 9 -> weapon.setNewGoal(EntityType.WITHER, (short) 3);
             case 10 -> {
                 weapon.item().addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 5);
-                player.sendMessage(Component.text("Looting V was added to your Sword.").color(NamedTextColor.GRAY));
+                player.sendMessage(
+                        Component.translatable("weapon.enchantAdded",
+                                NamedTextColor.GRAY,
+                                Enchantment.LOOT_BONUS_MOBS.displayName(5)
+                        )
+                );
                 weapon.setNewGoal(null, (short) -1);
             }
         }
@@ -103,7 +113,7 @@ public class CrownWeapons {
         }
         Component message = Component.text()
                 .append(CrownCore.prefix())
-                .append(Component.text("Your sword was upgraded to Rank " + CrownUtils.arabicToRoman(rank) + "!")
+                .append(Component.text("Your sword was upgraded to Rank " + FtcUtils.arabicToRoman(rank) + "!")
                         .color(NamedTextColor.GRAY))
                 .build();
         player.sendMessage(message);
@@ -121,7 +131,7 @@ public class CrownWeapons {
             this.item = item;
             List<Component> lore = Objects.requireNonNull(item.lore());
             byte[] loreLines = rankAndGoalLine(lore);
-            rank = (byte) CrownUtils.romanToArabic(ChatUtils.plainText(lore.get(loreLines[0])).replaceAll("Rank ", ""));
+            rank = (byte) FtcUtils.romanToArabic(ChatUtils.plainText(lore.get(loreLines[0])).replaceAll("Rank ", ""));
 
             Component lore5 = item.lore().get(loreLines[1]);
             String parseFrom = ChatUtils.plainText(lore5).toLowerCase().replaceAll("men", "mans");
@@ -164,7 +174,7 @@ public class CrownWeapons {
             Component lore5 = Component.text(lore5GoalText + (type == EntityType.AREA_EFFECT_CLOUD ? "Charged Creepers to rank up!" : lore5Text))
                     .color(NamedTextColor.AQUA)
                     .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
-            Component lore0 = Component.text("Rank " + CrownUtils.arabicToRoman(rank))
+            Component lore0 = Component.text("Rank " + FtcUtils.arabicToRoman(rank))
                     .color(NamedTextColor.GRAY)
                     .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
 

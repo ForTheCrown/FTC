@@ -23,7 +23,7 @@ public class EmoteScare extends CommandEmote {
     }
 
     @Override
-    protected int execute(CrownUser sender, CrownUser recipient) {
+    public int execute(CrownUser sender, CrownUser recipient) {
         sender.sendMessage(
                 Component.text("You scared ")
                         .append(recipient.nickDisplayName().color(NamedTextColor.YELLOW))
@@ -46,7 +46,7 @@ public class EmoteScare extends CommandEmote {
     }
 
     @Override
-    protected int executeSelf(CrownUser user) {
+    public int executeSelf(CrownUser user) {
         scare(user.getPlayer());
         return 0;
     }

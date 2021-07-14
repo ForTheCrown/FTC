@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandDeathTop extends FtcCommand {
@@ -20,7 +20,7 @@ public class CommandDeathTop extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
-            CrownUtils.showLeaderboard(getPlayerSender(c), "Death");
+            FtcUtils.showLeaderboard(getPlayerSender(c), "Death");
             return 0;
         });
     }

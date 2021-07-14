@@ -11,7 +11,7 @@ import net.forthecrown.core.WgFlags;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -47,7 +47,7 @@ public class PlayerRidingManager implements Listener {
     @EventHandler
     public void playerRightClickPlayer(PlayerInteractEntityEvent event) {
         if(event.getHand() == EquipmentSlot.OFF_HAND) return;
-        if(!CrownUtils.isItemEmpty(event.getPlayer().getInventory().getItemInMainHand())) return;
+        if(!FtcUtils.isItemEmpty(event.getPlayer().getInventory().getItemInMainHand())) return;
         if(event.getPlayer().getWorld().equals(Worlds.VOID)) return;
         if(event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
         if(!(event.getRightClicked() instanceof Player)) return;

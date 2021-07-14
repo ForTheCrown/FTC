@@ -9,7 +9,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -57,7 +57,7 @@ public class CommandWithdraw extends FtcCommand {
                 .color(NamedTextColor.GRAY);
 
         Component message = Component.translatable("economy.withdraw",
-                Component.text(itemAmount + " coin" + CrownUtils.addAnS(itemAmount)),
+                Component.text(itemAmount + " coin" + FtcUtils.addAnS(itemAmount)),
                 Balances.formatted(amount).color(NamedTextColor.GOLD)
         )
                 .color(NamedTextColor.GRAY)

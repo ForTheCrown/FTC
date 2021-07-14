@@ -92,7 +92,7 @@ public class HeadMerchant implements BlackMarketMerchant {
     public void update(CrownRandom random, byte day) {
         BlockPos pos = chests[random.intInRange(0, chests.length-1)];
 
-        Chest chest = pos.stateAs(Worlds.NORMAL);
+        Chest chest = pos.stateAs(Worlds.OVERWORLD);
         Inventory inv = chest.getBlockInventory();
 
         alreadySold.clear();
@@ -153,7 +153,7 @@ public class HeadMerchant implements BlackMarketMerchant {
 
         ItemStack item = null;
         for (ItemStack i: inv){
-            if(CrownUtils.isItemEmpty(i)) continue;
+            if(FtcUtils.isItemEmpty(i)) continue;
             if(i.getType() != Material.PLAYER_HEAD) continue;
 
             SkullMeta meta = (SkullMeta) i.getItemMeta();
@@ -179,7 +179,7 @@ public class HeadMerchant implements BlackMarketMerchant {
                         .append(Component.translatable(
                                 "pirates.heads.reward",
                                 Balances.formatted(getMoneyReward()).color(NamedTextColor.GOLD),
-                                Component.text(getPiratePointReward() + " Pirate Point" + CrownUtils.addAnS(getPiratePointReward())).color(NamedTextColor.GOLD),
+                                Component.text(getPiratePointReward() + " Pirate Point" + FtcUtils.addAnS(getPiratePointReward())).color(NamedTextColor.GOLD),
                                 Component.text(pp.getScore()).color(NamedTextColor.GOLD)
                         ))
         );

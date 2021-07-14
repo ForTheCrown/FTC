@@ -5,7 +5,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -65,7 +65,7 @@ public class CommandDeposit extends FtcCommand {
                             .color(NamedTextColor.GRAY)
                             .append(
                                     Component.translatable("commands.deposited",
-                                            Component.text(mainItem.getAmount() + " coin" + CrownUtils.addAnS(mainItem.getAmount())).color(NamedTextColor.YELLOW),
+                                            Component.text(mainItem.getAmount() + " coin" + FtcUtils.addAnS(mainItem.getAmount())).color(NamedTextColor.YELLOW),
                                             Balances.formatted(amount).color(NamedTextColor.GOLD)
                                     )
                             )

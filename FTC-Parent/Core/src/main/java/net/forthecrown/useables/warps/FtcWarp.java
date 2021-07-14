@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.useables.CheckableBase;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -30,7 +30,7 @@ public class FtcWarp extends CheckableBase implements Warp {
     public FtcWarp(JsonElement element) throws CommandSyntaxException {
         JsonObject json = element.getAsJsonObject();
 
-        this.key = CrownUtils.parseKey(json.get("key").getAsString());
+        this.key = FtcUtils.parseKey(json.get("key").getAsString());
         this.location = JsonUtils.readLocation(json.getAsJsonObject("location"));
         reloadChecksFrom(json);
     }
@@ -47,7 +47,7 @@ public class FtcWarp extends CheckableBase implements Warp {
 
     @Override
     public Location getDestination() {
-        return location;
+        return location.clone();
     }
 
     @Override

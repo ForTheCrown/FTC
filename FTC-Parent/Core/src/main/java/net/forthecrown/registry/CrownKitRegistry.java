@@ -12,7 +12,7 @@ import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.useables.kits.FtcKit;
 import net.forthecrown.useables.kits.Kit;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
@@ -53,13 +53,13 @@ public class CrownKitRegistry extends AbstractJsonSerializer implements KitRegis
 
     @Override
     public Kit get(Key key) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         return kits.get(key);
     }
 
     @Override
     public Kit register(Key key, List<ItemStack> raw) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         FtcKit kit = new FtcKit(key, raw);
         kits.put(key, kit);
 
@@ -68,7 +68,7 @@ public class CrownKitRegistry extends AbstractJsonSerializer implements KitRegis
 
     @Override
     public void remove(Key key) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         kits.remove(key);
     }
 
@@ -79,7 +79,7 @@ public class CrownKitRegistry extends AbstractJsonSerializer implements KitRegis
 
     @Override
     public boolean contains(Key key) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         return kits.containsKey(key);
     }
 
@@ -99,7 +99,7 @@ public class CrownKitRegistry extends AbstractJsonSerializer implements KitRegis
     }
 
     @Override
-    public List<Kit> getUseableFor(Player player) {
+    public List<Kit> getUsableFor(Player player) {
         List<Kit> useableKits = new ArrayList<>();
 
         for (FtcKit k: kits.values()){
@@ -111,6 +111,6 @@ public class CrownKitRegistry extends AbstractJsonSerializer implements KitRegis
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return CompletionProvider.suggestMatching(builder, ListUtils.convert(getUseableFor(context.getSource().asPlayer()), Kit::getName));
+        return CompletionProvider.suggestMatching(builder, ListUtils.convert(getUsableFor(context.getSource().asPlayer()), Kit::getName));
     }
 }

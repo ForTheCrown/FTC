@@ -4,14 +4,18 @@ import com.google.gson.*;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.utils.math.CrownRegion;
+import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.key.Key;
+import net.minecraft.core.Position;
+import net.minecraft.core.PositionImpl;
 import net.minecraft.nbt.TagParser;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -22,6 +26,9 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Utility methods to make serializing and deserializing json easier
+ */
 public final class JsonUtils {
     private JsonUtils() {}
 
@@ -45,7 +52,7 @@ public final class JsonUtils {
 
         if(json.has("world")){
             World gottenWorld = Bukkit.getWorld(json.get("world").getAsString());
-            world = gottenWorld == null ? Worlds.NORMAL : gottenWorld;
+            world = gottenWorld == null ? Worlds.OVERWORLD : gottenWorld;
         } else world = null;
 
         double x = json.get("x").getAsDouble();
@@ -58,7 +65,25 @@ public final class JsonUtils {
         return new Location(world, x, y, z, pitch, yaw);
     }
 
-    public static JsonObject writeRegion(CrownRegion box){
+    public static Position readPosition(JsonObject json) {
+        double x = json.get("x").getAsDouble();
+        double y = json.get("y").getAsDouble();
+        double z = json.get("z").getAsDouble();
+
+        return new PositionImpl(x, y, z);
+    }
+
+    public static JsonObject writePosition(Position position) {
+        JsonObject json = new JsonObject();
+
+        json.addProperty("x", position.x());
+        json.addProperty("y", position.y());
+        json.addProperty("z", position.z());
+
+        return json;
+    }
+
+    public static JsonObject writeRegion(FtcRegion box){
         JsonObject json = new JsonObject();
 
         json.addProperty("world", box.getWorld().getName());
@@ -74,7 +99,7 @@ public final class JsonUtils {
         return json;
     }
 
-    public static CrownRegion readRegion(JsonObject json){
+    public static FtcRegion readRegion(JsonObject json){
         World world = Objects.requireNonNull(Bukkit.getWorld(json.get("world").getAsString()));
 
         double minX = json.get("minX").getAsDouble();
@@ -85,7 +110,33 @@ public final class JsonUtils {
         double maxY = json.get("maxY").getAsDouble();
         double maxZ = json.get("maxZ").getAsDouble();
 
-        return new CrownRegion(world, minX, minY, minZ, maxX, maxY, maxZ);
+        return new FtcRegion(world, minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    public static JsonObject writeBoundingBox(BoundingBox box) {
+        JsonBuf json = JsonBuf.empty();
+
+        json.add("minX", box.getMinX());
+        json.add("minY", box.getMinY());
+        json.add("minZ", box.getMinZ());
+
+        json.add("maxX", box.getMaxX());
+        json.add("maxY", box.getMaxY());
+        json.add("maxZ", box.getMaxZ());
+
+        return json.getSource();
+    }
+
+    public static BoundingBox readBoundingBox(JsonObject json) {
+        double minX = json.get("minX").getAsDouble();
+        double minY = json.get("minY").getAsDouble();
+        double minZ = json.get("minZ").getAsDouble();
+
+        double maxX = json.get("maxX").getAsDouble();
+        double maxY = json.get("maxY").getAsDouble();
+        double maxZ = json.get("maxZ").getAsDouble();
+
+        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public static <T> JsonArray writeCollection(@NotNull Collection<T> collection, @NotNull Function<T, JsonElement> converter){
@@ -105,35 +156,6 @@ public final class JsonUtils {
         array.forEach(e -> adder.accept(func.apply(e)));
     }
 
-    public static <K, V> JsonObject writeMap(Map<K, V> map, Function<Map.Entry<K, V>, Pair<String, JsonElement>> function){
-        Validate.notNull(map, "Map was null");
-        Validate.notNull(function, "Function was null");
-
-        JsonObject json = new JsonObject();
-
-        for (Map.Entry<K, V> e: map.entrySet()){
-            Pair<String, JsonElement> element = function.apply(e);
-            if(element == null) continue;
-
-            json.add(element.first, element.second);
-        }
-
-        return json;
-    }
-
-    public static <K, V> Map<K, V> readMap(JsonObject json, Function<Map.Entry<String, JsonElement>, Pair<K, V>> function){
-        Map<K, V> result = new HashMap<>();
-
-        for (Map.Entry<String, JsonElement> e: json.entrySet()){
-            Pair<K, V> pair = function.apply(e);
-            if(pair == null) continue;
-
-            result.put(pair.first, pair.second);
-        }
-
-        return result;
-    }
-
     public static <T extends Enum<T>> T readEnum(Class<T> clazz, JsonElement element){
         if(element == null || element.isJsonNull()) return null;
         return Enum.valueOf(clazz, element.getAsString().toUpperCase());
@@ -143,6 +165,7 @@ public final class JsonUtils {
         return anum == null ? JsonNull.INSTANCE : new JsonPrimitive(anum.name().toLowerCase());
     }
 
+    //Reads the item using a string representation of it's NBT data
     public static ItemStack readItem(JsonElement json) {
         try {
             return NbtHandler.itemFromNBT(NBT.of(TagParser.parseTag(json.getAsString())));
@@ -152,6 +175,7 @@ public final class JsonUtils {
         }
     }
 
+    //Writes the item using it's NBT
     public static JsonPrimitive writeItem(ItemStack itemStack){
         return new JsonPrimitive(NbtHandler.ofItem(itemStack).serialize());
     }
@@ -161,7 +185,7 @@ public final class JsonUtils {
     }
 
     public static Key readKey(JsonElement element){
-        return CrownUtils.parseKey(element.getAsString());
+        return FtcUtils.parseKey(element.getAsString());
     }
 
     public static UUID readUUID(JsonElement element){
@@ -172,12 +196,14 @@ public final class JsonUtils {
         return new JsonPrimitive(id.toString());
     }
 
+    //Writes json to a file
     public static void writeFile(JsonObject json, File f) throws IOException {
         FileWriter writer = new FileWriter(f);
         writer.write(json.toString());
         writer.close();
     }
 
+    //Reads json from a file
     public static JsonObject readFile(File file) throws IOException {
         FileReader reader = new FileReader(file);
         JsonParser parser = new JsonParser();

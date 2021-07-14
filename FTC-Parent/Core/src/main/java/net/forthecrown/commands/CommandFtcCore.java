@@ -38,7 +38,7 @@ import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.enums.Pet;
 import net.forthecrown.user.enums.Rank;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -112,6 +112,16 @@ public class CommandFtcCore extends FtcCommand {
                             return 0;
                         })
                 )
+
+                .then(literal("update_spectator")
+                        .executes(c -> {
+                            UserManager.updateSpectatorTab();
+
+                            c.getSource().sendAdmin("Updating specators in tab");
+                            return 0;
+                        })
+                )
+
                 .then(literal("goto_spawn")
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
@@ -706,7 +716,7 @@ public class CommandFtcCore extends FtcCommand {
 
         ItemMeta meta = toGive.getItemMeta();
         player.getInventory().addItem(toGive);
-        broadcastAdmin(c.getSource(), "Giving " + (CrownUtils.isNullOrBlank(meta.getDisplayName()) ? ChatFormatter.normalEnum(toGive.getType()) : meta.getDisplayName()));
+        broadcastAdmin(c.getSource(), "Giving " + (FtcUtils.isNullOrBlank(meta.getDisplayName()) ? ChatFormatter.normalEnum(toGive.getType()) : meta.getDisplayName()));
         return level;
     }
 
@@ -764,6 +774,10 @@ public class CommandFtcCore extends FtcCommand {
     }
 
     private enum SaveReloadPart {
+        ITEM_PRICES ("Item Prices", b -> {
+            if(b) CrownCore.getPriceMap().reload();
+            else CrownCore.getPriceMap().save();
+        }),
         GRAPPLING_HOOK ("Grappling Hook", b -> {
             if(b) Pirates.getParkour().getData().reload();
             else Pirates.getParkour().getData().save();

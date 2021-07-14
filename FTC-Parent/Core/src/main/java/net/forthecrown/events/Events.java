@@ -2,7 +2,6 @@ package net.forthecrown.events;
 
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.CrownException;
-import net.forthecrown.events.custom.SellShopUseEvent;
 import net.forthecrown.events.custom.SignShopUseEvent;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -44,7 +43,6 @@ public class Events {
 
         register(new CosmeticsListener());
         register(new CustomInventoryClickListener());
-
         register(new InventoryBuilderListener());
     }
 
@@ -57,10 +55,6 @@ public class Events {
     }
 
     public static void handleSignShop(SignShopUseEvent event, ExceptionedEvent<SignShopUseEvent> executor){
-        handle(event.getUser(), event, executor);
-    }
-
-    public static void handleSellShop(SellShopUseEvent event, ExceptionedEvent<SellShopUseEvent> executor){
         handle(event.getUser(), event, executor);
     }
 

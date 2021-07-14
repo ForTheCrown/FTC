@@ -25,7 +25,7 @@ public class EmotePoke extends CommandEmote {
     private final static List<String> pokeOwies = Arrays.asList("stomach", "back", "arm", "butt", "cheek", "neck");
 
     @Override
-    protected int execute(CrownUser sender, CrownUser recipient) {
+    public int execute(CrownUser sender, CrownUser recipient) {
         int pokeOwieInt = (int)(Math.random()*pokeOwies.size()); //The random int that determines what body part they'll poke lol
         String pokedPart = pokeOwies.get(pokeOwieInt);
 
@@ -55,7 +55,7 @@ public class EmotePoke extends CommandEmote {
     }
 
     @Override
-    protected int executeSelf(CrownUser user) {
+    public int executeSelf(CrownUser user) {
         Player player = user.getPlayer();
         player.sendMessage("You poked yourself! Weirdo"); //Damn, some people really be weird, pokin themselves, couldn't be me ( ._.)
         player.getWorld().playSound(player.getLocation(), Sound.ENCHANT_THORNS_HIT, 3.0F, 1.8F);

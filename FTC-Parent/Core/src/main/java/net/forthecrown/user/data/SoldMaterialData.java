@@ -1,6 +1,5 @@
 package net.forthecrown.user.data;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.serializer.JsonSerializable;
@@ -20,11 +19,15 @@ public class SoldMaterialData implements JsonSerializable {
     }
 
     public void recalculate(){
-        short startPrice = CrownCore.getItemPrice(material);
+        if(getEarned() > CrownCore.getMaxShopEarnings()) {
+            price = 0;
+            return;
+        }
 
-        if(earned <= 0) price = startPrice;
+        short startPrice = getOriginalPrice();
 
-        price = (short) Math.ceil((1+startPrice)*Math.exp(-earned*Math.log(1+startPrice)/500000 )-1 );
+        if(earned <= 0) price = -1;
+        else price = (short) Math.ceil((1+startPrice)*Math.exp(-earned*Math.log(1+startPrice)/CrownCore.getMaxShopEarnings())-1);
     }
 
     public Material getMaterial() {
@@ -44,7 +47,7 @@ public class SoldMaterialData implements JsonSerializable {
     }
 
     public short getPrice() {
-        if(price == -1) return CrownCore.getItemPrice(material); //Return default price if one hasn't been set
+        if(price == -1) return getOriginalPrice(); //Return default price if one hasn't been set
         return price;
     }
 
@@ -53,11 +56,15 @@ public class SoldMaterialData implements JsonSerializable {
     }
 
     public boolean isPriceSet(){
-        return getPrice() != CrownCore.getItemPrice(material);
+        return getPrice() != getOriginalPrice();
+    }
+
+    public short getOriginalPrice(){
+        return CrownCore.getPriceMap().get(getMaterial());
     }
 
     @Override
-    public JsonElement serialize() {
+    public JsonPrimitive serialize() {
         if(earned < 1) return null;
         return new JsonPrimitive(earned);
     }

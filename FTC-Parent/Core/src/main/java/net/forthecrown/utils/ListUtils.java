@@ -76,7 +76,7 @@ public final class ListUtils {
     }
 
     public static <I> String join(@NotNull Collection<I> list, @Nullable String delimiter, @Nullable String prefix, @Nullable String suffix, @NotNull Function<I, String> joiner){
-        StringBuilder builder = new StringBuilder(CrownUtils.isNullOrBlank(prefix) ? "" : prefix);
+        StringBuilder builder = new StringBuilder(FtcUtils.isNullOrBlank(prefix) ? "" : prefix);
         String acDelimiter = delimiter == null ? ", " : delimiter;
 
         int iteration = 0;
@@ -87,7 +87,7 @@ public final class ListUtils {
             if(iteration < list.size()) builder.append(acDelimiter);
         }
 
-        if(!CrownUtils.isNullOrBlank(suffix)) builder.append(suffix);
+        if(!FtcUtils.isNullOrBlank(suffix)) builder.append(suffix);
         return builder.toString();
     }
 }

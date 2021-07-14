@@ -4,6 +4,9 @@ import net.forthecrown.core.CrownCore;
 
 import static net.forthecrown.registry.Registries.USAGE_CHECKS;
 
+/**
+ * Used for instantiating and registering and the default usage checks
+ */
 public class UsageChecks {
     public static void init(){
         register(new CheckCooldownType());

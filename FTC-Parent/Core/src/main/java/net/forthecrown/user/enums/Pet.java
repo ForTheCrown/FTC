@@ -11,6 +11,9 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Parrot;
 
+/**
+ * Represents a pet a pirate user can have
+ */
 public enum Pet implements JsonSerializable {
     GRAY_PARROT (Parrot.Variant.GRAY, NamedTextColor.GRAY, null, 50000,
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzFiZTcyM2FhMTczOTNkOTlkYWRkYzExOWM5OGIyYzc5YzU0YjM1ZGViZTA1YzcxMzhlZGViOGQwMjU2ZGM0NiJ9fX0="

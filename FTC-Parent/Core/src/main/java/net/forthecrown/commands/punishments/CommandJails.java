@@ -8,7 +8,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.JailType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;
@@ -122,7 +122,7 @@ public class CommandJails extends FtcCommand {
     }
 
     private int createJail(Location loc, String name, CommandSource source, float yaw, float pitch) {
-        Key key = CrownUtils.parseKey(name);
+        Key key = FtcUtils.parseKey(name);
 
         loc.setYaw(yaw);
         loc.setPitch(pitch);

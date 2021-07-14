@@ -14,7 +14,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -51,7 +51,7 @@ public class CommandPardon extends FtcCommand {
 
                                     if(list.isBanned(name)) list.pardon(name);
 
-                                    UUID id = CrownUtils.uuidFromName(name);
+                                    UUID id = FtcUtils.uuidFromName(name);
                                     if(id != null){
                                         PunishmentEntry entry = CrownCore.getPunishmentManager().getEntry(id);
                                         if(entry != null) entry.pardon(PunishmentType.BAN);

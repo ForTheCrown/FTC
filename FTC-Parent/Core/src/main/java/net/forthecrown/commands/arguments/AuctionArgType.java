@@ -14,6 +14,10 @@ import net.forthecrown.royalgrenadier.GrenadierUtils;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Parses an auction by its name.
+ * <p>Currently only used by {@link net.forthecrown.commands.CommandAuction}</p>
+ */
 public class AuctionArgType implements ArgumentType<Auction> {
     private AuctionArgType() {}
     public static final AuctionArgType AUCTION = new AuctionArgType();

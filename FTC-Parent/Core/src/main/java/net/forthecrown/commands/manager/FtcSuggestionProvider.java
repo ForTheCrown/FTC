@@ -1,10 +1,10 @@
 package net.forthecrown.commands.manager;
 
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import io.papermc.paper.adventure.PaperAdventure;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
@@ -34,7 +34,7 @@ public interface FtcSuggestionProvider {
             if(user.isVanished() && !seeVanished) continue;
             if(!user.getName().toLowerCase().startsWith(token)) continue;
 
-            Message message = PaperAdventure.asVanilla(user.hoverEventText());
+            Message message = new LiteralMessage(user.getUniqueId().toString());
 
             builder.suggest(user.getName(), message);
         }

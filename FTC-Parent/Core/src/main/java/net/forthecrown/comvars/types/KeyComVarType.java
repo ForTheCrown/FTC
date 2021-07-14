@@ -5,9 +5,10 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.arguments.KeyType;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +23,7 @@ public class KeyComVarType implements ComVarType<Key> {
 
     @Override
     public Key parse(StringReader input) throws CommandSyntaxException {
-        return CrownUtils.parseKey(input);
+        return KeyType.ftc().parse(input);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class KeyComVarType implements ComVarType<Key> {
     public Key deserialize(JsonElement element) {
         if(element == null || element.isJsonNull()) return null;
 
-        return CrownUtils.parseKey(element.getAsString());
+        return FtcUtils.parseKey(element.getAsString());
     }
 
     @Override

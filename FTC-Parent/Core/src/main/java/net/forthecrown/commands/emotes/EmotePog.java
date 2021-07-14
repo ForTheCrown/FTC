@@ -7,7 +7,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -49,7 +49,7 @@ public class EmotePog extends FtcCommand {
                 .color(NamedTextColor.GRAY)
                 .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
                 .append(Component.text(" PogChamped"))
-                .append(CrownUtils.isNullOrBlank(message) ? Component.empty() : Component.text(": ").append(Component.text(message).color(NamedTextColor.WHITE)))
+                .append(FtcUtils.isNullOrBlank(message) ? Component.empty() : Component.text(": ").append(Component.text(message).color(NamedTextColor.WHITE)))
                 .build();
 
         CrownCore.getAnnouncer().announceToAllRaw(cMessage);

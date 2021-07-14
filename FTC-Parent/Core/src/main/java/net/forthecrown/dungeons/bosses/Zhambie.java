@@ -4,7 +4,7 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.dungeons.BossItems;
-import net.forthecrown.utils.RoyalUtils;
+import net.forthecrown.utils.DungeonUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -34,9 +34,9 @@ public class Zhambie extends DungeonBoss<Husk> {
         super("Zhambie", new Location(Worlds.VOID, -191.5, 80, 157.5),
                 (short) 60, DungeonAreas.ZHAMBIE_ROOM,
                 Arrays.asList( //Required items
-                        RoyalUtils.makeDungeonItem(Material.DRIED_KELP, 45,  (Component) null),
-                        RoyalUtils.makeDungeonItem(Material.GOLD_NUGGET, 30, (Component) null),
-                        RoyalUtils.makeDungeonItem(Material.ROTTEN_FLESH, 15, "Knight's Flesh"),
+                        DungeonUtils.makeDungeonItem(Material.DRIED_KELP, 45,  (Component) null),
+                        DungeonUtils.makeDungeonItem(Material.GOLD_NUGGET, 30, (Component) null),
+                        DungeonUtils.makeDungeonItem(Material.ROTTEN_FLESH, 15, "Knight's Flesh"),
                         mummyIngot()
                 )
         );
@@ -131,6 +131,6 @@ public class Zhambie extends DungeonBoss<Husk> {
     }
 
     public static ItemStack mummyIngot(){
-        return RoyalUtils.makeDungeonItem(Material.GOLD_INGOT, 1, (Component) null).clone();
+        return DungeonUtils.makeDungeonItem(Material.GOLD_INGOT, 1, (Component) null).clone();
     }
 }

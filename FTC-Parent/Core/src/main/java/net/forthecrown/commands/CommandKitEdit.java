@@ -8,7 +8,7 @@ import net.forthecrown.commands.arguments.KitType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.useables.kits.Kit;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.InteractionUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -36,12 +36,12 @@ public class CommandKitEdit extends FtcCommand {
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
                                     String name = c.getArgument("name", String.class);
-                                    Key key = CrownUtils.parseKey(name);
+                                    Key key = FtcUtils.parseKey(name);
 
                                     List<ItemStack> items = new ArrayList<>();
 
                                     for (ItemStack i: player.getInventory()){
-                                        if(CrownUtils.isItemEmpty(i)) continue;
+                                        if(FtcUtils.isItemEmpty(i)) continue;
                                         items.add(i);
                                     }
 

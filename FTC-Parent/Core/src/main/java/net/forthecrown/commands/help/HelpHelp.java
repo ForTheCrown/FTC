@@ -9,7 +9,7 @@ import net.forthecrown.commands.arguments.CommandHelpType;
 import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -101,13 +101,13 @@ public class HelpHelp extends FtcCommand {
                 .append(Component.space())
                 .append(border);
 
-        if(showDetails && !CrownUtils.isNullOrBlank(permission)){
+        if(showDetails && !FtcUtils.isNullOrBlank(permission)){
             builder
                     .append(Component.newline())
                     .append(Component.text("Permission: ").style(header).append(Component.text(permission).style(cell)));
         }
 
-        if(showDetails && !CrownUtils.isNullOrBlank(plugin)){
+        if(showDetails && !FtcUtils.isNullOrBlank(plugin)){
             builder
                     .append(Component.newline())
                     .append(Component.text("Plugin: ").style(header).append(Component.text(plugin).style(cell)));
@@ -119,7 +119,7 @@ public class HelpHelp extends FtcCommand {
                     .append(Component.text("Aliases: ").style(header).append(Component.text(listAliases(aliases)).style(cell)));
         }
 
-        if(!CrownUtils.isNullOrBlank(description)){
+        if(!FtcUtils.isNullOrBlank(description)){
             builder
                     .append(Component.newline())
                     .append(Component.text("Description: ").style(header).append(Component.text(description).style(cell)));
@@ -163,7 +163,7 @@ public class HelpHelp extends FtcCommand {
             formatted.add(
                     Component.text("/" + c.getHelpOrNormalName())
                             .color(NamedTextColor.YELLOW)
-                            .append(Component.text(": " + (CrownUtils.isNullOrBlank(description) ? "no description" : (description + (description.endsWith(".") ? "" : ".")))).color(NamedTextColor.WHITE))
+                            .append(Component.text(": " + (FtcUtils.isNullOrBlank(description) ? "no description" : (description + (description.endsWith(".") ? "" : ".")))).color(NamedTextColor.WHITE))
                             .hoverEvent(aliasMessage(c.getAliases()))
                             .append(Component.newline())
             );

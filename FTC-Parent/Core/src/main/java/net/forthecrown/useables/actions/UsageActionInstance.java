@@ -1,12 +1,15 @@
 package net.forthecrown.useables.actions;
 
-import net.kyori.adventure.key.Key;
+import net.forthecrown.useables.UsageTypeInstance;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
-public interface UsageActionInstance {
+/**
+ * An instance of a UsageAction
+ */
+public interface UsageActionInstance extends UsageTypeInstance {
+    /**
+     * The code to execute when a player interacts with this action
+     * @param player The interacting player
+     */
     void onInteract(Player player);
-    String asString();
-
-    @NotNull Key typeKey();
 }

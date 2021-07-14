@@ -71,6 +71,8 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
     public SoldMaterialData getMatData(Material material) { return getMain().getMatData(material); }
     @Override
     public void setMatData(SoldMaterialData data) { getMain().setMatData(data); }
+    @Override
+    public CosmeticData getCosmeticData() { return getMain().getCosmeticData(); }
 
     @Override
     public boolean equals(Object o) {

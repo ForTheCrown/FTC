@@ -9,11 +9,12 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -59,7 +60,10 @@ public class CommandSelfOrUser extends FtcCommand {
         new CommandSelfOrUser("feed",
                 Permissions.FEED,
                 (user, source, self) -> {
-                    user.getPlayer().setFoodLevel(20);
+                    Player player = user.getPlayer();
+                    player.setFoodLevel(20);
+                    player.setExhaustion(0f);
+                    player.setSaturation(10f);
 
                     source.sendAdmin(Component.text("Satiated the appetite of ")
                             .color(NamedTextColor.YELLOW)
@@ -73,7 +77,7 @@ public class CommandSelfOrUser extends FtcCommand {
                 Permissions.HEAL,
                 (user, source, self) -> {
                     user.getPlayer().setHealth(user.getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-                    CrownUtils.clearEffects(user.getPlayer());
+                    FtcUtils.clearEffects(user.getPlayer());
 
                     source.sendAdmin(Component.text("Healing ")
                             .color(NamedTextColor.YELLOW)
@@ -128,7 +132,7 @@ public class CommandSelfOrUser extends FtcCommand {
                 Permissions.REPAIR,
                 (user, source, self) -> {
                     ItemStack item = user.getPlayer().getInventory().getItemInMainHand();
-                    if(CrownUtils.isItemEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
+                    if(FtcUtils.isItemEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
 
                     if(!(item.getItemMeta() instanceof Damageable)) throw FtcExceptionProvider.create("Given is not repairable");
                     ItemMeta meta = item.getItemMeta();

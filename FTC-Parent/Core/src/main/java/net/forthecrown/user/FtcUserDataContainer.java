@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 
 import javax.annotation.Nonnull;
@@ -75,7 +75,7 @@ public class FtcUserDataContainer implements JsonSerializable, JsonDeserializabl
         JsonObject json = element.getAsJsonObject();
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
-            data.put(CrownUtils.parseKey(e.getKey()), e.getValue());
+            data.put(FtcUtils.parseKey(e.getKey()), e.getValue());
         }
     }
 }

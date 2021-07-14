@@ -15,11 +15,13 @@ import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.WgFlags;
-import net.forthecrown.core.admin.*;
-import net.forthecrown.core.admin.record.PunishmentType;
+import net.forthecrown.core.admin.EavesDropper;
+import net.forthecrown.core.admin.MuteStatus;
+import net.forthecrown.core.admin.PunishmentManager;
+import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.economy.SellShop;
+import net.forthecrown.economy.selling.SellShops;
 import net.forthecrown.inventory.CrownWeapons;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.useables.kits.Kit;
@@ -27,7 +29,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.MarriageMessage;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -49,7 +51,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -65,6 +70,7 @@ public class CoreListener implements Listener {
 
             Component welcomeMsg = Component.translatable("user.firstJoin", NamedTextColor.YELLOW, user.nickDisplayName());
             CrownCore.getAnnouncer().announceRaw(welcomeMsg);
+            event.joinMessage(null);
 
             //Give join kit
             Kit kit = CrownCore.getKitRegistry().get(CrownCore.onFirstJoinKit());
@@ -93,30 +99,15 @@ public class CoreListener implements Listener {
         else event.quitMessage(ChatFormatter.formatLeaveMessage(user));
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
-        PunishmentManager manager = CrownCore.getPunishmentManager();
-        PunishmentEntry entry = manager.getEntry(event.getUniqueId());
-
-        if(entry == null) return;
-        if(entry.checkPunished(PunishmentType.BAN)){
-            event.disallow(
-                    AsyncPlayerPreLoginEvent.Result.KICK_BANNED,
-                    ChatFormatter.banMessage(entry.getCurrent(PunishmentType.BAN))
-            );
-            event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
-        }
-    }
-
     @EventHandler
-    public void onServerShopNpcUse(PlayerInteractEntityEvent event){
+    public void onServerShopNpcUse(PlayerInteractEntityEvent event) {
         if(event.getHand() != EquipmentSlot.HAND) return;
         if(event.getRightClicked().getType() != EntityType.WANDERING_TRADER) return;
         LivingEntity trader = (LivingEntity) event.getRightClicked();
 
         if(trader.hasAI() && trader.getCustomName() == null || !trader.getCustomName().contains("Server Shop")) return;
 
-        event.getPlayer().openInventory(new SellShop(event.getPlayer()).mainMenu());
+        SellShops.MAIN.open(event.getPlayer());
         event.setCancelled(true);
     }
 
@@ -203,7 +194,6 @@ public class CoreListener implements Listener {
         }
     }
 
-
     @EventHandler
     public void onPlayerChat(AsyncChatEvent event) {
         event.renderer(ChatFormatter::formatChat);
@@ -214,7 +204,7 @@ public class CoreListener implements Listener {
 
         if(status != MuteStatus.NONE){
             event.viewers().removeIf(a -> {
-                Player p = CrownUtils.fromAudience(a);
+                Player p = FtcUtils.fromAudience(a);
                 if(p == null) return false;
 
                 return !punishments.isSoftmuted(p.getUniqueId());
@@ -233,7 +223,7 @@ public class CoreListener implements Listener {
             }
 
             event.viewers().removeIf(a -> {
-                Player p = CrownUtils.fromAudience(a);
+                Player p = FtcUtils.fromAudience(a);
                 if(p == null) return false;
 
                 return  !p.hasPermission(Permissions.STAFF_CHAT) || StaffChat.ignoring.contains(p);
@@ -243,14 +233,14 @@ public class CoreListener implements Listener {
 
         if(player.getWorld().equals(Worlds.SENATE)){
             event.viewers().removeIf(a -> {
-                Player p = CrownUtils.fromAudience(a);
+                Player p = FtcUtils.fromAudience(a);
                 if(p == null) return false;
 
                 return !p.getWorld().equals(Worlds.SENATE);
             });
             return;
         } else event.viewers().removeIf(a -> {
-            Player p = CrownUtils.fromAudience(a);
+            Player p = FtcUtils.fromAudience(a);
             if(p == null) return false;
 
             return p.getWorld().equals(Worlds.SENATE);
@@ -258,7 +248,7 @@ public class CoreListener implements Listener {
 
         //Remove ignored
         event.viewers().removeIf(a -> {
-            Player p = CrownUtils.fromAudience(a);
+            Player p = FtcUtils.fromAudience(a);
             if(p == null) return false;
 
             UserInteractions inter = UserManager.getUser(p).getInteractions();

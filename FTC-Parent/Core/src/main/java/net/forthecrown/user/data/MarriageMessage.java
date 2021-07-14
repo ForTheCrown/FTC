@@ -63,7 +63,7 @@ public class MarriageMessage {
         return sender;
     }
 
-    public CrownUser getRecipient() {
+    public CrownUser getReceiver() {
         return recipient;
     }
 

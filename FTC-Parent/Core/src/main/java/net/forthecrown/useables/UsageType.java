@@ -14,10 +14,34 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface UsageType<T> extends SuggestionProvider<CommandSource>, Keyed {
+/**
+ * Represents a usage type
+ * @param <T> The type
+ */
+public interface UsageType<T extends UsageTypeInstance> extends SuggestionProvider<CommandSource>, Keyed {
+
+    /**
+     * Parses the given input into the type
+     * @param reader The input
+     * @param source The source of the input
+     * @return The parse result of the input
+     * @throws CommandSyntaxException If something goes wrong lol, idk
+     */
     T parse(StringReader reader, CommandSource source) throws CommandSyntaxException;
 
+    /**
+     * Deserializes the type from the given {@link JsonElement}.
+     * @param element The element to deserialize from
+     * @return The deserialized result of the input
+     * @throws CommandSyntaxException If something goes wrong idk
+     */
     T deserialize(JsonElement element) throws CommandSyntaxException;
+
+    /**
+     * Serializes the given type to JSON
+     * @param value The type to serialize
+     * @return The serialized version of the given value
+     */
     JsonElement serialize(T value);
 
     @Override
@@ -25,6 +49,10 @@ public interface UsageType<T> extends SuggestionProvider<CommandSource>, Keyed {
         return Suggestions.empty();
     }
 
+    /**
+     * Gets the key of this implementation of the type.
+     * @return The key
+     */
     @Override
     @NotNull Key key();
 }

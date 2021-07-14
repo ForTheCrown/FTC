@@ -2,6 +2,7 @@ package net.forthecrown.inventory.builder;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -9,6 +10,7 @@ import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.inventory.builder.options.OptionPriority;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -32,7 +34,7 @@ public class BuiltInventory implements InventoryHolder {
                           InventoryCloseAction onClose,
                           InventoryAction onOpen
     ) {
-        this.options = options;
+        this.options = new Int2ObjectOpenHashMap<>(options);
         this.title = title;
         this.size = size;
         this.onClose = onClose;
@@ -55,12 +57,14 @@ public class BuiltInventory implements InventoryHolder {
     public void run(Player player, InventoryClickEvent event){
         InventoryOption option = getOptions().get(event.getSlot());
         if(option == null) return;
+        if(Cooldown.contains(player, getClass().getSimpleName())) return;
 
         ClickContext context = new ClickContext(player, event.getSlot(), event.getCursor(), event.getClick());
 
         try {
             option.onClick(UserManager.getUser(player), context);
 
+            if(context.shouldCooldown()) Cooldown.add(player, getClass().getSimpleName(), 5);
             if(context.shouldReload()) open(player);
         } catch (RoyalCommandException e){
             player.sendMessage(e.formattedText());

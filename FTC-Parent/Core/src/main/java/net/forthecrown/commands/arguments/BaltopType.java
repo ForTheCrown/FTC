@@ -14,10 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Parses a page number for /baltop
+ */
 public class BaltopType implements ArgumentType<Integer> {
     public static BaltopType BALTOP = new BaltopType();
     private BaltopType() {}
 
+    //The max page number
     public static final int MAX = Math.round(((float) CrownCore.getBalances().getMap().size())/10);
 
     @Override

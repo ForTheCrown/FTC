@@ -143,6 +143,7 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
         }
 
         daily.update(dailyData, random);
+        CrownCore.logger().info("Picking " + dailyData.getEnchantment().getKey().toString() + " as the daily enchantment");
 
         if(day == 1 || day == 0) alreadyPicked.clear();
 

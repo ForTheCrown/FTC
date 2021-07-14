@@ -56,8 +56,6 @@ public class GhParkourData extends AbstractJsonSerializer {
 
     @Override
     protected JsonObject createDefaults(JsonObject json) {
-        
-
         return json;
     }
 }

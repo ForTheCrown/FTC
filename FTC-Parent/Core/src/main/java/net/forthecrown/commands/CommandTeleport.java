@@ -1,5 +1,6 @@
 package net.forthecrown.commands;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -99,7 +100,9 @@ public class CommandTeleport extends FtcCommand {
                 );
     }
 
-    private int teleport(Collection<Entity> entities, Location location, Component destDisplayName, CommandSource source){
+    private int teleport(Collection<Entity> entities, Location location, Component destDisplayName, CommandSource source) throws CommandSyntaxException {
+        if(entities.isEmpty()) throw FtcExceptionProvider.create("Found no one to teleport");
+
         int amount = 0;
         for (Entity e: entities){
             if(e.getType() != EntityType.PLAYER){

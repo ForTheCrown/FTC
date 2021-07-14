@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.NamespacedKey;
@@ -51,7 +51,7 @@ public interface CrownLootTable extends LootTable, JsonSerializable {
     static CrownLootTable deserialize(JsonElement element){
         JsonObject json = element.getAsJsonObject();
 
-        Key key = CrownUtils.parseKey(json.get("key").getAsString());
+        Key key = FtcUtils.parseKey(json.get("key").getAsString());
 
         JsonArray array = json.getAsJsonArray("items");
         List<ItemStack> items = new ArrayList<>();

@@ -3,9 +3,9 @@ package net.forthecrown.dungeons.bosses;
 import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.dungeons.BossFightContext;
-import net.forthecrown.utils.CrownUtils;
-import net.forthecrown.utils.RoyalUtils;
-import net.forthecrown.utils.math.CrownRegion;
+import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.DungeonUtils;
+import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
@@ -40,7 +40,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
     protected static final ThreadLocalRandom random = ThreadLocalRandom.current();
 
     protected final Location spawnLocation;
-    protected final CrownRegion bossRoom;
+    protected final FtcRegion bossRoom;
     protected final ImmutableList<ItemStack> requiredToSpawn;
     protected final Key key;
 
@@ -52,7 +52,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
     private final short updaterDelay;
     protected BossFightContext context;
 
-    protected DungeonBoss(String name, Location spawnLocation, short updaterDelay, CrownRegion bossRoom, Collection<ItemStack> requiredItems){
+    protected DungeonBoss(String name, Location spawnLocation, short updaterDelay, FtcRegion bossRoom, Collection<ItemStack> requiredItems){
         this.spawnLocation = spawnLocation;
         this.bossRoom = bossRoom;
         this.requiredToSpawn = ImmutableList.copyOf(requiredItems);
@@ -121,7 +121,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
 
     private int startUpdater(){
         return Bukkit.getScheduler().scheduleSyncRepeatingTask(CrownCore.inst(), () ->{
-            Player target = RoyalUtils.getOptimalTarget(bossEntity, getBossRoom());
+            Player target = DungeonUtils.getOptimalTarget(bossEntity, getBossRoom());
             if(target != null && (bossEntity.getTarget() == null || !bossEntity.getTarget().equals(target))) bossEntity.setTarget(target);
 
             onUpdate();
@@ -140,7 +140,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
         return alive;
     }
 
-    public CrownRegion getBossRoom() {
+    public FtcRegion getBossRoom() {
         return bossRoom;
     }
 
@@ -167,7 +167,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
             if(CrownCore.getUserManager().isAltForAny(p.getUniqueId(), context.getPlayers())) continue;
 
 
-            if(!CrownUtils.isNullOrBlank(achievement)) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only " + achievement);
+            if(!FtcUtils.isNullOrBlank(achievement)) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only " + achievement);
             if(p.getInventory().firstEmpty() == -1) bossEntity.getWorld().dropItemNaturally(bossEntity.getLocation(), reward.clone());
             else p.getInventory().addItem(reward.clone());
         }
@@ -201,7 +201,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
 
             if(!inv.containsAtLeast(i, i.getAmount())){
                 player.sendMessage(Component.translatable("dungeons.notEnoughItems").color(NamedTextColor.GRAY));
-                player.sendMessage(RoyalUtils.itemRequiredMessage(this));
+                player.sendMessage(DungeonUtils.itemRequiredMessage(this));
                 return;
             }
         }

@@ -5,7 +5,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.CrownGameMode;
+import net.forthecrown.user.enums.FtcGameMode;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -15,8 +15,8 @@ import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 
 public class CommandSpecificGameMode extends FtcCommand {
-    private final CrownGameMode gameMode;
-    public CommandSpecificGameMode(@NotNull String name, Permission permission, CrownGameMode mode, String... aliases) {
+    private final FtcGameMode gameMode;
+    public CommandSpecificGameMode(@NotNull String name, Permission permission, FtcGameMode mode, String... aliases) {
         super(name, CrownCore.inst());
 
         this.aliases = aliases;
@@ -69,9 +69,9 @@ public class CommandSpecificGameMode extends FtcCommand {
     }
 
     public static void init(){
-        new CommandSpecificGameMode("survival", Permissions.HELPER, CrownGameMode.SURVIVAL, "gms");
-        new CommandSpecificGameMode("creative", Permissions.CORE_ADMIN, CrownGameMode.CREATIVE, "gmc");
-        new CommandSpecificGameMode("spectator", Permissions.HELPER, CrownGameMode.SPECTATOR, "gmsp");
-        new CommandSpecificGameMode("adventure", Permissions.CORE_ADMIN, CrownGameMode.ADVENTURE, "gma");
+        new CommandSpecificGameMode("survival", Permissions.HELPER, FtcGameMode.SURVIVAL, "gms");
+        new CommandSpecificGameMode("creative", Permissions.CORE_ADMIN, FtcGameMode.CREATIVE, "gmc");
+        new CommandSpecificGameMode("spectator", Permissions.HELPER, FtcGameMode.SPECTATOR, "gmsp");
+        new CommandSpecificGameMode("adventure", Permissions.CORE_ADMIN, FtcGameMode.ADVENTURE, "gma");
     }
 }

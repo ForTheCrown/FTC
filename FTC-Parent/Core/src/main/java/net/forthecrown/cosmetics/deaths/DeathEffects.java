@@ -22,8 +22,8 @@ public class DeathEffects {
         ENDER_RING = register(new EnderRingDeathEffect());
 
         INVENTORY = CosmeticConstants.baseInventory(36, Component.text("Death effects"), true)
-                .addOptions(Registries.DEATH_EFFECTS)
-                .addOption(CosmeticConstants.NO_DEATH)
+                .addAll(Registries.DEATH_EFFECTS)
+                .add(CosmeticConstants.NO_DEATH)
                 .build();
 
         Registries.DEATH_EFFECTS.close();

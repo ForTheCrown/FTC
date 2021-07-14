@@ -1,15 +1,14 @@
 package net.forthecrown.commands.emotes;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.Permissions;
+import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.user.CrownUser;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.utils.Cooldown;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.Cooldown;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnegative;
@@ -49,19 +48,23 @@ public abstract class CommandEmote extends FtcCommand {
                             }
 
                             CrownUser recipient = UserType.getUser(c, "player");
-                            if(recipient.equals(sender)) return executeSelf(sender);
+                            if(recipient.equals(sender)) return executeSelf(sender); //Make sure to execute on self, not on others
 
+                            //If either doesn't allow emotes, stop
                             if(!sender.allowsEmotes()) throw FtcExceptionProvider.senderEmoteDisabled();
                             if(!recipient.allowsEmotes()) throw FtcExceptionProvider.targetEmoteDisabled(recipient);
 
+                            //If return value is more than or equal to 0, add to cooldown
                             if(execute(sender, recipient) >= 0 && !sender.hasPermission(Permissions.EMOTE_IGNORE)){
                                 Cooldown.add(sender, cooldownCategory, cooldownTime);
                             }
+
+                            //Return 0 anyway, cuz fuck u
                             return 0;
                         })
                 );
     }
 
-    protected abstract int execute(CrownUser sender, CrownUser recipient) throws CommandSyntaxException;
-    protected abstract int executeSelf(CrownUser user) throws CommandSyntaxException;
+    public abstract int execute(CrownUser sender, CrownUser recipient);
+    public abstract int executeSelf(CrownUser user);
 }

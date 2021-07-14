@@ -5,7 +5,7 @@ import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.UserTeleport;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -33,12 +33,15 @@ public class JailListener implements Listener {
     }
 
     public boolean invertedPlayerCheck(Player player){ return !player.equals(this.player); }
-    public void checkDistance(){ if(player.getLocation().distance(jail) > 7.5) player.teleport(jail); }
-    public void checkJailed(){
-        if(System.currentTimeMillis() < record.expiresAt) return;
-        CrownCore.getPunishmentManager().checkJailed(player);
+    public void checkDistance(){
+        if(!checkJailed()) return;
+        if(player.getLocation().distance(jail) > 7.5) player.teleport(jail);
+    }
+    public boolean checkJailed(){
+        if(CrownCore.getPunishmentManager().checkJailed(player)) return true;
 
         release();
+        return false;
     }
 
     public void unreg(){
@@ -49,7 +52,7 @@ public class JailListener implements Listener {
     public void release(){
         unreg();
 
-        UserManager.getUser(player).createTeleport(() -> CrownUtils.LOCATION_HAZELGUARD, false, true, UserTeleport.Type.OTHER)
+        UserManager.getUser(player).createTeleport(() -> FtcUtils.LOCATION_HAZELGUARD, false, true, UserTeleport.Type.OTHER)
                 .start(false);
     }
 

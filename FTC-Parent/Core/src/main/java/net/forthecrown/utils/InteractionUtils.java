@@ -248,7 +248,7 @@ public final class InteractionUtils {
     }
 
     public static UsageActionInstance readAction(String strKey, JsonElement element) throws CommandSyntaxException {
-        Key key = CrownUtils.parseKey(strKey);
+        Key key = FtcUtils.parseKey(strKey);
 
         return (UsageActionInstance) Registries.USAGE_ACTIONS.get(key).deserialize(element);
     }
@@ -260,7 +260,7 @@ public final class InteractionUtils {
     }
 
     public static UsageCheckInstance readCheck(String strKey, JsonElement element) throws CommandSyntaxException {
-        Key key = CrownUtils.parseKey(strKey);
+        Key key = FtcUtils.parseKey(strKey);
 
         return (UsageCheckInstance) Registries.USAGE_CHECKS.get(key).deserialize(element);
     }

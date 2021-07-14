@@ -8,22 +8,22 @@ import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.JoinInfo;
 import net.forthecrown.core.kingship.Kingship;
+import net.forthecrown.economy.selling.UserSellResult;
 import net.forthecrown.events.dynamic.AfkListener;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.royalgrenadier.source.CommandSources;
-import net.forthecrown.user.data.EssToFTC;
 import net.forthecrown.user.data.SoldMaterialData;
 import net.forthecrown.user.data.UserProperty;
 import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.user.enums.*;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
@@ -48,6 +48,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundChatPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -56,6 +57,8 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftOfflinePlayer;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -67,7 +70,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -193,11 +197,6 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public CommandSource getCommandSource(){
-        return getCommandSource(null);
-    }
-
-    @Override
     public Player getPlayer(){
         return getOnlineHandle();
     }
@@ -219,11 +218,6 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public void addRank(Rank rank){
-        addRank(rank, true);
-    }
-
-    @Override
     public void addRank(Rank rank, boolean givePermission){
         ranks.add(rank);
         if(givePermission) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + getName() + " parent add " + rank.getLpRank());
@@ -240,11 +234,6 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public void removeRank(Rank rank){
-        removeRank(rank, true);
-    }
-
-    @Override
     public void removeRank(Rank rank, boolean removePermission){
         ranks.remove(rank);
         if(removePermission) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + getName() + " parent remove " + rank.getLpRank());
@@ -253,10 +242,6 @@ public class FtcUser implements CrownUser {
     @Override
     public Rank getRank(){
         return currentRank;
-    }
-    @Override
-    public void setRank(Rank rank){
-        setRank(rank, true);
     }
 
     @Override
@@ -361,18 +346,18 @@ public class FtcUser implements CrownUser {
 
     @Override
     public boolean isBaron() {
-        Score score = CrownCore.inst().getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName());
+        Score score = getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName());
         return score.isScoreSet() && score.getScore() == 1;
     }
     @Override
     public void setBaron(boolean baron) {
         int yayNay = baron ? 1 : 0;
-        CrownCore.inst().getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName()).setScore(yayNay);
-        if(baron){
+        getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName()).setScore(yayNay);
+
+        if(baron) {
             addRank(Rank.BARON, true);
             addRank(Rank.BARONESS, false);
-        }
-        else{
+        } else {
              removeRank(Rank.BARON, true);
              removeRank(Rank.BARONESS, false);
         }
@@ -423,7 +408,7 @@ public class FtcUser implements CrownUser {
     @Nonnull
     @Override
     public String getName(){
-        if(CrownUtils.isNullOrBlank(name)) name = getOfflinePlayer().getName();
+        if(FtcUtils.isNullOrBlank(name)) name = getOfflinePlayer().getName();
         return name;
     }
 
@@ -494,7 +479,7 @@ public class FtcUser implements CrownUser {
     @Override
     public void sendBlockableMessage(UUID id, Component message){
         if(!isOnline()) return;
-        sendMessage(id, new AdventureComponent(message), ChatType.GAME_INFO);
+        sendMessage(id, new AdventureComponent(message), ChatType.CHAT);
     }
 
     @Nonnull
@@ -515,7 +500,8 @@ public class FtcUser implements CrownUser {
 
     @Override
     public boolean isKing() {
-        if(CrownCore.getKingship().getUniqueId() != null) return CrownCore.getKingship().getUniqueId().equals(getUniqueId());
+        Kingship king = CrownCore.getKingship();
+        if(king.getUniqueId() != null) return king.getUniqueId().equals(getUniqueId());
         return false;
     }
 
@@ -712,13 +698,6 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void onJoinLater(){
-        if(EssToFTC.hasEssData(this)){
-            EssToFTC ess = EssToFTC.of(this);
-
-            ess.convert();
-            ess.complete();
-        }
-
         JoinInfo news = CrownCore.getJoinInfo();
         if(news.shouldShow()) sendMessage(news.display());
 
@@ -743,15 +722,10 @@ public class FtcUser implements CrownUser {
             if(record == null) return;
 
             try {
-                Key key = CrownUtils.parseKey(record.extra);
+                Key key = FtcUtils.parseKey(record.extra);
                 CrownCore.getPunishmentManager().jail(key, getPlayer());
             } catch (Exception ignored) {}
         }
-    }
-
-    @Override
-    public Component hoverEventText(){
-        return hoverEventText(UnaryOperator.identity());
     }
 
     @Override
@@ -1005,13 +979,13 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public CrownGameMode getGameMode() {
+    public FtcGameMode getGameMode() {
         checkOnline();
-        return CrownGameMode.wrap(getPlayer().getGameMode());
+        return FtcGameMode.wrap(getPlayer().getGameMode());
     }
 
     @Override
-    public void setGameMode(CrownGameMode gameMode) {
+    public void setGameMode(FtcGameMode gameMode) {
         checkOnline();
 
         getOnlineHandle().setGameMode(gameMode.bukkit);
@@ -1110,9 +1084,41 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
+    public UserSellResult sellMaterial(Material material, int targetAmount) {
+        Validate.isTrue(targetAmount != 0, "Target amount cannot be 0");
+        Validate.isTrue(targetAmount > -2, "Target amount cannot be less than -1");
+        Validate.isTrue(targetAmount <= material.getMaxStackSize(), "Cannot remove more than a stack of one type");
+
+        int foundAmount = 0;
+        int filteredTarget = Math.max(1, targetAmount);
+        PlayerInventory inv = getPlayer().getInventory();
+
+        ItemStack item = new ItemStack(material, filteredTarget);
+
+        if(!inv.containsAtLeast(item, filteredTarget)) {
+            return UserSellResult.foundNone(this, targetAmount, material);
+        }
+
+        if(targetAmount == -1) {
+            for (ItemStack i: inv) {
+                if(FtcUtils.isItemEmpty(i)) continue;
+                if(i.getType() != material) continue;
+
+                foundAmount += i.getAmount();
+                inv.removeItemAnySlot(i);
+            }
+        } else {
+            inv.removeItemAnySlot(item);
+            foundAmount = filteredTarget;
+        }
+
+        return new UserSellResult(foundAmount, targetAmount, this, material);
+    }
+
+    @Override
     public void sendActionBar(@NonNull Component message) {
         checkOnline();
-        getPlayer().sendActionBar(message);
+        sendMessage(new AdventureComponent(message), ChatType.GAME_INFO);
     }
 
     @Override

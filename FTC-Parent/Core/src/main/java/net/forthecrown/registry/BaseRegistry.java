@@ -2,7 +2,7 @@ package net.forthecrown.registry;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -17,7 +17,7 @@ public class BaseRegistry<V> implements Registry<V> {
     private final Key key;
 
     public BaseRegistry(Key key) {
-        this.key = CrownUtils.checkNotBukkit(key);
+        this.key = FtcUtils.checkNotBukkit(key);
     }
 
     @NotNull
@@ -28,20 +28,20 @@ public class BaseRegistry<V> implements Registry<V> {
 
     @Override
     public V get(Key key) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         return entries.get(key);
     }
 
     @Override
     public V register(Key key, V raw) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         entries.put(key, raw);
         return raw;
     }
 
     @Override
     public void remove(Key key) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         entries.remove(key);
     }
 
@@ -52,7 +52,7 @@ public class BaseRegistry<V> implements Registry<V> {
 
     @Override
     public boolean contains(Key key) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         return entries.containsKey(key);
     }
 

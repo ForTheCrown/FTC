@@ -6,6 +6,13 @@ import net.forthecrown.serializer.JsonSerializable;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+/**
+ * A class which holds the offset from a given pos.
+ * <p>
+ * Allows the easy applying of this offset as well with the
+ * {@link BlockOffset#apply(Location)} method.
+ * </p>
+ */
 public class BlockOffset implements JsonSerializable {
 
     private final int xOffset;

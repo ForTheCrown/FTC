@@ -7,7 +7,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.useables.actions.UsageActionInstance;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.InteractionUtils;
 import net.kyori.adventure.key.Key;
 
@@ -76,7 +76,7 @@ public abstract class UsableBase extends CheckableBase implements Actionable, Pr
 
     @Override
     public <T extends UsageActionInstance> T getAction(Key key, Class<T> clazz) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         for (UsageActionInstance a: actions){
             if(!a.typeKey().equals(key)) continue;
             if(!clazz.isAssignableFrom(a.getClass())) continue;

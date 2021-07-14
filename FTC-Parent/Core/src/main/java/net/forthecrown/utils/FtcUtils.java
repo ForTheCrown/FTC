@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,21 +26,22 @@ import static org.bukkit.Bukkit.getServer;
 /**
  * General Utility functions as well as some useful variables, like variables for the two main worlds, world and world_void and the server's time zone lol
  */
-public final class CrownUtils {
+public final class FtcUtils {
+    private FtcUtils() {}
 
     public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 200.5, 70, 1000.5);
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
-
-    private CrownUtils() {}
 
     public static int worldTimeToYears(World world){
         return (int) ((world.getFullTime()/1000)/24)/365;
     }
 
-    public static Integer randomIntInRange(int min, int max) {
+    @Deprecated
+    public static int randomInRange(int min, int max) {
         return new CrownRandom().intInRange(min, max);
     }
 
+    //True if the string is null or contains only blank spaces
     public static boolean isNullOrBlank(String str){
         return str == null || str.isBlank();
     }
@@ -54,6 +56,7 @@ public final class CrownUtils {
         return "s";
     }
 
+    //Shows a leaderboard, used by /deathtop and /crowntop
     public static void showLeaderboard(Player player, String objectiveName){
         Scoreboard mainScoreboard = getServer().getScoreboardManager().getMainScoreboard();
         Objective objective = mainScoreboard.getObjective(objectiveName);
@@ -69,7 +72,9 @@ public final class CrownUtils {
         Objective newObj = scoreboard.registerNewObjective(player.getName(), "dummy", displayName);
 
         for(String name : objective.getScoreboard().getEntries()) {
+            //If you don't have a set score, or your score is 0, dont' show it
             if(!objective.getScore(name).isScoreSet() || objective.getScore(name).getScore() == 0) continue;
+
             newObj.getScore(name).setScore(objective.getScore(name).getScore());
         }
 
@@ -88,6 +93,8 @@ public final class CrownUtils {
         return parseKey(new StringReader(str));
     }
 
+    //Parses a key from a string
+    //I realize now I couldn've just used Key.key(String), but too late
     public static Key parseKey(StringReader reader) {
         String first = reader.readUnquotedString();
         if(reader.canRead() && reader.peek() == ':'){
@@ -97,11 +104,13 @@ public final class CrownUtils {
         return Key.key(CrownCore.inst(), first);
     }
 
+    //Makes sure the given key is not a bukkit key, since different hash result
     public static Key checkNotBukkit(Key key){
         if(!(key instanceof NamespacedKey)) return key;
         return Key.key(key.namespace(), key.value());
     }
 
+    //Gets all visible players to the source
     public static Collection<? extends Player> getVisiblePlayers(CommandSource source){
         if(source.isPlayer()){
             try {
@@ -118,8 +127,8 @@ public final class CrownUtils {
         return Bukkit.getOnlinePlayers();
     }
 
-    public static boolean isItemEmpty(ItemStack itemStack){
-        return itemStack == null || itemStack.getType() == Material.AIR;
+    public static boolean isItemEmpty(ItemStack itemStack) {
+        return itemStack == null || itemStack.getType() == Material.AIR || itemStack.getAmount() <= 0;
     }
 
     public static boolean isInRange(int check, int min, int max){
@@ -127,11 +136,13 @@ public final class CrownUtils {
         return check <= max;
     }
 
-    public static Player fromAudience(Audience audience){
+    //Gets a player from an audience, used by the chat event listener in CoreListener
+    public static @Nullable Player fromAudience(Audience audience){
         if(audience instanceof Player) return (Player) audience;
         return null;
     }
 
+    //Clears all the effects on a living entity
     public static void clearEffects(LivingEntity player){
         player.getActivePotionEffects().forEach(e -> player.removePotionEffect(e.getType()));
     }

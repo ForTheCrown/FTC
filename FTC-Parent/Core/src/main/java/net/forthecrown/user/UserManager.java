@@ -3,7 +3,7 @@ package net.forthecrown.user;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.serializer.CrownSerializer;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -67,7 +67,7 @@ public interface UserManager extends CrownSerializer {
      * @return
      */
     static CrownUser getUser(String name){
-        return getUser(CrownUtils.uuidFromName(name));
+        return getUser(FtcUtils.uuidFromName(name));
     }
 
     /**
@@ -100,6 +100,10 @@ public interface UserManager extends CrownSerializer {
         return set;
     }
 
+    /**
+     * Updates vanished players from the perspective of the given user
+     * @param user The user to update vanished players for
+     */
     static void updateVanishedFromPerspective(CrownUser user){
         if(!user.isOnline()) return;
         if(user.hasPermission(Permissions.VANISH_SEE)) return;
@@ -131,8 +135,20 @@ public interface UserManager extends CrownSerializer {
      */
     boolean isAlt(UUID id);
 
+    /**
+     * Checks if the given ID is an alt account for any of the given players
+     * @param id The alt ID to check
+     * @param players The players to check
+     * @return if the given ID is an alt for any of the players
+     */
     boolean isAltForAny(UUID id, Collection<Player> players);
 
+    /**
+     * Checks if the given ID is a main account for any of the given players
+     * @param id The main ID to check
+     * @param players The players to check
+     * @return if the given ID is a main for any of the players
+     */
     boolean isMainForAny(UUID id, Collection<Player> players);
 
     /**
@@ -155,19 +171,22 @@ public interface UserManager extends CrownSerializer {
      */
     void removeEntry(UUID alt);
 
-    private static List<ServerPlayer> getSpectators() {
+    //Gets all the currently online NMS players
+    private static List<ServerPlayer> getServerPlayers() {
         List<ServerPlayer> list = new ArrayList<>();
 
         for (Player p: Bukkit.getOnlinePlayers()){
-            if(p.getGameMode() != GameMode.SPECTATOR) continue;
             list.add(((CraftPlayer) p).getHandle());
         }
 
         return list;
     }
 
+    /**
+     * Updates spectators so no one knows who's a spectator
+     */
     static void updateSpectatorTab(){
-        ClientboundPlayerInfoPacket packet = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.UPDATE_GAME_MODE, getSpectators());
+        ClientboundPlayerInfoPacket packet = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.UPDATE_GAME_MODE, getServerPlayers());
         ListIterator<ClientboundPlayerInfoPacket.PlayerUpdate> iterator = packet.getEntries().listIterator();
 
         while(iterator.hasNext()){

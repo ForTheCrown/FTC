@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Represents a user's rank
+ */
 public enum Rank implements JsonSerializable {
     //royals
     KNIGHT ( "&8[&7Knight&8] &f", Branch.ROYALS, "free-rank", RankTier.FREE),
@@ -42,6 +45,7 @@ public enum Rank implements JsonSerializable {
     DEFAULT("DEFAULT", Branch.DEFAULT, "default", RankTier.NONE),
     LEGEND("&#dfdfdf[&#fff147Legend&#dfdfdf] &r", Branch.DEFAULT, "legend", RankTier.TIER_3);
 
+    //TODO get rid of string variables, switch to components completely
     private final String tabPrefix;
     private final Branch rankBranch;
     private final String lpRank;

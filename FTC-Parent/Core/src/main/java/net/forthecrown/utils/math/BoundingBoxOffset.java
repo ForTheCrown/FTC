@@ -4,6 +4,9 @@ import org.bukkit.Location;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+/**
+ * Similar to {@link BlockOffset} except for Bounding boxes.
+ */
 public class BoundingBoxOffset {
 
     private final BlockOffset minOffset;
@@ -30,11 +33,11 @@ public class BoundingBoxOffset {
         return maxOffset;
     }
 
-    public CrownRegion apply(Location minLoc){
+    public FtcRegion apply(Location minLoc){
         Location min = minOffset.apply(minLoc);
         Location max = maxOffset.apply(minLoc);
 
-        return CrownRegion.of(min, max);
+        return FtcRegion.of(min, max);
     }
 
     public BoundingBox apply(Vector vector){

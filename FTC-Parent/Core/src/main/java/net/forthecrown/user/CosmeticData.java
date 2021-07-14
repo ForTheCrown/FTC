@@ -5,6 +5,9 @@ import net.forthecrown.cosmetics.deaths.AbstractDeathEffect;
 
 import java.util.List;
 
+/**
+ * Represents the user's cosmetic data
+ */
 public interface CosmeticData extends UserAttachment {
 
     boolean hasActiveDeath();

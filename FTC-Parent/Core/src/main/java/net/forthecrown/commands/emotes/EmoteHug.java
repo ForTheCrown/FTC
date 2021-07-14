@@ -23,7 +23,7 @@ public class EmoteHug extends CommandEmote {
     }
 
     @Override
-    protected int execute(CrownUser user, CrownUser recipient) {
+    public int execute(CrownUser user, CrownUser recipient) {
         if(Cooldown.contains(recipient, "Emote_Hug_Received")){
             user.sendMessage("&e" + recipient.getNickOrName() + " &7has already received some love lol");
             return -1;
@@ -53,7 +53,7 @@ public class EmoteHug extends CommandEmote {
     }
 
     @Override
-    protected int executeSelf(CrownUser user) {
+    public int executeSelf(CrownUser user) {
         user.sendMessage("It's alright to hug yourself &c❤", "We've all got to love ourselves &c❤");
         user.getWorld().spawnParticle(Particle.HEART, user.getLocation().add(0, 0.5, 0), 3, 0.25, 0.25 ,0.25);
         return -1;

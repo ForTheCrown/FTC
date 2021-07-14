@@ -11,7 +11,7 @@ import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.InteractionUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -124,12 +124,12 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
 
     @Override
     public void addCheck(UsageCheckInstance precondition) {
-        checks.put(CrownUtils.checkNotBukkit(precondition.typeKey()), precondition);
+        checks.put(FtcUtils.checkNotBukkit(precondition.typeKey()), precondition);
     }
 
     @Override
     public void removeCheck(Key name) {
-        checks.remove(CrownUtils.checkNotBukkit(name));
+        checks.remove(FtcUtils.checkNotBukkit(name));
     }
 
     @Override
@@ -174,7 +174,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
 
     @Override
     public <T extends UsageActionInstance> T getAction(Key key, Class<T> clazz) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         for (UsageActionInstance a: actions){
             if(!a.typeKey().equals(key)) continue;
             if(!clazz.isAssignableFrom(a.getClass())) continue;
@@ -186,7 +186,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
 
     @Override
     public <T extends UsageCheckInstance> T getCheck(Key key, Class<T> clazz) {
-        key = CrownUtils.checkNotBukkit(key);
+        key = FtcUtils.checkNotBukkit(key);
         if(!checks.containsKey(key)) return null;
 
         UsageCheckInstance c = checks.get(key);

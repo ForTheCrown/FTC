@@ -1,6 +1,5 @@
 package net.forthecrown.dungeons;
 
-import net.forthecrown.commands.arguments.KeyType;
 import net.forthecrown.dungeons.bosses.*;
 import net.forthecrown.dungeons.usables.ActionGiveArtifact;
 import net.forthecrown.dungeons.usables.ActionSpawnBoss;
@@ -16,8 +15,6 @@ import org.bukkit.entity.WitherSkeleton;
 public class Bosses {
 
     public static final NamespacedKey key = Squire.createRoyalKey("bossitem");
-
-    public static final KeyType ROYAL_KEY_PARSER = KeyType.key("royals");
 
     private static Zhambie zhambie;
     private static Skalatan skalatan;

@@ -37,7 +37,7 @@ public class ChatEmotes implements SuggestionProvider<CommandSource> {
         register("fedup", "(¬_¬)");
         register("reallysad", "(◉︵◉ )");
 
-        CrownCore.logger().info("Default emotes loaded");
+        CrownCore.logger().info("Emotes registered");
     }
 
     private void register(String key, String emote){

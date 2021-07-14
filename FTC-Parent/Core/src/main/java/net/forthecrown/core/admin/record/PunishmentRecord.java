@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.text.Component;
@@ -60,7 +60,7 @@ public class PunishmentRecord implements JsonSerializable, ComponentLike {
     }
 
     public boolean hasReason(){
-        return !CrownUtils.isNullOrBlank(reason);
+        return !FtcUtils.isNullOrBlank(reason);
     }
 
     public boolean isPermanent(){

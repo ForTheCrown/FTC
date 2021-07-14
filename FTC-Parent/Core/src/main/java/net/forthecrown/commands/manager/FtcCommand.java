@@ -12,7 +12,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Pair;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
@@ -47,13 +47,6 @@ public abstract class FtcCommand extends AbstractCommand {
     }
 
     protected FtcCommand(String name){ this(name, CrownCore.inst()); }
-
-    @Override
-    public boolean test(CommandSource source) {
-        if(CrownCore.getPunishmentManager().checkJailed(source.asBukkit())) return false;
-
-        return testPermissionSilent(source.asBukkit());
-    }
 
     protected CommandSender getSender(CommandContext<CommandSource> c){
         return c.getSource().asBukkit();
@@ -119,6 +112,6 @@ public abstract class FtcCommand extends AbstractCommand {
     }
 
     public String getHelpOrNormalName(){
-        return CrownUtils.isNullOrBlank(helpListName) ? getName() : getHelpListName();
+        return FtcUtils.isNullOrBlank(helpListName) ? getName() : getHelpListName();
     }
 }

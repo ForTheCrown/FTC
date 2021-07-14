@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.NamespacedKey;
@@ -35,7 +35,7 @@ public class CrownWeightedLootTable implements WeightedLootTable {
     public CrownWeightedLootTable(JsonElement element){
         JsonObject json = element.getAsJsonObject();
 
-        Key temp = CrownUtils.parseKey(json.get("key").getAsString());
+        Key temp = FtcUtils.parseKey(json.get("key").getAsString());
         this.key = new NamespacedKey(temp.namespace(), temp.value());
         this.maxItemsToGive = json.get("maxToGive").getAsInt();
 

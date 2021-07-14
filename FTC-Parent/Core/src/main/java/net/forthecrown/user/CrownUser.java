@@ -1,6 +1,7 @@
 package net.forthecrown.user;
 
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.forthecrown.economy.selling.UserSellResult;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.serializer.Deletable;
@@ -36,8 +37,14 @@ public interface CrownUser extends
         Deletable
 {
 
+    /**
+     * Reloads the user's data
+     */
     void reload();
 
+    /**
+     * Saves the user's data
+     */
     void save();
 
     /**
@@ -52,9 +59,20 @@ public interface CrownUser extends
      */
     UUID getUniqueId();
 
+    /**
+     * Creates a command source with the given command
+     * @param command The command to create with
+     * @return The command source for this user
+     */
     CommandSource getCommandSource(AbstractCommand command);
 
-    CommandSource getCommandSource();
+    /**
+     * creates a command source with no command
+     * @return The user's command source
+     */
+    default CommandSource getCommandSource() {
+        return getCommandSource(null);
+    }
 
     /**
      * Gets the player tied to this user
@@ -86,16 +104,30 @@ public interface CrownUser extends
      * Gives the user a rank
      * @param rank The rank to give
      */
-    void addRank(Rank rank);
+    default void addRank(Rank rank) {
+        addRank(rank, true);
+    }
 
+    /**
+     * Gives the user a rank, Also gives the permission
+     * @param rank The rank to give
+     * @param givePermission Whether to also give the rank's permission
+     */
     void addRank(Rank rank, boolean givePermission);
 
     /**
-     * Removes a rank from the user
+     * Removes a rank from the user along with the ranks permission
      * @param rank The rank to remove
      */
-    void removeRank(Rank rank);
+    default void removeRank(Rank rank) {
+        removeRank(rank, true);
+    }
 
+    /**
+     * Removes a rank from the user
+     * @param rank The ran to remove
+     * @param removePermission Whether to also remove the permission
+     */
     void removeRank(Rank rank, boolean removePermission);
 
     /**
@@ -105,10 +137,12 @@ public interface CrownUser extends
     Rank getRank();
 
     /**
-     * Sets the user's active rank
+     * Sets the user's active rank and tab prefix
      * @param rank The user's new rank
      */
-    void setRank(Rank rank);
+    default void setRank(Rank rank) {
+        setRank(rank, true);
+    }
 
     /**
      * Sets the user's active rank
@@ -136,8 +170,9 @@ public interface CrownUser extends
     long getNextAllowedBranchSwap();
 
     /**
-     *
-     * @return
+     * Checks if the user can swap branches and sends them a message if they can't
+     * <p>Used by the Smith and Jerome interactions</p>
+     * @return Whether the user is allowed to swap branches
      */
     boolean performBranchSwappingCheck();
 
@@ -148,24 +183,65 @@ public interface CrownUser extends
      */
     ObjectList<Pet> getPets();
 
+    /**
+     * NOT API, Executes required code when a user joins
+     * @return Whether the user's name has changed since they last joined
+     */
     boolean onJoin();
 
+    /**
+     * NOT API, like on join, except for things that need to be delayed a single tick
+     */
     void onJoinLater();
 
-    Component hoverEventText();
+    /**
+     * Gets the hover event text of this user
+     * @return The user's hover text
+     */
+    default Component hoverEventText() {
+        return hoverEventText(UnaryOperator.identity());
+    }
 
+    /**
+     * Gets the hover text of this user
+     * @param operator The component manipulator
+     * @return The user's hover text
+     */
     Component hoverEventText(UnaryOperator<Component> operator);
 
+    /**
+     * Updates the display name of this user in the Tab List
+     */
     void updateDisplayName();
 
+    /**
+     * Gets the list display name of this user
+     * @return The user's tab list display name
+     */
     Component listDisplayName();
 
+    /**
+     * Gets the current prefix of this user
+     * @return The user's current tab prefix
+     */
     Component getCurrentPrefix();
 
+    /**
+     * Sets the current prefix of this user
+     * @param component The user's tab prefix
+     */
     void setCurrentPrefix(Component component);
 
+    /**
+     * Sets the last name this user had while online
+     * @param lastOnlineName The last name this user had while online
+     */
     void setLastOnlineName(String lastOnlineName);
 
+    /**
+     * Gets the last name this user had while online
+     * @return last online name
+     */
     String getLastOnlineName();
 
     /**
@@ -187,18 +263,44 @@ public interface CrownUser extends
      */
     void removePet(Pet pet);
 
+    /**
+     * Checks whether the user has the given property
+     * @param property The property to check
+     * @return Whether they have it
+     */
     boolean hasProperty(UserProperty property);
 
+    /**
+     * Adds the given property to the user
+     * @param property The property to add
+     */
     void addProperty(UserProperty property);
 
+    /**
+     * Removes the given property from the user
+     * @param property The property to remove
+     */
     void removeProperty(UserProperty property);
 
+    /**
+     * Sets the property value of the given property.
+     * @param add Whether to add or remove the property
+     * @param property The property to set
+     */
     void setProperty(boolean add, UserProperty property);
 
+    /**
+     * Checks whether the user is ignoring broadcasts
+     * @return ^^^^^^^^^
+     */
     default boolean ignoringBroadcasts(){
         return hasProperty(UserProperty.IGNORING_BROADCASTS);
     }
 
+    /**
+     * Sets whether the user is ignoring broadcasts
+     * @param ignoring ^^^^
+     */
     default void setIgnoringBroadcasts(boolean ignoring){
         setProperty(ignoring, UserProperty.IGNORING_BROADCASTS);
     }
@@ -245,10 +347,25 @@ public interface CrownUser extends
      */
     void setAllowsEmotes(boolean allowsEmotes);
 
+    /**
+     * Gets the material data of the given material
+     * <p>Will return a default empty data if the user has no data for this material</p>
+     * @param material The material to get the data of
+     * @return The given material's data, empty data if the the user doesn't have data for the material
+     */
     SoldMaterialData getMatData(Material material);
 
+    /**
+     * Checks whether the user has any material data for the given material
+     * @param material The material to check for
+     * @return Whether the user has data for the material
+     */
     boolean hasMatData(Material material);
 
+    /**
+     * Sets the material data of the given material
+     * @param data The data to set
+     */
     void setMatData(SoldMaterialData data);
 
     /**
@@ -352,8 +469,20 @@ public interface CrownUser extends
      */
     void sendMessage(net.minecraft.network.chat.Component message, ChatType type);
 
+    /**
+     * Sends the user an NMS message.
+     * @param id The UUID of the sender, if not null, will let the client
+     *           decide if it should show the message, depending on if the UUID is blocked or not
+     * @param message The message to send
+     * @param type The message's type
+     */
     void sendMessage(UUID id, net.minecraft.network.chat.Component message, ChatType type);
 
+    /**
+     * Send a message that won't be displayed to the user if the given UUID is blocked by the client
+     * @param id The UUID of the sender
+     * @param message the message
+     */
     void sendBlockableMessage(UUID id, Component message);
 
     /**
@@ -429,42 +558,77 @@ public interface CrownUser extends
      */
     void onLeave();
 
+    /**
+     * Unloads the user if they're not online
+     */
     default void unloadIfNotOnline(){
         if(!isOnline()) unload();
     }
 
+    /**
+     * Gets the user's click event, '/tell [name] ' if online, '/profile [name]' if offline
+     * @return The user's click event
+     */
     default ClickEvent asClickEvent(){
         return ClickEvent.suggestCommand("/" + (isOnline() ? "tell " + getName() + " " : "profile " + getName()));
     }
 
+    /**
+     * Gets the user's display name, click event and all
+     * @return The user's display name
+     */
     default Component displayName(){
         return Component.text(getName())
                 .hoverEvent(this)
                 .clickEvent(asClickEvent());
     }
 
+    /**
+     * Gets the user's display name, with the nickname, if they have it
+     * @return The user's display name, possibly with a nickname
+     */
     default Component nickDisplayName(){
         return Component.text(getNickOrName())
                 .hoverEvent(this)
                 .clickEvent(asClickEvent());
     }
 
-    default Component  coloredNickDisplayName(){
+    /**
+     * Same as {@link CrownUser#nickDisplayName()} except it'll have the rank tier's color
+     * @return The user's display name
+     */
+    default Component coloredNickDisplayName(){
         return nickDisplayName().color(getHighestTierRank().tier.color);
     }
 
+    /**
+     * Whether the user has a nickname or not
+     * @return ^^^^^
+     */
     default boolean hasNickname(){
         return getNickname() != null;
     }
 
+    /**
+     * Gets either the name of the user, or their nickname
+     * @return The user's nickname or name
+     */
     default String getNickOrName(){
         return hasNickname() ? getNickname() : getName();
     }
 
+    /**
+     * Same as {@link CrownUser#nickOrName()} except component
+     * @return The user's nick or name
+     */
     default Component nickOrName(){
         return Component.text(getNickOrName());
     }
 
+    /**
+     * Gets the user's highest tier rank
+     * @return The user's highest tier rank
+     */
     default Rank getHighestTierRank(){
         Rank highest = null;
 
@@ -486,40 +650,118 @@ public interface CrownUser extends
      */
     UserTeleport getLastTeleport();
 
+    /**
+     * Creates a teleport to the given location
+     * @param destination The destination
+     * @param tell Whether to tell the player about the teleport
+     * @param type The teleport type
+     * @return The created teleport
+     */
     UserTeleport createTeleport(Supplier<Location> destination, boolean tell, UserTeleport.Type type);
 
+    /**
+     * Creates a teleport to the given location
+     * @param destination The destination
+     * @param tell Whether to tell the player about the teleport
+     * @param type The teleport type
+     * @param bypassCooldown whether to bypass the teleport cooldown
+     * @return The created teleport
+     */
     UserTeleport createTeleport(Supplier<Location> destination, boolean tell, boolean bypassCooldown, UserTeleport.Type type);
 
+    /**
+     * Checks if the user is teleporting
+     * @return Whether the user is teleporting
+     */
     boolean isTeleporting();
 
+    /**
+     * Gets whether the user is allowed to teleport
+     * @return Whether the user is allowed to teleport
+     */
     boolean canTeleport();
 
+    /**
+     * Runs the code when a teleport is completed
+     */
     void onTpComplete();
 
+    /**
+     * Checks teleporting
+     * @return Like {@link CrownUser#canTeleport()} but it also sends the user a message
+     */
     boolean checkTeleporting();
 
+    /**
+     * Gets the last location of the user, used for /back
+     * @return The user's last location
+     */
     Location getLastLocation();
 
+    /**
+     * Sets the user's last location
+     * @param lastLocation The last location
+     */
     void setLastLocation(Location lastLocation);
 
+    /**
+     * Gets whether the user allows TPA requests
+     * @return ^^^^^^^^^
+     */
     boolean allowsTPA();
 
+    /**
+     * Sets whether the user allows TPA requests
+     * @param allowsTPA Whether the user allows TPA requests
+     */
     void setAllowsTPA(boolean allowsTPA);
 
+    /**
+     * Gets whether the user is eaves dropping
+     * @return ^^^
+     */
     boolean isEavesDropping();
 
+    /**
+     * Sets whether the user is eaves dropping
+     * @param listeningToSocialSpy Whether the user is eaves dropping
+     */
     void setEavesDropping(boolean listeningToSocialSpy);
 
+    /**
+     * Gets the last message reply target
+     * @return Last reply target
+     */
     CommandSource getLastMessage();
 
+    /**
+     * Sets the last message reply target
+     * @param lastMessage The last message reply target
+     */
     void setLastMessage(CommandSource lastMessage);
 
+    /**
+     * Sets the nickname
+     * @param nick New nickname
+     */
     void setNickname(String nick);
 
+    /**
+     * Sets the user's nickname
+     * @param component The user's new nickname
+     */
     void setNickname(Component component);
 
+    /**
+     * Gets the user's nickname
+     * @return The user's nickname
+     */
     String getNickname();
 
+    /**
+     * Gets the nickname
+     * @return ^^^^
+     */
     Component nickname();
 
     boolean isVanished();
@@ -552,13 +794,30 @@ public interface CrownUser extends
 
     UserHomes getHomes();
 
-    CrownGameMode getGameMode();
+    FtcGameMode getGameMode();
 
-    void setGameMode(CrownGameMode gameMode);
+    void setGameMode(FtcGameMode gameMode);
 
     boolean allowsPaying();
 
     void setAllowsPay(boolean acceptsPay);
+
+    /**
+     * Creates a sell result by attempting to sell items in the user's inventory
+     * @param material The material to sell aka remove
+     * @param targetAmount The amount of items to remove, -1 for unlimited
+     * @return The sell result
+     */
+    UserSellResult sellMaterial(Material material, int targetAmount);
+
+    /**
+     * Creates a sell result and uses the user's sell amount for the target
+     * @param material The material to sell
+     * @return The sell result
+     */
+    default UserSellResult sellMaterial(Material material) {
+        return sellMaterial(material, getSellAmount() == SellAmount.ALL ? -1 : getSellAmount().getValue());
+    }
 
     @Override
     boolean equals(Object o);

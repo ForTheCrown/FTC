@@ -17,11 +17,10 @@ import java.util.UUID;
 public class DirectMessage {
     private final CommandSource sender;
     private final CommandSource receiver;
-
+    private final Component formattedText;
     private final boolean responding;
-    private String input;
-    private Component formattedText;
-    private MuteStatus muteStatus;
+    private final MuteStatus muteStatus;
+    private final String input;
 
     public DirectMessage(CommandSource sender, CommandSource receiver, boolean responding, String input) {
         this.sender = sender;
@@ -29,7 +28,8 @@ public class DirectMessage {
         this.responding = responding;
         this.input = input;
 
-        format();
+        formattedText = ChatFormatter.formatStringIfAllowed(input, sender.asBukkit());
+        muteStatus = CrownCore.getPunishmentManager().checkMute(sender.asBukkit());
     }
 
     public CommandSource getSender() {
@@ -66,11 +66,6 @@ public class DirectMessage {
                 .append(Component.text(" -> "))
                 .append(second)
                 .append(Component.text("]"));
-    }
-
-    public void format() {
-        formattedText = ChatFormatter.formatStringIfAllowed(input, sender.asBukkit());
-        muteStatus = CrownCore.getPunishmentManager().checkMute(sender.asBukkit());
     }
 
     public void complete(){
@@ -136,9 +131,5 @@ public class DirectMessage {
 
     public String getInput() {
         return input;
-    }
-
-    public void setInput(String input) {
-        this.input = input;
     }
 }

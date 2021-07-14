@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.math.BlockPos;
-import net.forthecrown.utils.math.CrownRegion;
+import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -23,16 +23,26 @@ import static net.forthecrown.utils.JsonUtils.*;
  */
 public class JsonBuf {
 
+    //The source and handle of the buffer
     private final JsonObject json;
 
     JsonBuf(JsonObject json) {
         this.json = json;
     }
 
+    /**
+     * Creates a buf for the given JSON
+     * @param json the json to create the buf for
+     * @return The buf for the given JSON object
+     */
     public static JsonBuf of(JsonObject json){
         return new JsonBuf(json);
     }
 
+    /**
+     * Creates an empty json buf
+     * @return An empty json buf
+     */
     public static JsonBuf empty(){
         return new JsonBuf(new JsonObject());
     }
@@ -79,11 +89,11 @@ public class JsonBuf {
         return get(name, JsonUtils::readKey);
     }
 
-    public void addRegion(String name, CrownRegion box){
+    public void addRegion(String name, FtcRegion box){
         json.add(name, writeRegion(box));
     }
 
-    public CrownRegion getRegion(String name){
+    public FtcRegion getRegion(String name){
         return get(name, e -> readRegion(e.getAsJsonObject()));
     }
 
@@ -93,7 +103,6 @@ public class JsonBuf {
 
     public ItemStack getItem(String name){
         if(missingOrNull(name)) return null;
-
         return readItem(get(name));
     }
 

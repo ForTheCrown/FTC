@@ -8,7 +8,7 @@ import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.JsonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,11 +123,11 @@ public class FtcUserCosmeticData implements CosmeticData, JsonSerializable, Json
         }
 
         if(json.has("arrowEffects")){
-            arrowEffects.addAll(json.getList("arrowEffects", e -> Registries.ARROW_EFFECTS.get(CrownUtils.parseKey(e.getAsString()))));
+            arrowEffects.addAll(json.getList("arrowEffects", e -> Registries.ARROW_EFFECTS.get(JsonUtils.readKey(e))));
         }
 
         if(json.has("deathEffects")){
-            deathEffects.addAll(json.getList("deathEffects", e -> Registries.DEATH_EFFECTS.get(CrownUtils.parseKey(e.getAsString()))));
+            deathEffects.addAll(json.getList("deathEffects", e -> Registries.DEATH_EFFECTS.get(JsonUtils.readKey(e))));
         }
     }
 

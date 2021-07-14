@@ -9,12 +9,7 @@ import java.util.List;
 /**
  * Represents the storage of special items for a user on death
  */
-public interface Grave {
-    /**
-     * Gets the user that the grave belongs to
-     * @return The grave's owner
-     */
-    CrownUser getUser();
+public interface Grave extends UserAttachment {
 
     /**
      * Attempts to give the grave's items back to the owner

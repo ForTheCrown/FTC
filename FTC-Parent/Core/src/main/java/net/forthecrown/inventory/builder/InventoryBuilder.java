@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryRunnable;
+import net.forthecrown.inventory.builder.options.SimpleCordedOption;
 import net.forthecrown.inventory.builder.options.SimpleOption;
 import net.kyori.adventure.text.Component;
 import org.apache.logging.log4j.core.util.Builder;
@@ -37,22 +38,34 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
         return options;
     }
 
-    public InventoryBuilder addOption(InventoryOption action){
+    public InventoryBuilder add(InventoryOption action){
         options.put(action.getSlot(), action);
         return this;
     }
 
-    public InventoryBuilder addOption(int slot, ItemStack item, @Nullable InventoryRunnable runnable){
-        return addOption(new SimpleOption(slot, item, runnable));
+    public InventoryBuilder add(int slot, ItemStack item) {
+        return add(slot, item, null);
     }
 
-    public InventoryBuilder addOptions(InventoryOption... options){
-        for (InventoryOption o: options) addOption(o);
+    public InventoryBuilder add(int column, int row, ItemStack item) {
+        return add(column, row, item, null);
+    }
+
+    public InventoryBuilder add(int slot, ItemStack item, @Nullable InventoryRunnable runnable){
+        return add(new SimpleOption(slot, item, runnable));
+    }
+
+    public InventoryBuilder add(int column, int row, ItemStack item, @Nullable InventoryRunnable runnable) {
+        return add(new SimpleCordedOption(column, row, item, runnable));
+    }
+
+    public InventoryBuilder addAll(InventoryOption... options){
+        for (InventoryOption o: options) add(o);
         return this;
     }
 
-    public InventoryBuilder addOptions(Iterable<? extends InventoryOption> options){
-        for (InventoryOption o: options) addOption(o);
+    public InventoryBuilder addAll(Iterable<? extends InventoryOption> options){
+        for (InventoryOption o: options) add(o);
         return this;
     }
 

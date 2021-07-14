@@ -9,7 +9,7 @@ import net.forthecrown.economy.Balances;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.loot.CrownLootTable;
@@ -56,8 +56,12 @@ public class TreasureShulker extends AbstractJsonSerializer {
         super("treasure_shulker");
 
         reload();
-        CrownCore.getDayUpdate().addListener(this::relocate);
         CrownCore.logger().info("Treasure Shulker loaded");
+
+        CrownCore.getDayUpdate().addListener(() -> {
+            alreadyFound.clear();
+            relocate();
+        });
     }
 
     @Override
@@ -111,8 +115,6 @@ public class TreasureShulker extends AbstractJsonSerializer {
             currentID = shulker.getUniqueId();
 
             shulker.getPersistentDataContainer().set(Pirates.SHULKER_KEY, PersistentDataType.BYTE, (byte) 1);
-
-            shulker.setPersistent(true);
             shulker.setRemoveWhenFarAway(false);
 
             shulker.setAI(false);
@@ -167,8 +169,8 @@ public class TreasureShulker extends AbstractJsonSerializer {
     public CrownLootTable getRandomLoot(){
         int index = random.nextInt(100);
 
-        if(CrownUtils.isInRange(index, 0, 20)) return getSpecialLoot();
-        if(CrownUtils.isInRange(index, 20, 50)) return getRareLoot();
+        if(FtcUtils.isInRange(index, 0, 20)) return getSpecialLoot();
+        if(FtcUtils.isInRange(index, 20, 50)) return getRareLoot();
         return getCommonLoot();
     }
 
@@ -184,11 +186,19 @@ public class TreasureShulker extends AbstractJsonSerializer {
     }
 
     public Location getLocation() {
+        Shulker shulker = getShulker();
+        if(shulker != null) return shulker.getLocation();
+
         return location.clone();
     }
 
     public UUID getCurrentID() {
         return currentID;
+    }
+
+    public Shulker getShulker() {
+        if(currentID == null) return null;
+        return (Shulker) Bukkit.getEntity(currentID);
     }
 
     @Override
@@ -198,19 +208,19 @@ public class TreasureShulker extends AbstractJsonSerializer {
 
         json.add("specialLoot", lootTableFromChest(
                 new BlockPos(-674, 59, 3847),
-                Worlds.NORMAL,
+                Worlds.OVERWORLD,
                 specialKey
         ).serialize());
 
         json.add("rareLoot", lootTableFromChest(
                 new BlockPos(-674, 59, 3848),
-                Worlds.NORMAL,
+                Worlds.OVERWORLD,
                 rareKey
         ).serialize());
 
         json.add("commonLoot", lootTableFromChest(
                 new BlockPos(-674, 59, 3849),
-                Worlds.NORMAL,
+                Worlds.OVERWORLD,
                 commonKey
         ).serialize());
 
@@ -275,7 +285,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
                     .color(NamedTextColor.YELLOW)
                     .append(Balances.formatted(rhineReward))
                     .append(
-                            Component.text("and some items")
+                            Component.text(" and some items")
                                     .hoverEvent(this)
                     )
                     .build();

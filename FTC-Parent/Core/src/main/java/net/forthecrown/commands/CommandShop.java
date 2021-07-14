@@ -4,13 +4,13 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.economy.SellShop;
+import net.forthecrown.economy.selling.SellShops;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.entity.Player;
+import net.forthecrown.inventory.builder.BuiltInventory;
+import net.forthecrown.user.CrownUser;
+
+import static net.forthecrown.economy.selling.SellShops.WEB_MESSAGE;
 
 public class CommandShop extends FtcCommand {
 
@@ -27,23 +27,23 @@ public class CommandShop extends FtcCommand {
      * ----------------------------------------
      * Opens the ShopGUI and allows players to sell their items
      *
-     *
      * Valid usages of command:
      * - /shop
-     * - /shop <farming | mining | drops | web>
+     * - /shop <farming | mining | mining_blocks | minerals | drops | web>
      *
-     * Author: Botul
+     * Author: Ants
      */
 
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .executes(cmd(SellShop.Menu.MAIN))
+                .executes(cmd(SellShops.MAIN))
 
-                .then(arg(SellShop.Menu.DROPS))
-                .then(arg(SellShop.Menu.MINING))
-                .then(arg(SellShop.Menu.MINING_BLOCKS))
-                .then(arg(SellShop.Menu.CROPS))
+                .then(arg("farming", SellShops.CROPS))
+                .then(arg("drops", SellShops.DROPS))
+                .then(arg("mining", SellShops.MINING))
+                .then(arg("mining_blocks", SellShops.CRAFTABLE_BLOCKS))
+                .then(arg("minerals", SellShops.MINERALS))
 
                 .then(literal("web")
                         .executes(c -> {
@@ -53,23 +53,16 @@ public class CommandShop extends FtcCommand {
                 );
     }
 
-    public static final Component WEB_MESSAGE = Component.text()
-            .append(Component.translatable("commands.shop.web", NamedTextColor.GRAY))
-            .append(Component.newline())
-            .append(Component.text("https://for-the-crown.tebex.io/").color(NamedTextColor.AQUA)
-                    .clickEvent(ClickEvent.openUrl("https://for-the-crown.tebex.io/"))
-                    .hoverEvent(Component.translatable("commands.shop.web.hover")))
-            .build();
-
-    private Command<CommandSource> cmd(SellShop.Menu menu){
+    private Command<CommandSource> cmd(BuiltInventory inventory) {
         return c -> {
-            Player player = getPlayerSender(c);
-            player.openInventory(new SellShop(player).open(menu));
+            CrownUser user = getUserSender(c);
+
+            inventory.open(user);
             return 0;
         };
     }
 
-    private LiteralArgumentBuilder<CommandSource> arg(SellShop.Menu menu){
-        return literal(menu.toString().toLowerCase()).executes(cmd(menu));
+    private LiteralArgumentBuilder<CommandSource> arg(String name, BuiltInventory inventory) {
+        return literal(name).executes(cmd(inventory));
     }
 }

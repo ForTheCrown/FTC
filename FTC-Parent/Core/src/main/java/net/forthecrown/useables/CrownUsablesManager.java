@@ -28,7 +28,7 @@ public class CrownUsablesManager implements UsablesManager {
     }
 
     @Override
-    public UsableBlock createSign(TileState l){
+    public UsableBlock createBlock(TileState l){
         l.getPersistentDataContainer().set(USABLE_KEY, PersistentDataType.BYTE, (byte) 1);
         l.update();
 

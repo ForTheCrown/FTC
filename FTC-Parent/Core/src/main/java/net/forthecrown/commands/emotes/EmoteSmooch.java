@@ -24,7 +24,7 @@ public class EmoteSmooch extends CommandEmote {
     }
 
     @Override
-    protected int execute(CrownUser sender, CrownUser recipient) {
+    public int execute(CrownUser sender, CrownUser recipient) {
         Location loc = sender.getLocation();
 
         sender.sendMessage(
@@ -64,7 +64,7 @@ public class EmoteSmooch extends CommandEmote {
     }
 
     @Override
-    protected int executeSelf(CrownUser user) {
+    public int executeSelf(CrownUser user) {
         Location loc = user.getPlayer().getLocation();
         user.sendMessage(
                 Component.text()

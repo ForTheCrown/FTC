@@ -5,7 +5,7 @@ import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.utils.RoyalUtils;
+import net.forthecrown.utils.DungeonUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -35,12 +35,12 @@ public class HideySpidey extends DungeonBoss<Spider> {
     public HideySpidey() {
         super("Hidey Spidey", new Location(Worlds.VOID, -78.5, 55, 284.5), (short) 20, DungeonAreas.SPIDEY_ROOM,
                 Arrays.asList(
-                        RoyalUtils.makeDungeonItem(Material.SPIDER_EYE, 45, (Component) null),
-                        RoyalUtils.makeDungeonItem(Material.FERMENTED_SPIDER_EYE, 20, (Component) null),
-                        RoyalUtils.makeDungeonItem(Material.STRING, 30, (Component) null),
+                        DungeonUtils.makeDungeonItem(Material.SPIDER_EYE, 45, (Component) null),
+                        DungeonUtils.makeDungeonItem(Material.FERMENTED_SPIDER_EYE, 20, (Component) null),
+                        DungeonUtils.makeDungeonItem(Material.STRING, 30, (Component) null),
                         new ItemStackBuilder(Material.TIPPED_ARROW, 5)
                                 .setBaseEffect(new PotionData(PotionType.POISON))
-                                .addLore(RoyalUtils.DUNGEON_LORE)
+                                .addLore(DungeonUtils.DUNGEON_LORE)
                                 .build()
                 )
         );
@@ -77,7 +77,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
     @Override
     protected void onUpdate() {
         for (CaveSpider s: helpers){
-            Player nearest = RoyalUtils.getNearestVisiblePlayer(s.getLocation(), getBossRoom());
+            Player nearest = DungeonUtils.getNearestVisiblePlayer(s.getLocation(), getBossRoom());
             if(s.getTarget() != null && s.getTarget().equals(nearest)) continue;
             s.setTarget(nearest);
         }

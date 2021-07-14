@@ -17,7 +17,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.squire.enchantment.RoyalEnchant;
-import net.forthecrown.utils.RoyalUtils;
+import net.forthecrown.utils.DungeonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
@@ -57,12 +57,12 @@ public class CommandRoyals extends FtcCommand {
                 .then(literal("spawndummy")
                         .executes(c -> {
                             Player player = getPlayerSender(c);
-                            RoyalUtils.spawnDummy(player.getLocation());
+                            DungeonUtils.spawnDummy(player.getLocation());
                             return 0;
                         })
                         .then(argument("location", PositionArgument.position())
                                 .executes(c -> {
-                                    RoyalUtils.spawnDummy(PositionArgument.getLocation(c, "location"));
+                                    DungeonUtils.spawnDummy(PositionArgument.getLocation(c, "location"));
                                     return 0;
                                 })
                         )
@@ -96,7 +96,7 @@ public class CommandRoyals extends FtcCommand {
                                     ItemMeta meta = item.getItemMeta();
 
                                     List<Component> lore = meta.lore() == null ? new ArrayList<>() : meta.lore();
-                                    lore.set(0, RoyalUtils.DUNGEON_LORE);
+                                    lore.set(0, DungeonUtils.DUNGEON_LORE);
 
                                     if(meta.displayName() != null){
                                         Component name = meta.displayName();

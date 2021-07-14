@@ -32,17 +32,17 @@ public abstract class CosmeticConstants {
 
     public static InventoryBuilder baseInventory(int size, Component title, boolean goBack){
         InventoryBuilder builder = new InventoryBuilder(size, title)
-                .addOption(new InventoryBorder());
+                .add(new InventoryBorder());
 
-        if(goBack) builder.addOption(GO_BACK);
+        if(goBack) builder.add(GO_BACK);
 
         return builder;
     }
 
     public static final BuiltInventory MAIN = baseInventory(54, Component.text("Cosmetics"), false)
-            .addOption(RIDING_TOGGLE)
-            .addOption(HEADER)
-            .addOption(20,
+            .add(RIDING_TOGGLE)
+            .add(HEADER)
+            .add(20,
                     new ItemStackBuilder(Material.BOW)
                             .setName(Component.text("Arrow Particle Trails").style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
                             .addLore(Component.empty())
@@ -51,7 +51,7 @@ public abstract class CosmeticConstants {
                             .build(),
                     (user, context) -> ArrowEffects.getInventory().open(user)
             )
-            .addOption(22,
+            .add(22,
                     new ItemStackBuilder(Material.TOTEM_OF_UNDYING)
                             .setName(Component.text("Emotes").style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
                             .addLore(Component.empty())
@@ -60,7 +60,7 @@ public abstract class CosmeticConstants {
                             .build(),
                     (user, context) -> CosmeticEmotes.getInventory().open(user)
             )
-            .addOption(24,
+            .add(24,
                     new ItemStackBuilder(Material.SKELETON_SKULL)
                             .setName(Component.text("Death Particles").style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
                             .addLore(Component.empty())

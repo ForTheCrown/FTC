@@ -1,5 +1,8 @@
 package net.forthecrown.core.admin;
 
+/**
+ * Represents the mute status of someone
+ */
 public enum MuteStatus {
     SOFT ("(Softmuted) ", false),
     HARD ("(Muted) ", false),

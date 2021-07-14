@@ -3,7 +3,7 @@ package net.forthecrown.useables;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.utils.CrownUtils;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import org.bukkit.Location;
 import org.bukkit.block.TileState;
@@ -12,7 +12,7 @@ public class CrownUsableBlock extends AbstractUsable implements UsableBlock {
     private final Location location;
 
     public CrownUsableBlock(Location location, boolean create){
-        super(CrownUtils.locationToFilename(location), "signs", !create);
+        super(FtcUtils.locationToFilename(location), "signs", !create);
         this.location = location;
 
         if(!fileExists && !create) throw new IllegalStateException(fileName + " doesn't exist");
@@ -46,7 +46,7 @@ public class CrownUsableBlock extends AbstractUsable implements UsableBlock {
     }
 
     @Override
-    public TileState getSign() {
+    public TileState getBlock() {
         return (TileState) location.getBlock().getState();
     }
 
@@ -55,7 +55,7 @@ public class CrownUsableBlock extends AbstractUsable implements UsableBlock {
         deleteFile();
 
         CrownCore.getUsablesManager().removeBlock(this);
-        TileState sign = getSign();
+        TileState sign = getBlock();
         sign.getPersistentDataContainer().remove(UsablesManager.USABLE_KEY);
         sign.update();
     }

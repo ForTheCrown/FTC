@@ -40,7 +40,7 @@ public class EmoteJingle extends CommandEmote {
      */
 
     @Override
-    protected int execute(CrownUser sender, CrownUser recipient) {
+    public int execute(CrownUser sender, CrownUser recipient) {
         sender.sendMessage(
                 Component.text("You've sent ")
                         .append(recipient.nickDisplayName().color(NamedTextColor.YELLOW))
@@ -62,7 +62,7 @@ public class EmoteJingle extends CommandEmote {
     }
 
     @Override
-    protected int executeSelf(CrownUser user) {
+    public int executeSelf(CrownUser user) {
         Cooldown.add(user, cooldownCategory, cooldownTime);
         jingle(user);
         return 0;
