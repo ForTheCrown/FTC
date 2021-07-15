@@ -5,7 +5,7 @@
  * Maybe this should change :shrug: idk lol
  * </p>
  * <p></p>
- * You can create them with the ComVars class's method set(String name, ComVarType<T> type, T value){
+ * You can create them with the ComVars class's method set(String name, ComVarType&lt;T&gt; type, T value){
  * Where T can be any type that you've specified a ComVarType for
  */
 package net.forthecrown.comvars;

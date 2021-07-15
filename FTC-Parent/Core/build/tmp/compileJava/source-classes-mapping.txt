@@ -183,6 +183,8 @@ net/forthecrown/utils/InteractionUtils.java
 net/forthecrown/dungeons/usables/ActionSpawnBoss.java
  net.forthecrown.dungeons.usables.ActionSpawnBoss
  net.forthecrown.dungeons.usables.ActionSpawnBoss$ActionInstance
+net/forthecrown/valhalla/data/ChestGroup.java
+ net.forthecrown.valhalla.data.ChestGroup
 net/forthecrown/crownevents/CrownEventUtils.java
  net.forthecrown.crownevents.CrownEventUtils
 net/forthecrown/inventory/builder/BuiltInventory.java
@@ -252,11 +254,15 @@ net/forthecrown/cosmetics/deaths/DeathEffects.java
 net/forthecrown/useables/preconditions/CheckCooldownType.java
  net.forthecrown.useables.preconditions.CheckCooldownType
  net.forthecrown.useables.preconditions.CheckCooldownType$CheckInstance
+net/forthecrown/valhalla/ValhallaEngine.java
+ net.forthecrown.valhalla.ValhallaEngine
 net/forthecrown/useables/actions/ActionTeleport.java
  net.forthecrown.useables.actions.ActionTeleport
  net.forthecrown.useables.actions.ActionTeleport$ActionInstance
 net/forthecrown/cosmetics/PlayerRidingManager.java
  net.forthecrown.cosmetics.PlayerRidingManager
+net/forthecrown/valhalla/data/LootData.java
+ net.forthecrown.valhalla.data.LootData
 net/forthecrown/utils/JsonUtils.java
  net.forthecrown.utils.JsonUtils
 net/forthecrown/events/dynamic/BmSellItemListener.java
@@ -292,6 +298,8 @@ net/forthecrown/user/enums/Pet.java
  net.forthecrown.user.enums.Pet
 net/forthecrown/user/UserManager.java
  net.forthecrown.user.UserManager
+net/forthecrown/valhalla/RaidGenerator.java
+ net.forthecrown.valhalla.RaidGenerator
 net/forthecrown/core/nbt/NBT.java
  net.forthecrown.core.nbt.NBT
 net/forthecrown/utils/BlackMarketUtils.java
@@ -329,6 +337,8 @@ net/forthecrown/pirates/Pirates.java
  net.forthecrown.pirates.Pirates
 net/forthecrown/commands/CommandSkull.java
  net.forthecrown.commands.CommandSkull
+net/forthecrown/valhalla/data/RaidData.java
+ net.forthecrown.valhalla.data.RaidData
 net/forthecrown/economy/selling/PreviousPageOption.java
  net.forthecrown.economy.selling.PreviousPageOption
 net/forthecrown/serializer/Deletable.java
@@ -467,6 +477,8 @@ net/forthecrown/commands/emotes/EmotePog.java
  net.forthecrown.commands.emotes.EmotePog
 net/forthecrown/cosmetics/arrows/ArrowEffects.java
  net.forthecrown.cosmetics.arrows.ArrowEffects
+net/forthecrown/valhalla/RaidSerializer.java
+ net.forthecrown.valhalla.RaidSerializer
 net/forthecrown/commands/arguments/PetType.java
  net.forthecrown.commands.arguments.PetType
 net/forthecrown/commands/help/HelpDiscord.java
@@ -817,6 +829,8 @@ net/forthecrown/commands/CommandMakeAward.java
  net.forthecrown.commands.CommandMakeAward
 net/forthecrown/commands/help/HelpSpawn.java
  net.forthecrown.commands.help.HelpSpawn
+net/forthecrown/valhalla/RaidGenerationContext.java
+ net.forthecrown.valhalla.RaidGenerationContext
 net/forthecrown/cosmetics/PlayerRider.java
  net.forthecrown.cosmetics.PlayerRider
 net/forthecrown/serializer/AbstractNbtSerializer.java
@@ -878,6 +892,8 @@ net/forthecrown/inventory/CrownWeapons.java
  net.forthecrown.inventory.CrownWeapons$Weapon
 net/forthecrown/commands/arguments/HomeParseResult.java
  net.forthecrown.commands.arguments.HomeParseResult
+net/forthecrown/valhalla/VikingRaidSerializer.java
+ net.forthecrown.valhalla.VikingRaidSerializer
 net/forthecrown/serializer/UserSerializer.java
  net.forthecrown.serializer.UserSerializer
 net/forthecrown/user/FtcUserHomes.java
@@ -922,6 +938,8 @@ net/forthecrown/commands/punishments/CommandPunishment.java
  net.forthecrown.commands.punishments.CommandPunishment
 net/forthecrown/commands/clickevent/ClickEventManager.java
  net.forthecrown.commands.clickevent.ClickEventManager
+net/forthecrown/valhalla/data/VikingRaid.java
+ net.forthecrown.valhalla.data.VikingRaid
 net/forthecrown/commands/arguments/AuctionArgType.java
  net.forthecrown.commands.arguments.AuctionArgType
 net/forthecrown/commands/CommandWild.java
@@ -937,8 +955,6 @@ net/forthecrown/user/FtcUserDataContainer.java
 net/forthecrown/commands/CommandLore.java
  net.forthecrown.commands.CommandLore
  net.forthecrown.commands.CommandLore$ComponentCommand
-net/forthecrown/commands/arguments/KeyType.java
- net.forthecrown.commands.arguments.KeyType
 net/forthecrown/user/data/SoldMaterialData.java
  net.forthecrown.user.data.SoldMaterialData
 net/forthecrown/utils/SilentPredicate.java

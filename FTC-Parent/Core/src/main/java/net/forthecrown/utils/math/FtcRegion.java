@@ -162,7 +162,7 @@ public class FtcRegion extends BoundingBox implements Iterable<Block> {
     @Override
     public String toString() {
         return getClass().getSimpleName() + '{' +
-                "world=" + world +
+                "world=" + world.getName() +
                 ",minX=" + getMinX() +
                 ",minY=" + getMinY() +
                 ",minZ=" + getMinZ() +

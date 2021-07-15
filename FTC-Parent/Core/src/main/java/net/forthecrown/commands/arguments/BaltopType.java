@@ -30,7 +30,7 @@ public class BaltopType implements ArgumentType<Integer> {
         int read = reader.readInt();
 
         if(read > 0) read--;
-        if(read > MAX) throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.integerTooHigh().createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), read, MAX);
+        if(read > MAX) throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.integerTooHigh().createWithContext(GrenadierUtils.correctReader(reader, cursor), read, MAX);
 
         return read;
     }

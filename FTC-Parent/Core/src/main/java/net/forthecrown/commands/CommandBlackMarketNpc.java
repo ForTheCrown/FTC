@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.commands.arguments.KeyType;
+import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -36,7 +36,7 @@ public class CommandBlackMarketNpc extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("target", EntityArgument.entity())
-                        .then(argument("key", KeyType.key("ftccore"))
+                        .then(argument("key", CoreCommands.ftcKeyType())
                                 .suggests((c, b) -> CompletionProvider.suggestKeys(b, Pirates.getPirateEconomy().getNpcRegistry().keySet()))
 
                                 .executes(c -> {

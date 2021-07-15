@@ -152,7 +152,7 @@ public class UserJsonSerializer implements UserSerializer {
         user.ranks.clear();
         user.ranks.add(Rank.DEFAULT);
         if(json.has("ranks")){
-            List<Rank> ranks = ListUtils.fromIterable(json.getAsJsonArray("ranks"), e -> JsonUtils.readEnum(Rank.class, e));
+            List<Rank> ranks = ListUtils.fromIterable(json.getArray("ranks"), e -> JsonUtils.readEnum(Rank.class, e));
             user.ranks.addAll(ranks);
         }
 
@@ -212,7 +212,7 @@ public class UserJsonSerializer implements UserSerializer {
         //Material data
         user.matData.clear();
         if(json.has("soldData")){
-            JsonObject soldData = json.getAsJsonObject("soldData");
+            JsonObject soldData = json.getObject("soldData");
 
             for (Map.Entry<String, JsonElement> e: soldData.entrySet()){
                 Material material = Material.valueOf(e.getKey().toUpperCase());

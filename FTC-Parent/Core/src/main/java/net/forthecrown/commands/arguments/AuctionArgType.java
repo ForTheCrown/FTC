@@ -34,7 +34,7 @@ public class AuctionArgType implements ArgumentType<Auction> {
         String name = reader.readUnquotedString();
 
         Auction auction = AuctionManager.getAuction(name);
-        if(auction == null) throw UNKNOWN_AUCTION.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), name);
+        if(auction == null) throw UNKNOWN_AUCTION.createWithContext(GrenadierUtils.correctReader(reader, cursor), name);
 
         return auction;
     }

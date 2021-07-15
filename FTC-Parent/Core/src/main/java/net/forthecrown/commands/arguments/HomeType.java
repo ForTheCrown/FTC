@@ -7,13 +7,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
+import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
-import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,7 +22,7 @@ import org.bukkit.entity.Player;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static net.forthecrown.royalgrenadier.GrenadierUtils.correctCursorReader;
+import static net.forthecrown.royalgrenadier.GrenadierUtils.correctReader;
 
 public class HomeType implements ArgumentType<HomeParseResult> {
     private static final HomeType HOME = new HomeType();
@@ -49,12 +49,12 @@ public class HomeType implements ArgumentType<HomeParseResult> {
             String homeName = reader.readUnquotedString();
 
             UUID id = FtcUtils.uuidFromName(name);
-            if(id == null) throw UserType.UNKNOWN_USER.createWithContext(correctCursorReader(reader, cursor), Component.text(name));
+            if(id == null) throw UserType.UNKNOWN_USER.createWithContext(correctReader(reader, cursor), Component.text(name));
 
-            return new HomeParseResult(correctCursorReader(reader, cursor), id, homeName);
+            return new HomeParseResult(correctReader(reader, cursor), id, homeName);
         }
 
-        return new HomeParseResult(correctCursorReader(reader, cursor), name);
+        return new HomeParseResult(correctReader(reader, cursor), name);
     }
 
     @Override

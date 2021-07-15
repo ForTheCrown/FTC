@@ -10,6 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.types.KeyArgument;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
 
@@ -20,7 +21,7 @@ public class DungeonBossArgument implements ArgumentType<DungeonBoss<?>> {
     public static final DungeonBossArgument BOSS = new DungeonBossArgument();
 
     public static DynamicCommandExceptionType UNKNOWN_BOSS = new DynamicCommandExceptionType(o -> () -> "Unknown boss: " + o);
-    private final KeyType keyParser = KeyType.key("royals");
+    private final KeyArgument keyParser = KeyArgument.key("royals");
 
     public static DungeonBossArgument boss(){
         return BOSS;

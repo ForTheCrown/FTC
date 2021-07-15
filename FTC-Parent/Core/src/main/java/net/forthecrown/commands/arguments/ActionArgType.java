@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
@@ -39,12 +40,12 @@ public class ActionArgType implements ArgumentType<Key> {
     @Override
     public Key parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
-        Key key = KeyType.ftc().parse(reader); //parse the key
+        Key key = CoreCommands.ftcKeyType().parse(reader); //parse the key
 
         try {
             Registries.USAGE_ACTIONS.get(key).key(); //Couldn't be arsed doing a if blabla == null thing here, so this shit it is lol
         } catch (NullPointerException e){
-            throw UNKNOWN_ACTION.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), key.asString());
+            throw UNKNOWN_ACTION.createWithContext(GrenadierUtils.correctReader(reader, cursor), key.asString());
         } //GrenadierUtils.correctCursorReader returns a reader that's been moved back to the correct position to correctly highlight things
 
         return key;

@@ -34,7 +34,7 @@ public class ComVarArgument implements ArgumentType<ComVar<?>> {
         String name = reader.readUnquotedString();
 
         ComVar<?> result = ComVarRegistry.getVar(name);
-        if(result == null) throw UNKNOWN_VAR.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), name);
+        if(result == null) throw UNKNOWN_VAR.createWithContext(GrenadierUtils.correctReader(reader, cursor), name);
 
         return result;
     }

@@ -147,6 +147,19 @@ public final class FtcUtils {
         player.getActivePotionEffects().forEach(e -> player.removePotionEffect(e.getType()));
     }
 
+    public static void safeRunnable(Runnable runnable){
+        try {
+            runnable.run();
+        } catch (Throwable e){
+            e.printStackTrace();
+        }
+    }
+
+    public static NamespacedKey toBukkit(Key key) {
+        if(key instanceof NamespacedKey) return (NamespacedKey) key;
+        return new NamespacedKey(key.namespace(), key.value());
+    }
+
     /*
      * The following RomanNumeral converters and code was made by Baeldung
      * Link: https://www.baeldung.com/java-convert-roman-arabic
@@ -205,14 +218,6 @@ public final class FtcUtils {
         }
 
         return prefix + sb.toString();
-    }
-
-    public static void safeRunnable(Runnable runnable){
-        try {
-            runnable.run();
-        } catch (Throwable e){
-            e.printStackTrace();
-        }
     }
 
     public enum RomanNumeral {

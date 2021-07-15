@@ -25,7 +25,7 @@ public class CommandHelpType implements ArgumentType<Integer> {
         int page = reader.readInt();
 
         if(page > 0) page--;
-        if(page > MAX) throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.integerTooHigh().createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), page, MAX);
+        if(page > MAX) throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.integerTooHigh().createWithContext(GrenadierUtils.correctReader(reader, cursor), page, MAX);
 
         return page;
     }

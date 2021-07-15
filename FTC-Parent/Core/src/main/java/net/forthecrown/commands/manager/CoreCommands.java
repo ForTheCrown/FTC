@@ -13,6 +13,7 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.RoyalArguments;
 import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.grenadier.types.EnumArgument;
+import net.forthecrown.grenadier.types.KeyArgument;
 import net.forthecrown.royalgrenadier.arguments.RoyalArgumentsImpl;
 import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.enums.Rank;
@@ -33,6 +34,7 @@ public final class CoreCommands {
     public static final Map<String, FtcCommand> BY_NAME = new HashMap<>();
     public static final EnumArgument<Branch> BRANCH = EnumArgument.of(Branch.class);
     public static final EnumArgument<Rank> RANK = EnumArgument.of(Rank.class);
+    public static final KeyArgument FTC_KEY_PARSER = KeyArgument.key(CrownCore.inst());
 
     private static Commands dispatcher;
 
@@ -216,6 +218,10 @@ public final class CoreCommands {
         new HelpHelp();
 
         CrownCore.logger().log(Level.INFO, "Commands loaded");
+    }
+
+    public static KeyArgument ftcKeyType() {
+        return FTC_KEY_PARSER;
     }
 
     /**

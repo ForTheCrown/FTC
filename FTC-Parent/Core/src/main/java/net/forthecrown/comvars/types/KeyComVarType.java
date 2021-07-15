@@ -5,7 +5,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.arguments.KeyType;
+import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.FtcUtils;
@@ -23,7 +23,7 @@ public class KeyComVarType implements ComVarType<Key> {
 
     @Override
     public Key parse(StringReader input) throws CommandSyntaxException {
-        return KeyType.ftc().parse(input);
+        return CoreCommands.ftcKeyType().parse(input);
     }
 
     @Override

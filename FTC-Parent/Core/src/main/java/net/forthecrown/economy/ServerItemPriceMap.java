@@ -62,6 +62,7 @@ public class ServerItemPriceMap extends AbstractJsonSerializer implements ItemPr
         def(IRON_INGOT, 5);
         def(GOLD_INGOT, 7);
         def(NETHERITE_INGOT, 8000);
+        def(AMETHYST_SHARD, 8);
 
         //Mining
         def(STONE, 2);
@@ -99,9 +100,9 @@ public class ServerItemPriceMap extends AbstractJsonSerializer implements ItemPr
         def(BAMBOO, 2);
         def(KELP, 2);
         def(CACTUS, 2);
-        def(MELON, 4);
+        def(MELON, 8);
         def(VINE, 10);
-        def(SUGAR_CANE, 2);
+        def(SUGAR_CANE, 3);
         def(POTATO, 4);
         def(WHEAT, 7);
         def(CARROT, 4);

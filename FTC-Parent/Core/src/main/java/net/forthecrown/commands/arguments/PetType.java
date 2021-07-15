@@ -50,7 +50,7 @@ public class PetType implements ArgumentType<Pet> {
         try {
             pet = Pet.valueOf(name.toUpperCase());
         } catch (IllegalArgumentException e){
-            throw UNKOWN_PET.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), name);
+            throw UNKOWN_PET.createWithContext(GrenadierUtils.correctReader(reader, cursor), name);
         }
 
         return pet;

@@ -81,7 +81,7 @@ public class UserType implements ArgumentType<UserParseResult> {
         String name = reader.readUnquotedString();
         UUID id = FtcUtils.uuidFromName(name);
 
-        if(id == null) throw UNKNOWN_USER.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), Component.text(name));
+        if(id == null) throw UNKNOWN_USER.createWithContext(GrenadierUtils.correctReader(reader, cursor), Component.text(name));
 
         CrownUser result = UserManager.getUser(id);
         if(!result.isOnline() && !allowOffline){

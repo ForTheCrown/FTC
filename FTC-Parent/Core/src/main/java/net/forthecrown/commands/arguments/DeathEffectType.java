@@ -6,8 +6,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.cosmetics.deaths.AbstractDeathEffect;
 import net.forthecrown.grenadier.exceptions.MutableCommandExceptionType;
+import net.forthecrown.grenadier.types.KeyArgument;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
@@ -27,7 +29,7 @@ public class DeathEffectType implements ArgumentType<AbstractDeathEffect> {
                     .build()
     );
 
-    private final KeyType keyType = KeyType.ftc();
+    private final KeyArgument keyType = CoreCommands.ftcKeyType();
 
     public static DeathEffectType deathEffect(){
         return INSTANCE;
@@ -39,7 +41,7 @@ public class DeathEffectType implements ArgumentType<AbstractDeathEffect> {
         Key key = keyType.parse(reader);
 
         AbstractDeathEffect effect = Registries.DEATH_EFFECTS.get(key);
-        if(effect == null) throw UNKNOWN_EFFECT.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), key);
+        if(effect == null) throw UNKNOWN_EFFECT.createWithContext(GrenadierUtils.correctReader(reader, cursor), key);
 
         return effect;
     }

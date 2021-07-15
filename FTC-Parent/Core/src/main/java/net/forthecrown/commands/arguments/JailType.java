@@ -37,7 +37,7 @@ public class JailType implements ArgumentType<Key> {
         Key key = FtcUtils.parseKey(reader);
 
         if(!CrownCore.getJailManager().contains(key)){
-            throw UNKNOWN_JAIL.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), key.asString());
+            throw UNKNOWN_JAIL.createWithContext(GrenadierUtils.correctReader(reader, cursor), key.asString());
         }
 
         return key;

@@ -29,7 +29,7 @@ public class RoyalEnchantType implements ArgumentType<RoyalEnchant> {
             case "aim", "strong_aim" -> RoyalEnchants.strongAim();
             case "crit", "poison_crit" -> RoyalEnchants.poisonCrit();
             case "block", "healing_block" -> RoyalEnchants.healingBlock();
-            default -> throw EnchantArgumentImpl.UNKNOWN_ENCHANTMENT.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), Component.text(name));
+            default -> throw EnchantArgumentImpl.UNKNOWN_ENCHANTMENT.createWithContext(GrenadierUtils.correctReader(reader, cursor), Component.text(name));
         };
     }
 

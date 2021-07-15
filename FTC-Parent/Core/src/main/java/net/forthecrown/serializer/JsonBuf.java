@@ -116,7 +116,7 @@ public class JsonBuf {
 
         Collection<T> list = new ArrayList<>();
 
-        JsonArray array = getAsJsonArray(name);
+        JsonArray array = getArray(name);
         array.forEach(e -> list.add(func.apply(e)));
         
         return list;
@@ -210,7 +210,7 @@ public class JsonBuf {
 
     public JsonBuf getBuf(String name){
         if(missingOrNull(name)) return null;
-        return of(getAsJsonObject(name));
+        return of(getObject(name));
     }
 
     public void add(String name, JsonBuf buf){
@@ -242,7 +242,7 @@ public class JsonBuf {
     public <K, V> Map<K, V> getMap(String name, Function<String, K> keyFunc, Function<JsonElement, V> valueFunc){
         if(missingOrNull(name)) return null;
 
-        JsonObject json = getAsJsonObject(name);
+        JsonObject json = getObject(name);
         Map<K, V> result = new HashMap<>();
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
@@ -294,15 +294,15 @@ public class JsonBuf {
         return json.get(memberName);
     }
 
-    public JsonPrimitive getAsJsonPrimitive(String memberName) {
+    public JsonPrimitive getPrimitive(String memberName) {
         return json.getAsJsonPrimitive(memberName);
     }
 
-    public JsonArray getAsJsonArray(String memberName) {
+    public JsonArray getArray(String memberName) {
         return json.getAsJsonArray(memberName);
     }
 
-    public JsonObject getAsJsonObject(String memberName) {
+    public JsonObject getObject(String memberName) {
         return json.getAsJsonObject(memberName);
     }
 

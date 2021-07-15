@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
@@ -33,12 +34,12 @@ public class CheckArgType implements ArgumentType<Key> {
     @Override
     public Key parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
-        Key key = KeyType.ftc().parse(reader);
+        Key key = CoreCommands.ftcKeyType().parse(reader);
 
         try {
             Registries.USAGE_CHECKS.get(key).key();
         } catch (NullPointerException e){
-            throw UNKNOWN_PRECONDITION.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), key.asString());
+            throw UNKNOWN_PRECONDITION.createWithContext(GrenadierUtils.correctReader(reader, cursor), key.asString());
         }
 
         return key;

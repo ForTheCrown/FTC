@@ -6,8 +6,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.grenadier.exceptions.MutableCommandExceptionType;
+import net.forthecrown.grenadier.types.KeyArgument;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
@@ -33,7 +35,7 @@ public class ArrowEffectType implements ArgumentType<ArrowEffect> {
     );
 
     //Key type to use to parse
-    private final KeyType keyType = KeyType.ftc();
+    private final KeyArgument keyType = CoreCommands.ftcKeyType();
 
     //Static instance getter, looks nicer than using the variable itself
     public static ArrowEffectType arrowEffect(){
@@ -46,7 +48,7 @@ public class ArrowEffectType implements ArgumentType<ArrowEffect> {
         Key key = keyType.parse(reader);
 
         ArrowEffect effect = Registries.ARROW_EFFECTS.get(key);
-        if(effect == null) throw UNKNOWN_EFFECT.createWithContext(GrenadierUtils.correctCursorReader(reader, cursor), key);
+        if(effect == null) throw UNKNOWN_EFFECT.createWithContext(GrenadierUtils.correctReader(reader, cursor), key);
 
         return effect;
     }
