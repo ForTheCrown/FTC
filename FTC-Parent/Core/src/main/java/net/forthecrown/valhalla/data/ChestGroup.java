@@ -31,6 +31,10 @@ public class ChestGroup implements Keyed {
         return maxChests;
     }
 
+    public byte getMax() {
+        return (byte) Math.min(possibleLocations.size(), maxChests);
+    }
+
     public void setMaxChests(byte maxChests) {
         this.maxChests = maxChests;
     }

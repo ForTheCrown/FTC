@@ -27,6 +27,7 @@ import net.forthecrown.useables.actions.UsageActions;
 import net.forthecrown.useables.preconditions.UsageChecks;
 import net.forthecrown.user.CrownUserManager;
 import net.forthecrown.utils.Worlds;
+import net.forthecrown.valhalla.ValhallaEngine;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Bukkit;
@@ -110,6 +111,8 @@ public final class Main extends JavaPlugin implements CrownCore {
         safeRunnable(Pirates::init);
         safeRunnable(Bosses::init);
         safeRunnable(Cosmetics::init);
+
+        if(CrownCore.inDebugMode()) safeRunnable(ValhallaEngine::init);
 
         safeRunnable(UsageChecks::init);
         safeRunnable(UsageActions::init);

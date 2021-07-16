@@ -172,10 +172,11 @@ public interface UserManager extends CrownSerializer {
     void removeEntry(UUID alt);
 
     //Gets all the currently online NMS players
-    private static List<ServerPlayer> getServerPlayers() {
+    private static List<ServerPlayer> getSpectators() {
         List<ServerPlayer> list = new ArrayList<>();
 
         for (Player p: Bukkit.getOnlinePlayers()){
+            if(p.getGameMode() != GameMode.SPECTATOR) continue;
             list.add(((CraftPlayer) p).getHandle());
         }
 
@@ -186,7 +187,7 @@ public interface UserManager extends CrownSerializer {
      * Updates spectators so no one knows who's a spectator
      */
     static void updateSpectatorTab(){
-        ClientboundPlayerInfoPacket packet = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.UPDATE_GAME_MODE, getServerPlayers());
+        ClientboundPlayerInfoPacket packet = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.UPDATE_GAME_MODE, getSpectators());
         ListIterator<ClientboundPlayerInfoPacket.PlayerUpdate> iterator = packet.getEntries().listIterator();
 
         while(iterator.hasNext()){

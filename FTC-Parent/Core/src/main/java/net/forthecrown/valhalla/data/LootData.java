@@ -8,15 +8,13 @@ import net.forthecrown.utils.math.BlockPos;
 import net.forthecrown.valhalla.RaidGenerationContext;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
-import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 
 import java.util.List;
 import java.util.Map;
+
+import static net.forthecrown.valhalla.RaidUtil.applyLootTable;
 
 public class LootData implements RaidData {
 
@@ -35,30 +33,26 @@ public class LootData implements RaidData {
     public void generate(RaidGenerationContext context) {
         World world = context.getWorld();
         CrownRandom random = context.getRandom();
+        float mod = context.getDifficulty().getModifier();
 
-        for (Map.Entry<BlockPos, Key> e: definiteSpawns.entrySet()) {
-            BlockPos pos = e.getKey();
-            LootTable table = Bukkit.getLootTable(FtcUtils.toBukkit(e.getValue()));
+        if(hasDefiniteSpawns()) {
+            for (Map.Entry<BlockPos, Key> e: definiteSpawns.entrySet()) {
+                BlockPos pos = e.getKey();
+                LootTable table = Bukkit.getLootTable(FtcUtils.keyToBukkit(e.getValue()));
 
-            if(table == null) {
-                CrownCore.logger().warning("Found key pointing to null loot table in definite chests: " + e.getValue().asString());
-                continue;
+                if(table == null) {
+                    CrownCore.logger().warning("Found key pointing to null loot table in definite chests: " + e.getValue().asString());
+                    continue;
+                }
+
+                applyLootTable(pos, world, table, random, mod);
             }
-
-            Block block = pos.getBlock(world);
-            block.setType(Material.CHEST);
-
-            Chest chest = (Chest) block.getState();
-            chest.setLootTable(table);
-            table.fillInventory(
-                    chest.getBlockInventory(),
-                    random,
-                    new LootContext.Builder(chest.getLocation()).build()
-            );
         }
 
+        if(!hasChestGroups()) return;
+
         for (ChestGroup g: chestGroups.values()) {
-            LootTable loot = Bukkit.getLootTable(FtcUtils.toBukkit(g.getLootTableKey()));
+            LootTable loot = Bukkit.getLootTable(FtcUtils.keyToBukkit(g.getLootTableKey()));
 
             if(loot == null) {
                 CrownCore.logger().warning("Found key pointing to null loot table in chest group: " + g.getLootTableKey().asString());
@@ -68,22 +62,10 @@ public class LootData implements RaidData {
 
             List<BlockPos> chosenPositions = random.pickRandomEntries(
                     g.getPossibleLocations(),
-                    random.intInRange(1, g.getMaxChests())
+                    random.intInRange(1, g.getMax())
             );
 
-            for (BlockPos pos: chosenPositions) {
-                Block block = pos.getBlock(world);
-                block.setType(Material.CHEST);
-
-                Chest chest = (Chest) block.getState();
-
-                chest.setLootTable(loot);
-                loot.fillInventory(
-                        chest.getBlockInventory(),
-                        random,
-                        new LootContext.Builder(chest.getLocation()).build()
-                );
-            }
+            for (BlockPos pos: chosenPositions) applyLootTable(pos, world, loot, random, mod);
         }
     }
 
@@ -99,12 +81,16 @@ public class LootData implements RaidData {
         this.definiteSpawns = definiteSpawns;
     }
 
-    public void addChest(BlockPos pos, Key lootTable) {
+    public void setChest(BlockPos pos, Key lootTable) {
         definiteSpawns.put(pos, lootTable);
     }
 
     public void removeChest(BlockPos pos) {
         definiteSpawns.remove(pos);
+    }
+
+    public Key getLootTable(BlockPos pos) {
+        return definiteSpawns.get(pos);
     }
 
     public boolean hasChestGroups() {
@@ -117,6 +103,10 @@ public class LootData implements RaidData {
 
     public void removeGroup(ChestGroup group) {
         chestGroups.remove(group.key());
+    }
+
+    public ChestGroup getChestGroup(Key key) {
+        return chestGroups.get(key);
     }
 
     public Map<Key, ChestGroup> getChestGroups() {

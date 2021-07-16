@@ -19,7 +19,6 @@ import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.enums.Rank;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -175,13 +174,15 @@ public class CommandProfile extends FtcCommand {
                 null :
                 Component.text(ListUtils.join(profile.interactions.separated, id -> UserManager.getUser(id).getName()));
 
+        Component ip = profile.ip == null ? null : Component.text(profile.ip);
+
         return Component.newline()
                 .append(Component.text("\nAdmin Info:").color(NamedTextColor.YELLOW))
                 .append(line(" Ranks", ListUtils.join(profile.getAvailableRanks(), r -> r.name().toLowerCase()), true))
 
                 .append(Component.newline())
                 .append(timeSinceOnlineOrOnlineTime(profile))
-                .append(line(" IP", profile.ip, !FtcUtils.isNullOrBlank(profile.ip)))
+                .append(line(" IP", ip, ip != null))
                 .append(line(" Ignored: ", ignored, ignored != null))
                 .append(line(" Separated", separated, separated != null))
 

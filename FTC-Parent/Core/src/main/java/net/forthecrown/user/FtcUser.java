@@ -149,9 +149,8 @@ public class FtcUser implements CrownUser {
 
     public void updateName(){
         if(isOnline() && name != null && !name.equals(getPlayer().getName())){ //transfers all scores to new player name if player name changes
-            previousNames.add(name);
-
             Scoreboard scoreboard = getPlayer().getScoreboard();
+
             for (Objective obj : scoreboard.getObjectives()){
                 if(!obj.getScore(name).isScoreSet()) continue;
 
@@ -679,11 +678,11 @@ public class FtcUser implements CrownUser {
     @Override
     public boolean onJoin(){
         this.handle = getOnlineHandle().getHandle();
-        this.name = getOnlineHandle().getName();
+        updateName();
 
         if(!name.equalsIgnoreCase(lastOnlineName)){
+            previousNames.add(lastOnlineName);
             lastOnlineName = name;
-            updateName();
             return true;
         }
 
@@ -772,6 +771,8 @@ public class FtcUser implements CrownUser {
         checkOnline();
         Component displayName = listDisplayName();
         getOnlineHandle().playerListName(displayName);
+
+        net.forthecrown.user.UserManager.updateSpectatorTab();
     }
 
     @Override

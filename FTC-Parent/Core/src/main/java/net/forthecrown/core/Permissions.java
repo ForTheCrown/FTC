@@ -30,6 +30,7 @@ public final class Permissions {
 
     public static final Permission STAFF_CHAT =         register("ftc.staffchat");
     public static final Permission CORE_ADMIN =         register("ftc.admin");
+    public static final Permission VIKING_ADMIN =       register("ftc.admin.vikings");
     public static final Permission GAMEMODES =          register("ftc.gamemodes");
     public static final Permission KING_MAKER =         register("ftc.kingmaker");
     public static final Permission IGNORE_CHAT_CASE =   register("ftc.chatcaseignore");

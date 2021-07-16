@@ -22,6 +22,10 @@ public class RaidType implements ArgumentType<VikingRaid> {
 
     public static final DynamicCommandExceptionType UNKNOWN_RAID = new DynamicCommandExceptionType(o -> () -> "Unknown raid: " + o.toString());
 
+    public static RaidType raid() {
+        return INSTANCE;
+    }
+
     @Override
     public VikingRaid parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();

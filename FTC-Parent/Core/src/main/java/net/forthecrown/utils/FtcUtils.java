@@ -155,7 +155,7 @@ public final class FtcUtils {
         }
     }
 
-    public static NamespacedKey toBukkit(Key key) {
+    public static NamespacedKey keyToBukkit(Key key) {
         if(key instanceof NamespacedKey) return (NamespacedKey) key;
         return new NamespacedKey(key.namespace(), key.value());
     }

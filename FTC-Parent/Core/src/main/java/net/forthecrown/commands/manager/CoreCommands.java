@@ -20,6 +20,7 @@ import net.forthecrown.user.enums.Rank;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.NbtTagArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.TimeArgument;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
@@ -48,6 +49,7 @@ public final class CoreCommands {
         //ArgumentType registration
         RoyalArgumentsImpl.register(NbtType.class, g -> NbtTagArgument.nbtTag(), true);
         RoyalArgumentsImpl.register(UserType.class, UserType::getHandle, false);
+        RoyalArgumentsImpl.register(TimeArgument.class, t -> t, true);
 
         RoyalArguments.register(BaltopType.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, BaltopType.MAX)));
         RoyalArguments.register(ComVarArgument.class, VanillaArgumentType.WORD);
@@ -100,6 +102,7 @@ public final class CoreCommands {
         new CommandMakeAward();
         new CommandBlackMarketNpc();
         new CommandTeleportExact();
+        new CommandTime();
         CommandSpecificGameMode.init();
 
         //Policing commands
