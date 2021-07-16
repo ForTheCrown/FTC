@@ -1,12 +1,10 @@
 package net.forthecrown.commands;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.suggestion.Suggestions;
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.ComponentArgument;
-import net.kyori.adventure.text.Component;
 
 public class CommandBroadcast extends FtcCommand {
 
@@ -39,19 +37,9 @@ public class CommandBroadcast extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("announcement", StringArgumentType.greedyString())
-                        .executes(context -> {
-                            CrownCore.getAnnouncer().announce(context.getArgument("announcement", String.class));
-                            return 0;
-                        })
-                )
-                .then(literal("-component")
-                        .then(argument("componentAnnouncement", ComponentArgument.component())
-                                .executes(c -> {
-                                    CrownCore.getAnnouncer().announce(c.getArgument("componentAnnouncement", Component.class));
-                                    return 0;
-                                })
-                             )
-                );
+                .then(CommandLore.compOrStringArg(literal("ac"), (c, b) -> Suggestions.empty(), ((context, lore) -> {
+                    CrownCore.getAnnouncer().announce(lore);
+                    return 0;
+                })));
     }
 }

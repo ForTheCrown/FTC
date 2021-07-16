@@ -2,11 +2,16 @@ package net.forthecrown.core.chat;
 
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.serializer.CrownSerializer;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 /**
@@ -38,6 +43,10 @@ public interface Announcer extends CrownSerializer {
      */
     void setAnnouncements(List<Component> announcements);
 
+    void add(Component announcement);
+
+    void remove(int acIndex);
+
     /**
      * Stops the AutoAnnouncer
      */
@@ -47,20 +56,6 @@ public interface Announcer extends CrownSerializer {
      * Starts the AutoAnnouncer
      */
     void start();
-
-    /**
-     * Announces a message to everyone, even the console and players in the senate world
-     * @param message the message to announce, hex colors are automatically translated
-     */
-    void announceToAll(String message);
-
-    void announceToAll(Component component);
-
-    /**
-     * Announces a message to every player, excluding senate world players and the console
-     * @param message the message to announce, hex colors are automatically translated
-     */
-    void announce(String message);
 
     /**
      * Broadcasts a message without formatting hex colors or emojis
@@ -81,24 +76,26 @@ public interface Announcer extends CrownSerializer {
         CrownCore.logger().log(level, message);
     }
 
-    void announce(Component message);
+    default void announce(Component message) { announceRaw(formatMessage(message), FtcUtils.alwaysAccept()); }
+    default void announce(Component message, Permission permission) { announce(message, permission.getName()); }
+    default void announce(Component message, String permission) { announceRaw(formatMessage(message), plr -> plr.hasPermission(permission)); }
 
-    void announce(Component message, String permission);
+    default void announceToAll(Component message) { announceToAllRaw(formatMessage(message), FtcUtils.alwaysAccept()); }
+    default void announceToAll(Component message, Permission perm) { announceToAll(message, perm.getName()); }
+    default void announceToAll(Component message, String permission) { announceToAllRaw(formatMessage(message), plr -> plr.hasPermission(permission)); }
 
-    void announceToAllRaw(Component message);
+    default void announceRaw(Component message) { announceRaw(message, FtcUtils.alwaysAccept()); }
+    default void announceRaw(Component message, Permission permission) { announce(message, permission.getName()); }
+    default void announceRaw(Component message, String permission) { announceRaw(message, plr -> plr.hasPermission(permission)); }
+
+    default void announceToAllRaw(Component message) { announceToAllRaw(message, FtcUtils.alwaysAccept()); }
+    default void announceToAllRaw(Component message, Permission perm) { announceToAll(message, perm.getName()); }
+    default void announceToAllRaw(Component message, String permission) { announceToAllRaw(message, plr -> plr.hasPermission(permission)); }
+
+    void announceRaw(Component announcement, @Nullable Predicate<Player> predicate);
+    void announceToAllRaw(Component announcement, @Nullable Predicate<CommandSender> predicate);
 
     Component formatMessage(Component message);
-
-    /**
-     *
-     * @param message
-     * @param permission
-     */
-    void announce(String message, @Nullable String permission);
-
-    void announceRaw(Component message);
-
-    void announceRaw(Component message, @Nullable String permission);
 
     /**
      * Logs or announces a debug message, won't broadcast if on actual server

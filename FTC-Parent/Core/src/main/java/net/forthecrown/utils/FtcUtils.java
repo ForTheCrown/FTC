@@ -19,6 +19,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.bukkit.Bukkit.getServer;
@@ -31,6 +32,10 @@ public final class FtcUtils {
 
     public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 200.5, 70, 1000.5);
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
+
+    public static <T> Predicate<T> alwaysAccept() {
+        return t -> true;
+    }
 
     public static int worldTimeToYears(World world){
         return (int) ((world.getFullTime()/1000)/24)/365;

@@ -12,6 +12,7 @@ import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Rank;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -19,12 +20,14 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class CrownBroadcaster extends AbstractJsonSerializer implements Announcer {
 
@@ -84,7 +87,8 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
                     if (player.ignoringBroadcasts()) continue;
 
                     player.sendMessage(broadcast);
-                    if (player.getWorld().getName().equalsIgnoreCase("world_resource")){
+
+                    if (player.getWorld().equals(Worlds.RESOURCE)){
                         player.sendMessage(Component.text("You're in the resource world! To get back to the normal survival world, do /warp portal.").color(NamedTextColor.GRAY));
                     }
                 }
@@ -117,6 +121,16 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
     }
 
     @Override
+    public void add(Component announcement) {
+        announcements.add(announcement);
+    }
+
+    @Override
+    public void remove(int acIndex) {
+        announcements.remove(acIndex);
+    }
+
+    @Override
     public void stop() {
         broadcaster.cancel();
     }
@@ -127,59 +141,22 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
         doBroadcasts();
     }
 
-    public boolean wasStopped(){
-        return broadcaster.isCancelled();
-    }
-
     @Override
-    public void announceToAll(String message) {
-        announceToAll(ChatUtils.convertString(message));
-    }
-
-    @Override
-    public void announceToAll(Component component){
-        announceToAllRaw(formatMessage(component));
-    }
-
-    @Override
-    public void announce(String message) {
-        announce(ChatUtils.convertString(message), null);
-    }
-
-    @Override
-    public void announce(Component message){
-        announce(message, null);
-    }
-
-    @Override
-    public void announce(Component message, String permission){
-        Component formatted = formatMessage(message);
-        announceRaw(formatted, permission);
-    }
-
-    @Override
-    public void announce(String message, @Nullable String permission) {
-        Component cMessage = ChatUtils.convertString(message, true);
-        announce(cMessage, permission);
-    }
-
-    @Override
-    public void announceRaw(Component message) {
-        announceRaw(message, null);
-    }
-
-    @Override
-    public void announceRaw(Component message, @Nullable String permission) {
-        for (Player p: Bukkit.getOnlinePlayers()){
-            if(permission != null && !p.hasPermission(permission)) continue;
-
-            p.sendMessage(message);
+    public void announceRaw(Component announcement, @Nullable Predicate<Player> predicate) {
+        for (Player p: Bukkit.getOnlinePlayers()) {
+            if(predicate != null && !predicate.test(p)) continue;
+            p.sendMessage(announcement);
         }
     }
 
     @Override
-    public void announceToAllRaw(Component message){
-        Bukkit.getServer().sendMessage(message);
+    public void announceToAllRaw(Component announcement, @Nullable Predicate<CommandSender> predicate) {
+        announceRaw(announcement, predicate == null ? FtcUtils.alwaysAccept() : predicate::test);
+        if(predicate == null || predicate.test(Bukkit.getConsoleSender())) Bukkit.getConsoleSender().sendMessage(announcement);
+    }
+
+    public boolean wasStopped(){
+        return broadcaster.isCancelled();
     }
 
     @Override
