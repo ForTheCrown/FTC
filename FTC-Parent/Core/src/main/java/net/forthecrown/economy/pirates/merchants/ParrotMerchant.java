@@ -10,7 +10,7 @@ import net.forthecrown.events.dynamic.BmParrotListener;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.enums.Pet;
-import net.forthecrown.utils.BlackMarketUtils;
+import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

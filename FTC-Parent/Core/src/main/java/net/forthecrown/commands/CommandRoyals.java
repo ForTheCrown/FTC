@@ -17,7 +17,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.squire.enchantment.RoyalEnchant;
-import net.forthecrown.utils.DungeonUtils;
+import net.forthecrown.dungeons.DungeonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;

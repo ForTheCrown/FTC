@@ -6,7 +6,7 @@ import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.pirates.merchants.MaterialMerchant;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.user.enums.SellAmount;
-import net.forthecrown.utils.BlackMarketUtils;
+import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;

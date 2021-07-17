@@ -12,7 +12,7 @@ import net.forthecrown.useables.warps.Warp;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.InteractionUtils;
+import net.forthecrown.useables.InteractionUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;

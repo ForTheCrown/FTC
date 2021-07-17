@@ -9,7 +9,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.InteractionUtils;
+import net.forthecrown.useables.InteractionUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.key.Key;

@@ -1,4 +1,4 @@
-package net.forthecrown.utils;
+package net.forthecrown.dungeons;
 
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.inventory.CrownItems;

@@ -24,6 +24,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
+import net.minecraft.Util;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -48,7 +49,11 @@ import java.util.regex.Pattern;
  * A utility class meant for methods which, in some way, format a string or component
  */
 public class ChatFormatter {
-    private static final DecimalFormat DECIMAL_FORMAT;
+    private static final DecimalFormat DECIMAL_FORMAT = Util.make(new DecimalFormat("#.##"), format -> {
+        format.setGroupingUsed(true);
+        format.setGroupingSize(3);
+    });
+
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
     public static final Component AFK_SUFFIX = Component.text(" [AFK]").style(nonItalic(NamedTextColor.GRAY));
@@ -63,12 +68,6 @@ public class ChatFormatter {
             "Hey!", "Hi!", "Welcome back!", "Hello!", "Heyo!", "Yo!",   //Grammar good :D
             "Hey %s!", "Hello %s!", "Hi %s!"                            //Formattable
     };*/
-
-    static {
-        DECIMAL_FORMAT = new DecimalFormat("#.##");
-        DECIMAL_FORMAT.setGroupingUsed(true);
-        DECIMAL_FORMAT.setGroupingSize(3);
-    }
 
     //Yeah, no clue
     public static String translateHexCodes(@NotNull String textToTranslate) {

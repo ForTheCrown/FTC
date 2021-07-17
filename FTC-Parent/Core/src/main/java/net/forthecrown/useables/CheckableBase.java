@@ -7,7 +7,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.InteractionUtils;
 import net.kyori.adventure.key.Key;
 
 import java.util.ArrayList;

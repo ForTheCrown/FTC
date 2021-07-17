@@ -77,12 +77,12 @@ public class LootData implements RaidData {
         return definiteSpawns;
     }
 
-    public void setDefiniteSpawns(Map<BlockPos, Key> definiteSpawns) {
-        this.definiteSpawns = definiteSpawns;
+    public void setChest(BlockPos pos, Key lootTable) {
+        definiteSpawns.put(pos, FtcUtils.checkNotBukkit(lootTable));
     }
 
-    public void setChest(BlockPos pos, Key lootTable) {
-        definiteSpawns.put(pos, lootTable);
+    public boolean hasChestAt(BlockPos pos) {
+        return definiteSpawns.containsKey(pos);
     }
 
     public void removeChest(BlockPos pos) {
@@ -101,12 +101,16 @@ public class LootData implements RaidData {
         chestGroups.put(group.key(), group);
     }
 
-    public void removeGroup(ChestGroup group) {
-        chestGroups.remove(group.key());
+    public void removeGroup(Key group) {
+        chestGroups.remove(FtcUtils.checkNotBukkit(group));
+    }
+
+    public boolean hasGroup(Key key) {
+        return chestGroups.containsKey(FtcUtils.checkNotBukkit(key));
     }
 
     public ChestGroup getChestGroup(Key key) {
-        return chestGroups.get(key);
+        return chestGroups.get(FtcUtils.checkNotBukkit(key));
     }
 
     public Map<Key, ChestGroup> getChestGroups() {

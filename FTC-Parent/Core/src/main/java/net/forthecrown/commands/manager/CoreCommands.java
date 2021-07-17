@@ -83,7 +83,6 @@ public final class CoreCommands {
         new CommandSetSpawn();
         new CommandRoyals();
         new CommandPirate();
-        new CommandDataFix();
         new CommandCosmeticEffects();
 
         //Admin utility

@@ -65,9 +65,6 @@ net/forthecrown/serializer/AbstractJsonSerializer.java
  net.forthecrown.serializer.AbstractJsonSerializer
 net/forthecrown/inventory/custom/SlotClickHandler.java
  net.forthecrown.inventory.custom.SlotClickHandler
-net/forthecrown/serializer/UserYamlToJson.java
- net.forthecrown.serializer.UserYamlToJson
- net.forthecrown.serializer.UserYamlToJson$YamlUserInstance
 net/forthecrown/inventory/RankInventory.java
  net.forthecrown.inventory.RankInventory
  net.forthecrown.inventory.RankInventory$1
@@ -160,6 +157,8 @@ net/forthecrown/economy/BrokenShopException.java
  net.forthecrown.economy.BrokenShopException
 net/forthecrown/user/CrownUser.java
  net.forthecrown.user.CrownUser
+net/forthecrown/dungeons/DungeonUtils.java
+ net.forthecrown.dungeons.DungeonUtils
 net/forthecrown/economy/selling/BlockSellOption.java
  net.forthecrown.economy.selling.BlockSellOption
 net/forthecrown/registry/CrownRegistry.java
@@ -185,9 +184,6 @@ net/forthecrown/commands/CommandSpeed.java
  net.forthecrown.commands.CommandSpeed
 net/forthecrown/inventory/builder/InventoryAction.java
  net.forthecrown.inventory.builder.InventoryAction
-net/forthecrown/utils/InteractionUtils.java
- net.forthecrown.utils.InteractionUtils
- net.forthecrown.utils.InteractionUtils$BrigadierFunction
 net/forthecrown/dungeons/usables/ActionSpawnBoss.java
  net.forthecrown.dungeons.usables.ActionSpawnBoss
  net.forthecrown.dungeons.usables.ActionSpawnBoss$ActionInstance
@@ -225,8 +221,6 @@ net/forthecrown/useables/actions/ActionRemoveNumber.java
  net.forthecrown.useables.actions.ActionRemoveNumber$ActionInstance
 net/forthecrown/useables/preconditions/UsageCheckInstance.java
  net.forthecrown.useables.preconditions.UsageCheckInstance
-net/forthecrown/commands/CommandDataFix.java
- net.forthecrown.commands.CommandDataFix
 net/forthecrown/economy/pirates/merchants/MaterialMerchant.java
  net.forthecrown.economy.pirates.merchants.MaterialMerchant
 net/forthecrown/commands/CommandProfilePublic.java
@@ -310,8 +304,6 @@ net/forthecrown/valhalla/RaidGenerator.java
  net.forthecrown.valhalla.RaidGenerator
 net/forthecrown/core/nbt/NBT.java
  net.forthecrown.core.nbt.NBT
-net/forthecrown/utils/BlackMarketUtils.java
- net.forthecrown.utils.BlackMarketUtils
 net/forthecrown/commands/marriage/CommandMarriageChat.java
  net.forthecrown.commands.marriage.CommandMarriageChat
 net/forthecrown/economy/pirates/merchants/GrapplingHookMerchant.java
@@ -652,6 +644,10 @@ net/forthecrown/commands/marriage/CommandMarry.java
 net/forthecrown/useables/preconditions/CheckPermission.java
  net.forthecrown.useables.preconditions.CheckPermission
  net.forthecrown.useables.preconditions.CheckPermission$CheckInstance
+net/forthecrown/valhalla/data/MobData.java
+ net.forthecrown.valhalla.data.MobData
+net/forthecrown/economy/pirates/BlackMarketUtils.java
+ net.forthecrown.economy.pirates.BlackMarketUtils
 net/forthecrown/useables/preconditions/CheckBranchType.java
  net.forthecrown.useables.preconditions.CheckBranchType
  net.forthecrown.useables.preconditions.CheckBranchType$CheckInstance
@@ -677,8 +673,6 @@ net/forthecrown/economy/selling/ItemSellOption.java
 net/forthecrown/comvars/types/ComVarType.java
  net.forthecrown.comvars.types.ComVarType
  net.forthecrown.comvars.types.ComVarType$PrimitiveComVarType
-net/forthecrown/utils/DungeonUtils.java
- net.forthecrown.utils.DungeonUtils
 net/forthecrown/inventory/builder/InventoryBuilder.java
  net.forthecrown.inventory.builder.InventoryBuilder
 net/forthecrown/commands/arguments/RoyalEnchantType.java
@@ -833,6 +827,9 @@ net/forthecrown/serializer/NbtSerializable.java
  net.forthecrown.serializer.NbtSerializable
 net/forthecrown/core/kingship/CrownKingship.java
  net.forthecrown.core.kingship.CrownKingship
+net/forthecrown/useables/InteractionUtils.java
+ net.forthecrown.useables.InteractionUtils
+ net.forthecrown.useables.InteractionUtils$BrigadierFunction
 net/forthecrown/commands/arguments/JailType.java
  net.forthecrown.commands.arguments.JailType
 net/forthecrown/user/CrownUserManager.java

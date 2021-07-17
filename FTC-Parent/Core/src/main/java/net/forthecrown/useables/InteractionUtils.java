@@ -1,4 +1,4 @@
-package net.forthecrown.utils;
+package net.forthecrown.useables;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
@@ -18,12 +18,11 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.item.ItemArgument;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.useables.Actionable;
-import net.forthecrown.useables.Preconditionable;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.useables.preconditions.UsageCheck;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;

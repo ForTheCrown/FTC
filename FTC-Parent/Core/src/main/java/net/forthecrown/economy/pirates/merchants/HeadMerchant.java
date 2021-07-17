@@ -11,6 +11,7 @@ import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.comvars.types.ComVarType;
 import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.*;

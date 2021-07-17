@@ -13,6 +13,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandSpeed extends FtcCommand {
+
+    public static float DEF_WALK = 0.2f;
+    public static float DEF_FLY = 0.1f;
+
     public CommandSpeed(){
         super("speed", CrownCore.inst());
 
@@ -63,8 +67,8 @@ public class CommandSpeed extends FtcCommand {
     }
 
     private int changeSpeed(CrownUser user, float amount, CommandSource source, boolean fly){
-        if(fly) user.getPlayer().setFlySpeed(amount * 0.1f);
-        else user.getPlayer().setWalkSpeed(amount * 0.2f);
+        if(fly) user.getPlayer().setFlySpeed(amount * DEF_FLY);
+        else user.getPlayer().setWalkSpeed(amount * DEF_WALK);
 
         source.sendAdmin(
                 Component.text("Set " + (fly ? "fly" : "walk") + "ing speed of ")
@@ -77,14 +81,15 @@ public class CommandSpeed extends FtcCommand {
 
     private int querySpeed(CrownUser user, CommandSource source, boolean fly){
         float realValue = fly ? user.getPlayer().getFlySpeed() : user.getPlayer().getWalkSpeed();
-        double value = Math.floor(realValue / (fly ? 0.1f : 0.2f));
+        double value = Math.floor(realValue / (fly ? DEF_FLY : DEF_WALK));
+
         source.sendMessage(
                 Component.text((fly ? "Fly" : "Walk") + "ing speed of ")
                         .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
                         .append(Component.text(" is "))
-                        .append(Component.text(realValue).color(NamedTextColor.YELLOW))
-                        .append(Component.text(", actual is "))
                         .append(Component.text(value).color(NamedTextColor.YELLOW))
+                        .append(Component.text(", actual is "))
+                        .append(Component.text(realValue).color(NamedTextColor.YELLOW))
         );
         return 0;
     }

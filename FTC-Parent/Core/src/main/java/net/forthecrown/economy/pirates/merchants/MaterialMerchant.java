@@ -10,7 +10,7 @@ import net.forthecrown.events.dynamic.BmSellItemListener;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.BlackMarketUtils;
+import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.key.Key;

@@ -1,6 +1,7 @@
 package net.forthecrown.utils;
 
 import com.google.gson.*;
+import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
@@ -22,7 +23,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -196,10 +199,18 @@ public final class JsonUtils {
         return new JsonPrimitive(id.toString());
     }
 
+    static final Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .create();
+
     //Writes json to a file
     public static void writeFile(JsonObject json, File f) throws IOException {
         FileWriter writer = new FileWriter(f);
-        writer.write(json.toString());
+
+        JsonWriter jWriter = gson.newJsonWriter(writer);
+        gson.toJson(json, jWriter);
+
+        jWriter.close();
         writer.close();
     }
 

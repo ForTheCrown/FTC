@@ -12,7 +12,6 @@ import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.InteractionUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;

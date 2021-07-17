@@ -167,6 +167,7 @@ public final class Main extends JavaPlugin implements CrownCore {
         safeRunnable(Bosses::shutDown);
         safeRunnable(Cosmetics::shutDown);
         safeRunnable(Pirates::shutDown);
+        //safeRunnable(ValhallaEngine::shutDown);
 
         CrownUserManager.LOADED_USERS.clear();
         CrownUserManager.LOADED_ALTS.clear();

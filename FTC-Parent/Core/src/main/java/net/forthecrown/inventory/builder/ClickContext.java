@@ -24,6 +24,7 @@ public class ClickContext {
     private final ClickType clickType;
 
     private boolean shouldReload;
+    private boolean shouldCancelEvent;
     private int cooldownTime;
 
     public ClickContext(Player player, int slot, ItemStack cursorItem, ClickType type) {
@@ -32,6 +33,7 @@ public class ClickContext {
         this.cursorItem = cursorItem;
         this.clickType = type;
 
+        this.shouldCancelEvent = true;
         this.shouldReload = false;
         this.cooldownTime = DEFAULT_COOLDOWN;
     }
@@ -70,5 +72,13 @@ public class ClickContext {
 
     public void setCooldownTime(int cooldownTime) {
         this.cooldownTime = cooldownTime;
+    }
+
+    public void setShouldCancelEvent(boolean shouldCancelEvent) {
+        this.shouldCancelEvent = shouldCancelEvent;
+    }
+
+    public boolean shouldCancelEvent() {
+        return shouldCancelEvent;
     }
 }

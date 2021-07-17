@@ -40,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static net.forthecrown.utils.BlackMarketUtils.getBaseInventory;
+import static net.forthecrown.economy.pirates.BlackMarketUtils.getBaseInventory;
 
 public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
     public static final Key KEY = Squire.createPiratesKey("enchants");

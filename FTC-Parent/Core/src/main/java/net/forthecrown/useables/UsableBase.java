@@ -8,7 +8,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.InteractionUtils;
 import net.kyori.adventure.key.Key;
 
 import java.util.ArrayList;

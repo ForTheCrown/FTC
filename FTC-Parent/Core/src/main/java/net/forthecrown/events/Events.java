@@ -5,7 +5,6 @@ import net.forthecrown.core.CrownException;
 import net.forthecrown.events.custom.SignShopUseEvent;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
@@ -13,10 +12,13 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.plugin.PluginManager;
 
 public class Events {
-    private static final PluginManager pm = Bukkit.getPluginManager();
-    private static final CrownCore main = CrownCore.inst();
+    private static PluginManager pm;
+    private static CrownCore main;
 
     public static void init(){
+        main = CrownCore.inst();
+        pm = main.getServer().getPluginManager();
+
         register(new JeromeEvent());
         register(new JackEvent());
 
@@ -44,6 +46,9 @@ public class Events {
         register(new CosmeticsListener());
         register(new CustomInventoryClickListener());
         register(new InventoryBuilderListener());
+
+        main = null;
+        pm = null;
     }
 
     private static void register(Listener listener){

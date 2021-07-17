@@ -1,15 +1,14 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.FtcGameMode;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.enums.FtcGameMode;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
@@ -46,26 +45,18 @@ public class CommandSpecificGameMode extends FtcCommand {
         user.setGameMode(gameMode);
         user.updateFlying();
 
-        TranslatableComponent title = gameMode.title().color(NamedTextColor.GOLD);
+        if(broadcast) source.sendAdmin(message(user.nickDisplayName()));
+        else user.sendMessage(message(Component.text("own")));
 
-        if(broadcast){
-            source.sendAdmin(
-                    Component.text("Set ")
-                            .color(NamedTextColor.GRAY)
-                            .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
-                            .append(Component.text("'s gamemode to "))
-                            .append(title)
-            );
-        } else {
-            user.sendMessage(
-                    Component.text("Set ")
-                            .color(NamedTextColor.GRAY)
-                            .append(Component.text("own").color(NamedTextColor.YELLOW))
-                            .append(Component.text(" gamemode to "))
-                            .append(title)
-            );
-        }
         return 0;
+    }
+
+    private Component message(Component plr) {
+        return Component.text("Set ")
+                .color(NamedTextColor.GRAY)
+                .append(plr.color(NamedTextColor.YELLOW))
+                .append(Component.text(" gamemode to "))
+                .append(gameMode.title().color(NamedTextColor.GOLD));
     }
 
     public static void init(){

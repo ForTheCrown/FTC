@@ -66,6 +66,7 @@ public class BuiltInventory implements InventoryHolder {
 
             if(context.shouldCooldown()) Cooldown.add(player, getClass().getSimpleName(), 5);
             if(context.shouldReload()) open(player);
+            event.setCancelled(context.shouldCancelEvent());
         } catch (RoyalCommandException e){
             player.sendMessage(e.formattedText());
         }

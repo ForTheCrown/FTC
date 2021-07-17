@@ -11,7 +11,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.useables.Usable;
 import net.forthecrown.useables.UsableEntity;
 import net.forthecrown.useables.UsableBlock;
-import net.forthecrown.utils.InteractionUtils;
+import net.forthecrown.useables.InteractionUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;

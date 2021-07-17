@@ -5,7 +5,7 @@ import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.user.enums.Pet;
-import net.forthecrown.utils.BlackMarketUtils;
+import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;

@@ -42,6 +42,10 @@ public final class ChatUtils {
         return net.minecraft.network.chat.Component.Serializer.fromJson(GsonComponentSerializer.gson().serialize(text));
     }
 
+    public static Component vanillaToAdventure(net.minecraft.network.chat.Component component){
+        return GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(component));
+    }
+
     public static String getString(Component tex) {
         return PaperAdventure.LEGACY_SECTION_UXRC.serialize(tex);
     }
@@ -64,9 +68,5 @@ public final class ChatUtils {
 
     public static Component fromJson(JsonElement element){
         return GSON.deserializeFromTree(element);
-    }
-
-    public static Component vanillaToAdventure(net.minecraft.network.chat.Component component){
-        return GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(component));
     }
 }

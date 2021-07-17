@@ -39,6 +39,12 @@ public class ValhallaEngine implements Valhalla {
         instance = new ValhallaEngine();
     }
 
+    public static void shutDown() {
+        if(instance == null) return;
+
+        if(instance.activeRaidExists()) instance.getActiveRaid().shutDown();
+    }
+
     private void findExistingRaids() {
         for (String s: serializer.getRaidDirectory().list()) {
             try {

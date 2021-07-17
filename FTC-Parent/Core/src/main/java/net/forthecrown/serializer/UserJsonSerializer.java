@@ -45,7 +45,6 @@ public class UserJsonSerializer implements UserSerializer {
     @Override
     public void serialize(FtcUser user) {
         if(deletedFiles.contains(user.getUniqueId())) return;
-        CrownCore.logger().info("Serializing " + user.getName());
 
         JsonBuf json = JsonBuf.empty();
 
@@ -134,7 +133,6 @@ public class UserJsonSerializer implements UserSerializer {
     @Override
     public void deserialize(FtcUser user) {
         if(deletedFiles.contains(user.getUniqueId())) return;
-        CrownCore.logger().info("Deserializing " + user.getName());
 
         JsonBuf json = readJson(user);
         if(json == null) return;

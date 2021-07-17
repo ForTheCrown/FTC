@@ -3,9 +3,11 @@ package net.forthecrown.valhalla;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Branch;
+import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.math.BlockPos;
 import net.forthecrown.utils.math.FtcRegion;
+import net.forthecrown.valhalla.data.VikingRaid;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -14,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
@@ -28,6 +31,10 @@ public class RaidUtil {
                     return user.getBranch() == Branch.VIKINGS;
                 })
                 .toList();
+    }
+
+    public static RaidGenerationContext createTestContext(VikingRaid raid) {
+        return new RaidGenerationContext(Worlds.VOID, raid, new CrownRandom(), RaidDifficulty.medium(), new ArrayList<>());
     }
 
     public static void applyLootTable(BlockPos pos, World world, LootTable lootTable, Random random, float mod) {

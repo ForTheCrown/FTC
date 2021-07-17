@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.DungeonUtils;
+import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;

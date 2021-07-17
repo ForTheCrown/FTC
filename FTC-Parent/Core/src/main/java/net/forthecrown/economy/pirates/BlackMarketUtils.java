@@ -1,7 +1,8 @@
-package net.forthecrown.utils;
+package net.forthecrown.economy.pirates;
 
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.inventory.CustomInventoryHolder;
+import net.forthecrown.utils.FtcUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryType;

@@ -18,7 +18,7 @@ import net.forthecrown.user.enums.Rank;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.utils.DungeonUtils;
+import net.forthecrown.dungeons.DungeonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;

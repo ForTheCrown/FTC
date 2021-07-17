@@ -30,11 +30,11 @@ public class RaidDifficulty {
         return modifier;
     }
 
-    public double applyHealth(double initial) {
+    public double multiply(double initial) {
         return initial * (modifier / 2);
     }
 
-    public double applyDamage(double initial) {
+    public double addTo(double initial) {
         return initial + (modifier * 2);
     }
 }
