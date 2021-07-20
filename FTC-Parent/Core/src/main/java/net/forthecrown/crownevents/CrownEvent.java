@@ -1,7 +1,9 @@
 package net.forthecrown.crownevents;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.crownevents.entries.EventEntry;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.royalgrenadier.GrenadierUtils;
 import org.bukkit.entity.Player;
 
 import java.time.Month;
@@ -20,7 +22,21 @@ public interface CrownEvent<T extends EventEntry> {
      * <p>Note: the start method should also create an event entry for the player</p>
      * @param player The player to start the event for
      */
-    void start(Player player) throws RoyalCommandException;
+    void start(Player player) throws CommandSyntaxException;
+
+    /**
+     * Starts the event, and handles any exceptions thrown by start(Player)
+     * @param player The player to start
+     */
+    default void startHandled(Player player) {
+        try {
+            start(player);
+        } catch (RoyalCommandException r) {
+            player.sendMessage(r.formattedText());
+        } catch (CommandSyntaxException e) {
+            player.sendMessage(GrenadierUtils.formatCommandException(e));
+        }
+    }
 
     /**
      * Method to call when ending an event

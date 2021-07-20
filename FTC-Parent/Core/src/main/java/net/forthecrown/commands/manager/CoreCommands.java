@@ -9,6 +9,7 @@ import net.forthecrown.commands.emotes.EmoteToggle;
 import net.forthecrown.commands.help.*;
 import net.forthecrown.commands.marriage.*;
 import net.forthecrown.commands.punishments.*;
+import net.forthecrown.commands.viking.CommandVRaid;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.RoyalArguments;
 import net.forthecrown.grenadier.VanillaArgumentType;
@@ -67,7 +68,10 @@ public final class CoreCommands {
         //Command loading
 
         //Debug command
-        if(CrownCore.inDebugMode()) new CommandTestCore();
+        if(CrownCore.inDebugMode()) {
+            new CommandTestCore();
+            new CommandVRaid();
+        }
 
         //admin commands
         new CommandKingMaker();
@@ -99,7 +103,6 @@ public final class CoreCommands {
         new CommandMemory();
         new CommandSkull();
         new CommandMakeAward();
-        new CommandBlackMarketNpc();
         new CommandTeleportExact();
         new CommandTime();
         CommandSpecificGameMode.init();

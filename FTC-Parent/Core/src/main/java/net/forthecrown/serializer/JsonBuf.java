@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.utils.JsonUtils;
+import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.math.BlockPos;
 import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.key.Key;
@@ -106,20 +107,19 @@ public class JsonBuf {
         return readItem(get(name));
     }
 
-    public <T> T get(String name, Function<JsonElement, T> function){
-        if(missingOrNull(name)) return null;
+    public <T> T get(String name, Function<JsonElement, T> function) { return get(name, function, null); }
+    public <T> T get(String name, Function<JsonElement, T> function, T def){
+        if(missingOrNull(name)) return def;
         return function.apply(json.get(name));
     }
 
-    public <T> Collection<T> getList(String name, Function<JsonElement, T> func){
-        if(missingOrNull(name)) return null;
+    public <T> Collection<T> getList(String name, Function<JsonElement, T> func) {
+        return getList(name, func, null);
+    }
 
-        Collection<T> list = new ArrayList<>();
-
-        JsonArray array = getArray(name);
-        array.forEach(e -> list.add(func.apply(e)));
-        
-        return list;
+    public <T> Collection<T> getList(String name, Function<JsonElement, T> func, Collection<T> def){
+        if(missingOrNull(name)) return def;
+        return ListUtils.fromIterable(getArray(name), func);
     }
     
     public void addList(String name, Iterable<? extends JsonSerializable> list){

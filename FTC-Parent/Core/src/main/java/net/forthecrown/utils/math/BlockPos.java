@@ -129,7 +129,11 @@ public class BlockPos implements JsonSerializable, Cloneable, ImmutableBlockPos 
     }
 
     public Location toLoc(World world){
-        return new Location(world, x, y, z);
+        return toLoc(world, 0f, 0f);
+    }
+
+    public Location toLoc(World world, float yaw, float pitch) {
+        return new Location(world, x, y, z, yaw, pitch);
     }
 
     public Vector toVec(){

@@ -48,7 +48,7 @@ public class ValhallaEngine implements Valhalla {
     private void findExistingRaids() {
         for (String s: serializer.getRaidDirectory().list()) {
             try {
-                existingRaids.add(KEY_PARSER.parse(new StringReader(s)));
+                existingRaids.add(KEY_PARSER.parse(new StringReader(s.replaceAll(".json", ""))));
             } catch (CommandSyntaxException ignored) {}
         }
     }

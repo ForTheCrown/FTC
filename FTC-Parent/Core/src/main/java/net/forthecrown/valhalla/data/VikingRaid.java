@@ -1,5 +1,6 @@
 package net.forthecrown.valhalla.data;
 
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.core.Position;
@@ -13,6 +14,7 @@ public class VikingRaid implements Keyed {
     private final Position startingPos;
 
     private LootData lootData;
+    private MobData mobData;
 
     public VikingRaid(Key key, BoundingBox region, Position startingPos) {
         this.key = key;
@@ -33,11 +35,23 @@ public class VikingRaid implements Keyed {
     }
 
     public LootData getLootData() {
-        return lootData == null ? lootData = new LootData() : lootData;
+        return FtcUtils.makeIfNull(lootData, LootData::new);
     }
 
     public void setLootData(LootData lootData) {
         this.lootData = lootData;
+    }
+
+    public MobData getMobData() {
+        return FtcUtils.makeIfNull(mobData, MobData::new);
+    }
+
+    public boolean hasMobData() {
+        return mobData != null;
+    }
+
+    public void setMobData(MobData mobData) {
+        this.mobData = mobData;
     }
 
     @Override

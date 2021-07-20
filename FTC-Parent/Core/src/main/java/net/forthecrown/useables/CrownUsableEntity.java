@@ -25,6 +25,7 @@ public class CrownUsableEntity extends AbstractUsable implements UsableEntity {
 
     @Override
     protected void save(JsonObject json) {
+        json.add("uuid", new JsonPrimitive(id.toString()));
         saveInto(json);
     }
 

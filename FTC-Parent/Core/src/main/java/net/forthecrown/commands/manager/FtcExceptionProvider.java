@@ -11,7 +11,9 @@ import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.entity.Entity;
 
 import static net.forthecrown.commands.manager.CrownExceptionProvider.*;
 
@@ -221,5 +223,9 @@ public interface FtcExceptionProvider {
 
     static RoyalCommandException notPirate(){
         return NOT_PIRATE.create(Component.text("/visit Questmoor"));
+    }
+
+    static RoyalCommandException realPirate(Entity name) {
+        return GOTTA_BE_PIRATE.create(NamedTextColor.YELLOW, ChatFormatter.entityDisplayName(name).color(NamedTextColor.YELLOW));
     }
 }

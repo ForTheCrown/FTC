@@ -3,6 +3,7 @@ package net.forthecrown.valhalla.data;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.MapUtils;
 import net.forthecrown.utils.math.BlockPos;
 import net.forthecrown.valhalla.RaidGenerationContext;
@@ -11,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.loot.LootTable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +20,12 @@ import static net.forthecrown.valhalla.RaidUtil.applyLootTable;
 
 public class LootData implements RaidData {
 
-    private Map<BlockPos, Key> definiteSpawns;
-    private Map<Key, ChestGroup> chestGroups;
+    private final Map<BlockPos, Key> definiteSpawns;
+    private final Map<Key, ChestGroup> chestGroups;
 
     public LootData() {
+        this.definiteSpawns = new HashMap<>();
+        this.chestGroups = new HashMap<>();
     }
 
     public LootData(Map<BlockPos, Key> definiteSpawns, Map<Key, ChestGroup> chestGroups) {
@@ -58,7 +62,7 @@ public class LootData implements RaidData {
                 CrownCore.logger().warning("Found key pointing to null loot table in chest group: " + g.getLootTableKey().asString());
                 continue;
             }
-            if(g.getPossibleLocations() == null) continue;
+            if(ListUtils.isNullOrEmpty(g.getPossibleLocations())) continue;
 
             List<BlockPos> chosenPositions = random.pickRandomEntries(
                     g.getPossibleLocations(),

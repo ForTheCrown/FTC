@@ -4,7 +4,7 @@ import net.forthecrown.core.CrownCore;
 import net.forthecrown.crownevents.ObjectiveLeaderboard;
 import net.forthecrown.economy.pirates.CrownPirateEconomy;
 import net.forthecrown.economy.pirates.PirateEconomy;
-import net.forthecrown.pirates.grappling.GrapplingHookParkour;
+import net.forthecrown.pirates.grappling.GhParkour;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
@@ -19,7 +19,7 @@ public class Pirates {
     public static final NamespacedKey BM_MERCHANT = Squire.createPiratesKey("black_market_merchant");
 
     static TreasureShulker shulker;
-    static GrapplingHookParkour ghParkour;
+    static GhParkour ghParkour;
     static CrownPirateEconomy pirateEconomy;
     static ParrotTracker parrotTracker;
     static AuctionManager auctionManager;
@@ -29,7 +29,7 @@ public class Pirates {
     public static void init(){
         pirateEconomy = new CrownPirateEconomy();
         shulker = new TreasureShulker();
-        ghParkour = new GrapplingHookParkour();
+        ghParkour = new GhParkour();
         auctionManager = new AuctionManager();
         parrotTracker = new ParrotTracker();
 
@@ -64,14 +64,14 @@ public class Pirates {
     public static void shutDown(){
         pirateEconomy.save();
         shulker.save();
-        ghParkour.getData().save();
+        ghParkour.save();
         parrotTracker.save();
         auctionManager.saveAuctions();
         leaderboard.destroy();
     }
 
     public static PirateEconomy getPirateEconomy() { return pirateEconomy; }
-    public static GrapplingHookParkour getParkour() { return ghParkour; }
+    public static GhParkour getParkour() { return ghParkour; }
     public static TreasureShulker getTreasure() { return shulker; }
     public static ParrotTracker getParrotTracker() { return parrotTracker; }
     public static AuctionManager getAuctions() { return auctionManager; }

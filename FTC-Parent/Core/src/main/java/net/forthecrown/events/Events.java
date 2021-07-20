@@ -20,7 +20,6 @@ public class Events {
         pm = main.getServer().getPluginManager();
 
         register(new JeromeEvent());
-        register(new JackEvent());
 
         register(new CoreListener());
         register(new GraveListener());
@@ -31,6 +30,7 @@ public class Events {
         register(new ShopTransactionEvent());
 
         register(new PirateEvents());
+        register(new GhListener());
 
         register(new MobHealthBar());
         register(new SmokeBomb());

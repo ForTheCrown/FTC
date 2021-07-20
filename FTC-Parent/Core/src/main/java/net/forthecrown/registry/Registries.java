@@ -2,11 +2,11 @@ package net.forthecrown.registry;
 
 import net.forthecrown.comvars.types.ComVarType;
 import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.npc.InteractableNPC;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.AbstractDeathEffect;
 import net.forthecrown.cosmetics.emotes.CosmeticEmote;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
-import net.forthecrown.economy.pirates.merchants.UsablePirateNpc;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.preconditions.UsageCheck;
 import net.forthecrown.utils.FtcUtils;
@@ -21,6 +21,8 @@ public interface Registries {
      */
     Registry<Registry<?>> MASTER_REGISTRY = new BaseRegistry<>(CrownCore.coreKey("master_registry"));
 
+    Registry<InteractableNPC> NPCS = create("npcs");
+
     CloseableRegistry<CosmeticEmote> EMOTES = createCloseable("emotes");
     CloseableRegistry<AbstractDeathEffect> DEATH_EFFECTS = createCloseable("death_effects");
     CloseableRegistry<ArrowEffect> ARROW_EFFECTS = createCloseable("arrow_effects");
@@ -31,7 +33,6 @@ public interface Registries {
     CloseableRegistry<ComVarType<?>> COMVAR_TYPES = createCloseable("comvar_types");
 
     CloseableRegistry<DungeonBoss<?>> DUNGEON_BOSSES = createCloseable("dungeon_bosses");
-    CloseableRegistry<UsablePirateNpc> BLACK_MARKET_NPCS = createCloseable("black_market_npcs");
 
     /**
      * Creates a closeable registry with the given key and registers it into the master registry

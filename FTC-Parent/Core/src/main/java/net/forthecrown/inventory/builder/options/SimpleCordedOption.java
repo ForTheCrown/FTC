@@ -40,6 +40,6 @@ public class SimpleCordedOption implements CordedInventoryOption {
 
     @Override
     public void onClick(CrownUser user, ClickContext context) throws RoyalCommandException {
-        if(runnable != null) runnable.onClick(user, context);
+        if(getRunnable() != null) getRunnable().onClick(user, context);
     }
 }

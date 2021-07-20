@@ -9,6 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -46,7 +47,7 @@ public class CheckInWorld implements UsageCheck<CheckInWorld.CheckInstance> {
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return WorldArgument.world().listSuggestions(context, builder);
+        return CompletionProvider.suggestWorlds(builder);
     }
 
     public static class CheckInstance implements UsageCheckInstance {

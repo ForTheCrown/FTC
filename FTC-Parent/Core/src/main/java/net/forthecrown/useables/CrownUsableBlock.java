@@ -23,6 +23,8 @@ public class CrownUsableBlock extends AbstractUsable implements UsableBlock {
 
     @Override
     protected void save(JsonObject json) {
+        json.add("location", JsonUtils.writeLocation(location));
+
         saveInto(json);
     }
 

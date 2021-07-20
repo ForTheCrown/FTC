@@ -46,8 +46,8 @@ public class CommandSeparate extends FtcCommand {
                                     UserInteractions secondInter = second.getInteractions();
 
                                     if(firstInter.isSeparatedPlayer(second.getUniqueId()) && secondInter.isSeparatedPlayer(first.getUniqueId())){
-                                        first.getInteractions().removeSeparated(second.getUniqueId());
-                                        second.getInteractions().removeSeparated(first.getUniqueId());
+                                        firstInter.removeSeparated(second.getUniqueId());
+                                        secondInter.removeSeparated(first.getUniqueId());
 
                                         StaffChat.sendCommand(
                                                 c.getSource(),
@@ -57,8 +57,8 @@ public class CommandSeparate extends FtcCommand {
                                                         .append(second.displayName())
                                         );
                                     } else {
-                                        first.getInteractions().addSeparated(second.getUniqueId());
-                                        second.getInteractions().addSeparated(first.getUniqueId());
+                                        firstInter.addSeparated(second.getUniqueId());
+                                        secondInter.addSeparated(first.getUniqueId());
 
                                         StaffChat.sendCommand(
                                                 c.getSource(),

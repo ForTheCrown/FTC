@@ -13,6 +13,7 @@ import net.forthecrown.registry.WarpRegistry;
 import net.forthecrown.serializer.UserSerializer;
 import net.forthecrown.useables.UsablesManager;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.valhalla.Valhalla;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Namespaced;
 import net.kyori.adventure.text.Component;
@@ -86,6 +87,10 @@ public interface CrownCore extends Plugin, Namespaced {
 
         Main.joinInfo.save();
         Main.prices.save();
+
+        if(inDebugMode()) {
+            Valhalla.getInstance().saveAll();
+        }
 
         Main.inst.saveConfig();
         logger().log(Level.INFO, "FTC-Core saved");

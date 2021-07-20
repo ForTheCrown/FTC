@@ -139,7 +139,7 @@ public class FtcUser implements CrownUser {
     @Override
     public void reload(){
         CrownCore.getUserSerializer().deserialize(this);
-        updateName();
+        updateName(lastOnlineName);
     }
 
     @Override
@@ -147,7 +147,7 @@ public class FtcUser implements CrownUser {
         CrownCore.getUserSerializer().serialize(this);
     }
 
-    public void updateName(){
+    public void updateName(String name){
         if(isOnline() && name != null && !name.equals(getPlayer().getName())){ //transfers all scores to new player name if player name changes
             Scoreboard scoreboard = getPlayer().getScoreboard();
 
@@ -157,8 +157,6 @@ public class FtcUser implements CrownUser {
                 obj.getScore(getPlayer().getName()).setScore(obj.getScore(name).getScore());
                 obj.getScore(name).setScore(0);
             }
-
-            name = getPlayer().getName();
         }
     }
 
@@ -678,9 +676,10 @@ public class FtcUser implements CrownUser {
     @Override
     public boolean onJoin(){
         this.handle = getOnlineHandle().getHandle();
-        updateName();
 
-        if(!name.equalsIgnoreCase(lastOnlineName)){
+        if(!getName().equalsIgnoreCase(lastOnlineName)){
+            updateName(lastOnlineName);
+
             previousNames.add(lastOnlineName);
             lastOnlineName = name;
             return true;

@@ -1,7 +1,6 @@
 package net.forthecrown.economy.pirates;
 
 import net.forthecrown.economy.pirates.merchants.*;
-import net.forthecrown.registry.Registry;
 import net.forthecrown.serializer.CrownSerializer;
 
 public interface PirateEconomy extends CrownSerializer {
@@ -24,8 +23,4 @@ public interface PirateEconomy extends CrownSerializer {
     int getMaxEarnings();
 
     void setMaxEarnings(int maxEarnings);
-
-    UsablePirateNpc getNpcById(String id);
-
-    Registry<UsablePirateNpc> getNpcRegistry();
 }

@@ -72,4 +72,5 @@ public class CrownExceptionProvider {
     static final TranslatableExceptionType NOT_MARRIED =                new TranslatableExceptionType("marriage.notMarried");
 
     static final TranslatableExceptionType NOT_PIRATE =                 new TranslatableExceptionType("pirates.exclusive");
+    static final TranslatableExceptionType GOTTA_BE_PIRATE =            new TranslatableExceptionType("pirates.wrongBranch");
 }

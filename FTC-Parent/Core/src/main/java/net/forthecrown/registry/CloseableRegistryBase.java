@@ -1,7 +1,7 @@
 package net.forthecrown.registry;
 
 import net.kyori.adventure.key.Key;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
+import org.apache.commons.lang.Validate;
 
 public class CloseableRegistryBase<T> extends BaseRegistry<T> implements CloseableRegistry<T> {
 

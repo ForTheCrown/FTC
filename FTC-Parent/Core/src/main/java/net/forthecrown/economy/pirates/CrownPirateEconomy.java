@@ -4,16 +4,14 @@ import com.google.common.io.Files;
 import com.google.gson.JsonObject;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.economy.pirates.merchants.*;
-import net.forthecrown.registry.Registry;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.JsonUtils;
-import net.kyori.adventure.key.Key;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static net.forthecrown.registry.Registries.BLACK_MARKET_NPCS;
+import static net.forthecrown.registry.Registries.NPCS;
 
 public class CrownPirateEconomy implements PirateEconomy {
     private final CrownRandom random;
@@ -21,9 +19,11 @@ public class CrownPirateEconomy implements PirateEconomy {
     private final EnchantMerchant enchantMerchant;
     private final HeadMerchant headMerchant;
     private final ParrotMerchant parrotMerchant;
+
     private final MaterialMerchant miningMerchant;
     private final MaterialMerchant dropsMerchant;
     private final MaterialMerchant cropsMerchant;
+
     private final GrapplingHookMerchant ghMerchant;
 
     private int maxEarnings = 500000;
@@ -46,22 +46,20 @@ public class CrownPirateEconomy implements PirateEconomy {
     }
 
     private void registerMerchants(){
-        BLACK_MARKET_NPCS.register(parrotMerchant.key(), parrotMerchant);
-        BLACK_MARKET_NPCS.register(ghMerchant.key(), ghMerchant);
+        NPCS.register(parrotMerchant.key(), parrotMerchant);
+        NPCS.register(ghMerchant.key(), ghMerchant);
 
-        BLACK_MARKET_NPCS.register(enchantMerchant.key(), enchantMerchant);
-        BLACK_MARKET_NPCS.register(headMerchant.key(), headMerchant);
+        NPCS.register(enchantMerchant.key(), enchantMerchant);
+        NPCS.register(headMerchant.key(), headMerchant);
 
-        BLACK_MARKET_NPCS.register(miningMerchant.key(), miningMerchant);
-        BLACK_MARKET_NPCS.register(dropsMerchant.key(), dropsMerchant);
-        BLACK_MARKET_NPCS.register(cropsMerchant.key(), cropsMerchant);
-
-        BLACK_MARKET_NPCS.close();
+        NPCS.register(miningMerchant.key(), miningMerchant);
+        NPCS.register(dropsMerchant.key(), dropsMerchant);
+        NPCS.register(cropsMerchant.key(), cropsMerchant);
     }
 
     @Override
     public void updateDate(){
-        BLACK_MARKET_NPCS.values().forEach(usable -> {
+        NPCS.values().forEach(usable -> {
             if(!(usable instanceof BlackMarketMerchant)) return;
 
             BlackMarketMerchant merchant = (BlackMarketMerchant) usable;
@@ -148,15 +146,5 @@ public class CrownPirateEconomy implements PirateEconomy {
     @Override
     public void setMaxEarnings(int maxEarnings) {
         this.maxEarnings = maxEarnings;
-    }
-
-    @Override
-    public UsablePirateNpc getNpcById(String id){
-        return BLACK_MARKET_NPCS.get(Key.key(id));
-    }
-
-    @Override
-    public Registry<UsablePirateNpc> getNpcRegistry() {
-        return BLACK_MARKET_NPCS;
     }
 }

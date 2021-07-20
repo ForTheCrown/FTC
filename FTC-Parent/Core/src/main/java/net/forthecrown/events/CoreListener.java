@@ -21,6 +21,7 @@ import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.npc.NpcDirectory;
 import net.forthecrown.economy.selling.SellShops;
 import net.forthecrown.inventory.CrownWeapons;
 import net.forthecrown.pirates.Pirates;
@@ -57,6 +58,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 public class CoreListener implements Listener {
 
@@ -286,5 +288,16 @@ public class CoreListener implements Listener {
             new MarriageMessage(user, UserManager.getUser(inter.getMarriedTo()), ChatUtils.getString(event.message()))
                     .complete();
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if(!event.getRightClicked().getPersistentDataContainer().has(NpcDirectory.KEY, PersistentDataType.STRING)) return;
+
+        NpcDirectory.interact(
+                event.getRightClicked().getPersistentDataContainer().get(NpcDirectory.KEY, PersistentDataType.STRING),
+                event.getRightClicked(),
+                event.getPlayer()
+        );
     }
 }

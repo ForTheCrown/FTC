@@ -22,7 +22,7 @@ public class CrownRandom extends Random {
     public <T> List<T> pickRandomEntries(Collection<T> from, int size){
         Validate.isTrue(from.size() > size, "Collection size was smaller than specified size");
 
-        List<T> orig = new ArrayList<>(from);
+        List<T> orig = from instanceof List ? (List<T>) from : new ArrayList<>(from);
         List<T> result = new ArrayList<>();
 
         while(result.size() < size){

@@ -2,195 +2,202 @@ package net.forthecrown.pirates.grappling;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.economy.Balances;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.pirates.Pirates;
+import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.utils.math.BlockPos;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.JsonUtils;
+import net.forthecrown.utils.math.BlockPos;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class GhLevelData implements JsonSerializable {
 
     private final String name;
-    private final GhBiome biome;
-    private final Material selectorMat;
 
-    private final BlockPos exitDest;
-    private final int nextHooks;
-    private final int nextDistance;
+    private final BlockPos startPos;
+    private final String nextLevel;
+
+    private final int hooks;
+    private final int distance;
+
+    private final GhBiome biome;
     private final GhType type;
 
-    private final byte index;
-    private final List<UUID> completed = new ArrayList<>();
+    private final Set<UUID> completed = new HashSet<>();
 
-    public GhLevelData(String name, GhBiome biome, Material selectorMat, BlockPos exitDest, int nextHooks, int nextDistance) {
-        this(name, biome, selectorMat, exitDest, nextHooks, nextDistance, GhType.NORMAL);
-    }
-
-    public GhLevelData(String name, GhBiome biome, Material selectorMat, BlockPos exitDest) {
-        this(name, biome, selectorMat, exitDest, -1, -1, GhType.NORMAL);
-    }
-
-    public GhLevelData(String name, GhBiome biome, Material selectorMat, BlockPos exitDest, GhType type) {
-        this(name, biome, selectorMat, exitDest, -1, -1, type);
-    }
-
-    public GhLevelData(String name, GhBiome biome, Material selectorMat, BlockPos exitDest, int nextHooks) {
-        this(name, biome, selectorMat, exitDest, nextHooks, -1, GhType.NORMAL);
-    }
-
-    public GhLevelData(String name, GhBiome biome, Material selectorMat, BlockPos exitDest, int nextHooks, GhType type) {
-        this(name, biome, selectorMat, exitDest, nextHooks, -1, type);
-    }
-
-    public GhLevelData(String name, GhBiome biome, Material selectorMat, BlockPos exitDest, int nextHooks, int nextDistance, GhType type) {
+    public GhLevelData(String name, BlockPos startPos, String nextLevel, int hooks, int distance, GhBiome biome, GhType type) {
         this.name = name;
+
+        this.startPos = startPos;
+        this.nextLevel = nextLevel;
+
+        this.hooks = hooks;
+        this.distance = distance;
+
         this.biome = biome;
-        this.selectorMat = selectorMat;
-        this.exitDest = exitDest;
-        this.nextHooks = nextHooks;
-        this.nextDistance = nextDistance;
         this.type = type;
-
-        this.index = (byte) Pirates.getParkour().getData().entrySet().size();
     }
 
-    public GhLevelData(String name, JsonElement element) {
-        JsonObject json = element.getAsJsonObject();
-
+    public GhLevelData(String name, JsonElement e) {
         this.name = name;
-        this.exitDest = BlockPos.of(json.get("exitDest"));
-        this.biome = JsonUtils.readEnum(GhBiome.class, json.get("biome"));
-        this.selectorMat = JsonUtils.readEnum(Material.class, json.get("selectorMat"));
-        this.index = json.get("index").getAsByte();
 
-        this.nextHooks = json.has("nextHooks") ? json.get("nextHooks").getAsInt() : -1;
-        this.nextDistance = json.has("nextDistance") ? json.get("nextDistance").getAsInt() : -1;
+        JsonBuf json = JsonBuf.of(e.getAsJsonObject());
 
-        GhType type = JsonUtils.readEnum(GhType.class, json.get("type"));
-        if(type == null) this.type = GhType.NORMAL;
-        else this.type = type;
+        this.startPos = json.getPos("start");
+        this.nextLevel = json.getString("next", null);
 
-        if(json.has("completed")){
-            completed.clear();
+        this.hooks = json.getInt("hooks", -1);
+        this.distance = json.getInt("distance", -1);
 
-            for (JsonElement ele: json.getAsJsonArray("completed")){
-                completed.add(UUID.fromString(ele.getAsString()));
-            }
-        }
+        this.biome = json.getEnum("biome", GhBiome.class, GhBiome.FLOATING_ISLANDS);
+        this.type = json.getEnum("type", GhType.class, GhType.NORMAL);
+
+        completed.addAll(json.getList("completed", JsonUtils::readUUID, Collections.emptySet()));
     }
 
-    public void giveHook(Player player){
+    public void enter(Player player, World world) {
+        player.getInventory().clear();
+        player.teleport(startPos.toLoc(world));
+
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gh give " + player.getName() +
-                (hookLimited() ? "" : " " + nextHooks) +
-                (distanceLimited() ? "" : " " + nextDistance)
+                (isHookLimited() ? " " + hooks + (isDistanceLimited() ? " " + distance : "") : "")
         );
     }
 
-    public boolean distanceLimited(){
-        return nextDistance == -1;
+    public void exit(Player player, World world) {
+        CrownUser user = UserManager.getUser(player);
+
+        if(!hasCompleted(player.getUniqueId())) {
+            switch (getType()) {
+                default:
+                case NORMAL: break;
+
+                case END:
+                    CrownCore.getBalances().add(user.getUniqueId(), CrownCore.getGhFinalReward(), false);
+                    user.sendMessage(
+                            Component.translatable("gh.reward.final", Balances.formatted(CrownCore.getGhFinalReward()).color(NamedTextColor.YELLOW))
+                                    .color(NamedTextColor.GRAY)
+                    );
+
+                    player.getInventory().addItem(CrownItems.cutlass());
+                    break;
+
+                case SPECIAL:
+                    CrownCore.getBalances().add(user.getUniqueId(), CrownCore.getGhSpecialReward(), false);
+                    user.sendMessage(
+                            Component.translatable("gh.reward.special", Balances.formatted(CrownCore.getGhSpecialReward()).color(NamedTextColor.YELLOW))
+                                    .color(NamedTextColor.GRAY)
+                    );
+                    break;
+            }
+
+            complete(player.getUniqueId());
+        }
+
+        GhLevelData data = Pirates.getParkour().byName(getNextLevel());
+        if(data == null) {
+            if(type != GhType.END) CrownCore.logger().warning(name + " has null nextLevel pointer");
+            else player.teleport(GhParkour.EXIT);
+
+            return;
+        }
+
+        data.enter(player, world);
     }
 
-    public boolean hookLimited(){
-        return nextHooks == -1;
+    public boolean hasCompleted(UUID uuid) {
+        return completed.contains(uuid);
+    }
+
+    public void complete(UUID id) {
+        completed.add(id);
+    }
+
+    public void uncomplete(UUID id) {
+        completed.remove(id);
     }
 
     public String getName() {
         return name;
     }
 
-    public Component displayName(){
-        return Component.text(getName())
-                .color(NamedTextColor.AQUA)
-                .decoration(TextDecoration.ITALIC, false);
+    public BlockPos getStartPos() {
+        return startPos;
+    }
+
+    public String getNextLevel() {
+        return nextLevel;
+    }
+
+    public int getHooks() {
+        return hooks;
+    }
+
+    public boolean isHookLimited() {
+        return hooks == -1;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public boolean isDistanceLimited() {
+        return distance == -1;
     }
 
     public GhBiome getBiome() {
         return biome;
     }
 
-    public Material getSelectorMat() {
-        return selectorMat;
-    }
-
-    public Material getCompletedMat(){
-        return switch (selectorMat) {
-            case GRASS_BLOCK -> Material.GREEN_TERRACOTTA;
-            case RED_SANDSTONE -> Material.ORANGE_TERRACOTTA;
-            case PURPLE_STAINED_GLASS -> Material.PURPLE_TERRACOTTA;
-            case OAK_PLANKS -> Material.TERRACOTTA;
-            default -> Material.BLACK_TERRACOTTA;
-        };
-    }
-
-    public BlockPos getExitDest() {
-        return exitDest;
-    }
-
-    public Location getExitLoc(World world){
-        return exitDest.toLoc(world);
-    }
-
-    public int getNextHooks() {
-        return nextHooks;
-    }
-
-    public int getNextDistance() {
-        return nextDistance;
-    }
-
     public GhType getType() {
         return type;
     }
 
-    public boolean hasCompleted(UUID id){
-        return completed.contains(id);
-    }
-
-    public void complete(UUID id){
-        completed.add(id);
-    }
-
-    public void removeCompleted(UUID id){
-        completed.remove(id);
-    }
-
-    public List<UUID> getCompleted() {
+    public Set<UUID> getCompleted() {
         return completed;
     }
 
-    public byte getIndex() {
-        return index;
+    public ItemStack makeItem(UUID uuid) {
+        ItemStackBuilder builder = new ItemStackBuilder(hasCompleted(uuid) ? biome.completedMat() : biome.selectorMat())
+                .setName(Component.text(name).style(ChatFormatter.nonItalic(biome.color)));
+
+        if(Pirates.getParkour().isFirstUncompleted(uuid, this)) builder.addEnchant(Enchantment.CHANNELING, 1);
+
+        return builder.build();
     }
 
     @Override
     public JsonObject serialize() {
-        JsonObject json = new JsonObject();
+        JsonBuf json = JsonBuf.empty();
 
-        json.addProperty("name", name);
-        json.addProperty("index", index);
+        json.add("start", startPos);
+        json.add("next", nextLevel);
 
-        json.add("biome", JsonUtils.writeEnum(biome));
-        json.add("selectorMat", JsonUtils.writeEnum(selectorMat));
+        json.addEnum("biome", biome);
+        if(type != GhType.NORMAL) json.addEnum("type", type);
 
-        json.add("exitDest", exitDest.serialize());
+        if(isHookLimited()) json.add("hooks", hooks);
+        if(isDistanceLimited()) json.add("distance", distance);
 
-        if(type != GhType.NORMAL) json.add("type", JsonUtils.writeEnum(type));
-        if(hookLimited()) json.add("nextHooks", new JsonPrimitive(nextHooks));
-        if(distanceLimited()) json.add("nextDistance", new JsonPrimitive(nextDistance));
-        if(!completed.isEmpty()) json.add("completed", JsonUtils.writeCollection(completed, id -> new JsonPrimitive(id.toString())));
+        if(!completed.isEmpty()) json.addList("completed", completed, JsonUtils::writeUUID);
 
-        return json;
+        return json.getSource();
     }
 }

@@ -1,0 +1,3 @@
+name: AugustEvent
+main: net.forthecrown.august.AugustMain
+version: 1.0.0-SNAPSHOT

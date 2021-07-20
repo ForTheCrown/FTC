@@ -2,6 +2,7 @@ package net.forthecrown.utils;
 
 import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -84,6 +85,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder amount(int amount) {
+        Validate.isTrue(FtcUtils.isInRange(amount, 0, material.getMaxStackSize()), "Invalid stack size");
         this.amount = amount;
         return this;
     }
@@ -189,27 +191,32 @@ public class ItemStackBuilder {
         if(!ListUtils.isNullOrEmpty(flags)) meta.addItemFlags(flags);
         if(name != null) meta.displayName(name);
         if(!ListUtils.isNullOrEmpty(lores)) meta.lore(lores);
+
         if(!MapUtils.isNullOrEmpty(enchants)){
             for (Enchantment e: enchants.keySet()){
                 meta.addEnchant(e, enchants.get(e), ignoreEnchantRestrictions);
             }
         }
+
         if(!MapUtils.isNullOrEmpty(modifiers)){
             for (Map.Entry<Attribute, AttributeModifier> entry: modifiers.entrySet()){
                 meta.addAttributeModifier(entry.getKey(), entry.getValue());
             }
         }
+
         if(!MapUtils.isNullOrEmpty(persistentData)){
             for (Map.Entry<NamespacedKey, Byte> entry: persistentData.entrySet()){
                 meta.getPersistentDataContainer().set(entry.getKey(), PersistentDataType.BYTE, entry.getValue());
             }
         }
+
         if(!ListUtils.isNullOrEmpty(effects)){
             PotionMeta meta1 = (PotionMeta) meta;
             for (PotionEffect e: effects){
                 meta1.addCustomEffect(e, true);
             }
         }
+
         if(baseEffect != null){
             PotionMeta meta1 = (PotionMeta) meta;
             meta1.setBasePotionData(baseEffect);

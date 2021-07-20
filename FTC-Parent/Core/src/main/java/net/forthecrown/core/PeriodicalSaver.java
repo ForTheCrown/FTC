@@ -13,7 +13,7 @@ public final class PeriodicalSaver extends BukkitRunnable {
     private static final ComVar<Long> interval;
 
     static {
-        interval = ComVarRegistry.set("core_autoSaveIntervalMins", ComVarType.LONG, CrownCore.inst().getConfig().getLong("System.save-interval-mins"));
+        interval = ComVarRegistry.set("core_autoSaveIntervalMins", ComVarType.LONG, CrownCore.config().getLong("System.save-interval-mins"));
     }
 
     PeriodicalSaver(CrownCore core){

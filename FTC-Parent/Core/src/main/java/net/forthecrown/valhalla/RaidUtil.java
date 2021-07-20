@@ -45,11 +45,12 @@ public class RaidUtil {
 
         chest.getBlockInventory().clear();
 
-        chest.setLootTable(lootTable);
         lootTable.fillInventory(
                 chest.getBlockInventory(),
                 random,
-                new LootContext.Builder(chest.getLocation()).luck(mod).build()
+                new LootContext.Builder(chest.getLocation())
+                        .luck(mod)
+                        .build()
         );
     }
 }

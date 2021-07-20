@@ -1,8 +1,8 @@
 package net.forthecrown.commands.help;
 
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -48,8 +48,7 @@ public class HelpFindPost extends FtcCommand {
                 player.sendMessage(ChatColor.GRAY + "Try " + ChatColor.YELLOW + "/warp portal" + ChatColor.GRAY + " to get back to the normal world.");
                 player.sendMessage(ChatColor.GRAY + "Type " + ChatColor.YELLOW + "/posthelp" + ChatColor.GRAY + " for more help.");
                 return 0;
-            }
-            else if (loc.getWorld().getName().contains("world_")) {
+            } else if (loc.getWorld().getName().contains("world_")) {
                 player.sendMessage(ChatColor.RED + "You are not currently in the world with regions!");
                 player.sendMessage(ChatColor.GRAY + "Type " + ChatColor.YELLOW + "/posthelp" + ChatColor.GRAY + " for more help.");
                 return 0;
@@ -61,16 +60,12 @@ public class HelpFindPost extends FtcCommand {
             int x_pole;
             int z_pole;
 
-            if (x % 400 > 200) {
-                x_pole = x - ((x % 400) - 200);
-            } else {
-                x_pole = x + (200 - (x % 400));
-            }
-            if (z % 400 > 200) {
-                z_pole = z - ((z % 400) - 200);
-            } else {
-                z_pole = z + (200 - (z % 400));
-            }
+            if (x % 400 > 200) x_pole = x - ((x % 400) - 200);
+            else x_pole = x + (200 - (x % 400));
+
+            if (z % 400 > 200) z_pole = z - ((z % 400) - 200);
+            else z_pole = z + (200 - (z % 400));
+
             if (x < 0) x_pole -= 400;
             if (z < 0) z_pole -= 400;
 

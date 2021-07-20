@@ -24,12 +24,12 @@ public class CosmeticEmotes {
         SMOOCH = register(new CosmeticEmote(13, new EmoteSmooch(), "smooch", "Shower your friends with love."));
         POKE = register(new CosmeticEmote(14, new EmotePoke(), "poke", "Poke someone and make 'em jump back a bit."));
 
-        SCARE = register(new CosmeticEmote(21, new EmoteScare(), "scare", null,
+        SCARE = register(new CosmeticEmote(21, new EmoteScare(), "scare", Permissions.EMOTE_SCARE,
                 Component.text("Can be earned around Halloween."),
                 Component.text("Scares someone")
         ));
 
-        JINGLE = register(new CosmeticEmote(22, new EmoteJingle(), "jingle", null,
+        JINGLE = register(new CosmeticEmote(22, new EmoteJingle(), "jingle", Permissions.EMOTE_JINGLE,
                 Component.text("Can be earned around Christmas."),
                 Component.text("Plays a christmas tune")
         ));

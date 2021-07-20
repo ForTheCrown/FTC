@@ -779,8 +779,8 @@ public class CommandFtcCore extends FtcCommand {
             else CrownCore.getPriceMap().save();
         }),
         GRAPPLING_HOOK ("Grappling Hook", b -> {
-            if(b) Pirates.getParkour().getData().reload();
-            else Pirates.getParkour().getData().save();
+            if(b) Pirates.getParkour().reload();
+            else Pirates.getParkour().save();
         }),
         PARROT_TRACKER ("Parrot Tracker", b -> {
             if(b) Pirates.getParrotTracker().reload();

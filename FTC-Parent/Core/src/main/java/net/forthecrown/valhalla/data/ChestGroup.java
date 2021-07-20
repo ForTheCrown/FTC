@@ -82,6 +82,16 @@ public class ChestGroup implements Keyed {
     }
 
     @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+                "groupKey=" + groupKey +
+                ", lootTableKey=" + lootTableKey +
+                ", maxChests=" + maxChests +
+                ", possibleLocations=" + possibleLocations +
+                '}';
+    }
+
+    @Override
     public @NotNull Key key() {
         return groupKey;
     }

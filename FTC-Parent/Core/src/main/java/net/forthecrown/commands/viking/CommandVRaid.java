@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.regions.Region;
@@ -71,9 +72,13 @@ public class CommandVRaid extends FtcCommand {
                                             NamespacedKey key = KeyArgument.getKey(c, "key");
 
                                             BukkitPlayer bPlayer = BukkitAdapter.adapt(player);
-                                            Region region = bPlayer.getSelection();
+                                            Region region;
 
-                                            if(region == null) throw FtcExceptionProvider.create("You must make a region selection for raid area");
+                                            try {
+                                                region = bPlayer.getSelection();
+                                            } catch (IncompleteRegionException e) {
+                                                throw FtcExceptionProvider.create("You must make a region selection for raid area");
+                                            }
 
                                             Valhalla.getInstance().addRaid(key, startingLocation, region);
 
@@ -162,6 +167,80 @@ public class CommandVRaid extends FtcCommand {
                                 )
                         )
 
+                        .then(literal("edit")
+                                .then(argument("group_key", Valhalla.KEY_PARSER)
+                                        .then(literal("add_chest")
+                                                .then(argument("position", PositionArgument.blockPos())
+                                                        .executes(c -> {
+                                                            ChestGroup group = getGroup(c);
+                                                            BlockPos pos = BlockPos.of(PositionArgument.getLocation(c, "position"));
+
+                                                            group.getPossibleLocations().add(pos);
+
+                                                            c.getSource().sendAdmin("Added position to chest group " + group.key().asString());
+                                                            return 0;
+                                                        })
+                                                )
+                                        )
+
+                                        .then(literal("remove_chest")
+                                                .then(argument("position", PositionArgument.blockPos())
+                                                        .executes(c -> {
+                                                            ChestGroup group = getGroup(c);
+                                                            BlockPos pos = BlockPos.of(PositionArgument.getLocation(c, "position"));
+
+                                                            group.getPossibleLocations().remove(pos);
+
+                                                            c.getSource().sendAdmin("Removed position from chest group " + group.key().asString());
+                                                            return 0;
+                                                        })
+                                                )
+                                        )
+
+                                        .then(literal("lootTable")
+                                                .executes(c -> {
+                                                    ChestGroup group = getGroup(c);
+
+                                                    c.getSource().sendAdmin(group.getLootTableKey().asString());
+                                                    return 0;
+                                                })
+
+                                                .then(argument("lootTable", LootTableArgument.lootTable())
+                                                        .executes(c -> {
+                                                            ChestGroup group = getGroup(c);
+                                                            LootTable table = LootTableArgument.getLootTable(c, "lootTable");
+
+                                                            group.setLootTableKey(table.getKey());
+
+                                                            c.getSource().sendAdmin("Set lootTable of " + group.key().asString() + " to " + table.getKey().asString());
+                                                            return 0;
+                                                        })
+                                                )
+                                        )
+
+                                        .then(literal("maxChests")
+                                                .executes(c -> {
+                                                    ChestGroup group = getGroup(c);
+
+                                                    c.getSource().sendAdmin("maxChests: " + group.getMaxChests());
+                                                    return 0;
+                                                })
+
+                                                .then(argument("amount", IntegerArgumentType.integer(1, 127))
+                                                        .executes(c -> {
+                                                            ChestGroup group = getGroup(c);
+                                                            int amount = IntegerArgumentType.getInteger(c, "amount");
+
+                                                            group.setMaxChests((byte) amount);
+
+                                                            c.getSource().sendAdmin("Set maxChests to " + amount + " for " + group.key().asString());
+                                                            return 0;
+                                                        })
+                                                )
+                                        )
+                                )
+                        )
+
                         .then(literal("remove")
                                 .then(argument("remove_key", Valhalla.KEY_PARSER)
                                         .executes(c -> {
@@ -239,5 +318,18 @@ public class CommandVRaid extends FtcCommand {
                                 )
                         )
                 );
+    }
+
+    private ChestGroup getGroup(CommandContext<CommandSource> c) throws CommandSyntaxException {
+        VikingRaid raid = get(c);
+        checkHasLoot(raid);
+
+        LootData data = raid.getLootData();
+        if(!data.hasChestGroups()) throw FtcExceptionProvider.create("Given raid does not have any chest groups");
+
+        NamespacedKey key = c.getArgument("group_key", NamespacedKey.class);
+        if(!data.hasGroup(key)) throw FtcExceptionProvider.create("LootData doesn't have group with ID " + key.asString());
+
+        return data.getChestGroup(key);
     }
 }

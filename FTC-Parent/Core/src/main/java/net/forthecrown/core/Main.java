@@ -1,6 +1,5 @@
 package net.forthecrown.core;
 
-import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.comvars.types.ComVarType;
@@ -15,16 +14,13 @@ import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.CrownBalances;
 import net.forthecrown.economy.ServerItemPriceMap;
 import net.forthecrown.economy.shops.CrownShopManager;
-import net.forthecrown.events.Events;
 import net.forthecrown.events.MobHealthBar;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.registry.CrownKitRegistry;
 import net.forthecrown.registry.CrownWarpRegistry;
-import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.useables.CrownUsablesManager;
-import net.forthecrown.useables.actions.UsageActions;
-import net.forthecrown.useables.preconditions.UsageChecks;
 import net.forthecrown.user.CrownUserManager;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.valhalla.ValhallaEngine;
@@ -94,42 +90,12 @@ public final class Main extends JavaPlugin implements CrownCore {
         saveDefaultConfig();
         getConfig().options().copyDefaults(true);
 
-        joinInfo = new JoinInfo();
-
-        balances = new CrownBalances();
-        userSerializer = new UserJsonSerializer();
-
-        shopManager = new CrownShopManager();
-        userManager = new CrownUserManager();
-        punishmentManager = new CrownPunishmentManager();
-        jailManager = new CrownJailManager();
-        kingship = new CrownKingship();
-        rules = new ServerRules();
-
-        usablesManager = new CrownUsablesManager();
-
-        safeRunnable(Pirates::init);
-        safeRunnable(Bosses::init);
-        safeRunnable(Cosmetics::init);
-
-        if(CrownCore.inDebugMode()) safeRunnable(ValhallaEngine::init);
-
-        safeRunnable(UsageChecks::init);
-        safeRunnable(UsageActions::init);
-
-        warpRegistry = new CrownWarpRegistry();
-        kitRegistry = new CrownKitRegistry();
+        FtcBootStrap.secondPhase();
 
         announcer.doBroadcasts();
-
-        safeRunnable(CoreCommands::init);
-        safeRunnable(Events::init);
-
         dayUpdate.checkDay();
 
         if(getConfig().getBoolean("System.run-deleter-on-startup")) userManager.runUserDeletionCheck();
-
-        Registries.COMVAR_TYPES.close();
 
         logger.info("FTC startup completed");
     }
@@ -138,20 +104,11 @@ public final class Main extends JavaPlugin implements CrownCore {
     public void onLoad() {
         inst = this;
         inDebugMode = ComVarRegistry.set("core_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
-
         logger = getLogger();
-        announcer = new CrownBroadcaster();
 
-        messages = new CrownMessages();
-        messages.load();
+        RoyalCommandException.ENABLE_HOVER_STACK_TRACE = CrownCore.inDebugMode();
 
-        emotes = new ChatEmotes();
-        emotes.registerEmotes();
-
-        prices = new ServerItemPriceMap();
-        tabList = new CrownTabList();
-
-        WgFlags.init();
+        FtcBootStrap.firstPhase();
     }
 
     @Override
@@ -167,7 +124,7 @@ public final class Main extends JavaPlugin implements CrownCore {
         safeRunnable(Bosses::shutDown);
         safeRunnable(Cosmetics::shutDown);
         safeRunnable(Pirates::shutDown);
-        //safeRunnable(ValhallaEngine::shutDown);
+        if(CrownCore.inDebugMode()) safeRunnable(ValhallaEngine::shutDown);
 
         CrownUserManager.LOADED_USERS.clear();
         CrownUserManager.LOADED_ALTS.clear();

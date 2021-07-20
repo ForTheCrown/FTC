@@ -32,19 +32,19 @@ public class InventoryBorder implements InventoryOption {
     public void place(Inventory inventory, CrownUser user) {
         for (int i = 0; i < inventory.getSize(); i++){
             if(i < 9){
-                inventory.setItem(i, borderItem);
+                inventory.setItem(i, getBorderItem());
                 continue;
             }
 
             if(i >= inventory.getSize() - 9){
-                inventory.setItem(i, borderItem);
+                inventory.setItem(i, getBorderItem());
                 continue;
             }
 
             if(i % 9 != 0) return;
-            inventory.setItem(i, borderItem);
+            inventory.setItem(i, getBorderItem());
             i += 8;
-            inventory.setItem(i, borderItem);
+            inventory.setItem(i, getBorderItem());
         }
     }
 

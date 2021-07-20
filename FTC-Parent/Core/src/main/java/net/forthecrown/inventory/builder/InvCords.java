@@ -1,5 +1,7 @@
 package net.forthecrown.inventory.builder;
 
+import org.apache.commons.lang.Validate;
+
 /**
  * Inventory Coordinates, basically a class that holds an X and Y cord value for determining
  * where in the inventory something is or should be.
@@ -9,6 +11,9 @@ public class InvCords {
     private final byte column;
 
     public InvCords(int column, int row) {
+        Validate.isTrue(column < 9, "Column cannot be more than 8");
+        Validate.isTrue(row < 6, "Row cannot be more than 5");
+
         this.row = (byte) row;
         this.column = (byte) column;
     }
@@ -40,16 +45,16 @@ public class InvCords {
 
         InvCords cords = (InvCords) o;
 
-        return cords.column == this.column && cords.row == this.row;
+        return cords.getColumn() == this.column && cords.getRow() == this.row;
     }
 
     @Override
     public int hashCode() {
-        return row * column;
+        return getRow() * getColumn();
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '{' + "row=" + row + ", column=" + column + '}';
+        return getClass().getSimpleName() + '{' + "row=" + getRow() + ", column=" + getColumn() + '}';
     }
 }

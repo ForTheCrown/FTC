@@ -2,6 +2,7 @@ package net.forthecrown.utils;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.audience.Audience;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.bukkit.Bukkit.getServer;
@@ -98,15 +100,13 @@ public final class FtcUtils {
         return parseKey(new StringReader(str));
     }
 
-    //Parses a key from a string
-    //I realize now I couldn've just used Key.key(String), but too late
-    public static Key parseKey(StringReader reader) {
-        String first = reader.readUnquotedString();
-        if(reader.canRead() && reader.peek() == ':'){
-            reader.skip();
-            return Key.key(first, reader.readUnquotedString());
+    public static Key parseKey(StringReader reader) throws IllegalStateException {
+        try {
+            NamespacedKey key = CoreCommands.ftcKeyType().parse(reader);
+            return Key.key(key.namespace(), key.value());
+        } catch (CommandSyntaxException e) {
+            throw new IllegalStateException("Invalid string to parse");
         }
-        return Key.key(CrownCore.inst(), first);
     }
 
     //Makes sure the given key is not a bukkit key, since different hash result
@@ -163,6 +163,10 @@ public final class FtcUtils {
     public static NamespacedKey keyToBukkit(Key key) {
         if(key instanceof NamespacedKey) return (NamespacedKey) key;
         return new NamespacedKey(key.namespace(), key.value());
+    }
+
+    public static <T> T makeIfNull(T obj, Supplier<T> supplier) {
+        return obj == null ? supplier.get() : obj;
     }
 
     /*
@@ -230,13 +234,13 @@ public final class FtcUtils {
         XL(40), L(50), XC(90), C(100),
         CD(400), D(500), CM(900), M(1000);
 
-        private final int value;
+        private final short value;
 
         RomanNumeral(int value) {
-            this.value = value;
+            this.value = (short) value;
         }
 
-        public int getValue() {
+        public short getValue() {
             return value;
         }
 

@@ -2,23 +2,17 @@ package net.forthecrown.events;
 
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.economy.pirates.PirateEconomy;
-import net.forthecrown.economy.pirates.merchants.UsablePirateNpc;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.pirates.TreasureShulker;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Branch;
 import net.forthecrown.utils.Cooldown;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -33,45 +27,22 @@ public class PirateEvents implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event1) {
-        if(event1.getRightClicked().getPersistentDataContainer().has(Pirates.BM_MERCHANT, PersistentDataType.STRING)){
-            if(!(event1.getRightClicked() instanceof Villager)) return;
+        if (!event1.getRightClicked().getPersistentDataContainer().has(Pirates.SHULKER_KEY, PersistentDataType.BYTE)) return;
 
-            Entity entity = event1.getRightClicked();
+        Events.handlePlayer(event1, event -> {
+            Player player = event.getPlayer();
+            if(Cooldown.contains(player)) return;
+            Cooldown.add(player, 16);
 
-            String id = entity.getPersistentDataContainer().get(Pirates.BM_MERCHANT, PersistentDataType.STRING);
-            assert  id != null : "Id was null";
+            CrownUser user = UserManager.getUser(player);
+            if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.notPirate();
 
-            event1.setCancelled(true);
-
-            CrownUser user = UserManager.getUser(event1.getPlayer());
-            PirateEconomy bm = Pirates.getPirateEconomy();
-
-            if(user.getBranch() != Branch.PIRATES){
-                user.sendMessage(Component.translatable("pirates.wrongBranch", NamedTextColor.YELLOW, entity.customName()));
-                return;
+            TreasureShulker shulker = Pirates.getTreasure();
+            if(shulker.createLoot(player, event.getRightClicked()).giveRewards(player)){
+                shulker.find(user.getUniqueId());
+                shulker.relocate();
             }
-
-            UsablePirateNpc npc = bm.getNpcById(id);
-            npc.onUse(user, entity);
-            return;
-        }
-
-        if(event1.getRightClicked().getPersistentDataContainer().has(Pirates.SHULKER_KEY, PersistentDataType.BYTE)){
-            Events.handlePlayer(event1, event -> {
-                Player player = event.getPlayer();
-                if(Cooldown.contains(player)) return;
-                Cooldown.add(player, 16);
-
-                CrownUser user = UserManager.getUser(player);
-                if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.notPirate();
-
-                TreasureShulker shulker = Pirates.getTreasure();
-                if(shulker.createLoot(player, event.getRightClicked()).giveRewards(player)){
-                    shulker.find(user.getUniqueId());
-                    shulker.relocate();
-                }
-            });
-        }
+        });
     }
 
     @EventHandler(ignoreCancelled = true)

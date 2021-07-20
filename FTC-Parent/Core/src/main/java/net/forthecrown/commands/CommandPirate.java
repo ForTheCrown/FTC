@@ -20,7 +20,7 @@ public class CommandPirate extends FtcCommand {
                 .then(literal("reload")
                         .executes(c -> {
                             Pirates.getTreasure().reload();
-                            Pirates.getParkour().getData().reload();
+                            Pirates.getParkour().reload();
                             Pirates.getAuctions().reloadAuctions();
                             broadcastAdmin(c.getSource(), "Pirate config reloaded.");
                             return 0;
