@@ -1,9 +1,9 @@
 package net.forthecrown.august;
 
+import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.crownevents.CrownEventUtils;
 import net.forthecrown.crownevents.TimerMessageFormatter;
-import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.math.FtcRegion;
@@ -19,21 +19,39 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Objective;
 
 public class EventConstants {
+    public static final String EVENT_NAMESPACE = "august_event";
+
     public static final Objective CROWN = CrownEventUtils.getCrownObjective();
+
     public static final FtcRegion PINATA_REGION = new FtcRegion(Worlds.OVERWORLD, -67, 64, 868, -38, 82, 900);
+    public static final FtcRegion SAFE_ZONE = new FtcRegion(Worlds.OVERWORLD, -62, 67, 875, -44, 81, 893);
+    public static final FtcRegion ARENA_REGION = new FtcRegion(Worlds.OVERWORLD, -75, 62, 863, -34, 83, 906);
 
-    public static final Location EXIT = new Location(Worlds.OVERWORLD, 1, 1, 1);
-    public static final Location START = new Location(Worlds.OVERWORLD, 1, 1,1);
+    public static final Location EXIT = new Location(Worlds.OVERWORLD, 69, 74, 882);
+    public static final Location START = new Location(Worlds.OVERWORLD, -63, 72, 872, -45, 12);
+    public static final Location MIDDLE = new Location(Worlds.OVERWORLD, -51.5, 78, 884.5);
+    public static final Location SPAWN = new Location(Worlds.OVERWORLD, -44.5, 71, 877.5);
 
-    public static final NamespacedKey TICKET_KEY = Squire.createKey("august_event", "ticket");
-    public static final NamespacedKey PINATA_KEY = Squire.createKey("august_event", "pinata");
+    public static final NamespacedKey TICKET_KEY = EventUtil.createEventKey("ticket");
+    public static final NamespacedKey PINATA_KEY = EventUtil.createEventKey("pinata");
+
+    public static final int MAX_TICKS_IN_EVENT = 5 * 60 * 20;
 
     public static final TimerMessageFormatter TIMER_FORMAT = (timer, time) -> Component.text("Time left: ")
             .color(NamedTextColor.YELLOW)
             .decorate(TextDecoration.BOLD)
             .append(Component.text(timer).color(NamedTextColor.WHITE));
 
-    private static final ItemStack TICKET = new ItemStackBuilder(Material.FLOWER_BANNER_PATTERN, 1)
+    public static final ImmutableList<PinataDrop> DROPS = ImmutableList.of(
+            new PinataDrop(0, 39, new ItemStack(Material.EMERALD, 1)),
+            new PinataDrop(40, 59, new ItemStack(Material.GOLD_INGOT, 1)),
+            new PinataDrop(60, 79, new ItemStack(Material.IRON_INGOT, 1)),
+
+            new PinataDrop(80, 89, new ItemStack(Material.DIAMOND, 1)),
+            new PinataDrop(90, 100, new ItemStack(Material.NETHERITE_INGOT, 1))
+    );
+
+    private static final ItemStack TICKET = new ItemStackBuilder(Material.PAPER, 1)
             .setName(
                     Component.text("Pinata event ticket")
                             .style(ChatFormatter.nonItalic(NamedTextColor.AQUA))

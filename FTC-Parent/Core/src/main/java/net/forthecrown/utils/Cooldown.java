@@ -24,7 +24,7 @@ public final class Cooldown {
     private Cooldown(){}
 
     public static boolean contains(@NotNull CommandSender sender){
-        return contains(sender, "general");
+        return contains(sender, GENERAL);
     }
 
     public static boolean contains(@NotNull CommandSender sender, @NotNull String category){

@@ -8,6 +8,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Branch;
@@ -22,7 +23,7 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public class GrapplingHookMerchant implements BlackMarketMerchant, ClickEventTask {
-    private static final Key KEY = CrownCore.coreKey("gh_merchant");
+    private static final Key KEY = Squire.createPiratesKey("gh_merchant");
 
     private final String npcID;
 

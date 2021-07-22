@@ -105,6 +105,8 @@ public final class CoreCommands {
         new CommandMakeAward();
         new CommandTeleportExact();
         new CommandTime();
+        new CommandNPC();
+        new CommandGhStand();
         CommandSpecificGameMode.init();
 
         //Policing commands

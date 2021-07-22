@@ -176,11 +176,18 @@ public class GhLevelData implements JsonSerializable {
 
     public ItemStack makeItem(UUID uuid) {
         ItemStackBuilder builder = new ItemStackBuilder(hasCompleted(uuid) ? biome.completedMat() : biome.selectorMat())
-                .setName(Component.text(name).style(ChatFormatter.nonItalic(biome.color)));
+                .setName(formattedName().style(ChatFormatter.nonItalic(biome.color)));
 
         if(Pirates.getParkour().isFirstUncompleted(uuid, this)) builder.addEnchant(Enchantment.CHANNELING, 1);
 
         return builder.build();
+    }
+
+    public Component formattedName() {
+        return Component.text(name
+                .replaceAll("-", " ")
+                .replaceAll("_", " ")
+        );
     }
 
     @Override

@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -136,9 +137,8 @@ public final class FtcUtils {
         return itemStack == null || itemStack.getType() == Material.AIR || itemStack.getAmount() <= 0;
     }
 
-    public static boolean isInRange(int check, int min, int max){
-        if(check < min) return false;
-        return check <= max;
+    public static boolean isInRange(int check, int min, int max) {
+        return check >= min && check <= max;
     }
 
     //Gets a player from an audience, used by the chat event listener in CoreListener
@@ -167,6 +167,10 @@ public final class FtcUtils {
 
     public static <T> T makeIfNull(T obj, Supplier<T> supplier) {
         return obj == null ? supplier.get() : obj;
+    }
+
+    public static Vector vectorBetweenPoints(Location l1, Location l2) {
+        return l1.toVector().clone().subtract(l2.toVector());
     }
 
     /*

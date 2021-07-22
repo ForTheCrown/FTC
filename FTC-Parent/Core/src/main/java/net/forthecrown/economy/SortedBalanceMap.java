@@ -163,7 +163,7 @@ public class SortedBalanceMap implements BalanceMap {
     @Override
     public long getTotalBalance(){
         long totalAmount = 0;
-        for (BalEntry e: entrySet()){
+        for (BalEntry e: entries()){
             totalAmount += e.getValue();
         }
 
@@ -185,7 +185,8 @@ public class SortedBalanceMap implements BalanceMap {
         return ListUtils.convertToList(entries, BalEntry::getValue);
     }
 
-    List<BalEntry> entrySet() {
+    @Override
+    public List<BalEntry> entries() {
         return new ArrayList<>(entries);
     }
 }

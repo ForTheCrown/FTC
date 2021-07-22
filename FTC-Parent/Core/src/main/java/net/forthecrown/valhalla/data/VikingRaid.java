@@ -35,7 +35,7 @@ public class VikingRaid implements Keyed {
     }
 
     public LootData getLootData() {
-        return FtcUtils.makeIfNull(lootData, LootData::new);
+        return lootData = FtcUtils.makeIfNull(lootData, LootData::new);
     }
 
     public void setLootData(LootData lootData) {
@@ -43,7 +43,7 @@ public class VikingRaid implements Keyed {
     }
 
     public MobData getMobData() {
-        return FtcUtils.makeIfNull(mobData, MobData::new);
+        return mobData = FtcUtils.makeIfNull(mobData, MobData::new);
     }
 
     public boolean hasMobData() {

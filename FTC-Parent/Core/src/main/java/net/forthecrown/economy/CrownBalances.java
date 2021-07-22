@@ -1,57 +1,49 @@
 package net.forthecrown.economy;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.forthecrown.core.CrownCore;
 import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.serializer.AbstractYamlSerializer;
+import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.user.UserManager;
 import org.bukkit.Bukkit;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class CrownBalances extends AbstractYamlSerializer implements Balances {
+public class CrownBalances extends AbstractJsonSerializer implements Balances {
 
-    private SortedBalanceMap balanceMap = new SortedBalanceMap(CrownCore::getStartRhines); //this is how all the balances are stored, in a private Map
+    private BalanceMap balanceMap = new SortedBalanceMap(CrownCore::getStartRhines);
 
     public CrownBalances() {
-        super("balance");
+        super("balances");
 
         reload();
         CrownCore.logger().info("Balances loaded");
     }
 
     @Override
-    public synchronized void saveFile(){
-        Set<UUID> alreadySerialized = new HashSet<>();
-        int defAmount = CrownCore.getStartRhines();
+    protected void save(JsonObject json) {
+        Set<UUID> serialized = new HashSet<>();
 
-        for (BalanceMap.BalEntry e: balanceMap.entrySet()){
-            if(alreadySerialized.contains(e.getUniqueId())) continue;
-            if(e.getValue() == defAmount) continue;
+        for (BalanceMap.BalEntry e: getMap().entries()) {
+            if(serialized.contains(e)) continue;
+            serialized.add(e.getUniqueId());
 
-            alreadySerialized.add(e.getUniqueId());
-            getFile().set(e.getUniqueId().toString(), e.getValue());
+            json.addProperty(e.getUniqueId().toString(), e.getValue());
         }
     }
 
     @Override
-    public synchronized void reloadFile(){
+    protected void reload(JsonObject json) {
         balanceMap.clear();
 
-        for(String string : getFile().getKeys(true)){
-            UUID id;
-            try {
-                id = UUID.fromString(string);
-            } catch (Exception e){
-                CrownCore.logger().warning(string + " is not a valid UUID, reload() in Balance");
-                continue;
-            }
-
-            int balance = getFile().getInt(string);
-            balanceMap.put(id, balance);
+        for (Map.Entry<String, JsonElement> e: json.entrySet()) {
+            balanceMap.put(UUID.fromString(e.getKey()), e.getValue().getAsInt());
         }
     }
 
@@ -60,7 +52,7 @@ public class CrownBalances extends AbstractYamlSerializer implements Balances {
         return balanceMap;
     }
     @Override
-    public synchronized void setMap(SortedBalanceMap balanceMap){
+    public synchronized void setMap(BalanceMap balanceMap){
         this.balanceMap = balanceMap;
     }
 
@@ -118,5 +110,10 @@ public class CrownBalances extends AbstractYamlSerializer implements Balances {
         int percent = (int) (UserManager.getUser(uuid).getTotalEarnings() / 50000 * 10);
         if(percent >= 30) return 50;
         return percent;
+    }
+
+    @Override
+    protected JsonObject createDefaults(JsonObject json) {
+        return null;
     }
 }

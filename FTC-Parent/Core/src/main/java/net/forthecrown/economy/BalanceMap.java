@@ -42,6 +42,8 @@ public interface BalanceMap {
 
     List<Integer> values();
 
+    List<BalEntry> entries();
+
     class BalEntry implements Comparable<BalanceMap.BalEntry> {
         private final UUID id;
         private int bal;

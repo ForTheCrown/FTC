@@ -52,7 +52,7 @@ public interface Balances extends CrownSerializer {
      * Sets the balance map
      * @param balanceMap The balance map
      */
-    void setMap(SortedBalanceMap balanceMap);
+    void setMap(BalanceMap balanceMap);
 
     /**
      * Gets the balance of a player by their UUID

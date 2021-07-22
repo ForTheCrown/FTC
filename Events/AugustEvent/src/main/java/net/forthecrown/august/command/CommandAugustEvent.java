@@ -1,12 +1,15 @@
 package net.forthecrown.august.command;
 
-import net.forthecrown.august.A_Main;
-import net.forthecrown.august.AugustEvent;
+import net.forthecrown.august.AugustPlugin;
+import net.forthecrown.august.EventUtil;
+import net.forthecrown.august.event.PinataEvent;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class CommandAugustEvent extends FtcCommand {
@@ -38,9 +41,9 @@ public class CommandAugustEvent extends FtcCommand {
                                     CommandSource source = c.getSource();
                                     Player player = EntityArgument.getPlayer(c, "player");
 
-                                    if(AugustEvent.currentEntry != null) throw FtcExceptionProvider.create("There is already someone in the event");
+                                    if(PinataEvent.currentEntry != null) throw FtcExceptionProvider.create("There is already someone in the event");
 
-                                    A_Main.event.start(player);
+                                    AugustPlugin.event.start(player);
 
                                     source.sendAdmin("Forcing " + player.getName() + " to enter the event");
                                     return 0;
@@ -49,9 +52,36 @@ public class CommandAugustEvent extends FtcCommand {
                 )
 
                 .then(literal("end")
-                        .then(argument("player", EntityArgument.player())
-                                .executes(c -> {
+                        .executes(c -> {
+                            if(PinataEvent.currentEntry == null) throw FtcExceptionProvider.create("There is no one in the event");
 
+                            AugustPlugin.event.end(PinataEvent.currentEntry);
+
+                            c.getSource().sendAdmin("Ending event");
+                            return 0;
+                        })
+                )
+
+                .then(literal("complete")
+                        .executes(c -> {
+                            if(PinataEvent.currentEntry == null) throw FtcExceptionProvider.create("There is no one in the event");
+
+                            AugustPlugin.event.complete(PinataEvent.currentEntry);
+
+                            c.getSource().sendAdmin("Completing event");
+                            return 0;
+                        })
+                )
+
+                .then(literal("spawnPinata")
+                        .then(argument("cords", PositionArgument.position())
+                                .executes(c -> {
+                                    Location loc = PositionArgument.getLocation(c, "cords");
+
+                                    EventUtil.spawnPinata(loc);
+
+                                    c.getSource().sendAdmin("Spawned pinata");
+                                    return 0;
                                 })
                         )
                 );

@@ -45,6 +45,8 @@ public class CommandSetHome extends FtcCommand {
             if(CommandTpask.isNonAcceptedWorld(context.loc.getWorld())) throw FtcExceptionProvider.cannotSetHomeHere();
         }
 
+        if(context.isDefault) context.user.getPlayer().setBedSpawnLocation(context.loc, true);
+
         context.homes.set(context.name, context.loc);
         context.user.sendMessage(
                 Component.translatable("homes.set", Component.text(context.name).color(NamedTextColor.GOLD))
@@ -58,12 +60,14 @@ public class CommandSetHome extends FtcCommand {
         private final UserHomes homes;
         private final String name;
         private final Location loc;
+        private final boolean isDefault;
 
-        public HomeCreationContext(CrownUser user, String name) {
+        HomeCreationContext(CrownUser user, String name) {
             this.user = user;
             this.homes = user.getHomes();
             this.name = name;
             this.loc = user.getLocation();
+            this.isDefault = name.equals(CommandHome.DEFAULT);
         }
     }
 }

@@ -16,6 +16,7 @@ public class GhListener implements Listener {
     public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
         if(!event.getRightClicked().getPersistentDataContainer().has(Pirates.GH_STAND_KEY, PersistentDataType.STRING)) return;
         if(Cooldown.contains(event.getPlayer(), COOLDOWN_CATEGORY)) return;
+        Cooldown.add(event.getPlayer(), COOLDOWN_CATEGORY, 20);
 
         String id = event.getRightClicked().getPersistentDataContainer().get(Pirates.GH_STAND_KEY, PersistentDataType.STRING);
         assert id != null : "Id was null";

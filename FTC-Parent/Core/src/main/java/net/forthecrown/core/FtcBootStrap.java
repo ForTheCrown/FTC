@@ -5,6 +5,7 @@ import net.forthecrown.core.admin.CrownPunishmentManager;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.CrownJailManager;
 import net.forthecrown.core.chat.*;
+import net.forthecrown.core.converters.Balances_YamlToJson;
 import net.forthecrown.core.kingship.CrownKingship;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
@@ -50,7 +51,9 @@ public final class FtcBootStrap {
     static void secondPhase() {
         Main.joinInfo = new JoinInfo();
 
+        Balances_YamlToJson.checkAndRun();
         Main.balances = new CrownBalances();
+
         Main.userSerializer = new UserJsonSerializer();
 
         Main.shopManager = new CrownShopManager();

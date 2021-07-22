@@ -294,6 +294,7 @@ public class CoreListener implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if(!event.getRightClicked().getPersistentDataContainer().has(NpcDirectory.KEY, PersistentDataType.STRING)) return;
 
+        event.setCancelled(true);
         NpcDirectory.interact(
                 event.getRightClicked().getPersistentDataContainer().get(NpcDirectory.KEY, PersistentDataType.STRING),
                 event.getRightClicked(),

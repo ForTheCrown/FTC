@@ -28,6 +28,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
 import java.util.Date;
+import java.util.function.Function;
 
 public class CommandProfile extends FtcCommand {
 
@@ -176,6 +177,10 @@ public class CommandProfile extends FtcCommand {
 
         Component ip = profile.ip == null ? null : Component.text(profile.ip);
 
+        Component lastNames = ListUtils.isNullOrEmpty(profile.previousNames) ? null : Component.text(
+                ListUtils.join(profile.previousNames, Function.identity())
+        );
+
         return Component.newline()
                 .append(Component.text("\nAdmin Info:").color(NamedTextColor.YELLOW))
                 .append(line(" Ranks", ListUtils.join(profile.getAvailableRanks(), r -> r.name().toLowerCase()), true))
@@ -183,6 +188,7 @@ public class CommandProfile extends FtcCommand {
                 .append(Component.newline())
                 .append(timeSinceOnlineOrOnlineTime(profile))
                 .append(line(" IP", ip, ip != null))
+                .append(line(" PreviousNames", lastNames, lastNames != null))
                 .append(line(" Ignored: ", ignored, ignored != null))
                 .append(line(" Separated", separated, separated != null))
 

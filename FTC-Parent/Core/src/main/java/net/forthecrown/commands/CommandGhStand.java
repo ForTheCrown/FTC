@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -47,17 +48,48 @@ public class CommandGhStand extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
+                .then(literal("exit")
+                        .then(argument("name", StringArgumentType.word())
+                                .suggests((c, b) -> CompletionProvider.suggestMatching(b, Pirates.getParkour().keySet()))
+
+                                .executes(c -> {
+                                    Player player = c.getSource().asPlayer();
+
+                                    GhLevelData data = Pirates.getParkour().byName(c.getArgument("name", String.class));
+                                    if(data == null) throw FtcExceptionProvider.create("Unknown Level");
+
+                                    String name = data.getName();
+
+                                    player.getWorld().spawn(player.getLocation(), ArmorStand.class, stand -> {
+                                        stand.setInvisible(true);
+                                        stand.setInvulnerable(true);
+
+                                        stand.getPersistentDataContainer().set(Pirates.GH_STAND_KEY, PersistentDataType.STRING, name);
+                                        stand.getEquipment().setHelmet(new ItemStack(Material.GLOWSTONE, 1));
+
+                                        stand.setCanMove(false);
+                                        stand.setGravity(false);
+                                        stand.setRemoveWhenFarAway(false);
+                                        stand.setBasePlate(false);
+                                    });
+
+                                    c.getSource().sendAdmin("Placed exit stand");
+                                    return 0;
+                                })
+                        )
+                )
+
                 .then(argument("name", StringArgumentType.word())
                         .then(argument("start", PositionArgument.blockPos())
                                 .then(argument("biome", EnumArgument.of(GhBiome.class))
                                         .executes(c -> doStuff(c, null, null, null, null))
 
-                                        .then(argument("next", StringArgumentType.word())
-                                                .suggests((c, b) -> CompletionProvider.suggestMatching(b, Pirates.getParkour().keySet()))
+                                        .then(argument("type", EnumArgument.of(GhType.class))
+                                                .executes(c -> doStuff(c, "type", null, null, null))
 
-                                                .executes(c -> doStuff(c, null, null, null, "next"))
-
-                                                .then(argument("type", EnumArgument.of(GhType.class))
+                                                .then(argument("next", StringArgumentType.word())
+                                                        .suggests((c, b) -> CompletionProvider.suggestMatching(b, Pirates.getParkour().keySet()))
+                                                        
                                                         .executes(c -> doStuff(c, "type", null, null, "next"))
 
                                                         .then(argument("hooks", IntegerArgumentType.integer(1))
@@ -75,8 +107,6 @@ public class CommandGhStand extends FtcCommand {
     }
 
     private int doStuff(CommandContext<CommandSource> c, @Nullable String typeStr, @Nullable String hks, @Nullable String dist, @Nullable String nxt) throws CommandSyntaxException {
-        Player player = c.getSource().asPlayer();
-
         String name = c.getArgument("name", String.class);
         BlockPos start = BlockPos.of(PositionArgument.getLocation(c, "start"));
         GhBiome biome = c.getArgument("biome", GhBiome.class);
@@ -89,19 +119,6 @@ public class CommandGhStand extends FtcCommand {
 
         GhLevelData data = new GhLevelData(name, start, next, hooks, distance, biome, type);
         Pirates.getParkour().add(data);
-
-        player.getWorld().spawn(player.getLocation(), ArmorStand.class, stand -> {
-            stand.setInvisible(true);
-            stand.setInvulnerable(true);
-
-            stand.getPersistentDataContainer().set(Pirates.GH_STAND_KEY, PersistentDataType.STRING, name);
-            stand.getEquipment().setHelmet(new ItemStack(Material.GLOWSTONE, 1));
-
-            stand.setCanMove(false);
-            stand.setGravity(false);
-            stand.setRemoveWhenFarAway(false);
-            stand.setBasePlate(false);
-        });
 
         c.getSource().sendAdmin("Created stand with name " + name);
         return 0;

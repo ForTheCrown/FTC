@@ -3,9 +3,9 @@ package net.forthecrown.pirates.grappling;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.AbstractJsonSerializer;
+import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Branch;
@@ -23,7 +23,7 @@ public class GhParkour extends AbstractJsonSerializer {
     public GhParkour() {
         super("parkour_data");
 
-        Registries.NPCS.register(CrownCore.coreKey("gh_jack"), (player, entity) -> {
+        Registries.NPCS.register(Squire.createPiratesKey("gh_jack"), (player, entity) -> {
             CrownUser user = UserManager.getUser(player);
 
             if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.notPirate();
