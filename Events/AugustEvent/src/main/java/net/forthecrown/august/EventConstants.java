@@ -14,9 +14,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -38,10 +36,13 @@ public class EventConstants {
 
     public static final NamespacedKey TICKET_KEY = EventUtil.createEventKey("ticket");
     public static final NamespacedKey PINATA_KEY = EventUtil.createEventKey("pinata");
+    public static final NamespacedKey BEBE_KEY = EventUtil.createEventKey("bebe");
 
     public static final int MAX_TICKS_IN_EVENT = 1200;
-    public static final int VELOCITY_BOUND = 2;
+    public static final int VELOCITY_BOUND = 1;
     public static final double SQUID_HEALTH = 2047;
+
+    public static final Particle.DustOptions dust = new Particle.DustOptions(Color.WHITE, 2);
 
     public static final net.minecraft.network.chat.Component PLUS_ONE;
 
@@ -50,6 +51,12 @@ public class EventConstants {
         component.withStyle(ChatFormatting.YELLOW);
 
         PLUS_ONE = component;
+    }
+
+    public static net.minecraft.network.chat.Component getPlusX(int x) {
+        MutableComponent component = new TextComponent("+" + x);
+        component.withStyle(ChatFormatting.YELLOW);
+        return component;
     }
 
     public static final TimerMessageFormatter TIMER_FORMAT = (timer, time) -> Component.text("Time left: ")

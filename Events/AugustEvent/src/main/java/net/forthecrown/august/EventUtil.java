@@ -62,6 +62,26 @@ public class EventUtil {
         Bukkit.getScheduler().runTaskLater(AugustPlugin.inst, entity::discard, 20);
     }
 
+    public static void spawnPlusX(Location loc, int x) {
+        ServerLevel level = ((CraftWorld) loc.getWorld()).getHandle();
+
+        //These have to be different variables due to obfuscation mappings
+        ArmorStand stand = EntityType.ARMOR_STAND.create(level);
+        stand.setMarker(true);
+        stand.setNoBasePlate(true);
+
+        Entity entity = stand;
+        entity.moveTo(loc.getX(), loc.getY(), loc.getZ());
+        entity.setInvulnerable(true);
+        entity.setCustomNameVisible(true);
+        entity.setCustomName(getPlusX(x));
+        entity.setInvisible(true);
+
+        level.addAllEntitiesSafely(stand, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+        Bukkit.getScheduler().runTaskLater(AugustPlugin.inst, entity::discard, 20);
+    }
+
     public static Rabbit spawnPinata(Location loc) {
         return loc.getWorld().spawn(loc, Rabbit.class, pinata -> {
             pinata.getPersistentDataContainer().set(PINATA_KEY, PersistentDataType.BYTE, (byte) 1);
@@ -88,13 +108,13 @@ public class EventUtil {
     public static Vector findRandomDirection(CrownRandom random) {
         return new Vector(
                 randomDouble(random, VELOCITY_BOUND),
-                Math.max(random.nextDouble(), 0.5),
+                Math.max(random.nextDouble(), 0.75),
                 randomDouble(random, VELOCITY_BOUND)
         );
     }
 
     private static double randomDouble(CrownRandom random, int bound) {
-        return Math.max(random.nextDouble(), 0.1) * ((double) random.intInRange(-bound, bound));
+        return Math.max(random.nextDouble(), 0.08) * ((double) random.intInRange(-bound, bound));
     }
 
     public static boolean canEnter(Player player) {

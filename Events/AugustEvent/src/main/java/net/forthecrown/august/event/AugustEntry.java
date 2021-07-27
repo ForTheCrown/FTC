@@ -5,6 +5,8 @@ import net.forthecrown.august.EventConstants;
 import net.forthecrown.august.listener.AugustInEventListener;
 import net.forthecrown.crownevents.EventTimer;
 import net.forthecrown.crownevents.entries.SingleEntry;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 public class AugustEntry extends SingleEntry {
@@ -25,12 +27,21 @@ public class AugustEntry extends SingleEntry {
         return timer;
     }
 
+    public void addSecToTimer(int seconds) {
+        timer().setTimeInTicks(timer.getTimeInTicks() + seconds * 20L);
+        player.sendMessage(Component.text("+10 seconds!").color(NamedTextColor.GOLD));
+    }
+
     public int score() {
         return score;
     }
 
     public void increment() {
         score++;
+    }
+
+    public void increment(int inc) {
+        score += inc;
     }
 
     @Override
