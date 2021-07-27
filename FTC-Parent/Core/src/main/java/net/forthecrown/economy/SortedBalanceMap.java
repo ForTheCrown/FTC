@@ -177,12 +177,12 @@ public class SortedBalanceMap implements BalanceMap {
 
     @Override
     public List<UUID> keySet(){
-        return ListUtils.convertToList(entries, BalEntry::getUniqueId);
+        return ListUtils.convert(entries, BalEntry::getUniqueId);
     }
 
     @Override
     public List<Integer> values(){
-        return ListUtils.convertToList(entries, BalEntry::getValue);
+        return ListUtils.convert(entries, BalEntry::getValue);
     }
 
     @Override

@@ -22,6 +22,7 @@ import net.forthecrown.registry.CrownWarpRegistry;
 import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.useables.CrownUsablesManager;
 import net.forthecrown.user.CrownUserManager;
+import net.forthecrown.user.GameModePacketListener;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.valhalla.ValhallaEngine;
 import net.luckperms.api.LuckPerms;
@@ -124,6 +125,7 @@ public final class Main extends JavaPlugin implements CrownCore {
         safeRunnable(Bosses::shutDown);
         safeRunnable(Cosmetics::shutDown);
         safeRunnable(Pirates::shutDown);
+        safeRunnable(GameModePacketListener::removeAll);
         if(CrownCore.inDebugMode()) safeRunnable(ValhallaEngine::shutDown);
 
         CrownUserManager.LOADED_USERS.clear();

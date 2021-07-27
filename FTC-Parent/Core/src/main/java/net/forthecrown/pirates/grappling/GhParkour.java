@@ -17,8 +17,10 @@ import java.util.*;
 public class GhParkour extends AbstractJsonSerializer {
 
     public static final Location EXIT = new Location(Worlds.VOID, 1, 1, 1);
+    public static final GhComparator COMPARATOR = new GhComparator();
+
     private final Map<String, GhLevelData> byName = new HashMap<>();
-    private final ArrayList<GhLevelData> orderedList = new ArrayList<>();
+    private final List<GhLevelData> orderedList = new ArrayList<>();
 
     public GhParkour() {
         super("parkour_data");
@@ -27,6 +29,7 @@ public class GhParkour extends AbstractJsonSerializer {
             CrownUser user = UserManager.getUser(player);
 
             if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.notPirate();
+            sort();
 
             GhLevelSelector.SELECTOR_MENU.open(user);
         });
@@ -38,13 +41,9 @@ public class GhParkour extends AbstractJsonSerializer {
         return byName.get(s);
     }
 
-    public GhLevelData byIndex(int index) {
-        return orderedList.get(index);
-    }
-
     public void add(GhLevelData data){
         add0(data);
-        GhLevelSelector.recreateSelector();
+        sort();
     }
 
     private void add0(GhLevelData data) {
@@ -54,6 +53,11 @@ public class GhParkour extends AbstractJsonSerializer {
 
     public void resetProgress(UUID uuid) {
         byName.values().forEach(d -> d.uncomplete(uuid));
+    }
+
+    public void sort() {
+        orderedList.sort(COMPARATOR);
+        GhLevelSelector.recreateSelector();
     }
 
     public boolean isFirstUncompleted(UUID uuid, GhLevelData data) {
@@ -100,6 +104,8 @@ public class GhParkour extends AbstractJsonSerializer {
         for (Map.Entry<String, JsonElement> e: json.entrySet()) {
             add0(new GhLevelData(e.getKey(), e.getValue()));
         }
+
+        orderedList.sort(COMPARATOR);
     }
 
     @Override

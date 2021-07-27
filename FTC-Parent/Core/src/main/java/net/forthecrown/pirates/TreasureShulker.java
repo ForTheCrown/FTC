@@ -9,11 +9,11 @@ import net.forthecrown.economy.Balances;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.loot.CrownLootTable;
 import net.forthecrown.utils.math.BlockPos;
+import net.forthecrown.utils.math.MathUtil;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -118,6 +118,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
             shulker.setRemoveWhenFarAway(false);
 
             shulker.setAI(false);
+            shulker.setInvulnerable(true);
             shulker.setColor(DyeColor.GRAY);
         });
     }
@@ -169,12 +170,29 @@ public class TreasureShulker extends AbstractJsonSerializer {
     public CrownLootTable getRandomLoot(){
         int index = random.nextInt(100);
 
-        if(FtcUtils.isInRange(index, 0, 20)) return getSpecialLoot();
-        if(FtcUtils.isInRange(index, 20, 50)) return getRareLoot();
+        if(MathUtil.isInRange(index, 0, 20)) return getSpecialLoot();
+        if(MathUtil.isInRange(index, 20, 50)) return getRareLoot();
         return getCommonLoot();
     }
 
     public void moveLocToRandom(){
+        Location loc = getRandomLoc();
+        short safeGuard = 300;
+
+        while (loc.getBlock().getType() == Material.WATER) {
+            loc = getRandomLoc();
+
+            safeGuard--;
+            if(safeGuard < 0) {
+                CrownCore.logger().warning("Couldn't find valid location for TreasureShulker in 300 attempts");
+                break;
+            }
+        }
+
+        this.location = loc;
+    }
+
+    private Location getRandomLoc() {
         int x = random.intInRange(250, 1970);
         int y = random.intInRange(40, 50);
         int z = random.intInRange(250, 1970);
@@ -182,7 +200,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
         if(random.nextBoolean()) x = -x;
         if(random.nextBoolean()) z = -z;
 
-        this.location = new Location(CrownCore.getTreasureWorld(), x, y, z);
+        return new Location(CrownCore.getTreasureWorld(), x, y, z);
     }
 
     public Location getLocation() {

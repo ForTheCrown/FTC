@@ -32,7 +32,7 @@ public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShop
     }
 
     private void sendInvMessage(CrownUser owner, SignShop shop){
-        if(shop.getType().isAdmin) return;
+        if(shop.getType().isAdmin()) return;
 
         //If no good, then no go
         if ((shop.getType() != ShopType.BUY_SHOP || !shop.getInventory().isEmpty()) && (shop.getType() != ShopType.SELL_SHOP || !shop.getInventory().isFull())) {
@@ -40,7 +40,7 @@ public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShop
         }
 
         Location l = shop.getLocation();
-        Component specification = Component.translatable("shops." + (shop.getType().buyType ? "out" : "full"));
+        Component specification = Component.translatable("shops." + (shop.getType().isBuyType() ? "out" : "full"));
         Component builder = Component.translatable("shops.stockWarning", ChatFormatter.prettyLocationMessage(l, false), specification);
 
         owner.sendMessage(builder);
@@ -68,7 +68,7 @@ public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShop
             //WorldGuard checks
             Branch allowedOwner = WgFlags.query(shop.getLocation(), WgFlags.SHOP_OWNERSHIP_FLAG);
             Branch allowedUser = WgFlags.query(shop.getLocation(), WgFlags.SHOP_USAGE_FLAG);
-            if(allowedOwner != null && owner.getBranch() != Branch.DEFAULT && !shop.getType().isAdmin && allowedOwner != owner.getBranch()){
+            if(allowedOwner != null && owner.getBranch() != Branch.DEFAULT && !shop.getType().isAdmin() && allowedOwner != owner.getBranch()){
                 event.setCancelled(true);
                 throw CrownException.translatable(customer, "shops.wrongOwner", NamedTextColor.GRAY, Component.text(allowedOwner.getName()));
             }
@@ -138,7 +138,7 @@ public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShop
                     playerInv.addItem(example); //adds the item to player's inventory
                     event.setCustomerBalance(event.getCustomerBalance() - shop.getPrice());
 
-                    if(shop.getType().isAdmin && CrownCore.logAdminShopUsage()){
+                    if(shop.getType().isAdmin() && CrownCore.logAdminShopUsage()){
                         Announcer.log(
                                 Level.INFO,
                                 customer.getName() + " bought " + example.getAmount() + " " + ChatFormatter.getItemNormalName(example) + " at an admin shop, location: " + shop.getName());
@@ -197,7 +197,7 @@ public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShop
                         event.getOwner().sendMessage(ownerMsg);
                     }
 
-                    if(shop.getType().isAdmin && CrownCore.logAdminShopUsage()){
+                    if(shop.getType().isAdmin() && CrownCore.logAdminShopUsage()){
                         Announcer.log(Level.INFO,
                                 customer.getName() + " sold " + example.getAmount() + " " + ChatFormatter.getItemNormalName(example) + " at an admin shop, location: " + shop.getName());
                     } else if(CrownCore.logNormalShopUsage()){

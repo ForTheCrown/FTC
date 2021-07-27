@@ -1,10 +1,9 @@
 package net.forthecrown.inventory;
 
 import net.forthecrown.core.CrownCore;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Balances;
-import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.Worlds;
@@ -29,7 +28,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnegative;
 import java.util.Arrays;
-import java.util.UUID;
+
+import static net.forthecrown.core.chat.ChatFormatter.nonItalic;
 
 /**
  * Class for server items, such as Royal Swords, Crowns and home of the great makeItem method
@@ -37,6 +37,9 @@ import java.util.UUID;
 public final class CrownItems {
     private CrownItems() {}
 
+    /**
+     * Key used by persistent data container to store stuff
+     */
     public static final NamespacedKey ITEM_KEY = new NamespacedKey(CrownCore.inst(), "crownitem");
 
     private static final ItemStack BASE_ROYAL_SWORD = makeRoyalWeapon(Material.GOLDEN_SWORD, Component.text("-")
@@ -128,8 +131,9 @@ public final class CrownItems {
         return BASE_VIKING_AXE.clone();
     }
 
+    //Makes a royal weapon, like Viking Axe, Royal Sword or Captain's Cutlass
     private static ItemStack makeRoyalWeapon(Material material, Component name, Component lore2, Component lore3){
-        final Component border = Component.text("------------------------------").style(ChatFormatter.nonItalic(NamedTextColor.DARK_GRAY));
+        final Component border = Component.text("------------------------------").style(nonItalic(NamedTextColor.DARK_GRAY));
         return new ItemStackBuilder(material, 1)
                 .setFlags(ItemFlag.HIDE_ATTRIBUTES)
                 .setName(name.decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE))
@@ -170,7 +174,13 @@ public final class CrownItems {
         return result;
     }
 
-    public static ItemStack getCoins(int amount, int itemAmount){
+    /**
+     * Make some coins
+     * @param amount The amount the coin(s) will be worth
+     * @param itemAmount The amount of seperate coins to make
+     * @return The created coin(s)
+     */
+    public static ItemStack makeCoins(int amount, int itemAmount){
         return new ItemStackBuilder(Material.SUNFLOWER, itemAmount)
                 .setName(Component.text("Rhines").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
                 .addLore(Component.text("Worth ").append(Component.text(Balances.getFormatted(amount))).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false))
@@ -189,43 +199,68 @@ public final class CrownItems {
                 .append(kingship.name());
     }
 
+    /**
+     * The Crown's title, the -Crown-
+     */
+    public static final Component CROWN_TITLE = Component.text()
+            .style(nonItalic(NamedTextColor.GOLD))
+            .append(Component.text("-"))
+            .append(Component.text("Crown").style(nonItalic(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)))
+            .append(Component.text("-"))
+            .build();
+
+    /**
+     * Creates a crown
+     * @param level The crown's level
+     * @param owner The name of the owner
+     * @return The created crown
+     */
     public static ItemStack makeCrown(int level, String owner){
         String levelS = FtcUtils.arabicToRoman(level);
-        ItemStack crown = makeItem(Material.GOLDEN_HELMET, 1, false, "&6-&e&lCrown&6-",
-                "&7Rank " + levelS,
-                "&8--------------------------------",
-                "&6Only the worthy shall wear this ",
-                "&6symbol of strength and power.",
-                "&8Crafted for " + owner);
 
-        ItemMeta meta = crown.getItemMeta();
-        meta.getPersistentDataContainer().set(ITEM_KEY, PersistentDataType.BYTE, (byte) 1);
-        AttributeModifier attributeModifier;
+        ItemStackBuilder builder = new ItemStackBuilder(Material.GOLDEN_HELMET, 1)
+                .setName(CROWN_TITLE)
 
-        meta.setUnbreakable(true);
+                .addLore(Component.text("Rank " + levelS).style(nonItalic(NamedTextColor.GRAY)))
+                .addLore(Component.text("--------------------------------").style(nonItalic(NamedTextColor.DARK_GRAY)))
+                .addLore(Component.text("Only the worthy shall wear this").style(nonItalic(NamedTextColor.GOLD)))
+                .addLore(Component.text("symbol of strength and power.").style(nonItalic(NamedTextColor.GOLD)))
+                .addLore(Component.text("Crafted for " + owner).style(nonItalic(NamedTextColor.DARK_GRAY)))
+
+                .addData(ITEM_KEY, (byte) 1)
+                .setUnbreakable(true);
 
         int eLevel = 5;
 
         if(level > 1){
-            attributeModifier = new AttributeModifier(UUID.randomUUID(), "generic.movement_speed", 0.25,
-                    AttributeModifier.Operation.ADD_SCALAR, EquipmentSlot.HEAD);
-
-            meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, attributeModifier);
+            builder.addModifier(Attribute.GENERIC_MOVEMENT_SPEED, "generic.movement_speed", 0.25,
+                    AttributeModifier.Operation.ADD_SCALAR, EquipmentSlot.HEAD
+            );
         }
+
         if(level > 2){
-            attributeModifier = new AttributeModifier(UUID.randomUUID(), "generic.max_health", 20,
-                    AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
-
-            meta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, attributeModifier);
+            builder.addModifier(Attribute.GENERIC_MAX_HEALTH, "generic.max_health", 20,
+                    AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD
+            );
         }
+
         if(level > 3) eLevel = 6;
+        builder.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, eLevel);
 
-        meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, eLevel, true);
-        crown.setItemMeta(meta);
-
-        return crown;
+        return builder.build();
     }
 
+    /**
+     * Makes an item using the given values
+     * @param material The material of the item
+     * @param amount The item's amount
+     * @param hideFlags Whether to hide flags
+     * @param name The items' name
+     * @param loreStrings Any lore to add to the item
+     * @deprecated Method is too limited, use {@link ItemStackBuilder}
+     * @return The created item
+     */
+    @Deprecated
     public static ItemStack makeItem(@NotNull Material material, @Nonnegative int amount, boolean hideFlags, @Nullable Component name, @Nullable Component... loreStrings) {
         Validate.notNull(material, "Material cannot be null");
 
@@ -243,7 +278,16 @@ public final class CrownItems {
         return result;
     }
 
-    //Strings are outdated, use Components
+    /**
+     * Makes an item using the given values
+     * @param material The material of the item
+     * @param amount The item's amount
+     * @param hideFlags Whether to hide flags
+     * @param name The items' name
+     * @param lores Any lore to add to the item
+     * @deprecated Method is too limited and out of date, use {@link ItemStackBuilder}
+     * @return The created item
+     */
     @Deprecated
     public static ItemStack makeItem(@NotNull Material material, @Nonnegative int amount, boolean hideFlags, String name, String... lores){
         Validate.notNull(material, "Material cannot be null");

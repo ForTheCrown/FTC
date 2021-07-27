@@ -1,5 +1,6 @@
 package net.forthecrown.august;
 
+import net.forthecrown.august.command.CommandAugustEvent;
 import net.forthecrown.august.event.PinataEvent;
 import net.forthecrown.august.usables.ActionEnterEvent;
 import net.forthecrown.august.usables.CheckCanEnter;
@@ -29,13 +30,21 @@ public class AugustPlugin extends JavaPlugin {
         event = new PinataEvent();
         reporter = ReporterFactory.of(this, event);
 
+        new CommandAugustEvent();
+
         CommandLeave.add(EventConstants.ARENA_REGION, EventConstants.EXIT,
                 player -> {
                     if(PinataEvent.currentEntry != null && PinataEvent.currentEntry.player().equals(player)) {
+                        event.end(PinataEvent.currentEntry);
                         return true;
                     }
 
-                    return PinataEvent.currentStarter != null && PinataEvent.currentStarter.getPlayer().equals(player);
+                    if(PinataEvent.currentStarter != null && PinataEvent.currentStarter.getPlayer().equals(player)) {
+                        PinataEvent.currentStarter.cancel();
+                        return true;
+                    }
+
+                    return false;
                 }
         );
     }

@@ -74,7 +74,7 @@ public class CommandNear extends FtcCommand {
 
     private int showNearby(Location loc, int radius, CommandSource source) throws CommandSyntaxException {
         FtcRegion box = FtcRegion.of(loc, radius);
-        List<CrownUser> players = ListUtils.convertToList(box.getPlayers(), UserManager::getUser);
+        List<CrownUser> players = ListUtils.convert(box.getPlayers(), UserManager::getUser);
         players.removeIf(user -> user.hasPermission(Permissions.NEARBY_IGNORE)
                 || user.getGameMode() == FtcGameMode.SPECTATOR
                 || user.getName().equalsIgnoreCase(source.textName())

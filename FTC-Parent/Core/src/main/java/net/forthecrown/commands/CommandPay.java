@@ -65,7 +65,7 @@ public class CommandPay extends FtcCommand {
                                           CrownUser user = getUserSender(c);
                                           int amount = c.getArgument("amount", Integer.class);
                                           List<CrownUser> users = UserType.getUsers(c, "players");
-                                          Component message = ChatFormatter.formatStringIfAllowed(c.getArgument("message", String.class), user);
+                                          Component message = ChatFormatter.formatIfAllowed(c.getArgument("message", String.class), user);
 
                                           return pay(user, users, amount, message);
                                       })

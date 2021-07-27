@@ -22,10 +22,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class GhLevelData implements JsonSerializable {
 
@@ -74,7 +71,7 @@ public class GhLevelData implements JsonSerializable {
 
     public void enter(Player player, World world) {
         player.getInventory().clear();
-        player.teleport(startPos.toLoc(world));
+        player.teleport(startPos.toLoc(world).toCenterLocation());
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gh give " + player.getName() +
                 (isHookLimited() ? " " + hooks + (isDistanceLimited() ? " " + distance : "") : "")
@@ -151,7 +148,7 @@ public class GhLevelData implements JsonSerializable {
     }
 
     public boolean isHookLimited() {
-        return hooks == -1;
+        return hooks != -1;
     }
 
     public int getDistance() {
@@ -159,7 +156,7 @@ public class GhLevelData implements JsonSerializable {
     }
 
     public boolean isDistanceLimited() {
-        return distance == -1;
+        return distance != -1;
     }
 
     public GhBiome getBiome() {
@@ -206,5 +203,34 @@ public class GhLevelData implements JsonSerializable {
         if(!completed.isEmpty()) json.addList("completed", completed, JsonUtils::writeUUID);
 
         return json.getSource();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + '{' +
+                "name='" + name + '\'' +
+                ", nextLevel='" + nextLevel + '\'' +
+                ", biome=" + biome +
+                ", type=" + type +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GhLevelData data = (GhLevelData) o;
+        return getHooks() == data.getHooks() &&
+                getDistance() == data.getDistance() &&
+                Objects.equals(getName(), data.getName()) &&
+                Objects.equals(getStartPos(), data.getStartPos()) &&
+                Objects.equals(getNextLevel(), data.getNextLevel()) &&
+                getBiome() == data.getBiome() &&
+                getType() == data.getType();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getStartPos(), getNextLevel(), getHooks(), getDistance(), getBiome(), getType());
     }
 }

@@ -1,6 +1,7 @@
 package net.forthecrown.august.event;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.august.AugustPlugin;
 import net.forthecrown.august.EventConstants;
 import net.forthecrown.august.EventUtil;
 import net.forthecrown.crownevents.CrownEvent;
@@ -19,6 +20,7 @@ public class PinataEvent implements CrownEvent<AugustEntry> {
     public void start(Player player) throws CommandSyntaxException {
         if(!EventUtil.canEnter(player)) return;
 
+        AugustPlugin.reporter.logEntry(player);
         currentStarter = new EventStarter(player);
     }
 
@@ -30,11 +32,13 @@ public class PinataEvent implements CrownEvent<AugustEntry> {
         entry.inEventListener().unregister();
 
         currentEntry = null;
+        AugustPlugin.reporter.logExit(entry.player());
     }
 
     @Override
     public void complete(AugustEntry entry) {
         Score record = EventConstants.CROWN.getScore(entry.player().getName());
+        AugustPlugin.reporter.logExit(entry.player(), entry.score(), "Record: " + record.getScore());
 
         TextComponent.Builder builder = Component.text();
 

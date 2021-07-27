@@ -113,14 +113,14 @@ public class CommandFtcCore extends FtcCommand {
                         })
                 )
 
-                .then(literal("update_spectator")
+                /*.then(literal("update_spectator")
                         .executes(c -> {
                             UserManager.updateSpectatorTab();
 
                             c.getSource().sendAdmin("Updating specators in tab");
                             return 0;
                         })
-                )
+                )*/
 
                 .then(literal("goto_spawn")
                         .executes(c -> {
@@ -733,7 +733,7 @@ public class CommandFtcCore extends FtcCommand {
     }
 
     private int giveCoins(Player player, int amount){
-        player.getInventory().addItem(CrownItems.getCoins(amount, 1));
+        player.getInventory().addItem(CrownItems.makeCoins(amount, 1));
         player.sendMessage("You got " + amount + " Rhines worth of coins");
         return 0;
     }

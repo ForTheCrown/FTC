@@ -6,7 +6,9 @@ import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryRunnable;
 import net.forthecrown.inventory.builder.options.SimpleCordedOption;
 import net.forthecrown.inventory.builder.options.SimpleOption;
+import net.forthecrown.utils.math.MathUtil;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang.Validate;
 import org.apache.logging.log4j.core.util.Builder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class InventoryBuilder implements Builder<BuiltInventory> {
 
     private final int size;
-    private final Component title;
+    private Component title;
 
     private final Int2ObjectMap<InventoryOption> options = new Int2ObjectOpenHashMap<>();
 
@@ -22,8 +24,21 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
     private InventoryAction onOpen;
 
     public InventoryBuilder(int size, Component title) {
+        Validate.isTrue(isValidSize(size));
+
         this.size = size;
         this.title = title;
+    }
+
+    public InventoryBuilder(int size) {
+        Validate.isTrue(isValidSize(size));
+
+        this.size = size;
+    }
+
+    public static boolean isValidSize(int size) {
+        if(!MathUtil.isInRange(size, 9, 54)) return false;
+        return size % 9 == 0;
     }
 
     public int size() {
@@ -32,6 +47,11 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
 
     public Component title() {
         return title;
+    }
+
+    public InventoryBuilder title(Component title) {
+        this.title = title;
+        return this;
     }
 
     public Int2ObjectMap<InventoryOption> options() {

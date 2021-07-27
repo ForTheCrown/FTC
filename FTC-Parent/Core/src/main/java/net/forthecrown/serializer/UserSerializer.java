@@ -26,13 +26,13 @@ public interface UserSerializer {
      * Code to execute when a user is unloaded
      * @param user The user that's being unloaded
      */
-    void onUnload(FtcUser user);
+    void onUnload(UUID user);
 
     /**
      * Deletes a certain user's data
      * @param id the user whose data to delete
      */
-    void delete(FtcUser id);
+    void delete(UUID id);
 
     /**
      * Gets the file of a user by the given UUID

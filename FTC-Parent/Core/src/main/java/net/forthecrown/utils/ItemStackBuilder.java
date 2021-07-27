@@ -1,6 +1,7 @@
 package net.forthecrown.utils;
 
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.utils.math.MathUtil;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
@@ -46,7 +47,7 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder(Material material, int amount){
         this.material = material;
-        amount(amount);
+        setAmount(amount);
     }
 
     public ItemStackBuilder addEffect(PotionEffect effect){
@@ -84,8 +85,8 @@ public class ItemStackBuilder {
         return amount;
     }
 
-    public ItemStackBuilder amount(int amount) {
-        Validate.isTrue(FtcUtils.isInRange(amount, 0, material.getMaxStackSize()), "Invalid stack size");
+    public ItemStackBuilder setAmount(int amount) {
+        Validate.isTrue(MathUtil.isInRange(amount, 0, material.getMaxStackSize()), "Invalid stack size");
         this.amount = amount;
         return this;
     }
@@ -95,7 +96,11 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder addModifier(Attribute attribute, String name, double amount, AttributeModifier.Operation operation, EquipmentSlot slot){
-        this.modifiers.put(attribute, new AttributeModifier(UUID.randomUUID(), name, amount, operation, slot));
+        return addModifier(attribute, new AttributeModifier(UUID.randomUUID(), name, amount, operation, slot));
+    }
+
+    public ItemStackBuilder addModifier(Attribute attribute, AttributeModifier modifier) {
+        this.modifiers.put(attribute, modifier);
         return this;
     }
 
@@ -113,7 +118,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder setLore(Collection<String> lores, boolean translateColors){
-        return setLore(ListUtils.convertToList(lores, s -> ChatUtils.convertString(s, translateColors)));
+        return setLore(ListUtils.convert(lores, s -> ChatUtils.stringToNonItalic(s, translateColors)));
     }
 
     public ItemStackBuilder addLore(Component lore) {
@@ -136,7 +141,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder setName(String name, boolean translateColors){
-        this.name = ChatUtils.convertString(name, translateColors);
+        this.name = ChatUtils.stringToNonItalic(name, translateColors);
         return this;
     }
 

@@ -226,14 +226,14 @@ public class UserJsonSerializer implements UserSerializer {
     }
 
     @Override
-    public void onUnload(FtcUser user) {
-        userFiles.remove(user.getUniqueId());
+    public void onUnload(UUID user) {
+        userFiles.remove(user);
     }
 
     @Override
-    public void delete(FtcUser id) {
-        getFile(id.getUniqueId()).delete();
-        deletedFiles.add(id.getUniqueId());
+    public void delete(UUID id) {
+        getFile(id).delete();
+        deletedFiles.add(id);
         onUnload(id);
     }
 
@@ -262,7 +262,7 @@ public class UserJsonSerializer implements UserSerializer {
         json.add("lastOnlineName", id.getName());
 
         JsonBuf timeStamps = JsonBuf.empty();
-        timeStamps.add("lastLoad", System.currentTimeMillis());
+        timeStamps.add("lastLoad", id.getOfflinePlayer().getLastLogin());
         timeStamps.add("nextReset", System.currentTimeMillis() + CrownCore.getUserResetInterval());
 
         json.add("timeStamps", timeStamps);

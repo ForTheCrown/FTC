@@ -504,7 +504,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void delete() {
-        CrownCore.getUserSerializer().delete(this);
+        CrownCore.getUserSerializer().delete(getUniqueId());
     }
 
     @Override
@@ -660,6 +660,8 @@ public class FtcUser implements CrownUser {
             afkListener = null;
         }
 
+        GameModePacketListener.remove(getPlayer());
+
         interactions.clearIncoming();
         interactions.clearOutgoing();
 
@@ -709,7 +711,7 @@ public class FtcUser implements CrownUser {
         permsCheck();
         if(shouldResetEarnings()) resetEarnings();
 
-        net.forthecrown.user.UserManager.updateSpectatorTab();
+        GameModePacketListener.inject(getPlayer());
 
         lastLoad = System.currentTimeMillis();
 
@@ -771,7 +773,7 @@ public class FtcUser implements CrownUser {
         Component displayName = listDisplayName();
         getOnlineHandle().playerListName(displayName);
 
-        net.forthecrown.user.UserManager.updateSpectatorTab();
+        //net.forthecrown.user.UserManager.updateSpectatorTab();
     }
 
     @Override
@@ -990,7 +992,7 @@ public class FtcUser implements CrownUser {
 
         getOnlineHandle().setGameMode(gameMode.bukkit);
 
-        net.forthecrown.user.UserManager.updateSpectatorTab();
+        //net.forthecrown.user.UserManager.updateSpectatorTab();
     }
 
     @Override

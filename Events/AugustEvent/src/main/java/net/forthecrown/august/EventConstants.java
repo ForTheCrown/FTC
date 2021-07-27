@@ -4,12 +4,16 @@ import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.crownevents.CrownEventUtils;
 import net.forthecrown.crownevents.TimerMessageFormatter;
+import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -27,7 +31,7 @@ public class EventConstants {
     public static final FtcRegion SAFE_ZONE = new FtcRegion(Worlds.OVERWORLD, -62, 67, 875, -44, 81, 893);
     public static final FtcRegion ARENA_REGION = new FtcRegion(Worlds.OVERWORLD, -75, 62, 863, -34, 83, 906);
 
-    public static final Location EXIT = new Location(Worlds.OVERWORLD, 69, 74, 882);
+    public static final Location EXIT = new Location(Worlds.OVERWORLD, -66.5, 74, 900.5, 90, 0);
     public static final Location START = new Location(Worlds.OVERWORLD, -63, 72, 872, -45, 12);
     public static final Location MIDDLE = new Location(Worlds.OVERWORLD, -51.5, 78, 884.5);
     public static final Location SPAWN = new Location(Worlds.OVERWORLD, -44.5, 71, 877.5);
@@ -35,7 +39,18 @@ public class EventConstants {
     public static final NamespacedKey TICKET_KEY = EventUtil.createEventKey("ticket");
     public static final NamespacedKey PINATA_KEY = EventUtil.createEventKey("pinata");
 
-    public static final int MAX_TICKS_IN_EVENT = 5 * 60 * 20;
+    public static final int MAX_TICKS_IN_EVENT = 1200;
+    public static final int VELOCITY_BOUND = 2;
+    public static final double SQUID_HEALTH = 2047;
+
+    public static final net.minecraft.network.chat.Component PLUS_ONE;
+
+    static {
+        MutableComponent component = new TextComponent("+1");
+        component.withStyle(ChatFormatting.YELLOW);
+
+        PLUS_ONE = component;
+    }
 
     public static final TimerMessageFormatter TIMER_FORMAT = (timer, time) -> Component.text("Time left: ")
             .color(NamedTextColor.YELLOW)
@@ -57,7 +72,9 @@ public class EventConstants {
                             .style(ChatFormatter.nonItalic(NamedTextColor.AQUA))
             )
             .addLore(
-                    Component.text("Use this to enter the event and compete!")
+                    Component.text("Use this to enter the event and compete for the ")
+                            .append(CrownItems.CROWN_TITLE)
+                            .append(Component.text("!"))
                             .style(ChatFormatter.nonItalic(NamedTextColor.GRAY))
             )
             .addData(TICKET_KEY, (byte) 1)

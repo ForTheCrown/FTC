@@ -43,7 +43,7 @@ public abstract class ShopInteraction {
         Branch allowedOwner = WgFlags.query(shop.getLocation(), WgFlags.SHOP_OWNERSHIP_FLAG);
         Branch allowedUser = WgFlags.query(shop.getLocation(), WgFlags.SHOP_USAGE_FLAG);
 
-        if(allowedOwner != null && owner.getBranch() != Branch.DEFAULT && !shop.getType().isAdmin && allowedOwner != owner.getBranch()){
+        if(allowedOwner != null && owner.getBranch() != Branch.DEFAULT && !shop.getType().isAdmin() && allowedOwner != owner.getBranch()){
             customer.sendMessage(
                     Component.translatable("shops.wrongOwner",
                             NamedTextColor.GRAY,

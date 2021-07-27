@@ -128,10 +128,10 @@ public class CoreListener implements Listener {
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
 
-        event.line(0, ChatFormatter.formatStringIfAllowed(event.getLine(0), player));
-        event.line(1, ChatFormatter.formatStringIfAllowed(event.getLine(1), player));
-        event.line(2, ChatFormatter.formatStringIfAllowed(event.getLine(2), player));
-        event.line(3, ChatFormatter.formatStringIfAllowed(event.getLine(3), player));
+        event.line(0, ChatFormatter.formatIfAllowed(event.getLine(0), player));
+        event.line(1, ChatFormatter.formatIfAllowed(event.getLine(1), player));
+        event.line(2, ChatFormatter.formatIfAllowed(event.getLine(2), player));
+        event.line(3, ChatFormatter.formatIfAllowed(event.getLine(3), player));
 
         EavesDropper.reportSignPlacement(event.getPlayer(), event.getBlock().getLocation(),
                 event.line(0),

@@ -32,7 +32,7 @@ public class MarriageMessage {
         this.sender = sender;
         this.recipient = recipient;
         this.input = input;
-        this.formatted = ChatFormatter.formatStringIfAllowed(input, sender.getPlayer());
+        this.formatted = ChatFormatter.formatIfAllowed(input, sender.getPlayer());
         status = CrownCore.getPunishmentManager().checkMute(sender.getPlayer());
     }
 

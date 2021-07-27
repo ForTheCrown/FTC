@@ -28,7 +28,7 @@ public class EventStarter {
     private int countDown() {
         return Bukkit.getScheduler().scheduleSyncRepeatingTask(AugustPlugin.inst, () -> {
             secondOn--;
-            boolean last = secondOn < 0;
+            boolean last = secondOn < 1;
 
             if(last) {
                 player.teleport(EventConstants.START);

@@ -28,7 +28,7 @@ public class DirectMessage {
         this.responding = responding;
         this.input = input;
 
-        formattedText = ChatFormatter.formatStringIfAllowed(input, sender.asBukkit());
+        formattedText = ChatFormatter.formatIfAllowed(input, sender.asBukkit());
         muteStatus = CrownCore.getPunishmentManager().checkMute(sender.asBukkit());
     }
 

@@ -9,7 +9,6 @@ import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.user.data.TeleportRequest;
 import net.forthecrown.utils.JsonUtils;
-import net.forthecrown.utils.ListUtils;
 
 import java.util.*;
 
@@ -33,14 +32,6 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
 
     public FtcUserInteractions(FtcUser user){
         this.user = user;
-    }
-
-    public void reload(List<String> raw){
-        this.blocked = ListUtils.convertToSet(raw, UUID::fromString);
-    }
-
-    public List<String> save(){
-        return ListUtils.convertToList(blocked, UUID::toString);
     }
 
     @Override

@@ -219,7 +219,7 @@ public class CommandEditShop extends FtcCommand {
         SignShop shop = getShop(player);
 
         ShopType type = shop.getType();
-        ShopType to = sell ? (type.isAdmin ? ShopType.ADMIN_SELL_SHOP : ShopType.SELL_SHOP) : (type.isAdmin ? ShopType.ADMIN_BUY_SHOP : ShopType.BUY_SHOP);
+        ShopType to = sell ? (type.isAdmin() ? ShopType.ADMIN_SELL_SHOP : ShopType.SELL_SHOP) : (type.isAdmin() ? ShopType.ADMIN_BUY_SHOP : ShopType.BUY_SHOP);
         shop.setType(to);
 
         player.sendMessage(Component.translatable("shops.edit.type", to.inStockLabel()).color(NamedTextColor.GRAY));

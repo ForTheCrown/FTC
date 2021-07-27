@@ -53,7 +53,7 @@ public class CommandMe extends FtcCommand {
                             }
 
                             Component displayName = source.isPlayer() ? UserManager.getUser(source.asPlayer()).coloredNickDisplayName() : source.displayName();
-                            Component action = ChatFormatter.formatStringIfAllowed(c.getArgument("action", String.class), source.asBukkit());
+                            Component action = ChatFormatter.formatIfAllowed(c.getArgument("action", String.class), source.asBukkit());
 
                             Component formatted = Component.text()
                                     .append(Component.text("* "))

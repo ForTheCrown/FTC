@@ -1,6 +1,7 @@
 package net.forthecrown.august.command;
 
 import net.forthecrown.august.AugustPlugin;
+import net.forthecrown.august.EventConstants;
 import net.forthecrown.august.EventUtil;
 import net.forthecrown.august.event.PinataEvent;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -73,7 +74,31 @@ public class CommandAugustEvent extends FtcCommand {
                         })
                 )
 
-                .then(literal("spawnPinata")
+                .then(literal("give_ticket")
+                        .then(argument("player", EntityArgument.player())
+                                .executes(c -> {
+                                    Player player = EntityArgument.getPlayer(c, "player");
+
+                                    player.getInventory().addItem(EventConstants.ticket());
+
+                                    c.getSource().sendAdmin("Giving ticket");
+                                    return 0;
+                                })
+                        )
+                )
+
+                .then(literal("spawn_plus_one")
+                        .executes(c -> {
+                            Player player = c.getSource().asPlayer();
+
+                            EventUtil.spawnPlusOne(player.getLocation().add(1, 1, 1));
+
+                            c.getSource().sendAdmin("Spawning plus one");
+                            return 0;
+                        })
+                )
+
+                .then(literal("spawn_pinata")
                         .then(argument("cords", PositionArgument.position())
                                 .executes(c -> {
                                     Location loc = PositionArgument.getLocation(c, "cords");

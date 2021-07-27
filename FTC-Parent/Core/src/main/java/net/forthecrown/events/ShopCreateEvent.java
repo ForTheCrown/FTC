@@ -141,7 +141,7 @@ public class ShopCreateEvent implements Listener {
             Component finishMessage = Component.text()
                     .append(Component.text("Sign Shop created!").color(NamedTextColor.GREEN))
                     .append(Component.text(" It'll " +
-                            (shop.getType().buyType ? "sell" : "buy") +
+                            (shop.getType().isBuyType() ? "sell" : "buy") +
                             " " + item.getAmount() + " " + ChatFormatter.getItemNormalName(item) +
                             " for " + Balances.getFormatted(shop.getPrice()) + "."
                     ))

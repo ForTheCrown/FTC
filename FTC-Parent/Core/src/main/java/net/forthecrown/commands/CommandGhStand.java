@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -119,6 +120,8 @@ public class CommandGhStand extends FtcCommand {
 
         GhLevelData data = new GhLevelData(name, start, next, hooks, distance, biome, type);
         Pirates.getParkour().add(data);
+
+        Announcer.debug(Pirates.getParkour().getOrderedList());
 
         c.getSource().sendAdmin("Created stand with name " + name);
         return 0;

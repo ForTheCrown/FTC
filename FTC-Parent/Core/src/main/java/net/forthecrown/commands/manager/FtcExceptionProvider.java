@@ -222,7 +222,7 @@ public interface FtcExceptionProvider {
     }
 
     static RoyalCommandException notPirate(){
-        return NOT_PIRATE.create(Component.text("/visit Questmoor"));
+        return NOT_PIRATE.create(NamedTextColor.YELLOW, Component.text("/visit Questmoor").color(NamedTextColor.GOLD));
     }
 
     static RoyalCommandException realPirate(Entity name) {

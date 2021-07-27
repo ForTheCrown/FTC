@@ -51,10 +51,10 @@ public final class FtcBootStrap {
     static void secondPhase() {
         Main.joinInfo = new JoinInfo();
 
+        Main.userSerializer = new UserJsonSerializer();
+
         Balances_YamlToJson.checkAndRun();
         Main.balances = new CrownBalances();
-
-        Main.userSerializer = new UserJsonSerializer();
 
         Main.shopManager = new CrownShopManager();
         Main.userManager = new CrownUserManager();
@@ -65,10 +65,10 @@ public final class FtcBootStrap {
         Main.kingship = new CrownKingship();
         Main.rules = new ServerRules();
 
+        if(CrownCore.inDebugMode()) safeRunnable(ValhallaEngine::init);
         safeRunnable(Pirates::init);
         safeRunnable(Bosses::init);
         safeRunnable(Cosmetics::init);
-        if(CrownCore.inDebugMode()) safeRunnable(ValhallaEngine::init);
         safeRunnable(UsageChecks::init);
         safeRunnable(UsageActions::init);
         safeRunnable(CoreCommands::init);

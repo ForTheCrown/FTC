@@ -205,14 +205,14 @@ public class ChatFormatter {
         return NamedTextColor.YELLOW;
     }
 
-    public static Component formatStringIfAllowed(String msg, CommandSender sender){
+    public static Component formatIfAllowed(String msg, CommandSender sender){
         return formatString(msg, sender, false);
     }
 
     public static Component formatString(String msg, @Nullable CommandSender sender, boolean ignorePerms){
         msg = CrownCore.getEmotes().format(msg, sender, ignorePerms);
 
-        return ChatUtils.convertString(msg, ignorePerms || sender.hasPermission(Permissions.DONATOR_2));
+        return ChatUtils.convertString(msg, ignorePerms || sender == null || sender.hasPermission(Permissions.DONATOR_2));
     }
 
     public static Component queryGems(int amount){
@@ -241,16 +241,13 @@ public class ChatFormatter {
         if (day >= 11 && day <= 13) {
             return "th ";
         }
-        switch (day%10){
-            case 1:
-                return "st ";
-            case 2:
-                return "nd ";
-            case 3:
-                return "rd ";
-            default:
-                return "th ";
-        }
+
+        return switch (day % 10) {
+            case 1 -> "st ";
+            case 2 -> "nd ";
+            case 3 -> "rd ";
+            default -> "th ";
+        };
     }
 
     public static Component itemName(ItemStack item){
@@ -365,7 +362,7 @@ public class ChatFormatter {
         try { //tEaM cOloRs mUsT hAvE hEX vAlUeS, what a fucking retarded place to throw an exception, in a getter
             color = team.color();
         } catch (IllegalStateException e){
-            color = NamedTextColor.WHITE;
+            color = null;
         }
 
         Component prefix = Component.empty();

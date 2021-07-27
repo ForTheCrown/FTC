@@ -1,6 +1,5 @@
 package net.forthecrown.economy.shops;
 
-import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import org.jetbrains.annotations.NotNull;
@@ -17,8 +16,8 @@ public enum ShopType {
 
     private final Component inStock;
     private final Component outStock;
-    public final boolean isAdmin;
-    public final boolean buyType;
+    private final boolean isAdmin;
+    private final boolean buyType;
 
     ShopType(@NotNull String label, @NotNull Style style, boolean isAdmin){
         buyType = label.contains("Buy");
@@ -26,28 +25,6 @@ public enum ShopType {
         outStock = Component.text(label).style(ShopManager.OUT_OF_STOCK_STYLE);
 
         this.isAdmin = isAdmin;
-    }
-
-    /**
-     * Gets the in stock label of the sign
-     * @return The in stock label of the sign
-     * @deprecated In favour of {@link ShopType#inStockLabel()}
-     */
-    @NotNull
-    @Deprecated
-    public String getInStockLabel(){
-        return ChatUtils.getString(inStock);
-    }
-
-    /**
-     * Gets the out of stock label of the type
-     * @return The sign label of the shop while it's out of stock
-     * @deprecated In favour of {@link ShopType#outOfStockLabel()}
-     */
-    @NotNull
-    @Deprecated
-    public String getOutOfStockLabel() {
-        return ChatUtils.getString(outStock);
     }
 
     /**
@@ -66,5 +43,13 @@ public enum ShopType {
     @NotNull
     public Component outOfStockLabel(){
         return outStock;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public boolean isBuyType() {
+        return buyType;
     }
 }

@@ -87,6 +87,7 @@ public interface CrownCore extends Plugin, Namespaced {
 
         Main.joinInfo.save();
         Main.prices.save();
+        Main.tabList.save();
 
         if(inDebugMode()) {
             Valhalla.getInstance().saveAll();

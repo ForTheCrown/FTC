@@ -39,6 +39,16 @@ public class Balances_YamlToJson {
 
     public Balances_YamlToJson convert() {
         for (String s: configuration.getKeys(false)) {
+            /*UUID id = UUID.fromString(s);
+            OfflinePlayer player = Bukkit.getOfflinePlayer(id);
+
+            if(player == null || player.getName() == null) continue;
+
+            if (System.currentTimeMillis() - player.getLastSeen() > CrownCore.getUserResetInterval()) {
+                CrownCore.getUserSerializer().delete(id);
+                continue;
+            }*/
+
             int bal = configuration.getInt(s);
             if(bal <= CrownCore.getStartRhines()) continue;
 

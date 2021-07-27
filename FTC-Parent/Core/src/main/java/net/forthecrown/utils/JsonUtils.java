@@ -65,7 +65,7 @@ public final class JsonUtils {
         float pitch = json.has("pitch") ? json.get("pitch").getAsFloat() : 0f;
         float yaw = json.has("yaw") ? json.get("yaw").getAsFloat() : 0f;
 
-        return new Location(world, x, y, z, pitch, yaw);
+        return new Location(world, x, y, z, yaw, pitch);
     }
 
     public static Position readPosition(JsonObject json) {
@@ -219,6 +219,7 @@ public final class JsonUtils {
         FileReader reader = new FileReader(file);
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(reader).getAsJsonObject();
+
         reader.close();
 
         return json;

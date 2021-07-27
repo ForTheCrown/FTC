@@ -5,9 +5,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.GameType;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -181,23 +179,5 @@ public interface UserManager extends CrownSerializer {
         }
 
         return list;
-    }
-
-    /**
-     * Updates spectators so no one knows who's a spectator
-     */
-    static void updateSpectatorTab(){
-        ClientboundPlayerInfoPacket packet = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.UPDATE_GAME_MODE, getSpectators());
-        ListIterator<ClientboundPlayerInfoPacket.PlayerUpdate> iterator = packet.getEntries().listIterator();
-
-        while(iterator.hasNext()){
-            ClientboundPlayerInfoPacket.PlayerUpdate u = iterator.next();
-            iterator.set(new ClientboundPlayerInfoPacket.PlayerUpdate(u.getProfile(), u.getLatency(), GameType.SURVIVAL, u.getDisplayName()));
-        }
-
-        for (Player p: Bukkit.getOnlinePlayers()) {
-            if(p.getGameMode() == GameMode.SPECTATOR) continue;
-            ((CraftPlayer) p).getHandle().connection.connection.send(packet);
-        }
     }
 }

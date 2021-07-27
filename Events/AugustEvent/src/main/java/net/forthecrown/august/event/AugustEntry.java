@@ -18,7 +18,7 @@ public class AugustEntry extends SingleEntry {
         super(player);
 
         this.listener = new AugustInEventListener(this, player);
-        this.timer = new EventTimer(player, EventConstants.TIMER_FORMAT, plr -> AugustPlugin.event.end(PinataEvent.currentEntry));
+        this.timer = new EventTimer(player, EventConstants.TIMER_FORMAT, plr -> AugustPlugin.event.complete(PinataEvent.currentEntry));
     }
 
     public EventTimer timer() {

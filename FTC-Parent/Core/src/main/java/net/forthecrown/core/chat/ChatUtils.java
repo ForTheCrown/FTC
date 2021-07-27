@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -68,5 +69,13 @@ public final class ChatUtils {
 
     public static Component fromJson(JsonElement element){
         return GSON.deserializeFromTree(element);
+    }
+
+    public static Component stringToNonItalic(String str) { return stringToNonItalic(str, true); }
+    public static Component stringToNonItalic(String str, boolean translateColors) {
+        return Component.text()
+                .append(convertString(str, translateColors))
+                .decoration(TextDecoration.ITALIC, false)
+                .build();
     }
 }

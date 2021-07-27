@@ -37,7 +37,7 @@ public class UserParseResult {
 
     public List<CrownUser> getUsers(CommandSource source) throws CommandSyntaxException {
         if(selector == null) return new ArrayList<>(Collections.singletonList(user));
-        return ListUtils.convertToList(selector.getPlayers(source), UserManager::getUser);
+        return ListUtils.convert(selector.getPlayers(source), UserManager::getUser);
     }
 
     public boolean checkSourceCanSee(CrownUser user, CommandSource source){

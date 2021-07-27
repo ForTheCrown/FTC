@@ -12,7 +12,9 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * The RankGUI where players can choose their ranks
+ * @deprecated Needs to be rewritten to use {@link net.forthecrown.inventory.builder.BuiltInventory}
  */
+@Deprecated
 public class RankInventory {
 
     private final CrownUser user;
