@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
@@ -13,8 +13,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionRemoveNumber implements UsageAction<ActionRemoveNumber.ActionInstance> {
-    public static final Key BAL_KEY = Key.key(CrownCore.inst(), "remove_balance");
-    public static final Key GEM_KEY = Key.key(CrownCore.inst(), "remove_gems");
+    public static final Key BAL_KEY = Key.key(ForTheCrown.inst(), "remove_balance");
+    public static final Key GEM_KEY = Key.key(ForTheCrown.inst(), "remove_gems");
 
     private final boolean fromBal;
 
@@ -53,7 +53,7 @@ public class ActionRemoveNumber implements UsageAction<ActionRemoveNumber.Action
 
         @Override
         public void onInteract(Player player) {
-            if (fromBal) CrownCore.getBalances().add(player.getUniqueId(), -amount);
+            if (fromBal) ForTheCrown.getBalances().add(player.getUniqueId(), -amount);
             else {
                 CrownUser user = UserManager.getUser(player);
                 user.setGems(user.getGems() - amount);

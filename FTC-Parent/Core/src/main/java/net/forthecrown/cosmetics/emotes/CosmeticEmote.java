@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics.emotes;
 
 import net.forthecrown.commands.emotes.CommandEmote;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.cosmetics.CosmeticEffect;
@@ -37,7 +37,7 @@ public class CosmeticEmote implements Predicate<Permissible>, CosmeticEffect {
         this.permission = permission;
         this.description = description;
 
-        this.key = CrownCore.coreKey(name.toLowerCase());
+        this.key = ForTheCrown.coreKey(name.toLowerCase());
     }
 
     CosmeticEmote(int slot, CommandEmote command, String name, String desc){

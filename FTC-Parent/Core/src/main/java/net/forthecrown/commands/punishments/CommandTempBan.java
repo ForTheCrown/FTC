@@ -2,7 +2,7 @@ package net.forthecrown.commands.punishments;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
@@ -27,7 +27,7 @@ import java.util.Date;
 
 public class CommandTempBan extends FtcCommand implements TempPunisher {
     public CommandTempBan(){
-        super("tempban", CrownCore.inst());
+        super("tempban", ForTheCrown.inst());
 
         setPermission(Permissions.POLICE);
         register();
@@ -61,7 +61,7 @@ public class CommandTempBan extends FtcCommand implements TempPunisher {
     public int punish(CrownUser user, CommandSource source, long length, String reason) throws CommandSyntaxException {
         if(user.hasPermission(Permissions.BAN_BYPASS) && !source.is(ConsoleCommandSender.class)) throw FtcExceptionProvider.cannotBan(user);
 
-        PunishmentManager manager = CrownCore.getPunishmentManager();
+        PunishmentManager manager = ForTheCrown.getPunishmentManager();
         BanList list = Bukkit.getBanList(BanList.Type.NAME);
         long until = lengthTranslate(length);
 

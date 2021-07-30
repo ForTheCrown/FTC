@@ -11,7 +11,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.comvars.ParseFunction;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
@@ -75,7 +75,7 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource>, Keyed,
             this.clazz = clazz;
             this.serializationFunc = json;
             deserializationFunc = func;
-            key = CrownCore.coreKey(clazz.getSimpleName().toLowerCase() + "_type");
+            key = ForTheCrown.coreKey(clazz.getSimpleName().toLowerCase() + "_type");
 
             Registries.COMVAR_TYPES.register(key, this);
         }

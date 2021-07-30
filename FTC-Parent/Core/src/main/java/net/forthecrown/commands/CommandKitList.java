@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.useables.kits.Kit;
@@ -14,7 +14,7 @@ import java.util.Collection;
 
 public class CommandKitList extends FtcCommand {
     public CommandKitList(){
-        super("kitlist", CrownCore.inst());
+        super("kitlist", ForTheCrown.inst());
 
         setPermission(Permissions.KIT);
         setAliases("kits");
@@ -35,7 +35,7 @@ public class CommandKitList extends FtcCommand {
                             .color(NamedTextColor.GOLD);
 
                     Collection<Kit> kits = c.getSource().hasPermission(Permissions.KIT_ADMIN) ?
-                            CrownCore.getKitRegistry().values() : CrownCore.getKitRegistry().getUsableFor(player);
+                            ForTheCrown.getKitRegistry().values() : ForTheCrown.getKitRegistry().getUsableFor(player);
 
                     for (Kit k: kits){
                         Component name = Component.text(" [")

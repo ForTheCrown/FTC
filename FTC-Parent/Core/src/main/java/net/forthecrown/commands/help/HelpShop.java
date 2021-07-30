@@ -1,6 +1,6 @@
 package net.forthecrown.commands.help;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -12,7 +12,7 @@ import org.bukkit.command.CommandSender;
 public class HelpShop extends FtcCommand {
 
     public HelpShop(){
-        super("shophelp", CrownCore.inst());
+        super("shophelp", ForTheCrown.inst());
 
         setAliases("helpshop");
         setPermission(Permissions.HELP);
@@ -28,7 +28,7 @@ public class HelpShop extends FtcCommand {
             Component edit_message = Component.text("[editshop]").clickEvent(ClickEvent.runCommand("/editshop"));
 
             Component help_message = Component.text()
-                    .append(CrownCore.prefix())
+                    .append(ForTheCrown.prefix())
                     .append(Component.text("Sign Shop info:").color(NamedTextColor.YELLOW))
                     .append(Component.newline())
 

@@ -2,7 +2,7 @@ package net.forthecrown.core.chat;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.record.PunishmentRecord;
@@ -105,7 +105,7 @@ public class ChatFormatter {
         boolean staffChat = StaffChat.toggledPlayers.contains(source);
 
         if(source.hasPermission(Permissions.DONATOR_2) || inSenateWorld || staffChat) strMessage = translateHexCodes(strMessage);
-        if(source.hasPermission(Permissions.DONATOR_3) || inSenateWorld || staffChat) strMessage = CrownCore.getEmotes().format(strMessage, source, true);
+        if(source.hasPermission(Permissions.DONATOR_3) || inSenateWorld || staffChat) strMessage = ForTheCrown.getEmotes().format(strMessage, source, true);
 
         strMessage = checkUppercase(source, strMessage);
         message = ChatUtils.convertString(strMessage);
@@ -210,7 +210,7 @@ public class ChatFormatter {
     }
 
     public static Component formatString(String msg, @Nullable CommandSender sender, boolean ignorePerms){
-        msg = CrownCore.getEmotes().format(msg, sender, ignorePerms);
+        msg = ForTheCrown.getEmotes().format(msg, sender, ignorePerms);
 
         return ChatUtils.convertString(msg, ignorePerms || sender == null || sender.hasPermission(Permissions.DONATOR_2));
     }
@@ -336,9 +336,9 @@ public class ChatFormatter {
     }
 
     public static void checkNickAllowed(String nick) throws CommandSyntaxException {
-        if(CrownCore.getMaxNickLength() < nick.length()) throw FtcExceptionProvider.nickTooLong(nick.length());
+        if(ForTheCrown.getMaxNickLength() < nick.length()) throw FtcExceptionProvider.nickTooLong(nick.length());
 
-        if(!CrownCore.allowOtherPlayerNameNicks()){
+        if(!ForTheCrown.allowOtherPlayerNameNicks()){
             if(Bukkit.getOfflinePlayerIfCached(nick) != null) throw FtcExceptionProvider.create("Nickname cannot be the name of another player");
         }
     }

@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class CommandSkull extends FtcCommand {
     public CommandSkull(){
-        super("skull", CrownCore.inst());
+        super("skull", ForTheCrown.inst());
 
         register();
     }
@@ -38,7 +38,7 @@ public class CommandSkull extends FtcCommand {
                                 meta.setOwningPlayer(user.getOfflinePlayer());
                                 item.setItemMeta(meta);
 
-                                Bukkit.getScheduler().runTask(CrownCore.inst(), () -> player.getInventory().addItem(item));
+                                Bukkit.getScheduler().runTask(ForTheCrown.inst(), () -> player.getInventory().addItem(item));
                             });
                             return 0;
                         })

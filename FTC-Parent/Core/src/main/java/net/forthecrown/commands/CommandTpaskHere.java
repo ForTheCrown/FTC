@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -13,7 +13,7 @@ import static net.forthecrown.commands.CommandTpask.*;
 public class CommandTpaskHere extends FtcCommand {
 
     public CommandTpaskHere(){
-        super("tpaskhere", CrownCore.inst());
+        super("tpaskhere", ForTheCrown.inst());
 
         setAliases("tpahere", "eptahere", "etpaskhere");
         setDescription("Asks a player to teleport to them.");

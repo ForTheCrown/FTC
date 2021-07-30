@@ -1,6 +1,6 @@
 package net.forthecrown.core.chat;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
@@ -73,7 +73,7 @@ public interface Announcer extends CrownSerializer {
      */
     static void log(Level level, String message){
         if(message == null) message = "null";
-        CrownCore.logger().log(level, message);
+        ForTheCrown.logger().log(level, message);
     }
 
     default void announce(Component message) { announceRaw(formatMessage(message), FtcUtils.alwaysAccept()); }
@@ -104,7 +104,7 @@ public interface Announcer extends CrownSerializer {
     static void debug(Object message){
         String stringMessage = message == null ? "null" : message.toString();
 
-        if(CrownCore.inDebugMode()) acLiteral(stringMessage);
+        if(ForTheCrown.inDebugMode()) acLiteral(stringMessage);
         else log(DebugLevel.DEBUG, stringMessage);
     }
 

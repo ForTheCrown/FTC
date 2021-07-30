@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -11,7 +11,7 @@ import org.bukkit.World;
 
 public class CommandWeather extends FtcCommand {
     public CommandWeather(){
-        super("weather", CrownCore.inst());
+        super("weather", ForTheCrown.inst());
 
         register();
     }

@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserType;
@@ -13,7 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandNickname extends FtcCommand {
     public CommandNickname(){
-        super("nickname", CrownCore.inst());
+        super("nickname", ForTheCrown.inst());
 
         setAliases("nick");
         setPermission(Permissions.DONATOR_3);

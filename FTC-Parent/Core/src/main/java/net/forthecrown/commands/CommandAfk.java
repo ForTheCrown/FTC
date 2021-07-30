@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -14,7 +14,7 @@ import org.bukkit.Bukkit;
 
 public class CommandAfk extends FtcCommand {
     public CommandAfk(){
-        super("afk", CrownCore.inst());
+        super("afk", ForTheCrown.inst());
 
         setDescription("Marks or un-marks you as AFK");
         setPermission(Permissions.DEFAULT);
@@ -61,7 +61,7 @@ public class CommandAfk extends FtcCommand {
                     //.clickEvent(ChatFormatter.unAfkClickEvent())
                     .color(NamedTextColor.GRAY);
         } else {
-            MuteStatus status = CrownCore.getPunishmentManager().checkMuteSilent(user.getUniqueId());
+            MuteStatus status = ForTheCrown.getPunishmentManager().checkMuteSilent(user.getUniqueId());
 
             userMsg = Component.translatable("afk.self",
                     (hasMessage ? Component.text(": " + message) : Component.empty())

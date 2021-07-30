@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.chat.Announcer;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.WarpType;
@@ -22,7 +22,7 @@ import org.bukkit.Location;
 
 public class CommandWarpEdit extends FtcCommand {
     public CommandWarpEdit(){
-        super("warpedit", CrownCore.inst());
+        super("warpedit", ForTheCrown.inst());
 
         setPermission(Permissions.WARP_ADMIN);
         register();
@@ -93,7 +93,7 @@ public class CommandWarpEdit extends FtcCommand {
     }
 
     private int createWarp(CommandSource c, String name, Location location) throws CommandSyntaxException {
-        Warp warp = CrownCore.getWarpRegistry().register(FtcUtils.parseKey(name), location);
+        Warp warp = ForTheCrown.getWarpRegistry().register(FtcUtils.parseKey(name), location);
         c.sendAdmin(Component.text("Creating warp named ").append(warp.displayName()));
         return 0;
     }

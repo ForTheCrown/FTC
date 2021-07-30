@@ -1,7 +1,7 @@
 package net.forthecrown.crownevents;
 
 import net.forthecrown.commands.CommandHologram;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Main;
 import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.text.Component;
@@ -47,7 +47,7 @@ public class ArmorStandLeaderboard {
         setScoreFormatter(ScoreFormatter.defaultFormat());
 
         Main.LEADERBOARDS.add(this);
-        getLocation().getChunk().addPluginChunkTicket(CrownCore.inst());
+        getLocation().getChunk().addPluginChunkTicket(ForTheCrown.inst());
     }
 
     /**

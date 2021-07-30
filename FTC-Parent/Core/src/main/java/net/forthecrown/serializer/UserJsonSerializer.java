@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.data.SoldMaterialData;
@@ -29,11 +29,11 @@ public class UserJsonSerializer implements UserSerializer {
     private final Map<UUID, File> userFiles = new HashMap<>();
     private final Set<UUID> deletedFiles = new HashSet<>();
 
-    private static final Logger logger = CrownCore.logger();
+    private static final Logger logger = ForTheCrown.logger();
     public static final File USER_DIR;
 
     static {
-        USER_DIR = new File(CrownCore.dataFolder().getPath() + File.separator + "users");
+        USER_DIR = new File(ForTheCrown.dataFolder().getPath() + File.separator + "users");
 
         if(!USER_DIR.exists()) USER_DIR.mkdir();
         else if(!USER_DIR.isDirectory()) {
@@ -263,7 +263,7 @@ public class UserJsonSerializer implements UserSerializer {
 
         JsonBuf timeStamps = JsonBuf.empty();
         timeStamps.add("lastLoad", id.getOfflinePlayer().getLastLogin());
-        timeStamps.add("nextReset", System.currentTimeMillis() + CrownCore.getUserResetInterval());
+        timeStamps.add("nextReset", System.currentTimeMillis() + ForTheCrown.getUserResetInterval());
 
         json.add("timeStamps", timeStamps);
     }

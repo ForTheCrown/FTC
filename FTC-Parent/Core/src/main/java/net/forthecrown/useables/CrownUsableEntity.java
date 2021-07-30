@@ -3,7 +3,7 @@ package net.forthecrown.useables;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import org.bukkit.entity.Entity;
 
 import java.util.UUID;
@@ -19,7 +19,7 @@ public class CrownUsableEntity extends AbstractUsable implements UsableEntity {
         this.id = entity.getUniqueId();
         this.entity = entity;
 
-        CrownCore.getUsablesManager().addEntity(this);
+        ForTheCrown.getUsablesManager().addEntity(this);
         reload();
     }
 
@@ -54,7 +54,7 @@ public class CrownUsableEntity extends AbstractUsable implements UsableEntity {
     public void delete(){
         deleteFile();
 
-        CrownCore.getUsablesManager().removeEntity(this);
+        ForTheCrown.getUsablesManager().removeEntity(this);
         entity.getPersistentDataContainer().remove(UsablesManager.USABLE_KEY);
     }
 }

@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.HomeParseResult;
@@ -15,7 +15,7 @@ import org.bukkit.Location;
 
 public class CommandDelHome extends FtcCommand {
     public CommandDelHome(){
-        super("delhome", CrownCore.inst());
+        super("delhome", ForTheCrown.inst());
 
         setPermission(Permissions.HOME);
         setDescription("Deletes a home");

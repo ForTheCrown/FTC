@@ -2,7 +2,7 @@ package net.forthecrown.pirates;
 
 import net.forthecrown.commands.CommandAuction;
 import net.forthecrown.core.chat.Announcer;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.economy.auctions.Auction;
 import net.forthecrown.economy.auctions.AuctionEvents;
 import net.forthecrown.economy.auctions.CrownAuction;
@@ -43,14 +43,14 @@ public final class AuctionManager {
     public static final FtcRegion AUCTION_AREA = new FtcRegion(Worlds.OVERWORLD, -657, 49, 3848, -616, 21, 3810);
 
     public AuctionManager(){
-        Bukkit.getPluginManager().registerEvents(new AuctionEvents(), CrownCore.inst());
+        Bukkit.getPluginManager().registerEvents(new AuctionEvents(), ForTheCrown.inst());
 
         AUCTION_KEY = Squire.createPiratesKey("auction");
         new CommandAuction();
     }
 
     public void loadAuctions(){
-        File directory = new File(CrownCore.dataFolder() + File.separator + "auctions");
+        File directory = new File(ForTheCrown.dataFolder() + File.separator + "auctions");
 
         if(!directory.exists()) directory.mkdir();
         else {

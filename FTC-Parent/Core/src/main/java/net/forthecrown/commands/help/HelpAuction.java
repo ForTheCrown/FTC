@@ -1,6 +1,6 @@
 package net.forthecrown.commands.help;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -10,7 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class HelpAuction extends FtcCommand {
 
     public HelpAuction() {
-        super("auctionhelp", CrownCore.inst());
+        super("auctionhelp", ForTheCrown.inst());
 
         setAliases("helpauction", "help_auction", "auction_help");
         setPermission(Permissions.HELP);
@@ -22,7 +22,7 @@ public class HelpAuction extends FtcCommand {
 
     private Component makeMessage(){
         return Component.text()
-                .append(CrownCore.prefix())
+                .append(ForTheCrown.prefix())
                 .append(Component.text("Auction info:").color(NamedTextColor.YELLOW))
 
                 .append(Component.newline())

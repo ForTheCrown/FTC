@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.GameModeArgument;
@@ -16,7 +16,7 @@ import org.bukkit.GameMode;
 
 public class CommandGameMode extends FtcCommand {
     public CommandGameMode(){
-        super("gm", CrownCore.inst());
+        super("gm", ForTheCrown.inst());
 
         setPermission(Permissions.HELPER);
         setAliases("gamemode");

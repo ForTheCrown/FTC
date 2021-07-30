@@ -12,7 +12,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.forthecrown.commands.arguments.UserType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.WgFlags;
 import net.forthecrown.core.admin.EavesDropper;
@@ -68,14 +68,14 @@ public class CoreListener implements Listener {
         boolean nameChanged = user.onJoin();
 
         if(!event.getPlayer().hasPlayedBefore()){
-            user.getPlayer().teleport(CrownCore.getServerSpawn());
+            user.getPlayer().teleport(ForTheCrown.getServerSpawn());
 
             Component welcomeMsg = Component.translatable("user.firstJoin", NamedTextColor.YELLOW, user.nickDisplayName());
-            CrownCore.getAnnouncer().announceRaw(welcomeMsg);
+            ForTheCrown.getAnnouncer().announceRaw(welcomeMsg);
             event.joinMessage(null);
 
             //Give join kit
-            Kit kit = CrownCore.getKitRegistry().get(CrownCore.onFirstJoinKit());
+            Kit kit = ForTheCrown.getKitRegistry().get(ForTheCrown.onFirstJoinKit());
             if(kit != null) kit.attemptItemGiving(event.getPlayer());
         } else {
             user.sendMessage(Component.translatable("server.welcomeBack").color(NamedTextColor.GOLD));
@@ -87,7 +87,7 @@ public class CoreListener implements Listener {
         Pirates.getParrotTracker().check(user.getPlayer());
 
         UserManager.updateVanishedFromPerspective(user);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), user::onJoinLater, 1);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), user::onJoinLater, 1);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -116,12 +116,12 @@ public class CoreListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getBlock().getType() != Material.HOPPER) return;
-        if(CrownCore.getHoppersInOneChunk() == -1) return;
+        if(ForTheCrown.getHoppersInOneChunk() == -1) return;
         int hopperAmount = event.getBlock().getChunk().getTileEntities(block -> block.getType() == Material.HOPPER, true).size();
-        if(hopperAmount <= CrownCore.getHoppersInOneChunk()) return;
+        if(hopperAmount <= ForTheCrown.getHoppersInOneChunk()) return;
 
         event.setCancelled(true);
-        event.getPlayer().sendMessage(Component.text("Too many hoppers (Max " + CrownCore.getHoppersInOneChunk() + ")").color(NamedTextColor.RED));
+        event.getPlayer().sendMessage(Component.text("Too many hoppers (Max " + ForTheCrown.getHoppersInOneChunk() + ")").color(NamedTextColor.RED));
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -200,7 +200,7 @@ public class CoreListener implements Listener {
     public void onPlayerChat(AsyncChatEvent event) {
         event.renderer(ChatFormatter::formatChat);
 
-        PunishmentManager punishments = CrownCore.getPunishmentManager();
+        PunishmentManager punishments = ForTheCrown.getPunishmentManager();
         Player player = event.getPlayer();
         MuteStatus status = punishments.checkMute(player);
 

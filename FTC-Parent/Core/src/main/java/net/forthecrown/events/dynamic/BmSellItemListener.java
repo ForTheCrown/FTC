@@ -1,6 +1,6 @@
 package net.forthecrown.events.dynamic;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.pirates.merchants.MaterialMerchant;
@@ -77,7 +77,7 @@ public class BmSellItemListener extends AbstractInvListener implements Listener 
 
         Component s = ChatFormatter.itemName(toSellItem);
 
-        Balances bals = CrownCore.getBalances();
+        Balances bals = ForTheCrown.getBalances();
         bals.add(uuid, toPay, false);
 
         Component message = Component.text("sold ")

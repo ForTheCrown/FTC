@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.Suggestions;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -15,7 +15,7 @@ import org.bukkit.Bukkit;
 
 public class CommandSudo extends FtcCommand {
     public CommandSudo(){
-        super("sudo", CrownCore.inst());
+        super("sudo", ForTheCrown.inst());
 
         register();
     }

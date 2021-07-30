@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckPermission implements UsageCheck<CheckPermission.CheckInstance> {
-    public static final Key KEY = Key.key(CrownCore.inst(), "required_permission");
+    public static final Key KEY = Key.key(ForTheCrown.inst(), "required_permission");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

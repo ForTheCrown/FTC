@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.CrownUser;
@@ -10,7 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandEavesDrop extends FtcCommand {
     public CommandEavesDrop(){
-        super("eavesdrop", CrownCore.inst());
+        super("eavesdrop", ForTheCrown.inst());
 
         setPermission(Permissions.EAVESDROP);
         register();

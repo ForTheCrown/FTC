@@ -1,7 +1,7 @@
 package net.forthecrown.commands.emotes;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class EmotePog extends FtcCommand {
 
     public EmotePog(){
-        super("pog", CrownCore.inst());
+        super("pog", ForTheCrown.inst());
 
         setAliases("pgo", "poggers", "pogchamp", "pogo");
         setPermission(Permissions.EMOTE_POG);
@@ -52,7 +52,7 @@ public class EmotePog extends FtcCommand {
                 .append(FtcUtils.isNullOrBlank(message) ? Component.empty() : Component.text(": ").append(Component.text(message).color(NamedTextColor.WHITE)))
                 .build();
 
-        CrownCore.getAnnouncer().announceToAllRaw(cMessage);
+        ForTheCrown.getAnnouncer().announceToAllRaw(cMessage);
         Cooldown.add(user, "Core_Emote_Pog", 3*20);
     }
 }

@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.squire.Squire;
@@ -61,12 +61,12 @@ public class GrapplingHookMerchant implements BlackMarketMerchant, ClickEventTas
     public void run(Player player, String[] args) throws CrownException, RoyalCommandException {
         checkPreconditions(UserManager.getUser(player));
 
-        CrownCore.getBalances().add(player.getUniqueId(), -price);
+        ForTheCrown.getBalances().add(player.getUniqueId(), -price);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gh give " + player.getName() + (uses == -1 ? "" : " " + uses));
     }
 
     private void checkPreconditions(CrownUser user) throws RoyalCommandException {
-        if(!CrownCore.getBalances().canAfford(user.getUniqueId(), price)){
+        if(!ForTheCrown.getBalances().canAfford(user.getUniqueId(), price)){
             throw FtcExceptionProvider.cannotAfford(price);
         }
 

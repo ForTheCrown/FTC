@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.useables.warps.FtcWarp;
 import net.forthecrown.useables.warps.Warp;
@@ -28,7 +28,7 @@ public class CrownWarpRegistry extends AbstractJsonSerializer implements WarpReg
         super("warps");
 
         reload();
-        CrownCore.logger().info("Warps loaded");
+        ForTheCrown.logger().info("Warps loaded");
     }
 
     @Override

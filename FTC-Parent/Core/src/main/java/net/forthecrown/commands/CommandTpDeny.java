@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -11,7 +11,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandTpDeny extends FtcCommand {
     public CommandTpDeny(){
-        super("tpdeny", CrownCore.inst());
+        super("tpdeny", ForTheCrown.inst());
 
         setPermission(Permissions.TPA);
         setDescription("Denies a tpa request");

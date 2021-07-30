@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.chat.ChatFormatter;
@@ -23,13 +23,13 @@ import java.util.Collection;
 public class CommandHologram extends FtcCommand {
 
     public CommandHologram(){
-        super("hologram", CrownCore.inst());
+        super("hologram", ForTheCrown.inst());
 
         setPermission(Permissions.CORE_ADMIN);
         register();
     }
 
-    public static final NamespacedKey HOLOGRAM_KEY = new NamespacedKey(CrownCore.inst(), "hologram");
+    public static final NamespacedKey HOLOGRAM_KEY = new NamespacedKey(ForTheCrown.inst(), "hologram");
 
     /*
      * ----------------------------------------

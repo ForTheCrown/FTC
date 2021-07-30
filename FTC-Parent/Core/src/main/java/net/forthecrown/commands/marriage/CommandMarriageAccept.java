@@ -1,6 +1,6 @@
 package net.forthecrown.commands.marriage;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -14,7 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class CommandMarriageAccept extends FtcCommand {
 
     public CommandMarriageAccept() {
-        super("marryaccept", CrownCore.inst());
+        super("marryaccept", ForTheCrown.inst());
 
         setAliases("maccept");
         setPermission(Permissions.MARRY);

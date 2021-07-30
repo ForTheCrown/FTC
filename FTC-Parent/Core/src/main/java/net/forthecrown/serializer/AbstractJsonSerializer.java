@@ -1,7 +1,7 @@
 package net.forthecrown.serializer;
 
 import com.google.gson.JsonObject;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.utils.JsonUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,14 +36,14 @@ public abstract class AbstractJsonSerializer implements CrownSerializer {
         this.fileName = fileName.endsWith(".json") ? fileName : fileName + ".json";
         this.directory = directory;
         this.stopIfFileDoesntExist = stopIfFileDoesntExist;
-        this.logger = CrownCore.logger();
+        this.logger = ForTheCrown.logger();
 
         this.fullFileDirectory = (directory == null ? "" : directory + File.separator) + this.fileName;
         load();
     }
 
     private void load(){
-        file = new File(CrownCore.dataFolder() + File.separator + fullFileDirectory);
+        file = new File(ForTheCrown.dataFolder() + File.separator + fullFileDirectory);
         fileExists = file.exists();
 
         if(!fileExists){

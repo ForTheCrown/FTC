@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
@@ -27,7 +27,7 @@ public class VikingRaidSerializer implements RaidSerializer {
     private final File directory;
 
     VikingRaidSerializer() {
-        directory = new File(CrownCore.dataFolder().getPath() + File.separator + "raids");
+        directory = new File(ForTheCrown.dataFolder().getPath() + File.separator + "raids");
         checkDirectory();
     }
 
@@ -66,7 +66,7 @@ public class VikingRaidSerializer implements RaidSerializer {
         try {
             JsonUtils.writeFile(json.getSource(), getFile(raid.key()));
         } catch (IOException e) {
-            CrownCore.logger().severe("Error while serializing viking raid");
+            ForTheCrown.logger().severe("Error while serializing viking raid");
             e.printStackTrace();
         }
     }

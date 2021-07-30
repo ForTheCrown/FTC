@@ -1,6 +1,6 @@
 package net.forthecrown.economy.shops;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.utils.FtcUtils;
@@ -43,7 +43,7 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
         this.block = location.getBlock();
 
         inventory = new CrownShopInventory(this);
-        CrownCore.getShopManager().addShop(this);
+        ForTheCrown.getShopManager().addShop(this);
 
         reload();
     }
@@ -68,7 +68,7 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
         super.save(false);
 
         inventory = new CrownShopInventory(this);
-        CrownCore.getShopManager().addShop(this);
+        ForTheCrown.getShopManager().addShop(this);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
 
     @Override
     public void destroy(boolean removeBlock) {
-        CrownCore.getShopManager().removeShop(this);
+        ForTheCrown.getShopManager().removeShop(this);
         if(inventory != null && inventory.getShopContents().size() > 0) {
             for (ItemStack stack : inventory.getShopContents()){ location.getWorld().dropItemNaturally(location, stack); }
             location.getWorld().spawnParticle(Particle.CLOUD, location.add(0.5, 0.5, 0.5), 5, 0.1D, 0.1D, 0.1D, 0.05D);
@@ -117,7 +117,7 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
 
     @Override
     public void unload(){
-        CrownCore.getShopManager().removeShop(this);
+        ForTheCrown.getShopManager().removeShop(this);
         save();
     }
 
@@ -219,9 +219,9 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
         if(isOutOfStock()) ln1 = getType().outOfStockLabel();
 
         s.line(0, ln1);
-        s.line(3, CrownCore.getShopManager().getPriceLine(price));
+        s.line(3, ForTheCrown.getShopManager().getPriceLine(price));
 
-        Bukkit.getScheduler().runTask(CrownCore.inst(), () -> s.update(true));
+        Bukkit.getScheduler().runTask(ForTheCrown.inst(), () -> s.update(true));
     }
 
     @Override

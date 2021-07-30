@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.arguments.UserType;
@@ -13,7 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandIgnore extends FtcCommand {
     public CommandIgnore(){
-        super("ignore", CrownCore.inst());
+        super("ignore", ForTheCrown.inst());
 
         setPermission(Permissions.IGNORE);
         setAliases("ignoreplayer", "unignore", "unignoreplayer", "block", "unblock");

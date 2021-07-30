@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.economy.selling.SellShops;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -15,7 +15,7 @@ import static net.forthecrown.economy.selling.SellShops.WEB_MESSAGE;
 public class CommandShop extends FtcCommand {
 
     public CommandShop(){
-        super("shop", CrownCore.inst());
+        super("shop", ForTheCrown.inst());
 
         setDescription("Opens the Shop GUI in which one can sell things");
         register();

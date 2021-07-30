@@ -1,6 +1,6 @@
 package net.forthecrown.events.dynamic;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.UserTeleport;
 import org.bukkit.Bukkit;
@@ -19,7 +19,7 @@ public class AsyncTeleportListener implements Listener {
         this.player = user.getPlayer();
         this.teleport = teleport;
 
-        Bukkit.getPluginManager().registerEvents(this, CrownCore.inst());
+        Bukkit.getPluginManager().registerEvents(this, ForTheCrown.inst());
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
@@ -21,7 +21,7 @@ public class CrownKingship extends AbstractJsonSerializer implements Kingship {
         super("king");
 
         reload();
-        CrownCore.logger().info("Kingship loaded");
+        ForTheCrown.logger().info("Kingship loaded");
     }
 
     private void attemptSetting(String from){

@@ -6,7 +6,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.CoreCommands;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class KeyComVarType implements ComVarType<Key> {
     public static final ComVarType<Key> KEY = new KeyComVarType();
-    private final Key key = CrownCore.coreKey("key_type");
+    private final Key key = ForTheCrown.coreKey("key_type");
 
     private KeyComVarType() {
         Registries.COMVAR_TYPES.register(key, this);

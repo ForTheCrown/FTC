@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -16,7 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandBecomeBaron extends FtcCommand {
     public CommandBecomeBaron() {
-        super("becomebaron", CrownCore.inst());
+        super("becomebaron", ForTheCrown.inst());
 
         setPermission(Permissions.BECOME_BARON);
         setDescription("Allows you to become a baron");
@@ -43,19 +43,19 @@ public class CommandBecomeBaron extends FtcCommand {
 
     @Override
     protected void createCommand(BrigadierCommand command) {
-        Balances bals = CrownCore.getBalances();
+        Balances bals = ForTheCrown.getBalances();
 
         command
                 .executes(c -> {
                     CrownUser p = getUserSender(c);
-                    int baronPrice = CrownCore.getBaronPrice();
+                    int baronPrice = ForTheCrown.getBaronPrice();
 
                     if(p.hasRank(Rank.BARON)) throw FtcExceptionProvider.create("You're already a baron");
                     if(!bals.canAfford(p.getUniqueId(), baronPrice)) throw FtcExceptionProvider.cannotAfford(baronPrice);
 
                     //Tell em cost and ask for confirmation
                     TextComponent message = Component.text()
-                            .append(CrownCore.prefix())
+                            .append(ForTheCrown.prefix())
                             .append(Component.translatable("commands.becomeBaron.confirm", Rank.BARON.noEndSpacePrefix(), Balances.formatted(baronPrice).color(NamedTextColor.YELLOW)))
                             .append(Component.text(" "))
                             .append(Component.translatable("commands.becomeBaron.confirm.button")
@@ -73,7 +73,7 @@ public class CommandBecomeBaron extends FtcCommand {
                 .then(literal("confirm")
                         .executes(c -> {
                             CrownUser p = getUserSender(c);
-                            int baronPrice = CrownCore.getBaronPrice();
+                            int baronPrice = ForTheCrown.getBaronPrice();
 
                             if(p.hasRank(Rank.BARON)) throw FtcExceptionProvider.alreadyBaron();
                             if(!bals.canAfford(p.getUniqueId(), baronPrice)) throw FtcExceptionProvider.cannotAfford(baronPrice);

@@ -21,7 +21,7 @@ import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.useables.CrownUsablesManager;
 import net.forthecrown.useables.actions.UsageActions;
 import net.forthecrown.useables.preconditions.UsageChecks;
-import net.forthecrown.user.CrownUserManager;
+import net.forthecrown.user.FtcUserManager;
 import net.forthecrown.valhalla.ValhallaEngine;
 
 import static net.forthecrown.utils.FtcUtils.safeRunnable;
@@ -57,7 +57,7 @@ public final class FtcBootStrap {
         Main.balances = new CrownBalances();
 
         Main.shopManager = new CrownShopManager();
-        Main.userManager = new CrownUserManager();
+        Main.userManager = new FtcUserManager();
         Main.punishmentManager = new CrownPunishmentManager();
         Main.usablesManager = new CrownUsablesManager();
         Main.jailManager = new CrownJailManager();
@@ -65,7 +65,7 @@ public final class FtcBootStrap {
         Main.kingship = new CrownKingship();
         Main.rules = new ServerRules();
 
-        if(CrownCore.inDebugMode()) safeRunnable(ValhallaEngine::init);
+        if(ForTheCrown.inDebugMode()) safeRunnable(ValhallaEngine::init);
         safeRunnable(Pirates::init);
         safeRunnable(Bosses::init);
         safeRunnable(Cosmetics::init);

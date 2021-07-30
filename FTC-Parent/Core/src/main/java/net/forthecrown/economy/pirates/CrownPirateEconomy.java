@@ -2,7 +2,7 @@ package net.forthecrown.economy.pirates;
 
 import com.google.common.io.Files;
 import com.google.gson.JsonObject;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.economy.pirates.merchants.*;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.JsonUtils;
@@ -31,7 +31,7 @@ public class CrownPirateEconomy implements PirateEconomy {
     public CrownPirateEconomy(){
         this.random = new CrownRandom();
 
-        CrownCore.getDayUpdate().addListener(this::updateDate);
+        ForTheCrown.getDayUpdate().addListener(this::updateDate);
 
         this.enchantMerchant = new EnchantMerchant();
         this.headMerchant = new HeadMerchant();
@@ -63,7 +63,7 @@ public class CrownPirateEconomy implements PirateEconomy {
             if(!(usable instanceof BlackMarketMerchant)) return;
 
             BlackMarketMerchant merchant = (BlackMarketMerchant) usable;
-            merchant.update(random, CrownCore.getDayUpdate().getDay());
+            merchant.update(random, ForTheCrown.getDayUpdate().getDay());
         });
     }
 
@@ -119,11 +119,11 @@ public class CrownPirateEconomy implements PirateEconomy {
     }
 
     private File getFile() throws IOException {
-        File file = new File(CrownCore.dataFolder().getPath() + File.separator + "blackmarket.json");
+        File file = new File(ForTheCrown.dataFolder().getPath() + File.separator + "blackmarket.json");
         if(!file.exists()){
             file.createNewFile();
 
-            InputStream stream = CrownCore.resource("blackmarket.json");
+            InputStream stream = ForTheCrown.resource("blackmarket.json");
             Files.write(stream.readAllBytes(), file);
         }
 

@@ -1,6 +1,6 @@
 package net.forthecrown.commands.emotes;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
@@ -54,13 +54,13 @@ public class EmoteScare extends CommandEmote {
     private void scare(Player player) {
         Location loc = player.getLocation();
         player.spawnParticle(Particle.MOB_APPEARANCE, loc.getX(), loc.getY(), loc.getZ(), 1);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> {
             player.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.MASTER, 2.0F, 1F);
 
             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 9, false, false, false));
 
             for (int i = 0; i < 3; i++) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> player.playSound(loc, Sound.ENTITY_ENDERMAN_SCREAM, SoundCategory.MASTER, 1.5F, 1F), i* 3L);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> player.playSound(loc, Sound.ENTITY_ENDERMAN_SCREAM, SoundCategory.MASTER, 1.5F, 1F), i* 3L);
             }
         }, 3L);
     }

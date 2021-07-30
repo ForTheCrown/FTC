@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.CrownUser;
@@ -21,7 +21,7 @@ import org.bukkit.inventory.ItemStack;
 public class CommandMakeAward extends FtcCommand {
 
     public CommandMakeAward() {
-        super("makeaward", CrownCore.inst());
+        super("makeaward", ForTheCrown.inst());
 
         register();
     }

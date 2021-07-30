@@ -1,7 +1,7 @@
 package net.forthecrown.registry;
 
 import net.forthecrown.comvars.types.ComVarType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.npc.InteractableNPC;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.AbstractDeathEffect;
@@ -19,7 +19,7 @@ public interface Registries {
     /**
      * A registry of registries, master registry
      */
-    Registry<Registry<?>> MASTER_REGISTRY = new BaseRegistry<>(CrownCore.coreKey("master_registry"));
+    Registry<Registry<?>> MASTER_REGISTRY = new BaseRegistry<>(ForTheCrown.coreKey("master_registry"));
 
     Registry<InteractableNPC> NPCS = create("npcs");
 

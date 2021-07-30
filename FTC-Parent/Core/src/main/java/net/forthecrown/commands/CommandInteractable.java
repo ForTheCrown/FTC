@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -27,7 +27,7 @@ import org.bukkit.entity.Player;
 public class CommandInteractable extends FtcCommand {
 
     public CommandInteractable(){
-        super("interactable", CrownCore.inst());
+        super("interactable", ForTheCrown.inst());
 
         setAliases("usable");
         setPermission(Permissions.CORE_ADMIN);
@@ -45,9 +45,9 @@ public class CommandInteractable extends FtcCommand {
                                             Location l = c.getArgument("location", Position.class).getLocation(source);
 
                                             if(!(l.getBlock().getState() instanceof TileState)) throw FtcExceptionProvider.create("Block is not sign");
-                                            if(CrownCore.getUsablesManager().isInteractableSign(l.getBlock())) throw FtcExceptionProvider.create("Block is already an interactable sign");
+                                            if(ForTheCrown.getUsablesManager().isInteractableSign(l.getBlock())) throw FtcExceptionProvider.create("Block is already an interactable sign");
 
-                                            CrownCore.getUsablesManager().createBlock((TileState) l.getBlock().getState());
+                                            ForTheCrown.getUsablesManager().createBlock((TileState) l.getBlock().getState());
                                             c.getSource().sendAdmin("Creating interactable sign");
                                             return 0;
                                         })
@@ -65,9 +65,9 @@ public class CommandInteractable extends FtcCommand {
                                             Entity entity = c.getArgument("selector", EntitySelector.class).getEntity(source);
 
                                             if(entity instanceof Player) throw FtcExceptionProvider.create("Players cannot be interactable");
-                                            if(CrownCore.getUsablesManager().isInteractableEntity(entity)) throw FtcExceptionProvider.create("Entity is already interactable");
+                                            if(ForTheCrown.getUsablesManager().isInteractableEntity(entity)) throw FtcExceptionProvider.create("Entity is already interactable");
 
-                                            CrownCore.getUsablesManager().createEntity(entity);
+                                            ForTheCrown.getUsablesManager().createEntity(entity);
 
                                             c.getSource().sendAdmin("Creating interactable entity");
                                             return 0;
@@ -114,16 +114,16 @@ public class CommandInteractable extends FtcCommand {
 
     private UsableEntity entity(CommandContext<CommandSource> c) throws CommandSyntaxException {
         Entity entity = c.getArgument("selector", EntitySelector.class).getEntity(c.getSource());
-        if(!CrownCore.getUsablesManager().isInteractableEntity(entity)) throw FtcExceptionProvider.create("Given entity is not an interactable entity");
+        if(!ForTheCrown.getUsablesManager().isInteractableEntity(entity)) throw FtcExceptionProvider.create("Given entity is not an interactable entity");
 
-        return CrownCore.getUsablesManager().getEntity(entity);
+        return ForTheCrown.getUsablesManager().getEntity(entity);
     }
 
     private UsableBlock getSign(CommandContext<CommandSource> c) throws CommandSyntaxException {
         Location l = c.getArgument("location", Position.class).getLocation(c.getSource());
         Block b = l.getBlock();
-        if(!CrownCore.getUsablesManager().isInteractableSign(b)) throw FtcExceptionProvider.create("Specified location is not an interactable sign");
+        if(!ForTheCrown.getUsablesManager().isInteractableSign(b)) throw FtcExceptionProvider.create("Specified location is not an interactable sign");
 
-        return CrownCore.getUsablesManager().getBlock(b.getLocation());
+        return ForTheCrown.getUsablesManager().getBlock(b.getLocation());
     }
 }

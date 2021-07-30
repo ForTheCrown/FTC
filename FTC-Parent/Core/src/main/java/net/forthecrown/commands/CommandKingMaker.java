@@ -5,7 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.grenadier.CommandSource;
@@ -16,7 +16,7 @@ import net.kyori.adventure.text.Component;
 public class CommandKingMaker extends FtcCommand {
 
     public CommandKingMaker(){
-        super("kingmaker", CrownCore.inst());
+        super("kingmaker", ForTheCrown.inst());
 
         setDescription("This command is used to assign and unassign a king or queen");
         setPermission(Permissions.KING_MAKER);
@@ -42,14 +42,14 @@ public class CommandKingMaker extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> {
-                    c.getSource().sendMessage("The Current king is " + CrownCore.getKingship().getName());
+                    c.getSource().sendMessage("The Current king is " + ForTheCrown.getKingship().getName());
                     return 0;
                 })
                 .then(literal("remove")
                         .executes(c ->{
-                            if(CrownCore.getKingship().getUniqueId() == null) throw FtcExceptionProvider.create("There is already no king");
+                            if(ForTheCrown.getKingship().getUniqueId() == null) throw FtcExceptionProvider.create("There is already no king");
 
-                            CrownCore.getKingship().set(null);
+                            ForTheCrown.getKingship().set(null);
                             c.getSource().sendMessage("King has been removed");
                             return 0;
                         })
@@ -61,7 +61,7 @@ public class CommandKingMaker extends FtcCommand {
     }
 
     private int makeKing(CommandContext<CommandSource> c, boolean isQueen) throws CommandSyntaxException {
-        Kingship kingship = CrownCore.getKingship();
+        Kingship kingship = ForTheCrown.getKingship();
         if(kingship.getUniqueId() != null) throw FtcExceptionProvider.create("There already is a king");
 
         CrownUser king = UserType.getUser(c, "player");

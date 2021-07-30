@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics.emotes;
 
 import net.forthecrown.commands.emotes.*;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.cosmetics.CosmeticConstants;
 import net.forthecrown.inventory.builder.BuiltInventory;
@@ -45,7 +45,7 @@ public class CosmeticEmotes {
                 .build();
 
         Registries.EMOTES.close();
-        CrownCore.logger().info("Emotes registered");
+        ForTheCrown.logger().info("Emotes registered");
     }
 
     private static CosmeticEmote register(CosmeticEmote emote){

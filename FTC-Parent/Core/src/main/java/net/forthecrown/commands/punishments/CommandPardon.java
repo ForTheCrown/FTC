@@ -3,7 +3,7 @@ package net.forthecrown.commands.punishments;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
@@ -29,7 +29,7 @@ import java.util.UUID;
 
 public class CommandPardon extends FtcCommand {
     public CommandPardon(){
-        super("pardon_ftc", CrownCore.inst());
+        super("pardon_ftc", ForTheCrown.inst());
 
         setAliases("pardon");
         setPermission(Permissions.HELPER);
@@ -53,7 +53,7 @@ public class CommandPardon extends FtcCommand {
 
                                     UUID id = FtcUtils.uuidFromName(name);
                                     if(id != null){
-                                        PunishmentEntry entry = CrownCore.getPunishmentManager().getEntry(id);
+                                        PunishmentEntry entry = ForTheCrown.getPunishmentManager().getEntry(id);
                                         if(entry != null) entry.pardon(PunishmentType.BAN);
                                     }
 
@@ -71,7 +71,7 @@ public class CommandPardon extends FtcCommand {
                         .then(literal("softmute")
                                 .executes(c -> {
                                     CrownUser user = user(c);
-                                    PunishmentManager manager = CrownCore.getPunishmentManager();
+                                    PunishmentManager manager = ForTheCrown.getPunishmentManager();
 
                                     if(manager.isSoftmuted(user.getUniqueId())) throw FtcExceptionProvider.create(user.getName() + " is not softmuted");
 
@@ -90,7 +90,7 @@ public class CommandPardon extends FtcCommand {
                         .then(literal("jail")
                                 .executes(c -> {
                                     CrownUser user = user(c);
-                                    PunishmentManager manager = CrownCore.getPunishmentManager();
+                                    PunishmentManager manager = ForTheCrown.getPunishmentManager();
                                     JailManager jails = manager.getJailManager();
 
                                     if(!manager.checkJailed(user.getPlayer())) throw FtcExceptionProvider.create(user.getName() + " is not jailed");
@@ -112,7 +112,7 @@ public class CommandPardon extends FtcCommand {
 
                                 .executes(c -> {
                                     CrownUser user = user(c);
-                                    PunishmentManager manager = CrownCore.getPunishmentManager();
+                                    PunishmentManager manager = ForTheCrown.getPunishmentManager();
 
                                     if(manager.isMuted(user.getUniqueId())) throw FtcExceptionProvider.create(user.getName() + " is not muted");
 

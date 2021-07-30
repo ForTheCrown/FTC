@@ -4,7 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -25,7 +25,7 @@ import org.bukkit.permissions.Permission;
 public class CommandSelfOrUser extends FtcCommand {
     private final CommandFunction function;
     private CommandSelfOrUser(String name, Permission perm, CommandFunction function, String... aliases){
-        super(name, CrownCore.inst());
+        super(name, ForTheCrown.inst());
 
         this.permission = perm;
         this.aliases = aliases;

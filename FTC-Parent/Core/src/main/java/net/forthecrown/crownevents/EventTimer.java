@@ -1,6 +1,6 @@
 package net.forthecrown.crownevents;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import org.bukkit.Bukkit;
@@ -45,7 +45,7 @@ public class EventTimer {
             public void run() {
                 elapsedTime += 100;
                 if(elapsedTime >= maxTicks * 50){
-                    Bukkit.getScheduler().runTask(CrownCore.inst(), () -> onTimerExpire.accept(getPlayer()));
+                    Bukkit.getScheduler().runTask(ForTheCrown.inst(), () -> onTimerExpire.accept(getPlayer()));
                     stop();
                 }
 
@@ -64,7 +64,7 @@ public class EventTimer {
                 elapsedTime -= 100;
 
                 if(elapsedTime <= 0){
-                    Bukkit.getScheduler().runTask(CrownCore.inst(), () -> onTimerExpire.accept(getPlayer()));
+                    Bukkit.getScheduler().runTask(ForTheCrown.inst(), () -> onTimerExpire.accept(getPlayer()));
                     stop();
                 }
 
@@ -85,6 +85,18 @@ public class EventTimer {
 
     public long getTime(){
         return elapsedTime;
+    }
+
+    public void setTime(long millis) {
+        this.elapsedTime = millis;
+    }
+
+    public long getTimeInTicks() {
+        return getTime() / 50;
+    }
+
+    public void setTimeInTicks(long time) {
+        this.elapsedTime = time * 50;
     }
 
     public Player getPlayer() {

@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.Suggestions;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.ComVarArgument;
@@ -14,7 +14,7 @@ import net.kyori.adventure.text.Component;
 public class CommandComVar extends FtcCommand {
 
     public CommandComVar(){
-        super("comvar", CrownCore.inst());
+        super("comvar", ForTheCrown.inst());
 
         setPermission(Permissions.CORE_ADMIN);
         setAliases("convar", "consolevar", "commandvar", "commandvariables");

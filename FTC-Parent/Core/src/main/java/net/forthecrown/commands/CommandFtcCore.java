@@ -18,7 +18,7 @@ import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.chat.ChatFormatter;
@@ -57,13 +57,13 @@ import org.bukkit.scoreboard.Scoreboard;
 public class CommandFtcCore extends FtcCommand {
 
     public CommandFtcCore(){
-        super("ftccore", CrownCore.inst());
+        super("ftccore", ForTheCrown.inst());
 
         setDescription("The primary FTC-Core command");
         setPermission(Permissions.CORE_ADMIN);
 
-        this.bals = CrownCore.getBalances();
-        this.maxMoney = CrownCore.getMaxMoneyAmount();
+        this.bals = ForTheCrown.getBalances();
+        this.maxMoney = ForTheCrown.getMaxMoneyAmount();
 
         register();
     }
@@ -90,7 +90,7 @@ public class CommandFtcCore extends FtcCommand {
                 .then(CommandLore.compOrStringArg(literal("tablist_score"),
                         (c, b) -> CompletionProvider.suggestMatching(b,"Deaths", " Crown Score"),
                         (c, field) -> {
-                            CrownCore.getTabList().setScore(field);
+                            ForTheCrown.getTabList().setScore(field);
 
                             c.getSource().sendAdmin(
                                     Component.text("Set tab score field to ")
@@ -126,7 +126,7 @@ public class CommandFtcCore extends FtcCommand {
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
 
-                            user.createTeleport(CrownCore::getServerSpawn, true, true, UserTeleport.Type.TELEPORT)
+                            user.createTeleport(ForTheCrown::getServerSpawn, true, true, UserTeleport.Type.TELEPORT)
                                     .start(true);
 
                             user.sendMessage(Component.text("Going to spawn").color(NamedTextColor.GRAY));
@@ -137,7 +137,7 @@ public class CommandFtcCore extends FtcCommand {
                 .then(literal("join_info")
                         .then(literal("display")
                                 .executes(c -> {
-                                    c.getSource().sendMessage(CrownCore.getJoinInfo().display());
+                                    c.getSource().sendMessage(ForTheCrown.getJoinInfo().display());
                                     return 0;
                                 })
                         )
@@ -146,7 +146,7 @@ public class CommandFtcCore extends FtcCommand {
                                 .executes(c -> {
                                     c.getSource().sendMessage(
                                             Component.text("Should show join info: ")
-                                                    .append(Component.text(CrownCore.getJoinInfo().shouldShow()))
+                                                    .append(Component.text(ForTheCrown.getJoinInfo().shouldShow()))
                                     );
                                     return 0;
                                 })
@@ -154,7 +154,7 @@ public class CommandFtcCore extends FtcCommand {
                                 .then(argument("shouldShow", BoolArgumentType.bool())
                                         .executes(c -> {
                                             boolean bool = c.getArgument("shouldShow", Boolean.class);
-                                            CrownCore.getJoinInfo().setShouldShow(bool);
+                                            ForTheCrown.getJoinInfo().setShouldShow(bool);
 
                                             c.getSource().sendAdmin(
                                                     Component.text("Set should show join message: ")
@@ -169,7 +169,7 @@ public class CommandFtcCore extends FtcCommand {
                                 .then(argument("component", ComponentArgument.component())
                                         .executes(c -> {
                                             Component component = c.getArgument("component", Component.class);
-                                            CrownCore.getJoinInfo().setDisplay(component);
+                                            ForTheCrown.getJoinInfo().setDisplay(component);
 
                                             c.getSource().sendMessage(
                                                     Component.text("Set join info to ")
@@ -251,7 +251,7 @@ public class CommandFtcCore extends FtcCommand {
                                         .then(literal("list")
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
-                                                    UserManager um = CrownCore.getUserManager();
+                                                    UserManager um = ForTheCrown.getUserManager();
 
                                                     c.getSource().sendMessage(
                                                             Component.text(user.getName() + "'s alt accounts:")
@@ -268,7 +268,7 @@ public class CommandFtcCore extends FtcCommand {
                                                         .executes(c -> {
                                                             CrownUser user = getUser(c);
                                                             CrownUser main = c.getArgument("altFor", UserParseResult.class).getUser(c.getSource());
-                                                            UserManager um = CrownCore.getUserManager();
+                                                            UserManager um = ForTheCrown.getUserManager();
 
                                                             um.addEntry(user.getUniqueId(), main.getUniqueId());
                                                             user.unload();
@@ -283,7 +283,7 @@ public class CommandFtcCore extends FtcCommand {
                                         .then(literal("for_none")
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
-                                                    UserManager um = CrownCore.getUserManager();
+                                                    UserManager um = ForTheCrown.getUserManager();
 
                                                     if(!um.isAlt(user.getUniqueId())) throw FtcExceptionProvider.create(user.getName() + " is not an alt");
                                                     um.removeEntry(user.getUniqueId());
@@ -422,7 +422,7 @@ public class CommandFtcCore extends FtcCommand {
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
 
-                                                    Balances bals = CrownCore.getBalances();
+                                                    Balances bals = ForTheCrown.getBalances();
                                                     BalanceMap balMap = bals.getMap();
 
                                                     balMap.remove(user.getUniqueId());
@@ -634,7 +634,7 @@ public class CommandFtcCore extends FtcCommand {
                         .then(literal("stop").executes(c -> announcerThing(c, false)))
                         .then(literal("announce_all")
                                 .executes(c -> {
-                                    Announcer announcer = CrownCore.getAnnouncer();
+                                    Announcer announcer = ForTheCrown.getAnnouncer();
 
                                     for (Component comp: announcer.getAnnouncements()){
                                         announcer.announce(comp);
@@ -740,12 +740,12 @@ public class CommandFtcCore extends FtcCommand {
 
     private int announcerThing(CommandContext<CommandSource> c, boolean start){
         if(start){
-            CrownCore.getAnnouncer().start();
+            ForTheCrown.getAnnouncer().start();
             broadcastAdmin(c.getSource(), "Announcer started");
             return 0;
         }
 
-        CrownCore.getAnnouncer().stop();
+        ForTheCrown.getAnnouncer().stop();
         broadcastAdmin(c.getSource(), "Announcer stopped");
         return 0;
     }
@@ -775,8 +775,8 @@ public class CommandFtcCore extends FtcCommand {
 
     private enum SaveReloadPart {
         ITEM_PRICES ("Item Prices", b -> {
-            if(b) CrownCore.getPriceMap().reload();
-            else CrownCore.getPriceMap().save();
+            if(b) ForTheCrown.getPriceMap().reload();
+            else ForTheCrown.getPriceMap().save();
         }),
         GRAPPLING_HOOK ("Grappling Hook", b -> {
             if(b) Pirates.getParkour().reload();
@@ -791,59 +791,59 @@ public class CommandFtcCore extends FtcCommand {
             else Pirates.getTreasure().save();
         }),
         JOIN_INFO ("Join info", b -> {
-            if(!b) CrownCore.getJoinInfo().reload();
-            else CrownCore.getJoinInfo().save();
+            if(!b) ForTheCrown.getJoinInfo().reload();
+            else ForTheCrown.getJoinInfo().save();
         }),
         MESSAGES ("Messages", b -> {
-            if(!b) CrownCore.getMessages().reload();
+            if(!b) ForTheCrown.getMessages().reload();
         }),
         RULES ("Rules", b -> {
-            if(b) CrownCore.getRules().save();
-            else CrownCore.getRules().reload();
+            if(b) ForTheCrown.getRules().save();
+            else ForTheCrown.getRules().reload();
         }),
         KING ("Kingship", b -> {
-           if(b) CrownCore.getKingship().save();
-           else CrownCore.getKingship().reload();
+           if(b) ForTheCrown.getKingship().save();
+           else ForTheCrown.getKingship().reload();
         }),
         PUNISHMENTS("Punishments", b ->{
-            if(b) CrownCore.getPunishmentManager().save();
-            else CrownCore.getPunishmentManager().reload();
+            if(b) ForTheCrown.getPunishmentManager().save();
+            else ForTheCrown.getPunishmentManager().reload();
         }),
         KITS("Kits", b -> {
-            if(b) CrownCore.getKitRegistry().save();
-            else CrownCore.getKitRegistry().reload();
+            if(b) ForTheCrown.getKitRegistry().save();
+            else ForTheCrown.getKitRegistry().reload();
         }),
         WARPS("Warps", b -> {
-            if(b) CrownCore.getWarpRegistry().save();
-            else CrownCore.getWarpRegistry().reload();
+            if(b) ForTheCrown.getWarpRegistry().save();
+            else ForTheCrown.getWarpRegistry().reload();
         }),
         INTERACTABLES("Interactable Manager", b -> {
-           if(b) CrownCore.getUsablesManager().saveAll();
-           else CrownCore.getUsablesManager().reloadAll();
+           if(b) ForTheCrown.getUsablesManager().saveAll();
+           else ForTheCrown.getUsablesManager().reloadAll();
         }),
         ANNOUNCER ("Announcer", (b) -> {
-            if(b) CrownCore.getAnnouncer().save();
-            else CrownCore.getAnnouncer().reload();
+            if(b) ForTheCrown.getAnnouncer().save();
+            else ForTheCrown.getAnnouncer().reload();
         }),
         BALANCES ("Balances", b -> {
-            if(b) CrownCore.getBalances().save();
-            else CrownCore.getBalances().reload();
+            if(b) ForTheCrown.getBalances().save();
+            else ForTheCrown.getBalances().reload();
         }),
         USERS ("Users", b -> {
             if(b) UserManager.inst().saveUsers();
             else UserManager.inst().reloadUsers();
         }),
         SHOPS ("Signshops", b ->{
-            if(b) CrownCore.getShopManager().save();
-            else CrownCore.getShopManager().reload();
+            if(b) ForTheCrown.getShopManager().save();
+            else ForTheCrown.getShopManager().reload();
         }),
         BLACK_MARKET ("Black Market", b -> {
             if(b) Pirates.getPirateEconomy().save();
             else Pirates.getPirateEconomy().reload();
         }),
         CONFIG ("Main Config", b -> {
-            if(b) CrownCore.inst().saveConfig();
-            else CrownCore.inst().reloadConfig();
+            if(b) ForTheCrown.inst().saveConfig();
+            else ForTheCrown.inst().reloadConfig();
         }),
         USER_MANAGER("User Manager", b ->{
             if(b) UserManager.inst().save();

@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.utils.math.FtcRegion;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.utils.Pair;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -19,7 +19,7 @@ public class CommandLeave extends FtcCommand {
     private final static Map<FtcRegion, Pair<Location, Predicate<Player>>> ALLOWED_USAGE_AREAS = new HashMap<>();
 
     public CommandLeave(){
-        super("leave", CrownCore.inst());
+        super("leave", ForTheCrown.inst());
 
         setPermission(Permissions.DEFAULT);
         setDescription("I'm out :D");

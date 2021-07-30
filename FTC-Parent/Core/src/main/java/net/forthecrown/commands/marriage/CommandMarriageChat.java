@@ -1,7 +1,7 @@
 package net.forthecrown.commands.marriage;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -16,7 +16,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 public class CommandMarriageChat extends FtcCommand {
 
     public CommandMarriageChat() {
-        super("marriagechat", CrownCore.inst());
+        super("marriagechat", ForTheCrown.inst());
 
         setPermission(Permissions.MARRY);
         setAliases("marryc", "marriagec", "mc", "mchat");

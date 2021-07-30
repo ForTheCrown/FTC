@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserParseResult;
@@ -15,7 +15,7 @@ import net.kyori.adventure.text.Component;
 
 public class CommandVanish extends FtcCommand {
     public CommandVanish(){
-        super("vanish", CrownCore.inst());
+        super("vanish", ForTheCrown.inst());
 
         setPermission(Permissions.VANISH);
         register();
@@ -48,7 +48,7 @@ public class CommandVanish extends FtcCommand {
 
         if(joinLeaveMsg){
             Component message = vanished ? ChatFormatter.joinMessage(user) : ChatFormatter.formatLeaveMessage(user);
-            CrownCore.getAnnouncer().announceToAllRaw(message);
+            ForTheCrown.getAnnouncer().announceToAllRaw(message);
         }
 
         user.setVanished(!vanished);

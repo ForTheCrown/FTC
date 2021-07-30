@@ -1,6 +1,6 @@
 package net.forthecrown.pirates;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.crownevents.ObjectiveLeaderboard;
 import net.forthecrown.economy.pirates.CrownPirateEconomy;
 import net.forthecrown.economy.pirates.PirateEconomy;
@@ -37,7 +37,7 @@ public class Pirates {
 
         initLeaderboard();
 
-        CrownCore.logger().info("Pirates loaded");
+        ForTheCrown.logger().info("Pirates loaded");
     }
 
     private static void initLeaderboard(){

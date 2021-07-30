@@ -1,6 +1,6 @@
 package net.forthecrown.dungeons.bosses;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.dungeons.BossItems;
@@ -75,7 +75,7 @@ public class Drawned extends DungeonBoss<Drowned> {
     protected void onUpdate() {
         // Sounds
         for(int i = 1; i < 6; i++) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> {
                 bossEntity.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, bossEntity.getLocation().getX(), bossEntity.getLocation().getY() + 1.5, bossEntity.getLocation().getZ(), 30, 0.2d, 0.1d, 0.2d, 1);
                 bossEntity.getWorld().playSound(bossEntity.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.MASTER, 2f, 0.8f);
             }, i * 8L);
@@ -93,7 +93,7 @@ public class Drawned extends DungeonBoss<Drowned> {
 
         bossEntity.getWorld().strikeLightningEffect(bossEntity.getLocation());
 
-        Bukkit.getScheduler().runTaskLater(CrownCore.inst(), () -> {
+        Bukkit.getScheduler().runTaskLater(ForTheCrown.inst(), () -> {
             bossEntity.setInvulnerable(false);
             bossEntity.setGlowing(false);
             for (Guardian g: guardians){

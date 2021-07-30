@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -23,15 +23,15 @@ public class CommandPay extends FtcCommand {
     private final int maxMoneyAmount;
 
     public CommandPay(){
-        super("pay", CrownCore.inst());
+        super("pay", ForTheCrown.inst());
 
-        maxMoneyAmount = CrownCore.getMaxMoneyAmount();
+        maxMoneyAmount = ForTheCrown.getMaxMoneyAmount();
 
         setDescription("Pays another player");
         register();
     }
 
-    private final Balances bals = CrownCore.getBalances();
+    private final Balances bals = ForTheCrown.getBalances();
 
     /*
      * ----------------------------------------

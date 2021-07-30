@@ -3,7 +3,7 @@ package net.forthecrown.utils;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.CoreCommands;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
@@ -87,7 +87,7 @@ public final class FtcUtils {
 
         newObj.setDisplaySlot(DisplaySlot.SIDEBAR);
         player.setScoreboard(scoreboard);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> player.setScoreboard(mainScoreboard), 300L);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> player.setScoreboard(mainScoreboard), 300L);
     }
 
     //This is bad, underscores SHOULD NOT be used in file names with locations, world names can get caught up in it.

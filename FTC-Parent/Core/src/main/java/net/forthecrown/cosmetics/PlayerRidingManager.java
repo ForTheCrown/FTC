@@ -6,7 +6,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.WgFlags;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
@@ -35,9 +35,9 @@ public class PlayerRidingManager implements Listener {
 
     PlayerRidingManager(){
         this.riders = new ObjectArraySet<>();
-        Bukkit.getPluginManager().registerEvents(this, CrownCore.inst());
+        Bukkit.getPluginManager().registerEvents(this, ForTheCrown.inst());
 
-        CrownCore.logger().info("Player Riding Manager loaded");
+        ForTheCrown.logger().info("Player Riding Manager loaded");
     }
 
     public ObjectSet<PlayerRider> getRiders() {
@@ -73,7 +73,7 @@ public class PlayerRidingManager implements Listener {
         }
 
         PlayerRider riderM = new PlayerRider(rider, riddenPlayer);
-        Bukkit.getPluginManager().registerEvents(riderM, CrownCore.inst());
+        Bukkit.getPluginManager().registerEvents(riderM, ForTheCrown.inst());
         addRider(riderM);
     }
 

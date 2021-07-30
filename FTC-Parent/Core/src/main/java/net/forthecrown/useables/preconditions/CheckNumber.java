@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.grenadier.CommandSource;
@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public class CheckNumber implements UsageCheck<CheckNumber.CheckInstance> {
-    public static final Key BAL_KEY = Key.key(CrownCore.inst(), "required_balance");
-    public static final Key GEM_KEY = Key.key(CrownCore.inst(), "required_gems");
+    public static final Key BAL_KEY = Key.key(ForTheCrown.inst(), "required_balance");
+    public static final Key GEM_KEY = Key.key(ForTheCrown.inst(), "required_gems");
 
     private final boolean checkBal;
 
@@ -86,7 +86,7 @@ public class CheckNumber implements UsageCheck<CheckNumber.CheckInstance> {
 
         @Override
         public boolean test(Player player) {
-            if(checkBal) return CrownCore.getBalances().canAfford(player.getUniqueId(), amount);
+            if(checkBal) return ForTheCrown.getBalances().canAfford(player.getUniqueId(), amount);
 
             return UserManager.getUser(player).getGems() >= amount;
         }
@@ -94,7 +94,7 @@ public class CheckNumber implements UsageCheck<CheckNumber.CheckInstance> {
         @Override
         public Consumer<Player> onSuccess() {
             return plr -> {
-                if(checkBal) CrownCore.getBalances().add(plr.getUniqueId(), -amount, false);
+                if(checkBal) ForTheCrown.getBalances().add(plr.getUniqueId(), -amount, false);
                 else UserManager.getUser(plr).addGems(-amount);
             };
         }

@@ -1,6 +1,6 @@
 package net.forthecrown.dungeons;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Item;
@@ -26,7 +26,7 @@ public class BossFightContext implements Predicate<Player> {
 
         calculateBase();
         float initialMod = Math.max(1, (float) ((enchants / 3 * 2) + armorAmount) / (players.size() < 2 ? 20 : 17));
-        finalModifier = Math.min(initialMod, CrownCore.getMaxBossDifficulty());
+        finalModifier = Math.min(initialMod, ForTheCrown.getMaxBossDifficulty());
     }
 
     private void calculateBase(){

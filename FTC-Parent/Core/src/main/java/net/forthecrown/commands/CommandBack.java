@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -10,7 +10,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandBack extends FtcCommand {
     public CommandBack(){
-        super("back", CrownCore.inst());
+        super("back", ForTheCrown.inst());
 
         setPermission(Permissions.BACK);
         setAliases("return");

@@ -1,6 +1,6 @@
 package net.forthecrown.core.converters;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.utils.JsonUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class Balances_YamlToJson {
     public static void checkAndRun() {
-        if(!new File(CrownCore.dataFolder().getPath() + File.separator + "balance.yml").exists()) return;
+        if(!new File(ForTheCrown.dataFolder().getPath() + File.separator + "balance.yml").exists()) return;
 
         try {
             new Balances_YamlToJson()
@@ -28,8 +28,8 @@ public class Balances_YamlToJson {
     private final JsonBuf json;
 
     private Balances_YamlToJson() throws IOException {
-        this.yamlFile = new File(CrownCore.dataFolder().getPath() + File.separator + "balance.yml");
-        this.jsonFile = new File(CrownCore.dataFolder().getPath() + File.separator + "balances.json");
+        this.yamlFile = new File(ForTheCrown.dataFolder().getPath() + File.separator + "balance.yml");
+        this.jsonFile = new File(ForTheCrown.dataFolder().getPath() + File.separator + "balances.json");
 
         if(!jsonFile.exists()) jsonFile.createNewFile();
 
@@ -50,7 +50,7 @@ public class Balances_YamlToJson {
             }*/
 
             int bal = configuration.getInt(s);
-            if(bal <= CrownCore.getStartRhines()) continue;
+            if(bal <= ForTheCrown.getStartRhines()) continue;
 
             json.add(s, bal);
         }

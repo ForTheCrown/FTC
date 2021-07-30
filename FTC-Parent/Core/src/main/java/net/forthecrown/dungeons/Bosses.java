@@ -14,7 +14,7 @@ import org.bukkit.entity.WitherSkeleton;
 
 public class Bosses {
 
-    public static final NamespacedKey key = Squire.createRoyalKey("bossitem");
+    public static final NamespacedKey KEY = Squire.createRoyalKey("bossitem");
 
     private static Zhambie zhambie;
     private static Skalatan skalatan;

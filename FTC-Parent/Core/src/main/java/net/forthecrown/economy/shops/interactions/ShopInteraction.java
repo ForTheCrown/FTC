@@ -1,6 +1,6 @@
 package net.forthecrown.economy.shops.interactions;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.WgFlags;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.shops.ShopInventory;
@@ -30,7 +30,7 @@ public abstract class ShopInteraction {
 
         this.customer = customer;
         this.owner = UserManager.getUser(shop.getOwner());
-        this.bals = CrownCore.getBalances();
+        this.bals = ForTheCrown.getBalances();
     }
 
     public void run() {

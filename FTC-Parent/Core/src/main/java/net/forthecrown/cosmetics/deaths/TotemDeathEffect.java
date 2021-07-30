@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics.deaths;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import org.bukkit.*;
 
 public class TotemDeathEffect extends AbstractDeathEffect {
@@ -12,7 +12,7 @@ public class TotemDeathEffect extends AbstractDeathEffect {
         double y = loc.getY()+1;
         double z = loc.getZ();
         for (int i = 0; i < 20; i++) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> {
                 for (int i1 = 0; i1 < 2; i1++) {
                     loc.getWorld().spawnParticle(Particle.TOTEM, x, y, z, 5, 0, 0, 0, 0.4);
                 }

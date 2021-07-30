@@ -1,6 +1,6 @@
 package net.forthecrown.commands.help;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.inventory.CrownItems;
@@ -14,7 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class HelpBank extends FtcCommand {
 
     public HelpBank(){
-        super("bank", CrownCore.inst());
+        super("bank", ForTheCrown.inst());
 
         setAliases("bankhelp", "helpbank");
         setPermission(Permissions.HELP);
@@ -29,7 +29,7 @@ public class HelpBank extends FtcCommand {
             CrownUser u = getUserSender(c);
 
             Component component = Component.text()
-                    .append(CrownCore.prefix())
+                    .append(ForTheCrown.prefix())
                     .append(Component.text("Bank info:").color(NamedTextColor.YELLOW))
                     .append(Component.newline())
 

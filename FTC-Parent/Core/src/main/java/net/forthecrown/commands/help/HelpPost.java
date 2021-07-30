@@ -1,6 +1,6 @@
 package net.forthecrown.commands.help;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 public class HelpPost extends FtcCommand {
 
     public HelpPost(){
-        super("posthelp", CrownCore.inst());
+        super("posthelp", ForTheCrown.inst());
 
         setAliases("polehelp");
         setPermission(Permissions.HELP);
@@ -43,7 +43,7 @@ public class HelpPost extends FtcCommand {
             CommandSender sender = c.getSource().asBukkit();
 
             // Send information
-            sender.sendMessage(CrownCore.getPrefix() + ChatColor.YELLOW + "Information about regionpoles:");
+            sender.sendMessage(ForTheCrown.getPrefix() + ChatColor.YELLOW + "Information about regionpoles:");
             sender.sendMessage("You can only teleport between regionpoles.");
             sender.sendMessage("Use " + ChatColor.YELLOW + "/findpole" + ChatColor.RESET + " to find the closest pole.");
             sender.sendMessage("Use " + ChatColor.YELLOW + "/visit" + ChatColor.RESET + " to travel between them.");

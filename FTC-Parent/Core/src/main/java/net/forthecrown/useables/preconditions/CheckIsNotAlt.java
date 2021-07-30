@@ -1,6 +1,6 @@
 package net.forthecrown.useables.preconditions;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.user.UserManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckIsNotAlt implements UsageCheckInstance {
-    public static final Key KEY = Key.key(CrownCore.inst(), "not_alt");
+    public static final Key KEY = Key.key(ForTheCrown.inst(), "not_alt");
 
     @Override
     public String asString() {

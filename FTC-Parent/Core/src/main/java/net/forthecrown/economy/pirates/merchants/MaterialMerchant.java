@@ -3,7 +3,7 @@ package net.forthecrown.economy.pirates.merchants;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.events.dynamic.BmSellItemListener;
@@ -157,7 +157,7 @@ public class MaterialMerchant implements BlackMarketMerchant {
     @Override
     public void onUse(CrownUser user, Entity entity) {
         BmSellItemListener listener = new BmSellItemListener(user.getPlayer(), this);
-        Bukkit.getPluginManager().registerEvents(listener, CrownCore.inst());
+        Bukkit.getPluginManager().registerEvents(listener, ForTheCrown.inst());
 
         user.getPlayer().openInventory(createInventory(user));
     }

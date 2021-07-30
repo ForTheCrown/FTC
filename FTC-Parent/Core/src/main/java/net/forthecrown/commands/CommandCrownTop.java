@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.utils.FtcUtils;
@@ -9,7 +9,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 public class CommandCrownTop extends FtcCommand {
 
     public CommandCrownTop(){
-        super("crowntop", CrownCore.inst());
+        super("crowntop", ForTheCrown.inst());
 
         setPermission(Permissions.DEFAULT);
         setDescription("Shows the players with the most crown score");

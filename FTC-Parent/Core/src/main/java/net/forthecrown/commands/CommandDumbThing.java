@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.utils.FtcUtils;
@@ -19,7 +19,7 @@ public class CommandDumbThing extends FtcCommand {
     private final Function<Player, Integer> func;
 
     public CommandDumbThing(String name, Permission permission, String description, Function<Player, Integer> func){
-        super(name, CrownCore.inst());
+        super(name, ForTheCrown.inst());
 
         this.func = func;
         this.permission = permission;
@@ -48,7 +48,7 @@ public class CommandDumbThing extends FtcCommand {
                     Bee bee = l.getWorld().spawn(l, Bee.class);
                     bee.setVelocity(player.getEyeLocation().getDirection().multiply(2));
 
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> {
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> {
                         final Location loc = bee.getLocation();
                         bee.remove();
                         loc.getWorld().createExplosion(loc, 0F);
@@ -70,7 +70,7 @@ public class CommandDumbThing extends FtcCommand {
 
                     cat.setVelocity(player.getEyeLocation().getDirection().multiply(2));
 
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> {
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> {
                         final Location loc = cat.getLocation();
                         cat.remove();
                         loc.getWorld().createExplosion(loc, 0F);

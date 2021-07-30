@@ -1,6 +1,6 @@
 package net.forthecrown.commands.help;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -12,7 +12,7 @@ import org.bukkit.command.CommandSender;
 
 public class HelpMap extends FtcCommand {
     public HelpMap(){
-        super("map", CrownCore.inst());
+        super("map", ForTheCrown.inst());
 
         setAliases("worldmap");
         setPermission(Permissions.HELP);

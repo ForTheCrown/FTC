@@ -1,7 +1,7 @@
 package net.forthecrown.commands.punishments;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
@@ -25,7 +25,7 @@ public class CommandPunishment extends FtcCommand {
 
     private final Punisher punisher;
     public CommandPunishment(String name, Permission perm, Punisher punisher, String... aliases){
-        super(name, CrownCore.inst());
+        super(name, ForTheCrown.inst());
 
         this.punisher = punisher;
         this.aliases = aliases;
@@ -61,7 +61,7 @@ public class CommandPunishment extends FtcCommand {
                 (user, source, reason) -> {
                     if(user.hasPermission(Permissions.BAN_BYPASS) && !source.is(ConsoleCommandSender.class)) throw FtcExceptionProvider.cannotBan(user);
 
-                    PunishmentManager manager = CrownCore.getPunishmentManager();
+                    PunishmentManager manager = ForTheCrown.getPunishmentManager();
                     PunishmentEntry entry = manager.getEntry(user.getUniqueId());
                     if(entry != null && entry.checkPunished(PunishmentType.BAN)) throw FtcExceptionProvider.create("User has already been banned");
 

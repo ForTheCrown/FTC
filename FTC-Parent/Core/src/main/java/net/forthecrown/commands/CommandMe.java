@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -15,7 +15,7 @@ import org.bukkit.Bukkit;
 public class CommandMe extends FtcCommand {
 
     public CommandMe() {
-        super("ftc_me", CrownCore.inst());
+        super("ftc_me", ForTheCrown.inst());
 
         setAliases("me");
         setPermission(Permissions.DEFAULT);
@@ -46,7 +46,7 @@ public class CommandMe extends FtcCommand {
                             boolean mayBroadcast = true;
 
                             if(source.isPlayer()){
-                                MuteStatus status = CrownCore.getPunishmentManager().checkMute(source.asBukkit());
+                                MuteStatus status = ForTheCrown.getPunishmentManager().checkMute(source.asBukkit());
 
                                 if(status == MuteStatus.HARD) return 0;
                                 if(status == MuteStatus.SOFT) mayBroadcast = false;

@@ -138,11 +138,11 @@ public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShop
                     playerInv.addItem(example); //adds the item to player's inventory
                     event.setCustomerBalance(event.getCustomerBalance() - shop.getPrice());
 
-                    if(shop.getType().isAdmin() && CrownCore.logAdminShopUsage()){
+                    if(shop.getType().isAdmin() && ForTheCrown.logAdminShopUsage()){
                         Announcer.log(
                                 Level.INFO,
                                 customer.getName() + " bought " + example.getAmount() + " " + ChatFormatter.getItemNormalName(example) + " at an admin shop, location: " + shop.getName());
-                    } else if(CrownCore.logNormalShopUsage()){
+                    } else if(ForTheCrown.logNormalShopUsage()){
                         Announcer.log(Level.INFO,
                                 customer.getName() + " bought " + example.getAmount() + " " + ChatFormatter.getItemNormalName(example) + " at a shop, location: " + shop.getName());
                     }
@@ -197,10 +197,10 @@ public class ShopTransactionEvent implements Listener, ExceptionedEvent<SignShop
                         event.getOwner().sendMessage(ownerMsg);
                     }
 
-                    if(shop.getType().isAdmin() && CrownCore.logAdminShopUsage()){
+                    if(shop.getType().isAdmin() && ForTheCrown.logAdminShopUsage()){
                         Announcer.log(Level.INFO,
                                 customer.getName() + " sold " + example.getAmount() + " " + ChatFormatter.getItemNormalName(example) + " at an admin shop, location: " + shop.getName());
-                    } else if(CrownCore.logNormalShopUsage()){
+                    } else if(ForTheCrown.logNormalShopUsage()){
                         Announcer.log(Level.INFO,
                                 customer.getName() + " sold " + example.getAmount() + " " + ChatFormatter.getItemNormalName(example) + " at a shop, location: " + shop.getName());
                     }

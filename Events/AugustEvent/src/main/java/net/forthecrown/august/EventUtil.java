@@ -1,24 +1,26 @@
 package net.forthecrown.august;
 
 import net.forthecrown.august.event.PinataEvent;
-import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.CrownRandom;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -42,29 +44,12 @@ public class EventUtil {
         return spawnPinata(SPAWN);
     }
 
-    public static void spawnPlusOne(Location loc) {
-        ServerLevel level = ((CraftWorld) loc.getWorld()).getHandle();
-
-        //These have to be different variables due to obfuscation mappings
-        ArmorStand stand = EntityType.ARMOR_STAND.create(level);
-        stand.setMarker(true);
-        stand.setNoBasePlate(true);
-
-        Entity entity = stand;
-        entity.moveTo(loc.getX(), loc.getY(), loc.getZ());
-        entity.setInvulnerable(true);
-        entity.setCustomNameVisible(true);
-        entity.setCustomName(PLUS_ONE);
-        entity.setInvisible(true);
-
-        level.addAllEntitiesSafely(stand, CreatureSpawnEvent.SpawnReason.CUSTOM);
-
-        Bukkit.getScheduler().runTaskLater(AugustPlugin.inst, entity::discard, 20);
-    }
-
     public static void spawnPlusX(Location loc, int x) {
         ServerLevel level = ((CraftWorld) loc.getWorld()).getHandle();
 
+        MutableComponent name = new TextComponent("+" + x);
+        name.withStyle(ChatFormatting.YELLOW);
+
         //These have to be different variables due to obfuscation mappings
         ArmorStand stand = EntityType.ARMOR_STAND.create(level);
         stand.setMarker(true);
@@ -74,7 +59,7 @@ public class EventUtil {
         entity.moveTo(loc.getX(), loc.getY(), loc.getZ());
         entity.setInvulnerable(true);
         entity.setCustomNameVisible(true);
-        entity.setCustomName(getPlusX(x));
+        entity.setCustomName(name);
         entity.setInvisible(true);
 
         level.addAllEntitiesSafely(stand, CreatureSpawnEvent.SpawnReason.CUSTOM);
@@ -89,9 +74,45 @@ public class EventUtil {
             pinata.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(SQUID_HEALTH);
             pinata.setHealth(SQUID_HEALTH);
 
+            pinata.setAdult();
+
+            pinata.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, Integer.MAX_VALUE, 2, false, false));
+
             pinata.setCustomNameVisible(true);
-            pinata.customName(ChatUtils.convertString("&cP&6i&en&2a&1t&5a"));
+            pinata.customName(PINATA_NAME);
         });
+    }
+
+    //Kill all the bebes so no one else can use them after you've left the event
+    public static void killAllBebes() {
+        ARENA_REGION.getEntities()
+                .stream().filter(e -> e.getPersistentDataContainer().has(BEBE_KEY, PersistentDataType.BYTE))
+                .forEach(org.bukkit.entity.Entity::remove);
+    }
+
+    public static void spawnBabies(Location loc, Rabbit.Type type) {
+        loc.getWorld().spawnParticle(Particle.TOTEM, loc, 20, 0, 0, 0, 0.2);
+        loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.25f, 1.5f);
+        loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 1.5f);
+
+        for(int i = 0; i < BEBE_NAMES.length; i++) {
+            int finalI = i;
+            loc.getWorld().spawn(loc, Rabbit.class, bebe -> {
+                bebe.getPersistentDataContainer().set(BEBE_KEY, PersistentDataType.BYTE, (byte) 1);
+
+                bebe.setBaby();
+                bebe.setRabbitType(type);
+
+                //Give em each a name and make it visible
+                bebe.customName(BEBE_NAMES[finalI]);
+                bebe.setCustomNameVisible(true);
+
+                bebe.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(SQUID_HEALTH);
+                bebe.setHealth(SQUID_HEALTH);
+                bebe.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
+                bebe.setVelocity(new Vector(0, 0.35, 0));
+            });
+        }
     }
 
     public static void dropRandomLoot(Location loc, CrownRandom random) {

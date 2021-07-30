@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -21,7 +21,7 @@ import static net.forthecrown.commands.manager.FtcExceptionProvider.*;
 public class CommandTpask extends FtcCommand {
 
     public CommandTpask(){
-        super("tpask", CrownCore.inst());
+        super("tpask", ForTheCrown.inst());
 
         setAliases("tpa", "tprequest", "tpr", "etpa", "etpask");
         setDescription("Asks a to teleport to a player.");

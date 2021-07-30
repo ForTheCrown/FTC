@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.KitType;
@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 public class CommandKit extends FtcCommand {
 
     public CommandKit(){
-        super("kit", CrownCore.inst());
+        super("kit", ForTheCrown.inst());
 
         setPermission(Permissions.KIT);
         setDescription("Gives you a kit");

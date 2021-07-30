@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.AuctionArgType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.auctions.Auction;
@@ -57,7 +57,7 @@ public class CommandAuction extends FtcCommand {
 
     @Override
     protected void createCommand(BrigadierCommand command) {
-        Balances bals = CrownCore.getBalances();
+        Balances bals = ForTheCrown.getBalances();
 
         command
                 .then(literal("save")
@@ -182,7 +182,7 @@ public class CommandAuction extends FtcCommand {
 
                                     Bukkit.getPluginManager().registerEvents(
                                             new AuctionClaiming(user, auction, c.getArgument("startingBid", Integer.class)),
-                                            CrownCore.inst());
+                                            ForTheCrown.inst());
                                     return 0;
                                 })
                         )

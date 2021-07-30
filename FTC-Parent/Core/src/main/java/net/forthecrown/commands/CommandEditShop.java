@@ -6,7 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -32,9 +32,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class CommandEditShop extends FtcCommand {
 
     public CommandEditShop(){
-        super("editshop", CrownCore.inst());
+        super("editshop", ForTheCrown.inst());
 
-        maxMoney = CrownCore.getMaxMoneyAmount();
+        maxMoney = ForTheCrown.getMaxMoneyAmount();
 
         this.usageMessage = makeUsageMessage();
 
@@ -232,7 +232,7 @@ public class CommandEditShop extends FtcCommand {
         Block block = player.getTargetBlock(5);
         if(block == null || !(block.getState() instanceof Sign)) throw FtcExceptionProvider.translatable("commands.lookingAtShop");
 
-        SignShop result = CrownCore.getShopManager().getShop(block.getLocation());
+        SignShop result = ForTheCrown.getShopManager().getShop(block.getLocation());
         if(result == null || !result.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) throw FtcExceptionProvider.translatable("commands.lookingAtShop");
         return result;
     }
@@ -243,6 +243,6 @@ public class CommandEditShop extends FtcCommand {
             public void run() {
                 shop.update();
             }
-        }.runTaskLater(CrownCore.inst(), 1);
+        }.runTaskLater(ForTheCrown.inst(), 1);
     }
 }

@@ -21,7 +21,7 @@ import net.forthecrown.registry.CrownKitRegistry;
 import net.forthecrown.registry.CrownWarpRegistry;
 import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.useables.CrownUsablesManager;
-import net.forthecrown.user.CrownUserManager;
+import net.forthecrown.user.FtcUserManager;
 import net.forthecrown.user.GameModePacketListener;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.valhalla.ValhallaEngine;
@@ -46,7 +46,7 @@ import static net.forthecrown.utils.FtcUtils.safeRunnable;
 /**
  * Main class that does all the dirty internal stuff
  */
-public final class Main extends JavaPlugin implements CrownCore {
+public final class Main extends JavaPlugin implements ForTheCrown {
 
     //Hacky way of determining if we're on the test server or not
     public static ComVar<Boolean> inDebugMode;
@@ -65,7 +65,7 @@ public final class Main extends JavaPlugin implements CrownCore {
     static CrownUsablesManager      usablesManager;
     static CrownShopManager         shopManager;
     static CrownPunishmentManager   punishmentManager;
-    static CrownUserManager         userManager;
+    static FtcUserManager           userManager;
     static CrownJailManager         jailManager;
 
     static CrownWarpRegistry        warpRegistry;
@@ -107,14 +107,14 @@ public final class Main extends JavaPlugin implements CrownCore {
         inDebugMode = ComVarRegistry.set("core_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
         logger = getLogger();
 
-        RoyalCommandException.ENABLE_HOVER_STACK_TRACE = CrownCore.inDebugMode();
+        RoyalCommandException.ENABLE_HOVER_STACK_TRACE = ForTheCrown.inDebugMode();
 
         FtcBootStrap.firstPhase();
     }
 
     @Override
     public void onDisable() {
-        if(getConfig().getBoolean("System.save-on-disable")) CrownCore.saveFTC();
+        if(getConfig().getBoolean("System.save-on-disable")) ForTheCrown.saveFTC();
 
         Bukkit.getScheduler().cancelTasks(this);
 
@@ -126,10 +126,10 @@ public final class Main extends JavaPlugin implements CrownCore {
         safeRunnable(Cosmetics::shutDown);
         safeRunnable(Pirates::shutDown);
         safeRunnable(GameModePacketListener::removeAll);
-        if(CrownCore.inDebugMode()) safeRunnable(ValhallaEngine::shutDown);
+        if(ForTheCrown.inDebugMode()) safeRunnable(ValhallaEngine::shutDown);
 
-        CrownUserManager.LOADED_USERS.clear();
-        CrownUserManager.LOADED_ALTS.clear();
+        FtcUserManager.LOADED_USERS.clear();
+        FtcUserManager.LOADED_ALTS.clear();
     }
 
     @Override

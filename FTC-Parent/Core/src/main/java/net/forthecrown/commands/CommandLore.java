@@ -11,7 +11,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -29,7 +29,7 @@ import java.util.List;
 
 public class CommandLore extends FtcCommand {
     public CommandLore() {
-        super("lore", CrownCore.inst());
+        super("lore", ForTheCrown.inst());
 
         setAliases("itemlore");
         setPermission(Permissions.CORE_ADMIN);

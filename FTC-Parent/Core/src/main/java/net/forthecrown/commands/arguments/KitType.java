@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.useables.kits.Kit;
@@ -28,7 +28,7 @@ public class KitType implements ArgumentType<Key> {
     }
 
     public static Kit getKit(CommandContext<CommandSource> c, String argument){
-        return CrownCore.getKitRegistry().get(c.getArgument(argument, Key.class));
+        return ForTheCrown.getKitRegistry().get(c.getArgument(argument, Key.class));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class KitType implements ArgumentType<Key> {
         int cursor = reader.getCursor();
         Key key = CoreCommands.ftcKeyType().parse(reader);
 
-        if(!CrownCore.getKitRegistry().contains(key)) throw UNKNOWN_KIT.createWithContext(GrenadierUtils.correctReader(reader, cursor), key);
+        if(!ForTheCrown.getKitRegistry().contains(key)) throw UNKNOWN_KIT.createWithContext(GrenadierUtils.correctReader(reader, cursor), key);
 
         return key;
     }
@@ -47,10 +47,10 @@ public class KitType implements ArgumentType<Key> {
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, boolean ignoreChecks){
-        if(ignoreChecks) return FtcSuggestionProvider.suggestRegistry(builder, CrownCore.getKitRegistry());
+        if(ignoreChecks) return FtcSuggestionProvider.suggestRegistry(builder, ForTheCrown.getKitRegistry());
 
         try {
-            return CrownCore.getKitRegistry().getSuggestions((CommandContext<CommandSource>) context, builder);
+            return ForTheCrown.getKitRegistry().getSuggestions((CommandContext<CommandSource>) context, builder);
         } catch (CommandSyntaxException ignored) {}
         return Suggestions.empty();
     }

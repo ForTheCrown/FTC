@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.useables.CheckableBase;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
 import net.forthecrown.utils.FtcUtils;
@@ -82,7 +82,7 @@ public class FtcWarp extends CheckableBase implements Warp {
 
     @Override
     public void delete() {
-        CrownCore.getWarpRegistry().remove(key);
+        ForTheCrown.getWarpRegistry().remove(key);
     }
 
     @Override

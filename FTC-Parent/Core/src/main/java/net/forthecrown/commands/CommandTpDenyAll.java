@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandTpDenyAll extends FtcCommand {
     public CommandTpDenyAll(){
-        super("tpdenyall", CrownCore.inst());
+        super("tpdenyall", ForTheCrown.inst());
 
         setPermission(Permissions.TPA);
         setDescription("Denies all incoming tpa requests");

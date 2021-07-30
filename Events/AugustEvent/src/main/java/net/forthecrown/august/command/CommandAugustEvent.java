@@ -91,7 +91,7 @@ public class CommandAugustEvent extends FtcCommand {
                         .executes(c -> {
                             Player player = c.getSource().asPlayer();
 
-                            EventUtil.spawnPlusOne(player.getLocation().add(1, 1, 1));
+                            EventUtil.spawnPlusX(player.getLocation().add(1, 1, 1), 1);
 
                             c.getSource().sendAdmin("Spawning plus one");
                             return 0;

@@ -1,7 +1,7 @@
 package net.forthecrown.events.dynamic;
 
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.pirates.DailyEnchantment;
 import net.forthecrown.economy.pirates.PirateEconomy;
@@ -43,7 +43,7 @@ public class BmEnchantListener extends AbstractInvListener implements Listener {
         if(toCheck == null) return;
 
         Player player = (Player) event1.getWhoClicked();
-        Balances balances = CrownCore.getBalances();
+        Balances balances = ForTheCrown.getBalances();
         PirateEconomy bm = Pirates.getPirateEconomy();
 
         EnchantMerchant merchant = bm.getEnchantMerchant();

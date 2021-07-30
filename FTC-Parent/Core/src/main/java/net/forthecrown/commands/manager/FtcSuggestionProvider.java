@@ -5,7 +5,7 @@ import com.mojang.brigadier.Message;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -47,7 +47,7 @@ public interface FtcSuggestionProvider {
 
         suggestPlayerNames(c.getSource(), builder);
         if(c.getSource().hasPermission(Permissions.DONATOR_3) || ignorePerms){
-            return CrownCore.getEmotes().getSuggestions(c, builder, ignorePerms);
+            return ForTheCrown.getEmotes().getSuggestions(c, builder, ignorePerms);
         }
 
         return builder.buildFuture();

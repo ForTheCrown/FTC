@@ -1,6 +1,6 @@
 package net.forthecrown.inventory;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.FtcUtils;
@@ -104,7 +104,7 @@ public class CrownWeapons {
         player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
         for (int i = 0; i <= 5; i++) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(
-                    CrownCore.inst(), () -> player.getWorld().spawnParticle(Particle.TOTEM,
+                    ForTheCrown.inst(), () -> player.getWorld().spawnParticle(Particle.TOTEM,
                     player.getLocation().getX(),
                     player.getLocation().getY()+2,
                     player.getLocation().getZ(),
@@ -112,7 +112,7 @@ public class CrownWeapons {
                     i*5L);
         }
         Component message = Component.text()
-                .append(CrownCore.prefix())
+                .append(ForTheCrown.prefix())
                 .append(Component.text("Your sword was upgraded to Rank " + FtcUtils.arabicToRoman(rank) + "!")
                         .color(NamedTextColor.GRAY))
                 .build();

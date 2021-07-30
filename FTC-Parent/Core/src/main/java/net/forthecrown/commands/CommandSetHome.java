@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -15,7 +15,7 @@ import org.bukkit.Location;
 
 public class CommandSetHome extends FtcCommand {
     public CommandSetHome(){
-        super("sethome", CrownCore.inst());
+        super("sethome", ForTheCrown.inst());
 
         setPermission(Permissions.HOME);
         setDescription("Sets a home where your standing");

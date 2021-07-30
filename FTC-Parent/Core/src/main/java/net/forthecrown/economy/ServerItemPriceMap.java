@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import org.bukkit.Material;
 
@@ -20,7 +20,7 @@ public class ServerItemPriceMap extends AbstractJsonSerializer implements ItemPr
         super("item_prices");
 
         reload();
-        CrownCore.logger().info("Item Prices loaded");
+        ForTheCrown.logger().info("Item Prices loaded");
     }
 
     @Override

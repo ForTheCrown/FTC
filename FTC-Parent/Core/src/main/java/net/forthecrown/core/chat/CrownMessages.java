@@ -1,7 +1,7 @@
 package net.forthecrown.core.chat;
 
 import com.google.common.io.Files;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.translation.GlobalTranslator;
@@ -20,7 +20,7 @@ public class CrownMessages implements Keyed {
     private final Key key;
 
     public CrownMessages(){
-        key = Key.key(CrownCore.inst(), "messages");
+        key = Key.key(ForTheCrown.inst(), "messages");
         registry = TranslationRegistry.create(key);
         registry.defaultLocale(Locale.ENGLISH);
 
@@ -29,7 +29,7 @@ public class CrownMessages implements Keyed {
     }
 
     private void ensureDirectoryExists(){
-        File f = new File(CrownCore.dataFolder().getPath() + File.separator + "translations");
+        File f = new File(ForTheCrown.dataFolder().getPath() + File.separator + "translations");
 
         if(!f.exists()) f.mkdir();
         if(!f.isDirectory()){
@@ -39,12 +39,12 @@ public class CrownMessages implements Keyed {
     }
 
     private void ensureDefaultExists(){
-        File f = new File(CrownCore.dataFolder().getPath() + File.separator + "translations" + File.separator + "en_US.properties");
+        File f = new File(ForTheCrown.dataFolder().getPath() + File.separator + "translations" + File.separator + "en_US.properties");
 
         if(!f.exists()){
             try {
                 f.createNewFile();
-                Files.write(CrownCore.resource("en_US.properties").readAllBytes(), f);
+                Files.write(ForTheCrown.resource("en_US.properties").readAllBytes(), f);
             } catch (IOException e){
                 e.printStackTrace();
             }
@@ -52,7 +52,7 @@ public class CrownMessages implements Keyed {
     }
 
     public void load(){
-        File dir = new File(CrownCore.dataFolder().getPath() + File.separator + "translations");
+        File dir = new File(ForTheCrown.dataFolder().getPath() + File.separator + "translations");
 
         for (File f: dir.listFiles()){
             try {

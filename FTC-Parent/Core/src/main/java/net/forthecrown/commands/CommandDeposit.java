@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.economy.Balances;
@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 public class CommandDeposit extends FtcCommand {
 
     public CommandDeposit(){
-        super("deposit", CrownCore.inst());
+        super("deposit", ForTheCrown.inst());
 
         setDescription("Allows you to deposit coins into your balance");
 
@@ -57,7 +57,7 @@ public class CommandDeposit extends FtcCommand {
 
             amount = amount*mainItem.getAmount();
 
-            Balances bals = CrownCore.getBalances();
+            Balances bals = ForTheCrown.getBalances();
             bals.add(player.getUniqueId(), amount, false);
 
             player.sendMessage(

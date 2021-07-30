@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -52,7 +52,7 @@ public class PlayerRider implements Listener {
         seat.remove();
 
         HandlerList.unregisterAll(this);
-        Bukkit.getScheduler().runTaskLater(CrownCore.inst(), this::preventBadLocation, 5);
+        Bukkit.getScheduler().runTaskLater(ForTheCrown.inst(), this::preventBadLocation, 5);
         Cosmetics.getRideManager().removeRider(this);
     }
 

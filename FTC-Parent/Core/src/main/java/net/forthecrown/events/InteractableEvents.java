@@ -1,6 +1,6 @@
 package net.forthecrown.events;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.useables.UsablesManager;
 import net.forthecrown.utils.Cooldown;
 import org.bukkit.GameMode;
@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 public class InteractableEvents implements Listener {
-    private final UsablesManager manager = CrownCore.getUsablesManager();
+    private final UsablesManager manager = ForTheCrown.getUsablesManager();
     private static final String cooldownCategory = "Core_Interactables";
 
     @EventHandler(ignoreCancelled = true)

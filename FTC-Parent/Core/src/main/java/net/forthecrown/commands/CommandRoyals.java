@@ -82,7 +82,7 @@ public class CommandRoyals extends FtcCommand {
                                     display = display.decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
 
                                     meta.displayName(display);
-                                    meta.getPersistentDataContainer().set(Bosses.key, PersistentDataType.BYTE, (byte) 1);
+                                    meta.getPersistentDataContainer().set(Bosses.KEY, PersistentDataType.BYTE, (byte) 1);
                                     item.setItemMeta(meta);
                                     broadcastAdmin(c.getSource(), "apple updated");
                                     return 0;

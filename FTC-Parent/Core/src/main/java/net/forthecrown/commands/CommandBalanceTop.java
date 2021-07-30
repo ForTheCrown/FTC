@@ -1,9 +1,10 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.arguments.BaltopType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.economy.BalanceMap;
+import net.forthecrown.economy.Balances;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -17,7 +18,7 @@ import javax.annotation.Nonnegative;
 
 public class CommandBalanceTop extends FtcCommand {
     public CommandBalanceTop() {
-        super("balancetop", CrownCore.inst());
+        super("balancetop", ForTheCrown.inst());
 
         setAliases("baltop", "banktop", "cashtop", "topbals", "ebaltop", "ebalancetop");
         setDescription("Displays all the player's balances in order from biggest to smallest");
@@ -49,7 +50,7 @@ public class CommandBalanceTop extends FtcCommand {
 
     //Send the message
     private int sendBaltopMessage(CommandSender sender, @Nonnegative int page){
-        BalanceMap balMap = CrownCore.getBalances().getMap();
+        BalanceMap balMap = ForTheCrown.getBalances().getMap();
 
         final TextComponent border = Component.text(" --------- ").style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
         TextComponent.Builder text = Component.text()
@@ -57,6 +58,14 @@ public class CommandBalanceTop extends FtcCommand {
                 .append(Component.translatable("economy.baltop.header").color(NamedTextColor.YELLOW))
                 .append(border)
                 .append(Component.newline());
+
+        if(page < 1) {
+            text
+                    .append(Component.text("Server total: ").color(NamedTextColor.YELLOW))
+                    .append(Balances.formatted((int) balMap.getTotalBalance()))
+                    .append(Component.text("."))
+                    .append(Component.newline());
+        }
 
         for(int i = 0 ; i < 10 ; i++){
             if((page*10) + i >= balMap.size()) break;

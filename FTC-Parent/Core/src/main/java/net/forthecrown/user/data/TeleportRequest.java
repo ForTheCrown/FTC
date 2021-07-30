@@ -1,6 +1,6 @@
 package net.forthecrown.user.data;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -26,7 +26,7 @@ public class TeleportRequest {
     }
 
     public void startCountdown(){
-        expiry.runTaskLaterAsynchronously(CrownCore.inst(), CrownCore.getTpaExpiryTime());
+        expiry.runTaskLaterAsynchronously(ForTheCrown.inst(), ForTheCrown.getTpaExpiryTime());
     }
 
     public void onAccept(){

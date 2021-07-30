@@ -162,12 +162,12 @@ public class SortedBalanceMap implements BalanceMap {
 
     @Override
     public long getTotalBalance(){
-        long totalAmount = 0;
-        for (BalEntry e: entries()){
-            totalAmount += e.getValue();
-        }
+        int defAmount = getDefaultAmount().getAsInt();
 
-        return totalAmount;
+        return entries.stream()
+                .filter(e -> e.getValue() > defAmount)
+                .mapToLong(BalEntry::getValue)
+                .sum();
     }
 
     @Override

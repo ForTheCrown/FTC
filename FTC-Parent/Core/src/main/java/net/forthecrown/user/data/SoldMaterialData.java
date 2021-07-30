@@ -1,7 +1,7 @@
 package net.forthecrown.user.data;
 
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.JsonSerializable;
 import org.bukkit.Material;
 
@@ -19,7 +19,7 @@ public class SoldMaterialData implements JsonSerializable {
     }
 
     public void recalculate(){
-        if(getEarned() > CrownCore.getMaxShopEarnings()) {
+        if(getEarned() > ForTheCrown.getMaxShopEarnings()) {
             price = 0;
             return;
         }
@@ -27,7 +27,7 @@ public class SoldMaterialData implements JsonSerializable {
         short startPrice = getOriginalPrice();
 
         if(earned <= 0) price = -1;
-        else price = (short) Math.ceil((1+startPrice)*Math.exp(-earned*Math.log(1+startPrice)/CrownCore.getMaxShopEarnings())-1);
+        else price = (short) Math.ceil((1+startPrice)*Math.exp(-earned*Math.log(1+startPrice)/ ForTheCrown.getMaxShopEarnings())-1);
     }
 
     public Material getMaterial() {
@@ -60,7 +60,7 @@ public class SoldMaterialData implements JsonSerializable {
     }
 
     public short getOriginalPrice(){
-        return CrownCore.getPriceMap().get(getMaterial());
+        return ForTheCrown.getPriceMap().get(getMaterial());
     }
 
     @Override

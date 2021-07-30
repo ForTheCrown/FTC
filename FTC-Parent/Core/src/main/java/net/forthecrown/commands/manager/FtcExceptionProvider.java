@@ -3,7 +3,7 @@ package net.forthecrown.commands.manager;
 import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -98,7 +98,7 @@ public interface FtcExceptionProvider {
     }
 
     static RoyalCommandException nickTooLong(int length){
-        return NICK_TOO_LONG.create(Component.text(length), Component.text(CrownCore.getMaxNickLength()));
+        return NICK_TOO_LONG.create(Component.text(length), Component.text(ForTheCrown.getMaxNickLength()));
     }
 
     static CommandSyntaxException cannotBan(CrownUser user){

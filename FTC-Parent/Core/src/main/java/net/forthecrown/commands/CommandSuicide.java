@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class CommandSuicide extends FtcCommand {
     public CommandSuicide(){
-        super("suicide", CrownCore.inst());
+        super("suicide", ForTheCrown.inst());
 
         setPermission(Permissions.DONATOR_2);
         setDescription("Commits suicide D:");

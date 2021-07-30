@@ -1,6 +1,6 @@
 package net.forthecrown.commands.marriage;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -14,7 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class CommandMarriageDeny extends FtcCommand {
 
     public CommandMarriageDeny() {
-        super("marrydeny", CrownCore.inst());
+        super("marrydeny", ForTheCrown.inst());
 
         setDescription("Deny a person's marriage request");
         setAliases("mdeny");

@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.serializer.AbstractJsonSerializer;
@@ -28,7 +28,7 @@ public class CrownKitRegistry extends AbstractJsonSerializer implements KitRegis
         super("kits");
 
         reload();
-        CrownCore.logger().info("Kits loaded");
+        ForTheCrown.logger().info("Kits loaded");
     }
 
     @Override

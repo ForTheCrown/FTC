@@ -1,6 +1,6 @@
 package net.forthecrown.events.dynamic;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.economy.Balances;
@@ -56,7 +56,7 @@ public class BmParrotListener extends AbstractInvListener implements Listener {
                 return;
             }
         } else {
-            if(!CrownCore.getBalances().canAfford(user.getUniqueId(), pet.getRequiredBal())){
+            if(!ForTheCrown.getBalances().canAfford(user.getUniqueId(), pet.getRequiredBal())){
                 user.sendMessage(
                         Component.translatable("commands.cannotAfford",
                                 NamedTextColor.GRAY,

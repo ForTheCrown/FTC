@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics.deaths;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.cosmetics.CosmeticConstants;
@@ -35,7 +35,7 @@ public abstract class AbstractDeathEffect implements CosmeticEffect {
         this.description = description;
         this.name = name;
 
-        this.key = CrownCore.coreKey(name.toLowerCase().replaceAll(" ", "_").replaceAll("'", ""));
+        this.key = ForTheCrown.coreKey(name.toLowerCase().replaceAll(" ", "_").replaceAll("'", ""));
     }
 
     AbstractDeathEffect(int slot, String name, String desc){

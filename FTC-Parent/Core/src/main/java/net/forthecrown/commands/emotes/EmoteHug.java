@@ -1,6 +1,6 @@
 package net.forthecrown.commands.emotes;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.Cooldown;
@@ -65,7 +65,7 @@ public class EmoteHug extends CommandEmote {
 
         public HugTick(CrownUser user){
             this.user = user;
-            runTaskTimerAsynchronously(CrownCore.inst(), 0, 2);
+            runTaskTimerAsynchronously(ForTheCrown.inst(), 0, 2);
         }
 
         @Override

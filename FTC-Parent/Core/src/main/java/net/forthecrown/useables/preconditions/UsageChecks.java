@@ -1,6 +1,6 @@
 package net.forthecrown.useables.preconditions;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 
 import static net.forthecrown.registry.Registries.USAGE_CHECKS;
 
@@ -31,7 +31,7 @@ public class UsageChecks {
         register(new SimpleCheckType(CheckIsNotAlt::new, CheckIsNotAlt.KEY));
 
         USAGE_CHECKS.close();
-        CrownCore.logger().info("Default checks registered");
+        ForTheCrown.logger().info("Default checks registered");
     }
 
     private static void register(UsageCheck<?> check){

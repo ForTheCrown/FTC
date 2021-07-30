@@ -2,7 +2,7 @@ package net.forthecrown.user;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.serializer.JsonDeserializable;
@@ -36,7 +36,7 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
 
     @Override
     public MuteStatus muteStatus() {
-        return CrownCore.getPunishmentManager().checkMuteSilent(user.getUniqueId());
+        return ForTheCrown.getPunishmentManager().checkMuteSilent(user.getUniqueId());
     }
 
     @Override
@@ -206,7 +206,10 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
 
     @Override
     public boolean canChangeMarriageStatus(){
-        return (lastMarriageChange + CrownCore.getMarriageCooldown()) <= System.currentTimeMillis();
+        if(lastMarriageChange == 0) return true;
+
+        long nextAllowed = lastMarriageChange + ForTheCrown.getMarriageCooldown();
+        return System.currentTimeMillis() > nextAllowed;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package net.forthecrown.useables;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -12,7 +12,7 @@ public interface UsablesManager {
     /**
      * The key that blocks and entities have to make sure they're interactable
      */
-    NamespacedKey USABLE_KEY = new NamespacedKey(CrownCore.inst(), "useablesign");
+    NamespacedKey USABLE_KEY = new NamespacedKey(ForTheCrown.inst(), "useablesign");
 
     /**
      * Gets a block from the given location

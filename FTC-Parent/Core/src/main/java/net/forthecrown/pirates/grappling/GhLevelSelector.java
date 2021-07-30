@@ -1,7 +1,7 @@
 package net.forthecrown.pirates.grappling;
 
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.builder.BuiltInventory;
@@ -102,7 +102,7 @@ public class GhLevelSelector {
             GhLevelData data = Pirates.getParkour().byName(levelName);
 
             if(data == null) {
-                CrownCore.logger().warning("Null data for InvOption with name " + levelName);
+                ForTheCrown.logger().warning("Null data for InvOption with name " + levelName);
                 return null;
             }
 

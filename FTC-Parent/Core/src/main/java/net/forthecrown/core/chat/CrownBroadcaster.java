@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.comvars.types.ComVarType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.user.CrownUser;
@@ -42,7 +42,7 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
         reload();
 
         delay.setOnUpdate(val -> start());
-        CrownCore.logger().info("Announcer loaded");
+        ForTheCrown.logger().info("Announcer loaded");
     }
 
 
@@ -70,14 +70,14 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
     }
 
     public void doBroadcasts(){
-        CrownCore.logger().info("Starting announcer");
+        ForTheCrown.logger().info("Starting announcer");
         broadcaster = new BukkitRunnable() {
             int counter = 0;
 
             @Override
             public void run() {
                 Component broadcast = Component.text()
-                        .append(CrownCore.prefix())
+                        .append(ForTheCrown.prefix())
                         .append(getAnnouncements().get(counter))
                         .build();
 
@@ -97,7 +97,7 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
                 else counter++;
             }
         };
-        broadcaster.runTaskTimer(CrownCore.inst(), 500, getDelay());
+        broadcaster.runTaskTimer(ForTheCrown.inst(), 500, getDelay());
     }
 
     @Override
@@ -162,7 +162,7 @@ public class CrownBroadcaster extends AbstractJsonSerializer implements Announce
     @Override
     public Component formatMessage(Component message){
         return Component.text()
-                .append(CrownCore.prefix())
+                .append(ForTheCrown.prefix())
                 .append(message)
                 .build();
     }

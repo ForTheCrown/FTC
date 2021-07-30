@@ -1,6 +1,6 @@
 package net.forthecrown.commands.emotes;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.Cooldown;
@@ -73,7 +73,7 @@ public class EmoteJingle extends CommandEmote {
         Location loc = user.getPlayer().getLocation();
         loc.getWorld().spawnParticle(Particle.SNOW_SHOVEL,loc, 25, 0.1, 0, 0.1, 1);
         loc.getWorld().spawnParticle(Particle.END_ROD, loc, 50, 0.1, 0, 0.1, 0.1);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> {
             //b = bass //s = snare
             playSound(0, loc, midTone); //b
             playSound(4, loc, midTone); //s
@@ -118,7 +118,7 @@ public class EmoteJingle extends CommandEmote {
     private final float highTone = 1.7f;
 
     private void playSound(int delay, Location loc, float pitch) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> {
             if (bass.contains(delay)) {
                 loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, SoundCategory.MASTER, 0.2F, 1F);
             }

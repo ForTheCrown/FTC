@@ -1,6 +1,6 @@
 package net.forthecrown.events;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import org.bukkit.*;
 import org.bukkit.entity.Egg;
 import org.bukkit.event.EventHandler;
@@ -40,7 +40,7 @@ public class SmokeBomb implements Listener {
     }
 
     private void eggSmoke() {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> {
             Set<UUID> toRemove = new HashSet<>();
             for (UUID eggID : eggs) {
                 try {

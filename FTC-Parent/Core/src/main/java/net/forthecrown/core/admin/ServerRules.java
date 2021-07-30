@@ -3,7 +3,7 @@ package net.forthecrown.core.admin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -25,7 +25,7 @@ public class ServerRules extends AbstractJsonSerializer {
 
         if(!fileExists) reload();
         reload();
-        CrownCore.logger().info("Server rules loaded");
+        ForTheCrown.logger().info("Server rules loaded");
     }
 
     //Displays the rules

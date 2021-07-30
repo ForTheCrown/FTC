@@ -20,7 +20,7 @@ public enum BossItems {
         this.itemCreator = new ItemStackBuilder(Material.GOLDEN_APPLE, 1)
                 .setName(Component.text(name).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE))
                 .addLore(Component.text(tagLine))
-                .addData(Bosses.key, (byte) 1)
+                .addData(Bosses.KEY, (byte) 1)
                 .build();
     }
 

@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.KitType;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -22,7 +22,7 @@ import java.util.List;
 
 public class CommandKitEdit extends FtcCommand {
     public CommandKitEdit(){
-        super("kitedit", CrownCore.inst());
+        super("kitedit", ForTheCrown.inst());
 
         setPermission(Permissions.KIT_ADMIN);
         register();
@@ -45,7 +45,7 @@ public class CommandKitEdit extends FtcCommand {
                                         items.add(i);
                                     }
 
-                                    Kit kit = CrownCore.getKitRegistry().register(key, items);
+                                    Kit kit = ForTheCrown.getKitRegistry().register(key, items);
 
                                     c.getSource().sendAdmin(
                                             Component.text("Created kit named ")

@@ -1,6 +1,6 @@
 package net.forthecrown.user;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.utils.FtcUtils;
@@ -26,7 +26,7 @@ public interface UserManager extends CrownSerializer {
      * @return the current UserManager instance, same as FtcCore.getUserManager(); lol
      */
     static @NotNull UserManager inst(){
-        return CrownCore.getUserManager();
+        return ForTheCrown.getUserManager();
     }
 
     /**
@@ -55,7 +55,7 @@ public interface UserManager extends CrownSerializer {
      */
     static CrownUser getUser(@NotNull UUID base) {
         Validate.notNull(base, "UUID cannot be null");
-        if(CrownUserManager.LOADED_USERS.containsKey(base)) return CrownUserManager.LOADED_USERS.get(base);
+        if(FtcUserManager.LOADED_USERS.containsKey(base)) return FtcUserManager.LOADED_USERS.get(base);
         return inst().isAlt(base) ? new FtcUserAlt(base, inst().getMain(base)) : new FtcUser(base);
     }
 
@@ -73,7 +73,7 @@ public interface UserManager extends CrownSerializer {
      * @return The currently loaded users
      */
     static Collection<CrownUser> getLoadedUsers(){
-        return new ArrayList<>(CrownUserManager.LOADED_USERS.values());
+        return new ArrayList<>(FtcUserManager.LOADED_USERS.values());
     }
 
     /**
@@ -106,7 +106,7 @@ public interface UserManager extends CrownSerializer {
         if(!user.isOnline()) return;
         if(user.hasPermission(Permissions.VANISH_SEE)) return;
 
-        getVanishedUsers().forEach(u -> user.getPlayer().hidePlayer(CrownCore.inst(), u.getPlayer()));
+        getVanishedUsers().forEach(u -> user.getPlayer().hidePlayer(ForTheCrown.inst(), u.getPlayer()));
     }
 
     /**

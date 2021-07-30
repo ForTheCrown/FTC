@@ -23,7 +23,7 @@ public class SellShopHeader implements CordedInventoryOption {
     static final SellShopHeader MINERALS = new SellShopHeader(
             (user, context) -> SellShops.MINERALS.open(user),
             Material.AMETHYST_SHARD,
-            "Minerals", "Ores and minerals found from the gound."
+            "Minerals", "Ores and minerals found from the ground."
     );
 
     static final SellShopHeader MINING = new SellShopHeader(

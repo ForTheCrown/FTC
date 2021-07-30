@@ -1,6 +1,6 @@
 package net.forthecrown.commands.clickevent;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -81,7 +81,7 @@ public final class ClickEventManager {
         if(allow){
             if(allowedToUseCommand.contains(player)) return;
             allowedToUseCommand.add(player);
-            if(cooldown) Bukkit.getScheduler().runTaskLater(CrownCore.inst(), () -> allowedToUseCommand.remove(player), 30*20); //automatically makes it so you can't use the NPC command after a minute
+            if(cooldown) Bukkit.getScheduler().runTaskLater(ForTheCrown.inst(), () -> allowedToUseCommand.remove(player), 30*20); //automatically makes it so you can't use the NPC command after a minute
         } else allowedToUseCommand.remove(player);
     }
 

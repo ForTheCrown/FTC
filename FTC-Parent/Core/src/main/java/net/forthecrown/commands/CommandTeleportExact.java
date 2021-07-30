@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.FloatArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -18,7 +18,7 @@ import org.bukkit.World;
 
 public class CommandTeleportExact extends FtcCommand {
     public CommandTeleportExact(){
-        super("tp_exact", CrownCore.inst());
+        super("tp_exact", ForTheCrown.inst());
 
         setPermission(Permissions.HELPER);
         register();

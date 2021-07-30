@@ -1,6 +1,6 @@
 package net.forthecrown.utils;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -62,7 +62,7 @@ public final class Cooldown {
         COOLDOWN_MAP.put(category, set);
 
         if(timeInTicks != -1){
-            Bukkit.getScheduler().runTaskLater(CrownCore.inst(), () -> remove(sender, category), timeInTicks);
+            Bukkit.getScheduler().runTaskLater(ForTheCrown.inst(), () -> remove(sender, category), timeInTicks);
         }
     }
 

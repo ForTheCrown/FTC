@@ -1,6 +1,6 @@
 package net.forthecrown.commands.marriage;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -14,10 +14,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 
 public class CommandMarry extends FtcCommand {
-    public static final NamespacedKey KEY = new NamespacedKey(CrownCore.inst(), "marriage");
+    public static final NamespacedKey KEY = new NamespacedKey(ForTheCrown.inst(), "marriage");
 
     public CommandMarry() {
-        super("marry", CrownCore.inst());
+        super("marry", ForTheCrown.inst());
 
         setDescription("Marry a person");
         setPermission(Permissions.MARRY);

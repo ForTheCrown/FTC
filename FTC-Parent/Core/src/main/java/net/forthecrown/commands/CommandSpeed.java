@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserType;
@@ -18,7 +18,7 @@ public class CommandSpeed extends FtcCommand {
     public static float DEF_FLY = 0.1f;
 
     public CommandSpeed(){
-        super("speed", CrownCore.inst());
+        super("speed", ForTheCrown.inst());
 
         setPermission(Permissions.CORE_ADMIN);
         register();

@@ -1,6 +1,6 @@
 package net.forthecrown.events;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.events.custom.SignShopUseEvent;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -13,10 +13,10 @@ import org.bukkit.plugin.PluginManager;
 
 public class Events {
     private static PluginManager pm;
-    private static CrownCore main;
+    private static ForTheCrown main;
 
     public static void init(){
-        main = CrownCore.inst();
+        main = ForTheCrown.inst();
         pm = main.getServer().getPluginManager();
 
         register(new JeromeEvent());

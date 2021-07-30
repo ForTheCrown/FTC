@@ -1,7 +1,7 @@
 package net.forthecrown.events;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.economy.shops.SignShop;
 import net.forthecrown.core.CrownException;
@@ -17,14 +17,14 @@ public class ShopDestroyEvent implements Listener {
     public void onSignDestroy(BlockBreakEvent event) throws CrownException {
         if(!ShopManager.isShop(event.getBlock())) return;
 
-        SignShop shop = CrownCore.getShopManager().getShop(event.getBlock().getLocation());
+        SignShop shop = ForTheCrown.getShopManager().getShop(event.getBlock().getLocation());
         if(shop == null) return;
         event.setCancelled(true);
 
         if(!shop.getOwner().equals(event.getPlayer().getUniqueId()) && !event.getPlayer().hasPermission("ftc.admin"))
             throw new CrownException(event.getPlayer(), "&cYou cannot destroy a shop you do not own!");
 
-        Bukkit.getScheduler().runTaskLater(CrownCore.inst(), () -> shop.destroy(true), 1);
+        Bukkit.getScheduler().runTaskLater(ForTheCrown.inst(), () -> shop.destroy(true), 1);
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -1,6 +1,6 @@
 package net.forthecrown.inventory;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Balances;
@@ -40,7 +40,7 @@ public final class CrownItems {
     /**
      * Key used by persistent data container to store stuff
      */
-    public static final NamespacedKey ITEM_KEY = new NamespacedKey(CrownCore.inst(), "crownitem");
+    public static final NamespacedKey ITEM_KEY = new NamespacedKey(ForTheCrown.inst(), "crownitem");
 
     private static final ItemStack BASE_ROYAL_SWORD = makeRoyalWeapon(Material.GOLDEN_SWORD, Component.text("-")
                     .color(NamedTextColor.GOLD)
@@ -190,7 +190,7 @@ public final class CrownItems {
     }
 
     private static Component s(){
-        Kingship kingship = CrownCore.getKingship();
+        Kingship kingship = ForTheCrown.getKingship();
         if(!kingship.hasKing()) return Component.text("During the Interregnum").color(NamedTextColor.DARK_GRAY);
 
         return Component.text("During the reign of ")

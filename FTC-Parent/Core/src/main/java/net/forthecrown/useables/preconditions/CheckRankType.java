@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.CoreCommands;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.Rank;
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckRankType implements UsageCheck<CheckRankType.CheckInstance> {
-    public static final Key KEY = CrownCore.coreKey("required_rank");
+    public static final Key KEY = ForTheCrown.coreKey("required_rank");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

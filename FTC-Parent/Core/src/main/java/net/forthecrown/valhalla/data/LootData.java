@@ -1,6 +1,6 @@
 package net.forthecrown.valhalla.data;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
@@ -45,7 +45,7 @@ public class LootData implements RaidData {
                 LootTable table = Bukkit.getLootTable(FtcUtils.keyToBukkit(e.getValue()));
 
                 if(table == null) {
-                    CrownCore.logger().warning("Found key pointing to null loot table in definite chests: " + e.getValue().asString());
+                    ForTheCrown.logger().warning("Found key pointing to null loot table in definite chests: " + e.getValue().asString());
                     continue;
                 }
 
@@ -59,7 +59,7 @@ public class LootData implements RaidData {
             LootTable loot = Bukkit.getLootTable(FtcUtils.keyToBukkit(g.getLootTableKey()));
 
             if(loot == null) {
-                CrownCore.logger().warning("Found key pointing to null loot table in chest group: " + g.getLootTableKey().asString());
+                ForTheCrown.logger().warning("Found key pointing to null loot table in chest group: " + g.getLootTableKey().asString());
                 continue;
             }
             if(ListUtils.isNullOrEmpty(g.getPossibleLocations())) continue;

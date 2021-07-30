@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserType;
@@ -11,7 +11,7 @@ import org.bukkit.Location;
 
 public class CommandGetPos extends FtcCommand {
     public CommandGetPos(){
-        super("getpos", CrownCore.inst());
+        super("getpos", ForTheCrown.inst());
 
         setPermission(Permissions.HELPER);
         register();

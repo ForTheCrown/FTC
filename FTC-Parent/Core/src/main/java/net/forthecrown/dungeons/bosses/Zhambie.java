@@ -1,6 +1,6 @@
 package net.forthecrown.dungeons.bosses;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.dungeons.BossItems;
@@ -93,7 +93,7 @@ public class Zhambie extends DungeonBoss<Husk> {
     private void spawnHelper(Location location){
         location.getWorld().spawnParticle(Particle.FLAME, location.add(0, 2, 0), 5, 0.1D, 0.4D, 0.1D, 0.01D);
         for (long i = 1; i < 6; i++) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> location.getWorld().spawnParticle(Particle.FLAME, location, 5, 0.1D, 0.4D, 0.1D, 0.01D), i*10);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> location.getWorld().spawnParticle(Particle.FLAME, location, 5, 0.1D, 0.4D, 0.1D, 0.01D), i*10);
         }
 
         Husk helper = location.getWorld().spawn(location, Husk.class, zhelper  -> {

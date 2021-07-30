@@ -29,15 +29,11 @@ public class AugustEntry extends SingleEntry {
 
     public void addSecToTimer(int seconds) {
         timer().setTimeInTicks(timer.getTimeInTicks() + seconds * 20L);
-        player.sendMessage(Component.text("+10 seconds!").color(NamedTextColor.GOLD));
+        player.sendMessage(Component.text("+" + seconds + " seconds!").color(NamedTextColor.GOLD));
     }
 
     public int score() {
         return score;
-    }
-
-    public void increment() {
-        score++;
     }
 
     public void increment(int inc) {

@@ -1,6 +1,6 @@
 package net.forthecrown.economy.auctions;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
@@ -209,7 +209,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
         this.adminAuction = admin;
         this.bids = new HashMap<>();
 
-        expiresAt = System.currentTimeMillis() + CrownCore.getAuctionExpirationTime();
+        expiresAt = System.currentTimeMillis() + ForTheCrown.getAuctionExpirationTime();
 
         Component itemName = ChatUtils.convertString(ChatFormatter.getItemNormalName(item));
         if(item.getItemMeta().hasDisplayName()) itemName = item.getItemMeta().displayName();
@@ -239,7 +239,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
 
         if (user.getPlayer().getInventory().firstEmpty() == -1) throw new CrownException(user, "Your inventory is full!");
 
-        Balances bals = CrownCore.getBalances();
+        Balances bals = ForTheCrown.getBalances();
 
         if(!highestBidder.equals(owner)){
             bals.add(owner, getHighestBid(), false);
@@ -358,7 +358,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
 
         final int originalValue = value;
         if(bids.containsKey(user.getUniqueId())) value = value - bids.get(user.getUniqueId());
-        CrownCore.getBalances().add(user.getUniqueId(), -value);
+        ForTheCrown.getBalances().add(user.getUniqueId(), -value);
 
         bids.put(user.getUniqueId(), originalValue);
     }
@@ -373,7 +373,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
             setWaitingForItemClaim(true);
             getSign().line(0, AuctionManager.WAITING_FOR_ITEM_CLAIM_LABEL);
             updateSign();
-            freeForAll = System.currentTimeMillis() + CrownCore.getAuctionPickupTime();
+            freeForAll = System.currentTimeMillis() + ForTheCrown.getAuctionPickupTime();
             giveBalancesToLosers(false);
             return false;
         }
@@ -395,7 +395,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
     public void giveBalancesToLosers(boolean toHighestBidder){
         if(bids == null) return;
 
-        Balances bals = CrownCore.getBalances();
+        Balances bals = ForTheCrown.getBalances();
         for (UUID id: bids.keySet()){
             if(!toHighestBidder && id.equals(getHighestBidder().getUniqueId())) continue;
 

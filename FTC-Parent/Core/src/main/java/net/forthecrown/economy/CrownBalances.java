@@ -2,7 +2,7 @@ package net.forthecrown.economy;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.serializer.AbstractJsonSerializer;
@@ -17,13 +17,13 @@ import java.util.logging.Level;
 
 public class CrownBalances extends AbstractJsonSerializer implements Balances {
 
-    private BalanceMap balanceMap = new SortedBalanceMap(CrownCore::getStartRhines);
+    private BalanceMap balanceMap = new SortedBalanceMap(ForTheCrown::getStartRhines);
 
     public CrownBalances() {
         super("balances");
 
         reload();
-        CrownCore.logger().info("Balances loaded");
+        ForTheCrown.logger().info("Balances loaded");
     }
 
     @Override
@@ -63,9 +63,9 @@ public class CrownBalances extends AbstractJsonSerializer implements Balances {
 
     @Override
     public synchronized void set(UUID uuid, Integer amount){
-        if(amount >= CrownCore.getMaxMoneyAmount()) Announcer.log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
+        if(amount >= ForTheCrown.getMaxMoneyAmount()) Announcer.log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
 
-        setUnlimited(uuid, Math.max(0, Math.min(CrownCore.getMaxMoneyAmount(), amount)));
+        setUnlimited(uuid, Math.max(0, Math.min(ForTheCrown.getMaxMoneyAmount(), amount)));
     }
 
     @Override
@@ -85,15 +85,15 @@ public class CrownBalances extends AbstractJsonSerializer implements Balances {
 
     @Override
     public synchronized void add(UUID uuid, Integer amount, boolean isTaxed){
-        if(amount + get(uuid) >= CrownCore.getMaxMoneyAmount()){
+        if(amount + get(uuid) >= ForTheCrown.getMaxMoneyAmount()){
             Announcer.log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
-            balanceMap.put(uuid, CrownCore.getMaxMoneyAmount());
+            balanceMap.put(uuid, ForTheCrown.getMaxMoneyAmount());
             return;
         }
 
         if(amount > 0) UserManager.getUser(uuid).addTotalEarnings(amount);
 
-        if(CrownCore.areTaxesEnabled() && isTaxed && getTax(uuid) > 1 && amount > 1){
+        if(ForTheCrown.areTaxesEnabled() && isTaxed && getTax(uuid) > 1 && amount > 1){
             int amountToRemove = (int) (amount * ((float) getTax(uuid)/100));
             amount -= amountToRemove;
 

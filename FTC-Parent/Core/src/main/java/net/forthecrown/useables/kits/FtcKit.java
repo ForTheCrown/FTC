@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.useables.CheckableBase;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
@@ -162,6 +162,6 @@ public class FtcKit extends CheckableBase implements Kit {
 
     @Override
     public void delete() {
-        CrownCore.getKitRegistry().remove(key);
+        ForTheCrown.getKitRegistry().remove(key);
     }
 }

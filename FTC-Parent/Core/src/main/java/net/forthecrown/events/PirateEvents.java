@@ -1,7 +1,7 @@
 package net.forthecrown.events;
 
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.pirates.TreasureShulker;
 import net.forthecrown.user.CrownUser;
@@ -50,7 +50,7 @@ public class PirateEvents implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_AIR) return;
         if (!event.getHand().equals(EquipmentSlot.HAND)) return;
         if (event.getItem() == null || event.getItem().getType() != Material.COMPASS) return;
-        if (!event.getPlayer().getWorld().equals(CrownCore.getTreasureWorld())) return;
+        if (!event.getPlayer().getWorld().equals(ForTheCrown.getTreasureWorld())) return;
         if (UserManager.getUser(event.getPlayer()).getBranch() != Branch.PIRATES) return;
 
         event.getPlayer().setCompassTarget(Pirates.getTreasure().getLocation());

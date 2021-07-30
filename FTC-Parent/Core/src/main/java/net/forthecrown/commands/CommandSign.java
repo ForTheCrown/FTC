@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.grenadier.CommandSource;
@@ -19,7 +19,7 @@ import org.bukkit.block.Sign;
 
 public class CommandSign extends FtcCommand {
     public CommandSign(){
-        super("sign", CrownCore.inst());
+        super("sign", ForTheCrown.inst());
 
         setAliases("editsign");
         register();

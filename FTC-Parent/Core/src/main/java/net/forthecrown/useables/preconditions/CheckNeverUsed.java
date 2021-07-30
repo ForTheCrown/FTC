@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public class CheckNeverUsed implements UsageCheck<CheckNeverUsed.CheckInstance> {
-    public static final Key KEY = Key.key(CrownCore.inst(), "never_used");
+    public static final Key KEY = Key.key(ForTheCrown.inst(), "never_used");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

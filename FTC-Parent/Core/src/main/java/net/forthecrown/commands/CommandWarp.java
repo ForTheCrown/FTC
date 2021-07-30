@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserType;
@@ -15,7 +15,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class CommandWarp extends FtcCommand {
 
     public CommandWarp(){
-        super("warp", CrownCore.inst());
+        super("warp", ForTheCrown.inst());
 
         setPermission(Permissions.WARP);
         setDescription("Warps you to a warp");

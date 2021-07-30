@@ -9,14 +9,14 @@ import org.bukkit.scheduler.BukkitRunnable;
  * Class which saves the FTC-Core in the interval given in the core_autoSaveIntervalMins comvar
  */
 public final class PeriodicalSaver extends BukkitRunnable {
-    private final CrownCore core;
+    private final ForTheCrown core;
     private static final ComVar<Long> interval;
 
     static {
-        interval = ComVarRegistry.set("core_autoSaveIntervalMins", ComVarType.LONG, CrownCore.config().getLong("System.save-interval-mins"));
+        interval = ComVarRegistry.set("core_autoSaveIntervalMins", ComVarType.LONG, ForTheCrown.config().getLong("System.save-interval-mins"));
     }
 
-    PeriodicalSaver(CrownCore core){
+    PeriodicalSaver(ForTheCrown core){
         this.core = core;
     }
 
@@ -28,6 +28,6 @@ public final class PeriodicalSaver extends BukkitRunnable {
 
     @Override
     public void run() {
-        CrownCore.saveFTC();
+        ForTheCrown.saveFTC();
     }
 }

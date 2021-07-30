@@ -1,6 +1,6 @@
 package net.forthecrown.economy.selling;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.inventory.builder.BuiltInventory;
@@ -194,7 +194,7 @@ public class SellShops {
      */
     public static int sell(CrownUser user, Material toRemove, int priceScalar, SoldMaterialData data) {
         SellAmount sellAmount = user.getSellAmount();
-        Balances balances = CrownCore.getBalances();
+        Balances balances = ForTheCrown.getBalances();
 
         ItemStack sellItem = new ItemStack(toRemove, sellAmount.value);
         UserSellResult result = user.sellMaterial(toRemove);
@@ -219,7 +219,7 @@ public class SellShops {
                         Balances.formatted(totalEarned).color(NamedTextColor.GOLD)
                 )
         );
-        CrownCore.logger().info(user.getName() + " sold " + result.getFoundAmount() + " " + ChatFormatter.normalEnum(toRemove) + " for " + Balances.getFormatted(totalEarned));
+        ForTheCrown.logger().info(user.getName() + " sold " + result.getFoundAmount() + " " + ChatFormatter.normalEnum(toRemove) + " for " + Balances.getFormatted(totalEarned));
 
         int initPrice = data.getPrice();
 

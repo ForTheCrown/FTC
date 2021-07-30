@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -21,7 +21,7 @@ public class CommandVolleyBall extends FtcCommand {
     public static final int chickenHealth = 1024;
 
     public CommandVolleyBall() {
-        super("volleyball", CrownCore.inst());
+        super("volleyball", ForTheCrown.inst());
 
         setPermission(Permissions.HELPER);
         register();

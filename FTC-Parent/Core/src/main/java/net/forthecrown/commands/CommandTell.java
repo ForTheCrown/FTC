@@ -5,7 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -16,7 +16,7 @@ import net.forthecrown.commands.manager.FtcSuggestionProvider;
 
 public class CommandTell extends FtcCommand {
     public CommandTell(){
-        super("ftell", CrownCore.inst());
+        super("ftell", ForTheCrown.inst());
 
         setAliases("emsg", "tell", "whisper", "w", "msg", "etell", "ewhisper", "pm", "dm", "t", "message");
         setPermission(Permissions.MESSAGE);

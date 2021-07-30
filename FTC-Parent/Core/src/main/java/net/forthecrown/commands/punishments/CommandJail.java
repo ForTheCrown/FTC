@@ -1,7 +1,7 @@
 package net.forthecrown.commands.punishments;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -26,7 +26,7 @@ import org.bukkit.command.ConsoleCommandSender;
 
 public class CommandJail extends FtcCommand implements GenericPunisher {
     public CommandJail(){
-        super("jail", CrownCore.inst());
+        super("jail", ForTheCrown.inst());
 
         setPermission(Permissions.HELPER);
         register();
@@ -59,8 +59,8 @@ public class CommandJail extends FtcCommand implements GenericPunisher {
     public int punish(CrownUser user, CommandSource source, long length, Key jail) throws CommandSyntaxException {
         if(user.hasPermission(Permissions.JAIL_BYPASS) && !source.is(ConsoleCommandSender.class)) throw FtcExceptionProvider.cannotJail(user);
 
-        PunishmentManager manager = CrownCore.getPunishmentManager();
-        JailManager jails = CrownCore.getJailManager();
+        PunishmentManager manager = ForTheCrown.getPunishmentManager();
+        JailManager jails = ForTheCrown.getJailManager();
 
         if(manager.checkJailed(user.getPlayer())) throw FtcExceptionProvider.create("Player is already jailed");
 
@@ -69,7 +69,7 @@ public class CommandJail extends FtcCommand implements GenericPunisher {
 
         if(user.isOnline()){
             CoreCommands.resendCommandPackets(user.getPlayer());
-            Bukkit.getPluginManager().registerEvents(new JailListener(user.getPlayer(), jails.get(jail)), CrownCore.inst());
+            Bukkit.getPluginManager().registerEvents(new JailListener(user.getPlayer(), jails.get(jail)), ForTheCrown.inst());
         }
 
         StaffChat.sendCommand(

@@ -19,6 +19,7 @@ CrownEventActive: false
 EventScoreIsTimer: false
 MaxBossDifficulty: 5
 MaxShopEarnings: 500000
+HulkSmashPoles: true
 Day: 1
 
 MiniGameRegion:

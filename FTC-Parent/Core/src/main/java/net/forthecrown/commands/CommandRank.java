@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.events.dynamic.RankGuiUseEvent;
 import net.forthecrown.inventory.RankInventory;
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public class CommandRank extends FtcCommand {
 
     public CommandRank(){
-        super("rank", CrownCore.inst());
+        super("rank", ForTheCrown.inst());
 
         setAliases("ranks");
         setDescription("Allows you to set your rank");
@@ -39,7 +39,7 @@ public class CommandRank extends FtcCommand {
         command.executes(c ->{
             Player player = getPlayerSender(c);
 
-            Bukkit.getPluginManager().registerEvents(new RankGuiUseEvent(player), CrownCore.inst());
+            Bukkit.getPluginManager().registerEvents(new RankGuiUseEvent(player), ForTheCrown.inst());
             player.openInventory(new RankInventory(UserManager.getUser(player)).getUsersRankGUI());
             return 0;
         });

@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 
@@ -22,7 +22,7 @@ public class BaltopType implements ArgumentType<Integer> {
     private BaltopType() {}
 
     //The max page number
-    public static final int MAX = Math.round(((float) CrownCore.getBalances().getMap().size())/10);
+    public static final int MAX = Math.round(((float) ForTheCrown.getBalances().getMap().size())/10);
 
     @Override
     public Integer parse(StringReader reader) throws CommandSyntaxException {

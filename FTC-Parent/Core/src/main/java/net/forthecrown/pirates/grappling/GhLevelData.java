@@ -2,7 +2,7 @@ package net.forthecrown.pirates.grappling;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.inventory.CrownItems;
@@ -87,9 +87,9 @@ public class GhLevelData implements JsonSerializable {
                 case NORMAL: break;
 
                 case END:
-                    CrownCore.getBalances().add(user.getUniqueId(), CrownCore.getGhFinalReward(), false);
+                    ForTheCrown.getBalances().add(user.getUniqueId(), ForTheCrown.getGhFinalReward(), false);
                     user.sendMessage(
-                            Component.translatable("gh.reward.final", Balances.formatted(CrownCore.getGhFinalReward()).color(NamedTextColor.YELLOW))
+                            Component.translatable("gh.reward.final", Balances.formatted(ForTheCrown.getGhFinalReward()).color(NamedTextColor.YELLOW))
                                     .color(NamedTextColor.GRAY)
                     );
 
@@ -97,9 +97,9 @@ public class GhLevelData implements JsonSerializable {
                     break;
 
                 case SPECIAL:
-                    CrownCore.getBalances().add(user.getUniqueId(), CrownCore.getGhSpecialReward(), false);
+                    ForTheCrown.getBalances().add(user.getUniqueId(), ForTheCrown.getGhSpecialReward(), false);
                     user.sendMessage(
-                            Component.translatable("gh.reward.special", Balances.formatted(CrownCore.getGhSpecialReward()).color(NamedTextColor.YELLOW))
+                            Component.translatable("gh.reward.special", Balances.formatted(ForTheCrown.getGhSpecialReward()).color(NamedTextColor.YELLOW))
                                     .color(NamedTextColor.GRAY)
                     );
                     break;
@@ -110,7 +110,7 @@ public class GhLevelData implements JsonSerializable {
 
         GhLevelData data = Pirates.getParkour().byName(getNextLevel());
         if(data == null) {
-            if(type != GhType.END) CrownCore.logger().warning(name + " has null nextLevel pointer");
+            if(type != GhType.END) ForTheCrown.logger().warning(name + " has null nextLevel pointer");
             else player.teleport(GhParkour.EXIT);
 
             return;

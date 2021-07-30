@@ -1,6 +1,6 @@
 package net.forthecrown.economy.shops;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -18,7 +18,7 @@ import java.util.UUID;
  * Manages shops n stuff
  */
 public interface ShopManager {
-    NamespacedKey SHOP_KEY = new NamespacedKey(CrownCore.inst(), "signshop");
+    NamespacedKey SHOP_KEY = new NamespacedKey(ForTheCrown.inst(), "signshop");
 
     String BUY_LABEL = "=[Buy]=";
     String SELL_LABEL = "=[Sell]=";

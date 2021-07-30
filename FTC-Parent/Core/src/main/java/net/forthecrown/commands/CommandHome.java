@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.HomeParseResult;
 import net.forthecrown.commands.arguments.HomeType;
@@ -18,7 +18,7 @@ public class CommandHome extends FtcCommand {
     public static final String DEFAULT = "home";
 
     public CommandHome(){
-        super("home", CrownCore.inst());
+        super("home", ForTheCrown.inst());
 
         setPermission(Permissions.HOME);
         setDescription("Takes you to one of your homes");

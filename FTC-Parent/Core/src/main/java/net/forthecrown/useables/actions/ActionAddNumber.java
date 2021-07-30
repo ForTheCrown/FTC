@@ -3,7 +3,7 @@ package net.forthecrown.useables.actions;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.user.UserManager;
@@ -12,8 +12,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstance> {
-    public static final Key GEM_KEY = CrownCore.coreKey("add_gems");
-    public static final Key BAL_KEY = CrownCore.coreKey("add_bal");
+    public static final Key GEM_KEY = ForTheCrown.coreKey("add_gems");
+    public static final Key BAL_KEY = ForTheCrown.coreKey("add_bal");
 
     private final boolean toBal;
 
@@ -84,7 +84,7 @@ public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstan
 
         @Override
         public void onInteract(Player player) {
-            if(toBal) CrownCore.getBalances().add(player.getUniqueId(), amount, taxed);
+            if(toBal) ForTheCrown.getBalances().add(player.getUniqueId(), amount, taxed);
             else UserManager.getUser(player).addGems(amount);
         }
 
@@ -103,35 +103,3 @@ public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstan
         }
     }
 }
-
-/*@Override
-    public void parse(JsonElement json) throws CommandSyntaxException {
-        JsonObject obj = json.getAsJsonObject();
-
-        this.amount = obj.get("amount").getAsInt();
-        this.taxed = obj.get("taxed").getAsBoolean();
-    }
-
-    @Override
-    public void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException {
-        this.amount = reader.readInt();
-
-        if(!reader.canRead()){
-            taxed = false;
-            return;
-        }
-
-        reader.skipWhitespace();
-
-        this.taxed = reader.readBoolean();
-    }*/
-
-    /*@Override
-    public JsonObject serialize() {
-        JsonObject json = new JsonObject();
-
-        json.addProperty("amount", amount);
-        json.addProperty("taxed", taxed);
-
-        return json;
-    }*/

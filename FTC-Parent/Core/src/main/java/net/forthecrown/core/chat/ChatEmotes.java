@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import org.bukkit.command.CommandSender;
@@ -37,7 +37,7 @@ public class ChatEmotes implements SuggestionProvider<CommandSource> {
         register("fedup", "(¬_¬)");
         register("reallysad", "(◉︵◉ )");
 
-        CrownCore.logger().info("Emotes registered");
+        ForTheCrown.logger().info("Emotes registered");
     }
 
     private void register(String key, String emote){

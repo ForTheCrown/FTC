@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics.arrows;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.cosmetics.CosmeticConstants;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.registry.Registries;
@@ -38,7 +38,7 @@ public class ArrowEffects {
                 .build();
 
         Registries.ARROW_EFFECTS.close();
-        CrownCore.logger().info("Arrow Effects registered");
+        ForTheCrown.logger().info("Arrow Effects registered");
     }
 
     private static ArrowEffect register(int slot, Particle particle, String name, String desc){

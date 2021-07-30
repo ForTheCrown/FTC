@@ -3,7 +3,7 @@ package net.forthecrown.commands.emotes;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -24,7 +24,7 @@ public abstract class CommandEmote extends FtcCommand {
     protected final String cooldownCategory;
 
     protected CommandEmote(@NotNull String name, @Nonnegative int cooldownTime, @NotNull String cooldownMessage) {
-        super(name, CrownCore.inst());
+        super(name, ForTheCrown.inst());
 
         setPermission(Permissions.EMOTES);
 

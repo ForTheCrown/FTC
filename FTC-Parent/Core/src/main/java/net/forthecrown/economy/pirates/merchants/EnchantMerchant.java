@@ -7,7 +7,7 @@ import com.google.gson.JsonPrimitive;
 import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.economy.Balances;
@@ -143,7 +143,7 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
         }
 
         daily.update(dailyData, random);
-        CrownCore.logger().info("Picking " + dailyData.getEnchantment().getKey().toString() + " as the daily enchantment");
+        ForTheCrown.logger().info("Picking " + dailyData.getEnchantment().getKey().toString() + " as the daily enchantment");
 
         if(day == 1 || day == 0) alreadyPicked.clear();
 
@@ -237,7 +237,7 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
         if(Pirates.getPirateEconomy().getEnchantMerchant().isAllowedToBuy(player.getUniqueId())) {
             player.openInventory(createInventory(UserManager.getUser(player)));
 
-            Bukkit.getPluginManager().registerEvents(new BmEnchantListener(player), CrownCore.inst());
+            Bukkit.getPluginManager().registerEvents(new BmEnchantListener(player), ForTheCrown.inst());
         } else {
             throw FtcExceptionProvider.translatable("pirates.enchants.alreadyBought", NamedTextColor.YELLOW);
         }

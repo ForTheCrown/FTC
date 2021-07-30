@@ -212,7 +212,7 @@ public interface CrownUser extends
     /**
      * Updates the display name of this user in the Tab List
      */
-    void updateDisplayName();
+    void updateTabName();
 
     /**
      * Gets the list display name of this user
@@ -618,7 +618,7 @@ public interface CrownUser extends
     }
 
     /**
-     * Same as {@link CrownUser#nickOrName()} except component
+     * Same as {@link CrownUser#getNickOrName()} except component
      * @return The user's nick or name
      */
     default Component nickOrName(){

@@ -1,7 +1,7 @@
 package net.forthecrown.commands.punishments;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -19,7 +19,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandMute extends FtcCommand implements TempPunisher {
     public CommandMute(){
-        super("mute", CrownCore.inst());
+        super("mute", ForTheCrown.inst());
 
         setPermission(Permissions.POLICE);
         register();
@@ -51,7 +51,7 @@ public class CommandMute extends FtcCommand implements TempPunisher {
     public int punish(CrownUser user, CommandSource source, long length, String reason) throws CommandSyntaxException {
         if(user.hasPermission(Permissions.MUTE_BYPASS)) throw FtcExceptionProvider.cannotMute(user);
 
-        PunishmentManager manager = CrownCore.getPunishmentManager();
+        PunishmentManager manager = ForTheCrown.getPunishmentManager();
 
         if(manager.checkMute(user.getPlayer()) == MuteStatus.HARD){
             manager.pardon(user.getUniqueId(), PunishmentType.MUTE);

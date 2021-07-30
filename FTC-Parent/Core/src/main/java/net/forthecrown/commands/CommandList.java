@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.CrownUser;
@@ -15,7 +15,7 @@ import java.util.Collection;
 
 public class CommandList extends FtcCommand {
     public CommandList(){
-        super("flist", CrownCore.inst());
+        super("flist", ForTheCrown.inst());
 
         setAliases("list", "elist", "playerlist");
         setPermission(Permissions.HELPER);

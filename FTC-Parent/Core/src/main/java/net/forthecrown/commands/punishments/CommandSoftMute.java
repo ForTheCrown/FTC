@@ -1,7 +1,7 @@
 package net.forthecrown.commands.punishments;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.admin.PunishmentManager;
@@ -20,7 +20,7 @@ import org.bukkit.command.ConsoleCommandSender;
 
 public class CommandSoftMute extends FtcCommand implements TempPunisher {
     public CommandSoftMute() {
-        super("softmute", CrownCore.inst());
+        super("softmute", ForTheCrown.inst());
 
         setPermission(Permissions.HELPER);
         register();
@@ -52,7 +52,7 @@ public class CommandSoftMute extends FtcCommand implements TempPunisher {
     public int punish(CrownUser user, CommandSource source, long length, String reason) throws CommandSyntaxException {
         if(user.hasPermission(Permissions.MUTE_BYPASS) && !source.is(ConsoleCommandSender.class)) throw FtcExceptionProvider.cannotMute(user);
 
-        PunishmentManager manager = CrownCore.getPunishmentManager();
+        PunishmentManager manager = ForTheCrown.getPunishmentManager();
 
         if(manager.checkMute(user.getPlayer()) == MuteStatus.SOFT){
             manager.pardon(user.getUniqueId(), PunishmentType.SOFT_MUTE);

@@ -3,10 +3,13 @@ package net.forthecrown.useables.actions;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
@@ -15,7 +18,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance> {
-    public static final Key KEY = Key.key(CrownCore.inst(), "teleport_user");
+    public static final Key KEY = Key.key(ForTheCrown.inst(), "teleport_user");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
@@ -55,7 +58,8 @@ public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance
 
         @Override
         public void onInteract(Player player) {
-            player.teleport(location);
+            CrownUser user = UserManager.getUser(player);
+            user.createTeleport(this::getLocation, true, true, UserTeleport.Type.TELEPORT);
         }
 
         @Override

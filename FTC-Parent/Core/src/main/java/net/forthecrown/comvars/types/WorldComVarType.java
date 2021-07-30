@@ -5,7 +5,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class WorldComVarType implements ComVarType<World> {
     public static final ComVarType<World> WORLD = new WorldComVarType();
-    private final Key key = CrownCore.coreKey("world_type");
+    private final Key key = ForTheCrown.coreKey("world_type");
 
     private WorldComVarType() {
         Registries.COMVAR_TYPES.register(key, this);

@@ -30,7 +30,7 @@ public final class WgFlags {
             registry.register(TRAPDOOR_USE);
             registry.register(RIDING_ALLOWED);
 
-            CrownCore.logger().info("FTC flags registered");
+            ForTheCrown.logger().info("FTC flags registered");
         } catch (FlagConflictException e){
             e.printStackTrace();
         }

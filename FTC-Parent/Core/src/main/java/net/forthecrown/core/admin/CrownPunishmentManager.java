@@ -3,7 +3,7 @@ package net.forthecrown.core.admin;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -29,7 +29,7 @@ public class CrownPunishmentManager extends AbstractJsonSerializer implements Pu
         super("punishments");
 
         reload();
-        CrownCore.logger().info("Punishment Manager loaded");
+        ForTheCrown.logger().info("Punishment Manager loaded");
     }
 
     @Override
@@ -158,7 +158,7 @@ public class CrownPunishmentManager extends AbstractJsonSerializer implements Pu
 
     @Override
     public void jail(Key key, Player player){
-        Bukkit.getPluginManager().registerEvents(new JailListener(player, getJailManager().get(key)), CrownCore.inst());
+        Bukkit.getPluginManager().registerEvents(new JailListener(player, getJailManager().get(key)), ForTheCrown.inst());
     }
 
     @Override

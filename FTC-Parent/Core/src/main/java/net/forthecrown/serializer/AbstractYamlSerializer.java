@@ -1,6 +1,6 @@
 package net.forthecrown.serializer;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractYamlSerializer implements CrownSerializer {
 
-    private static final Logger logger = CrownCore.logger();
+    private static final Logger logger = ForTheCrown.logger();
 
     protected final String fileName;
     protected final String directory;
@@ -45,12 +45,12 @@ public abstract class AbstractYamlSerializer implements CrownSerializer {
     }
 
     private void loadOrCreate(){
-        if(directory == null) file = new File(CrownCore.dataFolder(), fileName + ".yml");
-        else file = new File(CrownCore.dataFolder() + "/" + directory, fileName + ".yml");
+        if(directory == null) file = new File(ForTheCrown.dataFolder(), fileName + ".yml");
+        else file = new File(ForTheCrown.dataFolder() + "/" + directory, fileName + ".yml");
 
         //if the directory doesn't exist and it can't create it
         if(!file.getParentFile().exists() && !file.getParentFile().mkdirs())
-            logger.log(Level.SEVERE, "Failed to create " + fileName + " directory, at " + CrownCore.inst().getDataFolder() + "/" + directory);
+            logger.log(Level.SEVERE, "Failed to create " + fileName + " directory, at " + ForTheCrown.inst().getDataFolder() + "/" + directory);
 
         if(!file.exists()){
             fileDoesntExist = true;

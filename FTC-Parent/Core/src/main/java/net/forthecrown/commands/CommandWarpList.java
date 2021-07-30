@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.useables.warps.Warp;
@@ -15,7 +15,7 @@ import java.util.Collection;
 
 public class CommandWarpList extends FtcCommand {
     public CommandWarpList(){
-        super("warplist", CrownCore.inst());
+        super("warplist", ForTheCrown.inst());
 
         setPermission(Permissions.WARP);
         setAliases("warps");
@@ -34,7 +34,7 @@ public class CommandWarpList extends FtcCommand {
                     .append(Component.text(":").color(NamedTextColor.GRAY))
                     .color(NamedTextColor.GOLD);
 
-            WarpRegistry registry = CrownCore.getWarpRegistry();
+            WarpRegistry registry = ForTheCrown.getWarpRegistry();
             Collection<Warp> warps = player.hasPermission(Permissions.WARP_ADMIN) ?
                     registry.values() : registry.getUsableFor(player);
 

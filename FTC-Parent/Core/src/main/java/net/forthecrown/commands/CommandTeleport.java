@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -24,7 +24,7 @@ import java.util.Collection;
 
 public class CommandTeleport extends FtcCommand {
     public CommandTeleport(){
-        super("fteleport", CrownCore.inst());
+        super("fteleport", ForTheCrown.inst());
 
         setPermission(Permissions.HELPER);
         setAliases("tp", "teleport", "eteleport", "etp");

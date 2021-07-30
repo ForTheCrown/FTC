@@ -1,12 +1,12 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandPlayerTime extends FtcCommand {
     public CommandPlayerTime(){
-        super("playertime", CrownCore.inst());
+        super("playertime", ForTheCrown.inst());
 
         setAliases("ptime");
         register();

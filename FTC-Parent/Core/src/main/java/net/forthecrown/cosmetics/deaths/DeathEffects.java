@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics.deaths;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.cosmetics.CosmeticConstants;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.registry.Registries;
@@ -27,7 +27,7 @@ public class DeathEffects {
                 .build();
 
         Registries.DEATH_EFFECTS.close();
-        CrownCore.logger().info("Death Effects registered");
+        ForTheCrown.logger().info("Death Effects registered");
     }
 
     private static <T extends AbstractDeathEffect> T register(T effect){

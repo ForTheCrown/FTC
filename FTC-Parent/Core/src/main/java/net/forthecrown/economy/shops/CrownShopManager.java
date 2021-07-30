@@ -1,6 +1,6 @@
 package net.forthecrown.economy.shops;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 
@@ -16,7 +16,7 @@ public class CrownShopManager implements ShopManager{
         try {
             return new CrownSignShop(signShop);
         } catch (Exception e){
-            CrownCore.logger().severe(e.getMessage());
+            ForTheCrown.logger().severe(e.getMessage());
         }
 
         return null;

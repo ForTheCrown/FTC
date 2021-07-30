@@ -7,7 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.WorldArgument;
@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class CheckInWorld implements UsageCheck<CheckInWorld.CheckInstance> {
-    public static final Key KEY = Key.key(CrownCore.inst(), "in_world");
+    public static final Key KEY = Key.key(ForTheCrown.inst(), "in_world");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

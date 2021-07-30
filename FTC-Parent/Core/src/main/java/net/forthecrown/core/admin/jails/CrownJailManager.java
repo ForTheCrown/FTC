@@ -2,7 +2,7 @@ package net.forthecrown.core.admin.jails;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.events.dynamic.JailListener;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.utils.FtcUtils;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class CrownJailManager extends AbstractJsonSerializer implements JailManager {
-    private static final Key KEY = CrownCore.coreKey("jails");
+    private static final Key KEY = ForTheCrown.coreKey("jails");
 
     private final Map<Key, Location> jails = new HashMap<>();
     private final Map<Player, JailListener> onlineInJail = new HashMap<>();
@@ -24,7 +24,7 @@ public class CrownJailManager extends AbstractJsonSerializer implements JailMana
         super("jails");
         reload();
 
-        CrownCore.logger().info("Jails loaded");
+        ForTheCrown.logger().info("Jails loaded");
     }
 
     @Override

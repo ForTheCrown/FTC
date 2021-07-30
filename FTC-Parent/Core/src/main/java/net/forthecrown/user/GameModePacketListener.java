@@ -1,8 +1,8 @@
 package net.forthecrown.user;
 
 import io.netty.channel.*;
-import net.forthecrown.core.chat.Announcer;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
+import net.minecraft.world.level.GameType;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -27,10 +27,10 @@ public class GameModePacketListener {
     }
 
     private static class InjectorInstance {
-        private final Player player;
+        private final Player receiver;
 
         public InjectorInstance(Player player) {
-            this.player = player;
+            this.receiver = player;
 
             inject();
         }
@@ -41,13 +41,14 @@ public class GameModePacketListener {
                 public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
                     if(packet instanceof ClientboundPlayerInfoPacket) {
                         ClientboundPlayerInfoPacket infoPacket = (ClientboundPlayerInfoPacket) packet;
-                        if (infoPacket.getAction() == ClientboundPlayerInfoPacket.Action.UPDATE_GAME_MODE || infoPacket.getAction() == ClientboundPlayerInfoPacket.Action.ADD_PLAYER) {
+
+                        if (infoPacket.getAction() == ClientboundPlayerInfoPacket.Action.UPDATE_GAME_MODE) {
                             ListIterator<ClientboundPlayerInfoPacket.PlayerUpdate> iterator = infoPacket.getEntries().listIterator();
 
-                            Announcer.debug("Receiver: " + player.getName());
                             while (iterator.hasNext()) {
                                 ClientboundPlayerInfoPacket.PlayerUpdate u = iterator.next();
-                                if(!u.getProfile().getId().equals(player.getUniqueId())) return;
+                                if(u.getGameMode() != GameType.SPECTATOR) continue;
+                                if(!u.getProfile().getId().equals(receiver.getUniqueId())) return;
                             }
                         }
                     }
@@ -56,8 +57,8 @@ public class GameModePacketListener {
                 }
             };
 
-            ChannelPipeline pipeline = ((CraftPlayer) player).getHandle().connection.connection.channel.pipeline();
-            pipeline.addBefore("packet_handler", player.getName(), handler);
+            ChannelPipeline pipeline = ((CraftPlayer) receiver).getHandle().connection.connection.channel.pipeline();
+            pipeline.addBefore("packet_handler", receiver.getName(), handler);
         }
     }
 }

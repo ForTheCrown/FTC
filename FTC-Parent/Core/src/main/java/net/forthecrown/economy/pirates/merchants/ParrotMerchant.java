@@ -3,7 +3,7 @@ package net.forthecrown.economy.pirates.merchants;
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.events.dynamic.BmParrotListener;
@@ -114,7 +114,7 @@ public class ParrotMerchant implements UsablePirateNpc {
     @Override
     public void onUse(CrownUser user, Entity entity) {
         BmParrotListener listener = new BmParrotListener(user.getPlayer());
-        Bukkit.getPluginManager().registerEvents(listener, CrownCore.inst());
+        Bukkit.getPluginManager().registerEvents(listener, ForTheCrown.inst());
 
         user.getPlayer().openInventory(createInventory(user));
     }

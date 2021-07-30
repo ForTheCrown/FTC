@@ -13,6 +13,6 @@ public final class CrownEventUtils {
 
     public static boolean isNewRecord(Score record, int score){
         int recordInt = record.getScore();
-        return record.isScoreSet() || score > recordInt;
+        return !record.isScoreSet() || score > recordInt;
     }
 }

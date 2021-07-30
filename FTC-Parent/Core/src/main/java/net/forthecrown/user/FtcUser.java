@@ -2,14 +2,14 @@ package net.forthecrown.user;
 
 import io.papermc.paper.adventure.AdventureComponent;
 import it.unimi.dsi.fastutil.objects.*;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.JoinInfo;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.selling.UserSellResult;
@@ -77,7 +77,7 @@ import java.util.function.UnaryOperator;
 
 public class FtcUser implements CrownUser {
 
-    private final UUID base;
+    private final UUID uniqueId;
     public String name;
 
     public String lastOnlineName;
@@ -120,8 +120,8 @@ public class FtcUser implements CrownUser {
 
     private CommandSender lastMessage;
 
-    public FtcUser(@NotNull UUID base){
-        this.base = base;
+    public FtcUser(@NotNull UUID uniqueId){
+        this.uniqueId = uniqueId;
 
         dataContainer = new FtcUserDataContainer(this);
         interactions = new FtcUserInteractions(this);
@@ -131,20 +131,20 @@ public class FtcUser implements CrownUser {
 
         reload();
 
-        CrownUserManager.LOADED_USERS.put(base, this);
+        FtcUserManager.LOADED_USERS.put(uniqueId, this);
 
         if(isOnline()) handle = getOnlineHandle().getHandle();
     }
 
     @Override
     public void reload(){
-        CrownCore.getUserSerializer().deserialize(this);
+        ForTheCrown.getUserSerializer().deserialize(this);
         updateName(lastOnlineName);
     }
 
     @Override
     public void save(){
-        CrownCore.getUserSerializer().serialize(this);
+        ForTheCrown.getUserSerializer().serialize(this);
     }
 
     public void updateName(String name){
@@ -163,22 +163,22 @@ public class FtcUser implements CrownUser {
     @Override
     public void unload(){
         save();
-        CrownUserManager.LOADED_USERS.remove(this.getUniqueId());
+        FtcUserManager.LOADED_USERS.remove(this.getUniqueId());
         handle = null;
     }
 
     @Override
     public UUID getUniqueId() {
-        return base;
+        return uniqueId;
     }
 
     public CraftPlayer getOnlineHandle(){
-        return (CraftPlayer) Bukkit.getPlayer(base);
+        return (CraftPlayer) Bukkit.getPlayer(uniqueId);
     }
 
     //If you get this while the player is online, it causes a class cast exception, use only when actually offline lol
     public CraftOfflinePlayer getOfflineHandle(){
-        return (CraftOfflinePlayer) Bukkit.getOfflinePlayer(base);
+        return (CraftOfflinePlayer) Bukkit.getOfflinePlayer(uniqueId);
     }
 
     public ServerPlayer getHandle() {
@@ -221,7 +221,7 @@ public class FtcUser implements CrownUser {
     }
 
     private User getLuckPermsUser(){
-        UserManager manager = CrownCore.getLuckPerms().getUserManager();
+        UserManager manager = ForTheCrown.getLuckPerms().getUserManager();
         if(!manager.isLoaded(getUniqueId())) manager.loadUser(getUniqueId());
         return manager.getUser(getUniqueId());
     }
@@ -258,7 +258,7 @@ public class FtcUser implements CrownUser {
     public void setCanSwapBranch(boolean canSwapBranch, boolean addToCooldown) {
         setProperty(!canSwapBranch, UserProperty.CANNOT_SWAP_BRANCH);
 
-        if(addToCooldown) nextAllowedBranchSwap = System.currentTimeMillis() + CrownCore.getBranchSwapCooldown();
+        if(addToCooldown) nextAllowedBranchSwap = System.currentTimeMillis() + ForTheCrown.getBranchSwapCooldown();
         else nextAllowedBranchSwap = 0;
     }
 
@@ -397,7 +397,7 @@ public class FtcUser implements CrownUser {
         matData.clear();
         setTotalEarnings(0);
 
-        nextResetTime = System.currentTimeMillis() + CrownCore.getUserResetInterval();
+        nextResetTime = System.currentTimeMillis() + ForTheCrown.getUserResetInterval();
         System.out.println(getName() + " earnings reset, next reset in: " + (((((getNextResetTime() - System.currentTimeMillis())/1000)/60)/60)/24) + " days");
         save();
     }
@@ -497,14 +497,14 @@ public class FtcUser implements CrownUser {
 
     @Override
     public boolean isKing() {
-        Kingship king = CrownCore.getKingship();
+        Kingship king = ForTheCrown.getKingship();
         if(king.getUniqueId() != null) return king.getUniqueId().equals(getUniqueId());
         return false;
     }
 
     @Override
     public void delete() {
-        CrownCore.getUserSerializer().delete(getUniqueId());
+        ForTheCrown.getUserSerializer().delete(getUniqueId());
     }
 
     @Override
@@ -667,8 +667,8 @@ public class FtcUser implements CrownUser {
 
         if(lastTeleport != null) lastTeleport.interrupt(false);
 
-        if(CrownCore.getPunishmentManager().checkJailed(getPlayer())){
-            CrownCore.getJailManager().getListener(getPlayer()).unreg();
+        if(ForTheCrown.getPunishmentManager().checkJailed(getPlayer())){
+            ForTheCrown.getJailManager().getListener(getPlayer()).unreg();
         }
 
         lastLoad = System.currentTimeMillis();
@@ -687,9 +687,9 @@ public class FtcUser implements CrownUser {
             return true;
         }
 
-        if(isKing()) currentPrefix = CrownCore.getKingship().isFemale() ? Kingship.queenTitle() : Kingship.kingTitle();
+        if(isKing()) currentPrefix = ForTheCrown.getKingship().isFemale() ? Kingship.queenTitle() : Kingship.kingTitle();
 
-        getOnlineHandle().sendPlayerListHeader(CrownCore.getTabList().format());
+        getOnlineHandle().sendPlayerListHeader(ForTheCrown.getTabList().format());
 
         this.ip = getPlayer().getAddress().getHostString();
         updateVanished();
@@ -698,7 +698,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void onJoinLater(){
-        JoinInfo news = CrownCore.getJoinInfo();
+        JoinInfo news = ForTheCrown.getJoinInfo();
         if(news.shouldShow()) sendMessage(news.display());
 
         updateFlying();
@@ -706,16 +706,17 @@ public class FtcUser implements CrownUser {
 
         if(!hasPermission(Permissions.CORE_ADMIN)) setGodMode(false);
         updateGodMode();
-        updateDisplayName();
+        updateTabName();
 
         permsCheck();
         if(shouldResetEarnings()) resetEarnings();
 
         GameModePacketListener.inject(getPlayer());
+        setGameMode(getGameMode());
 
         lastLoad = System.currentTimeMillis();
 
-        PunishmentManager manager = CrownCore.getPunishmentManager();
+        PunishmentManager manager = ForTheCrown.getPunishmentManager();
         PunishmentEntry entry = manager.getEntry(getUniqueId());
         if(entry != null){
             PunishmentRecord record = entry.getCurrent(PunishmentType.JAIL);
@@ -723,7 +724,7 @@ public class FtcUser implements CrownUser {
 
             try {
                 Key key = FtcUtils.parseKey(record.extra);
-                CrownCore.getPunishmentManager().jail(key, getPlayer());
+                ForTheCrown.getPunishmentManager().jail(key, getPlayer());
             } catch (Exception ignored) {}
         }
     }
@@ -742,7 +743,7 @@ public class FtcUser implements CrownUser {
 
         if(interactions.marriedTo != null && isProfilePublic()){
             text
-                    .append(Component.text("Married to: ").append(net.forthecrown.user.UserManager.getUser(interactions.marriedTo).nickOrName()))
+                    .append(Component.text("Married to: ").append(interactions.marriedToUser().nickOrName()))
                     .append(Component.newline());
         }
 
@@ -768,12 +769,10 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public void updateDisplayName(){
+    public void updateTabName(){
         checkOnline();
         Component displayName = listDisplayName();
         getOnlineHandle().playerListName(displayName);
-
-        //net.forthecrown.user.UserManager.updateSpectatorTab();
     }
 
     @Override
@@ -798,7 +797,7 @@ public class FtcUser implements CrownUser {
     public void setCurrentPrefix(Component component){
         this.currentPrefix = component;
 
-        if(isOnline()) updateDisplayName();
+        if(isOnline()) updateTabName();
     }
 
     @Override
@@ -858,10 +857,10 @@ public class FtcUser implements CrownUser {
     @Override
     public void onTpComplete(){
         if(!lastTeleport.shouldBypassCooldown()){
-            long cooldownMillis = CrownCore.getTpCooldown() * 50;
+            long cooldownMillis = ForTheCrown.getTpCooldown() * 50;
             nextAllowedTeleport = System.currentTimeMillis() + cooldownMillis;
 
-            Cooldown.add(this, "Core_TeleportCooldown", CrownCore.getTpCooldown());
+            Cooldown.add(this, "Core_TeleportCooldown", ForTheCrown.getTpCooldown());
         }
 
         if(!lastTeleport.isCancelled()) lastTeleport.stop();
@@ -926,9 +925,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void setNickname(String nick) {
-        if(nick == null){
-            this.nickname = null;
-        }
+        if(nick == null) this.nickname = null;
         else setNickname(ChatUtils.convertString(nick, false));
     }
 
@@ -970,7 +967,7 @@ public class FtcUser implements CrownUser {
         this.afk = afk;
 
         if(isOnline()){
-            updateDisplayName();
+            updateTabName();
             updateAfk();
         }
     }
@@ -991,8 +988,6 @@ public class FtcUser implements CrownUser {
         checkOnline();
 
         getOnlineHandle().setGameMode(gameMode.bukkit);
-
-        //net.forthecrown.user.UserManager.updateSpectatorTab();
     }
 
     @Override
@@ -1003,8 +998,8 @@ public class FtcUser implements CrownUser {
             if(u.hasPermission(Permissions.VANISH_SEE)) continue;
             if(u.equals(this)) continue;
 
-            if(isVanished()) u.getPlayer().hidePlayer(CrownCore.inst(), getPlayer());
-            else u.getPlayer().showPlayer(CrownCore.inst(), getPlayer());
+            if(isVanished()) u.getPlayer().hidePlayer(ForTheCrown.inst(), getPlayer());
+            else u.getPlayer().showPlayer(ForTheCrown.inst(), getPlayer());
         }
     }
 
@@ -1014,7 +1009,7 @@ public class FtcUser implements CrownUser {
 
         if(afk){
             afkListener = new AfkListener(this);
-            Bukkit.getPluginManager().registerEvents(afkListener, CrownCore.inst());
+            Bukkit.getPluginManager().registerEvents(afkListener, ForTheCrown.inst());
         } else {
             if(afkListener != null) HandlerList.unregisterAll(afkListener);
             afkListener = null;
@@ -1186,7 +1181,7 @@ public class FtcUser implements CrownUser {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof FtcUser)) return false;
         FtcUser user = (FtcUser) o;
         return user.getUniqueId().equals(getUniqueId());
     }
@@ -1194,7 +1189,7 @@ public class FtcUser implements CrownUser {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(base)
+                .append(uniqueId)
                 .append(getBranch())
                 .append(getGems())
                 .append(properties)
@@ -1209,8 +1204,8 @@ public class FtcUser implements CrownUser {
 
     @Override
     public String toString() {
-        return getClass().getName() + "{" +
-                "base=" + base +
+        return getClass().getSimpleName() + '{' +
+                "UUID=" + uniqueId +
                 ",name='" + name + '\'' +
                 '}';
     }

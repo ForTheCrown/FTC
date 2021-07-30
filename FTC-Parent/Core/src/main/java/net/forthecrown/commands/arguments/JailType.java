@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.CommandSource;
@@ -28,7 +28,7 @@ public class JailType implements ArgumentType<Key> {
     }
 
     public static Location getJailLocation(CommandContext<CommandSource> c, String argument){
-        return CrownCore.getJailManager().get(c.getArgument(argument, Key.class));
+        return ForTheCrown.getJailManager().get(c.getArgument(argument, Key.class));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class JailType implements ArgumentType<Key> {
         int cursor = reader.getCursor();
         Key key = FtcUtils.parseKey(reader);
 
-        if(!CrownCore.getJailManager().contains(key)){
+        if(!ForTheCrown.getJailManager().contains(key)){
             throw UNKNOWN_JAIL.createWithContext(GrenadierUtils.correctReader(reader, cursor), key.asString());
         }
 
@@ -45,6 +45,6 @@ public class JailType implements ArgumentType<Key> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return FtcSuggestionProvider.suggestKeysNoNamespace(builder, CrownCore.getJailManager().keySet());
+        return FtcSuggestionProvider.suggestKeysNoNamespace(builder, ForTheCrown.getJailManager().keySet());
     }
 }

@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.chat.ChatFormatter;
@@ -16,7 +16,7 @@ import java.lang.management.ManagementFactory;
 
 public class CommandMemory extends FtcCommand {
     public CommandMemory(){
-        super("memory", CrownCore.inst());
+        super("memory", ForTheCrown.inst());
 
         setAliases("mem");
         setPermission(Permissions.HELPER);

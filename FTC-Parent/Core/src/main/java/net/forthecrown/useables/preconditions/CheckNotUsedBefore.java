@@ -3,7 +3,7 @@ package net.forthecrown.useables.preconditions;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
@@ -19,7 +19,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class CheckNotUsedBefore implements UsageCheck<CheckNotUsedBefore.CheckInstance> {
-    public static final Key KEY = Key.key(CrownCore.inst(), "not_used_before");
+    public static final Key KEY = Key.key(ForTheCrown.inst(), "not_used_before");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

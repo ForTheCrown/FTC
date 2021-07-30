@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.useables.warps.Warp;
@@ -28,7 +28,7 @@ public class WarpType implements ArgumentType<Key> {
     }
 
     public static Warp getWarp(CommandContext<CommandSource> c, String argument){
-        return CrownCore.getWarpRegistry().get(c.getArgument(argument, Key.class));
+        return ForTheCrown.getWarpRegistry().get(c.getArgument(argument, Key.class));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class WarpType implements ArgumentType<Key> {
         int cursor = reader.getCursor();
         Key key = CoreCommands.ftcKeyType().parse(reader);
 
-        if(!CrownCore.getWarpRegistry().contains(key)) throw UNKNOWN_WARP.createWithContext(GrenadierUtils.correctReader(reader, cursor), key.value());
+        if(!ForTheCrown.getWarpRegistry().contains(key)) throw UNKNOWN_WARP.createWithContext(GrenadierUtils.correctReader(reader, cursor), key.value());
 
         return key;
     }
@@ -47,10 +47,10 @@ public class WarpType implements ArgumentType<Key> {
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, boolean ignoreChecks){
-        if(ignoreChecks) return FtcSuggestionProvider.suggestRegistry(builder, CrownCore.getWarpRegistry());
+        if(ignoreChecks) return FtcSuggestionProvider.suggestRegistry(builder, ForTheCrown.getWarpRegistry());
 
         try {
-            return CrownCore.getWarpRegistry().getSuggestions((CommandContext<CommandSource>) context, builder);
+            return ForTheCrown.getWarpRegistry().getSuggestions((CommandContext<CommandSource>) context, builder);
         } catch (CommandSyntaxException e) {
             return Suggestions.empty();
         }

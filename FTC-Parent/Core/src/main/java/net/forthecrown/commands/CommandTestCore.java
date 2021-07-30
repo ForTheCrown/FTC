@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -10,7 +10,7 @@ import net.forthecrown.user.CrownUser;
 public class CommandTestCore extends FtcCommand {
 
     public CommandTestCore(){
-        super("coretest", CrownCore.inst());
+        super("coretest", ForTheCrown.inst());
 
         setAliases("testcore");
         setPermission(Permissions.CORE_ADMIN);

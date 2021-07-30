@@ -31,6 +31,8 @@ public class PinataEvent implements CrownEvent<AugustEntry> {
         entry.player().teleport(EventConstants.EXIT);
         entry.inEventListener().unregister();
 
+        EventUtil.killAllBebes();
+
         currentEntry = null;
         AugustPlugin.reporter.logExit(entry.player());
     }
@@ -43,9 +45,9 @@ public class PinataEvent implements CrownEvent<AugustEntry> {
         TextComponent.Builder builder = Component.text();
 
         if(CrownEventUtils.isNewRecord(record, entry.score())) {
-            builder.append(Component.text("New record!").color(NamedTextColor.GOLD));
+            builder.append(Component.text("You got a new record!").color(NamedTextColor.GOLD));
             record.setScore(entry.score());
-        } else builder.append(Component.text("Better luck next time!"));
+        } else builder.append(Component.text("Better luck next time! :("));
 
         entry.player().sendMessage(
                 builder.append(Component.text(" Score: ")

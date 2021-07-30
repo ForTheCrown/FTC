@@ -1,6 +1,6 @@
 package net.forthecrown.user.data;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.chat.ChatFormatter;
@@ -29,7 +29,7 @@ public class DirectMessage {
         this.input = input;
 
         formattedText = ChatFormatter.formatIfAllowed(input, sender.asBukkit());
-        muteStatus = CrownCore.getPunishmentManager().checkMute(sender.asBukkit());
+        muteStatus = ForTheCrown.getPunishmentManager().checkMute(sender.asBukkit());
     }
 
     public CommandSource getSender() {

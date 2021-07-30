@@ -1,6 +1,6 @@
 package net.forthecrown.user.data;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.user.CrownUser;
@@ -33,7 +33,7 @@ public class MarriageMessage {
         this.recipient = recipient;
         this.input = input;
         this.formatted = ChatFormatter.formatIfAllowed(input, sender.getPlayer());
-        status = CrownCore.getPunishmentManager().checkMute(sender.getPlayer());
+        status = ForTheCrown.getPunishmentManager().checkMute(sender.getPlayer());
     }
 
     public void complete(){

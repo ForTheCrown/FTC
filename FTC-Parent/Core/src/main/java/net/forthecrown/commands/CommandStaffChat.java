@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -13,7 +13,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 public class CommandStaffChat extends FtcCommand {
 
     public CommandStaffChat(){
-        super("staffchat", CrownCore.inst());
+        super("staffchat", ForTheCrown.inst());
 
         setPermission(Permissions.STAFF_CHAT);
         setAliases("sc");

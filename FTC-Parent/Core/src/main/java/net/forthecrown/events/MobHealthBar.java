@@ -1,6 +1,6 @@
 package net.forthecrown.events;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
@@ -49,7 +49,7 @@ public class MobHealthBar implements Listener {
                 hitmobs.remove(damaged);
             }
         };
-        runnable.runTaskLater(CrownCore.inst(), 5*20); //Start new delay
+        runnable.runTaskLater(ForTheCrown.inst(), 5*20); //Start new delay
         hitmobs.put(damaged, runnable); //Put delay in map
     }
 

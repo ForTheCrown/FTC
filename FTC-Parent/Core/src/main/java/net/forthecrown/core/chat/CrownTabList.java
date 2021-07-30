@@ -1,7 +1,7 @@
 package net.forthecrown.core.chat;
 
 import com.google.gson.JsonObject;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,7 +18,7 @@ public class CrownTabList extends AbstractJsonSerializer implements TabList {
         super("tab_list");
 
         reload();
-        CrownCore.logger().info("Tab list loaded");
+        ForTheCrown.logger().info("Tab list loaded");
     }
 
     @Override

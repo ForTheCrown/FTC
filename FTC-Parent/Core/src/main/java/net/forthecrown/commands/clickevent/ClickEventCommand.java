@@ -1,7 +1,7 @@
 package net.forthecrown.commands.clickevent;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class ClickEventCommand extends FtcCommand {
 
     public ClickEventCommand(){
-        super("npcconverse", CrownCore.inst());
+        super("npcconverse", ForTheCrown.inst());
         setDescription("The Command used by the ClickEventManager to execute code ran by clickable text");register();
         register();
     }

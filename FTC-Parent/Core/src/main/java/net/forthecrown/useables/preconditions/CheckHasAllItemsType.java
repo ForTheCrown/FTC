@@ -3,7 +3,7 @@ package net.forthecrown.useables.preconditions;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class CheckHasAllItemsType implements UsageCheck<CheckHasAllItemsType.CheckInstance> {
-    public static final Key KEY = CrownCore.coreKey("has_all_items");
+    public static final Key KEY = ForTheCrown.coreKey("has_all_items");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

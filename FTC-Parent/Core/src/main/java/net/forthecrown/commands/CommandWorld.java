@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserType;
@@ -14,7 +14,7 @@ import org.bukkit.World;
 
 public class CommandWorld extends FtcCommand {
     public CommandWorld(){
-        super("world", CrownCore.inst());
+        super("world", ForTheCrown.inst());
 
         setPermission(Permissions.HELPER);
         register();

@@ -1,6 +1,6 @@
 package net.forthecrown.events.dynamic;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.user.UserManager;
@@ -26,8 +26,8 @@ public class JailListener implements Listener {
         this.player = player;
         this.jail = jail;
 
-        record = CrownCore.getPunishmentManager().getEntry(player.getUniqueId()).getCurrent(PunishmentType.JAIL);
-        CrownCore.getJailManager().addListener(this);
+        record = ForTheCrown.getPunishmentManager().getEntry(player.getUniqueId()).getCurrent(PunishmentType.JAIL);
+        ForTheCrown.getJailManager().addListener(this);
 
         checkDistance();
     }
@@ -38,7 +38,7 @@ public class JailListener implements Listener {
         if(player.getLocation().distance(jail) > 7.5) player.teleport(jail);
     }
     public boolean checkJailed(){
-        if(CrownCore.getPunishmentManager().checkJailed(player)) return true;
+        if(ForTheCrown.getPunishmentManager().checkJailed(player)) return true;
 
         release();
         return false;
@@ -46,7 +46,7 @@ public class JailListener implements Listener {
 
     public void unreg(){
         HandlerList.unregisterAll(this);
-        CrownCore.getJailManager().removeListener(this);
+        ForTheCrown.getJailManager().removeListener(this);
     }
 
     public void release(){

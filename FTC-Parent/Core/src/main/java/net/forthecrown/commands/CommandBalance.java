@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.economy.Balances;
@@ -13,7 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class CommandBalance extends FtcCommand {
 
     public CommandBalance() {
-        super("balance", CrownCore.inst());
+        super("balance", ForTheCrown.inst());
 
         setAliases("bal", "cash", "money", "ebal", "ebalance", "emoney");
         setDescription("Displays a player's balance");
@@ -44,7 +44,7 @@ public class CommandBalance extends FtcCommand {
     }
 
     private int showBal(CommandSource sender, CrownUser user){
-        Balances balances = CrownCore.getBalances();
+        Balances balances = ForTheCrown.getBalances();
         boolean senderIsUser = user.getName().equals(sender.textName());
         Component formatted = Balances.formatted(balances.get(user.getUniqueId())).color(NamedTextColor.GOLD);
 

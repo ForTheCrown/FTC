@@ -1,6 +1,6 @@
 package net.forthecrown.commands.marriage;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -15,7 +15,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class CommandMarriageChatToggle extends FtcCommand {
 
     public CommandMarriageChatToggle() {
-        super("marriagechattoggle", CrownCore.inst());
+        super("marriagechattoggle", ForTheCrown.inst());
 
         setDescription("Toggle all your chat messages being sent to marriage chat");
         setPermission(Permissions.MARRY);

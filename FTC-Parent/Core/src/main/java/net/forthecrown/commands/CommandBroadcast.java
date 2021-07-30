@@ -2,14 +2,14 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandBroadcast extends FtcCommand {
 
     public CommandBroadcast(){
-        super("broadcast", CrownCore.inst());
+        super("broadcast", ForTheCrown.inst());
 
         setDescription("Broadcasts a message to the entire server.");
         setAliases("announce", "bc", "ac");
@@ -38,7 +38,7 @@ public class CommandBroadcast extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(CommandLore.compOrStringArg(literal("ac"), (c, b) -> Suggestions.empty(), ((context, lore) -> {
-                    CrownCore.getAnnouncer().announce(lore);
+                    ForTheCrown.getAnnouncer().announce(lore);
                     return 0;
                 })));
     }

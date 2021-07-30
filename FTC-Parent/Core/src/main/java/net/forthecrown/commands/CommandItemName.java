@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.chat.ChatUtils;
@@ -16,7 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class CommandItemName extends FtcCommand {
     public CommandItemName(){
-        super("itemname", CrownCore.inst());
+        super("itemname", ForTheCrown.inst());
 
         setAliases("itemrename", "nameitem", "renameitem");
         register();

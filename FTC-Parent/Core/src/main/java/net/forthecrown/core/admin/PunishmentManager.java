@@ -1,7 +1,7 @@
 package net.forthecrown.core.admin;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.admin.jails.JailManager;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
@@ -44,6 +44,6 @@ public interface PunishmentManager extends CrownSerializer {
     void pardon(UUID id, PunishmentType type) throws CommandSyntaxException;
 
     default JailManager getJailManager(){
-        return CrownCore.getJailManager();
+        return ForTheCrown.getJailManager();
     }
 }

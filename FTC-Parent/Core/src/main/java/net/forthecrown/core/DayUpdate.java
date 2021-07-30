@@ -12,7 +12,7 @@ public class DayUpdate {
 
     DayUpdate(byte day) {
         this.day = day;
-        CrownCore.logger().info("DayUpdate loaded");
+        ForTheCrown.logger().info("DayUpdate loaded");
     }
 
     public void checkDay(){
@@ -21,14 +21,14 @@ public class DayUpdate {
     }
 
     public void update(){
-        CrownCore.logger().info("Updating date");
+        ForTheCrown.logger().info("Updating date");
         setDay((byte) Calendar.getInstance(FtcUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK));
 
         listeners.forEach(r -> {
             try {
                 r.run();
             } catch (Exception e){
-                CrownCore.logger().severe("Could not update date of " + r.getClass().getSimpleName());
+                ForTheCrown.logger().severe("Could not update date of " + r.getClass().getSimpleName());
                 e.printStackTrace();
             }
         });
@@ -44,7 +44,7 @@ public class DayUpdate {
 
     public void setDay(byte day) {
         this.day = day;
-        CrownCore.config().set("Day", day);
+        ForTheCrown.config().set("Day", day);
     }
 
     public List<Runnable> getListeners() {

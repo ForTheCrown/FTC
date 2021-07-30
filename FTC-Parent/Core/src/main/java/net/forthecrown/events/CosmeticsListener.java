@@ -1,7 +1,7 @@
 package net.forthecrown.events;
 
 import com.destroystokyo.paper.ParticleBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
@@ -48,7 +48,7 @@ public class CosmeticsListener implements Listener {
         private final ParticleBuilder builder;
 
         public ArrowScheduler(Arrow arrow, Player player, ArrowEffect effect){
-            this.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(CrownCore.inst(), this, 1, 1);
+            this.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(ForTheCrown.inst(), this, 1, 1);
 
             this.arrow = arrow;
 

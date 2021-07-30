@@ -1,6 +1,6 @@
 package net.forthecrown.serializer;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 public abstract class AbstractNbtSerializer implements CrownSerializer {
-    private static final Logger logger = CrownCore.logger();
+    private static final Logger logger = ForTheCrown.logger();
 
     private final File file;
 

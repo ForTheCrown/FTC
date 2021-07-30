@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.CrownUser;
@@ -11,7 +11,7 @@ import org.bukkit.Location;
 
 public class CommandTop extends FtcCommand {
     public CommandTop(){
-        super("top", CrownCore.inst());
+        super("top", ForTheCrown.inst());
 
         setPermission(Permissions.CORE_ADMIN);
         register();

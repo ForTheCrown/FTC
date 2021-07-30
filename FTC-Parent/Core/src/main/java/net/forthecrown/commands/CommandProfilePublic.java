@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -10,7 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class CommandProfilePublic extends FtcCommand {
 
     protected CommandProfilePublic(CommandProfile command) {
-        super("profilepublic", CrownCore.inst());
+        super("profilepublic", ForTheCrown.inst());
 
         setPermission(command.getPermission());
         setAliases("publicprofile");

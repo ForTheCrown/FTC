@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -11,7 +11,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandTpaAccept extends FtcCommand {
     public CommandTpaAccept(){
-        super("tpaccept", CrownCore.inst());
+        super("tpaccept", ForTheCrown.inst());
 
         setPermission(Permissions.TPA);
         setDescription("Accepts a tpa request");

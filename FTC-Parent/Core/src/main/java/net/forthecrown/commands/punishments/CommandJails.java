@@ -3,7 +3,7 @@ package net.forthecrown.commands.punishments;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.JailType;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -20,7 +20,7 @@ import org.bukkit.Location;
 
 public class CommandJails extends FtcCommand {
     public CommandJails(){
-        super("jails", CrownCore.inst());
+        super("jails", ForTheCrown.inst());
 
         setPermission(Permissions.CORE_ADMIN);
         register();
@@ -68,7 +68,7 @@ public class CommandJails extends FtcCommand {
                                 .executes(c -> {
                                     CommandSource source = c.getSource();
                                     Key key = get(c);
-                                    Location l = CrownCore.getJailManager().get(key);
+                                    Location l = ForTheCrown.getJailManager().get(key);
 
                                     source.sendMessage(
                                             Component.text("Location of ")
@@ -86,7 +86,7 @@ public class CommandJails extends FtcCommand {
                                             Key key = get(c);
                                             Location l = c.getArgument("pos", Position.class).getLocation(source);
 
-                                            CrownCore.getJailManager().register(key, l);
+                                            ForTheCrown.getJailManager().register(key, l);
                                             source.sendAdmin(
                                                     Component.text("Set location of ")
                                                             .color(NamedTextColor.GRAY)
@@ -104,7 +104,7 @@ public class CommandJails extends FtcCommand {
                                     CommandSource source = c.getSource();
                                     Key key = get(c);
 
-                                    CrownCore.getJailManager().remove(key);
+                                    ForTheCrown.getJailManager().remove(key);
 
                                     source.sendAdmin(
                                             Component.text("Deleted jail ")
@@ -127,7 +127,7 @@ public class CommandJails extends FtcCommand {
         loc.setYaw(yaw);
         loc.setPitch(pitch);
 
-        CrownCore.getJailManager().register(key, loc);
+        ForTheCrown.getJailManager().register(key, loc);
 
         source.sendAdmin(
                 Component.text("Created jail ")

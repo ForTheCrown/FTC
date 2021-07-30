@@ -18,7 +18,7 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
         super(base);
         this.mainID = main;
         this.main = UserManager.getUser(main);
-        CrownUserManager.LOADED_ALTS.put(base, this);
+        FtcUserManager.LOADED_ALTS.put(base, this);
     }
 
     @Override

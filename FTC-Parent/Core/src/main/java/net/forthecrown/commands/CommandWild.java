@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.utils.Cooldown;
@@ -27,7 +27,7 @@ import java.util.Collection;
 public class CommandWild extends FtcCommand {
 
     public CommandWild(){
-        super("wild", CrownCore.inst());
+        super("wild", ForTheCrown.inst());
 
         setPermission(Permissions.DEFAULT);
         setDescription("Puts you in the wild, only available in the Resource World");

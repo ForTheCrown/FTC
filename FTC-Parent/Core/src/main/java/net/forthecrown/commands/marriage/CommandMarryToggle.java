@@ -1,6 +1,6 @@
 package net.forthecrown.commands.marriage;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.CrownUser;
@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class CommandMarryToggle extends FtcCommand {
 
     public CommandMarryToggle() {
-        super("marrytoggle", CrownCore.inst());
+        super("marrytoggle", ForTheCrown.inst());
 
         setPermission(Permissions.MARRY);
         setDescription("Toggle people being able to propose to you lol");

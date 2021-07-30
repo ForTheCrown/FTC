@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.user.CrownUser;
@@ -12,7 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class CommandGems extends FtcCommand {
 
     public CommandGems(){
-        super("gems", CrownCore.inst());
+        super("gems", ForTheCrown.inst());
 
         setDescription("Shows the amount of gems you have or another player has.");
         register();

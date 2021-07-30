@@ -1,6 +1,6 @@
 package net.forthecrown.events;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.economy.shops.ShopInventory;
 import net.forthecrown.economy.shops.ShopManager;
@@ -30,7 +30,7 @@ public class SignInteractEvent implements Listener {
         if(Cooldown.contains(event.getPlayer())) return;
         Cooldown.add(event.getPlayer(), 6);
 
-        SignShop shop = CrownCore.getShopManager().getShop(event.getClickedBlock().getLocation());
+        SignShop shop = ForTheCrown.getShopManager().getShop(event.getClickedBlock().getLocation());
         if(shop == null) return;
 
         Player player = event.getPlayer();
@@ -41,12 +41,12 @@ public class SignInteractEvent implements Listener {
         //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it
         if(player.isSneaking() && (shop.getOwner().equals(player.getUniqueId()) || player.hasPermission(Permissions.CORE_ADMIN))){
             player.openInventory(shop.getInventory());
-            Bukkit.getPluginManager().registerEvents(new SignShopInteractSubClass(player, shop), CrownCore.inst());
+            Bukkit.getPluginManager().registerEvents(new SignShopInteractSubClass(player, shop), ForTheCrown.inst());
             return;
         }
 
         //Call the event
-        new SignShopUseEvent(shop, UserManager.getUser(player), player, CrownCore.getBalances()).callEvent();
+        new SignShopUseEvent(shop, UserManager.getUser(player), player, ForTheCrown.getBalances()).callEvent();
     }
 
     public class SignShopInteractSubClass implements Listener {

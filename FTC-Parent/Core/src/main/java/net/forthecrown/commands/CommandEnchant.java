@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -23,7 +23,7 @@ import java.util.List;
 
 public class CommandEnchant extends FtcCommand {
     public CommandEnchant(){
-        super("enchant", CrownCore.inst());
+        super("enchant", ForTheCrown.inst());
 
         setPermission(Permissions.CORE_ADMIN);
         register();

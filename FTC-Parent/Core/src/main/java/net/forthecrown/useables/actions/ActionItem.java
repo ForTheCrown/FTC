@@ -3,7 +3,7 @@ package net.forthecrown.useables.actions;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.InteractionUtils;
 import net.forthecrown.utils.JsonUtils;
@@ -13,8 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionItem implements UsageAction<ActionItem.ActionInstance> {
-    public static final Key ADD_KEY = Key.key(CrownCore.inst(), "give_item");
-    public static final Key REMOVE_KEY = Key.key(CrownCore.inst(), "remove_item");
+    public static final Key ADD_KEY = Key.key(ForTheCrown.inst(), "give_item");
+    public static final Key REMOVE_KEY = Key.key(ForTheCrown.inst(), "remove_item");
 
     private final boolean add;
 

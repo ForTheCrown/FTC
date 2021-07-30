@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
@@ -33,7 +33,7 @@ import java.util.function.Function;
 public class CommandProfile extends FtcCommand {
 
     public CommandProfile(){
-        super("profile", CrownCore.inst());
+        super("profile", ForTheCrown.inst());
 
         new CommandProfilePublic(this);
         new CommandProfilePrivate(this);
@@ -100,7 +100,7 @@ public class CommandProfile extends FtcCommand {
         Objective crown = profile.getScoreboard().getObjective("crown");
         Score crownScr = crown.getScore(profile.getName());
 
-        Component scrDisplay = Component.text(CrownCore.isEventTimed() ? EventTimer.getTimerCounter(crownScr.getScore()).toString() : crownScr.getScore() + "");
+        Component scrDisplay = Component.text(ForTheCrown.isEventTimed() ? EventTimer.getTimerCounter(crownScr.getScore()).toString() : crownScr.getScore() + "");
         Component marriedTo = marriedMessage(profile);
 
         //Footer size roughly lines up with header size
@@ -124,10 +124,10 @@ public class CommandProfile extends FtcCommand {
                 .append(line("Married to", marriedTo, marriedTo != null))
 
                 .append(line("Pirate Points", score.getScore() + "", score.isScoreSet() && score.getScore() != 0))
-                .append(line("Crown score", scrDisplay, crownScr.isScoreSet() && crownScr.getScore() > 0 && CrownCore.isEventActive()))
+                .append(line("Crown score", scrDisplay, crownScr.isScoreSet() && crownScr.getScore() > 0 && ForTheCrown.isEventActive()))
 
                 .append(line("Gems", profile.getGems() + "", profile.getGems() > 0))
-                .append(line("Balance", Balances.formatted(CrownCore.getBalances().get(profile.getUniqueId())), true))
+                .append(line("Balance", Balances.formatted(ForTheCrown.getBalances().get(profile.getUniqueId())), true))
 
                 .append(adminInfo(user, profile))
 
@@ -161,7 +161,7 @@ public class CommandProfile extends FtcCommand {
         if(!sender.hasPermission(Permissions.PROFILE_BYPASS)) return Component.empty();
         FtcUser profile = (FtcUser) profile1;
 
-        PunishmentManager list = CrownCore.getPunishmentManager();
+        PunishmentManager list = ForTheCrown.getPunishmentManager();
         PunishmentEntry entry = list.getEntry(profile.getUniqueId());
 
         Component locMessage = profile.getLocation() == null ? null : ChatFormatter.clickableLocationMessage(profile.getLocation(), true);

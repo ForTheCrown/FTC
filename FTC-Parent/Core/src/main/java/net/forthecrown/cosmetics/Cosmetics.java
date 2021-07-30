@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.cosmetics.arrows.ArrowEffects;
 import net.forthecrown.cosmetics.deaths.DeathEffects;
 import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
@@ -18,7 +18,7 @@ public final class Cosmetics {
         ArrowEffects.init();
         DeathEffects.init();
 
-        CrownCore.logger().info("Cosmetics loaded");
+        ForTheCrown.logger().info("Cosmetics loaded");
     }
 
     public static void shutDown(){

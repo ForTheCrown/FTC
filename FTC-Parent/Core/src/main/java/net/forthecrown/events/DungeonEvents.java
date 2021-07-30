@@ -2,7 +2,7 @@ package net.forthecrown.events;
 
 import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.Bosses;
@@ -86,7 +86,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
                 hit.remove(dummy);
             }
         };
-        runnable.runTaskLater(CrownCore.inst(), 100);
+        runnable.runTaskLater(ForTheCrown.inst(), 100);
         hit.put(dummy, runnable);
     }
 
@@ -133,12 +133,12 @@ public class DungeonEvents implements Listener, ClickEventTask {
 
         switch (name) {
             case "Right Click Me!" -> player.sendMessage(Component.text()
-                    .append(CrownCore.prefix().color(NamedTextColor.AQUA))
+                    .append(ForTheCrown.prefix().color(NamedTextColor.AQUA))
                     .append(Component.text("Right clicking this will show you a list of items needed to spawn the level's boss"))
                     .build()
             );
             case "Right Click to Spawn" -> player.sendMessage(Component.text()
-                    .append(CrownCore.prefix().color(NamedTextColor.AQUA))
+                    .append(ForTheCrown.prefix().color(NamedTextColor.AQUA))
                     .append(Component.text("If you have all the required items, using this, will spawn the boss"))
                     .build()
             );
@@ -166,7 +166,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
             player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1.2f);
             player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
             for (int i = 0; i <= 5; i++) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> player.getWorld().spawnParticle(Particle.TOTEM, player.getLocation().getX(), player.getLocation().getY()+2, player.getLocation().getZ(), 30, 0.2d, 0.1d, 0.2d, 0.275d), i*5L);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> player.getWorld().spawnParticle(Particle.TOTEM, player.getLocation().getX(), player.getLocation().getY()+2, player.getLocation().getZ(), 30, 0.2d, 0.1d, 0.2d, 0.275d), i*5L);
             }
             CrownUser user = UserManager.getUser(player);
             if(user.getBranch() == Branch.DEFAULT || user.getBranch() == Branch.ROYALS || !user.hasRank(Rank.KNIGHT)){
@@ -213,7 +213,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
             if (event.getEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() == 75d) {
                 Location spawnLoc =  event.getEntity().getLocation();
 
-                Bukkit.getScheduler().scheduleSyncDelayedTask(CrownCore.inst(), () -> {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(ForTheCrown.inst(), () -> {
                     for (int i = 0; i <= 2; i++) {
                         CaveSpider caveSpider = spawnLoc.getWorld().spawn(spawnLoc.add(new Vector(0.2*i*Math.pow(-1, i), i*0.1, 0.2*i*Math.pow(-1, i))), CaveSpider.class);
                         caveSpider.setLootTable(LootTables.EMPTY.getLootTable());

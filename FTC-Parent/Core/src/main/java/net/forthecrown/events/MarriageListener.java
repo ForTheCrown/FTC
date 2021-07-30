@@ -4,7 +4,7 @@ import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -118,7 +118,7 @@ public class MarriageListener implements Listener, ClickEventTask {
                         Component.translatable("marriage.priestText.married", target.nickDisplayName().color(NamedTextColor.YELLOW)).color(NamedTextColor.GOLD)
                 );
 
-                CrownCore.getAnnouncer().announceToAll(
+                ForTheCrown.getAnnouncer().announceToAll(
                         Component.text()
                                 .append(user.nickDisplayName())
                                 .append(Component.text(" is now married to "))

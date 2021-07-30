@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics.arrows;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.cosmetics.CosmeticConstants;
@@ -35,7 +35,7 @@ public class ArrowEffect implements CosmeticEffect {
         this.description = description;
         this.slot = slot;
 
-        this.key = CrownCore.coreKey(name.toLowerCase().replaceAll(" ", "_").replaceAll("'", ""));
+        this.key = ForTheCrown.coreKey(name.toLowerCase().replaceAll(" ", "_").replaceAll("'", ""));
     }
 
     ArrowEffect(int slot, Particle particle, String name, String desc){

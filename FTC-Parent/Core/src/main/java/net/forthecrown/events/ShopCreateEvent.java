@@ -4,7 +4,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.CrownException;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.WgFlags;
@@ -85,10 +85,10 @@ public class ShopCreateEvent implements Listener {
             ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(wgPlayer.getLocation());
             if(!set.testState(wgPlayer, WgFlags.SHOP_CREATION) && !player.hasPermission("ftc.admin")) throw new CrownException(player, "&c&lHey! &7Shop creation is disabled here");
 
-            SignShop shop = CrownCore.getShopManager().createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
+            SignShop shop = ForTheCrown.getShopManager().createSignShop(sign.getLocation(), shopType, price, player.getUniqueId()); //creates the signshop file
 
             player.openInventory(shop.getExampleInventory());
-            CrownCore.inst().getServer().getPluginManager().registerEvents(new SignShopSubClass1(player, shop), CrownCore.inst());
+            ForTheCrown.inst().getServer().getPluginManager().registerEvents(new SignShopSubClass1(player, shop), ForTheCrown.inst());
 
             if(shopType == ShopType.BUY_SHOP) event.line(0, shopType.outOfStockLabel());
             else event.line(0, shopType.inStockLabel());

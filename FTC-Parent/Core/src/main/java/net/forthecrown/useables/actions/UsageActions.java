@@ -1,6 +1,6 @@
 package net.forthecrown.useables.actions;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 
 import static net.forthecrown.registry.Registries.USAGE_ACTIONS;
 
@@ -27,7 +27,7 @@ public class UsageActions {
         register(new ActionTeleport());
 
         USAGE_ACTIONS.close();
-        CrownCore.logger().info("Default actions registered");
+        ForTheCrown.logger().info("Default actions registered");
     }
 
     private static void register(UsageAction action){

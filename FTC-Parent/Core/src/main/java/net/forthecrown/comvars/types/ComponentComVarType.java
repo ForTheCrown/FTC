@@ -5,7 +5,7 @@ import com.google.gson.JsonNull;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.types.ComponentArgument;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 public class ComponentComVarType implements ComVarType<Component> {
 
     public static final ComVarType<Component> COMPONENT_TYPE = new ComponentComVarType();
-    private final Key key = CrownCore.coreKey("component_type");
+    private final Key key = ForTheCrown.coreKey("component_type");
 
     private ComponentComVarType() {
         Registries.COMVAR_TYPES.register(key, this);

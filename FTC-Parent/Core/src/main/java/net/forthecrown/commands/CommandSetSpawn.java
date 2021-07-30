@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.chat.ChatFormatter;
@@ -13,7 +13,7 @@ import org.bukkit.Location;
 
 public class CommandSetSpawn extends FtcCommand {
     public CommandSetSpawn(){
-        super("setspawn", CrownCore.inst());
+        super("setspawn", ForTheCrown.inst());
 
         setPermission(Permissions.CORE_ADMIN);
 
@@ -47,7 +47,7 @@ public class CommandSetSpawn extends FtcCommand {
     }
 
     private int setServerSpawn(Location l, CommandSource source){
-        CrownCore.setServerSpawn(l);
+        ForTheCrown.setServerSpawn(l);
 
         source.sendMessage(
                 Component.text("Set server spawn to ")

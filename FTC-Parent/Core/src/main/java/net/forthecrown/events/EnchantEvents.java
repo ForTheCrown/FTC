@@ -1,6 +1,6 @@
 package net.forthecrown.events;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.squire.enchantment.RoyalEnchant;
 import net.forthecrown.squire.enchantment.RoyalEnchants;
 import net.forthecrown.utils.Cooldown;
@@ -124,7 +124,7 @@ public class EnchantEvents implements Listener {
 
         public StrongAimScheduler(Arrow arrow){
             this.arrow = arrow;
-            loopID = scheduler.scheduleSyncRepeatingTask(CrownCore.inst(), this, 3, 3);
+            loopID = scheduler.scheduleSyncRepeatingTask(ForTheCrown.inst(), this, 3, 3);
         }
 
         @Override

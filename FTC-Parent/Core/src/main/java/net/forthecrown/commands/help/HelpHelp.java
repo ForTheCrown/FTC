@@ -3,7 +3,7 @@ package net.forthecrown.commands.help;
 import com.google.common.base.Joiner;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.CommandHelpType;
 import net.forthecrown.commands.manager.CoreCommands;
@@ -30,7 +30,7 @@ import java.util.List;
 public class HelpHelp extends FtcCommand {
 
     public HelpHelp(){
-        super("fhelp", CrownCore.inst());
+        super("fhelp", ForTheCrown.inst());
 
         setPermission(Permissions.HELP);
         setAliases("help", "ehelp");

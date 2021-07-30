@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserType;
@@ -26,7 +26,7 @@ public class CommandToolBlock extends FtcCommand {
                             String description,
                             String... aliases
     ){
-        super(name, CrownCore.inst());
+        super(name, ForTheCrown.inst());
 
         this.aliases = aliases;
         this.function = function;

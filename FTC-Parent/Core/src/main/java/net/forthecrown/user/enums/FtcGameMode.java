@@ -8,18 +8,18 @@ import org.bukkit.GameMode;
  * Represents a game mode, but with more stuff, like the translation component and whether the gamemode can fly
  */
 public enum FtcGameMode {
-    SURVIVAL ("gameMode.survival", GameMode.SURVIVAL, false, 0),
-    CREATIVE ("gameMode.creative", GameMode.CREATIVE, true, 1),
-    SPECTATOR ("gameMode.spectator", GameMode.SPECTATOR, true, 2),
-    ADVENTURE ("gameMode.adventure", GameMode.ADVENTURE, false, 3);
+    SURVIVAL (GameMode.SURVIVAL, false, 0),
+    CREATIVE (GameMode.CREATIVE, true, 1),
+    SPECTATOR (GameMode.SPECTATOR, true, 2),
+    ADVENTURE (GameMode.ADVENTURE, false, 3);
 
     public final String translationKey;
     public final GameMode bukkit;
     public final boolean canFly;
     public final int id;
 
-    FtcGameMode(String translationKey, GameMode handle, boolean canFly, int id){
-        this.translationKey = translationKey;
+    FtcGameMode(GameMode handle, boolean canFly, int id){
+        this.translationKey = "gameMode." + name().toLowerCase();
         this.bukkit = handle;
         this.canFly = canFly;
         this.id = id;

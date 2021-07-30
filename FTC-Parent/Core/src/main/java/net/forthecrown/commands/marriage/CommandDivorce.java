@@ -1,6 +1,6 @@
 package net.forthecrown.commands.marriage;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -15,7 +15,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class CommandDivorce extends FtcCommand {
 
     public CommandDivorce() {
-        super("divorce", CrownCore.inst());
+        super("divorce", ForTheCrown.inst());
 
         setPermission(Permissions.MARRY);
         setDescription("Divorce your spouse");
@@ -44,7 +44,7 @@ public class CommandDivorce extends FtcCommand {
                     UserInteractions inter = user.getInteractions();
 
                     if(inter.getMarriedTo() == null) throw FtcExceptionProvider.notMarried();
-                    if(inter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
+                    if(!inter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
 
                     CrownUser spouse = UserManager.getUser(inter.getMarriedTo());
                     if(!spouse.getInteractions().canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(spouse);
@@ -71,7 +71,7 @@ public class CommandDivorce extends FtcCommand {
                             UserInteractions inter = user.getInteractions();
 
                             if(inter.getMarriedTo() == null) throw FtcExceptionProvider.notMarried();
-                            if(inter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
+                            if(!inter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
 
                             CrownUser spouse = UserManager.getUser(inter.getMarriedTo());
                             if(!spouse.getInteractions().canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(spouse);

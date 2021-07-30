@@ -1,7 +1,7 @@
 package net.forthecrown.dungeons.bosses;
 
 import com.google.common.collect.ImmutableList;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.dungeons.DungeonUtils;
@@ -58,7 +58,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
         this.requiredToSpawn = ImmutableList.copyOf(requiredItems);
         this.updaterDelay = updaterDelay;
 
-        key = CrownCore.coreKey(name.toLowerCase().replaceAll(" ", "_"));
+        key = ForTheCrown.coreKey(name.toLowerCase().replaceAll(" ", "_"));
     }
 
     protected abstract T onSummon(BossFightContext context);
@@ -71,7 +71,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
         //Only 1 boss can exist and a time
         if(isAlive()) return;
         //Register events and start updater loop
-        Bukkit.getPluginManager().registerEvents(this, CrownCore.inst());
+        Bukkit.getPluginManager().registerEvents(this, ForTheCrown.inst());
         loopID = startUpdater();
 
         //Summon boss with context and create bossbar
@@ -120,7 +120,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
     }
 
     private int startUpdater(){
-        return Bukkit.getScheduler().scheduleSyncRepeatingTask(CrownCore.inst(), () ->{
+        return Bukkit.getScheduler().scheduleSyncRepeatingTask(ForTheCrown.inst(), () ->{
             Player target = DungeonUtils.getOptimalTarget(bossEntity, getBossRoom());
             if(target != null && (bossEntity.getTarget() == null || !bossEntity.getTarget().equals(target))) bossEntity.setTarget(target);
 
@@ -164,7 +164,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
     protected void giveRewards(@Nullable String achievement, @NotNull ItemStack reward, @NotNull BossFightContext context){
         for (Player p: context.getPlayers()){
             if(!getBossRoom().contains(p)) continue;
-            if(CrownCore.getUserManager().isAltForAny(p.getUniqueId(), context.getPlayers())) continue;
+            if(ForTheCrown.getUserManager().isAltForAny(p.getUniqueId(), context.getPlayers())) continue;
 
 
             if(!FtcUtils.isNullOrBlank(achievement)) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only " + achievement);

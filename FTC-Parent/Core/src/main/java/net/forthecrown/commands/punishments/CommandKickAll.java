@@ -1,7 +1,7 @@
 package net.forthecrown.commands.punishments;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.admin.StaffChat;
@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class CommandKickAll extends FtcCommand {
     public CommandKickAll(){
-        super("kickall", CrownCore.inst());
+        super("kickall", ForTheCrown.inst());
 
         setPermission(Permissions.CORE_ADMIN);
         register();

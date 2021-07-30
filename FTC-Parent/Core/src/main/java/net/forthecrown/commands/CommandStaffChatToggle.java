@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.core.admin.StaffChat;
@@ -17,7 +17,7 @@ import java.util.Set;
 public class CommandStaffChatToggle extends FtcCommand {
 
     public CommandStaffChatToggle(){
-        super("staffchattoggle", CrownCore.inst());
+        super("staffchattoggle", ForTheCrown.inst());
 
         setAliases("sct", "sctoggle");
         setPermission(Permissions.STAFF_CHAT);

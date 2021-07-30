@@ -10,7 +10,7 @@ import net.forthecrown.commands.help.*;
 import net.forthecrown.commands.marriage.*;
 import net.forthecrown.commands.punishments.*;
 import net.forthecrown.commands.viking.CommandVRaid;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.RoyalArguments;
 import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.grenadier.types.EnumArgument;
@@ -36,7 +36,7 @@ public final class CoreCommands {
     public static final Map<String, FtcCommand> BY_NAME = new HashMap<>();
     public static final EnumArgument<Branch> BRANCH = EnumArgument.of(Branch.class);
     public static final EnumArgument<Rank> RANK = EnumArgument.of(Rank.class);
-    public static final KeyArgument FTC_KEY_PARSER = KeyArgument.key(CrownCore.inst());
+    public static final KeyArgument FTC_KEY_PARSER = KeyArgument.key(ForTheCrown.inst());
 
     private static Commands dispatcher;
 
@@ -68,7 +68,7 @@ public final class CoreCommands {
         //Command loading
 
         //Debug command
-        if(CrownCore.inDebugMode()) {
+        if(ForTheCrown.inDebugMode()) {
             new CommandTestCore();
             new CommandVRaid();
         }
@@ -224,7 +224,7 @@ public final class CoreCommands {
 
         new HelpHelp();
 
-        CrownCore.logger().log(Level.INFO, "Commands loaded");
+        ForTheCrown.logger().log(Level.INFO, "Commands loaded");
     }
 
     public static KeyArgument ftcKeyType() {

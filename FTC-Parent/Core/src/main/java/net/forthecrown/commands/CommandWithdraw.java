@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.economy.Balances;
@@ -21,15 +21,15 @@ import javax.annotation.Nonnegative;
 public class CommandWithdraw extends FtcCommand {
 
     public CommandWithdraw(){
-        super("withdraw", CrownCore.inst());
+        super("withdraw", ForTheCrown.inst());
 
-        maxMoney = CrownCore.getMaxMoneyAmount();
+        maxMoney = ForTheCrown.getMaxMoneyAmount();
 
         setDescription("Get cold coins from your balance");
         register();
     }
 
-    private final Balances bals = CrownCore.getBalances();
+    private final Balances bals = ForTheCrown.getBalances();
     private final int maxMoney;
 
     @Override

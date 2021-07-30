@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -15,7 +15,7 @@ import net.forthecrown.royalgrenadier.source.CommandSources;
 
 public class CommandReply extends FtcCommand {
     public CommandReply(){
-        super("reply", CrownCore.inst());
+        super("reply", ForTheCrown.inst());
 
         setPermission(Permissions.MESSAGE);
         setAliases("er", "ereply", "respond", "r");

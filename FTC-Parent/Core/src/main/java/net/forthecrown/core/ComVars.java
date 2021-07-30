@@ -34,6 +34,7 @@ public final class ComVars {
     static ComVar<Boolean>          logNormalShop;
     static ComVar<Boolean>          crownEventActive;
     static ComVar<Boolean>          crownEventIsTimed;
+    static ComVar<Boolean>          hulkSmashPoles;
 
     static ComVar<Integer>          tpTickDelay;
     static ComVar<Integer>          tpCooldown;
@@ -52,42 +53,43 @@ public final class ComVars {
     private ComVars() {}
 
     static void reload(Configuration config){
-        maxNickLength = register(           "core_maxNickLength",               ComVarType.BYTE,            (byte) config.getInt("MaxNickLength"));
-        maxBossDifficulty = register(       "royals_maxBossDif",                ComVarType.BYTE,            (byte) config.getInt("MaxBossDifficulty"));
-        maxTreasureItems = register(        "pr_maxTreasureItems",              ComVarType.BYTE,            (byte) config.getInt("Pirates.MaxTreasureItems"));
+        maxNickLength = register(           "maxNickLength",                ComVarType.BYTE,            (byte) config.getInt("MaxNickLength"));
+        maxBossDifficulty = register(       "maxBossDif",                   ComVarType.BYTE,            (byte) config.getInt("MaxBossDifficulty"));
+        maxTreasureItems = register(        "maxTreasureItems",             ComVarType.BYTE,            (byte) config.getInt("Pirates.MaxTreasureItems"));
 
-        nearRadius = register(              "core_nearRadius",                  ComVarType.SHORT,           (short) config.getInt("NearRadius"));
-        hoppersInOneChunk = register(       "core_maxHoppersPerChunk",          ComVarType.SHORT,           (short) config.getInt("HoppersInOneChunk"));
+        nearRadius = register(              "nearRadius",                   ComVarType.SHORT,           (short) config.getInt("NearRadius"));
+        hoppersInOneChunk = register(       "maxHoppersPerChunk",           ComVarType.SHORT,           (short) config.getInt("HoppersInOneChunk"));
 
-        branchSwapCooldown = register(      "core_branchSwapInterval",          ComVarType.LONG,            config.getLong("BranchSwapCooldown"));
-        marriageCooldown = register(        "core_marriageCooldown",            ComVarType.LONG,            config.getLong("MarriageStatusCooldown"));
-        userDataResetInterval = register(   "core_userEarningsResetInterval",   ComVarType.LONG,            config.getLong("UserDataResetInterval"));
-        auctionExpirationTime = register(   "pr_auctionExpirationTime",         ComVarType.LONG,            config.getLong("Auctions.ExpirationTime"));
-        auctionPickupTime = register(       "pr_auctionPickupTime",             ComVarType.LONG,            config.getLong("Auctions.PickUpTime"));
+        branchSwapCooldown = register(      "branchSwapInterval",           ComVarType.LONG,            config.getLong("BranchSwapCooldown"));
+        marriageCooldown = register(        "marriageCooldown",             ComVarType.LONG,            config.getLong("MarriageStatusCooldown"));
+        userDataResetInterval = register(   "userEarningsResetInterval",    ComVarType.LONG,            config.getLong("UserDataResetInterval"));
+        auctionExpirationTime = register(   "auctionExpirationTime",        ComVarType.LONG,            config.getLong("Auctions.ExpirationTime"));
+        auctionPickupTime = register(       "auctionPickupTime",            ComVarType.LONG,            config.getLong("Auctions.PickUpTime"));
 
-        taxesEnabled = register(            "core_taxesEnabled",                ComVarType.BOOLEAN,         config.getBoolean("Taxes"));
-        logAdminShop = register(            "core_log_admin",                   ComVarType.BOOLEAN,         config.getBoolean("Shops.log-admin-purchases"));
-        logNormalShop = register(           "core_log_normal",                  ComVarType.BOOLEAN,         config.getBoolean("Shops.log-normal-purchases"));
-        allowOtherPlayerNicks = register(   "core_allowOtherPlayerNicks",       ComVarType.BOOLEAN,         config.getBoolean("AllowOtherPlayerNicks"));
-        crownEventActive = register(        "core_crownEventActive",            ComVarType.BOOLEAN,         config.getBoolean("CrownEventActive"));
-        crownEventIsTimed = register(       "core_eventScoreIsTimer",           ComVarType.BOOLEAN,         config.getBoolean("EventScoreIsTimer"));
+        taxesEnabled = register(            "taxesEnabled",                 ComVarType.BOOLEAN,         config.getBoolean("Taxes"));
+        logAdminShop = register(            "log_admin",                    ComVarType.BOOLEAN,         config.getBoolean("Shops.log-admin-purchases"));
+        logNormalShop = register(           "log_normal",                   ComVarType.BOOLEAN,         config.getBoolean("Shops.log-normal-purchases"));
+        allowOtherPlayerNicks = register(   "allowOtherPlayerNicks",        ComVarType.BOOLEAN,         config.getBoolean("AllowOtherPlayerNicks"));
+        crownEventActive = register(        "crownEventActive",             ComVarType.BOOLEAN,         config.getBoolean("CrownEventActive"));
+        crownEventIsTimed = register(       "eventScoreIsTimer",            ComVarType.BOOLEAN,         config.getBoolean("EventScoreIsTimer"));
+        hulkSmashPoles = register(    "hulkSmashPoles",               ComVarType.BOOLEAN,         config.getBoolean("HulkSmashPoles"));
 
-        maxMoneyAmount = register(          "core_maxMoneyAmount",              ComVarType.INTEGER,         config.getInt("MaxMoneyAmount"));
-        tpTickDelay = register(             "core_tpTickDelay",                 ComVarType.INTEGER,         config.getInt("TeleportTickDelay"));
-        tpCooldown = register(              "core_tpCooldown",                  ComVarType.INTEGER,         config.getInt("TeleportCooldown"));
-        tpaExpiryTime = register(           "core_tpaExpiryTime",               ComVarType.INTEGER,         config.getInt("TpaExpiryTime"));
-        startRhines = register(             "core_startRhines",                 ComVarType.INTEGER,         config.getInt("StartRhines"));
-        baronPrice = register(              "core_baronPrice",                  ComVarType.INTEGER,         config.getInt("BaronPrice"));
-        chickenLevitation = register(       "core_chickenLevitation",           ComVarType.INTEGER,         config.getInt("MiniGameRegion.ChickenLevitation"));
-        chickenLevitationTime = register(   "core_chickenLevitation_time",      ComVarType.INTEGER,         config.getInt("MiniGameRegion.ChickenLevitationTime"));
-        ghSpecialReward = register(         "pr_gh_specialReward",              ComVarType.INTEGER,         config.getInt("Pirates.SpecialReward"));
-        ghFinalReward = register(           "pr_gh_finalReward",                ComVarType.INTEGER,         config.getInt("Pirates.FinalReward"));
-        maxTreasurePrize = register(        "pr_maxTreasurePrize",              ComVarType.INTEGER,         config.getInt("Pirates.MaxTreasurePrize"));
-        minTreasurePrize = register(        "pr_minTreasurePrize",              ComVarType.INTEGER,         config.getInt("Pirates.MinTreasurePrize"));
-        maxShopEarnings = register(         "core_maxShopEarnings",             ComVarType.INTEGER,         config.getInt("MaxShopEarnings"));
+        maxMoneyAmount = register(          "maxMoneyAmount",               ComVarType.INTEGER,         config.getInt("MaxMoneyAmount"));
+        tpTickDelay = register(             "tpTickDelay",                  ComVarType.INTEGER,         config.getInt("TeleportTickDelay"));
+        tpCooldown = register(              "tpCooldown",                   ComVarType.INTEGER,         config.getInt("TeleportCooldown"));
+        tpaExpiryTime = register(           "tpaExpiryTime",                ComVarType.INTEGER,         config.getInt("TpaExpiryTime"));
+        startRhines = register(             "startRhines",                  ComVarType.INTEGER,         config.getInt("StartRhines"));
+        baronPrice = register(              "baronPrice",                   ComVarType.INTEGER,         config.getInt("BaronPrice"));
+        chickenLevitation = register(       "chickenLevitation",            ComVarType.INTEGER,         config.getInt("MiniGameRegion.ChickenLevitation"));
+        chickenLevitationTime = register(   "chickenLevitation_time",       ComVarType.INTEGER,         config.getInt("MiniGameRegion.ChickenLevitationTime"));
+        ghSpecialReward = register(         "specialReward",                ComVarType.INTEGER,         config.getInt("Pirates.SpecialReward"));
+        ghFinalReward = register(           "finalReward",                  ComVarType.INTEGER,         config.getInt("Pirates.FinalReward"));
+        maxTreasurePrize = register(        "maxTreasurePrize",             ComVarType.INTEGER,         config.getInt("Pirates.MaxTreasurePrize"));
+        minTreasurePrize = register(        "minTreasurePrize",             ComVarType.INTEGER,         config.getInt("Pirates.MinTreasurePrize"));
+        maxShopEarnings = register(         "maxShopEarnings",              ComVarType.INTEGER,         config.getInt("MaxShopEarnings"));
 
-        treasureWorld = register(           "pr_treasureWorld",                 WorldComVarType.WORLD,      Bukkit.getWorld(config.getString("Pirates.TreasureWorld")));
-        onFirstJoinKit = register(          "core_onJoinKit",                   KeyComVarType.KEY,          Key.key(CrownCore.inst(), config.getString("OnJoinKit")));
+        treasureWorld = register(           "treasureWorld",                WorldComVarType.WORLD,      Bukkit.getWorld(config.getString("Pirates.TreasureWorld")));
+        onFirstJoinKit = register(          "onJoinKit",                    KeyComVarType.KEY,          Key.key(ForTheCrown.inst(), config.getString("OnJoinKit")));
     }
     
     private static <T> ComVar<T> register(String name, ComVarType<T> type, T value){
@@ -123,5 +125,6 @@ public final class ComVars {
         config.set("Pirates.MaxTreasureItems",              maxTreasureItems.getValue());
         config.set("MaxBossDifficulty",                     maxBossDifficulty.getValue());
         config.set("MaxShopEarnings",                       maxShopEarnings.getValue());
+        config.set("HulkSmashPoles",                        hulkSmashPoles.getValue());
     }
 }

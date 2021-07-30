@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import net.forthecrown.commands.arguments.UserType;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public class CommandSpecificGameMode extends FtcCommand {
     private final FtcGameMode gameMode;
     public CommandSpecificGameMode(@NotNull String name, Permission permission, FtcGameMode mode, String... aliases) {
-        super(name, CrownCore.inst());
+        super(name, ForTheCrown.inst());
 
         this.aliases = aliases;
         this.gameMode = mode;

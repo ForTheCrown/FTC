@@ -3,7 +3,7 @@ package net.forthecrown.pirates;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.serializer.AbstractJsonSerializer;
@@ -56,9 +56,9 @@ public class TreasureShulker extends AbstractJsonSerializer {
         super("treasure_shulker");
 
         reload();
-        CrownCore.logger().info("Treasure Shulker loaded");
+        ForTheCrown.logger().info("Treasure Shulker loaded");
 
-        CrownCore.getDayUpdate().addListener(() -> {
+        ForTheCrown.getDayUpdate().addListener(() -> {
             alreadyFound.clear();
             relocate();
         });
@@ -111,7 +111,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
         Block block = location.getBlock();
         if(!block.getType().isAir()) block.setType(Material.AIR);
 
-        CrownCore.getTreasureWorld().spawn(location, Shulker.class, shulker -> {
+        ForTheCrown.getTreasureWorld().spawn(location, Shulker.class, shulker -> {
             currentID = shulker.getUniqueId();
 
             shulker.getPersistentDataContainer().set(Pirates.SHULKER_KEY, PersistentDataType.BYTE, (byte) 1);
@@ -125,7 +125,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
 
     public void kill(){
         if(currentID == null && location == null){
-            CrownCore.logger().warning("Tried to kill treasure shulker, but both location and id were null");
+            ForTheCrown.logger().warning("Tried to kill treasure shulker, but both location and id were null");
             return;
         }
 
@@ -184,7 +184,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
 
             safeGuard--;
             if(safeGuard < 0) {
-                CrownCore.logger().warning("Couldn't find valid location for TreasureShulker in 300 attempts");
+                ForTheCrown.logger().warning("Couldn't find valid location for TreasureShulker in 300 attempts");
                 break;
             }
         }
@@ -200,7 +200,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
         if(random.nextBoolean()) x = -x;
         if(random.nextBoolean()) z = -z;
 
-        return new Location(CrownCore.getTreasureWorld(), x, y, z);
+        return new Location(ForTheCrown.getTreasureWorld(), x, y, z);
     }
 
     public Location getLocation() {
@@ -263,8 +263,8 @@ public class TreasureShulker extends AbstractJsonSerializer {
         int rhineReward;
 
         public Loot(Player player, Location location, CrownRandom random, CrownLootTable lootTable){
-            this.items = lootTable.populateLoot(random, new LootContext.Builder(location).killer(player).build(), CrownCore.getMaxTreasureItems());
-            this.rhineReward = random.intInRange(CrownCore.getTreasureMinPrize(), CrownCore.getTreasureMaxPrize());
+            this.items = lootTable.populateLoot(random, new LootContext.Builder(location).killer(player).build(), ForTheCrown.getMaxTreasureItems());
+            this.rhineReward = random.intInRange(ForTheCrown.getTreasureMinPrize(), ForTheCrown.getTreasureMaxPrize());
         }
 
         public boolean giveRewards(Player player){
@@ -278,7 +278,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
                 return false;
             }
 
-            CrownCore.getBalances().add(player.getUniqueId(), rhineReward, false);
+            ForTheCrown.getBalances().add(player.getUniqueId(), rhineReward, false);
             items.forEach(i -> player.getInventory().addItem(i));
 
             player.sendMessage(display());

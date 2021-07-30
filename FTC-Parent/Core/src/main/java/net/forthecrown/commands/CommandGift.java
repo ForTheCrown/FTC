@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 public class CommandGift extends FtcCommand {
 
     public CommandGift(){
-        super("gift", CrownCore.inst());
+        super("gift", ForTheCrown.inst());
 
         setPermission(Permissions.CORE_ADMIN);
         register();

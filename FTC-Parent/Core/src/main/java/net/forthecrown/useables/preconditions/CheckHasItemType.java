@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.InteractionUtils;
 import net.forthecrown.utils.JsonUtils;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class CheckHasItemType implements UsageCheck<CheckHasItemType.CheckInstance> {
-    public static Key KEY = CrownCore.coreKey("has_item");
+    public static Key KEY = ForTheCrown.coreKey("has_item");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

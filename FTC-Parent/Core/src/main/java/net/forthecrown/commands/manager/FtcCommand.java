@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.user.CrownUser;
@@ -46,7 +46,7 @@ public abstract class FtcCommand extends AbstractCommand {
         CoreCommands.BY_NAME.put(name, this);
     }
 
-    protected FtcCommand(String name){ this(name, CrownCore.inst()); }
+    protected FtcCommand(String name){ this(name, ForTheCrown.inst()); }
 
     protected CommandSender getSender(CommandContext<CommandSource> c){
         return c.getSource().asBukkit();
@@ -72,7 +72,7 @@ public abstract class FtcCommand extends AbstractCommand {
         broadcastAdmin(c.getSource(), message);
     }
 
-    private static Balances bals = CrownCore.getBalances();
+    private static Balances bals = ForTheCrown.getBalances();
     protected SuggestionProvider<CommandSource> suggestMonies(){
         return (c, b) -> {
             if(!c.getSource().isPlayer()) return Suggestions.empty();

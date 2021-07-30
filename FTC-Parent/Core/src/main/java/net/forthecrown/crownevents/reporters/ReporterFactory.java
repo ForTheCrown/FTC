@@ -1,6 +1,6 @@
 package net.forthecrown.crownevents.reporters;
 
-import net.forthecrown.core.CrownCore;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.crownevents.CrownEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -32,7 +32,7 @@ public class ReporterFactory {
     }
 
     public static File getReportDirectory(){
-        File dir = new File(CrownCore.inst().getDataFolder() + File.separator + "eventReports");
+        File dir = new File(ForTheCrown.inst().getDataFolder() + File.separator + "eventReports");
         if(!dir.exists()) dir.mkdir();
         if(!dir.isDirectory()) throw new IllegalStateException("Report directory is not a directory");
 
