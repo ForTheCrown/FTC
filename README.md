@@ -19,11 +19,9 @@ Todo for 1.17 Reset
 Structure:
 • Parent
   • ForTheCrown-Core
-  • FTC-Royals
-  • FTC-Pirates
-  • FTC-Vikings
-  • FTC-Cosmetics
+  • Squire
 • Events
+  • AugustEvent
   • AprilEvent
   • BigAssCrownEvent
   • DummyEvent
