@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ForTheCrown;
@@ -54,7 +54,7 @@ public class CommandKingMaker extends FtcCommand {
                             return 0;
                         })
                 )
-                .then(argument("player", UserType.USER)
+                .then(argument("player", UserArgument.user())
                         .then(literal("queen").executes(c -> makeKing(c, true)))
                         .then(literal("king").executes(c -> makeKing(c, false)))
                 );
@@ -64,7 +64,7 @@ public class CommandKingMaker extends FtcCommand {
         Kingship kingship = ForTheCrown.getKingship();
         if(kingship.getUniqueId() != null) throw FtcExceptionProvider.create("There already is a king");
 
-        CrownUser king = UserType.getUser(c, "player");
+        CrownUser king = UserArgument.getUser(c, "player");
 
         kingship.set(king.getUniqueId());
         kingship.setFemale(isQueen);

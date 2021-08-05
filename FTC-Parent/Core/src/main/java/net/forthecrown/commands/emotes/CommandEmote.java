@@ -1,11 +1,11 @@
 package net.forthecrown.commands.emotes;
 
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.Cooldown;
@@ -38,16 +38,16 @@ public abstract class CommandEmote extends FtcCommand {
         command
                 .executes(c -> executeSelf(getUserSender(c)))
 
-                .then(argument("player", UserType.onlineUser())
+                .then(argument("player", UserArgument.onlineUser())
                         .executes(c -> {
                             CrownUser sender = getUserSender(c);
 
                             if(Cooldown.contains(sender, cooldownCategory)){
-                                sender.sendMessage(ChatFormatter.formatString(cooldownMessage, null, true));
+                                sender.sendMessage(FtcFormatter.formatString(cooldownMessage, null, true));
                                 return 0;
                             }
 
-                            CrownUser recipient = UserType.getUser(c, "player");
+                            CrownUser recipient = UserArgument.getUser(c, "player");
                             if(recipient.equals(sender)) return executeSelf(sender); //Make sure to execute on self, not on others
 
                             //If either doesn't allow emotes, stop

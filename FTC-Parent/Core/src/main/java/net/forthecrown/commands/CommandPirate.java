@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.pirates.TreasureShulker;
@@ -48,7 +48,7 @@ public class CommandPirate extends FtcCommand {
                         .executes(c -> {
                             TreasureShulker shulker = Pirates.getTreasure();
 
-                            c.getSource().sendMessage(ChatFormatter.clickableLocationMessage(shulker.getLocation(), true));
+                            c.getSource().sendMessage(FtcFormatter.clickableLocationMessage(shulker.getLocation(), true));
                             return 0;
                         })
                 );

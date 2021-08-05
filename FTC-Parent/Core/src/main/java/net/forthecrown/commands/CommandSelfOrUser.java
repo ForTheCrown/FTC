@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ForTheCrown;
@@ -39,9 +39,9 @@ public class CommandSelfOrUser extends FtcCommand {
         command
                 .executes(c -> function.run(getUserSender(c), c.getSource(), true))
 
-                .then(argument("user", UserType.onlineUser())
+                .then(argument("user", UserArgument.onlineUser())
                         .executes(c -> {
-                            CrownUser user = UserType.getUser(c, "user");
+                            CrownUser user = UserArgument.getUser(c, "user");
 
                             return function.run(
                                     user,
@@ -99,7 +99,7 @@ public class CommandSelfOrUser extends FtcCommand {
         );
 
         new CommandSelfOrUser("fly",
-                Permissions.CORE_ADMIN,
+                Permissions.FTC_ADMIN,
                 (user, source, self) -> {
                     boolean flying = !user.isFlying();
                     user.setFlying(flying);
@@ -114,7 +114,7 @@ public class CommandSelfOrUser extends FtcCommand {
         );
 
         new CommandSelfOrUser("godmode",
-                Permissions.CORE_ADMIN,
+                Permissions.FTC_ADMIN,
                 (user, source, self) -> {
                     boolean inv = !user.godMode();
                     user.setGodMode(inv);

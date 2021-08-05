@@ -151,7 +151,7 @@ public class DungeonEvents implements Listener, ClickEventTask {
 
     //Diego clickable text code
     @Override
-    public void run(Player player, String[] args) throws CrownException {
+    public void run(Player player, String[] args) {
         PlayerInventory inv = player.getInventory();
         if(args[1].contains("sword")){
             if(!inv.containsAtLeast(BossItems.ZHAMBIE.item(), 1) || !inv.containsAtLeast(BossItems.SKALATAN.item(), 1) || !inv.containsAtLeast(BossItems.HIDEY_SPIDEY.item(), 1))

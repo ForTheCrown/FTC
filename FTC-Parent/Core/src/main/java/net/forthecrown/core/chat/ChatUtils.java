@@ -24,7 +24,7 @@ public final class ChatUtils {
     public static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     public static TextComponent convertString(String text, boolean translateColors){
-        return SERIALIZER.deserialize(translateColors ? ChatFormatter.translateHexCodes(text) : text);
+        return SERIALIZER.deserialize(translateColors ? FtcFormatter.translateHexCodes(text) : text);
     }
 
     public static TextComponent convertString(String text){

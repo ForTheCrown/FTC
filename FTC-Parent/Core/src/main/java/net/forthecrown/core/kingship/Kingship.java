@@ -13,6 +13,8 @@ import java.util.UUID;
 
 /**
  * Represents the current king or queen on the server
+ * <p></p>
+ * Implementation: {@link CrownKingship}
  */
 public interface Kingship extends Nameable, CrownSerializer {
     static Component queenTitle(){

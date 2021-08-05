@@ -1,11 +1,14 @@
 package net.forthecrown.user;
 
+import net.forthecrown.commands.arguments.BaltopArgument;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.MapUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -125,20 +128,22 @@ public final class FtcUserManager extends AbstractYamlSerializer implements User
                 }
 
                 long lastLoad = timeStamps.getLong("lastLoad");
+                long nextReset = lastLoad + ComVars.getUserResetInterval();
 
-                if (System.currentTimeMillis() - lastLoad <= ForTheCrown.getUserResetInterval()) continue;
+                if (nextReset > System.currentTimeMillis()) continue;
 
                 //Is older and has been untouched for the entire interval, yeet it
                 f.delete();
                 ForTheCrown.getBalances().getMap().remove(id);
 
-                log("Deleting data of " + id);
                 amount++;
+                log("Deleting data of " + id + "name: " + Bukkit.getOfflinePlayer(id).getName());
             } catch (IOException e){
                 e.printStackTrace();
             }
         }
 
+        if(amount > 0) BaltopArgument.resetMax();
         log("All user data files have been checked for deletion. Deleted " + amount + " files.");
     }
 }

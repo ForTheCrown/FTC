@@ -4,17 +4,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.CrownException;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.pirates.DailyEnchantment;
 import net.forthecrown.economy.pirates.EnchantmentData;
 import net.forthecrown.events.dynamic.BmEnchantListener;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.squire.Squire;
@@ -152,7 +150,7 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
 
     public ItemStack getAcceptButton(){
         return CrownItems.makeItem(Material.LIME_STAINED_GLASS_PANE, 1, true, ChatColor.GREEN + "[Accept and Pay]",
-                "&7Enchant the item for " + ChatFormatter.decimalizeNumber(daily.getPrice()) + " Rhines");
+                "&7Enchant the item for " + FtcFormatter.decimalizeNumber(daily.getPrice()) + " Rhines");
     }
 
     public ItemStack getDenyButton(){
@@ -164,7 +162,7 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
         ItemStack item = CrownItems.makeItem(Material.ENCHANTED_BOOK, 1, false, null,
                 Component.text("Value: ")
                         .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
-                        .append(Balances.formatted(daily.getPrice())
+                        .append(FtcFormatter.rhines(daily.getPrice())
                                 .color(NamedTextColor.YELLOW)
                         )
                         .append(Component.text("."))
@@ -196,7 +194,7 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
                                 .hoverEvent(edward)
                                 .color(NamedTextColor.YELLOW),
                         daily.getEnchantment().displayName(daily.getLevel()).color(NamedTextColor.YELLOW),
-                        Balances.formatted(daily.getPrice()).color(NamedTextColor.GOLD)
+                        FtcFormatter.rhines(daily.getPrice()).color(NamedTextColor.GOLD)
                 )
         );
 
@@ -233,7 +231,7 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
     }
 
     @Override
-    public void run(Player player, String[] args) throws CrownException, RoyalCommandException {
+    public void run(Player player, String[] args) throws CommandSyntaxException {
         if(Pirates.getPirateEconomy().getEnchantMerchant().isAllowedToBuy(player.getUniqueId())) {
             player.openInventory(createInventory(UserManager.getUser(player)));
 

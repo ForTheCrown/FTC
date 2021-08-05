@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -34,9 +34,9 @@ public class CommandWorld extends FtcCommand {
                             return 0;
                         })
 
-                        .then(argument("user", UserType.onlineUser())
+                        .then(argument("user", UserArgument.onlineUser())
                                 .executes(c -> {
-                                    CrownUser user = UserType.getUser(c, "user");
+                                    CrownUser user = UserArgument.getUser(c, "user");
                                     World world = c.getArgument("world", World.class);
 
                                     user.createTeleport(() -> world.getSpawnLocation().toCenterLocation(), true, true, UserTeleport.Type.OTHER).start(true);

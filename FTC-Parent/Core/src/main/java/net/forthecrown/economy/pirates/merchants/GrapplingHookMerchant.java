@@ -6,7 +6,6 @@ import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.CrownException;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
@@ -58,7 +57,7 @@ public class GrapplingHookMerchant implements BlackMarketMerchant, ClickEventTas
     }
 
     @Override
-    public void run(Player player, String[] args) throws CrownException, RoyalCommandException {
+    public void run(Player player, String[] args) throws RoyalCommandException {
         checkPreconditions(UserManager.getUser(player));
 
         ForTheCrown.getBalances().add(player.getUniqueId(), -price);

@@ -1,8 +1,6 @@
 package net.forthecrown.events;
 
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.CrownException;
-import net.forthecrown.events.custom.SignShopUseEvent;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
@@ -27,7 +25,6 @@ public class Events {
         register(new ShopCreateEvent());
         register(new SignInteractEvent());
         register(new ShopDestroyEvent());
-        register(new ShopTransactionEvent());
 
         register(new PirateEvents());
         register(new GhListener());
@@ -40,12 +37,12 @@ public class Events {
 
         register(new MarriageListener());
 
-        register(new DungeonEvents());
-        register(new EnchantEvents());
-
         register(new CosmeticsListener());
         register(new CustomInventoryClickListener());
         register(new InventoryBuilderListener());
+
+        register(new DungeonEvents());
+        register(new EnchantEvents());
 
         main = null;
         pm = null;
@@ -59,14 +56,9 @@ public class Events {
         handle(event.getPlayer(), event, executor);
     }
 
-    public static void handleSignShop(SignShopUseEvent event, ExceptionedEvent<SignShopUseEvent> executor){
-        handle(event.getUser(), event, executor);
-    }
-
     public static <E extends Event> void handle(CommandSender sender, E event, ExceptionedEvent<E> executor){
         try {
             executor.execute(event);
-        } catch (CrownException ignored){
         } catch (RoyalCommandException e){
             if(sender == null) return;
 

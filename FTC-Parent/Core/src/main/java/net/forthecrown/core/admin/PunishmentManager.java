@@ -14,6 +14,11 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.UUID;
 
+/**
+ * Manages punishments.
+ * <p></p>
+ * Implementation: {@link CrownPunishmentManager}
+ */
 public interface PunishmentManager extends CrownSerializer {
     MuteStatus checkMute(CommandSender sender);
 

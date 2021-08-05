@@ -1,9 +1,8 @@
 package net.forthecrown.economy.auctions;
 
-import net.forthecrown.core.CrownException;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.pirates.AuctionManager;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
@@ -34,13 +33,13 @@ public class AuctionEvents implements Listener {
 
         Auction auction = AuctionManager.getAuction(sign.getLocation());
         Validate.notNull(auction, "Auction is null :(");
-        if(!event.getPlayer().hasPermission(Permissions.CORE_ADMIN)) return;
+        if(!event.getPlayer().hasPermission(Permissions.FTC_ADMIN)) return;
 
         auction.delete();
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event) throws CrownException {
+    public void onPlayerInteract(PlayerInteractEvent event) {
         if(!(event.getClickedBlock().getState() instanceof Sign)) return;
         Sign sign = (Sign) event.getClickedBlock().getState();
         if(!sign.getPersistentDataContainer().has(AuctionManager.AUCTION_KEY, PersistentDataType.BYTE)) return;
@@ -90,14 +89,14 @@ public class AuctionEvents implements Listener {
                         .hoverEvent(auction.getOwner().asHoverEvent())
                         .clickEvent(ClickEvent.suggestCommand("/w " + auction.getOwner().getName())))
                 .append(Component.text(", Item: "))
-                .append(Component.text(item.getAmount() + " " + ChatFormatter.getItemNormalName(item)).color(NamedTextColor.YELLOW).hoverEvent(item.asHoverEvent()))
+                .append(Component.text(item.getAmount() + " " + FtcFormatter.getItemNormalName(item)).color(NamedTextColor.YELLOW).hoverEvent(item.asHoverEvent()))
                 .build();
 
         TextComponent expireMessage = Component.text().color(NamedTextColor.GRAY)
                 .append(Component.text("The auction will expire in "))
-                .append(Component.text(ChatFormatter.convertMillisIntoTime(auction.getExpiresAt() - System.currentTimeMillis()))
+                .append(Component.text(FtcFormatter.convertMillisIntoTime(auction.getExpiresAt() - System.currentTimeMillis()))
                         .hoverEvent(HoverEvent.showText(
-                                Component.text("Expires on the " + ChatFormatter.getDateFromMillis(auction.getExpiresAt()))
+                                Component.text("Expires on the " + FtcFormatter.getDateFromMillis(auction.getExpiresAt()))
                         )))
                 .build();
 

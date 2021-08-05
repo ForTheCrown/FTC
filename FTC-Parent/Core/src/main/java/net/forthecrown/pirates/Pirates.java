@@ -2,7 +2,7 @@ package net.forthecrown.pirates;
 
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.crownevents.ObjectiveLeaderboard;
-import net.forthecrown.economy.pirates.CrownPirateEconomy;
+import net.forthecrown.economy.pirates.FtcPirateEconomy;
 import net.forthecrown.economy.pirates.PirateEconomy;
 import net.forthecrown.pirates.grappling.GhParkour;
 import net.forthecrown.squire.Squire;
@@ -13,25 +13,29 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 
+import static net.forthecrown.utils.FtcUtils.safeRunnable;
+
 public class Pirates {
     public static final NamespacedKey SHULKER_KEY = Squire.createPiratesKey("treasure_shulker");
     public static final NamespacedKey GH_STAND_KEY = Squire.createPiratesKey("level_end_stand");
-    public static final NamespacedKey BM_MERCHANT = Squire.createPiratesKey("black_market_merchant");
 
     static TreasureShulker shulker;
     static GhParkour ghParkour;
-    static CrownPirateEconomy pirateEconomy;
+    static FtcPirateEconomy pirateEconomy;
     static ParrotTracker parrotTracker;
     static AuctionManager auctionManager;
 
     static ObjectiveLeaderboard leaderboard;
 
+    /**
+     * Initiates the pirates. NOT API
+     */
     public static void init(){
-        pirateEconomy = new CrownPirateEconomy();
-        shulker = new TreasureShulker();
-        ghParkour = new GhParkour();
-        auctionManager = new AuctionManager();
-        parrotTracker = new ParrotTracker();
+        safeRunnable(() -> pirateEconomy = new FtcPirateEconomy());
+        safeRunnable(() -> shulker = new TreasureShulker());
+        safeRunnable(() -> ghParkour = new GhParkour());
+        safeRunnable(() -> auctionManager = new AuctionManager());
+        safeRunnable(() -> parrotTracker = new ParrotTracker());
 
         auctionManager.loadAuctions();
 

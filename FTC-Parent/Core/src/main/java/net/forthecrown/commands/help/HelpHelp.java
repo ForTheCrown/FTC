@@ -3,16 +3,16 @@ package net.forthecrown.commands.help;
 import com.google.common.base.Joiner;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.arguments.CommandHelpType;
+import net.forthecrown.commands.arguments.HelpPageArgument;
 import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.ListUtils;
+import net.forthecrown.core.ForTheCrown;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,7 +20,6 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 
 import java.util.ArrayList;
@@ -42,9 +41,9 @@ public class HelpHelp extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .executes(c -> sendHelp(getSender(c), 0, c.getInput()))
-                .then(argument("page", CommandHelpType.HELP_TYPE)
-                              .executes(c -> sendHelp(getSender(c), c.getArgument("page", Integer.class), c.getInput()))
+                .executes(c -> sendHelp(c.getSource(), 0, c.getInput()))
+                .then(argument("page", HelpPageArgument.HELP_TYPE)
+                              .executes(c -> sendHelp(c.getSource(), c.getArgument("page", Integer.class), c.getInput()))
                 )
 
                 .then(literal("specific")
@@ -63,13 +62,13 @@ public class HelpHelp extends FtcCommand {
                                                         lookup.getAliases(),
                                                         lookup.getDescription(),
                                                         "FTC",
-                                                        source.hasPermission(Permissions.CORE_ADMIN)
+                                                        source.hasPermission(Permissions.FTC_ADMIN)
                                                 )
                                         );
                                         return 0;
                                     }
 
-                                    if(!source.hasPermission(Permissions.CORE_ADMIN)){
+                                    if(!source.hasPermission(Permissions.FTC_ADMIN)){
                                         source.sendMessage(Component.translatable("commands.generic.permission", NamedTextColor.RED));
                                         return 0;
                                     }
@@ -131,9 +130,9 @@ public class HelpHelp extends FtcCommand {
         return builder.build();
     }
 
-    private int sendHelp(CommandSender sender, int page, String input) throws CommandSyntaxException { // D: Send help!!!!!!!!!!
+    private int sendHelp(CommandSource sender, int page, String input) throws CommandSyntaxException { // D: Send help!!!!!!!!!!
         List<Component> commands = availableCommands(sender);
-        int maxPage = CommandHelpType.MAX;
+        int maxPage = HelpPageArgument.MAX;
 
         final Component header = Component.text("--------").color(NamedTextColor.GRAY);
         TextComponent.Builder message = Component.text()
@@ -152,12 +151,12 @@ public class HelpHelp extends FtcCommand {
         return page;
     }
 
-    private List<Component> availableCommands(CommandSender sender){
+    private List<Component> availableCommands(CommandSource sender){
         Collection<FtcCommand> commands = CoreCommands.BY_NAME.values();
         List<Component> formatted = new ArrayList<>();
 
         for (FtcCommand c: commands){
-            if(!c.testPermissionSilent(sender)) continue;
+            if(!c.testPermissionSilent(sender.asBukkit())) continue;
             String description = c.getDescription();
 
             formatted.add(

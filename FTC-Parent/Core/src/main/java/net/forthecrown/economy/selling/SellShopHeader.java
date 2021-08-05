@@ -1,10 +1,10 @@
 package net.forthecrown.economy.selling;
 
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.builder.ClickContext;
-import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.inventory.builder.InvCords;
+import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryRunnable;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.ItemStackBuilder;
@@ -60,10 +60,10 @@ public class SellShopHeader implements CordedInventoryOption {
 
         ItemStackBuilder builder = new ItemStackBuilder(material, 1)
                 .setFlags(ItemFlag.HIDE_ATTRIBUTES)
-                .setName(Component.text(name).style(ChatFormatter.nonItalic(NamedTextColor.AQUA)));
+                .setName(Component.text(name).style(FtcFormatter.nonItalic(NamedTextColor.AQUA)));
 
         for (String s: desc) {
-            builder.addLore(Component.text(s).style(ChatFormatter.nonItalic(NamedTextColor.GRAY)));
+            builder.addLore(Component.text(s).style(FtcFormatter.nonItalic(NamedTextColor.GRAY)));
         }
 
         this.item = builder.build();
@@ -104,7 +104,7 @@ public class SellShopHeader implements CordedInventoryOption {
     }
 
     @Override
-    public void onClick(CrownUser user, ClickContext context) throws RoyalCommandException {
+    public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
         runnable.onClick(user, context);
     }
 }

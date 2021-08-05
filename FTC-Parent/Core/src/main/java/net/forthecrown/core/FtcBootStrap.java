@@ -14,8 +14,8 @@ import net.forthecrown.economy.ServerItemPriceMap;
 import net.forthecrown.economy.shops.CrownShopManager;
 import net.forthecrown.events.Events;
 import net.forthecrown.pirates.Pirates;
-import net.forthecrown.registry.CrownKitRegistry;
-import net.forthecrown.registry.CrownWarpRegistry;
+import net.forthecrown.useables.kits.CrownKitManager;
+import net.forthecrown.useables.warps.CrownWarpManager;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.useables.CrownUsablesManager;
@@ -34,7 +34,7 @@ public final class FtcBootStrap {
     private FtcBootStrap() {}
 
     static void firstPhase() {
-        Main.announcer = new CrownBroadcaster();
+        Main.announcer = new FtcAnnouncer();
 
         Main.messages = new CrownMessages();
         Main.messages.load();
@@ -74,8 +74,8 @@ public final class FtcBootStrap {
         safeRunnable(CoreCommands::init);
         safeRunnable(Events::init);
 
-        Main.warpRegistry = new CrownWarpRegistry();
-        Main.kitRegistry = new CrownKitRegistry();
+        Main.warpRegistry = new CrownWarpManager();
+        Main.kitRegistry = new CrownKitManager();
 
         Registries.COMVAR_TYPES.close();
     }

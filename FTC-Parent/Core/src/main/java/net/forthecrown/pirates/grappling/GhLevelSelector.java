@@ -2,7 +2,7 @@ package net.forthecrown.pirates.grappling;
 
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.ClickContext;
@@ -28,13 +28,13 @@ public class GhLevelSelector {
             .add(new InventoryBorder())
             .add(3, 1,
                     new ItemStackBuilder(Material.GREEN_STAINED_GLASS_PANE, 1)
-                            .setName(Component.text("[Confirm]").style(ChatFormatter.nonItalic(NamedTextColor.GREEN)))
+                            .setName(Component.text("[Confirm]").style(FtcFormatter.nonItalic(NamedTextColor.GREEN)))
                             .build()
                     , resetConfirm()
             )
             .add(5, 1,
                     new ItemStackBuilder(Material.RED_STAINED_GLASS_PANE, 1)
-                            .setName(Component.text("[Deny]").style(ChatFormatter.nonItalic(NamedTextColor.RED)))
+                            .setName(Component.text("[Deny]").style(FtcFormatter.nonItalic(NamedTextColor.RED)))
                             .build()
                     , resetDeny()
             )
@@ -51,8 +51,8 @@ public class GhLevelSelector {
                 .addAll(listLevels())
                 .add(4, 5,
                         new ItemStackBuilder(Material.BARRIER)
-                                .setName(Component.text("Reset progress").style(ChatFormatter.nonItalic(NamedTextColor.RED)))
-                                .addLore(Component.text("Reset all your progress to get the rewards again").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
+                                .setName(Component.text("Reset progress").style(FtcFormatter.nonItalic(NamedTextColor.RED)))
+                                .addLore(Component.text("Reset all your progress to get the rewards again").style(FtcFormatter.nonItalic(NamedTextColor.GRAY)))
                                 .build()
                         , (user, context) -> CONFIRM_RESET.open(user)
                 )
@@ -125,6 +125,10 @@ public class GhLevelSelector {
             if(data == null) return;
 
             data.enter(user.getPlayer(), user.getWorld());
+            user.sendMessage(Component.translatable("gh.leave",
+                    NamedTextColor.GRAY,
+                    Component.text("/leave").color(NamedTextColor.YELLOW))
+            );
         }
 
         @Override

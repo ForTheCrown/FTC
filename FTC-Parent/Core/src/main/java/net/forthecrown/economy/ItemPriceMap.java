@@ -5,6 +5,8 @@ import org.bukkit.Material;
 
 /**
  * A map of item prices with the prices stored as shorts
+ * <p></p>
+ * Implementation: {@link ServerItemPriceMap}
  */
 public interface ItemPriceMap extends CrownSerializer {
 

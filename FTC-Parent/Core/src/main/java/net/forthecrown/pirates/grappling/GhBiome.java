@@ -1,6 +1,6 @@
 package net.forthecrown.pirates.grappling;
 
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -33,6 +33,6 @@ public enum GhBiome {
     }
 
     public Component displayName(){
-        return Component.text(ChatFormatter.normalEnum(this));
+        return Component.text(FtcFormatter.normalEnum(this));
     }
 }

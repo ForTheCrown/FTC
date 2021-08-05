@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.TeleportRequest;
@@ -39,10 +39,10 @@ public class CommandTpaskHere extends FtcCommand {
 
     @Override
     protected void createCommand(BrigadierCommand command) {
-        command.then(argument("player", UserType.onlineUser())
+        command.then(argument("player", UserArgument.onlineUser())
                 .executes(c -> {
                     CrownUser player = getUserSender(c);
-                    CrownUser target = UserType.getUser(c, "player");
+                    CrownUser target = UserArgument.getUser(c, "player");
                     checkPreconditions(player, target, true);
 
                     player.sendMessage(cancelRequest(target));

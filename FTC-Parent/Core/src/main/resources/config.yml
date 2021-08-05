@@ -20,6 +20,7 @@ EventScoreIsTimer: false
 MaxBossDifficulty: 5
 MaxShopEarnings: 500000
 HulkSmashPoles: true
+MaxSignShopPrice: 1000000
 Day: 1
 
 MiniGameRegion:

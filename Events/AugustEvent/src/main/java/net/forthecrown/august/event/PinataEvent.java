@@ -39,7 +39,7 @@ public class PinataEvent implements CrownEvent<AugustEntry> {
 
     @Override
     public void complete(AugustEntry entry) {
-        Score record = EventConstants.CROWN.getScore(entry.player().getName());
+        Score record = CrownEventUtils.crownObjective().getScore(entry.player().getName());
         AugustPlugin.reporter.logExit(entry.player(), entry.score(), "Record: " + record.getScore());
 
         TextComponent.Builder builder = Component.text();
@@ -47,7 +47,7 @@ public class PinataEvent implements CrownEvent<AugustEntry> {
         if(CrownEventUtils.isNewRecord(record, entry.score())) {
             builder.append(Component.text("You got a new record!").color(NamedTextColor.GOLD));
             record.setScore(entry.score());
-        } else builder.append(Component.text("Better luck next time! :("));
+        } else builder.append(Component.text("Better luck next time! :(").color(NamedTextColor.AQUA));
 
         entry.player().sendMessage(
                 builder.append(Component.text(" Score: ")

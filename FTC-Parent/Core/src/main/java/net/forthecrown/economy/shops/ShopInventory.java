@@ -8,6 +8,8 @@ import java.util.List;
 
 /**
  * Represents the inventory of a sign shop
+ * <p></p>
+ * Implementation: {@link CrownShopInventory}
  */
 public interface ShopInventory extends Inventory {
     /**

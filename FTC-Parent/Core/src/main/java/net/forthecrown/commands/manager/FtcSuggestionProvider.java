@@ -18,19 +18,19 @@ import net.kyori.adventure.key.Key;
 import java.util.concurrent.CompletableFuture;
 
 public interface FtcSuggestionProvider {
-    static CompletableFuture<Suggestions> suggestRegistry(SuggestionsBuilder builder, CrownRegistry<?, ?> registry){
+    static CompletableFuture<Suggestions> suggestRegistry(SuggestionsBuilder builder, CrownRegistry<?, ?> registry) {
         return CompletionProvider.suggestKeys(builder, registry.keySet());
     }
 
-    static CompletableFuture<Suggestions> suggestKeysNoNamespace(SuggestionsBuilder builder, Iterable<Key> keys){
+    static CompletableFuture<Suggestions> suggestKeysNoNamespace(SuggestionsBuilder builder, Iterable<Key> keys) {
         return CompletionProvider.suggestMatching(builder, ListUtils.fromIterable(keys, Key::value));
     }
 
-    static CompletableFuture<Suggestions> suggestPlayerNames(CommandSource c, SuggestionsBuilder builder){
+    static CompletableFuture<Suggestions> suggestPlayerNames(CommandSource c, SuggestionsBuilder builder) {
         String token = builder.getRemainingLowerCase();
         boolean seeVanished = c.hasPermission(Permissions.VANISH_SEE);
 
-        for (CrownUser user: UserManager.getOnlineUsers()){
+        for (CrownUser user: UserManager.getOnlineUsers()) {
             if(user.isVanished() && !seeVanished) continue;
             if(!user.getName().toLowerCase().startsWith(token)) continue;
 
@@ -42,7 +42,7 @@ public interface FtcSuggestionProvider {
         return builder.buildFuture();
     }
 
-    static CompletableFuture<Suggestions> suggestPlayernamesAndEmotes(CommandContext<CommandSource> c, SuggestionsBuilder builder, boolean ignorePerms){
+    static CompletableFuture<Suggestions> suggestPlayerNamesAndEmotes(CommandContext<CommandSource> c, SuggestionsBuilder builder, boolean ignorePerms) {
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ')+1);
 
         suggestPlayerNames(c.getSource(), builder);

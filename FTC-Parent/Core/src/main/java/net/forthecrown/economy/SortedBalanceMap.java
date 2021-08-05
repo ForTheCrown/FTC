@@ -2,6 +2,7 @@ package net.forthecrown.economy;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.ListUtils;
@@ -24,7 +25,7 @@ public class SortedBalanceMap implements BalanceMap {
     }
 
     @Override
-    public IntSupplier getDefaultAmount() {
+    public IntSupplier getDefaultSupplier() {
         return defaultAmount;
     }
 
@@ -44,7 +45,7 @@ public class SortedBalanceMap implements BalanceMap {
     @Override
     public int get(UUID id){
         int index = getIndex(id);
-        if(index == -1) return defaultAmount.getAsInt();
+        if(index == -1) return getDefaultAmount();
 
         return entries.get(index).getValue();
     }
@@ -78,7 +79,7 @@ public class SortedBalanceMap implements BalanceMap {
         return Component.text()
                 .append(displayName)
                 .append(Component.text(" - "))
-                .append(Balances.formatted(entry.getValue()).color(NamedTextColor.YELLOW))
+                .append(FtcFormatter.rhines(entry.getValue()).color(NamedTextColor.YELLOW))
                 .build();
     }
 
@@ -162,7 +163,7 @@ public class SortedBalanceMap implements BalanceMap {
 
     @Override
     public long getTotalBalance(){
-        int defAmount = getDefaultAmount().getAsInt();
+        int defAmount = getDefaultSupplier().getAsInt();
 
         return entries.stream()
                 .filter(e -> e.getValue() > defAmount)

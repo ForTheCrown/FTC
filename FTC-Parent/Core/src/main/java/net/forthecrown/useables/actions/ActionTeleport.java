@@ -59,7 +59,9 @@ public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance
         @Override
         public void onInteract(Player player) {
             CrownUser user = UserManager.getUser(player);
-            user.createTeleport(this::getLocation, true, true, UserTeleport.Type.TELEPORT);
+
+            user.createTeleport(this::getLocation, true, true, UserTeleport.Type.TELEPORT)
+                    .start(true);
         }
 
         @Override

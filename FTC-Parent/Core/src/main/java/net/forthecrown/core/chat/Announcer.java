@@ -16,6 +16,8 @@ import java.util.logging.Level;
 
 /**
  * The class representing the ingame Announcer.
+ * <p></p>
+ * Implementation: {@link FtcAnnouncer}
  */
 public interface Announcer extends CrownSerializer {
 
@@ -38,13 +40,15 @@ public interface Announcer extends CrownSerializer {
     List<Component> getAnnouncements();
 
     /**
-     * Set the list of strings the AutoAnnouncer uses, the [FTC] prefix is automatic
-     * @param announcements The new list the announcer will use
+     * Adds an announcement
+     * @param announcement the announcement to add
      */
-    void setAnnouncements(List<Component> announcements);
-
     void add(Component announcement);
 
+    /**
+     * Removes an announcement
+     * @param acIndex The index of the announcement to remove
+     */
     void remove(int acIndex);
 
     /**

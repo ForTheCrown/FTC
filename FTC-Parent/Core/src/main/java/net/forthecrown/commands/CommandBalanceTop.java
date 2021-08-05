@@ -1,10 +1,10 @@
 package net.forthecrown.commands;
 
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.commands.arguments.BaltopType;
+import net.forthecrown.commands.arguments.BaltopArgument;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.BalanceMap;
-import net.forthecrown.economy.Balances;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -43,7 +43,7 @@ public class CommandBalanceTop extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> sendBaltopMessage(c.getSource().asBukkit(), 0))
-                .then(argument("page", BaltopType.BALTOP)
+                .then(argument("page", BaltopArgument.BALTOP)
                         .executes(c -> sendBaltopMessage(c.getSource().asBukkit(), c.getArgument("page", Integer.class)))
                 );
     }
@@ -61,9 +61,10 @@ public class CommandBalanceTop extends FtcCommand {
 
         if(page < 1) {
             text
-                    .append(Component.text("Server total: ").color(NamedTextColor.YELLOW))
-                    .append(Balances.formatted((int) balMap.getTotalBalance()))
-                    .append(Component.text("."))
+                    .append(Component.translatable("economy.baltop.total",
+                            NamedTextColor.YELLOW,
+                            FtcFormatter.rhines((int) balMap.getTotalBalance()))
+                    )
                     .append(Component.newline());
         }
 
@@ -80,12 +81,12 @@ public class CommandBalanceTop extends FtcCommand {
                     .append(Component.newline());
         }
 
-        Component pageAscending = page + 1 == BaltopType.MAX ? Component.empty() : Component.text("> ")
+        Component pageAscending = page + 1 == BaltopArgument.MAX ? Component.empty() : Component.text(" > ")
                 .decorate(TextDecoration.BOLD)
                 .clickEvent(ClickEvent.runCommand("/baltop " + (page + 2)))
                 .hoverEvent(Component.text("Next page"));
 
-        Component pageDescending = page == 0 ? Component.empty() : Component.text(" <")
+        Component pageDescending = page == 0 ? Component.empty() : Component.text(" < ")
                 .decorate(TextDecoration.BOLD)
                 .clickEvent(ClickEvent.runCommand("/baltop " + page))
                 .hoverEvent(Component.text("Last page"));
@@ -93,9 +94,7 @@ public class CommandBalanceTop extends FtcCommand {
         Component footerMessage = Component.text()
                 .color(NamedTextColor.YELLOW)
                 .append(pageDescending)
-                .append(Component.space())
-                .append(Component.translatable("economy.baltop.footer", Component.text((page+1) + "/" + BaltopType.MAX)))
-                .append(Component.space())
+                .append(Component.translatable("economy.baltop.footer", Component.text((page+1) + "/" + BaltopArgument.MAX)))
                 .append(pageAscending)
                 .build();
 

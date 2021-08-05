@@ -3,7 +3,7 @@ package net.forthecrown.user.data;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
@@ -28,7 +28,7 @@ public class DirectMessage {
         this.responding = responding;
         this.input = input;
 
-        formattedText = ChatFormatter.formatIfAllowed(input, sender.asBukkit());
+        formattedText = FtcFormatter.formatIfAllowed(input, sender.asBukkit());
         muteStatus = ForTheCrown.getPunishmentManager().checkMute(sender.asBukkit());
     }
 
@@ -40,8 +40,8 @@ public class DirectMessage {
         return receiver;
     }
 
-    public Component senderDisplayName(){ return ChatFormatter.sourceDisplayName(sender); }
-    public Component receiverDisplayName(){ return ChatFormatter.sourceDisplayName(receiver); }
+    public Component senderDisplayName(){ return FtcFormatter.sourceDisplayName(sender); }
+    public Component receiverDisplayName(){ return FtcFormatter.sourceDisplayName(receiver); }
 
     public Component getSenderHeader(){
         return getHeader(

@@ -1,13 +1,16 @@
 package net.forthecrown.core;
 
-import net.forthecrown.utils.FtcUtils;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class DayUpdate {
     private final List<Runnable> listeners = new ArrayList<>();
+
+    //Means this thing thinks the day changed right before the server's restart.
+    private final TimeZone updateTimeZone = TimeZone.getTimeZone("GMT+06:00"); //TimeZone of central Kazakhstan lmao
+
     private byte day;
 
     DayUpdate(byte day) {
@@ -16,13 +19,13 @@ public class DayUpdate {
     }
 
     public void checkDay(){
-        Calendar calendar = Calendar.getInstance(FtcUtils.SERVER_TIME_ZONE);
+        Calendar calendar = Calendar.getInstance(updateTimeZone);
         if(calendar.get(Calendar.DAY_OF_WEEK) != getDay()) update();
     }
 
     public void update(){
         ForTheCrown.logger().info("Updating date");
-        setDay((byte) Calendar.getInstance(FtcUtils.SERVER_TIME_ZONE).get(Calendar.DAY_OF_WEEK));
+        setDay((byte) Calendar.getInstance(updateTimeZone).get(Calendar.DAY_OF_WEEK));
 
         listeners.forEach(r -> {
             try {
@@ -40,6 +43,10 @@ public class DayUpdate {
 
     public byte getDay() {
         return day;
+    }
+
+    public TimeZone getUpdateTimeZone() {
+        return updateTimeZone;
     }
 
     public void setDay(byte day) {

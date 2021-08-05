@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
@@ -25,10 +25,10 @@ public class CommandIgnore extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
-                            CrownUser target = UserType.getUser(c, "user");
+                            CrownUser target = UserArgument.getUser(c, "user");
 
                             if(target.equals(user)) throw FtcExceptionProvider.cannotIgnoreSelf();
 

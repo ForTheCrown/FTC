@@ -1,6 +1,6 @@
 package net.forthecrown.inventory;
 
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.enums.Rank;
@@ -90,7 +90,7 @@ public class RankInventory {
     }
 
     private Inventory getBaseInventory(Branch branch, String title){
-        CustomInventoryHolder holder = new CustomInventoryHolder(ChatFormatter.translateHexCodes(title), 54);
+        CustomInventoryHolder holder = new CustomInventoryHolder(FtcFormatter.translateHexCodes(title), 54);
         Inventory inventory = holder.getInventory();
 
         inventory.setItem(8, CrownItems.makeItem(Material.PAPER, 1, true, "&eNext page >"));

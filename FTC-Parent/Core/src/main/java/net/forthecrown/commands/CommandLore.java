@@ -32,7 +32,7 @@ public class CommandLore extends FtcCommand {
         super("lore", ForTheCrown.inst());
 
         setAliases("itemlore");
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 

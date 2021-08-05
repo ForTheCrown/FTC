@@ -11,7 +11,8 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.WgFlags;
@@ -19,7 +20,7 @@ import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.StaffChat;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.npc.NpcDirectory;
 import net.forthecrown.economy.selling.SellShops;
@@ -62,7 +63,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 public class CoreListener implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event){
         CrownUser user = UserManager.getUser(event.getPlayer());
         boolean nameChanged = user.onJoin();
@@ -75,13 +76,13 @@ public class CoreListener implements Listener {
             event.joinMessage(null);
 
             //Give join kit
-            Kit kit = ForTheCrown.getKitRegistry().get(ForTheCrown.onFirstJoinKit());
+            Kit kit = ForTheCrown.getKitManager().get(ComVars.onFirstJoinKit());
             if(kit != null) kit.attemptItemGiving(event.getPlayer());
         } else {
             user.sendMessage(Component.translatable("server.welcomeBack").color(NamedTextColor.GOLD));
 
             if(user.isVanished()) event.joinMessage(null);
-            else event.joinMessage(nameChanged ? ChatFormatter.newNameJoinMessage(user) : ChatFormatter.joinMessage(user));
+            else event.joinMessage(nameChanged ? FtcFormatter.newNameJoinMessage(user) : FtcFormatter.joinMessage(user));
         }
 
         Pirates.getParrotTracker().check(user.getPlayer());
@@ -98,7 +99,7 @@ public class CoreListener implements Listener {
         Pirates.getParrotTracker().check(user.getPlayer());
 
         if(user.isVanished()) event.quitMessage(null);
-        else event.quitMessage(ChatFormatter.formatLeaveMessage(user));
+        else event.quitMessage(FtcFormatter.leaveMessage(user));
     }
 
     @EventHandler
@@ -116,22 +117,22 @@ public class CoreListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getBlock().getType() != Material.HOPPER) return;
-        if(ForTheCrown.getHoppersInOneChunk() == -1) return;
+        if(ComVars.getHoppersInOneChunk() == -1) return;
         int hopperAmount = event.getBlock().getChunk().getTileEntities(block -> block.getType() == Material.HOPPER, true).size();
-        if(hopperAmount <= ForTheCrown.getHoppersInOneChunk()) return;
+        if(hopperAmount <= ComVars.getHoppersInOneChunk()) return;
 
         event.setCancelled(true);
-        event.getPlayer().sendMessage(Component.text("Too many hoppers (Max " + ForTheCrown.getHoppersInOneChunk() + ")").color(NamedTextColor.RED));
+        event.getPlayer().sendMessage(Component.text("Too many hoppers (Max " + ComVars.getHoppersInOneChunk() + ")").color(NamedTextColor.RED));
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
 
-        event.line(0, ChatFormatter.formatIfAllowed(event.getLine(0), player));
-        event.line(1, ChatFormatter.formatIfAllowed(event.getLine(1), player));
-        event.line(2, ChatFormatter.formatIfAllowed(event.getLine(2), player));
-        event.line(3, ChatFormatter.formatIfAllowed(event.getLine(3), player));
+        event.line(0, FtcFormatter.formatIfAllowed(event.getLine(0), player));
+        event.line(1, FtcFormatter.formatIfAllowed(event.getLine(1), player));
+        event.line(2, FtcFormatter.formatIfAllowed(event.getLine(2), player));
+        event.line(3, FtcFormatter.formatIfAllowed(event.getLine(3), player));
 
         EavesDropper.reportSignPlacement(event.getPlayer(), event.getBlock().getLocation(),
                 event.line(0),
@@ -198,7 +199,7 @@ public class CoreListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncChatEvent event) {
-        event.renderer(ChatFormatter::formatChat);
+        event.renderer(FtcFormatter::formatChat);
 
         PunishmentManager punishments = ForTheCrown.getPunishmentManager();
         Player player = event.getPlayer();
@@ -264,7 +265,7 @@ public class CoreListener implements Listener {
         if(inter.mChatToggled()){
             event.viewers().clear();
 
-            if(inter.getMarriedTo() == null){
+            if(inter.getSpouse() == null){
                 user.sendMessage(
                         Component.text()
                                 .append(Component.translatable("marriage.notMarried").color(NamedTextColor.RED))
@@ -276,16 +277,16 @@ public class CoreListener implements Listener {
                 return;
             }
 
-            CrownUser target = UserManager.getUser(inter.getMarriedTo());
+            CrownUser target = UserManager.getUser(inter.getSpouse());
             if(!target.isOnline()){
                 user.sendMessage(
-                        Component.translatable(UserType.USER_NOT_ONLINE.getTranslationKey(), target.nickDisplayName())
+                        Component.translatable(UserArgument.USER_NOT_ONLINE.getTranslationKey(), target.nickDisplayName())
                                 .color(NamedTextColor.RED)
                 );
                 return;
             }
 
-            new MarriageMessage(user, UserManager.getUser(inter.getMarriedTo()), ChatUtils.getString(event.message()))
+            new MarriageMessage(user, UserManager.getUser(inter.getSpouse()), ChatUtils.getString(event.message()))
                     .complete();
         }
     }

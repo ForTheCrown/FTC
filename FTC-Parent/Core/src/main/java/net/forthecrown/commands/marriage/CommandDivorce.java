@@ -43,10 +43,10 @@ public class CommandDivorce extends FtcCommand {
                     CrownUser user = getUserSender(c);
                     UserInteractions inter = user.getInteractions();
 
-                    if(inter.getMarriedTo() == null) throw FtcExceptionProvider.notMarried();
+                    if(inter.getSpouse() == null) throw FtcExceptionProvider.notMarried();
                     if(!inter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
 
-                    CrownUser spouse = UserManager.getUser(inter.getMarriedTo());
+                    CrownUser spouse = UserManager.getUser(inter.getSpouse());
                     if(!spouse.getInteractions().canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(spouse);
 
                     user.sendMessage(
@@ -56,7 +56,7 @@ public class CommandDivorce extends FtcCommand {
                                     .color(NamedTextColor.GRAY)
                                     .append(Component.space())
                                     .append(
-                                            Component.translatable("commands.becomeBaron.confirm.button")
+                                            Component.translatable("buttons.confirm")
                                                     .color(NamedTextColor.AQUA)
                                                     .hoverEvent(Component.text("Click to confirm"))
                                                     .clickEvent(ClickEvent.runCommand("/divorce confirm"))
@@ -70,20 +70,20 @@ public class CommandDivorce extends FtcCommand {
                             CrownUser user = getUserSender(c);
                             UserInteractions inter = user.getInteractions();
 
-                            if(inter.getMarriedTo() == null) throw FtcExceptionProvider.notMarried();
+                            if(inter.getSpouse() == null) throw FtcExceptionProvider.notMarried();
                             if(!inter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
 
-                            CrownUser spouse = UserManager.getUser(inter.getMarriedTo());
+                            CrownUser spouse = UserManager.getUser(inter.getSpouse());
                             if(!spouse.getInteractions().canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(spouse);
 
-                            inter.setMarriedTo(null);
+                            inter.setSpouse(null);
                             inter.setMChatToggled(false);
                             inter.setLastMarriageChange(System.currentTimeMillis());
 
                             UserInteractions tInter = spouse.getInteractions();
 
                             tInter.setMChatToggled(false);
-                            tInter.setMarriedTo(null);
+                            tInter.setSpouse(null);
                             tInter.setLastMarriageChange(System.currentTimeMillis());
 
                             user.sendMessage(Component.translatable("marriage.divorce", spouse.nickDisplayName().color(NamedTextColor.GOLD)).color(NamedTextColor.YELLOW));

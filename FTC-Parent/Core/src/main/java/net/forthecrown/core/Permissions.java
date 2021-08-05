@@ -29,7 +29,7 @@ public final class Permissions {
     public static final Permission VANISH_SEE =         register("ftc.vanish.see");
 
     public static final Permission STAFF_CHAT =         register("ftc.staffchat");
-    public static final Permission CORE_ADMIN =         register("ftc.admin");
+    public static final Permission FTC_ADMIN =          register("ftc.admin");
     public static final Permission VIKING_ADMIN =       register("ftc.admin.vikings");
     public static final Permission GAMEMODES =          register("ftc.gamemodes");
     public static final Permission KING_MAKER =         register("ftc.kingmaker");
@@ -72,6 +72,9 @@ public final class Permissions {
     public static final Permission TPA_HERE =           register(COMMAND_PREFIX + "tpahere");
 
     public static final Permission HELP =               register(COMMAND_PREFIX + "help");
+
+    public static final Permission PAY_TOGGLE =         register(COMMAND_PREFIX + "pay.toggle");
+    public static final Permission PAY =                register(COMMAND_PREFIX + "pay");
 
     public static final Permission MESSAGE =            register(COMMAND_PREFIX + "message");
 

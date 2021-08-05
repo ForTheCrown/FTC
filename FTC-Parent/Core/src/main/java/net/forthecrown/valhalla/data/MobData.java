@@ -46,6 +46,11 @@ public class MobData implements RaidData {
         hostile.add(data);
     }
 
+    public void removeHostile(int index) {
+        if(hostile == null) return;
+        hostile.remove(index);
+    }
+
     public ObjectList<EntitySpawnData> getPassive() {
         return passive;
     }
@@ -59,6 +64,11 @@ public class MobData implements RaidData {
         passive.add(data);
     }
 
+    public void removePassive(int index) {
+        if(passive == null) return;
+        passive.remove(index);
+    }
+
     public ObjectList<EntitySpawnData> getSpecial() {
         return special;
     }
@@ -70,5 +80,10 @@ public class MobData implements RaidData {
     public void addSpecial(EntitySpawnData data) {
         if(special == null) special = new ObjectArrayList<>();
         special.add(data);
+    }
+
+    public void removeSpecial(int index) {
+        if(special == null) return;
+        special.remove(index);
     }
 }

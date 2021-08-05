@@ -2,9 +2,9 @@ package net.forthecrown.pirates.grappling;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.serializer.JsonBuf;
@@ -87,9 +87,9 @@ public class GhLevelData implements JsonSerializable {
                 case NORMAL: break;
 
                 case END:
-                    ForTheCrown.getBalances().add(user.getUniqueId(), ForTheCrown.getGhFinalReward(), false);
+                    ForTheCrown.getBalances().add(user.getUniqueId(), ComVars.getGhFinalReward(), false);
                     user.sendMessage(
-                            Component.translatable("gh.reward.final", Balances.formatted(ForTheCrown.getGhFinalReward()).color(NamedTextColor.YELLOW))
+                            Component.translatable("gh.reward.final", FtcFormatter.rhines(ComVars.getGhFinalReward()).color(NamedTextColor.YELLOW))
                                     .color(NamedTextColor.GRAY)
                     );
 
@@ -97,9 +97,9 @@ public class GhLevelData implements JsonSerializable {
                     break;
 
                 case SPECIAL:
-                    ForTheCrown.getBalances().add(user.getUniqueId(), ForTheCrown.getGhSpecialReward(), false);
+                    ForTheCrown.getBalances().add(user.getUniqueId(), ComVars.getGhSpecialReward(), false);
                     user.sendMessage(
-                            Component.translatable("gh.reward.special", Balances.formatted(ForTheCrown.getGhSpecialReward()).color(NamedTextColor.YELLOW))
+                            Component.translatable("gh.reward.special", FtcFormatter.rhines(ComVars.getGhSpecialReward()).color(NamedTextColor.YELLOW))
                                     .color(NamedTextColor.GRAY)
                     );
                     break;
@@ -111,12 +111,13 @@ public class GhLevelData implements JsonSerializable {
         GhLevelData data = Pirates.getParkour().byName(getNextLevel());
         if(data == null) {
             if(type != GhType.END) ForTheCrown.logger().warning(name + " has null nextLevel pointer");
-            else player.teleport(GhParkour.EXIT);
+            else  player.teleport(GhParkour.EXIT);
 
             return;
         }
 
         data.enter(player, world);
+        player.sendMessage(Component.translatable("gh.advanced", NamedTextColor.GRAY));
     }
 
     public boolean hasCompleted(UUID uuid) {
@@ -173,7 +174,7 @@ public class GhLevelData implements JsonSerializable {
 
     public ItemStack makeItem(UUID uuid) {
         ItemStackBuilder builder = new ItemStackBuilder(hasCompleted(uuid) ? biome.completedMat() : biome.selectorMat())
-                .setName(formattedName().style(ChatFormatter.nonItalic(biome.color)));
+                .setName(formattedName().style(FtcFormatter.nonItalic(biome.color)));
 
         if(Pirates.getParkour().isFirstUncompleted(uuid, this)) builder.addEnchant(Enchantment.CHANNELING, 1);
 

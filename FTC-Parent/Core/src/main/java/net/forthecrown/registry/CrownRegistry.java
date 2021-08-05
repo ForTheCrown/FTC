@@ -9,7 +9,7 @@ import java.util.Set;
 public interface CrownRegistry<T, R> {
     T get(Key key);
 
-    T register(Key key, R raw);
+    T register(Key key, R value);
 
     void remove(Key key);
 

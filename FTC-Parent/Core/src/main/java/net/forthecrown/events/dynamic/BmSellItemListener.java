@@ -1,7 +1,7 @@
 package net.forthecrown.events.dynamic;
 
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.pirates.merchants.MaterialMerchant;
 import net.forthecrown.pirates.Pirates;
@@ -75,7 +75,7 @@ public class BmSellItemListener extends AbstractInvListener implements Listener 
         }
         merchant.setEarned(toSell, newEarned);
 
-        Component s = ChatFormatter.itemName(toSellItem);
+        Component s = FtcFormatter.itemDisplayName(toSellItem);
 
         Balances bals = ForTheCrown.getBalances();
         bals.add(uuid, toPay, false);
@@ -86,7 +86,7 @@ public class BmSellItemListener extends AbstractInvListener implements Listener 
                 .append(Component.text(" "))
                 .append(s.color(NamedTextColor.YELLOW))
                 .append(Component.text(" for "))
-                .append(Balances.formatted(toPay).color(NamedTextColor.GOLD));
+                .append(FtcFormatter.rhines(toPay).color(NamedTextColor.GOLD));
 
         user.sendMessage(
                 Component.text("You ")

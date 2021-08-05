@@ -5,6 +5,9 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import org.bukkit.Location;
 import org.bukkit.World;
 
+/**
+ * Dear god, I don't know enough about structure editing in MC to make this
+ */
 public class RegionPolePlacer {
     public static boolean needsPole(RegionCords cords, World world) {
         return true;

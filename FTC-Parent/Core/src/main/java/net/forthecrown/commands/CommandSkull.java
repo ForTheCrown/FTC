@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
@@ -24,12 +24,12 @@ public class CommandSkull extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("profile", UserType.user())
+                .then(argument("profile", UserArgument.user())
                         .executes(c -> {
                             Player player = getPlayerSender(c);
                             if(player.getInventory().firstEmpty() == -1) throw FtcExceptionProvider.inventoryFull();
 
-                            CrownUser user = UserType.getUser(c, "profile");
+                            CrownUser user = UserArgument.getUser(c, "profile");
 
                             CompletableFuture.runAsync(() -> {
                                 ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);

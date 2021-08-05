@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
@@ -73,10 +73,10 @@ public class CommandStaffChatToggle extends FtcCommand {
                             return 0;
                         })
 
-                        .then(argument("user", UserType.onlineUser())
+                        .then(argument("user", UserArgument.onlineUser())
                                 .executes(c -> {
                                     CommandSource source = c.getSource();
-                                    Player player = UserType.getUser(c, "user").getPlayer();
+                                    Player player = UserArgument.getUser(c, "user").getPlayer();
                                     Set<Player> set = StaffChat.ignoring;
 
                                     if(set.contains(player)){

@@ -1,6 +1,6 @@
 package net.forthecrown.inventory.builder.options;
 
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.user.CrownUser;
 import org.bukkit.inventory.Inventory;
@@ -39,7 +39,7 @@ public class SimpleOption implements InventoryOption {
     }
 
     @Override
-    public void onClick(CrownUser user, ClickContext context) throws RoyalCommandException {
+    public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
         if(runnable != null) runnable.onClick(user, context);
     }
 }

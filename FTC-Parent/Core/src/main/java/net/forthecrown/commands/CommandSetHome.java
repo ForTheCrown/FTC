@@ -1,14 +1,14 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.ForTheCrown;
+import net.forthecrown.core.Permissions;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserHomes;
-import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -38,7 +38,6 @@ public class CommandSetHome extends FtcCommand {
 
 
     private int attemptHomeSetting(HomeCreationContext context) throws RoyalCommandException {
-        if(context.homes.contains(context.name)) throw FtcExceptionProvider.homeNameInUse();
         if(!context.homes.canMakeMore()) throw FtcExceptionProvider.overHomeLimit(context.user);
 
         if(!context.user.hasPermission(Permissions.WORLD_BYPASS)){

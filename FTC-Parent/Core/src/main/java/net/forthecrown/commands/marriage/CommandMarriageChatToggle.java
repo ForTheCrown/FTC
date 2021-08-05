@@ -2,7 +2,7 @@ package net.forthecrown.commands.marriage;
 
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
@@ -47,13 +47,13 @@ public class CommandMarriageChatToggle extends FtcCommand {
                     CrownUser user = getUserSender(c);
                     UserInteractions inter = user.getInteractions();
 
-                    if(inter.getMarriedTo() == null) throw FtcExceptionProvider.notMarried();
+                    if(inter.getSpouse() == null) throw FtcExceptionProvider.notMarried();
 
                     boolean toggled = !inter.mChatToggled();
 
                     if(toggled){
-                        CrownUser spouse = UserManager.getUser(inter.getMarriedTo());
-                        if(!spouse.isOnline()) throw UserType.USER_NOT_ONLINE.create(spouse.nickDisplayName());
+                        CrownUser spouse = UserManager.getUser(inter.getSpouse());
+                        if(!spouse.isOnline()) throw UserArgument.USER_NOT_ONLINE.create(spouse.nickDisplayName());
                     }
 
                     String key = "marriage.chat." + (toggled ? "on" : "off");

@@ -6,7 +6,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -53,7 +53,7 @@ public class CommandMe extends FtcCommand {
                             }
 
                             Component displayName = source.isPlayer() ? UserManager.getUser(source.asPlayer()).coloredNickDisplayName() : source.displayName();
-                            Component action = ChatFormatter.formatIfAllowed(c.getArgument("action", String.class), source.asBukkit());
+                            Component action = FtcFormatter.formatIfAllowed(c.getArgument("action", String.class), source.asBukkit());
 
                             Component formatted = Component.text()
                                     .append(Component.text("* "))

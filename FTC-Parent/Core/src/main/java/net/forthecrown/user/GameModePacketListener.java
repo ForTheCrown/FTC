@@ -41,14 +41,23 @@ public class GameModePacketListener {
                 public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
                     if(packet instanceof ClientboundPlayerInfoPacket) {
                         ClientboundPlayerInfoPacket infoPacket = (ClientboundPlayerInfoPacket) packet;
+                        ListIterator<ClientboundPlayerInfoPacket.PlayerUpdate> iterator = infoPacket.getEntries().listIterator();
 
                         if (infoPacket.getAction() == ClientboundPlayerInfoPacket.Action.UPDATE_GAME_MODE) {
-                            ListIterator<ClientboundPlayerInfoPacket.PlayerUpdate> iterator = infoPacket.getEntries().listIterator();
-
                             while (iterator.hasNext()) {
                                 ClientboundPlayerInfoPacket.PlayerUpdate u = iterator.next();
                                 if(u.getGameMode() != GameType.SPECTATOR) continue;
                                 if(!u.getProfile().getId().equals(receiver.getUniqueId())) return;
+                            }
+                        } else if(infoPacket.getAction() == ClientboundPlayerInfoPacket.Action.ADD_PLAYER) {
+                            //I swear to god, if a player receives a packet of their own player being added
+                            //I will murder someone
+
+                            while (iterator.hasNext()) {
+                                ClientboundPlayerInfoPacket.PlayerUpdate u = iterator.next();
+                                if(u.getGameMode() != GameType.SPECTATOR) continue;
+
+                                iterator.set(new ClientboundPlayerInfoPacket.PlayerUpdate(u.getProfile(), u.getLatency(), GameType.SURVIVAL, u.getDisplayName()));
                             }
                         }
                     }

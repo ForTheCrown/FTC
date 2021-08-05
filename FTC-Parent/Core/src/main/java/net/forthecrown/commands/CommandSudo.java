@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
@@ -23,7 +23,7 @@ public class CommandSudo extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.onlineUser())
+                .then(argument("user", UserArgument.onlineUser())
                         .then(argument("text", StringArgumentType.greedyString())
                                 .suggests((c, b) -> {
                                     String token = b.getRemaining().toLowerCase();
@@ -38,7 +38,7 @@ public class CommandSudo extends FtcCommand {
 
                                 .executes(c -> {
                                     CommandSource source = c.getSource();
-                                    CrownUser user = UserType.getUser(c, "user");
+                                    CrownUser user = UserArgument.getUser(c, "user");
 
                                     String text = c.getArgument("text", String.class);
                                     boolean chat = text.startsWith("c:");

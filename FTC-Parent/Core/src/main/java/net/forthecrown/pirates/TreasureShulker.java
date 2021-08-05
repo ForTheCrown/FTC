@@ -3,9 +3,9 @@ package net.forthecrown.pirates;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.CrownRandom;
@@ -111,7 +111,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
         Block block = location.getBlock();
         if(!block.getType().isAir()) block.setType(Material.AIR);
 
-        ForTheCrown.getTreasureWorld().spawn(location, Shulker.class, shulker -> {
+        ComVars.getTreasureWorld().spawn(location, Shulker.class, shulker -> {
             currentID = shulker.getUniqueId();
 
             shulker.getPersistentDataContainer().set(Pirates.SHULKER_KEY, PersistentDataType.BYTE, (byte) 1);
@@ -200,7 +200,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
         if(random.nextBoolean()) x = -x;
         if(random.nextBoolean()) z = -z;
 
-        return new Location(ForTheCrown.getTreasureWorld(), x, y, z);
+        return new Location(ComVars.getTreasureWorld(), x, y, z);
     }
 
     public Location getLocation() {
@@ -263,8 +263,8 @@ public class TreasureShulker extends AbstractJsonSerializer {
         int rhineReward;
 
         public Loot(Player player, Location location, CrownRandom random, CrownLootTable lootTable){
-            this.items = lootTable.populateLoot(random, new LootContext.Builder(location).killer(player).build(), ForTheCrown.getMaxTreasureItems());
-            this.rhineReward = random.intInRange(ForTheCrown.getTreasureMinPrize(), ForTheCrown.getTreasureMaxPrize());
+            this.items = lootTable.populateLoot(random, new LootContext.Builder(location).killer(player).build(), ComVars.getMaxTreasureItems());
+            this.rhineReward = random.intInRange(ComVars.getTreasureMinPrize(), ComVars.getTreasureMaxPrize());
         }
 
         public boolean giveRewards(Player player){
@@ -281,7 +281,12 @@ public class TreasureShulker extends AbstractJsonSerializer {
             ForTheCrown.getBalances().add(player.getUniqueId(), rhineReward, false);
             items.forEach(i -> player.getInventory().addItem(i));
 
-            player.sendMessage(display());
+            player.sendMessage(
+                    Component.translatable("pirates.shulker.found",
+                            NamedTextColor.GRAY,
+                            display()
+                    )
+            );
             return true;
         }
 
@@ -301,7 +306,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
         public Component display(){
             return Component.text()
                     .color(NamedTextColor.YELLOW)
-                    .append(Balances.formatted(rhineReward))
+                    .append(FtcFormatter.rhines(rhineReward))
                     .append(
                             Component.text(" and some items")
                                     .hoverEvent(this)
@@ -318,7 +323,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
             for (ItemStack i: items){
                 builder
                         .append(Component.newline())
-                        .append(ChatFormatter.itemName(i));
+                        .append(FtcFormatter.itemDisplayName(i));
             }
 
             return HoverEvent.showText(builder.build());

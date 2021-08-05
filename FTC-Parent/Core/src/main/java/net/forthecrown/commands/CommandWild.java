@@ -16,6 +16,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -71,10 +72,10 @@ public class CommandWild extends FtcCommand {
                     return 0;
                 })
                 .then(argument("player", EntityArgument.multipleEntities())
-                        .requires(c -> c.hasPermission("ftc.admin"))
+                        .requires(c -> c.hasPermission(Permissions.FTC_ADMIN))
 
                         .then(argument("world", WorldArgument.world())
-                                .requires(c -> c.hasPermission("ftc.admin"))
+                                .requires(c -> c.hasPermission(Permissions.FTC_ADMIN))
 
                                 .executes(c -> {
                                     Collection<? extends Entity> players = c.getArgument("player", EntitySelector.class).getEntities(c.getSource());
@@ -92,7 +93,7 @@ public class CommandWild extends FtcCommand {
                     .color(NamedTextColor.YELLOW)
                     .clickEvent(ClickEvent.runCommand("/warp portal"))
                     .hoverEvent(Component.text("Warps you to the portal"))
-                   )
+            )
             .append(Component.text(" to get back"));
 
     public static void wildTP(Entity p, World world, boolean cooldown){
@@ -103,13 +104,16 @@ public class CommandWild extends FtcCommand {
         if(cooldown) Cooldown.add(p, "RandomFeatures_Wild", 600);
     }
 
-    private static boolean obstructed(Location bottom){
-        return isObstructed(bottom) || isObstructed(bottom.add(0, 1, 0));
+    private static boolean isInvalid(Location bottom){
+        return isInvalidLocation(bottom) || isInvalidLocation(bottom.add(0, 1, 0));
     }
 
-    private static boolean isObstructed(Location location){
+    private static boolean isInvalidLocation(Location location){
+        Biome biome = location.getWorld().getBiome(location.getBlockX(), location.getBlockX(), location.getBlockX());
+        if(biome.name().contains("OCEAN")) return true;
+
         Material mat = location.getBlock().getType();
-        return mat != Material.AIR && mat != Material.CAVE_AIR;
+        return !mat.isAir();
     }
 
     private static Location randLocation(World world, CrownRandom random){
@@ -121,7 +125,7 @@ public class CommandWild extends FtcCommand {
 
         Location result = new Location(world, x, y, z);
 
-        while (obstructed(result)){
+        while (isInvalid(result)){
             x = rand(maxSize, random);
             z = rand(maxSize, random);
             if(changeY) y = random.intInRange(30, 120);
@@ -129,7 +133,7 @@ public class CommandWild extends FtcCommand {
             result = new Location(world, x, y, z);
         }
 
-        return result;
+        return result.toCenterLocation();
     }
 
     private static int rand(int maxSize, CrownRandom random){

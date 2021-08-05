@@ -1,5 +1,7 @@
 package net.forthecrown.commands;
 
+import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -20,6 +22,8 @@ public class CommandCrownTop extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
+            if(!ComVars.isEventActive()) throw FtcExceptionProvider.create("Event is not active");
+
             FtcUtils.showLeaderboard(c.getSource().asPlayer(), "crown");
             return 0;
         });

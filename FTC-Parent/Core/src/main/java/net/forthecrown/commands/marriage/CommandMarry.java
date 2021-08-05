@@ -2,7 +2,7 @@ package net.forthecrown.commands.marriage;
 
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
@@ -41,18 +41,18 @@ public class CommandMarry extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.onlineUser())
+                .then(argument("user", UserArgument.onlineUser())
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
-                            CrownUser target = UserType.getUser(c, "user");
+                            CrownUser target = UserArgument.getUser(c, "user");
 
                             if(target.equals(user)) throw FtcExceptionProvider.translatable("marriage.marrySelf");
 
                             UserInteractions uInter = user.getInteractions();
                             UserInteractions tInter = target.getInteractions();
 
-                            if(uInter.getMarriedTo() != null) throw FtcExceptionProvider.senderAlreadyMarried();
-                            if(tInter.getMarriedTo() != null) throw FtcExceptionProvider.targetAlreadyMarried(target);
+                            if(uInter.getSpouse() != null) throw FtcExceptionProvider.senderAlreadyMarried();
+                            if(tInter.getSpouse() != null) throw FtcExceptionProvider.targetAlreadyMarried(target);
 
                             if(!uInter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
                             if(!tInter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(target);

@@ -1,14 +1,10 @@
 package net.forthecrown.events;
 
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.economy.shops.ShopInventory;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.economy.shops.SignShop;
-import net.forthecrown.events.custom.SignShopUseEvent;
-import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Cooldown;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,7 +26,8 @@ public class SignInteractEvent implements Listener {
         if(Cooldown.contains(event.getPlayer())) return;
         Cooldown.add(event.getPlayer(), 6);
 
-        SignShop shop = ForTheCrown.getShopManager().getShop(event.getClickedBlock().getLocation());
+        ShopManager manager = ForTheCrown.getShopManager();
+        SignShop shop = manager.getShop(event.getClickedBlock().getLocation());
         if(shop == null) return;
 
         Player player = event.getPlayer();
@@ -38,23 +35,17 @@ public class SignInteractEvent implements Listener {
         //Can't use in spectator lol
         if(player.getGameMode() == GameMode.SPECTATOR) return;
 
-        //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it
-        if(player.isSneaking() && (shop.getOwner().equals(player.getUniqueId()) || player.hasPermission(Permissions.CORE_ADMIN))){
-            player.openInventory(shop.getInventory());
-            Bukkit.getPluginManager().registerEvents(new SignShopInteractSubClass(player, shop), ForTheCrown.inst());
-            return;
-        }
-
         //Call the event
-        new SignShopUseEvent(shop, UserManager.getUser(player), player, ForTheCrown.getBalances()).callEvent();
+        //new SignShopUseEvent(shop, UserManager.getUser(player), player, ForTheCrown.getBalances()).callEvent();
+        manager.getInteractionHandler().handleInteraction(shop, player, ForTheCrown.getBalances());
     }
 
-    public class SignShopInteractSubClass implements Listener {
+    public static class ShopRestockListener implements Listener {
 
         private final SignShop shop;
         private final Player player;
 
-        public SignShopInteractSubClass(Player player, SignShop shop){
+        public ShopRestockListener(Player player, SignShop shop){
             this.player = player;
             this.shop = shop;
         }

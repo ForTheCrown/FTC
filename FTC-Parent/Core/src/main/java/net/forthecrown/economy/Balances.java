@@ -1,46 +1,19 @@
 package net.forthecrown.economy;
 
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.ComVars;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.CrownSerializer;
-import net.forthecrown.utils.FtcUtils;
-import net.kyori.adventure.text.Component;
+import net.forthecrown.utils.math.MathUtil;
+import org.bukkit.Bukkit;
 
 import java.util.UUID;
 
 /**
  * Represents the ingame balances held by the players
+ * <p></p>
+ * Implementation: {@link CrownBalances}
  */
 public interface Balances extends CrownSerializer {
-
-    /**
-     * Gets a formatted currency messaage
-     * @param amount The amount to format
-     * @return The message, will look like: "1,000,000 Rhines"
-     */
-    static String getFormatted(int amount){
-        return ChatFormatter.decimalizeNumber(amount) + " Rhine" + FtcUtils.addAnS(amount);
-    }
-
-    /**
-     * Same as formatted(int) except not translatable.
-     * @param amount The amount to format for
-     * @return The formatted message
-     */
-    static Component formattedNonTrans(int amount) {
-        return Component.text(getFormatted(amount));
-    }
-
-    /**
-     * Same thing as getFormatted but for components, is also translatable
-     * @param amount The amount to format
-     * @return A formatted, translatable, component
-     */
-    static Component formatted(int amount){
-        return Component.text()
-                .content(ChatFormatter.decimalizeNumber(amount) + " ")
-                .append(Component.translatable("economy.currency." + (amount == 1 || amount == -1 ? "singular" : "multiple")))
-                .build();
-    }
 
     /**
      * Gets the map of all balances on the server
@@ -59,21 +32,28 @@ public interface Balances extends CrownSerializer {
      * @param uuid the UUID of the player
      * @return The balance of the player
      */
-    Integer get(UUID uuid);
+    int get(UUID uuid);
 
     /**
      * Sets the players balance
      * @param uuid The UUID of the player
      * @param amount The new balance of the player
      */
-    void set(UUID uuid, Integer amount);
+    void set(UUID uuid, int amount);
 
     /**
      * Adds to a players balance
      * @param uuid The UUID of the player
      * @param amount The amount of Rhines to add to their balance
      */
-    void add(UUID uuid, Integer amount);
+    void add(UUID uuid, int amount);
+
+    /**
+     * Removes an amount for the given UUID
+     * @param id the id to remove from
+     * @param amount the amount to remove
+     */
+    void remove(UUID id, int amount);
 
     /**
      * Adds to a players balance
@@ -81,21 +61,21 @@ public interface Balances extends CrownSerializer {
      * @param amount The amount to add
      * @param isTaxed Whether the transaction is taxed, aka, if a % doesn't reach the player
      */
-    void add(UUID uuid, Integer amount, boolean isTaxed);
+    void add(UUID uuid, int amount, boolean isTaxed);
 
     /**
      * Gets the % a player is taxed
      * @param uuid The UUID of the player
      * @return the tax bracket of the person
      */
-    Integer getTax(UUID uuid);
+    int getTax(UUID uuid, int currentBal);
 
     /**
      * Sets a user's balance, ignoring the maximum balance limit
      * @param id The id of the balance to set
      * @param amount The amount to set the balance
      */
-    void setUnlimited(UUID id, Integer amount);
+    void setUnlimited(UUID id, int amount);
 
     /**
      * Checks if the given user can afford losing the given amount
@@ -104,4 +84,27 @@ public interface Balances extends CrownSerializer {
      * @return Whether they can afford losing that amount
      */
     boolean canAfford(UUID id, int amount);
+
+    /**
+     * Checks that the amount for the given UUID is under the max bal limit.
+     * <p></p>
+     * This returns nothing but it will log a warning if the balance is on or over the bal limit
+     * @param uuid The holder of the balance
+     * @param amount The amount to check
+     */
+    static void checkUnderMax(UUID uuid, int amount) {
+        if(amount > ComVars.getMaxMoneyAmount()) {
+            ForTheCrown.logger().warning(Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
+        }
+    }
+
+    /**
+     * Returns an amount that's within the balance bounds of 0 to {@link ComVars#getMaxMoneyAmount()}
+     * <p>Uses {@link MathUtil#clamp(long, long, long)}</p>
+     * @param amount The amount to clamp
+     * @return The amount within the bal limits.
+     */
+    static int clampToBalBounds(int amount) {
+        return (int) MathUtil.clamp(amount, 0, ComVars.getMaxMoneyAmount());
+    }
 }

@@ -1,9 +1,9 @@
 package net.forthecrown.events.dynamic;
 
 import net.forthecrown.core.ForTheCrown;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.economy.Balances;
 import net.forthecrown.user.enums.Pet;
 import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.kyori.adventure.text.Component;
@@ -60,7 +60,7 @@ public class BmParrotListener extends AbstractInvListener implements Listener {
                 user.sendMessage(
                         Component.translatable("commands.cannotAfford",
                                 NamedTextColor.GRAY,
-                                Balances.formatted(pet.getRequiredBal())
+                                FtcFormatter.rhines(pet.getRequiredBal())
                         )
                 );
                 return;

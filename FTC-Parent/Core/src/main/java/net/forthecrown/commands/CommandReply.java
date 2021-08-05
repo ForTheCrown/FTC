@@ -27,7 +27,7 @@ public class CommandReply extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.then(argument("message", StringArgumentType.greedyString())
-                .suggests((c, b) -> FtcSuggestionProvider.suggestPlayernamesAndEmotes(c, b, false))
+                .suggests((c, b) -> FtcSuggestionProvider.suggestPlayerNamesAndEmotes(c, b, false))
 
                 .executes(c -> {
                     CrownUser user = getUserSender(c);

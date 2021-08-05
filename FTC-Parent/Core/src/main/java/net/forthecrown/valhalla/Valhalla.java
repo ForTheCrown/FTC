@@ -37,9 +37,14 @@ public interface Valhalla extends Namespaced {
 
     ActiveRaid getActiveRaid();
 
-    boolean activeRaidExists();
+    default boolean activeRaidExists() {
+        return getActiveRaid() != null;
+    }
 
     @Pattern("[a-z0-9_\\-.]+")
     @Override
-    @NotNull String namespace();
+    @NotNull
+    default String namespace() {
+        return VIKING_NAMESPACE;
+    }
 }

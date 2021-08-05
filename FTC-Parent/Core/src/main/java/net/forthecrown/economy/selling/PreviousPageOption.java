@@ -1,6 +1,6 @@
 package net.forthecrown.economy.selling;
 
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.builder.options.SimpleOption;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
@@ -13,7 +13,7 @@ public class PreviousPageOption extends SimpleOption {
     private PreviousPageOption() {
         super(0,
                 new ItemStackBuilder(Material.PAPER, 1)
-                        .setName(Component.text("< Previous Page").style(ChatFormatter.nonItalic(NamedTextColor.YELLOW)))
+                        .setName(Component.text("< Previous Page").style(FtcFormatter.nonItalic(NamedTextColor.YELLOW)))
                         .build(),
                 (user, context) -> SellShops.MAIN.open(user)
         );

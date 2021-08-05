@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.TimeArgument;
 import net.forthecrown.serializer.JsonBuf;
@@ -98,7 +98,7 @@ public class CheckCooldownType implements UsageCheck<CheckCooldownType.CheckInst
         public Component personalizedMessage(Player player) {
             return duration > (2400*50) ? Component.text("You cannot use this for ")
                     .color(NamedTextColor.GRAY)
-                    .append(Component.text(ChatFormatter.convertMillisIntoTime(onCooldown.get(player.getUniqueId()) - System.currentTimeMillis())).color(NamedTextColor.GOLD))
+                    .append(Component.text(FtcFormatter.convertMillisIntoTime(onCooldown.get(player.getUniqueId()) - System.currentTimeMillis())).color(NamedTextColor.GOLD))
                     : null;
         }
 

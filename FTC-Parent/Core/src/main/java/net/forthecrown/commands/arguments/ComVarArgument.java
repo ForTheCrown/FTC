@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.grenadier.CommandSource;
@@ -32,6 +33,12 @@ public class ComVarArgument implements ArgumentType<ComVar<?>> {
     public ComVar<?> parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
         String name = reader.readUnquotedString();
+
+        try {
+            ComVarRegistry.validateName(name);
+        } catch (IllegalArgumentException e) {
+            throw FtcExceptionProvider.create(e.getMessage());
+        }
 
         ComVar<?> result = ComVarRegistry.getVar(name);
         if(result == null) throw UNKNOWN_VAR.createWithContext(GrenadierUtils.correctReader(reader, cursor), name);

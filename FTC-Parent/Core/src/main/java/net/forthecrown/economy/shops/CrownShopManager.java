@@ -2,12 +2,14 @@ package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.ForTheCrown;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 
 import java.util.*;
 
-public class CrownShopManager implements ShopManager{
+public class CrownShopManager implements ShopManager {
     Map<Location, CrownSignShop> loadedShops = new HashMap<>();
+    final FtcShopInteractionHandler handler = new FtcShopInteractionHandler();
 
     @Override
     public SignShop getShop(Location signShop) { //gets a signshop, null if not found
@@ -29,7 +31,10 @@ public class CrownShopManager implements ShopManager{
 
     @Override
     public Component getPriceLine(int amount){
-        return PRICE_LINE.append(Component.text("$" + amount));
+        return PRICE_LINE
+                .append(Component.text("$" + amount)
+                        .color(NamedTextColor.BLACK)
+                );
     }
 
     @Override
@@ -37,7 +42,9 @@ public class CrownShopManager implements ShopManager{
         for (CrownSignShop shop: loadedShops.values()){
             try {
                 shop.save();
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -46,7 +53,9 @@ public class CrownShopManager implements ShopManager{
         for (CrownSignShop shop: loadedShops.values()){
             try {
                 shop.reload();
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -68,5 +77,10 @@ public class CrownShopManager implements ShopManager{
     @Override
     public Collection<SignShop> getShops() {
         return new ArrayList<>(loadedShops.values());
+    }
+
+    @Override
+    public ShopInteractionHandler getInteractionHandler() {
+        return handler;
     }
 }

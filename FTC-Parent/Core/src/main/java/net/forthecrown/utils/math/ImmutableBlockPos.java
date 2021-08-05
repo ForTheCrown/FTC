@@ -6,10 +6,12 @@ import net.forthecrown.serializer.JsonSerializable;
 /**
  * An immutable block pos
  */
-public interface ImmutableBlockPos extends JsonSerializable {
+public interface ImmutableBlockPos extends JsonSerializable, Cloneable {
     int getX();
     int getY();
     int getZ();
+
+    ImmutableBlockPos clone();
 
     @Override
     default JsonObject serialize() {

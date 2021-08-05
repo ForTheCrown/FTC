@@ -19,7 +19,6 @@ import net.forthecrown.royalgrenadier.arguments.RoyalArgumentsImpl;
 import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.enums.Rank;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.NbtTagArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.TimeArgument;
 import net.minecraft.server.MinecraftServer;
@@ -48,22 +47,22 @@ public final class CoreCommands {
         VanillaArgumentType key = VanillaArgumentType.custom(ResourceLocationArgument::id);
 
         //ArgumentType registration
-        RoyalArgumentsImpl.register(NbtType.class, g -> NbtTagArgument.nbtTag(), true);
-        RoyalArgumentsImpl.register(UserType.class, UserType::getHandle, false);
+        RoyalArgumentsImpl.register(UserArgument.class, UserArgument::getHandle, false);
+        RoyalArgumentsImpl.register(NBTArgument.class, NBTArgument::getHandle, true);
         RoyalArgumentsImpl.register(TimeArgument.class, t -> t, true);
 
-        RoyalArguments.register(BaltopType.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, BaltopType.MAX)));
+        RoyalArguments.register(BaltopArgument.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, BaltopArgument.MAX)));
         RoyalArguments.register(ComVarArgument.class, VanillaArgumentType.WORD);
-        RoyalArguments.register(PetType.class, VanillaArgumentType.WORD);
+        RoyalArguments.register(PetArgument.class, VanillaArgumentType.WORD);
 
-        RoyalArguments.register(DeathEffectType.class, key);
-        RoyalArguments.register(ArrowEffectType.class, key);
+        RoyalArguments.register(DeathEffectArgument.class, key);
+        RoyalArguments.register(ArrowEffectArgument.class, key);
 
-        RoyalArguments.register(ActionArgType.class, key);
-        RoyalArguments.register(CheckArgType.class, key);
+        RoyalArguments.register(UsageActionArgument.class, key);
+        RoyalArguments.register(UsageCheckArgument.class, key);
 
-        RoyalArguments.register(WarpType.class, key);
-        RoyalArguments.register(KitType.class, key);
+        RoyalArguments.register(WarpArgument.class, key);
+        RoyalArguments.register(KitArgument.class, key);
 
         //Command loading
 
@@ -212,15 +211,15 @@ public final class CoreCommands {
         //Home commands
         new CommandHome();
         new CommandSetHome();
-        new CommandDelHome();
+        new CommandDeleteHome();
         new CommandHomeList();
 
         //emotes
         new EmoteToggle();
         new EmotePog();
 
-        CommandHelpType.MAX = Math.round(((float) CoreCommands.BY_NAME.size())/10);
-        RoyalArguments.register(CommandHelpType.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, CommandHelpType.MAX)));
+        HelpPageArgument.MAX = Math.round(((float) CoreCommands.BY_NAME.size())/10);
+        RoyalArguments.register(HelpPageArgument.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, HelpPageArgument.MAX)));
 
         new HelpHelp();
 

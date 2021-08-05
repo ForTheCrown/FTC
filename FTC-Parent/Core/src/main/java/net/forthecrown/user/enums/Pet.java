@@ -1,9 +1,8 @@
 package net.forthecrown.user.enums;
 
 import com.google.gson.JsonElement;
-import net.forthecrown.economy.Balances;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -41,7 +40,7 @@ public enum Pet implements JsonSerializable {
 
     Pet(Parrot.Variant variant, TextColor color, String permission, Rank required, String texture){
         this.variant = variant;
-        this.name = Component.text(ChatFormatter.normalEnum(this)).color(color);
+        this.name = Component.text(FtcFormatter.normalEnum(this)).color(color);
         this.permission = permission;
         this.texture = texture;
 
@@ -51,7 +50,7 @@ public enum Pet implements JsonSerializable {
 
     Pet(Parrot.Variant variant, TextColor color, String permission, int required, String texture){
         this.variant = variant;
-        this.name = Component.text(ChatFormatter.normalEnum(this)).color(color);
+        this.name = Component.text(FtcFormatter.normalEnum(this)).color(color);
         this.permission = permission;
         this.texture = texture;
 
@@ -81,7 +80,7 @@ public enum Pet implements JsonSerializable {
     }
 
     public Component requirementDisplay(){
-        Component needed = requiresRank() ? required.noEndSpacePrefix() : Component.text(Balances.getFormatted(requiredBal));
+        Component needed = requiresRank() ? required.noEndSpacePrefix() : Component.text(FtcFormatter.getRhines(requiredBal));
 
         return Component.text()
                 .color(NamedTextColor.YELLOW)

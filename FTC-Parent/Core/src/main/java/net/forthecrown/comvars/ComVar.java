@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * </p>
  * @param <T> The type stored by the variable, can be an int, String or whatever you want it to be
  */
-public class ComVar<T> {
+public final class ComVar<T> {
     private T value;
     private final ComVarType<T> type;
     private final String name;
@@ -65,7 +65,7 @@ public class ComVar<T> {
 
     @Override
     public String toString() {
-        return type.asString(value);
+        return type.asParsableString(value);
     }
 
     public String getName() {

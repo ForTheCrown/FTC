@@ -1,6 +1,6 @@
 package net.forthecrown.commands.punishments;
 
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -12,7 +12,7 @@ public class CommandSmite extends FtcCommand {
     public CommandSmite() {
         super("smite");
 
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 
@@ -34,9 +34,9 @@ public class CommandSmite extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.onlineUser())
+                .then(argument("user", UserArgument.onlineUser())
                         .executes(c -> {
-                            CrownUser user = UserType.getUser(c, "user");
+                            CrownUser user = UserArgument.getUser(c, "user");
 
                             user.getWorld().strikeLightning(user.getLocation());
 

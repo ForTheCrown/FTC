@@ -11,6 +11,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
+import javax.annotation.Nullable;
+
 public class EntitySpawnData {
     private final NamespacedKey entityKey;
     private final CompoundTag tag;
@@ -34,8 +36,12 @@ public class EntitySpawnData {
         level.addAllEntitiesSafely(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
     }
 
-    public CompoundTag getTag() {
+    public @Nullable CompoundTag getTag() {
         return tag;
+    }
+
+    public boolean hasTag() {
+        return tag != null;
     }
 
     public NamespacedKey getEntityKey() {

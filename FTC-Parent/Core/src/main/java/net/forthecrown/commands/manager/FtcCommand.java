@@ -48,16 +48,12 @@ public abstract class FtcCommand extends AbstractCommand {
 
     protected FtcCommand(String name){ this(name, ForTheCrown.inst()); }
 
-    protected CommandSender getSender(CommandContext<CommandSource> c){
-        return c.getSource().asBukkit();
-    }
-
     protected Player getPlayerSender(CommandContext<CommandSource> c) throws CommandSyntaxException {
         return c.getSource().asPlayer();
     }
 
     protected CrownUser getUserSender(CommandContext<CommandSource> c) throws CommandSyntaxException {
-        return UserManager.getUser(getPlayerSender(c));
+        return UserManager.getUser(c.getSource().asPlayer());
     }
 
     protected static void broadcastAdmin(CommandSource source, String message){
@@ -66,10 +62,6 @@ public abstract class FtcCommand extends AbstractCommand {
 
     protected void broadcastAdmin(CommandSender sender, String message){
         broadcastAdmin(CommandSources.getOrCreate(sender, this), message);
-    }
-
-    protected void broadcastAdmin(CommandContext<CommandSource> c, String message){
-        broadcastAdmin(c.getSource(), message);
     }
 
     private static Balances bals = ForTheCrown.getBalances();

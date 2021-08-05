@@ -1,11 +1,11 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
@@ -38,11 +38,11 @@ public class CommandHomeList extends FtcCommand {
                     return listHomes(user.getHomes(), c.getSource(), true);
                 })
 
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .requires(s -> s.hasPermission(Permissions.HOME_OTHERS))
 
                         .executes(c -> {
-                            CrownUser user = UserType.getUser(c, "user");
+                            CrownUser user = UserArgument.getUser(c, "user");
                             boolean self = user.getName().equalsIgnoreCase(c.getSource().textName());
 
                             return listHomes(user.getHomes(), c.getSource(), self);
@@ -63,7 +63,7 @@ public class CommandHomeList extends FtcCommand {
             builder
                     .append(Component.text("[" + e.getKey() + "] ")
                             .color(NamedTextColor.GOLD)
-                            .hoverEvent(ChatFormatter.prettyLocationMessage(e.getValue(), false))
+                            .hoverEvent(FtcFormatter.prettyLocationMessage(e.getValue(), false))
                             .clickEvent(ClickEvent.runCommand("/home " + prefix + e.getKey()))
                     );
         }

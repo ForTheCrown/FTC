@@ -1,6 +1,5 @@
 package net.forthecrown.economy.auctions;
 
-import net.forthecrown.core.CrownException;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.user.CrownUser;
 import org.bukkit.Location;
@@ -11,6 +10,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Represents an auction sign
+ * <p></p>
+ * Implementation: {@link CrownAuction}
+ */
 public interface Auction extends CrownSerializer {
 
     void delete();
@@ -23,7 +27,7 @@ public interface Auction extends CrownSerializer {
 
     void setClaimed(CrownUser owner, int baseBid, ItemStack item, boolean admin);
 
-    void attemptItemClaim(CrownUser user) throws CrownException;
+    void attemptItemClaim(CrownUser user);
 
     void updateSign();
 

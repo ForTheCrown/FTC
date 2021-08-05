@@ -1,6 +1,6 @@
 package net.forthecrown.dungeons;
 
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.squire.Squire;
@@ -47,7 +47,7 @@ public final class DungeonUtils {
                     Component.text()
                             .hoverEvent(i.asHoverEvent())
                             .append(Component.text("- " + i.getAmount() + " "))
-                            .append(ChatFormatter.itemName(i).color(NamedTextColor.DARK_AQUA))
+                            .append(FtcFormatter.itemDisplayName(i).color(NamedTextColor.DARK_AQUA))
             );
         }
         return text;

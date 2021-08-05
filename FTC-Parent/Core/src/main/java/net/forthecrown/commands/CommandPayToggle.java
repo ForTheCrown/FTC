@@ -2,6 +2,7 @@ package net.forthecrown.commands;
 
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -12,6 +13,8 @@ public class CommandPayToggle extends FtcCommand {
         super("paytoggle", ForTheCrown.inst());
 
         setDescription("Toggles your ability to pay others and for others to pay you");
+        setPermission(Permissions.PAY_TOGGLE);
+
         register();
     }
 
@@ -22,15 +25,10 @@ public class CommandPayToggle extends FtcCommand {
                     CrownUser user = getUserSender(c);
                     boolean accepting = !user.allowsPaying();
 
-                    if(accepting){
-                        user.sendMessage(
-                                Component.translatable("commands.payToggle.on").color(NamedTextColor.YELLOW)
-                        );
-                    } else {
-                        user.sendMessage(
-                                Component.translatable("commands.payToggle.off").color(NamedTextColor.GRAY)
-                        );
-                    }
+                    user.sendMessage(
+                            Component.translatable("commands.payToggle." + (accepting ? "on" : "off"))
+                                    .color(accepting ? NamedTextColor.YELLOW : NamedTextColor.GRAY)
+                    );
 
                     user.setAllowsPay(accepting);
                     return 0;

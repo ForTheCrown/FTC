@@ -1,7 +1,6 @@
 package net.forthecrown.commands.clickevent;
 
-import net.forthecrown.core.CrownException;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import org.bukkit.entity.Player;
 
 public interface ClickEventTask {
@@ -10,5 +9,5 @@ public interface ClickEventTask {
      * @param player The player that called the click event
      * @param args Any extra args you may want to pass in
      */
-    void run(Player player, String[] args) throws CrownException, RoyalCommandException;
+    void run(Player player, String[] args) throws CommandSyntaxException;
 }

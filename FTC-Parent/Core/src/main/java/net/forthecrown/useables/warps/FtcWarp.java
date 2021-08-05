@@ -82,7 +82,7 @@ public class FtcWarp extends CheckableBase implements Warp {
 
     @Override
     public void delete() {
-        ForTheCrown.getWarpRegistry().remove(key);
+        ForTheCrown.getWarpManager().remove(key);
     }
 
     @Override

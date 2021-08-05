@@ -6,11 +6,11 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.TimeArgument;
@@ -29,9 +29,9 @@ public class CommandSoftMute extends FtcCommand implements TempPunisher {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .executes(c -> punish(
-                                UserType.getUser(c, "user"),
+                                UserArgument.getUser(c, "user"),
                                 c.getSource(),
                                 -1,
                                 null
@@ -39,7 +39,7 @@ public class CommandSoftMute extends FtcCommand implements TempPunisher {
 
                         .then(argument("time", TimeArgument.time())
                                 .executes(c -> punish(
-                                        UserType.getUser(c, "user"),
+                                        UserArgument.getUser(c, "user"),
                                         c.getSource(),
                                         TimeArgument.getMillis(c, "time"),
                                         null
@@ -67,7 +67,7 @@ public class CommandSoftMute extends FtcCommand implements TempPunisher {
                 Component.text((length == 0 ? "Uns" : "S") + "oftmuting ")
                         .color(NamedTextColor.YELLOW)
                         .append(user.displayName().color(NamedTextColor.GOLD))
-                        .append(Component.text(length > 1 ? " for " + ChatFormatter.convertMillisIntoTime(length) : ""))
+                        .append(Component.text(length > 1 ? " for " + FtcFormatter.convertMillisIntoTime(length) : ""))
         );
         return 0;
     }

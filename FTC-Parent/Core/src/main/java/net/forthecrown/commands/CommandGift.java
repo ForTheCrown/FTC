@@ -17,7 +17,7 @@ public class CommandGift extends FtcCommand {
     public CommandGift(){
         super("gift", ForTheCrown.inst());
 
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 

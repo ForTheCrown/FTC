@@ -13,7 +13,6 @@ import net.minecraft.core.Position;
 import net.minecraft.core.PositionImpl;
 import org.bukkit.Location;
 import org.bukkit.util.BoundingBox;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -113,15 +112,5 @@ public class ValhallaEngine implements Valhalla {
     @Override
     public ActiveRaid getActiveRaid() {
         return activeRaid;
-    }
-
-    @Override
-    public boolean activeRaidExists() {
-        return activeRaid != null;
-    }
-
-    @Override
-    public @NotNull String namespace() {
-        return VIKING_NAMESPACE;
     }
 }

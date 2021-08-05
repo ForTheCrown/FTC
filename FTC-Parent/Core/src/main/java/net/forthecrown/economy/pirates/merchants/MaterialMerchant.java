@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.events.dynamic.BmSellItemListener;
 import net.forthecrown.pirates.Pirates;
@@ -134,7 +134,7 @@ public class MaterialMerchant implements BlackMarketMerchant {
             item = CrownItems.makeItem(material, 1, true, s.decoration(TextDecoration.ITALIC, false),
                     Component.text("Value: " + getItemPrice(material) + " Rhines per item,").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false),
                     Component.text(getItemPrice(material) * 64 + " Rhines for a stack.").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false),
-                    Component.text("Amount of items you will sell: " + ChatFormatter.normalEnum(user.getSellAmount())).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+                    Component.text("Amount of items you will sell: " + FtcFormatter.normalEnum(user.getSellAmount())).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
         }
 
         return item;

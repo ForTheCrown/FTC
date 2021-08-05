@@ -22,9 +22,9 @@ public class CloseableRegistryBase<T> extends BaseRegistry<T> implements Closeab
     }
 
     @Override
-    public T register(Key key, T raw) {
+    public T register(Key key, T value) {
         validateOpen();
-        return super.register(key, raw);
+        return super.register(key, value);
     }
 
     @Override

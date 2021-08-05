@@ -9,8 +9,8 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
-import net.forthecrown.comvars.types.ComVarType;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.comvars.types.ComVarTypes;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
@@ -58,8 +58,8 @@ public class HeadMerchant implements BlackMarketMerchant {
     public void load(JsonElement element) {
         JsonObject json = element.getAsJsonObject();
 
-        piratePointReward = ComVarRegistry.set("pr_heads_ppReward", ComVarType.BYTE, json.get("ppReward").getAsByte());
-        moneyReward = ComVarRegistry.set("pr_heads_moneyReward", ComVarType.INTEGER, json.get("moneyReward").getAsInt());
+        piratePointReward = ComVarRegistry.set("pr_heads_ppReward", ComVarTypes.BYTE, json.get("ppReward").getAsByte());
+        moneyReward = ComVarRegistry.set("pr_heads_moneyReward", ComVarTypes.INTEGER, json.get("moneyReward").getAsInt());
 
         JsonArray array = json.getAsJsonArray("chests");
         chests = new BlockPos[array.size()];
@@ -179,7 +179,7 @@ public class HeadMerchant implements BlackMarketMerchant {
                         .append(Component.newline())
                         .append(Component.translatable(
                                 "pirates.heads.reward",
-                                Balances.formatted(getMoneyReward()).color(NamedTextColor.GOLD),
+                                FtcFormatter.rhines(getMoneyReward()).color(NamedTextColor.GOLD),
                                 Component.text(getPiratePointReward() + " Pirate Point" + FtcUtils.addAnS(getPiratePointReward())).color(NamedTextColor.GOLD),
                                 Component.text(pp.getScore()).color(NamedTextColor.GOLD)
                         ))

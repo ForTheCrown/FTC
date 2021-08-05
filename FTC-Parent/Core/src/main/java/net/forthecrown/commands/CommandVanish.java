@@ -6,9 +6,9 @@ import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserParseResult;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -26,17 +26,17 @@ public class CommandVanish extends FtcCommand {
         command
                 .executes(c -> vanish(c.getSource(), getUserSender(c), false))
 
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .executes(c -> vanish(
                                         c.getSource(),
-                                        c.getArgument("user", UserParseResult.class).getUser(c.getSource()),
+                                        c.getArgument("user", UserParseResult.class).getUser(c.getSource(), false),
                                         false
                         ))
 
                         .then(argument("message", BoolArgumentType.bool())
                                 .executes(c -> vanish(
                                         c.getSource(),
-                                        c.getArgument("user", UserParseResult.class).getUser(c.getSource()),
+                                        c.getArgument("user", UserParseResult.class).getUser(c.getSource(), false),
                                         c.getArgument("message", Boolean.class)
                                 ))
                         )
@@ -47,7 +47,7 @@ public class CommandVanish extends FtcCommand {
         boolean vanished = user.isVanished();
 
         if(joinLeaveMsg){
-            Component message = vanished ? ChatFormatter.joinMessage(user) : ChatFormatter.formatLeaveMessage(user);
+            Component message = vanished ? FtcFormatter.joinMessage(user) : FtcFormatter.leaveMessage(user);
             ForTheCrown.getAnnouncer().announceToAllRaw(message);
         }
 

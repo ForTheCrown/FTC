@@ -10,11 +10,11 @@ import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.math.BlockPos;
-import net.forthecrown.valhalla.data.ChestGroup;
-import net.forthecrown.valhalla.data.LootData;
-import net.forthecrown.valhalla.data.VikingRaid;
+import net.forthecrown.valhalla.data.*;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.Position;
+import net.minecraft.nbt.CompoundTag;
+import org.bukkit.NamespacedKey;
 import org.bukkit.util.BoundingBox;
 
 import java.io.File;
@@ -50,6 +50,7 @@ public class VikingRaidSerializer implements RaidSerializer {
         VikingRaid result = new VikingRaid(key, region, pos);
 
         if(json.has("lootData")) result.setLootData(readLoot(json.getBuf("lootData")));
+        if(json.has("mobData")) result.setMobData(readMobData(json.getBuf("mobData")));
 
         return result;
     }
@@ -62,6 +63,10 @@ public class VikingRaidSerializer implements RaidSerializer {
         json.add("region", JsonUtils.writeBoundingBox(raid.getRegion()));
 
         if(raid.hasLootData()) json.add("lootData", writeLoot(raid.getLootData()));
+        if(raid.hasMobData()) {
+            JsonObject mobData = writeMobData(raid.getMobData());
+            if(mobData != null) json.add("mobData", mobData);
+        }
 
         try {
             JsonUtils.writeFile(json.getSource(), getFile(raid.key()));
@@ -158,5 +163,56 @@ public class VikingRaidSerializer implements RaidSerializer {
         }
 
         return new LootData(defSpawns, groups);
+    }
+
+    private JsonObject writeMobData(MobData data) {
+        JsonBuf json = JsonBuf.empty();
+
+        if(data.hasHostile()) json.add("hostile", writeMobList(data.getHostile()));
+        if(data.hasPassive()) json.add("passive", writeMobList(data.getPassive()));
+        if(data.hasSpecial()) json.add("special", writeMobList(data.getSpecial()));
+
+        return json.nullIfEmpty();
+    }
+
+    private JsonArray writeMobList(ObjectList<EntitySpawnData> data) {
+        JsonArray array = new JsonArray();
+
+        for (EntitySpawnData d: data) {
+            JsonBuf buf = JsonBuf.empty();
+
+            buf.addKey("key", d.getEntityKey());
+            buf.add("pos", JsonUtils.writePosition(d.getPosition()));
+            if(d.hasTag()) buf.addNBT("tag", d.getTag());
+
+            array.add(buf.getSource());
+        }
+
+        return array;
+    }
+
+    private MobData readMobData(JsonBuf json) {
+        ObjectList<EntitySpawnData> hostile = readMobList(json.get("hostile"));
+        ObjectList<EntitySpawnData> special = readMobList(json.get("special"));
+        ObjectList<EntitySpawnData> passive = readMobList(json.get("passive"));
+
+        return new MobData(passive, hostile, special);
+    }
+
+    private ObjectList<EntitySpawnData> readMobList(JsonElement element) {
+        if(element == null || element.isJsonNull()) return null;
+        ObjectList<EntitySpawnData> result = new ObjectArrayList<>();
+
+        for (JsonElement e: element.getAsJsonArray()) {
+            JsonBuf buf = JsonBuf.of(e.getAsJsonObject());
+
+            Position pos = JsonUtils.readPosition(buf.getObject("pos"));
+            NamespacedKey key = FtcUtils.keyToBukkit(buf.getKey("key"));
+            CompoundTag tag = buf.getNBT("tag");
+
+            result.add(new EntitySpawnData(key, tag, pos));
+        }
+
+        return result.isEmpty() ? null : result;
     }
 }

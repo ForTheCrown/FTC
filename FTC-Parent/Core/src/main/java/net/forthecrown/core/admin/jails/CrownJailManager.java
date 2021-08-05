@@ -63,9 +63,9 @@ public class CrownJailManager extends AbstractJsonSerializer implements JailMana
     }
 
     @Override
-    public Location register(Key key, Location raw) {
-        jails.put(key, raw);
-        return raw;
+    public Location register(Key key, Location value) {
+        jails.put(key, value);
+        return value;
     }
 
     @Override

@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * A class for building item stacks
  */
-public class ItemStackBuilder {
+public class ItemStackBuilder implements Cloneable {
 
     private final Material material;
     private Component name = null;
@@ -231,5 +231,15 @@ public class ItemStackBuilder {
 
         result.setItemMeta(meta);
         return result;
+    }
+
+    @Override
+    protected ItemStackBuilder clone() {
+        try {
+            return (ItemStackBuilder) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

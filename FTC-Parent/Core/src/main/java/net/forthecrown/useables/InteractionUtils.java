@@ -11,8 +11,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.commands.arguments.ActionArgType;
-import net.forthecrown.commands.arguments.CheckArgType;
+import net.forthecrown.commands.arguments.UsageActionArgument;
+import net.forthecrown.commands.arguments.UsageCheckArgument;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -95,18 +95,18 @@ public final class InteractionUtils {
                 )
 
                         .then(literal("add")
-                                .then(argument("type", ActionArgType.action())
+                                .then(argument("type", UsageActionArgument.action())
                                         .then(argument("toParse", StringArgumentType.greedyString())
                                                 .suggests((c, b) -> {
                                                     try {
-                                                        return ActionArgType.getAction(c, "type").getSuggestions(c, b);
+                                                        return UsageActionArgument.getAction(c, "type").getSuggestions(c, b);
                                                     } catch (Exception ignored) {}
                                                     return Suggestions.empty();
                                                 })
 
                                         .executes(c -> {
                                             Actionable sign = p.apply(c);
-                                            UsageAction<?> action = ActionArgType.getAction(c, "type");
+                                            UsageAction<?> action = UsageActionArgument.getAction(c, "type");
                                             String toParse = c.getArgument("toParse", String.class);
 
                                             UsageActionInstance instance = action.parse(new StringReader(toParse), c.getSource());
@@ -151,7 +151,7 @@ public final class InteractionUtils {
                 )
 
                 .then(literal("remove")
-                        .then(argument("key", CheckArgType.precondition())
+                        .then(argument("key", UsageCheckArgument.precondition())
                                 .suggests((c, b) -> CompletionProvider.suggestMatching(b, p.apply(c).getStringCheckTypes()))
 
                                 .executes(c -> {
@@ -167,18 +167,18 @@ public final class InteractionUtils {
                 )
 
                 .then(literal("put")
-                        .then(argument("type", CheckArgType.precondition())
+                        .then(argument("type", UsageCheckArgument.precondition())
                                 .then(argument("toParse", StringArgumentType.greedyString())
                                         .suggests((c, b) -> {
                                             try {
-                                                return CheckArgType.getCheck(c, "type").getSuggestions(c, b);
+                                                return UsageCheckArgument.getCheck(c, "type").getSuggestions(c, b);
                                             } catch (Exception ignored) {}
                                             return Suggestions.empty();
                                         })
 
                                         .executes(c -> {
                                             Preconditionable sign = p.apply(c);
-                                            UsageCheck<?> pa = CheckArgType.getCheck(c, "type");
+                                            UsageCheck<?> pa = UsageCheckArgument.getCheck(c, "type");
                                             String toParse = c.getArgument("toParse", String.class);
 
                                             UsageCheckInstance instance = pa.parse(new StringReader(toParse), c.getSource());

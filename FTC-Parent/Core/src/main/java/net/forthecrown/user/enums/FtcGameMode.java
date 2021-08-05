@@ -2,6 +2,7 @@ package net.forthecrown.user.enums;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
+import net.minecraft.world.level.GameType;
 import org.bukkit.GameMode;
 
 /**
@@ -32,6 +33,15 @@ public enum FtcGameMode {
      */
     public static FtcGameMode wrap(GameMode bukkit){
         return switch (bukkit) {
+            case CREATIVE -> CREATIVE;
+            case SURVIVAL -> SURVIVAL;
+            case ADVENTURE -> ADVENTURE;
+            case SPECTATOR -> SPECTATOR;
+        };
+    }
+
+    public static FtcGameMode wrap(GameType type) {
+        return switch (type) {
             case CREATIVE -> CREATIVE;
             case SURVIVAL -> SURVIVAL;
             case ADVENTURE -> ADVENTURE;

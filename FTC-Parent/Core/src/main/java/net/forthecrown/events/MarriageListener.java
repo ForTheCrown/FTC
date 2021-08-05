@@ -5,7 +5,6 @@ import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.CrownException;
 import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
@@ -65,23 +64,23 @@ public class MarriageListener implements Listener, ClickEventTask {
 
             CrownUser user = UserManager.getUser(event.getPlayer());
             UserInteractions inter = user.getInteractions();
-            if(inter.getMarriedTo() == null) return;
+            if(inter.getSpouse() == null) return;
             if(!user.getPlayer().isSneaking()) return;
 
             CrownUser target = UserManager.getUser(event.getRightClicked().getUniqueId());
-            if(!inter.getMarriedTo().equals(target.getUniqueId())) return;
+            if(!inter.getSpouse().equals(target.getUniqueId())) return;
 
             CosmeticEmotes.SMOOCH.getCommand().execute(user, target);
         }
     }
 
     @Override
-    public void run(Player player, String[] args) throws CrownException, RoyalCommandException {
+    public void run(Player player, String[] args) throws RoyalCommandException {
         String firstArg = args[1];
         CrownUser user = UserManager.getUser(player);
         UserInteractions inter = user.getInteractions();
 
-        if(inter.getMarriedTo() != null) throw FtcExceptionProvider.senderAlreadyMarried();
+        if(inter.getSpouse() != null) throw FtcExceptionProvider.senderAlreadyMarried();
         if(inter.getWaitingFinish() == null) throw FtcExceptionProvider.translatable("marriage.nooneWaiting");
 
         CrownUser target = UserManager.getUser(inter.getWaitingFinish());
@@ -102,12 +101,12 @@ public class MarriageListener implements Listener, ClickEventTask {
         } else if(firstArg.contains("marriageConfirm")){
             if(awaitingFinishSet.contains(user.getUniqueId())) throw FtcExceptionProvider.translatable("marriage.priestText.alreadyAccepted");
             if(awaitingFinishSet.contains(target.getUniqueId())){
-                inter.setMarriedTo(target.getUniqueId());
+                inter.setSpouse(target.getUniqueId());
                 inter.setWaitingFinish(null);
                 inter.setLastMarriageChange(System.currentTimeMillis());
 
                 UserInteractions tInter = target.getInteractions();
-                tInter.setMarriedTo(user.getUniqueId());
+                tInter.setSpouse(user.getUniqueId());
                 tInter.setWaitingFinish(null);
                 tInter.setLastMarriageChange(System.currentTimeMillis());
 

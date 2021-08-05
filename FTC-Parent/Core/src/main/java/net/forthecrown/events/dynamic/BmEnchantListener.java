@@ -2,6 +2,7 @@ package net.forthecrown.events.dynamic;
 
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ForTheCrown;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.pirates.DailyEnchantment;
 import net.forthecrown.economy.pirates.PirateEconomy;
@@ -86,7 +87,7 @@ public class BmEnchantListener extends AbstractInvListener implements Listener {
                                 .color(NamedTextColor.GRAY)
                                 .append(daily.getEnchantment().displayName(daily.getLevel()).color(NamedTextColor.GOLD))
                                 .append(Component.text(" for "))
-                                .append(Balances.formatted(daily.getPrice()).color(NamedTextColor.YELLOW))
+                                .append(FtcFormatter.rhines(daily.getPrice()).color(NamedTextColor.YELLOW))
                 );
             }
         });

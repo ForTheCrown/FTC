@@ -7,7 +7,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.UserTeleport;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
@@ -53,7 +53,7 @@ public class CommandTeleportExact extends FtcCommand {
                                                             Component.text("Teleported ")
                                                                     .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
                                                                     .append(Component.text(" to "))
-                                                                    .append(ChatFormatter.clickableLocationMessage(loc, false).color(NamedTextColor.YELLOW))
+                                                                    .append(FtcFormatter.clickableLocationMessage(loc, false).color(NamedTextColor.YELLOW))
                                                     );
                                                     return 0;
                                                 })

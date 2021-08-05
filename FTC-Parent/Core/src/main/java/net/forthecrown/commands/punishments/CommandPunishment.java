@@ -8,10 +8,10 @@ import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -37,16 +37,16 @@ public class CommandPunishment extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .executes(c -> punisher.punish(
-                                UserType.getUser(c, "user"),
+                                UserArgument.getUser(c, "user"),
                                 c.getSource(),
                                 null
                         ))
 
                         .then(argument("reason", StringArgumentType.greedyString())
                                 .executes(c -> punisher.punish(
-                                        UserType.getUser(c, "user"),
+                                        UserArgument.getUser(c, "user"),
                                         c.getSource(),
                                         c.getArgument("reason", String.class)
                                 ))
@@ -67,7 +67,7 @@ public class CommandPunishment extends FtcCommand {
 
                     PunishmentRecord record = manager.punish(user.getUniqueId(), PunishmentType.BAN, source, reason, -1);
 
-                    if(user.isOnline()) user.getPlayer().kick(ChatFormatter.banMessage(record));
+                    if(user.isOnline()) user.getPlayer().kick(FtcFormatter.banMessage(record));
 
                     BanList list = Bukkit.getBanList(BanList.Type.NAME);
                     list.addBan(user.getName(), reason, null, source.textName());

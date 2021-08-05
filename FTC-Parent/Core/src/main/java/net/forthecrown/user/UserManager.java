@@ -5,12 +5,9 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
-import net.minecraft.server.level.ServerPlayer;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,7 +52,10 @@ public interface UserManager extends CrownSerializer {
      */
     static CrownUser getUser(@NotNull UUID base) {
         Validate.notNull(base, "UUID cannot be null");
+        Validate.isTrue(isPlayerID(base), "Given UUID did not belong to a player");
+
         if(FtcUserManager.LOADED_USERS.containsKey(base)) return FtcUserManager.LOADED_USERS.get(base);
+
         return inst().isAlt(base) ? new FtcUserAlt(base, inst().getMain(base)) : new FtcUser(base);
     }
 
@@ -66,6 +66,16 @@ public interface UserManager extends CrownSerializer {
      */
     static CrownUser getUser(String name){
         return getUser(FtcUtils.uuidFromName(name));
+    }
+
+    /**
+     * Checks if the given UUID belongs to a player
+     * @param id The id to check
+     * @return Whether the UUID is one of a player or not
+     */
+    static boolean isPlayerID(UUID id) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(id);
+        return player != null && player.getName() != null;
     }
 
     /**
@@ -168,16 +178,4 @@ public interface UserManager extends CrownSerializer {
      * @param alt
      */
     void removeEntry(UUID alt);
-
-    //Gets all the currently online NMS players
-    private static List<ServerPlayer> getSpectators() {
-        List<ServerPlayer> list = new ArrayList<>();
-
-        for (Player p: Bukkit.getOnlinePlayers()){
-            if(p.getGameMode() != GameMode.SPECTATOR) continue;
-            list.add(((CraftPlayer) p).getHandle());
-        }
-
-        return list;
-    }
 }

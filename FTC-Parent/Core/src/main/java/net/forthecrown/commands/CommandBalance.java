@@ -2,7 +2,8 @@ package net.forthecrown.commands;
 
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
@@ -38,15 +39,15 @@ public class CommandBalance extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> showBal(c.getSource(), getUserSender(c)))
-                .then(argument("player", UserType.user()) //Player is checking someone else's balance
-                        .executes(c -> showBal(c.getSource(), UserType.getUser(c, "player")))
+                .then(argument("player", UserArgument.user()) //Player is checking someone else's balance
+                        .executes(c -> showBal(c.getSource(), UserArgument.getUser(c, "player")))
                 );
     }
 
     private int showBal(CommandSource sender, CrownUser user){
         Balances balances = ForTheCrown.getBalances();
         boolean senderIsUser = user.getName().equals(sender.textName());
-        Component formatted = Balances.formatted(balances.get(user.getUniqueId())).color(NamedTextColor.GOLD);
+        Component formatted = FtcFormatter.rhines(balances.get(user.getUniqueId())).color(NamedTextColor.GOLD);
 
         Component text = senderIsUser ?
                 Component.translatable("user.valueQuery.self", formatted) :

@@ -30,7 +30,7 @@ public class CommandInteractable extends FtcCommand {
         super("interactable", ForTheCrown.inst());
 
         setAliases("usable");
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 

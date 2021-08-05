@@ -15,10 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class WorldComVarType implements ComVarType<World> {
-    public static final ComVarType<World> WORLD = new WorldComVarType();
     private final Key key = ForTheCrown.coreKey("world_type");
 
-    private WorldComVarType() {
+    WorldComVarType() {
         Registries.COMVAR_TYPES.register(key, this);
     }
 
@@ -28,7 +27,7 @@ public class WorldComVarType implements ComVarType<World> {
     }
 
     @Override
-    public String asString(@Nullable World value) {
+    public String asParsableString(@Nullable World value) {
         return value == null ? "null" : value.getName();
     }
 

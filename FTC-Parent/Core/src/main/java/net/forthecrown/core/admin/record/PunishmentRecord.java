@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.grenadier.CommandSource;
@@ -82,7 +82,7 @@ public class PunishmentRecord implements JsonSerializable, ComponentLike {
 
     @Override
     public @NonNull Component asComponent() {
-        return Component.text("  Punishment on " + ChatFormatter.getDateFromMillis(date) + ":")
+        return Component.text("  Punishment on " + FtcFormatter.getDateFromMillis(date) + ":")
                 .append(Component.newline())
                 .append(Component.text("   Punisher: ")
                         .append(Component.text(punisher).color(NamedTextColor.WHITE))
@@ -97,7 +97,7 @@ public class PunishmentRecord implements JsonSerializable, ComponentLike {
                         expiresAt > 0 ?
                                 Component.newline()
                                         .append(Component.text("   Expires: ").color(NamedTextColor.YELLOW))
-                                        .append(Component.text(ChatFormatter.getDateFromMillis(expiresAt)).color(NamedTextColor.WHITE))
+                                        .append(Component.text(FtcFormatter.getDateFromMillis(expiresAt)).color(NamedTextColor.WHITE))
                                 : Component.empty()
                 );
     }

@@ -1,5 +1,6 @@
 package net.forthecrown.user.data;
 
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
@@ -26,7 +27,7 @@ public class TeleportRequest {
     }
 
     public void startCountdown(){
-        expiry.runTaskLaterAsynchronously(ForTheCrown.inst(), ForTheCrown.getTpaExpiryTime());
+        expiry.runTaskLaterAsynchronously(ForTheCrown.inst(), ComVars.getTpaExpiryTime());
     }
 
     public void onAccept(){

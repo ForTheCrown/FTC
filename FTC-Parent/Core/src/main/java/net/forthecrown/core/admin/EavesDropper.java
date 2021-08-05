@@ -2,7 +2,7 @@ package net.forthecrown.core.admin;
 
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.data.DirectMessage;
@@ -110,7 +110,7 @@ public class EavesDropper {
                         .append(Component.text()
                                 .append(user.displayName())
                                 .append(Component.text(" placed a sign at "))
-                                .append(ChatFormatter.clickableLocationMessage(location, true))
+                                .append(FtcFormatter.clickableLocationMessage(location, true))
                                 .color(NamedTextColor.GRAY)
                         )
 

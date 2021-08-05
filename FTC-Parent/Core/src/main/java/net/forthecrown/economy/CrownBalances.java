@@ -2,22 +2,22 @@ package net.forthecrown.economy;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.Announcer;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.user.UserManager;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class CrownBalances extends AbstractJsonSerializer implements Balances {
 
-    private BalanceMap balanceMap = new SortedBalanceMap(ForTheCrown::getStartRhines);
+    private BalanceMap balanceMap = new SortedBalanceMap(ComVars::getStartRhines);
 
     public CrownBalances() {
         super("balances");
@@ -57,19 +57,18 @@ public class CrownBalances extends AbstractJsonSerializer implements Balances {
     }
 
     @Override
-    public synchronized Integer get(UUID uuid){
+    public synchronized int get(UUID uuid){
         return balanceMap.get(uuid);
     }
 
     @Override
-    public synchronized void set(UUID uuid, Integer amount){
-        if(amount >= ForTheCrown.getMaxMoneyAmount()) Announcer.log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
-
-        setUnlimited(uuid, Math.max(0, Math.min(ForTheCrown.getMaxMoneyAmount(), amount)));
+    public synchronized void set(UUID uuid, int amount){
+        Balances.checkUnderMax(uuid, amount);
+        setUnlimited(uuid, Balances.clampToBalBounds(amount));
     }
 
     @Override
-    public synchronized void setUnlimited(UUID id, Integer amount){
+    public synchronized void setUnlimited(UUID id, int amount){
         balanceMap.put(id, amount);
     }
 
@@ -79,33 +78,45 @@ public class CrownBalances extends AbstractJsonSerializer implements Balances {
     }
 
     @Override
-    public synchronized void add(UUID uuid, Integer amount){
+    public synchronized void add(UUID uuid, int amount){
         add(uuid, amount, false);
     }
 
     @Override
-    public synchronized void add(UUID uuid, Integer amount, boolean isTaxed){
-        if(amount + get(uuid) >= ForTheCrown.getMaxMoneyAmount()){
-            Announcer.log(Level.WARNING, Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
-            balanceMap.put(uuid, ForTheCrown.getMaxMoneyAmount());
-            return;
-        }
-
-        if(amount > 0) UserManager.getUser(uuid).addTotalEarnings(amount);
-
-        if(ForTheCrown.areTaxesEnabled() && isTaxed && getTax(uuid) > 1 && amount > 1){
-            int amountToRemove = (int) (amount * ((float) getTax(uuid)/100));
-            amount -= amountToRemove;
-
-            UserManager.getUser(uuid).sendMessage("&7You were taxed " + getTax(uuid) + "%, which means you lost " + ChatFormatter.decimalizeNumber(amountToRemove) + " Rhines of your last transaction");
-        }
-
-        balanceMap.put(uuid, get(uuid) + amount);
+    public synchronized void remove(UUID id, int amount) {
+        int bal = get(id);
+        set(id, bal - amount);
     }
 
     @Override
-    public Integer getTax(UUID uuid){
-        if(get(uuid) < 500000) return 0; //if the player has less thank 500k rhines, no tax
+    public synchronized void add(UUID uuid, int amount, boolean isTaxed){
+        int current = get(uuid);
+
+        //If should be taxed
+        int tax = getTax(uuid, current);
+        if(ComVars.areTaxesEnabled() && isTaxed && amount > 1 && tax > 1){
+            int amountToRemove = (int) (amount * ((float) tax/100));
+            amount -= amountToRemove;
+
+            //Tell em they lost mulaa
+            UserManager.getUser(uuid).sendMessage(
+                    Component.translatable("economy.taxed", NamedTextColor.GRAY,
+                            Component.text(tax),
+                            FtcFormatter.rhines(amountToRemove)
+                    )
+            );
+        }
+
+        //If it's more than 0, add earnings
+        if(amount > 0) UserManager.getUser(uuid).addTotalEarnings(amount);
+
+        int actual = current + amount;
+        set(uuid, actual);
+    }
+
+    @Override
+    public int getTax(UUID uuid, int currentBal){
+        if(currentBal < 500000) return 0; //if the player has less thank 500k rhines, no tax
 
         int percent = (int) (UserManager.getUser(uuid).getTotalEarnings() / 50000 * 10);
         if(percent >= 30) return 50;

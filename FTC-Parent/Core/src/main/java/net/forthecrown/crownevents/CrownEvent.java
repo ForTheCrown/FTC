@@ -2,8 +2,7 @@ package net.forthecrown.crownevents;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.crownevents.entries.EventEntry;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
-import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.utils.FtcUtils;
 import org.bukkit.entity.Player;
 
 import java.time.Month;
@@ -31,10 +30,8 @@ public interface CrownEvent<T extends EventEntry> {
     default void startHandled(Player player) {
         try {
             start(player);
-        } catch (RoyalCommandException r) {
-            player.sendMessage(r.formattedText());
         } catch (CommandSyntaxException e) {
-            player.sendMessage(GrenadierUtils.formatCommandException(e));
+            FtcUtils.handleSyntaxException(player, e);
         }
     }
 
@@ -51,6 +48,6 @@ public interface CrownEvent<T extends EventEntry> {
     void complete(T entry);
 
     default String getName(){
-        return "CrownEvent_" + Month.of(new Date().getMonth()).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        return "CrownEvent_" + Month.of(new Date().getMonth()+1).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
     }
 }

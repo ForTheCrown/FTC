@@ -1,5 +1,6 @@
 package net.forthecrown.core.converters;
 
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.utils.JsonUtils;
@@ -50,7 +51,7 @@ public class Balances_YamlToJson {
             }*/
 
             int bal = configuration.getInt(s);
-            if(bal <= ForTheCrown.getStartRhines()) continue;
+            if(bal <= ComVars.getStartRhines()) continue;
 
             json.add(s, bal);
         }

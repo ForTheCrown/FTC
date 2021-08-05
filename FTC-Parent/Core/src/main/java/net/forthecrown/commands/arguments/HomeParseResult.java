@@ -50,7 +50,7 @@ public class HomeParseResult {
     }
 
     private RoyalCommandException exception(){
-        return HomeType.UNKNOWN_HOME.createWithContext(reader, Component.text(reader.getRemaining()));
+        return HomeArgument.UNKNOWN_HOME.createWithContext(reader, Component.text(reader.getRemaining()));
     }
 
     public String getName() {

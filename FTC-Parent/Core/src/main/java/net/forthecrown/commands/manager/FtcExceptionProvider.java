@@ -3,9 +3,8 @@ package net.forthecrown.commands.manager;
 import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.core.ComVars;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.user.CrownUser;
@@ -14,12 +13,13 @@ import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemStack;
 
 import static net.forthecrown.commands.manager.CrownExceptionProvider.*;
 
 public interface FtcExceptionProvider {
     static CommandSyntaxException create(String messasge){
-        return GENERIC.create(ChatFormatter.translateHexCodes(messasge));
+        return GENERIC.create(FtcFormatter.translateHexCodes(messasge));
     }
 
     static CommandSyntaxException createWithContext(String message, String input, int cursor){
@@ -30,7 +30,7 @@ public interface FtcExceptionProvider {
     }
 
     static CommandSyntaxException createWithContext(String message, StringReader reader){
-        return GENERIC.createWithContext(reader, ChatFormatter.translateHexCodes(message));
+        return GENERIC.createWithContext(reader, FtcFormatter.translateHexCodes(message));
     }
 
     static RoyalCommandException translatable(String key, ComponentLike... args){
@@ -46,7 +46,7 @@ public interface FtcExceptionProvider {
     }
 
     static RoyalCommandException cannotAfford(int amount){
-        return CANNOT_AFFORD_TRANSACTION.create(Balances.formatted(amount));
+        return CANNOT_AFFORD_TRANSACTION.create(FtcFormatter.rhines(amount));
     }
 
     static RoyalCommandException cannotAfford(){
@@ -98,7 +98,7 @@ public interface FtcExceptionProvider {
     }
 
     static RoyalCommandException nickTooLong(int length){
-        return NICK_TOO_LONG.create(Component.text(length), Component.text(ForTheCrown.getMaxNickLength()));
+        return NICK_TOO_LONG.create(Component.text(length), Component.text(ComVars.getMaxNickLength()));
     }
 
     static CommandSyntaxException cannotBan(CrownUser user){
@@ -226,6 +226,30 @@ public interface FtcExceptionProvider {
     }
 
     static RoyalCommandException realPirate(Entity name) {
-        return GOTTA_BE_PIRATE.create(NamedTextColor.YELLOW, ChatFormatter.entityDisplayName(name).color(NamedTextColor.YELLOW));
+        return GOTTA_BE_PIRATE.create(NamedTextColor.YELLOW, FtcFormatter.entityDisplayName(name).color(NamedTextColor.YELLOW));
+    }
+
+    static RoyalCommandException cannotPayBlocked() {
+        return CANNOT_PAY_BLOCKED.create();
+    }
+
+    static RoyalCommandException shopOutOfStock() {
+        return SHOP_OUT_OF_STOCK.create(NamedTextColor.GRAY);
+    }
+
+    static RoyalCommandException dontHaveItemForShop(ItemStack item) {
+        return SHOP_DONT_HAVE_ITEM.create(FtcFormatter.itemAndAmount(item));
+    }
+
+    static RoyalCommandException shopOwnerCannotAfford(int amount) {
+        return SHOP_OWNER_CANNOT_AFFORD.create(NamedTextColor.GRAY, FtcFormatter.rhines(amount).color(NamedTextColor.YELLOW));
+    }
+
+    static RoyalCommandException noShopSpace() {
+        return SHOP_NO_SPACE.create();
+    }
+
+    static RoyalCommandException maxShopPriceExceeded() {
+        return SHOP_PRICE_EXCEEDED.create(FtcFormatter.rhines(ComVars.getMaxSignShopPrice()));
     }
 }

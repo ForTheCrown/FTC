@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
@@ -30,11 +30,11 @@ public class CommandSpecificGameMode extends FtcCommand {
         command
                 .executes(c -> doStuff(getUserSender(c), c.getSource(), false))
 
-                .then(argument("user", UserType.onlineUser())
+                .then(argument("user", UserArgument.onlineUser())
                         .requires(s -> s.hasPermission(Permissions.GAMEMODES))
 
                         .executes(c -> doStuff(
-                                UserType.getUser(c, "user"),
+                                UserArgument.getUser(c, "user"),
                                 c.getSource(),
                                 true
                         ))
@@ -61,8 +61,8 @@ public class CommandSpecificGameMode extends FtcCommand {
 
     public static void init(){
         new CommandSpecificGameMode("survival", Permissions.HELPER, FtcGameMode.SURVIVAL, "gms");
-        new CommandSpecificGameMode("creative", Permissions.CORE_ADMIN, FtcGameMode.CREATIVE, "gmc");
+        new CommandSpecificGameMode("creative", Permissions.FTC_ADMIN, FtcGameMode.CREATIVE, "gmc");
         new CommandSpecificGameMode("spectator", Permissions.HELPER, FtcGameMode.SPECTATOR, "gmsp");
-        new CommandSpecificGameMode("adventure", Permissions.CORE_ADMIN, FtcGameMode.ADVENTURE, "gma");
+        new CommandSpecificGameMode("adventure", Permissions.FTC_ADMIN, FtcGameMode.ADVENTURE, "gma");
     }
 }

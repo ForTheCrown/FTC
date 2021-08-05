@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -20,7 +20,7 @@ public class CommandSpeed extends FtcCommand {
     public CommandSpeed(){
         super("speed", ForTheCrown.inst());
 
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 
@@ -43,9 +43,9 @@ public class CommandSpeed extends FtcCommand {
                                 fly
                         ))
 
-                        .then(argument("user", UserType.onlineUser())
+                        .then(argument("user", UserArgument.onlineUser())
                                 .executes(c -> changeSpeed(
-                                        UserType.getUser(c, "user"),
+                                        UserArgument.getUser(c, "user"),
                                         c.getArgument("value", Float.class),
                                         c.getSource(),
                                         fly
@@ -56,9 +56,9 @@ public class CommandSpeed extends FtcCommand {
                 .then(literal("query")
                         .executes(c -> querySpeed(getUserSender(c), c.getSource(), fly))
 
-                        .then(argument("user", UserType.onlineUser())
+                        .then(argument("user", UserArgument.onlineUser())
                                 .executes(c -> querySpeed(
-                                        UserType.getUser(c, "user"),
+                                        UserArgument.getUser(c, "user"),
                                         c.getSource(),
                                         fly
                                 ))

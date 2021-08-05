@@ -2,12 +2,13 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.Suggestions;
-import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.ComVarArgument;
+import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
+import net.forthecrown.core.ForTheCrown;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 
@@ -16,8 +17,7 @@ public class CommandComVar extends FtcCommand {
     public CommandComVar(){
         super("comvar", ForTheCrown.inst());
 
-        setPermission(Permissions.CORE_ADMIN);
-        setAliases("convar", "consolevar", "commandvar", "commandvariables");
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 
@@ -62,8 +62,13 @@ public class CommandComVar extends FtcCommand {
                             ComVar<?> var = c.getArgument("var", ComVar.class);
                             String toParse = c.getArgument("value", String.class);
 
-                            ComVarRegistry.parseVar(var.getName(), toParse);
-                            broadcastAdmin(c.getSource(), "Set " + var.getName() + " to " + var.toString());
+                            try {
+                                ComVarRegistry.parseVar(var.getName(), toParse);
+                            } catch (IllegalArgumentException e) {
+                                throw FtcExceptionProvider.create(e.getMessage());
+                            }
+
+                            c.getSource().sendAdmin("Set " + var.getName() + " to '" + var.toString() + "'");
                             return 0;
                         })
                 )

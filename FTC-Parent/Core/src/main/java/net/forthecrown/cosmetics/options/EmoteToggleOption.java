@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics.options;
 
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.options.InventoryOption;
@@ -22,8 +22,8 @@ public class EmoteToggleOption implements InventoryOption {
         boolean allows = user.allowsEmotes();
 
         ItemStackBuilder builder = new ItemStackBuilder(allows ? Material.STRUCTURE_VOID : Material.BARRIER)
-                .setName(Component.text("Emotes " + (allows ? "Enabled" : "Disabled")).style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
-                .addLore(Component.text("Righ-click to " + (allows ? "disable" : "enable") + " emotes.").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)));
+                .setName(Component.text("Emotes " + (allows ? "Enabled" : "Disabled")).style(FtcFormatter.nonItalic(NamedTextColor.GOLD)))
+                .addLore(Component.text("Righ-click to " + (allows ? "disable" : "enable") + " emotes.").style(FtcFormatter.nonItalic(NamedTextColor.GRAY)));
 
         inventory.setItem(getSlot(), builder.build());
     }

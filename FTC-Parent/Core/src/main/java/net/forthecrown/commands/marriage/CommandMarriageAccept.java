@@ -2,7 +2,7 @@ package net.forthecrown.commands.marriage;
 
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
@@ -40,10 +40,10 @@ public class CommandMarriageAccept extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
-                            CrownUser target = UserType.getUser(c, "user");
+                            CrownUser target = UserArgument.getUser(c, "user");
                             UserInteractions inter = user.getInteractions();
 
                             if(inter.getLastProposal() == null || !inter.getLastProposal().equals(target.getUniqueId())){

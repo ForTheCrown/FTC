@@ -57,7 +57,7 @@ public class CrownMessages implements Keyed {
         for (File f: dir.listFiles()){
             try {
                 PropertyResourceBundle bundle = new PropertyResourceBundle(new FileReader(f));
-                Locale locale = Locale.forLanguageTag(f.getName().replaceAll("_", "-").replaceAll(".properties", "").trim());
+                Locale locale = Locale.forLanguageTag(bundle.getString("language.code"));
 
                 registry.registerAll(locale, bundle, true);
             } catch (IOException e){

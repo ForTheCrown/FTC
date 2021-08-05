@@ -1,7 +1,6 @@
 package net.forthecrown.economy.selling;
 
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
@@ -64,9 +63,9 @@ public class ItemSellOption implements CordedInventoryOption {
         builder
                 .addLore(
                         Component.text("Value: ")
-                                .style(ChatFormatter.nonItalic(NamedTextColor.YELLOW))
+                                .style(FtcFormatter.nonItalic(NamedTextColor.YELLOW))
 
-                                .append(Balances.formattedNonTrans(data.getPrice() * scalar))
+                                .append(FtcFormatter.rhinesNonTrans(data.getPrice() * scalar))
                                 .append(Component.text(" per item."))
                 );
 
@@ -74,25 +73,25 @@ public class ItemSellOption implements CordedInventoryOption {
             builder
                     .addLore(
                             Component.text("Original price: ")
-                                    .style(ChatFormatter.nonItalic(NamedTextColor.GRAY))
-                                    .append(Balances.formattedNonTrans(data.getOriginalPrice() * scalar))
+                                    .style(FtcFormatter.nonItalic(NamedTextColor.GRAY))
+                                    .append(FtcFormatter.rhinesNonTrans(data.getOriginalPrice() * scalar))
                     );
         }
 
         builder
                 .addLore(
-                        Balances.formattedNonTrans(data.getPrice() * 64 * scalar)
-                                .style(ChatFormatter.nonItalic(NamedTextColor.GOLD))
+                        FtcFormatter.rhinesNonTrans(data.getPrice() * 64 * scalar)
+                                .style(FtcFormatter.nonItalic(NamedTextColor.GOLD))
                                 .append(Component.text(" per stack."))
                 )
                 .addLore(
                         Component.text("Amount you will sell: ")
-                                .style(ChatFormatter.nonItalic(NamedTextColor.GRAY))
+                                .style(FtcFormatter.nonItalic(NamedTextColor.GRAY))
                                 .append(amount.loreThing())
                 )
                 .addLore(
                         Component.text("Change the amount you will sell on the right")
-                                .style(ChatFormatter.nonItalic(NamedTextColor.GRAY))
+                                .style(FtcFormatter.nonItalic(NamedTextColor.GRAY))
                 );
     }
 }

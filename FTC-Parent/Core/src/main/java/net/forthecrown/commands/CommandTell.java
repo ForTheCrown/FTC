@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ForTheCrown;
@@ -29,13 +29,13 @@ public class CommandTell extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.
-                then(argument("user", UserType.onlineUser())
+                then(argument("user", UserArgument.onlineUser())
                         .then(argument("message", StringArgumentType.greedyString())
-                                .suggests((c, b) -> FtcSuggestionProvider.suggestPlayernamesAndEmotes(c, b, false))
+                                .suggests((c, b) -> FtcSuggestionProvider.suggestPlayerNamesAndEmotes(c, b, false))
 
                                 .executes(c -> {
                                     CommandSource source = c.getSource();
-                                    CrownUser user = UserType.getUser(c, "user");
+                                    CrownUser user = UserArgument.getUser(c, "user");
                                     String text = c.getArgument("message", String.class);
 
                                     return sendMsg(source, user, text);

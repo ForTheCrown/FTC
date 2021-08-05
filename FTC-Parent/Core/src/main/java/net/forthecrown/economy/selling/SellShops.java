@@ -1,7 +1,7 @@
 package net.forthecrown.economy.selling;
 
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.InventoryBuilder;
@@ -42,8 +42,8 @@ public class SellShops {
     public static InventoryOption WEB_SHOP = new SimpleCordedOption(
             4, 1,
             new ItemStackBuilder(EMERALD_BLOCK, 1)
-                    .setName(Component.text("-Web Shop-").style(ChatFormatter.nonItalic(NamedTextColor.GREEN)))
-                    .addLore(Component.text("Show's the server's webstore link").style(ChatFormatter.nonItalic(NamedTextColor.GRAY)))
+                    .setName(Component.text("-Web Shop-").style(FtcFormatter.nonItalic(NamedTextColor.GREEN)))
+                    .addLore(Component.text("Show's the server's webstore link").style(FtcFormatter.nonItalic(NamedTextColor.GRAY)))
                     .build(),
 
             (user, context) -> {
@@ -214,12 +214,12 @@ public class SellShops {
                         NamedTextColor.GRAY,
                         Component.text()
                                 .color(NamedTextColor.YELLOW)
-                                .append(ChatFormatter.itemMessage(sellItem, result.getFoundAmount()))
+                                .append(FtcFormatter.itemAndAmount(sellItem, result.getFoundAmount()))
                                 .build(),
-                        Balances.formatted(totalEarned).color(NamedTextColor.GOLD)
+                        FtcFormatter.rhines(totalEarned).color(NamedTextColor.GOLD)
                 )
         );
-        ForTheCrown.logger().info(user.getName() + " sold " + result.getFoundAmount() + " " + ChatFormatter.normalEnum(toRemove) + " for " + Balances.getFormatted(totalEarned));
+        ForTheCrown.logger().info(user.getName() + " sold " + result.getFoundAmount() + " " + FtcFormatter.normalEnum(toRemove) + " for " + FtcFormatter.getRhines(totalEarned));
 
         int initPrice = data.getPrice();
 
@@ -233,7 +233,7 @@ public class SellShops {
             user.sendMessage(Component.translatable("economy.sellshop.priceDrop",
                     NamedTextColor.GRAY,
                     Component.translatable(toRemove.getTranslationKey()).color(NamedTextColor.YELLOW),
-                    Balances.formatted(comparison * priceScalar).color(NamedTextColor.GOLD)
+                    FtcFormatter.rhines(comparison * priceScalar).color(NamedTextColor.GOLD)
             ));
         }
 

@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
@@ -27,13 +27,13 @@ public class CommandAfk extends FtcCommand {
                 .executes(c -> afk(getUserSender(c), null))
 
                 .then(literal("-other")
-                        .requires(s -> s.hasPermission(Permissions.CORE_ADMIN))
+                        .requires(s -> s.hasPermission(Permissions.FTC_ADMIN))
 
-                        .then(argument("user", UserType.onlineUser())
-                                .requires(s -> s.hasPermission(Permissions.CORE_ADMIN))
+                        .then(argument("user", UserArgument.onlineUser())
+                                .requires(s -> s.hasPermission(Permissions.FTC_ADMIN))
 
                                 .executes(c -> afk(
-                                        UserType.getUser(c, "user"),
+                                        UserArgument.getUser(c, "user"),
                                         null
                                 ))
                         )

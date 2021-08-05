@@ -9,11 +9,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * The CommandVariables class, manages and handles the CommandVariables
  */
 public class ComVarRegistry {
+    public static final Pattern ALLOWED_NAME = Pattern.compile("^[a-z_]\\w*$");
     private static final Map<String, ComVar<?>> COM_VARS = new HashMap<>();
 
     public static <T> ComVar<T> set(@NotNull String name, @NotNull ComVarType<T> type, T value){
@@ -27,6 +29,8 @@ public class ComVarRegistry {
     }
 
     public static <T> void parseVar(String name, String input) throws CommandSyntaxException {
+        validateName(name);
+
         ComVar<T> type = (ComVar<T>) COM_VARS.get(name);
         T value = type.getType().parse(new StringReader(input));
         set(name, type.getType(), value);
@@ -34,11 +38,12 @@ public class ComVarRegistry {
 
     public static <T> String getString(@NotNull String name){
         Validate.notNull(name, "Name was null");;
+        validateName(name);
         if(!COM_VARS.containsKey(name)) throw new NullPointerException("No variable by the name of: " + name + " found");
 
         ComVar<T> var = (ComVar<T>) COM_VARS.get(name);
         ComVarType<T> type= var.getType();
-        return type.asString(var.getValue());
+        return type.asParsableString(var.getValue());
     }
 
     public static <T> T get(@NotNull String name, @NotNull ComVarType<T> type){
@@ -61,11 +66,13 @@ public class ComVarRegistry {
     }
 
     public static ComVar<?> getVar(String name){
+        validateName(name);
         return COM_VARS.get(name);
     }
 
     public static ComVarType<?> getType(@NotNull String name){
         Validate.notNull(name, "Name was null");
+        validateName(name);
         return COM_VARS.get(name).getType();
     }
 
@@ -88,6 +95,19 @@ public class ComVarRegistry {
 
     private static void validate(String name, ComVarType<?> type){
         Validate.notNull(name, "Name was null");
+        validateName(name);
+
         Validate.notNull(type, "Type was null");
+    }
+
+    /**
+     * Checks if a name is a valid variable name
+     * <p></p>
+     * Fuck you, these need the same syntax as normal java variables.
+     * <p>Love you &lt;3</p>
+     * @param name The name to check
+     */
+    public static void validateName(String name) {
+        Validate.isTrue(ALLOWED_NAME.matcher(name).matches(), "Illegal variable name, use java variable naming convention (Lowercase first letter and no irregular characters)");
     }
 }

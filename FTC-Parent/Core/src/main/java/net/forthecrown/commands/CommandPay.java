@@ -3,13 +3,15 @@ package net.forthecrown.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.royalgrenadier.types.selector.EntityArgumentImpl;
 import net.kyori.adventure.text.Component;
@@ -25,9 +27,11 @@ public class CommandPay extends FtcCommand {
     public CommandPay(){
         super("pay", ForTheCrown.inst());
 
-        maxMoneyAmount = ForTheCrown.getMaxMoneyAmount();
+        maxMoneyAmount = ComVars.getMaxMoneyAmount();
 
         setDescription("Pays another player");
+        setPermission(Permissions.PAY);
+
         register();
     }
 
@@ -48,14 +52,14 @@ public class CommandPay extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("players", UserType.users())
+                .then(argument("players", UserArgument.users())
                       .then(argument("amount", IntegerArgumentType.integer(1, maxMoneyAmount))
                               .suggests(suggestMonies())
 
                             .executes(c -> {
                                 CrownUser user = getUserSender(c);
                                 int amount = c.getArgument("amount", Integer.class);
-                                List<CrownUser> users = UserType.getUsers(c, "players");
+                                List<CrownUser> users = UserArgument.getUsers(c, "players");
 
                                 return pay(user, users, amount, null);
                             })
@@ -64,8 +68,8 @@ public class CommandPay extends FtcCommand {
                                       .executes(c -> {
                                           CrownUser user = getUserSender(c);
                                           int amount = c.getArgument("amount", Integer.class);
-                                          List<CrownUser> users = UserType.getUsers(c, "players");
-                                          Component message = ChatFormatter.formatIfAllowed(c.getArgument("message", String.class), user);
+                                          List<CrownUser> users = UserArgument.getUsers(c, "players");
+                                          Component message = FtcFormatter.formatIfAllowed(c.getArgument("message", String.class), user);
 
                                           return pay(user, users, amount, message);
                                       })
@@ -89,38 +93,54 @@ public class CommandPay extends FtcCommand {
         if(targets.size() == 1){
             CrownUser target = targets.get(0);
             if(!target.allowsPaying()) throw FtcExceptionProvider.targetPayDisabled(target);
+            if(target.getInteractions().isBlockedPlayer(user.getUniqueId())) throw FtcExceptionProvider.cannotPayBlocked();
         }
 
-        for (CrownUser target: targets){
+        Component messageActual = message == null || !user.getInteractions().muteStatus().maySpeak ?
+                Component.text(".").color(NamedTextColor.GRAY) :
+                message.color(NamedTextColor.WHITE);
+
+        Component formattedAmount = FtcFormatter.rhines(amount).color(NamedTextColor.GOLD);
+
+        for (CrownUser target: targets) {
+            if(!target.allowsPaying()) continue;
+
             bals.add(target.getUniqueId(), amount, false);
             bals.add(id, -amount, false);
 
             user.sendMessage(
-                    Component.text("You've paid ")
-                            .color(NamedTextColor.GRAY)
-                            .append(Balances.formatted(amount).color(NamedTextColor.GOLD))
-                            .append(Component.text(" to "))
-                            .append(target.nickDisplayName().color(NamedTextColor.YELLOW))
-                            .append(message == null ? Component.empty() : Component.text(": ").append(message.color(NamedTextColor.WHITE)))
+                    Component.translatable("economy.pay.sender",
+                            NamedTextColor.GRAY,
+                            formattedAmount,
+                            target.nickDisplayName().color(NamedTextColor.YELLOW),
+                            message == null ? messageActual : message.color(NamedTextColor.WHITE)
+                    )
             );
 
+            boolean ignoring = target.getInteractions().isBlockedPlayer(user.getUniqueId());
             target.sendMessage(
-                    Component.text("You've received ")
-                            .color(NamedTextColor.GRAY)
-                            .append(Balances.formatted(amount).color(NamedTextColor.GOLD))
-                            .append(Component.text(" from "))
-                            .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
-                            .append(message == null ? Component.empty() : Component.text(": ").append(message.color(NamedTextColor.WHITE)))
+                    Component.translatable("economy.pay.receiver",
+                            NamedTextColor.GRAY,
+                            formattedAmount,
+                            user.nickDisplayName().color(NamedTextColor.YELLOW),
+                            ignoring ? Component.text(".").color(NamedTextColor.GRAY) : messageActual
+                    )
             );
+
             paidAmount++;
         }
 
-        if(paidAmount == 0) throw UserType.NO_USERS_FOUND.create();
-        if(paidAmount > 1) user.sendMessage(
-                Component.text("Paid " + paidAmount + " people. Lost ")
-                        .color(NamedTextColor.GRAY)
-                        .append(Balances.formatted(paidAmount * amount).color(NamedTextColor.YELLOW))
-        );
+        if(paidAmount == 0) throw UserArgument.NO_USERS_FOUND.create();
+
+        if(paidAmount > 1) {
+            user.sendMessage(
+                    Component.translatable("economy.pay.result",
+                            NamedTextColor.GRAY,
+                            Component.text(paidAmount).color(NamedTextColor.YELLOW),
+                            FtcFormatter.rhines(paidAmount * amount).color(NamedTextColor.GOLD)
+                    )
+            );
+        }
         return 0;
     }
 }

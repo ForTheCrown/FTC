@@ -9,11 +9,11 @@ import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.TimeArgument;
@@ -36,10 +36,10 @@ public class CommandTempBan extends FtcCommand implements TempPunisher {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .then(argument("time", TimeArgument.time())
                                 .executes(c -> punish(
-                                        UserType.getUser(c, "user"),
+                                        UserArgument.getUser(c, "user"),
                                         c.getSource(),
                                         c.getArgument("time", Long.class),
                                         null
@@ -47,7 +47,7 @@ public class CommandTempBan extends FtcCommand implements TempPunisher {
 
                                 .then(argument("reason", StringArgumentType.greedyString())
                                         .executes(c -> punish(
-                                                UserType.getUser(c, "user"),
+                                                UserArgument.getUser(c, "user"),
                                                 c.getSource(),
                                                 c.getArgument("time", Long.class),
                                                 c.getArgument("reason", String.class)
@@ -69,7 +69,7 @@ public class CommandTempBan extends FtcCommand implements TempPunisher {
         if(entry != null && entry.checkPunished(PunishmentType.BAN)) throw FtcExceptionProvider.create("User has already been banned");
 
         PunishmentRecord record = manager.punish(user.getUniqueId(), PunishmentType.BAN, source, reason, until);
-        if(user.isOnline()) user.getPlayer().kick(ChatFormatter.banMessage(record));
+        if(user.isOnline()) user.getPlayer().kick(FtcFormatter.banMessage(record));
 
         list.addBan(user.getName(), reason, new Date(until), source.textName());
 
@@ -79,7 +79,7 @@ public class CommandTempBan extends FtcCommand implements TempPunisher {
                         .color(NamedTextColor.YELLOW)
                         .append(user.displayName().color(NamedTextColor.GOLD))
                         .append(Component.text(" for "))
-                        .append(ChatFormatter.millisIntoTime(length).color(NamedTextColor.GOLD))
+                        .append(FtcFormatter.millisIntoTime(length).color(NamedTextColor.GOLD))
         );
         return 0;
     }

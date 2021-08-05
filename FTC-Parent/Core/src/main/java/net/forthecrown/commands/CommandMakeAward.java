@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.ItemStackBuilder;
@@ -44,11 +44,11 @@ public class CommandMakeAward extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("award", StringArgumentType.word())
-                        .then(argument("winner", UserType.user())
+                        .then(argument("winner", UserArgument.user())
                                 .executes(c -> doAward(
                                         c,
                                         c.getArgument("award", String.class),
-                                        UserType.getUser(c, "winner"),
+                                        UserArgument.getUser(c, "winner"),
                                         Material.RED_TULIP
                                 ))
 
@@ -56,7 +56,7 @@ public class CommandMakeAward extends FtcCommand {
                                         .executes(c -> doAward(
                                                 c,
                                                 c.getArgument("award", String.class),
-                                                UserType.getUser(c, "winner"),
+                                                UserArgument.getUser(c, "winner"),
                                                 c.getArgument("mat", Material.class)
                                         ))
                                 )

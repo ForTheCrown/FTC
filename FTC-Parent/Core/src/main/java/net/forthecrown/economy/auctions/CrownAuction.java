@@ -1,9 +1,9 @@
 package net.forthecrown.economy.auctions;
 
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.CrownException;
-import net.forthecrown.core.chat.ChatFormatter;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.pirates.AuctionManager;
 import net.forthecrown.pirates.Pirates;
@@ -209,9 +209,9 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
         this.adminAuction = admin;
         this.bids = new HashMap<>();
 
-        expiresAt = System.currentTimeMillis() + ForTheCrown.getAuctionExpirationTime();
+        expiresAt = System.currentTimeMillis() + ComVars.getAuctionExpirationTime();
 
-        Component itemName = ChatUtils.convertString(ChatFormatter.getItemNormalName(item));
+        Component itemName = ChatUtils.convertString(FtcFormatter.getItemNormalName(item));
         if(item.getItemMeta().hasDisplayName()) itemName = item.getItemMeta().displayName();
 
         getSign().line(1, Component.text(item.getAmount()));
@@ -222,7 +222,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
     }
 
     @Override
-    public void attemptItemClaim(CrownUser user) throws CrownException {
+    public void attemptItemClaim(CrownUser user) {
         if(!canBeClaimedByAnyone && !highestBidder.equals(user)){
             user.sendMessage(
                     Component.text("You cannot claim this item! ")
@@ -237,13 +237,18 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
             return;
         }
 
-        if (user.getPlayer().getInventory().firstEmpty() == -1) throw new CrownException(user, "Your inventory is full!");
+        if (user.getPlayer().getInventory().firstEmpty() == -1) {
+            user.sendMessage(
+                    Component.translatable("commands.invFull")
+            );
+            return;
+        }
 
         Balances bals = ForTheCrown.getBalances();
 
         if(!highestBidder.equals(owner)){
             bals.add(owner, getHighestBid(), false);
-            getOwner().sendMessage("&6$ &7You've received &e" + Balances.getFormatted(highestBid) + " &7from &e" + getName() + "&7 by &e" + user.getName());
+            getOwner().sendMessage("&6$ &7You've received &e" + FtcFormatter.getRhines(highestBid) + " &7from &e" + getName() + "&7 by &e" + user.getName());
         }
 
         user.getPlayer().getInventory().addItem(getItem());
@@ -373,7 +378,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
             setWaitingForItemClaim(true);
             getSign().line(0, AuctionManager.WAITING_FOR_ITEM_CLAIM_LABEL);
             updateSign();
-            freeForAll = System.currentTimeMillis() + ForTheCrown.getAuctionPickupTime();
+            freeForAll = System.currentTimeMillis() + ComVars.getAuctionPickupTime();
             giveBalancesToLosers(false);
             return false;
         }
@@ -388,7 +393,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
     private Component willBeMadeAvailableInMessage(){
         return Component.text("Auction will be made free for all in: " )
                 .color(NamedTextColor.GRAY)
-                .append(Component.text(ChatFormatter.convertMillisIntoTime(freeForAll - System.currentTimeMillis())).color(NamedTextColor.GOLD));
+                .append(Component.text(FtcFormatter.convertMillisIntoTime(freeForAll - System.currentTimeMillis())).color(NamedTextColor.GOLD));
     }
 
     @Override
@@ -401,7 +406,7 @@ public class CrownAuction extends AbstractYamlSerializer implements Auction {
 
             int amount = bids.get(id);
 
-            UserManager.getUser(id).sendMessage("&6$ &7You received &e" + ChatFormatter.decimalizeNumber(amount) + " Rhines&7 from your bid on &e" + getName());
+            UserManager.getUser(id).sendMessage("&6$ &7You received &e" + FtcFormatter.decimalizeNumber(amount) + " Rhines&7 from your bid on &e" + getName());
             bals.add(id, amount, false);
         }
     }

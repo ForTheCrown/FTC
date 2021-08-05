@@ -1,6 +1,6 @@
 package net.forthecrown.inventory.builder.options;
 
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.InvCords;
 import net.forthecrown.user.CrownUser;
@@ -39,7 +39,7 @@ public class SimpleCordedOption implements CordedInventoryOption {
     }
 
     @Override
-    public void onClick(CrownUser user, ClickContext context) throws RoyalCommandException {
+    public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
         if(getRunnable() != null) getRunnable().onClick(user, context);
     }
 }

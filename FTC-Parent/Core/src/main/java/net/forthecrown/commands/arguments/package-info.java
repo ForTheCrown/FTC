@@ -7,7 +7,7 @@
  * </p>
  * <p></p>
  * <p>
- * Some classes have a static get method to get the parse result as well. In the case of {@link net.forthecrown.commands.arguments.UserType#getUser(com.mojang.brigadier.context.CommandContext, java.lang.String)}
+ * Some classes have a static get method to get the parse result as well. In the case of {@link net.forthecrown.commands.arguments.UserArgument#getUser(com.mojang.brigadier.context.CommandContext, java.lang.String)}
  * It is used for correctly detecting that the gotten user can be accessed by the command source,
  * aka if the user is vanished or something
  * </p>
@@ -26,7 +26,7 @@
  * </p>
  * <p></p>
  * <p>
- * If you're ever working with a type that parses a key, I reccommend using the {@link net.forthecrown.commands.arguments.KeyType}
+ * If you're ever working with a type that parses a key, I reccommend using the {@link net.forthecrown.grenadier.types.KeyArgument}
  * to do this. Saves a lot of hassel lol
  * </p>
  */

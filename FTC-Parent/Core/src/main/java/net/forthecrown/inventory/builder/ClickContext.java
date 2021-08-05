@@ -74,7 +74,7 @@ public class ClickContext {
         this.cooldownTime = cooldownTime;
     }
 
-    public void setShouldCancelEvent(boolean shouldCancelEvent) {
+    public void setCancelEvent(boolean shouldCancelEvent) {
         this.shouldCancelEvent = shouldCancelEvent;
     }
 

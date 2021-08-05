@@ -4,7 +4,7 @@ import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -32,7 +32,7 @@ public class MarriageMessage {
         this.sender = sender;
         this.recipient = recipient;
         this.input = input;
-        this.formatted = ChatFormatter.formatIfAllowed(input, sender.getPlayer());
+        this.formatted = FtcFormatter.formatIfAllowed(input, sender.getPlayer());
         status = ForTheCrown.getPunishmentManager().checkMute(sender.getPlayer());
     }
 

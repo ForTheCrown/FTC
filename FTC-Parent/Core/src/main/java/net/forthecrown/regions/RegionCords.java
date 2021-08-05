@@ -4,6 +4,9 @@ import net.forthecrown.utils.math.BlockPos;
 import net.minecraft.world.phys.Vec2;
 import org.bukkit.Location;
 
+/**
+ * Represents the coordinates of a region pole in a 2 dimensional X Z grid.
+ */
 public class RegionCords {
     public static final int REGION_SIZE = 400;
     public static final int HALF_REGION_SIZE = REGION_SIZE / 2;

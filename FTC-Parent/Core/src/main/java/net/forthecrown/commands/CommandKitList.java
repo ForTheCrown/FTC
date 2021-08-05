@@ -35,7 +35,7 @@ public class CommandKitList extends FtcCommand {
                             .color(NamedTextColor.GOLD);
 
                     Collection<Kit> kits = c.getSource().hasPermission(Permissions.KIT_ADMIN) ?
-                            ForTheCrown.getKitRegistry().values() : ForTheCrown.getKitRegistry().getUsableFor(player);
+                            ForTheCrown.getKitManager().values() : ForTheCrown.getKitManager().getUsableFor(player);
 
                     for (Kit k: kits){
                         Component name = Component.text(" [")

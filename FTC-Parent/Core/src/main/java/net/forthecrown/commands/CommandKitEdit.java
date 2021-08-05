@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.arguments.KitType;
+import net.forthecrown.commands.arguments.KitArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.useables.kits.Kit;
@@ -45,7 +45,7 @@ public class CommandKitEdit extends FtcCommand {
                                         items.add(i);
                                     }
 
-                                    Kit kit = ForTheCrown.getKitRegistry().register(key, items);
+                                    Kit kit = ForTheCrown.getKitManager().register(key, items);
 
                                     c.getSource().sendAdmin(
                                             Component.text("Created kit named ")
@@ -56,8 +56,8 @@ public class CommandKitEdit extends FtcCommand {
                         )
                 )
 
-                .then(argument("kit", KitType.kit())
-                        .suggests((c, b) -> KitType.kit().listSuggestions(c, b, true))
+                .then(argument("kit", KitArgument.kit())
+                        .suggests((c, b) -> KitArgument.kit().listSuggestions(c, b, true))
 
                         .then(literal("delete")
                                 .executes(c -> {
@@ -86,6 +86,6 @@ public class CommandKitEdit extends FtcCommand {
     }
 
     private Kit get(CommandContext<CommandSource> c){
-        return KitType.getKit(c, "kit");
+        return KitArgument.getKit(c, "kit");
     }
 }

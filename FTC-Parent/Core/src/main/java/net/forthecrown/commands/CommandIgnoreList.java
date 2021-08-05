@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
@@ -51,9 +51,9 @@ public class CommandIgnoreList extends FtcCommand {
         command
                 .executes(c -> displayIgnored(c.getSource(), getUserSender(c)))
 
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .requires(s -> s.hasPermission(Permissions.HELPER))
-                        .executes(c -> displayIgnored(c.getSource(), UserType.getUser(c, "user")))
+                        .executes(c -> displayIgnored(c.getSource(), UserArgument.getUser(c, "user")))
                 );
     }
 

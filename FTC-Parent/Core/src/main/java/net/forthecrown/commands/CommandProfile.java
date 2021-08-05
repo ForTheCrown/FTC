@@ -1,16 +1,17 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.commands.arguments.UserType;
+import com.google.common.base.Joiner;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.crownevents.EventTimer;
-import net.forthecrown.economy.Balances;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
@@ -28,7 +29,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
 import java.util.Date;
-import java.util.function.Function;
 
 public class CommandProfile extends FtcCommand {
 
@@ -66,11 +66,11 @@ public class CommandProfile extends FtcCommand {
                     sendProfileMessage(user, user);
                     return 0;
                 })
-                .then(argument("player", UserType.user())
+                .then(argument("player", UserArgument.user())
 
                         .executes(c ->{
                             CrownUser user = getUserSender(c);
-                            CrownUser profile = UserType.getUser(c, "player");
+                            CrownUser profile = UserArgument.getUser(c, "player");
                             sendProfileMessage(profile, user);
                             return 0;
                         })
@@ -100,7 +100,7 @@ public class CommandProfile extends FtcCommand {
         Objective crown = profile.getScoreboard().getObjective("crown");
         Score crownScr = crown.getScore(profile.getName());
 
-        Component scrDisplay = Component.text(ForTheCrown.isEventTimed() ? EventTimer.getTimerCounter(crownScr.getScore()).toString() : crownScr.getScore() + "");
+        Component scrDisplay = Component.text(ComVars.isEventTimed() ? EventTimer.getTimerCounter(crownScr.getScore()).toString() : crownScr.getScore() + "");
         Component marriedTo = marriedMessage(profile);
 
         //Footer size roughly lines up with header size
@@ -120,14 +120,14 @@ public class CommandProfile extends FtcCommand {
                 .append(line("Rank", profile.getRank().prefix(), profile.getRank() != Rank.DEFAULT))
 
                 .append(line("Allowed to swap branches in", timeThing(profile), !profile.canSwapBranch() && (self || user.hasPermission(Permissions.PROFILE_BYPASS))))
-                .append(line("Play time", ChatFormatter.decimalizeNumber(playTime) + " hours", playTime > 0))
+                .append(line("Play time", FtcFormatter.decimalizeNumber(playTime) + " hours", playTime > 0))
                 .append(line("Married to", marriedTo, marriedTo != null))
 
                 .append(line("Pirate Points", score.getScore() + "", score.isScoreSet() && score.getScore() != 0))
-                .append(line("Crown score", scrDisplay, crownScr.isScoreSet() && crownScr.getScore() > 0 && ForTheCrown.isEventActive()))
+                .append(line("Crown score", scrDisplay, crownScr.isScoreSet() && crownScr.getScore() > 0 && ComVars.isEventActive()))
 
                 .append(line("Gems", profile.getGems() + "", profile.getGems() > 0))
-                .append(line("Balance", Balances.formatted(ForTheCrown.getBalances().get(profile.getUniqueId())), true))
+                .append(line("Balance", FtcFormatter.rhines(ForTheCrown.getBalances().get(profile.getUniqueId())), true))
 
                 .append(adminInfo(user, profile))
 
@@ -142,7 +142,7 @@ public class CommandProfile extends FtcCommand {
 
     private static String timeThing(CrownUser profile){
         long timeUntil = profile.getNextAllowedBranchSwap() - System.currentTimeMillis();
-        return ChatFormatter.convertMillisIntoTime(timeUntil);
+        return FtcFormatter.convertMillisIntoTime(timeUntil);
     }
 
     private static Component line(String field, String value, boolean check){
@@ -164,7 +164,7 @@ public class CommandProfile extends FtcCommand {
         PunishmentManager list = ForTheCrown.getPunishmentManager();
         PunishmentEntry entry = list.getEntry(profile.getUniqueId());
 
-        Component locMessage = profile.getLocation() == null ? null : ChatFormatter.clickableLocationMessage(profile.getLocation(), true);
+        Component locMessage = profile.getLocation() == null ? null : FtcFormatter.clickableLocationMessage(profile.getLocation(), true);
         Component punishmentDisplay = entry == null ? Component.empty() : Component.newline().append(entry.display(false));
         Component marriageCooldown = marriageCooldown(profile.interactions);
         Component ignored = profile.interactions.blocked.isEmpty() ?
@@ -178,7 +178,7 @@ public class CommandProfile extends FtcCommand {
         Component ip = profile.ip == null ? null : Component.text(profile.ip);
 
         Component lastNames = ListUtils.isNullOrEmpty(profile.previousNames) ? null : Component.text(
-                ListUtils.join(profile.previousNames, Function.identity())
+                Joiner.on(' ').join(profile.previousNames)
         );
 
         return Component.newline()
@@ -199,16 +199,16 @@ public class CommandProfile extends FtcCommand {
     }
 
     private static Component marriedMessage(CrownUser user){
-        if(user.getInteractions().getMarriedTo() == null) return null;
+        if(user.getInteractions().getSpouse() == null) return null;
 
-        return user.getInteractions().marriedToUser().nickDisplayName();
+        return user.getInteractions().spouseUser().nickDisplayName();
     }
 
     private static Component marriageCooldown(UserInteractions interactions){
         if(interactions.canChangeMarriageStatus()) return null;
 
         long time = interactions.getLastMarriageChange();
-        return Component.text(ChatFormatter.getDateFromMillis(time))
+        return Component.text(FtcFormatter.getDateFromMillis(time))
                 .hoverEvent(Component.text(new Date(time).toString()));
     }
 
@@ -216,12 +216,12 @@ public class CommandProfile extends FtcCommand {
         if(user.isOnline()){
             return Component.text(" Has been online for ")
                     .color(NamedTextColor.YELLOW)
-                    .append(ChatFormatter.millisIntoTime(System.currentTimeMillis() - user.getPlayer().getLastLogin()).color(NamedTextColor.WHITE));
+                    .append(FtcFormatter.millisIntoTime(System.currentTimeMillis() - user.getPlayer().getLastLogin()).color(NamedTextColor.WHITE));
         } else {
             return Component.text(" Has been offline for ")
                     .color(NamedTextColor.YELLOW)
                     .hoverEvent(Component.text(new Date(user.getOfflinePlayer().getLastLogin()).toString()))
-                    .append(ChatFormatter.millisIntoTime(System.currentTimeMillis() - user.getOfflinePlayer().getLastLogin()).color(NamedTextColor.WHITE));
+                    .append(FtcFormatter.millisIntoTime(System.currentTimeMillis() - user.getOfflinePlayer().getLastLogin()).color(NamedTextColor.WHITE));
         }
     }
 }

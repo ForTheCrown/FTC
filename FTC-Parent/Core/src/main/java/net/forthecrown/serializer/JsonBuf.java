@@ -4,11 +4,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.math.BlockPos;
 import net.forthecrown.utils.math.FtcRegion;
 import net.kyori.adventure.key.Key;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
@@ -250,6 +253,22 @@ public class JsonBuf {
         }
 
         return result;
+    }
+
+    public void addNBT(String name, CompoundTag tag) {
+        add(name, tag.toString());
+    }
+
+    public CompoundTag getNBT(String name) { return getNBT(name, null); }
+    public CompoundTag getNBT(String name, CompoundTag def) {
+        if(missingOrNull(name)) return def;
+
+        try {
+            return TagParser.parseTag(getString(name));
+        } catch (CommandSyntaxException exception) {
+            exception.printStackTrace();
+            return def;
+        }
     }
 
     //------------------ Delegate Methods -----------------//

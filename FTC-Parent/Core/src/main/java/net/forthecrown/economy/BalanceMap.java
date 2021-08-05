@@ -9,9 +9,18 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.IntSupplier;
 
+/**
+ * The map object which stores the balances of player.
+ * <p></p>
+ * Implementation: {@link SortedBalanceMap}
+ */
 public interface BalanceMap {
 
-    IntSupplier getDefaultAmount();
+    IntSupplier getDefaultSupplier();
+
+    default int getDefaultAmount() {
+        return getDefaultSupplier().getAsInt();
+    }
 
     boolean contains(UUID id);
 

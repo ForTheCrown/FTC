@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
@@ -15,7 +15,7 @@ public class CommandSetSpawn extends FtcCommand {
     public CommandSetSpawn(){
         super("setspawn", ForTheCrown.inst());
 
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
 
         register();
     }
@@ -52,7 +52,7 @@ public class CommandSetSpawn extends FtcCommand {
         source.sendMessage(
                 Component.text("Set server spawn to ")
                         .color(NamedTextColor.GRAY)
-                        .append(ChatFormatter.clickableLocationMessage(l, true).color(NamedTextColor.GOLD))
+                        .append(FtcFormatter.clickableLocationMessage(l, true).color(NamedTextColor.GOLD))
         );
         return 0;
     }
@@ -63,7 +63,7 @@ public class CommandSetSpawn extends FtcCommand {
 
         source.sendAdmin(
                 Component.text("Set world spawn to ")
-                        .append(ChatFormatter.clickableLocationMessage(l, true))
+                        .append(FtcFormatter.clickableLocationMessage(l, true))
         );
         return 0;
     }

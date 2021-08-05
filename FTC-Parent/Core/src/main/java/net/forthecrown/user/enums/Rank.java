@@ -2,7 +2,7 @@ package net.forthecrown.user.enums;
 
 import com.google.gson.JsonElement;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
@@ -17,33 +17,33 @@ import java.util.List;
  */
 public enum Rank implements JsonSerializable {
     //royals
-    KNIGHT ( "&8[&7Knight&8] &f", Branch.ROYALS, "free-rank", RankTier.FREE),
-    BARON ("&8[&7Baron&8] &f", Branch.ROYALS, "free-rank", RankTier.FREE),
-    BARONESS( "&8[&7Baroness&8] &f", Branch.ROYALS, "free-rank", RankTier.FREE),
-    LORD ("&#959595[&6Lord&#959595] &r", Branch.ROYALS, "donator-tier-1", RankTier.TIER_1),
-    LADY( "&#959595[&6Lady&#959595] &r", Branch.ROYALS, "donator-tier-1", RankTier.TIER_1),
-    DUKE ("&7[&#ffbf15Duke&7] &r", Branch.ROYALS, "donator-tier-2", RankTier.TIER_2),
-    DUCHESS( "&7[&#ffbf15Duchess&7] &r", Branch.ROYALS, "donator-tier-2", RankTier.TIER_2),
-    PRINCE ("[&#FBFF0FPrince&f] &r", Branch.ROYALS, "donator-tier-3", RankTier.TIER_3),
-    PRINCESS ( "[&#FBFF0FPrincess&f] &r", Branch.ROYALS, "donator-tier-3", RankTier.TIER_3),
+    KNIGHT (        "&8[&7Knight&8] &f",            Branch.ROYALS,  "free-rank",         RankTier.FREE),
+    BARON (         "&8[&7Baron&8] &f",             Branch.ROYALS,  "free-rank",         RankTier.FREE),
+    BARONESS(       "&8[&7Baroness&8] &f",          Branch.ROYALS,  "free-rank",         RankTier.FREE),
+    LORD (          "&#959595[&6Lord&#959595] &r",  Branch.ROYALS,  "donator-tier-1",    RankTier.TIER_1),
+    LADY(           "&#959595[&6Lady&#959595] &r",  Branch.ROYALS,  "donator-tier-1",    RankTier.TIER_1),
+    DUKE (          "&7[&#ffbf15Duke&7] &r",        Branch.ROYALS,  "donator-tier-2",    RankTier.TIER_2),
+    DUCHESS(        "&7[&#ffbf15Duchess&7] &r",     Branch.ROYALS,  "donator-tier-2",    RankTier.TIER_2),
+    PRINCE (        "[&#FBFF0FPrince&f] &r",        Branch.ROYALS,  "donator-tier-3",    RankTier.TIER_3),
+    PRINCESS (      "[&#FBFF0FPrincess&f] &r",      Branch.ROYALS,  "donator-tier-3",    RankTier.TIER_3),
 
     //pirates
-    SAILOR ("&8&l{&7Sailor&8&l} &r", Branch.PIRATES, "free-rank", RankTier.FREE),
-    PIRATE ("&8&l{&7Pirate&8&l} &r", Branch.PIRATES, "donator-tier-1", RankTier.TIER_1),
-    CAPTAIN ("&7{&6Captain&7} &r", Branch.PIRATES, "donator-tier-2", RankTier.TIER_2),
-    ADMIRAL ("{&eAdmiral&f} &r", Branch.PIRATES, "donator-tier-3", RankTier.TIER_3),
+    SAILOR (        "&8&l{&7Sailor&8&l} &r",        Branch.PIRATES, "free-rank",        RankTier.FREE),
+    PIRATE (        "&8&l{&7Pirate&8&l} &r",        Branch.PIRATES, "donator-tier-1",   RankTier.TIER_1),
+    CAPTAIN (       "&7{&6Captain&7} &r",           Branch.PIRATES, "donator-tier-2",   RankTier.TIER_2),
+    ADMIRAL (       "{&eAdmiral&f} &r",             Branch.PIRATES, "donator-tier-3",   RankTier.TIER_3),
 
     //vikings
-    VIKING ("<Viking>", Branch.VIKINGS, "free-rank", RankTier.FREE),
-    BERSERKER ("<Berserker>", Branch.VIKINGS, "free-rank", RankTier.FREE),
-    WARRIOR ("<Warrior>",  Branch.VIKINGS, "donator-tier-1", RankTier.TIER_1),
-    SHIELD_MAIDEN ("<Shield-maiden>", Branch.VIKINGS, "donator-tier-1", RankTier.TIER_1),
-    HERSIR ("<Hersir>", Branch.VIKINGS, "donator-tier-2", RankTier.TIER_2),
-    JARL ("<Jarl>", Branch.VIKINGS, "donator-tier-3", RankTier.TIER_3),
+    VIKING (        "<Viking>",                     Branch.VIKINGS, "free-rank",        RankTier.FREE),
+    BERSERKER (     "<Berserker>",                  Branch.VIKINGS, "free-rank",        RankTier.FREE),
+    WARRIOR (       "<Warrior>",                    Branch.VIKINGS, "donator-tier-1",   RankTier.TIER_1),
+    SHIELD_MAIDEN ( "<Shield-maiden>",              Branch.VIKINGS, "donator-tier-1",   RankTier.TIER_1),
+    HERSIR (        "<Hersir>",                     Branch.VIKINGS, "donator-tier-2",   RankTier.TIER_2),
+    JARL (          "<Jarl>",                       Branch.VIKINGS, "donator-tier-3",   RankTier.TIER_3),
 
     //non branch ranks
-    DEFAULT("DEFAULT", Branch.DEFAULT, "default", RankTier.NONE),
-    LEGEND("&#dfdfdf[&#fff147Legend&#dfdfdf] &r", Branch.DEFAULT, "legend", RankTier.TIER_3);
+    DEFAULT(        "DEFAULT",                      Branch.DEFAULT, "default",          RankTier.NONE),
+    LEGEND(  "&#dfdfdf[&#fff147Legend&#dfdfdf] &r", Branch.DEFAULT, "legend",           RankTier.TIER_3);
 
     //TODO get rid of string variables, switch to components completely
     private final String tabPrefix;
@@ -58,7 +58,7 @@ public enum Rank implements JsonSerializable {
     }
 
     public String getPrefix(){
-        return ChatFormatter.translateHexCodes(tabPrefix);
+        return FtcFormatter.translateHexCodes(tabPrefix);
     }
 
     public String getColorlessPrefix(){

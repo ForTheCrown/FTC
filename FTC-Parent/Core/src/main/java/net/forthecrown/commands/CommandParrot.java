@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.arguments.PetType;
+import net.forthecrown.commands.arguments.PetArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
@@ -37,7 +37,7 @@ public class CommandParrot extends FtcCommand {
                     removeOldParrot(user.getPlayer(), (Parrot) user.getPlayer().getShoulderEntityLeft());
                     return 0;
                 })
-                .then(argument("parrot", PetType.PET)
+                .then(argument("parrot", PetArgument.PET)
                         .executes(c -> setParrot(c, false))
                         .then(literal("silent").executes(c -> setParrot(c, true)))
                 );
@@ -48,7 +48,7 @@ public class CommandParrot extends FtcCommand {
         if(user.getBranch() != Branch.PIRATES) throw FtcExceptionProvider.notPirate();
 
         List<Pet> pets = user.getPets();
-        Pet pet = PetType.getPetIfOwned(c, "parrot");
+        Pet pet = PetArgument.getPetIfOwned(c, "parrot");
 
         if(!pets.contains(pet)){
             user.sendMessage(

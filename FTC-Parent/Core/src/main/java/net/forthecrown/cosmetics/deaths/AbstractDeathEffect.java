@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics.deaths;
 
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.cosmetics.CosmeticConstants;
 import net.forthecrown.cosmetics.CosmeticEffect;
@@ -72,10 +72,10 @@ public abstract class AbstractDeathEffect implements CosmeticEffect {
         boolean owned = data.hasDeath(this);
 
         ItemStackBuilder builder = new ItemStackBuilder(owned ? Material.ORANGE_DYE : Material.GRAY_DYE)
-                .setName(name().style(ChatFormatter.nonItalic(NamedTextColor.YELLOW)));
+                .setName(name().style(FtcFormatter.nonItalic(NamedTextColor.YELLOW)));
 
         for (Component c: description){
-            builder.addLore(c.style(ChatFormatter.nonItalic(NamedTextColor.GRAY)));
+            builder.addLore(c.style(FtcFormatter.nonItalic(NamedTextColor.GRAY)));
         }
 
         builder.addLore(Component.empty());
@@ -83,8 +83,8 @@ public abstract class AbstractDeathEffect implements CosmeticEffect {
         if(!owned){
             builder.addLore(
                     Component.text("Click to purchase for ")
-                            .style(ChatFormatter.nonItalic(NamedTextColor.GRAY))
-                            .append(Component.text(CosmeticConstants.DEATH_PRICE + " Gems").style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
+                            .style(FtcFormatter.nonItalic(NamedTextColor.GRAY))
+                            .append(Component.text(CosmeticConstants.DEATH_PRICE + " Gems").style(FtcFormatter.nonItalic(NamedTextColor.GOLD)))
             );
         }
 
@@ -108,7 +108,7 @@ public abstract class AbstractDeathEffect implements CosmeticEffect {
             user.sendMessage(Component.translatable("user.deathParticle.set", NamedTextColor.YELLOW, name()));
         } else {
             if(user.getGems() < CosmeticConstants.DEATH_PRICE){
-                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, ChatFormatter.queryGems(CosmeticConstants.DEATH_PRICE)));
+                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.queryGems(CosmeticConstants.DEATH_PRICE)));
                 return;
             }
 

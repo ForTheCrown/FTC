@@ -24,16 +24,17 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
     private InventoryAction onOpen;
 
     public InventoryBuilder(int size, Component title) {
-        Validate.isTrue(isValidSize(size));
-
-        this.size = size;
+        this.size = validSize(size);
         this.title = title;
     }
 
     public InventoryBuilder(int size) {
-        Validate.isTrue(isValidSize(size));
+        this.size = validSize(size);
+    }
 
-        this.size = size;
+    private int validSize(int size) {
+        Validate.isTrue(isValidSize(size), "Invalid inventory size");
+        return size;
     }
 
     public static boolean isValidSize(int size) {

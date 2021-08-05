@@ -139,13 +139,13 @@ public interface UserInteractions extends SocialInteractionsService, UserAttachm
      * Gets the UUID that this user is married to
      * @return The user's spouse's UUID
      */
-    UUID getMarriedTo();
+    UUID getSpouse();
 
     /**
      * Sets the UUID that this user is married to
-     * @param marriedTo The spouse's UUID
+     * @param spouse The spouse's UUID
      */
-    void setMarriedTo(UUID marriedTo);
+    void setSpouse(UUID spouse);
 
     /**
      * Gets the last time this user changed their marriage status
@@ -217,8 +217,8 @@ public interface UserInteractions extends SocialInteractionsService, UserAttachm
      * Gets the user object of this user's spouse
      * @return The spouse's User, or null, if not married
      */
-    default CrownUser marriedToUser(){
-        if(getMarriedTo() == null) return null;
-        return UserManager.getUser(getMarriedTo());
+    default CrownUser spouseUser(){
+        if(getSpouse() == null) return null;
+        return UserManager.getUser(getSpouse());
     }
 }

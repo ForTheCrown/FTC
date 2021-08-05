@@ -4,7 +4,7 @@ import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.useables.warps.Warp;
-import net.forthecrown.registry.WarpRegistry;
+import net.forthecrown.useables.warps.WarpManager;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -34,7 +34,7 @@ public class CommandWarpList extends FtcCommand {
                     .append(Component.text(":").color(NamedTextColor.GRAY))
                     .color(NamedTextColor.GOLD);
 
-            WarpRegistry registry = ForTheCrown.getWarpRegistry();
+            WarpManager registry = ForTheCrown.getWarpManager();
             Collection<Warp> warps = player.hasPermission(Permissions.WARP_ADMIN) ?
                     registry.values() : registry.getUsableFor(player);
 

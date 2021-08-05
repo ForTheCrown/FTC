@@ -5,12 +5,15 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -58,7 +61,7 @@ public final class FtcUtils {
         return player == null ? null : player.getUniqueId();
     }
 
-    public static String addAnS(int amount){
+    public static String addAnS(long amount){
         if(amount == 1 || amount == -1) return "";
         return "s";
     }
@@ -96,7 +99,7 @@ public final class FtcUtils {
         return l.getWorld().getName() + "_" + l.getBlockX() + "_" + l.getBlockY() + "_" + l.getBlockZ();
     }
 
-    public static Key parseKey(String str) {
+    public static Key parseKey(String str) throws IllegalStateException {
         return parseKey(new StringReader(str));
     }
 
@@ -107,6 +110,16 @@ public final class FtcUtils {
         } catch (CommandSyntaxException e) {
             throw new IllegalStateException("Invalid string to parse");
         }
+    }
+
+    public static void handleSyntaxException(CommandSender sender, CommandSyntaxException exception) {
+        if(exception instanceof RoyalCommandException) {
+            RoyalCommandException e = (RoyalCommandException) exception;
+            sender.sendMessage(e.formattedText());
+            return;
+        }
+
+        sender.sendMessage(GrenadierUtils.formatCommandException(exception));
     }
 
     //Makes sure the given key is not a bukkit key, since different hash result
@@ -147,7 +160,7 @@ public final class FtcUtils {
         player.getActivePotionEffects().forEach(e -> player.removePotionEffect(e.getType()));
     }
 
-    public static void safeRunnable(Runnable runnable){
+    public static void safeRunnable(ExceptionedRunnable runnable){
         try {
             runnable.run();
         } catch (Throwable e){
@@ -195,21 +208,21 @@ public final class FtcUtils {
     }
 
     public static String arabicToRoman(int number) {
+        StringBuilder sb = new StringBuilder();
+
         if (number == 0) return "0";
-        String prefix = "";
         if (number < 0) {
-            prefix = "-";
+            sb.append('-');
             number = -number;
         }
         if (number > 4000) {
-            for (int i = 0; i < number / 4000; i++) prefix += "MMMM";
+            sb.append("MMMM".repeat(number / 4000));
             number = number % 4000;
         }
 
         List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
 
         int i = 0;
-        StringBuilder sb = new StringBuilder();
 
         while ((number > 0) && (i < romanNumerals.size())) {
             RomanNumeral currentSymbol = romanNumerals.get(i);
@@ -221,7 +234,7 @@ public final class FtcUtils {
             }
         }
 
-        return prefix + sb.toString();
+        return sb.toString();
     }
 
     public enum RomanNumeral {

@@ -3,6 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.FtcUtils;
@@ -66,7 +67,7 @@ public class CommandDeposit extends FtcCommand {
                             .append(
                                     Component.translatable("commands.deposited",
                                             Component.text(mainItem.getAmount() + " coin" + FtcUtils.addAnS(mainItem.getAmount())).color(NamedTextColor.YELLOW),
-                                            Balances.formatted(amount).color(NamedTextColor.GOLD)
+                                            FtcFormatter.rhines(amount).color(NamedTextColor.GOLD)
                                     )
                             )
             );

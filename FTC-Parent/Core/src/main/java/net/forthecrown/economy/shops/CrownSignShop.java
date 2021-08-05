@@ -39,7 +39,7 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
         //file doesn't exist there for go fuck yourself
         if (fileDoesntExist) throw new NullPointerException("Could not load shop file! Named, " + fileName);
 
-        this.location = location;
+        this.location = location.toBlockLocation();
         this.block = location.getBlock();
 
         inventory = new CrownShopInventory(this);
@@ -52,13 +52,13 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
     public CrownSignShop(Location location, ShopType shopType, Integer price, UUID shopOwner) {
         super(FtcUtils.locationToFilename(location), "shopdata", false);
 
-        this.location = location;
+        this.location = location.toBlockLocation();
         this.block = location.getBlock();
         this.type = shopType;
         this.price = price;
         this.owner = shopOwner;
 
-        if(type != ShopType.ADMIN_BUY_SHOP && type != ShopType.ADMIN_SELL_SHOP) this.outOfStock = true;
+        if(type != ShopType.ADMIN_BUY && type != ShopType.ADMIN_SELL) this.outOfStock = true;
 
         getFile().addDefault("Owner", owner.toString());
         getFile().addDefault("Location", location);
@@ -85,7 +85,7 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
     @Override
     public void reloadFile() {
         setOwner(UUID.fromString(getFile().getString("Owner")));
-        setType(ShopType.valueOf(getFile().getString("Type")));
+        setType(ShopType.valueOf(getFile().getString("Type").replaceAll("_SHOP", "")));
         setPrice(getFile().getInt("Price"));
         if(getFile().get("GetOutOfStock") != null) setOutOfStock(getFile().getBoolean("OutOfStock"));
 
@@ -190,7 +190,7 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
 
     @Override
     public void setOutOfStock(boolean outOfStock) {
-        if(getType().equals(ShopType.ADMIN_SELL_SHOP)) return;
+        if(getType().equals(ShopType.ADMIN_SELL)) return;
 
         this.outOfStock = outOfStock;
         update();

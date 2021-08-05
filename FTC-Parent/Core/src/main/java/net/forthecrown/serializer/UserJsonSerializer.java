@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.FtcUser;
@@ -263,7 +264,7 @@ public class UserJsonSerializer implements UserSerializer {
 
         JsonBuf timeStamps = JsonBuf.empty();
         timeStamps.add("lastLoad", id.getOfflinePlayer().getLastLogin());
-        timeStamps.add("nextReset", System.currentTimeMillis() + ForTheCrown.getUserResetInterval());
+        timeStamps.add("nextReset", System.currentTimeMillis() + ComVars.getUserResetInterval());
 
         json.add("timeStamps", timeStamps);
     }

@@ -6,15 +6,15 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.commands.arguments.JailType;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.JailArgument;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.events.dynamic.JailListener;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.jails.JailManager;
 import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.TimeArgument;
@@ -35,10 +35,10 @@ public class CommandJail extends FtcCommand implements GenericPunisher {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.user())
-                        .then(argument("jail", JailType.jail())
+                .then(argument("user", UserArgument.user())
+                        .then(argument("jail", JailArgument.jail())
                                 .executes(c -> punish(
-                                        UserType.getUser(c, "user"),
+                                        UserArgument.getUser(c, "user"),
                                         c.getSource(),
                                         -1,
                                         c.getArgument("jail", Key.class)
@@ -46,7 +46,7 @@ public class CommandJail extends FtcCommand implements GenericPunisher {
 
                                 .then(argument("time", TimeArgument.time())
                                         .executes(c -> punish(
-                                                UserType.getUser(c, "user"),
+                                                UserArgument.getUser(c, "user"),
                                                 c.getSource(),
                                                 TimeArgument.getMillis(c, "time"),
                                                 c.getArgument("jail", Key.class)
@@ -77,7 +77,7 @@ public class CommandJail extends FtcCommand implements GenericPunisher {
                 Component.text("Jailed ")
                         .color(NamedTextColor.YELLOW)
                         .append(user.displayName().color(NamedTextColor.GOLD))
-                        .append(Component.text(punishTime == -1 ? "" : " for " + ChatFormatter.convertMillisIntoTime(length)))
+                        .append(Component.text(punishTime == -1 ? "" : " for " + FtcFormatter.convertMillisIntoTime(length)))
         );
         return 0;
     }

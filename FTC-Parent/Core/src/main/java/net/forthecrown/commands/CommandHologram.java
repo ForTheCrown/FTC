@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
@@ -25,7 +25,7 @@ public class CommandHologram extends FtcCommand {
     public CommandHologram(){
         super("hologram", ForTheCrown.inst());
 
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 
@@ -101,7 +101,7 @@ public class CommandHologram extends FtcCommand {
                 stand.setGravity(false);
                 stand.setInvulnerable(true);
                 stand.setCustomNameVisible(true);
-                stand.setCustomName(ChatFormatter.translateHexCodes(name));
+                stand.setCustomName(FtcFormatter.translateHexCodes(name));
 
                 stand.getPersistentDataContainer().set(HOLOGRAM_KEY, PersistentDataType.BYTE, (byte) 1);
             }

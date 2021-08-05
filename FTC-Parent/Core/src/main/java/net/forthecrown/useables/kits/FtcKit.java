@@ -9,7 +9,7 @@ import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.useables.CheckableBase;
 import net.forthecrown.useables.preconditions.UsageCheckInstance;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -50,6 +50,7 @@ public class FtcKit extends CheckableBase implements Kit {
 
     @Override
     public boolean attemptItemGiving(Player player) {
+        if(!testSpace(player)) return false;
         if(!test(player)) return false;
         giveItems(player);
         return true;
@@ -150,7 +151,7 @@ public class FtcKit extends CheckableBase implements Kit {
 
         for (ItemStack i: items){
             ItemMeta m = i.getItemMeta();
-            Component name = m.hasDisplayName() ? m.displayName() : Component.text(ChatFormatter.normalEnum(i.getType()));
+            Component name = m.hasDisplayName() ? m.displayName() : Component.text(FtcFormatter.normalEnum(i.getType()));
 
             builder
                     .append(Component.newline())
@@ -162,6 +163,6 @@ public class FtcKit extends CheckableBase implements Kit {
 
     @Override
     public void delete() {
-        ForTheCrown.getKitRegistry().remove(key);
+        ForTheCrown.getKitManager().remove(key);
     }
 }

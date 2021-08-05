@@ -3,7 +3,7 @@ package net.forthecrown.commands.marriage;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
@@ -42,17 +42,17 @@ public class CommandMarriageChat extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("message", StringArgumentType.greedyString())
-                        .suggests((c, b) -> FtcSuggestionProvider.suggestPlayernamesAndEmotes(c, b, false))
+                        .suggests((c, b) -> FtcSuggestionProvider.suggestPlayerNamesAndEmotes(c, b, false))
 
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
                             String str = c.getArgument("message", String.class);
 
                             UserInteractions inter = user.getInteractions();
-                            if(inter.getMarriedTo() == null) throw FtcExceptionProvider.notMarried();
+                            if(inter.getSpouse() == null) throw FtcExceptionProvider.notMarried();
 
-                            CrownUser spouse = UserManager.getUser(inter.getMarriedTo());
-                            if(!spouse.isOnline()) throw UserType.USER_NOT_ONLINE.create(spouse.nickDisplayName());
+                            CrownUser spouse = UserManager.getUser(inter.getSpouse());
+                            if(!spouse.isOnline()) throw UserArgument.USER_NOT_ONLINE.create(spouse.nickDisplayName());
 
                             new MarriageMessage(user, spouse, str)
                                     .complete();

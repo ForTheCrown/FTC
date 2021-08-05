@@ -3,7 +3,7 @@ package net.forthecrown.useables.actions;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.arguments.KitType;
+import net.forthecrown.commands.arguments.KitArgument;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.kits.Kit;
@@ -18,7 +18,7 @@ public class ActionKit implements UsageAction<ActionKit.ActionInstance> {
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
-        Kit kit = ForTheCrown.getKitRegistry().get(KitType.kit().parse(reader));
+        Kit kit = ForTheCrown.getKitManager().get(KitArgument.kit().parse(reader));
 
         return new ActionInstance(kit.key());
     }
@@ -47,7 +47,7 @@ public class ActionKit implements UsageAction<ActionKit.ActionInstance> {
 
         @Override
         public void onInteract(Player player) {
-            Kit kit = ForTheCrown.getKitRegistry().get(kitKey);
+            Kit kit = ForTheCrown.getKitManager().get(kitKey);
             if(kit == null){
                 ForTheCrown.logger().warning("Null kit in action!");
                 return;

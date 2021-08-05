@@ -1,8 +1,8 @@
 package net.forthecrown.commands.clickevent;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.CrownException;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.Bukkit;
@@ -63,9 +63,8 @@ public final class ClickEventManager {
         ClickEventTask task = registeredClickEvents.get(id);
         try {
             task.run(player, args);
-        } catch (CrownException ignored) {
-        } catch (RoyalCommandException e) {
-            player.sendMessage(e.formattedText());
+        } catch (CommandSyntaxException e) {
+            FtcUtils.handleSyntaxException(player, e);
         }
     }
 

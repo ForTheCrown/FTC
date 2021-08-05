@@ -5,8 +5,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.UserManager;
 import net.kyori.adventure.key.Key;
@@ -75,7 +74,7 @@ public class CheckNumber implements UsageCheck<CheckNumber.CheckInstance> {
         public Component failMessage() {
             return Component.text("You need at least ")
                 .color(NamedTextColor.GRAY)
-                .append((checkBal ? Balances.formatted(amount) : ChatFormatter.queryGems(amount)).color(NamedTextColor.GOLD))
+                .append((checkBal ? FtcFormatter.rhines(amount) : FtcFormatter.queryGems(amount)).color(NamedTextColor.GOLD))
                 .append(Component.text(" to use this."));
         }
 

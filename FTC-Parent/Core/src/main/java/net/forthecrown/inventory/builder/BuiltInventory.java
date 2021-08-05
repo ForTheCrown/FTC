@@ -1,16 +1,17 @@
 package net.forthecrown.inventory.builder;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.inventory.builder.options.OptionPriority;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Cooldown;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -43,7 +44,7 @@ public class BuiltInventory implements InventoryHolder {
 
     @Override
     public @NotNull Inventory getInventory() {
-        throw new UnsupportedOperationException("Use createInventory(CrownUser user) or open(CrownUser user)");
+        throw new UnsupportedOperationException("Use open(CrownUser)");
     }
 
     public boolean hasOption(int slot){
@@ -66,9 +67,10 @@ public class BuiltInventory implements InventoryHolder {
 
             if(context.shouldCooldown()) Cooldown.add(player, getClass().getSimpleName(), 5);
             if(context.shouldReload()) open(player);
+
             event.setCancelled(context.shouldCancelEvent());
-        } catch (RoyalCommandException e){
-            player.sendMessage(e.formattedText());
+        } catch (CommandSyntaxException e) {
+            FtcUtils.handleSyntaxException(player, e);
         }
     }
 

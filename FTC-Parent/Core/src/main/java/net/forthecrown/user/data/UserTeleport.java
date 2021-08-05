@@ -1,10 +1,11 @@
 package net.forthecrown.user.data;
 
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.events.dynamic.AsyncTeleportListener;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -39,13 +40,13 @@ public class UserTeleport extends BukkitRunnable {
                 user.sendMessage(Objects.requireNonNullElseGet(startMessage, () ->
                         Component.text(type.action + " in ")
                                 .color(NamedTextColor.GRAY)
-                                .append(Component.text(ChatFormatter.convertTicksIntoTime(ForTheCrown.getTpTickDelay())).color(NamedTextColor.GOLD))
+                                .append(Component.text(FtcFormatter.convertTicksIntoTime(ComVars.getTpTickDelay())).color(NamedTextColor.GOLD))
                                 .append(Component.newline())
                                 .append(Component.text("Don't move!"))));
             }
 
             listener = new AsyncTeleportListener(user, this);
-            runTaskLater(ForTheCrown.inst(), ForTheCrown.getTpTickDelay());
+            runTaskLater(ForTheCrown.inst(), ComVars.getTpTickDelay());
         } else complete(tell);
     }
 

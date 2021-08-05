@@ -75,7 +75,7 @@ public class AugustInEventListener implements InEventListener, Listener {
         if (combo < 10) combo++;
         else {
             EventUtil.spawnBabies(pinata.getLocation(), pinata.getRabbitType());
-            entry.addSecToTimer(10);
+            entry.addSecToTimer(10, true);
             combo = 1;
         }
 
@@ -100,6 +100,8 @@ public class AugustInEventListener implements InEventListener, Listener {
         bebe.getWorld().playSound(bebe.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 2, 1.5f);
         bebe.getWorld().spawnParticle(Particle.REDSTONE, bebe.getLocation(), 5, 0, 0, 0, EventConstants.DUST);
         bebe.remove();
+
+        entry.addSecToTimer(1, false);
     }
 
     @EventHandler

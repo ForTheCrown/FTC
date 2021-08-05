@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics.options;
 
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.cosmetics.deaths.AbstractDeathEffect;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.builder.ClickContext;
@@ -23,10 +23,10 @@ public class NoDeathOption implements InventoryOption {
 
     @Override
     public void place(Inventory inventory, CrownUser user) {
-        Style gray = ChatFormatter.nonItalic(NamedTextColor.GRAY);
+        Style gray = FtcFormatter.nonItalic(NamedTextColor.GRAY);
 
         ItemStackBuilder builder = new ItemStackBuilder(Material.BARRIER, 1)
-                .setName(Component.text("No effect").style(ChatFormatter.nonItalic(NamedTextColor.GOLD)))
+                .setName(Component.text("No effect").style(FtcFormatter.nonItalic(NamedTextColor.GOLD)))
                 .addLore(Component.text("Click to go back to default arrows").style(gray))
                 .addLore(Component.text("without any effects").style(gray));
 

@@ -2,7 +2,7 @@ package net.forthecrown.core;
 
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
-import net.forthecrown.comvars.types.ComVarType;
+import net.forthecrown.comvars.types.ComVarTypes;
 import net.forthecrown.core.admin.CrownPunishmentManager;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.CrownJailManager;
@@ -17,8 +17,8 @@ import net.forthecrown.economy.shops.CrownShopManager;
 import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.pirates.Pirates;
-import net.forthecrown.registry.CrownKitRegistry;
-import net.forthecrown.registry.CrownWarpRegistry;
+import net.forthecrown.useables.kits.CrownKitManager;
+import net.forthecrown.useables.warps.CrownWarpManager;
 import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.useables.CrownUsablesManager;
 import net.forthecrown.user.FtcUserManager;
@@ -58,7 +58,7 @@ public final class Main extends JavaPlugin implements ForTheCrown {
     static PeriodicalSaver          saver;
 
     static CrownBalances            balances;
-    static CrownBroadcaster         announcer;
+    static FtcAnnouncer             announcer;
     static CrownKingship            kingship;
     static UserJsonSerializer       userSerializer;
 
@@ -67,9 +67,8 @@ public final class Main extends JavaPlugin implements ForTheCrown {
     static CrownPunishmentManager   punishmentManager;
     static FtcUserManager           userManager;
     static CrownJailManager         jailManager;
-
-    static CrownWarpRegistry        warpRegistry;
-    static CrownKitRegistry         kitRegistry;
+    static CrownWarpManager         warpRegistry;
+    static CrownKitManager          kitRegistry;
 
     static Location                 serverSpawn;
     static CrownMessages            messages;
@@ -104,7 +103,7 @@ public final class Main extends JavaPlugin implements ForTheCrown {
     @Override
     public void onLoad() {
         inst = this;
-        inDebugMode = ComVarRegistry.set("core_debug", ComVarType.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
+        inDebugMode = ComVarRegistry.set("debugMode", ComVarTypes.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
         logger = getLogger();
 
         RoyalCommandException.ENABLE_HOVER_STACK_TRACE = ForTheCrown.inDebugMode();

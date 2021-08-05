@@ -1,7 +1,7 @@
 package net.forthecrown.events;
 
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
@@ -98,7 +98,7 @@ public class MobHealthBar implements Listener {
         if(!(event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent)) return;
 
         EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
-        String name = ChatFormatter.normalEnum(damageEvent.getDamager().getType());
+        String name = FtcFormatter.normalEnum(damageEvent.getDamager().getType());
 
         String message = event.getDeathMessage().replaceAll("❤", "") + name;
         event.setDeathMessage(message);

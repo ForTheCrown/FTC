@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -42,11 +42,11 @@ public class CommandToolBlock extends FtcCommand {
         command
                 .executes(c -> function.run(c.getSource(), getUserSender(c), true))
 
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .requires(s -> s.hasPermission(othersPerm))
 
                         .executes(c -> {
-                            CrownUser user = UserType.getUser(c, "user");
+                            CrownUser user = UserArgument.getUser(c, "user");
                             CommandSource source = c.getSource();
 
                             source.sendAdmin(adminMessageFunc.apply(user.nickDisplayName()));

@@ -1,18 +1,18 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.UserManager;
-import net.forthecrown.user.data.UserTeleport;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.ForTheCrown;
+import net.forthecrown.core.Permissions;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.data.UserTeleport;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -28,6 +28,8 @@ public class CommandTeleport extends FtcCommand {
 
         setPermission(Permissions.HELPER);
         setAliases("tp", "teleport", "eteleport", "etp");
+        setHelpListName("teleport");
+
         register();
     }
 
@@ -40,7 +42,7 @@ public class CommandTeleport extends FtcCommand {
                                     Entity entity = EntityArgument.getPlayer(c, "entity_to");
                                     Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
 
-                                    Component display = ChatFormatter.entityDisplayName(entity);
+                                    Component display = FtcFormatter.entityDisplayName(entity);
                                     if(entity.getType() == EntityType.PLAYER) display = UserManager.getUser(entity.getUniqueId()).nickDisplayName();
 
                                     return teleport(entities, entity.getLocation(), display, c.getSource());
@@ -52,7 +54,7 @@ public class CommandTeleport extends FtcCommand {
                                     Location location = PositionArgument.getLocation(c, "location_to");
                                     Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
 
-                                    return teleport(entities, location, ChatFormatter.clickableLocationMessage(location, false), c.getSource());
+                                    return teleport(entities, location, FtcFormatter.clickableLocationMessage(location, false), c.getSource());
                                 })
                         )
                 )
@@ -62,7 +64,7 @@ public class CommandTeleport extends FtcCommand {
                             CrownUser user = getUserSender(c);
                             Entity entity = EntityArgument.getEntity(c, "entity");
 
-                            Component display = ChatFormatter.entityDisplayName(entity);
+                            Component display = FtcFormatter.entityDisplayName(entity);
                             if(entity instanceof Player) display = UserManager.getUser(entity.getUniqueId()).nickDisplayName();
                             if(user.isTeleporting()) throw FtcExceptionProvider.create("You are already teleporting");
 
@@ -93,7 +95,7 @@ public class CommandTeleport extends FtcCommand {
                                     Component.text("Teleported ")
                                             .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
                                             .append(Component.text(" to "))
-                                            .append(ChatFormatter.clickableLocationMessage(loc, false).color(NamedTextColor.YELLOW))
+                                            .append(FtcFormatter.clickableLocationMessage(loc, false).color(NamedTextColor.YELLOW))
                             );
                             return 0;
                         })
@@ -105,7 +107,7 @@ public class CommandTeleport extends FtcCommand {
 
         int amount = 0;
         for (Entity e: entities){
-            if(e.getType() != EntityType.PLAYER){
+            if(e.getType() != EntityType.PLAYER) {
                 e.teleport(location);
                 amount++;
                 continue;
@@ -132,7 +134,7 @@ public class CommandTeleport extends FtcCommand {
 
     public Component entOrUserDisplayName(Entity entity){
         if(entity.getType() == EntityType.PLAYER) return UserManager.getUser(entity.getUniqueId()).nickDisplayName();
-        return ChatFormatter.entityDisplayName(entity);
+        return FtcFormatter.entityDisplayName(entity);
     }
 
     public Component entDisplay(Collection<Entity> entities){

@@ -3,9 +3,11 @@ package net.forthecrown.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.user.CrownUser;
@@ -23,7 +25,7 @@ public class CommandWithdraw extends FtcCommand {
     public CommandWithdraw(){
         super("withdraw", ForTheCrown.inst());
 
-        maxMoney = ForTheCrown.getMaxMoneyAmount();
+        maxMoney = ComVars.getMaxMoneyAmount();
 
         setDescription("Get cold coins from your balance");
         register();
@@ -53,12 +55,12 @@ public class CommandWithdraw extends FtcCommand {
         if(totalAmount > bals.get(user.getUniqueId())) throw FtcExceptionProvider.cannotAfford(totalAmount);
         if(user.getPlayer().getInventory().firstEmpty() == -1) throw FtcExceptionProvider.inventoryFull();
 
-        Component text = Component.translatable("economy.withdraw.total", Balances.formatted(totalAmount).color(NamedTextColor.YELLOW))
+        Component text = Component.translatable("economy.withdraw.total", FtcFormatter.rhines(totalAmount).color(NamedTextColor.YELLOW))
                 .color(NamedTextColor.GRAY);
 
         Component message = Component.translatable("economy.withdraw",
                 Component.text(itemAmount + " coin" + FtcUtils.addAnS(itemAmount)),
-                Balances.formatted(amount).color(NamedTextColor.GOLD)
+                FtcFormatter.rhines(amount).color(NamedTextColor.GOLD)
         )
                 .color(NamedTextColor.GRAY)
                 .append(itemAmount > 1 ? Component.space().append(text) : Component.empty());

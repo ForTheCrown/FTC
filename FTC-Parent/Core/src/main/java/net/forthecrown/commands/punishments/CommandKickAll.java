@@ -18,7 +18,7 @@ public class CommandKickAll extends FtcCommand {
     public CommandKickAll(){
         super("kickall", ForTheCrown.inst());
 
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 

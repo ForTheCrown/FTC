@@ -1,6 +1,6 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ForTheCrown;
@@ -42,11 +42,11 @@ public class CommandGameMode extends FtcCommand {
                             return 0;
                         })
 
-                        .then(argument("user", UserType.onlineUser())
+                        .then(argument("user", UserArgument.onlineUser())
                                 .requires(s -> s.hasPermission(Permissions.GAMEMODES))
 
                                 .executes(c -> {
-                                    CrownUser user = UserType.getUser(c, "user");
+                                    CrownUser user = UserArgument.getUser(c, "user");
                                     GameMode gameMode = c.getArgument("gamemode", GameMode.class);
                                     FtcGameMode wrapped = FtcGameMode.wrap(gameMode);
 

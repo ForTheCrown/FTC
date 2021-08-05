@@ -2,7 +2,7 @@ package net.forthecrown.cosmetics.emotes;
 
 import net.forthecrown.commands.emotes.CommandEmote;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.cosmetics.CosmeticEffect;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -81,10 +81,10 @@ public class CosmeticEmote implements Predicate<Permissible>, CosmeticEffect {
     @Override
     public void place(Inventory inventory, CrownUser user) {
         ItemStackBuilder builder = new ItemStackBuilder(test(user) ? Material.ORANGE_DYE : Material.GRAY_DYE)
-                .setName(commandText().style(ChatFormatter.nonItalic(NamedTextColor.YELLOW)));
+                .setName(commandText().style(FtcFormatter.nonItalic(NamedTextColor.YELLOW)));
 
         for (Component c: description){
-            builder.addLore(c.style(ChatFormatter.nonItalic(NamedTextColor.GRAY)));
+            builder.addLore(c.style(FtcFormatter.nonItalic(NamedTextColor.GRAY)));
         }
 
         inventory.setItem(getSlot(), builder.build());

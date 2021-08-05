@@ -6,16 +6,16 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.shops.ShopType;
 import net.forthecrown.economy.shops.SignShop;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -23,6 +23,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minecraft.world.Container;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -34,7 +35,7 @@ public class CommandEditShop extends FtcCommand {
     public CommandEditShop(){
         super("editshop", ForTheCrown.inst());
 
-        maxMoney = ForTheCrown.getMaxMoneyAmount();
+        maxMoney = ComVars.getMaxMoneyAmount();
 
         this.usageMessage = makeUsageMessage();
 
@@ -93,7 +94,7 @@ public class CommandEditShop extends FtcCommand {
                 .then(literal("sell").executes(c -> setType(c, true)))
 
                 .then(literal("price")
-                        .then(argument("price_actual", IntegerArgumentType.integer(0, maxMoney/2))
+                        .then(argument("price_actual", IntegerArgumentType.integer(0, ComVars.getMaxSignShopPrice()))
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
                                     SignShop shop = getShop(player);
@@ -102,7 +103,7 @@ public class CommandEditShop extends FtcCommand {
                                     shop.setPrice(price);
 
                                     player.sendMessage(
-                                            Component.translatable("shops.edit.price", Balances.formatted(price)).color(NamedTextColor.GRAY)
+                                            Component.translatable("shops.edit.price", FtcFormatter.rhines(price)).color(NamedTextColor.GRAY)
                                     );
 
                                     updateShop(shop);
@@ -111,7 +112,7 @@ public class CommandEditShop extends FtcCommand {
                         )
                 )
                 .then(literal("amount")
-                        .then(argument("amount_actual", IntegerArgumentType.integer(1))
+                        .then(argument("amount_actual", IntegerArgumentType.integer(1, Container.MAX_STACK))
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
                                     SignShop shop = getShop(player);
@@ -140,12 +141,12 @@ public class CommandEditShop extends FtcCommand {
                         )
                 )
                 .then(literal("transfer")
-                        .then(argument("player_transfer", UserType.USER)
+                        .then(argument("player_transfer", UserArgument.user())
 
                                 .executes(c -> {
                                     CrownUser user = getUserSender(c);
                                     SignShop shop = getShop(user.getPlayer());
-                                    CrownUser transferTo = UserType.getUser(c, "player_transfer");
+                                    CrownUser transferTo = UserArgument.getUser(c, "player_transfer");
 
                                     if(user.equals(transferTo) && !user.hasPermission(Permissions.SHOP_ADMIN)) throw FtcExceptionProvider.translatable("shops.edit.transferToSelf");
 
@@ -158,7 +159,7 @@ public class CommandEditShop extends FtcCommand {
                                     transferTo.sendMessage(
                                             Component.translatable("shops.edit.transferred.receiver",
                                                     user.nickDisplayName().color(NamedTextColor.YELLOW),
-                                                    ChatFormatter.prettyLocationMessage(shop.getLocation(), false).color(NamedTextColor.GOLD)
+                                                    FtcFormatter.prettyLocationMessage(shop.getLocation(), false).color(NamedTextColor.GOLD)
                                             ).color(NamedTextColor.GRAY)
                                     );
 
@@ -219,7 +220,7 @@ public class CommandEditShop extends FtcCommand {
         SignShop shop = getShop(player);
 
         ShopType type = shop.getType();
-        ShopType to = sell ? (type.isAdmin() ? ShopType.ADMIN_SELL_SHOP : ShopType.SELL_SHOP) : (type.isAdmin() ? ShopType.ADMIN_BUY_SHOP : ShopType.BUY_SHOP);
+        ShopType to = sell ? (type.isAdmin() ? ShopType.ADMIN_SELL : ShopType.SELL) : (type.isAdmin() ? ShopType.ADMIN_BUY : ShopType.BUY);
         shop.setType(to);
 
         player.sendMessage(Component.translatable("shops.edit.type", to.inStockLabel()).color(NamedTextColor.GRAY));

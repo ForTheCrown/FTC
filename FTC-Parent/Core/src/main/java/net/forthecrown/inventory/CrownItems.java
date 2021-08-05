@@ -2,8 +2,8 @@ package net.forthecrown.inventory;
 
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.kingship.Kingship;
-import net.forthecrown.economy.Balances;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.Worlds;
@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnegative;
 import java.util.Arrays;
 
-import static net.forthecrown.core.chat.ChatFormatter.nonItalic;
+import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 /**
  * Class for server items, such as Royal Swords, Crowns and home of the great makeItem method
@@ -182,8 +182,8 @@ public final class CrownItems {
      */
     public static ItemStack makeCoins(int amount, int itemAmount){
         return new ItemStackBuilder(Material.SUNFLOWER, itemAmount)
-                .setName(Component.text("Rhines").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
-                .addLore(Component.text("Worth ").append(Component.text(Balances.getFormatted(amount))).color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false))
+                .setName(Component.text("Rhines").style(nonItalic(NamedTextColor.YELLOW)))
+                .addLore(Component.text("Worth ").append(Component.text(FtcFormatter.getRhines(amount))).style(nonItalic(NamedTextColor.GOLD)))
                 .addLore(Component.text("Minted in the year " + FtcUtils.arabicToRoman(FtcUtils.worldTimeToYears(Worlds.OVERWORLD)) + ".").style(NON_ITALIC_DARK_GRAY))
                 .addLore(s())
                 .build();

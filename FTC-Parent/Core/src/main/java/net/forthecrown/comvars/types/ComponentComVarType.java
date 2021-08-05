@@ -18,11 +18,9 @@ import org.jetbrains.annotations.Nullable;
  * A class for the Component com var type
  */
 public class ComponentComVarType implements ComVarType<Component> {
-
-    public static final ComVarType<Component> COMPONENT_TYPE = new ComponentComVarType();
     private final Key key = ForTheCrown.coreKey("component_type");
 
-    private ComponentComVarType() {
+    ComponentComVarType() {
         Registries.COMVAR_TYPES.register(key, this);
     }
 
@@ -36,7 +34,7 @@ public class ComponentComVarType implements ComVarType<Component> {
     }
 
     @Override
-    public String asString(Component value) {
+    public String asParsableString(Component value) {
         return value == null ? "null" : GsonComponentSerializer.gson().serialize(value);
     }
 

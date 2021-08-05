@@ -4,11 +4,11 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.DungeonBossArgument;
-import net.forthecrown.commands.arguments.RoyalEnchantType;
+import net.forthecrown.commands.arguments.RoyalEnchantArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
@@ -114,7 +114,7 @@ public class CommandRoyals extends FtcCommand {
 
                 .then(literal("enchant")
                         .then(argument("legacy", BoolArgumentType.bool())
-                                .then(argument("enchantment", RoyalEnchantType.ENCHANT)
+                                .then(argument("enchantment", RoyalEnchantArgument.ENCHANT)
                                         .executes(c -> enchantItemInHand(c,
                                                 c.getArgument("enchantment", RoyalEnchant.class),
                                                 c.getArgument("legacy", Boolean.class)
@@ -132,7 +132,7 @@ public class CommandRoyals extends FtcCommand {
                                             Player player = getPlayerSender(c);
                                             player.getInventory().addItem(boss.item());
 
-                                            broadcastAdmin(c.getSource(), "Giving " + ChatFormatter.normalEnum(boss) + " apple");
+                                            broadcastAdmin(c.getSource(), "Giving " + FtcFormatter.normalEnum(boss) + " apple");
                                             return 0;
                                         })
                                 )

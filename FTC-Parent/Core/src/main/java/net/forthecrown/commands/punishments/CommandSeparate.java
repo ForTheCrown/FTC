@@ -1,6 +1,6 @@
 package net.forthecrown.commands.punishments;
 
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.StaffChat;
@@ -36,11 +36,11 @@ public class CommandSeparate extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("first", UserType.user())
-                        .then(argument("second", UserType.user())
+                .then(argument("first", UserArgument.user())
+                        .then(argument("second", UserArgument.user())
                                 .executes(c -> {
-                                    CrownUser first = UserType.getUser(c, "first");
-                                    CrownUser second = UserType.getUser(c, "second");
+                                    CrownUser first = UserArgument.getUser(c, "first");
+                                    CrownUser second = UserArgument.getUser(c, "second");
 
                                     UserInteractions firstInter = first.getInteractions();
                                     UserInteractions secondInter = second.getInteractions();

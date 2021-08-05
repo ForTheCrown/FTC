@@ -4,11 +4,10 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.arguments.AuctionArgType;
+import net.forthecrown.commands.arguments.AuctionArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.CrownException;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.auctions.Auction;
 import net.forthecrown.economy.auctions.CrownAuction;
@@ -19,6 +18,7 @@ import net.forthecrown.pirates.Pirates;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.enums.Branch;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -102,7 +102,7 @@ public class CommandAuction extends FtcCommand {
                                 })
                         )
         )
-        .then(argument(AUCTION_ARG, AuctionArgType.auction())
+        .then(argument(AUCTION_ARG, AuctionArgument.auction())
                 .suggests(suggestMatching(AuctionManager.getAuctionNames()))
 
                 .then(literal("expire")
@@ -250,7 +250,7 @@ public class CommandAuction extends FtcCommand {
         }
 
         @EventHandler(ignoreCancelled = true)
-        public void onInventoryClose(InventoryCloseEvent event) throws CrownException {
+        public void onInventoryClose(InventoryCloseEvent event) {
             if(!event.getPlayer().equals(owner.getPlayer())) return;
             if(event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
             HandlerList.unregisterAll(this);
@@ -258,7 +258,10 @@ public class CommandAuction extends FtcCommand {
             claimedClaiming.remove(auction.getName());
 
             ItemStack item = event.getInventory().getItem(2);
-            if(item == null) throw new CrownException(event.getPlayer(), "Auction claiming failed, no item in slot");
+            if(item == null) {
+                owner.sendMessage(Component.translatable("auction.claimingFailed", NamedTextColor.GRAY));
+                return;
+            }
 
             if(auction.isClaimed()){
                 event.getPlayer().getInventory().addItem(item);

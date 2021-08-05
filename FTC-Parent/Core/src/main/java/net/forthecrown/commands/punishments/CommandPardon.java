@@ -12,7 +12,7 @@ import net.forthecrown.core.admin.jails.JailManager;
 import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
@@ -57,7 +57,8 @@ public class CommandPardon extends FtcCommand {
                                         if(entry != null) entry.pardon(PunishmentType.BAN);
                                     }
 
-                                    c.getSource().sendAdmin(
+                                    StaffChat.sendCommand(
+                                            c.getSource(),
                                             Component.text("Unbanned ")
                                                     .color(NamedTextColor.GRAY)
                                                     .append(Component.text(name).color(NamedTextColor.YELLOW))
@@ -67,7 +68,7 @@ public class CommandPardon extends FtcCommand {
                         )
                 )
 
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .then(literal("softmute")
                                 .executes(c -> {
                                     CrownUser user = user(c);
@@ -130,6 +131,6 @@ public class CommandPardon extends FtcCommand {
     }
 
     private CrownUser user(CommandContext<CommandSource> c) throws CommandSyntaxException {
-        return UserType.getUser(c, "user");
+        return UserArgument.getUser(c, "user");
     }
 }

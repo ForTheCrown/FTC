@@ -2,11 +2,12 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.enums.FtcGameMode;
@@ -38,7 +39,7 @@ public class CommandNear extends FtcCommand {
         command
                 .executes(c -> {
                     CrownUser user = getUserSender(c);
-                    return showNearby(user.getLocation(), ForTheCrown.getNearRadius(), c.getSource());
+                    return showNearby(user.getLocation(), ComVars.getNearRadius(), c.getSource());
                 })
 
                 .then(argument("radius", IntegerArgumentType.integer(1, 100000))
@@ -50,20 +51,20 @@ public class CommandNear extends FtcCommand {
                         })
                 )
 
-                .then(argument("user", UserType.onlineUser())
+                .then(argument("user", UserArgument.onlineUser())
                         .requires(s -> s.hasPermission(Permissions.HELPER))
 
                         .executes(c -> {
-                            CrownUser user = UserType.getUser(c, "user");
+                            CrownUser user = UserArgument.getUser(c, "user");
 
-                            return showNearby(user.getLocation(), ForTheCrown.getNearRadius(), c.getSource());
+                            return showNearby(user.getLocation(), ComVars.getNearRadius(), c.getSource());
                         })
 
                         .then(argument("radius", IntegerArgumentType.integer(1, 100000))
                                 .requires(s -> s.hasPermission(Permissions.HELPER))
 
                                 .executes(c -> {
-                                    CrownUser user = UserType.getUser(c, "user");
+                                    CrownUser user = UserArgument.getUser(c, "user");
                                     int radius = c.getArgument("radius", Integer.class);
 
                                     return showNearby(user.getLocation(), radius, c.getSource());

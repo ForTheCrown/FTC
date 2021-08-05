@@ -1,7 +1,7 @@
 package net.forthecrown.inventory;
 
 import net.forthecrown.core.ForTheCrown;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
@@ -169,7 +169,7 @@ public class CrownWeapons {
         }
 
         public void update(){
-            String lore5Text = type == null ? "Max rank." : (ChatFormatter.normalEnum(type) + "s to rank up!").replaceAll("mans ", "men ");
+            String lore5Text = type == null ? "Max rank." : (FtcFormatter.normalEnum(type) + "s to rank up!").replaceAll("mans ", "men ");
             String lore5GoalText = goal == -1 ? "" : (progress + "/" + goal + " ");
             Component lore5 = Component.text(lore5GoalText + (type == EntityType.AREA_EFFECT_CLOUD ? "Charged Creepers to rank up!" : lore5Text))
                     .color(NamedTextColor.AQUA)

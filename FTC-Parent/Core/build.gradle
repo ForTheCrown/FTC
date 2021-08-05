@@ -39,6 +39,19 @@ static String libJar(String s) {
     return '/libs/' + s + '.jar'
 }
 
+//Does the building and remapping all in one click of a button. :DDDDD
+tasks.register('remap', Copy) {
+    it.dependsOn(build)
+    it.from "$buildDir/libs" into "/remapping"
+
+    it.doLast {
+        exec {
+            workingDir '/remapping'
+            commandLine 'cmd', '/c', 'remap.bat'
+        }
+    }
+}
+
 processResources {
     File pluginYml = new File('build/resources/main/plugin.yml')
     if(pluginYml.exists()) pluginYml.delete()

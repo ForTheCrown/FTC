@@ -1,8 +1,8 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.commands.arguments.ArrowEffectType;
-import net.forthecrown.commands.arguments.DeathEffectType;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.ArrowEffectArgument;
+import net.forthecrown.commands.arguments.DeathEffectArgument;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
@@ -17,7 +17,7 @@ public class CommandCosmeticEffects extends FtcCommand {
     public CommandCosmeticEffects() {
         super("cosmeticeffect");
 
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 
@@ -40,11 +40,11 @@ public class CommandCosmeticEffects extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.user())
+                .then(argument("user", UserArgument.user())
                         .then(literal("death")
                                 .then(literal("unset")
                                         .executes(c -> {
-                                            CrownUser user = UserType.getUser(c, "user");
+                                            CrownUser user = UserArgument.getUser(c, "user");
                                             CosmeticData data = user.getCosmeticData();
 
                                             data.setActiveDeath(null);
@@ -56,7 +56,7 @@ public class CommandCosmeticEffects extends FtcCommand {
 
                                 .then(literal("list")
                                         .executes(c -> {
-                                            CrownUser user = UserType.getUser(c, "user");
+                                            CrownUser user = UserArgument.getUser(c, "user");
                                             CosmeticData data = user.getCosmeticData();
 
                                             String msg = ListUtils.join(data.getDeathEffects(), effect -> effect.key().value());
@@ -66,10 +66,10 @@ public class CommandCosmeticEffects extends FtcCommand {
                                         })
                                 )
 
-                                .then(argument("key", DeathEffectType.deathEffect())
+                                .then(argument("key", DeathEffectArgument.deathEffect())
                                         .then(literal("add")
                                                 .executes(c -> {
-                                                    CrownUser user = UserType.getUser(c, "user");
+                                                    CrownUser user = UserArgument.getUser(c, "user");
                                                     CosmeticData data = user.getCosmeticData();
 
                                                     AbstractDeathEffect effect = c.getArgument("key", AbstractDeathEffect.class);
@@ -82,7 +82,7 @@ public class CommandCosmeticEffects extends FtcCommand {
 
                                         .then(literal("remove")
                                                 .executes(c -> {
-                                                    CrownUser user = UserType.getUser(c, "user");
+                                                    CrownUser user = UserArgument.getUser(c, "user");
                                                     CosmeticData data = user.getCosmeticData();
 
                                                     AbstractDeathEffect effect = c.getArgument("key", AbstractDeathEffect.class);
@@ -95,7 +95,7 @@ public class CommandCosmeticEffects extends FtcCommand {
 
                                         .then(literal("set")
                                                 .executes(c -> {
-                                                    CrownUser user = UserType.getUser(c, "user");
+                                                    CrownUser user = UserArgument.getUser(c, "user");
                                                     CosmeticData data = user.getCosmeticData();
 
                                                     AbstractDeathEffect effect = c.getArgument("key", AbstractDeathEffect.class);
@@ -111,7 +111,7 @@ public class CommandCosmeticEffects extends FtcCommand {
                         .then(literal("arrow")
                                 .then(literal("unset")
                                         .executes(c -> {
-                                            CrownUser user = UserType.getUser(c, "user");
+                                            CrownUser user = UserArgument.getUser(c, "user");
                                             CosmeticData data = user.getCosmeticData();
 
                                             data.setActiveArrow(null);
@@ -123,7 +123,7 @@ public class CommandCosmeticEffects extends FtcCommand {
 
                                 .then(literal("list")
                                         .executes(c -> {
-                                            CrownUser user = UserType.getUser(c, "user");
+                                            CrownUser user = UserArgument.getUser(c, "user");
                                             CosmeticData data = user.getCosmeticData();
 
                                             String msg = ListUtils.join(data.getArrowEffects(), effect -> effect.key().value());
@@ -133,10 +133,10 @@ public class CommandCosmeticEffects extends FtcCommand {
                                         })
                                 )
 
-                                .then(argument("key", ArrowEffectType.arrowEffect())
+                                .then(argument("key", ArrowEffectArgument.arrowEffect())
                                         .then(literal("add")
                                                 .executes(c -> {
-                                                    CrownUser user = UserType.getUser(c, "user");
+                                                    CrownUser user = UserArgument.getUser(c, "user");
                                                     CosmeticData data = user.getCosmeticData();
 
                                                     ArrowEffect effect = c.getArgument("key", ArrowEffect.class);
@@ -149,7 +149,7 @@ public class CommandCosmeticEffects extends FtcCommand {
 
                                         .then(literal("remove")
                                                 .executes(c -> {
-                                                    CrownUser user = UserType.getUser(c, "user");
+                                                    CrownUser user = UserArgument.getUser(c, "user");
                                                     CosmeticData data = user.getCosmeticData();
 
                                                     ArrowEffect effect = c.getArgument("key", ArrowEffect.class);
@@ -162,7 +162,7 @@ public class CommandCosmeticEffects extends FtcCommand {
 
                                         .then(literal("set")
                                                 .executes(c -> {
-                                                    CrownUser user = UserType.getUser(c, "user");
+                                                    CrownUser user = UserArgument.getUser(c, "user");
                                                     CosmeticData data = user.getCosmeticData();
 
                                                     ArrowEffect effect = c.getArgument("key", ArrowEffect.class);

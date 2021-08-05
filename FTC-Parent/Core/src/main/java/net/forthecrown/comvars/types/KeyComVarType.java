@@ -14,10 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class KeyComVarType implements ComVarType<Key> {
-    public static final ComVarType<Key> KEY = new KeyComVarType();
     private final Key key = ForTheCrown.coreKey("key_type");
 
-    private KeyComVarType() {
+    KeyComVarType() {
         Registries.COMVAR_TYPES.register(key, this);
     }
 
@@ -27,7 +26,7 @@ public class KeyComVarType implements ComVarType<Key> {
     }
 
     @Override
-    public String asString(@Nullable Key value) {
+    public String asParsableString(@Nullable Key value) {
         return value == null ? "null" : value.asString();
     }
 

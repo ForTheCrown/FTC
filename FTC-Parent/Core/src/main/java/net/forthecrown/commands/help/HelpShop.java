@@ -1,13 +1,13 @@
 package net.forthecrown.commands.help;
 
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.CommandSender;
 
 public class HelpShop extends FtcCommand {
 
@@ -24,7 +24,7 @@ public class HelpShop extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
-            CommandSender sender = getSender(c);
+            CommandSource sender = c.getSource();
             Component edit_message = Component.text("[editshop]").clickEvent(ClickEvent.runCommand("/editshop"));
 
             Component help_message = Component.text()

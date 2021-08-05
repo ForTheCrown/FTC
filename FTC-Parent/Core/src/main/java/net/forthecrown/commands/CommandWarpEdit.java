@@ -7,7 +7,7 @@ import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.arguments.WarpType;
+import net.forthecrown.commands.arguments.WarpArgument;
 import net.forthecrown.useables.warps.Warp;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.UserTeleport;
@@ -49,8 +49,8 @@ public class CommandWarpEdit extends FtcCommand {
                         )
                 )
 
-                .then(argument("warp", WarpType.warp())
-                        .suggests((c, b) -> WarpType.warp().listSuggestions(c, b, true))
+                .then(argument("warp", WarpArgument.warp())
+                        .suggests((c, b) -> WarpArgument.warp().listSuggestions(c, b, true))
 
                         .then(literal("destination")
                                 .executes(c -> moveDest(
@@ -93,7 +93,7 @@ public class CommandWarpEdit extends FtcCommand {
     }
 
     private int createWarp(CommandSource c, String name, Location location) throws CommandSyntaxException {
-        Warp warp = ForTheCrown.getWarpRegistry().register(FtcUtils.parseKey(name), location);
+        Warp warp = ForTheCrown.getWarpManager().register(FtcUtils.parseKey(name), location);
         c.sendAdmin(Component.text("Creating warp named ").append(warp.displayName()));
         return 0;
     }
@@ -106,6 +106,6 @@ public class CommandWarpEdit extends FtcCommand {
     }
 
     public Warp get(CommandContext<CommandSource> c){
-        return WarpType.getWarp(c, "warp");
+        return WarpArgument.getWarp(c, "warp");
     }
 }

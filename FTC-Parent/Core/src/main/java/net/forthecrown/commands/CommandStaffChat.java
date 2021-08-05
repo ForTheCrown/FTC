@@ -6,7 +6,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
@@ -42,7 +42,7 @@ public class CommandStaffChat extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.then(argument("message", StringArgumentType.greedyString())
-                .suggests((c, b) -> FtcSuggestionProvider.suggestPlayernamesAndEmotes(c, b, true))
+                .suggests((c, b) -> FtcSuggestionProvider.suggestPlayerNamesAndEmotes(c, b, true))
 
                 .executes(c -> {
                     if(c.getSource().isPlayer() && StaffChat.ignoring.contains(c.getSource().asPlayer())){
@@ -51,7 +51,7 @@ public class CommandStaffChat extends FtcCommand {
 
                     StaffChat.send(
                             c.getSource(),
-                            ChatFormatter.formatString(
+                            FtcFormatter.formatString(
                                     c.getArgument("message", String.class),
                                     c.getSource().asBukkit(),
                                     true

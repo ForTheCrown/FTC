@@ -2,8 +2,7 @@ package net.forthecrown.august;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.common.collect.ImmutableList;
-import net.forthecrown.core.chat.ChatFormatter;
-import net.forthecrown.crownevents.CrownEventUtils;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.crownevents.TimerMessageFormatter;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.utils.ItemStackBuilder;
@@ -16,7 +15,6 @@ import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Objective;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
@@ -24,13 +22,11 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
 public class EventConstants {
     public static final String EVENT_NAMESPACE = "august_event";
 
-    public static final Objective CROWN = CrownEventUtils.getCrownObjective();
-
     public static final FtcRegion PINATA_REGION = new FtcRegion(Worlds.OVERWORLD, -67, 64, 868, -38, 82, 900);
     public static final FtcRegion ARENA_REGION = new FtcRegion(Worlds.OVERWORLD, -75, 62, 863, -34, 83, 906);
 
     public static final Location EXIT = new Location(Worlds.OVERWORLD, -66.5, 74, 900.5, 90, 0);
-    public static final Location START = new Location(Worlds.OVERWORLD, -63, 72, 872, -45, 12);
+    public static final Location START = new Location(Worlds.OVERWORLD, -63.5, 72, 872.5, -45, 12);
     public static final Location SPAWN = new Location(Worlds.OVERWORLD, -44.5, 71, 877.5);
 
     public static final NamespacedKey TICKET_KEY = EventUtil.createEventKey("ticket");
@@ -58,7 +54,7 @@ public class EventConstants {
             new PinataDrop(60, 84, new ItemStack(Material.IRON_INGOT, 1)),
 
             new PinataDrop(85, 94, new ItemStack(Material.DIAMOND, 1)),
-            new PinataDrop(95, 100, new ItemStack(Material.NETHERITE_INGOT, 1))
+            new PinataDrop(95, 100, new ItemStack(Material.NETHERITE_SCRAP, 1))
     );
 
     public static final Component[] BEBE_NAMES = {
@@ -76,13 +72,13 @@ public class EventConstants {
     private static final ItemStack TICKET = new ItemStackBuilder(Material.PAPER, 1)
             .setName(
                     text("Pinata event ticket")
-                            .style(ChatFormatter.nonItalic(NamedTextColor.AQUA))
+                            .style(FtcFormatter.nonItalic(NamedTextColor.AQUA))
             )
             .addLore(
                     text("Use this to enter the event and compete for the ")
                             .append(CrownItems.CROWN_TITLE)
                             .append(text("!"))
-                            .style(ChatFormatter.nonItalic(NamedTextColor.GRAY))
+                            .style(FtcFormatter.nonItalic(NamedTextColor.GRAY))
             )
             .addData(TICKET_KEY, (byte) 1)
             .addEnchant(Enchantment.CHANNELING, 1)

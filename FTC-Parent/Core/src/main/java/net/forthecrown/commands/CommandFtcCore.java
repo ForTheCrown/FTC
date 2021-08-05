@@ -11,17 +11,18 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import io.papermc.paper.adventure.PaperAdventure;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import net.forthecrown.commands.arguments.PetType;
+import net.forthecrown.commands.arguments.PetArgument;
 import net.forthecrown.commands.arguments.UserParseResult;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.CoreCommands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.Announcer;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.BalanceMap;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.SortedBalanceMap;
@@ -60,10 +61,10 @@ public class CommandFtcCore extends FtcCommand {
         super("ftccore", ForTheCrown.inst());
 
         setDescription("The primary FTC-Core command");
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
 
         this.bals = ForTheCrown.getBalances();
-        this.maxMoney = ForTheCrown.getMaxMoneyAmount();
+        this.maxMoney = ComVars.getMaxMoneyAmount();
 
         register();
     }
@@ -91,11 +92,21 @@ public class CommandFtcCore extends FtcCommand {
                         (c, b) -> CompletionProvider.suggestMatching(b,"Deaths", " Crown Score"),
                         (c, field) -> {
                             ForTheCrown.getTabList().setScore(field);
+                            ForTheCrown.getTabList().updateList();
 
                             c.getSource().sendAdmin(
                                     Component.text("Set tab score field to ")
                                             .append(field)
                             );
+                            return 0;
+                        })
+                )
+
+                .then(literal("updateDate")
+                        .executes(c -> {
+                            ForTheCrown.getDayUpdate().update();
+
+                            c.getSource().sendAdmin("Updated dated");
                             return 0;
                         })
                 )
@@ -210,7 +221,7 @@ public class CommandFtcCore extends FtcCommand {
 
                 //Everything relating to a specific user
                 .then(literal("user")
-                        .then(argument(USER_ARG, UserType.user())
+                        .then(argument(USER_ARG, UserArgument.user())
 
                                 //Save the user's data
                                 .then(literal("save")
@@ -263,11 +274,11 @@ public class CommandFtcCore extends FtcCommand {
                                                 })
                                         )
                                         .then(literal("for")
-                                                .then(argument("altFor", UserType.user())
+                                                .then(argument("altFor", UserArgument.user())
 
                                                         .executes(c -> {
                                                             CrownUser user = getUser(c);
-                                                            CrownUser main = c.getArgument("altFor", UserParseResult.class).getUser(c.getSource());
+                                                            CrownUser main = c.getArgument("altFor", UserParseResult.class).getUser(c.getSource(), false);
                                                             UserManager um = ForTheCrown.getUserManager();
 
                                                             um.addEntry(user.getUniqueId(), main.getUniqueId());
@@ -299,13 +310,13 @@ public class CommandFtcCore extends FtcCommand {
                                             CrownUser user = getUser(c);
                                             UserInteractions inter = user.getInteractions();
 
-                                            if(inter.getMarriedTo() == null) throw FtcExceptionProvider.create(user.getName() + " is not married");
+                                            if(inter.getSpouse() == null) throw FtcExceptionProvider.create(user.getName() + " is not married");
 
                                             c.getSource().sendMessage(
                                                     Component.text()
                                                             .append(user.displayName())
                                                             .append(Component.text(" is married to "))
-                                                            .append(UserManager.getUser(inter.getMarriedTo()).displayName())
+                                                            .append(UserManager.getUser(inter.getSpouse()).displayName())
                                                             .append(Component.text("."))
                                                             .build()
                                             );
@@ -329,12 +340,12 @@ public class CommandFtcCore extends FtcCommand {
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
 
-                                                    if(user.getInteractions().getMarriedTo() == null) throw FtcExceptionProvider.create("User is not married");
+                                                    if(user.getInteractions().getSpouse() == null) throw FtcExceptionProvider.create("User is not married");
 
-                                                    CrownUser spouse = UserManager.getUser(user.getInteractions().getMarriedTo());
+                                                    CrownUser spouse = UserManager.getUser(user.getInteractions().getSpouse());
 
-                                                    spouse.getInteractions().setMarriedTo(null);
-                                                    user.getInteractions().setMarriedTo(null);
+                                                    spouse.getInteractions().setSpouse(null);
+                                                    user.getInteractions().setSpouse(null);
 
                                                     c.getSource().sendAdmin(
                                                             Component.text("Made ")
@@ -345,15 +356,15 @@ public class CommandFtcCore extends FtcCommand {
                                                 })
                                         )
 
-                                        .then(argument("target", UserType.user())
+                                        .then(argument("target", UserArgument.user())
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
-                                                    CrownUser target = UserType.getUser(c, "target");
+                                                    CrownUser target = UserArgument.getUser(c, "target");
 
                                                     if(user.getUniqueId().equals(target.getUniqueId())) throw FtcExceptionProvider.create("Cannot make people marry themselves lol");
 
-                                                    user.getInteractions().setMarriedTo(target.getUniqueId());
-                                                    target.getInteractions().setMarriedTo(user.getUniqueId());
+                                                    user.getInteractions().setSpouse(target.getUniqueId());
+                                                    target.getInteractions().setSpouse(user.getUniqueId());
 
                                                     c.getSource().sendAdmin(
                                                             Component.text("Married ")
@@ -369,7 +380,7 @@ public class CommandFtcCore extends FtcCommand {
                                 .then(literal("balance")
                                         .executes(c-> { //Shows the balance
                                             CrownUser user = getUser(c);
-                                            c.getSource().sendMessage(user.getName() + " has " + Balances.getFormatted(bals.get(user.getUniqueId())) + " Rhines");
+                                            c.getSource().sendMessage(user.getName() + " has " + FtcFormatter.getRhines(bals.get(user.getUniqueId())) + " Rhines");
                                             return 0;
                                         })
 
@@ -382,7 +393,7 @@ public class CommandFtcCore extends FtcCommand {
                                                             int amount = c.getArgument("sAmount", Integer.class);
                                                             bals.set(user.getUniqueId(), amount);
 
-                                                            broadcastAdmin(c.getSource(), "Set " + user.getName() + "'s balance to " +Balances.getFormatted(bals.get(user.getUniqueId())));
+                                                            broadcastAdmin(c.getSource(), "Set " + user.getName() + "'s balance to " + FtcFormatter.getRhines(bals.get(user.getUniqueId())));
                                                             return 0;
                                                         })
                                                 )
@@ -397,7 +408,7 @@ public class CommandFtcCore extends FtcCommand {
                                                             bals.add(user.getUniqueId(), amount, false);
 
                                                             broadcastAdmin(c.getSource(), "Added " + amount + " to " + user.getName() + "'s balance.");
-                                                            broadcastAdmin(c.getSource(), "Now has " + Balances.getFormatted(bals.get(user.getUniqueId())));
+                                                            broadcastAdmin(c.getSource(), "Now has " + FtcFormatter.getRhines(bals.get(user.getUniqueId())));
                                                             return 0;
                                                         })
                                                 )
@@ -412,7 +423,7 @@ public class CommandFtcCore extends FtcCommand {
                                                             bals.add(user.getUniqueId(), -amount, false);
 
                                                             broadcastAdmin(c.getSource(), "Removed " + amount + " from " + user.getName() + "'s balance.");
-                                                            broadcastAdmin(c.getSource(), "Now has " + Balances.getFormatted(bals.get(user.getUniqueId())));
+                                                            broadcastAdmin(c.getSource(), "Now has " + FtcFormatter.getRhines(bals.get(user.getUniqueId())));
                                                             return 0;
                                                         })
                                                 )
@@ -476,13 +487,13 @@ public class CommandFtcCore extends FtcCommand {
                                                     if(user.isBaron() == isBaron) throw FtcExceptionProvider.create(user.getName() + "'s baron value is the same as entered!");
 
                                                     user.setBaron(isBaron);
-                                                    getSender(c).sendMessage(user.getName() + " isBaron " + user.isBaron());
+                                                    c.getSource().sendMessage(user.getName() + " isBaron " + user.isBaron());
                                                     return 0;
                                                 })
                                         )
                                         .executes(c ->{
                                             CrownUser user = getUser(c);
-                                            getSender(c).sendMessage(user.getName() + " is baron: " + user.isBaron());
+                                            c.getSource().sendMessage(user.getName() + " is baron: " + user.isBaron());
                                             return 0;
                                         })
                                 )
@@ -499,7 +510,7 @@ public class CommandFtcCore extends FtcCommand {
                                                     return 0;
                                                 })
                                         )
-                                        .then(argument("pet", PetType.PET)
+                                        .then(argument("pet", PetArgument.PET)
 
                                                 .then(literal("add")
                                                         .executes(c -> {
@@ -530,7 +541,7 @@ public class CommandFtcCore extends FtcCommand {
                                 .then(literal("rank")
                                         .executes(c -> {
                                             CrownUser user = getUser(c);
-                                            getSender(c).sendMessage(user.getName() + "'s rank is " + user.getRank().getPrefix());
+                                            c.getSource().sendMessage(user.getName() + "'s rank is " + user.getRank().getPrefix());
                                             return 0;
                                         })
 
@@ -656,7 +667,7 @@ public class CommandFtcCore extends FtcCommand {
                                                     String owner = c.getArgument("owner", String.class);
 
                                                     player.getInventory().addItem(CrownItems.makeCrown(level, owner));
-                                                    getSender(c).sendMessage("You got a level " + level + " crown");
+                                                    c.getSource().sendMessage("You got a level " + level + " crown");
 
                                                     return 0;
                                                 })
@@ -716,7 +727,7 @@ public class CommandFtcCore extends FtcCommand {
 
         ItemMeta meta = toGive.getItemMeta();
         player.getInventory().addItem(toGive);
-        broadcastAdmin(c.getSource(), "Giving " + (FtcUtils.isNullOrBlank(meta.getDisplayName()) ? ChatFormatter.normalEnum(toGive.getType()) : meta.getDisplayName()));
+        broadcastAdmin(c.getSource(), "Giving " + (FtcUtils.isNullOrBlank(meta.getDisplayName()) ? FtcFormatter.normalEnum(toGive.getType()) : meta.getDisplayName()));
         return level;
     }
 
@@ -751,7 +762,7 @@ public class CommandFtcCore extends FtcCommand {
     }
 
     private CrownUser getUser(CommandContext<CommandSource> c) throws CommandSyntaxException {
-        return c.getArgument(USER_ARG, UserParseResult.class).getUser(c.getSource());
+        return c.getArgument(USER_ARG, UserParseResult.class).getUser(c.getSource(), false);
     }
 
     private int saveOrReload(CommandSource sender, SaveReloadPart thingTo, boolean save){
@@ -810,12 +821,12 @@ public class CommandFtcCore extends FtcCommand {
             else ForTheCrown.getPunishmentManager().reload();
         }),
         KITS("Kits", b -> {
-            if(b) ForTheCrown.getKitRegistry().save();
-            else ForTheCrown.getKitRegistry().reload();
+            if(b) ForTheCrown.getKitManager().save();
+            else ForTheCrown.getKitManager().reload();
         }),
         WARPS("Warps", b -> {
-            if(b) ForTheCrown.getWarpRegistry().save();
-            else ForTheCrown.getWarpRegistry().reload();
+            if(b) ForTheCrown.getWarpManager().save();
+            else ForTheCrown.getWarpManager().reload();
         }),
         INTERACTABLES("Interactable Manager", b -> {
            if(b) ForTheCrown.getUsablesManager().saveAll();
@@ -858,11 +869,11 @@ public class CommandFtcCore extends FtcCommand {
         }
 
         public String reloadMessage() {
-            return ChatFormatter.translateHexCodes("&7" + msg + " reloaded.");
+            return FtcFormatter.translateHexCodes("&7" + msg + " reloaded.");
         }
 
         public String saveMessage() {
-            return ChatFormatter.translateHexCodes("&7" + msg + " saved.");
+            return FtcFormatter.translateHexCodes("&7" + msg + " saved.");
         }
     }
 }

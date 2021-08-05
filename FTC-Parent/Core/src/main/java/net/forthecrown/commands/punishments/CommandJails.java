@@ -5,9 +5,9 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.arguments.JailType;
+import net.forthecrown.commands.arguments.JailArgument;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -22,7 +22,7 @@ public class CommandJails extends FtcCommand {
     public CommandJails(){
         super("jails", ForTheCrown.inst());
 
-        setPermission(Permissions.CORE_ADMIN);
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 
@@ -63,7 +63,7 @@ public class CommandJails extends FtcCommand {
                         )
                 )
 
-                .then(argument("jail", JailType.jail())
+                .then(argument("jail", JailArgument.jail())
                         .then(literal("location")
                                 .executes(c -> {
                                     CommandSource source = c.getSource();
@@ -75,7 +75,7 @@ public class CommandJails extends FtcCommand {
                                                     .color(NamedTextColor.GRAY)
                                                     .append(Component.text(key.value()).color(NamedTextColor.YELLOW))
                                                     .append(Component.text(" is "))
-                                                    .append(ChatFormatter.clickableLocationMessage(l, true).color(NamedTextColor.GOLD))
+                                                    .append(FtcFormatter.clickableLocationMessage(l, true).color(NamedTextColor.GOLD))
                                     );
                                     return 0;
                                 })
@@ -92,7 +92,7 @@ public class CommandJails extends FtcCommand {
                                                             .color(NamedTextColor.GRAY)
                                                             .append(Component.text(key.value()).color(NamedTextColor.YELLOW))
                                                             .append(Component.text(" to "))
-                                                            .append(ChatFormatter.clickableLocationMessage(l, true).color(NamedTextColor.GOLD))
+                                                            .append(FtcFormatter.clickableLocationMessage(l, true).color(NamedTextColor.GOLD))
                                             );
                                             return 0;
                                         })
@@ -134,7 +134,7 @@ public class CommandJails extends FtcCommand {
                         .color(NamedTextColor.GRAY)
                         .append(Component.text(name).color(NamedTextColor.YELLOW))
                         .append(Component.text(" at "))
-                        .append(ChatFormatter.clickableLocationMessage(loc, true).color(NamedTextColor.GOLD))
+                        .append(FtcFormatter.clickableLocationMessage(loc, true).color(NamedTextColor.GOLD))
         );
         return 0;
     }

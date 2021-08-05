@@ -2,6 +2,7 @@ package net.forthecrown.user;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.serializer.JsonBuf;
@@ -18,7 +19,7 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
 
     public UUID lastMarriageRequest;
     public UUID waitingFinish;
-    public UUID marriedTo;
+    public UUID spouse;
     public long lastMarriageChange;
 
     public boolean acceptingProposals;
@@ -185,13 +186,13 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
     }
 
     @Override
-    public UUID getMarriedTo() {
-        return marriedTo;
+    public UUID getSpouse() {
+        return spouse;
     }
 
     @Override
-    public void setMarriedTo(UUID marriedTo) {
-        this.marriedTo = marriedTo;
+    public void setSpouse(UUID spouse) {
+        this.spouse = spouse;
     }
 
     @Override
@@ -208,7 +209,7 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
     public boolean canChangeMarriageStatus(){
         if(lastMarriageChange == 0) return true;
 
-        long nextAllowed = lastMarriageChange + ForTheCrown.getMarriageCooldown();
+        long nextAllowed = lastMarriageChange + ComVars.getMarriageCooldown();
         return System.currentTimeMillis() > nextAllowed;
     }
 
@@ -258,7 +259,7 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
 
         if(marriageChatToggled) json.add("marriageChat", true);
         if(!acceptingProposals) json.add("acceptingProposals", false);
-        if(marriedTo != null) json.addUUID("marriedTo", marriedTo);
+        if(spouse != null) json.addUUID("marriedTo", spouse);
         if(lastMarriageChange != 0) json.add("lastMarriage", lastMarriageChange);
 
         if(!blocked.isEmpty()) json.addList("blocked", blocked, JsonUtils::writeUUID);
@@ -275,7 +276,7 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
         marriageChatToggled = false;
         acceptingProposals = true;
         lastMarriageChange = 0L;
-        marriedTo = null;
+        spouse = null;
         lastMarriageRequest = null;
         waitingFinish = null;
 
@@ -285,7 +286,7 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
         marriageChatToggled = json.getBool("marriageChat");
         acceptingProposals = json.getBool("acceptingProposals");
 
-        marriedTo = json.getUUID("marriedTo");
+        spouse = json.getUUID("marriedTo");
         lastMarriageChange = json.getLong("lastMarriage");
 
         Collection<UUID> blockedIDs = json.getList("blocked", e -> UUID.fromString(e.getAsString()));

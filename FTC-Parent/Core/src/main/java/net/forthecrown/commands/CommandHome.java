@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.HomeParseResult;
-import net.forthecrown.commands.arguments.HomeType;
+import net.forthecrown.commands.arguments.HomeArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
@@ -46,7 +46,7 @@ public class CommandHome extends FtcCommand {
                     return 0;
                 })
 
-                .then(argument("home", HomeType.home())
+                .then(argument("home", HomeArgument.home())
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
                             HomeParseResult result = c.getArgument("home", HomeParseResult.class);

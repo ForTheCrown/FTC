@@ -4,7 +4,7 @@ import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.commands.arguments.UserType;
+import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.TeleportRequest;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -22,10 +22,10 @@ public class CommandTpaAccept extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("user", UserType.onlineUser())
+                .then(argument("user", UserArgument.onlineUser())
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
-                            CrownUser target = UserType.getUser(c, "user");
+                            CrownUser target = UserArgument.getUser(c, "user");
 
                             TeleportRequest r = user.getInteractions().getIncoming(target);
                             if(r == null) throw FtcExceptionProvider.noIncomingTP(target);

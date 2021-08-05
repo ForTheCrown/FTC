@@ -13,6 +13,8 @@ import java.util.UUID;
 
 /**
  * Represents a sign shop lol
+ * <p></p>
+ * Implementation: {@link CrownSignShop}
  */
 public interface SignShop extends CrownSerializer, InventoryHolder, Nameable {
 

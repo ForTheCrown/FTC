@@ -3,7 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -34,7 +34,7 @@ public class CommandMemory extends FtcCommand {
                     TextComponent.Builder builder = Component.text()
                             .color(yelo)
                             .append(Component.text("Uptime: "))
-                            .append(ChatFormatter.millisIntoTime(ManagementFactory.getRuntimeMXBean().getUptime()).color(gold))
+                            .append(FtcFormatter.millisIntoTime(ManagementFactory.getRuntimeMXBean().getUptime()).color(gold))
                             .append(Component.newline())
 
                             .append(Component.text("Current TPS: "))

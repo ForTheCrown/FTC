@@ -7,7 +7,7 @@ import org.bukkit.scoreboard.Score;
 public final class CrownEventUtils {
     private CrownEventUtils() {}
 
-    public static Objective getCrownObjective() {
+    public static Objective crownObjective() {
         return Bukkit.getScoreboardManager().getMainScoreboard().getObjective("crown");
     }
 

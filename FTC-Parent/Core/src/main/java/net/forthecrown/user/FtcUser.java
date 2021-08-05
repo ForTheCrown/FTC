@@ -2,13 +2,14 @@ package net.forthecrown.user;
 
 import io.papermc.paper.adventure.AdventureComponent;
 import it.unimi.dsi.fastutil.objects.*;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.core.chat.ChatFormatter;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.JoinInfo;
 import net.forthecrown.core.kingship.Kingship;
@@ -258,7 +259,7 @@ public class FtcUser implements CrownUser {
     public void setCanSwapBranch(boolean canSwapBranch, boolean addToCooldown) {
         setProperty(!canSwapBranch, UserProperty.CANNOT_SWAP_BRANCH);
 
-        if(addToCooldown) nextAllowedBranchSwap = System.currentTimeMillis() + ForTheCrown.getBranchSwapCooldown();
+        if(addToCooldown) nextAllowedBranchSwap = System.currentTimeMillis() + ComVars.getBranchSwapCooldown();
         else nextAllowedBranchSwap = 0;
     }
 
@@ -397,7 +398,7 @@ public class FtcUser implements CrownUser {
         matData.clear();
         setTotalEarnings(0);
 
-        nextResetTime = System.currentTimeMillis() + ForTheCrown.getUserResetInterval();
+        nextResetTime = System.currentTimeMillis() + ComVars.getUserResetInterval();
         System.out.println(getName() + " earnings reset, next reset in: " + (((((getNextResetTime() - System.currentTimeMillis())/1000)/60)/60)/24) + " days");
         save();
     }
@@ -441,7 +442,7 @@ public class FtcUser implements CrownUser {
     @Override
     public void sendMessage(UUID sender, @Nonnull String message) {
         if(!isOnline()) return;
-        getOnlineHandle().sendMessage(sender, ChatFormatter.translateHexCodes(message));
+        getOnlineHandle().sendMessage(sender, FtcFormatter.translateHexCodes(message));
     }
 
     @Override
@@ -453,12 +454,12 @@ public class FtcUser implements CrownUser {
 
     @Override
         public void sendMessage(net.minecraft.network.chat.Component message){
-        sendMessage(message, ChatType.CHAT);
+        sendMessage(message, ChatType.SYSTEM);
     }
 
     @Override
     public void sendMessage(UUID id, net.minecraft.network.chat.Component message){
-        sendMessage(id, message, ChatType.CHAT);
+        sendMessage(id, message, ChatType.SYSTEM);
     }
 
     @Override
@@ -628,7 +629,7 @@ public class FtcUser implements CrownUser {
         final long timUntil = getNextAllowedBranchSwap() - System.currentTimeMillis();
 
         sendMessage("&7You cannot currently swap branches!");
-        sendMessage("&7You can swap your branch in &e" + ChatFormatter.convertMillisIntoTime(timUntil) + "&7.");
+        sendMessage("&7You can swap your branch in &e" + FtcFormatter.convertMillisIntoTime(timUntil) + "&7.");
         return false;
     }
 
@@ -679,6 +680,8 @@ public class FtcUser implements CrownUser {
     public boolean onJoin(){
         this.handle = getOnlineHandle().getHandle();
 
+        GameModePacketListener.inject(getPlayer());
+
         if(!getName().equalsIgnoreCase(lastOnlineName)){
             updateName(lastOnlineName);
 
@@ -704,15 +707,12 @@ public class FtcUser implements CrownUser {
         updateFlying();
         afk = false;
 
-        if(!hasPermission(Permissions.CORE_ADMIN)) setGodMode(false);
+        if(!hasPermission(Permissions.FTC_ADMIN)) setGodMode(false);
         updateGodMode();
         updateTabName();
 
         permsCheck();
         if(shouldResetEarnings()) resetEarnings();
-
-        GameModePacketListener.inject(getPlayer());
-        setGameMode(getGameMode());
 
         lastLoad = System.currentTimeMillis();
 
@@ -741,9 +741,9 @@ public class FtcUser implements CrownUser {
                     .append(Component.newline());
         }
 
-        if(interactions.marriedTo != null && isProfilePublic()){
+        if(interactions.spouse != null && isProfilePublic()){
             text
-                    .append(Component.text("Married to: ").append(interactions.marriedToUser().nickOrName()))
+                    .append(Component.text("Married to: ").append(interactions.spouseUser().nickOrName()))
                     .append(Component.newline());
         }
 
@@ -778,10 +778,10 @@ public class FtcUser implements CrownUser {
     @Override
     public Component listDisplayName(){
         return Component.text()
-                .style(ChatFormatter.nonItalic(NamedTextColor.WHITE))
+                .style(FtcFormatter.nonItalic(NamedTextColor.WHITE))
                 .append(getCurrentPrefix())
                 .append(nickDisplayName())
-                .append(isAfk() ? ChatFormatter.AFK_SUFFIX : Component.empty())
+                .append(isAfk() ? FtcFormatter.AFK_SUFFIX : Component.empty())
                 .build();
     }
 
@@ -857,10 +857,10 @@ public class FtcUser implements CrownUser {
     @Override
     public void onTpComplete(){
         if(!lastTeleport.shouldBypassCooldown()){
-            long cooldownMillis = ForTheCrown.getTpCooldown() * 50;
+            long cooldownMillis = ComVars.getTpCooldown() * 50;
             nextAllowedTeleport = System.currentTimeMillis() + cooldownMillis;
 
-            Cooldown.add(this, "Core_TeleportCooldown", ForTheCrown.getTpCooldown());
+            Cooldown.add(this, "Core_TeleportCooldown", ComVars.getTpCooldown());
         }
 
         if(!lastTeleport.isCancelled()) lastTeleport.stop();
@@ -873,7 +873,7 @@ public class FtcUser implements CrownUser {
             sendMessage(
                     Component.text("You can teleport again in ")
                             .color(NamedTextColor.GRAY)
-                            .append(Component.text(ChatFormatter.convertMillisIntoTime(nextAllowedTeleport - System.currentTimeMillis())).color(NamedTextColor.GOLD))
+                            .append(Component.text(FtcFormatter.convertMillisIntoTime(nextAllowedTeleport - System.currentTimeMillis())).color(NamedTextColor.GOLD))
             );
             return false;
         }
@@ -932,6 +932,8 @@ public class FtcUser implements CrownUser {
     @Override
     public void setNickname(Component component){
         this.nickname = component;
+
+        if(isOnline()) updateTabName();
     }
 
     @Override

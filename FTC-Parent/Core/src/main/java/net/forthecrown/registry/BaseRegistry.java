@@ -33,10 +33,10 @@ public class BaseRegistry<V> implements Registry<V> {
     }
 
     @Override
-    public V register(Key key, V raw) {
+    public V register(Key key, V value) {
         key = FtcUtils.checkNotBukkit(key);
-        entries.put(key, raw);
-        return raw;
+        entries.put(key, value);
+        return value;
     }
 
     @Override

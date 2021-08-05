@@ -1,14 +1,14 @@
 package net.forthecrown.events;
 
-import net.forthecrown.core.CrownException;
 import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.inventory.CrownWeapons;
-import net.forthecrown.user.enums.Branch;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.Rank;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.user.enums.Branch;
+import net.forthecrown.user.enums.Rank;
 import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -121,7 +121,16 @@ public class JeromeEvent implements Listener, ClickEventTask {
                 break;
             }
 
-            if(sword == null) throw new CrownException(player, "&7You must have a Captain's Cutlass");
+            if(sword == null) {
+                player.sendMessage(
+                        Component.translatable("pirates.edward.missingSword",
+                                NamedTextColor.GRAY,
+                                FtcFormatter.itemDisplayName(CrownItems.cutlass())
+                        )
+                );
+
+                return;
+            }
 
             sword.setType(Material.GOLDEN_SWORD);
 
