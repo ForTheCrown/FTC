@@ -31,7 +31,7 @@ public class RaidGenerator {
         this.raid = raid;
         this.random = new CrownRandom();
         this.world = createWorld();
-        this.players = RaidUtil.getGatheredVikings();
+        this.players = VikingUtil.getGatheredVikings();
         this.difficulty = makeDifficulty(players);
 
         context = new RaidGenerationContext(world, raid, random, difficulty, players);
@@ -42,7 +42,7 @@ public class RaidGenerator {
 
         if(raid.hasLootData()) raid.getLootData().generate(getContext());
 
-        return new ActiveRaid(context.getStartingLocation(), context.getRegion());
+        return new ActiveRaid(context.getStartingLocation(), context.getRegion(), difficulty);
     }
 
     private RaidDifficulty makeDifficulty(Collection<Player> players) {

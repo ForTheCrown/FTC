@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.forthecrown.valhalla.RaidUtil.applyLootTable;
+import static net.forthecrown.valhalla.VikingUtil.applyLootTable;
 
 public class LootData implements RaidData {
 

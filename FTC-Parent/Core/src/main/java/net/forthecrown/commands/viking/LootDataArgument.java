@@ -12,7 +12,7 @@ import net.forthecrown.grenadier.types.LootTableArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.utils.math.BlockPos;
 import net.forthecrown.valhalla.RaidGenerationContext;
-import net.forthecrown.valhalla.RaidUtil;
+import net.forthecrown.valhalla.VikingUtil;
 import net.forthecrown.valhalla.Valhalla;
 import net.forthecrown.valhalla.data.ChestGroup;
 import net.forthecrown.valhalla.data.LootData;
@@ -37,7 +37,7 @@ public class LootDataArgument {
                             VikingRaid raid = get(c);
                             checkHasLoot(raid);
 
-                            RaidGenerationContext context = RaidUtil.createTestContext(raid);
+                            RaidGenerationContext context = VikingUtil.createTestContext(raid);
                             raid.getLootData().generate(context);
 
                             c.getSource().sendAdmin("Generating loot");

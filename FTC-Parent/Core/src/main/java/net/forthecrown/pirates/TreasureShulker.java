@@ -6,6 +6,7 @@ import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.CrownRandom;
@@ -30,6 +31,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.loot.LootContext;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scoreboard.Score;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.*;
@@ -152,7 +154,9 @@ public class TreasureShulker extends AbstractJsonSerializer {
     }
 
     public Loot createLoot(Player player, Entity interacted){
-        return new Loot(player, interacted.getLocation(), random, getRandomLoot());
+        Rarity rarity = getRandomRarity();
+
+        return new Loot(rarity, player, interacted.getLocation(), random, getLootByRarity(rarity));
     }
 
     public CrownLootTable getCommonLoot() {
@@ -165,6 +169,18 @@ public class TreasureShulker extends AbstractJsonSerializer {
 
     public CrownLootTable getSpecialLoot() {
         return specialLoot;
+    }
+
+    public CrownLootTable getLootByRarity(Rarity rarity) {
+        return switch (rarity) {
+            case COMMON -> getCommonLoot();
+            case SPECIAL -> getSpecialLoot();
+            case RARE -> getRareLoot();
+        };
+    }
+
+    public Rarity getRandomRarity() {
+        return Rarity.values()[random.intInRange(0, Rarity.values().length-1)];
     }
 
     public CrownLootTable getRandomLoot(){
@@ -257,12 +273,25 @@ public class TreasureShulker extends AbstractJsonSerializer {
         return CrownLootTable.of(key, items);
     }
 
+    public enum Rarity {
+        COMMON (1),
+        RARE (2),
+        SPECIAL (5);
+
+        final int ppReward;
+        Rarity(int i) {
+            this.ppReward = i;
+        }
+    }
+
     public static class Loot implements HoverEventSource<Component> {
 
+        final Rarity rarity;
         Collection<ItemStack> items;
         int rhineReward;
 
-        public Loot(Player player, Location location, CrownRandom random, CrownLootTable lootTable){
+        public Loot(Rarity rarity, Player player, Location location, CrownRandom random, CrownLootTable lootTable){
+            this.rarity = rarity;
             this.items = lootTable.populateLoot(random, new LootContext.Builder(location).killer(player).build(), ComVars.getMaxTreasureItems());
             this.rhineReward = random.intInRange(ComVars.getTreasureMinPrize(), ComVars.getTreasureMaxPrize());
         }
@@ -280,6 +309,9 @@ public class TreasureShulker extends AbstractJsonSerializer {
 
             ForTheCrown.getBalances().add(player.getUniqueId(), rhineReward, false);
             items.forEach(i -> player.getInventory().addItem(i));
+
+            Score pp = BlackMarketUtils.getPiratePointScore(player.getName());
+            pp.setScore(pp.getScore() + rarity.ppReward);
 
             player.sendMessage(
                     Component.translatable("pirates.shulker.found",

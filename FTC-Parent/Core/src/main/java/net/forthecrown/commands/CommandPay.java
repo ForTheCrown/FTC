@@ -84,6 +84,8 @@ public class CommandPay extends FtcCommand {
         UUID id = user.getUniqueId();
         if(!bals.canAfford(id, amount)) throw FtcExceptionProvider.cannotAfford(amount);
 
+        targets.removeIf(u -> !u.allowsPaying());
+
         if(targets.remove(user) && targets.isEmpty()) throw FtcExceptionProvider.cannotPaySelf();
         if(targets.isEmpty()) throw EntityArgumentImpl.NO_ENTITIES_FOUND.create();
         if(!bals.canAfford(user.getUniqueId(), amount * targets.size())) throw FtcExceptionProvider.cannotAfford();
@@ -98,13 +100,11 @@ public class CommandPay extends FtcCommand {
 
         Component messageActual = message == null || !user.getInteractions().muteStatus().maySpeak ?
                 Component.text(".").color(NamedTextColor.GRAY) :
-                message.color(NamedTextColor.WHITE);
+                Component.text(": ").append(message.color(NamedTextColor.WHITE));
 
         Component formattedAmount = FtcFormatter.rhines(amount).color(NamedTextColor.GOLD);
 
         for (CrownUser target: targets) {
-            if(!target.allowsPaying()) continue;
-
             bals.add(target.getUniqueId(), amount, false);
             bals.add(id, -amount, false);
 

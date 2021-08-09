@@ -1,8 +1,8 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.commands.arguments.BaltopArgument;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.BalanceMap;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -55,13 +55,14 @@ public class CommandBalanceTop extends FtcCommand {
         final TextComponent border = Component.text(" --------- ").style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
         TextComponent.Builder text = Component.text()
                 .append(border)
-                .append(Component.translatable("economy.baltop.header").color(NamedTextColor.YELLOW))
+                .append(Component.translatable("commands.baltop.header").color(NamedTextColor.YELLOW))
                 .append(border)
                 .append(Component.newline());
 
         if(page < 1) {
             text
-                    .append(Component.translatable("economy.baltop.total",
+                    .append(Component.translatable(
+                            "commands.baltop.total",
                             NamedTextColor.YELLOW,
                             FtcFormatter.rhines((int) balMap.getTotalBalance()))
                     )
@@ -81,20 +82,20 @@ public class CommandBalanceTop extends FtcCommand {
                     .append(Component.newline());
         }
 
-        Component pageAscending = page + 1 == BaltopArgument.MAX ? Component.empty() : Component.text(" > ")
+        Component pageAscending = page + 1 == BaltopArgument.MAX ? Component.space() : Component.text(" > ")
                 .decorate(TextDecoration.BOLD)
                 .clickEvent(ClickEvent.runCommand("/baltop " + (page + 2)))
-                .hoverEvent(Component.text("Next page"));
+                .hoverEvent(Component.translatable("spectatorMenu.next_page"));
 
-        Component pageDescending = page == 0 ? Component.empty() : Component.text(" < ")
+        Component pageDescending = page == 0 ? Component.space() : Component.text(" < ")
                 .decorate(TextDecoration.BOLD)
                 .clickEvent(ClickEvent.runCommand("/baltop " + page))
-                .hoverEvent(Component.text("Last page"));
+                .hoverEvent(Component.translatable("spectatorMenu.previous_page"));
 
         Component footerMessage = Component.text()
                 .color(NamedTextColor.YELLOW)
                 .append(pageDescending)
-                .append(Component.translatable("economy.baltop.footer", Component.text((page+1) + "/" + BaltopArgument.MAX)))
+                .append(Component.translatable("commands.baltop.footer", Component.text((page+1) + "/" + BaltopArgument.MAX)))
                 .append(pageAscending)
                 .build();
 

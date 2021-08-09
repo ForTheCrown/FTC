@@ -13,7 +13,7 @@ import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.KeyArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.valhalla.RaidGenerationContext;
-import net.forthecrown.valhalla.RaidUtil;
+import net.forthecrown.valhalla.VikingUtil;
 import net.forthecrown.valhalla.data.EntitySpawnData;
 import net.forthecrown.valhalla.data.MobData;
 import net.forthecrown.valhalla.data.VikingRaid;
@@ -125,7 +125,7 @@ public class MobDataArgument {
                         .then(literal("test")
                                 .executes(c -> {
                                     CommandInfo info = info(c);
-                                    RaidGenerationContext context = RaidUtil.createTestContext(info.raid);
+                                    RaidGenerationContext context = VikingUtil.createTestContext(info.raid);
 
                                     info.data.generate(context);
 
