@@ -1,4 +1,0 @@
-rootProject.name = 'FTC-Parent'
-include 'Core'
-include 'Squire'
-

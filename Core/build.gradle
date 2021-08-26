@@ -1,0 +1,63 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+}
+
+group = 'net.forthecrown'
+
+compileJava.options.encoding = 'UTF-8'
+javadoc.options.encoding = 'UTF-8'
+
+project.targetCompatibility = '1.16'
+project.sourceCompatibility = '1.16'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+
+    maven { url = 'https://papermc.io/repo/repository/maven-public/' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public/'}
+    maven { url = 'https://maven.enginehub.org/repo/' }
+    maven { url = 'https://jitpack.io' }
+    maven { url = "https://mvn.intellectualsites.com/content/repositories/releases/" }
+}
+
+dependencies {
+    //Annotations????
+    compileOnly 'org.jetbrains:annotations:19.0.0'
+
+    //LuckPerms and WorldGuard
+    compileOnly 'com.github.lucko:LuckPerms:5.3'
+    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT'
+
+    //Paper, Grenadier and Squire, FAWE
+    libJar('Paper')
+    libJar('Grenadier')
+    libJar('Squire')
+    libJar('FAWE')
+}
+
+void libJar(String s) {
+    dependencies.compileOnly(files('/libs/' + s + '.jar'))
+}
+
+//Does the building and remapping all in one click of a button. :DDDDD
+tasks.register('remap', Copy) {
+    it.dependsOn(build)
+    it.from "$buildDir/libs" into "/remapping"
+
+    it.doLast {
+        exec {
+            workingDir '/remapping'
+            commandLine 'cmd', '/c', 'remap.bat'
+        }
+    }
+}
+
+processResources {
+    File pluginYml = new File('build/resources/main/plugin.yml')
+    if(pluginYml.exists()) pluginYml.delete()
+
+    filter(ReplaceTokens, tokens: [version: version])
+}

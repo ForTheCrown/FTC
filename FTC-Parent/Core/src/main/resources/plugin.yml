@@ -1,7 +1,0 @@
-name: FTCCore
-version: @version@
-main: net.forthecrown.core.Main
-api-version: 1.17
-loadbefore: [ OpenInv, GriefPrevention ]
-depend: [ RoyalGrenadier, WorldGuard, LuckPerms ]
-authors: [ Botul ]
