@@ -23,7 +23,7 @@ public class RankInventory {
     }
 
     public Inventory getUsersRankGUI(){
-        return switch (user.getBranch()) {
+        return switch (user.getFaction()) {
             case PIRATES -> getPiratesGUI();
             case VIKINGS -> getVikingsGUI();
             case ROYALS, DEFAULT -> getRoyalsGUI();

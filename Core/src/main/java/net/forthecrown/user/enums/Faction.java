@@ -6,7 +6,9 @@ import net.forthecrown.utils.JsonUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A class representing a rank branch
+ * A class representing a rank's faction
+ * <p></p>
+ * What kind of dum dum thought this should be called a branch
  */
 public enum Faction implements JsonSerializable {
     DEFAULT ("Branch-less"),

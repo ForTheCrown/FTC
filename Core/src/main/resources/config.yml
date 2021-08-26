@@ -21,6 +21,7 @@ MaxBossDifficulty: 5
 MaxShopEarnings: 500000
 HulkSmashPoles: true
 MaxSignShopPrice: 1000000
+RegionWorld: world
 Day: 1
 
 MiniGameRegion:

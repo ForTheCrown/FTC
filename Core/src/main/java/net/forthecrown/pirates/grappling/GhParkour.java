@@ -28,7 +28,7 @@ public class GhParkour extends AbstractJsonSerializer {
         Registries.NPCS.register(Squire.createPiratesKey("gh_jack"), (player, entity) -> {
             CrownUser user = UserManager.getUser(player);
 
-            if(user.getBranch() != Faction.PIRATES) throw FtcExceptionProvider.notPirate();
+            if(user.getFaction() != Faction.PIRATES) throw FtcExceptionProvider.notPirate();
             sort();
 
             GhLevelSelector.SELECTOR_MENU.open(user);

@@ -595,15 +595,15 @@ public class CommandFtcCore extends FtcCommand {
                                 .then(literal("branch")
                                         .executes(c ->{
                                             CrownUser user = getUser(c);
-                                            c.getSource().sendMessage(user.getName() + "'s branch is " + user.getBranch().toString());
+                                            c.getSource().sendMessage(user.getName() + "'s branch is " + user.getFaction().toString());
                                             return 0;
                                         })
                                         .then(argument("branchToSet", FtcCommands.BRANCH)
                                                 .executes(c ->{
                                                     CrownUser user = getUser(c);
                                                     Faction faction = c.getArgument("branchToSet", Faction.class);
-                                                    user.setBranch(faction);
-                                                    c.getSource().sendAdmin( user.getName() + " is now a " + user.getBranch().getSingularName());
+                                                    user.setFaction(faction);
+                                                    c.getSource().sendAdmin( user.getName() + " is now a " + user.getFaction().getSingularName());
                                                     return 0;
                                                 })
                                         )
@@ -786,6 +786,10 @@ public class CommandFtcCore extends FtcCommand {
     }
 
     private enum SaveReloadPart {
+        REGIONS ("Regions", b -> {
+            if(b) Crown.getRegionManager().reload();
+            else Crown.getRegionManager().save();
+        }),
         ITEM_PRICES ("Item Prices", b -> {
             if(b) Crown.getPriceMap().reload();
             else Crown.getPriceMap().save();

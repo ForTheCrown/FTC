@@ -5,6 +5,7 @@ import net.forthecrown.cosmetics.arrows.ArrowEffects;
 import net.forthecrown.cosmetics.deaths.DeathEffects;
 import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
 import net.forthecrown.cosmetics.options.*;
+import net.forthecrown.cosmetics.travel.TravelEffects;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.options.InventoryBorder;
 import net.forthecrown.inventory.builder.InventoryBuilder;
@@ -22,6 +23,7 @@ public abstract class CosmeticConstants {
 
     public static final int ARROW_PRICE = 1000;
     public static final int DEATH_PRICE = 2000;
+    public static final int TRAVEL_PRICE = 2500;
 
     public static final CosmeticHeader HEADER = new CosmeticHeader();
     public static final RidingToggleOption RIDING_TOGGLE = new RidingToggleOption();
@@ -42,7 +44,7 @@ public abstract class CosmeticConstants {
     public static final BuiltInventory MAIN = baseInventory(54, Component.text("Cosmetics"), false)
             .add(RIDING_TOGGLE)
             .add(HEADER)
-            .add(20,
+            .add(2, 2,
                     new ItemStackBuilder(Material.BOW)
                             .setName(Component.text("Arrow Particle Trails").style(FtcFormatter.nonItalic(NamedTextColor.GOLD)))
                             .addLore(Component.empty())
@@ -51,7 +53,8 @@ public abstract class CosmeticConstants {
                             .build(),
                     (user, context) -> ArrowEffects.getInventory().open(user)
             )
-            .add(22,
+
+            .add(3, 3,
                     new ItemStackBuilder(Material.TOTEM_OF_UNDYING)
                             .setName(Component.text("Emotes").style(FtcFormatter.nonItalic(NamedTextColor.GOLD)))
                             .addLore(Component.empty())
@@ -60,7 +63,17 @@ public abstract class CosmeticConstants {
                             .build(),
                     (user, context) -> CosmeticEmotes.getInventory().open(user)
             )
-            .add(24,
+
+            .add(5, 3,
+                    new ItemStackBuilder(Material.FEATHER, 1)
+                            .setName(Component.text("Region pole effects").style(FtcFormatter.nonItalic(NamedTextColor.GOLD)))
+                            .addLore(Component.empty())
+                            .addLore(Component.text("Spice up your travels with some effects :D").style(FtcFormatter.nonItalic(NamedTextColor.GRAY)))
+                            .build(),
+                    (user, context) -> TravelEffects.getInventory().open(user)
+            )
+
+            .add(6, 2,
                     new ItemStackBuilder(Material.SKELETON_SKULL)
                             .setName(Component.text("Death Particles").style(FtcFormatter.nonItalic(NamedTextColor.GOLD)))
                             .addLore(Component.empty())

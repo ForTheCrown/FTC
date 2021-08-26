@@ -14,7 +14,7 @@ public class CommandSetHomeRegion extends FtcCommand {
     public CommandSetHomeRegion() {
         super("sethomeregion");
 
-        setAliases("sethomepole", "sethomepost");
+        setAliases("sethomepole", "sethomepost", "movein");
         setPermission(Permissions.REGIONS);
         setDescription("Sets your home region");
 

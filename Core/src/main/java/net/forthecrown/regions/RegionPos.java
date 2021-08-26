@@ -8,6 +8,7 @@ import org.bukkit.Location;
 
 import java.util.Objects;
 
+import static net.forthecrown.regions.RegionConstants.HALF_REGION_SIZE;
 import static net.forthecrown.regions.RegionConstants.REGION_SIZE;
 
 /**
@@ -27,10 +28,22 @@ public class RegionPos {
         this((int) x, (int) z);
     }
 
+    /**
+     * Creates a region pos with cords of this region added to the given x and z
+     * @param x The X cord to add
+     * @param z The Z cord to add
+     * @return A new region pos with the x and z of this pos added to the given x and z
+     */
     public RegionPos add(int x, int z) {
         return new RegionPos(this.x + x, this.z + z);
     }
 
+    /**
+     * Same as {@link RegionPos#add(int, int)} except it subtracts.
+     * @param x The X cord to subtract
+     * @param z The Z cord to subtract
+     * @return Same as {@link RegionPos#add(int, int)}, except subtracted
+     */
     public RegionPos subtract(int x, int z) {
         return add(-x, -z);
     }
@@ -55,54 +68,78 @@ public class RegionPos {
      * Gets the absolute world X cord of this region
      * @return The absolute world X cord of this region
      */
-    public int getAbsoluteX() {
-        return toAbsolute(x);
+    public int getCenterX() {
+        return toCenter(x);
     }
 
     /**
      * Gets the absolute world Z cord of this region
      * @return The absolute world Z cord of this region
      */
+    public int getCenterZ() {
+        return toCenter(z);
+    }
+
+    /**
+     * Gets the absolute x of this pos
+     * @return Absolute world x
+     */
+    public int getAbsoluteX() {
+        return toAbsolute(x);
+    }
+
+    /**
+     * Gets the absolute z cord of this pos
+     * @return Absolute world z
+     */
     public int getAbsoluteZ() {
         return toAbsolute(z);
     }
 
     /**
-     * Creates an 2D vector with the absolute cords of this region
-     * @return The absolute 2D vector for this region
+     * Creates an 2D vector with the region-centered absolute cords of this region
+     * @return The region-centered 2D vector for this region
      */
-    public BlockVector2 toAbsoluteVector() {
+    public BlockVector2 toCenter() {
+        return BlockVector2.at(getCenterX(), getCenterZ());
+    }
+
+    /**
+     * Creates a 2D vector with the absolute cords of this region
+     * @return The region's absolute vector
+     */
+    public BlockVector2 toAbsolute() {
         return BlockVector2.at(getAbsoluteX(), getAbsoluteZ());
     }
 
     /**
-     * Turns a relative int cord into absolute
-     * <p></p>
-     * All this really does is multiply the relative paramater with {@link RegionConstants#REGION_SIZE}
-     * @param relative The relative cord
-     * @return The absolute value of the relative cord
+     * Turns a relative int cord into absolute cord centered in a region
+     * @param relative The relative coordinate
+     * @return The region-centered coordinated
+     */
+    public static int toCenter(int relative) {
+        return toAbsolute(relative) + HALF_REGION_SIZE;
+    }
+
+    /**
+     * Turns a relative int cord into an absolute world coordinate
+     * @param relative The relative coordinate
+     * @return The absolute coordinate
      */
     public static int toAbsolute(int relative) {
         return relative * REGION_SIZE;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RegionPos cords = (RegionPos) o;
-        return getX() == cords.getX() &&
-                getZ() == cords.getZ();
-    }
+    /**
+     * Gets a relative region cord from an absolute cord
+     * @param absolute The absolute cord
+     * @return The relative region cord
+     */
+    public static int fromAbsolute(int absolute) {
+        int relative = absolute / REGION_SIZE;
+        if(absolute < 0) relative--;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getX(), getZ());
-    }
-
-    @Override
-    public String toString() {
-        return x + " " + z;
+        return relative;
     }
 
     /**
@@ -167,17 +204,27 @@ public class RegionPos {
      */
     public static RegionPos fromAbsolute(int x, int z) {
         return new RegionPos(
-                fromAbsoluteCord(x),
-                fromAbsoluteCord(z)
+                fromAbsolute(x),
+                fromAbsolute(z)
         );
     }
 
-    /**
-     * Gets a relative region cord from an absolute cord
-     * @param absolute The absolute cord
-     * @return The relative region cord
-     */
-    public static int fromAbsoluteCord(int absolute) {
-        return absolute / REGION_SIZE;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RegionPos cords = (RegionPos) o;
+        return getX() == cords.getX() &&
+                getZ() == cords.getZ();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getX(), getZ());
+    }
+
+    @Override
+    public String toString() {
+        return x + " " + z;
     }
 }

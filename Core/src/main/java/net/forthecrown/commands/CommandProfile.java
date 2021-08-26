@@ -106,7 +106,7 @@ public class CommandProfile extends FtcCommand {
         return Component.text()
                 .append(ChatUtils.convertString(header))
 
-                .append(line("Branch", profile.getBranch().getName(), profile.getBranch() != Faction.DEFAULT))
+                .append(line("Branch", profile.getFaction().getName(), profile.getFaction() != Faction.DEFAULT))
                 .append(line("Rank", profile.getRank().prefix(), profile.getRank() != Rank.DEFAULT))
 
                 .append(line("AFK", afkMessage, afkMessage != null))

@@ -169,7 +169,7 @@ public class DungeonListeners implements Listener, ClickEventTask {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(Crown.inst(), () -> player.getWorld().spawnParticle(Particle.TOTEM, player.getLocation().getX(), player.getLocation().getY()+2, player.getLocation().getZ(), 30, 0.2d, 0.1d, 0.2d, 0.275d), i*5L);
             }
             CrownUser user = UserManager.getUser(player);
-            if(user.getBranch() == Faction.DEFAULT || user.getBranch() == Faction.ROYALS || !user.hasRank(Rank.KNIGHT)){
+            if(user.getFaction() == Faction.DEFAULT || user.getFaction() == Faction.ROYALS || !user.hasRank(Rank.KNIGHT)){
                 player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "[FTC] " + ChatColor.WHITE + "You've been promoted to " + ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "Knight" + ChatColor.DARK_GRAY + "]" + ChatColor.WHITE + " !");
                 player.sendMessage(ChatColor.WHITE + "You can select the tag in " + ChatColor.YELLOW + "/rank" + ChatColor.WHITE + " now.");
                 user.addRank(Rank.KNIGHT);

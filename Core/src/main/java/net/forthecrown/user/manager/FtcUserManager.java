@@ -1,23 +1,15 @@
 package net.forthecrown.user.manager;
 
-import net.forthecrown.commands.arguments.BaltopArgument;
-import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.AbstractYamlSerializer;
-import net.forthecrown.serializer.JsonBuf;
-import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.FtcUserAlt;
 import net.forthecrown.user.actions.FtcUserActionHandler;
 import net.forthecrown.user.actions.UserActionHandler;
-import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.MapUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public final class FtcUserManager extends AbstractYamlSerializer implements UserManager {
@@ -118,43 +110,5 @@ public final class FtcUserManager extends AbstractYamlSerializer implements User
     @Override
     public UserActionHandler getActionHandler() {
         return actionHandler;
-    }
-
-    private void log(String s){
-        Crown.logger().info(s);
-    }
-
-    public void runUserDeletionCheck(){
-        int amount = 0;
-        for (File f: UserJsonSerializer.USER_DIR.listFiles()){
-            try {
-                JsonBuf json = JsonBuf.of(JsonUtils.readFile(f));
-                JsonBuf timeStamps = json.getBuf("timeStamps");
-
-                UUID id;
-                try {
-                    id = UUID.fromString(f.getName().replaceAll(".json", ""));
-                } catch (Exception ignored){
-                    continue;
-                }
-
-                long lastLoad = timeStamps.getLong("lastLoad");
-                long nextReset = lastLoad + ComVars.getUserResetInterval();
-
-                if (nextReset > System.currentTimeMillis()) continue;
-
-                //Is older and has been untouched for the entire interval, yeet it
-                f.delete();
-                Crown.getBalances().getMap().remove(id);
-
-                amount++;
-                log("Deleting data of " + id + "name: " + Bukkit.getOfflinePlayer(id).getName());
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-
-        if(amount > 0) BaltopArgument.resetMax();
-        log("All user data files have been checked for deletion. Deleted " + amount + " files.");
     }
 }

@@ -176,7 +176,7 @@ public class CommandAuction extends FtcCommand {
                                     CrownUser user = getUserExecutor(c);
                                     Auction auction = auctionFromArg(c);
 
-                                    if(user.getBranch() != Faction.PIRATES) throw FtcExceptionProvider.notPirate();
+                                    if(user.getFaction() != Faction.PIRATES) throw FtcExceptionProvider.notPirate();
                                     if(!isAllowedToOwn(c.getSource())) throw FtcExceptionProvider.create("&7You aren't allowed to own more than one auction at a time");
                                     if(claimedClaiming.contains(auction.getName())) throw FtcExceptionProvider.create("&7Someone is already claiming this Auction");
                                     if(auction.isClaimed()) throw FtcExceptionProvider.create("&7" + auction.getName() + " is already claimed by " + auction.getOwner().getName());

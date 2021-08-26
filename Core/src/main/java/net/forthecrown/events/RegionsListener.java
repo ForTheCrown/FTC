@@ -1,20 +1,15 @@
 package net.forthecrown.events;
 
-import com.sk89q.worldedit.math.BlockVector2;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.regions.PopulationRegion;
-import net.forthecrown.regions.RegionManager;
 import net.forthecrown.regions.RegionPos;
 import net.forthecrown.utils.Worlds;
-import net.forthecrown.utils.math.MathUtil;
 import net.minecraft.core.BlockPos;
-import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 
 public class RegionsListener implements Listener {
     @EventHandler(ignoreCancelled = true)
@@ -30,10 +25,10 @@ public class RegionsListener implements Listener {
         }
     }
 
-    private final RegionManager manager = Crown.getRegionManager();
+    /*private final RegionManager manager = Crown.getRegionManager();
 
     @EventHandler(ignoreCancelled = true)
-    public void onChunkLoad(ChunkLoadEvent event) {
+    public void onChunkLoad(PlayerChunkLoadEvent event) {
         Chunk chunk = event.getChunk();
 
         //Get block cords from chunk cords
@@ -73,5 +68,5 @@ public class RegionsListener implements Listener {
 
             return MathUtil.isInRange(x, minX, maxX) && MathUtil.isInRange(z, minZ, maxZ);
         }
-    }
+    }*/
 }

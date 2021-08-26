@@ -45,7 +45,7 @@ public class CommandParrot extends FtcCommand {
 
     private int setParrot(CommandContext<CommandSource> c, boolean silent) throws CommandSyntaxException {
         CrownUser user = getUserSender(c);
-        if(user.getBranch() != Faction.PIRATES) throw FtcExceptionProvider.notPirate();
+        if(user.getFaction() != Faction.PIRATES) throw FtcExceptionProvider.notPirate();
 
         List<Pet> pets = user.getPets();
         Pet pet = PetArgument.getPetIfOwned(c, "parrot");

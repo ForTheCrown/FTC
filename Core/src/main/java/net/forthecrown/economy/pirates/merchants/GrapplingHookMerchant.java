@@ -69,7 +69,7 @@ public class GrapplingHookMerchant implements BlackMarketMerchant, ClickEventTas
             throw FtcExceptionProvider.cannotAfford(price);
         }
 
-        if(user.getBranch() != Faction.PIRATES){
+        if(user.getFaction() != Faction.PIRATES){
             throw FtcExceptionProvider.notPirate();
         }
 

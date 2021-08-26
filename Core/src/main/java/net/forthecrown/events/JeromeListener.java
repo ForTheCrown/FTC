@@ -96,7 +96,7 @@ public class JeromeListener implements Listener, ClickEventTask {
             CrownUser user = UserManager.getUser(player);
             Faction royals = Faction.ROYALS;
 
-            if(user.getBranch() == Faction.ROYALS){
+            if(user.getFaction() == Faction.ROYALS){
                 player.sendMessage(ChatColor.GRAY + "You are already a part of the Royals!");
                 return;
             }
@@ -108,7 +108,7 @@ public class JeromeListener implements Listener, ClickEventTask {
                 return;
             }
 
-            user.setBranch(royals);
+            user.setFaction(royals);
             user.setCanSwapBranch(false, true);
             player.sendMessage(ChatColor.GRAY + "You are now part of the " + ChatColor.YELLOW + royals.getName() + "!");
 

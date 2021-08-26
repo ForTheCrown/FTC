@@ -54,7 +54,7 @@ public interface ShopInteraction {
         Faction allowedUser = WgFlags.query(session.getShop().getLocation(), WgFlags.SHOP_USAGE_FLAG);
 
         //If the owner's branch doesn't match up with the WG flag
-        if(allowedOwner != null && session.getOwner().getBranch() != Faction.DEFAULT && !session.getShop().getType().isAdmin() && allowedOwner != session.getOwner().getBranch()){
+        if(allowedOwner != null && session.getOwner().getFaction() != Faction.DEFAULT && !session.getShop().getType().isAdmin() && allowedOwner != session.getOwner().getFaction()){
             session.getUser().sendMessage(
                     Component.translatable("shops.wrongOwner",
                             NamedTextColor.GRAY,
@@ -65,7 +65,7 @@ public interface ShopInteraction {
         }
 
         //If the user's branch doesn't match up with the WG flag
-        if(allowedUser != null && session.getUser().getBranch() != Faction.DEFAULT && allowedUser != session.getUser().getBranch()){
+        if(allowedUser != null && session.getUser().getFaction() != Faction.DEFAULT && allowedUser != session.getUser().getFaction()){
             session.getUser().sendMessage(
                     Component.translatable("shops.wrongUser",
                             NamedTextColor.GRAY,

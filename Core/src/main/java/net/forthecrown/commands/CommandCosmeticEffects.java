@@ -6,6 +6,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
+import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
@@ -26,8 +27,8 @@ public class CommandCosmeticEffects extends FtcCommand {
      * ----------------------------------------
      *
      * Valid usages of command:
-     * /cosmeticeffect <user> <death | arrow> <effect key> <add | remove | set>
-     * /cosmeticeffect <user> <death | arrow> unset
+     * /cosmeticeffect <user> <death | arrow | travel> <effect key> <add | remove | set>
+     * /cosmeticeffect <user> <death | arrow | travel> unset
      *
      *
      * Permissions used:
@@ -101,6 +102,73 @@ public class CommandCosmeticEffects extends FtcCommand {
                                                     data.setActiveDeath(effect);
 
                                                     c.getSource().sendAdmin("Set " + user.getName() + "'s active death to " + effect);
+                                                    return 0;
+                                                })
+                                        )
+                                )
+                        )
+
+                        .then(literal("travel")
+                                .then(literal("unset")
+                                        .executes(c -> {
+                                            CrownUser user = UserArgument.getUser(c, "user");
+                                            CosmeticData data = user.getCosmeticData();
+
+                                            data.setActiveTravel(null);
+
+                                            c.getSource().sendAdmin("Unset " + user.getName() + "'s travel effect");
+                                            return 0;
+                                        })
+                                )
+
+                                .then(literal("list")
+                                        .executes(c -> {
+                                            CrownUser user = UserArgument.getUser(c, "user");
+                                            CosmeticData data = user.getCosmeticData();
+
+                                            String msg = ListUtils.join(data.getTravelEffects(), effect -> effect.key().value());
+
+                                            c.getSource().sendMessage(user.getName() + "'s travel effects: " + msg);
+                                            return 0;
+                                        })
+                                )
+
+                                .then(argument("key", RegistryArguments.travelEffect())
+                                        .then(literal("add")
+                                                .executes(c -> {
+                                                    CrownUser user = UserArgument.getUser(c, "user");
+                                                    CosmeticData data = user.getCosmeticData();
+
+                                                    TravelEffect effect = c.getArgument("key", TravelEffect.class);
+                                                    data.addTravel(effect);
+
+                                                    c.getSource().sendAdmin("Added " + effect + " to " + user.getName());
+                                                    return 0;
+                                                })
+                                        )
+
+                                        .then(literal("remove")
+                                                .executes(c -> {
+                                                    CrownUser user = UserArgument.getUser(c, "user");
+                                                    CosmeticData data = user.getCosmeticData();
+
+                                                    TravelEffect effect = c.getArgument("key", TravelEffect.class);
+                                                    data.removeTravel(effect);
+
+                                                    c.getSource().sendAdmin("Removed " + effect + " from " + user.getName());
+                                                    return 0;
+                                                })
+                                        )
+
+                                        .then(literal("set")
+                                                .executes(c -> {
+                                                    CrownUser user = UserArgument.getUser(c, "user");
+                                                    CosmeticData data = user.getCosmeticData();
+
+                                                    TravelEffect effect = c.getArgument("key", TravelEffect.class);
+                                                    data.setActiveTravel(effect);
+
+                                                    c.getSource().sendAdmin("Set " + user.getName() + "'s active travel effect to " + effect);
                                                     return 0;
                                                 })
                                         )

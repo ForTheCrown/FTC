@@ -1,5 +1,6 @@
 package net.forthecrown.cosmetics.travel;
 
+import net.forthecrown.core.Crown;
 import net.forthecrown.cosmetics.CosmeticConstants;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.registry.Registries;
@@ -15,9 +16,11 @@ public final class TravelEffects {
 
         //Final thing
         Registries.TRAVEL_EFFECTS.close();
-        INVENTORY = CosmeticConstants.baseInventory(54, Component.text(""), true)
+        INVENTORY = CosmeticConstants.baseInventory(54, Component.text("Region pole effects"), true)
                 .addAll(Registries.TRAVEL_EFFECTS)
                 .build();
+
+        Crown.logger().info("Travel effects registered");
     }
 
     private static <T extends TravelEffect> T register(T val) {

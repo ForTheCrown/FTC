@@ -442,13 +442,13 @@ public interface CrownUser extends
      * Gets the user's branch
      * @return The current branch of the player
      */
-    Faction getBranch();
+    Faction getFaction();
 
     /**
      * Sets the user's branch
      * @param faction The new branch of the user
      */
-    void setBranch(Faction faction);
+    void setFaction(Faction faction);
 
     /**
      * Sends the user a message, works just like the sendMessage in Player, but it also translates hexcodes and '&amp;' chars as color codes

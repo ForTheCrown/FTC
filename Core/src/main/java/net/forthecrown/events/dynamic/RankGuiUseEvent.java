@@ -71,7 +71,7 @@ public class RankGuiUseEvent implements Listener {
         }
 
         if(clickedRank.getRankBranch() != Faction.DEFAULT){
-            if(user.getBranch() != clickedRank.getRankBranch()) throw new CrownException(user, "&cThis rank is not in your branch!");
+            if(user.getFaction() != clickedRank.getRankBranch()) throw new CrownException(user, "&cThis rank is not in your branch!");
         }
 
         if(clickedRank == Rank.DEFAULT){
@@ -82,7 +82,7 @@ public class RankGuiUseEvent implements Listener {
         else{
             if(!user.isKing()) user.setRank(clickedRank);
             else user.sendMessage("&7You are currently the king, you will see your rank prefix once another player becomes king");
-            user.sendMessage(clickedRank.getPrefix() + "&7has become your new rank! (Branch: " + user.getBranch().getName() + ")");
+            user.sendMessage(clickedRank.getPrefix() + "&7has become your new rank! (Branch: " + user.getFaction().getName() + ")");
         }
 
         //reload inventory

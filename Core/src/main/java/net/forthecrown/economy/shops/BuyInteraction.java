@@ -35,7 +35,7 @@ public class BuyInteraction implements ShopInteraction {
         ItemStack example = session.getExampleItem();
 
         //Add money to owner, remove item from shop
-        balances.add(session.getOwner().getUniqueId(), session.getPrice(), owner.getBranch() != Faction.PIRATES);
+        balances.add(session.getOwner().getUniqueId(), session.getPrice(), owner.getFaction() != Faction.PIRATES);
         session.getInventory().removeItem(example.clone());
 
         //Check stock

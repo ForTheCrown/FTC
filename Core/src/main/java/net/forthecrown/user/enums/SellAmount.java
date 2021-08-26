@@ -22,9 +22,10 @@ public enum SellAmount implements JsonSerializable {
     public final SellAmountItem invOption;
 
     SellAmount(byte i, String text, int slot) {
-        this.value = i;
         this.text = text;
-        this.invOption = new SellAmountItem(this, slot);
+
+        value = i;
+        invOption = new SellAmountItem(this, slot);
     }
 
     /**
@@ -48,13 +49,13 @@ public enum SellAmount implements JsonSerializable {
      * @return The sell amount of the corresponding byte, or null if one wasn't found
      */
     public static @Nullable SellAmount fromInt(byte i){
-        switch (i){
-            case 64: return PER_64;
-            case 16: return PER_16;
-            case 1: return PER_1;
-            case -1: return ALL;
-            default: return null;
-        }
+        return switch (i) {
+            case 64 -> PER_64;
+            case 16 -> PER_16;
+            case 1 -> PER_1;
+            case -1 -> ALL;
+            default -> null;
+        };
     }
 
     @Override

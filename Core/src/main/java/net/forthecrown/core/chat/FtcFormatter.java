@@ -297,6 +297,10 @@ public interface FtcFormatter {
         return Component.translatable("user.gems.multiple", Component.text(decimalizeNumber(amount)));
     }
 
+    static Component gems(int amount) {
+        return GlobalTranslator.render(queryGems(amount), Locale.ROOT);
+    }
+
     /**
      * Gets a date from milliseconds
      * <p></p>

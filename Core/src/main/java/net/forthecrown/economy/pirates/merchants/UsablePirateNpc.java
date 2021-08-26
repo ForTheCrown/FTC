@@ -17,7 +17,7 @@ public interface  UsablePirateNpc extends Keyed, InteractableNPC {
     default void run(Player player, Entity entity) throws RoyalCommandException {
         CrownUser user = UserManager.getUser(player);
 
-        if(user.getBranch() != Faction.PIRATES) throw FtcExceptionProvider.realPirate(entity);
+        if(user.getFaction() != Faction.PIRATES) throw FtcExceptionProvider.realPirate(entity);
 
         onUse(user, entity);
     }

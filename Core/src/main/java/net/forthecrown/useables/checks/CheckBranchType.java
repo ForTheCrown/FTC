@@ -65,7 +65,7 @@ public class CheckBranchType implements UsageCheck<CheckBranchType.CheckInstance
 
         @Override
         public boolean test(Player player) {
-            return UserManager.getUser(player).getBranch() == faction;
+            return UserManager.getUser(player).getFaction() == faction;
         }
 
         @Override

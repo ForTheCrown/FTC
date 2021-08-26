@@ -60,7 +60,7 @@ public class AuctionEvents implements Listener {
         if(line3.contains("NONE")){ //Unclaimed auction
             p.sendMessage(ChatColor.GRAY + "This auction is currently not in use!");
 
-            if(user.getBranch() != Faction.PIRATES){
+            if(user.getFaction() != Faction.PIRATES){
                 user.sendMessage("&7You need to be a pirate to use auctions");
                 return;
             }

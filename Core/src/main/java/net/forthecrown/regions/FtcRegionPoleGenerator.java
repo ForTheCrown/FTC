@@ -34,6 +34,7 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
 
         //bounding box for the region pole
         FtcBoundingBox box = FtcBoundingBox.of(region.getWorld(), region.getPoleBoundingBox());
+        box.expand(BlockFace.SOUTH_EAST, 1);
 
         //Clear area
         box.forEach(b -> b.setType(Material.AIR, false));
@@ -71,23 +72,32 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
 
         //Place the base
         for (int index = 0; index < 25; index++) {
-            //If it's an edge, place cool block, if not, place based
-            Material blockMat = index == 0 || index == 4 || index == 21 || index == 25 ?
-                    Material.CHISELED_STONE_BRICKS : Material.STONE_BRICKS;
+            int x = index / 5;
+            int z = index % 5;
 
-            WorldVec3i pos = p.clone().add(index / 5, 0, index % 5);
+            WorldVec3i pos = p.clone().add(x, 0, z);
             Block block = pos.getBlock();
 
-            block.setType(blockMat);
+            block.setType(Material.STONE_BRICKS);
         }
+
+        //Set corner blocks
+        p.getBlock().setType(Material.CHISELED_STONE_BRICKS);
+        p.add(0, 0, 4).getBlock().setType(Material.CHISELED_STONE_BRICKS);
+        p.add(4, 0, 0).getBlock().setType(Material.CHISELED_STONE_BRICKS);
+        p.subtract(0, 0, 4).getBlock().setType(Material.CHISELED_STONE_BRICKS);
     }
 
     @Override
     public void generateRegionName(WorldVec3i pos, PopulationRegion region) {
         Block block = pos.getBlock();
-
-        //Set type
         block.setType(Material.OAK_SIGN);
+
+        //Make sure sign is facing north
+        org.bukkit.block.data.type.Sign signData = (org.bukkit.block.data.type.Sign) block.getBlockData();
+        signData.setRotation(BlockFace.NORTH);
+        block.setBlockData(signData);
+
         Sign sign = (Sign) block.getState();
 
         //Set lines

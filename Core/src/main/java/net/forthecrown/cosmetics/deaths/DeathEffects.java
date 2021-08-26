@@ -10,10 +10,10 @@ public class DeathEffects {
 
     private static BuiltInventory INVENTORY;
 
-    public static SoulDeathEffect SOUL;
-    public static TotemDeathEffect TOTEM;
-    public static ExplosionDeathEffect EXPLOSION;
-    public static EnderRingDeathEffect ENDER_RING;
+    public static DeathEffect SOUL;
+    public static DeathEffect TOTEM;
+    public static DeathEffect EXPLOSION;
+    public static DeathEffect ENDER_RING;
 
     public static void init(){
         SOUL = register(new SoulDeathEffect());

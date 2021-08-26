@@ -438,12 +438,12 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public Faction getBranch(){
+    public Faction getFaction(){
         return faction;
     }
 
     @Override
-    public void setBranch(Faction faction){
+    public void setFaction(Faction faction){
         this.faction = faction;
     }
 
@@ -778,9 +778,9 @@ public class FtcUser implements CrownUser {
                     .append(Component.newline());
         }
 
-        if(getBranch() != Faction.DEFAULT && isProfilePublic()){
+        if(getFaction() != Faction.DEFAULT && isProfilePublic()){
             text
-                    .append(Component.text("Branch: ").append(Component.text(getBranch().getName())))
+                    .append(Component.text("Branch: ").append(Component.text(getFaction().getName())))
                     .append(Component.newline());
         }
 
@@ -1147,7 +1147,7 @@ public class FtcUser implements CrownUser {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(uniqueId)
-                .append(getBranch())
+                .append(getFaction())
                 .append(getGems())
                 .append(properties)
                 .append(isAfk())

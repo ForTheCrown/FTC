@@ -1,8 +1,7 @@
 package net.forthecrown.cosmetics.deaths;
 
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.cosmetics.CosmeticConstants;
 import net.forthecrown.cosmetics.CosmeticEffect;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -10,33 +9,15 @@ import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.ItemStackBuilder;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
-public abstract class DeathEffect implements CosmeticEffect {
-
-    protected final InventoryPos slot;
-    protected final Component[] description;
-    protected final String name;
-    protected final Key key;
+public abstract class DeathEffect extends CosmeticEffect {
 
     DeathEffect(int slot, String name, Component... description) {
-        this.slot = InventoryPos.fromSlot(slot);
-        this.description = description;
-        this.name = name;
-
-        key = Crown.coreKey(name.toLowerCase().replaceAll(" ", "_").replaceAll("'", ""));
+        super(name, InventoryPos.fromSlot(slot), description);
     }
 
     DeathEffect(int slot, String name, String desc){
@@ -46,57 +27,19 @@ public abstract class DeathEffect implements CosmeticEffect {
     public abstract void activate(Location loc);
 
     @Override
-    public @NotNull Key key() {
-        return key;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Component[] getDescription() {
-        return description;
-    }
-
-    @Override
-    public InventoryPos getPos() {
-        return slot;
-    }
-
-    @Override
     public void place(Inventory inventory, CrownUser user) {
-        inventory.setItem(getSlot(), makeItem(user));
-    }
-
-    public ItemStack makeItem(CrownUser user){
         CosmeticData data = user.getCosmeticData();
-        boolean owned = data.hasDeath(this);
 
-        ItemStackBuilder builder = new ItemStackBuilder(owned ? Material.ORANGE_DYE : Material.GRAY_DYE)
-                .setName(name().style(FtcFormatter.nonItalic(NamedTextColor.YELLOW)));
+        inventory.setItem(
+                getSlot(),
 
-        for (Component c: description){
-            builder.addLore(c.style(FtcFormatter.nonItalic(NamedTextColor.GRAY)));
-        }
-
-        builder.addLore(Component.empty());
-
-        if(!owned){
-            builder.addLore(
-                    Component.text("Click to purchase for ")
-                            .style(FtcFormatter.nonItalic(NamedTextColor.GRAY))
-                            .append(Component.text(CosmeticConstants.DEATH_PRICE + " Gems").style(FtcFormatter.nonItalic(NamedTextColor.GOLD)))
-            );
-        }
-
-        DeathEffect deathParticle = data.getActiveDeath();
-        if(deathParticle != null && deathParticle.key.equals(key)){
-            builder
-                    .addEnchant(Enchantment.CHANNELING, 1)
-                    .setFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-
-        return builder.build();
+                CosmeticEffect.makeItem(
+                        equals(data.getActiveDeath()),
+                        data.hasDeath(this),
+                        this,
+                        CosmeticConstants.DEATH_PRICE
+                )
+        );
     }
 
     @Override
@@ -123,35 +66,5 @@ public abstract class DeathEffect implements CosmeticEffect {
         }
 
         context.setReloadInventory(true);
-    }
-
-    public String toString(){
-        return key.asString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DeathEffect effect = (DeathEffect) o;
-
-        return new EqualsBuilder()
-                .append(getSlot(), effect.getSlot())
-                .append(getDescription(), effect.getDescription())
-                .append(getName(), effect.getName())
-                .append(key, effect.key)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(getSlot())
-                .append(getDescription())
-                .append(getName())
-                .append(key)
-                .toHashCode();
     }
 }

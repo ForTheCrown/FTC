@@ -66,9 +66,9 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
     @Override
     public UserDataContainer getDataContainer() { return getMain().getDataContainer(); }
     @Override
-    public void setBranch(Faction faction) { getMain().setBranch(faction); }
+    public void setFaction(Faction faction) { getMain().setFaction(faction); }
     @Override
-    public Faction getBranch() { return getMain().getBranch(); }
+    public Faction getFaction() { return getMain().getFaction(); }
     @Override
     public SoldMaterialData getMatData(Material material) { return getMain().getMatData(material); }
     @Override

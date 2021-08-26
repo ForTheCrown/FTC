@@ -45,6 +45,7 @@ public class RegionVisitListener implements Listener {
 
     public void unregister() {
         HandlerList.unregisterAll(this);
+
         user.visitListener = null;
         if(!tickTask.isCancelled()) tickTask.cancel();
 

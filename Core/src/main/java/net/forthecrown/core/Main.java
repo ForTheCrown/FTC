@@ -98,8 +98,6 @@ public final class Main extends JavaPlugin implements Crown {
         announcer.doBroadcasts();
         dayUpdate.checkDay();
 
-        if(getConfig().getBoolean("System.run-deleter-on-startup")) userManager.runUserDeletionCheck();
-
         logger.info("FTC startup completed");
     }
 

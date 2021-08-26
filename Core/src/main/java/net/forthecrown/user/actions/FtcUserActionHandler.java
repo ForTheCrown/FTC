@@ -1,6 +1,7 @@
 package net.forthecrown.user.actions;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.admin.EavesDropper;
@@ -9,14 +10,20 @@ import net.forthecrown.events.dynamic.RegionVisitListener;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.utils.ListUtils;
+import net.forthecrown.utils.math.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Tameable;
 import org.bukkit.util.Vector;
 
+import java.util.List;
 import java.util.UUID;
 
 public class FtcUserActionHandler implements UserActionHandler {
@@ -141,6 +148,12 @@ public class FtcUserActionHandler implements UserActionHandler {
     @Override
     public void handleVisit(RegionVisit visit) {
         Player player = visit.getVisitor().getPlayer();
+        if(!ListUtils.isNullOrEmpty(player.getPassengers())) {
+            player.sendMessage(
+                    Component.translatable("commands.teleport.error.passengers", NamedTextColor.GRAY)
+            );
+        }
+
         CrownUser user = visit.getVisitor();
         CosmeticData cosmetics = user.getCosmeticData();
 
@@ -148,7 +161,55 @@ public class FtcUserActionHandler implements UserActionHandler {
         BlockVector2 poleCords = visit.getRegion().getPolePosition();
         Location loc = player.getLocation();
 
+        //For entities which should be teleported along with the player
+        List<Entity> toTeleport = new ObjectArrayList<>();
+        FtcBoundingBox box = FtcBoundingBox.of(world, visit.getRegion().getPoleBoundingBox());
+        box.expand(2.5);
+
+        for (Entity e: box.getEntities()) {
+            //If the entity is tameable and has been tamed
+            //by the visitor
+            if(e instanceof Tameable) {
+                Tameable tameable = (Tameable) e;
+                if(!tameable.isTamed()) continue;
+
+                if(tameable.getOwnerUniqueId().equals(user.getUniqueId())) {
+                    toTeleport.add(e);
+                }
+            }
+
+            //If they're leashed by the visitor
+            if(e instanceof LivingEntity) {
+                LivingEntity living = (LivingEntity) e;
+
+                try {
+                    Entity leashHolder = living.getLeashHolder();
+                    if(leashHolder.getUniqueId().equals(user.getUniqueId())) {
+                        toTeleport.add(e);
+                    }
+
+                } catch (IllegalStateException e1) {
+                }
+            }
+        }
+
+        //Declare the teleportation location
+        Location teleportLoc = new Location(
+                world,
+                poleCords.getX() + 0.5D,
+                world.getHighestBlockYAt(poleCords.getX(), poleCords.getZ()),
+                poleCords.getZ() + 0.5D,
+                loc.getYaw(),
+                loc.getPitch()
+        );
+
+        //Teleport all entities there
+        toTeleport.forEach(e -> e.teleport(teleportLoc));
+
         if(ComVars.shouldHulkSmashPoles() && user.hulkSmashesPoles()) {
+            //Move TP loc to sky since hulk smash
+            teleportLoc.setY(256);
+
             //Rocket vector
             Vector vector = new Vector(0, 20, 0);
 
@@ -162,15 +223,6 @@ public class FtcUserActionHandler implements UserActionHandler {
 
             //Once they've gone up, peaked or whatever,
             Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
-                Location teleportLoc = new Location(
-                        world,
-                        poleCords.getX() + 0.5D,
-                        256,
-                        poleCords.getZ() + 0.5D,
-                        loc.getYaw(),
-                        loc.getPitch()
-                );
-
                 //Teleport them over pole
                 player.teleport(teleportLoc);
 
@@ -179,15 +231,6 @@ public class FtcUserActionHandler implements UserActionHandler {
                 listener.beginListening();
             }, 15);
         } else {
-            Location teleportLoc = new Location(
-                    world,
-                    poleCords.getX() + 0.5D,
-                    world.getHighestBlockYAt(poleCords.getX(), poleCords.getZ()),
-                    poleCords.getZ() + 0.5D,
-                    loc.getYaw(),
-                    loc.getPitch()
-            );
-
             //Execute travel effect, if they have one
             if(cosmetics.hasActiveTravel()) {
                 cosmetics.getActiveTravel().onPoleTeleport(user, loc, teleportLoc.clone());

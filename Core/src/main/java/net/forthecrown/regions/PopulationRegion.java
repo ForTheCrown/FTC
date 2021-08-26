@@ -21,6 +21,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,11 +78,11 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
 
     //Makes a bounding box for the region, from -65 to 312
     private FtcBoundingBox makeRegion(World world) {
-        int minX = pos.getAbsoluteX() - RegionConstants.HALF_REGION_SIZE;
-        int minZ = pos.getAbsoluteZ() - RegionConstants.HALF_REGION_SIZE;
+        int minX = pos.getCenterX() - RegionConstants.HALF_REGION_SIZE;
+        int minZ = pos.getCenterZ() - RegionConstants.HALF_REGION_SIZE;
 
-        int maxX = pos.getAbsoluteX() + RegionConstants.HALF_REGION_SIZE;
-        int maxZ = pos.getAbsoluteZ() + RegionConstants.HALF_REGION_SIZE;
+        int maxX = pos.getCenterX() + RegionConstants.HALF_REGION_SIZE;
+        int maxZ = pos.getCenterZ() + RegionConstants.HALF_REGION_SIZE;
 
         return new FtcBoundingBox(world, minX, -65, minZ, maxX, 312, maxZ);
     }
@@ -123,7 +124,7 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
      * @return This region's pole position
      */
     public @NotNull BlockVector2 getPolePosition() {
-        return polePosition == null ? pos.toAbsoluteVector() : polePosition;
+        return polePosition == null ? pos.toCenter() : polePosition;
     }
 
     /**
@@ -132,6 +133,7 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
      */
     public void setPolePosition(@Nullable BlockVector2 polePosition) {
         FtcBoundingBox prev = FtcBoundingBox.of(getWorld(), poleBoundingBox);
+        prev.expand(BlockFace.SOUTH_EAST, 1);
         prev.forEach(b -> b.setType(Material.AIR));
 
         setPolePosition0(polePosition);
@@ -198,9 +200,9 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
         return HoverEvent.showText(
                 op.apply(
                         Component.text()
-                                .append(Component.text("x: " + getPos().getAbsoluteX()))
+                                .append(Component.text("x: " + getPos().getCenterX()))
                                 .append(Component.newline())
-                                .append(Component.text("z: " + getPos().getAbsoluteZ()))
+                                .append(Component.text("z: " + getPos().getCenterZ()))
                                 .build()
                 )
         );
@@ -213,7 +215,7 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
     public Message suggestionTooltip() {
         if(description != null) return GrenadierUtils.componentToMessage(description);
 
-        return new LiteralMessage("x: " + pos.getAbsoluteX() + ", z: " + pos.getAbsoluteZ());
+        return new LiteralMessage("x: " + pos.getCenterX() + ", z: " + pos.getCenterZ());
     }
 
     /**

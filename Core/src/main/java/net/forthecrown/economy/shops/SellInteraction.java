@@ -31,7 +31,7 @@ public class SellInteraction implements ShopInteraction {
 
         //Add item to shop, give user mulaa
         session.getInventory().addItem(example.clone());
-        balances.add(owner.getUniqueId(), session.getPrice(), owner.getBranch() != Faction.PIRATES);
+        balances.add(owner.getUniqueId(), session.getPrice(), owner.getFaction() != Faction.PIRATES);
 
         //When session expires, tell the owner what occurred lol
         session.onSessionExpire(() -> {

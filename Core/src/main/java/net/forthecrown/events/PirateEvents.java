@@ -35,7 +35,7 @@ public class PirateEvents implements Listener {
             if(Cooldown.containsOrAdd(player, 16)) return;
 
             CrownUser user = UserManager.getUser(player);
-            if(user.getBranch() != Faction.PIRATES) throw FtcExceptionProvider.notPirate();
+            if(user.getFaction() != Faction.PIRATES) throw FtcExceptionProvider.notPirate();
 
             TreasureShulker shulker = Pirates.getTreasure();
 
@@ -56,7 +56,7 @@ public class PirateEvents implements Listener {
         Player player = event.getPlayer();
 
         if (!player.getWorld().equals(ComVars.getTreasureWorld())) return;
-        if (UserManager.getUser(player).getBranch() != Faction.PIRATES) return;
+        if (UserManager.getUser(player).getFaction() != Faction.PIRATES) return;
 
         player.setCompassTarget(Pirates.getTreasure().getLocation());
         Location playerloc = player.getLocation();
