@@ -40,9 +40,10 @@ public class EmoteBonk extends CommandEmote {
                 Component.translatable("emotes.bonk.sender", target.nickDisplayName().color(NamedTextColor.YELLOW))
         );
 
-        target.sendMessage(Component.translatable("emotes.bonk.target", sender.nickDisplayName().color(NamedTextColor.YELLOW))
-                .clickEvent(ClickEvent.runCommand("/bonk " + sender.getName()))
-                .hoverEvent(HoverEvent.showText(Component.translatable("emotes.bonk.target.hover")))
+        target.sendMessage(
+                Component.translatable("emotes.bonk.target", sender.nickDisplayName().color(NamedTextColor.YELLOW))
+                        .clickEvent(ClickEvent.runCommand("/bonk " + sender.getName()))
+                        .hoverEvent(HoverEvent.showText(Component.translatable("emotes.bonk.target.hover")))
         );
 
         if(target.getPlayer().getGameMode() != GameMode.SPECTATOR){

@@ -16,7 +16,6 @@ public class EmoteSmooch extends CommandEmote {
         super("mwah", 3*20, Component.translatable("emotes.smooch.cooldown"));
 
         setAliases("smooch", "kiss");
-        setPermission("ftc.emotes");
         setDescription("Kisses another player.");
 
         register();

@@ -11,7 +11,8 @@ public class ClickEventCommand extends FtcCommand {
 
     public ClickEventCommand(){
         super("npcconverse", Crown.inst());
-        setDescription("The Command used by the ClickEventManager to execute code ran by clickable text");register();
+
+        setDescription(":)");
         register();
     }
 

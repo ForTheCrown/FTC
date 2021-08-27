@@ -3,11 +3,11 @@ package net.forthecrown.commands.emotes;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.enums.FtcGameMode;
 import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -32,16 +32,26 @@ public class EmoteHug extends CommandEmote {
             return -1;
         }
 
-        target.sendMessage(Component.translatable("emotes.hug.target", EmoteSmooch.HEART, user.nickDisplayName().color(NamedTextColor.YELLOW), Component.text("ʕっ•ᴥ•ʔっ"))
-                .clickEvent(ClickEvent.runCommand("/" + getName() + " " + user.getName()))
-                .hoverEvent(Component.text("Hug them back ❤"))
+        target.sendMessage(
+                Component.translatable("emotes.hug.target",
+                        EmoteSmooch.HEART,
+                        user.nickDisplayName()
+                                .color(NamedTextColor.YELLOW),
+                        Component.text("ʕっ•ᴥ•ʔっ")
+                )
+                        .clickEvent(ClickEvent.runCommand("/" + getName() + " " + user.getName()))
+                        .hoverEvent(Component.text("Hug them back ❤"))
         );
 
         user.sendMessage(
-                Component.translatable("emotes.hug.sender", EmoteSmooch.HEART, target.nickDisplayName().color(NamedTextColor.YELLOW))
+                Component.translatable("emotes.hug.sender",
+                        EmoteSmooch.HEART,
+                        target.nickDisplayName()
+                                .color(NamedTextColor.YELLOW)
+                )
         );
 
-        if(target.getPlayer().getGameMode() != GameMode.SPECTATOR){
+        if(target.getGameMode() != FtcGameMode.SPECTATOR){
             Cooldown.add(target, "Emote_Hug_Received", 10*20);
             new HugTick(target);
         }
@@ -76,7 +86,7 @@ public class EmoteHug extends CommandEmote {
             }
 
             try {
-                user.getPlayer().getWorld().spawnParticle(Particle.HEART, user.getPlayer().getLocation().clone().add(0, 1, 0), 1, 0.25, 0.25 ,0.25);
+                user.getWorld().spawnParticle(Particle.HEART, user.getPlayer().getLocation().clone().add(0, 1, 0), 1, 0.25, 0.25 ,0.25);
             } catch (NullPointerException ignored) {
                 cancel();
                 Cooldown.remove(user, "Emote_Hug_Received");

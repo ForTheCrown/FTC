@@ -31,7 +31,7 @@ public class CrownBalances extends AbstractJsonSerializer implements Balances {
         Set<UUID> serialized = new HashSet<>();
 
         for (BalanceMap.BalEntry e: getMap().entries()) {
-            if(serialized.contains(e)) continue;
+            if(serialized.contains(e.getUniqueId())) continue;
             serialized.add(e.getUniqueId());
 
             json.add(e.getUniqueId().toString(), e.getValue());

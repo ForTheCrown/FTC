@@ -1,27 +1,32 @@
 package net.forthecrown.inventory.builder.options;
 
-import it.unimi.dsi.fastutil.objects.ObjectList;
+import java.util.List;
 
 /**
  * Determines in which order options are loaded.
  * By default, options are set to MID.
  */
 public enum OptionPriority {
-    LOW ((lows, mids, highs) -> lows),
-    MID ((lows, mids, highs) -> mids),
-    HIGH ((lows, mids, highs) -> highs);
+    LOW {
+        @Override
+        public List<InventoryOption> pick(List<InventoryOption> lows, List<InventoryOption> mids, List<InventoryOption> highs) {
+            return lows;
+        }
+    },
 
-    private final TierPicker picker;
+    MID {
+        @Override
+        public List<InventoryOption> pick(List<InventoryOption> lows, List<InventoryOption> mids, List<InventoryOption> highs) {
+            return mids;
+        }
+    },
 
-    OptionPriority(TierPicker picker) {
-        this.picker = picker;
-    }
+    HIGH {
+        @Override
+        public List<InventoryOption> pick(List<InventoryOption> lows, List<InventoryOption> mids, List<InventoryOption> highs) {
+            return highs;
+        }
+    };
 
-    public ObjectList<InventoryOption> pick(ObjectList<InventoryOption> lows, ObjectList<InventoryOption> mids, ObjectList<InventoryOption> highs) {
-        return picker.pick(lows, mids, highs);
-    }
-}
-
-interface TierPicker {
-    ObjectList<InventoryOption> pick(ObjectList<InventoryOption> lows, ObjectList<InventoryOption> mids, ObjectList<InventoryOption> highs);
+    public abstract List<InventoryOption> pick(List<InventoryOption> lows, List<InventoryOption> mids, List<InventoryOption> highs);
 }

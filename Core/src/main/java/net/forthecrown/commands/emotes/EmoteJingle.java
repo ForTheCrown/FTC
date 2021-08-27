@@ -1,5 +1,7 @@
 package net.forthecrown.commands.emotes;
 
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
@@ -10,8 +12,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 public class EmoteJingle extends CommandEmote {
 
@@ -101,10 +101,12 @@ public class EmoteJingle extends CommandEmote {
         }, 8);
     }
 
-    private final Set<Integer> bass = new HashSet<>(Arrays.asList(
-            0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96));
-    private final Set<Integer> snare = new HashSet<>(Arrays.asList(
-            4, 20, 36, 44, 52, 68, 78, 84, 100, 104, 108, 112));
+    private final IntSet bass = new IntOpenHashSet(Arrays.asList(
+            0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96
+    ));
+    private final IntSet snare = new IntOpenHashSet(Arrays.asList(
+            4, 20, 36, 44, 52, 68, 78, 84, 100, 104, 108, 112
+    ));
     private final float midTone = 1.5f;
     private final float highTone = 1.7f;
 

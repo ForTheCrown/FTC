@@ -12,7 +12,7 @@ import static net.forthecrown.regions.RegionConstants.HALF_REGION_SIZE;
 import static net.forthecrown.regions.RegionConstants.REGION_SIZE;
 
 /**
- * Represents the position of a region pole in a 2 dimensional X Z grid.
+ * Represents the position of a region in a 2 dimensional X Z grid.
  */
 public class RegionPos {
 

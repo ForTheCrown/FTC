@@ -89,6 +89,8 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
         region.setName(newName);
         byName.put(newName, region);
 
+        getGenerator().generate(region);
+
         //Update surrounding regions
         for (int i = 0; i < 4; i++) {
             BlockFace face = BlockFace.values()[i];
@@ -114,12 +116,12 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
 
     @Override
     public void reset(PopulationRegion region, boolean resetLand) {
+        //Remove it
+        remove(region);
+
         //Reset name and pole position
         region.setName(null);
         region.setPolePosition(null);
-
-        //Remove it
-        remove(region);
 
         //TODO? idk if I should
         /*if(resetLand) {

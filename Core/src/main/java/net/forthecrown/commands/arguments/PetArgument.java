@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 public class PetArgument implements ArgumentType<Pet> {
     public static final PetArgument PET = new PetArgument();
 
-    public static final DynamicCommandExceptionType UNKOWN_PET = new DynamicCommandExceptionType(o -> () -> "Unknown pet: " + o.toString().toLowerCase());
+    public static final DynamicCommandExceptionType UNKNOWN_PET = new DynamicCommandExceptionType(o -> () -> "Unknown pet: " + o.toString().toLowerCase());
     public static final DynamicCommandExceptionType PET_NOT_OWNED = new DynamicCommandExceptionType(o -> () -> "You don't own this pet: " + o.toString().toLowerCase());
 
     public static Pet getPet(CommandContext<CommandSource> c, String argument){
@@ -50,7 +50,7 @@ public class PetArgument implements ArgumentType<Pet> {
         try {
             pet = Pet.valueOf(name.toUpperCase());
         } catch (IllegalArgumentException e){
-            throw UNKOWN_PET.createWithContext(GrenadierUtils.correctReader(reader, cursor), name);
+            throw UNKNOWN_PET.createWithContext(GrenadierUtils.correctReader(reader, cursor), name);
         }
 
         return pet;

@@ -5,7 +5,6 @@ import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -19,7 +18,7 @@ import static org.bukkit.Bukkit.getPluginManager;
 import static org.bukkit.Bukkit.getScheduler;
 
 public class RegionVisitListener implements Listener {
-    private static final byte TICKS_PER_TICK = 5; //Nice name, I know
+    public static final byte TICKS_PER_TICK = 1; //Nice name, I know
 
     private final FtcUser user;
     private final TravelEffect effect;
@@ -37,7 +36,7 @@ public class RegionVisitListener implements Listener {
         tickTask = getScheduler().runTaskTimer(Crown.inst(), this::tick, TICKS_PER_TICK, TICKS_PER_TICK);
     }
 
-    private short ticks = 60 * (20 / TICKS_PER_TICK);
+    private short ticks = 10 * (20 / TICKS_PER_TICK);
     private BukkitTask tickTask;
 
     private void tick() {
@@ -51,7 +50,7 @@ public class RegionVisitListener implements Listener {
         // otherwise the particles spawn in their face lol
         if(effect != null) {
             storedLocs.offer(user.getLocation().clone());
-            if (storedLocs.size() == 3) effect.onHulkTick(storedLocs.poll());
+            if (storedLocs.size() == 3) effect.onHulkTickDown(storedLocs.poll());
         }
     }
 

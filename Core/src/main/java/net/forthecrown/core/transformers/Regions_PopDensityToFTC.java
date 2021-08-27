@@ -3,10 +3,9 @@ package net.forthecrown.core.transformers;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import net.forthecrown.core.Crown;
-import net.forthecrown.regions.RegionPos;
 import net.forthecrown.regions.RegionManager;
+import net.forthecrown.regions.RegionPos;
 import net.forthecrown.utils.ListUtils;
-import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,15 +20,13 @@ public class Regions_PopDensityToFTC {
         File[] files = OLD_DIR.listFiles();
         if(ListUtils.isNullOrEmpty(files)) return;
 
-        Bukkit.getScheduler().runTaskAsynchronously(Crown.inst(), () -> {
-            try {
-                Regions_PopDensityToFTC transformer = new Regions_PopDensityToFTC(files, Crown.getRegionManager());
-                transformer.convert();
+        try {
+            Regions_PopDensityToFTC transformer = new Regions_PopDensityToFTC(files, Crown.getRegionManager());
+            transformer.convert();
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private final File[] oldFiles;

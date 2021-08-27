@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
@@ -26,6 +26,7 @@ public class CommandWeather extends FtcCommand {
                             WeatherType weatherType = c.getArgument("weather", WeatherType.class);
 
                             world.setStorm(weatherType == WeatherType.DOWNFALL);
+
                             source.sendAdmin(
                                     Component.text("Set weather to " + weatherType.name().toLowerCase())
                             );

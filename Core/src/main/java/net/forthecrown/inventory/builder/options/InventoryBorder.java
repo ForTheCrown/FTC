@@ -18,7 +18,7 @@ public class InventoryBorder implements InventoryOption {
     }
 
     public InventoryBorder(){
-        this.borderItem = new ItemStackBuilder(Material.GRAY_STAINED_GLASS_PANE)
+        borderItem = new ItemStackBuilder(Material.GRAY_STAINED_GLASS_PANE)
                 .setName(Component.space())
                 .build();
     }

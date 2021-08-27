@@ -19,6 +19,7 @@ public class CommandListRegions extends FtcCommand {
         super("listregions");
 
         setPermission(Permissions.REGIONS);
+        setAliases("regionlist", "regionslist", "allregions");
         setDescription("Lists all named regions");
 
         register();

@@ -21,6 +21,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -178,6 +179,8 @@ public class FtcUserActionHandler implements UserActionHandler {
                 }
             }
 
+            e.removePassenger(player);
+
             //If they're leashed by the visitor
             if(e instanceof LivingEntity) {
                 LivingEntity living = (LivingEntity) e;
@@ -221,15 +224,8 @@ public class FtcUserActionHandler implements UserActionHandler {
                 cosmetics.getActiveTravel().onHulkStart(loc);
             }
 
-            //Once they've gone up, peaked or whatever,
-            Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
-                //Teleport them over pole
-                player.teleport(teleportLoc);
-
-                //Create the listener to stop them from getting hurt
-                RegionVisitListener listener = new RegionVisitListener(user);
-                listener.beginListening();
-            }, 15);
+            //Tick task for them going up
+            new GoingUp(teleportLoc, user);
         } else {
             //Execute travel effect, if they have one
             if(cosmetics.hasActiveTravel()) {
@@ -238,6 +234,46 @@ public class FtcUserActionHandler implements UserActionHandler {
 
             //Just TP them to pole... boring
             player.teleport(teleportLoc);
+        }
+    }
+
+    private static class GoingUp implements Runnable {
+        private final Location tp;
+        private final CrownUser user;
+        private final CosmeticData cosmetics;
+
+        private final BukkitTask task;
+
+        private GoingUp(Location tp, CrownUser user) {
+            this.tp = tp;
+            this.user = user;
+            cosmetics = user.getCosmeticData();
+
+            task = Bukkit.getScheduler().runTaskTimer(Crown.inst(), this,
+                    RegionVisitListener.TICKS_PER_TICK, RegionVisitListener.TICKS_PER_TICK
+            );
+        }
+
+        byte tick = (byte) (0.75 * (20 / RegionVisitListener.TICKS_PER_TICK));
+
+        @Override
+        public void run() {
+            //If they have travel effect, run it
+            if(cosmetics.hasActiveTravel()) {
+                cosmetics.getActiveTravel().onHulkTickUp(user.getLocation());
+            }
+
+            tick--;
+
+            //If we're below the tick limit, stop and move on to fall listener
+            if(tick < 0) {
+                task.cancel();
+
+                user.getPlayer().teleport(tp);
+
+                RegionVisitListener listener = new RegionVisitListener(user);
+                listener.beginListening();
+            }
         }
     }
 }

@@ -162,7 +162,7 @@ public interface CrownUser extends
      * Gets if the user is allowed to swap branches
      * @return Whether the user is allowed to swap branches
      */
-    boolean canSwapBranch();
+    boolean canSwapFaction();
 
     /**
      * Sets if the user is allowed to swap branches

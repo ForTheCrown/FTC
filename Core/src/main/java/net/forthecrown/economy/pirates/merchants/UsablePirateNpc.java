@@ -10,7 +10,7 @@ import net.kyori.adventure.key.Keyed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-public interface  UsablePirateNpc extends Keyed, InteractableNPC {
+public interface UsablePirateNpc extends Keyed, InteractableNPC {
     void onUse(CrownUser user, Entity entity);
 
     @Override
