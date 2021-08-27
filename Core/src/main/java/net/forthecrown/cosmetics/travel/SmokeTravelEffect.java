@@ -13,7 +13,7 @@ public class SmokeTravelEffect extends TravelEffect {
                 Component.text("really.")
         );
     }
-    
+
     @Override
     public void onPoleTeleport(CrownUser user, Location from, Location pole) {
         // Little ball of smoke particles

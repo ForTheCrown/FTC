@@ -19,7 +19,7 @@ import static org.bukkit.Bukkit.getPluginManager;
 import static org.bukkit.Bukkit.getScheduler;
 
 public class RegionVisitListener implements Listener {
-    private static final byte TICKS_PER_TICK = 5; //Nice name, I know
+    private static final byte TICKS_PER_TICK = 1; //Nice name, I know
 
     private final FtcUser user;
     private final TravelEffect effect;
