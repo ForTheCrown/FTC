@@ -200,7 +200,7 @@ public class FtcUserActionHandler implements UserActionHandler {
         Location teleportLoc = new Location(
                 world,
                 poleCords.getX() + 0.5D,
-                world.getHighestBlockYAt(poleCords.getX(), poleCords.getZ()),
+                world.getHighestBlockYAt(poleCords.getX(), poleCords.getZ()) + 1,
                 poleCords.getZ() + 0.5D,
                 loc.getYaw(),
                 loc.getPitch()
@@ -229,7 +229,9 @@ public class FtcUserActionHandler implements UserActionHandler {
         } else {
             //Execute travel effect, if they have one
             if(cosmetics.hasActiveTravel()) {
-                cosmetics.getActiveTravel().onPoleTeleport(user, loc, teleportLoc.clone());
+                Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
+                    cosmetics.getActiveTravel().onPoleTeleport(user, loc, teleportLoc.clone());
+                }, 2);
             }
 
             //Just TP them to pole... boring
