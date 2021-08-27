@@ -78,7 +78,7 @@ public class UserJsonSerializer implements UserSerializer {
         JsonBuf timeStamps = JsonBuf.empty();
         timeStamps.add("nextReset", user.nextResetTime);
         timeStamps.add("lastLoad", user.lastLoad);
-        if(!user.canSwapBranch()) timeStamps.add("nextBranchSwap", user.nextAllowedBranchSwap);
+        if(!user.canSwapFaction()) timeStamps.add("nextBranchSwap", user.nextAllowedBranchSwap);
 
         json.add("timeStamps", timeStamps);
 

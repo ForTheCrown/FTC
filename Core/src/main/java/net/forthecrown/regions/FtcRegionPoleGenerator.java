@@ -10,8 +10,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 
 public class FtcRegionPoleGenerator implements RegionPoleGenerator {
 
@@ -30,7 +28,7 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
         int highestY = world.getHighestBlockYAt(place.getX(), place.getZ());
 
         //Get the center bottom the pole should be placed at
-        WorldVec3i p = RegionUtil.findBottomOfPole(new WorldVec3i(world, place.getX(), highestY, place.getZ()));
+        WorldVec3i pos = RegionUtil.findBottomOfPole(new WorldVec3i(world, place.getX(), highestY, place.getZ()));
 
         //bounding box for the region pole
         FtcBoundingBox box = FtcBoundingBox.of(region.getWorld(), region.getPoleBoundingBox());
@@ -38,54 +36,52 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
 
         //Clear area
         box.forEach(b -> b.setType(Material.AIR, false));
-        box.getEntitiesByType(Item.class).forEach(Entity::remove);
 
         //Go to the top and place the sea lantern
-        p.above(3);
-        p.getBlock().setType(Material.SEA_LANTERN);
+        pos.above(3);
+        pos.getBlock().setType(Material.SEA_LANTERN);
 
         //Place the help signs on the side
-        generateSideText(p.clone().inDirection(BlockFace.WEST), BlockFace.WEST);
-        generateSideText(p.clone().inDirection(BlockFace.EAST), BlockFace.EAST);
+        generateSideText(pos.clone().inDirection(BlockFace.WEST), BlockFace.WEST);
+        generateSideText(pos.clone().inDirection(BlockFace.EAST), BlockFace.EAST);
 
         //Place region name
-        p.above();
-        generateRegionName(p.clone(), region);
+        pos.above();
+        generateRegionName(pos.clone(), region);
 
         //Place first glowstone
-        p.below(2);
-        p.getBlock().setType(Material.GLOWSTONE);
+        pos.below(2);
+        pos.getBlock().setType(Material.GLOWSTONE);
 
         //Next region signs
-        generateNextRegion(p.clone().inDirection(BlockFace.NORTH), BlockFace.NORTH, BlockFace.EAST, region.getPos());
-        generateNextRegion(p.clone().inDirection(BlockFace.SOUTH), BlockFace.SOUTH, BlockFace.WEST, region.getPos());
-        generateNextRegion(p.clone().inDirection(BlockFace.WEST), BlockFace.WEST, BlockFace.NORTH, region.getPos());
-        generateNextRegion(p.clone().inDirection(BlockFace.EAST), BlockFace.EAST, BlockFace.SOUTH, region.getPos());
+        generateNextRegion(pos.clone().inDirection(BlockFace.NORTH), BlockFace.NORTH, BlockFace.EAST, region.getPos());
+        generateNextRegion(pos.clone().inDirection(BlockFace.SOUTH), BlockFace.SOUTH, BlockFace.WEST, region.getPos());
+        generateNextRegion(pos.clone().inDirection(BlockFace.WEST), BlockFace.WEST, BlockFace.NORTH, region.getPos());
+        generateNextRegion(pos.clone().inDirection(BlockFace.EAST), BlockFace.EAST, BlockFace.SOUTH, region.getPos());
 
         //Place final glowstone
-        p.below();
-        p.getBlock().setType(Material.GLOWSTONE);
-        p.below();
+        pos.below();
+        pos.getBlock().setType(Material.GLOWSTONE);
 
         //Get min bottom of pole
-        p.subtract(2, 0, 2);
+        pos.subtract(2, 1, 2);
 
         //Place the base
         for (int index = 0; index < 25; index++) {
             int x = index / 5;
             int z = index % 5;
 
-            WorldVec3i pos = p.clone().add(x, 0, z);
-            Block block = pos.getBlock();
+            WorldVec3i pos1 = pos.clone().add(x, 0, z);
+            Block block = pos1.getBlock();
 
             block.setType(Material.STONE_BRICKS);
         }
 
         //Set corner blocks
-        p.getBlock().setType(Material.CHISELED_STONE_BRICKS);
-        p.add(0, 0, 4).getBlock().setType(Material.CHISELED_STONE_BRICKS);
-        p.add(4, 0, 0).getBlock().setType(Material.CHISELED_STONE_BRICKS);
-        p.subtract(0, 0, 4).getBlock().setType(Material.CHISELED_STONE_BRICKS);
+        pos.getBlock().setType(Material.CHISELED_STONE_BRICKS);
+        pos.add(0, 0, 4).getBlock().setType(Material.CHISELED_STONE_BRICKS);
+        pos.add(4, 0, 0).getBlock().setType(Material.CHISELED_STONE_BRICKS);
+        pos.subtract(0, 0, 4).getBlock().setType(Material.CHISELED_STONE_BRICKS);
     }
 
     @Override

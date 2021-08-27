@@ -72,8 +72,9 @@ public class CommandRoyals extends FtcCommand {
                                     Player player = getPlayerSender(c);
                                     ItemStack item = player.getInventory().getItemInMainHand();
 
-                                    if(item == null || item.getType() != Material.GOLDEN_APPLE || !item.hasItemMeta() || item.getItemMeta().displayName() == null)
+                                    if(item == null || item.getType() != Material.GOLDEN_APPLE || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
                                         throw FtcExceptionProvider.create("You must be holding a boss apple!");
+                                    }
 
                                     ItemMeta meta = item.getItemMeta();
                                     Component display = item.getItemMeta().displayName();

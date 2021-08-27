@@ -39,7 +39,7 @@ public interface CrownEvent<T extends EventEntry> {
      * Method to call when ending an event
      * @param entry The entry to end the event for
      */
-    void end(T  entry);
+    void end(T entry);
 
     /**
      * Method for when someone passes an event successfully

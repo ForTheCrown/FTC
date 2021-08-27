@@ -54,6 +54,10 @@ public class RegistryArguments<T> implements ArgumentType<T> {
         return DEATH_EFFECT;
     }
 
+    public static RegistryArguments<TravelEffect> travelEffect() {
+        return TRAVEL_EFFECT;
+    }
+
     public static RegistryArguments<DungeonBoss<?>> dungeonBoss() {
         return DUNGEON_BOSS;
     }
@@ -80,10 +84,6 @@ public class RegistryArguments<T> implements ArgumentType<T> {
 
     public static UsageCheck getCheck(CommandContext<CommandSource> c, String arg) {
         return c.getArgument(arg, UsageCheck.class);
-    }
-
-    public static RegistryArguments<TravelEffect> travelEffect() {
-        return TRAVEL_EFFECT;
     }
 
     private final Registry<T> registry;

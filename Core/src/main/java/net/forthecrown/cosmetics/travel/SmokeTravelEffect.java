@@ -56,9 +56,15 @@ public class SmokeTravelEffect extends TravelEffect {
     }
 
     @Override
-    public void onHulkTick(Location loc) {
+    public void onHulkTickDown(Location loc) {
         // Smokes following user
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.add(0, 1.2, 0), 2, 0, 0, 0, 0);
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.add(0, 2, 0), 2, 0, 0, 0, 0);
+    }
+
+    @Override
+    public void onHulkTickUp(Location loc) {
+        // Smokes following user
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 2, 0, 0, 0, 0);
     }
 
     @Override

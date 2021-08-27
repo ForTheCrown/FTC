@@ -6,9 +6,9 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import net.forthecrown.user.enums.Faction;
 import org.jetbrains.annotations.Nullable;
 
-public class BranchFlag extends Flag<Faction> {
+public class FactionFlag extends Flag<Faction> {
 
-    public BranchFlag(String name) {
+    public FactionFlag(String name) {
         super(name);
     }
 

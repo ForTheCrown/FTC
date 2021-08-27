@@ -45,7 +45,6 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
         Crown.logger().info("Announcer loaded");
     }
 
-
     @Override
     protected void save(final JsonBuf json) {
         json.add("delay", delay.getValue());
@@ -60,7 +59,6 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
     @Override
     protected void reload(final JsonBuf json) {
-        if(!fileExists) return;
         delay.setValue(json.get("delay").getAsShort());
 
         JsonArray array = json.getArray("announcements");
@@ -70,7 +68,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
         }
     }
 
-    public void doBroadcasts(){
+    public void doBroadcasts() {
         Crown.logger().info("Starting announcer");
         broadcaster = new BukkitRunnable() {
             int counter = 0;

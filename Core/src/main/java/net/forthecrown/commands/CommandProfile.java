@@ -111,7 +111,7 @@ public class CommandProfile extends FtcCommand {
 
                 .append(line("AFK", afkMessage, afkMessage != null))
 
-                .append(line("Allowed to swap branches in", timeThing(profile), !profile.canSwapBranch() && (self || sender.hasPermission(Permissions.PROFILE_BYPASS))))
+                .append(line("Allowed to swap branches in", timeThing(profile), !profile.canSwapFaction() && (self || sender.hasPermission(Permissions.PROFILE_BYPASS))))
                 .append(line("Play time", FtcFormatter.decimalizeNumber(playTime) + " hours", playTime > 0))
                 .append(line("Married to", marriedTo, marriedTo != null))
 

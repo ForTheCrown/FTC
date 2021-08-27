@@ -277,7 +277,7 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public boolean canSwapBranch() {
+    public boolean canSwapFaction() {
         checkBranchSwapping();
         return !hasProperty(UserPref.CANNOT_SWAP_BRANCH);
     }
@@ -646,7 +646,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public boolean performBranchSwappingCheck(){
-        if(canSwapBranch()) return true;
+        if(canSwapFaction()) return true;
 
         final long timUntil = getNextAllowedBranchSwap() - System.currentTimeMillis();
 

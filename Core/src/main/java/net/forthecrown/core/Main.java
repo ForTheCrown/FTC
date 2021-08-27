@@ -50,7 +50,7 @@ import static net.forthecrown.utils.FtcUtils.safeRunnable;
 public final class Main extends JavaPlugin implements Crown {
 
     //Hacky way of determining if we're on the test server or not
-    public static ComVar<Boolean> inDebugMode;
+    public static ComVar<Boolean>   inDebugMode;
 
     static Main                     inst;
 

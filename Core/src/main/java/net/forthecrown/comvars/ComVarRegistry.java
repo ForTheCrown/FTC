@@ -2,12 +2,12 @@ package net.forthecrown.comvars;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.comvars.types.ComVarType;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  */
 public class ComVarRegistry {
     public static final Pattern ALLOWED_NAME = Pattern.compile("^[a-z_]\\w*$");
-    private static final Map<String, ComVar<?>> COM_VARS = new HashMap<>();
+    private static final Object2ObjectMap<String, ComVar<?>> COM_VARS = new Object2ObjectOpenHashMap<>();
 
     public static <T> ComVar<T> set(@NotNull String name, @NotNull ComVarType<T> type, T value){
         validate(name, type);

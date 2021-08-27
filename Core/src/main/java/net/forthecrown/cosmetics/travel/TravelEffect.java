@@ -21,7 +21,8 @@ public abstract class TravelEffect extends CosmeticEffect {
     public abstract void onPoleTeleport(CrownUser user, Location from, Location pole);
 
     public abstract void onHulkStart(Location loc);
-    public abstract void onHulkTick(Location loc);
+    public abstract void onHulkTickDown(Location loc);
+    public abstract void onHulkTickUp(Location loc);
     public abstract void onHulkLand(Location landing);
 
     @Override

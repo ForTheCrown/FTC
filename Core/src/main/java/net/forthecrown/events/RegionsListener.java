@@ -7,17 +7,28 @@ import net.forthecrown.regions.RegionPos;
 import net.forthecrown.utils.Worlds;
 import net.minecraft.core.BlockPos;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 public class RegionsListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if(event.getPlayer().hasPermission(Permissions.REGIONS_ADMIN)) return;
-        if(!event.getPlayer().getWorld().equals(Worlds.OVERWORLD)) return;
+        eventLogic(event.getPlayer(), event.getBlock(), event);
+    }
 
-        Block block = event.getBlock();
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        eventLogic(event.getPlayer(), event.getBlock(), event);
+    }
+
+    private void eventLogic(Player player, Block block, Cancellable event) {
+        if(player.hasPermission(Permissions.REGIONS_ADMIN)) return;
+        if(!player.getWorld().equals(Worlds.OVERWORLD)) return;
+
         PopulationRegion region = Crown.getRegionManager().get(RegionPos.fromAbsolute(block.getX(), block.getZ()));
 
         if(region.getPoleBoundingBox().isInside(new BlockPos(block.getX(), block.getY(), block.getZ()))) {

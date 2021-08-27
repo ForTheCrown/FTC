@@ -33,7 +33,7 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
 
         CrownUser user = UserManager.getUser(player);
         SignShopSession session = getOrCreateSession(user, shop);
-        ShopInteraction interaction = session.getType().getInteraction();
+        ShopInteraction interaction = shop.getType().getInteraction();
 
         //If not already on cooldown, add to cooldown
         if(!isOnExpiryCooldown(session)) doSessionExpiryCooldown(session);

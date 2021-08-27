@@ -214,8 +214,9 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
      */
     public Message suggestionTooltip() {
         if(description != null) return GrenadierUtils.componentToMessage(description);
+        BlockVector2 polePos = getPolePosition();
 
-        return new LiteralMessage("x: " + pos.getCenterX() + ", z: " + pos.getCenterZ());
+        return new LiteralMessage("x: " + polePos.getX() + ", z: " + polePos.getZ());
     }
 
     /**

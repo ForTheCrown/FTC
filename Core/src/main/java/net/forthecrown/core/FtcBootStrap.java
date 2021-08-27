@@ -7,6 +7,7 @@ import net.forthecrown.core.admin.jails.FtcJailManager;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.CrownKingship;
 import net.forthecrown.core.transformers.Balances_YamlToJson;
+import net.forthecrown.core.transformers.Regions_PopDensityToFTC;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.CrownBalances;
@@ -59,10 +60,8 @@ public final class FtcBootStrap {
         Balances_YamlToJson.checkAndRun();
         Main.balances = new CrownBalances();
 
-        if(Crown.inDebugMode()) {
-            Main.regionManager = new FtcRegionManager(Worlds.OVERWORLD);
-            //Regions_PopDensityToFTC.checkAndRun();
-        }
+        Main.regionManager = new FtcRegionManager(Worlds.OVERWORLD);
+        Regions_PopDensityToFTC.checkAndRun();
 
         //Instantiate default shop templates
         safeRunnable(ShopTemplates::init);

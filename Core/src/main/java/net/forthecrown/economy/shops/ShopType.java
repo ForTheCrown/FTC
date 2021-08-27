@@ -10,8 +10,9 @@ import org.jetbrains.annotations.NotNull;
 public enum ShopType {
 
     SELL(ShopManager.SELL_LABEL, ShopManager.NORMAL_STYLE, false, new SellInteraction()),
-    BUY(ShopManager.BUY_LABEL, ShopManager.NORMAL_STYLE, false, new BuyInteraction()),
     ADMIN_SELL(ShopManager.SELL_LABEL, ShopManager.ADMIN_STYLE, true, new AdminSellInteraction()),
+
+    BUY(ShopManager.BUY_LABEL, ShopManager.NORMAL_STYLE, false, new BuyInteraction()),
     ADMIN_BUY(ShopManager.BUY_LABEL, ShopManager.ADMIN_STYLE, true, new AdminBuyInteraction());
 
     private final Component inStock;
