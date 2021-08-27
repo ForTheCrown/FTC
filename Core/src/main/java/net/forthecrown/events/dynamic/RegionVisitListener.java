@@ -4,11 +4,16 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.LinkedList;
+import java.util.Queue;
 
 import static org.bukkit.Bukkit.getPluginManager;
 import static org.bukkit.Bukkit.getScheduler;
@@ -17,9 +22,12 @@ public class RegionVisitListener implements Listener {
     private static final byte TICKS_PER_TICK = 5; //Nice name, I know
 
     private final FtcUser user;
+    private final TravelEffect effect;
+    private final Queue<Location> storedLocs = new LinkedList<>();
 
     public RegionVisitListener(CrownUser user) {
         this.user = (FtcUser) user;
+        this.effect = user.getCosmeticData().getActiveTravel();
     }
 
     public void beginListening() {
@@ -39,8 +47,12 @@ public class RegionVisitListener implements Listener {
             return;
         }
 
-        TravelEffect effect = user.getCosmeticData().getActiveTravel();
-        if(effect != null) effect.onHulkTick(user.getLocation());
+        // Using queue to make locations lag behind player,
+        // otherwise the particles spawn in their face lol
+        if(effect != null) {
+            storedLocs.offer(user.getLocation().clone());
+            if (storedLocs.size() == 3) effect.onHulkTick(storedLocs.poll());
+        }
     }
 
     public void unregister() {
@@ -51,6 +63,8 @@ public class RegionVisitListener implements Listener {
 
         TravelEffect effect = user.getCosmeticData().getActiveTravel();
         if(effect != null) effect.onHulkLand(user.getLocation());
+
+        storedLocs.clear();
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -11,8 +11,11 @@ public final class TravelEffects {
 
     private static BuiltInventory INVENTORY;
 
+    public static TravelEffect SMOKE;
+
     public static void init() {
         //Register here with register() method :D
+        SMOKE = register(new SmokeTravelEffect());
 
         //Final thing
         Registries.TRAVEL_EFFECTS.close();
