@@ -4,17 +4,17 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public interface MarketShops {
-    MarketShop get(UUID owner);
-    MarketShop get(String claimName);
+public interface MarketRegion {
+    FtcMarketShop get(UUID owner);
+    FtcMarketShop get(String claimName);
 
-    void add(MarketShop claim);
+    void add(FtcMarketShop claim);
 
-    void attemptPurchase(MarketShop claim, Player player);
+    void attemptPurchase(FtcMarketShop claim, Player player);
 
     void eject(UUID owner);
 
-    default void remove(MarketShop s) {
+    default void remove(FtcMarketShop s) {
         remove(s.getWorldGuardRegion().getId());
     }
 

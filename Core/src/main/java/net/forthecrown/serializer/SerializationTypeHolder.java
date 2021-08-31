@@ -4,13 +4,13 @@ import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 
 public interface SerializationTypeHolder<T> {
-    SerializerType<? extends T> serializerType();
+    SerializerType<? extends T> getType();
 
     default SerializerType<T> normalSerializerType() {
-        return (SerializerType<T>) serializerType();
+        return (SerializerType<T>) getType();
     }
 
     default @NotNull Key serializerKey() {
-        return serializerType().key();
+        return getType().key();
     }
 }

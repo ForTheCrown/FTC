@@ -98,6 +98,9 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
 
             getGenerator().generate(update);
         }
+
+        //Drop any possibly unimportant regions we might've just created
+        dropUnimportantRegions();
     }
 
     @Override

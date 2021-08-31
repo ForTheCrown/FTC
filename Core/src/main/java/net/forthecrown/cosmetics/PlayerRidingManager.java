@@ -32,7 +32,7 @@ public class PlayerRidingManager implements Listener {
     static final Location RETREAT_LOCATION = new Location(Bukkit.getWorld("world"), 200.5, 71, 1000.5);
 
     PlayerRidingManager(){
-        this.riders = new ObjectArraySet<>();
+        riders = new ObjectArraySet<>();
         Bukkit.getPluginManager().registerEvents(this, Crown.inst());
 
         Crown.logger().info("Player Riding Manager loaded");
@@ -105,8 +105,10 @@ public class PlayerRidingManager implements Listener {
 
     public void stopAllRiding() {
         Set<PlayerRider> riders = getRiders();
-        for (PlayerRider r: riders)
+
+        for (PlayerRider r: riders) {
             r.stopRiding();
+        }
     }
 
     public PlayerRider getByRider(Player player){

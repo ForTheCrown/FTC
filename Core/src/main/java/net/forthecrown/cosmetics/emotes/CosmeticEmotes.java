@@ -8,7 +8,9 @@ import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.text.Component;
 
-public class CosmeticEmotes {
+public final class CosmeticEmotes {
+    private CosmeticEmotes() {}
+
     private static BuiltInventory INVENTORY;
 
     public static CosmeticEmote BONK;

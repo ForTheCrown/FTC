@@ -1,9 +1,9 @@
 package net.forthecrown.inventory.builder.options;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.user.CrownUser;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +34,7 @@ public class SimpleOption implements InventoryOption {
     }
 
     @Override
-    public void place(Inventory inventory, CrownUser user) {
+    public void place(FtcInventory inventory, CrownUser user) {
         inventory.setItem(slot, item.clone());
     }
 

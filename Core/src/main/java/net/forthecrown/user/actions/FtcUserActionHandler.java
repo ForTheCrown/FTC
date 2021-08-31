@@ -230,7 +230,7 @@ public class FtcUserActionHandler implements UserActionHandler {
             //Execute travel effect, if they have one
             if(cosmetics.hasActiveTravel()) {
                 Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
-                    cosmetics.getActiveTravel().onPoleTeleport(user, loc, teleportLoc.clone());
+                    cosmetics.getActiveTravel().onPoleTeleport(loc, teleportLoc.clone());
                 }, 2);
             }
 

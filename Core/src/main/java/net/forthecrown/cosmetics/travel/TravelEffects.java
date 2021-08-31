@@ -19,15 +19,16 @@ public final class TravelEffects {
 
         //Final thing
         Registries.TRAVEL_EFFECTS.close();
-        INVENTORY = CosmeticConstants.baseInventory(54, Component.text("Region pole effects"), true)
+        INVENTORY = CosmeticConstants.baseInventory(36, Component.text("Region pole effects"), true)
                 .addAll(Registries.TRAVEL_EFFECTS)
+                .add(CosmeticConstants.NO_TRAVEL)
                 .build();
 
         Crown.logger().info("Travel effects registered");
     }
 
-    private static <T extends TravelEffect> T register(T val) {
-        return (T) Registries.TRAVEL_EFFECTS.register(val.key(), val);
+    private static TravelEffect register(TravelEffect val) {
+        return Registries.TRAVEL_EFFECTS.register(val.key(), val);
     }
 
     public static BuiltInventory getInventory() {

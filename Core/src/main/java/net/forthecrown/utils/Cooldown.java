@@ -31,12 +31,7 @@ public final class Cooldown {
         Validate.notNull(sender, "Sender was null");
         Validate.notNull(category, "Category was null");
 
-        if(COOLDOWN_MAP.get(category) == null){
-            COOLDOWN_MAP.put(category, new HashSet<>());
-            return false;
-        }
-
-        return COOLDOWN_MAP.get(category).contains(sender);
+        return COOLDOWN_MAP.computeIfAbsent(category, k -> new HashSet<>()).contains(sender);
     }
 
     public static boolean containsOrAdd(CommandSender sender, @Nonnegative int ticks) {
@@ -67,11 +62,8 @@ public final class Cooldown {
         Validate.notNull(sender, "Sender was null");
         Validate.notNull(category, "Category was null");
 
-        COOLDOWN_MAP.computeIfAbsent(category, k -> new HashSet<>());
-
-        Set<CommandSender> set = COOLDOWN_MAP.get(category);
+        Set<CommandSender> set = COOLDOWN_MAP.computeIfAbsent(category, k -> new HashSet<>());
         set.add(sender);
-        COOLDOWN_MAP.put(category, set);
 
         if(timeInTicks != -1){
             Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> remove(sender, category), timeInTicks);
@@ -86,14 +78,8 @@ public final class Cooldown {
         Validate.notNull(sender, "Sender was null");
         Validate.notNull(category, "Category was null");
 
-        if(COOLDOWN_MAP.get(category) == null){
-            COOLDOWN_MAP.put(category, new HashSet<>());
-            return;
-        }
-
-        Set<CommandSender> set1 = COOLDOWN_MAP.get(category);
+        Set<CommandSender> set1 = COOLDOWN_MAP.computeIfAbsent(category, k -> new HashSet<>());
         set1.remove(sender);
-        COOLDOWN_MAP.put(category, set1);
     }
 
     public static Set<CommandSender> getCategory(String s){

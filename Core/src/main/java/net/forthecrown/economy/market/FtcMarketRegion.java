@@ -17,11 +17,11 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.UUID;
 
-public class FtcMarketShops extends AbstractJsonSerializer implements MarketShops {
-    private final Object2ObjectMap<UUID, MarketShop> byOwner = new Object2ObjectOpenHashMap<>();
-    private final Object2ObjectMap<String, MarketShop> byName = new Object2ObjectOpenHashMap<>();
+public class FtcMarketRegion extends AbstractJsonSerializer implements MarketRegion {
+    private final Object2ObjectMap<UUID, FtcMarketShop> byOwner = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectMap<String, FtcMarketShop> byName = new Object2ObjectOpenHashMap<>();
 
-    public FtcMarketShops() {
+    public FtcMarketRegion() {
         super("market_shops");
 
         reload();
@@ -30,7 +30,7 @@ public class FtcMarketShops extends AbstractJsonSerializer implements MarketShop
 
     @Override
     protected void save(JsonBuf json) {
-        for (MarketShop s: byName.values()) {
+        for (FtcMarketShop s: byName.values()) {
             json.add(s.getWorldGuardRegion().getId(), s);
         }
     }
@@ -40,28 +40,28 @@ public class FtcMarketShops extends AbstractJsonSerializer implements MarketShop
         clear();
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()) {
-            add(new MarketShop(e.getValue(), e.getKey()));
+            add(new FtcMarketShop(e.getValue(), e.getKey()));
         }
     }
 
     @Override
-    public MarketShop get(UUID owner) {
+    public FtcMarketShop get(UUID owner) {
         return byOwner.get(owner);
     }
 
     @Override
-    public MarketShop get(String claimName) {
+    public FtcMarketShop get(String claimName) {
         return byName.get(claimName);
     }
 
     @Override
-    public void add(MarketShop claim) {
+    public void add(FtcMarketShop claim) {
         byName.put(claim.getWorldGuardRegion().getId(), claim);
         if(claim.getOwner() != null) byOwner.put(claim.getOwner(), claim);
     }
 
     @Override
-    public void attemptPurchase(MarketShop claim, Player player) {
+    public void attemptPurchase(FtcMarketShop claim, Player player) {
         CrownUser user = UserManager.getUser(player);
         Balances balances = Crown.getBalances();
 
@@ -77,7 +77,7 @@ public class FtcMarketShops extends AbstractJsonSerializer implements MarketShop
 
     @Override
     public void eject(UUID owner) {
-        MarketShop shop = get(owner);
+        FtcMarketShop shop = get(owner);
         Validate.notNull(shop, "Given UUID does not own any market shops");
 
         shop.unclaim();
@@ -86,7 +86,7 @@ public class FtcMarketShops extends AbstractJsonSerializer implements MarketShop
 
     @Override
     public void remove(String name) {
-        MarketShop shop = get(name);
+        FtcMarketShop shop = get(name);
 
         byName.remove(name);
         if(shop.getOwner() != null) byOwner.remove(shop.getOwner());

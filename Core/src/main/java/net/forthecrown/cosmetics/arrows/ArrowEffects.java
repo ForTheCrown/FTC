@@ -7,7 +7,8 @@ import net.forthecrown.registry.Registries;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Particle;
 
-public class ArrowEffects {
+public final class ArrowEffects {
+    private ArrowEffects() {}
 
     private static BuiltInventory INVENTORY;
 

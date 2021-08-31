@@ -6,13 +6,13 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -84,8 +84,8 @@ public class BuiltInventory implements InventoryHolder {
         user.getPlayer().openInventory(inventory);
     }
 
-    public Inventory createInventory(CrownUser user){
-        Inventory inv = Bukkit.createInventory(this, size, title);
+    public FtcInventory createInventory(CrownUser user){
+        FtcInventory inv = FtcInventory.of(this, size, title);
 
         ObjectList<InventoryOption> lows = new ObjectArrayList<>();
         ObjectList<InventoryOption> mids = new ObjectArrayList<>();

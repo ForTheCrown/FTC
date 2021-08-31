@@ -90,7 +90,7 @@ public class RankInventory {
     }
 
     private Inventory getBaseInventory(Faction faction, String title){
-        CustomInventoryHolder holder = new CustomInventoryHolder(FtcFormatter.translateHexCodes(title), 54);
+        CustomInventoryHolder holder = new CustomInventoryHolder(FtcFormatter.formatColorCodes(title), 54);
         Inventory inventory = holder.getInventory();
 
         inventory.setItem(8, CrownItems.makeItem(Material.PAPER, 1, true, "&eNext page >"));

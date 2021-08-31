@@ -2,9 +2,10 @@ package net.forthecrown.economy.selling;
 
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.ClickContext;
-import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.inventory.builder.InventoryPos;
+import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.SoldMaterialData;
 import net.forthecrown.user.enums.SellAmount;
@@ -12,7 +13,6 @@ import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class ItemSellOption implements CordedInventoryOption {
@@ -43,7 +43,7 @@ public class ItemSellOption implements CordedInventoryOption {
     }
 
     @Override
-    public void place(Inventory inventory, CrownUser user) {
+    public void place(FtcInventory inventory, CrownUser user) {
         inventory.setItem(getSlot(), makeItem(user.getMatData(getMaterial()), user.getSellAmount()));
     }
 

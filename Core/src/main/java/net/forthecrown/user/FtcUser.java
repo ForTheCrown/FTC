@@ -279,12 +279,12 @@ public class FtcUser implements CrownUser {
     @Override
     public boolean canSwapFaction() {
         checkBranchSwapping();
-        return !hasProperty(UserPref.CANNOT_SWAP_BRANCH);
+        return !hasPref(UserPref.CANNOT_SWAP_BRANCH);
     }
 
     @Override
     public void setCanSwapBranch(boolean canSwapBranch, boolean addToCooldown) {
-        setProperty(!canSwapBranch, UserPref.CANNOT_SWAP_BRANCH);
+        setPref(!canSwapBranch, UserPref.CANNOT_SWAP_BRANCH);
 
         if(addToCooldown) nextAllowedBranchSwap = System.currentTimeMillis() + ComVars.getBranchSwapCooldown();
         else nextAllowedBranchSwap = 0;
@@ -296,33 +296,18 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public boolean hasProperty(UserPref property){
+    public boolean hasPref(UserPref property){
         return properties.contains(property);
     }
 
     @Override
-    public void addProperty(UserPref property){
+    public void addPref(UserPref property){
         properties.add(property);
     }
 
     @Override
-    public void removeProperty(UserPref property){
+    public void removePref(UserPref property){
         properties.remove(property);
-    }
-
-    @Override
-    public void setProperty(boolean add, UserPref property){
-        if(add) properties.add(property);
-        else properties.remove(property);
-    }
-
-    @Override
-    public boolean allowsRiding() {
-        return !hasProperty(UserPref.FORBIDS_RIDING);
-    }
-    @Override
-    public void setAllowsRiding(boolean allows) {
-        setProperty(!allows, UserPref.FORBIDS_RIDING);
     }
 
     @Override
@@ -336,15 +321,6 @@ public class FtcUser implements CrownUser {
     @Override
     public void addGems(int gems){
         this.gems += gems;
-    }
-
-    @Override
-    public boolean allowsEmotes() {
-        return !hasProperty(UserPref.FORBIDS_EMOTES);
-    }
-    @Override
-    public void setAllowsEmotes(boolean allowsEmotes) {
-        setProperty(!allowsEmotes, UserPref.FORBIDS_EMOTES);
     }
 
     @Override
@@ -469,7 +445,7 @@ public class FtcUser implements CrownUser {
     @Override
     public void sendMessage(UUID sender, @Nonnull String message) {
         if(!isOnline()) return;
-        getOnlineHandle().sendMessage(sender, FtcFormatter.translateHexCodes(message));
+        getOnlineHandle().sendMessage(sender, FtcFormatter.formatColorCodes(message));
     }
 
     @Override
@@ -533,16 +509,6 @@ public class FtcUser implements CrownUser {
     @Override
     public void delete() {
         Crown.getUserSerializer().delete(getUniqueId());
-    }
-
-    @Override
-    public boolean isProfilePublic() {
-        return !hasProperty(UserPref.PROFILE_PRIVATE);
-    }
-
-    @Override
-    public void setProfilePublic(boolean publicProfile) {
-        setProperty(!publicProfile, UserPref.PROFILE_PRIVATE);
     }
 
     @Nonnull
@@ -1199,7 +1165,7 @@ public class FtcUser implements CrownUser {
     }
 
     private void checkBranchSwapping(){
-        setProperty(nextAllowedBranchSwap != 0 && nextAllowedBranchSwap <= System.currentTimeMillis(), UserPref.CANNOT_SWAP_BRANCH);
+        setPref(nextAllowedBranchSwap != 0 && nextAllowedBranchSwap <= System.currentTimeMillis(), UserPref.CANNOT_SWAP_BRANCH);
     }
 
     protected void sendPacket(Packet<?> packet){

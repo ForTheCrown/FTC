@@ -17,7 +17,6 @@ import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -64,7 +63,7 @@ public class HomeArgument implements ArgumentType<HomeParseResult> {
         List<String> suggestions = new ArrayList<>();
 
         if(source.hasPermission(Permissions.HOME_OTHERS)){
-            suggestions.addAll(ListUtils.convert(Bukkit.getOnlinePlayers(), Player::getName));
+            suggestions.addAll(ListUtils.convert(Bukkit.getOnlinePlayers(), plr -> plr.getName() + ':'));
 
             if(remaining.contains(":")){
                 String name = remaining.substring(0, remaining.indexOf(':'));

@@ -87,7 +87,7 @@ public abstract class CosmeticEffect implements JsonSerializable, Keyed, CordedI
                 .append(getName())
                 .append(getDescription())
                 .append(getPos())
-                .append(key)
+                .append(key())
                 .toHashCode();
     }
 

@@ -1,5 +1,7 @@
 package net.forthecrown.utils;
 
+import com.sk89q.worldedit.bukkit.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.math.MathUtil;
 import net.kyori.adventure.text.Component;
@@ -36,13 +38,15 @@ public class ItemStackBuilder implements Cloneable {
     private boolean ignoreEnchantRestrictions = true;
     private boolean unbreakable = false;
 
-    private List<Component> lores = new ArrayList<>();
-    private List<PotionEffect> effects = new ArrayList<>();
-    private PotionData baseEffect = null;
+    private List<Component> lores = new ObjectArrayList<>();
+    private List<PotionEffect> effects = new ObjectArrayList<>();
 
-    private Map<Attribute, AttributeModifier> modifiers = new HashMap<>();
-    private Map<NamespacedKey, Byte> persistentData = new HashMap<>();
-    private Map<Enchantment, Integer> enchants = new HashMap<>();
+    private PotionData baseEffect = null;
+    private boolean ambientEffects = true;
+
+    private Map<Attribute, AttributeModifier> modifiers = new Object2ObjectOpenHashMap<>();
+    private Map<NamespacedKey, Byte> persistentData = new Object2ObjectOpenHashMap<>();
+    private Map<Enchantment, Integer> enchants = new Object2ObjectOpenHashMap<>();
     private CompoundTag tags = new CompoundTag();
 
     public ItemStackBuilder(Material material){
@@ -126,12 +130,20 @@ public class ItemStackBuilder implements Cloneable {
     }
 
     public ItemStackBuilder addLore(Component lore) {
-        this.lores.add(lore);
+        this.lores.add(ChatUtils.renderIfTranslatable(lore));
+        return this;
+    }
+
+    public ItemStackBuilder addLore(Iterable<Component> lore) {
+        for (Component c: lore) {
+            lores.add(ChatUtils.renderIfTranslatable(c));
+        }
+
         return this;
     }
 
     public ItemStackBuilder setLore(List<Component> lores) {
-        this.lores = lores;
+        this.lores = ListUtils.convert(lores, ChatUtils::renderIfTranslatable);
         return this;
     }
 
@@ -140,7 +152,7 @@ public class ItemStackBuilder implements Cloneable {
     }
 
     public ItemStackBuilder setName(Component name) {
-        this.name = name;
+        this.name = ChatUtils.renderIfTranslatable(name);
         return this;
     }
 
@@ -247,6 +259,15 @@ public class ItemStackBuilder implements Cloneable {
         return tags;
     }
 
+    public boolean ambientEffects() {
+        return ambientEffects;
+    }
+
+    public ItemStackBuilder setAmbientEffects(boolean ambientEffects) {
+        this.ambientEffects = ambientEffects;
+        return this;
+    }
+
     public ItemStack build() {
         ItemStack result = new ItemStack(material, amount);
         ItemMeta meta = result.getItemMeta();
@@ -276,7 +297,7 @@ public class ItemStackBuilder implements Cloneable {
         if(!ListUtils.isNullOrEmpty(effects)){
             PotionMeta meta1 = (PotionMeta) meta;
             for (PotionEffect e: effects){
-                meta1.addCustomEffect(e, true);
+                meta1.addCustomEffect(e, ambientEffects);
             }
         }
 

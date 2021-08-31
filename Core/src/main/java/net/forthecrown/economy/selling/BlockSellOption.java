@@ -1,6 +1,7 @@
 package net.forthecrown.economy.selling;
 
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.user.CrownUser;
@@ -8,7 +9,6 @@ import net.forthecrown.user.data.SoldMaterialData;
 import net.forthecrown.user.enums.SellAmount;
 import net.forthecrown.utils.ItemStackBuilder;
 import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class BlockSellOption implements InventoryOption {
@@ -51,7 +51,7 @@ public class BlockSellOption implements InventoryOption {
     }
 
     @Override
-    public void place(Inventory inventory, CrownUser user) {
+    public void place(FtcInventory inventory, CrownUser user) {
         inventory.setItem(getSlot(), makeItem(user.getMatData(getActualMat()), user.getSellAmount(), getBlockMat(), getScalar()));
     }
 

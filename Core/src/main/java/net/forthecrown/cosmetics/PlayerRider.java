@@ -45,7 +45,10 @@ public class PlayerRider implements Listener {
 
         nms.moveTo(loc.getX(), loc.getY(), loc.getZ());
 
-        nms.setInvisible(true);
+        //Invisible
+        nms.persistentInvisibility = true;
+        nms.setSharedFlag(5, true);
+
         nms.setInvulnerable(true);
         nms.setNoGravity(true);
         nms.setCustomName(new TextComponent(rider.getName() + '_' + ridden.getName()));

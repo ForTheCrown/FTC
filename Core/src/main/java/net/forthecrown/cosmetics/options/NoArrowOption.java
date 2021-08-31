@@ -2,6 +2,7 @@ package net.forthecrown.cosmetics.options;
 
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.user.CrownUser;
@@ -11,7 +12,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 
 public class NoArrowOption implements InventoryOption {
@@ -21,7 +21,7 @@ public class NoArrowOption implements InventoryOption {
     }
 
     @Override
-    public void place(Inventory inventory, CrownUser user) {
+    public void place(FtcInventory inventory, CrownUser user) {
         Style gray = FtcFormatter.nonItalic(NamedTextColor.GRAY);
 
         ItemStackBuilder builder = new ItemStackBuilder(Material.BARRIER, 1)
@@ -29,7 +29,7 @@ public class NoArrowOption implements InventoryOption {
                 .addLore(Component.text("Click to go back to default arrows").style(gray))
                 .addLore(Component.text("without any effects").style(gray));
 
-        if(user.getCosmeticData().getActiveArrow() == null){
+        if(!user.getCosmeticData().hasActiveArrow()){
             builder
                     .addEnchant(Enchantment.CHANNELING, 1)
                     .setFlags(ItemFlag.HIDE_ENCHANTS);

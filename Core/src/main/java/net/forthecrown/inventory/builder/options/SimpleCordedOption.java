@@ -1,10 +1,10 @@
 package net.forthecrown.inventory.builder.options;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.user.CrownUser;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,8 +34,8 @@ public class SimpleCordedOption implements CordedInventoryOption {
     }
 
     @Override
-    public void place(Inventory inventory, CrownUser user) {
-        inventory.setItem(getSlot(), getItem());
+    public void place(FtcInventory inventory, CrownUser user) {
+        inventory.setItem(getPos(), getItem());
     }
 
     @Override

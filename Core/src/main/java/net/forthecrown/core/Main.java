@@ -13,7 +13,7 @@ import net.forthecrown.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.CrownBalances;
 import net.forthecrown.economy.ServerItemPriceMap;
-import net.forthecrown.economy.market.FtcMarketShops;
+import net.forthecrown.economy.market.FtcMarketRegion;
 import net.forthecrown.economy.shops.CrownShopManager;
 import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -80,7 +80,7 @@ public final class Main extends JavaPlugin implements Crown {
     static JoinInfo                 joinInfo;
     static ChatEmotes               emotes;
     static DayUpdate                dayUpdate;
-    static FtcMarketShops           marketShops;
+    static FtcMarketRegion marketShops;
     static Logger                   logger;
 
     public static final Set<ArmorStandLeaderboard> LEADERBOARDS = new HashSet<>();
@@ -126,10 +126,6 @@ public final class Main extends JavaPlugin implements Crown {
         safeRunnable(Cosmetics::shutDown);
         safeRunnable(Pirates::shutDown);
         safeRunnable(GameModePacketListener::removeAll);
-
-        /*if(DebugConstants.VIKINGS_ENABLED) {
-            safeRunnable(ValhallaEngine::shutDown);
-        }*/
 
         if(Crown.inDebugMode()) {
             safeRunnable(regionManager::save);

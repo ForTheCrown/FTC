@@ -19,7 +19,7 @@ import static net.forthecrown.commands.manager.CrownExceptionProvider.*;
 
 public interface FtcExceptionProvider {
     static CommandSyntaxException create(String messasge){
-        return GENERIC.create(FtcFormatter.translateHexCodes(messasge));
+        return GENERIC.create(FtcFormatter.formatColorCodes(messasge));
     }
 
     static CommandSyntaxException createWithContext(String message, String input, int cursor){
@@ -30,7 +30,7 @@ public interface FtcExceptionProvider {
     }
 
     static CommandSyntaxException createWithContext(String message, StringReader reader){
-        return GENERIC.createWithContext(reader, FtcFormatter.translateHexCodes(message));
+        return GENERIC.createWithContext(reader, FtcFormatter.formatColorCodes(message));
     }
 
     static RoyalCommandException translatable(String key, ComponentLike... args){

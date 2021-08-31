@@ -42,7 +42,6 @@ public class AfkListener implements Listener {
                 //.clickEvent(ChatFormatter.unAfkClickEvent())
                 .color(NamedTextColor.GRAY);
 
-
         user.sendMessage(userMsg);
         Bukkit.getOnlinePlayers().stream()
                 .filter(p -> !p.getUniqueId().equals(user.getUniqueId()))

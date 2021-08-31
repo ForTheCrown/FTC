@@ -14,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
@@ -39,14 +40,14 @@ import static org.bukkit.Bukkit.getServer;
 public final class FtcUtils {
     private FtcUtils() {}
 
-    public static final Location LOCATION_HAZELGUARD = new Location(Bukkit.getWorld("world"), 200.5, 70, 1000.5);
+    public static final Location LOCATION_HAZELGUARD = new Location(Worlds.OVERWORLD, 200.5, 70, 1000.5);
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
 
     public static <T> Predicate<T> alwaysAccept() {
         return t -> true;
     }
 
-    public static void sendPacket(Player player, Packet packet) {
+    public static void sendPacket(Player player, Packet<ClientGamePacketListener> packet) {
         CraftPlayer craftPlayer = (CraftPlayer) player;
         craftPlayer.getHandle().networkManager.send(packet);
     }

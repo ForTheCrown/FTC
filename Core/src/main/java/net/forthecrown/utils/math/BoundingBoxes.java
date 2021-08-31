@@ -3,7 +3,6 @@ package net.forthecrown.utils.math;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import net.forthecrown.core.Crown;
-import net.forthecrown.core.chat.Announcer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.apache.commons.lang.math.IntRange;
@@ -36,7 +35,6 @@ public final class BoundingBoxes {
      */
     public static void copyTo(World world, BoundingBox area, WorldVec3i toMin) {
         int totalArea = area.getXSpan() * area.getYSpan() * area.getZSpan();
-        Announcer.debug("copyTo toMin: " + toMin);
 
         //If it's too small to warrant using 3 threads, use one only
         if(totalArea < MIN_MULTI_THREAD) {
@@ -55,8 +53,6 @@ public final class BoundingBoxes {
     }
 
     private static Runnable sectionRunnable(World world, BoundingBox area, WorldVec3i min, IntRange yRange) {
-        Announcer.debug("sectionRunnable min:" + min);
-
         return () -> {
             int maxY = yRange.getMaximumInteger() - yRange.getMinimumInteger();
 
@@ -98,8 +94,6 @@ public final class BoundingBoxes {
     public static BoundingBox[] createArray(Vector3i start, Vector3iOffset size, Direction direction, int distance, int amount) {
         BoundingBox[] result = new BoundingBox[amount];
 
-        Crown.logger().info("start: " + start);
-
         for (int i = 0; i < amount; i++) {
             Vector3i boxStart = new Vector3i(
                     //This is essentially: x = starting X + index * direction * (distance + size)
@@ -108,12 +102,8 @@ public final class BoundingBoxes {
                     start.getZ() + (i * direction.getNormal().getZ() * (size.getZ() + distance))
             );
 
-            Crown.logger().info("boxStart: " + boxStart);
-            Crown.logger().info("index: " + i);
-
             //Get the diagonal other end of the box with the size offset
             Vector3i boxEnd = size.apply(boxStart);
-            Crown.logger().info("end: " + boxEnd);
 
             //Set the box at the index to be the one we just calculated
             result[i] = new BoundingBox(boxStart.x, boxStart.y, boxStart.z, boxEnd.x, boxEnd.y, boxEnd.z);

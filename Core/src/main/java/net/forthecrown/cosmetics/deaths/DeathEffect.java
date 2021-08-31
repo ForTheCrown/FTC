@@ -5,6 +5,7 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.cosmetics.CosmeticConstants;
 import net.forthecrown.cosmetics.CosmeticEffect;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.user.CosmeticData;
@@ -12,7 +13,6 @@ import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.inventory.Inventory;
 
 public abstract class DeathEffect extends CosmeticEffect {
 
@@ -27,11 +27,11 @@ public abstract class DeathEffect extends CosmeticEffect {
     public abstract void activate(Location loc);
 
     @Override
-    public void place(Inventory inventory, CrownUser user) {
+    public void place(FtcInventory inventory, CrownUser user) {
         CosmeticData data = user.getCosmeticData();
 
         inventory.setItem(
-                getSlot(),
+                getPos(),
 
                 CosmeticEffect.makeItem(
                         equals(data.getActiveDeath()),
@@ -49,7 +49,7 @@ public abstract class DeathEffect extends CosmeticEffect {
 
         if(owned){
             data.setActiveDeath(this);
-            user.sendMessage(Component.translatable("user.deathParticle.set", NamedTextColor.YELLOW, name()));
+            user.sendMessage(Component.translatable("cosmetics.set.death", NamedTextColor.YELLOW, name()));
         } else {
             if(user.getGems() < CosmeticConstants.DEATH_PRICE){
                 user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.queryGems(CosmeticConstants.DEATH_PRICE)));
@@ -61,7 +61,7 @@ public abstract class DeathEffect extends CosmeticEffect {
             data.setActiveDeath(this);
 
             user.sendMessage(
-                    Component.translatable("user.particle.bought", NamedTextColor.GRAY, name())
+                    Component.translatable("cosmetics.bought", NamedTextColor.GRAY, name())
             );
         }
 

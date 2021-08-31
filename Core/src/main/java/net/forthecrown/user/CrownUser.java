@@ -275,33 +275,36 @@ public interface CrownUser extends
      * @param property The property to check
      * @return Whether they have it
      */
-    boolean hasProperty(UserPref property);
+    boolean hasPref(UserPref property);
 
     /**
      * Adds the given property to the user
      * @param property The property to add
      */
-    void addProperty(UserPref property);
+    void addPref(UserPref property);
 
     /**
      * Removes the given property from the user
      * @param property The property to remove
      */
-    void removeProperty(UserPref property);
+    void removePref(UserPref property);
 
     /**
      * Sets the property value of the given property.
      * @param add Whether to add or remove the property
      * @param property The property to set
      */
-    void setProperty(boolean add, UserPref property);
+    default void setPref(boolean add, UserPref property) {
+        if(add) addPref(property);
+        else removePref(property);
+    }
 
     /**
      * Checks whether the user is ignoring broadcasts
      * @return ^^^^^^^^^
      */
     default boolean ignoringBroadcasts(){
-        return hasProperty(UserPref.IGNORING_BROADCASTS);
+        return hasPref(UserPref.IGNORING_BROADCASTS);
     }
 
     /**
@@ -309,20 +312,24 @@ public interface CrownUser extends
      * @param ignoring ^^^^
      */
     default void setIgnoringBroadcasts(boolean ignoring){
-        setProperty(ignoring, UserPref.IGNORING_BROADCASTS);
+        setPref(ignoring, UserPref.IGNORING_BROADCASTS);
     }
 
     /**
      * Gets if the user allows player riding
      * @return Whether the user can be ride and be ridden or not
      */
-    boolean allowsRiding();
+    default boolean allowsRiding() {
+        return !hasPref(UserPref.FORBIDS_RIDING);
+    }
 
     /**
      * Sets if the player can ride and be ridden ;)
      * @param allowsRidingPlayers
      */
-    void setAllowsRiding(boolean allowsRidingPlayers);
+    default void setAllowsRiding(boolean allowsRidingPlayers) {
+        setPref(!allowsRidingPlayers, UserPref.FORBIDS_RIDING);
+    }
 
     /**
      * Gets the user's gem amount
@@ -346,13 +353,17 @@ public interface CrownUser extends
      * Gets if the user allows emotes
      * @return Whether the user can send and receive emotes or not
      */
-    boolean allowsEmotes();
+    default boolean allowsEmotes() {
+        return !hasPref(UserPref.FORBIDS_EMOTES);
+    }
 
     /**
      * Sets whether the user allows emotes or not
      * @param allowsEmotes kinda obvious lol
      */
-    void setAllowsEmotes(boolean allowsEmotes);
+    default void setAllowsEmotes(boolean allowsEmotes) {
+        setPref(!allowsEmotes, UserPref.FORBIDS_EMOTES);
+    }
 
     /**
      * Gets the material data of the given material
@@ -528,13 +539,17 @@ public interface CrownUser extends
      * Gets if the user's profile is private or public
      * @return ^^^^
      */
-    boolean isProfilePublic();
+    default boolean isProfilePublic() {
+        return !hasPref(UserPref.PROFILE_PRIVATE);
+    }
 
     /**
      * Sets the user's profile to either public or private
      * @param publicProfile ^^^^
      */
-    void setProfilePublic(boolean publicProfile);
+    default void setProfilePublic(boolean publicProfile) {
+        setPref(!publicProfile, UserPref.PROFILE_PRIVATE);
+    }
 
     /**
      * Gets the object which hold data for this user
@@ -716,7 +731,7 @@ public interface CrownUser extends
      * @return ^^^^^^^^^
      */
     default boolean allowsTPA() {
-        return !hasProperty(UserPref.FORBIDS_TPA);
+        return !hasPref(UserPref.FORBIDS_TPA);
     }
 
     /**
@@ -724,7 +739,7 @@ public interface CrownUser extends
      * @param allowsTPA Whether the user allows TPA requests
      */
     default void setAllowsTPA(boolean allowsTPA) {
-        setProperty(!allowsTPA, UserPref.FORBIDS_TPA);
+        setPref(!allowsTPA, UserPref.FORBIDS_TPA);
     }
 
     /**
@@ -732,7 +747,7 @@ public interface CrownUser extends
      * @return ^^^
      */
     default boolean isEavesDropping() {
-        return hasProperty(UserPref.LISTENING_TO_EAVESDROPPER);
+        return hasPref(UserPref.LISTENING_TO_EAVESDROPPER);
     }
 
     /**
@@ -740,7 +755,7 @@ public interface CrownUser extends
      * @param eavesDropping Whether the user is eaves dropping
      */
     default void setEavesDropping(boolean eavesDropping) {
-        setProperty(eavesDropping, UserPref.LISTENING_TO_EAVESDROPPER);
+        setPref(eavesDropping, UserPref.LISTENING_TO_EAVESDROPPER);
     }
 
     /**
@@ -784,11 +799,11 @@ public interface CrownUser extends
     Component nickname();
 
     default boolean isVanished() {
-        return hasProperty(UserPref.VANISHED);
+        return hasPref(UserPref.VANISHED);
     }
 
     default void setVanished(boolean vanished) {
-        setProperty(vanished, UserPref.VANISHED);
+        setPref(vanished, UserPref.VANISHED);
 
         if(isOnline()) updateVanished();
     }
@@ -804,11 +819,11 @@ public interface CrownUser extends
     void updateAfk();
 
     default boolean isFlying() {
-        return hasProperty(UserPref.FLYING);
+        return hasPref(UserPref.FLYING);
     }
 
     default void setFlying(boolean flying) {
-        setProperty(flying, UserPref.FLYING);
+        setPref(flying, UserPref.FLYING);
 
         if(isOnline()) updateFlying();
     }
@@ -816,11 +831,11 @@ public interface CrownUser extends
     void updateFlying();
 
     default boolean godMode() {
-        return hasProperty(UserPref.GOD_MODE);
+        return hasPref(UserPref.GOD_MODE);
     }
 
     default void setGodMode(boolean godMode) {
-        setProperty(godMode, UserPref.GOD_MODE);
+        setPref(godMode, UserPref.GOD_MODE);
 
         if(isOnline()) updateGodMode();
     }
@@ -838,27 +853,27 @@ public interface CrownUser extends
     void setGameMode(FtcGameMode gameMode);
 
     default boolean allowsPaying() {
-        return !hasProperty(UserPref.FORBIDS_PAY);
+        return !hasPref(UserPref.FORBIDS_PAY);
     }
 
     default void setAllowsPay(boolean acceptsPay) {
-        setProperty(!acceptsPay, UserPref.FORBIDS_PAY);
+        setPref(!acceptsPay, UserPref.FORBIDS_PAY);
     }
 
     default boolean allowsRegionInvites() {
-        return !hasProperty(UserPref.FORBIDS_REGION_INVITES);
+        return !hasPref(UserPref.FORBIDS_REGION_INVITES);
     }
 
     default void setAllowsRegionInvites(boolean val) {
-        setProperty(!val, UserPref.FORBIDS_REGION_INVITES);
+        setPref(!val, UserPref.FORBIDS_REGION_INVITES);
     }
 
     default boolean hulkSmashesPoles() {
-        return !hasProperty(UserPref.NON_HULK_SMASHER);
+        return !hasPref(UserPref.NON_HULK_SMASHER);
     }
 
     default void setHulkPoles(boolean hulk) {
-        setProperty(!hulk, UserPref.NON_HULK_SMASHER);
+        setPref(!hulk, UserPref.NON_HULK_SMASHER);
     }
 
     /**

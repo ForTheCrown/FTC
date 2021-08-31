@@ -15,6 +15,7 @@ public class DirectMessage implements UserAction {
 
     private final CommandSource sender;
     private final CommandSource target;
+
     private final Component formattedText;
     private final boolean responding;
     private final MuteStatus muteStatus;

@@ -58,7 +58,7 @@ public enum Rank implements JsonSerializable {
     }
 
     public String getPrefix(){
-        return FtcFormatter.translateHexCodes(tabPrefix);
+        return FtcFormatter.formatColorCodes(tabPrefix);
     }
 
     public String getColorlessPrefix(){

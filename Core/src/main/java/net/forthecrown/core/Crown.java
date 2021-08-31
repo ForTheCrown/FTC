@@ -7,7 +7,7 @@ import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.ItemPriceMap;
-import net.forthecrown.economy.market.MarketShops;
+import net.forthecrown.economy.market.MarketRegion;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.regions.RegionManager;
 import net.forthecrown.serializer.UserSerializer;
@@ -54,7 +54,7 @@ public interface Crown extends Plugin, Namespaced {
     static Balances getBalances(){ return Main.balances; }
     static Kingship getKingship(){ return Main.kingship; }
     static TabList getTabList() { return Main.tabList; }
-    static MarketShops getMarketShops() { return Main.marketShops; }
+    static MarketRegion getMarketShops() { return Main.marketShops; }
     static ItemPriceMap getPriceMap() { return Main.prices; }
 
     static CrownMessages getMessages() { return Main.messages; }
@@ -113,7 +113,7 @@ public interface Crown extends Plugin, Namespaced {
     }
 
     static String getPrefix(){
-        return FtcFormatter.translateHexCodes(Main.prefix);
+        return FtcFormatter.formatColorCodes(Main.prefix);
     }
 
     static boolean inDebugMode(){
@@ -121,7 +121,7 @@ public interface Crown extends Plugin, Namespaced {
     }
 
     static String getDiscord(){
-        return FtcFormatter.translateHexCodes(Main.discord);
+        return FtcFormatter.formatColorCodes(Main.discord);
     }
 
     static Component prefix(){

@@ -7,10 +7,9 @@ import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
 import net.forthecrown.cosmetics.travel.TravelEffects;
 
 public final class Cosmetics {
+    private Cosmetics() {}
 
     private static PlayerRidingManager rideManager;
-
-    private Cosmetics() {}
 
     public static void init(){
         rideManager = new PlayerRidingManager();

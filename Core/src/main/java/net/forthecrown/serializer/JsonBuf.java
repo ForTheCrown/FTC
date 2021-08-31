@@ -272,6 +272,10 @@ public class JsonBuf {
         }
     }
 
+    public void addArray(String name, JsonSerializable[] arr) {
+        addArray(name, arr, JsonSerializable::serialize);
+    }
+
     public <T> void addArray(String name, T[] arr, Function<T, JsonElement> converter) {
         JsonArray array = new JsonArray();
 

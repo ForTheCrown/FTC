@@ -1,12 +1,12 @@
 package net.forthecrown.inventory.builder.options;
 
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class InventoryBorder implements InventoryOption {
@@ -29,7 +29,7 @@ public class InventoryBorder implements InventoryOption {
     }
 
     @Override
-    public void place(Inventory inventory, CrownUser user) {
+    public void place(FtcInventory inventory, CrownUser user) {
         for (int i = 0; i < inventory.getSize(); i++){
             if(i < 9){
                 inventory.setItem(i, getBorderItem());

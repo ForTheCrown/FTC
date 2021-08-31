@@ -80,7 +80,11 @@ public class CommandWild extends FtcCommand {
                                 .executes(c -> {
                                     Collection<? extends Entity> players = c.getArgument("player", EntitySelector.class).getEntities(c.getSource());
                                     World world = c.getArgument("world", World.class);
-                                    for (Entity p: players) wildTP(p, world, false);
+
+                                    for (Entity p: players) {
+                                        wildTP(p, world, false);
+                                    }
+
                                     return 1;
                                 })
                         )
@@ -98,7 +102,7 @@ public class CommandWild extends FtcCommand {
 
     public static void wildTP(Entity p, World world, boolean cooldown){
         if(p instanceof LivingEntity) ((LivingEntity) p).addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 400, 1));
-        p.teleport(randLocation(world, new CrownRandom()));
+        p.teleport(wildLocation(world));
 
         if(p.getWorld().getName().contains("world_resource")) p.sendMessage(rwWildMessage);
         if(cooldown) Cooldown.add(p, "RandomFeatures_Wild", 600);
@@ -109,14 +113,18 @@ public class CommandWild extends FtcCommand {
     }
 
     private static boolean isInvalidLocation(Location location){
-        Biome biome = location.getWorld().getBiome(location.getBlockX(), location.getBlockX(), location.getBlockX());
+        Biome biome = location.getWorld().getBiome(location.getBlockX(), location.getBlockY(), location.getBlockX());
         if(biome.name().contains("OCEAN")) return true;
 
         Material mat = location.getBlock().getType();
         return !mat.isAir();
     }
 
-    private static Location randLocation(World world, CrownRandom random){
+    public static Location wildLocation(World world) {
+        return wildLocation(world, new CrownRandom());
+    }
+
+    private static Location wildLocation(World world, CrownRandom random){
         final int maxSize = (int) ((world.getWorldBorder().getSize()/2) - 200);
         boolean changeY = world.getName().contains("nether");
         int x = rand(maxSize, random);

@@ -14,18 +14,18 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
 
-public class MarketShopEntrance implements JsonSerializable {
+public class ShopEntrance implements JsonSerializable {
     public final BlockFace direction;
     public final Vector3i lecternPos;
     public final Vector3i signPos;
 
-    public MarketShopEntrance(BlockFace direction, Vector3i lecternPos, Vector3i signPos) {
+    public ShopEntrance(BlockFace direction, Vector3i lecternPos, Vector3i signPos) {
         this.direction = direction;
         this.lecternPos = lecternPos;
         this.signPos = signPos;
     }
 
-    public void onClaim(CrownUser user, MarketShop shop) {
+    public void onClaim(CrownUser user, FtcMarketShop shop) {
         //Above door sign
         boolean endsInS = user.getNickOrName().endsWith("s");
 
@@ -61,10 +61,10 @@ public class MarketShopEntrance implements JsonSerializable {
         sign.update();
     }
 
-    public static MarketShopEntrance fromJson(JsonElement element) {
+    public static ShopEntrance fromJson(JsonElement element) {
         JsonBuf json = JsonBuf.of(element.getAsJsonObject());
 
-        return new MarketShopEntrance(
+        return new ShopEntrance(
                 json.getEnum("direction", BlockFace.class),
                 Vector3i.of(json.get("lectern")),
                 Vector3i.of(json.get("sign"))

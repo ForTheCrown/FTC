@@ -6,7 +6,8 @@ import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.text.Component;
 
-public class DeathEffects {
+public final class DeathEffects {
+    private DeathEffects() {}
 
     private static BuiltInventory INVENTORY;
 

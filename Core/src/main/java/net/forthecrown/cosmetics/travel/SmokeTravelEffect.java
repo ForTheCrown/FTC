@@ -1,7 +1,6 @@
 package net.forthecrown.cosmetics.travel;
 
 import net.forthecrown.inventory.builder.InventoryPos;
-import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -15,7 +14,7 @@ public class SmokeTravelEffect extends TravelEffect {
     }
 
     @Override
-    public void onPoleTeleport(CrownUser user, Location from, Location pole) {
+    public void onPoleTeleport(Location from, Location pole) {
         // Little ball of smoke particles
         from.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, from.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D);
         pole.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, pole.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D);

@@ -3,7 +3,6 @@ package net.forthecrown.utils;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.utils.math.FtcBoundingBox;
@@ -15,6 +14,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
@@ -171,7 +171,11 @@ public final class JsonUtils {
     //Reads the item using a string representation of it's NBT data
     public static ItemStack readItem(JsonElement json) {
         try {
-            return NbtHandler.itemFromNBT(NBT.of(TagParser.parseTag(json.getAsString())));
+            return CraftItemStack.asBukkitCopy(
+                    net.minecraft.world.item.ItemStack.of(
+                            TagParser.parseTag(json.getAsString())
+                    )
+            );
         } catch (CommandSyntaxException e){
             e.printStackTrace();
             return null;

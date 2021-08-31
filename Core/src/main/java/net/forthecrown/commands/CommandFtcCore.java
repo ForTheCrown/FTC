@@ -874,11 +874,11 @@ public class CommandFtcCore extends FtcCommand {
         }
 
         public String reloadMessage() {
-            return FtcFormatter.translateHexCodes("&7" + msg + " reloaded.");
+            return FtcFormatter.formatColorCodes("&7" + msg + " reloaded.");
         }
 
         public String saveMessage() {
-            return FtcFormatter.translateHexCodes("&7" + msg + " saved.");
+            return FtcFormatter.formatColorCodes("&7" + msg + " saved.");
         }
     }
 }

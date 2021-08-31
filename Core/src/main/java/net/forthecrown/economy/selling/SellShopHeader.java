@@ -2,6 +2,7 @@ package net.forthecrown.economy.selling;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
@@ -11,7 +12,6 @@ import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
@@ -99,7 +99,7 @@ public class SellShopHeader implements CordedInventoryOption {
     }
 
     @Override
-    public void place(Inventory inventory, CrownUser user) {
+    public void place(FtcInventory inventory, CrownUser user) {
         inventory.setItem(getSlot(), getItem());
     }
 

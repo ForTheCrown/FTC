@@ -73,7 +73,7 @@ public interface FtcFormatter {
     };*/
 
     //Yeah, no clue
-    static String translateHexCodes(@NotNull String textToTranslate) {
+    static String formatColorCodes(@NotNull String textToTranslate) {
         Validate.notNull(textToTranslate, "Text to translate cannot be null");
 
         Matcher matcher = HEX_PATTERN.matcher(textToTranslate);
@@ -129,7 +129,7 @@ public interface FtcFormatter {
         boolean inSenateWorld = source.getWorld().equals(Worlds.SENATE);
         boolean staffChat = StaffChat.toggledPlayers.contains(source);
 
-        if(source.hasPermission(Permissions.DONATOR_2) || inSenateWorld || staffChat) strMessage = translateHexCodes(strMessage);
+        if(source.hasPermission(Permissions.DONATOR_2) || inSenateWorld || staffChat) strMessage = formatColorCodes(strMessage);
         if(source.hasPermission(Permissions.DONATOR_3) || inSenateWorld || staffChat) strMessage = Crown.getEmotes().format(strMessage, source, true);
 
         strMessage = checkUppercase(source, strMessage);
@@ -164,9 +164,9 @@ public interface FtcFormatter {
                 input = StringUtils.capitalize(input.toLowerCase());
                 input += "!";
 
-                if(!Cooldown.contains(source, "uppercase_warning")){
+                //1 and a half minute cooldown
+                if(!Cooldown.containsOrAdd(source, "uppercase_warning", 1800)){
                     source.sendMessage(Component.translatable("user.allCaps").color(NamedTextColor.GRAY));
-                    Cooldown.add(source, "uppercase_warning", 1800); //1 and a half mins
                 }
             }
         }

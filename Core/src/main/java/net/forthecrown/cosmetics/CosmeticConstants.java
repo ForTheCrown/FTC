@@ -2,9 +2,12 @@ package net.forthecrown.cosmetics;
 
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.cosmetics.arrows.ArrowEffects;
+import net.forthecrown.cosmetics.options.NoArrowOption;
 import net.forthecrown.cosmetics.deaths.DeathEffects;
+import net.forthecrown.cosmetics.options.NoDeathOption;
 import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
 import net.forthecrown.cosmetics.options.*;
+import net.forthecrown.cosmetics.options.NoTravelOption;
 import net.forthecrown.cosmetics.travel.TravelEffects;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.options.InventoryBorder;
@@ -29,6 +32,7 @@ public abstract class CosmeticConstants {
     public static final RidingToggleOption RIDING_TOGGLE = new RidingToggleOption();
     public static final EmoteToggleOption EMOTE_TOGGLE = new EmoteToggleOption();
 
+    public static final NoTravelOption NO_TRAVEL = new NoTravelOption();
     public static final NoDeathOption NO_DEATH = new NoDeathOption();
     public static final NoArrowOption NO_ARROW = new NoArrowOption();
 

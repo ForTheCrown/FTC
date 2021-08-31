@@ -101,7 +101,7 @@ public class CommandHologram extends FtcCommand {
                 stand.setGravity(false);
                 stand.setInvulnerable(true);
                 stand.setCustomNameVisible(true);
-                stand.setCustomName(FtcFormatter.translateHexCodes(name));
+                stand.setCustomName(FtcFormatter.formatColorCodes(name));
 
                 stand.getPersistentDataContainer().set(HOLOGRAM_KEY, PersistentDataType.BYTE, (byte) 1);
             }

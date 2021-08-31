@@ -4,11 +4,15 @@ import com.google.gson.JsonElement;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
+
+import java.util.Locale;
 
 /**
  * Utility functions relating to Components, mostly string converters lol
@@ -24,7 +28,7 @@ public final class ChatUtils {
     public static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     public static TextComponent convertString(String text, boolean translateColors){
-        return SERIALIZER.deserialize(translateColors ? FtcFormatter.translateHexCodes(text) : text);
+        return SERIALIZER.deserialize(translateColors ? FtcFormatter.formatColorCodes(text) : text);
     }
 
     public static TextComponent convertString(String text){
@@ -77,5 +81,9 @@ public final class ChatUtils {
                 .append(convertString(str, translateColors))
                 .decoration(TextDecoration.ITALIC, false)
                 .build();
+    }
+
+    public static Component renderIfTranslatable(Component component) {
+        return component instanceof TranslatableComponent ? GlobalTranslator.render(component, Locale.ENGLISH) : component;
     }
 }

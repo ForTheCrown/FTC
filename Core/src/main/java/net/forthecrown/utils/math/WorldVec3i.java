@@ -3,6 +3,7 @@ package net.forthecrown.utils.math;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.forthecrown.serializer.JsonBuf;
+import net.minecraft.core.SectionPos;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -57,11 +58,14 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
     }
 
     public Block getBlock() {
-        return world.getBlockAt(x, y, z);
+        return getWorld().getBlockAt(x, y, z);
     }
 
     public Chunk getChunk() {
-        return world.getChunkAt(x, z);
+        return world.getChunkAt(
+                SectionPos.blockToSectionCoord(x),
+                SectionPos.blockToSectionCoord(z)
+        );
     }
 
     public boolean stateIs(Class<? extends BlockState> state) {

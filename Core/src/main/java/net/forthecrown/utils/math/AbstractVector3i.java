@@ -74,7 +74,7 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
         final int y = face.getModY() * amount;
         final int z = face.getModZ() * amount;
 
-        return set(x + this.x, y + this.y, z + this.z);
+        return add(x, y, z);
     }
 
     public T subtract(ImmutableVector3i pos){ return subtract(pos.getX(), pos.getY(), pos.getZ()); }
@@ -88,41 +88,41 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
     public T add(Vec3i vec3i){ return add(vec3i.getX(), vec3i.getY(), vec3i.getZ()); }
 
     public T add(int x, int y, int z){
-        setX(getX() + x);
-        setY(getY() + y);
-        setZ(getZ() + z);
-
-        return getThis();
+        return set(
+                getX() + x,
+                getY() + y,
+                getZ() + z
+        );
     }
 
     public T subtract(int x, int y, int z){
-        setX(getX() - x);
-        setY(getY() - y);
-        setZ(getZ() - z);
-
-        return getThis();
+        return set(
+                getX() - x,
+                getY() - y,
+                getZ() - z
+        );
     }
 
     public T divide(ImmutableVector3i vec) { return divide(vec.getX(), vec.getY(), vec.getZ()); }
     public T divide(int n) { return divide(n, n, n); }
 
     public T divide(int x, int y, int z) {
-        setX(getX() / x);
-        setY(getY() / y);
-        setZ(getZ() / z);
-
-        return getThis();
+        return set(
+                getX() / x,
+                getY() / y,
+                getZ() / z
+        );
     }
 
     public T multiply(ImmutableVector3i vec) { return multiply(vec.getX(), vec.getY(), vec.getZ()); }
     public T multiply(int n) { return multiply(n, n, n); }
 
     public T multiply(int x, int y, int z) {
-        setX(getX() * x);
-        setY(getY() * y);
-        setZ(getZ() * z);
-
-        return getThis();
+        return set(
+                getX() * x,
+                getY() * y,
+                getZ() * z
+        );
     }
 
     @Override
