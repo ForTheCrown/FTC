@@ -1,8 +1,11 @@
 package net.forthecrown.utils;
 
+import com.destroystokyo.paper.profile.CraftPlayerProfile;
+import com.destroystokyo.paper.profile.PlayerProfile;
 import com.sk89q.worldedit.bukkit.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.math.MathUtil;
 import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
@@ -10,6 +13,7 @@ import net.minecraft.nbt.Tag;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
@@ -19,6 +23,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -43,6 +48,8 @@ public class ItemStackBuilder implements Cloneable {
 
     private PotionData baseEffect = null;
     private boolean ambientEffects = true;
+
+    private PlayerProfile profile;
 
     private Map<Attribute, AttributeModifier> modifiers = new Object2ObjectOpenHashMap<>();
     private Map<NamespacedKey, Byte> persistentData = new Object2ObjectOpenHashMap<>();
@@ -268,6 +275,23 @@ public class ItemStackBuilder implements Cloneable {
         return this;
     }
 
+    public PlayerProfile getProfile() {
+        return profile;
+    }
+
+    public ItemStackBuilder setProfile(PlayerProfile profile) {
+        this.profile = profile;
+        return this;
+    }
+
+    public ItemStackBuilder setProfile(OfflinePlayer player) {
+        return setProfile(new CraftPlayerProfile(player.getUniqueId(), player.getName()));
+    }
+
+    public ItemStackBuilder setProfile(CrownUser user) {
+        return setProfile(user.getProfile());
+    }
+
     public ItemStack build() {
         ItemStack result = new ItemStack(material, amount);
         ItemMeta meta = result.getItemMeta();
@@ -304,6 +328,12 @@ public class ItemStackBuilder implements Cloneable {
         if(baseEffect != null){
             PotionMeta meta1 = (PotionMeta) meta;
             meta1.setBasePotionData(baseEffect);
+        }
+
+        if(profile != null) {
+            SkullMeta skullMeta = (SkullMeta) meta;
+
+            skullMeta.setPlayerProfile(profile);
         }
 
         meta.setUnbreakable(unbreakable);

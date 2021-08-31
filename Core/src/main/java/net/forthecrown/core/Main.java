@@ -14,6 +14,7 @@ import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.CrownBalances;
 import net.forthecrown.economy.ServerItemPriceMap;
 import net.forthecrown.economy.market.FtcMarketRegion;
+import net.forthecrown.economy.market.guild.HazelguardTradersGuild;
 import net.forthecrown.economy.shops.CrownShopManager;
 import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -54,9 +55,10 @@ public final class Main extends JavaPlugin implements Crown {
 
     static Main                     inst;
 
+    static Location                 serverSpawn;
+    static Logger                   logger;
     static String                   prefix = "&6[FTC]&r  ";
     static String                   discord;
-    static PeriodicalSaver          saver;
 
     static CrownBalances            balances;
     static FtcAnnouncer             announcer;
@@ -72,7 +74,6 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcWarpManager           warpRegistry;
     static FtcKitManager            kitRegistry;
 
-    static Location                 serverSpawn;
     static CrownMessages            messages;
     static CrownTabList             tabList;
     static ServerRules              rules;
@@ -80,8 +81,9 @@ public final class Main extends JavaPlugin implements Crown {
     static JoinInfo                 joinInfo;
     static ChatEmotes               emotes;
     static DayUpdate                dayUpdate;
-    static FtcMarketRegion marketShops;
-    static Logger                   logger;
+    static FtcMarketRegion          marketShops;
+    static HazelguardTradersGuild   tradersGuild;
+    static PeriodicalSaver          saver;
 
     public static final Set<ArmorStandLeaderboard> LEADERBOARDS = new HashSet<>();
     static LuckPerms luckPerms;

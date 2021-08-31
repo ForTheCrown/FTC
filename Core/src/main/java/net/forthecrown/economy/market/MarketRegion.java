@@ -2,20 +2,22 @@ package net.forthecrown.economy.market;
 
 import org.bukkit.entity.Player;
 
+import java.util.Set;
 import java.util.UUID;
 
 public interface MarketRegion {
-    FtcMarketShop get(UUID owner);
-    FtcMarketShop get(String claimName);
+    MarketShop get(UUID owner);
+    MarketShop get(String claimName);
 
-    void add(FtcMarketShop claim);
+    void add(MarketShop claim);
 
-    void attemptPurchase(FtcMarketShop claim, Player player);
+    void attemptPurchase(MarketShop claim, Player player);
+    void evict(MarketShop shop);
 
-    void eject(UUID owner);
+    void evict(UUID owner);
 
-    default void remove(FtcMarketShop s) {
-        remove(s.getWorldGuardRegion().getId());
+    default void remove(MarketShop s) {
+        remove(s.getWorldGuard().getId());
     }
 
     void remove(String name);
@@ -23,4 +25,6 @@ public interface MarketRegion {
     void clear();
 
     int size();
+
+    Set<UUID> getOwners();
 }

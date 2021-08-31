@@ -3,18 +3,25 @@ package net.forthecrown.economy.market.guild.topics;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
+
+import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInstance> {
     public static final Key KEY = Crown.coreKey("evict_owner");
@@ -57,20 +64,31 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
 
     public static class EvictOwnerOption implements CordedInventoryOption {
         public static final EvictOwnerOption INSTANCE = new EvictOwnerOption();
+        private final InventoryPos pos = new InventoryPos(4, 1);
 
         @Override
         public InventoryPos getPos() {
-            return null;
+            return pos;
         }
 
         @Override
         public void place(FtcInventory inventory, CrownUser user) {
+            inventory.setItem(
+                    pos,
 
+                    new ItemStackBuilder(Material.BARRIER, 1)
+                            .setName(Component.text("Evict a shop owner").style(nonItalic(NamedTextColor.YELLOW)))
+
+                            .addLore(Component.text("Force a shop owner to give up their shop").style(nonItalic(NamedTextColor.GRAY)))
+                            .addLore(Component.text("Can be for any reason").style(nonItalic(NamedTextColor.GRAY)))
+
+                            .build()
+            );
         }
 
         @Override
         public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
-
+            EvictOwnerTopic.INSTANCE.getInventory().open(user);
         }
     }
 
@@ -94,7 +112,18 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
 
         @Override
         public void place(FtcInventory inventory, CrownUser user) {
+            CrownUser head = UserManager.getUser(id);
 
+            ItemStackBuilder builder = new ItemStackBuilder(Material.PLAYER_HEAD, 1)
+                    .setProfile(head)
+                    .setName(head.nickDisplayName().style(FtcFormatter.nonItalic(NamedTextColor.YELLOW)));
+
+
+
+            inventory.setItem(
+                    pos,
+                    builder.build()
+            );
         }
 
         @Override

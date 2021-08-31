@@ -26,6 +26,7 @@ import java.util.Set;
 
 public class PlayerRidingManager implements Listener {
 
+    public static final Location HAZELGUARD = new Location(Worlds.OVERWORLD, 200.5, 70, 1000.5);
     private final ObjectSet<PlayerRider> riders;
 
     static final NamespacedKey SEAT_KEY = new NamespacedKey(Crown.inst(), "player_seat");

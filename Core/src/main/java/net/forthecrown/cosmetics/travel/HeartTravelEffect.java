@@ -2,11 +2,9 @@ package net.forthecrown.cosmetics.travel;
 
 import net.forthecrown.inventory.builder.InventoryPos;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HeartTravelEffect extends TravelEffect {
@@ -29,7 +27,7 @@ public class HeartTravelEffect extends TravelEffect {
 
 
     HeartTravelEffect() {
-        super("Hearts", new InventoryPos(3, 2),
+        super("Hearts", new InventoryPos(2, 1),
                 Component.text("you are a lover "),
                 Component.text("really.")
         );
@@ -37,16 +35,16 @@ public class HeartTravelEffect extends TravelEffect {
 
     @Override
     public void onPoleTeleport(Location from, Location pole) {
-        util.spawnOnHearts(from, 0.2, Particle.END_ROD);
-        util.spawnOnHearts(pole, 0.2, Particle.END_ROD);
+        TravelUtil.spawnOnHearts(from, 0.2, Particle.END_ROD);
+        TravelUtil.spawnOnHearts(pole, 0.2, Particle.END_ROD);
     }
 
     @Override
     public void onHulkStart(Location loc) {
         // Prepare tick locations
-        this.circleLocs = util.getOnCircle(loc.getWorld(), -2.5, 1.5, amountSpiralPoints);
+        this.circleLocs = TravelUtil.getOnCircle(loc.getWorld(), -2.5, 1.5, amountSpiralPoints);
 
-        util.spawnOnHearts(loc, 0.2, Particle.END_ROD);
+        TravelUtil.spawnOnHearts(loc, 0.2, Particle.END_ROD);
     }
 
     @Override
@@ -65,6 +63,6 @@ public class HeartTravelEffect extends TravelEffect {
 
     @Override
     public void onHulkLand(Location landing) {
-        util.spawnOnHearts(landing, 0.2, Particle.END_ROD);
+        TravelUtil.spawnOnHearts(landing, 0.2, Particle.END_ROD);
     }
 }

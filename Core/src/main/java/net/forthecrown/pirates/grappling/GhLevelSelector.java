@@ -4,10 +4,11 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.ClickContext;
-import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.InventoryBuilder;
+import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryBorder;
 import net.forthecrown.inventory.builder.options.InventoryRunnable;
@@ -17,7 +18,6 @@ import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +110,7 @@ public class GhLevelSelector {
         }
 
         @Override
-        public void place(Inventory inventory, CrownUser user) {
+        public void place(FtcInventory inventory, CrownUser user) {
             GhLevelData data = getLevel();
             if(data == null) return;
 

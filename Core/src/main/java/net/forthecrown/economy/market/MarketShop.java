@@ -25,8 +25,12 @@ public interface MarketShop extends JsonSerializable, Nameable {
     Vector3i getShopResetPos();
 
     int getPrice();
+    void setPrice(int price);
+
     Date getDateOfPurchase();
     void setDateOfPurchase(Date dateOfPurchase);
+
+    boolean canBeEvicted();
 
     MarketShop getMerged();
     void setMerged(MarketShop shop);

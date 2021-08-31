@@ -1,8 +1,8 @@
 package net.forthecrown.events;
 
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import org.bukkit.event.Event;
 
 public interface ExceptionedListener<T extends Event> {
-    void execute(T event) throws RoyalCommandException;
+    void execute(T event) throws CommandSyntaxException;
 }

@@ -3,9 +3,9 @@ package net.forthecrown.events.dynamic;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
+import net.forthecrown.cosmetics.PlayerRidingManager;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.user.data.UserTeleport;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -52,7 +52,7 @@ public class JailListener implements Listener {
     public void release(){
         unreg();
 
-        UserManager.getUser(player).createTeleport(() -> FtcUtils.LOCATION_HAZELGUARD, false, true, UserTeleport.Type.OTHER)
+        UserManager.getUser(player).createTeleport(() -> PlayerRidingManager.HAZELGUARD, false, true, UserTeleport.Type.OTHER)
                 .start(false);
     }
 

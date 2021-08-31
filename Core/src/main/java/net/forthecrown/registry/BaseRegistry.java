@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -86,15 +85,14 @@ public class BaseRegistry<V> implements Registry<V> {
         BaseRegistry<?> registry = (BaseRegistry<?>) o;
 
         return new EqualsBuilder()
-                .append(values(), registry.values())
+                .append(entries, registry.entries)
+                .append(key, registry.key)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(values())
-                .toHashCode();
+        return entries.hashCode();
     }
 
     @Override

@@ -6,11 +6,11 @@ import org.jetbrains.annotations.NotNull;
 public interface SerializationTypeHolder<T> {
     SerializerType<? extends T> getType();
 
-    default SerializerType<T> normalSerializerType() {
+    default SerializerType<T> normalType() {
         return (SerializerType<T>) getType();
     }
 
-    default @NotNull Key serializerKey() {
+    default @NotNull Key typeKey() {
         return getType().key();
     }
 }

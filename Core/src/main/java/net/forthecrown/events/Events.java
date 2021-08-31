@@ -1,8 +1,8 @@
 package net.forthecrown.events;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.forthecrown.utils.FtcUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
@@ -15,7 +15,7 @@ public final class Events {
     private static PluginManager pm;
     private static Crown main;
 
-    public static void init(){
+    public static void init() {
         main = Crown.inst();
         pm = main.getServer().getPluginManager();
 
@@ -52,21 +52,21 @@ public final class Events {
         pm = null;
     }
 
-    private static void register(Listener listener){
+    private static void register(Listener listener) {
         pm.registerEvents(listener, main);
     }
 
-    public static <E extends PlayerEvent> void handlePlayer(E event, ExceptionedListener<E> executor){
+    public static <E extends PlayerEvent> void handlePlayer(E event, ExceptionedListener<E> executor) {
         handle(event.getPlayer(), event, executor);
     }
 
-    public static <E extends Event> void handle(CommandSender sender, E event, ExceptionedListener<E> executor){
+    public static <E extends Event> void handle(CommandSender sender, E event, ExceptionedListener<E> executor) {
         try {
             executor.execute(event);
-        } catch (RoyalCommandException e){
+        } catch (CommandSyntaxException e){
             if(sender == null) return;
 
-            sender.sendMessage(e.getComponentMessage().colorIfAbsent(NamedTextColor.GRAY));
+            FtcUtils.handleSyntaxException(sender, e);
         } catch (RuntimeException e){
             e.printStackTrace();
         }

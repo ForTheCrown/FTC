@@ -8,6 +8,7 @@ import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Balances;
 import net.forthecrown.economy.ItemPriceMap;
 import net.forthecrown.economy.market.MarketRegion;
+import net.forthecrown.economy.market.guild.TradersGuild;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.regions.RegionManager;
 import net.forthecrown.serializer.UserSerializer;
@@ -54,6 +55,7 @@ public interface Crown extends Plugin, Namespaced {
     static Balances getBalances(){ return Main.balances; }
     static Kingship getKingship(){ return Main.kingship; }
     static TabList getTabList() { return Main.tabList; }
+    static TradersGuild getTradersGuild() { return Main.tradersGuild; }
     static MarketRegion getMarketShops() { return Main.marketShops; }
     static ItemPriceMap getPriceMap() { return Main.prices; }
 

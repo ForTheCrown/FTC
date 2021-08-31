@@ -8,6 +8,8 @@ import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.emotes.CosmeticEmote;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
+import net.forthecrown.economy.market.guild.topics.VoteTopic;
+import net.forthecrown.economy.market.guild.topics.VoteTopicType;
 import net.forthecrown.economy.shops.template.ShopTemplate;
 import net.forthecrown.economy.shops.template.ShopTemplateType;
 import net.forthecrown.useables.actions.UsageAction;
@@ -31,6 +33,8 @@ public interface Registries {
     //Shop templates
     Registry<ShopTemplate> SHOP_TEMPLATES = create("shop_templates");
     CloseableRegistry<ShopTemplateType> SHOP_TEMPLATE_TYPES = createCloseable("shop_template_types");
+
+    CloseableRegistry<VoteTopicType<VoteTopic>> VOTE_TOPICS = createCloseable("vote_topics");
 
     //Cosmetic things registries
     CloseableRegistry<DeathEffect> DEATH_EFFECTS = createCloseable("death_effects");

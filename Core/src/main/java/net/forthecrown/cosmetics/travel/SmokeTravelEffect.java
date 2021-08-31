@@ -7,7 +7,7 @@ import org.bukkit.Particle;
 
 public class SmokeTravelEffect extends TravelEffect {
     SmokeTravelEffect() {
-        super("Smoke", new InventoryPos(3, 2),
+        super("Smoke", new InventoryPos(4, 1),
                 Component.text("you are a smoker "),
                 Component.text("really.")
         );
@@ -23,11 +23,11 @@ public class SmokeTravelEffect extends TravelEffect {
     @Override
     public void onHulkStart(Location loc) {
         // Cone shaped smoke
-        util.spawnOnCircle(loc, 1.3, 0.1, (short)5, Particle.SMOKE_LARGE, 2);  // Inner circle
-        util.spawnOnCircle(loc, 0.8, 0.25, (short)10, Particle.SMOKE_LARGE, 4);
-        util.spawnOnCircle(loc, 0.6, 0.5, (short)10, Particle.SMOKE_LARGE, 4);
-        util.spawnOnCircle(loc, 0.3, 1, (short)20, Particle.SMOKE_LARGE, 2);
-        util.spawnOnCircle(loc, 0.1, 1.5, (short)20, Particle.SMOKE_LARGE, 1); // Outer circle
+        TravelUtil.spawnOnCircle(loc, 1.3, 0.1, (short)5, Particle.SMOKE_LARGE, 2);  // Inner circle
+        TravelUtil.spawnOnCircle(loc, 0.8, 0.25, (short)10, Particle.SMOKE_LARGE, 4);
+        TravelUtil.spawnOnCircle(loc, 0.6, 0.5, (short)10, Particle.SMOKE_LARGE, 4);
+        TravelUtil.spawnOnCircle(loc, 0.3, 1, (short)20, Particle.SMOKE_LARGE, 2);
+        TravelUtil.spawnOnCircle(loc, 0.1, 1.5, (short)20, Particle.SMOKE_LARGE, 1); // Outer circle
 
         // Extra explosion for good measure :D
         loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc.add(0, 0.1, 0) , 1, 0, 0, 0, 0);

@@ -1,5 +1,6 @@
 package net.forthecrown.user;
 
+import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.sk89q.worldedit.math.BlockVector2;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.chat.ChatUtils;
@@ -915,6 +916,10 @@ public interface CrownUser extends
 
     default void setVelocity(Position pos) {
         setVelocity(pos.x(), pos.y(), pos.z());
+    }
+
+    default CraftPlayerProfile getProfile() {
+        return new CraftPlayerProfile(getUniqueId(), getName());
     }
 
     @Override

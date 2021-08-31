@@ -66,6 +66,14 @@ public class FtcBoundingBox extends BoundingBox implements Iterable<Block> {
         return of(b1.getLocation(), b2.getLocation());
     }
 
+    public static FtcBoundingBox of(World world, ImmutableVector3i center, double radius) {
+        int x = center.getX();
+        int y = center.getY();
+        int z = center.getZ();
+
+        return new FtcBoundingBox(world, x - radius, y - radius, z - radius, x + radius, y + radius, z + radius);
+    }
+
     public static FtcBoundingBox deserialize(Map<String, Object> args) {
         double minX = 0.0D;
         double minY = 0.0D;

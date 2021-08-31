@@ -13,6 +13,7 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.JoinInfo;
 import net.forthecrown.core.kingship.Kingship;
+import net.forthecrown.cosmetics.PlayerRidingManager;
 import net.forthecrown.economy.selling.UserSellResult;
 import net.forthecrown.events.dynamic.AfkListener;
 import net.forthecrown.events.dynamic.RegionVisitListener;
@@ -710,7 +711,7 @@ public class FtcUser implements CrownUser {
 
         //If in end, but end not open, leave end lol
         if(getWorld().equals(Worlds.END) && !ComVars.isEndOpen()) {
-            getPlayer().teleport(FtcUtils.LOCATION_HAZELGUARD);
+            getPlayer().teleport(PlayerRidingManager.HAZELGUARD);
         }
 
         PunishmentManager manager = Crown.getPunishmentManager();

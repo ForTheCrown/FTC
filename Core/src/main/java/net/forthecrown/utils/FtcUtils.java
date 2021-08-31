@@ -40,7 +40,6 @@ import static org.bukkit.Bukkit.getServer;
 public final class FtcUtils {
     private FtcUtils() {}
 
-    public static final Location LOCATION_HAZELGUARD = new Location(Worlds.OVERWORLD, 200.5, 70, 1000.5);
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
 
     public static <T> Predicate<T> alwaysAccept() {

@@ -23,8 +23,4 @@ public interface Registry<T> extends FtcRegistry<T, T>, Iterable<T>, Keyed {
      * @return Whether the registry is empty or not
      */
     boolean isEmpty();
-
-    default <V extends Keyed> V register(V val) {
-        return (V) register(val.key(), (T) val);
-    }
 }

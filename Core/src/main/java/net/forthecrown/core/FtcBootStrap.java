@@ -13,6 +13,7 @@ import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.CrownBalances;
 import net.forthecrown.economy.ServerItemPriceMap;
 import net.forthecrown.economy.market.FtcMarketRegion;
+import net.forthecrown.economy.market.guild.HazelguardTradersGuild;
 import net.forthecrown.economy.shops.CrownShopManager;
 import net.forthecrown.economy.shops.template.ShopTemplates;
 import net.forthecrown.events.Events;
@@ -77,6 +78,7 @@ public final class FtcBootStrap {
         Main.marketShops = new FtcMarketRegion();
         Main.kingship = new CrownKingship();
         Main.rules = new ServerRules();
+        Main.tradersGuild = new HazelguardTradersGuild();
 
         //Initialize modules
         safeRunnable(Pirates::init);
