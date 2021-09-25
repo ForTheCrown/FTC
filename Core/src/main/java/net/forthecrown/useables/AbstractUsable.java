@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.useables.checks.UsageCheckInstance;
 import net.forthecrown.utils.FtcUtils;
@@ -38,7 +38,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
 
     public abstract void delete();
 
-    protected void saveInto(JsonBuf json){
+    protected void saveInto(JsonWrapper json){
         json.add("sendFail", new JsonPrimitive(sendFail));
 
         JsonObject preconditions = new JsonObject();
@@ -60,7 +60,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
         json.add("actions", array);
     }
 
-    protected void reloadFrom(JsonBuf json) {
+    protected void reloadFrom(JsonWrapper json) {
         sendFail = json.get("sendFail").getAsBoolean();
 
         checks.clear();
@@ -80,7 +80,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
         if(actionsElement == null || !actionsElement.isJsonArray()) return;
 
         for (JsonElement e: actionsElement.getAsJsonArray()){
-            JsonBuf j = JsonBuf.of(e.getAsJsonObject());
+            JsonWrapper j = JsonWrapper.of(e.getAsJsonObject());
 
             try {
                 addAction(InteractionUtils.readAction(j.getString("type"), j.get("value")));

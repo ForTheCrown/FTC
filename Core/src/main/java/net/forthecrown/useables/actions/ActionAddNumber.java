@@ -5,7 +5,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
@@ -35,7 +35,7 @@ public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstan
 
     @Override
     public ActionInstance deserialize(JsonElement element) throws CommandSyntaxException {
-        JsonBuf json = JsonBuf.of(element.getAsJsonObject());
+        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
         int amount = json.getInt("amount");
         boolean taxed = json.getBool("taxed", false);
@@ -45,7 +45,7 @@ public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstan
 
     @Override
     public JsonElement serialize(ActionInstance value) {
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         json.add("taxed", value.isTaxed());
         json.add("amount", value.getAmount());
@@ -84,7 +84,7 @@ public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstan
 
         @Override
         public void onInteract(Player player) {
-            if(toBal) Crown.getBalances().add(player.getUniqueId(), amount, taxed);
+            if(toBal) Crown.getEconomy().add(player.getUniqueId(), amount, taxed);
             else UserManager.getUser(player).addGems(amount);
         }
 

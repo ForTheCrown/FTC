@@ -9,8 +9,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionConstants;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.actions.RegionVisit;
-import net.forthecrown.user.actions.UserActionHandler;
+import net.forthecrown.user.actions.ActionFactory;
 import net.md_5.bungee.api.ChatColor;
 
 public class HelpSpawn extends FtcCommand {
@@ -53,9 +52,7 @@ public class HelpSpawn extends FtcCommand {
                 BlockVector2 senderPos = sender.get2DLocation();
 
                 if(pole.distance(senderPos) < RegionConstants.DISTANCE_TO_POLE) {
-                    RegionVisit action = new RegionVisit(sender, region);
-                    UserActionHandler.handleAction(action);
-
+                    ActionFactory.visitRegion(sender, region);
                     return 0;
                 }
             }

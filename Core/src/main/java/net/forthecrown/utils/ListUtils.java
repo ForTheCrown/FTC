@@ -71,18 +71,16 @@ public final class ListUtils {
     }
 
     public static <I> String join(@NotNull Collection<I> list, @Nullable String delimiter, @Nullable String prefix, @Nullable String suffix, @NotNull Function<I, String> joiner){
-        StringBuilder builder = new StringBuilder(FtcUtils.isNullOrBlank(prefix) ? "" : prefix);
-        String acDelimiter = delimiter == null ? ", " : delimiter;
+        StringJoiner stringJoiner = new StringJoiner(
+                delimiter == null ? "" : delimiter,
+                prefix == null ? "" : prefix,
+                suffix == null ? "" : suffix
+        );
 
-        int iteration = 0;
-        for (I i: list){
-            iteration++;
-
-            builder.append(joiner.apply(i));
-            if(iteration < list.size()) builder.append(acDelimiter);
+        for (I i: list) {
+            stringJoiner.add(joiner.apply(i));
         }
 
-        if(!FtcUtils.isNullOrBlank(suffix)) builder.append(suffix);
-        return builder.toString();
+        return stringJoiner.toString();
     }
 }

@@ -32,7 +32,7 @@ public class CommandComVar extends FtcCommand {
      * - /comvar <variable
      * - /comvar <variable> <value>
      *
-     * Author: Botul
+     * Author: Julie
      */
 
     @Override

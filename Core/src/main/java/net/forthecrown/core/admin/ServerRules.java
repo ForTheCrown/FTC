@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -53,7 +53,7 @@ public class ServerRules extends AbstractJsonSerializer {
     }
 
     @Override
-    protected void save(JsonBuf json) {
+    protected void save(JsonWrapper json) {
         JsonArray array = new JsonArray();
 
         for (Component c: rules){
@@ -64,7 +64,7 @@ public class ServerRules extends AbstractJsonSerializer {
     }
 
     @Override
-    protected void reload(JsonBuf json) {
+    protected void reload(JsonWrapper json) {
         JsonArray array = json.getArray("rules");
 
         rules.clear();
@@ -74,7 +74,7 @@ public class ServerRules extends AbstractJsonSerializer {
     }
 
     @Override
-    protected void createDefaults(JsonBuf json) {
+    protected void createDefaults(JsonWrapper json) {
         JsonArray array = new JsonArray();
 
         array.add(ser(Component.text("No hacking or using xray")));

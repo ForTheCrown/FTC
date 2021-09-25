@@ -2,10 +2,10 @@ package net.forthecrown.events.dynamic;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.pirates.merchants.MaterialMerchant;
 import net.forthecrown.pirates.Pirates;
-import net.forthecrown.user.enums.SellAmount;
+import net.forthecrown.user.data.SellAmount;
 import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -77,7 +77,7 @@ public class BmSellItemListener extends AbstractInvListener implements Listener 
 
         Component s = FtcFormatter.itemDisplayName(toSellItem);
 
-        Balances bals = Crown.getBalances();
+        Economy bals = Crown.getEconomy();
         bals.add(uuid, toPay, false);
 
         Component message = Component.text("sold ")

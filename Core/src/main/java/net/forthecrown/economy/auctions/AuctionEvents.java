@@ -6,7 +6,7 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.pirates.AuctionManager;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.enums.Faction;
+import net.forthecrown.user.data.Faction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;

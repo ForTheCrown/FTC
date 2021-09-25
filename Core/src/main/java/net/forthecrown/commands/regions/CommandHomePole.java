@@ -9,8 +9,7 @@ import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionPos;
 import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.actions.RegionVisit;
-import net.forthecrown.user.actions.UserActionHandler;
+import net.forthecrown.user.actions.ActionFactory;
 
 public class CommandHomePole extends FtcCommand {
 
@@ -35,7 +34,7 @@ public class CommandHomePole extends FtcCommand {
      *
      * Permissions used:
      *
-     * Main Author:
+     * Main Author: Julie
      */
 
     @Override
@@ -51,9 +50,7 @@ public class CommandHomePole extends FtcCommand {
                     PopulationRegion region = Crown.getRegionManager().get(cords);
 
                     RegionUtil.validateDistance(region.getPolePosition(), user);
-
-                    RegionVisit action = new RegionVisit(user, region);
-                    UserActionHandler.handleAction(action);
+                    ActionFactory.visitRegion(user, region);
 
                     return 0;
                 });

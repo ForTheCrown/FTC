@@ -43,7 +43,7 @@ public class CommandIgnoreList extends FtcCommand {
      * Permissions used:
      * ftc.commands.ignore
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override

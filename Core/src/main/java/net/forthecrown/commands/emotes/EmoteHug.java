@@ -3,7 +3,7 @@ package net.forthecrown.commands.emotes;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.FtcGameMode;
+import net.forthecrown.user.data.FtcGameMode;
 import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;

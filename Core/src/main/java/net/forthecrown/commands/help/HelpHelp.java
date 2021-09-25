@@ -156,7 +156,7 @@ public class HelpHelp extends FtcCommand {
         List<Component> formatted = new ArrayList<>();
 
         for (FtcCommand c: commands){
-            if(!c.testPermissionSilent(sender.asBukkit())) continue;
+            if(!c.test(sender)) continue;
             String description = c.getDescription();
 
             formatted.add(

@@ -14,8 +14,6 @@ import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
-import net.forthecrown.economy.shops.template.ShopTemplate;
-import net.forthecrown.economy.shops.template.ShopTemplateType;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
@@ -35,9 +33,6 @@ public class RegistryArguments<T> implements ArgumentType<T> {
     private static final RegistryArguments<TravelEffect> TRAVEL_EFFECT = new RegistryArguments<>(Registries.TRAVEL_EFFECTS, "Travel Effect");
 
     private static final RegistryArguments<DungeonBoss<?>> DUNGEON_BOSS =  new RegistryArguments<>(Registries.DUNGEON_BOSSES, "Dungeon boss");
-
-    private static final RegistryArguments<ShopTemplate> SHOP_TEMPLATE = new RegistryArguments<>(Registries.SHOP_TEMPLATES, "Shop template");
-    private static final RegistryArguments<ShopTemplateType> TEMPLATE_TYPE = new RegistryArguments<>(Registries.SHOP_TEMPLATE_TYPES, "Shop Template Type");
 
     private static final RegistryArguments<UsageAction> USAGE_ACTION =  new RegistryArguments<>(Registries.USAGE_ACTIONS, "Usage action");
     private static final RegistryArguments<UsageCheck> USAGE_CHECK =   new RegistryArguments<>(Registries.USAGE_CHECKS, "Usage check");
@@ -60,14 +55,6 @@ public class RegistryArguments<T> implements ArgumentType<T> {
 
     public static RegistryArguments<DungeonBoss<?>> dungeonBoss() {
         return DUNGEON_BOSS;
-    }
-
-    public static RegistryArguments<ShopTemplate> shopTemplate() {
-        return SHOP_TEMPLATE;
-    }
-
-    public static RegistryArguments<ShopTemplateType> shopTemplateType() {
-        return TEMPLATE_TYPE;
     }
 
     public static RegistryArguments<UsageAction> usageAction() {

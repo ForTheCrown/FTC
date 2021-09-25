@@ -47,7 +47,7 @@ public class CommandRoyals extends FtcCommand {
      *
      * Permissions used:
      *
-     * Main Author:
+     * Main Author: Julie
      */
 
     @Override

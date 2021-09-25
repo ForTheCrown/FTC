@@ -22,10 +22,10 @@ public class BaltopArgument implements ArgumentType<Integer> {
     private BaltopArgument() {}
 
     //The max page number
-    public static int MAX = Math.round(((float) Crown.getBalances().getMap().size())/10);
+    public static int MAX = Math.round(((float) Crown.getEconomy().getMap().size())/10);
 
     public static void resetMax() {
-        MAX = Math.round(((float) Crown.getBalances().getMap().size())/10);
+        MAX = Math.round(((float) Crown.getEconomy().getMap().size())/10);
     }
 
     @Override

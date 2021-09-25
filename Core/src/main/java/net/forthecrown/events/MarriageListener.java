@@ -140,7 +140,7 @@ public class MarriageListener implements Listener, ClickEventTask {
         }
     }
 
-    private Component giveItAWeek(){
+    private Component giveItAWeek() {
         return FtcUtils.randomInRange(0, 1000) != 1 ? Component.empty() :
                 Component.text(" I give it a week").color(NamedTextColor.GRAY);
     }

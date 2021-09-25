@@ -1,9 +1,9 @@
 package net.forthecrown.economy.shops;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.WgFlags;
-import net.forthecrown.economy.Balances;
-import net.forthecrown.user.enums.Faction;
+import net.forthecrown.core.FtcFlags;
+import net.forthecrown.economy.Economy;
+import net.forthecrown.user.data.Faction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -23,10 +23,10 @@ public interface ShopInteraction {
      * otherwise it is a success
      *
      * @param session The session to check
-     * @param balances Economy
+     * @param economy Economy
      * @throws CommandSyntaxException If the check failed.
      */
-    void test(SignShopSession session, Balances balances) throws CommandSyntaxException;
+    void test(SignShopSession session, Economy economy) throws CommandSyntaxException;
 
     /**
      * Interacts with the shop
@@ -35,9 +35,9 @@ public interface ShopInteraction {
      * all the good stuff about a shop
      *
      * @param session The session that's interacting
-     * @param balances Balances :)
+     * @param economy Balances :)
      */
-    void interact(SignShopSession session, Balances balances);
+    void interact(SignShopSession session, Economy economy);
 
     /**
      * Tests the session's WorldGuard flags.
@@ -50,8 +50,8 @@ public interface ShopInteraction {
      * @return True if the flag checks passed, false if otherwise
      */
     default boolean testFlags(SignShopSession session) {
-        Faction allowedOwner = WgFlags.query(session.getShop().getLocation(), WgFlags.SHOP_OWNERSHIP_FLAG);
-        Faction allowedUser = WgFlags.query(session.getShop().getLocation(), WgFlags.SHOP_USAGE_FLAG);
+        Faction allowedOwner = FtcFlags.query(session.getShop().getLocation(), FtcFlags.SHOP_OWNERSHIP_FLAG);
+        Faction allowedUser = FtcFlags.query(session.getShop().getLocation(), FtcFlags.SHOP_USAGE_FLAG);
 
         //If the owner's branch doesn't match up with the WG flag
         if(allowedOwner != null && session.getOwner().getFaction() != Faction.DEFAULT && !session.getShop().getType().isAdmin() && allowedOwner != session.getOwner().getFaction()){

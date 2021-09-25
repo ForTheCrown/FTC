@@ -43,7 +43,7 @@ public class CommandHologram extends FtcCommand {
      * - /hologram <location> <text>
      * - /hologram <text>
      *
-     * Main Author: Botul
+     * Main Author: Julie
      */
 
     @Override

@@ -6,7 +6,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
-import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -17,7 +16,6 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.shops.ShopType;
 import net.forthecrown.economy.shops.SignShop;
-import net.forthecrown.economy.shops.template.ShopTemplate;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
@@ -198,23 +196,6 @@ public class CommandEditShop extends FtcCommand {
                                             return 0;
                                         })
                                 )
-                        )
-                )
-
-                .then(literal("template")
-                        .requires(s -> s.hasPermission(Permissions.SHOP_ADMIN))
-
-                        .then(argument("key", RegistryArguments.shopTemplate())
-                                .executes(c -> {
-                                    CrownUser user = getUserSender(c);
-                                    SignShop shop = getShop(user.getPlayer());
-
-                                    ShopTemplate template = c.getArgument("key", ShopTemplate.class);
-
-                                    shop.applyTemplate(template);
-
-                                    return 0;
-                                })
                         )
                 );
     }

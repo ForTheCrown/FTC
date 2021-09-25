@@ -39,7 +39,7 @@ public class CommandVolleyBall extends FtcCommand {
      * ftc.helper
      *
      * Main Author: Wout
-     * Edit: Ants
+     * Edit: Julie
      */
 
     @Override

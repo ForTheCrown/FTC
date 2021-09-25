@@ -36,7 +36,7 @@ public class CommandStaffChat extends FtcCommand {
      * Permissions used:
      * - ftc.staffchat
      *
-     * Author: Botul
+     * Author: Julie
      */
 
     @Override

@@ -8,10 +8,10 @@ import net.forthecrown.comvars.types.ComVarTypes;
 import net.forthecrown.core.Crown;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.enums.Rank;
+import net.forthecrown.user.data.Rank;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
@@ -46,7 +46,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
     }
 
     @Override
-    protected void save(final JsonBuf json) {
+    protected void save(final JsonWrapper json) {
         json.add("delay", delay.getValue());
 
         JsonArray array = new JsonArray();
@@ -58,7 +58,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
     }
 
     @Override
-    protected void reload(final JsonBuf json) {
+    protected void reload(final JsonWrapper json) {
         delay.setValue(json.get("delay").getAsShort());
 
         JsonArray array = json.getArray("announcements");
@@ -163,7 +163,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
 
     @Override
-    protected void createDefaults(final JsonBuf json) {
+    protected void createDefaults(final JsonWrapper json) {
         json.add("delay", 12000);
 
         JsonArray array = new JsonArray();

@@ -4,6 +4,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.utils.Struct;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -11,14 +12,14 @@ import net.kyori.adventure.text.format.TextColor;
 /**
  * struct for a DM between two command sources.
  */
-public class DirectMessage implements UserAction {
+public class DirectMessage implements UserAction, Struct {
 
     private final CommandSource sender;
     private final CommandSource target;
 
     private final Component formattedText;
     private final boolean responding;
-    private final MuteStatus muteStatus;
+    private MuteStatus muteStatus;
     private final String input;
 
     public DirectMessage(CommandSource sender, CommandSource target, boolean responding, String input) {
@@ -69,6 +70,10 @@ public class DirectMessage implements UserAction {
 
     public MuteStatus getMuteStatus(){
         return muteStatus;
+    }
+
+    public void setMuteStatus(MuteStatus muteStatus) {
+        this.muteStatus = muteStatus;
     }
 
     public Component getFormattedText() {

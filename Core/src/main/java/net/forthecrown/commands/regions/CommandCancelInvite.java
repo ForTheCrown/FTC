@@ -31,7 +31,7 @@ public class CommandCancelInvite extends FtcCommand {
      *
      * Permissions used: ftc.regions
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override

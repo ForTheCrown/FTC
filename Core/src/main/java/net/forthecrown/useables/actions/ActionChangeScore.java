@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.scoreboard.ObjectiveArgument;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
@@ -43,7 +43,7 @@ public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionIn
 
     @Override
     public ActionInstance deserialize(JsonElement element) throws CommandSyntaxException {
-        JsonBuf json = JsonBuf.of(element.getAsJsonObject());
+        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
         int amount = json.getInt("amount");
         Objective obj = ObjectiveArgument.objective().parse(new StringReader(json.getString("objective")));
@@ -53,7 +53,7 @@ public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionIn
 
     @Override
     public JsonElement serialize(ActionInstance value) {
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         json.add("amount", value.getAmount());
         json.add("objective", value.getObjective().getName());

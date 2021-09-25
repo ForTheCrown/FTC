@@ -3,17 +3,18 @@ package net.forthecrown.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.ComVars;
-import net.forthecrown.core.Crown;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.ComVars;
+import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.economy.Balances;
-import net.forthecrown.user.CrownUser;
+import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.royalgrenadier.types.selector.EntityArgumentImpl;
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -29,13 +30,13 @@ public class CommandPay extends FtcCommand {
 
         maxMoneyAmount = ComVars.getMaxMoneyAmount();
 
-        setDescription("Pays another player");
+        setDescription("Pay another player");
         setPermission(Permissions.PAY);
 
         register();
     }
 
-    private final Balances bals = Crown.getBalances();
+    private final Economy bals = Crown.getEconomy();
 
     /*
      * ----------------------------------------
@@ -46,7 +47,7 @@ public class CommandPay extends FtcCommand {
      * Valid usages of command:
      * - /pay <player> <amount> [message]
      *
-     * Author: Botul
+     * Author: Julie
      */
 
     @Override
@@ -82,13 +83,13 @@ public class CommandPay extends FtcCommand {
         if(!user.allowsPaying()) throw FtcExceptionProvider.senderPayDisabled();
 
         UUID id = user.getUniqueId();
-        if(!bals.canAfford(id, amount)) throw FtcExceptionProvider.cannotAfford(amount);
+        if(!bals.has(id, amount)) throw FtcExceptionProvider.cannotAfford(amount);
 
         targets.removeIf(u -> !u.allowsPaying());
 
         if(targets.remove(user) && targets.isEmpty()) throw FtcExceptionProvider.cannotPaySelf();
         if(targets.isEmpty()) throw EntityArgumentImpl.NO_ENTITIES_FOUND.create();
-        if(!bals.canAfford(user.getUniqueId(), amount * targets.size())) throw FtcExceptionProvider.cannotAfford();
+        if(!bals.has(user.getUniqueId(), amount * targets.size())) throw FtcExceptionProvider.cannotAfford();
 
         byte paidAmount = 0;
 
@@ -98,13 +99,15 @@ public class CommandPay extends FtcCommand {
             if(target.getInteractions().isBlockedPlayer(user.getUniqueId())) throw FtcExceptionProvider.cannotPayBlocked();
         }
 
-        Component messageActual = message == null || !user.getInteractions().muteStatus().maySpeak ?
+        Component messageActual = message == null || !user.getInteractions().muteStatusSilent().maySpeak || BannedWords.contains(message) ?
                 Component.text(".").color(NamedTextColor.GRAY) :
                 Component.text(": ").append(message.color(NamedTextColor.WHITE));
 
         Component formattedAmount = FtcFormatter.rhines(amount).color(NamedTextColor.GOLD);
 
         for (CrownUser target: targets) {
+            if(target.getInteractions().isBlockedPlayer(user.getUniqueId())) continue;
+
             bals.add(target.getUniqueId(), amount, false);
             bals.add(id, -amount, false);
 
@@ -117,17 +120,17 @@ public class CommandPay extends FtcCommand {
                     )
             );
 
-            boolean ignoring = target.getInteractions().isBlockedPlayer(user.getUniqueId());
             target.sendMessage(
                     Component.translatable("economy.pay.receiver",
                             NamedTextColor.GRAY,
                             formattedAmount,
                             user.nickDisplayName().color(NamedTextColor.YELLOW),
-                            ignoring ? Component.text(".").color(NamedTextColor.GRAY) : messageActual
+                            messageActual
                     )
             );
 
             paidAmount++;
+            target.unloadIfOffline();
         }
 
         if(paidAmount == 0) throw UserArgument.NO_USERS_FOUND.create();

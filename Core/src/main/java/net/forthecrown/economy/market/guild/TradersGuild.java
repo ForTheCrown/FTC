@@ -3,8 +3,12 @@ package net.forthecrown.economy.market.guild;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.economy.market.guild.topics.VoteTopic;
 import net.forthecrown.serializer.CrownSerializer;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.manager.UserManager;
+import org.bukkit.World;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public interface TradersGuild extends CrownSerializer {
     VoteState getVoteState();
@@ -13,7 +17,13 @@ public interface TradersGuild extends CrownSerializer {
         return getVoteState() != null;
     }
 
+    long getLastVoteEnd();
+    boolean canStartVote();
+
+    World getWorld();
+
     void createVote(VoteTopic topic);
+    void finishVoting();
 
     ObjectList<UUID> getMembers();
 
@@ -24,5 +34,21 @@ public interface TradersGuild extends CrownSerializer {
     void addMember(UUID member);
     void removeMember(UUID member);
 
-    VoteBoxPos getVoteBox();
+    int getMaxMembers();
+
+    VoteBox getVoteBox();
+
+    default void forEachUser(Consumer<CrownUser> consumer) {
+        for (UUID id: getMembers()) {
+            CrownUser u = UserManager.getUser(id);
+
+            consumer.accept(u);
+
+            u.unloadIfOffline();
+        }
+    }
+
+    default void forEach(Consumer<UUID> uuidConsumer) {
+        getMembers().forEach(uuidConsumer);
+    }
 }

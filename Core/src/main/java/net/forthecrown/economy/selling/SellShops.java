@@ -2,7 +2,7 @@ package net.forthecrown.economy.selling;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.InventoryBuilder;
 import net.forthecrown.inventory.builder.options.InventoryBorder;
@@ -10,7 +10,7 @@ import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.inventory.builder.options.SimpleCordedOption;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.SoldMaterialData;
-import net.forthecrown.user.enums.SellAmount;
+import net.forthecrown.user.data.SellAmount;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -194,7 +194,7 @@ public class SellShops {
      */
     public static int sell(CrownUser user, Material toRemove, int priceScalar, SoldMaterialData data) {
         SellAmount sellAmount = user.getSellAmount();
-        Balances balances = Crown.getBalances();
+        Economy economy = Crown.getEconomy();
 
         ItemStack sellItem = new ItemStack(toRemove, sellAmount.value);
         UserSellResult result = user.sellMaterial(toRemove);
@@ -206,7 +206,7 @@ public class SellShops {
 
         int totalEarned = result.getFoundAmount() * data.getPrice() * priceScalar;
 
-        balances.add(user.getUniqueId(), totalEarned, true);
+        economy.add(user.getUniqueId(), totalEarned, true);
         user.addTotalEarnings(totalEarned);
 
         user.sendMessage(

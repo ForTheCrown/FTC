@@ -7,12 +7,12 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.Worlds;
-import net.forthecrown.utils.loot.CrownLootTable;
+import net.forthecrown.utils.loot.FtcLootTable;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.math.MathUtil;
 import net.kyori.adventure.key.Key;
@@ -43,9 +43,9 @@ public class TreasureShulker extends AbstractJsonSerializer {
     private static final Key rareKey = Squire.createPiratesKey("rare_loot");
     private static final Key specialKey = Squire.createPiratesKey("special_loot");
 
-    private CrownLootTable commonLoot;
-    private CrownLootTable rareLoot;
-    private CrownLootTable specialLoot;
+    private FtcLootTable commonLoot;
+    private FtcLootTable rareLoot;
+    private FtcLootTable specialLoot;
 
     private Location location;
     private UUID currentID;
@@ -67,7 +67,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
     }
 
     @Override
-    protected void save(JsonBuf json) {
+    protected void save(JsonWrapper json) {
         json.add("loc", JsonUtils.writeLocation(location));
         json.add("currentID", currentID == null ? null : currentID.toString());
 
@@ -81,16 +81,16 @@ public class TreasureShulker extends AbstractJsonSerializer {
     }
 
     @Override
-    protected void reload(JsonBuf json) {
+    protected void reload(JsonWrapper json) {
         this.location = JsonUtils.readLocation(json.getObject("loc"));
 
         JsonElement element = json.get("currentID");
         if(element != null && !element.isJsonNull()) this.currentID = UUID.fromString(element.getAsString());
         else currentID = null;
 
-        this.commonLoot = CrownLootTable.deserialize(json.get("commonLoot"));
-        this.rareLoot = CrownLootTable.deserialize(json.get("rareLoot"));
-        this.specialLoot = CrownLootTable.deserialize(json.get("specialLoot"));
+        this.commonLoot = FtcLootTable.deserialize(json.get("commonLoot"));
+        this.rareLoot = FtcLootTable.deserialize(json.get("rareLoot"));
+        this.specialLoot = FtcLootTable.deserialize(json.get("specialLoot"));
 
         alreadyFound.clear();
         if(json.has("alreadyFound")){
@@ -159,19 +159,19 @@ public class TreasureShulker extends AbstractJsonSerializer {
         return new Loot(rarity, player, interacted.getLocation(), random, getLootByRarity(rarity));
     }
 
-    public CrownLootTable getCommonLoot() {
+    public FtcLootTable getCommonLoot() {
         return commonLoot;
     }
 
-    public CrownLootTable getRareLoot() {
+    public FtcLootTable getRareLoot() {
         return rareLoot;
     }
 
-    public CrownLootTable getSpecialLoot() {
+    public FtcLootTable getSpecialLoot() {
         return specialLoot;
     }
 
-    public CrownLootTable getLootByRarity(Rarity rarity) {
+    public FtcLootTable getLootByRarity(Rarity rarity) {
         return switch (rarity) {
             case COMMON -> getCommonLoot();
             case SPECIAL -> getSpecialLoot();
@@ -183,7 +183,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
         return Rarity.values()[random.intInRange(0, Rarity.values().length-1)];
     }
 
-    public CrownLootTable getRandomLoot(){
+    public FtcLootTable getRandomLoot(){
         int index = random.nextInt(100);
 
         if(MathUtil.isInRange(index, 0, 20)) return getSpecialLoot();
@@ -236,7 +236,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
     }
 
     @Override
-    protected void createDefaults(JsonBuf json) {
+    protected void createDefaults(JsonWrapper json) {
         moveLocToRandom();
         json.add("loc", JsonUtils.writeLocation(location));
 
@@ -259,7 +259,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
         ).serialize());
     }
 
-    private CrownLootTable lootTableFromChest(Vector3i pos, World world, Key key){
+    private FtcLootTable lootTableFromChest(Vector3i pos, World world, Key key){
         Chest chest = pos.stateAs(world);
         List<ItemStack> items = new ArrayList<>();
 
@@ -268,7 +268,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
             items.add(i);
         }
 
-        return CrownLootTable.of(key, items);
+        return FtcLootTable.of(key, items);
     }
 
     public enum Rarity {
@@ -288,7 +288,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
         Collection<ItemStack> items;
         int rhineReward;
 
-        public Loot(Rarity rarity, Player player, Location location, CrownRandom random, CrownLootTable lootTable){
+        public Loot(Rarity rarity, Player player, Location location, CrownRandom random, FtcLootTable lootTable){
             this.rarity = rarity;
             this.items = lootTable.populateLoot(random, new LootContext.Builder(location).killer(player).build(), ComVars.getMaxTreasureItems());
             this.rhineReward = random.intInRange(ComVars.getTreasureMinPrize(), ComVars.getTreasureMaxPrize());
@@ -305,7 +305,7 @@ public class TreasureShulker extends AbstractJsonSerializer {
                 return false;
             }
 
-            Crown.getBalances().add(player.getUniqueId(), rhineReward, false);
+            Crown.getEconomy().add(player.getUniqueId(), rhineReward, false);
             items.forEach(i -> player.getInventory().addItem(i));
 
             Score pp = BlackMarketUtils.getPiratePointScore(player.getName());

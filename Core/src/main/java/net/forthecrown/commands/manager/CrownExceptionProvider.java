@@ -1,7 +1,5 @@
 package net.forthecrown.commands.manager;
 
-import com.mojang.brigadier.LiteralMessage;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.kyori.adventure.text.Component;
 
@@ -9,8 +7,6 @@ import net.kyori.adventure.text.Component;
  * Class for storing exception constants
  */
 public class CrownExceptionProvider {
-    static final DynamicCommandExceptionType GENERIC =                  new DynamicCommandExceptionType(o -> new LiteralMessage(o.toString()));
-
     static final UserCommandExceptionType CANNOT_MUTE =                 new UserCommandExceptionType(u -> Component.text("Cannot mute ").append(u.displayName()));
     static final UserCommandExceptionType CANNOT_BAN =                  new UserCommandExceptionType(u -> Component.text("Cannot ban ").append(u.displayName()));
     static final UserCommandExceptionType CANNOT_KICK =                 new UserCommandExceptionType(u -> Component.text("Cannot kick ").append(u.displayName()));

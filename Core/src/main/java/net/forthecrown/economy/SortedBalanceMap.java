@@ -27,7 +27,7 @@ import java.util.function.IntSupplier;
  * two entries with the same UUID to exist. So uhh TODO: fix multiple entries for one UUID.
  */
 public class SortedBalanceMap implements BalanceMap {
-    private final ObjectList<BalEntry> entries = new ObjectArrayList<>(300);
+    private final ObjectList<Balance> entries = new ObjectArrayList<>(300);
     private final IntSupplier defaultAmount;
 
     public SortedBalanceMap(IntSupplier defaultAmount){
@@ -66,7 +66,7 @@ public class SortedBalanceMap implements BalanceMap {
     }
 
     @Override
-    public BalEntry getEntry(int index){
+    public Balance getEntry(int index){
         return entries.get(index);
     }
 
@@ -74,7 +74,7 @@ public class SortedBalanceMap implements BalanceMap {
     public Component getPrettyDisplay(int index){
         if(!isInList(index)) throw new IndexOutOfBoundsException(index);
 
-        BalEntry entry = getEntry(index);
+        Balance entry = getEntry(index);
         OfflinePlayer player = Bukkit.getOfflinePlayer(entry.getUniqueId());
         if(player == null || player.getName() == null){
             remove(entry.getUniqueId());
@@ -84,7 +84,7 @@ public class SortedBalanceMap implements BalanceMap {
         CrownUser user = UserManager.getUser(player);
         Component displayName = user.nickDisplayName();
 
-        user.unloadIfNotOnline();
+        user.unloadIfOffline();
 
         return Component.text()
                 .append(displayName)
@@ -96,7 +96,7 @@ public class SortedBalanceMap implements BalanceMap {
     @Override
     public int getIndex(UUID id){
         for (int i = 0; i < entries.size()/2; i++){
-            BalEntry entry = entries.get(i);
+            Balance entry = entries.get(i);
             if(entry.getUniqueId().equals(id)) return i;
 
             int oppositeEnd = entries.size() - 1 - i;
@@ -119,7 +119,7 @@ public class SortedBalanceMap implements BalanceMap {
     @Override
     public void put(UUID id, int amount){
         int index = getIndex(id);
-        BalEntry entry = new BalEntry(id, amount);
+        Balance entry = new Balance(id, amount);
 
         if(index == -1){
             entries.add(entry);
@@ -139,8 +139,8 @@ public class SortedBalanceMap implements BalanceMap {
     private void moveInDir(int index, int dir){
         int newIndex = index + dir;
 
-        BalEntry entry = entries.get(newIndex);
-        BalEntry newE = entries.get(index);
+        Balance entry = entries.get(newIndex);
+        Balance newE = entries.get(index);
 
         entries.set(newIndex, newE);
         entries.set(index, entry);
@@ -149,17 +149,17 @@ public class SortedBalanceMap implements BalanceMap {
     }
 
     private int moveDir(int index){
-        BalEntry entry = entries.get(index);
+        Balance entry = entries.get(index);
 
         int towardsTop = index + 1;
         if(isInList(towardsTop)){
-            BalEntry top = entries.get(towardsTop);
+            Balance top = entries.get(towardsTop);
             if(top.compareTo(entry) == 1) return 1;
         }
 
         int towardsBottom = index - 1;
         if(isInList(towardsBottom)){
-            BalEntry bottom = entries.get(towardsBottom);
+            Balance bottom = entries.get(towardsBottom);
             if(bottom.compareTo(entry) == -1) return -1;
         }
 
@@ -177,7 +177,7 @@ public class SortedBalanceMap implements BalanceMap {
 
         return entries.stream()
                 .filter(e -> e.getValue() > defAmount)
-                .mapToLong(BalEntry::getValue)
+                .mapToLong(Balance::getValue)
                 .sum();
     }
 
@@ -188,16 +188,16 @@ public class SortedBalanceMap implements BalanceMap {
 
     @Override
     public List<UUID> keys(){
-        return ImmutableList.copyOf(ListUtils.convert(entries, BalEntry::getUniqueId));
+        return ImmutableList.copyOf(ListUtils.convert(entries, Balance::getUniqueId));
     }
 
     @Override
     public List<Integer> values(){
-        return ImmutableList.copyOf(ListUtils.convert(entries, BalEntry::getValue));
+        return ImmutableList.copyOf(ListUtils.convert(entries, Balance::getValue));
     }
 
     @Override
-    public List<BalEntry> entries() {
+    public List<Balance> entries() {
         return ImmutableList.copyOf(entries);
     }
 }

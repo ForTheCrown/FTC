@@ -5,7 +5,7 @@ import net.forthecrown.core.npc.InteractableNPC;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.enums.Faction;
+import net.forthecrown.user.data.Faction;
 import net.kyori.adventure.key.Keyed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

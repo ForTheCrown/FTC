@@ -1,6 +1,6 @@
 package net.forthecrown.economy.shops;
 
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.user.CrownUser;
 import org.bukkit.entity.Player;
 
@@ -15,9 +15,9 @@ public interface ShopInteractionHandler {
      * Handles a simple interaction between a given player and a given shop
      * @param shop The shop being interacted with
      * @param player The interacting player
-     * @param balances The balances, used for economy stuff
+     * @param economy The balances, used for economy stuff
      */
-    void handleInteraction(SignShop shop, Player player, Balances balances);
+    void handleInteraction(SignShop shop, Player player, Economy economy);
 
     /**
      * Gets a session linked a user

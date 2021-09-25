@@ -7,7 +7,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.FtcGameMode;
+import net.forthecrown.user.data.FtcGameMode;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.permissions.Permission;
@@ -15,7 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class CommandSpecificGameMode extends FtcCommand {
     private final FtcGameMode gameMode;
-    public CommandSpecificGameMode(@NotNull String name, Permission permission, FtcGameMode mode, String... aliases) {
+
+    private CommandSpecificGameMode(@NotNull String name, Permission permission, FtcGameMode mode, String... aliases) {
         super(name, Crown.inst());
 
         this.aliases = aliases;

@@ -4,7 +4,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -34,7 +34,7 @@ public class CommandDeposit extends FtcCommand {
      * Valid usages of command:
      * - /deposit
      *
-     * Main Author: Botul
+     * Main Author: Julie
      */
 
     @Override
@@ -58,7 +58,7 @@ public class CommandDeposit extends FtcCommand {
 
             amount = amount*mainItem.getAmount();
 
-            Balances bals = Crown.getBalances();
+            Economy bals = Crown.getEconomy();
             bals.add(player.getUniqueId(), amount, false);
 
             player.sendMessage(

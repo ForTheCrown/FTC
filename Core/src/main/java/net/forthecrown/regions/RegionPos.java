@@ -143,6 +143,20 @@ public class RegionPos {
     }
 
     /**
+     * Same as {@link RegionPos#parse(StringReader)} except it doesn't throw an exception.
+     * @param str The string to parse
+     * @throws IllegalStateException If the parsing failed
+     * @return The pos parsed from the string
+     */
+    public static RegionPos fromString(String str) throws IllegalStateException {
+        try {
+            return parse(new StringReader(str));
+        } catch (CommandSyntaxException e) {
+            throw new IllegalStateException("Invalid parse input: " + str);
+        }
+    }
+
+    /**
      * Parses region cords from a string
      * <p></p>
      * An example for what this parses is: "-6 4", the characters before
@@ -152,21 +166,16 @@ public class RegionPos {
      * <p></p>
      * How much of that text was obvious? lol
      *
-     * @param str The string to parse
-     * @return The position parsed from the string, or null, if parsing failed
+     * @param reader The reader to parse from.
+     * @throws CommandSyntaxException if the parsing failed
+     * @return The position parsed from the string
      */
-    public static RegionPos fromString(String str) {
-        try {
-            StringReader reader = new StringReader(str);
+    public static RegionPos parse(StringReader reader) throws CommandSyntaxException {
+        int x = reader.readInt();
+        reader.skipWhitespace();
+        int z = reader.readInt();
 
-            int x = reader.readInt();
-            reader.skipWhitespace();
-            int z = reader.readInt();
-
-            return new RegionPos(x, z);
-        } catch (CommandSyntaxException e) {
-            throw new IllegalStateException("Invalid parse input: " + str);
-        }
+        return new RegionPos(x, z);
     }
 
     /**

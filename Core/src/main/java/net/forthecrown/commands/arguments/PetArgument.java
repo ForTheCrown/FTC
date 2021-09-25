@@ -7,13 +7,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.Pet;
-import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.data.Pet;
+import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.utils.ListUtils;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -61,8 +61,8 @@ public class PetArgument implements ArgumentType<Pet> {
         return listSuggestions(context, builder, false);
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, boolean ignorePerms){
-        if(ignorePerms) return CompletionProvider.suggestMatching(builder, ListUtils.arrayToList(Pet.values(), p -> p.name().toLowerCase()));
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, boolean ignoreOwner){
+        if(ignoreOwner) return CompletionProvider.suggestMatching(builder, ListUtils.arrayToList(Pet.values(), p -> p.name().toLowerCase()));
 
         if(context.getSource() instanceof CommandSource){
             CrownUser user;

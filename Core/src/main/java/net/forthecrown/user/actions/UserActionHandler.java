@@ -1,5 +1,6 @@
 package net.forthecrown.user.actions;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
 
 public interface UserActionHandler {
@@ -46,6 +47,10 @@ public interface UserActionHandler {
      * @param request The request to handle
      */
     void handleTeleport(TeleportRequest request);
+
+    void handleMailQuery(MailQuery query) throws CommandSyntaxException;
+
+    void handleMailAdd(MailAddAction action) throws CommandSyntaxException;
 
     /**
      * Handles a region visit

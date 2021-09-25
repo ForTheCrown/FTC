@@ -1,10 +1,57 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
+import java.time.Month
+import java.time.format.TextStyle
+import java.util.function.Consumer
+
 plugins {
     id 'java'
 }
 
 group = 'net.forthecrown'
+version = buildVersion()
+
+static String buildVersion() {
+    Calendar cal = Calendar.getInstance()
+    Month month = Month.values()[cal.get(Calendar.MONTH)]
+    int day = cal.get(Calendar.DAY_OF_MONTH)
+    int year = cal.get(Calendar.YEAR)
+
+    return month.getDisplayName(TextStyle.SHORT, Locale.ROOT).toUpperCase() + '-' + day + '-' + year
+}
+
+static int buildID() {
+    int result = 1
+
+    consumeProperties(p -> {
+        result = Integer.parseInt(p.getProperty("buildID"))
+    })
+
+    return result
+}
+
+static void incrementBuildID() {
+    consumeProperties(properties -> {
+        int id = Integer.parseInt(properties.getProperty("buildID"))
+        id++
+
+        properties.setProperty("buildID", id + "")
+    });
+}
+
+static void resetBuildID() {
+    consumeProperties(p -> p.setProperty("buildID", "1"))
+}
+
+static void consumeProperties(Consumer<Properties> propertiesConsumer) {
+    File f = new File('buildver.properties')
+    Properties properties = new Properties()
+    properties.load(new FileReader(f))
+
+    propertiesConsumer.accept(properties)
+
+    properties.save(new FileOutputStream(f), "Saves the last build ID, last edited:")
+}
 
 compileJava.options.encoding = 'UTF-8'
 javadoc.options.encoding = 'UTF-8'
@@ -42,8 +89,14 @@ void libJar(String s) {
     dependencies.compileOnly(files('/libs/' + s + '.jar'))
 }
 
+tasks.jar {
+    archiveFileName.set("${project.name}.jar")
+}
+
 //Does the building and remapping all in one click of a button. :DDDDD
 tasks.register('remap', Copy) {
+    incrementBuildID()
+
     it.dependsOn(build)
     it.from "$buildDir/libs" into "/remapping"
 
@@ -55,9 +108,19 @@ tasks.register('remap', Copy) {
     }
 }
 
+tasks.register('resetBuildID') {
+    resetBuildID()
+}
+
+tasks.register('incrementBuildID') {
+    incrementBuildID()
+}
+
 processResources {
     File pluginYml = new File('build/resources/main/plugin.yml')
     if(pluginYml.exists()) pluginYml.delete()
 
     filter(ReplaceTokens, tokens: [version: version])
+    filter(ReplaceTokens, tokens: [buildID: buildID() + ""])
+    filter(ReplaceTokens, tokens: [buildDate: new Date().toString()])
 }

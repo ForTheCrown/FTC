@@ -42,7 +42,7 @@ public class CommandTeleport extends FtcCommand {
                                     Entity entity = EntityArgument.getPlayer(c, "entity_to");
                                     Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
 
-                                    Component display = FtcFormatter.entityDisplayName(entity);
+                                    Component display = FtcFormatter.displayName(entity);
                                     if(entity.getType() == EntityType.PLAYER) display = UserManager.getUser(entity.getUniqueId()).nickDisplayName();
 
                                     return teleport(entities, entity.getLocation(), display, c.getSource());
@@ -64,7 +64,7 @@ public class CommandTeleport extends FtcCommand {
                             CrownUser user = getUserSender(c);
                             Entity entity = EntityArgument.getEntity(c, "entity");
 
-                            Component display = FtcFormatter.entityDisplayName(entity);
+                            Component display = FtcFormatter.displayName(entity);
                             if(entity instanceof Player) display = UserManager.getUser(entity.getUniqueId()).nickDisplayName();
                             if(user.isTeleporting()) throw FtcExceptionProvider.create("You are already teleporting");
 
@@ -134,7 +134,7 @@ public class CommandTeleport extends FtcCommand {
 
     public Component entOrUserDisplayName(Entity entity){
         if(entity.getType() == EntityType.PLAYER) return UserManager.getUser(entity.getUniqueId()).nickDisplayName();
-        return FtcFormatter.entityDisplayName(entity);
+        return FtcFormatter.displayName(entity);
     }
 
     public Component entDisplay(Collection<Entity> entities){

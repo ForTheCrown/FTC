@@ -2,7 +2,7 @@ package net.forthecrown.user;
 
 import com.google.gson.JsonElement;
 import net.kyori.adventure.key.Key;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents information that can be stored in a user's data
@@ -22,7 +22,7 @@ public interface UserDataContainer extends UserAttachment {
      * @param key The key of which to get the section of
      * @return The plugin's section
      */
-    @NotNull JsonElement get(Key key);
+    @Nullable JsonElement get(Key key);
 
     /**
      * returns if the data container is empty

@@ -3,14 +3,17 @@ package net.forthecrown.economy.market;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Nameable;
+import net.forthecrown.utils.Struct;
 import net.forthecrown.utils.math.Vector3i;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 import java.util.Date;
 import java.util.UUID;
 
-public interface MarketShop extends JsonSerializable, Nameable {
+public interface MarketShop extends JsonSerializable, Nameable, Struct {
     ProtectedRegion getWorldGuard();
 
     @Override
@@ -22,7 +25,7 @@ public interface MarketShop extends JsonSerializable, Nameable {
     void setEntrances(ObjectList<ShopEntrance> entrances);
 
     BoundingBox getVoidExample();
-    Vector3i getShopResetPos();
+    Vector3i getResetPos();
 
     int getPrice();
     void setPrice(int price);
@@ -37,6 +40,14 @@ public interface MarketShop extends JsonSerializable, Nameable {
 
     UUID getOwner();
     void setOwner(UUID uuid);
+
+    default boolean hasOwner() {
+        return getOwner() != null;
+    }
+
+    default CrownUser ownerUser() {
+        return hasOwner() ? UserManager.getUser(getOwner()) : null;
+    }
 
     ObjectList<UUID> getCoOwners();
     void setCoOwners(ObjectList<UUID> coOwners);

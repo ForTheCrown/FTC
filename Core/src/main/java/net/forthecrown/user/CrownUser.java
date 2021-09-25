@@ -9,10 +9,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.regions.RegionPos;
 import net.forthecrown.serializer.Deletable;
-import net.forthecrown.user.data.SoldMaterialData;
-import net.forthecrown.user.data.UserPref;
-import net.forthecrown.user.data.UserTeleport;
-import net.forthecrown.user.enums.*;
+import net.forthecrown.user.data.*;
 import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.math.ImmutableVector3i;
 import net.kyori.adventure.text.Component;
@@ -20,6 +17,8 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
 import net.minecraft.core.Position;
 import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -44,7 +43,6 @@ public interface CrownUser extends
         HoverEventSource<Component>,
         Deletable
 {
-
     /**
      * Reloads the user's data
      */
@@ -220,7 +218,7 @@ public interface CrownUser extends
     /**
      * Updates the display name of this user in the Tab List
      */
-    void updateTabName();
+    void updateTabName() throws UserNotOnlineException;
 
     /**
      * Gets the list display name of this user
@@ -553,18 +551,6 @@ public interface CrownUser extends
     }
 
     /**
-     * Gets the object which hold data for this user
-     * @return The user's data container
-     */
-    UserDataContainer getDataContainer();
-
-    /**
-     * Gets the user's grave
-     * @return The user's grave
-     */
-    Grave getGrave();
-
-    /**
      * Gets the location of the user, or the last known location if they're not online. Will return null if no location was found
      * @return The user's location, or last known location
      */
@@ -584,7 +570,7 @@ public interface CrownUser extends
     /**
      * Unloads the user if they're not online
      */
-    default void unloadIfNotOnline(){
+    default void unloadIfOffline() {
         if(!isOnline()) unload();
     }
 
@@ -592,7 +578,7 @@ public interface CrownUser extends
      * Gets the user's click event, '/tell [name] ' if online, '/profile [name]' if offline
      * @return The user's click event
      */
-    default ClickEvent asClickEvent(){
+    default ClickEvent asClickEvent() {
         return ClickEvent.suggestCommand("/" + (isOnline() ? "tell " + getName() + " " : "profile " + getName()));
     }
 
@@ -644,7 +630,7 @@ public interface CrownUser extends
      * Same as {@link CrownUser#getNickOrName()} except component
      * @return The user's nick or name
      */
-    default Component nickOrName(){
+    default Component nickOrName() {
         return Component.text(getNickOrName());
     }
 
@@ -652,7 +638,7 @@ public interface CrownUser extends
      * Gets the user's highest tier rank
      * @return The user's highest tier rank
      */
-    default Rank getHighestTierRank(){
+    default Rank getHighestTierRank() {
         Rank highest = null;
 
         for (Rank r: getAvailableRanks()){
@@ -680,7 +666,7 @@ public interface CrownUser extends
      * @param type The teleport type
      * @return The created teleport
      */
-    UserTeleport createTeleport(Supplier<Location> destination, boolean tell, UserTeleport.Type type);
+    UserTeleport createTeleport(Supplier<Location> destination, boolean tell, UserTeleport.Type type) throws UserNotOnlineException;
 
     /**
      * Creates a teleport to the given location
@@ -690,7 +676,7 @@ public interface CrownUser extends
      * @param bypassCooldown whether to bypass the teleport cooldown
      * @return The created teleport
      */
-    UserTeleport createTeleport(Supplier<Location> destination, boolean tell, boolean bypassCooldown, UserTeleport.Type type);
+    UserTeleport createTeleport(Supplier<Location> destination, boolean tell, boolean bypassCooldown, UserTeleport.Type type) throws UserNotOnlineException;
 
     /**
      * Checks if the user is teleporting
@@ -809,7 +795,7 @@ public interface CrownUser extends
         if(isOnline()) updateVanished();
     }
 
-    void updateVanished();
+    void updateVanished() throws UserNotOnlineException;
 
     boolean isAfk();
 
@@ -817,7 +803,7 @@ public interface CrownUser extends
 
     void setAfk(boolean afk, String reason);
 
-    void updateAfk();
+    void updateAfk() throws UserNotOnlineException;
 
     default boolean isFlying() {
         return hasPref(UserPref.FLYING);
@@ -829,7 +815,7 @@ public interface CrownUser extends
         if(isOnline()) updateFlying();
     }
 
-    void updateFlying();
+    void updateFlying() throws UserNotOnlineException;
 
     default boolean godMode() {
         return hasPref(UserPref.GOD_MODE);
@@ -841,17 +827,29 @@ public interface CrownUser extends
         if(isOnline()) updateGodMode();
     }
 
-    void updateGodMode();
+    void updateGodMode() throws UserNotOnlineException;
 
+    /**
+     * Gets the object which hold data for this user
+     * @return The user's data container
+     */
+    UserDataContainer getDataContainer();
+
+    /**
+     * Gets the user's grave
+     * @return The user's grave
+     */
+    Grave getGrave();
+
+    UserMarketOwnership getMarketOwnership();
     CosmeticData getCosmeticData();
-
     UserInteractions getInteractions();
-
     UserHomes getHomes();
+    UserMail getMail();
 
-    FtcGameMode getGameMode();
+    FtcGameMode getGameMode() throws UserNotOnlineException;
 
-    void setGameMode(FtcGameMode gameMode);
+    void setGameMode(FtcGameMode gameMode) throws UserNotOnlineException;
 
     default boolean allowsPaying() {
         return !hasPref(UserPref.FORBIDS_PAY);
@@ -877,20 +875,28 @@ public interface CrownUser extends
         setPref(!hulk, UserPref.NON_HULK_SMASHER);
     }
 
+    default boolean spouseCanSeeMail() {
+        return hasPref(UserPref.SPOUSE_SEE_MAIL);
+    }
+
+    default void setSpouseCanSeeMail(boolean canSee) {
+        setPref(canSee, UserPref.SPOUSE_SEE_MAIL);
+    }
+
     /**
      * Creates a sell result by attempting to sell items in the user's inventory
      * @param material The material to sell aka remove
      * @param targetAmount The amount of items to remove, -1 for unlimited
      * @return The sell result
      */
-    UserSellResult sellMaterial(Material material, int targetAmount);
+    UserSellResult sellMaterial(Material material, int targetAmount) throws UserNotOnlineException;
 
     /**
      * Creates a sell result and uses the user's sell amount for the target
      * @param material The material to sell
      * @return The sell result
      */
-    default UserSellResult sellMaterial(Material material) {
+    default UserSellResult sellMaterial(Material material) throws UserNotOnlineException {
         return sellMaterial(material, getSellAmount() == SellAmount.ALL ? -1 : getSellAmount().getValue());
     }
 
@@ -904,23 +910,37 @@ public interface CrownUser extends
         return RegionPos.of(getLocation());
     }
 
-    void setVelocity(double x, double y, double z);
+    void setVelocity(double x, double y, double z) throws UserNotOnlineException;
 
-    default void setVelocity(Vector velocity) {
+    default void setVelocity(Vector velocity) throws UserNotOnlineException {
         setVelocity(velocity.getX(), velocity.getY(), velocity.getZ());
     }
 
-    default void setVelocity(ImmutableVector3i vec) {
+    default void setVelocity(ImmutableVector3i vec) throws UserNotOnlineException {
         setVelocity(vec.getX(), vec.getY(), vec.getZ());
     }
 
-    default void setVelocity(Position pos) {
+    default void setVelocity(Position pos) throws UserNotOnlineException {
         setVelocity(pos.x(), pos.y(), pos.z());
     }
 
     default CraftPlayerProfile getProfile() {
         return new CraftPlayerProfile(getUniqueId(), getName());
     }
+
+    void sendOrMail(Component message, @Nullable UUID sender);
+
+    default void sendOrMail(Component message) {
+        sendOrMail(message, null);
+    }
+
+    void stopRiding(boolean suppressCancellation) throws UserNotOnlineException;
+
+    default void stopRiding() throws UserNotOnlineException {
+        stopRiding(false);
+    }
+
+    void sendPacket(Packet<ClientGamePacketListener> packet) throws UserNotOnlineException;
 
     @Override
     boolean equals(Object o);

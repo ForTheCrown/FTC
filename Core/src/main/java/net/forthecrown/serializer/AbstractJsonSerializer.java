@@ -62,7 +62,7 @@ public abstract class AbstractJsonSerializer implements CrownSerializer {
 
     public void save() {
         if(deleted) return;
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         if(fileExists) save(json);
         else createDefaults(json);
@@ -85,20 +85,20 @@ public abstract class AbstractJsonSerializer implements CrownSerializer {
 
         try {
             JsonObject json = JsonUtils.readFile(file);
-            reload(JsonBuf.of(json));
+            reload(JsonWrapper.of(json));
         } catch (IOException e){
             e.printStackTrace();
         }
     }
 
-    protected abstract void save(final JsonBuf json);
-    protected abstract void reload(final JsonBuf json);
+    protected abstract void save(final JsonWrapper json);
+    protected abstract void reload(final JsonWrapper json);
 
     /**
      * Empty files make JsonDaddy mad xD
      * @param json Json to add defaults to
      */
-    protected void createDefaults(final JsonBuf json) {}
+    protected void createDefaults(final JsonWrapper json) {}
 
     protected void delete(){
         if(!file.delete()) logger.log(Level.WARNING, "Couldn't delete file named " + fileName);

@@ -53,7 +53,7 @@ public class ActionRemoveNumber implements UsageAction<ActionRemoveNumber.Action
 
         @Override
         public void onInteract(Player player) {
-            if (fromBal) Crown.getBalances().add(player.getUniqueId(), -amount);
+            if (fromBal) Crown.getEconomy().add(player.getUniqueId(), -amount);
             else {
                 CrownUser user = UserManager.getUser(player);
                 user.setGems(user.getGems() - amount);

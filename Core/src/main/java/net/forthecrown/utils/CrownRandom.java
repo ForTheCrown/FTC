@@ -11,6 +11,12 @@ public class CrownRandom extends Random {
     public CrownRandom() {}
     public CrownRandom(long seed) { super(seed); }
 
+    /**
+     * Returns an int in the given range
+     * @param i The first bound
+     * @param j The second bound
+     * @return A random integer in the given bounds
+     */
     public int intInRange(int i, int j){
         int min = Math.min(i, j);
         int max = Math.max(i, j);
@@ -19,6 +25,13 @@ public class CrownRandom extends Random {
         return min + nextInt((max - min) + 1);
     }
 
+    /**
+     * Gets random entries from a given collection
+     * @param from The collection to get entries from
+     * @param size The amount of entries to get
+     * @param <T> The type of the items
+     * @return Random entries from the given list, size of the size param
+     */
     public <T> List<T> pickRandomEntries(Collection<T> from, int size){
         Validate.isTrue(from.size() > size, "Collection size was smaller than specified size");
 
@@ -36,6 +49,12 @@ public class CrownRandom extends Random {
         return result;
     }
 
+    /**
+     * Picks a singular random entry from the given collection
+     * @param from The collection to get from
+     * @param <T> The type of the item
+     * @return A random entry from the given collection
+     */
     public <T> T pickRandomEntry(Collection<T> from){
         if(from.size() == 0) return null;
         if(from.size() == 1) return new ArrayList<>(from).get(0);

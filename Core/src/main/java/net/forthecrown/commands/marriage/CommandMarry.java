@@ -35,7 +35,7 @@ public class CommandMarry extends FtcCommand {
      * Permissions used:
      * ftc.marry
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override

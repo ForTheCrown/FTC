@@ -4,7 +4,7 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.math.FtcBoundingBox;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.Position;
@@ -19,10 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
@@ -117,7 +114,7 @@ public final class JsonUtils {
     }
 
     public static JsonObject writeBoundingBox(BoundingBox box) {
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         json.add("minX", box.getMinX());
         json.add("minY", box.getMinY());
@@ -204,7 +201,7 @@ public final class JsonUtils {
     }
 
     public static JsonObject writeVanillaBoundingBox(net.minecraft.world.level.levelgen.structure.BoundingBox box) {
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         json.add("minX", box.minX());
         json.add("minY", box.minY());
@@ -218,7 +215,7 @@ public final class JsonUtils {
     }
 
     public static net.minecraft.world.level.levelgen.structure.BoundingBox readVanillaBoundingBox(JsonObject element) {
-        JsonBuf j = JsonBuf.of(element);
+        JsonWrapper j = JsonWrapper.of(element);
 
         return new net.minecraft.world.level.levelgen.structure.BoundingBox(
                 j.getInt("minX"),
@@ -236,7 +233,7 @@ public final class JsonUtils {
             .create();
 
     //Writes json to a file
-    public static void writeFile(JsonObject json, File f) throws IOException {
+    public static void writeFile(JsonElement json, File f) throws IOException {
         FileWriter writer = new FileWriter(f);
 
         JsonWriter jWriter = gson.newJsonWriter(writer);
@@ -248,9 +245,13 @@ public final class JsonUtils {
 
     //Reads json from a file
     public static JsonObject readFile(File file) throws IOException {
+        return readFileElement(file).getAsJsonObject();
+    }
+
+    public static JsonElement readFileElement(File file) throws IOException {
         FileReader reader = new FileReader(file);
         JsonParser parser = new JsonParser();
-        JsonObject json = parser.parse(reader).getAsJsonObject();
+        JsonElement json = parser.parse(reader);
 
         reader.close();
 

@@ -1,27 +1,27 @@
 package net.forthecrown.core;
 
 import net.forthecrown.commands.manager.FtcCommands;
-import net.forthecrown.core.admin.CrownPunishmentManager;
+import net.forthecrown.core.admin.FtcPunishmentManager;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.FtcJailManager;
 import net.forthecrown.core.chat.*;
-import net.forthecrown.core.kingship.CrownKingship;
-import net.forthecrown.core.transformers.Balances_YamlToJson;
+import net.forthecrown.core.kingship.FtcKingship;
+import net.forthecrown.core.transformers.Homes_PopDensityToFTC;
 import net.forthecrown.core.transformers.Regions_PopDensityToFTC;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
-import net.forthecrown.economy.CrownBalances;
+import net.forthecrown.economy.FtcEconomy;
 import net.forthecrown.economy.ServerItemPriceMap;
 import net.forthecrown.economy.market.FtcMarketRegion;
 import net.forthecrown.economy.market.guild.HazelguardTradersGuild;
-import net.forthecrown.economy.shops.CrownShopManager;
-import net.forthecrown.economy.shops.template.ShopTemplates;
+import net.forthecrown.economy.market.guild.topics.VoteTopics;
+import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.Events;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.regions.FtcRegionManager;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.UserJsonSerializer;
-import net.forthecrown.useables.CrownUsablesManager;
+import net.forthecrown.useables.FtcUsablesManager;
 import net.forthecrown.useables.actions.UsageActions;
 import net.forthecrown.useables.checks.UsageChecks;
 import net.forthecrown.useables.kits.FtcKitManager;
@@ -41,42 +41,38 @@ public final class FtcBootStrap {
     static void firstPhase() {
         Main.announcer = new FtcAnnouncer();
 
-        Main.messages = new CrownMessages();
+        Main.messages = new FtcMessages();
         Main.messages.load();
 
         Main.emotes = new ChatEmotes();
         Main.emotes.registerEmotes();
 
         Main.prices = new ServerItemPriceMap();
-        Main.tabList = new CrownTabList();
+        Main.tabList = new FtcTabList();
 
-        WgFlags.init();
+        FtcFlags.init();
     }
 
     static void secondPhase() {
         Main.joinInfo = new JoinInfo();
 
         Main.userSerializer = new UserJsonSerializer();
-
-        Balances_YamlToJson.checkAndRun();
-        Main.balances = new CrownBalances();
-
+        Main.economy = new FtcEconomy();
         Main.regionManager = new FtcRegionManager(Worlds.OVERWORLD);
-        Regions_PopDensityToFTC.checkAndRun();
 
-        //Instantiate default shop templates
-        safeRunnable(ShopTemplates::init);
+        Regions_PopDensityToFTC.checkAndRun();
+        Homes_PopDensityToFTC.checkAndRun();
 
         //Instantiate managers
         Main.userManager = new FtcUserManager();
-        Main.shopManager = new CrownShopManager();
-        Main.punishmentManager = new CrownPunishmentManager();
-        Main.usablesManager = new CrownUsablesManager();
+        Main.shopManager = new FtcShopManager();
+        Main.punishmentManager = new FtcPunishmentManager();
+        Main.usablesManager = new FtcUsablesManager();
         Main.jailManager = new FtcJailManager();
 
         //Instantiate these things :shrug:
-        Main.marketShops = new FtcMarketRegion();
-        Main.kingship = new CrownKingship();
+        Main.marketRegion = new FtcMarketRegion();
+        Main.kingship = new FtcKingship();
         Main.rules = new ServerRules();
         Main.tradersGuild = new HazelguardTradersGuild();
 
@@ -86,6 +82,7 @@ public final class FtcBootStrap {
         safeRunnable(Cosmetics::init);
         safeRunnable(UsageChecks::init);
         safeRunnable(UsageActions::init);
+        safeRunnable(VoteTopics::init);
         safeRunnable(FtcCommands::init);
         safeRunnable(Events::init);
 
@@ -94,5 +91,7 @@ public final class FtcBootStrap {
         Main.kitRegistry = new FtcKitManager();
 
         Registries.COMVAR_TYPES.close();
+
+        BannedWords.loadFromResource();
     }
 }

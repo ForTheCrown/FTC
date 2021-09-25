@@ -33,7 +33,7 @@ public class CommandDivorce extends FtcCommand {
      * Permissions used:
      * ftc.marry
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override

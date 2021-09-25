@@ -19,8 +19,8 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.enums.Faction;
-import net.forthecrown.user.enums.Rank;
+import net.forthecrown.user.data.Faction;
+import net.forthecrown.user.data.Rank;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -53,7 +53,7 @@ public class CommandProfile extends FtcCommand {
      * - /profile
      * - /profile [player]
      *
-     * Author: Botul
+     * Author: Julie
      */
 
     @Override
@@ -119,7 +119,7 @@ public class CommandProfile extends FtcCommand {
                 .append(line("Crown score", scrDisplay, crownScr.isScoreSet() && crownScr.getScore() > 0 && ComVars.isEventActive()))
 
                 .append(line("Gems", profile.getGems() + "", profile.getGems() > 0))
-                .append(line("Balance", FtcFormatter.rhines(Crown.getBalances().get(profile.getUniqueId())), true))
+                .append(line("Balance", FtcFormatter.rhines(Crown.getEconomy().get(profile.getUniqueId())), true))
 
                 .append(adminInfo(sender, profile))
 

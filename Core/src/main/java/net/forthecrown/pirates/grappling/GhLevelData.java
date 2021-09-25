@@ -7,7 +7,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.pirates.Pirates;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
@@ -55,7 +55,7 @@ public class GhLevelData implements JsonSerializable {
     public GhLevelData(String name, JsonElement e) {
         this.name = name;
 
-        JsonBuf json = JsonBuf.of(e.getAsJsonObject());
+        JsonWrapper json = JsonWrapper.of(e.getAsJsonObject());
 
         this.startPos = json.getPos("start");
         this.nextLevel = json.getString("next", null);
@@ -87,7 +87,7 @@ public class GhLevelData implements JsonSerializable {
                 case NORMAL: break;
 
                 case END:
-                    Crown.getBalances().add(user.getUniqueId(), ComVars.getGhFinalReward(), false);
+                    Crown.getEconomy().add(user.getUniqueId(), ComVars.getGhFinalReward(), false);
                     user.sendMessage(
                             Component.translatable("gh.reward.final", FtcFormatter.rhines(ComVars.getGhFinalReward()).color(NamedTextColor.YELLOW))
                                     .color(NamedTextColor.GRAY)
@@ -97,7 +97,7 @@ public class GhLevelData implements JsonSerializable {
                     break;
 
                 case SPECIAL:
-                    Crown.getBalances().add(user.getUniqueId(), ComVars.getGhSpecialReward(), false);
+                    Crown.getEconomy().add(user.getUniqueId(), ComVars.getGhSpecialReward(), false);
                     user.sendMessage(
                             Component.translatable("gh.reward.special", FtcFormatter.rhines(ComVars.getGhSpecialReward()).color(NamedTextColor.YELLOW))
                                     .color(NamedTextColor.GRAY)
@@ -190,7 +190,7 @@ public class GhLevelData implements JsonSerializable {
 
     @Override
     public JsonObject serialize() {
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         json.add("start", startPos);
         json.add("next", nextLevel);

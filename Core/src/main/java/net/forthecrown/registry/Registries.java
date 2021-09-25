@@ -10,8 +10,6 @@ import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.economy.market.guild.topics.VoteTopic;
 import net.forthecrown.economy.market.guild.topics.VoteTopicType;
-import net.forthecrown.economy.shops.template.ShopTemplate;
-import net.forthecrown.economy.shops.template.ShopTemplateType;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
 import net.forthecrown.utils.FtcUtils;
@@ -29,10 +27,6 @@ public interface Registries {
 
     Registry<InteractableNPC> NPCS = create("npcs");
     Registry<BlockAnimation> ANIMATIONS = create("animations");
-
-    //Shop templates
-    Registry<ShopTemplate> SHOP_TEMPLATES = create("shop_templates");
-    CloseableRegistry<ShopTemplateType> SHOP_TEMPLATE_TYPES = createCloseable("shop_template_types");
 
     CloseableRegistry<VoteTopicType<VoteTopic>> VOTE_TOPICS = createCloseable("vote_topics");
 

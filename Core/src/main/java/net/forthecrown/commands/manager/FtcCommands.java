@@ -3,6 +3,7 @@ package net.forthecrown.commands.manager;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.forthecrown.commands.*;
 import net.forthecrown.commands.arguments.*;
+import net.forthecrown.commands.click.CommandClickableText;
 import net.forthecrown.commands.clickevent.ClickEventCommand;
 import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.help.*;
@@ -15,8 +16,8 @@ import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.KeyArgument;
 import net.forthecrown.royalgrenadier.arguments.RoyalArgumentsImpl;
-import net.forthecrown.user.enums.Faction;
-import net.forthecrown.user.enums.Rank;
+import net.forthecrown.user.data.Faction;
+import net.forthecrown.user.data.Rank;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.TimeArgument;
@@ -99,10 +100,8 @@ public final class FtcCommands {
         new CommandTeleportExact();
         new CommandTime();
         new CommandNPC();
-        new CommandGhStand();
         new CommandLaunch();
         new CommandAnimation();
-        new CommandShopTemplate();
         CommandSpecificGameMode.init();
 
         //Policing commands
@@ -135,6 +134,7 @@ public final class FtcCommands {
         new CommandVolleyBall();
         new CommandParrot();
         new CommandCosmetics();
+        new CommandClickableText();
 
         CommandDumbThing.init();
         CommandToolBlock.init();

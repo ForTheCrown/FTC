@@ -21,7 +21,7 @@ public final class FtcUserManager extends AbstractYamlSerializer implements User
 
     private final FtcUserActionHandler actionHandler = new FtcUserActionHandler();
 
-    private Map<UUID, UUID> alts = new Object2ObjectOpenHashMap<>();
+    private final Map<UUID, UUID> alts = new Object2ObjectOpenHashMap<>();
 
     public FtcUserManager(){
         super("usermanager");
@@ -43,7 +43,8 @@ public final class FtcUserManager extends AbstractYamlSerializer implements User
             return;
         }
 
-        alts = MapUtils.convert(section.getValues(false), UUID::fromString, obj -> UUID.fromString(obj.toString()));
+        alts.clear();
+        alts.putAll(MapUtils.convert(section.getValues(false), UUID::fromString, obj -> UUID.fromString(obj.toString())));
     }
 
     @Override

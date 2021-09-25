@@ -8,15 +8,15 @@ import net.forthecrown.commands.arguments.AuctionArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.auctions.Auction;
-import net.forthecrown.economy.auctions.CrownAuction;
+import net.forthecrown.economy.auctions.FtcAuction;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.pirates.AuctionManager;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.Faction;
+import net.forthecrown.user.data.Faction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -58,7 +58,7 @@ public class CommandAuction extends FtcCommand {
 
     @Override
     protected void createCommand(BrigadierCommand command) {
-        Balances bals = Crown.getBalances();
+        Economy bals = Crown.getEconomy();
 
         command
                 .then(literal("save")
@@ -95,7 +95,7 @@ public class CommandAuction extends FtcCommand {
                                     String name = c.getArgument("name", String.class);
                                     if(AuctionManager.getAuctionNames().contains(name)) throw FtcExceptionProvider.create("&7An auction by this name already exists");
 
-                                    Auction auction = new CrownAuction(sign.getLocation(), name);
+                                    Auction auction = new FtcAuction(sign.getLocation(), name);
                                     auction.unClaim();
 
                                     c.getSource().sendAdmin( auction.getName() + " created!");

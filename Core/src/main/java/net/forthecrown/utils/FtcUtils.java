@@ -1,14 +1,15 @@
 package net.forthecrown.utils;
 
+import com.destroystokyo.paper.profile.CraftPlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcCommands;
 import net.forthecrown.core.Crown;
-import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
-import net.kyori.adventure.audience.Audience;
+import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -25,11 +26,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.bukkit.Bukkit.getServer;
@@ -40,10 +45,13 @@ import static org.bukkit.Bukkit.getServer;
 public final class FtcUtils {
     private FtcUtils() {}
 
+    public static final int MAX_Y = 312;
+
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
+    private static final Predicate ALWAYS_TRUE = o -> true;
 
     public static <T> Predicate<T> alwaysAccept() {
-        return t -> true;
+        return ALWAYS_TRUE;
     }
 
     public static void sendPacket(Player player, Packet<ClientGamePacketListener> packet) {
@@ -73,6 +81,53 @@ public final class FtcUtils {
     public static String addAnS(long amount){
         if(amount == 1 || amount == -1) return "";
         return "s";
+    }
+
+    public static InputStream getFileOrResource(String path)  {
+        File file = new File(Crown.dataFolder(), path);
+        if(file.exists()) {
+            try {
+                return new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        return Crown.resource(path);
+    }
+
+    public static CraftPlayerProfile profileWithTextureID(@Nullable String name, @Nullable UUID id, String textureID) {
+        return profileWithTexture(name, id, "http://textures.minecraft.net/texture/" + textureID);
+    }
+
+    public static CraftPlayerProfile profileWithTexture(@Nullable String name, @Nullable UUID id, String textureLink) {
+        CraftPlayerProfile profile = new CraftPlayerProfile(id, name);
+
+        String.join("", "");
+
+        profile.setProperty(
+                new ProfileProperty(
+                        "textures",
+                        Base64.getEncoder().encodeToString(("{\"SKIN\":{\"url\":\"" + textureLink + "\"}}").getBytes())
+                )
+        );
+
+        return profile;
+    }
+
+    public static Team getNoClipTeam() {
+        return Bukkit.getScoreboardManager().getMainScoreboard().getTeam("NoClip");
+    }
+
+    public static boolean hasOnlyAirAbove(WorldVec3i pos) {
+        for (int i = pos.getY(); i < MAX_Y; i++) {
+            pos.above();
+
+            if(!pos.getMaterial().isAir()) return false;
+        }
+
+        return true;
     }
 
     //Shows a leaderboard, used by /deathtop and /crowntop
@@ -108,7 +163,7 @@ public final class FtcUtils {
         return l.getWorld().getName() + "_" + l.getBlockX() + "_" + l.getBlockY() + "_" + l.getBlockZ();
     }
 
-    public static Location parseFilename(String name) {
+    public static Location filenameToLocation(String name) {
         World world = null;
         for (World w: Bukkit.getWorlds()) {
             if(name.startsWith(w.getName())) world = w;
@@ -157,31 +212,8 @@ public final class FtcUtils {
         return Key.key(key.namespace(), key.value());
     }
 
-    //Gets all visible players to the source
-    public static Collection<? extends Player> getVisiblePlayers(CommandSource source){
-        if(source.isPlayer()){
-            try {
-                Player player = source.asPlayer();
-                List<Player> returnVal = new ArrayList<>();
-
-                for (Player p : Bukkit.getOnlinePlayers()){
-                    if(player.canSee(p)) returnVal.add(p);
-                }
-
-                return returnVal;
-            } catch (CommandSyntaxException ignored) {}
-        }
-        return Bukkit.getOnlinePlayers();
-    }
-
     public static boolean isItemEmpty(ItemStack itemStack) {
         return itemStack == null || itemStack.getType() == Material.AIR || itemStack.getAmount() <= 0;
-    }
-
-    //Gets a player from an audience, used by the chat event listener in CoreListener
-    public static @Nullable Player fromAudience(Audience audience){
-        if(audience instanceof Player) return (Player) audience;
-        return null;
     }
 
     //Clears all the effects on a living entity
@@ -195,15 +227,6 @@ public final class FtcUtils {
         } catch (Throwable e){
             e.printStackTrace();
         }
-    }
-
-    public static NamespacedKey keyToBukkit(Key key) {
-        if(key instanceof NamespacedKey) return (NamespacedKey) key;
-        return new NamespacedKey(key.namespace(), key.value());
-    }
-
-    public static <T> T makeIfNull(T obj, Supplier<T> supplier) {
-        return obj == null ? supplier.get() : obj;
     }
 
     public static Location locFromPosition(Position pos, Location start) {

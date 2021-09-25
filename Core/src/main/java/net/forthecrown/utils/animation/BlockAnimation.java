@@ -1,7 +1,6 @@
 package net.forthecrown.utils.animation;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.utils.math.BoundingBoxes;
 import net.forthecrown.utils.math.Vector3i;
 import net.kyori.adventure.key.Key;
@@ -96,8 +95,6 @@ public class BlockAnimation implements Keyed {
 
         if(onPlay != null) onPlay.run(world, pos);
 
-        Announcer.debug("pos " + pos);
-
         playing = true;
         currentFrame = 0;
 
@@ -112,8 +109,6 @@ public class BlockAnimation implements Keyed {
             } else  {
                 //Apply offset
                 Vector3i at = frame.getOffset().apply(pos);
-                Announcer.debug("offset: " + frame.getOffset());
-                Announcer.debug("at: " + at);
 
                 //Paste the frame
                 BoundingBoxes.copyTo(world, frame.getFrameOrigin(), at.toWorldVector(world));

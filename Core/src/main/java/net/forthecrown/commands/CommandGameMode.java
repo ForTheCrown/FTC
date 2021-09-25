@@ -8,7 +8,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.GameModeArgument;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.FtcGameMode;
+import net.forthecrown.user.data.FtcGameMode;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.NamedTextColor;

@@ -10,7 +10,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.enums.FtcGameMode;
+import net.forthecrown.user.data.FtcGameMode;
 import net.forthecrown.utils.math.FtcBoundingBox;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.grenadier.CommandSource;

@@ -39,5 +39,5 @@ public class CloseableRegistryBase<T> extends BaseRegistry<T> implements Closeab
         super.clear();
     }
 
-    private void validateOpen(){ Validate.isTrue(open, "Registry is currently closed"); }
+    private void validateOpen(){ Validate.isTrue(open, "Registry is closed"); }
 }

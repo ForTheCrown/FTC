@@ -2,8 +2,8 @@ package net.forthecrown.inventory;
 
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.Faction;
-import net.forthecrown.user.enums.Rank;
+import net.forthecrown.user.data.Faction;
+import net.forthecrown.user.data.Rank;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;

@@ -10,7 +10,7 @@ import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.enums.Faction;
+import net.forthecrown.user.data.Faction;
 import net.forthecrown.utils.CrownRandom;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -60,12 +60,12 @@ public class GrapplingHookMerchant implements BlackMarketMerchant, ClickEventTas
     public void run(Player player, String[] args) throws RoyalCommandException {
         checkPreconditions(UserManager.getUser(player));
 
-        Crown.getBalances().add(player.getUniqueId(), -price);
+        Crown.getEconomy().add(player.getUniqueId(), -price);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gh give " + player.getName() + (uses == -1 ? "" : " " + uses));
     }
 
     private void checkPreconditions(CrownUser user) throws RoyalCommandException {
-        if(!Crown.getBalances().canAfford(user.getUniqueId(), price)){
+        if(!Crown.getEconomy().has(user.getUniqueId(), price)){
             throw FtcExceptionProvider.cannotAfford(price);
         }
 

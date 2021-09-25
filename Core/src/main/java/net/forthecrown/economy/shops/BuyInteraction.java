@@ -3,17 +3,17 @@ package net.forthecrown.economy.shops;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.Faction;
+import net.forthecrown.user.data.Faction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
 
 public class BuyInteraction implements ShopInteraction {
     @Override
-    public void test(SignShopSession session, Balances balances) throws CommandSyntaxException {
-        ShopType.ADMIN_BUY.getInteraction().test(session, balances); //Check they pass the basic stuff
+    public void test(SignShopSession session, Economy economy) throws CommandSyntaxException {
+        ShopType.ADMIN_BUY.getInteraction().test(session, economy); //Check they pass the basic stuff
 
         //Shop stock check
         if(session.getShop().isOutOfStock()) throw FtcExceptionProvider.shopOutOfStock();
@@ -28,14 +28,14 @@ public class BuyInteraction implements ShopInteraction {
     }
 
     @Override
-    public void interact(SignShopSession session, Balances balances) {
-        ShopType.ADMIN_BUY.getInteraction().interact(session, balances); //Change the basic stuff
+    public void interact(SignShopSession session, Economy economy) {
+        ShopType.ADMIN_BUY.getInteraction().interact(session, economy); //Change the basic stuff
 
         CrownUser owner = session.getOwner();
         ItemStack example = session.getExampleItem();
 
         //Add money to owner, remove item from shop
-        balances.add(session.getOwner().getUniqueId(), session.getPrice(), owner.getFaction() != Faction.PIRATES);
+        economy.add(session.getOwner().getUniqueId(), session.getPrice(), owner.getFaction() != Faction.PIRATES);
         session.getInventory().removeItem(example.clone());
 
         //Check stock

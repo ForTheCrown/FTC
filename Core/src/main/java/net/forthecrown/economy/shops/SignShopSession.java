@@ -30,8 +30,8 @@ public class SignShopSession {
     private Runnable onSessionExpire;
 
     public SignShopSession(SignShop shop, CrownUser user) {
-        this.material = shop.getInventory().getExampleItem().getType();
         this.shop = shop;
+        this.material = shop.getInventory().getExampleItem().getType();
         this.type = shop.getType();
         this.inventory = shop.getInventory();
 

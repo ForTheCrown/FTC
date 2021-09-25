@@ -7,8 +7,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.actions.RegionVisit;
-import net.forthecrown.user.actions.UserActionHandler;
+import net.forthecrown.user.actions.ActionFactory;
 import net.kyori.adventure.text.Component;
 
 public class CommandMoveToRegion extends FtcCommand {
@@ -32,7 +31,7 @@ public class CommandMoveToRegion extends FtcCommand {
      *
      * Permissions used:
      *
-     * Main Author:
+     * Main Author: Julie
      */
 
     @Override
@@ -44,8 +43,7 @@ public class CommandMoveToRegion extends FtcCommand {
                                     CrownUser user = UserArgument.getUser(c, "user");
                                     PopulationRegion region = RegionArgument.regionInviteIgnore(c, "region");
 
-                                    RegionVisit action = new RegionVisit(user, region);
-                                    UserActionHandler.handleAction(action);
+                                    ActionFactory.visitRegion(user, region);
 
                                     c.getSource().sendAdmin(
                                             Component.text("Sent ")

@@ -3,22 +3,22 @@ package net.forthecrown.economy.shops;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
 
 public class AdminBuyInteraction implements ShopInteraction {
     @Override
-    public void test(SignShopSession session, Balances balances) throws CommandSyntaxException {
+    public void test(SignShopSession session, Economy economy) throws CommandSyntaxException {
         if(!session.userHasSpace()) throw FtcExceptionProvider.inventoryFull(); //User has no space for items
 
         //User cannot afford shop
-        if(!balances.canAfford(session.getUser().getUniqueId(), session.getPrice())) throw FtcExceptionProvider.cannotAfford(session.getPrice());
+        if(!economy.has(session.getUser().getUniqueId(), session.getPrice())) throw FtcExceptionProvider.cannotAfford(session.getPrice());
     }
 
     @Override
-    public void interact(SignShopSession session, Balances balances) {
+    public void interact(SignShopSession session, Economy economy) {
         ItemStack exampleItem = session.getExampleItem();
 
         //Bought item message
@@ -31,7 +31,7 @@ public class AdminBuyInteraction implements ShopInteraction {
         );
 
         //Remove money
-        balances.remove(session.getUser().getUniqueId(), session.getPrice());
+        economy.remove(session.getUser().getUniqueId(), session.getPrice());
 
         //Give item
         int amount = exampleItem.getAmount();

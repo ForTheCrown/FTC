@@ -88,7 +88,7 @@ public class ShopCreateListener implements Listener {
             //WorldGuard flag check
             LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
             ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(wgPlayer.getLocation());
-            if(!set.testState(wgPlayer, WgFlags.SHOP_CREATION) && !player.hasPermission("ftc.admin")) {
+            if(!set.testState(wgPlayer, FtcFlags.SHOP_CREATION) && !player.hasPermission("ftc.admin")) {
 
                 player.sendMessage(
                         Component.text()

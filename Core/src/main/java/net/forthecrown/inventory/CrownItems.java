@@ -313,7 +313,7 @@ public final class CrownItems {
         if(lores != null){
             lore = new Component[lores.length];
             for (int i = 0; i < lores.length; i++){
-                if(FtcUtils.isNullOrBlank(lores[i])) lore[i] = Component.text("");
+                if(FtcUtils.isNullOrBlank(lores[i])) lore[i] = Component.empty();
                 else lore[i] = Component.text()
                         .append(ChatUtils.convertString(lores[i]))
                         .style(NON_ITALIC_WHITE)

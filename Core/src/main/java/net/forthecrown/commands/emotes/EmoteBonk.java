@@ -28,7 +28,7 @@ public class EmoteBonk extends CommandEmote {
      * Valid usages of command:
      * - /bonk <player>
      *
-     * Main Author: Botul
+     * Main Author: Julie
      */
 
     @Override

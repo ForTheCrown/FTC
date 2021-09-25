@@ -18,12 +18,12 @@ public abstract class TravelEffect extends CosmeticEffect {
         super(name, cords, description);
     }
 
-    public abstract void onPoleTeleport(Location from, Location pole);
+    public abstract void onPoleTeleport(CrownUser user, Location from, Location pole);
 
-    public abstract void onHulkStart(Location loc);
-    public abstract void onHulkTickDown(Location loc);
-    public abstract void onHulkTickUp(Location loc);
-    public abstract void onHulkLand(Location landing);
+    public abstract void onHulkStart(CrownUser user, Location loc);
+    public abstract void onHulkTickDown(CrownUser user, Location loc);
+    public abstract void onHulkTickUp(CrownUser user, Location loc);
+    public abstract void onHulkLand(CrownUser user, Location landing);
 
     @Override
     public void place(FtcInventory inventory, CrownUser user) {

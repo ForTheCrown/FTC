@@ -1,7 +1,6 @@
 package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.economy.shops.template.ShopTemplate;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.utils.FtcUtils;
@@ -28,7 +27,6 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
     private final Block block;
     private final CrownShopInventory inventory;
 
-    private ShopTemplate template;
     private UUID owner;
     private Integer price;
     private ShopType type;
@@ -210,16 +208,6 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
     }
 
     @Override
-    public ShopTemplate getTemplate() {
-        return template;
-    }
-
-    @Override
-    public void setTemplate(ShopTemplate template) {
-        this.template = template;
-    }
-
-    @Override
     public Sign getSign(){
         return (Sign) getBlock().getState();
     }
@@ -232,8 +220,6 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
 
         s.line(0, ln1);
         s.line(3, Crown.getShopManager().getPriceLine(price));
-
-        if(hasTemplate()) template.onSignUpdate(this, s);
 
         Bukkit.getScheduler().runTask(Crown.inst(), () -> s.update(true));
     }

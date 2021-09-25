@@ -6,20 +6,16 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.admin.MuteStatus;
-import net.forthecrown.serializer.JsonBuf;
-import net.forthecrown.serializer.JsonDeserializable;
-import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.actions.TeleportRequest;
 import net.forthecrown.utils.JsonUtils;
 
 import java.util.*;
 
-public class FtcUserInteractions implements UserInteractions, JsonSerializable, JsonDeserializable {
+public class FtcUserInteractions extends AbstractUserAttachment implements UserInteractions {
 
     //Transient variables declared just for convenience
     //So you'd know what is and isn't serialized in this class
-    public transient final FtcUser user;
-
     public transient UUID lastMarriageRequest;
     public transient UUID waitingFinish;
     public UUID spouse;
@@ -38,22 +34,22 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
     private transient final List<TeleportRequest> outgoing = new ArrayList<>();
 
     public FtcUserInteractions(FtcUser user){
-        this.user = user;
+        super(user);
+    }
+
+    @Override
+    public MuteStatus muteStatusSilent() {
+        return Crown.getPunishmentManager().checkMuteSilent(user.getUniqueId());
     }
 
     @Override
     public MuteStatus muteStatus() {
-        return Crown.getPunishmentManager().checkMuteSilent(user.getUniqueId());
+        return Crown.getPunishmentManager().checkMute(getUser());
     }
 
     @Override
     public Set<UUID> getBlockedUsers() {
         return blocked;
-    }
-
-    @Override
-    public CrownUser getUser() {
-        return user;
     }
 
     @Override
@@ -83,7 +79,7 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
 
     @Override
     public boolean chatAllowed() {
-        return muteStatus().maySpeak;
+        return muteStatusSilent().maySpeak;
     }
 
     @Override
@@ -289,7 +285,7 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
 
     @Override
     public JsonObject serialize() {
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         if(marriageChatToggled) json.add("marriageChat", true);
         if(!acceptingProposals) json.add("acceptingProposals", false);
@@ -315,7 +311,7 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
         waitingFinish = null;
 
         if(element == null) return;
-        JsonBuf json = JsonBuf.of(element.getAsJsonObject());
+        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
         marriageChatToggled = json.getBool("marriageChat");
         acceptingProposals = json.getBool("acceptingProposals");
@@ -323,10 +319,10 @@ public class FtcUserInteractions implements UserInteractions, JsonSerializable, 
         spouse = json.getUUID("marriedTo");
         lastMarriageChange = json.getLong("lastMarriage");
 
-        Collection<UUID> blockedIDs = json.getList("blocked", e -> UUID.fromString(e.getAsString()));
+        Collection<UUID> blockedIDs = json.getList("blocked", JsonUtils::readUUID);
         if(blockedIDs != null) blocked.addAll(blockedIDs);
 
-        Collection<UUID> separatedIDs = json.getList("separated", e -> UUID.fromString(e.getAsString()));
+        Collection<UUID> separatedIDs = json.getList("separated", JsonUtils::readUUID);
         if(separatedIDs != null) separated.addAll(separatedIDs);
     }
 }

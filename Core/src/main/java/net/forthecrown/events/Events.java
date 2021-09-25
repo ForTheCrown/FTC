@@ -29,7 +29,7 @@ public final class Events {
         register(new ShopDestroyListener());
 
         register(new RegionsListener());
-
+        register(new GuildListener());
         register(new PirateEvents());
         register(new GhListener());
 

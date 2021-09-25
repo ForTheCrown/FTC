@@ -36,7 +36,7 @@ public class CommandLaunch extends FtcCommand {
      *
      * Permissions used: ftc.admin
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override

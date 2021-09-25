@@ -85,7 +85,7 @@ public class CheckNumber implements UsageCheck<CheckNumber.CheckInstance> {
 
         @Override
         public boolean test(Player player) {
-            if(checkBal) return Crown.getBalances().canAfford(player.getUniqueId(), amount);
+            if(checkBal) return Crown.getEconomy().has(player.getUniqueId(), amount);
 
             return UserManager.getUser(player).getGems() >= amount;
         }
@@ -93,7 +93,7 @@ public class CheckNumber implements UsageCheck<CheckNumber.CheckInstance> {
         @Override
         public Consumer<Player> onSuccess() {
             return plr -> {
-                if(checkBal) Crown.getBalances().add(plr.getUniqueId(), -amount, false);
+                if(checkBal) Crown.getEconomy().remove(plr.getUniqueId(), amount);
                 else UserManager.getUser(plr).addGems(-amount);
             };
         }

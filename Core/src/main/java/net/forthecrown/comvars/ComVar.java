@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  * A type must always be specified. You probably won't have to worry about that though, as the only place this is constructed
  * is in the {@link ComVarRegistry} class, where this stuff gets done for you :)
  * </p>
- * @param <T> The type stored by the variable, can be an int, String or whatever you want it to be
+ * @param <T> The type stored by the variable.
  */
 public final class ComVar<T> {
     private T value;

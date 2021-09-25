@@ -36,7 +36,7 @@ public class CommandBalanceTop extends FtcCommand {
      * - /baltop
      * - /baltop <page number>
      *
-     * Author: Botul
+     * Author: Julie
      */
 
     @Override
@@ -50,7 +50,7 @@ public class CommandBalanceTop extends FtcCommand {
 
     //Send the message
     private int sendBaltopMessage(CommandSender sender, @Nonnegative int page){
-        BalanceMap balMap = Crown.getBalances().getMap();
+        BalanceMap balMap = Crown.getEconomy().getMap();
 
         final TextComponent border = Component.text(" --------- ").style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
         TextComponent.Builder text = Component.text()
@@ -69,7 +69,7 @@ public class CommandBalanceTop extends FtcCommand {
                     .append(Component.newline());
         }
 
-        for(int i = 0 ; i < 10 ; i++){
+        for(int i = 0 ; i < 10 ; i++) {
             if((page*10) + i >= balMap.size()) break;
             int index = (page*10) + i;
 

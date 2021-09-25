@@ -9,7 +9,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.key.Key;
@@ -30,14 +30,14 @@ public class FtcKitManager extends AbstractJsonSerializer implements KitManager 
     }
 
     @Override
-    protected void save(JsonBuf json) {
+    protected void save(JsonWrapper json) {
         for (FtcKit k: kits.values()){
             json.add(k.key().asString(), k.serialize());
         }
     }
 
     @Override
-    protected void reload(JsonBuf json) {
+    protected void reload(JsonWrapper json) {
         kits.clear();
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
             try {

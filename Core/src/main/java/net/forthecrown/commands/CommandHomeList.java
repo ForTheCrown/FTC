@@ -22,7 +22,7 @@ public class CommandHomeList extends FtcCommand {
     public CommandHomeList(){
         super("homelist");
 
-        setAliases("homes");
+        setAliases("homes", "listhomes");
         setPermission(Permissions.HOME);
         setDescription("Lists all your homes");
 

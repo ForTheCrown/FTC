@@ -4,11 +4,11 @@ import com.google.gson.JsonElement;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.enums.Faction;
+import net.forthecrown.user.data.Faction;
 import net.forthecrown.utils.Worlds;
 import org.bukkit.Location;
 
@@ -90,14 +90,14 @@ public class GhParkour extends AbstractJsonSerializer {
     }
 
     @Override
-    protected void save(JsonBuf json) {
+    protected void save(JsonWrapper json) {
         for (GhLevelData d: orderedList) {
             json.add(d.getName(), d.serialize());
         }
     }
 
     @Override
-    protected void reload(JsonBuf json) {
+    protected void reload(JsonWrapper json) {
         byName.clear();
         orderedList.clear();
 

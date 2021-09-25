@@ -4,6 +4,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.Struct;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -12,7 +13,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 /**
  * Struct for a message sent from a user to their spouse
  */
-public class MarriageMessage implements UserAction {
+public class MarriageMessage implements UserAction, Struct {
 
     public static final Component PREFIX = Component.text()
             .color(TextColor.color(255, 158, 208))
@@ -29,7 +30,7 @@ public class MarriageMessage implements UserAction {
     private final CrownUser target;
     private final String input;
     private final Component formatted;
-    private final MuteStatus status;
+    private MuteStatus status;
 
     public MarriageMessage(CrownUser sender, CrownUser target, String input) {
         this.sender = sender;
@@ -66,6 +67,10 @@ public class MarriageMessage implements UserAction {
 
     public MuteStatus getMuteStatus() {
         return status;
+    }
+
+    public void setStatus(MuteStatus status) {
+        this.status = status;
     }
 
     @Override

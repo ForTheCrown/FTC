@@ -5,7 +5,7 @@ import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.JailManager;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.Kingship;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.ItemPriceMap;
 import net.forthecrown.economy.market.MarketRegion;
 import net.forthecrown.economy.market.guild.TradersGuild;
@@ -50,27 +50,27 @@ public interface Crown extends Plugin, Namespaced {
     static KitManager getKitManager() { return Main.kitRegistry; }
 
     static UserSerializer getUserSerializer() { return Main.userSerializer; }
+    static TradersGuild getTradersGuild() { return Main.tradersGuild; }
+    static MarketRegion getMarketRegion() { return Main.marketRegion; }
     static LuckPerms getLuckPerms() { return Main.luckPerms; }
     static Announcer getAnnouncer(){ return Main.announcer; }
-    static Balances getBalances(){ return Main.balances; }
+    static ItemPriceMap getPriceMap() { return Main.prices; }
+    static Economy getEconomy(){ return Main.economy; }
     static Kingship getKingship(){ return Main.kingship; }
     static TabList getTabList() { return Main.tabList; }
-    static TradersGuild getTradersGuild() { return Main.tradersGuild; }
-    static MarketRegion getMarketShops() { return Main.marketShops; }
-    static ItemPriceMap getPriceMap() { return Main.prices; }
 
-    static CrownMessages getMessages() { return Main.messages; }
+    static FtcMessages getMessages() { return Main.messages; }
     static DayUpdate getDayUpdate() { return Main.dayUpdate; }
     static JoinInfo getJoinInfo() { return Main.joinInfo; }
-    static ServerRules getRules() { return Main.rules; }
     static ChatEmotes getEmotes() { return Main.emotes; }
+    static ServerRules getRules() { return Main.rules; }
 
     static Logger logger() { return Main.logger; }
     static File dataFolder() { return inst().getDataFolder(); }
     static FileConfiguration config() { return inst().getConfig(); }
     static InputStream resource(String name) { return inst().getResource(name); }
-    static void saveResource(boolean replace, String name) { inst().saveResource(name, replace); }
     static PluginDescriptionFile description() { return inst().getDescription(); }
+    static void saveResource(boolean replace, String name) { inst().saveResource(name, replace); }
 
     static void saveFTC(){
         Main.kingship.save();
@@ -78,7 +78,7 @@ public interface Crown extends Plugin, Namespaced {
         Main.userManager.save();
         Main.userManager.saveUsers();
 
-        Main.balances.save();
+        Main.economy.save();
 
         Main.warpRegistry.save();
         Main.kitRegistry.save();
@@ -87,20 +87,15 @@ public interface Crown extends Plugin, Namespaced {
         Main.jailManager.save();
 
         Main.shopManager.save();
-        Main.shopManager.templates.save();
         Main.usablesManager.saveAll();
 
         Main.joinInfo.save();
         Main.prices.save();
         Main.tabList.save();
 
-        /*if(inDebugMode()) {
-            Valhalla.getInstance().saveAll();
-        }*/
-
-        if(Crown.inDebugMode()) {
-            Main.regionManager.save();
-        }
+        Main.regionManager.save();
+        Main.marketRegion.save();
+        Main.tradersGuild.save();
 
         Main.inst.saveConfig();
         logger().log(Level.INFO, "FTC-Core saved");

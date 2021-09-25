@@ -82,7 +82,6 @@ public class FtcBoundingBox extends BoundingBox implements Iterable<Block> {
         double maxY = 0.0D;
         double maxZ = 0.0D;
         World world = Bukkit.getWorld(String.valueOf(args.get("world")));
-
         if (args.containsKey("minX")) {
             minX = ((Number)args.get("minX")).doubleValue();
         }

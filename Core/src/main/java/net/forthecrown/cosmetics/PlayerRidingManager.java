@@ -7,7 +7,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.forthecrown.core.Crown;
-import net.forthecrown.core.WgFlags;
+import net.forthecrown.core.FtcFlags;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Cooldown;
@@ -26,11 +26,10 @@ import java.util.Set;
 
 public class PlayerRidingManager implements Listener {
 
-    public static final Location HAZELGUARD = new Location(Worlds.OVERWORLD, 200.5, 70, 1000.5);
-    private final ObjectSet<PlayerRider> riders;
-
-    static final NamespacedKey SEAT_KEY = new NamespacedKey(Crown.inst(), "player_seat");
     static final Location RETREAT_LOCATION = new Location(Bukkit.getWorld("world"), 200.5, 71, 1000.5);
+    public static final Location HAZELGUARD = new Location(Worlds.OVERWORLD, 200.5, 70, 1000.5);
+
+    private final ObjectSet<PlayerRider> riders;
 
     PlayerRidingManager(){
         riders = new ObjectArraySet<>();
@@ -45,11 +44,11 @@ public class PlayerRidingManager implements Listener {
 
     @EventHandler
     public void playerRightClickPlayer(PlayerInteractEntityEvent event) {
+        if(!(event.getRightClicked() instanceof Player)) return;
         if(event.getHand() == EquipmentSlot.OFF_HAND) return;
         if(!FtcUtils.isItemEmpty(event.getPlayer().getInventory().getItemInMainHand())) return;
         if(event.getPlayer().getWorld().equals(Worlds.VOID)) return;
         if(event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
-        if(!(event.getRightClicked() instanceof Player)) return;
 
         Player rider = event.getPlayer();
         Player riddenPlayer = (Player) event.getRightClicked();
@@ -66,7 +65,7 @@ public class PlayerRidingManager implements Listener {
         //WorldGuard stuffs
         LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(rider);
         ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(wgPlayer.getLocation());
-        if(!set.testState(wgPlayer, WgFlags.RIDING_ALLOWED)){
+        if(!set.testState(wgPlayer, FtcFlags.RIDING_ALLOWED)){
             user.sendMessage("&c&lHey! &7You can't ride players here.");
             return;
         }

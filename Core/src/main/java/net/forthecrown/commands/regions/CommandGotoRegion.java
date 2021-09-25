@@ -10,12 +10,11 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.regions.PopulationRegion;
-import net.forthecrown.regions.RegionPos;
 import net.forthecrown.regions.RegionManager;
+import net.forthecrown.regions.RegionPos;
 import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.actions.RegionVisit;
-import net.forthecrown.user.actions.UserActionHandler;
+import net.forthecrown.user.actions.ActionFactory;
 import net.forthecrown.utils.FtcUtils;
 import org.bukkit.Location;
 
@@ -41,7 +40,7 @@ public class CommandGotoRegion extends FtcCommand {
      *
      * Permissions used:
      *
-     * Main Author:
+     * Main Author: Julie
      */
 
     @Override
@@ -80,9 +79,8 @@ public class CommandGotoRegion extends FtcCommand {
 
         RegionManager manager = Crown.getRegionManager();
         PopulationRegion region = manager.get(cords);
-        RegionVisit action = new RegionVisit(user, region);
 
-        UserActionHandler.handleAction(action);
+        ActionFactory.visitRegion(user, region);
         return 0;
     }
 }

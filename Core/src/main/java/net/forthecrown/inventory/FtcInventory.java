@@ -3,9 +3,9 @@ package net.forthecrown.inventory;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.forthecrown.inventory.builder.InventoryPos;
-import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
@@ -41,9 +41,15 @@ public interface FtcInventory extends Inventory, JsonSerializable, JsonDeseriali
         return getItem(pos.getSlot());
     }
 
+    default InventoryPos firstEmptyPos() {
+        int first = firstEmpty();
+
+        return first == -1 ? null : InventoryPos.fromSlot(first);
+    }
+
     @Override
     default void deserialize(JsonElement element) {
-        JsonBuf json = JsonBuf.of(element.getAsJsonObject());
+        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()) {
             int index = Integer.parseInt(e.getKey());
@@ -55,7 +61,7 @@ public interface FtcInventory extends Inventory, JsonSerializable, JsonDeseriali
 
     @Override
     default JsonObject serialize() {
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         for (int i = 0; i < getSize(); i++) {
             ItemStack item = getItem(i);

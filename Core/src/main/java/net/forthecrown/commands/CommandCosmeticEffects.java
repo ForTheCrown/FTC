@@ -34,7 +34,7 @@ public class CommandCosmeticEffects extends FtcCommand {
      * Permissions used:
      * ftc.core.admin
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override

@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * An easy to create loottable to use in-game
  */
-public class LiteralLootTable implements CrownLootTable {
+public class LiteralLootTable implements FtcLootTable {
 
     private final NamespacedKey key;
     private final List<ItemStack> items;

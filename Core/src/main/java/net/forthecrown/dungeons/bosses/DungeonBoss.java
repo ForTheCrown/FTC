@@ -3,8 +3,9 @@ package net.forthecrown.dungeons.bosses;
 import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.Crown;
 import net.forthecrown.dungeons.BossFightContext;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.dungeons.DungeonUtils;
+import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.FtcBoundingBox;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -33,11 +34,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
 
-    protected static final ThreadLocalRandom random = ThreadLocalRandom.current();
+    protected static final CrownRandom random = new CrownRandom();
 
     protected final Location spawnLocation;
     protected final FtcBoundingBox bossRoom;
@@ -188,6 +188,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
 
     public void attemptSpawn(Player player){
         Validate.notNull(player, "Player is null");
+
         if(isAlive()){
             player.sendMessage(Component.translatable("dungeons.alreadySpawned").color(NamedTextColor.GRAY));
             return;

@@ -1,6 +1,7 @@
 package net.forthecrown.cosmetics.travel;
 
 import net.forthecrown.inventory.builder.InventoryPos;
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -32,13 +33,13 @@ public class HeartTravelEffect extends TravelEffect {
     }
 
     @Override
-    public void onPoleTeleport(Location from, Location pole) {
+    public void onPoleTeleport(CrownUser user, Location from, Location pole) {
         TravelUtil.spawnOnHearts(from, 0.2, Particle.END_ROD);
         TravelUtil.spawnOnHearts(pole, -1, Particle.END_ROD);
     }
 
     @Override
-    public void onHulkStart(Location loc) {
+    public void onHulkStart(CrownUser user, Location loc) {
         // Prepare tick locations
         circleLocs = TravelUtil.getOnCircle(loc.getWorld(), -2.5, 1.5, amountSpiralPoints);
 
@@ -46,21 +47,21 @@ public class HeartTravelEffect extends TravelEffect {
     }
 
     @Override
-    public void onHulkTickDown(Location loc) {
+    public void onHulkTickDown(CrownUser user, Location loc) {
         Location spawnLoc = loc.add(circleLocs.get(getNext()));
         spawnLoc.getWorld().spawnParticle(Particle.HEART, spawnLoc, 2, 0.1, 0.2, 0.1, 0);
         spawnLoc.getWorld().spawnParticle(Particle.END_ROD, spawnLoc, 1, 0.1, 0.2, 0.1, 0);
     }
 
     @Override
-    public void onHulkTickUp(Location loc) {
+    public void onHulkTickUp(CrownUser user, Location loc) {
         Location spawnLoc = loc.add(circleLocs.get(getNext()));
         spawnLoc.getWorld().spawnParticle(Particle.HEART, spawnLoc, 2, 0.1, 0.2, 0.1, 0);
         spawnLoc.getWorld().spawnParticle(Particle.END_ROD, spawnLoc, 1, 0.1, 0.2, 0.1, 0);
     }
 
     @Override
-    public void onHulkLand(Location landing) {
+    public void onHulkLand(CrownUser user, Location landing) {
         TravelUtil.spawnOnHearts(landing, 0.2, Particle.END_ROD);
     }
 }

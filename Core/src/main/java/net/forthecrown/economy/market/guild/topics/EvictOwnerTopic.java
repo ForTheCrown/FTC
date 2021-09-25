@@ -2,11 +2,17 @@ package net.forthecrown.economy.market.guild.topics;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.economy.market.MarketRegion;
+import net.forthecrown.economy.market.MarketShop;
+import net.forthecrown.economy.market.guild.VoteResult;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.ClickContext;
+import net.forthecrown.inventory.builder.InventoryBuilder;
 import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.user.CrownUser;
@@ -17,8 +23,12 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Date;
 import java.util.UUID;
 
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
@@ -43,18 +53,30 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
     }
 
     @Override
-    public Component categoryText() {
-        return null;
+    public Component signDisplay(TopicInstance value) {
+        CrownUser user = value.user();
+        user.unloadIfOffline();
+
+        return Component.translatable("guilds.topics.evict", user.nickDisplayName());
     }
 
     @Override
-    public Component displayName(TopicInstance value) {
-        return null;
+    public void runTask(PostVoteTask task) {
+        UUID ownerID = JsonUtils.readUUID(task.data);
+
+        MarketRegion market = Crown.getMarketRegion();
+        MarketShop shop = market.get(ownerID);
+        if(shop == null) return;
+
+        market.unclaim(shop, true);
     }
 
     @Override
     public BuiltInventory getInventory() {
-        return null;
+        InventoryBuilder builder = new InventoryBuilder(36)
+                .title(Component.text("Choose who to evict"));
+
+        return builder.build();
     }
 
     @Override
@@ -80,7 +102,7 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
                             .setName(Component.text("Evict a shop owner").style(nonItalic(NamedTextColor.YELLOW)))
 
                             .addLore(Component.text("Force a shop owner to give up their shop").style(nonItalic(NamedTextColor.GRAY)))
-                            .addLore(Component.text("Can be for any reason").style(nonItalic(NamedTextColor.GRAY)))
+                            .addLore(Component.text("For any reason").style(nonItalic(NamedTextColor.GRAY)))
 
                             .build()
             );
@@ -94,15 +116,15 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
 
     private static class EvictHeadOption implements CordedInventoryOption {
         private final InventoryPos pos;
-        private final UUID id;
+        private final MarketShop market;
 
-        private EvictHeadOption(InventoryPos pos, UUID id) {
+        private EvictHeadOption(InventoryPos pos, MarketShop market) {
             this.pos = pos;
-            this.id = id;
+            this.market = market;
         }
 
-        public UUID getId() {
-            return id;
+        public MarketShop getShop() {
+            return market;
         }
 
         @Override
@@ -112,13 +134,17 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
 
         @Override
         public void place(FtcInventory inventory, CrownUser user) {
-            CrownUser head = UserManager.getUser(id);
+            CrownUser head = market.ownerUser();
 
             ItemStackBuilder builder = new ItemStackBuilder(Material.PLAYER_HEAD, 1)
                     .setProfile(head)
                     .setName(head.nickDisplayName().style(FtcFormatter.nonItalic(NamedTextColor.YELLOW)));
 
-
+            if(market.canBeEvicted()) {
+                builder
+                        .addEnchant(Enchantment.CHANNELING, 1)
+                        .setFlags(ItemFlag.HIDE_ENCHANTS);
+            }
 
             inventory.setItem(
                     pos,
@@ -128,7 +154,14 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
 
         @Override
         public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
+            CrownUser owner = market.ownerUser();
 
+            if(!market.canBeEvicted()) {
+                throw FtcExceptionProvider.translatable("guilds.cannotEvict", owner.nickDisplayName());
+            }
+
+            TopicInstance instance = new TopicInstance(market.getOwner());
+            Crown.getTradersGuild().createVote(instance);
         }
     }
 
@@ -143,19 +176,38 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
             return owner;
         }
 
-        @Override
-        public void onVoteSucceed() {
-
+        CrownUser user() {
+            return UserManager.getUser(getOwner());
         }
 
         @Override
-        public void onVoteFail() {
+        public @Nullable PostVoteTask onVoteEnd(VoteResult result) {
+            if(result.isWin()) {
+                user().sendOrMail(
+                        Component.translatable("guilds.topics.evict.notice.succeed")
+                                .color(NamedTextColor.RED)
+                );
 
+                return new PostVoteTask(
+                        new Date(System.currentTimeMillis() + ComVars.getEvictionCleanupTime()),
+                        JsonUtils.writeUUID(owner),
+                        KEY
+                );
+            }
+
+            user().sendOrMail(
+                    Component.translatable("guilds.topics.evict.notice.fail")
+                            .color(NamedTextColor.GREEN)
+            );
+            return null;
         }
 
         @Override
         public void onVotingBegin() {
-
+            user().sendOrMail(
+                    Component.translatable("guilds.topics.evict.notice.begin")
+                            .color(NamedTextColor.GRAY)
+            );
         }
 
         @Override

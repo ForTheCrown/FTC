@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.user.CrownUser;
@@ -54,7 +54,7 @@ public abstract class FtcCommand extends AbstractCommand {
         return UserManager.getUser(c.getSource().asPlayer());
     }
 
-    private static Balances bals = Crown.getBalances();
+    private static Economy bals = Crown.getEconomy();
     public static SuggestionProvider<CommandSource> suggestMonies(){
         return (c, b) -> {
             if(!c.getSource().isPlayer()) return Suggestions.empty();
@@ -82,7 +82,7 @@ public abstract class FtcCommand extends AbstractCommand {
 
     private static void suggestIf(UUID id, Pair<Integer, Message> pair, SuggestionsBuilder builder){
         int amount = pair.getFirst();
-        if(bals.canAfford(id, amount) && (amount + "").toLowerCase().startsWith(builder.getRemaining().toLowerCase())) builder.suggest(amount, pair.getSecond());
+        if(bals.has(id, amount) && (amount + "").toLowerCase().startsWith(builder.getRemaining().toLowerCase())) builder.suggest(amount, pair.getSecond());
     }
 
     public void setHelpListName(String descriptionName) {

@@ -4,28 +4,33 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
+import net.forthecrown.core.Crown;
 import net.forthecrown.economy.market.guild.topics.VoteTopic;
 import net.forthecrown.economy.market.guild.topics.VoteTopicType;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.UUID;
 
 public class VoteState implements JsonSerializable, JsonDeserializable {
-    private final ObjectList<UUID> pro = new ObjectArrayList<>();
-    private final ObjectList<UUID> against = new ObjectArrayList<>();
+    private final TradersGuild guild;
+
+    private final ObjectSet<UUID> pro = new ObjectOpenHashSet<>();
+    private final ObjectSet<UUID> against = new ObjectOpenHashSet<>();
 
     VoteTopic topic;
     Date started;
 
-    VoteState() {}
+    public VoteState(TradersGuild guild) {
+        this.guild = guild;
+    }
 
     public void vote(GuildVoter voter) {
         voter.vote(this);
@@ -40,31 +45,57 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
     }
 
     private void checkShouldEnd() {
-        int total = pro.size() + against.size();
+        if(!shouldEnd()) return;
 
-
+        guild.finishVoting();
     }
 
-    public void endVoting() {
+    private boolean shouldEnd() {
+        int total = pro.size() + against.size();
+        int totalPossible = guild.getMembers().size();
+
+        return total >= totalPossible;
     }
 
     public void voteFor(UUID id) {
         pro.add(id);
+        vote();
     }
 
     public void voteAgainst(UUID id) {
         against.add(id);
+        vote();
     }
 
-    public ObjectList<UUID> getAgainst() {
+    private void vote() {
+        Crown.getTradersGuild().getVoteBox().updateSign(this, guild.getWorld());
+        checkShouldEnd();
+    }
+
+    public ObjectSet<UUID> getAgainst() {
         return against;
     }
 
-    public ObjectList<UUID> getPro() {
+    public ObjectSet<UUID> getPro() {
         return pro;
     }
 
-    public VoteResult countVotes(TradersGuild guild) {
+    public boolean hasVoted(UUID id) {
+        return pro.contains(id) || against.contains(id);
+    }
+
+    public ObjectList<UUID> compileNonVoters() {
+        ObjectList<UUID> result = new ObjectArrayList<>();
+
+        for (UUID id: guild.getMembers()) {
+            if(hasVoted(id)) continue;
+            result.add(id);
+        }
+
+        return result;
+    }
+
+    public VoteResult countVotes() {
         int totalPossible = guild.getMembers().size();
         int pro = this.pro.size();
         int against = this.against.size();
@@ -79,39 +110,36 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
                 : (pro == against ?
                     VoteResult.TIE :
                     (pro > against ? VoteResult.WIN : VoteResult.LOSE)
-        );
+                );
     }
 
     @Override
     public void deserialize(JsonElement element) {
-        JsonBuf json = JsonBuf.of(element.getAsJsonObject());
+        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
         if(!json.missingOrNull("pro")) pro.addAll(json.getList("pro", JsonUtils::readUUID));
-        if(!json.missingOrNull("against")) pro.addAll(json.getList("against", JsonUtils::readUUID));
+        else pro.clear();
+
+        if(!json.missingOrNull("against")) against.addAll(json.getList("against", JsonUtils::readUUID));
+        else against.clear();
 
         //topic
-        JsonBuf topicJson = json.getBuf("topic");
+        JsonWrapper topicJson = json.getWrapped("topic");
         Key typeKey = topicJson.getKey("type");
 
         topic = Registries.VOTE_TOPICS.get(typeKey).deserialize(topicJson.get("value"));
-
-        try {
-            started = DateFormat.getDateInstance().parse(json.getString("started"));
-        } catch (ParseException e) {
-            started = null;
-            e.printStackTrace();
-        }
+        started = json.getDate("started");
     }
 
     @Override
     public JsonObject serialize() {
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         if(!pro.isEmpty()) json.addList("pro", pro, JsonUtils::writeUUID);
         if(!against.isEmpty()) json.addList("against", against, JsonUtils::writeUUID);
 
         //Topic
-        JsonBuf topicJson = JsonBuf.empty();
+        JsonWrapper topicJson = JsonWrapper.empty();
         topicJson.addKey("type", topic.typeKey());
 
         VoteTopicType type = topic.getType();
@@ -120,7 +148,7 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
         json.add("topic", topicJson);
 
         //date
-        json.add("started", started.toString());
+        json.addDate("started", started);
 
         return json.getSource();
     }

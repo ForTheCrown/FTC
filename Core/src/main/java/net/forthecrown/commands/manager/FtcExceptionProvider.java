@@ -4,9 +4,9 @@ import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.ComVars;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
-import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -18,34 +18,38 @@ import org.bukkit.inventory.ItemStack;
 import static net.forthecrown.commands.manager.CrownExceptionProvider.*;
 
 public interface FtcExceptionProvider {
-    static CommandSyntaxException create(String messasge){
-        return GENERIC.create(FtcFormatter.formatColorCodes(messasge));
+    static RoyalCommandException create(String messasge){
+        return OpenExceptionType.INSTANCE.create(ChatUtils.convertString(messasge, true));
     }
 
-    static CommandSyntaxException createWithContext(String message, String input, int cursor){
+    static RoyalCommandException createWithContext(String message, String input, int cursor){
         StringReader reader = new StringReader(input);
         reader.setCursor(cursor);
 
         return createWithContext(message, reader);
     }
 
-    static CommandSyntaxException createWithContext(String message, StringReader reader){
-        return GENERIC.createWithContext(reader, FtcFormatter.formatColorCodes(message));
+    static RoyalCommandException createWithContext(String message, StringReader reader){
+        return OpenExceptionType.INSTANCE.createWithContext(ChatUtils.convertString(message, true), reader);
     }
 
     static RoyalCommandException translatable(String key, ComponentLike... args){
-        return new TranslatableExceptionType(key).create(args);
+        return OpenExceptionType.INSTANCE.create(Component.translatable(key, args));
     }
 
     static RoyalCommandException translatable(String key, TextColor color, ComponentLike... args){
-        return new TranslatableExceptionType(key).create(color, args);
+        return OpenExceptionType.INSTANCE.create(Component.translatable(key, color, args));
     }
 
     static RoyalCommandException translatableWithContext(String key, ImmutableStringReader context, ComponentLike... args){
-        return new TranslatableExceptionType(key).createWithContext(context, args);
+        return OpenExceptionType.INSTANCE.createWithContext(Component.translatable(key, args), context);
     }
 
-    static RoyalCommandException cannotAfford(int amount){
+    static RoyalCommandException translatableWithContext(String key, TextColor color, ImmutableStringReader context, ComponentLike... args){
+        return OpenExceptionType.INSTANCE.createWithContext(Component.translatable(key, color, args), context);
+    }
+
+    static RoyalCommandException cannotAfford(long amount){
         return CANNOT_AFFORD_TRANSACTION.create(FtcFormatter.rhines(amount));
     }
 
@@ -226,7 +230,7 @@ public interface FtcExceptionProvider {
     }
 
     static RoyalCommandException realPirate(Entity name) {
-        return GOTTA_BE_PIRATE.create(NamedTextColor.YELLOW, FtcFormatter.entityDisplayName(name).color(NamedTextColor.YELLOW));
+        return GOTTA_BE_PIRATE.create(NamedTextColor.YELLOW, FtcFormatter.displayName(name).color(NamedTextColor.YELLOW));
     }
 
     static RoyalCommandException cannotPayBlocked() {

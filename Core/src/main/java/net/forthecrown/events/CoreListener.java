@@ -1,5 +1,6 @@
 package net.forthecrown.events;
 
+import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
@@ -10,18 +11,20 @@ import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
+import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcFlags;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.WgFlags;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.StaffChat;
-import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.npc.NpcDirectory;
 import net.forthecrown.economy.selling.SellShops;
 import net.forthecrown.inventory.CrownWeapons;
@@ -29,14 +32,16 @@ import net.forthecrown.pirates.Pirates;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
+import net.forthecrown.user.actions.MarriageMessage;
 import net.forthecrown.user.actions.UserActionHandler;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.actions.MarriageMessage;
-import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.Worlds;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -61,6 +66,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.Objects;
+
+import static net.forthecrown.core.chat.FtcFormatter.checkUppercase;
+import static net.forthecrown.core.chat.FtcFormatter.formatColorCodes;
 
 public class CoreListener implements Listener {
 
@@ -183,7 +196,7 @@ public class CoreListener implements Listener {
         RegionQuery query = platform.getRegionContainer().createQuery();
         boolean canBypass = platform.getSessionManager().hasBypass(wgPlayer, BukkitAdapter.adapt(block.getWorld()));
 
-        if(!query.testState(weLoc, wgPlayer, WgFlags.TRAPDOOR_USE) && !canBypass){
+        if(!query.testState(weLoc, wgPlayer, FtcFlags.TRAPDOOR_USE) && !canBypass){
             ApplicableRegionSet set = platform.getRegionContainer().get(BukkitAdapter.adapt(block.getWorld())).getApplicableRegions(BlockVector3.at(weLoc.getBlockX(), weLoc.getBlockY(), weLoc.getBlockZ()));
 
             for (ProtectedRegion region: set) if(region.isMember(wgPlayer)) return;
@@ -200,7 +213,16 @@ public class CoreListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncChatEvent event) {
-        event.renderer(FtcFormatter::formatChat);
+        event.renderer(new FtcChatRenderer());
+
+        //Check to make sure no bad bad's were said
+        Component rendered = event.renderer().render(event.getPlayer(), event.getPlayer().displayName(), event.message(), event.getPlayer());
+        if(BannedWords.checkAndWarn(event.getPlayer(), rendered)) {
+            EavesDropper.bannedWordChat(rendered);
+
+            event.setCancelled(true);
+            return;
+        }
 
         PunishmentManager punishments = Crown.getPunishmentManager();
         Player player = event.getPlayer();
@@ -208,7 +230,7 @@ public class CoreListener implements Listener {
 
         if(status != MuteStatus.NONE){
             event.viewers().removeIf(a -> {
-                Player p = FtcUtils.fromAudience(a);
+                Player p = fromAudience(a);
                 if(p == null) return false;
 
                 return !punishments.isSoftmuted(p.getUniqueId());
@@ -227,7 +249,7 @@ public class CoreListener implements Listener {
             }
 
             event.viewers().removeIf(a -> {
-                Player p = FtcUtils.fromAudience(a);
+                Player p = fromAudience(a);
                 if(p == null) return false;
 
                 return  !p.hasPermission(Permissions.STAFF_CHAT) || StaffChat.ignoring.contains(p);
@@ -237,14 +259,14 @@ public class CoreListener implements Listener {
 
         if(player.getWorld().equals(Worlds.SENATE)){
             event.viewers().removeIf(a -> {
-                Player p = FtcUtils.fromAudience(a);
+                Player p = fromAudience(a);
                 if(p == null) return false;
 
                 return !p.getWorld().equals(Worlds.SENATE);
             });
             return;
         } else event.viewers().removeIf(a -> {
-            Player p = FtcUtils.fromAudience(a);
+            Player p = fromAudience(a);
             if(p == null) return false;
 
             return p.getWorld().equals(Worlds.SENATE);
@@ -252,7 +274,7 @@ public class CoreListener implements Listener {
 
         //Remove ignored
         event.viewers().removeIf(a -> {
-            Player p = FtcUtils.fromAudience(a);
+            Player p = fromAudience(a);
             if(p == null) return false;
 
             UserInteractions inter = UserManager.getUser(p).getInteractions();
@@ -302,5 +324,62 @@ public class CoreListener implements Listener {
                 event.getRightClicked(),
                 event.getPlayer()
         );
+    }
+
+    private final CrownRandom playerNumRandom = new CrownRandom();
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPaperServerListPing(PaperServerListPingEvent event) {
+        int max = Bukkit.getMaxPlayers();
+        int newMax = playerNumRandom.intInRange(max, max + 20);
+
+        event.setMaxPlayers(newMax);
+
+        Iterator<Player> iterator = event.iterator();
+        while (iterator.hasNext()) {
+            CrownUser user = UserManager.getUser(iterator.next());
+            if(user.isVanished()) iterator.remove();
+        }
+    }
+
+    //Gets a player from an audience, used by the chat event listener in CoreListener
+    static @Nullable Player fromAudience(Audience audience){
+        if(audience instanceof Player) return (Player) audience;
+        return null;
+    }
+
+    public static class FtcChatRenderer implements ChatRenderer {
+        private Component message;
+
+        @Override
+        public @NotNull Component render(@NotNull Player source, @NotNull Component displayName, @NotNull Component message, @NotNull Audience viewer) {
+            return Objects.requireNonNullElse(this.message, this.message = format(source, message));
+        }
+
+        private Component format(Player source, Component message) {
+            CrownUser user = UserManager.getUser(source);
+
+            String strMessage = ChatUtils.getString(message);
+            boolean inSenateWorld = source.getWorld().equals(Worlds.SENATE);
+            boolean staffChat = StaffChat.toggledPlayers.contains(source);
+
+            if(source.hasPermission(Permissions.DONATOR_2) || inSenateWorld || staffChat) strMessage = formatColorCodes(strMessage);
+            if(source.hasPermission(Permissions.DONATOR_3) || inSenateWorld || staffChat) strMessage = Crown.getEmotes().format(strMessage, source, true);
+
+            strMessage = checkUppercase(source, strMessage);
+            message = ChatUtils.convertString(strMessage);
+
+            TextColor playerColor = inSenateWorld ? NamedTextColor.YELLOW : TextColor.color(240, 240, 240);
+            if(staffChat) playerColor = NamedTextColor.GRAY;
+
+            return Component.text()
+                    .append(StaffChat.toggledPlayers.contains(source) ? StaffChat.PREFIX : Component.empty())
+                    .append(user.nickDisplayName().color(playerColor))
+                    .append(Component.text(" > ").style(
+                            Style.style(NamedTextColor.GRAY, TextDecoration.BOLD)
+                    ))
+                    .append(message)
+                    .build();
+        }
     }
 }

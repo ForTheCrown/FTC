@@ -37,7 +37,7 @@ public class CommandMakeAward extends FtcCommand {
      * Permissions used:
      * ftc.commands.makeaward
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override

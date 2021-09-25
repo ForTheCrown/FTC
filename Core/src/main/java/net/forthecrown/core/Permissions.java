@@ -35,6 +35,7 @@ public final class Permissions {
     public static final Permission GAMEMODES =          register("ftc.gamemodes");
     public static final Permission KING_MAKER =         register("ftc.kingmaker");
     public static final Permission IGNORE_CHAT_CASE =   register("ftc.chatcaseignore");
+    public static final Permission IGNORE_SWEARS =      register("ftc.ignorebannedwords");
     public static final Permission BROADCAST =          register("ftc.broadcast");
 
     public static final Permission SHOP_ADMIN =         register("ftc.shops.admin");
@@ -54,6 +55,9 @@ public final class Permissions {
     public static final Permission EMOTE_POG =          register("ftc.emotes.pog");
     public static final Permission EMOTE_SCARE =        register("ftc.emotes.scare");
     public static final Permission EMOTE_HUG =          register("ftc.emotes.hug");
+
+    public static final Permission MAIL =               register("ftc.mail");
+    public static final Permission MAIL_OTHERS =        register("ftc.mail.others");
 
     public static final Permission NEARBY =             register(COMMAND_PREFIX + "near");
     public static final Permission NEARBY_IGNORE =      register(COMMAND_PREFIX + "near.ignore");

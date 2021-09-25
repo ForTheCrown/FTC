@@ -1,22 +1,16 @@
 package net.forthecrown.core.chat;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
+import net.forthecrown.user.data.Rank;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.enums.Rank;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.Worlds;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -35,7 +29,6 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -112,43 +105,6 @@ public interface FtcFormatter {
     }
 
     /**
-     * Formats a chat message.
-     * <p></p>
-     * Parameters needed cuz FtcFormatter::formatChat is way easier to write than creating
-     * a lambda lol.
-     * @param source The source of the chat message
-     * @param displayName Their display name, irrelevant since we use {@link CrownUser#nickDisplayName()}
-     * @param message The message they sent
-     * @param audience The viewer of the message, allows us to make the message different for each person
-     * @return The formatted chat message
-     */
-    static Component formatChat(Player source, Component displayName, Component message, Audience audience){
-        CrownUser user = UserManager.getUser(source);
-
-        String strMessage = ChatUtils.getString(message);
-        boolean inSenateWorld = source.getWorld().equals(Worlds.SENATE);
-        boolean staffChat = StaffChat.toggledPlayers.contains(source);
-
-        if(source.hasPermission(Permissions.DONATOR_2) || inSenateWorld || staffChat) strMessage = formatColorCodes(strMessage);
-        if(source.hasPermission(Permissions.DONATOR_3) || inSenateWorld || staffChat) strMessage = Crown.getEmotes().format(strMessage, source, true);
-
-        strMessage = checkUppercase(source, strMessage);
-        message = ChatUtils.convertString(strMessage);
-
-        TextColor playerColor = inSenateWorld ? NamedTextColor.YELLOW : TextColor.color(240, 240, 240);
-        if(staffChat) playerColor = NamedTextColor.GRAY;
-
-        return Component.text()
-                .append(StaffChat.toggledPlayers.contains(source) ? StaffChat.PREFIX : Component.empty())
-                .append(user.nickDisplayName().color(playerColor))
-                .append(Component.text(" > ").style(
-                        Style.style(NamedTextColor.GRAY, TextDecoration.BOLD)
-                ))
-                .append(message)
-                .build();
-    }
-
-    /**
      * Checks whether the given string is more than half uppercase, if it is, lower cases it
      * @param source The source of the input
      * @param input The input to check and potentially change
@@ -204,7 +160,7 @@ public interface FtcFormatter {
         FtcUser user = (FtcUser) user1;
 
         return Component.translatable("multiplayer.player.joined.renamed",
-                user.nickDisplayName().color(getJoinColor(user)),
+                user.displayName().color(getJoinColor(user)),
                 Component.text(user.previousNames.get(user.previousNames.size()-1))
         )
                 //.hoverEvent(Component.text("Click to say hello!"))
@@ -473,20 +429,7 @@ public interface FtcFormatter {
         return l == 1 ? "" : "s";
     }
 
-    /**
-     * Checks if the given nickname is allowed
-     * @param nick The nickname to check for
-     * @throws CommandSyntaxException If the nickname is invalid
-     */
-    static void checkNickAllowed(String nick) throws CommandSyntaxException {
-        if(ComVars.getMaxNickLength() < nick.length()) throw FtcExceptionProvider.nickTooLong(nick.length());
-
-        if(!ComVars.allowOtherPlayerNameNicks()){
-            if(Bukkit.getOfflinePlayerIfCached(nick) != null) throw FtcExceptionProvider.create("Nickname cannot be the name of another player");
-        }
-    }
-
-    static Component entityDisplayName(Entity entity){
+    static Component displayName(Entity entity){
         Component name = entity.customName() == null ? translatableEntityName(entity.getType()) : entity.customName();
         assert name != null;
 
@@ -550,7 +493,17 @@ public interface FtcFormatter {
      * @return The formatted message
      */
     static Component rhinesNonTrans(long amount) {
-        return GlobalTranslator.render(rhines(amount), Locale.ROOT);
+        return rhinesInLang(amount, Locale.ROOT);
+    }
+
+    /**
+     * Same as {@link FtcFormatter#rhines(long)} except in the given lang
+     * @param amount The amount to format for
+     * @param locale The locale to translate to
+     * @return The formatted message
+     */
+    static Component rhinesInLang(long amount, Locale locale) {
+        return GlobalTranslator.render(rhines(amount), locale);
     }
 
     /**

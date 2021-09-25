@@ -21,10 +21,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.royalgrenadier.source.CommandSources;
-import net.forthecrown.user.data.SoldMaterialData;
-import net.forthecrown.user.data.UserPref;
-import net.forthecrown.user.data.UserTeleport;
-import net.forthecrown.user.enums.*;
+import net.forthecrown.user.data.*;
 import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
@@ -50,6 +47,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundChatPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -83,20 +81,26 @@ import java.util.function.UnaryOperator;
 
 public class FtcUser implements CrownUser {
 
+    //Identifiers
     private final UUID uniqueId;
     public String name;
 
+    //Display and name info
     public String lastOnlineName;
     public ObjectList<String> previousNames = new ObjectArrayList<>();
     public Component nickname;
     public Component currentPrefix;
 
+    //Attachments
+    public final FtcUserMarketOwnership marketOwnership;
     public final FtcUserDataContainer dataContainer;
     public final FtcUserInteractions interactions;
+    public final FtcUserCosmeticData cosmeticData;
+    public final FtcUserMail mail;
     public final FtcUserGrave grave;
     public final FtcUserHomes homes;
-    public final FtcUserCosmeticData cosmeticData;
 
+    //Faction and rank stuff
     public Rank currentRank = Rank.DEFAULT;
     public Faction faction = Faction.DEFAULT;
     public ObjectSet<Rank> ranks = new ObjectOpenHashSet<>();
@@ -104,6 +108,7 @@ public class FtcUser implements CrownUser {
     public final ObjectList<Pet> pets = new ObjectArrayList<>();
     public final ObjectSet<UserPref> properties = new ObjectOpenHashSet<>();
 
+    //Primitive variables, idk
     private int gems = 0;
     public boolean afk = false;
     public long totalEarnings = 0L;
@@ -112,29 +117,39 @@ public class FtcUser implements CrownUser {
     public long nextAllowedBranchSwap = 0L;
     public String ip;
 
+    //Economy stuff
     public Object2ObjectMap<Material, SoldMaterialData> matData = new Object2ObjectOpenHashMap<>();
     public SellAmount sellAmount = SellAmount.PER_1;
 
+    //NMS handle
     private ServerPlayer handle;
 
+    //Region visit listener
     public RegionVisitListener visitListener;
+
+    //Afk stuff
     public AfkListener afkListener;
     public String afkReason;
 
+    //Locations
     public Location entityLocation;
     public Location lastLocation;
 
+    //Teleport stuff
     public UserTeleport lastTeleport;
     public long nextAllowedTeleport = 0L;
 
+    //Last command sender they sent or received a message from
     private CommandSender lastMessage;
 
     public FtcUser(@NotNull UUID uniqueId){
         this.uniqueId = uniqueId;
 
+        marketOwnership = new FtcUserMarketOwnership(this);
         dataContainer = new FtcUserDataContainer(this);
         interactions = new FtcUserInteractions(this);
         cosmeticData = new FtcUserCosmeticData(this);
+        mail = new FtcUserMail(this);
         homes = new FtcUserHomes(this);
         grave = new FtcUserGrave(this);
 
@@ -219,8 +234,18 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
+    public UserMail getMail() {
+        return mail;
+    }
+
+    @Override
     public CosmeticData getCosmeticData() {
         return cosmeticData;
+    }
+
+    @Override
+    public UserMarketOwnership getMarketOwnership() {
+        return marketOwnership;
     }
 
     @Override
@@ -403,7 +428,10 @@ public class FtcUser implements CrownUser {
         setTotalEarnings(0);
 
         nextResetTime = System.currentTimeMillis() + ComVars.getUserResetInterval();
-        System.out.println(getName() + " earnings reset, next reset in: " + (((((getNextResetTime() - System.currentTimeMillis())/1000)/60)/60)/24) + " days");
+        Crown.logger().info(
+                getName() + " earnings reset, next reset in: " + (((((getNextResetTime() - System.currentTimeMillis())/1000)/60)/60)/24) + " days"
+        );
+
         save();
     }
 
@@ -685,9 +713,9 @@ public class FtcUser implements CrownUser {
 
         if(isKing()) currentPrefix = Crown.getKingship().isFemale() ? Kingship.queenTitle() : Kingship.kingTitle();
 
-        getOnlineHandle().sendPlayerListHeader(Crown.getTabList().format());
+        sendPlayerListHeader(Crown.getTabList().format());
 
-        this.ip = getPlayer().getAddress().getHostString();
+        ip = getPlayer().getAddress().getHostString();
         updateVanished();
         return false;
     }
@@ -769,8 +797,11 @@ public class FtcUser implements CrownUser {
     @Override
     public void updateTabName(){
         checkOnline();
+
         Component displayName = listDisplayName();
         getOnlineHandle().playerListName(displayName);
+
+        Crown.getTabList().updateList();
     }
 
     @Override
@@ -920,6 +951,16 @@ public class FtcUser implements CrownUser {
         Entity entity = getHandle();
         entity.setDeltaMovement(x, y, z);
         entity.hurtMarked = true;
+    }
+
+    @Override
+    public void sendOrMail(Component message, @Nullable UUID sender) {
+        if(isOnline()) {
+            sendMessage(sender, new AdventureComponent(message));
+            return;
+        }
+
+        getMail().add(message, sender);
     }
 
     @Override
@@ -1103,6 +1144,13 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
+    public void stopRiding(boolean suppressCancellation) throws UserNotOnlineException {
+        checkOnline();
+
+        getHandle().stopRiding();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FtcUser)) return false;
@@ -1169,7 +1217,7 @@ public class FtcUser implements CrownUser {
         setPref(nextAllowedBranchSwap != 0 && nextAllowedBranchSwap <= System.currentTimeMillis(), UserPref.CANNOT_SWAP_BRANCH);
     }
 
-    protected void sendPacket(Packet<?> packet){
+    public void sendPacket(Packet<ClientGamePacketListener> packet){
         checkOnline();
         Connection connection = getHandle().connection.connection;
         connection.send(packet);

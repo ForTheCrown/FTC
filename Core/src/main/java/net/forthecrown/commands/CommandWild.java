@@ -48,7 +48,7 @@ public class CommandWild extends FtcCommand {
      * - /wild
      * - /wild <target selector>
      *
-     * Author: Botul
+     * Author: Julie
      */
 
     @Override

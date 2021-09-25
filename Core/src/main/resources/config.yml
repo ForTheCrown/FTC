@@ -22,6 +22,7 @@ MaxShopEarnings: 500000
 HulkSmashPoles: true
 MaxSignShopPrice: 1000000
 RegionWorld: world
+MarketEvictionTime: 259200000
 Day: 1
 
 MiniGameRegion:

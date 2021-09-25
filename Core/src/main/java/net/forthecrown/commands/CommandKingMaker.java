@@ -35,7 +35,7 @@ public class CommandKingMaker extends FtcCommand {
      * - /kingmaker remove
      * - /kingmaker <player> [king | queen]
      *
-     * Main Author: Botul
+     * Main Author: Julie
      */
 
     @Override

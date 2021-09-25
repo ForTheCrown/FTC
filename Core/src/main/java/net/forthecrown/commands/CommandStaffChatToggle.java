@@ -34,7 +34,7 @@ public class CommandStaffChatToggle extends FtcCommand {
      * - /staffchattoggle
      * - /sct
      *
-     * Author: Botul
+     * Author: Julie
      */
 
     @Override

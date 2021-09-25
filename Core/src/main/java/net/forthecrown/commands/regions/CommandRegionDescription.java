@@ -30,7 +30,7 @@ public class CommandRegionDescription extends FtcCommand {
      *
      * Permissions used: ftc.regions.admin
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override

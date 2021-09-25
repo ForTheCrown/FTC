@@ -27,7 +27,7 @@ public class CommandGems extends FtcCommand {
      * Valid usages of command:
      * - /gems [player]
      *
-     * Main Author: Botul
+     * Main Author: Julie
      */
 
     @Override

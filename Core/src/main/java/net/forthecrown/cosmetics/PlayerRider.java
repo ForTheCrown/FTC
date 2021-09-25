@@ -54,7 +54,7 @@ public class PlayerRider implements Listener {
         nms.setCustomName(new TextComponent(rider.getName() + '_' + ridden.getName()));
         nms.setCustomNameVisible(false);
 
-        slime.setSize(1, false);
+        slime.setSize(0, false);
         mob.setNoAi(true);
 
         level.addAllEntitiesSafely(slime, CreatureSpawnEvent.SpawnReason.CUSTOM);

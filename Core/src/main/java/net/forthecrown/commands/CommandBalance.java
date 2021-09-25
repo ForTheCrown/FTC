@@ -4,7 +4,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -32,7 +32,7 @@ public class CommandBalance extends FtcCommand {
      * Valid usages of command:
      * - /<command> <args>
      *
-     * Author:
+     * Author: Julie
      */
 
     @Override
@@ -45,9 +45,9 @@ public class CommandBalance extends FtcCommand {
     }
 
     private int showBal(CommandSource sender, CrownUser user){
-        Balances balances = Crown.getBalances();
+        Economy economy = Crown.getEconomy();
         boolean senderIsUser = user.getName().equals(sender.textName());
-        Component formatted = FtcFormatter.rhines(balances.get(user.getUniqueId())).color(NamedTextColor.GOLD);
+        Component formatted = FtcFormatter.rhines(economy.get(user.getUniqueId())).color(NamedTextColor.GOLD);
 
         Component text = senderIsUser ?
                 Component.translatable("user.valueQuery.self", formatted) :

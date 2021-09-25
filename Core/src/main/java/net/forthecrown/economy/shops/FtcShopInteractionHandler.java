@@ -6,7 +6,7 @@ import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.events.ShopInteractionListener;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
@@ -23,7 +23,7 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
     private final Map<UUID, BukkitRunnable> deletionDelay = new Object2ObjectOpenHashMap<>();
 
     @Override
-    public void handleInteraction(SignShop shop, Player player, Balances balances) {
+    public void handleInteraction(SignShop shop, Player player, Economy economy) {
         //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it
         if(player.isSneaking() && (shop.getOwner().equals(player.getUniqueId()) || player.hasPermission(Permissions.FTC_ADMIN))){
             player.openInventory(shop.getInventory());
@@ -43,7 +43,7 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
 
         //Test the test method and catch any potential exceptions
         try {
-            interaction.test(session, balances);
+            interaction.test(session, economy);
 
             //Only reset cooldown if test is successful
             doSessionExpiryCooldown(session);
@@ -53,9 +53,7 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
             return;
         }
 
-        if(shop.hasTemplate()) shop.getTemplate().onShopUse(session);
-
-        interaction.interact(session, balances);
+        interaction.interact(session, economy);
     }
 
     @Override

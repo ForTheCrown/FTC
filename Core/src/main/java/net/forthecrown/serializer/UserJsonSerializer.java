@@ -10,10 +10,10 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.data.SoldMaterialData;
 import net.forthecrown.user.data.UserPref;
-import net.forthecrown.user.enums.Faction;
-import net.forthecrown.user.enums.Pet;
-import net.forthecrown.user.enums.Rank;
-import net.forthecrown.user.enums.SellAmount;
+import net.forthecrown.user.data.Faction;
+import net.forthecrown.user.data.Pet;
+import net.forthecrown.user.data.Rank;
+import net.forthecrown.user.data.SellAmount;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
@@ -47,7 +47,7 @@ public class UserJsonSerializer implements UserSerializer {
     public void serialize(FtcUser user) {
         if(deletedFiles.contains(user.getUniqueId())) return;
 
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         //Basic stuff
         json.add("name", user.getName());
@@ -75,7 +75,7 @@ public class UserJsonSerializer implements UserSerializer {
         if(!user.properties.isEmpty()) json.addList("properties", user.properties);
 
         //Time stamps
-        JsonBuf timeStamps = JsonBuf.empty();
+        JsonWrapper timeStamps = JsonWrapper.empty();
         timeStamps.add("nextReset", user.nextResetTime);
         timeStamps.add("lastLoad", user.lastLoad);
         if(!user.canSwapFaction()) timeStamps.add("nextBranchSwap", user.nextAllowedBranchSwap);
@@ -112,9 +112,7 @@ public class UserJsonSerializer implements UserSerializer {
 
         //Cosmetic data
         JsonObject cosmetics = user.cosmeticData.serialize();
-        if(cosmetics != null){
-            json.add("cosmeticData", cosmetics);
-        }
+        if(cosmetics != null) json.add("cosmeticData", cosmetics);
 
         //Homes
         JsonObject homeData = user.homes.serialize();
@@ -128,6 +126,14 @@ public class UserJsonSerializer implements UserSerializer {
         JsonObject dataContainer = user.dataContainer.serialize();
         if(dataContainer != null) json.add("dataContainer", dataContainer);
 
+        //Market ownership
+        JsonObject ownership = user.marketOwnership.serialize();
+        if(ownership != null) json.add("marketOwnership", ownership);
+
+        //Mail
+        JsonElement mail = user.mail.serialize();
+        if(mail != null) json.add("mail", mail);
+
         writeJson(json, user.getUniqueId());
     }
 
@@ -135,10 +141,9 @@ public class UserJsonSerializer implements UserSerializer {
     public void deserialize(FtcUser user) {
         if(deletedFiles.contains(user.getUniqueId())) return;
 
-        JsonBuf json = readJson(user);
+        JsonWrapper json = readJson(user);
         if(json == null) return;
 
-        //Don't deserialize the actual name u dum dum
         user.lastOnlineName = json.getString("lastOnlineName");
         user.faction = json.getEnum("branch", Faction.class, Faction.DEFAULT);
         user.currentRank = json.getEnum("rank", Rank.class, Rank.DEFAULT);
@@ -150,20 +155,20 @@ public class UserJsonSerializer implements UserSerializer {
         //ranks
         user.ranks.clear();
         user.ranks.add(Rank.DEFAULT);
-        if(json.has("ranks")){
+        if(json.has("ranks")) {
             List<Rank> ranks = ListUtils.fromIterable(json.getArray("ranks"), e -> JsonUtils.readEnum(Rank.class, e));
             user.ranks.addAll(ranks);
         }
 
         //Nickname
         user.nickname = null;
-        if(json.has("nickname")){
+        if(json.has("nickname")) {
             user.nickname = ChatUtils.fromJson(json.get("nickname"));
         }
 
         //Current Prefix
         user.currentPrefix = null;
-        if(!json.missingOrNull("currentPrefix")){
+        if(!json.missingOrNull("currentPrefix")) {
             user.currentPrefix = ChatUtils.fromJson(json.get("currentPrefix"));
         }
 
@@ -175,29 +180,29 @@ public class UserJsonSerializer implements UserSerializer {
 
         //Pets
         user.pets.clear();
-        if(json.has("pets")){
+        if(json.has("pets")) {
             user.pets.addAll(json.getList("pets", e -> JsonUtils.readEnum(Pet.class, e)));
         }
 
         //Properties
         user.properties.clear();
-        if(json.has("properties")){
+        if(json.has("properties")) {
             user.properties.addAll(json.getList("properties", e -> JsonUtils.readEnum(UserPref.class, e)));
         }
 
         //Time stamps
-        JsonBuf timeStamps = json.getBuf("timeStamps");
+        JsonWrapper timeStamps = json.getWrapped("timeStamps");
         user.lastLoad = timeStamps.getLong("lastLoad");
         user.nextResetTime = timeStamps.getLong("nextReset");
         user.nextAllowedBranchSwap = timeStamps.getLong("nextBranchSwap");
 
         //Last location
-        if(json.has("lastLocation")){
+        if(json.has("lastLocation")) {
             user.lastLocation = json.getLocation("lastLocation");
         }
 
         //Last known location
-        if(json.has("lastKnowLoc")){
+        if(json.has("lastKnowLoc")) {
             user.entityLocation = json.getLocation("lastKnowLoc");
         }
 
@@ -207,13 +212,15 @@ public class UserJsonSerializer implements UserSerializer {
         user.homes.deserialize(json.get("homes"));
         user.interactions.deserialize(json.get("interactions"));
         user.dataContainer.deserialize(json.get("dataContainer"));
+        user.marketOwnership.deserialize(json.get("marketOwnership"));
+        user.mail.deserialize(json.get("mail"));
 
         //Material data
         user.matData.clear();
-        if(json.has("soldData")){
+        if(json.has("soldData")) {
             JsonObject soldData = json.getObject("soldData");
 
-            for (Map.Entry<String, JsonElement> e: soldData.entrySet()){
+            for (Map.Entry<String, JsonElement> e: soldData.entrySet()) {
                 Material material = Material.valueOf(e.getKey().toUpperCase());
                 int earned = e.getValue().getAsInt();
 
@@ -246,7 +253,7 @@ public class UserJsonSerializer implements UserSerializer {
         return new File(USER_DIR, id.toString() + ".json");
     }
 
-    public void writeJson(JsonBuf json, UUID id){
+    public void writeJson(JsonWrapper json, UUID id) {
         File f = getFile(id);
         if(!f.exists()) return;
 
@@ -258,23 +265,23 @@ public class UserJsonSerializer implements UserSerializer {
         }
     }
 
-    private void addDefaults(FtcUser id, JsonBuf json){
+    private void addDefaults(FtcUser id, JsonWrapper json) {
         json.add("name", id.getName());
         json.add("lastOnlineName", id.getName());
 
-        JsonBuf timeStamps = JsonBuf.empty();
+        JsonWrapper timeStamps = JsonWrapper.empty();
         timeStamps.add("lastLoad", id.getOfflinePlayer().getLastLogin());
         timeStamps.add("nextReset", System.currentTimeMillis() + ComVars.getUserResetInterval());
 
         json.add("timeStamps", timeStamps);
     }
 
-    public JsonBuf readJson(FtcUser id){
+    public JsonWrapper readJson(FtcUser id) {
         File f = getFile(id.getUniqueId());
-        JsonBuf json;
+        JsonWrapper json;
 
-        if(!f.exists()){
-            json = JsonBuf.empty();
+        if(!f.exists()) {
+            json = JsonWrapper.empty();
             addDefaults(id, json);
 
             try {
@@ -282,15 +289,15 @@ public class UserJsonSerializer implements UserSerializer {
                 logger.info("Created user file for " + id.toString());
 
                 writeJson(json, id.getUniqueId());
-            } catch (IOException e){
+            } catch (IOException e) {
                 logger.severe("Could not create user file for " + id.toString());
                 e.printStackTrace();
             }
         } else {
             try {
                 JsonObject jsonO = JsonUtils.readFile(f);
-                json = JsonBuf.of(jsonO);
-            } catch (IOException e){
+                json = JsonWrapper.of(jsonO);
+            } catch (IOException e) {
                 logger.severe("Exception while reading user data for " + id.toString());
                 e.printStackTrace();
                 return null;
@@ -300,7 +307,7 @@ public class UserJsonSerializer implements UserSerializer {
         return json;
     }
 
-    public void clearFiles(){
+    public void clearFiles() {
         userFiles.clear();
     }
 }

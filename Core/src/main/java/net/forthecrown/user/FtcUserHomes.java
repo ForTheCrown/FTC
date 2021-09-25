@@ -4,9 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.regions.RegionPos;
-import net.forthecrown.serializer.JsonBuf;
-import net.forthecrown.serializer.JsonDeserializable;
-import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.JsonUtils;
 import org.bukkit.Location;
 
@@ -15,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class FtcUserHomes implements UserHomes, JsonSerializable, JsonDeserializable {
+public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
 
     //They shouldn't be able to input this in a command
     //Hacky solution, but it'll work, and it also won't require me to transform the way
@@ -25,16 +23,14 @@ public class FtcUserHomes implements UserHomes, JsonSerializable, JsonDeserializ
     public Map<String, Location> homes = new HashMap<>();
     public RegionPos homeRegion;
 
-    private final FtcUser owner;
-
     public FtcUserHomes(FtcUser user){
-        this.owner = user;
+        super(user);
 
         checkOverLimit();
     }
 
     public void checkOverLimit(){ //Remove homes until under limit
-        if(owner.isOp()) return;
+        if(user.isOp()) return;
 
         homes.entrySet().removeIf(e -> check());
     }
@@ -42,7 +38,7 @@ public class FtcUserHomes implements UserHomes, JsonSerializable, JsonDeserializ
     private boolean check(){
         if(getUser().hasPermission(Permissions.FTC_ADMIN)) return false;
 
-        int max = owner.getHighestTierRank().tier.maxHomes;
+        int max = user.getHighestTierRank().tier.maxHomes;
         int current = size();
 
         return max < current;
@@ -65,10 +61,10 @@ public class FtcUserHomes implements UserHomes, JsonSerializable, JsonDeserializ
 
     @Override
     public boolean canMakeMore(){
-        if(owner.isOp()) return true;
+        if(user.isOp()) return true;
 
         int currentHomes = size();
-        int maxHomes = owner.getHighestTierRank().tier.maxHomes;
+        int maxHomes = user.getHighestTierRank().tier.maxHomes;
 
         return currentHomes <= maxHomes;
     }
@@ -83,11 +79,6 @@ public class FtcUserHomes implements UserHomes, JsonSerializable, JsonDeserializ
     public Map<String, Location> getHomes() {
         checkOverLimit();
         return homes;
-    }
-
-    @Override
-    public CrownUser getUser() {
-        return owner;
     }
 
     @Override
@@ -131,7 +122,7 @@ public class FtcUserHomes implements UserHomes, JsonSerializable, JsonDeserializ
     public JsonObject serialize() {
         if(homes.isEmpty()) return null;
 
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
         if(hasHomeRegion()) json.add(HOME_REGION_JSON_NAME, homeRegion.toString());
 
         for (Map.Entry<String, Location> e: homes.entrySet()){
@@ -146,7 +137,7 @@ public class FtcUserHomes implements UserHomes, JsonSerializable, JsonDeserializ
         homes.clear();
 
         if(element == null) return;
-        JsonBuf json = JsonBuf.of(element.getAsJsonObject());
+        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
         if(json.has(HOME_REGION_JSON_NAME)) {
             this.homeRegion = RegionPos.fromString(json.getString(HOME_REGION_JSON_NAME));

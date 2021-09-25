@@ -9,7 +9,7 @@ import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.events.dynamic.BmParrotListener;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.Pet;
+import net.forthecrown.user.data.Pet;
 import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;

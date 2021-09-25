@@ -18,8 +18,9 @@ public interface VoteTopicType<T extends VoteTopic> extends SerializerType<T> {
     @Override
     @NotNull Key key();
 
-    Component categoryText();
-    Component displayName(T value);
+    Component signDisplay(T value);
+
+    void runTask(PostVoteTask task);
 
     BuiltInventory getInventory();
     CordedInventoryOption getSelectionOption();

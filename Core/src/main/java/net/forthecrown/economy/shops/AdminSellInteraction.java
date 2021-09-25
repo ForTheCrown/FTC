@@ -3,14 +3,14 @@ package net.forthecrown.economy.shops;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
 
 public class AdminSellInteraction implements ShopInteraction {
     @Override
-    public void test(SignShopSession session, Balances balances) throws CommandSyntaxException {
+    public void test(SignShopSession session, Economy economy) throws CommandSyntaxException {
         ItemStack example = session.getExampleItem();
 
         //User does not have item to sell
@@ -18,11 +18,11 @@ public class AdminSellInteraction implements ShopInteraction {
     }
 
     @Override
-    public void interact(SignShopSession session, Balances balances) {
+    public void interact(SignShopSession session, Economy economy) {
         ItemStack example = session.getExampleItem();
 
         //Add money and remove item
-        balances.add(session.getUser().getUniqueId(), session.getPrice());
+        economy.add(session.getUser().getUniqueId(), session.getPrice());
         session.getPlayerInventory().removeItemAnySlot(example.clone());
 
         //Tell em

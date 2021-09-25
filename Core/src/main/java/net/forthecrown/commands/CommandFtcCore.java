@@ -24,7 +24,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.BalanceMap;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.SortedBalanceMap;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
@@ -36,9 +36,9 @@ import net.forthecrown.inventory.CrownWeapons;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.user.*;
 import net.forthecrown.user.data.UserTeleport;
-import net.forthecrown.user.enums.Faction;
-import net.forthecrown.user.enums.Pet;
-import net.forthecrown.user.enums.Rank;
+import net.forthecrown.user.data.Faction;
+import net.forthecrown.user.data.Pet;
+import net.forthecrown.user.data.Rank;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
@@ -64,14 +64,14 @@ public class CommandFtcCore extends FtcCommand {
         setDescription("The primary FTC-Core command");
         setPermission(Permissions.FTC_ADMIN);
 
-        this.bals = Crown.getBalances();
+        this.bals = Crown.getEconomy();
         this.maxMoney = ComVars.getMaxMoneyAmount();
 
         register();
     }
 
     private static final String USER_ARG = "user";
-    private final Balances bals;
+    private final Economy bals;
     private final int maxMoney;
 
     /*
@@ -83,7 +83,7 @@ public class CommandFtcCore extends FtcCommand {
      * Valid usages of command:
      * - too many to list lol
      *
-     * Main Author: Botul
+     * Main Author: Julie
      */
 
     @Override
@@ -434,7 +434,7 @@ public class CommandFtcCore extends FtcCommand {
                                                 .executes(c -> {
                                                     CrownUser user = getUser(c);
 
-                                                    Balances bals = Crown.getBalances();
+                                                    Economy bals = Crown.getEconomy();
                                                     BalanceMap balMap = bals.getMap();
 
                                                     balMap.remove(user.getUniqueId());
@@ -842,8 +842,8 @@ public class CommandFtcCore extends FtcCommand {
             else Crown.getAnnouncer().reload();
         }),
         BALANCES ("Balances", b -> {
-            if(b) Crown.getBalances().save();
-            else Crown.getBalances().reload();
+            if(b) Crown.getEconomy().save();
+            else Crown.getEconomy().reload();
         }),
         USERS ("Users", b -> {
             if(b) UserManager.inst().saveUsers();

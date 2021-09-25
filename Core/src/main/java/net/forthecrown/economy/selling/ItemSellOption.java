@@ -8,7 +8,7 @@ import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.SoldMaterialData;
-import net.forthecrown.user.enums.SellAmount;
+import net.forthecrown.user.data.SellAmount;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

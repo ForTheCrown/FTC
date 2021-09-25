@@ -7,13 +7,15 @@ import static net.forthecrown.registry.Registries.USAGE_CHECKS;
 /**
  * Used for instantiating and registering and the default usage checks
  */
-public class UsageChecks {
-    public static void init(){
-        register(new CheckCooldownType());
-        register(new CheckHasAllItemsType());
+public final class UsageChecks {
+    private UsageChecks() {}
 
-        register(new CheckHasItemType());
-        register(new CheckHasScoreType());
+    public static void init(){
+        register(new CheckCooldown());
+        register(new CheckHasAllItems());
+
+        register(new CheckHasitem());
+        register(new CheckHasScore());
 
         register(new CheckInWorld());
 
@@ -21,13 +23,14 @@ public class UsageChecks {
         register(new CheckNotUsedBefore());
 
         register(new CheckRankType());
-        register(new CheckBranchType());
+        register(new CheckBranch());
         register(new CheckPermission());
 
         register(new CheckNumber(true));
         register(new CheckNumber(false));
 
         register(new SimpleCheckType(CheckInventoryEmpty::new, CheckInventoryEmpty.KEY));
+        register(new SimpleCheckType(CheckNoRiders::new, CheckNoRiders.KEY));
         register(new SimpleCheckType(CheckIsNotAlt::new, CheckIsNotAlt.KEY));
 
         USAGE_CHECKS.close();

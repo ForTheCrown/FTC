@@ -5,6 +5,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
@@ -34,7 +35,7 @@ public class CommandMe extends FtcCommand {
      * Permissions used:
      * ftc.default
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override
@@ -54,6 +55,11 @@ public class CommandMe extends FtcCommand {
 
                             Component displayName = source.isPlayer() ? UserManager.getUser(source.asPlayer()).coloredNickDisplayName() : source.displayName();
                             Component action = FtcFormatter.formatIfAllowed(c.getArgument("action", String.class), source.asBukkit());
+
+                            //Check they didn't use a banned word
+                            if(BannedWords.checkAndWarn(source.asBukkit(), action)) {
+                                return 0;
+                            }
 
                             Component formatted = Component.text()
                                     .append(Component.text("* "))

@@ -7,7 +7,7 @@ import net.forthecrown.commands.manager.FtcCommands;
 import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.enums.Rank;
+import net.forthecrown.user.data.Rank;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;

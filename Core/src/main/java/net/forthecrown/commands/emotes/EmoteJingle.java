@@ -35,7 +35,7 @@ public class EmoteJingle extends CommandEmote {
      * - /jingle
      *
      * Main Author: Wout
-     * Edit: Botul
+     * Edit: Julie
      */
 
     @Override

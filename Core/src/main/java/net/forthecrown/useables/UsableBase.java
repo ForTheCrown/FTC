@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
@@ -43,7 +43,7 @@ public abstract class UsableBase extends CheckableBase implements Actionable, Pr
         if(actionsElement == null || !actionsElement.isJsonArray()) return;
 
         for (JsonElement e: actionsElement.getAsJsonArray()){
-            JsonBuf j = JsonBuf.of(e.getAsJsonObject());
+            JsonWrapper j = JsonWrapper.of(e.getAsJsonObject());
 
             try {
                 addAction(InteractionUtils.readAction(j.getString("type"), j.get("value")));

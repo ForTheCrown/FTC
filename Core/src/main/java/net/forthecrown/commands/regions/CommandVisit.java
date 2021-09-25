@@ -7,8 +7,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.actions.RegionVisit;
-import net.forthecrown.user.actions.UserActionHandler;
+import net.forthecrown.user.actions.ActionFactory;
 
 public class CommandVisit extends FtcCommand {
 
@@ -33,7 +32,7 @@ public class CommandVisit extends FtcCommand {
      *
      * Permissions used: ftc.regions
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override
@@ -47,9 +46,7 @@ public class CommandVisit extends FtcCommand {
                             RegionUtil.validateWorld(user.getWorld());
                             RegionUtil.validateDistance(region.getPolePosition(), user);
 
-                            RegionVisit action = new RegionVisit(user, region);
-                            UserActionHandler.handleAction(action);
-
+                            ActionFactory.visitRegion(user, region);
                             return 0;
                         })
                 );

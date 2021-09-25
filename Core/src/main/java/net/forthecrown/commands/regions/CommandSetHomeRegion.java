@@ -33,7 +33,7 @@ public class CommandSetHomeRegion extends FtcCommand {
      *
      * Permissions used: ftc.regions
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override

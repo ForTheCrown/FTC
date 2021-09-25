@@ -6,6 +6,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
+import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
@@ -72,15 +73,16 @@ public class CommandAfk extends FtcCommand {
                     hasMessage && status.maySpeak ? Component.text(": " + message) : Component.empty())
                     .color(NamedTextColor.GRAY);
 
-            message = status.maySpeak ? message : null;
+            broadcastMsg = status.maySpeak && BannedWords.contains(broadcastMsg) ? broadcastMsg : null;
         }
 
         user.sendMessage(userMsg);
         user.setAfk(!alreadyAFK, message);
 
+        Component finalBroadcastMsg = broadcastMsg;
         Bukkit.getOnlinePlayers().stream()
                 .filter(plr -> !plr.getUniqueId().equals(user.getUniqueId()))
-                .forEach(p -> p.sendMessage(broadcastMsg));
+                .forEach(p -> p.sendMessage(finalBroadcastMsg));
         return 0;
     }
 }

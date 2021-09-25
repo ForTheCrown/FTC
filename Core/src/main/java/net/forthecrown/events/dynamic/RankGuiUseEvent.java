@@ -2,9 +2,9 @@ package net.forthecrown.events.dynamic;
 
 import net.forthecrown.core.CrownException;
 import net.forthecrown.inventory.RankInventory;
-import net.forthecrown.user.enums.Faction;
+import net.forthecrown.user.data.Faction;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.enums.Rank;
+import net.forthecrown.user.data.Rank;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.core.chat.ChatUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -70,8 +70,8 @@ public class RankGuiUseEvent implements Listener {
             return;
         }
 
-        if(clickedRank.getRankBranch() != Faction.DEFAULT){
-            if(user.getFaction() != clickedRank.getRankBranch()) throw new CrownException(user, "&cThis rank is not in your branch!");
+        if(clickedRank.getFaction() != Faction.DEFAULT){
+            if(user.getFaction() != clickedRank.getFaction()) throw new CrownException(user, "&cThis rank is not in your branch!");
         }
 
         if(clickedRank == Rank.DEFAULT){

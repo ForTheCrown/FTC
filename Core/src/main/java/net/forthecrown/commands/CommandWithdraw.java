@@ -8,7 +8,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
@@ -31,7 +31,7 @@ public class CommandWithdraw extends FtcCommand {
         register();
     }
 
-    private final Balances bals = Crown.getBalances();
+    private final Economy bals = Crown.getEconomy();
     private final int maxMoney;
 
     @Override

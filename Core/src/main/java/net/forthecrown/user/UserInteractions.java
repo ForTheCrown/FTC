@@ -18,6 +18,8 @@ public interface UserInteractions extends SocialInteractionsService, UserAttachm
      * Gets the mute status of this user
      * @return The mute status of this user
      */
+    MuteStatus muteStatusSilent();
+
     MuteStatus muteStatus();
 
     /**
@@ -223,15 +225,41 @@ public interface UserInteractions extends SocialInteractionsService, UserAttachm
         return UserManager.getUser(getSpouse());
     }
 
+    /**
+     * Checks if the user has been invited to the given UUID's home region
+     * @param by The inviter
+     * @return Whether the given UUID invited this user
+     */
     boolean hasBeenInvited(UUID by);
 
+    /**
+     * Checks whether the user invited the given UUID
+     * @param target the invitee
+     * @return Whether the given UUID was invited by this user
+     */
     boolean hasInvited(UUID target);
 
+    /**
+     * Invites the given UUID
+     * @param target the UUID to invite
+     */
     void addInvite(UUID target);
 
+    /**
+     * Invites this user to the given UUID's home region
+     * @param sender The invite sender
+     */
     void addInvitedTo(UUID sender);
 
+    /**
+     * Cancels or just removes an invite to the given UUID
+     * @param to the UUID to remove the invite from
+     */
     void removeInvite(UUID to);
 
+    /**
+     * Removes an invite sent by the given UUID
+     * @param from the sender of the invite to remove
+     */
     void removeInvitedTo(UUID from);
 }

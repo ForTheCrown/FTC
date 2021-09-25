@@ -2,11 +2,12 @@ package net.forthecrown.user.actions;
 
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.Struct;
 
 /**
  * Struct for a user vising a region
  */
-public class RegionVisit implements UserAction {
+public class RegionVisit implements UserAction, Struct {
     private final CrownUser visitor;
     private final PopulationRegion region;
 

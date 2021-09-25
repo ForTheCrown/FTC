@@ -7,14 +7,12 @@ import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.serializer.JsonBuf;
-import net.forthecrown.serializer.JsonDeserializable;
-import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.JsonUtils;
 
 import java.util.Set;
 
-public class FtcUserCosmeticData implements CosmeticData, JsonSerializable, JsonDeserializable {
+public class FtcUserCosmeticData extends AbstractUserAttachment implements CosmeticData {
 
     public final Set<ArrowEffect> arrowEffects = new ObjectOpenHashSet<>();
     public final Set<DeathEffect> deathEffects = new ObjectOpenHashSet<>();
@@ -24,15 +22,8 @@ public class FtcUserCosmeticData implements CosmeticData, JsonSerializable, Json
     public DeathEffect death;
     public TravelEffect travel;
 
-    private final FtcUser user;
-
     FtcUserCosmeticData(FtcUser user){
-        this.user = user;
-    }
-
-    @Override
-    public CrownUser getUser() {
-        return user;
+        super(user);
     }
 
     @Override
@@ -137,7 +128,7 @@ public class FtcUserCosmeticData implements CosmeticData, JsonSerializable, Json
         travel = null;
 
         if(element == null) return;
-        JsonBuf json = JsonBuf.of(element.getAsJsonObject());
+        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
         if(json.has("arrow")) arrow = Registries.ARROW_EFFECTS.get(json.getKey("arrow"));
         if(json.has("death")) death = Registries.DEATH_EFFECTS.get(json.getKey("death"));
@@ -158,7 +149,7 @@ public class FtcUserCosmeticData implements CosmeticData, JsonSerializable, Json
 
     @Override
     public JsonObject serialize() {
-        JsonBuf json = JsonBuf.empty();
+        JsonWrapper json = JsonWrapper.empty();
 
         //Arrow and death effects are serialized by their keys
         if(hasActiveArrow()) json.add("arrow", arrow);

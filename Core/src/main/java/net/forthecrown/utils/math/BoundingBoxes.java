@@ -2,13 +2,11 @@ package net.forthecrown.utils.math;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import net.forthecrown.core.Crown;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.apache.commons.lang.math.IntRange;
 import org.bukkit.World;
 
-import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -47,7 +45,7 @@ public final class BoundingBoxes {
 
         //Create executors for the amount of threads
         for (int i = 0; i < COUNT; i++) {
-            IntRange range = new IntRange(current, current += divided-1);
+            IntRange range = new IntRange(current, current += divided);
             COPY_EXECUTOR.execute(sectionRunnable(world, area, toMin, range));
         }
     }
@@ -109,7 +107,6 @@ public final class BoundingBoxes {
             result[i] = new BoundingBox(boxStart.x, boxStart.y, boxStart.z, boxEnd.x, boxEnd.y, boxEnd.z);
         }
 
-        Crown.logger().info(Arrays.toString(result));
         return result;
     }
 

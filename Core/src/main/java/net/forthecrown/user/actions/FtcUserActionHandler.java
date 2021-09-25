@@ -1,18 +1,28 @@
 package net.forthecrown.user.actions;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldedit.math.BlockVector2;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
+import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.events.dynamic.RegionVisitListener;
+import net.forthecrown.regions.RegionConstants;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserMail;
 import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.math.FtcBoundingBox;
+import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,12 +34,18 @@ import org.bukkit.entity.Tameable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 public class FtcUserActionHandler implements UserActionHandler {
     @Override
     public void handleDirectMessage(DirectMessage message) {
+        //Validate they didn't just use a slur or something lol
+        if(BannedWords.checkAndWarn(message.getSender().asBukkit(), message.getFormattedText())) {
+            message.setMuteStatus(MuteStatus.HARD);
+        }
+
         EavesDropper.reportDM(message);
 
         UUID senderID = null;
@@ -86,9 +102,15 @@ public class FtcUserActionHandler implements UserActionHandler {
     @Override
     public void handleMarriageMessage(MarriageMessage message) {
         Component formatted = MarriageMessage.format(message.getSender().nickDisplayName(), message.getFormatted());
-        MuteStatus status = message.getMuteStatus();
+
+        //Validate they didn't just use a slur or something lol
+        if(BannedWords.checkAndWarn(message.getSender(), formatted)) {
+            message.setStatus(MuteStatus.HARD);
+        }
 
         EavesDropper.reportMarriageDM(message);
+
+        MuteStatus status = message.getMuteStatus();
 
         if(message.getSender().getInteractions().isBlockedPlayer(message.getTarget().getUniqueId())){
 
@@ -147,6 +169,127 @@ public class FtcUserActionHandler implements UserActionHandler {
     }
 
     @Override
+    public void handleMailQuery(MailQuery query) throws CommandSyntaxException {
+        if(!query.getSource().hasPermission(Permissions.MAIL_OTHERS) && !query.getMail().canSee(query.getSource().asBukkit())) {
+            throw FtcExceptionProvider.translatable("mail.private", query.getUser().nickDisplayName());
+        }
+
+        boolean self = query.isSelfQuery();
+        boolean onlyUnread = query.onlyUnread();
+
+        List<UserMail.MailMessage> messages = onlyUnread ? query.getMail().getUnread() : query.getMail().getMail();
+
+        if(messages.isEmpty()) {
+            throw FtcExceptionProvider.translatable("mail.none." + (self ? "self" : "other") + (onlyUnread ? ".unread" : ""));
+        }
+
+        TextComponent.Builder builder = Component.text()
+                .color(NamedTextColor.YELLOW)
+                .append(
+                        Component.translatable(
+                                "mail.header." + (self ? "self" : "other"),
+                                query.getUser().nickDisplayName()
+                                        .color(NamedTextColor.GOLD)
+                        )
+                );
+
+        int index = 0;
+        for (UserMail.MailMessage m: messages) {
+            index++;
+
+            Component senderMetadata = m.sender == null ? Component.empty() :
+                    Component.newline()
+                            .append(Component.translatable("mail.metadata.sender", UserManager.getUser(m.sender).nickDisplayName()));
+
+            builder.append(
+                    Component.text()
+                            .color(NamedTextColor.WHITE)
+                            .append(
+                                    Component.text(index + ")")
+                                            .color(NamedTextColor.GOLD)
+                                            .hoverEvent(
+                                                    Component.translatable(
+                                                            "mail.metadata.date",
+                                                            Component.text(new Date(m.sent).toString())
+                                                    )
+                                                            .append(senderMetadata)
+                                            )
+                            )
+
+                            .append(
+                                    Component.text()
+                                            .color(NamedTextColor.GRAY)
+                                            .content(" [")
+                                            .append(
+                                                    Component.translatable(m.read ? "mail.read" : "m.unread")
+                                                            .clickEvent(ClickEvent.runCommand("/mail read " + query.getMail().getMail().indexOf(m)))
+                                                            .hoverEvent(Component.translatable(m.read ? "mail.read.hover" : "mail.unread.hover"))
+                                            )
+                                            .append(Component.text("] "))
+                            )
+
+                            .append(m.message)
+            );
+        }
+
+        query.getSource().sendMessage(
+                builder.build()
+        );
+    }
+
+    @Override
+    public void handleMailAdd(MailAddAction action) throws CommandSyntaxException {
+        boolean online = action.getUser().isOnline();
+        CrownUser user = action.getUser();
+        UserMail mail = action.getMail();
+        Component text = action.getText();
+        Component senderDisplay = null;
+
+        if(action.getSender() != null && action.shouldValidateSender()) {
+            UUID sender = action.getSender();
+            CrownUser senderUser = UserManager.getUser(sender);
+            senderDisplay = senderUser.nickDisplayName().color(NamedTextColor.YELLOW);
+
+            if(user.getInteractions().isBlockedPlayer(sender)) {
+                throw FtcExceptionProvider.blockedPlayer(user);
+            }
+
+            MuteStatus status = senderUser.getInteractions().muteStatus();
+
+            if(BannedWords.checkAndWarn(senderUser, text)) {
+                status = MuteStatus.HARD;
+            }
+
+            if(status.senderMaySee) {
+                senderUser.sendMessage(
+                        Component.translatable("mail.sent",
+                                NamedTextColor.YELLOW,
+                                senderDisplay.color(NamedTextColor.GOLD),
+                                action.getText().color(NamedTextColor.WHITE)
+                        )
+                );
+            }
+
+            senderUser.unloadIfOffline();
+            if(!status.maySpeak) return;
+        }
+
+        mail.add(action.getText(), action.getSender());
+
+        if(online) {
+            if(action.hasSender()) {
+                user.sendMessage(
+                        Component.translatable("mail.received.humanSender", NamedTextColor.GRAY, senderDisplay)
+                );
+            } else {
+                user.sendMessage(
+                        Component.translatable("mail.received", NamedTextColor.GRAY)
+                );
+            }
+        }
+    }
+
+    @Override
     public void handleVisit(RegionVisit visit) {
         Player player = visit.getVisitor().getPlayer();
         if(!ListUtils.isNullOrEmpty(player.getPassengers())) {
@@ -162,40 +305,6 @@ public class FtcUserActionHandler implements UserActionHandler {
         BlockVector2 poleCords = visit.getRegion().getPolePosition();
         Location loc = player.getLocation();
 
-        //For entities which should be teleported along with the player
-        List<Entity> toTeleport = new ObjectArrayList<>();
-        FtcBoundingBox box = FtcBoundingBox.of(world, visit.getRegion().getPoleBoundingBox());
-        box.expand(2.5);
-
-        for (Entity e: box.getEntities()) {
-            //If the entity is tameable and has been tamed
-            //by the visitor
-            if(e instanceof Tameable) {
-                Tameable tameable = (Tameable) e;
-                if(!tameable.isTamed()) continue;
-
-                if(tameable.getOwnerUniqueId().equals(user.getUniqueId())) {
-                    toTeleport.add(e);
-                }
-            }
-
-            e.removePassenger(player);
-
-            //If they're leashed by the visitor
-            if(e instanceof LivingEntity) {
-                LivingEntity living = (LivingEntity) e;
-
-                try {
-                    Entity leashHolder = living.getLeashHolder();
-                    if(leashHolder.getUniqueId().equals(user.getUniqueId())) {
-                        toTeleport.add(e);
-                    }
-
-                } catch (IllegalStateException e1) {
-                }
-            }
-        }
-
         //Declare the teleportation location
         Location teleportLoc = new Location(
                 world,
@@ -206,10 +315,54 @@ public class FtcUserActionHandler implements UserActionHandler {
                 loc.getPitch()
         );
 
-        //Teleport all entities there
-        toTeleport.forEach(e -> e.teleport(teleportLoc));
+        //If near the pole, teleport tamed and/or owned entities at the pole
+        if(user.get2DLocation().distance(poleCords) <= RegionConstants.DISTANCE_TO_POLE) {
 
-        if(ComVars.shouldHulkSmashPoles() && user.hulkSmashesPoles()) {
+            //For entities which should be teleported along with the player
+            List<Entity> toTeleport = new ObjectArrayList<>();
+            FtcBoundingBox box = FtcBoundingBox.of(world, visit.getRegion().getPoleBoundingBox());
+            box.expand(2.5);
+
+            for (Entity e: box.getEntities()) {
+                //If the entity is tameable and has been tamed
+                //by the visitor
+                if(e instanceof Tameable) {
+                    Tameable tameable = (Tameable) e;
+                    if(!tameable.isTamed()) continue;
+
+                    if(tameable.getOwnerUniqueId().equals(user.getUniqueId())) {
+                        toTeleport.add(e);
+                    }
+                }
+
+                //If entity is being ridden by player, and is not a player, tp it
+                if(e.getPassengers().contains(player)) toTeleport.add(e);
+
+                //Remove player as passenger so it could be teleported
+                e.removePassenger(player);
+
+                //If they're leashed by the visitor
+                if(e instanceof LivingEntity) {
+                    LivingEntity living = (LivingEntity) e;
+
+                    try {
+                        Entity leashHolder = living.getLeashHolder();
+                        if(leashHolder.getUniqueId().equals(user.getUniqueId())) {
+                            toTeleport.add(e);
+                        }
+
+                    } catch (IllegalStateException e1) {
+                    }
+                }
+            }
+
+            //Teleport all entities there
+            toTeleport.forEach(e -> e.teleport(teleportLoc));
+        }
+
+        //If the comvar to allow hulk smashing is on, the user allows it and the sky above the destination
+        //is clear then do a hulk smash, else just teleport
+        if(ComVars.shouldHulkSmashPoles() && user.hulkSmashesPoles() && FtcUtils.hasOnlyAirAbove(WorldVec3i.of(teleportLoc))) {
             //Move TP loc to sky since hulk smash
             teleportLoc.setY(256);
 
@@ -221,7 +374,7 @@ public class FtcUserActionHandler implements UserActionHandler {
 
             //If they have cosmetic effect, execute it
             if(cosmetics.hasActiveTravel()) {
-                cosmetics.getActiveTravel().onHulkStart(loc);
+                cosmetics.getActiveTravel().onHulkStart(user, loc);
             }
 
             //Tick task for them going up
@@ -230,7 +383,7 @@ public class FtcUserActionHandler implements UserActionHandler {
             //Execute travel effect, if they have one
             if(cosmetics.hasActiveTravel()) {
                 Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
-                    cosmetics.getActiveTravel().onPoleTeleport(loc, teleportLoc.clone());
+                    cosmetics.getActiveTravel().onPoleTeleport(user, loc, teleportLoc.clone());
                 }, 2);
             }
 
@@ -262,7 +415,7 @@ public class FtcUserActionHandler implements UserActionHandler {
         public void run() {
             //If they have travel effect, run it
             if(cosmetics.hasActiveTravel()) {
-                cosmetics.getActiveTravel().onHulkTickUp(user.getLocation());
+                cosmetics.getActiveTravel().onHulkTickUp(user, user.getLocation());
             }
 
             tick--;

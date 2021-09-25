@@ -1,5 +1,6 @@
 package net.forthecrown.inventory.builder;
 
+import net.forthecrown.utils.math.MathUtil;
 import org.apache.commons.lang.Validate;
 
 /**
@@ -11,8 +12,8 @@ public class InventoryPos {
     private final byte column;
 
     public InventoryPos(int column, int row) {
-        Validate.isTrue(column < 9, "Column cannot be more than 8, found: " + column);
-        Validate.isTrue(row < 6, "Row cannot be more than 5, found: " + row);
+        Validate.isTrue(MathUtil.isInRange(column, 0, 8), "Column cannot be more than 8, found: " + column);
+        Validate.isTrue(MathUtil.isInRange(row, 0, 5), "Row cannot be more than 5, found: " + row);
 
         this.row = (byte) row;
         this.column = (byte) column;

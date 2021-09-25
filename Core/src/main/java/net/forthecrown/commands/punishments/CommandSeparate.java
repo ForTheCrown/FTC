@@ -30,7 +30,7 @@ public class CommandSeparate extends FtcCommand {
      * Permissions used:
      * ftc.police
      *
-     * Main Author: Ants
+     * Main Author: Julie
      */
 
     @Override

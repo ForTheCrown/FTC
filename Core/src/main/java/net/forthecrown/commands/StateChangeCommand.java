@@ -215,6 +215,18 @@ public class StateChangeCommand extends FtcCommand {
                 "Toggles whether you quickly teleport to poles to hulk smash onto them",
                 "togglehulk", "togglehulksmash"
         );
+
+        new StateChangeCommand(
+                "spousemail",
+
+                CrownUser::spouseCanSeeMail,
+                CrownUser::setSpouseCanSeeMail,
+
+                "mail.spouseSee.on", "mail.spouseSee.off",
+                Permissions.MAIL,
+                "Toggles whether your spouse can see your mail",
+                "togglespousemail", "spousecanseemail"
+        );
     }
 
     //Tests if a user is allowed to change the state

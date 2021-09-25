@@ -34,7 +34,7 @@ public class CommandTpaskHere extends FtcCommand {
      * Permissions used:
      * - ftc.tpahere
      *
-     * Main Author: Botul
+     * Main Author: Julie
      * Edit by: Wout
      */
 

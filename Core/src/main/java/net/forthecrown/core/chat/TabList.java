@@ -6,7 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 /**
  * Represents the TAB menu list.
  * <p></p>
- * Implementation: {@link CrownTabList}
+ * Implementation: {@link FtcTabList}
  */
 public interface TabList {
     Component SERVER_TITLE = ChatUtils.convertString("&e-&#fff147-&#ffcd00-&#ffb107&l[&6&lFor The Crown&#ffb107&l]&#ffcd00-&#fff147-&e-", true);

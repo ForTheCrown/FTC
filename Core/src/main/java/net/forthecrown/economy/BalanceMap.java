@@ -67,7 +67,7 @@ public interface BalanceMap {
      * @return The entry at the given index
      * @throws ArrayIndexOutOfBoundsException If the index is outside of the balances list
      */
-    BalEntry getEntry(int index) throws ArrayIndexOutOfBoundsException;
+    Balance getEntry(int index) throws ArrayIndexOutOfBoundsException;
 
     /**
      * Gets a pretty display component for the given index.
@@ -131,7 +131,7 @@ public interface BalanceMap {
      * <p>Warning: The returned list is immutable</p>
      * @return All entries held by this map.
      */
-    List<BalEntry> entries();
+    List<Balance> entries();
 
     /**
      * A single balance entry in the balance map
@@ -145,11 +145,11 @@ public interface BalanceMap {
      * {@link BalanceMap} to do so, as they will ensure the
      * map stays organized and sorted.
      */
-    class BalEntry implements Comparable<BalanceMap.BalEntry> {
+    class Balance implements Comparable<Balance> {
         private final UUID id;
         private int bal;
 
-        public BalEntry(UUID id, int bal) {
+        public Balance(UUID id, int bal) {
             this.id = id;
             this.bal = bal;
         }
@@ -173,7 +173,7 @@ public interface BalanceMap {
         /**
          * Sets the balance held by this entry.
          * <p></p>
-         * Note: Does not enforce the map the move this entry to resort.
+         * Note: Does not enforce the map to move this entry to re-sort.
          * Because of that, do not edit entries directly as it could
          * cause balances to become disordered.
          * @param bal The new balance of this entry
@@ -183,7 +183,7 @@ public interface BalanceMap {
         }
 
         @Override
-        public int compareTo(@NotNull BalanceMap.BalEntry o) {
+        public int compareTo(@NotNull BalanceMap.Balance o) {
             return Integer.compare(bal, o.bal);
         }
 
@@ -201,7 +201,7 @@ public interface BalanceMap {
 
             if (o == null || getClass() != o.getClass()) return false;
 
-            BalEntry entry = (BalEntry) o;
+            Balance entry = (Balance) o;
 
             return new EqualsBuilder()
                     .append(id, entry.id)

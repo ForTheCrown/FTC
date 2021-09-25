@@ -7,7 +7,7 @@ package net.forthecrown.user;
 public interface UserAttachment {
 
     /**
-     * The user that holds this attachment
+     * Gets the user that holds this attachment
      * @return The attachment holder
      */
     CrownUser getUser();

@@ -34,7 +34,7 @@ public class ShopInteractionListener implements Listener {
         if(player.getGameMode() == GameMode.SPECTATOR) return;
 
         //Handle interaction between player and shop
-        manager.getInteractionHandler().handleInteraction(shop, player, Crown.getBalances());
+        manager.getInteractionHandler().handleInteraction(shop, player, Crown.getEconomy());
     }
 
     public static class ShopRestockListener implements Listener {

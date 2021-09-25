@@ -1,6 +1,7 @@
 package net.forthecrown.cosmetics.travel;
 
 import net.forthecrown.inventory.builder.InventoryPos;
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -16,14 +17,14 @@ public class SmokeTravelEffect extends TravelEffect {
     }
 
     @Override
-    public void onPoleTeleport(Location from, Location pole) {
+    public void onPoleTeleport(CrownUser user, Location from, Location pole) {
         // Little ball of smoke particles
         from.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, from.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D);
         pole.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, pole.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D);
     }
 
     @Override
-    public void onHulkStart(Location loc) {
+    public void onHulkStart(CrownUser user, Location loc) {
         // Cone shaped smoke
         spawnOnCircle(loc, 1.3, 0.1, (short)5, Particle.SMOKE_LARGE, 2);  // Inner circle
         spawnOnCircle(loc, 0.8, 0.25, (short)10, Particle.SMOKE_LARGE, 4);
@@ -36,19 +37,19 @@ public class SmokeTravelEffect extends TravelEffect {
     }
 
     @Override
-    public void onHulkTickDown(Location loc) {
+    public void onHulkTickDown(CrownUser user, Location loc) {
         // Smokes following user
         loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.add(0, 2, 0), 2, 0, 0, 0, 0);
     }
 
     @Override
-    public void onHulkTickUp(Location loc) {
+    public void onHulkTickUp(CrownUser user, Location loc) {
         // Smokes following user
         loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 2, 0, 0, 0, 0);
     }
 
     @Override
-    public void onHulkLand(Location landing) {
+    public void onHulkLand(CrownUser user, Location landing) {
         // Little ball of smoke particles
         landing.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, landing.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D);
     }

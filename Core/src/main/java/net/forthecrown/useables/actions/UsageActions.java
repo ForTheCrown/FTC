@@ -4,7 +4,9 @@ import net.forthecrown.core.Crown;
 
 import static net.forthecrown.registry.Registries.USAGE_ACTIONS;
 
-public class UsageActions {
+public final class UsageActions {
+    private UsageActions() {}
+
     public static void init(){
         register(new ActionChangeScore(ActionChangeScore.Action.DECREMENT));
         register(new ActionChangeScore(ActionChangeScore.Action.INCREMENT));
@@ -25,6 +27,7 @@ public class UsageActions {
         register(new ActionKit());
         register(new ActionShowText());
         register(new ActionTeleport());
+        register(new ActionVisitRegion());
 
         USAGE_ACTIONS.close();
         Crown.logger().info("Default actions registered");

@@ -5,19 +5,20 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class ChatEmotes implements SuggestionProvider<CommandSource> {
 
-    private final Map<String, String> emoteMap = new HashMap<>();
+    private final Object2ObjectMap<String, String> emoteMap = new Object2ObjectOpenHashMap<>();
 
     public void registerEmotes(){
         register("shrug", "¯\\\\_(ツ)_/¯");

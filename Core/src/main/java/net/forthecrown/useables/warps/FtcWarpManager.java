@@ -10,7 +10,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
@@ -30,14 +30,14 @@ public class FtcWarpManager extends AbstractJsonSerializer implements WarpManage
     }
 
     @Override
-    protected void save(JsonBuf json) {
+    protected void save(JsonWrapper json) {
         for (Map.Entry<Key, FtcWarp> e: warps.entrySet()){
             json.add(e.getKey().asString(), e.getValue().serialize());
         }
     }
 
     @Override
-    protected void reload(JsonBuf json) {
+    protected void reload(JsonWrapper json) {
         warps.clear();
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
             try {

@@ -3,7 +3,7 @@ package net.forthecrown.events.dynamic;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Balances;
+import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.pirates.DailyEnchantment;
 import net.forthecrown.economy.pirates.PirateEconomy;
 import net.forthecrown.economy.pirates.merchants.EnchantMerchant;
@@ -44,7 +44,7 @@ public class BmEnchantListener extends AbstractInvListener implements Listener {
         if(toCheck == null) return;
 
         Player player = (Player) event1.getWhoClicked();
-        Balances balances = Crown.getBalances();
+        Economy economy = Crown.getEconomy();
         PirateEconomy bm = Pirates.getPirateEconomy();
 
         EnchantMerchant merchant = bm.getEnchantMerchant();
@@ -58,8 +58,8 @@ public class BmEnchantListener extends AbstractInvListener implements Listener {
             } else player.openInventory(merchant.createInventory(user, true, toCheck));
 
             if(event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE)){
-                if(balances.get(player.getUniqueId()) < daily.getPrice()) throw FtcExceptionProvider.cannotAfford(daily.getPrice());
-                balances.add(player.getUniqueId(), -daily.getPrice());
+                if(economy.get(player.getUniqueId()) < daily.getPrice()) throw FtcExceptionProvider.cannotAfford(daily.getPrice());
+                economy.add(player.getUniqueId(), -daily.getPrice());
 
                 ItemStack toEnchant = event.getClickedInventory().getItem(11).clone();
 

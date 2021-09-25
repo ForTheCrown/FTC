@@ -31,7 +31,7 @@ public class CommandShop extends FtcCommand {
      * - /shop
      * - /shop <farming | mining | mining_blocks | minerals | drops | web>
      *
-     * Author: Ants
+     * Author: Julie
      */
 
     @Override

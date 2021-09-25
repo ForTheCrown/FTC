@@ -3,6 +3,7 @@ package net.forthecrown.core;
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.types.ComVarTypes;
 import net.forthecrown.regions.RegionConstants;
+import net.forthecrown.utils.TimeUtil;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
@@ -25,6 +26,7 @@ public final class ComVars {
 
     static ComVar<Short>            nearRadius;
     static ComVar<Short>            hoppersInOneChunk;
+    static ComVar<Short>            maxGuildMembers;
 
     static ComVar<Long>             marriageCooldown;
     static ComVar<Long>             userDataResetInterval;
@@ -32,6 +34,11 @@ public final class ComVars {
     static ComVar<Long>             auctionExpirationTime;
     static ComVar<Long>             auctionPickupTime;
     static ComVar<Long>             autoSaveIntervalMins;
+    static ComVar<Long>             marketOwnershipSafeTime;
+    static ComVar<Long>             evictionCleanupTime;
+    static ComVar<Long>             voteTime;
+    static ComVar<Long>             voteInterval;
+    static ComVar<Long>             guildJoinRequirement;
 
     static ComVar<Boolean>          allowOtherPlayerNicks;
     static ComVar<Boolean>          taxesEnabled;
@@ -73,6 +80,7 @@ public final class ComVars {
 
         nearRadius = set(               "nearRadius",               ComVarTypes.SHORT,          (short) config.getInt("NearRadius"));
         hoppersInOneChunk = set(        "hoppersInOneChunk",        ComVarTypes.SHORT,          (short) config.getInt("HoppersInOneChunk"));
+        maxGuildMembers = set(          "maxGuildMembers",          ComVarTypes.SHORT,          (short) config.getInt("MaxGuildMembers"));
 
         marriageCooldown = set(         "marriageCooldown",         ComVarTypes.LONG,           config.getLong("MarriageStatusCooldown"));
         userDataResetInterval = set(    "userDataResetInterval",    ComVarTypes.LONG,           config.getLong("UserDataResetInterval"));
@@ -80,6 +88,11 @@ public final class ComVars {
         auctionExpirationTime = set(    "auctionExpirationTime",    ComVarTypes.LONG,           config.getLong("Auctions.ExpirationTime"));
         auctionPickupTime = set(        "auctionPickupTime",        ComVarTypes.LONG,           config.getLong("Auctions.PickUpTime"));
         autoSaveIntervalMins = set(     "autoSaveIntervalMins",     ComVarTypes.LONG,           config.getLong("System.save-interval-mins"));
+        marketOwnershipSafeTime = set(  "marketOwnershipSafeTime",  ComVarTypes.LONG,           config.getLong("MarketOwnershipSafeTime"));
+        evictionCleanupTime = set(      "evictionCleanupTime",      ComVarTypes.LONG,           config.getLong("MarketEvictionTime"));
+        voteTime = set(                 "voteTime",                 ComVarTypes.LONG,           config.getLong("VoteTime"));
+        voteInterval = set(             "voteInterval",             ComVarTypes.LONG,           config.getLong("VoteInterval"));
+        guildJoinRequirement = set(     "guildJoinRequirement",     ComVarTypes.LONG,           config.getLong("GuildJoinRequirement"));
 
         taxesEnabled = set(             "taxesEnabled",             ComVarTypes.BOOLEAN,        config.getBoolean("Taxes"));
         logAdminShop = set(             "logAdminShop",             ComVarTypes.BOOLEAN,        config.getBoolean("Shops.log-admin-purchases"));
@@ -127,6 +140,12 @@ public final class ComVars {
         config.set("Auctions.ExpirationTime",               auctionExpirationTime.getValue());
         config.set("Auctions.PickUpTime",                   auctionPickupTime.getValue());
         config.set("System.save-interval-mins",             autoSaveIntervalMins.getValue());
+        config.set("MarketOwnershipSafeTime",               marketOwnershipSafeTime.getValue());
+        config.set("evictionCleanupTime",                   evictionCleanupTime.getValue());
+        config.set("VoteTime",                              voteTime.getValue());
+        config.set("VoteInterval",                          voteInterval.getValue());
+        config.set("GuildJoinRequirement",                  guildJoinRequirement.getValue());
+        config.set("MaxGuildMembers",                       maxGuildMembers.getValue());
 
         config.set("AllowOtherPlayerNicks",                 allowOtherPlayerNicks.getValue());
         config.set("Taxes",                                 taxesEnabled.getValue());
@@ -185,6 +204,10 @@ public final class ComVars {
         return nearRadius.getValue((short) 200);
     }
 
+    public static short getMaxGuildMembers() {
+        return maxGuildMembers.getValue((short) 5);
+    }
+
 
 
 
@@ -201,11 +224,31 @@ public final class ComVars {
     }
 
     public static long getUserResetInterval() {
+        //Default: 2 months
         return userDataResetInterval.getValue(5356800000L);
     }
 
     public static long getBranchSwapCooldown()  {
-        return branchSwapCooldown.getValue(172800000L);
+        //Default: 2 days
+        return branchSwapCooldown.getValue(TimeUtil.DAY_IN_MILLIS * 2);
+    }
+
+    public static long getShopOwnershipSafeTime() {
+        //Default: 2 weeks
+        return marketOwnershipSafeTime.getValue(TimeUtil.WEEK_IN_MILLIS * 2);
+    }
+
+    public static long getEvictionCleanupTime() {
+        //Def: 3 days
+        return evictionCleanupTime.getValue(TimeUtil.DAY_IN_MILLIS * 3);
+    }
+
+    public static long getVoteInterval() {
+        return voteInterval.getValue(TimeUtil.DAY_IN_MILLIS * 3);
+    }
+
+    public static long getGuildJoinRequirement() {
+        return guildJoinRequirement.getValue(TimeUtil.MONTH_IN_MILLIS * 2);
     }
 
 

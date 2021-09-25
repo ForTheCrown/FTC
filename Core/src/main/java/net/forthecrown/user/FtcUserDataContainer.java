@@ -2,25 +2,22 @@ package net.forthecrown.user;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.forthecrown.serializer.JsonDeserializable;
-import net.forthecrown.serializer.JsonSerializable;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 
-import javax.annotation.Nonnull;
-import java.util.HashMap;
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
  * Allows other plugins to store data in a user's file.
  */
-public class FtcUserDataContainer implements JsonSerializable, JsonDeserializable, UserDataContainer {
+public class FtcUserDataContainer extends AbstractUserAttachment implements UserDataContainer {
 
-    private final Map<Key, JsonElement> data = new HashMap<>();
-    private final FtcUser user;
+    private final Map<Key, JsonElement> data = new Object2ObjectOpenHashMap<>();
 
     FtcUserDataContainer(FtcUser user){
-        this.user = user;
+        super(user);
     }
 
     @Override
@@ -28,7 +25,7 @@ public class FtcUserDataContainer implements JsonSerializable, JsonDeserializabl
         data.put(key, section);
     }
 
-    @Nonnull
+    @Nullable
     @Override
     public JsonElement get(Key key){
         return data.get(key);
@@ -47,12 +44,6 @@ public class FtcUserDataContainer implements JsonSerializable, JsonDeserializabl
     @Override
     public boolean has(Key key) {
         return data.containsKey(key);
-    }
-
-    @Nonnull
-    @Override
-    public CrownUser getUser(){
-        return user;
     }
 
     @Override

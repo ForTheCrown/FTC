@@ -3,7 +3,7 @@ package net.forthecrown.utils;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import net.forthecrown.user.enums.Faction;
+import net.forthecrown.user.data.Faction;
 import org.jetbrains.annotations.Nullable;
 
 public class FactionFlag extends Flag<Faction> {

@@ -4,8 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
-import net.forthecrown.serializer.JsonDeserializable;
-import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,23 +15,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FtcUserGrave implements Grave, JsonSerializable, JsonDeserializable {
+public class FtcUserGrave extends AbstractUserAttachment implements Grave {
 
-    private final FtcUser user;
     public List<ItemStack> items = new ArrayList<>();
 
     FtcUserGrave(FtcUser user){
-        this.user = user;
-    }
-
-    @Override
-    public CrownUser getUser() {
-        return user;
+        super(user);
     }
 
     @Override
     public void giveItems() throws RoyalCommandException, UserNotOnlineException {
-        if(!user.isOnline()) throw new UserNotOnlineException(user);
+        user.checkOnline();
 
         int freeSpace = 0;
         for (ItemStack i: getUser().getPlayer().getInventory().getStorageContents()){

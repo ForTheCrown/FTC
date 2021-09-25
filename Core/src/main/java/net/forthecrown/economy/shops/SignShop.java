@@ -1,8 +1,5 @@
 package net.forthecrown.economy.shops;
 
-import net.forthecrown.core.Crown;
-import net.forthecrown.economy.shops.template.ShopTemplate;
-import net.forthecrown.economy.shops.template.ShopTemplateManager;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.math.WorldVec3i;
@@ -147,26 +144,6 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable {
      */
     @Override
     @NotNull ShopInventory getInventory();
-
-    ShopTemplate getTemplate();
-
-    void setTemplate(ShopTemplate template);
-
-    default boolean hasTemplate() {
-        return getTemplate() != null;
-    }
-
-    default void applyTemplate(ShopTemplate template) {
-        setTemplate(template);
-        ShopTemplateManager manager = Crown.getShopManager().getTemplates();
-
-        if(hasTemplate()) {
-            template.onApply(this);
-            manager.onSetTemplate(this, template);
-        } else {
-            manager.onRemoveTemplate(this);
-        }
-    }
 
     @Override
     boolean equals(Object o);

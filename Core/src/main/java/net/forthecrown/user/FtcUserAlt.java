@@ -1,9 +1,9 @@
 package net.forthecrown.user;
 
 import net.forthecrown.user.data.SoldMaterialData;
-import net.forthecrown.user.enums.Faction;
-import net.forthecrown.user.enums.Pet;
-import net.forthecrown.user.enums.SellAmount;
+import net.forthecrown.user.data.Faction;
+import net.forthecrown.user.data.Pet;
+import net.forthecrown.user.data.SellAmount;
 import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.user.manager.UserManager;
 import org.bukkit.Material;
@@ -25,14 +25,12 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
 
     @Override
     public UUID getMainUniqueID() {
-        if(mainID == null) mainID = UserManager.inst().getMain(getUniqueId());
-        return mainID;
+        return mainID == null ? mainID = UserManager.inst().getMain(getUniqueId()) : mainID;
     }
 
     @Override
     public CrownUser getMain() {
-        if(main == null) main = UserManager.getUser(getMainUniqueID());
-        return main;
+        return main == null ? main = UserManager.getUser(getMainUniqueID()) : main;
     }
 
     @Override

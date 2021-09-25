@@ -7,6 +7,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.user.actions.DirectMessage;
 import net.forthecrown.user.actions.MarriageMessage;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -144,5 +145,20 @@ public class EavesDropper {
         }
 
         return emptyLines >= 4;
+    }
+
+    public static void bannedWordChat(Component rendered) {
+        Component finalMessage = Component.text()
+                .color(NamedTextColor.GRAY)
+                .content("(muted) ")
+                .append(rendered)
+                .build();
+
+        send(
+                finalMessage,
+                Permissions.EAVESDROP_MUTED,
+                FtcUtils.alwaysAccept(),
+                true
+        );
     }
 }

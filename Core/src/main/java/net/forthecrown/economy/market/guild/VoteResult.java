@@ -3,21 +3,27 @@ package net.forthecrown.economy.market.guild;
 import com.google.gson.JsonElement;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.JsonUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.translation.Translatable;
+import org.jetbrains.annotations.NotNull;
 
-public enum VoteResult implements JsonSerializable {
-    TIE (false),
-    TIE_WITH_ABSTENTIONS (false),
+public enum VoteResult implements JsonSerializable, Translatable, ComponentLike {
+    TIE (false, "tie"),
+    TIE_WITH_ABSTENTIONS (false, "tie"),
 
-    WIN (true),
-    WIN_WITH_ABSTENTIONS (true),
+    WIN (true, "win"),
+    WIN_WITH_ABSTENTIONS (true, "win"),
 
-    LOSE (false),
-    LOSE_WITH_ABSTENTIONS (false);
+    LOSE (false, "lose"),
+    LOSE_WITH_ABSTENTIONS (false, "lose");
 
     private final boolean win;
+    private final String translationKey;
 
-    VoteResult(boolean win) {
+    VoteResult(boolean win, String suffix) {
         this.win = win;
+        this.translationKey = "guilds.voteResult." + suffix;
     }
 
     public boolean isWin() {
@@ -27,5 +33,15 @@ public enum VoteResult implements JsonSerializable {
     @Override
     public JsonElement serialize() {
         return JsonUtils.writeEnum(this);
+    }
+
+    @Override
+    public @NotNull String translationKey() {
+        return translationKey;
+    }
+
+    @Override
+    public @NotNull Component asComponent() {
+        return Component.translatable(this);
     }
 }

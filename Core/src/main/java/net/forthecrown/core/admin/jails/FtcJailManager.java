@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import net.forthecrown.core.Crown;
 import net.forthecrown.events.dynamic.JailListener;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
@@ -28,14 +28,14 @@ public class FtcJailManager extends AbstractJsonSerializer implements JailManage
     }
 
     @Override
-    protected void save(JsonBuf json) {
+    protected void save(JsonWrapper json) {
         for (Map.Entry<Key, Location> e: jails.entrySet()){
             json.add(e.getKey().asString(), JsonUtils.writeLocation(e.getValue()));
         }
     }
 
     @Override
-    protected void reload(JsonBuf json) {
+    protected void reload(JsonWrapper json) {
         jails.clear();
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()){

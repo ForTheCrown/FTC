@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * Represents an auction sign
  * <p></p>
- * Implementation: {@link CrownAuction}
+ * Implementation: {@link FtcAuction}
  */
 public interface Auction extends CrownSerializer {
 

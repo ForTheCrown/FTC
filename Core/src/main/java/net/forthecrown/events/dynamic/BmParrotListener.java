@@ -4,7 +4,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.user.enums.Pet;
+import net.forthecrown.user.data.Pet;
 import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -56,7 +56,7 @@ public class BmParrotListener extends AbstractInvListener implements Listener {
                 return;
             }
         } else {
-            if(!Crown.getBalances().canAfford(user.getUniqueId(), pet.getRequiredBal())){
+            if(!Crown.getEconomy().has(user.getUniqueId(), pet.getRequiredBal())){
                 user.sendMessage(
                         Component.translatable("commands.cannotAfford",
                                 NamedTextColor.GRAY,

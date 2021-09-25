@@ -1,6 +1,7 @@
 package net.forthecrown.utils.animation;
 
 import com.google.common.base.MoreObjects;
+import net.forthecrown.utils.Struct;
 import net.forthecrown.utils.math.Vector3iOffset;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
@@ -10,7 +11,7 @@ import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.builder.HashCodeBuil
 /**
  * Represents a single frame of block animation
  */
-public class BlockAnimationFrame {
+public class BlockAnimationFrame implements Struct {
     private final AnimationConsumer onPlay;
     private final BoundingBox frameOrigin;
     private final Vector3iOffset posOffset;
@@ -88,8 +89,8 @@ public class BlockAnimationFrame {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(getClass())
-                .add("posOffset", posOffset.toString())
-                .add("frameOrigin", frameOrigin.toString())
+                .add("posOffset", posOffset)
+                .add("frameOrigin", frameOrigin)
                 .omitNullValues()
                 .toString();
     }

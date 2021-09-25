@@ -2,7 +2,6 @@ package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.shops.template.ShopTemplateManager;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,7 +19,7 @@ import java.util.UUID;
 /**
  * Manages shops n stuff
  * <p></p>
- * Implementation: {@link CrownShopManager}
+ * Implementation: {@link FtcShopManager}
  */
 public interface ShopManager {
     NamespacedKey SHOP_KEY = new NamespacedKey(Crown.inst(), "signshop");
@@ -147,6 +146,4 @@ public interface ShopManager {
      * @return The shop interaction handler
      */
     ShopInteractionHandler getInteractionHandler();
-
-    ShopTemplateManager getTemplates();
 }

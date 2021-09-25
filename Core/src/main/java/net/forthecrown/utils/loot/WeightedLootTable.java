@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 import java.util.Random;
 
-public interface WeightedLootTable extends CrownLootTable {
+public interface WeightedLootTable extends FtcLootTable {
 
     @Override
     void fillInventory(@NotNull Inventory inventory, @NotNull Random random, @NotNull LootContext context);
@@ -33,10 +33,10 @@ public interface WeightedLootTable extends CrownLootTable {
     JsonObject serialize();
 
     static WeightedLootTable of(Key key, Map<ItemStack, Integer> items, int maxItems){
-        return new CrownWeightedLootTable(new NamespacedKey(key.namespace(), key.value()), items, maxItems);
+        return new FtcWeightedLootTable(new NamespacedKey(key.namespace(), key.value()), items, maxItems);
     }
 
     static WeightedLootTable deserialize(JsonElement json){
-        return new CrownWeightedLootTable(json);
+        return new FtcWeightedLootTable(json);
     }
 }

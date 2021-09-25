@@ -9,7 +9,9 @@ import org.bukkit.entity.Player;
 
 import java.util.ListIterator;
 
-public class GameModePacketListener {
+public final class GameModePacketListener {
+    private GameModePacketListener() {}
+
     public static void inject(Player player) {
         new InjectorInstance(player);
     }
@@ -29,8 +31,8 @@ public class GameModePacketListener {
     private static class InjectorInstance {
         private final Player receiver;
 
-        public InjectorInstance(Player player) {
-            this.receiver = player;
+        private InjectorInstance(Player player) {
+            receiver = player;
 
             inject();
         }

@@ -4,4 +4,7 @@ main: net.forthecrown.core.Main
 api-version: 1.17
 loadbefore: [ OpenInv, GriefPrevention, PopulationDensity ]
 depend: [ RoyalGrenadier, WorldGuard, LuckPerms ]
-authors: [ Botul ]
+authors: [ Julie, Wout ]
+
+buildTime: @buildDate@
+buildID: @buildID@

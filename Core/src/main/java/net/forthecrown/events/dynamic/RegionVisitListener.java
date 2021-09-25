@@ -41,7 +41,7 @@ public class RegionVisitListener implements Listener {
             return;
         }
 
-        if(effect != null) effect.onHulkTickDown(user.getLocation());
+        if(effect != null) effect.onHulkTickDown(user, user.getLocation());
     }
 
     public void unregister() {
@@ -51,7 +51,7 @@ public class RegionVisitListener implements Listener {
         if(!tickTask.isCancelled()) tickTask.cancel();
 
         TravelEffect effect = user.getCosmeticData().getActiveTravel();
-        if(effect != null) effect.onHulkLand(user.getLocation());
+        if(effect != null) effect.onHulkLand(user, user.getLocation());
     }
 
     @EventHandler(ignoreCancelled = true)

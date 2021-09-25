@@ -2,7 +2,7 @@ package net.forthecrown.utils.math;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import net.minecraft.core.SectionPos;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -19,7 +19,7 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
     }
 
     public static WorldVec3i of(JsonElement element) {
-        JsonBuf json = JsonBuf.of(element.getAsJsonObject());
+        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
         return new WorldVec3i(
                 Bukkit.getWorld(json.getString("world")),

@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonBuf;
+import net.forthecrown.serializer.JsonWrapper;
 import org.bukkit.Material;
 
 import java.util.Map;
@@ -16,7 +16,7 @@ public class ServerItemPriceMap extends AbstractJsonSerializer implements ItemPr
 
     private final Object2ShortMap<Material> itemPrices = new Object2ShortOpenHashMap<>();
 
-    public ServerItemPriceMap(){
+    public ServerItemPriceMap() {
         super("item_prices");
 
         reload();
@@ -34,14 +34,14 @@ public class ServerItemPriceMap extends AbstractJsonSerializer implements ItemPr
     }
 
     @Override
-    protected void save(JsonBuf json) {
+    protected void save(JsonWrapper json) {
         for (Object2ShortMap.Entry<Material> e: itemPrices.object2ShortEntrySet()) {
             json.add(e.getKey().toString().toLowerCase(), e.getShortValue());
         }
     }
 
     @Override
-    protected void reload(JsonBuf json) {
+    protected void reload(JsonWrapper json) {
         itemPrices.clear();
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
@@ -50,7 +50,7 @@ public class ServerItemPriceMap extends AbstractJsonSerializer implements ItemPr
     }
 
     @Override
-    protected void createDefaults(JsonBuf json) {
+    protected void createDefaults(JsonWrapper json) {
         //Minerals
         def(COAL, 10);
         def(EMERALD, 7);

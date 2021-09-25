@@ -17,7 +17,7 @@ import java.util.UUID;
 /**
  * Manages punishments.
  * <p></p>
- * Implementation: {@link CrownPunishmentManager}
+ * Implementation: {@link FtcPunishmentManager}
  */
 public interface PunishmentManager extends CrownSerializer {
     MuteStatus checkMute(CommandSender sender);

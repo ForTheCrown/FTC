@@ -6,7 +6,7 @@ import net.forthecrown.pirates.Pirates;
 import net.forthecrown.pirates.TreasureShulker;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.enums.Faction;
+import net.forthecrown.user.data.Faction;
 import net.forthecrown.utils.Cooldown;
 import org.bukkit.Location;
 import org.bukkit.Material;

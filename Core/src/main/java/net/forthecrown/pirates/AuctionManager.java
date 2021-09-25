@@ -5,7 +5,7 @@ import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.Crown;
 import net.forthecrown.economy.auctions.Auction;
 import net.forthecrown.economy.auctions.AuctionEvents;
-import net.forthecrown.economy.auctions.CrownAuction;
+import net.forthecrown.economy.auctions.FtcAuction;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.math.FtcBoundingBox;
@@ -28,7 +28,7 @@ import java.util.logging.Level;
 
 public final class AuctionManager {
 
-    static final Map<String, CrownAuction> AUCTIONS = new HashMap<>(); //names and the auctions
+    static final Map<String, FtcAuction> AUCTIONS = new HashMap<>(); //names and the auctions
 
     private static final String LABEL = "=[Auction]=";
     private static final Component LABEL_COMPONENT = Component.text(LABEL).style(Style.style(TextDecoration.BOLD));
@@ -61,7 +61,7 @@ public final class AuctionManager {
                 String[] names = name.split("_");
                 Location loc = new Location(Bukkit.getWorld(names[1]), Double.parseDouble(names[2]), Double.parseDouble(names[3]), Double.parseDouble(names[4]));
 
-                Auction a = new CrownAuction(loc);
+                Auction a = new FtcAuction(loc);
                 Announcer.log(Level.INFO, a.getName() + " loaded");
             }
             Announcer.log(Level.INFO, "All auctions loaded");
@@ -80,7 +80,7 @@ public final class AuctionManager {
         AUCTIONS.remove(auction.getName());
     }
 
-    public void addAuction(CrownAuction auction){
+    public void addAuction(FtcAuction auction){
         AUCTIONS.put(auction.getName(), auction);
     }
 
