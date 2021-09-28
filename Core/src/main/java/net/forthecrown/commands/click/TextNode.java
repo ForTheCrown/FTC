@@ -108,9 +108,10 @@ public class TextNode {
     }
 
     public String getCommand() {
-        String parentCmd = parent == null ? "/clickable_text" : parent.getCommand();
+        boolean root = name.equals("root");
+        String parentCmd = parent == null || root ? "/clickable_text" : parent.getCommand();
 
-        return getName().equals("root") ? parentCmd : parentCmd + ' ' + getName().hashCode();
+        return root ? parentCmd : parentCmd + ' ' + getName().hashCode();
     }
 
     public ClickEvent getClickEvent() {

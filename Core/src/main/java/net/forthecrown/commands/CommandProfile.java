@@ -12,6 +12,8 @@ import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.crownevents.EventTimer;
+import net.forthecrown.economy.market.MarketDisplay;
+import net.forthecrown.economy.market.Markets;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -173,6 +175,11 @@ public class CommandProfile extends FtcCommand {
                 Joiner.on(' ').join(profile.previousNames)
         );
 
+        Markets markets = Crown.getMarkets();
+        Component marketDisplay = profile.marketOwnership.currentlyOwnsShop() ?
+                MarketDisplay.displayName(markets.get(profile.getUniqueId())) :
+                null;
+
         return Component.newline()
                 .append(Component.text("\nAdmin Info:").color(NamedTextColor.YELLOW))
                 .append(line(" Ranks", ListUtils.join(profile.getAvailableRanks(), r -> r.name().toLowerCase()), true))
@@ -183,6 +190,8 @@ public class CommandProfile extends FtcCommand {
                 .append(line(" PreviousNames", lastNames, lastNames != null))
                 .append(line(" Ignored: ", ignored, ignored != null))
                 .append(line(" Separated", separated, separated != null))
+
+                .append(line(" OwnedShop", marketDisplay, marketDisplay != null))
 
                 .append(line(" MarriageCooldown", marriageCooldown, marriageCooldown != null))
                 .append(line(profile.isOnline() ? " Location" : " Last seen", locMessage, locMessage != null))

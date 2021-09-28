@@ -3,17 +3,18 @@ package net.forthecrown.economy.pirates;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.utils.Struct;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 
 import java.util.Objects;
 
-public class EnchantmentData implements JsonSerializable {
+public class EnchantmentData implements JsonSerializable, Struct {
     private final Enchantment enchantment;
     private byte maxLevel;
     private int pricePerLevel;
 
-    public EnchantmentData(JsonElement element){
+    public EnchantmentData(JsonElement element) {
         JsonObject json = element.getAsJsonObject();
 
         String str = json.get("enchantment").getAsString();

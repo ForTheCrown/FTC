@@ -1,12 +1,13 @@
 package net.forthecrown.economy.market.guild.topics;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.market.MarketRegion;
+import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.economy.market.guild.VoteResult;
 import net.forthecrown.inventory.FtcInventory;
@@ -18,7 +19,6 @@ import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,18 +33,18 @@ import java.util.UUID;
 
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
-public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInstance> {
+public class EvictTopic implements VoteTopicType<EvictTopic.TopicInstance> {
     public static final Key KEY = Crown.coreKey("evict_owner");
-    public static final EvictOwnerTopic INSTANCE = new EvictOwnerTopic();
+    public static final EvictTopic INSTANCE = new EvictTopic();
 
     @Override
     public TopicInstance deserialize(JsonElement element) {
-        return new TopicInstance(JsonUtils.readUUID(element));
+        return new TopicInstance(element.getAsString());
     }
 
     @Override
     public JsonElement serialize(TopicInstance value) {
-        return JsonUtils.writeUUID(value.getOwner());
+        return new JsonPrimitive(value.getShop());
     }
 
     @Override
@@ -62,10 +62,10 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
 
     @Override
     public void runTask(PostVoteTask task) {
-        UUID ownerID = JsonUtils.readUUID(task.data);
+        String shopName = task.data.getAsString();
 
-        MarketRegion market = Crown.getMarketRegion();
-        MarketShop shop = market.get(ownerID);
+        Markets market = Crown.getMarkets();
+        MarketShop shop = market.get(shopName);
         if(shop == null) return;
 
         market.unclaim(shop, true);
@@ -110,7 +110,7 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
 
         @Override
         public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
-            EvictOwnerTopic.INSTANCE.getInventory().open(user);
+            EvictTopic.INSTANCE.getInventory().open(user);
         }
     }
 
@@ -160,20 +160,24 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
                 throw FtcExceptionProvider.translatable("guilds.cannotEvict", owner.nickDisplayName());
             }
 
-            TopicInstance instance = new TopicInstance(market.getOwner());
+            TopicInstance instance = new TopicInstance(market.getName());
             Crown.getTradersGuild().createVote(instance);
         }
     }
 
     public static class TopicInstance implements VoteTopic {
-        private final UUID owner;
+        private final String shop;
 
-        public TopicInstance(UUID owner) {
-            this.owner = owner;
+        public TopicInstance(String shop) {
+            this.shop = shop;
+        }
+
+        public String getShop() {
+            return shop;
         }
 
         public UUID getOwner() {
-            return owner;
+            return Crown.getMarkets().get(shop).getOwner();
         }
 
         CrownUser user() {
@@ -190,7 +194,7 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
 
                 return new PostVoteTask(
                         new Date(System.currentTimeMillis() + ComVars.getEvictionCleanupTime()),
-                        JsonUtils.writeUUID(owner),
+                        new JsonPrimitive(shop),
                         KEY
                 );
             }
@@ -211,7 +215,7 @@ public class EvictOwnerTopic implements VoteTopicType<EvictOwnerTopic.TopicInsta
         }
 
         @Override
-        public EvictOwnerTopic getType() {
+        public EvictTopic getType() {
             return INSTANCE;
         }
     }

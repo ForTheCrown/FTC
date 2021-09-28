@@ -38,6 +38,10 @@ public interface MarketShop extends JsonSerializable, Nameable, Struct {
     MarketShop getMerged();
     void setMerged(MarketShop shop);
 
+    default boolean isMerged() {
+        return getMerged() != null;
+    }
+
     UUID getOwner();
     void setOwner(UUID uuid);
 
@@ -51,4 +55,20 @@ public interface MarketShop extends JsonSerializable, Nameable, Struct {
 
     ObjectList<UUID> getCoOwners();
     void setCoOwners(ObjectList<UUID> coOwners);
+
+    ObjectList<String> getConnectedNames();
+    void setConnected(ObjectList<String> strings);
+
+    default boolean canInteractWith(UUID id) {
+        if(id.equals(getOwner())) return true;
+        if(getCoOwners().contains(id)) return true;
+
+        if(isMerged()) {
+            MarketShop shop = getMerged();
+            if(id.equals(shop.getOwner())) return true;
+            return shop.getCoOwners().contains(id);
+        }
+
+        return false;
+    }
 }

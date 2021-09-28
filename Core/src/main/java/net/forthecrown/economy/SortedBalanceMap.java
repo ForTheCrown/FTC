@@ -2,7 +2,6 @@ package net.forthecrown.economy;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
@@ -27,7 +26,7 @@ import java.util.function.IntSupplier;
  * two entries with the same UUID to exist. So uhh TODO: fix multiple entries for one UUID.
  */
 public class SortedBalanceMap implements BalanceMap {
-    private final ObjectList<Balance> entries = new ObjectArrayList<>(300);
+    private final ObjectArrayList<Balance> entries = new ObjectArrayList<>(300);
     private final IntSupplier defaultAmount;
 
     public SortedBalanceMap(IntSupplier defaultAmount){

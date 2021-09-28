@@ -29,6 +29,7 @@ public class FtcMarketShop implements MarketShop {
     private final BoundingBox voidExample;
     private final Vector3i resetPos;
     private ObjectList<ShopEntrance> entrances = new ObjectArrayList<>();
+    private ObjectList<String> connected = new ObjectArrayList<>();
 
     private UUID owner;
     private Date dateOfPurchase;
@@ -99,7 +100,7 @@ public class FtcMarketShop implements MarketShop {
 
     @Override
     public MarketShop getMerged() {
-        return FtcUtils.isNullOrBlank(mergedName) ? null : Crown.getMarketRegion().get(mergedName);
+        return FtcUtils.isNullOrBlank(mergedName) ? null : Crown.getMarkets().get(mergedName);
     }
 
     @Override
@@ -125,6 +126,16 @@ public class FtcMarketShop implements MarketShop {
     @Override
     public void setCoOwners(ObjectList<UUID> coOwners) {
         this.coOwners = coOwners;
+    }
+
+    @Override
+    public ObjectList<String> getConnectedNames() {
+        return connected;
+    }
+
+    @Override
+    public void setConnected(ObjectList<String> strings) {
+        this.connected = strings;
     }
 
     @Override

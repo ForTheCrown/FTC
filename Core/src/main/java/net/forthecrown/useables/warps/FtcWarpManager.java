@@ -7,8 +7,8 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.core.Crown;
-import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
@@ -69,7 +69,7 @@ public class FtcWarpManager extends AbstractJsonSerializer implements WarpManage
                 if(!warp.testSilent(player)) continue;
                 String name = warp.key().value();
 
-                if(name.toLowerCase().startsWith(token)) builder.suggest(name, ChatUtils.adventureToVanilla(warp.asHoverEvent().value()));
+                if(name.toLowerCase().startsWith(token)) builder.suggest(name, GrenadierUtils.componentToMessage(warp.asHoverEvent().value()));
             }
 
             return builder.buildFuture();

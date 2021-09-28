@@ -7,7 +7,7 @@ import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.ItemPriceMap;
-import net.forthecrown.economy.market.MarketRegion;
+import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.market.guild.TradersGuild;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.regions.RegionManager;
@@ -51,7 +51,7 @@ public interface Crown extends Plugin, Namespaced {
 
     static UserSerializer getUserSerializer() { return Main.userSerializer; }
     static TradersGuild getTradersGuild() { return Main.tradersGuild; }
-    static MarketRegion getMarketRegion() { return Main.marketRegion; }
+    static Markets getMarkets() { return Main.markets; }
     static LuckPerms getLuckPerms() { return Main.luckPerms; }
     static Announcer getAnnouncer(){ return Main.announcer; }
     static ItemPriceMap getPriceMap() { return Main.prices; }
@@ -94,7 +94,7 @@ public interface Crown extends Plugin, Namespaced {
         Main.tabList.save();
 
         Main.regionManager.save();
-        Main.marketRegion.save();
+        Main.markets.save();
         Main.tradersGuild.save();
 
         Main.inst.saveConfig();

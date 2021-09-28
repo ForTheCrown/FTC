@@ -121,6 +121,8 @@ public final class Permissions {
     public static final Permission REGIONS =            register("ftc.regions");
     public static final Permission REGIONS_ADMIN =      register("ftc.regions.admin");
 
+    public static final Permission MARKETS =             register("ftc.markets");
+
     public static final Permission DEFAULT =            register("ftc.default");
 
     /**

@@ -841,7 +841,7 @@ public interface CrownUser extends
      */
     Grave getGrave();
 
-    UserMarketOwnership getMarketOwnership();
+    MarketOwnership getMarketOwnership();
     CosmeticData getCosmeticData();
     UserInteractions getInteractions();
     UserHomes getHomes();

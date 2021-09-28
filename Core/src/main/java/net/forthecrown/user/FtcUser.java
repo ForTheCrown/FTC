@@ -92,7 +92,7 @@ public class FtcUser implements CrownUser {
     public Component currentPrefix;
 
     //Attachments
-    public final FtcUserMarketOwnership marketOwnership;
+    public final FtcMarketOwnership marketOwnership;
     public final FtcUserDataContainer dataContainer;
     public final FtcUserInteractions interactions;
     public final FtcUserCosmeticData cosmeticData;
@@ -145,7 +145,7 @@ public class FtcUser implements CrownUser {
     public FtcUser(@NotNull UUID uniqueId){
         this.uniqueId = uniqueId;
 
-        marketOwnership = new FtcUserMarketOwnership(this);
+        marketOwnership = new FtcMarketOwnership(this);
         dataContainer = new FtcUserDataContainer(this);
         interactions = new FtcUserInteractions(this);
         cosmeticData = new FtcUserCosmeticData(this);
@@ -244,7 +244,7 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public UserMarketOwnership getMarketOwnership() {
+    public MarketOwnership getMarketOwnership() {
         return marketOwnership;
     }
 
@@ -686,6 +686,7 @@ public class FtcUser implements CrownUser {
 
         interactions.clearIncoming();
         interactions.clearOutgoing();
+        marketOwnership.clearIncoming();
 
         if(lastTeleport != null) lastTeleport.interrupt(false);
 

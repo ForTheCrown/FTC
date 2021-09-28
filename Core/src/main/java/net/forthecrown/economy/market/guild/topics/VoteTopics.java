@@ -6,7 +6,7 @@ public final class VoteTopics {
     private VoteTopics() {}
 
     public static void init() {
-        register(EvictOwnerTopic.INSTANCE);
+        register(EvictTopic.INSTANCE);
     }
 
     private static void register(VoteTopicType type) {

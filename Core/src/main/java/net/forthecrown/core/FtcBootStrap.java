@@ -12,7 +12,7 @@ import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
 import net.forthecrown.economy.ServerItemPriceMap;
-import net.forthecrown.economy.market.FtcMarketRegion;
+import net.forthecrown.economy.market.FtcMarkets;
 import net.forthecrown.economy.market.guild.HazelguardTradersGuild;
 import net.forthecrown.economy.market.guild.topics.VoteTopics;
 import net.forthecrown.economy.shops.FtcShopManager;
@@ -71,7 +71,7 @@ public final class FtcBootStrap {
         Main.jailManager = new FtcJailManager();
 
         //Instantiate these things :shrug:
-        Main.marketRegion = new FtcMarketRegion();
+        Main.markets = new FtcMarkets();
         Main.kingship = new FtcKingship();
         Main.rules = new ServerRules();
         Main.tradersGuild = new HazelguardTradersGuild();

@@ -8,6 +8,7 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserInteractions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -259,5 +260,20 @@ public interface FtcExceptionProvider {
 
     static RoyalCommandException regionsWrongWorld() {
         return REGIONS_WRONG_WORLD.create();
+    }
+
+    static void checkNotBlocked(CrownUser user, CrownUser target) throws CommandSyntaxException {
+        UserInteractions inter = user.getInteractions();
+
+        if(inter.isOnlyBlocked(target.getUniqueId())) throw translatable("user.blockedOther", target.nickDisplayName());
+        if(inter.isSeparatedPlayer(target.getUniqueId())) throw translatable("user.blockedOther.separated", target.nickDisplayName());
+    }
+
+    static void checkNotBlockedBy(CrownUser user, CrownUser target) throws RoyalCommandException {
+        if(target.getInteractions().isBlockedPlayer(user.getUniqueId())) throw blockedPlayer(target);
+    }
+
+    static RoyalCommandException noShopOwned() {
+        return translatable("market.noShopOwned");
     }
 }

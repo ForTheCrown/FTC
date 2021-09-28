@@ -92,7 +92,7 @@ public class ShopEntrance implements JsonSerializable {
         });
     }
 
-    private void removeNotice(World world) {
+    void removeNotice(World world) {
         FtcBoundingBox area = FtcBoundingBox.of(world, notice, 1.5);
 
         area.getEntities().forEach(a -> {
@@ -100,6 +100,10 @@ public class ShopEntrance implements JsonSerializable {
             a.remove();
         });
 
+        notice.getBlock(world).setType(Material.AIR);
+    }
+
+    void removeSign(World world) {
         notice.getBlock(world).setType(Material.AIR);
     }
 

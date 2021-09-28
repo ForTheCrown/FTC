@@ -13,7 +13,7 @@ import net.forthecrown.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
 import net.forthecrown.economy.ServerItemPriceMap;
-import net.forthecrown.economy.market.FtcMarketRegion;
+import net.forthecrown.economy.market.FtcMarkets;
 import net.forthecrown.economy.market.guild.HazelguardTradersGuild;
 import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.MobHealthBar;
@@ -81,7 +81,7 @@ public final class Main extends JavaPlugin implements Crown {
     static JoinInfo                 joinInfo;
     static ChatEmotes               emotes;
     static DayUpdate                dayUpdate;
-    static FtcMarketRegion          marketRegion;
+    static FtcMarkets               markets;
     static HazelguardTradersGuild   tradersGuild;
     static PeriodicalSaver          saver;
 

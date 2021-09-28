@@ -9,7 +9,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Crown;
-import net.forthecrown.economy.market.MarketRegion;
+import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
@@ -31,7 +31,7 @@ public class MarketArgument implements ArgumentType<MarketShop> {
         int cursor = reader.getCursor();
         String name = reader.readUnquotedString();
 
-        MarketRegion region = Crown.getMarketRegion();
+        Markets region = Crown.getMarkets();
         MarketShop shop = region.get(name);
 
         if(shop == null) throw UNKNOWN_MARKET.createWithContext(GrenadierUtils.correctReader(reader, cursor), name);
@@ -41,6 +41,6 @@ public class MarketArgument implements ArgumentType<MarketShop> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CompletionProvider.suggestMatching(builder, Crown.getMarketRegion().getNames());
+        return CompletionProvider.suggestMatching(builder, Crown.getMarkets().getNames());
     }
 }

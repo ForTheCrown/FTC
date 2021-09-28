@@ -1,12 +1,14 @@
 package net.forthecrown.commands.manager;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import net.forthecrown.commands.CommandMarket;
 import net.forthecrown.commands.*;
 import net.forthecrown.commands.arguments.*;
 import net.forthecrown.commands.click.CommandClickableText;
 import net.forthecrown.commands.clickevent.ClickEventCommand;
 import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.help.*;
+import net.forthecrown.commands.markets.*;
 import net.forthecrown.commands.marriage.*;
 import net.forthecrown.commands.punishments.*;
 import net.forthecrown.commands.regions.*;
@@ -18,13 +20,8 @@ import net.forthecrown.grenadier.types.KeyArgument;
 import net.forthecrown.royalgrenadier.arguments.RoyalArgumentsImpl;
 import net.forthecrown.user.data.Faction;
 import net.forthecrown.user.data.Rank;
-import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.TimeArgument;
-import net.minecraft.server.MinecraftServer;
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,16 +34,12 @@ public final class FtcCommands {
     public static final EnumArgument<Rank> RANK = EnumArgument.of(Rank.class);
     public static final KeyArgument FTC_KEY_PARSER = KeyArgument.key(Crown.inst());
 
-    private static Commands dispatcher;
-
     private FtcCommands(){}
 
     public static void init(){
-        dispatcher = MinecraftServer.getServer().vanillaCommandDispatcher;
-
+        //ArgumentType registration
         VanillaArgumentType key = VanillaArgumentType.custom(ResourceLocationArgument::id);
 
-        //ArgumentType registration
         RoyalArgumentsImpl.register(UserArgument.class, UserArgument::getHandle, false);
         RoyalArgumentsImpl.register(NBTArgument.class, NBTArgument::getHandle, true);
         RoyalArgumentsImpl.register(TimeArgument.class, t -> t, true);
@@ -140,6 +133,14 @@ public final class FtcCommands {
         CommandToolBlock.init();
         CommandSelfOrUser.init();
         StateChangeCommand.init();
+
+        //Market commands
+        new CommandMarket();
+        new CommandShopTrust();
+        new CommandMergeShop();
+        new CommandUnmerge();
+        new CommandTransferShop();
+        new CommandUnclaimShop();
 
         //top me daddy xD
         new CommandDeathTop();
@@ -237,33 +238,5 @@ public final class FtcCommands {
 
     public static KeyArgument ftcKeyType() {
         return FTC_KEY_PARSER;
-    }
-
-    /**
-     * Resends all the commands packets, for stuff like the permissions and the test() method
-     * @param p The player to resend the packets to
-     */
-    public static void resendCommandPackets(Player p){
-        CraftPlayer player = (CraftPlayer) p;
-        getServerCommands().sendCommands(player.getHandle());
-    }
-
-    /**
-     * Resends command packets for every player on the server
-     * @see FtcCommands#resendCommandPackets(Player)
-     */
-    public static void resendAllCommandPackets(){
-        for (Player p: Bukkit.getOnlinePlayers()){
-            resendCommandPackets(p);
-        }
-    }
-
-    /**
-     * Gets the server's command class, that handles the all things related to commands, type name is misleading
-     * <p>The actual dispatcher is in the returned class</p>
-     * @return The server's commands class
-     */
-    public static Commands getServerCommands() {
-        return dispatcher;
     }
 }

@@ -42,6 +42,6 @@ public class SignLines implements Struct {
     }
 
     private static Component emptyIfNull(Component component) {
-        return component == null ? Component.empty() : component;
+        return component == null ? Component.empty() : ChatUtils.renderIfTranslatable(component);
     }
 }

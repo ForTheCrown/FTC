@@ -39,6 +39,7 @@ public final class ComVars {
     static ComVar<Long>             voteTime;
     static ComVar<Long>             voteInterval;
     static ComVar<Long>             guildJoinRequirement;
+    static ComVar<Long>             marketStatusCooldown;
 
     static ComVar<Boolean>          allowOtherPlayerNicks;
     static ComVar<Boolean>          taxesEnabled;
@@ -93,6 +94,7 @@ public final class ComVars {
         voteTime = set(                 "voteTime",                 ComVarTypes.LONG,           config.getLong("VoteTime"));
         voteInterval = set(             "voteInterval",             ComVarTypes.LONG,           config.getLong("VoteInterval"));
         guildJoinRequirement = set(     "guildJoinRequirement",     ComVarTypes.LONG,           config.getLong("GuildJoinRequirement"));
+        marketStatusCooldown = set(     "marketStatusCooldown",     ComVarTypes.LONG,           config.getLong("MarketStatusCooldown"));
 
         taxesEnabled = set(             "taxesEnabled",             ComVarTypes.BOOLEAN,        config.getBoolean("Taxes"));
         logAdminShop = set(             "logAdminShop",             ComVarTypes.BOOLEAN,        config.getBoolean("Shops.log-admin-purchases"));
@@ -133,6 +135,7 @@ public final class ComVars {
 
         config.set("NearRadius",                            nearRadius.getValue());
         config.set("HoppersInOneChunk",                     hoppersInOneChunk.getValue());
+        config.set("MaxGuildMembers",                       maxGuildMembers.getValue());
 
         config.set("MarriageStatusCooldown",                marriageCooldown.getValue());
         config.set("UserDataResetInterval",                 userDataResetInterval.getValue());
@@ -145,7 +148,7 @@ public final class ComVars {
         config.set("VoteTime",                              voteTime.getValue());
         config.set("VoteInterval",                          voteInterval.getValue());
         config.set("GuildJoinRequirement",                  guildJoinRequirement.getValue());
-        config.set("MaxGuildMembers",                       maxGuildMembers.getValue());
+        config.set("MarketStatusCooldown",                  marketStatusCooldown.getValue());
 
         config.set("AllowOtherPlayerNicks",                 allowOtherPlayerNicks.getValue());
         config.set("Taxes",                                 taxesEnabled.getValue());
@@ -229,17 +232,14 @@ public final class ComVars {
     }
 
     public static long getBranchSwapCooldown()  {
-        //Default: 2 days
         return branchSwapCooldown.getValue(TimeUtil.DAY_IN_MILLIS * 2);
     }
 
     public static long getShopOwnershipSafeTime() {
-        //Default: 2 weeks
         return marketOwnershipSafeTime.getValue(TimeUtil.WEEK_IN_MILLIS * 2);
     }
 
     public static long getEvictionCleanupTime() {
-        //Def: 3 days
         return evictionCleanupTime.getValue(TimeUtil.DAY_IN_MILLIS * 3);
     }
 
@@ -249,6 +249,10 @@ public final class ComVars {
 
     public static long getGuildJoinRequirement() {
         return guildJoinRequirement.getValue(TimeUtil.MONTH_IN_MILLIS * 2);
+    }
+
+    public static long getMarketStatusCooldown() {
+        return marketStatusCooldown.getValue(TimeUtil.DAY_IN_MILLIS * 2);
     }
 
 

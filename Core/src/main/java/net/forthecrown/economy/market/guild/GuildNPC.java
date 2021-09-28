@@ -10,7 +10,7 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.npc.InteractableNPC;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.UserMarketOwnership;
+import net.forthecrown.user.MarketOwnership;
 import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -25,19 +25,23 @@ public class GuildNPC implements InteractableNPC {
 
     private final TextNode guildInfo = new TextNode("info_guild")
             .setExecutor(user -> {
-                user.sendMessage("To keep the market fresh, this group of players can close inactive shops.",
+                user.sendMessage(
+                        "To keep the market fresh, this group of players can close inactive shops.",
                         "To join them, you must have had a shop in this region for atleast 6 months.",
-                        "There are max 5 (?) members in this guild, their shops get some benefits as a reward.");
+                        "There are max 5 (?) members in this guild, their shops get some benefits as a reward."
+                );
             })
             .setPrompt(user -> Component.translatable("guildmaster.infoGuild"));
 
     private final TextNode marketInfo = new TextNode("info_market")
             .setExecutor(user -> {
-                user.sendMessage("Houses in this region can be used as player shops.",
+                user.sendMessage(
+                        "Houses in this region can be used as player shops.",
                         "Add members to your shop using these commands:",
                         "/shoptrust <player> to allow the player to access your shops",
                         "/mergeshop <player> to merge two shops into one",
-                        "Inactive shops can be closed down by the market guild.");
+                        "Inactive shops can be closed down by the market guild."
+                );
             })
             .setPrompt(user -> Component.translatable("guildmaster.infoMarket"));
 
@@ -71,7 +75,7 @@ public class GuildNPC implements InteractableNPC {
                 TradersGuild guild = Crown.getTradersGuild();
                 if(guild.isMember(user.getUniqueId())) return;
 
-                UserMarketOwnership ownership = user.getMarketOwnership();
+                MarketOwnership ownership = user.getMarketOwnership();
 
                 if(guild.getMembers().size() >= guild.getMaxMembers()) {
                     throw FtcExceptionProvider.translatable("guilds.join.error.memberLimit");
@@ -111,7 +115,7 @@ public class GuildNPC implements InteractableNPC {
                 TradersGuild guild = Crown.getTradersGuild();
                 if(guild.isMember(user.getUniqueId())) return null;
 
-                UserMarketOwnership ownership = user.getMarketOwnership();
+                MarketOwnership ownership = user.getMarketOwnership();
 
                 Component prompt = Component.translatable("guildmaster.join");
 

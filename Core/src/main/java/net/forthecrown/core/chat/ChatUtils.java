@@ -1,6 +1,7 @@
 package net.forthecrown.core.chat;
 
 import com.google.gson.JsonElement;
+import io.papermc.paper.adventure.AdventureComponent;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -36,7 +37,7 @@ public final class ChatUtils {
     }
 
     public static net.minecraft.network.chat.Component stringToVanilla(String text, boolean translateColors){
-        return net.minecraft.network.chat.Component.Serializer.fromJson(GsonComponentSerializer.gson().serialize(convertString(text, translateColors)));
+        return new AdventureComponent(convertString(text, translateColors));
     }
 
     public static net.minecraft.network.chat.Component stringToVanilla(String text){
