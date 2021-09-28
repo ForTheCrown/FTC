@@ -85,6 +85,25 @@ public interface MarketDisplay {
             else builder.append(Component.text("Merged: " + shop.getMerged().getName()));
         }
 
+        if(!shop.getConnectedNames().isEmpty()) {
+            TextComponent.Builder connected = Component.text()
+                    .content("Connected: ");
+
+            Iterator<String> iterator = shop.getConnectedNames().iterator();
+
+            while (iterator.hasNext()) {
+                String s = iterator.next();
+
+                connected.append(Component.text(s));
+
+                if(iterator.hasNext()) connected.append(Component.text(", "));
+            }
+
+            builder
+                    .append(Component.newline())
+                    .append(connected.build());
+        }
+
         if(!shop.getEntrances().isEmpty()) {
             TextComponent.Builder entranceBuilder = Component.text()
                     .append(Component.newline())
