@@ -12,12 +12,12 @@ import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
 import net.forthecrown.economy.ServerItemPriceMap;
+import net.forthecrown.economy.houses.Dynasties;
 import net.forthecrown.economy.market.FtcMarkets;
 import net.forthecrown.economy.market.guild.HazelguardTradersGuild;
 import net.forthecrown.economy.market.guild.topics.VoteTopics;
 import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.Events;
-import net.forthecrown.pirates.Pirates;
 import net.forthecrown.regions.FtcRegionManager;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.UserJsonSerializer;
@@ -29,55 +29,58 @@ import net.forthecrown.useables.warps.FtcWarpManager;
 import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.utils.Worlds;
 
+import static net.forthecrown.core.Main.*;
 import static net.forthecrown.utils.FtcUtils.safeRunnable;
 
 /**
  * A class which loads and creates everything the FTC plugin does and needs.
  * Aka a class which starts the plugin
  */
-public final class FtcBootStrap {
+final class FtcBootStrap {
     private FtcBootStrap() {}
 
     static void firstPhase() {
-        Main.announcer = new FtcAnnouncer();
+        announcer = new FtcAnnouncer();
 
-        Main.messages = new FtcMessages();
-        Main.messages.load();
+        messages = new FtcMessages();
+        messages.load();
 
-        Main.emotes = new ChatEmotes();
-        Main.emotes.registerEmotes();
+        emotes = new ChatEmotes();
+        emotes.registerEmotes();
 
-        Main.prices = new ServerItemPriceMap();
-        Main.tabList = new FtcTabList();
+        prices = new ServerItemPriceMap();
+        tabList = new FtcTabList();
 
         FtcFlags.init();
     }
 
     static void secondPhase() {
-        Main.joinInfo = new JoinInfo();
+        joinInfo = new JoinInfo();
 
-        Main.userSerializer = new UserJsonSerializer();
-        Main.economy = new FtcEconomy();
-        Main.regionManager = new FtcRegionManager(Worlds.OVERWORLD);
+        userSerializer = new UserJsonSerializer();
+        economy = new FtcEconomy();
+        regionManager = new FtcRegionManager(Worlds.OVERWORLD);
 
         Regions_PopDensityToFTC.checkAndRun();
         Homes_PopDensityToFTC.checkAndRun();
 
         //Instantiate managers
-        Main.userManager = new FtcUserManager();
-        Main.shopManager = new FtcShopManager();
-        Main.punishmentManager = new FtcPunishmentManager();
-        Main.usablesManager = new FtcUsablesManager();
-        Main.jailManager = new FtcJailManager();
+        userManager = new FtcUserManager();
+        shopManager = new FtcShopManager();
+        punishmentManager = new FtcPunishmentManager();
+        usablesManager = new FtcUsablesManager();
+        jailManager = new FtcJailManager();
 
-        //Instantiate these things :shrug:
-        Main.markets = new FtcMarkets();
-        Main.kingship = new FtcKingship();
-        Main.rules = new ServerRules();
-        Main.tradersGuild = new HazelguardTradersGuild();
+        kingship = new FtcKingship();
+        rules = new ServerRules();
+
+        if(Crown.inDebugMode()) {
+            markets = new FtcMarkets();
+            tradersGuild = new HazelguardTradersGuild();
+        }
 
         //Initialize modules
-        safeRunnable(Pirates::init);
+        safeRunnable(Dynasties::init);
         safeRunnable(Bosses::init);
         safeRunnable(Cosmetics::init);
         safeRunnable(UsageChecks::init);
@@ -87,8 +90,8 @@ public final class FtcBootStrap {
         safeRunnable(Events::init);
 
         //These must be last, since usage actions and checks are registered before them
-        Main.warpRegistry = new FtcWarpManager();
-        Main.kitRegistry = new FtcKitManager();
+        warpRegistry = new FtcWarpManager();
+        kitRegistry = new FtcKitManager();
 
         Registries.COMVAR_TYPES.close();
 

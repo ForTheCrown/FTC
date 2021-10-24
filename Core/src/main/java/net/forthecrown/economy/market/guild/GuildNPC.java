@@ -24,25 +24,21 @@ public class GuildNPC implements InteractableNPC {
     GuildNPC() {}
 
     private final TextNode guildInfo = new TextNode("info_guild")
-            .setExecutor(user -> {
-                user.sendMessage(
-                        "To keep the market fresh, this group of players can close inactive shops.",
-                        "To join them, you must have had a shop in this region for atleast 6 months.",
-                        "There are max 5 (?) members in this guild, their shops get some benefits as a reward."
-                );
-            })
+            .setExecutor(user -> user.sendMessage(
+                    "To keep the market fresh, this group of players can close inactive shops.",
+                    "To join them, you must have had a shop in this region for atleast 6 months.",
+                    "There are max 5 (?) members in this guild, their shops get some benefits as a reward."
+            ))
             .setPrompt(user -> Component.translatable("guildmaster.infoGuild"));
 
     private final TextNode marketInfo = new TextNode("info_market")
-            .setExecutor(user -> {
-                user.sendMessage(
-                        "Houses in this region can be used as player shops.",
-                        "Add members to your shop using these commands:",
-                        "/shoptrust <player> to allow the player to access your shops",
-                        "/mergeshop <player> to merge two shops into one",
-                        "Inactive shops can be closed down by the market guild."
-                );
-            })
+            .setExecutor(user -> user.sendMessage(
+                    "Houses in this region can be used as player shops.",
+                    "Add members to your shop using these commands:",
+                    "/shoptrust <player> to allow the player to access your shops",
+                    "/mergeshop <player> to merge two shops into one",
+                    "Inactive shops can be closed down by the market guild."
+            ))
             .setPrompt(user -> Component.translatable("guildmaster.infoMarket"));
 
     private final TextNode proposeMotion = new TextNode("propose_motion")

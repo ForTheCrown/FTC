@@ -7,8 +7,6 @@ import net.forthecrown.core.nbt.NbtHandler;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.math.FtcBoundingBox;
 import net.kyori.adventure.key.Key;
-import net.minecraft.core.Position;
-import net.minecraft.core.PositionImpl;
 import net.minecraft.nbt.TagParser;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -19,7 +17,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
@@ -47,40 +48,22 @@ public final class JsonUtils {
         return result;
     }
 
-    public static Location readLocation(JsonObject json){
-        World world;
+    public static Location readLocation(JsonObject json) {
+        World world = null;
 
-        if(json.has("world")){
+        if(json.has("world")) {
             World gottenWorld = Bukkit.getWorld(json.get("world").getAsString());
             world = gottenWorld == null ? Worlds.OVERWORLD : gottenWorld;
-        } else world = null;
+        }
 
         double x = json.get("x").getAsDouble();
         double y = json.get("y").getAsDouble();
         double z = json.get("z").getAsDouble();
 
-        float pitch = json.has("pitch") ? json.get("pitch").getAsFloat() : 0f;
         float yaw = json.has("yaw") ? json.get("yaw").getAsFloat() : 0f;
+        float pitch = json.has("pitch") ? json.get("pitch").getAsFloat() : 0f;
 
         return new Location(world, x, y, z, yaw, pitch);
-    }
-
-    public static Position readPosition(JsonObject json) {
-        double x = json.get("x").getAsDouble();
-        double y = json.get("y").getAsDouble();
-        double z = json.get("z").getAsDouble();
-
-        return new PositionImpl(x, y, z);
-    }
-
-    public static JsonObject writePosition(Position position) {
-        JsonObject json = new JsonObject();
-
-        json.addProperty("x", position.x());
-        json.addProperty("y", position.y());
-        json.addProperty("z", position.z());
-
-        return json;
     }
 
     public static JsonObject writeRegion(FtcBoundingBox box){

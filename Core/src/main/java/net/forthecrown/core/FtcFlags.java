@@ -22,7 +22,7 @@ public final class FtcFlags {
     public static final StateFlag TRAPDOOR_USE = new StateFlag("trapdoor-use", true);
     public static final StateFlag RIDING_ALLOWED = new StateFlag("player-riding", true);
 
-    public static void init(){
+    static void init() {
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
 
         try {
@@ -38,7 +38,7 @@ public final class FtcFlags {
         }
     }
 
-    public static <T> T query(Location pos, Flag<T> flag){
+    public static <T> T query(Location pos, Flag<T> flag) {
         return WorldGuard.getInstance()
                 .getPlatform()
                 .getRegionContainer().createQuery()

@@ -58,9 +58,10 @@ public interface UserManager extends CrownSerializer {
         Validate.notNull(base, "UUID cannot be null");
         Validate.isTrue(isPlayerID(base), "Given UUID did not belong to a player");
 
-        if(FtcUserManager.LOADED_USERS.containsKey(base)) return FtcUserManager.LOADED_USERS.get(base);
-
-        return inst().isAlt(base) ? new FtcUserAlt(base, inst().getMain(base)) : new FtcUser(base);
+        return FtcUserManager.LOADED_USERS.computeIfAbsent(base, id -> {
+            UserManager manager = inst();
+            return manager.isAlt(id) ? new FtcUserAlt(id, manager.getMain(id)) : new FtcUser(id);
+        });
     }
 
     /**

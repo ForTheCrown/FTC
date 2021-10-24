@@ -3,6 +3,7 @@ package net.forthecrown.comvars.types;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.World;
@@ -18,7 +19,7 @@ public interface ComVarTypes {
     ComVarType<Double>      DOUBLE =        new PrimitiveComVarType<>(Double.class,         StringReader::readDouble,       JsonPrimitive::new,     JsonElement::getAsDouble);
     ComVarType<Float>       FLOAT =         new PrimitiveComVarType<>(Float.class,          StringReader::readFloat,        JsonPrimitive::new,     JsonElement::getAsFloat);
     ComVarType<Integer>     INTEGER =       new PrimitiveComVarType<>(Integer.class,        StringReader::readInt,          JsonPrimitive::new,     JsonElement::getAsInt);
-    ComVarType<Boolean>     BOOLEAN =       new PrimitiveComVarType<>(Boolean.class,        StringReader::readBoolean,      JsonPrimitive::new,     JsonElement::getAsBoolean);
+    ComVarType<Boolean>     BOOL =          new PrimitiveComVarType<>(Boolean.class,        StringReader::readBoolean,      JsonPrimitive::new,     JsonElement::getAsBoolean, PrimitiveComVarType.fromType(BoolArgumentType.bool()));
     ComVarType<String>      STRING =        new PrimitiveComVarType<>(String.class,         StringReader::getRemaining,     JsonPrimitive::new,     JsonElement::getAsString);
     ComVarType<Character>   CHAR =          new PrimitiveComVarType<>(Character.class,      StringReader::read,             JsonPrimitive::new,     JsonElement::getAsCharacter);
 

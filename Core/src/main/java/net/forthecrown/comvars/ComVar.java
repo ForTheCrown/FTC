@@ -1,6 +1,8 @@
 package net.forthecrown.comvars;
 
+import com.google.gson.JsonElement;
 import net.forthecrown.comvars.types.ComVarType;
+import net.forthecrown.serializer.JsonSerializable;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +17,7 @@ import java.util.function.Consumer;
  * </p>
  * @param <T> The type stored by the variable.
  */
-public final class ComVar<T> {
+public final class ComVar<T> implements JsonSerializable {
     private T value;
     private final ComVarType<T> type;
     private final String name;
@@ -70,5 +72,10 @@ public final class ComVar<T> {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public JsonElement serialize() {
+        return type.serialize(value);
     }
 }

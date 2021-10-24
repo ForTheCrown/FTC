@@ -10,6 +10,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.commons.lang.Validate;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -49,27 +50,29 @@ public class FtcEconomy extends AbstractJsonSerializer implements Economy {
     }
 
     @Override
-    public synchronized BalanceMap getMap(){
+    public synchronized BalanceMap getMap() {
         return balanceMap;
     }
     @Override
-    public synchronized void setMap(BalanceMap balanceMap){
+    public synchronized void setMap(BalanceMap balanceMap) {
         this.balanceMap = balanceMap;
     }
 
     @Override
-    public synchronized int get(UUID uuid){
+    public synchronized int get(UUID uuid) {
+        validateID(uuid);
         return balanceMap.get(uuid);
     }
 
     @Override
-    public synchronized void set(UUID uuid, int amount){
+    public synchronized void set(UUID uuid, int amount) {
         Economy.checkUnderMax(uuid, amount);
         setUnlimited(uuid, Economy.clampToBalBounds(amount));
     }
 
     @Override
-    public synchronized void setUnlimited(UUID id, int amount){
+    public synchronized void setUnlimited(UUID id, int amount) {
+        validateID(id);
         balanceMap.put(id, amount);
     }
 
@@ -85,12 +88,16 @@ public class FtcEconomy extends AbstractJsonSerializer implements Economy {
 
     @Override
     public synchronized void remove(UUID id, int amount) {
+        validateID(id);
+
         int bal = get(id);
         set(id, bal - amount);
     }
 
     @Override
-    public synchronized void add(UUID uuid, int amount, boolean isTaxed){
+    public synchronized void add(UUID uuid, int amount, boolean isTaxed) {
+        validateID(uuid);
+
         int current = get(uuid);
         CrownUser user = UserManager.getUser(uuid);
 
@@ -124,5 +131,9 @@ public class FtcEconomy extends AbstractJsonSerializer implements Economy {
         int percent = (int) (UserManager.getUser(uuid).getTotalEarnings() / 50000 * 10);
         if(percent >= 30) return 50;
         return percent;
+    }
+
+    private void validateID(UUID id) {
+        Validate.isTrue(UserManager.isPlayerID(id), "Given UUID doesn't belong to a player");
     }
 }

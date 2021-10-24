@@ -11,7 +11,7 @@ public final class Cosmetics {
 
     private static PlayerRidingManager rideManager;
 
-    public static void init(){
+    public static void init() {
         rideManager = new PlayerRidingManager();
 
         CosmeticEmotes.init();
@@ -22,7 +22,7 @@ public final class Cosmetics {
         Crown.logger().info("Cosmetics loaded");
     }
 
-    public static void shutDown(){
+    public static void shutDown() {
         rideManager.stopAllRiding();
     }
 

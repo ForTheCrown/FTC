@@ -55,7 +55,7 @@ public interface ShopInteraction {
 
         //If the owner's branch doesn't match up with the WG flag
         if(allowedOwner != null && session.getOwner().getFaction() != Faction.DEFAULT && !session.getShop().getType().isAdmin() && allowedOwner != session.getOwner().getFaction()){
-            session.getUser().sendMessage(
+            session.getCustomer().sendMessage(
                     Component.translatable(
                             "shops.error.flags.owner",
                             NamedTextColor.GRAY,
@@ -66,8 +66,8 @@ public interface ShopInteraction {
         }
 
         //If the user's branch doesn't match up with the WG flag
-        if(allowedUser != null && session.getUser().getFaction() != Faction.DEFAULT && allowedUser != session.getUser().getFaction()){
-            session.getUser().sendMessage(
+        if(allowedUser != null && session.getCustomer().getFaction() != Faction.DEFAULT && allowedUser != session.getCustomer().getFaction()){
+            session.getCustomer().sendMessage(
                     Component.translatable(
                             "shops.error.flags.user",
                             NamedTextColor.GRAY,

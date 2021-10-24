@@ -8,6 +8,7 @@ import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.emotes.CosmeticEmote;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
+import net.forthecrown.economy.houses.Dynasty;
 import net.forthecrown.economy.market.guild.topics.VoteTopic;
 import net.forthecrown.economy.market.guild.topics.VoteTopicType;
 import net.forthecrown.useables.actions.UsageAction;
@@ -29,6 +30,7 @@ public interface Registries {
     Registry<BlockAnimation> ANIMATIONS = create("animations");
 
     CloseableRegistry<VoteTopicType<VoteTopic>> VOTE_TOPICS = createCloseable("vote_topics");
+    CloseableRegistry<Dynasty> DYNASTIES = createCloseable("houses");
 
     //Cosmetic things registries
     CloseableRegistry<DeathEffect> DEATH_EFFECTS = createCloseable("death_effects");

@@ -121,7 +121,7 @@ public class SignShopSession {
      * Gets the session's user
      * @return The current user
      */
-    public CrownUser getUser() {
+    public CrownUser getCustomer() {
         return user;
     }
 

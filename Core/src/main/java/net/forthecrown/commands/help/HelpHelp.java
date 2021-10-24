@@ -33,6 +33,7 @@ public class HelpHelp extends FtcCommand {
 
         setPermission(Permissions.HELP);
         setAliases("help", "ehelp");
+        setHelpListName("help");
         setDescription("Shows you where to find help lol");
 
         register();

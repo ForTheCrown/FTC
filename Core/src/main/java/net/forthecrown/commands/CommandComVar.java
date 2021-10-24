@@ -1,12 +1,13 @@
 package net.forthecrown.commands;
 
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.commands.arguments.ComVarArgument;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.comvars.ComVar;
-import net.forthecrown.comvars.ComVarRegistry;
+import net.forthecrown.comvars.types.ComVarType;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -59,16 +60,25 @@ public class CommandComVar extends FtcCommand {
                         })
 
                         .executes(c -> {
-                            ComVar<?> var = c.getArgument("var", ComVar.class);
-                            String toParse = c.getArgument("value", String.class);
+                            ComVar var = c.getArgument("var", ComVar.class);
+                            ComVarType type = var.getType();
 
-                            try {
-                                ComVarRegistry.parseVar(var.getName(), toParse);
-                            } catch (IllegalArgumentException e) {
-                                throw FtcExceptionProvider.create(e.getMessage());
+                            String toParse = c.getArgument("value", String.class);
+                            StringReader reader = new StringReader(toParse);
+
+                            Object o = type.parse(reader);
+                            if(reader.canRead()) {
+                                throw CommandSyntaxException.BUILT_IN_EXCEPTIONS
+                                        .dispatcherExpectedArgumentSeparator()
+                                        .createWithContext(reader);
                             }
 
-                            c.getSource().sendAdmin("Set " + var.getName() + " to '" + var.toString() + "'");
+                            var.update(o);
+
+                            c.getSource().sendAdmin(
+                                    Component.text("Set value of " + var.getName() + " to ")
+                                            .append(var.prettyDisplay())
+                            );
                             return 0;
                         })
                 )

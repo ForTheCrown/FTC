@@ -1,5 +1,6 @@
 package net.forthecrown.commands.arguments;
 
+import com.mojang.brigadier.Message;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -11,7 +12,6 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 
 import java.util.concurrent.CompletableFuture;
@@ -48,6 +48,15 @@ public class ComVarArgument implements ArgumentType<ComVar<?>> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CompletionProvider.suggestMatching(builder, ComVarRegistry.getVariables());
+        String token = builder.getRemainingLowerCase();
+
+        for (ComVar v: ComVarRegistry.getValues()) {
+            if(!v.getName().toLowerCase().startsWith(token)) continue;
+
+            Message tooltip = GrenadierUtils.componentToMessage(v.prettyDisplay());
+            builder.suggest(v.getName(), tooltip);
+        }
+
+        return builder.buildFuture();
     }
 }

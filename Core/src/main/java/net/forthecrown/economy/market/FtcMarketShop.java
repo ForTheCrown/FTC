@@ -17,6 +17,8 @@ import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.math.Vector3i;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -26,14 +28,14 @@ import java.util.UUID;
 public class FtcMarketShop implements MarketShop {
     private final ProtectedRegion worldGuard;
 
-    private final BoundingBox voidExample;
-    private final Vector3i resetPos;
-    private ObjectList<ShopEntrance> entrances = new ObjectArrayList<>();
-    private ObjectList<String> connected = new ObjectArrayList<>();
+    private BoundingBox voidExample;
+    private Vector3i resetPos;
+    private final ObjectList<ShopEntrance> entrances = new ObjectArrayList<>();
+    private final ObjectList<String> connected = new ObjectArrayList<>();
 
     private UUID owner;
     private Date dateOfPurchase;
-    private ObjectList<UUID> coOwners = new ObjectArrayList<>();
+    private final ObjectList<UUID> coOwners = new ObjectArrayList<>();
 
     private int price = 35000;
     private String mergedName;
@@ -55,18 +57,23 @@ public class FtcMarketShop implements MarketShop {
     }
 
     @Override
-    public void setEntrances(ObjectList<ShopEntrance> entrances) {
-        this.entrances = entrances;
-    }
-
-    @Override
     public BoundingBox getVoidExample() {
         return voidExample;
     }
 
     @Override
+    public void setVoidExample(@NotNull BoundingBox voidExample) {
+        this.voidExample = Validate.notNull(voidExample, "Void example was null");
+    }
+
+    @Override
     public Vector3i getResetPos() {
         return resetPos;
+    }
+
+    @Override
+    public void setResetPos(Vector3i resetPos) {
+        this.resetPos = resetPos;
     }
 
     @Override
@@ -124,18 +131,8 @@ public class FtcMarketShop implements MarketShop {
     }
 
     @Override
-    public void setCoOwners(ObjectList<UUID> coOwners) {
-        this.coOwners = coOwners;
-    }
-
-    @Override
     public ObjectList<String> getConnectedNames() {
         return connected;
-    }
-
-    @Override
-    public void setConnected(ObjectList<String> strings) {
-        this.connected = strings;
     }
 
     @Override

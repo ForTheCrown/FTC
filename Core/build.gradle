@@ -11,7 +11,7 @@ plugins {
 group = 'net.forthecrown'
 version = buildVersion()
 
-static String buildVersion() {
+String buildVersion() {
     Calendar cal = Calendar.getInstance()
     Month month = Month.values()[cal.get(Calendar.MONTH)]
     int day = cal.get(Calendar.DAY_OF_MONTH)
@@ -20,7 +20,7 @@ static String buildVersion() {
     return month.getDisplayName(TextStyle.SHORT, Locale.ROOT).toUpperCase() + '-' + day + '-' + year
 }
 
-static int buildID() {
+int buildID() {
     int result = 1
 
     consumeProperties(p -> {
@@ -30,7 +30,7 @@ static int buildID() {
     return result
 }
 
-static void incrementBuildID() {
+void incrementBuildID() {
     consumeProperties(properties -> {
         int id = Integer.parseInt(properties.getProperty("buildID"))
         id++
@@ -39,11 +39,11 @@ static void incrementBuildID() {
     });
 }
 
-static void resetBuildID() {
+void resetBuildID() {
     consumeProperties(p -> p.setProperty("buildID", "1"))
 }
 
-static void consumeProperties(Consumer<Properties> propertiesConsumer) {
+void consumeProperties(Consumer<Properties> propertiesConsumer) {
     File f = new File('buildver.properties')
     Properties properties = new Properties()
     properties.load(new FileReader(f))

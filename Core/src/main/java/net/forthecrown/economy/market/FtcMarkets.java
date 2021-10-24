@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class FtcMarkets extends AbstractJsonSerializer implements Markets {
+    //2 maps for tracking shops, byName stores all saved shops
     private final Object2ObjectMap<UUID, MarketShop> byOwner = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectMap<String, MarketShop> byName = new Object2ObjectOpenHashMap<>();
 
@@ -45,6 +46,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
     @Override
     public World getWorld() {
+        //Return the OVERWORLD constant in Worlds
         return Worlds.OVERWORLD;
     }
 
@@ -57,19 +59,28 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
     @Override
     public void attemptPurchase(MarketShop claim, CrownUser user) throws CommandSyntaxException {
-        if(user.getMarketOwnership().currentlyOwnsShop()) {
+        MarketOwnership ownership = user.getMarketOwnership();
+
+        //If they already own a shop
+        if(ownership.currentlyOwnsShop()) {
             throw FtcExceptionProvider.translatable("market.alreadyOwner");
         }
 
+        //If the shop already has an owner, idk how this could even be triggered lol
         if(claim.hasOwner()) throw FtcExceptionProvider.translatable("market.alreadyOwned");
 
-        Markets.checkCanChangeStatus(user.getMarketOwnership());
+        //Check if they can even buy it
+        Markets.checkCanChangeStatus(ownership);
 
+        //Check if they can afford it
         Economy economy = Crown.getEconomy();
         if(!economy.has(user.getUniqueId(), claim.getPrice())) {
             throw FtcExceptionProvider.cannotAfford(claim.getPrice());
         }
 
+        economy.remove(user.getUniqueId(), claim.getPrice());
+
+        //Claim it
         claim(claim, user);
     }
 
@@ -77,13 +88,11 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
     public void claim(MarketShop claim, CrownUser user) {
         Validate.isTrue(!claim.hasOwner(), "Market already has owner");
 
-        Economy economy = Crown.getEconomy();
         MarketOwnership ownership = user.getMarketOwnership();
         if(!ownership.hasOwnedBefore()) ownership.setOwnershipBegan(System.currentTimeMillis());
         ownership.setOwnedName(claim.getName());
         ownership.setLastStatusChange(System.currentTimeMillis());
 
-        economy.remove(user.getUniqueId(), claim.getPrice());
         claim.setOwner(user.getUniqueId());
         claim.setDateOfPurchase(new Date());
 
@@ -98,8 +107,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
     public void unclaim(MarketShop shop, boolean complete) {
         Validate.isTrue(shop.hasOwner(), "Market has no owner");
 
-        shop.getWorldGuard().getMembers().clear();
-        shop.getWorldGuard().getOwners().clear();
+        if(shop.isMerged()) unmerge(shop);
 
         CrownUser owner = shop.ownerUser();
         MarketOwnership ownership = owner.getMarketOwnership();
@@ -109,6 +117,8 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         shop.setDateOfPurchase(null);
         shop.setMerged(null);
         shop.setOwner(null);
+
+        shop.getWorldGuard().getMembers().clear();
         shop.getCoOwners().clear();
 
         if(complete) {
@@ -132,6 +142,14 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
         shop.setMerged(merged);
         merged.setMerged(shop);
+
+        for (UUID id: shop.getCoOwners()) {
+            merged.getWorldGuard().getMembers().addPlayer(id);
+        }
+
+        for (UUID id: merged.getCoOwners()) {
+            shop.getWorldGuard().getMembers().addPlayer(id);
+        }
     }
 
     @Override
@@ -142,18 +160,36 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
         merged.setMerged(null);
         shop.setMerged(null);
+
+        for (UUID id: merged.getCoOwners()) {
+            shop.getWorldGuard().getMembers().removePlayer(id);
+        }
+
+        for (UUID id: shop.getCoOwners()) {
+            merged.getWorldGuard().getMembers().removePlayer(id);
+        }
     }
 
     @Override
     public void trust(MarketShop shop, UUID uuid) {
         shop.getCoOwners().add(uuid);
         shop.getWorldGuard().getMembers().addPlayer(uuid);
+
+        if(shop.isMerged()) {
+            MarketShop merged = shop.getMerged();
+            merged.getWorldGuard().getMembers().addPlayer(uuid);
+        }
     }
 
     @Override
     public void untrust(MarketShop shop, UUID uuid) {
         shop.getCoOwners().remove(uuid);
         shop.getWorldGuard().getMembers().removePlayer(uuid);
+
+        if(shop.isMerged()) {
+            MarketShop merged = shop.getMerged();
+            merged.getWorldGuard().getMembers().removePlayer(uuid);
+        }
     }
 
     @Override
@@ -208,7 +244,6 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
             shop.setOwner(null);
 
             region.getMembers().removePlayer(user.getUniqueId());
-            region.getOwners().removePlayer(user.getUniqueId());
 
             MarketOwnership ownership = user.getMarketOwnership();
             ownership.setOwnedName(null);
@@ -217,7 +252,6 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
             if(!shop.getCoOwners().isEmpty()) {
                 for (UUID id: shop.getCoOwners()) {
                     region.getMembers().removePlayer(id);
-                    region.getOwners().removePlayer(id);
                 }
             }
         }
@@ -234,8 +268,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
         ProtectedRegion region = shop.getWorldGuard();
         region.getMembers().clear();
-        region.getOwners().clear();
-        region.getOwners().addPlayer(target);
+        region.getMembers().addPlayer(target);
 
         for (ShopEntrance e: shop.getEntrances()) {
             e.onClaim(user, getWorld());

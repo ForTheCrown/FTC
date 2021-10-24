@@ -14,6 +14,7 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.forthecrown.commands.arguments.UserArgument;
+import net.forthecrown.commands.emotes.EmoteSmooch;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcFlags;
@@ -326,20 +327,47 @@ public class CoreListener implements Listener {
         );
     }
 
-    private final CrownRandom playerNumRandom = new CrownRandom();
+    private final CrownRandom random = new CrownRandom();
 
     @EventHandler(ignoreCancelled = true)
     public void onPaperServerListPing(PaperServerListPingEvent event) {
         int max = Bukkit.getMaxPlayers();
-        int newMax = playerNumRandom.intInRange(max, max + 20);
+        int newMax = random.intInRange(max, max + 20);
 
         event.setMaxPlayers(newMax);
+
+        event.motd(motd());
 
         Iterator<Player> iterator = event.iterator();
         while (iterator.hasNext()) {
             CrownUser user = UserManager.getUser(iterator.next());
             if(user.isVanished()) iterator.remove();
         }
+    }
+
+    Component motd() {
+        return Component.text()
+                .color(NamedTextColor.GRAY)
+
+                .append(Component.text("For The Crown").style(Style.style(NamedTextColor.GOLD, TextDecoration.BOLD)))
+                .append(Component.text(" - "))
+                .append(afterDashText())
+
+                .append(Component.newline())
+                .append(Component.text("Currently on " + Bukkit.getMinecraftVersion()))
+
+                .build();
+    }
+
+    Component afterDashText() {
+        if(Crown.inDebugMode()) return Component.text("Test server").color(NamedTextColor.GREEN);
+        if(Bukkit.hasWhitelist()) return Component.text("Maintenance").color(NamedTextColor.RED);
+
+        if(random.nextInt(50) == 45) return Component.text("You're amazing ")
+                .append(EmoteSmooch.HEART)
+                .color(NamedTextColor.RED);
+
+        return Component.text("Survival Minecraft").color(NamedTextColor.YELLOW);
     }
 
     //Gets a player from an audience, used by the chat event listener in CoreListener

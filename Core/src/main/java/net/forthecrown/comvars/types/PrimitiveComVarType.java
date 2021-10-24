@@ -3,37 +3,45 @@ package net.forthecrown.comvars.types;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.manager.FtcExceptionProvider;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.comvars.ParseFunction;
 import net.forthecrown.core.Crown;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 class PrimitiveComVarType<T> implements ComVarType<T> {
     private final ParseFunction<T> fromString;
     private final Function<T, JsonElement> serializationFunc;
     private final Function<JsonElement, T> deserializationFunc;
+    private final SuggestionProvider<CommandSource> suggestionProvider;
     private final Class<T> clazz;
     private final Key key;
 
     PrimitiveComVarType(Class<T> clazz, ParseFunction<T> fromString, Function<T, JsonElement> json, Function<JsonElement, T> func) {
+        this(clazz, fromString, json, func, (c, b) -> Suggestions.empty());
+    }
+
+    PrimitiveComVarType(Class<T> clazz, ParseFunction<T> fromString, Function<T, JsonElement> json, Function<JsonElement, T> func, SuggestionProvider<CommandSource> suggestionProvider) {
         this.fromString = fromString;
         this.clazz = clazz;
+        this.suggestionProvider = suggestionProvider;
         this.serializationFunc = json;
         deserializationFunc = func;
         key = Crown.coreKey(clazz.getSimpleName().toLowerCase() + "_type");
 
         Registries.COMVAR_TYPES.register(key, this);
-    }
-
-    private static CommandSyntaxException mismatchException(String className, String input) {
-        return FtcExceptionProvider.createWithContext("Mismatch between input and variable type. Var is: " + className, input, 0);
     }
 
     @Override
@@ -75,5 +83,14 @@ class PrimitiveComVarType<T> implements ComVarType<T> {
     @Override
     public @NotNull Key key() {
         return key;
+    }
+
+    @Override
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> c, SuggestionsBuilder b) throws CommandSyntaxException {
+        return suggestionProvider.getSuggestions(c, b);
+    }
+
+    static SuggestionProvider<CommandSource> fromType(ArgumentType<?> type) {
+        return type::listSuggestions;
     }
 }

@@ -7,6 +7,7 @@ import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.ItemPriceMap;
+import net.forthecrown.economy.houses.DynastySerializer;
 import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.market.guild.TradersGuild;
 import net.forthecrown.economy.shops.ShopManager;
@@ -94,10 +95,16 @@ public interface Crown extends Plugin, Namespaced {
         Main.tabList.save();
 
         Main.regionManager.save();
-        Main.markets.save();
-        Main.tradersGuild.save();
 
+        if(inDebugMode()) {
+            Main.markets.save();
+            Main.tradersGuild.save();
+        }
+
+        DynastySerializer.serialize();
+        ComVars.save();
         Main.inst.saveConfig();
+
         logger().log(Level.INFO, "FTC-Core saved");
     }
 

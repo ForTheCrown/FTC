@@ -2,6 +2,7 @@ package net.forthecrown.economy;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
@@ -11,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.IntSupplier;
@@ -26,7 +28,9 @@ import java.util.function.IntSupplier;
  * two entries with the same UUID to exist. So uhh TODO: fix multiple entries for one UUID.
  */
 public class SortedBalanceMap implements BalanceMap {
-    private final ObjectArrayList<Balance> entries = new ObjectArrayList<>(300);
+    private Balance[] entries = new Balance[300];
+    private int size;
+
     private final IntSupplier defaultAmount;
 
     public SortedBalanceMap(IntSupplier defaultAmount){
@@ -48,37 +52,53 @@ public class SortedBalanceMap implements BalanceMap {
         int index = getIndex(id);
         if(index == -1) return;
 
-        entries.remove(index);
+        //Remove entry
+        entries[index] = null;
+
+        //If the index wasn't the last entry in the list,
+        //collapse array a bit
+        if(index < entries.length - 1) {
+            //Collapse array at index so there's no empty spaces
+            System.arraycopy(entries, index+1, entries, index, entries.length-index);
+
+            //Nullify last entry, as it's a copy of length - 2 now
+            entries[entries.length - 1] = null;
+        }
+
+        //Decrement size
+        size--;
     }
 
     @Override
-    public int get(UUID id){
+    public int get(UUID id) {
         int index = getIndex(id);
         if(index == -1) return getDefaultAmount();
 
-        return entries.get(index).getValue();
+        return entries[index].getValue();
     }
 
     @Override
     public int get(int index){
-        return entries.get(index).getValue();
+        validateIndex(index);
+        return entries[index].getValue();
     }
 
     @Override
     public Balance getEntry(int index){
-        return entries.get(index);
+        validateIndex(index);
+        return entries[index];
     }
 
     @Override
-    public Component getPrettyDisplay(int index){
-        if(!isInList(index)) throw new IndexOutOfBoundsException(index);
+    public Component getPrettyDisplay(int index) {
+        validateIndex(index);
 
         Balance entry = getEntry(index);
         OfflinePlayer player = Bukkit.getOfflinePlayer(entry.getUniqueId());
-        if(player == null || player.getName() == null){
-            remove(entry.getUniqueId());
-            return null;
-        }
+
+        //This can happen when non player UUID's get stored
+        //in the map... somehow
+        if(player == null || player.getName() == null) return null;
 
         CrownUser user = UserManager.getUser(player);
         Component displayName = user.nickDisplayName();
@@ -93,72 +113,98 @@ public class SortedBalanceMap implements BalanceMap {
     }
 
     @Override
-    public int getIndex(UUID id){
-        for (int i = 0; i < entries.size()/2; i++){
-            Balance entry = entries.get(i);
+    public int getIndex(UUID id) {
+        //Slow, but idk how better to do it
+        //Go through list, checking each end of the list
+        //To find the entry
+
+        int half = size >> 1;
+        for (int i = 0; i < half; i++){
+            //Check front half
+            Balance entry = getEntry(i);
             if(entry.getUniqueId().equals(id)) return i;
 
-            int oppositeEnd = entries.size() - 1 - i;
-            entry = entries.get(oppositeEnd);
+            //Check last half
+            int oppositeEnd = size - 1 - i;
+            entry = getEntry(oppositeEnd);
             if(entry.getUniqueId().equals(id)) return oppositeEnd;
         }
+
+        //Not found
         return -1;
     }
 
     @Override
-    public int size(){
-        return entries.size();
+    public int size() {
+        return size;
     }
 
     @Override
-    public void clear(){
-        entries.clear();
+    public void clear() {
+        entries = new Balance[entries.length];
     }
 
     @Override
-    public void put(UUID id, int amount){
+    public void put(UUID id, int amount) {
         int index = getIndex(id);
-        Balance entry = new Balance(id, amount);
+        //Either get the entry, and update it's value, or create it
+        Balance entry = index == -1 ? new Balance(id, amount) : getEntry(index).setValue(amount);
 
-        if(index == -1){
-            entries.add(entry);
-            index = entries.size()-1;
-        } else entries.set(index, entry);
+        //If new entry
+        if(index == -1) {
+            index = size;
 
-        checkMoving(index);
+            //Increment size
+            size++;
+
+            //If array size has to be increased
+            if(size >= entries.length) {
+                Balance[] copy = entries;                                               //Copy old entries
+                entries = new Balance[copy.length + 1];                                 //Make new array with bigger size
+                System.arraycopy(copy, 0, entries, 0, copy.length);     //Copy all entries from copy to new array
+            }
+
+            setEntry(index, entry);
+        }
+
+        checkSorted(index);
     }
 
-    private void checkMoving(int index){
+    private void checkSorted(int index){
         int moveDir = moveDir(index);
         if(moveDir == 0) return;
 
         moveInDir(index, moveDir);
     }
 
+    private void setEntry(int index, Balance bal) {
+        entries[index] = bal;
+    }
+
     private void moveInDir(int index, int dir){
         int newIndex = index + dir;
 
-        Balance entry = entries.get(newIndex);
-        Balance newE = entries.get(index);
+        Balance entry = getEntry(newIndex);
+        Balance newE = getEntry(index);
 
-        entries.set(newIndex, newE);
-        entries.set(index, entry);
+        setEntry(newIndex, newE);
+        setEntry(index, entry);
 
-        checkMoving(newIndex);
+        checkSorted(newIndex);
     }
 
     private int moveDir(int index){
-        Balance entry = entries.get(index);
+        Balance entry = getEntry(index);
 
         int towardsTop = index + 1;
         if(isInList(towardsTop)){
-            Balance top = entries.get(towardsTop);
+            Balance top = getEntry(towardsTop);
             if(top.compareTo(entry) == 1) return 1;
         }
 
         int towardsBottom = index - 1;
         if(isInList(towardsBottom)){
-            Balance bottom = entries.get(towardsBottom);
+            Balance bottom = getEntry(towardsBottom);
             if(bottom.compareTo(entry) == -1) return -1;
         }
 
@@ -167,36 +213,48 @@ public class SortedBalanceMap implements BalanceMap {
 
     private boolean isInList(int index){
         if(index < 0) return false;
-        return index <= entries.size() - 1;
+        return index <= size - 1;
     }
 
     @Override
     public long getTotalBalance(){
         int defAmount = getDefaultSupplier().getAsInt();
 
-        return entries.stream()
-                .filter(e -> e.getValue() > defAmount)
-                .mapToLong(Balance::getValue)
+        return Arrays.stream(entries)
+                .filter(b -> b != null && b.getValue() > defAmount)
+                .mapToInt(Balance::getValue)
                 .sum();
     }
 
     @Override
     public String toString(){
-        return ListUtils.join(entries, "\n", bal -> bal.getUniqueId() + " has " + bal.getValue());
+        return ListUtils.join(entries(), "\n", bal -> bal.getUniqueId() + " = " + bal.getValue());
     }
 
     @Override
     public List<UUID> keys(){
-        return ImmutableList.copyOf(ListUtils.convert(entries, Balance::getUniqueId));
+        return ImmutableList.copyOf(ListUtils.arrayToList(entries, Balance::getUniqueId));
     }
 
     @Override
     public List<Integer> values(){
-        return ImmutableList.copyOf(ListUtils.convert(entries, Balance::getValue));
+        return ImmutableList.copyOf(ListUtils.arrayToList(entries, Balance::getValue));
     }
 
     @Override
     public List<Balance> entries() {
-        return ImmutableList.copyOf(entries);
+        ObjectList<Balance> bals = new ObjectArrayList<>();
+
+        for (Balance b: entries) {
+            if(b == null) continue;
+
+            bals.add(b);
+        }
+
+        return bals;
+    }
+
+    private void validateIndex(int index) {
+        if(!isInList(index)) throw new IndexOutOfBoundsException(index);
     }
 }

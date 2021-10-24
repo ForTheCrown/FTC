@@ -22,11 +22,11 @@ public class AdminSellInteraction implements ShopInteraction {
         ItemStack example = session.getExampleItem();
 
         //Add money and remove item
-        economy.add(session.getUser().getUniqueId(), session.getPrice());
+        economy.add(session.getCustomer().getUniqueId(), session.getPrice());
         session.getPlayerInventory().removeItemAnySlot(example.clone());
 
         //Tell em
-        session.getUser().sendMessage(
+        session.getCustomer().sendMessage(
                 Component.translatable("shops.used.sell", NamedTextColor.GRAY,
                         FtcFormatter.itemAndAmount(example).color(NamedTextColor.YELLOW),
                         FtcFormatter.rhines(session.getPrice()).color(NamedTextColor.GOLD)

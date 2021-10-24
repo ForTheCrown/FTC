@@ -34,7 +34,7 @@ public class JsonWrapper {
     //The source and handle of the buffer
     private final JsonObject json;
 
-    JsonWrapper(JsonObject json) {
+    protected JsonWrapper(JsonObject json) {
         this.json = json;
     }
 
@@ -249,7 +249,11 @@ public class JsonWrapper {
     }
 
     public <K, V> Map<K, V> getMap(String name, Function<String, K> keyFunc, Function<JsonElement, V> valueFunc){
-        if(missingOrNull(name)) return null;
+        return getMap(name, keyFunc, valueFunc, false);
+    }
+
+    public <K, V> Map<K, V> getMap(String name, Function<String, K> keyFunc, Function<JsonElement, V> valueFunc, boolean returnEmptyIfMissing) {
+        if(missingOrNull(name)) return returnEmptyIfMissing ? new HashMap<>() : null;
 
         JsonObject json = getObject(name);
         Map<K, V> result = new HashMap<>();

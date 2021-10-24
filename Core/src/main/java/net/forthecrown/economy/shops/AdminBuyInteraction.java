@@ -14,7 +14,7 @@ public class AdminBuyInteraction implements ShopInteraction {
         if(!session.userHasSpace()) throw FtcExceptionProvider.inventoryFull(); //User has no space for items
 
         //User cannot afford shop
-        if(!economy.has(session.getUser().getUniqueId(), session.getPrice())) throw FtcExceptionProvider.cannotAfford(session.getPrice());
+        if(!economy.has(session.getCustomer().getUniqueId(), session.getPrice())) throw FtcExceptionProvider.cannotAfford(session.getPrice());
     }
 
     @Override
@@ -22,7 +22,7 @@ public class AdminBuyInteraction implements ShopInteraction {
         ItemStack exampleItem = session.getExampleItem();
 
         //Bought item message
-        session.getUser().sendMessage(
+        session.getCustomer().sendMessage(
                 Component.translatable("shops.used.buy",
                         NamedTextColor.GRAY,
                         FtcFormatter.itemAndAmount(exampleItem).color(NamedTextColor.YELLOW),
@@ -31,7 +31,7 @@ public class AdminBuyInteraction implements ShopInteraction {
         );
 
         //Remove money
-        economy.remove(session.getUser().getUniqueId(), session.getPrice());
+        economy.remove(session.getCustomer().getUniqueId(), session.getPrice());
 
         //Give item
         int amount = exampleItem.getAmount();

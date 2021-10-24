@@ -5,10 +5,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.block.Sign;
 
 public class SignLines implements Struct {
-    public final Component line0;
-    public final Component line1;
-    public final Component line2;
-    public final Component line3;
+    public final Component line0, line1, line2, line3;
 
     public SignLines(String s1, String s2, String s3, String s4) {
         this(convert(s1), convert(s2), convert(s3), convert(s4));

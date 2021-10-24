@@ -1,16 +1,21 @@
 package net.forthecrown.core;
 
+import com.google.gson.JsonObject;
 import net.forthecrown.comvars.ComVar;
+import net.forthecrown.comvars.ComVarRegistry;
+import net.forthecrown.comvars.types.ComVarType;
 import net.forthecrown.comvars.types.ComVarTypes;
 import net.forthecrown.regions.RegionConstants;
+import net.forthecrown.serializer.JsonWrapper;
+import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.TimeUtil;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.key.Key;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.configuration.Configuration;
 
-import static net.forthecrown.comvars.ComVarRegistry.set;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
 
 public final class ComVars {
     static ComVar<Key>              onFirstJoinKit;
@@ -31,8 +36,6 @@ public final class ComVars {
     static ComVar<Long>             marriageCooldown;
     static ComVar<Long>             userDataResetInterval;
     static ComVar<Long>             branchSwapCooldown;
-    static ComVar<Long>             auctionExpirationTime;
-    static ComVar<Long>             auctionPickupTime;
     static ComVar<Long>             autoSaveIntervalMins;
     static ComVar<Long>             marketOwnershipSafeTime;
     static ComVar<Long>             evictionCleanupTime;
@@ -50,6 +53,8 @@ public final class ComVars {
     static ComVar<Boolean>          hulkSmashPoles;
     static ComVar<Boolean>          endOpen;
 
+    static ComVar<Integer>          houses_startingSupply;
+    static ComVar<Integer>          houses_startingDemand;
     static ComVar<Integer>          tpTickDelay;
     static ComVar<Integer>          tpCooldown;
     static ComVar<Integer>          tpaExpiryTime;
@@ -57,8 +62,6 @@ public final class ComVars {
     static ComVar<Integer>          baronPrice;
     static ComVar<Integer>          chickenLevitation;
     static ComVar<Integer>          chickenLevitationTime;
-    static ComVar<Integer>          ghSpecialReward;
-    static ComVar<Integer>          ghFinalReward;
     static ComVar<Integer>          maxMoneyAmount;
     static ComVar<Integer>          maxTreasurePrize;
     static ComVar<Integer>          minTreasurePrize;
@@ -67,112 +70,117 @@ public final class ComVars {
 
     private ComVars() {}
 
-    static void reload(Configuration config) {
-        onFirstJoinKit = set(           "onFirstJoinKit",           ComVarTypes.KEY,            Key.key(Crown.inst(), config.getString("OnJoinKit")));
+    private static ComVarJson j;
+    static void reload() {
+        readJson();
 
-        treasureWorld = set(            "treasureWorld",            ComVarTypes.WORLD,          Bukkit.getWorld(config.getString("Pirates.TreasureWorld")));
-        regionWorld = set(              "regionWorld",              ComVarTypes.WORLD,          Bukkit.getWorld(config.getString("RegionWorld")));
+        read("onFirstJoinKit",              ComVarTypes.KEY);
 
-        spawnRegion = set(              "spawnRegion",              ComVarTypes.STRING,         config.getString("SpawnRegion", RegionConstants.DEFAULT_SPAWN_NAME));
+        read("treasureWorld",               ComVarTypes.WORLD);
+        read("regionWorld",                 ComVarTypes.WORLD);
 
-        maxNickLength = set(            "maxNickLength",            ComVarTypes.BYTE,           (byte) config.getInt("MaxNickLength"));
-        maxBossDifficulty = set(        "maxBossDifficulty",        ComVarTypes.BYTE,           (byte) config.getInt("MaxBossDifficulty"));
-        maxTreasureItems = set(         "maxTreasureItems",         ComVarTypes.BYTE,           (byte) config.getInt("Pirates.MaxTreasureItems"));
+        read("spawnRegion",                 ComVarTypes.STRING);
 
-        nearRadius = set(               "nearRadius",               ComVarTypes.SHORT,          (short) config.getInt("NearRadius"));
-        hoppersInOneChunk = set(        "hoppersInOneChunk",        ComVarTypes.SHORT,          (short) config.getInt("HoppersInOneChunk"));
-        maxGuildMembers = set(          "maxGuildMembers",          ComVarTypes.SHORT,          (short) config.getInt("MaxGuildMembers"));
+        read("maxNickLength",               ComVarTypes.BYTE);
+        read("maxBossDifficulty",           ComVarTypes.BYTE);
+        read("maxTreasureItems",            ComVarTypes.BYTE);
 
-        marriageCooldown = set(         "marriageCooldown",         ComVarTypes.LONG,           config.getLong("MarriageStatusCooldown"));
-        userDataResetInterval = set(    "userDataResetInterval",    ComVarTypes.LONG,           config.getLong("UserDataResetInterval"));
-        branchSwapCooldown = set(       "branchSwapCooldown",       ComVarTypes.LONG,           config.getLong("BranchSwapCooldown"));
-        auctionExpirationTime = set(    "auctionExpirationTime",    ComVarTypes.LONG,           config.getLong("Auctions.ExpirationTime"));
-        auctionPickupTime = set(        "auctionPickupTime",        ComVarTypes.LONG,           config.getLong("Auctions.PickUpTime"));
-        autoSaveIntervalMins = set(     "autoSaveIntervalMins",     ComVarTypes.LONG,           config.getLong("System.save-interval-mins"));
-        marketOwnershipSafeTime = set(  "marketOwnershipSafeTime",  ComVarTypes.LONG,           config.getLong("MarketOwnershipSafeTime"));
-        evictionCleanupTime = set(      "evictionCleanupTime",      ComVarTypes.LONG,           config.getLong("MarketEvictionTime"));
-        voteTime = set(                 "voteTime",                 ComVarTypes.LONG,           config.getLong("VoteTime"));
-        voteInterval = set(             "voteInterval",             ComVarTypes.LONG,           config.getLong("VoteInterval"));
-        guildJoinRequirement = set(     "guildJoinRequirement",     ComVarTypes.LONG,           config.getLong("GuildJoinRequirement"));
-        marketStatusCooldown = set(     "marketStatusCooldown",     ComVarTypes.LONG,           config.getLong("MarketStatusCooldown"));
+        read("nearRadius",                  ComVarTypes.SHORT);
+        read("hoppersInOneChunk",           ComVarTypes.SHORT);
+        read("maxGuildMembers",             ComVarTypes.SHORT);
 
-        taxesEnabled = set(             "taxesEnabled",             ComVarTypes.BOOLEAN,        config.getBoolean("Taxes"));
-        logAdminShop = set(             "logAdminShop",             ComVarTypes.BOOLEAN,        config.getBoolean("Shops.log-admin-purchases"));
-        logNormalShop = set(            "logNormalShop",            ComVarTypes.BOOLEAN,        config.getBoolean("Shops.log-normal-purchases"));
-        allowOtherPlayerNicks = set(    "allowOtherPlayerNicks",    ComVarTypes.BOOLEAN,        config.getBoolean("AllowOtherPlayerNicks"));
-        crownEventActive = set(         "crownEventActive",         ComVarTypes.BOOLEAN,        config.getBoolean("CrownEventActive"));
-        crownEventIsTimed = set(        "crownEventIsTimed",        ComVarTypes.BOOLEAN,        config.getBoolean("EventScoreIsTimer"));
-        hulkSmashPoles = set(           "hulkSmashPoles",           ComVarTypes.BOOLEAN,        config.getBoolean("HulkSmashPoles"));
-        endOpen = set(                  "endOpen",                  ComVarTypes.BOOLEAN,        config.getBoolean("EndOpen"));
+        read("marriageCooldown",            ComVarTypes.LONG);
+        read("userDataResetInterval",       ComVarTypes.LONG);
+        read("branchSwapCooldown",          ComVarTypes.LONG);
+        read("autoSaveIntervalMins",        ComVarTypes.LONG);
+        read("marketOwnershipSafeTime",     ComVarTypes.LONG);
+        read("evictionCleanupTime",         ComVarTypes.LONG);
+        read("voteTime",                    ComVarTypes.LONG);
+        read("voteInterval",                ComVarTypes.LONG);
+        read("guildJoinRequirement",        ComVarTypes.LONG);
+        read("marketStatusCooldown",        ComVarTypes.LONG);
 
-        maxMoneyAmount = set(           "maxMoneyAmount",           ComVarTypes.INTEGER,        config.getInt("MaxMoneyAmount"));
-        tpTickDelay = set(              "tpTickDelay",              ComVarTypes.INTEGER,        config.getInt("TeleportTickDelay"));
-        tpCooldown = set(               "tpCooldown",               ComVarTypes.INTEGER,        config.getInt("TeleportCooldown"));
-        tpaExpiryTime = set(            "tpaExpiryTime",            ComVarTypes.INTEGER,        config.getInt("TpaExpiryTime"));
-        startRhines = set(              "startRhines",              ComVarTypes.INTEGER,        config.getInt("StartRhines"));
-        baronPrice = set(               "baronPrice",               ComVarTypes.INTEGER,        config.getInt("BaronPrice"));
-        chickenLevitation = set(        "chickenLevitation",        ComVarTypes.INTEGER,        config.getInt("MiniGameRegion.ChickenLevitation"));
-        chickenLevitationTime = set(    "chickenLevitationTime",    ComVarTypes.INTEGER,        config.getInt("MiniGameRegion.ChickenLevitationTime"));
-        ghSpecialReward = set(          "ghSpecialReward",          ComVarTypes.INTEGER,        config.getInt("Pirates.SpecialReward"));
-        ghFinalReward = set(            "ghFinalReward",            ComVarTypes.INTEGER,        config.getInt("Pirates.FinalReward"));
-        maxTreasurePrize = set(         "maxTreasurePrize",         ComVarTypes.INTEGER,        config.getInt("Pirates.MaxTreasurePrize"));
-        minTreasurePrize = set(         "minTreasurePrize",         ComVarTypes.INTEGER,        config.getInt("Pirates.MinTreasurePrize"));
-        maxShopEarnings = set(          "maxShopEarnings",          ComVarTypes.INTEGER,        config.getInt("MaxShopEarnings"));
-        maxSignShopPrice = set(         "maxSignShopPrice",         ComVarTypes.INTEGER,        config.getInt("MaxSignShopPrice"));
+        read("allowOtherPlayerNicks",       ComVarTypes.BOOL);
+        read("taxesEnabled",                ComVarTypes.BOOL);
+        read("logAdminShop",                ComVarTypes.BOOL);
+        read("logNormalShop",               ComVarTypes.BOOL);
+        read("crownEventActive",            ComVarTypes.BOOL);
+        read("crownEventIsTimed",           ComVarTypes.BOOL);
+        read("hulkSmashPoles",              ComVarTypes.BOOL);
+        read("endOpen",                     ComVarTypes.BOOL);
+
+        read("houses_startingSupply",       ComVarTypes.INTEGER);
+        read("houses_startingDemand",       ComVarTypes.INTEGER);
+        read("tpTickDelay",                 ComVarTypes.INTEGER);
+        read("tpCooldown",                  ComVarTypes.INTEGER);
+        read("tpaExpiryTime",               ComVarTypes.INTEGER);
+        read("startRhines",                 ComVarTypes.INTEGER);
+        read("baronPrice",                  ComVarTypes.INTEGER);
+        read("chickenLevitation",           ComVarTypes.INTEGER);
+        read("chickenLevitationTime",       ComVarTypes.INTEGER);
+        read("maxMoneyAmount",              ComVarTypes.INTEGER);
+        read("maxTreasurePrize",            ComVarTypes.INTEGER);
+        read("minTreasurePrize",            ComVarTypes.INTEGER);
+        read("maxShopEarnings",             ComVarTypes.INTEGER);
+        read("maxSignShopPrice",            ComVarTypes.INTEGER);
+
+        j = null;
     }
 
-    static void save(Configuration config) {
-        config.set("OnJoinKit",                             onFirstJoinKit.getValue().value());
+    static void save() {
+        ComVarJson json = createJson();
 
-        config.set("TreasureWorld",                         treasureWorld.getValue().getName());
-        config.set("RegionWorld",                           regionWorld.getValue().getName());
+        //Fuck you, I cannot be bothered to write all the variables again
+        try {
+            for (Field f: ComVars.class.getDeclaredFields()) {
+                if(f.getType() != ComVar.class) continue;
 
-        config.set("SpawnRegion",                           spawnRegion.getValue());
+                json.addVar((ComVar) f.get(null));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        config.set("MaxNickLength",                         maxNickLength.getValue((byte) 16));
-        config.set("MaxBossDifficulty",                     maxBossDifficulty.getValue());
-        config.set("Pirates.MaxTreasureItems",              maxTreasureItems.getValue());
+        writeJson(json);
+    }
 
-        config.set("NearRadius",                            nearRadius.getValue());
-        config.set("HoppersInOneChunk",                     hoppersInOneChunk.getValue());
-        config.set("MaxGuildMembers",                       maxGuildMembers.getValue());
+    private static void read(String name, ComVarType type) {
+        try {
+            Field f = ComVars.class.getDeclaredField(name);
+            f.set(null, j.getVar(name, type));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-        config.set("MarriageStatusCooldown",                marriageCooldown.getValue());
-        config.set("UserDataResetInterval",                 userDataResetInterval.getValue());
-        config.set("BranchSwapCooldown",                    branchSwapCooldown.getValue());
-        config.set("Auctions.ExpirationTime",               auctionExpirationTime.getValue());
-        config.set("Auctions.PickUpTime",                   auctionPickupTime.getValue());
-        config.set("System.save-interval-mins",             autoSaveIntervalMins.getValue());
-        config.set("MarketOwnershipSafeTime",               marketOwnershipSafeTime.getValue());
-        config.set("evictionCleanupTime",                   evictionCleanupTime.getValue());
-        config.set("VoteTime",                              voteTime.getValue());
-        config.set("VoteInterval",                          voteInterval.getValue());
-        config.set("GuildJoinRequirement",                  guildJoinRequirement.getValue());
-        config.set("MarketStatusCooldown",                  marketStatusCooldown.getValue());
+    private static ComVarJson createJson() {
+        return new ComVarJson(new JsonObject());
+    }
 
-        config.set("AllowOtherPlayerNicks",                 allowOtherPlayerNicks.getValue());
-        config.set("Taxes",                                 taxesEnabled.getValue());
-        config.set("Shops.log-normal-purchases",            logNormalShop.getValue());
-        config.set("Shops.log-admin-purchases",             logAdminShop.getValue());
-        config.set("CrownEventActive",                      crownEventActive.getValue());
-        config.set("EventScoreIsTimer",                     crownEventIsTimed.getValue());
-        config.set("HulkSmashPoles",                        hulkSmashPoles.getValue());
-        config.set("EndOpen",                               endOpen.getValue());
+    private static void readJson() {
+        File f = getFile();
+        try {
+            j = new ComVarJson(JsonUtils.readFile(f));
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to read JSON from ComVar file", e);
+        }
+    }
 
-        config.set("TeleportTickDelay",                     tpTickDelay.getValue());
-        config.set("TeleportCooldown",                      tpCooldown.getValue());
-        config.set("TpaExpiryTime",                         tpaExpiryTime.getValue());
-        config.set("StartRhines",                           startRhines.getValue(100));
-        config.set("BaronPrice",                            baronPrice.getValue());
-        config.set("MiniGameRegion.ChickenLevitation",      chickenLevitation.getValue());
-        config.set("MiniGameRegion.ChickenLevitationTime",  chickenLevitationTime.getValue());
-        config.set("Pirates.FinalReward",                   ghFinalReward.getValue());
-        config.set("Pirates.SpecialReward",                 ghSpecialReward.getValue());
-        config.set("MaxMoneyAmount",                        maxMoneyAmount.getValue());
-        config.set("Pirates.MaxTreasurePrize",              maxTreasurePrize.getValue());
-        config.set("Pirates.MinTreasurePrize",              minTreasurePrize.getValue());
-        config.set("MaxShopEarnings",                       maxShopEarnings.getValue());
-        config.set("MaxSignShopPrice",                      maxSignShopPrice.getValue());
+    private static void writeJson(ComVarJson json) {
+        try {
+            JsonUtils.writeFile(json.getSource(), getFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static File getFile() {
+        File file = new File(Crown.dataFolder(), "comvars.json");
+
+        if(file.isDirectory()) file.delete();
+        if(!file.exists()) Crown.saveResource(true, "comvars.json");
+
+        return file;
     }
 
     public static String getSpawnRegion() {
@@ -218,14 +226,6 @@ public final class ComVars {
         return marriageCooldown.getValue(259200000L);
     }
 
-    public static long getAuctionExpirationTime() {
-        return auctionExpirationTime.getValue(604800000L);
-    }
-
-    public static long getAuctionPickupTime() {
-        return auctionPickupTime.getValue(259200000L);
-    }
-
     public static long getUserResetInterval() {
         //Default: 2 months
         return userDataResetInterval.getValue(5356800000L);
@@ -253,6 +253,10 @@ public final class ComVars {
 
     public static long getMarketStatusCooldown() {
         return marketStatusCooldown.getValue(TimeUtil.DAY_IN_MILLIS * 2);
+    }
+
+    public static long getVoteTime() {
+        return voteTime.getValue(TimeUtil.DAY_IN_MILLIS * 3);
     }
 
 
@@ -292,6 +296,13 @@ public final class ComVars {
 
 
 
+    public static int getHousesStartingSupply() {
+        return houses_startingSupply.getValue(250);
+    }
+
+    public static int getHousesStartingDemand() {
+        return houses_startingDemand.getValue(0);
+    }
 
     public static int getTpTickDelay() {
         return tpTickDelay.getValue(60);
@@ -315,14 +326,6 @@ public final class ComVars {
 
     public static int getMaxMoneyAmount() {
         return maxMoneyAmount.getValue(50000000);
-    }
-
-    public static int getGhSpecialReward() {
-        return ghSpecialReward.getValue(25000);
-    }
-
-    public static int getGhFinalReward() {
-        return ghFinalReward.getValue(50000);
     }
 
     public static int getTreasureMaxPrize() {
@@ -350,5 +353,19 @@ public final class ComVars {
 
     public static Key onFirstJoinKit() {
         return onFirstJoinKit.getValue();
+    }
+
+    private static class ComVarJson extends JsonWrapper {
+        private ComVarJson(JsonObject json) {
+            super(json);
+        }
+
+        public void addVar(ComVar var) {
+            add(var.getName(), var);
+        }
+
+        public <T> ComVar<T> getVar(String name, ComVarType<T> type) {
+            return ComVarRegistry.set(name, type, get(name));
+        }
     }
 }

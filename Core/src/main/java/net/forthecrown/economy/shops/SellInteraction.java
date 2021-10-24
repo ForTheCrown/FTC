@@ -41,7 +41,7 @@ public class SellInteraction implements ShopInteraction {
                     Component.translatable("shops.used.sell.owner",
                             NamedTextColor.GRAY,
 
-                            session.getUser().nickDisplayName().color(NamedTextColor.YELLOW),
+                            session.getCustomer().nickDisplayName().color(NamedTextColor.YELLOW),
                             FtcFormatter.itemAndAmount(session.getExampleItem(), session.getAmount()).color(NamedTextColor.GOLD),
                             FtcFormatter.rhines(totalEarned).color(NamedTextColor.YELLOW)
                     )

@@ -1,9 +1,9 @@
 package net.forthecrown.comvars;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectCollection;
 import net.forthecrown.comvars.types.ComVarType;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
@@ -16,34 +16,34 @@ import java.util.regex.Pattern;
  */
 public class ComVarRegistry {
     public static final Pattern ALLOWED_NAME = Pattern.compile("^[a-z_]\\w*$");
-    private static final Object2ObjectMap<String, ComVar<?>> COM_VARS = new Object2ObjectOpenHashMap<>();
+    private static final Object2ObjectMap<String, ComVar> COM_VARS = new Object2ObjectOpenHashMap<>();
 
     public static <T> ComVar<T> set(@NotNull String name, @NotNull ComVarType<T> type, T value){
         validate(name, type);
 
-        boolean alreadyExists = COM_VARS.containsKey(name);
-        if(alreadyExists && !COM_VARS.get(name).getType().equals(type)) throw new IllegalArgumentException("Mismatch between provided var type and already existing var type");
+        ComVar<T> entry = COM_VARS.get(name);
+        boolean alreadyExists = entry != null;
+        if(alreadyExists && entry.getType() != type) throw new IllegalArgumentException("Mismatch between provided var type and already existing var type");
 
-        ComVar<T> entry = alreadyExists ? ((ComVar<T>) COM_VARS.get(name)).update(value) : new ComVar<>(type, name, value);
+        entry = alreadyExists ? COM_VARS.get(name).update(value) : new ComVar<>(type, name, value);
         return setVar(entry);
     }
 
-    public static <T> void parseVar(String name, String input) throws CommandSyntaxException {
-        validateName(name);
-
-        ComVar<T> type = (ComVar<T>) COM_VARS.get(name);
-        T value = type.getType().parse(new StringReader(input));
-        set(name, type.getType(), value);
+    public static <T> ComVar<T> set(@NotNull String name, @NotNull ComVarType<T> type, JsonElement e) {
+        return set(name, type, type.deserialize(e));
     }
 
-    public static <T> String getString(@NotNull String name){
+    public static JsonElement serialize(String name) {
+        return getVar(name).serialize();
+    }
+
+    public static String getString(@NotNull String name){
         Validate.notNull(name, "Name was null");;
         validateName(name);
         if(!COM_VARS.containsKey(name)) throw new NullPointerException("No variable by the name of: " + name + " found");
 
-        ComVar<T> var = (ComVar<T>) COM_VARS.get(name);
-        ComVarType<T> type= var.getType();
-        return type.asParsableString(var.getValue());
+        ComVar var = COM_VARS.get(name);
+        return var.toString();
     }
 
     public static <T> T get(@NotNull String name, @NotNull ComVarType<T> type){
@@ -65,12 +65,12 @@ public class ComVarRegistry {
         return (ComVar<T>) COM_VARS.get(name);
     }
 
-    public static ComVar<?> getVar(String name){
+    public static ComVar getVar(String name){
         validateName(name);
         return COM_VARS.get(name);
     }
 
-    public static ComVarType<?> getType(@NotNull String name){
+    public static ComVarType getType(@NotNull String name){
         Validate.notNull(name, "Name was null");
         validateName(name);
         return COM_VARS.get(name).getType();
@@ -109,5 +109,9 @@ public class ComVarRegistry {
      */
     public static void validateName(String name) {
         Validate.isTrue(ALLOWED_NAME.matcher(name).matches(), "Illegal variable name, use java variable naming convention (Lowercase first letter and no irregular characters)");
+    }
+
+    public static ObjectCollection<ComVar> getValues() {
+        return COM_VARS.values();
     }
 }

@@ -12,13 +12,30 @@ import net.kyori.adventure.text.event.HoverEvent;
 import java.util.Iterator;
 import java.util.UUID;
 
+/**
+ * A utility class for display names and info texts for shops and markets
+ */
 public interface MarketDisplay {
+
+    /**
+     * Gets a display name for a shop
+     * <p></p>
+     * Note: this shop will have the shop's info text as a hover event
+     * and it's /market MARKET_NAME as the click event
+     * @param shop The shop to get the display name for
+     * @return The shop's display name
+     */
     static Component displayName(MarketShop shop) {
         return Component.text('[' + shop.getName() + ']')
                 .hoverEvent(asHoverEvent(shop))
                 .clickEvent(ClickEvent.runCommand("/market " + shop.getName()));
     }
 
+    /**
+     * Gets a display name for the shop entrance
+     * @param e The entrance
+     * @return The entrance's display
+     */
     static Component displayName(ShopEntrance e) {
         return Component.text()
                 .append(Component.text("sign={" + e.doorSign.x + ", " + e.doorSign.y + ", " + e.doorSign.z + "}, "))
@@ -27,6 +44,11 @@ public interface MarketDisplay {
                 .build();
     }
 
+    /**
+     * Gets the info text for the given shop
+     * @param shop The shop to get the text of
+     * @return The shop's info text
+     */
     static Component infoText(MarketShop shop) {
         return infoText(shop, true);
     }
@@ -133,6 +155,11 @@ public interface MarketDisplay {
         return builder.build();
     }
 
+    /**
+     * Gets the hover event for the shop
+     * @param shop The shop to get the hover event for
+     * @return The shop's hover event
+     */
     static HoverEvent<Component> asHoverEvent(MarketShop shop) {
         return HoverEvent.showText(infoText(shop, false));
     }

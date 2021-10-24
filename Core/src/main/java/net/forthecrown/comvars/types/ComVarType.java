@@ -20,12 +20,9 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Represents a type of command variable.
  * <p></p>
- * <p></p>
  * This tells the variable registry how it could serialize and deserialize the variable, on top of also telling it
  * how to parse it from a string. Types must be able to return a string that could be parsed back into a variable with
  * the {@link ComVarType#asParsableString(Object)} method
- *
- * <p></p>
  * <p></p>
  * Several ComVarType constants are stored in the class {@link ComVarTypes}. Please make sure that only one instance of
  * a command variable exists at any time. Less RAM usage that way
@@ -75,7 +72,7 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource>, Keyed,
     T deserialize(JsonElement element);
 
     @Override
-    default CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> c, SuggestionsBuilder b){
+    default CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         return Suggestions.empty();
     }
 

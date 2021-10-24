@@ -35,7 +35,7 @@ public class HazelguardTradersGuild extends AbstractJsonSerializer implements Tr
 
     private long lastVoteEnd;
 
-    final ObjectList<PostVoteTask> tasks = new ObjectArrayList<>();
+    private final ObjectList<PostVoteTask> tasks = new ObjectArrayList<>();
 
     public HazelguardTradersGuild() {
         super("traders_guild");
@@ -84,14 +84,14 @@ public class HazelguardTradersGuild extends AbstractJsonSerializer implements Tr
         if (!isCurrentlyVoting()) return;
 
         VoteState state = getVoteState();
-        long executeAt = state.started.getTime() - System.currentTimeMillis();
+        long runIn = (state.started.getTime() + ComVars.getVoteTime()) - System.currentTimeMillis();
 
-        if(executeAt <= 0) {
+        if(runIn <= 0) {
             finishVoting();
             return;
         }
 
-        stateEndTask = Bukkit.getScheduler().runTaskLater(Crown.inst(), this::finishVoting, TimeUtil.millisToTicks(executeAt));
+        stateEndTask = Bukkit.getScheduler().runTaskLater(Crown.inst(), this::finishVoting, TimeUtil.millisToTicks(runIn));
     }
 
     @Override
@@ -134,6 +134,8 @@ public class HazelguardTradersGuild extends AbstractJsonSerializer implements Tr
     public void finishVoting() {
         VoteResult result = currentState.countVotes();
         getVoteBox().remove(getWorld());
+
+        lastVoteEnd = System.currentTimeMillis();
 
         PostVoteTask task = currentState.getTopic().onVoteEnd(result);
 
@@ -191,6 +193,8 @@ public class HazelguardTradersGuild extends AbstractJsonSerializer implements Tr
     protected void save(JsonWrapper json) {
         json.addList("members", members, JsonUtils::writeUUID);
         if(isCurrentlyVoting()) json.add("currentVote", currentState);
+
+        if(!tasks.isEmpty()) json.addList("tasks", tasks);
     }
 
     @Override
@@ -203,6 +207,11 @@ public class HazelguardTradersGuild extends AbstractJsonSerializer implements Tr
             currentState = null;
             getVoteBox().remove(getWorld());
             if(stateEndTask != null && stateEndTask.isCancelled()) stateEndTask.cancel();
+        }
+
+        tasks.clear();
+        if(json.has("tasks")) {
+            tasks.addAll(json.getList("tasks", PostVoteTask::fromJson));
         }
     }
 }

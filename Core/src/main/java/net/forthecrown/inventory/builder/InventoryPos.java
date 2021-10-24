@@ -31,6 +31,10 @@ public class InventoryPos {
         return row;
     }
 
+    public InventoryPos add(int column, int row) {
+        return new InventoryPos(this.column + column, this.row + row);
+    }
+
     /**
      * Gets the absolute inventory index of this cord
      * @return the index of these cords in an inventory

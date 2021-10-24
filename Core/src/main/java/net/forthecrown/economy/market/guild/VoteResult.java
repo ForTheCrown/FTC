@@ -9,6 +9,8 @@ import net.kyori.adventure.translation.Translatable;
 import org.jetbrains.annotations.NotNull;
 
 public enum VoteResult implements JsonSerializable, Translatable, ComponentLike {
+    NO_VOTES(false, "noVotes"),
+
     TIE (false, "tie"),
     TIE_WITH_ABSTENTIONS (false, "tie"),
 

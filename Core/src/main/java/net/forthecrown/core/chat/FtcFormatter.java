@@ -241,6 +241,53 @@ public interface FtcFormatter {
     }
 
     /**
+     * Creates a text with a gradient color
+     * @param input The input
+     * @param start The starting color, on the left
+     * @param end The end color, on the right
+     * @return The text colored as a gradient
+     */
+    static TextComponent gradientText(String input, TextColor start, TextColor end) {
+        Validate.isTrue(!FtcUtils.isNullOrBlank(input), "Given string was null or blank");
+
+        int length = input.length();
+        char[] chars = input.toCharArray();
+
+        //Not enough space for gradient
+        if(length == 1) return Component.text(input).color(start);
+
+        //Not enough space for gradient
+        if(length == 2) {
+            return Component.text(chars[0])
+                    .color(start)
+                    .append(Component.text(chars[1]).color(end));
+        }
+
+        //Step taken between each letter
+        int rStep = (end.red() - start.red()) / length;
+        int gStep = (end.green() - start.green()) / length;
+        int bStep = (end.blue() - start.blue()) / length;
+
+        TextComponent.Builder builder = Component.text();
+
+        //Create text
+        for (int i = 0; i < length; i++) {
+            if(i == length - 1) { //Ensure last letter has the end color
+                builder.append(Component.text(chars[i]).color(end));
+                break;
+            }
+
+            int r = start.red() + (i * rStep);
+            int g = start.green() + (i * gStep);
+            int b = start.blue() + (i * bStep);
+
+            builder.append(Component.text(chars[i]).color(TextColor.color(r, g, b)));
+        }
+
+        return builder.build();
+    }
+
+    /**
      * Formats a gem message with translatable components.
      * <p></p>
      * Note: Does not work with item names, lores, signs or anything where the translatable component is not under
@@ -416,7 +463,6 @@ public interface FtcFormatter {
         if(hours != 0) stringBuilder.append(hours).append(" hour").append(s(hours)).append(", ");
         if(minutes != 0) stringBuilder.append(minutes).append(" minute").append(s(minutes)).append(" and ");
         if(seconds != 0) stringBuilder.append(seconds).append(" second").append(s(seconds));
-        else if(millis < 1000 && millis > -1000) stringBuilder.append(millis).append(" millisecond").append(s(millis));
 
         return stringBuilder.toString();
     }

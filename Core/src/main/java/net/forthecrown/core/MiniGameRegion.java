@@ -1,11 +1,8 @@
 package net.forthecrown.core;
 
-public interface MiniGameRegion {
-    static int chickenLevitation(){
-        return ComVars.chickenLevitation.getValue(5);
-    }
+import static net.forthecrown.core.ComVars.*;
 
-    static int chickenLevitationTime(){
-        return ComVars.chickenLevitationTime.getValue(10);
-    }
+public interface MiniGameRegion {
+    static int chickenLevitation() { return chickenLevitation.getValue(5); }
+    static int chickenLevitationTime() { return chickenLevitationTime.getValue(10); }
 }

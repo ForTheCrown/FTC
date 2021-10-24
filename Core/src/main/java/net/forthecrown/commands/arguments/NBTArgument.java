@@ -4,7 +4,6 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.nbt.NBT;
 import net.forthecrown.grenadier.CommandSource;
 import net.minecraft.commands.arguments.NbtTagArgument;
 import net.minecraft.nbt.CompoundTag;
@@ -19,10 +18,6 @@ public class NBTArgument implements ArgumentType<CompoundTag> {
 
     public static NBTArgument nbt(){
         return TYPE;
-    }
-
-    public static NBT getWrapper(CommandContext<CommandSource> c, String arg) {
-        return NBT.of(get(c, arg));
     }
 
     public static CompoundTag get(CommandContext<CommandSource> c, String arg) {

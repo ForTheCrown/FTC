@@ -3,7 +3,10 @@ package net.forthecrown.user;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
 
-public abstract class AbstractUserAttachment implements UserAttachment, JsonSerializable, JsonDeserializable {
+public abstract class AbstractUserAttachment
+        implements UserAttachment,
+        JsonSerializable, JsonDeserializable
+{
     protected final FtcUser user;
 
     public AbstractUserAttachment(FtcUser user) {

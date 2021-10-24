@@ -58,6 +58,14 @@ public final class FtcCommands {
         //Debug command
         if(Crown.inDebugMode()) {
             new CommandTestCore();
+
+            //Market commands
+            new CommandMarket();
+            new CommandShopTrust();
+            new CommandMergeShop();
+            new CommandUnmerge();
+            new CommandTransferShop();
+            new CommandUnclaimShop();
         }
 
         //admin commands
@@ -133,14 +141,6 @@ public final class FtcCommands {
         CommandToolBlock.init();
         CommandSelfOrUser.init();
         StateChangeCommand.init();
-
-        //Market commands
-        new CommandMarket();
-        new CommandShopTrust();
-        new CommandMergeShop();
-        new CommandUnmerge();
-        new CommandTransferShop();
-        new CommandUnclaimShop();
 
         //top me daddy xD
         new CommandDeathTop();

@@ -19,8 +19,9 @@ import java.util.Locale;
  * Utility functions relating to Components, mostly string converters lol
  */
 public final class ChatUtils {
+    private ChatUtils() {}
 
-    public static final LegacyComponentSerializer SERIALIZER = LegacyComponentSerializer.builder()
+    public static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
             .extractUrls()
             .hexColors()
             .build();
@@ -29,7 +30,7 @@ public final class ChatUtils {
     public static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     public static TextComponent convertString(String text, boolean translateColors){
-        return SERIALIZER.deserialize(translateColors ? FtcFormatter.formatColorCodes(text) : text);
+        return LEGACY.deserialize(translateColors ? FtcFormatter.formatColorCodes(text) : text);
     }
 
     public static TextComponent convertString(String text){
@@ -66,6 +67,10 @@ public final class ChatUtils {
 
     public static net.minecraft.network.chat.Component fromJson(String json){
         return net.minecraft.network.chat.Component.Serializer.fromJson(json);
+    }
+
+    public static Component fromJsonText(String json) {
+        return GSON.deserialize(json);
     }
 
     public static JsonElement toJson(Component component){

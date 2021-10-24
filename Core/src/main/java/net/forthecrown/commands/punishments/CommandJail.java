@@ -1,23 +1,22 @@
 package net.forthecrown.commands.punishments;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommands;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.arguments.JailArgument;
 import net.forthecrown.commands.arguments.UserArgument;
-import net.forthecrown.events.dynamic.JailListener;
+import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.Crown;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.jails.JailManager;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.user.CrownUser;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.events.dynamic.JailListener;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.TimeArgument;
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -68,7 +67,6 @@ public class CommandJail extends FtcCommand implements GenericPunisher {
         manager.punish(user.getUniqueId(), PunishmentType.JAIL, source, null, punishTime, jail.asString());
 
         if(user.isOnline()){
-            FtcCommands.resendCommandPackets(user.getPlayer());
             Bukkit.getPluginManager().registerEvents(new JailListener(user.getPlayer(), jails.get(jail)), Crown.inst());
         }
 

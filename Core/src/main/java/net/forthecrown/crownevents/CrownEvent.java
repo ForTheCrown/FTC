@@ -21,15 +21,15 @@ public interface CrownEvent<T extends EventEntry> {
      * <p>Note: the start method should also create an event entry for the player</p>
      * @param player The player to start the event for
      */
-    void start(Player player) throws CommandSyntaxException;
+    void startPlayer(Player player) throws CommandSyntaxException;
 
     /**
      * Starts the event, and handles any exceptions thrown by start(Player)
      * @param player The player to start
      */
-    default void startHandled(Player player) {
+    default void start(Player player) {
         try {
-            start(player);
+            startPlayer(player);
         } catch (CommandSyntaxException e) {
             FtcUtils.handleSyntaxException(player, e);
         }

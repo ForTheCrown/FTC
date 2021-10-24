@@ -33,4 +33,11 @@ public interface ItemPriceMap extends CrownSerializer {
      * @return The price of the item, default if none found
      */
     short getOrDefault(Material mat, short def);
+
+    /**
+     * Checks if the price map contains the given material
+     * @param mat The material to check
+     * @return Whether the map contains the material
+     */
+    boolean contains(Material mat);
 }

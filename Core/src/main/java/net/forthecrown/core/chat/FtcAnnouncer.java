@@ -10,15 +10,14 @@ import net.forthecrown.inventory.CrownItems;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.user.data.Rank;
+import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -32,7 +31,6 @@ import java.util.function.Predicate;
 public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
     private final List<Component> announcements = new ArrayList<>();
-    private final GsonComponentSerializer serializer = GsonComponentSerializer.builder().build();
     private final ComVar<Short> delay = ComVarRegistry.set("broadcastDelay", ComVarTypes.SHORT, (short) 12000);
     private BukkitRunnable broadcaster;
 
@@ -51,7 +49,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
         JsonArray array = new JsonArray();
         for (Component c: announcements){
-            array.add(serializer.serializeToTree(c));
+            array.add(ChatUtils.toJson(c));
         }
 
         json.add("announcements", array);
@@ -64,7 +62,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
         JsonArray array = json.getArray("announcements");
         announcements.clear();
         for (JsonElement j: array){
-            announcements.add(serializer.deserializeFromTree(j));
+            announcements.add(ChatUtils.fromJson(j));
         }
     }
 
@@ -238,10 +236,10 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
     }
 
     private JsonElement deser(String json){
-        return ser(serializer.deserialize(json));
+        return ser(ChatUtils.fromJsonText(json));
     }
 
     private JsonElement ser(Component component){
-        return serializer.serializeToTree(component);
+        return ChatUtils.toJson(component);
     }
 }

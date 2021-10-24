@@ -183,8 +183,7 @@ public class ComponentTagVisitor implements TagVisitor {
                 if(iterator.hasNext()){
                     addComma();
                     newLineIndent(false);
-                }
-                else newLineIndent(true);
+                } else newLineIndent(true);
             }
         }
 

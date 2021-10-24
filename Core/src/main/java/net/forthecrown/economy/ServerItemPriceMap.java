@@ -34,6 +34,11 @@ public class ServerItemPriceMap extends AbstractJsonSerializer implements ItemPr
     }
 
     @Override
+    public boolean contains(Material mat) {
+        return itemPrices.containsKey(mat);
+    }
+
+    @Override
     protected void save(JsonWrapper json) {
         for (Object2ShortMap.Entry<Material> e: itemPrices.object2ShortEntrySet()) {
             json.add(e.getKey().toString().toLowerCase(), e.getShortValue());

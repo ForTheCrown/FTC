@@ -65,6 +65,7 @@ public class FtcTabList extends AbstractJsonSerializer implements TabList {
     @Override
     public void updateList() {
         Component formatted = format();
+
         for (Player p: Bukkit.getOnlinePlayers()){
             p.sendPlayerListHeader(formatted);
         }

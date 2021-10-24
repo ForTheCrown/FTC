@@ -112,7 +112,7 @@ public final class Cooldown {
         Set<CommandSender> set = COOLDOWN_MAP.computeIfAbsent(category, k -> new HashSet<>());
         set.add(sender);
 
-        if(timeInTicks != -1){
+        if(timeInTicks != -1) {
             Bukkit.getScheduler().runTaskLaterAsynchronously(Crown.inst(), () -> remove(sender, category), timeInTicks);
         }
     }

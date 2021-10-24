@@ -78,7 +78,7 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
 
     @Override
     public void doSessionExpiryCooldown(SignShopSession session) {
-        UUID key = session.getUser().getUniqueId();
+        UUID key = session.getCustomer().getUniqueId();
 
         if(deletionDelay.containsKey(key)) {
             try {
@@ -101,7 +101,7 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
 
     @Override
     public void removeAndLog(SignShopSession session) {
-        UUID id = session.getUser().getUniqueId();
+        UUID id = session.getCustomer().getUniqueId();
 
         //Remove and stop all delays
         sessions.remove(id);
@@ -125,12 +125,12 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
 
     @Override
     public boolean isOnExpiryCooldown(SignShopSession session) {
-        return deletionDelay.containsKey(session.getUser().getUniqueId());
+        return deletionDelay.containsKey(session.getCustomer().getUniqueId());
     }
 
     //Create the log info string for the session
     private String logInfo(SignShopSession session) {
-        return session.getUser().getName() + " " +
+        return session.getCustomer().getName() + " " +
                 (session.getType().isBuyType() ? "bought" : "sold") + " " +
                 session.getAmount() + " " +
                 FtcFormatter.normalEnum(session.getMaterial()) +

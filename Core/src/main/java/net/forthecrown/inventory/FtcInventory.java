@@ -7,6 +7,7 @@ import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.event.inventory.InventoryType;
@@ -33,8 +34,20 @@ public interface FtcInventory extends Inventory, JsonSerializable, JsonDeseriali
         return new FtcInventoryImpl(holder, type, title);
     }
 
+    static FtcInventory wrap(Inventory inventory) {
+        return new WrappedFtcInventory(inventory);
+    }
+
     default void setItem(InventoryPos pos, ItemStack itemStack) {
         setItem(pos.getSlot(), itemStack);
+    }
+
+    default void setItem(InventoryPos pos, ItemStackBuilder builder) {
+        setItem(pos.getSlot(), builder.build());
+    }
+
+    default void setItem(int slot, ItemStackBuilder builder) {
+        setItem(slot, builder.build());
     }
 
     default ItemStack getItem(InventoryPos pos) {

@@ -101,7 +101,7 @@ public class ItemStackBuilder implements Cloneable {
     }
 
     public ItemStackBuilder setAmount(int amount) {
-        Validate.isTrue(MathUtil.isInRange(amount, 0, material.getMaxStackSize()), "Invalid stack size");
+        Validate.isTrue(MathUtil.isInRange(amount, 0, material.getMaxStackSize()), "Invalid stack size: " + amount);
         this.amount = amount;
         return this;
     }

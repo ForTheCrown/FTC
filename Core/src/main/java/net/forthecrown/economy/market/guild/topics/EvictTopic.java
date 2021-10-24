@@ -7,8 +7,11 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.market.Markets;
+import net.forthecrown.economy.houses.Dynasty;
+import net.forthecrown.economy.houses.Relation;
+import net.forthecrown.economy.houses.VoteModifier;
 import net.forthecrown.economy.market.MarketShop;
+import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.market.guild.VoteResult;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.BuiltInventory;
@@ -28,6 +31,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
@@ -73,10 +77,29 @@ public class EvictTopic implements VoteTopicType<EvictTopic.TopicInstance> {
 
     @Override
     public BuiltInventory getInventory() {
-        InventoryBuilder builder = new InventoryBuilder(36)
+        Markets markets = Crown.getMarkets();
+        Collection<MarketShop> shops = markets.getOwnedShops();
+
+        InventoryBuilder builder = new InventoryBuilder(shops.size() > 14 ? 54 : 36)
                 .title(Component.text("Choose who to evict"));
 
+        int index = 0;
+        for (MarketShop s: shops) {
+            InventoryPos pos = posFromIndex(index);
+            index++;
+
+            EvictHeadOption option = new EvictHeadOption(pos, s);
+            builder.add(option);
+        }
+
         return builder.build();
+    }
+
+    private InventoryPos posFromIndex(int index) {
+        int y = index / 6;
+        int x = index % 6;
+
+        return new InventoryPos(x + 1, y + 1);
     }
 
     @Override
@@ -146,10 +169,7 @@ public class EvictTopic implements VoteTopicType<EvictTopic.TopicInstance> {
                         .setFlags(ItemFlag.HIDE_ENCHANTS);
             }
 
-            inventory.setItem(
-                    pos,
-                    builder.build()
-            );
+            inventory.setItem(pos, builder);
         }
 
         @Override
@@ -189,6 +209,12 @@ public class EvictTopic implements VoteTopicType<EvictTopic.TopicInstance> {
             if(result.isWin()) {
                 user().sendOrMail(
                         Component.translatable("guilds.topics.evict.notice.succeed")
+                                .append(Component.newline())
+                                .append(Component.translatable(
+                                        "guilds.topics.evict.notice.succeed2",
+                                        NamedTextColor.DARK_RED,
+                                        FtcFormatter.millisIntoTime(ComVars.getEvictionCleanupTime())
+                                ))
                                 .color(NamedTextColor.RED)
                 );
 
@@ -217,6 +243,14 @@ public class EvictTopic implements VoteTopicType<EvictTopic.TopicInstance> {
         @Override
         public EvictTopic getType() {
             return INSTANCE;
+        }
+
+        @Override
+        public VoteModifier makeModifier(Dynasty dynasty) {
+            UUID shopOwner = getOwner();
+            Relation r = dynasty.getRelationWith(shopOwner);
+
+            return new VoteModifier(r.getValue() / 2);
         }
     }
 }

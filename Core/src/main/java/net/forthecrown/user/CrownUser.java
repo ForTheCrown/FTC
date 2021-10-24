@@ -1,10 +1,12 @@
 package net.forthecrown.user;
 
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
+import com.destroystokyo.paper.profile.PlayerProfile;
 import com.sk89q.worldedit.math.BlockVector2;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.selling.UserSellResult;
+import net.forthecrown.economy.shops.ShopCustomer;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.regions.RegionPos;
@@ -25,6 +27,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
@@ -41,7 +44,7 @@ import java.util.function.UnaryOperator;
 public interface CrownUser extends
         CommandSender, Nameable,
         HoverEventSource<Component>,
-        Deletable
+        Deletable, ShopCustomer
 {
     /**
      * Reloads the user's data
@@ -829,26 +832,26 @@ public interface CrownUser extends
 
     void updateGodMode() throws UserNotOnlineException;
 
-    /**
-     * Gets the object which hold data for this user
-     * @return The user's data container
-     */
     UserDataContainer getDataContainer();
-
-    /**
-     * Gets the user's grave
-     * @return The user's grave
-     */
     Grave getGrave();
-
     MarketOwnership getMarketOwnership();
     CosmeticData getCosmeticData();
     UserInteractions getInteractions();
     UserHomes getHomes();
     UserMail getMail();
 
+    /**
+     * Gets the user's game mode
+     * @return The user's gamemode
+     * @throws UserNotOnlineException If the user is not online
+     */
     FtcGameMode getGameMode() throws UserNotOnlineException;
 
+    /**
+     * Sets the user's gamemode
+     * @param gameMode The gamemode
+     * @throws UserNotOnlineException If the user is not online
+     */
     void setGameMode(FtcGameMode gameMode) throws UserNotOnlineException;
 
     default boolean allowsPaying() {
@@ -900,46 +903,106 @@ public interface CrownUser extends
         return sellMaterial(material, getSellAmount() == SellAmount.ALL ? -1 : getSellAmount().getValue());
     }
 
+    /**
+     * Gets the user's 2d block location
+     * @return The user's 2d block location
+     */
     default BlockVector2 get2DLocation() {
         Location l = getLocation();
 
         return BlockVector2.at(l.getX(), l.getZ());
     }
 
+    /**
+     * Gets the region pos of the user
+     * @return The user's region pos
+     */
     default RegionPos getRegionCords() {
         return RegionPos.of(getLocation());
     }
 
+    /**
+     * Sets the velocity of the user
+     * @param x The x cord velocity
+     * @param y The y cord velocity
+     * @param z The z cord velocity
+     * @throws UserNotOnlineException If the user is not online
+     */
     void setVelocity(double x, double y, double z) throws UserNotOnlineException;
 
+    /**
+     * Sets the user's velocity
+     * @param velocity The velocity vector
+     * @throws UserNotOnlineException If the user is not online
+     */
     default void setVelocity(Vector velocity) throws UserNotOnlineException {
         setVelocity(velocity.getX(), velocity.getY(), velocity.getZ());
     }
 
+    /**
+     * Sets the user's velocity
+     * @param vec The velocity vector
+     * @throws UserNotOnlineException If the user is not online
+     */
     default void setVelocity(ImmutableVector3i vec) throws UserNotOnlineException {
         setVelocity(vec.getX(), vec.getY(), vec.getZ());
     }
 
+    /**
+     * Sets the user's velocity
+     * @param pos The velocity vector
+     * @throws UserNotOnlineException If the user is not online
+     */
     default void setVelocity(Position pos) throws UserNotOnlineException {
         setVelocity(pos.x(), pos.y(), pos.z());
     }
 
+    /**
+     * Gets the profile of this user
+     * <p></p>
+     * Note: It's just a new craft player profile that has no properties or anything.
+     * Do {@link PlayerProfile#complete()} for those
+     * @return The user's profile
+     */
     default CraftPlayerProfile getProfile() {
         return new CraftPlayerProfile(getUniqueId(), getName());
     }
 
+    /**
+     * Either sends the user a message in chat, or in their mail, depending on if they're online
+     * @param message The message to send
+     * @param sender The potential sender of the message, may be null
+     */
     void sendOrMail(Component message, @Nullable UUID sender);
 
+    /**
+     * Same as {@link CrownUser#sendOrMail(Component, UUID)} except with a null sender
+     * @param message The message
+     */
     default void sendOrMail(Component message) {
         sendOrMail(message, null);
     }
 
+    /**
+     * Stops all riding the user might be doing
+     * @param suppressCancellation Whether to ignore the result of {@link org.spigotmc.event.entity.EntityDismountEvent}, which might stop the function call
+     * @throws UserNotOnlineException If the user is not online
+     */
     void stopRiding(boolean suppressCancellation) throws UserNotOnlineException;
 
+    /**
+     * Same as {@link CrownUser#stopRiding(boolean)} except sets the parameter to false
+     * @throws UserNotOnlineException If the user is not online
+     */
     default void stopRiding() throws UserNotOnlineException {
         stopRiding(false);
     }
 
+    /**
+     * Sends the user the given packet
+     * @param packet The packet to send
+     * @throws UserNotOnlineException If the user is not online
+     */
     void sendPacket(Packet<ClientGamePacketListener> packet) throws UserNotOnlineException;
 
     @Override
@@ -950,4 +1013,9 @@ public interface CrownUser extends
 
     @Override
     String toString();
+
+    @Override
+    default Inventory getInventory() throws UserNotOnlineException {
+        return getPlayer().getInventory();
+    }
 }

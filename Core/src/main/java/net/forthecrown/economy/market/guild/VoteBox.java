@@ -83,9 +83,9 @@ public class VoteBox implements JsonSerializable {
                 .content(absentionCount + "/")
                 .color(NamedTextColor.GRAY)
 
-                .append(Component.text(state.getPro().size()).color(NamedTextColor.GREEN))
+                .append(Component.text(state.proCount()).color(NamedTextColor.GREEN))
                 .append(Component.text("/"))
-                .append(Component.text(state.getAgainst().size()).color(NamedTextColor.RED))
+                .append(Component.text(state.againstCount()).color(NamedTextColor.RED))
 
                 .build();
 

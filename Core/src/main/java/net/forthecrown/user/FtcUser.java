@@ -106,7 +106,7 @@ public class FtcUser implements CrownUser {
     public ObjectSet<Rank> ranks = new ObjectOpenHashSet<>();
 
     public final ObjectList<Pet> pets = new ObjectArrayList<>();
-    public final ObjectSet<UserPref> properties = new ObjectOpenHashSet<>();
+    public final ObjectSet<UserPref> prefs = new ObjectOpenHashSet<>();
 
     //Primitive variables, idk
     private int gems = 0;
@@ -155,8 +155,6 @@ public class FtcUser implements CrownUser {
 
         reload();
 
-        FtcUserManager.LOADED_USERS.put(uniqueId, this);
-
         if(isOnline()) handle = getOnlineHandle().getHandle();
     }
 
@@ -187,7 +185,7 @@ public class FtcUser implements CrownUser {
     @Override
     public void unload(){
         save();
-        FtcUserManager.LOADED_USERS.remove(this.getUniqueId());
+        FtcUserManager.LOADED_USERS.remove(getUniqueId());
         handle = null;
     }
 
@@ -323,17 +321,17 @@ public class FtcUser implements CrownUser {
 
     @Override
     public boolean hasPref(UserPref property){
-        return properties.contains(property);
+        return prefs.contains(property);
     }
 
     @Override
     public void addPref(UserPref property){
-        properties.add(property);
+        prefs.add(property);
     }
 
     @Override
     public void removePref(UserPref property){
-        properties.remove(property);
+        prefs.remove(property);
     }
 
     @Override
@@ -1165,7 +1163,7 @@ public class FtcUser implements CrownUser {
                 .append(uniqueId)
                 .append(getFaction())
                 .append(getGems())
-                .append(properties)
+                .append(prefs)
                 .append(isAfk())
                 .append(getTotalEarnings())
                 .append(getNextResetTime())

@@ -9,7 +9,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.economy.auctions.Auction;
-import net.forthecrown.pirates.AuctionManager;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 
 import java.util.concurrent.CompletableFuture;

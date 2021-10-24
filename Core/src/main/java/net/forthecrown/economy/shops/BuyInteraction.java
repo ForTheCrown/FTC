@@ -53,7 +53,7 @@ public class BuyInteraction implements ShopInteraction {
                     Component.translatable("shops.used.buy.owner",
                             NamedTextColor.GRAY,
 
-                            session.getUser().nickDisplayName().color(NamedTextColor.YELLOW),
+                            session.getCustomer().nickDisplayName().color(NamedTextColor.YELLOW),
                             FtcFormatter.itemAndAmount(example, session.getAmount()).color(NamedTextColor.GOLD),
                             FtcFormatter.rhines(totalEarned).color(NamedTextColor.YELLOW)
                     )

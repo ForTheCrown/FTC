@@ -27,6 +27,11 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.UUID;
 
+/**
+ * A shop's entrance
+ * <p></p>
+ * Used for setting and changing the shop's owner sign and purchase notice
+ */
 public class ShopEntrance implements JsonSerializable {
     public static final NamespacedKey NOTICE_KEY = Squire.createFtcKey("market_notice");
     public static final CraftPlayerProfile NOTICE_PROFILE = FtcUtils.profileWithTextureID(
@@ -44,6 +49,11 @@ public class ShopEntrance implements JsonSerializable {
         this.doorSign = doorSign;
     }
 
+    /**
+     * Sets the sign to the user's name and removes the purchase notice
+     * @param user The user that claimed the shop
+     * @param world The world the shop is in
+     */
     public void onClaim(CrownUser user, World world) {
         boolean endsWithS = user.getNickOrName().endsWith("s");
 
@@ -52,6 +62,11 @@ public class ShopEntrance implements JsonSerializable {
         removeNotice(world);
     }
 
+    /**
+     * Spawms the purchase notice and sets the sign above the door to say "Available"
+     * @param world The world the shop is in
+     * @param shop The shop itself
+     */
     public void onUnclaim(World world, MarketShop shop) {
         //Above door sign
         setSign(world, Component.text("Available player"));
@@ -61,18 +76,24 @@ public class ShopEntrance implements JsonSerializable {
         spawnNotice(world, shop);
     }
 
+    //Spawns the notice in the given world with info for the given shop
     private void spawnNotice(World world, MarketShop shop) {
+        //Set block type
         Block block = notice.getBlock(world);
         block.setType(Material.PLAYER_HEAD);
 
+        //Place sign in correct orientation
         Directional directional = (Directional) block.getBlockData();
         directional.setFacing(direction);
         block.setBlockData(directional);
 
+        //Floating crystal head
         Skull skull = (Skull) block.getState();
+        skull.getPersistentDataContainer().set(NOTICE_KEY, PersistentDataType.STRING, shop.getName());
         skull.setPlayerProfile(NOTICE_PROFILE);
         skull.update();
 
+        //Slime, which player's can click on
         Location l = new Location(world, notice.getX() + 0.5D, notice.getY(), notice.getZ() + 0.5D);
         world.spawn(l, Slime.class, slime -> {
             slime.getPersistentDataContainer().set(NOTICE_KEY, PersistentDataType.STRING, shop.getName());
@@ -82,8 +103,10 @@ public class ShopEntrance implements JsonSerializable {
             slime.setGravity(false);
             slime.setRemoveWhenFarAway(false);
 
+            //Add to no clip team
             FtcUtils.getNoClipTeam().addEntry(slime.getUniqueId().toString());
 
+            //Price text
             slime.customName(
                     Component.text("Price: ")
                             .color(NamedTextColor.GRAY)
@@ -92,6 +115,7 @@ public class ShopEntrance implements JsonSerializable {
         });
     }
 
+    //Removes the purchase notice
     void removeNotice(World world) {
         FtcBoundingBox area = FtcBoundingBox.of(world, notice, 1.5);
 
@@ -103,18 +127,23 @@ public class ShopEntrance implements JsonSerializable {
         notice.getBlock(world).setType(Material.AIR);
     }
 
+    //Removes the door sign
     void removeSign(World world) {
-        notice.getBlock(world).setType(Material.AIR);
+        doorSign.getBlock(world).setType(Material.AIR);
     }
 
+    //Creates a sign in the given world with the given title, aka the given text for the second line
     private void setSign(World world, Component signTitle) {
+        //Make sign
         Block block = doorSign.getBlock(world);
         block.setType(Material.BIRCH_WALL_SIGN);
 
+        //Orient correctly
         Directional signData = (Directional) block.getBlockData();
         signData.setFacing(direction);
         block.setBlockData(signData);
 
+        //Set text
         Sign sign = (Sign) block.getState();
         sign.line(0, Component.empty());
         sign.line(1, signTitle);

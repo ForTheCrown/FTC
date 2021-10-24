@@ -51,14 +51,9 @@ public class ArmorStandLeaderboard {
     }
 
     /**
-     * Because of some recent changes, this is the same as create
-     * It destroys and then creates the leaderboard. But the Create method does both
-     * of those things too lol
+     * Updates the map with the given entry 2 score map
+     * @param scores New scores
      */
-    public void update(){
-        create();
-    }
-
     public void update(Map<String, Integer> scores){
         setList(scores);
         create();
@@ -68,16 +63,18 @@ public class ArmorStandLeaderboard {
      * Destroys any preexisting leaderboards at the specified location and then creates
      * a new leaderboard
      */
-    public void create(){
+    public void create() {
         destroy();
+
         Location loc = getLocation().clone();
+
         createTitleStands(loc);
         createStand(getBorder(), loc.subtract(0, 0.25, 0));
 
         Map<String, Integer> sorted = getSortedMap();
         List<String> stringList = new ArrayList<>(sorted.keySet());
 
-        for (int i = 0; i < getSize(); i++){
+        for (int i = 0; i < getSize(); i++) {
             int toGet = i;
             if(getOrder() != Order.LOW_TO_HIGH) toGet = sorted.size() - i-1;
             if(toGet >= stringList.size() || toGet <= -1) break;
@@ -85,6 +82,7 @@ public class ArmorStandLeaderboard {
             String name = stringList.get(toGet);
             createStand(formatString(i+1, name, sorted.get(name)), loc.subtract(0, 0.25, 0));
         }
+
         createStand(getBorder(), loc.subtract(0, 0.25, 0));
     }
 

@@ -50,7 +50,6 @@ import static net.forthecrown.utils.FtcUtils.safeRunnable;
  */
 public final class Main extends JavaPlugin implements Crown {
 
-    //Hacky way of determining if we're on the test server or not
     static ComVar<Boolean>          inDebugMode;
 
     static Main                     inst;
@@ -106,7 +105,10 @@ public final class Main extends JavaPlugin implements Crown {
     @Override
     public void onLoad() {
         inst = this;
-        inDebugMode = ComVarRegistry.set("debugMode", ComVarTypes.BOOLEAN, !new File("plugins/CoreProtect/config.yml").exists());
+
+        //Hacky way of determining if we're on the test server or not
+        inDebugMode = ComVarRegistry.set("debugMode", ComVarTypes.BOOL, !new File("plugins/CoreProtect/config.yml").exists());
+
         logger = getLogger();
 
         saveResource("banned_words.json", true);
@@ -139,10 +141,7 @@ public final class Main extends JavaPlugin implements Crown {
     @Override
     public void saveConfig() {
         FileConfiguration config = getConfig();
-
         config.set("ServerSpawn", serverSpawn);
-
-        ComVars.save(config);
 
         super.saveConfig();
     }
@@ -155,7 +154,7 @@ public final class Main extends JavaPlugin implements Crown {
         prefix = config.getString("Prefix");
         discord = config.getString("Discord");
 
-        ComVars.reload(config);
+        ComVars.reload();
 
         Location defSpawnLoc = new Location(Worlds.VOID, 153.5, 5, 353.5, 90, 0);
         serverSpawn = config.getLocation("ServerSpawn", defSpawnLoc);
@@ -168,7 +167,7 @@ public final class Main extends JavaPlugin implements Crown {
             } catch (IllegalStateException ignored){}
         }
 
-        if(config.getBoolean("System.save-periodically")){
+        if(config.getBoolean("System.save-periodically")) {
             saver = new PeriodicalSaver(this);
             saver.start();
         } else if (saver != null && !saver.isCancelled()){

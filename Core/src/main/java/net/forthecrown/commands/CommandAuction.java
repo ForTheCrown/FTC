@@ -13,7 +13,6 @@ import net.forthecrown.economy.auctions.Auction;
 import net.forthecrown.economy.auctions.FtcAuction;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.pirates.AuctionManager;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.Faction;

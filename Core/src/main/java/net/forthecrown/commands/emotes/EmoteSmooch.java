@@ -21,7 +21,7 @@ public class EmoteSmooch extends CommandEmote {
         register();
     }
 
-    static final Component HEART = Component.text("❤").color(NamedTextColor.RED);
+    public static final Component HEART = Component.text("❤").color(NamedTextColor.RED);
 
     @Override
     public int execute(CrownUser sender, CrownUser target) {

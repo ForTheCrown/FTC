@@ -3,6 +3,7 @@ package net.forthecrown.commands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.utils.animation.AnimationBuilder;
@@ -10,6 +11,8 @@ import net.forthecrown.utils.animation.BlockAnimation;
 import net.forthecrown.utils.math.BoundingBoxes;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.math.Vector3iOffset;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.core.Direction;
 
 public class CommandTestCore extends FtcCommand {
@@ -39,5 +42,11 @@ public class CommandTestCore extends FtcCommand {
 
     @Override
     protected void createCommand(BrigadierCommand command) {
+        command.executes(c -> {
+            Component gradient = FtcFormatter.gradientText("GradientTest", NamedTextColor.RED, NamedTextColor.BLUE);
+
+            c.getSource().sendMessage(gradient);
+            return 0;
+        });
     }
 }

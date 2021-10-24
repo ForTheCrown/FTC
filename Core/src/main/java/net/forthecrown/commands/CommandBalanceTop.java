@@ -17,6 +17,8 @@ import org.bukkit.command.CommandSender;
 import javax.annotation.Nonnegative;
 
 public class CommandBalanceTop extends FtcCommand {
+    public static final int ENTRIES_PER_PAGE = 10;
+
     public CommandBalanceTop() {
         super("balancetop", Crown.inst());
 
@@ -69,9 +71,10 @@ public class CommandBalanceTop extends FtcCommand {
                     .append(Component.newline());
         }
 
-        for(int i = 0 ; i < 10 ; i++) {
-            if((page*10) + i >= balMap.size()) break;
-            int index = (page*10) + i;
+        int firstIndex = ENTRIES_PER_PAGE * page;
+        for(int i = 0 ; i < ENTRIES_PER_PAGE ; i++) {
+            if(firstIndex + i >= balMap.size()) break;
+            int index = firstIndex + i;
 
             Component entryText = balMap.getPrettyDisplay(index);
             if(entryText == null) continue;

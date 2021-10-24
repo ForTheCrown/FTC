@@ -72,7 +72,7 @@ public class UserJsonSerializer implements UserSerializer {
         if(user.currentPrefix != null) json.add("currentPrefix", ChatUtils.toJson(user.currentPrefix));
 
         //Properties
-        if(!user.properties.isEmpty()) json.addList("properties", user.properties);
+        if(!user.prefs.isEmpty()) json.addList("properties", user.prefs);
 
         //Time stamps
         JsonWrapper timeStamps = JsonWrapper.empty();
@@ -185,9 +185,9 @@ public class UserJsonSerializer implements UserSerializer {
         }
 
         //Properties
-        user.properties.clear();
+        user.prefs.clear();
         if(json.has("properties")) {
-            user.properties.addAll(json.getList("properties", e -> JsonUtils.readEnum(UserPref.class, e)));
+            user.prefs.addAll(json.getList("properties", e -> JsonUtils.readEnum(UserPref.class, e)));
         }
 
         //Time stamps

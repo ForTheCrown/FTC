@@ -4,8 +4,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Crown;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
@@ -13,6 +17,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.CompletableFuture;
 
 public class WorldComVarType implements ComVarType<World> {
     private final Key key = Crown.coreKey("world_type");
@@ -45,5 +51,10 @@ public class WorldComVarType implements ComVarType<World> {
     @Override
     public @NotNull Key key() {
         return key;
+    }
+
+    @Override
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> c, SuggestionsBuilder b) {
+        return WorldArgument.world().listSuggestions(c, b);
     }
 }

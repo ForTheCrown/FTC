@@ -147,11 +147,11 @@ public interface BalanceMap {
      */
     class Balance implements Comparable<Balance> {
         private final UUID id;
-        private int bal;
+        private int value;
 
-        public Balance(UUID id, int bal) {
+        public Balance(UUID id, int value) {
             this.id = id;
-            this.bal = bal;
+            this.value = value;
         }
 
         /**
@@ -167,7 +167,7 @@ public interface BalanceMap {
          * @return The entry's balance
          */
         public int getValue() {
-            return bal;
+            return value;
         }
 
         /**
@@ -177,21 +177,26 @@ public interface BalanceMap {
          * Because of that, do not edit entries directly as it could
          * cause balances to become disordered.
          * @param bal The new balance of this entry
+         * @return This entry
          */
-        public void setValue(int bal) {
-            this.bal = bal;
+        public Balance setValue(int bal) {
+            this.value = bal;
+
+            //Returns this so the code in SortedBalanceMap.put(UUID, int)
+            //is a bit shorter
+            return this;
         }
 
         @Override
         public int compareTo(@NotNull BalanceMap.Balance o) {
-            return Integer.compare(bal, o.bal);
+            return Integer.compare(value, o.value);
         }
 
         @Override
         public String toString() {
             return getClass().getSimpleName() + "{" +
                     "id=" + id +
-                    ",bal=" + bal +
+                    ",bal=" + value +
                     '}';
         }
 
