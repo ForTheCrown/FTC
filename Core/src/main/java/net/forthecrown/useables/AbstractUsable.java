@@ -157,7 +157,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
         for (UsageCheckInstance p: checks.values()){
             if(!p.test(player)){
                 if(sendFail){
-                    Component failMsg = p.personalizedMessage(player);
+                    Component failMsg = p.failMessage(player);
                     if(failMsg != null) player.sendMessage(failMsg);
                 }
                 return false;

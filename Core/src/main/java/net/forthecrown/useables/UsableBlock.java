@@ -2,7 +2,7 @@ package net.forthecrown.useables;
 
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.serializer.Deletable;
-import org.bukkit.Location;
+import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.block.TileState;
 
 /**
@@ -14,7 +14,7 @@ public interface UsableBlock extends CrownSerializer, Deletable, Usable {
      * Gets the location of the block
      * @return The block's location
      */
-    Location getLocation();
+    WorldVec3i getLocation();
 
     /**
      * Gets the Tile Entity of the block

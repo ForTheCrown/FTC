@@ -2,7 +2,7 @@ package net.forthecrown.events;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.Announcer;
-import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.Grave;
 import net.forthecrown.user.manager.UserManager;
@@ -65,7 +65,7 @@ public class GraveListener implements Listener {
 
         Grave grave = user.getGrave();
         for (ItemStack i: event.getEntity().getInventory()){
-            if(CrownItems.isCrownItem(i)){
+            if(FtcItems.isCrownItem(i)){
                 grave.addItem(i);
                 event.getDrops().remove(i);
             }

@@ -58,7 +58,7 @@ public class CheckNotUsedBefore implements UsageCheck<CheckNotUsedBefore.CheckIn
         }
 
         @Override
-        public Component failMessage() {
+        public Component failMessage(Player player) {
             return Component.text("You can only use this once")
                     .color(NamedTextColor.GRAY);
         }

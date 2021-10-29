@@ -19,8 +19,6 @@ public final class Events {
         main = Crown.inst();
         pm = main.getServer().getPluginManager();
 
-        register(new JeromeListener());
-
         register(new CoreListener());
         register(new GraveListener());
 
@@ -31,7 +29,6 @@ public final class Events {
         register(new RegionsListener());
         register(new GuildListener());
         register(new PirateEvents());
-        register(new GhListener());
 
         register(new MobHealthBar());
         register(new SmokeBomb());

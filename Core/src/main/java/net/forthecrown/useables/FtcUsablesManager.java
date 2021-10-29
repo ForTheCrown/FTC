@@ -1,6 +1,7 @@
 package net.forthecrown.useables;
 
-import net.forthecrown.serializer.AbstractJsonSerializer;
+import net.forthecrown.serializer.CrownSerializer;
+import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
@@ -13,15 +14,16 @@ import java.util.Map;
 import java.util.UUID;
 
 public class FtcUsablesManager implements UsablesManager {
-    final Map<Location, FtcUsableBlock> signs = new HashMap<>();
-    final Map<UUID, FtcUsableEntity> entities = new HashMap<>();
+    final Map<WorldVec3i, UsableBlock> signs = new HashMap<>();
+    final Map<UUID, UsableEntity> entities = new HashMap<>();
 
     @Override
     public UsableBlock getBlock(Location l){
-        if(signs.containsKey(l)) return signs.get(l);
+        WorldVec3i pos = WorldVec3i.of(l);
+        if(signs.containsKey(pos)) return signs.get(pos);
 
         try {
-            return new FtcUsableBlock(l, false);
+            return new FtcUsableBlock(pos, false);
         } catch (IllegalStateException e) {
             return null;
         }
@@ -32,7 +34,7 @@ public class FtcUsablesManager implements UsablesManager {
         l.getPersistentDataContainer().set(USABLE_KEY, PersistentDataType.BYTE, (byte) 1);
         l.update();
 
-        return new FtcUsableBlock(l.getLocation(), true);
+        return new FtcUsableBlock(WorldVec3i.of(l.getBlock()), true);
     }
 
     @Override
@@ -71,24 +73,24 @@ public class FtcUsablesManager implements UsablesManager {
 
     @Override
     public void reloadAll(){
-        signs.values().forEach(AbstractJsonSerializer::reload);
-        entities.values().forEach(AbstractJsonSerializer::reload);
+        signs.values().forEach(CrownSerializer::reload);
+        entities.values().forEach(CrownSerializer::reload);
     }
 
     @Override
     public void saveAll(){
-        signs.values().forEach(AbstractJsonSerializer::save);
-        entities.values().forEach(AbstractJsonSerializer::save);
+        signs.values().forEach(CrownSerializer::save);
+        entities.values().forEach(CrownSerializer::save);
     }
 
     @Override
     public void addEntity(UsableEntity entity) {
-        entities.put(entity.getUniqueId(), (FtcUsableEntity) entity);
+        entities.put(entity.getUniqueId(), entity);
     }
 
     @Override
     public void addBlock(UsableBlock sign) {
-        signs.put(sign.getLocation(), (FtcUsableBlock) sign);
+        signs.put(sign.getLocation(), sign);
     }
 
     @Override

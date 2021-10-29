@@ -1,7 +1,7 @@
 package net.forthecrown.dungeons;
 
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.math.FtcBoundingBox;
@@ -33,7 +33,7 @@ public final class DungeonUtils {
     }
 
     public static ItemStack makeDungeonItem(Material material, int amount, @Nullable Component name){
-        return CrownItems.makeItem(material, amount, false, name, DUNGEON_LORE);
+        return FtcItems.makeItem(material, amount, false, name, DUNGEON_LORE);
     }
 
     public static TextComponent itemRequiredMessage(DungeonBoss<?> boss){

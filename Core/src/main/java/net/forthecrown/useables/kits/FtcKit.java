@@ -75,7 +75,7 @@ public class FtcKit extends CheckableBase implements Kit {
         List<Consumer<Player>> onSuccess = new ArrayList<>();
         for (UsageCheckInstance c: checks.values()){
             if(!c.test(player)){
-                Component m = c.personalizedMessage(player);
+                Component m = c.failMessage(player);
                 if(m != null) player.sendMessage(m);
                 return false;
             }

@@ -79,7 +79,7 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
     }
 
     public Vector3i toNonWorld() {
-        return new Vector3i(x, y, z);
+        return new Vector3i(getX(), getY(), getZ());
     }
 
     public Material getMaterial() {

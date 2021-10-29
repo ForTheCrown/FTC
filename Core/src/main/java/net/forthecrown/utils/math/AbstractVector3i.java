@@ -127,23 +127,23 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
 
     @Override
     public T clone() {
-        return cloneAt(x, y, z);
+        return cloneAt(getX(), getY(), getZ());
     }
 
     public Vector toVec(){
-        return new Vector(x, y, z);
+        return new Vector(getX(), getY(), getZ());
     }
 
     public BlockVector2 to2D() {
-        return BlockVector2.at(x, z);
+        return BlockVector2.at(getX(), getZ());
     }
 
     public net.minecraft.core.BlockPos toNms(){
-        return new net.minecraft.core.BlockPos(x, y, z);
+        return new net.minecraft.core.BlockPos(getX(), getY(), getZ());
     }
 
     public BlockVector3 toWE(){
-        return BlockVector3.at(x, y, z);
+        return BlockVector3.at(getX(), getY(), getZ());
     }
 
     public T zero() {

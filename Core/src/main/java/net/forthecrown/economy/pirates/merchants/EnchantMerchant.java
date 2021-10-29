@@ -13,7 +13,7 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.pirates.DailyEnchantment;
 import net.forthecrown.economy.pirates.EnchantmentData;
 import net.forthecrown.events.dynamic.BmEnchantListener;
-import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
@@ -62,10 +62,10 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
     }
 
     public Inventory createInventory(CrownUser user, boolean accepting, ItemStack userItem){
-        final ItemStack rod = CrownItems.makeItem(Material.END_ROD, 1, true, "&7-");
+        final ItemStack rod = FtcItems.makeItem(Material.END_ROD, 1, true, "&7-");
         rod.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
-        final ItemStack purpleGlass = CrownItems.makeItem(Material.PURPLE_STAINED_GLASS_PANE, 1 ,true, "&7-");
-        final ItemStack border = CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
+        final ItemStack purpleGlass = FtcItems.makeItem(Material.PURPLE_STAINED_GLASS_PANE, 1 ,true, "&7-");
+        final ItemStack border = FtcItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
 
         Inventory inv = getBaseInventory("Black Market: Enchants", rod);
 
@@ -149,17 +149,17 @@ public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
     }
 
     public ItemStack getAcceptButton(){
-        return CrownItems.makeItem(Material.LIME_STAINED_GLASS_PANE, 1, true, ChatColor.GREEN + "[Accept and Pay]",
+        return FtcItems.makeItem(Material.LIME_STAINED_GLASS_PANE, 1, true, ChatColor.GREEN + "[Accept and Pay]",
                 "&7Enchant the item for " + FtcFormatter.decimalizeNumber(daily.getPrice()) + " Rhines");
     }
 
     public ItemStack getDenyButton(){
-        return CrownItems.makeItem(Material.RED_STAINED_GLASS_PANE, 1, true, ChatColor.RED + "[Cannot accept]",
+        return FtcItems.makeItem(Material.RED_STAINED_GLASS_PANE, 1, true, ChatColor.RED + "[Cannot accept]",
                 "&7Cannot accept enchantment!");
     }
 
     private ItemStack getCoolEnchant(){
-        ItemStack item = CrownItems.makeItem(Material.ENCHANTED_BOOK, 1, false, null,
+        ItemStack item = FtcItems.makeItem(Material.ENCHANTED_BOOK, 1, false, null,
                 Component.text("Value: ")
                         .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
                         .append(FtcFormatter.rhines(daily.getPrice())

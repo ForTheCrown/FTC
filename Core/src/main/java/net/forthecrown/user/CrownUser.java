@@ -965,7 +965,10 @@ public interface CrownUser extends
      * @return The user's profile
      */
     default CraftPlayerProfile getProfile() {
-        return new CraftPlayerProfile(getUniqueId(), getName());
+        CraftPlayerProfile profile = new CraftPlayerProfile(getUniqueId(), getName());
+        profile.completeFromCache(false, true);
+
+        return profile;
     }
 
     /**

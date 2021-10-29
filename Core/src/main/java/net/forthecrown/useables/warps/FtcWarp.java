@@ -68,7 +68,7 @@ public class FtcWarp extends CheckableBase implements Warp {
         List<Consumer<Player>> onSuccess = new ArrayList<>();
         for (UsageCheckInstance c: checks.values()){
             if(!c.test(player)){
-                if(c.personalizedMessage(player) != null) player.sendMessage(c.personalizedMessage(player));
+                if(c.failMessage(player) != null) player.sendMessage(c.failMessage(player));
                 return false;
             }
 

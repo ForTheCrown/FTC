@@ -1,6 +1,6 @@
 package net.forthecrown.economy.pirates;
 
-import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.inventory.CustomInventoryHolder;
 import net.forthecrown.utils.FtcUtils;
 import org.bukkit.Bukkit;
@@ -17,7 +17,7 @@ import org.bukkit.scoreboard.Score;
 public final class BlackMarketUtils {
     private BlackMarketUtils() {}
 
-    private static final ItemStack borderItem = CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
+    private static final ItemStack borderItem = FtcItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, "&7-");
 
     public static Inventory getBaseInventory(String name, ItemStack header){
         CustomInventoryHolder holder = new CustomInventoryHolder(name, InventoryType.CHEST);

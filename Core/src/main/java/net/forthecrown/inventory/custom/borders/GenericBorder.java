@@ -1,6 +1,6 @@
 package net.forthecrown.inventory.custom.borders;
 
-import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.FtcItems;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -22,7 +22,7 @@ public class GenericBorder extends Border {
 
     @Override
     public ItemStack getBorderItem() {
-        return CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
+        return FtcItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
     }
 
 }

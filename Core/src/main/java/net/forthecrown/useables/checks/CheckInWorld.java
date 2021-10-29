@@ -67,7 +67,7 @@ public class CheckInWorld implements UsageCheck<CheckInWorld.CheckInstance> {
         }
 
         @Override
-        public Component failMessage() {
+        public Component failMessage(Player player) {
             return Component.text("You cannot use this in this world")
                     .color(NamedTextColor.GRAY);
         }

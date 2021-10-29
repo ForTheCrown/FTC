@@ -11,6 +11,7 @@ import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.economy.houses.Dynasty;
 import net.forthecrown.economy.market.guild.topics.VoteTopic;
 import net.forthecrown.economy.market.guild.topics.VoteTopicType;
+import net.forthecrown.inventory.weapon.WeaponGoal;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
 import net.forthecrown.utils.FtcUtils;
@@ -31,6 +32,8 @@ public interface Registries {
 
     CloseableRegistry<VoteTopicType<VoteTopic>> VOTE_TOPICS = createCloseable("vote_topics");
     CloseableRegistry<Dynasty> DYNASTIES = createCloseable("houses");
+
+    CloseableRegistry<WeaponGoal> WEAPON_GOALS = createCloseable("weapon_goals");
 
     //Cosmetic things registries
     CloseableRegistry<DeathEffect> DEATH_EFFECTS = createCloseable("death_effects");

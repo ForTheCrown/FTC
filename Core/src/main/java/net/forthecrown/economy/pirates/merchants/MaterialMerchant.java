@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.events.dynamic.BmSellItemListener;
 import net.forthecrown.pirates.Pirates;
 import net.forthecrown.squire.Squire;
@@ -128,10 +128,10 @@ public class MaterialMerchant implements BlackMarketMerchant {
         ItemStack item;
 
         if(isSoldOut(material)){
-            item = CrownItems.makeItem(material, 1, true, s.decoration(TextDecoration.ITALIC, false),
+            item = FtcItems.makeItem(material, 1, true, s.decoration(TextDecoration.ITALIC, false),
                     Component.text("No longer available!").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
         } else {
-            item = CrownItems.makeItem(material, 1, true, s.decoration(TextDecoration.ITALIC, false),
+            item = FtcItems.makeItem(material, 1, true, s.decoration(TextDecoration.ITALIC, false),
                     Component.text("Value: " + getItemPrice(material) + " Rhines per item,").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false),
                     Component.text(getItemPrice(material) * 64 + " Rhines for a stack.").color(NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false),
                     Component.text("Amount of items you will sell: " + FtcFormatter.normalEnum(user.getSellAmount())).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));

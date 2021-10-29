@@ -160,7 +160,15 @@ public final class FtcUtils {
     //This is bad, underscores SHOULD NOT be used in file names with locations, world names can get caught up in it.
     //Need to use spaces instead
     public static String locationToFilename(Location l){
-        return l.getWorld().getName() + "_" + l.getBlockX() + "_" + l.getBlockY() + "_" + l.getBlockZ();
+        return locationToFilename(l.getWorld(), l.getBlockX(), l.getBlockY(), l.getBlockZ());
+    }
+
+    public static String locationToFilename(WorldVec3i vec) {
+        return locationToFilename(vec.getWorld(), vec.x, vec.y, vec.z);
+    }
+
+    public static String locationToFilename(World world, int x, int y, int z) {
+        return world.getName() + "_" + x + "_" + y + "_" + z;
     }
 
     public static Location filenameToLocation(String name) {

@@ -6,6 +6,8 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.inventory.weapon.RoyalWeapons;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.animation.AnimationBuilder;
 import net.forthecrown.utils.animation.BlockAnimation;
 import net.forthecrown.utils.math.BoundingBoxes;
@@ -43,9 +45,12 @@ public class CommandTestCore extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
-            Component gradient = FtcFormatter.gradientText("GradientTest", NamedTextColor.RED, NamedTextColor.BLUE);
+            CrownUser user = getUserSender(c);
+            Component gradient = FtcFormatter.gradientText("Giving RoyalSword", NamedTextColor.RED, NamedTextColor.BLUE);
 
-            c.getSource().sendMessage(gradient);
+            user.getInventory().addItem(RoyalWeapons.make(user.getUniqueId()));
+
+            user.sendMessage(gradient);
             return 0;
         });
     }

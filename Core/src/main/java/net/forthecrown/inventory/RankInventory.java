@@ -93,30 +93,30 @@ public class RankInventory {
         CustomInventoryHolder holder = new CustomInventoryHolder(FtcFormatter.formatColorCodes(title), 54);
         Inventory inventory = holder.getInventory();
 
-        inventory.setItem(8, CrownItems.makeItem(Material.PAPER, 1, true, "&eNext page >"));
+        inventory.setItem(8, FtcItems.makeItem(Material.PAPER, 1, true, "&eNext page >"));
         inventory.setItem(10, getRankItem(Material.MAP, Rank.DEFAULT, "&7This is the default rank!"));
 
         //border making
         ItemStack borderItem;
         switch (faction){
             case ROYALS:
-                borderItem = CrownItems.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, " ");
-                inventory.setItem(4, CrownItems.makeItem(Material.IRON_SWORD, 1, true, ChatColor.AQUA + "Royals", "&7The Crown's most loyal knights and nobles!"));
+                borderItem = FtcItems.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, " ");
+                inventory.setItem(4, FtcItems.makeItem(Material.IRON_SWORD, 1, true, ChatColor.AQUA + "Royals", "&7The Crown's most loyal knights and nobles!"));
                 break;
 
             case PIRATES:
-                borderItem = CrownItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
-                inventory.setItem(4, CrownItems.makeItem(Material.OAK_BOAT, 1, true, ChatColor.AQUA + "Pirates", "&7Sailors who bow to no crown!"));
+                borderItem = FtcItems.makeItem(Material.GRAY_STAINED_GLASS_PANE, 1, true, " ");
+                inventory.setItem(4, FtcItems.makeItem(Material.OAK_BOAT, 1, true, ChatColor.AQUA + "Pirates", "&7Sailors who bow to no crown!"));
                 break;
 
             case VIKINGS:
-                borderItem = CrownItems.makeItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, true, " ");
-                inventory.setItem(4, CrownItems.makeItem(Material.IRON_AXE, 1, true, ChatColor.AQUA + "Vikings", "&7Warriors from the north with an", "uncontrollable lust for blood"));
+                borderItem = FtcItems.makeItem(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 1, true, " ");
+                inventory.setItem(4, FtcItems.makeItem(Material.IRON_AXE, 1, true, ChatColor.AQUA + "Vikings", "&7Warriors from the north with an", "uncontrollable lust for blood"));
                 break;
 
             default:
-                inventory.setItem(4, CrownItems.makeItem(Material.IRON_SWORD, 1, true, ChatColor.AQUA + "Royals", "&7The Crown's most loyal knights and nobles!"));
-                borderItem = CrownItems.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, " ");
+                inventory.setItem(4, FtcItems.makeItem(Material.IRON_SWORD, 1, true, ChatColor.AQUA + "Royals", "&7The Crown's most loyal knights and nobles!"));
+                borderItem = FtcItems.makeItem(Material.BLACK_STAINED_GLASS_PANE, 1, true, " ");
                 break;
         }
 
@@ -139,7 +139,7 @@ public class RankInventory {
         if (rank == Rank.DEFAULT) s = "Default";
         else s = rank.getPrefix();
 
-        ItemStack item = CrownItems.makeItem(mat, 1, true, s, description);
+        ItemStack item = FtcItems.makeItem(mat, 1, true, s, description);
         if (Rank.freeRanks().contains(rank)) {
             if (user.getAvailableRanks().contains(rank)) item.setType(Material.MAP);
             else item.setType(Material.PAPER);

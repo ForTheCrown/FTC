@@ -224,8 +224,8 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
 
         if(!json.missingOrNull("pro")) pro.addAll(json.getList("pro", JsonUtils::readUUID));
         if(!json.missingOrNull("against")) against.addAll(json.getList("against", JsonUtils::readUUID));
-        if(!json.missingOrNull("proHouses")) proDynasties.addAll(json.getList("proHouses", e -> Registries.DYNASTIES.get(JsonUtils.readKey(e))));
-        if(!json.missingOrNull("againstHouses")) againstDynasties.addAll(json.getList("againstHouses", e -> Registries.DYNASTIES.get(JsonUtils.readKey(e))));
+        if(!json.missingOrNull("proDynasties")) proDynasties.addAll(json.getList("proHouses", e -> Registries.DYNASTIES.get(JsonUtils.readKey(e))));
+        if(!json.missingOrNull("againstDynasties")) againstDynasties.addAll(json.getList("againstHouses", e -> Registries.DYNASTIES.get(JsonUtils.readKey(e))));
 
         //topic
         JsonWrapper topicJson = json.getWrapped("topic");
@@ -242,8 +242,8 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
         if(!pro.isEmpty()) json.addList("pro", pro, JsonUtils::writeUUID);
         if(!against.isEmpty()) json.addList("against", against, JsonUtils::writeUUID);
 
-        if(!proDynasties.isEmpty()) json.addList("proHouses", proDynasties, h -> JsonUtils.writeKey(h.key()));
-        if(!againstDynasties.isEmpty()) json.addList("againstHouses", againstDynasties, h -> JsonUtils.writeKey(h.key()));
+        if(!proDynasties.isEmpty()) json.addList("proDynasties", proDynasties, h -> JsonUtils.writeKey(h.key()));
+        if(!againstDynasties.isEmpty()) json.addList("againstDynasties", againstDynasties, h -> JsonUtils.writeKey(h.key()));
 
         //Topic
         JsonWrapper topicJson = JsonWrapper.empty();

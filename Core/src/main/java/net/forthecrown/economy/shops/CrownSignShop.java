@@ -1,7 +1,7 @@
 package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.WorldVec3i;
@@ -124,10 +124,10 @@ public class CrownSignShop extends AbstractYamlSerializer implements SignShop {
     @Override
     public Inventory getExampleInventory(){
         Inventory inv = Bukkit.createInventory(this, InventoryType.HOPPER, Component.text("Specify what and how much"));
-        inv.setItem(0, CrownItems.makeItem(Material.BARRIER, 1, true, ""));
-        inv.setItem(1, CrownItems.makeItem(Material.BARRIER, 1, true, ""));
-        inv.setItem(3, CrownItems.makeItem(Material.BARRIER, 1, true, ""));
-        inv.setItem(4, CrownItems.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(0, FtcItems.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(1, FtcItems.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(3, FtcItems.makeItem(Material.BARRIER, 1, true, ""));
+        inv.setItem(4, FtcItems.makeItem(Material.BARRIER, 1, true, ""));
 
         return inv;
     }

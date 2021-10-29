@@ -18,7 +18,6 @@ import net.forthecrown.economy.market.guild.HazelguardTradersGuild;
 import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
-import net.forthecrown.pirates.Pirates;
 import net.forthecrown.regions.FtcRegionManager;
 import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.useables.FtcUsablesManager;
@@ -131,7 +130,6 @@ public final class Main extends JavaPlugin implements Crown {
 
         safeRunnable(Bosses::shutDown);
         safeRunnable(Cosmetics::shutDown);
-        safeRunnable(Pirates::shutDown);
         safeRunnable(GameModePacketListener::removeAll);
 
         FtcUserManager.LOADED_USERS.clear();

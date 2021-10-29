@@ -3,7 +3,7 @@ package net.forthecrown.commands.help;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -34,7 +34,7 @@ public class HelpBank extends FtcCommand {
             .append(Component.newline())
             .append(Component.text("To enter the bank, you need a "))
             .append(Component.text("[Bank Ticket]")
-                    .hoverEvent(CrownItems.voteTicket().asHoverEvent())
+                    .hoverEvent(FtcItems.voteTicket().asHoverEvent())
                     .color(NamedTextColor.AQUA))
             .append(Component.text(" earned by voting for the server with"))
             .append(Component.text(" /vote.")

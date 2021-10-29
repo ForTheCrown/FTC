@@ -63,7 +63,7 @@ public class CheckHasitem implements UsageCheck<CheckHasitem.CheckInstance> {
         }
 
         @Override
-        public Component failMessage() {
+        public Component failMessage(Player player) {
             return Component.text("You don't have the required item");
         }
 

@@ -14,12 +14,6 @@ import java.util.function.Predicate;
 public interface UsageCheckInstance extends Predicate<Player>, UsageTypeInstance {
 
     /**
-     * Gets the message to show to a player when they fail this check
-     * @return The failure message
-     */
-    @Nullable Component failMessage();
-
-    /**
      * Gets the action to perform when all the checks for an interaction have passed successfully.
      * @return ^^^^^^^^^^
      */
@@ -28,14 +22,11 @@ public interface UsageCheckInstance extends Predicate<Player>, UsageTypeInstance
     }
 
     /**
-     * Gets a personalized failure message
-     * <p>
-     * By default returns {@link UsageCheckInstance#failMessage()}
-     * </p>
+     * Gets a failure message for the check, null by default
      * @param player The player to get the message of
      * @return the personalized failure message
      */
-    default @Nullable Component personalizedMessage(Player player){
-        return failMessage();
+    default @Nullable Component failMessage(Player player) {
+        return null;
     }
 }

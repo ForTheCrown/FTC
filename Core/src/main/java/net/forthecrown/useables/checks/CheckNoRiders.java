@@ -12,7 +12,7 @@ public class CheckNoRiders implements UsageCheckInstance {
     public static final Key KEY = Crown.coreKey("no_riders");
 
     @Override
-    public @Nullable Component failMessage() {
+    public @Nullable Component failMessage(Player player) {
         return Component.text("You cannot be ridden to use this")
                 .color(NamedTextColor.GRAY);
     }

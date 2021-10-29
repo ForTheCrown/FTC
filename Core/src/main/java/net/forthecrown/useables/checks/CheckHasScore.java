@@ -77,7 +77,7 @@ public class CheckHasScore implements UsageCheck<CheckHasScore.CheckInstance> {
         }
 
         @Override
-        public Component failMessage() {
+        public Component failMessage(Player player) {
             return Component.text()
                     .color(NamedTextColor.GRAY)
                     .append(Component.text("You need at least "))

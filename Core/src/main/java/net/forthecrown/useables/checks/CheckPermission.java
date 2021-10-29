@@ -53,7 +53,7 @@ public class CheckPermission implements UsageCheck<CheckPermission.CheckInstance
         }
 
         @Override
-        public Component failMessage() {
+        public Component failMessage(Player player) {
             return Component.text("You don't have permission to use this")
                     .color(NamedTextColor.GRAY);
         }

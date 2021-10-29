@@ -9,7 +9,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
-import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.CommandSource;
@@ -52,7 +52,7 @@ public class CommandWithdraw extends FtcCommand {
         int amount = c.getArgument("amount", Integer.class);
         int totalAmount = amount * itemAmount;
 
-        if(totalAmount > bals.get(user.getUniqueId())) throw FtcExceptionProvider.cannotAfford(totalAmount);
+        if(!bals.has(user.getUniqueId(), totalAmount)) throw FtcExceptionProvider.cannotAfford(totalAmount);
         if(user.getPlayer().getInventory().firstEmpty() == -1) throw FtcExceptionProvider.inventoryFull();
 
         Component text = Component.translatable("economy.withdraw.total", FtcFormatter.rhines(totalAmount).color(NamedTextColor.YELLOW))
@@ -66,7 +66,7 @@ public class CommandWithdraw extends FtcCommand {
                 .append(itemAmount > 1 ? Component.space().append(text) : Component.empty());
 
         bals.add(user.getUniqueId(), -totalAmount, false);
-        user.getPlayer().getInventory().addItem(CrownItems.makeCoins(amount, itemAmount));
+        user.getPlayer().getInventory().addItem(FtcItems.makeCoins(amount, itemAmount));
         user.sendMessage(message);
         return 0;
     }

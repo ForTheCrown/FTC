@@ -81,7 +81,6 @@ public final class FtcCommands {
         new CommandSudo();
         new CommandSetSpawn();
         new CommandRoyals();
-        new CommandPirate();
         new CommandCosmeticEffects();
 
         //Admin utility

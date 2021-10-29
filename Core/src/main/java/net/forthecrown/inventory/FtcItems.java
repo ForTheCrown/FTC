@@ -12,6 +12,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -27,15 +29,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnegative;
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Map;
 
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 /**
  * Class for server items, such as Royal Swords, Crowns and home of the great makeItem method
  */
-public final class CrownItems {
-    private CrownItems() {}
+public final class FtcItems {
+    private FtcItems() {}
 
     /**
      * Key used by persistent data container to store stuff
@@ -50,7 +54,8 @@ public final class CrownItems {
                     )
                     .append(Component.text("-")),
             Component.text("The bearer of this weapon has proven themselves,").color(NamedTextColor.GOLD),
-            Component.text("to the Crown...").color(NamedTextColor.GOLD));
+            Component.text("to the Crown...").color(NamedTextColor.GOLD)
+    );
 
     private static final ItemStack BASE_CUTLASS = makeRoyalWeapon(Material.NETHERITE_SWORD,
             ChatUtils.convertString("&#917558-&#D1C8BA&lCaptain's Cutlass&#917558-"),
@@ -158,7 +163,6 @@ public final class CrownItems {
         if(item == null) return false;
         if(!item.hasItemMeta()) return false;
         if(item.getItemMeta().getPersistentDataContainer().has(ITEM_KEY, PersistentDataType.BYTE)) return true;
-        if(CrownWeapons.isCrownWeapon(item) || CrownWeapons.isLegacyWeapon(item)) return true;
         return isLegacyItem(item);
     }
 
@@ -322,5 +326,67 @@ public final class CrownItems {
         }
 
         return makeItem(material, amount, hideFlags, name_c, lore);
+    }
+
+    public static void setCustomTags(ItemMeta meta, CompoundTag tag) {
+        try {
+            Field f = getTagField();
+            f.setAccessible(true);
+
+            Map<String, Tag> metaTags = (Map<String, Tag>) f.get(meta);
+            metaTags.putAll(tag.tags);
+
+            f.set(meta, metaTags);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Couldn't set internalTag in ItemMeta", e);
+        }
+    }
+
+    public static @NotNull CompoundTag getCustomTags(ItemMeta meta) {
+        try {
+            Field f = getTagField();
+            f.setAccessible(true);
+
+            Map<String, Tag> metaTags = (Map<String, Tag>) f.get(meta);
+
+            CompoundTag result = new CompoundTag();
+            result.tags.putAll(metaTags);
+
+            return result;
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Couldn't get internalTag in ItemMeta", e);
+        }
+    }
+
+    public static CompoundTag getTagElement(ItemMeta meta, String key) {
+        return getCustomTags(meta).getCompound(key);
+    }
+
+    public static void setTagElement(ItemMeta meta, String key, CompoundTag tag) {
+        CompoundTag internalTag = getCustomTags(meta);
+        internalTag.put(key, tag);
+
+        setCustomTags(meta, internalTag);
+    }
+
+    public static boolean hasTagElement(ItemMeta meta, String key) {
+        return getCustomTags(meta).contains(key);
+    }
+
+    private static Field getTagField() {
+        Class meta = metaClass();
+        try {
+            return meta.getDeclaredField("unhandledTags");
+        } catch (NoSuchFieldException e) {
+            throw new IllegalStateException("couldn't find internalTag field", e);
+        }
+    }
+
+    private static Class metaClass() {
+        try {
+            return Class.forName("org.bukkit.craftbukkit.v1_17_R1.inventory.CraftMetaItem");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Couldn't find class for item meta??????", e);
+        }
     }
 }

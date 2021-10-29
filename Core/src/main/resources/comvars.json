@@ -30,7 +30,12 @@
     "crownEventIsTimed": false,
     "hulkSmashPoles": true,
     "endOpen": false,
+    "allowNonOwnerSwords": true,
 
+    "swordGoalGainPerKill": 1,
+    "advReward_task": 100,
+    "advReward_challenge": 200,
+    "advReward_goal": 500,
     "houses_startingSupply": 250,
     "houses_startingDemand": 0,
     "tpTickDelay": 60,

@@ -54,7 +54,7 @@ public class CheckNeverUsed implements UsageCheck<CheckNeverUsed.CheckInstance> 
         }
 
         @Override
-        public Component failMessage() {
+        public Component failMessage(Player player) {
             return Component.text("Only one person may ever use this")
                     .color(NamedTextColor.GRAY);
         }

@@ -28,8 +28,8 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.npc.NpcDirectory;
 import net.forthecrown.economy.selling.SellShops;
-import net.forthecrown.inventory.CrownWeapons;
-import net.forthecrown.pirates.Pirates;
+import net.forthecrown.inventory.weapon.RoyalSword;
+import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
@@ -49,7 +49,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.TrapDoor;
-import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -58,7 +57,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -100,7 +98,7 @@ public class CoreListener implements Listener {
             else event.joinMessage(nameChanged ? FtcFormatter.newNameJoinMessage(user) : FtcFormatter.joinMessage(user));
         }
 
-        Pirates.getParrotTracker().check(user.getPlayer());
+        //Pirates.getParrotTracker().check(user.getPlayer());
 
         UserManager.updateVanishedFromPerspective(user);
         Bukkit.getScheduler().scheduleSyncDelayedTask(Crown.inst(), user::onJoinLater, 1);
@@ -111,7 +109,7 @@ public class CoreListener implements Listener {
         CrownUser user = UserManager.getUser(event.getPlayer());
         user.onLeave();
 
-        Pirates.getParrotTracker().check(user.getPlayer());
+        //Pirates.getParrotTracker().check(user.getPlayer());
 
         if(user.isVanished()) event.quitMessage(null);
         else event.quitMessage(FtcFormatter.leaveMessage(user));
@@ -163,25 +161,12 @@ public class CoreListener implements Listener {
         if(event.getEntity().getKiller() == null) return;
         Player player = event.getEntity().getKiller();
         ItemStack item = player.getInventory().getItemInMainHand();
-        if(item == null || item.getType() == Material.AIR) return;
+        if(!RoyalWeapons.isRoyalSword(item)) return;
 
-        if(!CrownWeapons.isLegacyWeapon(item) && !CrownWeapons.isCrownWeapon(item)) return;
-        EntityDamageEvent event2 = event.getEntity().getLastDamageCause();
-        if (!(event2.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) || event2.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK))) return;
+        RoyalSword sword = new RoyalSword(item);
+        if(!ComVars.allowNonOwnerSwords() && !sword.getOwner().equals(player.getUniqueId())) return;
 
-        CrownWeapons.Weapon weapon = CrownWeapons.fromItem(item);
-
-        if(weapon.getTarget() == EntityType.AREA_EFFECT_CLOUD){
-            if(!(event.getEntity() instanceof Creeper)) return;
-            if(!((Creeper) event.getEntity()).isPowered()) return;
-        } else if(event.getEntity().getType() != weapon.getTarget()) return;
-
-        short pog = (short) (weapon.getProgress() + 1);
-        if(pog >= weapon.getGoal()) CrownWeapons.upgradeLevel(weapon, player);
-        else {
-            weapon.setProgress(pog);
-            weapon.update();
-        }
+        sword.kill(player, event.getEntity());
     }
 
     @EventHandler(ignoreCancelled = true)

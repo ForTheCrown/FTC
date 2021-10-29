@@ -16,7 +16,7 @@ public class CheckInventoryEmpty implements UsageCheckInstance {
     }
 
     @Override
-    public Component failMessage() {
+    public Component failMessage(Player player) {
         return Component.text("You must have an empty inventory").color(NamedTextColor.GRAY);
     }
 

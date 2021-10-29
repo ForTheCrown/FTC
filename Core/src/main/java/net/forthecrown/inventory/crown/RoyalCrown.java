@@ -4,7 +4,9 @@ import net.forthecrown.inventory.RoyalItem;
 import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.List;
 import java.util.UUID;
 
 public class RoyalCrown extends RoyalItem {
@@ -12,6 +14,11 @@ public class RoyalCrown extends RoyalItem {
 
     public RoyalCrown(ItemStack item) {
         super(item);
+    }
+
+    @Override
+    protected void onUpdate(ItemStack item, ItemMeta meta, CompoundTag nbt) {
+
     }
 
     public RoyalCrown(UUID owner, ItemStack item, byte level) {
@@ -25,12 +32,7 @@ public class RoyalCrown extends RoyalItem {
     }
 
     @Override
-    protected void writeNBT(CompoundTag tag) {
-        tag.putByte("level", level);
-    }
-
-    @Override
-    protected Component renderLore() {
+    protected List<Component> createLore() {
         return null;
     }
 }

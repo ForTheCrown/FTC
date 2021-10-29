@@ -56,7 +56,7 @@ public class CheckBranch implements UsageCheck<CheckBranch.CheckInstance> {
         }
 
         @Override
-        public Component failMessage() {
+        public Component failMessage(Player player) {
             return Component.text("You need to be a ")
                     .color(NamedTextColor.GRAY)
                     .append(Component.text(faction.getSingularName()))

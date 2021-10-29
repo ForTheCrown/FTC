@@ -52,7 +52,12 @@ public final class ComVars {
     static ComVar<Boolean>          crownEventIsTimed;
     static ComVar<Boolean>          hulkSmashPoles;
     static ComVar<Boolean>          endOpen;
+    static ComVar<Boolean>          allowNonOwnerSwords;
 
+    static ComVar<Integer>          swordGoalGainPerKill;
+    static ComVar<Integer>          advReward_task;
+    static ComVar<Integer>          advReward_challenge;
+    static ComVar<Integer>          advReward_goal;
     static ComVar<Integer>          houses_startingSupply;
     static ComVar<Integer>          houses_startingDemand;
     static ComVar<Integer>          tpTickDelay;
@@ -108,7 +113,12 @@ public final class ComVars {
         read("crownEventIsTimed",           ComVarTypes.BOOL);
         read("hulkSmashPoles",              ComVarTypes.BOOL);
         read("endOpen",                     ComVarTypes.BOOL);
+        read("allowNonOwnerSwords",         ComVarTypes.BOOL);
 
+        read("swordGoalGainPerKill",        ComVarTypes.INTEGER);
+        read("advReward_task",              ComVarTypes.INTEGER);
+        read("advReward_challenge",         ComVarTypes.INTEGER);
+        read("advReward_goal",              ComVarTypes.INTEGER);
         read("houses_startingSupply",       ComVarTypes.INTEGER);
         read("houses_startingDemand",       ComVarTypes.INTEGER);
         read("tpTickDelay",                 ComVarTypes.INTEGER);
@@ -294,7 +304,26 @@ public final class ComVars {
         return endOpen.getValue(false);
     }
 
+    public static boolean allowNonOwnerSwords() {
+        return allowNonOwnerSwords.getValue(true);
+    }
 
+
+    public static int swordGoalGainPerKill() {
+        return swordGoalGainPerKill.getValue(1);
+    }
+
+    public static int getTaskAdvReward() {
+        return advReward_task.getValue(100);
+    }
+
+    public static int getChallengeAdvReward() {
+        return advReward_challenge.getValue(250);
+    }
+
+    public static int getGoalAdvReward() {
+        return advReward_goal.getValue(500);
+    }
 
     public static int getHousesStartingSupply() {
         return houses_startingSupply.getValue(250);

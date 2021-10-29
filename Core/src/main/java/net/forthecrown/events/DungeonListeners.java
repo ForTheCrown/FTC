@@ -8,7 +8,7 @@ import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.bosses.Skalatan;
-import net.forthecrown.inventory.CrownItems;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.squire.enchantment.RoyalEnchant;
 import net.forthecrown.squire.enchantment.RoyalEnchants;
 import net.forthecrown.user.CrownUser;
@@ -108,7 +108,7 @@ public class DungeonListeners implements Listener, ClickEventTask {
                     .append(Component.text("[Claim Royal Sword]")
                             .color(NamedTextColor.AQUA)
                             .clickEvent(ClickEvent.runCommand(ClickEventManager.getCommand(id, "sword")))
-                            .hoverEvent(CrownItems.royalSword().asHoverEvent())
+                            .hoverEvent(FtcItems.royalSword().asHoverEvent())
                     )
                     .append(Component.text(" or "))
                     .append(Component.text("[Claim Trident]")
@@ -161,7 +161,7 @@ public class DungeonListeners implements Listener, ClickEventTask {
             inv.removeItemAnySlot(BossItems.SKALATAN.item());
             inv.removeItemAnySlot(BossItems.HIDEY_SPIDEY.item());
             
-            inv.addItem(CrownItems.royalSword());
+            inv.addItem(FtcItems.royalSword());
             
             player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1.2f);
             player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);

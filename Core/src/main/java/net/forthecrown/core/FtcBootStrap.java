@@ -18,6 +18,7 @@ import net.forthecrown.economy.market.guild.HazelguardTradersGuild;
 import net.forthecrown.economy.market.guild.topics.VoteTopics;
 import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.Events;
+import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.regions.FtcRegionManager;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.UserJsonSerializer;
@@ -81,6 +82,7 @@ final class FtcBootStrap {
 
         //Initialize modules
         safeRunnable(Dynasties::init);
+        safeRunnable(RoyalWeapons::init);
         safeRunnable(Bosses::init);
         safeRunnable(Cosmetics::init);
         safeRunnable(UsageChecks::init);

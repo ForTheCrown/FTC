@@ -71,7 +71,7 @@ public class CheckNumber implements UsageCheck<CheckNumber.CheckInstance> {
         }
 
         @Override
-        public Component failMessage() {
+        public Component failMessage(Player player) {
             return Component.text("You need at least ")
                 .color(NamedTextColor.GRAY)
                 .append((checkBal ? FtcFormatter.rhines(amount) : FtcFormatter.queryGems(amount)).color(NamedTextColor.GOLD))

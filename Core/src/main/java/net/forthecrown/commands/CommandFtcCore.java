@@ -1,21 +1,19 @@
 package net.forthecrown.commands;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import io.papermc.paper.adventure.PaperAdventure;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.forthecrown.commands.arguments.PetArgument;
-import net.forthecrown.commands.arguments.UserParseResult;
 import net.forthecrown.commands.arguments.UserArgument;
-import net.forthecrown.commands.manager.FtcCommands;
+import net.forthecrown.commands.arguments.UserParseResult;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcCommands;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
 import net.forthecrown.core.ComVars;
@@ -31,16 +29,17 @@ import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.ComponentArgument;
 import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.inventory.CrownItems;
-import net.forthecrown.inventory.CrownWeapons;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.pirates.Pirates;
-import net.forthecrown.user.*;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.CrownUserAlt;
+import net.forthecrown.user.FtcUserAlt;
+import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.data.Faction;
 import net.forthecrown.user.data.Pet;
 import net.forthecrown.user.data.Rank;
+import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -50,8 +49,6 @@ import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -667,7 +664,7 @@ public class CommandFtcCore extends FtcCommand {
                                                     int level = c.getArgument("level", Integer.class);
                                                     String owner = c.getArgument("owner", String.class);
 
-                                                    player.getInventory().addItem(CrownItems.makeCrown(level, owner));
+                                                    player.getInventory().addItem(FtcItems.makeCrown(level, owner));
                                                     c.getSource().sendMessage("You got a level " + level + " crown");
 
                                                     return 0;
@@ -681,9 +678,6 @@ public class CommandFtcCore extends FtcCommand {
                                 )
                                 .executes(c -> giveCoins(getPlayerSender(c), 100))
                         )
-                        .then(weaponArg("royalsword", CrownItems.royalSword()))
-                        .then(weaponArg("cutlass", CrownItems.cutlass()))
-                        .then(weaponArg("viking_axe", CrownItems.vikingAxe()))
 
                         .then(literal("voteticket").executes(c -> giveTicket(false, getPlayerSender(c), c.getSource())))
                         .then(literal("eliteticket").executes(c -> giveTicket(true, getPlayerSender(c), c.getSource())))
@@ -703,39 +697,10 @@ public class CommandFtcCore extends FtcCommand {
                 );
     }
 
-    private LiteralArgumentBuilder<CommandSource> weaponArg(String arg, ItemStack item){
-        return literal(arg)
-                .executes(weapon(item))
-                .then(levelArg(item));
-    }
-
-    private RequiredArgumentBuilder<CommandSource, Integer> levelArg(ItemStack item){
-        return argument("level", IntegerArgumentType.integer(1, 10)).executes(c -> giveWeapon(c, item, c.getArgument("level", Integer.class)));
-    }
-
-    private Command<CommandSource> weapon(ItemStack item){
-        return c -> giveWeapon(c, item, 1);
-    }
-
-    private int giveWeapon(CommandContext<CommandSource> c, ItemStack item, int level) throws CommandSyntaxException {
-        Player player = getPlayerSender(c);
-        ItemStack toGive = item.clone();
-        CrownWeapons.Weapon weapon = CrownWeapons.fromItem(toGive);
-
-        for (int i = 0; i < level-1; i++){
-            CrownWeapons.upgradeLevel(weapon, player);
-        }
-
-        ItemMeta meta = toGive.getItemMeta();
-        player.getInventory().addItem(toGive);
-        c.getSource().sendAdmin( "Giving " + (FtcUtils.isNullOrBlank(meta.getDisplayName()) ? FtcFormatter.normalEnum(toGive.getType()) : meta.getDisplayName()));
-        return level;
-    }
-
     private int giveTicket(boolean elite, Player player, CommandSource source){
         try {
-            if(elite) player.getInventory().addItem(CrownItems.eliteVoteTicket());
-            else player.getInventory().addItem(CrownItems.voteTicket());
+            if(elite) player.getInventory().addItem(FtcItems.eliteVoteTicket());
+            else player.getInventory().addItem(FtcItems.voteTicket());
         } catch (Exception e){
             player.sendMessage("Inventory full");
             return 0;
@@ -745,7 +710,7 @@ public class CommandFtcCore extends FtcCommand {
     }
 
     private int giveCoins(Player player, int amount){
-        player.getInventory().addItem(CrownItems.makeCoins(amount, 1));
+        player.getInventory().addItem(FtcItems.makeCoins(amount, 1));
         player.sendMessage("You got " + amount + " Rhines worth of coins");
         return 0;
     }
@@ -793,10 +758,6 @@ public class CommandFtcCore extends FtcCommand {
         ITEM_PRICES ("Item Prices", b -> {
             if(b) Crown.getPriceMap().reload();
             else Crown.getPriceMap().save();
-        }),
-        GRAPPLING_HOOK ("Grappling Hook", b -> {
-            if(b) Pirates.getParkour().reload();
-            else Pirates.getParkour().save();
         }),
         PARROT_TRACKER ("Parrot Tracker", b -> {
             if(b) Pirates.getParrotTracker().reload();

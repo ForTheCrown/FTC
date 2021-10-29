@@ -22,7 +22,7 @@ public class CommandCrownTop extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
-            if(!ComVars.isEventActive()) throw FtcExceptionProvider.create("Event is not active");
+            if(!ComVars.isEventActive()) throw FtcExceptionProvider.translatable("commands.eventNotActive");
 
             FtcUtils.showLeaderboard(c.getSource().asPlayer(), "crown");
             return 0;

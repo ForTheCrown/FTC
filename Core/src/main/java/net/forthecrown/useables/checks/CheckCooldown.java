@@ -90,12 +90,7 @@ public class CheckCooldown implements UsageCheck<CheckCooldown.CheckInstance> {
         }
 
         @Override
-        public Component failMessage() {
-            return null;
-        }
-
-        @Override
-        public Component personalizedMessage(Player player) {
+        public Component failMessage(Player player) {
             return duration > (2400*50) ? Component.text("You cannot use this for ")
                     .color(NamedTextColor.GRAY)
                     .append(Component.text(FtcFormatter.convertMillisIntoTime(onCooldown.get(player.getUniqueId()) - System.currentTimeMillis())).color(NamedTextColor.GOLD))

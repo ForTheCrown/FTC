@@ -69,7 +69,7 @@ public class CheckHasAllItems implements UsageCheck<CheckHasAllItems.CheckInstan
         }
 
         @Override
-        public Component failMessage() {
+        public Component failMessage(Player player) {
             return Component.text("You don't have all the items needed").color(NamedTextColor.GRAY);
         }
 

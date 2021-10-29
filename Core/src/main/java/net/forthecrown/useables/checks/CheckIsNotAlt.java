@@ -17,7 +17,7 @@ public class CheckIsNotAlt implements UsageCheckInstance {
     }
 
     @Override
-    public Component failMessage() {
+    public Component failMessage(Player player) {
         return Component.text("Alt accounts cannot use this")
                 .color(NamedTextColor.GRAY);
     }
