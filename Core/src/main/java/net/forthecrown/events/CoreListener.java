@@ -13,6 +13,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.emotes.EmoteSmooch;
 import net.forthecrown.core.ComVars;
@@ -23,11 +25,13 @@ import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.StaffChat;
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.npc.NpcDirectory;
 import net.forthecrown.economy.selling.SellShops;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.useables.kits.Kit;
@@ -37,6 +41,7 @@ import net.forthecrown.user.actions.MarriageMessage;
 import net.forthecrown.user.actions.UserActionHandler;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -44,6 +49,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -58,18 +64,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.logging.Level;
 
 import static net.forthecrown.core.chat.FtcFormatter.checkUppercase;
 import static net.forthecrown.core.chat.FtcFormatter.formatColorCodes;
@@ -394,5 +403,52 @@ public class CoreListener implements Listener {
                     .append(message)
                     .build();
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        if(event.getKeepInventory()) return;
+
+        CrownUser user = UserManager.getUser(event.getEntity());
+        org.bukkit.Location loc = user.getLocation();
+
+        user.setLastLocation(loc);
+
+        // Tell the Player where they died, but ignore world_void deaths.
+        String diedAt = "died at x=" + loc.getBlockX() + ", y=" + loc.getBlockY() + ", z=" + loc.getBlockZ() + ".";
+        if (!loc.getWorld().getName().equalsIgnoreCase("world_void"))
+            user.sendMessage(ChatColor.GRAY + "[FTC] You " + diedAt);
+
+        Announcer.log(Level.INFO, "! " + user.getName() + " " + diedAt);
+
+        /*Grave grave = user.getGrave();
+        for (ItemStack i: event.getEntity().getInventory()){
+            if(FtcItems.isCrownItem(i)){
+                grave.addItem(i);
+                event.getDrops().remove(i);
+            }
+        }*/
+
+        PlayerInventory inventory = event.getEntity().getInventory();
+        Int2ObjectMap<ItemStack> items = new Int2ObjectOpenHashMap<>();
+
+        for (int i = 0; i < inventory.getSize(); i++) {
+            ItemStack item = inventory.getItem(i);
+
+            if(FtcUtils.isItemEmpty(item)) continue;
+
+            if(FtcItems.isCrownItem(item) || RoyalWeapons.isRoyalSword(item)) {
+                items.put(i, item);;
+            }
+        }
+        event.getDrops().removeAll(items.values());
+
+        Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
+            PlayerInventory inv = user.getPlayer().getInventory();
+
+            for (Int2ObjectMap.Entry<ItemStack> e: items.int2ObjectEntrySet()) {
+                inv.setItem(e.getIntKey(), e.getValue());
+            }
+        }, 1);
     }
 }

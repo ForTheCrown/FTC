@@ -32,6 +32,9 @@
     "endOpen": false,
     "allowNonOwnerSwords": true,
 
+    "effectCost_arrow": 1000,
+    "effectCost_death": 2000,
+    "effectCost_travel": 2500,
     "swordGoalGainPerKill": 1,
     "advReward_task": 100,
     "advReward_challenge": 200,

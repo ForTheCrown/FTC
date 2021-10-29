@@ -20,7 +20,6 @@ public final class Events {
         pm = main.getServer().getPluginManager();
 
         register(new CoreListener());
-        register(new GraveListener());
 
         register(new ShopCreateListener());
         register(new ShopInteractionListener());

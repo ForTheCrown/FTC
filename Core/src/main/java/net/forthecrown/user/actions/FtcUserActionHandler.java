@@ -365,6 +365,7 @@ public class FtcUserActionHandler implements UserActionHandler {
         if(ComVars.shouldHulkSmashPoles() && user.hulkSmashesPoles() && FtcUtils.hasOnlyAirAbove(WorldVec3i.of(teleportLoc))) {
             //Move TP loc to sky since hulk smash
             teleportLoc.setY(256);
+            teleportLoc.setPitch(90f);
 
             //Rocket vector
             Vector vector = new Vector(0, 20, 0);

@@ -7,11 +7,11 @@ public class VoteModifier {
     public static final int MAX_VALUE = 50;
 
     //Negative against, positive pro
-    private final int value;
+    private final byte value;
     private final CrownRandom random = new CrownRandom();
 
     public VoteModifier(int value) {
-        this.value = MathUtil.clamp(value, -MAX_VALUE, MAX_VALUE);
+        this.value = (byte) MathUtil.clamp(value, -MAX_VALUE, MAX_VALUE);
     }
 
     public int getValue() {

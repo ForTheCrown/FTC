@@ -121,7 +121,6 @@ public final class FtcCommands {
         new CommandGems();
         new CommandProfile();
         new CommandRank();
-        new CommandGrave();
         new CommandLeave();
         new CommandWild();
         new CommandIgnore();

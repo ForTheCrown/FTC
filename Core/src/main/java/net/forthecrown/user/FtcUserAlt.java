@@ -36,8 +36,6 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
     @Override
     protected boolean shouldResetEarnings() { return System.currentTimeMillis() > getMain().getNextResetTime(); }
     @Override
-    public Grave getGrave(){ return getMain().getGrave(); }
-    @Override
     public boolean hasPet(Pet pet) { return getMain().hasPet(pet); }
     @Override
     public void addPet(Pet pet) { getMain().addPet(pet); }

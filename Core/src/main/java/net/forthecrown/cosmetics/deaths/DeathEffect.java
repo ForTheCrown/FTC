@@ -1,8 +1,8 @@
 package net.forthecrown.cosmetics.deaths;
 
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.cosmetics.CosmeticConstants;
 import net.forthecrown.cosmetics.CosmeticEffect;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.FtcInventory;
@@ -37,7 +37,7 @@ public abstract class DeathEffect extends CosmeticEffect {
                         equals(data.getActiveDeath()),
                         data.hasDeath(this),
                         this,
-                        CosmeticConstants.DEATH_PRICE
+                        ComVars.deathEffectCost()
                 )
         );
     }
@@ -51,12 +51,12 @@ public abstract class DeathEffect extends CosmeticEffect {
             data.setActiveDeath(this);
             user.sendMessage(Component.translatable("cosmetics.set.death", NamedTextColor.YELLOW, name()));
         } else {
-            if(user.getGems() < CosmeticConstants.DEATH_PRICE){
-                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.queryGems(CosmeticConstants.DEATH_PRICE)));
+            if(user.getGems() < ComVars.deathEffectCost()){
+                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.queryGems(ComVars.deathEffectCost())));
                 return;
             }
 
-            user.setGems(user.getGems() - CosmeticConstants.DEATH_PRICE);
+            user.setGems(user.getGems() - ComVars.deathEffectCost());
             data.addDeath(this);
             data.setActiveDeath(this);
 

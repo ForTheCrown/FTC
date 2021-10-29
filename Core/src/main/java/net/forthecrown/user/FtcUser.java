@@ -97,7 +97,6 @@ public class FtcUser implements CrownUser {
     public final FtcUserInteractions interactions;
     public final FtcUserCosmeticData cosmeticData;
     public final FtcUserMail mail;
-    public final FtcUserGrave grave;
     public final FtcUserHomes homes;
 
     //Faction and rank stuff
@@ -151,7 +150,6 @@ public class FtcUser implements CrownUser {
         cosmeticData = new FtcUserCosmeticData(this);
         mail = new FtcUserMail(this);
         homes = new FtcUserHomes(this);
-        grave = new FtcUserGrave(this);
 
         reload();
 
@@ -646,11 +644,6 @@ public class FtcUser implements CrownUser {
         sendMessage("&7You cannot currently swap branches!");
         sendMessage("&7You can swap your branch in &e" + FtcFormatter.convertMillisIntoTime(timUntil) + "&7.");
         return false;
-    }
-
-    @Override
-    public Grave getGrave() {
-        return grave;
     }
 
     @Override

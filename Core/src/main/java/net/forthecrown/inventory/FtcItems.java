@@ -11,7 +11,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.apache.commons.lang.Validate;
@@ -162,20 +161,7 @@ public final class FtcItems {
     public static boolean isCrownItem(@Nullable ItemStack item){
         if(item == null) return false;
         if(!item.hasItemMeta()) return false;
-        if(item.getItemMeta().getPersistentDataContainer().has(ITEM_KEY, PersistentDataType.BYTE)) return true;
-        return isLegacyItem(item);
-    }
-
-    private static boolean isLegacyItem(ItemStack itemStack){
-        ItemMeta meta = itemStack.getItemMeta();
-        if(meta == null) return false;
-        if(meta.lore() == null) return false;
-        boolean result =  meta.lore().size() > 1 && ChatColor.stripColor(meta.getDisplayName()).contains("-Crown-");
-        if(result){
-            meta.getPersistentDataContainer().set(ITEM_KEY, PersistentDataType.BYTE, (byte) 1);
-            itemStack.setItemMeta(meta);
-        }
-        return result;
+        return item.getItemMeta().getPersistentDataContainer().has(ITEM_KEY, PersistentDataType.BYTE);
     }
 
     /**

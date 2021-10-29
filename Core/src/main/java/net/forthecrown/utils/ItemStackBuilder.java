@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.sk89q.worldedit.bukkit.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.math.MathUtil;
 import net.kyori.adventure.text.Component;
@@ -16,7 +17,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
@@ -28,7 +28,10 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * A class for building item stacks
@@ -338,17 +341,10 @@ public class ItemStackBuilder implements Cloneable {
 
         meta.setUnbreakable(unbreakable);
 
+        if(!tags.isEmpty()) FtcItems.setCustomTags(meta, tags);
+
         result.setItemMeta(meta);
-
-        if(!tags.isEmpty()) {
-            net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(result);
-            CompoundTag tag = nms.getOrCreateTag();
-
-            tag.merge(tags);
-            nms.setTag(tag);
-
-            return CraftItemStack.asBukkitCopy(nms);
-        } else return result;
+        return result;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package net.forthecrown.serializer;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -8,12 +7,7 @@ import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.FtcUser;
-import net.forthecrown.user.data.SoldMaterialData;
-import net.forthecrown.user.data.UserPref;
-import net.forthecrown.user.data.Faction;
-import net.forthecrown.user.data.Pet;
-import net.forthecrown.user.data.Rank;
-import net.forthecrown.user.data.SellAmount;
+import net.forthecrown.user.data.*;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
@@ -92,10 +86,6 @@ public class UserJsonSerializer implements UserSerializer {
         //Last known location
         Location entLoc = user.entityLocation;
         if(entLoc != null) json.addLocation("lastKnowLoc", entLoc);
-
-        //Grave items
-        JsonArray graveItems = user.grave.serialize();
-        if(graveItems != null) json.add("grave", graveItems);
 
         //Sold materials
         if(!MapUtils.isNullOrEmpty(user.matData)){
@@ -207,7 +197,6 @@ public class UserJsonSerializer implements UserSerializer {
         }
 
         //User data type things
-        user.grave.deserialize(json.get("grave"));
         user.cosmeticData.deserialize(json.get("cosmeticData"));
         user.homes.deserialize(json.get("homes"));
         user.interactions.deserialize(json.get("interactions"));

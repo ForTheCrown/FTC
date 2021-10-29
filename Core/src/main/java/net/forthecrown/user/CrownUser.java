@@ -833,7 +833,6 @@ public interface CrownUser extends
     void updateGodMode() throws UserNotOnlineException;
 
     UserDataContainer getDataContainer();
-    Grave getGrave();
     MarketOwnership getMarketOwnership();
     CosmeticData getCosmeticData();
     UserInteractions getInteractions();

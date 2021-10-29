@@ -54,6 +54,9 @@ public final class ComVars {
     static ComVar<Boolean>          endOpen;
     static ComVar<Boolean>          allowNonOwnerSwords;
 
+    static ComVar<Integer>          effectCost_arrow;
+    static ComVar<Integer>          effectCost_death;
+    static ComVar<Integer>          effectCost_travel;
     static ComVar<Integer>          swordGoalGainPerKill;
     static ComVar<Integer>          advReward_task;
     static ComVar<Integer>          advReward_challenge;
@@ -115,6 +118,9 @@ public final class ComVars {
         read("endOpen",                     ComVarTypes.BOOL);
         read("allowNonOwnerSwords",         ComVarTypes.BOOL);
 
+        read("effectCost_arrow",            ComVarTypes.INTEGER);
+        read("effectCost_death",            ComVarTypes.INTEGER);
+        read("effectCost_travel",           ComVarTypes.INTEGER);
         read("swordGoalGainPerKill",        ComVarTypes.INTEGER);
         read("advReward_task",              ComVarTypes.INTEGER);
         read("advReward_challenge",         ComVarTypes.INTEGER);
@@ -308,6 +314,20 @@ public final class ComVars {
         return allowNonOwnerSwords.getValue(true);
     }
 
+
+
+
+    public static int arrowEffectCost() {
+        return effectCost_arrow.getValue(1000);
+    }
+
+    public static int deathEffectCost() {
+        return effectCost_death.getValue(2000);
+    }
+
+    public static int travelEffectCost() {
+        return effectCost_travel.getValue(2500);
+    }
 
     public static int swordGoalGainPerKill() {
         return swordGoalGainPerKill.getValue(1);

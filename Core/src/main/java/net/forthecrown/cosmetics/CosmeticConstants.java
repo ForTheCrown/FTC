@@ -22,12 +22,6 @@ import org.bukkit.Material;
 public abstract class CosmeticConstants {
     private CosmeticConstants() {}
 
-    //private static final int MENU_COOLDOWN = 0;
-
-    public static final int ARROW_PRICE = 1000;
-    public static final int DEATH_PRICE = 2000;
-    public static final int TRAVEL_PRICE = 2500;
-
     public static final CosmeticHeader HEADER = new CosmeticHeader();
     public static final RidingToggleOption RIDING_TOGGLE = new RidingToggleOption();
     public static final EmoteToggleOption EMOTE_TOGGLE = new EmoteToggleOption();

@@ -1,8 +1,8 @@
 package net.forthecrown.cosmetics.arrows;
 
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.cosmetics.CosmeticConstants;
 import net.forthecrown.cosmetics.CosmeticEffect;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.FtcInventory;
@@ -43,7 +43,7 @@ public class ArrowEffect extends CosmeticEffect {
                         equals(data.getActiveArrow()),
                         data.hasArrow(this),
                         this,
-                        CosmeticConstants.ARROW_PRICE
+                        ComVars.arrowEffectCost()
                 )
         );
     }
@@ -57,12 +57,12 @@ public class ArrowEffect extends CosmeticEffect {
             data.setActiveArrow(this);
             user.sendMessage(Component.translatable("cosmetics.set.arrow", NamedTextColor.YELLOW, name()));
         } else {
-            if(user.getGems() < CosmeticConstants.ARROW_PRICE){
-                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.queryGems(CosmeticConstants.ARROW_PRICE)));
+            if(user.getGems() < ComVars.arrowEffectCost()){
+                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.queryGems(ComVars.arrowEffectCost())));
                 return;
             }
 
-            user.setGems(user.getGems() - CosmeticConstants.ARROW_PRICE);
+            user.setGems(user.getGems() - ComVars.arrowEffectCost());
             data.addArrow(this);
             data.setActiveArrow(this);
 

@@ -2,6 +2,7 @@ package net.forthecrown.economy.houses;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
@@ -13,6 +14,7 @@ import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.Nameable;
 import net.kyori.adventure.key.Key;
@@ -173,6 +175,10 @@ public class Dynasty implements
         return new EqualsBuilder()
                 .append(key, dynasty.key)
                 .isEquals();
+    }
+
+    public JsonPrimitive serializeReference() {
+        return JsonUtils.writeKey(key());
     }
 
     @Override
