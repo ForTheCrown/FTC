@@ -12,6 +12,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 
 public class CommandKingMaker extends FtcCommand {
 
@@ -49,6 +50,9 @@ public class CommandKingMaker extends FtcCommand {
                         .executes(c ->{
                             if(Crown.getKingship().getUniqueId() == null) throw FtcExceptionProvider.create("There is already no king");
 
+                            String removeGroupCmd = "lp user " + Crown.getKingship().getUser().getName() + " parent remove king";
+                            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), removeGroupCmd);
+
                             Crown.getKingship().set(null);
                             c.getSource().sendMessage("King has been removed");
                             return 0;
@@ -71,6 +75,9 @@ public class CommandKingMaker extends FtcCommand {
 
         kingship.set(king.getUniqueId());
         kingship.setFemale(isQueen);
+
+        String addGroupCmd = "lp user " + king.getName() + " parent add " + ( isQueen ? "queen" : "king" );
+        Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), addGroupCmd);
 
         Component prefix = isQueen ? Kingship.queenTitle() : Kingship.kingTitle();
 
