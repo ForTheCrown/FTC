@@ -1,4 +1,4 @@
-package net.forthecrown.economy.market.guild;
+package net.forthecrown.economy.guild;
 
 import com.google.gson.JsonElement;
 import net.forthecrown.serializer.JsonSerializable;

@@ -10,6 +10,7 @@ import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.utils.math.WorldVec3i;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -17,8 +18,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import org.bukkit.*;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -104,8 +103,6 @@ public final class FtcUtils {
     public static CraftPlayerProfile profileWithTexture(@Nullable String name, @Nullable UUID id, String textureLink) {
         CraftPlayerProfile profile = new CraftPlayerProfile(id, name);
 
-        String.join("", "");
-
         profile.setProperty(
                 new ProfileProperty(
                         "textures",
@@ -157,40 +154,6 @@ public final class FtcUtils {
         Bukkit.getScheduler().scheduleSyncDelayedTask(Crown.inst(), () -> player.setScoreboard(mainScoreboard), 300L);
     }
 
-    //This is bad, underscores SHOULD NOT be used in file names with locations, world names can get caught up in it.
-    //Need to use spaces instead
-    public static String locationToFilename(Location l){
-        return locationToFilename(l.getWorld(), l.getBlockX(), l.getBlockY(), l.getBlockZ());
-    }
-
-    public static String locationToFilename(WorldVec3i vec) {
-        return locationToFilename(vec.getWorld(), vec.x, vec.y, vec.z);
-    }
-
-    public static String locationToFilename(World world, int x, int y, int z) {
-        return world.getName() + "_" + x + "_" + y + "_" + z;
-    }
-
-    public static Location filenameToLocation(String name) {
-        World world = null;
-        for (World w: Bukkit.getWorlds()) {
-            if(name.startsWith(w.getName())) world = w;
-        }
-
-        assert world != null;
-
-        name = name.replaceAll(world.getName() + "_", "");
-        String[] cords = name.split("_");
-
-        Validate.isTrue(cords.length == 3, "Invalid file name");
-
-        int x = Integer.parseInt(cords[0]);
-        int y = Integer.parseInt(cords[1]);
-        int z = Integer.parseInt(cords[2]);
-
-        return new Location(world, x, y, z);
-    }
-
     public static Key parseKey(String str) throws IllegalStateException {
         return parseKey(new StringReader(str));
     }
@@ -204,7 +167,7 @@ public final class FtcUtils {
         }
     }
 
-    public static void handleSyntaxException(CommandSender sender, CommandSyntaxException exception) {
+    public static void handleSyntaxException(Audience sender, CommandSyntaxException exception) {
         if(exception instanceof RoyalCommandException) {
             RoyalCommandException e = (RoyalCommandException) exception;
             sender.sendMessage(e.formattedText());

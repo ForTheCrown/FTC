@@ -1,11 +1,8 @@
 package net.forthecrown.economy.shops;
 
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 /**
  * A shop session.
@@ -19,45 +16,28 @@ public class SignShopSession {
     private final SignShop shop;
     private final ShopType type;
     private final ShopInventory inventory;
+    private final ShopOwnership ownership;
 
-    private final CrownUser user;
-    private final Player player;
-    private final PlayerInventory playerInventory;
-
-    private final CrownUser owner;
+    private final ShopCustomer user;
 
     private int amount = 0;
     private Runnable onSessionExpire;
 
-    public SignShopSession(SignShop shop, CrownUser user) {
+    public SignShopSession(SignShop shop, ShopCustomer user) {
         this.shop = shop;
         this.material = shop.getInventory().getExampleItem().getType();
         this.type = shop.getType();
         this.inventory = shop.getInventory();
+        this.ownership = shop.getOwnership();
 
         this.user = user;
-        this.player = user.getPlayer();
-        this.playerInventory = player.getInventory();
-
-        this.owner = UserManager.getUser(shop.getOwner());
-    }
-
-    /**
-     * Gets the owner of the shop the user is interacting with.
-     * <p></p>
-     * Since admin shops don't handle owners differently, this works in all cases
-     *
-     * @return The shop's owner
-     */
-    public CrownUser getOwner() {
-        return owner;
     }
 
     /**
      * Gets the inventory of the session's shop
      * @return This session's shop's inventory
      */
-    public ShopInventory getInventory() {
+    public ShopInventory getShopInventory() {
         return inventory;
     }
 
@@ -66,7 +46,7 @@ public class SignShopSession {
      * @return Current shop's exampleItem
      */
     public ItemStack getExampleItem() {
-        return getInventory().getExampleItem();
+        return getShopInventory().getExampleItem();
     }
 
     /**
@@ -101,12 +81,16 @@ public class SignShopSession {
         return shop;
     }
 
+    public ShopOwnership getOwnership() {
+        return ownership;
+    }
+
     /**
      * Gets whether the use has space for more items in their inventory.
      * @return Whether the user has inventory room.
      */
-    public boolean userHasSpace() {
-        return getPlayerInventory().firstEmpty() != -1;
+    public boolean customerHasSpace() {
+        return getCustomerInventory().firstEmpty() != -1;
     }
 
     /**
@@ -114,31 +98,23 @@ public class SignShopSession {
      * @return Whether the shop has inventory room.
      */
     public boolean shopHasSpace() {
-        return !getInventory().isFull();
+        return !getShopInventory().isFull();
     }
 
     /**
      * Gets the session's user
      * @return The current user
      */
-    public CrownUser getCustomer() {
+    public ShopCustomer getCustomer() {
         return user;
-    }
-
-    /**
-     * Gets the session's player
-     * @return The current player
-     */
-    public Player getPlayer() {
-        return player;
     }
 
     /**
      * Gets the inventory of the session's player
      * @return The player's inventory
      */
-    public PlayerInventory getPlayerInventory() {
-        return playerInventory;
+    public Inventory getCustomerInventory() {
+        return user.getInventory();
     }
 
     /**

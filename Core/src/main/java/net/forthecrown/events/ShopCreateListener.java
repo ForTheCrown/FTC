@@ -54,6 +54,7 @@ public class ShopCreateListener implements Listener {
                 case "=[buy]=":
                 case "(buy)":
                 case "[buy]":
+                case "<buy>":
                     if(player.hasPermission(Permissions.SHOP_ADMIN) && player.getGameMode() == GameMode.CREATIVE) shopType = ShopType.ADMIN_BUY;
                     else shopType = ShopType.BUY;
                     break;
@@ -62,6 +63,7 @@ public class ShopCreateListener implements Listener {
                 case "=[sell]=":
                 case "(sell)":
                 case "[sell]":
+                case "<sell>":
                     if(player.hasPermission(Permissions.SHOP_ADMIN) && player.getGameMode() == GameMode.CREATIVE) shopType = ShopType.ADMIN_SELL;
                     else shopType = ShopType.SELL;
                     break;
@@ -106,7 +108,7 @@ public class ShopCreateListener implements Listener {
             SignShop shop = shopManager.createSignShop(sign.getLocation(), shopType, price, player.getUniqueId());
 
             //Opens the example item selection screen
-            player.openInventory(shop.getExampleInventory());
+            player.openInventory(shopManager.getExampleInventory());
             Crown.inst().getServer().getPluginManager().registerEvents(new ExampleItemSelectionListener(player, shop), Crown.inst());
 
             if(shopType == ShopType.BUY) event.line(0, shopType.outOfStockLabel());

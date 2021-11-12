@@ -4,12 +4,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Represents the inventory of a sign shop
  * <p></p>
- * Implementation: {@link CrownShopInventory}
+ * Implementation: {@link FtcShopInventory}
  */
 public interface ShopInventory extends Inventory {
     /**
@@ -37,7 +38,7 @@ public interface ShopInventory extends Inventory {
      * Sets the shops contents and sorts it
      * @param list The new contents of the shop
      */
-    void setShopContents(List<ItemStack> list);
+    void setShopContents(Collection<ItemStack> list);
 
     /**
      * Gets the shops contents without without any null item stacks

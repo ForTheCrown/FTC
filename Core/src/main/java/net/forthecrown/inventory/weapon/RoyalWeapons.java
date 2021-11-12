@@ -10,13 +10,11 @@ import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,25 +24,112 @@ import java.util.UUID;
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 public final class RoyalWeapons {
+    public static final Component RANK_1_NAME = makeName("Traveller's", NamedTextColor.GRAY, NamedTextColor.DARK_GRAY, false);
+    public static final Component RANK_2_NAME = makeName("Squire's", NamedTextColor.YELLOW, NamedTextColor.GRAY, false);
+    public static final Component RANK_3_NAME = makeName("Knight's", NamedTextColor.YELLOW, NamedTextColor.YELLOW, false);
+    public static final Component RANK_4_NAME = makeName("Lord's", NamedTextColor.YELLOW, NamedTextColor.YELLOW, true);
+    public static final Component RANK_5_NAME = makeName("Royal", NamedTextColor.YELLOW, NamedTextColor.GOLD, true);
+    public static final Component RANK_FINAL_NAME = makeName("Dragon's", NamedTextColor.RED, NamedTextColor.DARK_RED, true);
+
+    public static final int MAX_RANK = 30;
+    public static final Material NON_DONATOR_LIMIT_MAT = Material.GOLDEN_SWORD;
+
     private RoyalWeapons() {}
 
     private static final Int2ObjectMap<WeaponUpgrade> UPGRADES = new Int2ObjectOpenHashMap<>();
 
     public static void init() {
-        //Upgrade creation
-        UPGRADES.put(5, WeaponUpgrade.enchantment(Enchantment.LOOT_BONUS_MOBS, 4));
-        UPGRADES.put(10, WeaponUpgrade.enchantment(Enchantment.LOOT_BONUS_MOBS, 5));
+        int rank = 1;
 
-        //Goal registration
-        register(WeaponGoal.simple(EntityType.ZOMBIE, 1000, 1));
-        register(WeaponGoal.simple(EntityType.SKELETON, 1000, 2));
-        register(WeaponGoal.simple(EntityType.SNOWMAN, 100, 3));
-        register(WeaponGoal.simple(EntityType.CREEPER, 1000, 4));
-        register(WeaponGoal.simple(EntityType.BLAZE, 1000, 5));
-        register(WeaponGoal.simple(EntityType.ENDERMAN, 1000, 6));
-        register(WeaponGoal.simple(EntityType.GHAST, 200, 7));
-        register(new WeaponGoal.ChargedCreeperGoal(25, 8));
-        register(WeaponGoal.simple(EntityType.WITHER, 10, 9));
+        UPGRADES.put(rank, WeaponUpgrade.reforge(
+                Material.WOODEN_SWORD,
+                RANK_1_NAME,
+                Component.text("Why are you even seeing this???"),
+                "The sword of an aspiring", "adventurer"
+        ));
+
+        //Traveller
+        register(WeaponGoal.anyEntity(100, rank));
+
+        //Squire
+        int goal = 150;
+        UPGRADES.put(++rank, WeaponUpgrade.reforge(
+                Material.STONE_SWORD,
+                RANK_2_NAME,
+                Component.text("Upgrade to Stone"),
+                "Forged from grand rock",
+                "it carries the hero on"
+        ));
+
+        register(WeaponGoal.simple(EntityType.ZOMBIE, goal, rank));
+        register(WeaponGoal.simple(EntityType.CREEPER, goal, rank));
+        register(WeaponGoal.simple(EntityType.SKELETON, goal, rank));
+        register(WeaponGoal.simple(EntityType.SPIDER, goal, rank));
+
+        //Knight
+        goal = 200;
+        UPGRADES.put(++rank, WeaponUpgrade.reforge(
+                Material.IRON_SWORD,
+                RANK_3_NAME,
+                Component.text("Upgrade to Iron"),
+                "Progress, as stone is left",
+                "in favor of unbreaking iron"
+        ));
+
+        register(WeaponGoal.simple(EntityType.BLAZE, goal, rank));
+        register(WeaponGoal.simple(EntityType.WITHER_SKELETON, goal, rank));
+        register(WeaponGoal.simple(EntityType.MAGMA_CUBE, goal, rank));
+        register(WeaponGoal.simple(EntityType.PIGLIN, goal, rank));
+        register(WeaponGoal.simple(EntityType.ENDERMAN, goal, rank));
+
+        //Lord
+        UPGRADES.put(++rank, WeaponUpgrade.reforge(
+                Material.DIAMOND_SWORD,
+                RANK_4_NAME,
+                Component.text("Upgrade to Diamond"),
+                "The shining beauty of",
+                "diamonds blinds enemies"
+        ));
+
+        //Royal
+        UPGRADES.put(++rank, WeaponUpgrade.reforge(
+                Material.GOLDEN_SWORD,
+                Enchantment.LOOT_BONUS_MOBS, 4,
+                RANK_5_NAME,
+                Component.text("Upgrade to Gold"),
+                "The bearer of this weapon has",
+                "proven themselves to the Crown..."
+        ));
+
+        register(WeaponGoal.simple(EntityType.SNOWMAN, 100, rank));
+        register(WeaponGoal.simple(EntityType.GHAST, 200, ++rank));
+        register(new WeaponGoal.ChargedCreeperGoal(25, ++rank));
+        register(WeaponGoal.simple(EntityType.WITHER, 10, ++rank));
+
+        //Dragon
+
+        //Rank it up so sword can't simply
+        //be leveled up with kills to dragon
+        ++rank;
+
+        UPGRADES.put(++rank, WeaponUpgrade.reforge(
+                Material.NETHERITE_SWORD,
+                Enchantment.LOOT_BONUS_MOBS, 5,
+                RANK_FINAL_NAME,
+                Component.text("Upgrade to Netherite"),
+                "The bearer of this weapon has",
+                "proven themselves to the Crown..."
+        ));
+
+        //Endless dragon stuf
+        for (int i = rank; i < MAX_RANK; i++) {
+            int endGoal = (int) (((double) i) * 1.25D);
+
+            register(WeaponGoal.endBoss(EntityType.ENDER_DRAGON, endGoal, i));
+            register(WeaponGoal.endBoss(EntityType.WITHER, endGoal, i));
+
+            if(i != rank) UPGRADES.put(i, WeaponUpgrade.dragon(i));
+        }
 
         Registries.WEAPON_GOALS.close();
     }
@@ -84,28 +169,15 @@ public final class RoyalWeapons {
      */
     public static ItemStack make(UUID owner) {
         ItemStackBuilder builder = new ItemStackBuilder(Material.GOLDEN_SWORD, 1)
-                .setName(
-                        Component.text("-")
-                                .style(nonItalic(NamedTextColor.GOLD))
-                                .append(Component.text("Royal Sword")
-                                        .style(nonItalic(NamedTextColor.YELLOW))
-                                        .decorate(TextDecoration.BOLD)
-                                )
-                                .append(Component.text("-"))
-                )
+                .setName(RANK_1_NAME)
                 .setFlags(ItemFlag.HIDE_ATTRIBUTES)
 
-                .setUnbreakable(true)
-
-                .addModifier(Attribute.GENERIC_ATTACK_DAMAGE, "generic.attackDamage", 7, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND)
-                .addModifier(Attribute.GENERIC_ATTACK_SPEED, "generic.attackSpeed", -2.4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND)
-
-                .addEnchant(Enchantment.DAMAGE_ALL, 5)
-                .addEnchant(Enchantment.LOOT_BONUS_MOBS, 3)
-                .addEnchant(Enchantment.SWEEPING_EDGE, 3);
+                .setUnbreakable(true);
 
         ItemStack result = builder.build();
         RoyalSword sword = new RoyalSword(owner, result);
+        sword.waitingUpdate = getUpgrade(sword.getRank());
+
         sword.update();
 
         return result;
@@ -119,5 +191,14 @@ public final class RoyalWeapons {
     public static boolean isRoyalSword(ItemStack item) {
         if(FtcUtils.isItemEmpty(item)) return false;
         return FtcItems.hasTagElement(item.getItemMeta(), RoyalItem.NBT_KEY);
+    }
+
+    private static Component makeName(String name, TextColor nameColor, TextColor borderColor, boolean bold) {
+        return Component.text()
+                .style(nonItalic(nameColor).decoration(TextDecoration.BOLD, bold))
+                .append(Component.text("-").color(borderColor))
+                .append(Component.text(name + " Sword"))
+                .append(Component.text("-").color(borderColor))
+                .build();
     }
 }

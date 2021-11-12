@@ -29,6 +29,6 @@ public class MarketListener implements Listener {
     }
 
     private void openPurchaseBook(Markets markets, MarketShop shop, CrownUser user) {
-
+        // :I
     }
 }

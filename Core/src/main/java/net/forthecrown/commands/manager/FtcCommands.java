@@ -1,7 +1,6 @@
 package net.forthecrown.commands.manager;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import net.forthecrown.commands.CommandMarket;
 import net.forthecrown.commands.*;
 import net.forthecrown.commands.arguments.*;
 import net.forthecrown.commands.click.CommandClickableText;

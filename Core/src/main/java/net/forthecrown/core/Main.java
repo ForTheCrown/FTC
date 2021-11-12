@@ -13,18 +13,17 @@ import net.forthecrown.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
 import net.forthecrown.economy.ServerItemPriceMap;
+import net.forthecrown.economy.guild.HazelguardTradersGuild;
 import net.forthecrown.economy.market.FtcMarkets;
-import net.forthecrown.economy.market.guild.HazelguardTradersGuild;
 import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.regions.FtcRegionManager;
-import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.useables.FtcUsablesManager;
 import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
-import net.forthecrown.user.GameModePacketListener;
 import net.forthecrown.user.manager.FtcUserManager;
+import net.forthecrown.user.packets.PacketListeners;
 import net.forthecrown.utils.Worlds;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -61,7 +60,6 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcEconomy               economy;
     static FtcAnnouncer             announcer;
     static FtcKingship              kingship;
-    static UserJsonSerializer       userSerializer;
 
     static FtcUserManager           userManager;
     static FtcRegionManager         regionManager;
@@ -130,7 +128,7 @@ public final class Main extends JavaPlugin implements Crown {
 
         safeRunnable(Bosses::shutDown);
         safeRunnable(Cosmetics::shutDown);
-        safeRunnable(GameModePacketListener::removeAll);
+        safeRunnable(PacketListeners::removeAll);
 
         FtcUserManager.LOADED_USERS.clear();
         FtcUserManager.LOADED_ALTS.clear();

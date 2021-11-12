@@ -40,6 +40,7 @@ import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.actions.MarriageMessage;
 import net.forthecrown.user.actions.UserActionHandler;
 import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.packets.PacketListeners;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Worlds;
@@ -90,8 +91,10 @@ public class CoreListener implements Listener {
         CrownUser user = UserManager.getUser(event.getPlayer());
         boolean nameChanged = user.onJoin();
 
+        PacketListeners.inject(event.getPlayer());
+
         if(!event.getPlayer().hasPlayedBefore()){
-            user.getPlayer().teleport(Crown.getServerSpawn());
+            event.getPlayer().teleport(Crown.getServerSpawn());
 
             Component welcomeMsg = Component.translatable("user.firstJoin", NamedTextColor.YELLOW, user.nickDisplayName());
             Crown.getAnnouncer().announceRaw(welcomeMsg);
@@ -117,6 +120,8 @@ public class CoreListener implements Listener {
     public void onPlayerLeave(PlayerQuitEvent event){
         CrownUser user = UserManager.getUser(event.getPlayer());
         user.onLeave();
+
+        PacketListeners.unInject(event.getPlayer());
 
         //Pirates.getParrotTracker().check(user.getPlayer());
 

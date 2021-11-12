@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.block.TileState;
 
@@ -12,7 +12,7 @@ public class FtcUsableBlock extends AbstractUsable implements UsableBlock {
     private final WorldVec3i location;
 
     public FtcUsableBlock(WorldVec3i location, boolean create){
-        super(FtcUtils.locationToFilename(location), "signs", !create);
+        super(LocationFileName.of(location).toString(), "signs", !create);
         this.location = location;
 
         if(!fileExists && !create) throw new IllegalStateException(fileName + " doesn't exist");

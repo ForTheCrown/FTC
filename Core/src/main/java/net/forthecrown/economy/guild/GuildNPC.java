@@ -1,4 +1,4 @@
-package net.forthecrown.economy.market.guild;
+package net.forthecrown.economy.guild;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.click.ClickableTexts;

@@ -9,6 +9,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A RoyalSword's goal, which is achieved through killing entities.
@@ -52,6 +53,20 @@ public interface WeaponGoal extends Keyed {
      */
     static WeaponGoal simple(EntityType type, int goal, int rank) {
         return new SimpleGoal(goal, rank, type);
+    }
+
+    /**
+     * Creates a weapon goal that allows any entity
+     * @param goal The kill goal
+     * @param rank The rank
+     * @return The created weapon goal
+     */
+    static WeaponGoal anyEntity(int goal, int rank) {
+        return new SimpleGoal(goal, rank, null);
+    }
+
+    static WeaponGoal endBoss(EntityType type, int goal, int rank) {
+        return new EndBossGoal(type, goal, rank);
     }
 
     class ChargedCreeperGoal implements WeaponGoal {
@@ -98,11 +113,50 @@ public interface WeaponGoal extends Keyed {
         private final EntityType type;
         private final Key key;
 
-        public SimpleGoal(int goal, int rank, EntityType type) {
+        public SimpleGoal(int goal, int rank, @Nullable EntityType type) {
             this.goal = goal;
             this.type = type;
             this.rank = rank;
-            this.key = Crown.coreKey("goal_" + type.name().toLowerCase());
+            this.key = Crown.coreKey("goal_" + (type == null ? "any" : type.name().toLowerCase()));
+        }
+
+        @Override
+        public int getKillGoal() {
+            return goal;
+        }
+
+        @Override
+        public int getGoalRank() {
+            return rank;
+        }
+
+        @Override
+        public boolean isValidTarget(Entity killed) {
+            return type == null || killed.getType() == type;
+        }
+
+        @Override
+        public @NotNull Key key() {
+            return key;
+        }
+
+        @Override
+        public Component loreDisplay() {
+            return type == null ? Component.text("Any entity") : Component.translatable(Bukkit.getUnsafe().getTranslationKey(type));
+        }
+    }
+
+    class EndBossGoal implements WeaponGoal {
+        private final int goal, rank;
+        private final Key key;
+        private final EntityType type;
+
+        public EndBossGoal(EntityType type, int goal, int rank) {
+            this.goal = goal;
+            this.rank = rank;
+            this.type = type;
+
+            this.key = Crown.coreKey("goal_boss_" + type.name().toLowerCase() + '_' + rank);
         }
 
         @Override

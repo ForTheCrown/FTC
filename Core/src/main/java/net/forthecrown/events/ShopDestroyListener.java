@@ -24,7 +24,7 @@ public class ShopDestroyListener implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-        if(!shop.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) {
+        if(!shop.getOwnership().isOwner(player.getUniqueId()) && !player.hasPermission("ftc.admin")) {
             player.sendMessage(
                     Component.translatable("shops.destroy.notOwned", NamedTextColor.GRAY)
             );

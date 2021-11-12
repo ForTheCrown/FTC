@@ -1,10 +1,10 @@
-package net.forthecrown.economy.market.guild;
+package net.forthecrown.economy.guild;
 
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
-import net.forthecrown.economy.market.guild.topics.VoteTopicType;
+import net.forthecrown.economy.guild.topics.VoteTopicType;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.InventoryBuilder;
 import net.forthecrown.registry.Registries;

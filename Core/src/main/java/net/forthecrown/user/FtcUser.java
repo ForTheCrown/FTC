@@ -87,7 +87,7 @@ public class FtcUser implements CrownUser {
 
     //Display and name info
     public String lastOnlineName;
-    public ObjectList<String> previousNames = new ObjectArrayList<>();
+    public final ObjectList<String> previousNames = new ObjectArrayList<>();
     public Component nickname;
     public Component currentPrefix;
 
@@ -158,13 +158,13 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void reload(){
-        Crown.getUserSerializer().deserialize(this);
+        Crown.getUserManager().getSerializer().deserialize(this);
         updateName(lastOnlineName);
     }
 
     @Override
     public void save(){
-        Crown.getUserSerializer().serialize(this);
+        Crown.getUserManager().getSerializer().serialize(this);
     }
 
     public void updateName(String name){
@@ -533,7 +533,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void delete() {
-        Crown.getUserSerializer().delete(getUniqueId());
+        Crown.getUserManager().getSerializer().delete(getUniqueId());
     }
 
     @Nonnull
@@ -673,8 +673,6 @@ public class FtcUser implements CrownUser {
             visitListener.unregister();
         }
 
-        GameModePacketListener.remove(getPlayer());
-
         interactions.clearIncoming();
         interactions.clearOutgoing();
         marketOwnership.clearIncoming();
@@ -692,8 +690,6 @@ public class FtcUser implements CrownUser {
     @Override
     public boolean onJoin(){
         this.handle = getOnlineHandle().getHandle();
-
-        GameModePacketListener.inject(getPlayer());
 
         if(!getName().equalsIgnoreCase(lastOnlineName)){
             updateName(lastOnlineName);

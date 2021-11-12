@@ -1,4 +1,4 @@
-package net.forthecrown.economy.market.guild.topics;
+package net.forthecrown.economy.guild.topics;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -7,12 +7,12 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.houses.Dynasty;
+import net.forthecrown.economy.houses.House;
 import net.forthecrown.economy.houses.Relation;
 import net.forthecrown.economy.houses.VoteModifier;
 import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.economy.market.Markets;
-import net.forthecrown.economy.market.guild.VoteResult;
+import net.forthecrown.economy.guild.VoteResult;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.ClickContext;
@@ -246,9 +246,9 @@ public class EvictTopic implements VoteTopicType<EvictTopic.TopicInstance> {
         }
 
         @Override
-        public VoteModifier makeModifier(Dynasty dynasty) {
+        public VoteModifier makeModifier(House house) {
             UUID shopOwner = getOwner();
-            Relation r = dynasty.getRelationWith(shopOwner);
+            Relation r = house.getRelationWith(shopOwner);
 
             return new VoteModifier(r.getValue() / 2);
         }

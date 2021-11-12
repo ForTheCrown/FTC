@@ -6,15 +6,16 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-public class CrownShopInventory extends CraftInventoryCustom implements ShopInventory {
+public class FtcShopInventory extends CraftInventoryCustom implements ShopInventory {
 
-    private final CrownSignShop owningShop;
+    private final FtcSignShop owningShop;
     private ItemStack exampleItem;
 
-    public CrownShopInventory(CrownSignShop signShop){
+    public FtcShopInventory(FtcSignShop signShop){
         super(signShop, InventoryType.CHEST, "Shop Contents");
         owningShop = signShop;
     }
@@ -32,7 +33,7 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
     }
 
     @Override
-    public void setShopContents(List<ItemStack> stacks){
+    public void setShopContents(Collection<ItemStack> stacks){
         clear();
 
         for (ItemStack i: stacks){
@@ -43,7 +44,7 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
 
     @Nonnull
     @Override
-    public CrownSignShop getHolder() {
+    public FtcSignShop getHolder() {
         return owningShop;
     }
 
@@ -55,6 +56,11 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
     @Override
     public ItemStack getExampleItem() {
         return exampleItem == null ? null : exampleItem.clone();
+    }
+
+    @Override
+    public void setExampleItem(ItemStack exampleItem) {
+        this.exampleItem = exampleItem;
     }
 
     @Override
@@ -75,11 +81,6 @@ public class CrownShopInventory extends CraftInventoryCustom implements ShopInve
         if(getExampleItem() == null) return;
         if(isFull() && !owningShop.getType().isBuyType()) getHolder().setOutOfStock(true);
         getHolder().setOutOfStock(getTotalItemAmount() < getExampleItem().getAmount());
-    }
-
-    @Override
-    public void setExampleItem(ItemStack exampleItem) {
-        this.exampleItem = exampleItem;
     }
 
     @Nonnull

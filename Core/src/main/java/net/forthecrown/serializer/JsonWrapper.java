@@ -81,12 +81,12 @@ public class JsonWrapper {
     }
 
     public void addUUID(String name, UUID id){
-        add(name, id.toString());
+        add(name, JsonUtils.writeUUID(id));
     }
 
     public UUID getUUID(String name){
         if(missingOrNull(name)) return null;
-        return UUID.fromString(getString(name));
+        return JsonUtils.readUUID(get(name));
     }
 
     public void addKey(String name, Key key){

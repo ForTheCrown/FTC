@@ -1,10 +1,10 @@
-package net.forthecrown.economy.market.guild;
+package net.forthecrown.economy.guild;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.economy.market.guild.topics.VoteTopic;
+import net.forthecrown.economy.guild.topics.VoteTopic;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.math.Vector3i;

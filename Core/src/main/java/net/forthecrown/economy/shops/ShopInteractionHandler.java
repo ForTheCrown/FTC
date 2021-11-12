@@ -1,8 +1,6 @@
 package net.forthecrown.economy.shops;
 
 import net.forthecrown.economy.Economy;
-import net.forthecrown.user.CrownUser;
-import org.bukkit.entity.Player;
 
 /**
  * A class which handles interactions between a signshop and a player
@@ -17,14 +15,14 @@ public interface ShopInteractionHandler {
      * @param player The interacting player
      * @param economy The balances, used for economy stuff
      */
-    void handleInteraction(SignShop shop, Player player, Economy economy);
+    void handleInteraction(SignShop shop, ShopCustomer player, Economy economy);
 
     /**
      * Gets a session linked a user
      * @param user The user to get the session of
      * @return The session, or null, if the user has no current session
      */
-    SignShopSession getSession(CrownUser user);
+    SignShopSession getSession(ShopCustomer user);
 
     /**
      * Gets or creates a session for the given user and the sign shop
@@ -32,7 +30,7 @@ public interface ShopInteractionHandler {
      * @param shop The shop the user is interacting with
      * @return The shop session
      */
-    SignShopSession getOrCreateSession(CrownUser user, SignShop shop);
+    SignShopSession getOrCreateSession(ShopCustomer user, SignShop shop);
 
     /**
      * Does the session expiry cooldown thing

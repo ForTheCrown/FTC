@@ -11,18 +11,19 @@ import org.bukkit.inventory.ItemStack;
 public class AdminBuyInteraction implements ShopInteraction {
     @Override
     public void test(SignShopSession session, Economy economy) throws CommandSyntaxException {
-        if(!session.userHasSpace()) throw FtcExceptionProvider.inventoryFull(); //User has no space for items
+        if(!session.customerHasSpace()) throw FtcExceptionProvider.inventoryFull(); //User has no space for items
 
         //User cannot afford shop
-        if(!economy.has(session.getCustomer().getUniqueId(), session.getPrice())) throw FtcExceptionProvider.cannotAfford(session.getPrice());
+        if(!session.getCustomer().hasBalance(session.getPrice())) throw FtcExceptionProvider.cannotAfford(session.getPrice());
     }
 
     @Override
     public void interact(SignShopSession session, Economy economy) {
         ItemStack exampleItem = session.getExampleItem();
+        ShopCustomer customer = session.getCustomer();
 
         //Bought item message
-        session.getCustomer().sendMessage(
+        customer.sendMessage(
                 Component.translatable("shops.used.buy",
                         NamedTextColor.GRAY,
                         FtcFormatter.itemAndAmount(exampleItem).color(NamedTextColor.YELLOW),
@@ -31,11 +32,11 @@ public class AdminBuyInteraction implements ShopInteraction {
         );
 
         //Remove money
-        economy.remove(session.getCustomer().getUniqueId(), session.getPrice());
+        customer.removeBalance(session.getPrice());
 
         //Give item
         int amount = exampleItem.getAmount();
-        session.getPlayerInventory().addItem(exampleItem);
+        session.getCustomerInventory().addItem(exampleItem);
 
         //Tell the session that the amount of items exchanged changed
         session.growAmount(amount);

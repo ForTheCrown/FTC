@@ -79,7 +79,7 @@ public final class ComVars {
     private ComVars() {}
 
     private static ComVarJson j;
-    static void reload() {
+    public static void reload() {
         readJson();
 
         read("onFirstJoinKit",              ComVarTypes.KEY);
@@ -143,7 +143,7 @@ public final class ComVars {
         j = null;
     }
 
-    static void save() {
+    public static void save() {
         ComVarJson json = createJson();
 
         //Fuck you, I cannot be bothered to write all the variables again

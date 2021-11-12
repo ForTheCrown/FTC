@@ -1,23 +1,23 @@
 package net.forthecrown.economy.shops;
 
 import net.forthecrown.serializer.CrownSerializer;
+import net.forthecrown.serializer.Deletable;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.math.WorldVec3i;
-import org.bukkit.Location;
+import net.kyori.adventure.text.Component;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 /**
  * Represents a sign shop lol
  * <p></p>
- * Implementation: {@link CrownSignShop}
+ * Implementation: {@link FtcSignShop}
  */
-public interface SignShop extends CrownSerializer, InventoryHolder, Nameable {
+public interface SignShop extends CrownSerializer, InventoryHolder, Nameable, Deletable {
 
     /**
      * Gets the file name of the shop
@@ -27,7 +27,9 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable {
      * @return The file name of the shop
      */
     @Override
-    String getName();
+    default String getName() {
+        return getFileName().toString();
+    }
 
     /**
      * Destroys the shop lol
@@ -40,20 +42,16 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable {
     void unload();
 
     /**
-     * Gets the hopper inventory with 1 available slot, used for setting the exampleItem of a shop
-     * @return the example inventory
-     */
-    Inventory getExampleInventory();
-
-    /**
      * Gets the shop's location
      * @return The shop's location
      */
-    default Location getLocation() {
-        return getShopLocation().toLocation();
-    }
+    WorldVec3i getPosition();
 
-    WorldVec3i getShopLocation();
+    /**
+     * Gets the shops file name
+     * @return The shop's file name
+     */
+    LocationFileName getFileName();
 
     /**
      * Gets the block the sign is at
@@ -62,17 +60,10 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable {
     Block getBlock();
 
     /**
-     * Gets the owner of the shop
-     * @return the UUID of the owner of the shop
+     * Gets the shop's ownership
+     * @return The shop's ownership
      */
-    UUID getOwner();
-
-    /**
-     * Sets the owner of a shop
-     * <p>Why does this exist lol</p>
-     * @param shopOwner the new owner
-     */
-    void setOwner(UUID shopOwner);
+    ShopOwnership getOwnership();
 
     /**
      * Gets the shops type
@@ -91,20 +82,22 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable {
      * Gets the price of the shop
      * @return The price of the shop
      */
-    Integer getPrice();
+    int getPrice();
 
     /**
      * Sets the price of the shop
      * @param price The new price of the shop
      */
-    void setPrice(Integer price);
+    default void setPrice(int price) {
+        setPrice(price, true);
+    }
 
     /**
      * Sets the price of the shop
      * @param price The new price of the shop
      * @param updateSign whether the shop's sign should be updated
      */
-    void setPrice(Integer price, boolean updateSign);
+    void setPrice(int price, boolean updateSign);
 
     /**
      * Gets if the shop is out of stock or not
@@ -144,6 +137,8 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable {
      */
     @Override
     @NotNull ShopInventory getInventory();
+
+    Component getPriceLineFor(CrownUser user);
 
     @Override
     boolean equals(Object o);

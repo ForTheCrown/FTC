@@ -4,6 +4,7 @@ import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.sk89q.worldedit.math.BlockVector2;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.selling.UserSellResult;
 import net.forthecrown.economy.shops.ShopCustomer;
@@ -1019,5 +1020,30 @@ public interface CrownUser extends
     @Override
     default Inventory getInventory() throws UserNotOnlineException {
         return getPlayer().getInventory();
+    }
+
+    @Override
+    default int getBalance() {
+        return Crown.getEconomy().get(getUniqueId());
+    }
+
+    @Override
+    default void setBalance(int balance) {
+        Crown.getEconomy().set(getUniqueId(), balance);
+    }
+
+    @Override
+    default void addBalance(int amount) {
+        Crown.getEconomy().add(getUniqueId(), amount);
+    }
+
+    @Override
+    default void removeBalance(int amount) {
+        Crown.getEconomy().remove(getUniqueId(), amount);
+    }
+
+    @Override
+    default Component shopDisplayName() {
+        return nickDisplayName();
     }
 }

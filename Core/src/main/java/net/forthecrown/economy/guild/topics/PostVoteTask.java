@@ -1,4 +1,4 @@
-package net.forthecrown.economy.market.guild.topics;
+package net.forthecrown.economy.guild.topics;
 
 import com.google.gson.JsonElement;
 import net.forthecrown.serializer.JsonSerializable;
@@ -25,7 +25,7 @@ public class PostVoteTask implements JsonSerializable, Struct {
         return new PostVoteTask(
                 json.getDate("executionDate"),
                 json.get("data"),
-                json.getKey("topicKey")
+                json.getKey("topicType")
         );
     }
 

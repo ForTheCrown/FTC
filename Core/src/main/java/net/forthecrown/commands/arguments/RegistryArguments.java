@@ -14,7 +14,7 @@ import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
-import net.forthecrown.economy.houses.Dynasty;
+import net.forthecrown.economy.houses.House;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
@@ -38,7 +38,7 @@ public class RegistryArguments<T> implements ArgumentType<T> {
     private static final RegistryArguments<UsageAction> USAGE_ACTION =  new RegistryArguments<>(Registries.USAGE_ACTIONS, "Usage action");
     private static final RegistryArguments<UsageCheck> USAGE_CHECK =   new RegistryArguments<>(Registries.USAGE_CHECKS, "Usage check");
 
-    private static final RegistryArguments<Dynasty> DYNASTY = new RegistryArguments<>(Registries.DYNASTIES, "Dynasty");
+    private static final RegistryArguments<House> HOUSE = new RegistryArguments<>(Registries.HOUSES, "Dynasty");
 
     public static RegistryArguments<BlockAnimation> animation() {
         return ANIMATION;
@@ -76,8 +76,8 @@ public class RegistryArguments<T> implements ArgumentType<T> {
         return c.getArgument(arg, UsageCheck.class);
     }
 
-    public static RegistryArguments<Dynasty> dynasty() {
-        return DYNASTY;
+    public static RegistryArguments<House> house() {
+        return HOUSE;
     }
 
     private final Registry<T> registry;

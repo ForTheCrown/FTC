@@ -1,8 +1,10 @@
 package net.forthecrown.economy.shops;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.FtcFlags;
 import net.forthecrown.economy.Economy;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.Faction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -49,36 +51,32 @@ public interface ShopInteraction {
      * @param session The session to check
      * @return True if the flag checks passed, false if otherwise
      */
-    default boolean testFlags(SignShopSession session) {
-        Faction allowedOwner = FtcFlags.query(session.getShop().getLocation(), FtcFlags.SHOP_OWNERSHIP_FLAG);
-        Faction allowedUser = FtcFlags.query(session.getShop().getLocation(), FtcFlags.SHOP_USAGE_FLAG);
+    default void testFlags(SignShopSession session) throws CommandSyntaxException {
+        Faction allowedOwner = FtcFlags.query(session.getShop().getPosition().toLocation(), FtcFlags.SHOP_OWNERSHIP_FLAG);
+        Faction allowedUser = FtcFlags.query(session.getShop().getPosition().toLocation(), FtcFlags.SHOP_USAGE_FLAG);
 
         //If the owner's branch doesn't match up with the WG flag
-        if(allowedOwner != null && session.getOwner().getFaction() != Faction.DEFAULT && !session.getShop().getType().isAdmin() && allowedOwner != session.getOwner().getFaction()){
-            session.getCustomer().sendMessage(
-                    Component.translatable(
-                            "shops.error.flags.owner",
-                            NamedTextColor.GRAY,
-                            Component.text(allowedOwner.getName())
-                    )
-            );
-            return false;
+        if(session.getOwnership().hasOwner()) {
+            CrownUser owner = session.getOwnership().ownerUser();
+
+            if(allowedOwner != null && owner.getFaction() != Faction.DEFAULT && !session.getShop().getType().isAdmin() && allowedOwner != owner.getFaction()){
+                throw FtcExceptionProvider.translatable(
+                        "shops.error.flags.owner",
+                        NamedTextColor.GRAY,
+                        Component.text(allowedOwner.getName())
+                );
+            }
         }
 
         //If the user's branch doesn't match up with the WG flag
-        if(allowedUser != null && session.getCustomer().getFaction() != Faction.DEFAULT && allowedUser != session.getCustomer().getFaction()){
-            session.getCustomer().sendMessage(
-                    Component.translatable(
-                            "shops.error.flags.user",
-                            NamedTextColor.GRAY,
-                            Component.text(allowedUser.getName())
-                    )
+        Faction customerFaction = session.getCustomer() instanceof CrownUser ? ((CrownUser) session.getCustomer()).getFaction() : Faction.DEFAULT;
+        if(allowedUser != null && customerFaction != Faction.DEFAULT && allowedUser != customerFaction){
+            throw FtcExceptionProvider.translatable(
+                    "shops.error.flags.user",
+                    NamedTextColor.GRAY,
+                    Component.text(allowedUser.getName())
             );
-            return false;
         }
-
-        //Both checks passed :D
-        return true;
     }
 
     /**

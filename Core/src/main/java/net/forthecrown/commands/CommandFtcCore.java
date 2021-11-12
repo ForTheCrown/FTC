@@ -751,6 +751,10 @@ public class CommandFtcCore extends FtcCommand {
     }
 
     private enum SaveReloadPart {
+        COMVARS ("ComVars", b -> {
+           if(b) ComVars.reload();
+           else ComVars.save();
+        }),
         REGIONS ("Regions", b -> {
             if(b) Crown.getRegionManager().reload();
             else Crown.getRegionManager().save();

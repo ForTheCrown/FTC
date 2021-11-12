@@ -1,4 +1,4 @@
-package net.forthecrown.economy.market.guild;
+package net.forthecrown.economy.guild;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -7,9 +7,9 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.forthecrown.core.Crown;
-import net.forthecrown.economy.houses.Dynasty;
-import net.forthecrown.economy.market.guild.topics.VoteTopic;
-import net.forthecrown.economy.market.guild.topics.VoteTopicType;
+import net.forthecrown.economy.houses.House;
+import net.forthecrown.economy.guild.topics.VoteTopic;
+import net.forthecrown.economy.guild.topics.VoteTopicType;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
@@ -28,8 +28,8 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
 
     private final ObjectSet<UUID> pro = new ObjectOpenHashSet<>();
     private final ObjectSet<UUID> against = new ObjectOpenHashSet<>();
-    private final ObjectSet<Dynasty> proDynasties = new ObjectOpenHashSet<>();
-    private final ObjectSet<Dynasty> againstDynasties = new ObjectOpenHashSet<>();
+    private final ObjectSet<House> proDynasties = new ObjectOpenHashSet<>();
+    private final ObjectSet<House> againstDynasties = new ObjectOpenHashSet<>();
 
     VoteTopic topic;
     Date started;
@@ -88,8 +88,8 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
         vote();
     }
 
-    public void voteFor(Dynasty dynasty) {
-        proDynasties.add(dynasty);
+    public void voteFor(House house) {
+        proDynasties.add(house);
         vote();
     }
 
@@ -102,8 +102,8 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
         vote();
     }
 
-    public void voteAgainst(Dynasty dynasty) {
-        againstDynasties.add(dynasty);
+    public void voteAgainst(House house) {
+        againstDynasties.add(house);
         vote();
     }
 
@@ -132,7 +132,7 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
      * Gets all the houses that voted against the motion
      * @return All houses that voted against
      */
-    public ObjectSet<Dynasty> getAgainstHouses() {
+    public ObjectSet<House> getAgainstHouses() {
         return againstDynasties;
     }
 
@@ -140,17 +140,17 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
      * Gets all the houses that voted for the motion
      * @return All houses that voted for
      */
-    public ObjectSet<Dynasty> getProHouses() {
+    public ObjectSet<House> getProHouses() {
         return proDynasties;
     }
 
     /**
      * Checks if the given house has voted
-     * @param dynasty The house to check
+     * @param house The house to check
      * @return Whether the house has voted
      */
-    public boolean hasVoted(Dynasty dynasty) {
-        return againstDynasties.contains(dynasty) || proDynasties.contains(dynasty);
+    public boolean hasVoted(House house) {
+        return againstDynasties.contains(house) || proDynasties.contains(house);
     }
 
     /**
@@ -194,7 +194,7 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
         if(proCount() + againstCount() == 0) return VoteResult.NO_VOTES;
 
         //Count votes
-        int totalPossible = guild.getMembers().size() + Registries.DYNASTIES.size();
+        int totalPossible = guild.getMembers().size() + Registries.HOUSES.size();
         int pro = proCount();
         int against = againstCount();
         int didVote = pro + against;
@@ -224,8 +224,8 @@ public class VoteState implements JsonSerializable, JsonDeserializable {
 
         if(!json.missingOrNull("pro")) pro.addAll(json.getList("pro", JsonUtils::readUUID));
         if(!json.missingOrNull("against")) against.addAll(json.getList("against", JsonUtils::readUUID));
-        if(!json.missingOrNull("proDynasties")) proDynasties.addAll(json.getList("proHouses", e -> Registries.DYNASTIES.get(JsonUtils.readKey(e))));
-        if(!json.missingOrNull("againstDynasties")) againstDynasties.addAll(json.getList("againstHouses", e -> Registries.DYNASTIES.get(JsonUtils.readKey(e))));
+        if(!json.missingOrNull("proDynasties")) proDynasties.addAll(json.getList("proHouses", e -> Registries.HOUSES.get(JsonUtils.readKey(e))));
+        if(!json.missingOrNull("againstDynasties")) againstDynasties.addAll(json.getList("againstHouses", e -> Registries.HOUSES.get(JsonUtils.readKey(e))));
 
         //topic
         JsonWrapper topicJson = json.getWrapped("topic");

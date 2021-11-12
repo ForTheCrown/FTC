@@ -78,11 +78,12 @@ dependencies {
     compileOnly 'com.github.lucko:LuckPerms:5.3'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT'
 
-    //Paper, Grenadier and Squire, FAWE
+    //Paper, Grenadier, Squire, FAWE
     libJar('Paper')
     libJar('Grenadier')
     libJar('Squire')
     libJar('FAWE')
+    libJar('DiscordSRV')
 }
 
 void libJar(String s) {

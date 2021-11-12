@@ -3,24 +3,24 @@ package net.forthecrown.economy.houses;
 import com.google.gson.JsonElement;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
-import net.forthecrown.economy.FtcMaterial;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
+import org.bukkit.Material;
 
 public class HouseMaterialData implements JsonSerializable {
-    private final FtcMaterial material;
+    private final Material material;
     private int price;
     private int demand;
     private int supply;
 
-    public HouseMaterialData(FtcMaterial material) {
+    public HouseMaterialData(Material material) {
         this.material = material;
         this.price = -1;
 
         reset();
     }
 
-    public HouseMaterialData(JsonElement e, FtcMaterial material) {
+    public HouseMaterialData(JsonElement e, Material material) {
         JsonWrapper json = JsonWrapper.of(e.getAsJsonObject());
 
         this.material = material;
@@ -31,7 +31,7 @@ public class HouseMaterialData implements JsonSerializable {
         recalculate();
     }
 
-    public FtcMaterial getMaterial() {
+    public Material getMaterial() {
         return material;
     }
 
@@ -83,7 +83,7 @@ public class HouseMaterialData implements JsonSerializable {
     }
 
     public int getBasePrice() {
-        return Crown.getPriceMap().get(material.getBukkitMaterial());
+        return Crown.getPriceMap().get(material);
     }
 
     @Override

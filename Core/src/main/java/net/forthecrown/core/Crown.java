@@ -7,12 +7,11 @@ import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.ItemPriceMap;
-import net.forthecrown.economy.houses.DynastySerializer;
+import net.forthecrown.economy.houses.HouseSerializer;
+import net.forthecrown.economy.guild.TradersGuild;
 import net.forthecrown.economy.market.Markets;
-import net.forthecrown.economy.market.guild.TradersGuild;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.regions.RegionManager;
-import net.forthecrown.serializer.UserSerializer;
 import net.forthecrown.useables.UsablesManager;
 import net.forthecrown.useables.kits.KitManager;
 import net.forthecrown.useables.warps.WarpManager;
@@ -50,7 +49,6 @@ public interface Crown extends Plugin, Namespaced {
     static WarpManager getWarpManager() { return Main.warpRegistry; }
     static KitManager getKitManager() { return Main.kitRegistry; }
 
-    static UserSerializer getUserSerializer() { return Main.userSerializer; }
     static TradersGuild getTradersGuild() { return Main.tradersGuild; }
     static Markets getMarkets() { return Main.markets; }
     static LuckPerms getLuckPerms() { return Main.luckPerms; }
@@ -101,7 +99,7 @@ public interface Crown extends Plugin, Namespaced {
             Main.tradersGuild.save();
         }
 
-        DynastySerializer.serialize();
+        HouseSerializer.serialize();
         ComVars.save();
         Main.inst.saveConfig();
 

@@ -8,9 +8,8 @@ import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.emotes.CosmeticEmote;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
-import net.forthecrown.economy.houses.Dynasty;
-import net.forthecrown.economy.market.guild.topics.VoteTopic;
-import net.forthecrown.economy.market.guild.topics.VoteTopicType;
+import net.forthecrown.economy.guild.topics.VoteTopicType;
+import net.forthecrown.economy.houses.House;
 import net.forthecrown.inventory.weapon.WeaponGoal;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
@@ -30,8 +29,8 @@ public interface Registries {
     Registry<InteractableNPC> NPCS = create("npcs");
     Registry<BlockAnimation> ANIMATIONS = create("animations");
 
-    CloseableRegistry<VoteTopicType<VoteTopic>> VOTE_TOPICS = createCloseable("vote_topics");
-    CloseableRegistry<Dynasty> DYNASTIES = createCloseable("houses");
+    CloseableRegistry<VoteTopicType> VOTE_TOPICS = createCloseable("vote_topics");
+    CloseableRegistry<House> HOUSES = createCloseable("houses");
 
     CloseableRegistry<WeaponGoal> WEAPON_GOALS = createCloseable("weapon_goals");
 

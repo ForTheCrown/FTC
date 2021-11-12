@@ -1,7 +1,7 @@
-package net.forthecrown.economy.market.guild;
+package net.forthecrown.economy.guild;
 
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.forthecrown.economy.market.guild.topics.VoteTopic;
+import net.forthecrown.economy.guild.topics.VoteTopic;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;

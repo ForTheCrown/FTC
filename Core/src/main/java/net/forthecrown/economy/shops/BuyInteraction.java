@@ -21,7 +21,7 @@ public class BuyInteraction implements ShopInteraction {
         ItemStack example = session.getExampleItem();
 
         //Shop stock check, but better
-        if(!session.getInventory().containsAtLeast(example, example.getAmount())) {
+        if(!session.getShopInventory().containsAtLeast(example, example.getAmount())) {
             session.getShop().setOutOfStock(true);
             throw FtcExceptionProvider.shopOutOfStock();
         }
@@ -31,15 +31,15 @@ public class BuyInteraction implements ShopInteraction {
     public void interact(SignShopSession session, Economy economy) {
         ShopType.ADMIN_BUY.getInteraction().interact(session, economy); //Change the basic stuff
 
-        CrownUser owner = session.getOwner();
+        CrownUser owner = session.getOwnership().ownerUser();
         ItemStack example = session.getExampleItem();
 
         //Add money to owner, remove item from shop
-        economy.add(session.getOwner().getUniqueId(), session.getPrice(), owner.getFaction() != Faction.PIRATES);
-        session.getInventory().removeItem(example.clone());
+        economy.add(owner.getUniqueId(), session.getPrice(), owner.getFaction() != Faction.PIRATES);
+        session.getShopInventory().removeItem(example.clone());
 
         //Check stock
-        if(!session.getInventory().containsAtLeast(example, example.getAmount())) {
+        if(!session.getShopInventory().containsAtLeast(example, example.getAmount())) {
             session.getShop().setOutOfStock(true);
             ShopManager.informOfStockIssue(owner, session.getShop());
         }
@@ -53,7 +53,7 @@ public class BuyInteraction implements ShopInteraction {
                     Component.translatable("shops.used.buy.owner",
                             NamedTextColor.GRAY,
 
-                            session.getCustomer().nickDisplayName().color(NamedTextColor.YELLOW),
+                            session.getCustomer().shopDisplayName().color(NamedTextColor.YELLOW),
                             FtcFormatter.itemAndAmount(example, session.getAmount()).color(NamedTextColor.GOLD),
                             FtcFormatter.rhines(totalEarned).color(NamedTextColor.YELLOW)
                     )

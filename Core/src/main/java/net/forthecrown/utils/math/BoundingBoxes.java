@@ -77,7 +77,7 @@ public final class BoundingBoxes {
      * @param toMin The position to copy to
      */
     public static void mainThreadCopy(World world, BoundingBox area, WorldVec3i toMin) {
-        sectionRunnable(world, area, toMin, new IntRange(area.minY(), area.maxY())).run();
+        sectionRunnable(world, area, toMin.clone().subtract(0, toMin.y, 0), new IntRange(area.minY(), area.maxY())).run();
     }
 
     /**

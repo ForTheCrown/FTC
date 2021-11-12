@@ -1,4 +1,4 @@
-package net.forthecrown.economy.market.guild;
+package net.forthecrown.economy.guild;
 
 public interface GuildVoter {
     void vote(VoteState state);

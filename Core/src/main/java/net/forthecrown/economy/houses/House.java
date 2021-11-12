@@ -6,9 +6,8 @@ import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.economy.FtcMaterial;
-import net.forthecrown.economy.market.guild.GuildVoter;
-import net.forthecrown.economy.market.guild.VoteState;
+import net.forthecrown.economy.guild.GuildVoter;
+import net.forthecrown.economy.guild.VoteState;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
@@ -26,6 +25,7 @@ import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
 
-public class Dynasty implements
+public class House implements
         Keyed, Nameable, HoverEventSource<Component>, GuildVoter,
         JsonSerializable, JsonDeserializable
 {
@@ -42,25 +42,25 @@ public class Dynasty implements
 
     private Component[] description;
 
-    private final Map<Dynasty, Relation> houseRelations = new Object2ObjectOpenHashMap<>();
+    private final Map<House, Relation> houseRelations = new Object2ObjectOpenHashMap<>();
     private final Map<UUID, Relation> relations = new Object2ObjectOpenHashMap<>();
 
-    private final Map<FtcMaterial, HouseMaterialData> matData = new Object2ObjectOpenHashMap<>();
+    private final Map<Material, HouseMaterialData> matData = new Object2ObjectOpenHashMap<>();
 
-    public Dynasty(String name) {
+    public House(String name) {
         this.name = name;
         this.key = Crown.coreKey("house_" + name.toLowerCase().replaceAll(" ", "_"));
     }
 
-    public Relation getRelationWith(Dynasty dynasty) {
-        return houseRelations.computeIfAbsent(dynasty, h -> new Relation());
+    public Relation getRelationWith(House house) {
+        return houseRelations.computeIfAbsent(house, h -> new Relation());
     }
 
     public Relation getRelationWith(UUID id) {
         return relations.computeIfAbsent(id, uuid -> new Relation());
     }
 
-    public HouseMaterialData getMatData(FtcMaterial material) {
+    public HouseMaterialData getMatData(Material material) {
         return matData.computeIfAbsent(material, HouseMaterialData::new);
     }
 
@@ -120,7 +120,7 @@ public class Dynasty implements
         houseRelations.clear();
         houseRelations.putAll(
                 json.getMap("houseRelations",
-                        s -> Registries.DYNASTIES.get(FtcUtils.parseKey(s)),
+                        s -> Registries.HOUSES.get(FtcUtils.parseKey(s)),
                         e -> new Relation(e.getAsByte()),
                         true
                 )
@@ -140,7 +140,7 @@ public class Dynasty implements
             JsonObject mat = json.getObject("materialData");
 
             for (Map.Entry<String, JsonElement> e: mat.entrySet()) {
-                FtcMaterial material = FtcMaterial.fromString(e.getKey());
+                Material material = Material.matchMaterial(e.getKey());
                 HouseMaterialData data = new HouseMaterialData(e.getValue(), material);
 
                 matData.put(material, data);
@@ -152,9 +152,9 @@ public class Dynasty implements
     public JsonElement serialize() {
         JsonWrapper json = JsonWrapper.empty();
 
-        if(!houseRelations.isEmpty()) json.addMap("houseRelations", houseRelations, Dynasty::toString, Relation::serialize);
+        if(!houseRelations.isEmpty()) json.addMap("houseRelations", houseRelations, House::toString, Relation::serialize);
         if(relations.isEmpty()) json.addMap("relations", relations, UUID::toString, Relation::serialize);
-        if(matData.isEmpty()) json.addMap("materialData", matData, d -> d.key().asString(), HouseMaterialData::serialize);
+        if(matData.isEmpty()) json.addMap("materialData", matData, d -> d.name().toLowerCase(), HouseMaterialData::serialize);
         if(description != null) json.addArray("description", description, ChatUtils::toJson);
 
         return json.getSource();
@@ -170,10 +170,10 @@ public class Dynasty implements
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Dynasty dynasty = (Dynasty) o;
+        House house = (House) o;
 
         return new EqualsBuilder()
-                .append(key, dynasty.key)
+                .append(key, house.key)
                 .isEquals();
     }
 

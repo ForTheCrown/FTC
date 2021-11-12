@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.options.InventoryOption;
+import net.forthecrown.inventory.builder.options.InventoryRunnable;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Cooldown;
@@ -24,21 +25,25 @@ public class BuiltInventory implements InventoryHolder {
     private final Int2ObjectMap<InventoryOption> options;
     private final Component title;
     private final int size;
+    private final boolean freeInventory;
 
     private final InventoryCloseAction onClose;
     private final InventoryAction onOpen;
+    private final InventoryRunnable onClick;
 
     public BuiltInventory(Int2ObjectMap<InventoryOption> options,
                           Component title,
                           int size,
-                          InventoryCloseAction onClose,
-                          InventoryAction onOpen
-    ) {
+                          boolean inventory, InventoryCloseAction onClose,
+                          InventoryAction onOpen,
+                          InventoryRunnable click) {
         this.options = new Int2ObjectOpenHashMap<>(options);
         this.title = title;
         this.size = size;
+        freeInventory = inventory;
         this.onClose = onClose;
         this.onOpen = onOpen;
+        onClick = click;
     }
 
     @Override
@@ -55,19 +60,28 @@ public class BuiltInventory implements InventoryHolder {
     }
 
     public void run(Player player, InventoryClickEvent event){
-        InventoryOption option = getOptions().get(event.getSlot());
-        if(option == null) return;
-        if(Cooldown.contains(player, getClass().getSimpleName())) return;
-
-        ClickContext context = new ClickContext(player, event.getSlot(), event.getCursor(), event.getClick());
+        ClickContext context = new ClickContext(
+                (FtcInventory) event.getClickedInventory(), player,
+                event.getSlot(), event.getCursor(), event.getClick()
+        );
 
         try {
-            option.onClick(UserManager.getUser(player), context);
+            CrownUser user = UserManager.getUser(player);
+
+            if(onClick != null) onClick.onClick(user, context);
+            if(Cooldown.contains(player, getClass().getSimpleName())) return;
+
+            InventoryOption option = getOptions().get(event.getSlot());
+            if(option == null) return;
+
+            option.onClick(user, context);
 
             if(context.shouldCooldown()) Cooldown.add(player, getClass().getSimpleName(), 5);
             if(context.shouldReload()) open(player);
 
             event.setCancelled(context.shouldCancelEvent());
+
+            if(context.shouldClose()) event.getWhoClicked().closeInventory();
         } catch (CommandSyntaxException e) {
             FtcUtils.handleSyntaxException(player, e);
         }
@@ -112,5 +126,13 @@ public class BuiltInventory implements InventoryHolder {
 
     public Int2ObjectMap<InventoryOption> getOptions() {
         return Int2ObjectMaps.unmodifiable(options);
+    }
+
+    public boolean isFreeInventory() {
+        return freeInventory;
+    }
+
+    public InventoryRunnable getOnClick() {
+        return onClick;
     }
 }

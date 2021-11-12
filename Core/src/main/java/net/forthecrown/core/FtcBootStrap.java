@@ -8,26 +8,27 @@ import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.FtcKingship;
 import net.forthecrown.core.transformers.Homes_PopDensityToFTC;
 import net.forthecrown.core.transformers.Regions_PopDensityToFTC;
+import net.forthecrown.core.transformers.Shops_YamlToJson;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
 import net.forthecrown.economy.ServerItemPriceMap;
-import net.forthecrown.economy.houses.Dynasties;
+import net.forthecrown.economy.houses.Houses;
+import net.forthecrown.economy.guild.HazelguardTradersGuild;
+import net.forthecrown.economy.guild.topics.VoteTopics;
 import net.forthecrown.economy.market.FtcMarkets;
-import net.forthecrown.economy.market.guild.HazelguardTradersGuild;
-import net.forthecrown.economy.market.guild.topics.VoteTopics;
 import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.Events;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.regions.FtcRegionManager;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.useables.FtcUsablesManager;
 import net.forthecrown.useables.actions.UsageActions;
 import net.forthecrown.useables.checks.UsageChecks;
 import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
 import net.forthecrown.user.manager.FtcUserManager;
+import net.forthecrown.user.packets.listeners.CorePacketListeners;
 import net.forthecrown.utils.Worlds;
 
 import static net.forthecrown.core.Main.*;
@@ -58,12 +59,8 @@ final class FtcBootStrap {
     static void secondPhase() {
         joinInfo = new JoinInfo();
 
-        userSerializer = new UserJsonSerializer();
         economy = new FtcEconomy();
         regionManager = new FtcRegionManager(Worlds.OVERWORLD);
-
-        Regions_PopDensityToFTC.checkAndRun();
-        Homes_PopDensityToFTC.checkAndRun();
 
         //Instantiate managers
         userManager = new FtcUserManager();
@@ -71,6 +68,10 @@ final class FtcBootStrap {
         punishmentManager = new FtcPunishmentManager();
         usablesManager = new FtcUsablesManager();
         jailManager = new FtcJailManager();
+
+        Regions_PopDensityToFTC.checkAndRun();
+        Homes_PopDensityToFTC.checkAndRun();
+        Shops_YamlToJson.checkAndRun();
 
         kingship = new FtcKingship();
         rules = new ServerRules();
@@ -81,7 +82,8 @@ final class FtcBootStrap {
         }
 
         //Initialize modules
-        safeRunnable(Dynasties::init);
+        safeRunnable(CorePacketListeners::init);
+        safeRunnable(Houses::init);
         safeRunnable(RoyalWeapons::init);
         safeRunnable(Bosses::init);
         safeRunnable(Cosmetics::init);

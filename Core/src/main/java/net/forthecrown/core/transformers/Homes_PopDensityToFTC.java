@@ -43,7 +43,7 @@ public class Homes_PopDensityToFTC implements Runnable {
                 RegionPos pos = RegionPos.fromString(homePos);
                 if(pos.getX() == 0 && pos.getZ() == 0) continue;
 
-                File userFile = Crown.getUserSerializer().getFile(uuid);
+                File userFile = Crown.getUserManager().getSerializer().getFile(uuid);
                 if(!userFile.exists()) {
                     f.delete();
                     continue;

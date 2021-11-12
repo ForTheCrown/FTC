@@ -2,7 +2,9 @@ package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.serializer.ShopSerializer;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -11,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collection;
@@ -65,7 +68,7 @@ public interface ShopManager {
             return;
         }
 
-        Location l = shop.getLocation();
+        Location l = shop.getPosition().toLocation();
         Component specification = Component.translatable("shops." + (shop.getType().isBuyType() ? "out" : "full"));
         Component builder = Component.translatable("shops.stockWarning",
                 NamedTextColor.YELLOW,
@@ -81,7 +84,16 @@ public interface ShopManager {
      * @param signShop The location of the sign
      * @return The shop at the location, null if no shop exists at the given location
      */
-    SignShop getShop(Location signShop);
+    default SignShop getShop(Location signShop) {
+        return getShop(WorldVec3i.of(signShop));
+    }
+
+    /**
+     * Gets a shop at the given location
+     * @param vec The location of the sign
+     * @return The shop at the location, null if no shop exists at the given location
+     */
+    SignShop getShop(WorldVec3i vec);
 
     /**
      * Gets a shop from a given name
@@ -98,7 +110,19 @@ public interface ShopManager {
      * @param ownerUUID The UUID of the owner
      * @return The created shop
      */
-    SignShop createSignShop(Location location, ShopType shopType, Integer price, UUID ownerUUID);
+    default SignShop createSignShop(Location location, ShopType shopType, int price, UUID ownerUUID) {
+        return createSignShop(WorldVec3i.of(location), shopType, price, ownerUUID);
+    }
+
+    /**
+     * Creates a sign shop at the given location
+     * @param vec The shop's location
+     * @param type The shop's type
+     * @param price The shop's starting price
+     * @param owner The UUID of the owner
+     * @return The created shop
+     */
+    SignShop createSignShop(WorldVec3i vec, ShopType type, int price, UUID owner);
 
     /**
      * Gets the "Price: 12345 Rhines" line for the shop's sign with the given amount.
@@ -106,6 +130,12 @@ public interface ShopManager {
      * @return The created text
      */
     Component getPriceLine(int amount);
+
+    /**
+     * Gets the hopper inventory with 1 available slot, used for setting the exampleItem of a shop
+     * @return the example inventory
+     */
+    Inventory getExampleInventory();
 
     /**
      * Saves all shops
@@ -121,7 +151,7 @@ public interface ShopManager {
      * Adds a shop to the loaded shop list
      * @param shop The shop to add to the list
      */
-    void addShop(CrownSignShop shop);
+    void addShop(SignShop shop);
 
     /**
      * Removes a sign from the loaded shop list
@@ -146,4 +176,10 @@ public interface ShopManager {
      * @return The shop interaction handler
      */
     ShopInteractionHandler getInteractionHandler();
+
+    /**
+     * Gets the serializer incharge of serializing and deserializing shops
+     * @return The shop serializer
+     */
+    ShopSerializer getSerializer();
 }

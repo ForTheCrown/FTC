@@ -27,6 +27,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -352,7 +353,12 @@ public interface FtcFormatter {
     static Component itemDisplayName(ItemStack item){
         Validate.notNull(item, "Item was null");
 
-        return item.displayName();
+        net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
+        Component hoverName = ChatUtils.vanillaToAdventure(nms.getHoverName());
+        if(nms.hasCustomHoverName()) hoverName = hoverName.decorate(TextDecoration.ITALIC);
+
+        return hoverName
+                .hoverEvent(item);
     }
 
     /**

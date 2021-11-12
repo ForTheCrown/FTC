@@ -1,4 +1,4 @@
-package net.forthecrown.economy.market.guild.topics;
+package net.forthecrown.economy.guild.topics;
 
 import com.google.gson.JsonElement;
 import net.forthecrown.inventory.builder.BuiltInventory;

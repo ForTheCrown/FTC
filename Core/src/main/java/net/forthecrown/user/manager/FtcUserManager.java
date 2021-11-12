@@ -4,6 +4,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.AbstractYamlSerializer;
+import net.forthecrown.serializer.UserJsonSerializer;
+import net.forthecrown.serializer.UserSerializer;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.FtcUserAlt;
 import net.forthecrown.user.actions.FtcUserActionHandler;
@@ -20,6 +22,7 @@ public final class FtcUserManager extends AbstractYamlSerializer implements User
     public static final Object2ObjectMap<UUID, FtcUserAlt> LOADED_ALTS = new Object2ObjectOpenHashMap<>();
 
     private final FtcUserActionHandler actionHandler = new FtcUserActionHandler();
+    private final UserJsonSerializer serializer = new UserJsonSerializer();
 
     private final Map<UUID, UUID> alts = new Object2ObjectOpenHashMap<>();
 
@@ -113,5 +116,10 @@ public final class FtcUserManager extends AbstractYamlSerializer implements User
     @Override
     public UserActionHandler getActionHandler() {
         return actionHandler;
+    }
+
+    @Override
+    public UserSerializer getSerializer() {
+        return serializer;
     }
 }

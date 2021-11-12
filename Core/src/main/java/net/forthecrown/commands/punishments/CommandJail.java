@@ -21,7 +21,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.command.ConsoleCommandSender;
 
 public class CommandJail extends FtcCommand implements GenericPunisher {
     public CommandJail(){
@@ -56,8 +55,6 @@ public class CommandJail extends FtcCommand implements GenericPunisher {
     }
 
     public int punish(CrownUser user, CommandSource source, long length, Key jail) throws CommandSyntaxException {
-        if(user.hasPermission(Permissions.JAIL_BYPASS) && !source.is(ConsoleCommandSender.class)) throw FtcExceptionProvider.cannotJail(user);
-
         PunishmentManager manager = Crown.getPunishmentManager();
         JailManager jails = Crown.getJailManager();
 

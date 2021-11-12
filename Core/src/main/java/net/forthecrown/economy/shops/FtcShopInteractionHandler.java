@@ -9,7 +9,6 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.events.ShopInteractionListener;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,32 +22,34 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
     private final Map<UUID, BukkitRunnable> deletionDelay = new Object2ObjectOpenHashMap<>();
 
     @Override
-    public void handleInteraction(SignShop shop, Player player, Economy economy) {
+    public void handleInteraction(SignShop shop, ShopCustomer customer, Economy economy) {
         //checks if they're the owner and if they're sneaking, then opens the shop inventory to edit it
-        if(player.isSneaking() && (shop.getOwner().equals(player.getUniqueId()) || player.hasPermission(Permissions.FTC_ADMIN))){
-            player.openInventory(shop.getInventory());
-            Bukkit.getPluginManager().registerEvents(new ShopInteractionListener.ShopRestockListener(player, shop), Crown.inst());
-            return;
+        if(customer instanceof CrownUser) {
+            Player user = ((CrownUser) customer).getPlayer();
+
+            if(user.isSneaking() && (shop.getOwnership().isOwner(user.getUniqueId()) || user.hasPermission(Permissions.SHOP_ADMIN))) {
+                user.openInventory(shop.getInventory());
+                Bukkit.getPluginManager().registerEvents(new ShopInteractionListener.ShopRestockListener(user, shop), Crown.inst());
+                return;
+            }
         }
 
-        CrownUser user = UserManager.getUser(player);
-        SignShopSession session = getOrCreateSession(user, shop);
+        SignShopSession session = getOrCreateSession(customer, shop);
         ShopInteraction interaction = shop.getType().getInteraction();
 
         //If not already on cooldown, add to cooldown
         if(!isOnExpiryCooldown(session)) doSessionExpiryCooldown(session);
 
-        //Test flags
-        if(!interaction.testFlags(session)) return;
-
         //Test the test method and catch any potential exceptions
         try {
+            //Test flags and then test type-specific requirements
+            interaction.testFlags(session);
             interaction.test(session, economy);
 
             //Only reset cooldown if test is successful
             doSessionExpiryCooldown(session);
         } catch (CommandSyntaxException e) {
-            FtcUtils.handleSyntaxException(player, e);
+            FtcUtils.handleSyntaxException(customer, e);
             //Exception thrown, check failed
             return;
         }
@@ -57,12 +58,12 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
     }
 
     @Override
-    public SignShopSession getSession(CrownUser user) {
+    public SignShopSession getSession(ShopCustomer user) {
         return sessions.get(user.getUniqueId());
     }
 
     @Override
-    public SignShopSession getOrCreateSession(CrownUser user, SignShop shop) {
+    public SignShopSession getOrCreateSession(ShopCustomer user, SignShop shop) {
         if(sessions.containsKey(user.getUniqueId())) {
             SignShopSession session = sessions.get(user.getUniqueId());
             if(shop.equals(session.getShop())) return session;

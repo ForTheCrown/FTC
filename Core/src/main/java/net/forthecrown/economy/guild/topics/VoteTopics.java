@@ -1,4 +1,4 @@
-package net.forthecrown.economy.market.guild.topics;
+package net.forthecrown.economy.guild.topics;
 
 import net.forthecrown.registry.Registries;
 

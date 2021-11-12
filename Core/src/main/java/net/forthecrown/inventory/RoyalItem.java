@@ -3,7 +3,9 @@ package net.forthecrown.inventory;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.utils.LoreBuilder;
 import net.kyori.adventure.text.Component;
+import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,7 +17,7 @@ public abstract class RoyalItem {
     public static final String NBT_KEY = "royal_item";
 
     private UUID owner;
-    private final ItemStack item;
+    protected final ItemStack item;
     private int loreStart;
     private int loreEnd;
 
@@ -45,7 +47,11 @@ public abstract class RoyalItem {
         ItemMeta meta = item.getItemMeta();
 
         List<Component> lore = meta.hasLore() ? meta.lore() : new ObjectArrayList<>();
-        List<Component> extraLore = createLore();
+
+        LoreBuilder loreBuilder = new LoreBuilder();
+        createLore(loreBuilder);
+
+        List<Component> extraLore = loreBuilder.getLore();
 
         //Remove preexisting lore created by the item
         int maxIndex = lore.isEmpty() ? 0 : lore.size();
@@ -73,9 +79,13 @@ public abstract class RoyalItem {
     protected abstract void onUpdate(ItemStack item, ItemMeta meta, CompoundTag nbt);
 
     protected abstract void readNBT(CompoundTag tag);
-    protected abstract List<Component> createLore();
+    protected abstract void createLore(LoreBuilder lore);
 
     public CrownUser getOwnerUser() {
-        return UserManager.getUser(getOwner());
+        return !hasPlayerOwner() ? null : UserManager.getUser(getOwner());
+    }
+
+    public boolean hasPlayerOwner() {
+        return owner != null && owner != Util.NIL_UUID;
     }
 }

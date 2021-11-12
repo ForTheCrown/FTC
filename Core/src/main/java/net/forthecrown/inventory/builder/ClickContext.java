@@ -1,5 +1,6 @@
 package net.forthecrown.inventory.builder;
 
+import net.forthecrown.inventory.FtcInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +19,7 @@ public class ClickContext {
      */
     public static final byte DEFAULT_COOLDOWN = 5;
 
+    private final FtcInventory inventory;
     private final Player player;
     private final int slot;
     private final ItemStack cursorItem;
@@ -25,16 +27,17 @@ public class ClickContext {
 
     private boolean shouldReload;
     private boolean shouldCancelEvent;
+    private boolean shouldClose;
     private int cooldownTime;
 
-    public ClickContext(Player player, int slot, ItemStack cursorItem, ClickType type) {
+    public ClickContext(FtcInventory inventory, Player player, int slot, ItemStack cursorItem, ClickType type) {
+        this.inventory = inventory;
         this.player = player;
         this.slot = slot;
         this.cursorItem = cursorItem;
         this.clickType = type;
 
         this.shouldCancelEvent = true;
-        this.shouldReload = false;
         this.cooldownTime = DEFAULT_COOLDOWN;
     }
 
@@ -80,5 +83,17 @@ public class ClickContext {
 
     public boolean shouldCancelEvent() {
         return shouldCancelEvent;
+    }
+
+    public void setShouldClose(boolean shouldClose) {
+        this.shouldClose = shouldClose;
+    }
+
+    public boolean shouldClose() {
+        return shouldClose;
+    }
+
+    public FtcInventory getInventory() {
+        return inventory;
     }
 }

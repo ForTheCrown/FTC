@@ -4,6 +4,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.economy.shops.ShopInventory;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.economy.shops.SignShop;
+import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Cooldown;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -34,7 +35,7 @@ public class ShopInteractionListener implements Listener {
         if(player.getGameMode() == GameMode.SPECTATOR) return;
 
         //Handle interaction between player and shop
-        manager.getInteractionHandler().handleInteraction(shop, player, Crown.getEconomy());
+        manager.getInteractionHandler().handleInteraction(shop, UserManager.getUser(player), Crown.getEconomy());
     }
 
     public static class ShopRestockListener implements Listener {

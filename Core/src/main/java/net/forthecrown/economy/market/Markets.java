@@ -146,6 +146,8 @@ public interface Markets extends CrownSerializer {
      */
     void remove(MarketShop shop);
 
+    void reset(MarketShop shop);
+
     /**
      * Clears all the shops from this manager
      */

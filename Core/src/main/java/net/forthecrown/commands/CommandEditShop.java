@@ -147,7 +147,7 @@ public class CommandEditShop extends FtcCommand {
 
                                     if(user.equals(transferTo) && !user.hasPermission(Permissions.SHOP_ADMIN)) throw FtcExceptionProvider.translatable("shops.edit.transferToSelf");
 
-                                    shop.setOwner(transferTo.getUniqueId());
+                                    shop.getOwnership().setOwner(transferTo.getUniqueId());
 
                                     user.sendMessage(
                                             Component.translatable("shops.edit.transferred", transferTo.nickDisplayName().color(NamedTextColor.YELLOW)).color(NamedTextColor.GRAY)
@@ -156,7 +156,7 @@ public class CommandEditShop extends FtcCommand {
                                     transferTo.sendMessage(
                                             Component.translatable("shops.edit.transferred.receiver",
                                                     user.nickDisplayName().color(NamedTextColor.YELLOW),
-                                                    FtcFormatter.prettyLocationMessage(shop.getLocation(), false).color(NamedTextColor.GOLD)
+                                                    FtcFormatter.prettyLocationMessage(shop.getPosition().toLocation(), false).color(NamedTextColor.GOLD)
                                             ).color(NamedTextColor.GRAY)
                                     );
 
@@ -231,7 +231,12 @@ public class CommandEditShop extends FtcCommand {
         if(block == null || !(block.getState() instanceof Sign)) throw FtcExceptionProvider.translatable("commands.lookingAtShop");
 
         SignShop result = Crown.getShopManager().getShop(block.getLocation());
-        if(result == null || !result.getOwner().equals(player.getUniqueId()) && !player.hasPermission("ftc.admin")) throw FtcExceptionProvider.translatable("commands.lookingAtShop");
+        if(result == null
+                || !result.getOwnership().isOwner(player.getUniqueId())
+                && !player.hasPermission("ftc.admin")
+        ) {
+            throw FtcExceptionProvider.translatable("commands.lookingAtShop");
+        }
         return result;
     }
 

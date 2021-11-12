@@ -1,13 +1,13 @@
-package net.forthecrown.economy.market.guild;
+package net.forthecrown.economy.guild;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
-import net.forthecrown.economy.market.guild.topics.PostVoteTask;
-import net.forthecrown.economy.market.guild.topics.VoteTopic;
-import net.forthecrown.economy.market.guild.topics.VoteTopicType;
+import net.forthecrown.economy.guild.topics.PostVoteTask;
+import net.forthecrown.economy.guild.topics.VoteTopic;
+import net.forthecrown.economy.guild.topics.VoteTopicType;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;

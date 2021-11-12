@@ -2,13 +2,13 @@ package net.forthecrown.inventory.weapon;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.inventory.RoyalItem;
+import net.forthecrown.inventory.RankedItem;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.LoreBuilder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -30,10 +30,13 @@ import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
  * A RoyalSword is a special in-game sword, this is the class which
  * represents it... shocking, I know.
  */
-public class RoyalSword extends RoyalItem {
-    private int rank = 1;
+public class RoyalSword extends RankedItem {
+    //I know it's flavor, not fluff, as in flavor text, but fuck you UwU
+    private int lastFluffChange = 1;
+
     private WeaponUpgrade nextUpgrade;
-    private WeaponUpgrade waitingUpdate;
+    WeaponUpgrade waitingUpdate;
+
     private Object2IntMap<WeaponGoal> goalsAndProgress = new Object2IntOpenHashMap<>();
 
     /**
@@ -59,8 +62,10 @@ public class RoyalSword extends RoyalItem {
 
     @Override
     protected void readNBT(CompoundTag tag) {
-        this.rank = tag.getInt("rank");
+        super.readNBT(tag);
+
         this.nextUpgrade = RoyalWeapons.getUpgrade(rank+1);
+        this.lastFluffChange = tag.getInt("lastFluffChange");
 
         //No need to null this, if it's null,
         //the tag returns an empty compound
@@ -84,7 +89,9 @@ public class RoyalSword extends RoyalItem {
 
     @Override
     protected void onUpdate(ItemStack item, ItemMeta meta, CompoundTag tag) {
-        tag.putInt("rank", rank);
+        super.onUpdate(item, meta, tag);
+
+        tag.putInt("lastFluffChange", lastFluffChange);
 
         //Serialize goals, same as map, goal 2 progress
         CompoundTag goalsTag = new CompoundTag();
@@ -96,20 +103,14 @@ public class RoyalSword extends RoyalItem {
 
         //If there's an upgrade waiting to be applied, apply it and then null it.
         if(waitingUpdate == null) return;
-        waitingUpdate.apply(item, meta, tag);
+        waitingUpdate.apply(this, item, meta, tag);
 
         waitingUpdate = null;
     }
 
     @Override
-    protected List<Component> createLore() {
-        List<Component> lore = new ObjectArrayList<>();
-
-        //Add the rank identifier
-        lore.add(
-                Component.text("Rank " + FtcUtils.arabicToRoman(rank))
-                        .style(nonItalic(NamedTextColor.GRAY))
-        );
+    protected void createLore(LoreBuilder lore) {
+        super.createLore(lore);
 
         //The bearer of this... bla bla
         addFlavorText(lore);
@@ -146,10 +147,12 @@ public class RoyalSword extends RoyalItem {
                 lore.add(builder.build());
             }
         } else {
-            //Else, we've reached max rank
-            lore.add(
-                    Component.text("Max rank reached!").style(nonItalic(NamedTextColor.YELLOW))
-            );
+            if(rank == RoyalWeapons.MAX_RANK) {
+                lore.add(
+                        Component.text("Max rank reached")
+                                .style(nonItalic(NamedTextColor.DARK_GRAY))
+                );
+            }
         }
 
         //If there's something we'll upgrade to once we beat the goal(s),
@@ -178,23 +181,20 @@ public class RoyalSword extends RoyalItem {
                             .append(getOwnerUser().nickDisplayName())
             );
         }
-
-        return lore;
     }
 
-    private void addFlavorText(List<Component> lore) {
+    private void addFlavorText(LoreBuilder lore) {
         final Component border = Component.text("------------------------------").style(nonItalic(NamedTextColor.DARK_GRAY));
 
         lore.add(border);
 
-        lore.add(
-                Component.text("The bearer of this weapon has")
-                        .style(nonItalic(NamedTextColor.GOLD))
-        );
-        lore.add(
-                Component.text("proven themselves to the Crown...")
-                        .style(nonItalic(NamedTextColor.GOLD))
-        );
+        WeaponUpgrade lastChange = RoyalWeapons.getUpgrade(lastFluffChange);
+
+        for (Component c: lastChange.loreFluff()) {
+            lore.add(
+                    c.style(nonItalic(NamedTextColor.GRAY))
+            );
+        }
 
         lore.add(border);
     }
@@ -231,6 +231,8 @@ public class RoyalSword extends RoyalItem {
         this.waitingUpdate = nextUpgrade;
         nextUpgrade = RoyalWeapons.getUpgrade(rank + 1);
 
+        if(waitingUpdate != null && waitingUpdate.loreFluff() != null) lastFluffChange = rank;
+
         setGoals(RoyalWeapons.getGoalsAtRank(rank));
     }
 
@@ -266,29 +268,17 @@ public class RoyalSword extends RoyalItem {
      * @return Whether to rank up the sword.
      */
     public boolean shouldRankUp() {
-        if(rank == 5 && !getOwnerUser().hasPermission(Permissions.DONATOR_1)) return false;
+        if(rank == RoyalWeapons.MAX_RANK) return false;
 
         for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {
             if(e.getIntValue() < e.getKey().getKillGoal()) return false;
         }
 
+        if(!getOwnerUser().hasPermission(Permissions.DONATOR_1) && item.getType() == RoyalWeapons.NON_DONATOR_LIMIT_MAT) {
+            return false;
+        }
+
         return true;
-    }
-
-    /**
-     * Sets the rank
-     * @param rank The new rank
-     */
-    public void setRank(int rank) {
-        this.rank = rank;
-    }
-
-    /**
-     * Gets the sword's rank
-     * @return The sword's rank
-     */
-    public int getRank() {
-        return rank;
     }
 
     /**
@@ -331,5 +321,13 @@ public class RoyalSword extends RoyalItem {
         for (WeaponGoal g: goals) {
             this.goalsAndProgress.put(g, 0);
         }
+    }
+
+    public int getLastFluffChange() {
+        return lastFluffChange;
+    }
+
+    public void setLastFluffChange(int lastFluffChange) {
+        this.lastFluffChange = lastFluffChange;
     }
 }

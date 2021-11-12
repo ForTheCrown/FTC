@@ -10,13 +10,13 @@ import net.forthecrown.utils.JsonUtils;
 import java.io.File;
 import java.io.IOException;
 
-public final class DynastySerializer {
-    private DynastySerializer() {}
+public final class HouseSerializer {
+    private HouseSerializer() {}
 
     public static void serialize() {
         JsonWrapper json = JsonWrapper.empty();
 
-        for (Dynasty h: Registries.DYNASTIES) {
+        for (House h: Registries.HOUSES) {
             json.add(h.toString(), h.serialize());
         }
 
@@ -37,7 +37,7 @@ public final class DynastySerializer {
             return;
         }
 
-        for (Dynasty h: Registries.DYNASTIES) {
+        for (House h: Registries.HOUSES) {
             JsonElement element = json.get(h.toString());
             h.deserialize(element == null ? new JsonObject() : element);
         }

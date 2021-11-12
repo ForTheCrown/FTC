@@ -3,6 +3,7 @@ package net.forthecrown.user.manager;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.serializer.CrownSerializer;
+import net.forthecrown.serializer.UserSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.FtcUserAlt;
@@ -185,4 +186,5 @@ public interface UserManager extends CrownSerializer {
     void removeEntry(UUID alt);
 
     UserActionHandler getActionHandler();
+    UserSerializer getSerializer();
 }

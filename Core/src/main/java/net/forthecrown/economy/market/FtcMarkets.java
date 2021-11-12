@@ -124,11 +124,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         if(complete) {
             ownership.setOwnershipBegan(0L);
 
-            BoundingBoxes.copyTo(
-                    Worlds.VOID,
-                    shop.getVoidExample(),
-                    shop.getResetPos().toWorldVector(getWorld())
-            );
+            reset(shop);
         }
 
         for (ShopEntrance e: shop.getEntrances()) {
@@ -275,6 +271,15 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         }
 
         user.unloadIfOffline();
+    }
+
+    @Override
+    public void reset(MarketShop shop) {
+        BoundingBoxes.mainThreadCopy(
+                Worlds.VOID,
+                shop.getVoidExample(),
+                shop.getResetPos().toWorldVector(getWorld())
+        );
     }
 
     @Override

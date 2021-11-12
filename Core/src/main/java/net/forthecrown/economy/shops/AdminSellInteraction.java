@@ -14,19 +14,22 @@ public class AdminSellInteraction implements ShopInteraction {
         ItemStack example = session.getExampleItem();
 
         //User does not have item to sell
-        if(!session.getPlayerInventory().containsAtLeast(example, example.getAmount())) throw FtcExceptionProvider.dontHaveItemForShop(example);
+        if(!session.getCustomerInventory().containsAtLeast(example, example.getAmount())) {
+            throw FtcExceptionProvider.dontHaveItemForShop(example);
+        }
     }
 
     @Override
     public void interact(SignShopSession session, Economy economy) {
         ItemStack example = session.getExampleItem();
+        ShopCustomer customer = session.getCustomer();
 
         //Add money and remove item
-        economy.add(session.getCustomer().getUniqueId(), session.getPrice());
-        session.getPlayerInventory().removeItemAnySlot(example.clone());
+        customer.addBalance(session.getPrice());
+        session.getCustomerInventory().removeItemAnySlot(example.clone());
 
         //Tell em
-        session.getCustomer().sendMessage(
+        customer.sendMessage(
                 Component.translatable("shops.used.sell", NamedTextColor.GRAY,
                         FtcFormatter.itemAndAmount(example).color(NamedTextColor.YELLOW),
                         FtcFormatter.rhines(session.getPrice()).color(NamedTextColor.GOLD)

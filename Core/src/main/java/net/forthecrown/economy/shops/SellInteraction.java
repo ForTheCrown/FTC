@@ -16,7 +16,7 @@ public class SellInteraction implements ShopInteraction {
         ShopType.ADMIN_SELL.getInteraction().test(session, economy); //Check basic stuff
 
         //Check the shop's owner can afford the shop
-        if(!economy.has(session.getOwner().getUniqueId(), session.getPrice())) throw FtcExceptionProvider.shopOwnerCannotAfford(session.getPrice());
+        if(!economy.has(session.getOwnership().getOwner(), session.getPrice())) throw FtcExceptionProvider.shopOwnerCannotAfford(session.getPrice());
 
         //Check shop has space for any more items
         if(!session.shopHasSpace()) throw FtcExceptionProvider.noShopSpace();
@@ -26,11 +26,11 @@ public class SellInteraction implements ShopInteraction {
     public void interact(SignShopSession session, Economy economy) {
         ShopType.ADMIN_SELL.getInteraction().interact(session, economy);
 
-        CrownUser owner = session.getOwner();
+        CrownUser owner = session.getOwnership().ownerUser();
         ItemStack example = session.getExampleItem();
 
         //Add item to shop, give user mulaa
-        session.getInventory().addItem(example.clone());
+        session.getShopInventory().addItem(example.clone());
         economy.add(owner.getUniqueId(), session.getPrice(), owner.getFaction() != Faction.PIRATES);
 
         //When session expires, tell the owner what occurred lol
@@ -41,7 +41,7 @@ public class SellInteraction implements ShopInteraction {
                     Component.translatable("shops.used.sell.owner",
                             NamedTextColor.GRAY,
 
-                            session.getCustomer().nickDisplayName().color(NamedTextColor.YELLOW),
+                            session.getCustomer().shopDisplayName().color(NamedTextColor.YELLOW),
                             FtcFormatter.itemAndAmount(session.getExampleItem(), session.getAmount()).color(NamedTextColor.GOLD),
                             FtcFormatter.rhines(totalEarned).color(NamedTextColor.YELLOW)
                     )

@@ -1,6 +1,9 @@
 package net.forthecrown.commands.punishments;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import net.forthecrown.commands.arguments.UserArgument;
+import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
@@ -8,17 +11,13 @@ import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.admin.record.PunishmentRecord;
 import net.forthecrown.core.admin.record.PunishmentType;
-import net.forthecrown.commands.arguments.UserArgument;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.permissions.Permission;
 
 public class CommandPunishment extends FtcCommand {
@@ -59,8 +58,6 @@ public class CommandPunishment extends FtcCommand {
                 "ban_ftc",
                 Permissions.POLICE,
                 (user, source, reason) -> {
-                    if(user.hasPermission(Permissions.BAN_BYPASS) && !source.is(ConsoleCommandSender.class)) throw FtcExceptionProvider.cannotBan(user);
-
                     PunishmentManager manager = Crown.getPunishmentManager();
                     PunishmentEntry entry = manager.getEntry(user.getUniqueId());
                     if(entry != null && entry.checkPunished(PunishmentType.BAN)) throw FtcExceptionProvider.create("User has already been banned");
@@ -87,8 +84,6 @@ public class CommandPunishment extends FtcCommand {
                 "kick_ftc",
                 Permissions.POLICE,
                 (user, source, reason) -> {
-                    if(user.hasPermission(Permissions.KICK_BYPASS) && !source.is(ConsoleCommandSender.class)) throw FtcExceptionProvider.cannotKick(user);
-
                     user.getPlayer().kick(reason == null ? null : ChatUtils.convertString(reason, true));
 
                     StaffChat.sendCommand(

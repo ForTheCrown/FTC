@@ -22,6 +22,9 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
 
     private InventoryCloseAction onClose;
     private InventoryAction onOpen;
+    private InventoryRunnable onClick;
+
+    private boolean freeInventory;
 
     public InventoryBuilder(int size, Component title) {
         this(size);
@@ -107,12 +110,31 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
         return this;
     }
 
+    public boolean isFreeInventory() {
+        return freeInventory;
+    }
+
+    public InventoryBuilder setFreeInventory(boolean freeInventory) {
+        this.freeInventory = freeInventory;
+        return this;
+    }
+
+    public InventoryRunnable onClick() {
+        return onClick;
+    }
+
+    public InventoryBuilder onClick(InventoryRunnable onClick) {
+        this.onClick = onClick;
+        return this;
+    }
+
     @Override
     public BuiltInventory build() {
         return new BuiltInventory(
                 options,
-                title, size,
-                onClose, onOpen
+                title, size, freeInventory,
+                onClose, onOpen,
+                onClick
         );
     }
 }

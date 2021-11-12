@@ -1,5 +1,6 @@
 package net.forthecrown.events;
 
+import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.InventoryCloseAction;
 import org.bukkit.entity.Player;
@@ -19,9 +20,9 @@ public class InventoryBuilderListener implements Listener {
         if(event.isShiftClick()) event.setCancelled(true);
         if (event.getClickedInventory() instanceof PlayerInventory) return;
 
-        event.setCancelled(true);
-
         BuiltInventory inventory = (BuiltInventory) event.getInventory().getHolder();
+        event.setCancelled(!inventory.isFreeInventory());
+
         inventory.run((Player) event.getWhoClicked(), event);
     }
 
@@ -33,6 +34,6 @@ public class InventoryBuilderListener implements Listener {
         InventoryCloseAction action = inventory.getOnClose();
 
         if(action == null) return;
-        action.onClose((Player) event.getPlayer(), event.getReason());
+        action.onClose((Player) event.getPlayer(), (FtcInventory) event.getInventory(), event.getReason());
     }
 }

@@ -1,8 +1,8 @@
-package net.forthecrown.economy.market.guild.topics;
+package net.forthecrown.economy.guild.topics;
 
-import net.forthecrown.economy.houses.Dynasty;
+import net.forthecrown.economy.houses.House;
 import net.forthecrown.economy.houses.VoteModifier;
-import net.forthecrown.economy.market.guild.VoteResult;
+import net.forthecrown.economy.guild.VoteResult;
 import net.forthecrown.serializer.SerializationTypeHolder;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -21,5 +21,5 @@ public interface VoteTopic extends SerializationTypeHolder<VoteTopic> {
         return type.signDisplay(this);
     }
 
-    VoteModifier makeModifier(Dynasty dynasty);
+    VoteModifier makeModifier(House house);
 }
