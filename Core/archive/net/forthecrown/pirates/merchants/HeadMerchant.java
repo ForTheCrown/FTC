@@ -14,7 +14,6 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.*;
 import net.forthecrown.utils.math.Vector3i;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -31,8 +30,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scoreboard.Score;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
 
 public class HeadMerchant implements BlackMarketMerchant {
     public static final Key KEY = Squire.createPiratesKey("heads");

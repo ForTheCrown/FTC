@@ -36,8 +36,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
-
 import static net.forthecrown.economy.pirates.BlackMarketUtils.getBaseInventory;
 
 public class EnchantMerchant implements BlackMarketMerchant, ClickEventTask {
