@@ -1,5 +1,6 @@
 package net.forthecrown.inventory.weapon;
 
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -20,20 +21,29 @@ public interface WeaponGoal extends Keyed {
      * Gets the amount of kills needed to beat this goal
      * @return The goal's required kill amount
      */
-    int getKillGoal();
+    int getGoal();
 
     /**
      * Gets the rank at which a sword has to beat this goal
      * @return The rank at which swords have to beat this
      */
-    int getGoalRank();
+    int getRank();
 
     /**
      * Tests if the killed entity fits this goal
-     * @param killed The entity
+     * @param event The entity
      * @return Whether the entity is a legal kill for this goal or not
      */
-    boolean isValidTarget(Entity killed);
+    boolean test(WeaponUseContext event);
+
+    /**
+     * Gets the amount to increment the goal
+     * @param event The context of the weapon's usage
+     * @return The amount to increase
+     */
+    default int getIncrementAmount(WeaponUseContext event) {
+        return ComVars.swordGoalGainPerKill();
+    }
 
     @Override
     @NotNull Key key();
@@ -69,7 +79,22 @@ public interface WeaponGoal extends Keyed {
         return new EndBossGoal(type, goal, rank);
     }
 
-    class ChargedCreeperGoal implements WeaponGoal {
+    static WeaponGoal damage(int goal, int rank) {
+        return new DamageGoal(rank, goal);
+    }
+
+    interface WeaponKillGoal extends WeaponGoal {
+        boolean test(Entity entity);
+
+        @Override
+        default boolean test(WeaponUseContext event) {
+            if(event.entity.getHealth() - event.finalDamage > 0) return false;
+
+            return test(event.entity);
+        }
+    }
+
+    class ChargedCreeperGoal implements WeaponKillGoal {
         private final Key key;
         private final int rank, goal;
 
@@ -80,17 +105,17 @@ public interface WeaponGoal extends Keyed {
         }
 
         @Override
-        public int getKillGoal() {
+        public int getGoal() {
             return goal;
         }
 
         @Override
-        public int getGoalRank() {
+        public int getRank() {
             return rank;
         }
 
         @Override
-        public boolean isValidTarget(Entity killed) {
+        public boolean test(Entity killed) {
             if(killed.getType() != EntityType.CREEPER) return false;
             Creeper creeper = (Creeper) killed;
 
@@ -108,7 +133,7 @@ public interface WeaponGoal extends Keyed {
         }
     }
 
-    class SimpleGoal implements WeaponGoal {
+    class SimpleGoal implements WeaponKillGoal {
         private final int goal, rank;
         private final EntityType type;
         private final Key key;
@@ -121,17 +146,17 @@ public interface WeaponGoal extends Keyed {
         }
 
         @Override
-        public int getKillGoal() {
+        public int getGoal() {
             return goal;
         }
 
         @Override
-        public int getGoalRank() {
+        public int getRank() {
             return rank;
         }
 
         @Override
-        public boolean isValidTarget(Entity killed) {
+        public boolean test(Entity killed) {
             return type == null || killed.getType() == type;
         }
 
@@ -146,7 +171,7 @@ public interface WeaponGoal extends Keyed {
         }
     }
 
-    class EndBossGoal implements WeaponGoal {
+    class EndBossGoal implements WeaponKillGoal {
         private final int goal, rank;
         private final Key key;
         private final EntityType type;
@@ -160,17 +185,17 @@ public interface WeaponGoal extends Keyed {
         }
 
         @Override
-        public int getKillGoal() {
+        public int getGoal() {
             return goal;
         }
 
         @Override
-        public int getGoalRank() {
+        public int getRank() {
             return rank;
         }
 
         @Override
-        public boolean isValidTarget(Entity killed) {
+        public boolean test(Entity killed) {
             return killed.getType() == type;
         }
 
@@ -182,6 +207,48 @@ public interface WeaponGoal extends Keyed {
         @Override
         public Component loreDisplay() {
             return Component.translatable(Bukkit.getUnsafe().getTranslationKey(type));
+        }
+    }
+
+    class DamageGoal implements WeaponGoal {
+        private final Key key;
+        private final int rank, goal;
+
+        public DamageGoal(int rank, int goal) {
+            this.rank = rank;
+            this.goal = goal;
+
+            this.key = Crown.coreKey("goal_damage_" + rank);
+        }
+
+        @Override
+        public int getGoal() {
+            return goal;
+        }
+
+        @Override
+        public int getRank() {
+            return rank;
+        }
+
+        @Override
+        public boolean test(WeaponUseContext event) {
+            return true;
+        }
+
+        @Override
+        public int getIncrementAmount(WeaponUseContext event) {
+            return (int) event.finalDamage;
+        }
+
+        @Override
+        public @NotNull Key key() {
+            return key;
+        }
+
+        @Override
+        public Component loreDisplay() {
+            return Component.text("Dealt damage");
         }
     }
 }

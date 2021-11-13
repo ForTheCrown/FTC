@@ -2,7 +2,6 @@ package net.forthecrown.inventory.weapon;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.inventory.RankedItem;
@@ -16,8 +15,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.*;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -31,6 +31,7 @@ import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
  * represents it... shocking, I know.
  */
 public class RoyalSword extends RankedItem {
+
     //I know it's flavor, not fluff, as in flavor text, but fuck you UwU
     private int lastFluffChange = 1;
 
@@ -44,7 +45,7 @@ public class RoyalSword extends RankedItem {
      * @param item The item to load from
      */
     public RoyalSword(ItemStack item) {
-        super(item);
+        super(item, RoyalWeapons.TAG_KEY);
 
         load();
     }
@@ -55,7 +56,7 @@ public class RoyalSword extends RankedItem {
      * @param item The item itself.
      */
     public RoyalSword(UUID owner, ItemStack item) {
-        super(owner, item);
+        super(owner, item, RoyalWeapons.TAG_KEY);
 
         setGoals(RoyalWeapons.getGoalsAtRank(1));
     }
@@ -137,7 +138,7 @@ public class RoyalSword extends RankedItem {
                 if(multiEntry) builder.append(Component.text("• "));
 
                 builder.append(
-                        Component.text(e.getIntValue() + "/" + e.getKey().getKillGoal() + " ")
+                        Component.text(e.getIntValue() + "/" + e.getKey().getGoal() + " ")
                 );
 
                 builder
@@ -157,7 +158,7 @@ public class RoyalSword extends RankedItem {
 
         //If there's something we'll upgrade to once we beat the goal(s),
         //then show the upgrade
-        if(nextUpgrade != null) {
+        if(nextUpgrade != null && nextUpgrade.loreDisplay() != null) {
             lore.add(
                     Component.text("Next upgrade: ")
                             .style(nonItalic(NamedTextColor.GRAY))
@@ -199,13 +200,15 @@ public class RoyalSword extends RankedItem {
         lore.add(border);
     }
 
-    public void kill(Player killer, Entity killed) {
-        //Test all goals to see if we killed any matching entities
-        for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {
-            if(!e.getKey().isValidTarget(killed)) continue;
+    public void damage(Player killer, EntityDamageByEntityEvent event) {
+        WeaponUseContext context = new WeaponUseContext(killer, this, (LivingEntity) event.getEntity(), event.getFinalDamage());
 
-            //If we did, increment kill count by the amount stated in ComVar
-            int newVal = e.getIntValue() + ComVars.swordGoalGainPerKill();
+        //Test all goals to see if we damaged any matching entities
+        for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {
+            if(!e.getKey().test(context)) continue;
+
+            //If we did, increment goal count by the amount stated in ComVar
+            int newVal = e.getIntValue() + e.getKey().getIncrementAmount(context);
             goalsAndProgress.put(e.getKey(), newVal);
         }
 
@@ -215,7 +218,7 @@ public class RoyalSword extends RankedItem {
 
             doEffects(
                     killer,
-                    killed.getWorld(),
+                    killer.getWorld(),
                     killer.getLocation()
             );
         }
@@ -271,7 +274,7 @@ public class RoyalSword extends RankedItem {
         if(rank == RoyalWeapons.MAX_RANK) return false;
 
         for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {
-            if(e.getIntValue() < e.getKey().getKillGoal()) return false;
+            if(e.getIntValue() < e.getKey().getGoal()) return false;
         }
 
         if(!getOwnerUser().hasPermission(Permissions.DONATOR_1) && item.getType() == RoyalWeapons.NON_DONATOR_LIMIT_MAT) {

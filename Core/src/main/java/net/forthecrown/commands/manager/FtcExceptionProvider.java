@@ -162,14 +162,6 @@ public interface FtcExceptionProvider {
         return NO_DEF_HOME.create();
     }
 
-    static RoyalCommandException emptyGrave(){
-        return EMPTY_GRAVE.create();
-    }
-
-    static RoyalCommandException homeNameInUse(){
-        return HOME_NAME_IN_USE.create();
-    }
-
     static RoyalCommandException overHomeLimit(CrownUser user){
         return OVER_HOME_LIMIT.create(Component.text(user.getHighestTierRank().tier.maxHomes));
     }

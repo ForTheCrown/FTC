@@ -37,7 +37,6 @@ import javax.annotation.Nullable;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 
 /**
  * Represents a user's profile, all their ranks, effects and such
@@ -203,21 +202,6 @@ public interface CrownUser extends
      * NOT API, like on join, except for things that need to be delayed a single tick
      */
     void onJoinLater();
-
-    /**
-     * Gets the hover event text of this user
-     * @return The user's hover text
-     */
-    default Component hoverEventText() {
-        return hoverEventText(UnaryOperator.identity());
-    }
-
-    /**
-     * Gets the hover text of this user
-     * @param operator The component manipulator
-     * @return The user's hover text
-     */
-    Component hoverEventText(UnaryOperator<Component> operator);
 
     /**
      * Updates the display name of this user in the Tab List

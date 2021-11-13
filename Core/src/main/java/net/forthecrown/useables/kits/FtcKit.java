@@ -8,9 +8,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.nbt.NbtHandler;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.useables.CheckableBase;
 import net.forthecrown.useables.checks.UsageCheckInstance;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -104,7 +104,7 @@ public class FtcKit extends CheckableBase implements Kit {
         int freeSlots = 0;
 
        for (ItemStack i: inventory){
-           if(FtcUtils.isItemEmpty(i)) freeSlots++;
+           if(FtcItems.isEmpty(i)) freeSlots++;
        }
 
        return freeSlots >= items.size();

@@ -112,7 +112,7 @@ public class ShopOwnership implements JsonSerializable, JsonDeserializable {
 
         JsonWrapper json = JsonWrapper.empty();
         if(hasOwner()) json.addUUID("owner", getOwner());
-        if(hasOwningHouse()) json.add("owningHouse", owningHouse.serializeReference());
+        if(hasOwningHouse()) json.add("owningHouse", owningHouse);
         if(hasCoOwners()) json.addList("coOwners", coOwners, JsonUtils::writeUUID);
 
         return json.getSource();

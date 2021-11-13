@@ -1,5 +1,6 @@
 package net.forthecrown.economy.shops;
 
+import net.forthecrown.inventory.FtcItems;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +26,7 @@ public class FtcShopInventory extends CraftInventoryCustom implements ShopInvent
         List<ItemStack> tempList = new ArrayList<>();
 
         for (ItemStack i: getContents()){
-            if(i == null) continue;
+            if(FtcItems.isEmpty(i)) continue;
             tempList.add(i);
         }
 
@@ -37,7 +38,7 @@ public class FtcShopInventory extends CraftInventoryCustom implements ShopInvent
         clear();
 
         for (ItemStack i: stacks){
-            if(i == null) continue;
+            if(FtcItems.isEmpty(i)) continue;
             addItem(i);
         }
     }

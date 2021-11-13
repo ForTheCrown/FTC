@@ -148,8 +148,7 @@ public class House implements
         }
     }
 
-    @Override
-    public JsonElement serialize() {
+    public JsonElement serializeFull() {
         JsonWrapper json = JsonWrapper.empty();
 
         if(!houseRelations.isEmpty()) json.addMap("houseRelations", houseRelations, House::toString, Relation::serialize);
@@ -177,7 +176,8 @@ public class House implements
                 .isEquals();
     }
 
-    public JsonPrimitive serializeReference() {
+    @Override
+    public JsonPrimitive serialize() {
         return JsonUtils.writeKey(key());
     }
 

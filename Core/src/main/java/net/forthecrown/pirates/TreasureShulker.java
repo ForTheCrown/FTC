@@ -5,7 +5,6 @@ import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.pirates.BlackMarketUtils;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.squire.Squire;
@@ -13,8 +12,8 @@ import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.loot.FtcLootTable;
-import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.math.MathUtil;
+import net.forthecrown.utils.math.Vector3i;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -31,7 +30,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.loot.LootContext;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scoreboard.Score;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.*;
@@ -307,9 +305,6 @@ public class TreasureShulker extends AbstractJsonSerializer {
 
             Crown.getEconomy().add(player.getUniqueId(), rhineReward, false);
             items.forEach(i -> player.getInventory().addItem(i));
-
-            Score pp = BlackMarketUtils.getPiratePointScore(player.getName());
-            pp.setScore(pp.getScore() + rarity.ppReward);
 
             player.sendMessage(
                     Component.translatable("pirates.shulker.found",

@@ -7,6 +7,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.KitArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.useables.InteractionUtils;
@@ -41,7 +42,7 @@ public class CommandKitEdit extends FtcCommand {
                                     List<ItemStack> items = new ArrayList<>();
 
                                     for (ItemStack i: player.getInventory()){
-                                        if(FtcUtils.isItemEmpty(i)) continue;
+                                        if(FtcItems.isEmpty(i)) continue;
                                         items.add(i);
                                     }
 

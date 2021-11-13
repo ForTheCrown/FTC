@@ -14,24 +14,25 @@ import java.util.List;
 import java.util.UUID;
 
 public abstract class RoyalItem {
-    public static final String NBT_KEY = "royal_item";
-
+    private final String tagKey;
     private UUID owner;
     protected final ItemStack item;
     private int loreStart;
     private int loreEnd;
 
-    public RoyalItem(ItemStack item) {
+    public RoyalItem(ItemStack item, String tagKey) {
         this.item = item;
+        this.tagKey = tagKey;
     }
 
-    public RoyalItem(UUID owner, ItemStack item) {
+    public RoyalItem(UUID owner, ItemStack item, String tagKey) {
         this.owner = owner;
         this.item = item;
+        this.tagKey = tagKey;
     }
 
     protected void load() {
-        CompoundTag tag = FtcItems.getTagElement(item.getItemMeta(), NBT_KEY);
+        CompoundTag tag = FtcItems.getTagElement(item.getItemMeta(), tagKey);
         this.owner = tag.getUUID("owner");
         this.loreStart = tag.getInt("lore_start");
         this.loreEnd = tag.getInt("lore_end");
@@ -72,7 +73,7 @@ public abstract class RoyalItem {
         onUpdate(item, meta, tag);
 
         meta.lore(lore);
-        FtcItems.setTagElement(meta, NBT_KEY, tag);
+        FtcItems.setTagElement(meta, tagKey, tag);
         item.setItemMeta(meta);
     }
 
@@ -87,5 +88,9 @@ public abstract class RoyalItem {
 
     public boolean hasPlayerOwner() {
         return owner != null && owner != Util.NIL_UUID;
+    }
+
+    public ItemStack getItem() {
+        return item;
     }
 }

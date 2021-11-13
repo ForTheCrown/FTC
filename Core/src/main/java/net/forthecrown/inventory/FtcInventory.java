@@ -6,7 +6,6 @@ import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
@@ -60,6 +59,10 @@ public interface FtcInventory extends Inventory, JsonSerializable, JsonDeseriali
         return first == -1 ? null : InventoryPos.fromSlot(first);
     }
 
+    default boolean isFull() {
+        return firstEmpty() == -1;
+    }
+
     @Override
     default void deserialize(JsonElement element) {
         JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
@@ -78,7 +81,7 @@ public interface FtcInventory extends Inventory, JsonSerializable, JsonDeseriali
 
         for (int i = 0; i < getSize(); i++) {
             ItemStack item = getItem(i);
-            if(FtcUtils.isItemEmpty(item)) continue;
+            if(FtcItems.isEmpty(item)) continue;
 
             json.addItem(i + "", getItem(i));
         }

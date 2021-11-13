@@ -3,7 +3,7 @@ package net.forthecrown.utils;
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.sk89q.worldedit.bukkit.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.*;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.CrownUser;
@@ -55,8 +55,8 @@ public class ItemStackBuilder implements Cloneable {
     private PlayerProfile profile;
 
     private Map<Attribute, AttributeModifier> modifiers = new Object2ObjectOpenHashMap<>();
-    private Map<NamespacedKey, Byte> persistentData = new Object2ObjectOpenHashMap<>();
-    private Map<Enchantment, Integer> enchants = new Object2ObjectOpenHashMap<>();
+    private Object2ByteMap<NamespacedKey> persistentData = new Object2ByteOpenHashMap<>();
+    private Object2IntMap<Enchantment> enchants = new Object2IntOpenHashMap<>();
     private CompoundTag tags = new CompoundTag();
 
     public ItemStackBuilder(Material material){
@@ -187,11 +187,6 @@ public class ItemStackBuilder implements Cloneable {
         return enchants;
     }
 
-    public ItemStackBuilder setEnchants(Map<Enchantment, Integer> enchants) {
-        this.enchants = enchants;
-        return this;
-    }
-
     public ItemStackBuilder addEnchant(Enchantment enchantment, int level){
         this.enchants.put(enchantment, level);
         return this;
@@ -305,7 +300,7 @@ public class ItemStackBuilder implements Cloneable {
 
         if(!MapUtils.isNullOrEmpty(enchants)){
             for (Enchantment e: enchants.keySet()){
-                meta.addEnchant(e, enchants.get(e), ignoreEnchantRestrictions);
+                meta.addEnchant(e, enchants.getInt(e), ignoreEnchantRestrictions);
             }
         }
 

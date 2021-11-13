@@ -1,5 +1,6 @@
 package net.forthecrown.commands;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.UserArgument;
@@ -10,9 +11,13 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.inventory.crown.Crowns;
+import net.forthecrown.inventory.crown.RoyalCrown;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class CommandKingMaker extends FtcCommand {
 
@@ -61,7 +66,88 @@ public class CommandKingMaker extends FtcCommand {
                 .then(argument("player", UserArgument.user())
                         .then(literal("queen").executes(c -> makeKing(c, true)))
                         .then(literal("king").executes(c -> makeKing(c, false)))
+                )
+
+                .then(literal("crown")
+                        .then(literal("make")
+                                .then(argument("owner", UserArgument.user())
+                                        .executes(makeCommand(false))
+
+                                        .then(literal("queen")
+                                                .executes(makeCommand(true))
+                                        )
+                                )
+                        )
+
+                        .then(literal("force_update")
+                                .executes(c -> {
+                                    Player player = c.getSource().asPlayer();
+                                    ItemStack held = player.getInventory().getItemInMainHand();
+
+                                    if(!Crowns.isCrown(held)) {
+                                        throw FtcExceptionProvider.create("Held item is not crown");
+                                    }
+
+                                    RoyalCrown crown = new RoyalCrown(held);
+                                    crown.update();
+
+                                    c.getSource().sendAdmin("Updated crown");
+                                    return 0;
+                                })
+                        )
+
+                        .then(literal("gender_flip")
+                                .executes(c -> {
+                                    Player player = c.getSource().asPlayer();
+                                    ItemStack held = player.getInventory().getItemInMainHand();
+
+                                    if(!Crowns.isCrown(held)) {
+                                        throw FtcExceptionProvider.create("Held item is not crown");
+                                    }
+
+                                    RoyalCrown crown = new RoyalCrown(held);
+                                    crown.setQueen(!crown.isQueen());
+                                    crown.update();
+
+                                    c.getSource().sendAdmin("Set crown to have " + (crown.isQueen() ? "Queen" : "King") + " owner");
+                                    return 0;
+                                })
+                        )
+
+                        .then(literal("upgrade")
+                                .executes(c -> {
+                                    Player player = c.getSource().asPlayer();
+                                    ItemStack held = player.getInventory().getItemInMainHand();
+
+                                    if(!Crowns.isCrown(held)) {
+                                        throw FtcExceptionProvider.create("Held item is not crown");
+                                    }
+
+                                    RoyalCrown crown = new RoyalCrown(held);
+                                    crown.upgrade();
+
+                                    c.getSource().sendAdmin("Upgraded crown");
+                                    return 0;
+                                })
+                        )
                 );
+    }
+
+    private Command<CommandSource> makeCommand(boolean queen) {
+        return c -> {
+            Player player = c.getSource().asPlayer();
+            CrownUser user = UserArgument.getUser(c, "owner");
+
+            if(player.getInventory().firstEmpty() == -1) {
+                throw FtcExceptionProvider.inventoryFull();
+            }
+
+            ItemStack crown = Crowns.make(user.getUniqueId(), queen);
+            player.getInventory().addItem(crown);
+
+            c.getSource().sendAdmin("Made crown for " + user.getNickOrName());
+            return 0;
+        };
     }
 
     private int makeKing(CommandContext<CommandSource> c, boolean isQueen) throws CommandSyntaxException {

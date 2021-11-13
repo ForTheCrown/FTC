@@ -19,6 +19,7 @@ import net.forthecrown.events.dynamic.AfkListener;
 import net.forthecrown.events.dynamic.RegionVisitListener;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.royalgrenadier.source.CommandSources;
 import net.forthecrown.user.data.*;
@@ -34,7 +35,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -744,42 +744,9 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public Component hoverEventText(UnaryOperator<Component> operator){
-        TextComponent.Builder text = Component.text()
-                .append(name())
-                .append(Component.newline());
-
-        if(nickname != null){
-            text
-                    .append(Component.text("Nickname: ").append(nickname))
-                    .append(Component.newline());
-        }
-
-        if(interactions.spouse != null && isProfilePublic()){
-            text
-                    .append(Component.text("Married to: ").append(interactions.spouseUser().nickOrName()))
-                    .append(Component.newline());
-        }
-
-        if(getFaction() != Faction.DEFAULT && isProfilePublic()){
-            text
-                    .append(Component.text("Branch: ").append(Component.text(getFaction().getName())))
-                    .append(Component.newline());
-        }
-
-        if(getRank() != Rank.DEFAULT){
-            text
-                    .append(Component.text("Rank: ").append(getRank().prefix()))
-                    .append(Component.newline());
-        }
-
-        text.append(Component.text(getUniqueId().toString()));
-        return operator.apply(text.build());
-    }
-
-    @Override
     public @NonNull HoverEvent<Component> asHoverEvent(@NonNull UnaryOperator<Component> op) {
-        return HoverEvent.showText(hoverEventText(op));
+        ProfilePrinter printer = new ProfilePrinter(this, false, false);
+        return HoverEvent.showText(op.apply(printer.printForHover()));
     }
 
     @Override
@@ -1051,7 +1018,7 @@ public class FtcUser implements CrownUser {
 
         if(targetAmount == -1) {
             for (ItemStack i: inv) {
-                if(FtcUtils.isItemEmpty(i)) continue;
+                if(FtcItems.isEmpty(i)) continue;
                 if(i.getType() != material) continue;
 
                 foundAmount += i.getAmount();

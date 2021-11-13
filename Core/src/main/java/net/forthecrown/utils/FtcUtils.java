@@ -183,10 +183,6 @@ public final class FtcUtils {
         return Key.key(key.namespace(), key.value());
     }
 
-    public static boolean isItemEmpty(ItemStack itemStack) {
-        return itemStack == null || itemStack.getType() == Material.AIR || itemStack.getAmount() <= 0;
-    }
-
     //Clears all the effects on a living entity
     public static void clearEffects(LivingEntity player){
         player.getActivePotionEffects().forEach(e -> player.removePotionEffect(e.getType()));
