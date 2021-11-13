@@ -7,7 +7,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.economy.shops.ShopInventory;
 import net.forthecrown.economy.shops.ShopType;
 import net.forthecrown.economy.shops.SignShop;
-import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.LocationFileName;
 import net.minecraft.Util;
@@ -42,7 +42,7 @@ public class ShopJsonSerializer implements ShopSerializer {
         JsonWrapper inv = JsonWrapper.empty();
         ShopInventory sInv = shop.getInventory();
         if(sInv.getExampleItem() != null) inv.addItem("exampleItem", sInv.getExampleItem());
-        if(!sInv.isEmpty()) inv.addList("items", sInv, JsonUtils::writeItem);
+        if(!sInv.isEmpty()) inv.addList("items", sInv.getShopContents(), JsonUtils::writeItem);
         json.add("inventory", inv);
 
         writeShop(json, shop);
@@ -61,7 +61,7 @@ public class ShopJsonSerializer implements ShopSerializer {
 
         ItemStack item = inv.getItem("exampleItem");
 
-        if(FtcUtils.isItemEmpty(item)) {
+        if(FtcItems.isEmpty(item)) {
             Crown.logger().warning("Found null exampleItem in " + shop.getFileName() + "'s file, bad touch lol");
         }
 

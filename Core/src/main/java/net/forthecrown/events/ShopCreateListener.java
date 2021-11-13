@@ -12,7 +12,7 @@ import net.forthecrown.economy.shops.ShopInventory;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.economy.shops.ShopType;
 import net.forthecrown.economy.shops.SignShop;
-import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.inventory.FtcItems;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -149,7 +149,7 @@ public class ShopCreateListener implements Listener {
             ShopInventory shopInv = shop.getInventory();
 
             ItemStack item = inv.getContents()[2];
-            if(FtcUtils.isItemEmpty(item)){ //If example item was not found: destroy shop and tell them why they failed
+            if(FtcItems.isEmpty(item)){ //If example item was not found: destroy shop and tell them why they failed
                 shop.destroy(false);
 
                 player.sendMessage(

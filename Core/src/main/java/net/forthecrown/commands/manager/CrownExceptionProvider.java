@@ -49,13 +49,11 @@ public class CrownExceptionProvider {
     static final TranslatableExceptionType NO_ONE_NEARBY =              new TranslatableExceptionType("commands.noOneNearby");
 
     static final TranslatableExceptionType BLOCKED_PLAYER =             new TranslatableExceptionType("user.blocked");
-    static final TranslatableExceptionType EMPTY_GRAVE =                new TranslatableExceptionType("user.grave.empty");
     static final TranslatableExceptionType IGNORE_SELF_NO =             new TranslatableExceptionType("user.cannotIgnoreSelf");
     static final TranslatableExceptionType CANNOT_PAY_BLOCKED =         new TranslatableExceptionType("user.cannotPayBlocked");
 
     static final TranslatableExceptionType NO_HOMES =                   new TranslatableExceptionType("homes.noneToList");
     static final TranslatableExceptionType NO_DEF_HOME =                new TranslatableExceptionType("homes.noDefaultHome");
-    static final TranslatableExceptionType HOME_NAME_IN_USE =           new TranslatableExceptionType("homes.nameInUse");
     static final TranslatableExceptionType OVER_HOME_LIMIT =            new TranslatableExceptionType("homes.overLimit");
     static final TranslatableExceptionType CANNOT_TP_HOME =             new TranslatableExceptionType("homes.badWorld");
     static final TranslatableExceptionType CANNOT_SET_HOME =            new TranslatableExceptionType("homes.cannotSetHere");

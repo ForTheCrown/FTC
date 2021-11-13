@@ -72,7 +72,7 @@ public final class ListUtils {
 
     public static <I> String join(@NotNull Collection<I> list, @Nullable String delimiter, @Nullable String prefix, @Nullable String suffix, @NotNull Function<I, String> joiner){
         StringJoiner stringJoiner = new StringJoiner(
-                delimiter == null ? "" : delimiter,
+                delimiter == null ? ", " : delimiter,
                 prefix == null ? "" : prefix,
                 suffix == null ? "" : suffix
         );

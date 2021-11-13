@@ -2,7 +2,6 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -656,22 +655,6 @@ public class CommandFtcCore extends FtcCommand {
                 )
 
                 .then(literal("item")
-                        .then(literal("crown")
-                                .then(argument("level", IntegerArgumentType.integer(1, 6))
-                                        .then(argument("owner", StringArgumentType.greedyString())
-                                                .executes(c ->{
-                                                    Player player = getPlayerSender(c);
-                                                    int level = c.getArgument("level", Integer.class);
-                                                    String owner = c.getArgument("owner", String.class);
-
-                                                    player.getInventory().addItem(FtcItems.makeCrown(level, owner));
-                                                    c.getSource().sendMessage("You got a level " + level + " crown");
-
-                                                    return 0;
-                                                })
-                                        )
-                                )
-                        )
                         .then(literal("coin")
                                 .then(argument("amount", IntegerArgumentType.integer(1))
                                         .executes(c -> giveCoins(getPlayerSender(c), c.getArgument("amount", Integer.class)))
@@ -817,10 +800,6 @@ public class CommandFtcCore extends FtcCommand {
         SHOPS ("Signshops", b ->{
             if(b) Crown.getShopManager().save();
             else Crown.getShopManager().reload();
-        }),
-        BLACK_MARKET ("Black Market", b -> {
-            if(b) Pirates.getPirateEconomy().save();
-            else Pirates.getPirateEconomy().reload();
         }),
         CONFIG ("Main Config", b -> {
             if(b) Crown.inst().saveConfig();

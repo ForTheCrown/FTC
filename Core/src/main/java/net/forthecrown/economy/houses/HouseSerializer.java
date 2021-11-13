@@ -17,7 +17,7 @@ public final class HouseSerializer {
         JsonWrapper json = JsonWrapper.empty();
 
         for (House h: Registries.HOUSES) {
-            json.add(h.toString(), h.serialize());
+            json.add(h.toString(), h.serializeFull());
         }
 
         try {

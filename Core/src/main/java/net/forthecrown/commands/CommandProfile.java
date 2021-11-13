@@ -15,9 +15,9 @@ import net.forthecrown.user.manager.UserManager;
 public class CommandProfile extends FtcCommand {
 
     public CommandProfile(){
-        super("user", Crown.inst());
+        super("profile", Crown.inst());
 
-        setAliases("playerprofile", "gameprofile");
+        setAliases("user", "playerprofile", "gameprofile");
         setDescription("Displays a user's user information");
         setPermission(Permissions.PROFILE);
 
@@ -31,8 +31,8 @@ public class CommandProfile extends FtcCommand {
      * Shows some basic info about a user.
      *
      * Valid usages of command:
-     * - /user
-     * - /user [player]
+     * - /profile
+     * - /profile [player]
      *
      * Author: Julie
      */

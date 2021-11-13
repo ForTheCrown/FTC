@@ -11,9 +11,9 @@ import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.grenadier.types.EnchantArgument;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.squire.enchantment.RoyalEnchant;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -72,7 +72,7 @@ public class CommandEnchant extends FtcCommand {
 
     private int enchant(CommandSource source, CrownUser user, int level, Enchantment ench) throws RoyalCommandException {
         ItemStack inHand = user.getPlayer().getInventory().getItemInMainHand();
-        if(FtcUtils.isItemEmpty(inHand)) throw FtcExceptionProvider.mustHoldItem();
+        if(FtcItems.isEmpty(inHand)) throw FtcExceptionProvider.mustHoldItem();
 
         if(ench instanceof RoyalEnchant) RoyalEnchant.addCrownEnchant(inHand, (RoyalEnchant) ench, level);
         else inHand.addUnsafeEnchantment(ench, level);

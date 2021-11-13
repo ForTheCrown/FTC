@@ -47,8 +47,8 @@ public interface WeaponUpgrade {
         return reforge(type, ench, enchLevel, itemName, display, arr);
     }
 
-    static WeaponUpgrade dragon(int rank) {
-        return new DragonUpgrade(rank);
+    static WeaponUpgrade endBoss(int rank) {
+        return new EndBossUpgrade(rank);
     }
 
     class ReforgeUpgrade implements WeaponUpgrade {
@@ -88,10 +88,10 @@ public interface WeaponUpgrade {
         }
     }
 
-    class DragonUpgrade implements WeaponUpgrade {
+    class EndBossUpgrade implements WeaponUpgrade {
         private final int rank;
 
-        public DragonUpgrade(int rank) {
+        public EndBossUpgrade(int rank) {
             this.rank = rank;
         }
 

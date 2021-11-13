@@ -18,6 +18,8 @@ import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Statistic;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -33,6 +35,9 @@ public class ProfilePrinter {
 
     private final TextComponent.Builder builder;
     private int headerLength;
+
+    private Style borderStyle = Style.style(NamedTextColor.GOLD, TextDecoration.STRIKETHROUGH);
+    private Style lineStyle = Style.style(NamedTextColor.YELLOW);
 
     public ProfilePrinter(CrownUser user, CommandSource source) {
         this(
@@ -66,24 +71,55 @@ public class ProfilePrinter {
         return printCurrent();
     }
 
-    public ProfilePrinter header() {
-        String header = "&6&m----&e " + (self ? "Your" : (user.getNickOrName() + "'s")) + " player profile &6&m----";
-        this.headerLength = header.length();
+    public Component printForHover() {
+        append(user.nickOrName().color(NamedTextColor.GOLD));
 
-        return append(header);
+        if(profilePublic) {
+            optionalInfo();
+            basicInfo();
+        }
+
+        if(adminViewer) adminInfo();
+
+        line("ID", user.getUniqueId().toString());
+        return printCurrent();
+    }
+
+    public ProfilePrinter header() {
+        String header = "---- " + (self ? "Your" : (user.getNickOrName() + "'s")) + " profile ----";
+        headerLength = header.length();
+
+        append(
+                Component.text("----")
+                        .style(borderStyle)
+        );
+
+        append(Component.space());
+        append(headerDisplay());
+        append(Component.space());
+
+        append(
+                Component.text("----")
+                        .style(borderStyle)
+        );
+
+        return this;
     }
 
     public ProfilePrinter footer() {
         newLine();
-        return append("-".repeat(headerLength < 1 ? 10 : (int) (headerLength * 0.75)));
+        return append(
+                Component.text("-".repeat(headerLength < 1 ? 10 : headerLength))
+                        .style(borderStyle)
+        );
     }
 
     public ProfilePrinter basicInfo() {
         line("Branch", user.getFaction().getName(), user.getFaction() != Faction.DEFAULT);
         line("Rank", user.getRank().noEndSpacePrefix(), user.getRank() != Rank.DEFAULT);
 
-        line("Gems", user.getGems() + "", user.getGems() > 0);
-        line("Rhines", Crown.getEconomy().get(user.getUniqueId()) + "");
+        line("Gems", FtcFormatter.gems(user.getGems()), user.getGems() > 0);
+        line("Rhines", FtcFormatter.rhines(Crown.getEconomy().get(user.getUniqueId())));
 
         return this;
     }
@@ -111,7 +147,7 @@ public class ProfilePrinter {
         PunishmentEntry entry = list.getEntry(user.getUniqueId());
 
         Component locMessage = user.getLocation() == null ? null : FtcFormatter.clickableLocationMessage(user.getLocation(), true);
-        Component punishmentDisplay = Component.newline().append(entry.display(false));
+        Component punishmentDisplay = entry == null ? null : Component.newline().append(entry.display(false));
 
         Component ignored = user.interactions.blocked.isEmpty() ?
                 null :
@@ -121,7 +157,8 @@ public class ProfilePrinter {
                 null :
                 Component.text(ListUtils.join(user.interactions.separated, id -> UserManager.getUser(id).getName()));
 
-        append("\nAdmin Info:");
+        append(Component.text("\n\n"));
+        append("&eAdmin Info:");
 
         line(" Ranks", ListUtils.join(user.getAvailableRanks(), r -> r.name().toLowerCase()));
 
@@ -176,7 +213,7 @@ public class ProfilePrinter {
         if(!shouldInclude || text == null) return this;
 
         newLine();
-        append(Component.text(line + ": ").color(NamedTextColor.YELLOW));
+        append(Component.text(line + ": ").style(lineStyle));
         return append(text);
     }
 
@@ -192,7 +229,21 @@ public class ProfilePrinter {
     private Component marriedMessage(){
         if(user.getInteractions().getSpouse() == null) return null;
 
-        return user.getInteractions().spouseUser().nickDisplayName();
+        return user.getInteractions().spouseUser().nickOrName();
+    }
+
+    private Component headerDisplay() {
+        Component result;
+
+        if(self) result = Component.translatable("user.profile.header.your");
+        else {
+            result = Component.translatable(
+                    "user.profile.header",
+                    user.nickDisplayName()
+            );
+        }
+
+        return result.style(lineStyle);
     }
 
     private void onlineTimeThing() {
@@ -240,5 +291,21 @@ public class ProfilePrinter {
 
     public CrownUser getUser() {
         return user;
+    }
+
+    public Style getBorderStyle() {
+        return borderStyle;
+    }
+
+    public void setBorderStyle(Style borderStyle) {
+        this.borderStyle = borderStyle;
+    }
+
+    public Style getLineStyle() {
+        return lineStyle;
+    }
+
+    public void setLineStyle(Style lineStyle) {
+        this.lineStyle = lineStyle;
     }
 }

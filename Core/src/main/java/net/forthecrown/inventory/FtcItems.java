@@ -209,47 +209,6 @@ public final class FtcItems {
             .build();
 
     /**
-     * Creates a crown
-     * @param level The crown's level
-     * @param owner The name of the owner
-     * @return The created crown
-     */
-    public static ItemStack makeCrown(int level, String owner){
-        String levelS = FtcUtils.arabicToRoman(level);
-
-        ItemStackBuilder builder = new ItemStackBuilder(Material.GOLDEN_HELMET, 1)
-                .setName(CROWN_TITLE)
-
-                .addLore(Component.text("Rank " + levelS).style(nonItalic(NamedTextColor.GRAY)))
-                .addLore(Component.text("--------------------------------").style(nonItalic(NamedTextColor.DARK_GRAY)))
-                .addLore(Component.text("Only the worthy shall wear this").style(nonItalic(NamedTextColor.GOLD)))
-                .addLore(Component.text("symbol of strength and power.").style(nonItalic(NamedTextColor.GOLD)))
-                .addLore(Component.text("Crafted for " + owner).style(nonItalic(NamedTextColor.DARK_GRAY)))
-
-                .addData(ITEM_KEY, (byte) 1)
-                .setUnbreakable(true);
-
-        int eLevel = 5;
-
-        if(level > 1){
-            builder.addModifier(Attribute.GENERIC_MOVEMENT_SPEED, "generic.movement_speed", 0.25,
-                    AttributeModifier.Operation.ADD_SCALAR, EquipmentSlot.HEAD
-            );
-        }
-
-        if(level > 2){
-            builder.addModifier(Attribute.GENERIC_MAX_HEALTH, "generic.max_health", 20,
-                    AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD
-            );
-        }
-
-        if(level > 3) eLevel = 6;
-        builder.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, eLevel);
-
-        return builder.build();
-    }
-
-    /**
      * Makes an item using the given values
      * @param material The material of the item
      * @param amount The item's amount
@@ -374,5 +333,9 @@ public final class FtcItems {
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Couldn't find class for item meta??????", e);
         }
+    }
+
+    public static boolean isEmpty(ItemStack itemStack) {
+        return itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0;
     }
 }

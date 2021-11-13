@@ -8,10 +8,10 @@ import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcFlags;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -46,7 +46,7 @@ public class PlayerRidingManager implements Listener {
     public void playerRightClickPlayer(PlayerInteractEntityEvent event) {
         if(!(event.getRightClicked() instanceof Player)) return;
         if(event.getHand() == EquipmentSlot.OFF_HAND) return;
-        if(!FtcUtils.isItemEmpty(event.getPlayer().getInventory().getItemInMainHand())) return;
+        if(!FtcItems.isEmpty(event.getPlayer().getInventory().getItemInMainHand())) return;
         if(event.getPlayer().getWorld().equals(Worlds.VOID)) return;
         if(event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
 

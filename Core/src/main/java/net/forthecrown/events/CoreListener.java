@@ -31,7 +31,7 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.npc.NpcDirectory;
 import net.forthecrown.economy.selling.SellShops;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.crown.Crowns;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.useables.kits.Kit;
@@ -42,7 +42,6 @@ import net.forthecrown.user.actions.UserActionHandler;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.user.packets.PacketListeners;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Worlds;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -56,6 +55,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.TrapDoor;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -64,7 +64,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -169,18 +169,21 @@ public class CoreListener implements Listener {
         );
     }
 
-    //Entity death by crown weapon
     @EventHandler(ignoreCancelled = true)
-    public void onEntityDeath(EntityDeathEvent event) {
-        if(event.getEntity().getKiller() == null) return;
-        Player player = event.getEntity().getKiller();
-        ItemStack item = player.getInventory().getItemInMainHand();
-        if(!RoyalWeapons.isRoyalSword(item)) return;
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if(!(event.getDamager() instanceof Player)) return;
+        if(event.getEntity() instanceof ArmorStand) return;
 
-        RoyalSword sword = new RoyalSword(item);
-        if(!ComVars.allowNonOwnerSwords() && !sword.getOwner().equals(player.getUniqueId())) return;
+        Player damager = (Player) event.getDamager();
+        ItemStack swordItem = damager.getInventory().getItemInMainHand();
 
-        sword.kill(player, event.getEntity());
+        if(!RoyalWeapons.isRoyalSword(swordItem)) return;
+
+        RoyalSword sword = new RoyalSword(swordItem);
+
+        if(!ComVars.allowNonOwnerSwords() && !sword.getOwner().equals(damager.getUniqueId())) return;
+
+        sword.damage(damager, event);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -426,24 +429,14 @@ public class CoreListener implements Listener {
 
         Announcer.log(Level.INFO, "! " + user.getName() + " " + diedAt);
 
-        /*Grave grave = user.getGrave();
-        for (ItemStack i: event.getEntity().getInventory()){
-            if(FtcItems.isCrownItem(i)){
-                grave.addItem(i);
-                event.getDrops().remove(i);
-            }
-        }*/
-
         PlayerInventory inventory = event.getEntity().getInventory();
         Int2ObjectMap<ItemStack> items = new Int2ObjectOpenHashMap<>();
 
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack item = inventory.getItem(i);
 
-            if(FtcUtils.isItemEmpty(item)) continue;
-
-            if(FtcItems.isCrownItem(item) || RoyalWeapons.isRoyalSword(item)) {
-                items.put(i, item);;
+            if(RoyalWeapons.isRoyalSword(item) || Crowns.isCrown(item)) {
+                items.put(i, item);
             }
         }
         event.getDrops().removeAll(items.values());

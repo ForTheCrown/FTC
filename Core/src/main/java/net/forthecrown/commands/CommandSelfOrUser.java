@@ -8,6 +8,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
@@ -132,7 +133,7 @@ public class CommandSelfOrUser extends FtcCommand {
                 Permissions.REPAIR,
                 (user, source, self) -> {
                     ItemStack item = user.getPlayer().getInventory().getItemInMainHand();
-                    if(FtcUtils.isItemEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
+                    if(FtcItems.isEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
 
                     if(!(item.getItemMeta() instanceof Damageable)) throw FtcExceptionProvider.create("Given item is not repairable");
                     ItemMeta meta = item.getItemMeta();

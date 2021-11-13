@@ -15,12 +15,12 @@ import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 public abstract class RankedItem extends RoyalItem {
     protected int rank = 1;
 
-    public RankedItem(ItemStack item) {
-        super(item);
+    public RankedItem(ItemStack item, String tagKey) {
+        super(item, tagKey);
     }
 
-    public RankedItem(UUID owner, ItemStack item) {
-        super(owner, item);
+    public RankedItem(UUID owner, ItemStack item, String tagKey) {
+        super(owner, item, tagKey);
     }
 
     @Override

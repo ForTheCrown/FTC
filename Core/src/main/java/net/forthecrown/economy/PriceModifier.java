@@ -22,7 +22,7 @@ public interface PriceModifier {
 
         return context -> {
             float current = context.currentPrice;
-            float newPrice = current * taxAmount;
+            float newPrice = current * taxAmount + current;
 
             context.currentPrice = (int) newPrice;
         };
