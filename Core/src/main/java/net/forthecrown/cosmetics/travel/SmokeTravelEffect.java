@@ -19,8 +19,8 @@ public class SmokeTravelEffect extends TravelEffect {
     @Override
     public void onPoleTeleport(CrownUser user, Location from, Location pole) {
         // Little ball of smoke particles
-        from.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, from.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D);
-        pole.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, pole.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D);
+        from.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, from.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D, null, true);
+        pole.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, pole.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D, null, true);
     }
 
     @Override
@@ -33,24 +33,24 @@ public class SmokeTravelEffect extends TravelEffect {
         spawnOnCircle(loc, 0.1, 1.5, (short)20, Particle.SMOKE_LARGE, 1); // Outer circle
 
         // Extra explosion for good measure :D
-        loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc.add(0, 0.1, 0) , 1, 0, 0, 0, 0);
+        loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc.add(0, 0.1, 0) , 1, 0, 0, 0, 0, null, true);
     }
 
     @Override
     public void onHulkTickDown(CrownUser user, Location loc) {
         // Smokes following user
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.add(0, 2, 0), 2, 0, 0, 0, 0);
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.add(0, 3, 0), 2, 0, 0.5, 0, 0.01, null, true);
     }
 
     @Override
     public void onHulkTickUp(CrownUser user, Location loc) {
         // Smokes following user
-        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 2, 0, 0, 0, 0);
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.add(0, -1, 0), 3, 0, 0.5, 0, 0.01, null, true);
     }
 
     @Override
     public void onHulkLand(CrownUser user, Location landing) {
         // Little ball of smoke particles
-        landing.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, landing.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D);
+        landing.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, landing.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D,null,  true);
     }
 }

@@ -49,15 +49,15 @@ public class HeartTravelEffect extends TravelEffect {
     @Override
     public void onHulkTickDown(CrownUser user, Location loc) {
         Location spawnLoc = loc.add(circleLocs.get(getNext()));
-        spawnLoc.getWorld().spawnParticle(Particle.HEART, spawnLoc, 2, 0.1, 0.2, 0.1, 0);
-        spawnLoc.getWorld().spawnParticle(Particle.END_ROD, spawnLoc, 1, 0.1, 0.2, 0.1, 0);
+        spawnLoc.getWorld().spawnParticle(Particle.HEART, spawnLoc, 2, 0.1, 0.2, 0.1, 0, null, true);
+        spawnLoc.getWorld().spawnParticle(Particle.END_ROD, spawnLoc, 1, 0.1, 0.2, 0.1, 0, null, true);
     }
 
     @Override
     public void onHulkTickUp(CrownUser user, Location loc) {
         Location spawnLoc = loc.add(circleLocs.get(getNext()));
-        spawnLoc.getWorld().spawnParticle(Particle.HEART, spawnLoc, 2, 0.1, 0.2, 0.1, 0);
-        spawnLoc.getWorld().spawnParticle(Particle.END_ROD, spawnLoc, 1, 0.1, 0.2, 0.1, 0);
+        spawnLoc.getWorld().spawnParticle(Particle.HEART, spawnLoc, 2, 0.1, 0.2, 0.1, 0, null, true);
+        spawnLoc.getWorld().spawnParticle(Particle.END_ROD, spawnLoc, 1, 0.1, 0.2, 0.1, 0, null, true);
     }
 
     @Override

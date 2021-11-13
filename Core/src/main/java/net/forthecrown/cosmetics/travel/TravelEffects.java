@@ -11,12 +11,14 @@ public final class TravelEffects {
 
     private static BuiltInventory INVENTORY;
 
-    public static TravelEffect SMOKE, HEART;
+    public static TravelEffect SMOKE, HEART, PINK_ROCKET, BEAM;
 
     public static void init() {
         //Register here with register() method :D
         SMOKE = register(new SmokeTravelEffect());
         HEART = register(new HeartTravelEffect());
+        PINK_ROCKET = register(new PinkRocketTravelEffect());
+        BEAM = register(new BeamTravelEffect());
 
         //Final thing
         Registries.TRAVEL_EFFECTS.close();

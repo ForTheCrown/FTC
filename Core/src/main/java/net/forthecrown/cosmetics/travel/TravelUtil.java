@@ -79,7 +79,7 @@ public final class TravelUtil {
             double z = Math.sin(angle) * radius;
 
             Location pointLoc = new Location(loc.getWorld(), loc.getX() + x, loc.getY() + extraY, loc.getZ() + z);
-            pointLoc.getWorld().spawnParticle(particle, pointLoc, amountParticlesPerPoint, 0, 0, 0, 0);
+            pointLoc.getWorld().spawnParticle(particle, pointLoc, amountParticlesPerPoint, 0, 0, 0, 0, null, true);
         }
     }
 
@@ -96,7 +96,7 @@ public final class TravelUtil {
                     loc.getX() + xz[0],
                     loc.getY() + extraY,
                     loc.getZ() + xz[1]
-            ), 3, 0, 0, 0, 0.002);
+            ), 3, 0, 0, 0, 0.002, null, true);
         }
     }
 }
