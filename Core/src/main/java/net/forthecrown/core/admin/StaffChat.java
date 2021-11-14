@@ -19,7 +19,9 @@ import java.util.Set;
  * Class representing the staff chat
  * <p>Exists because I was cleaning up the ChatEvents class lol</p>
  */
-public class StaffChat {
+public final class StaffChat {
+    private StaffChat() {}
+
     public static final Set<Player> toggledPlayers = new HashSet<>();
     public static final Set<Player> ignoring = new HashSet<>();
     public static final Component PREFIX = Component.text("[Staff] ").color(NamedTextColor.DARK_GRAY);

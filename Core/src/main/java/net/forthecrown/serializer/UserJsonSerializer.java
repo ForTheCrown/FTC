@@ -239,7 +239,7 @@ public class UserJsonSerializer implements UserSerializer {
         File result = userFiles.get(id);
         if(result != null) return result;
 
-        return new File(USER_DIR, id.toString() + ".json");
+        return new File(USER_DIR, id + ".json");
     }
 
     public void writeJson(JsonWrapper json, UUID id) {
@@ -249,7 +249,7 @@ public class UserJsonSerializer implements UserSerializer {
         try {
             JsonUtils.writeFile(json.getSource(), f);
         } catch (IOException e){
-            logger.severe("Exception while attempting write user data for " + id.toString());
+            logger.severe("Exception while attempting write user data for " + id);
             e.printStackTrace();
         }
     }
@@ -275,11 +275,11 @@ public class UserJsonSerializer implements UserSerializer {
 
             try {
                 f.createNewFile();
-                logger.info("Created user file for " + id.toString());
+                logger.info("Created user file for " + id);
 
                 writeJson(json, id.getUniqueId());
             } catch (IOException e) {
-                logger.severe("Could not create user file for " + id.toString());
+                logger.severe("Could not create user file for " + id);
                 e.printStackTrace();
             }
         } else {
@@ -287,7 +287,7 @@ public class UserJsonSerializer implements UserSerializer {
                 JsonObject jsonO = JsonUtils.readFile(f);
                 json = JsonWrapper.of(jsonO);
             } catch (IOException e) {
-                logger.severe("Exception while reading user data for " + id.toString());
+                logger.severe("Exception while reading user data for " + id);
                 e.printStackTrace();
                 return null;
             }

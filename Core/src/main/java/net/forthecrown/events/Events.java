@@ -38,7 +38,6 @@ public final class Events {
         register(new MarriageListener());
 
         register(new CosmeticsListener());
-        register(new CustomInventoryClickListener());
         register(new InventoryBuilderListener());
 
         register(new DungeonListeners());

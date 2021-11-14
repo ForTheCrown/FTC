@@ -19,8 +19,8 @@ public class SmokeTravelEffect extends TravelEffect {
     @Override
     public void onPoleTeleport(CrownUser user, Location from, Location pole) {
         // Little ball of smoke particles
-        from.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, from.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D, null, true);
-        pole.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, pole.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D, null, true);
+        ninjaBomb(from);
+        ninjaBomb(pole);
     }
 
     @Override
@@ -52,5 +52,9 @@ public class SmokeTravelEffect extends TravelEffect {
     public void onHulkLand(CrownUser user, Location landing) {
         // Little ball of smoke particles
         landing.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, landing.add(0, 0.1, 0), 20, 0.2D, 0, 0.2D, 0.01D,null,  true);
+    }
+
+    void ninjaBomb(Location loc) {
+        loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc.add(0, 0.1, 0), 100, 0.5D, 1, 0.5D, 0.01D, null, true);
     }
 }

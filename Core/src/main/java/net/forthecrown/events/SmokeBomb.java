@@ -69,12 +69,17 @@ public class SmokeBomb implements Listener {
 
         eggs.remove(event.getEntity().getUniqueId());
         Location loc = event.getEntity().getLocation();
+        spawnSmoke(loc);
+    }
+
+    public static void spawnSmoke(Location loc) {
         loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1);
         loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc.getX(), loc.getY()+1, loc.getZ(), 10, 1, 1, 1, 0);
 
         double x = loc.getBlockX();
         double y = loc.getBlockY();
         double z = loc.getBlockZ();
+        
         for (int i = -1; i <= 1; i++) {
             for (int j = 0; j <= 2; j++) {
                 for (int k = -1; k <= 1; k++) {
@@ -82,6 +87,5 @@ public class SmokeBomb implements Listener {
                 }
             }
         }
-
     }
 }

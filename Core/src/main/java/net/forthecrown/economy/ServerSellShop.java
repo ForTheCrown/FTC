@@ -7,13 +7,18 @@ import net.forthecrown.inventory.builder.*;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryRunnable;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+
+import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 //Mmmm yes, internal classes
 public final class ServerSellShop {
@@ -70,7 +75,13 @@ class SellShopInfoOption implements CordedInventoryOption {
 
     @Override
     public void place(FtcInventory inventory, CrownUser user) {
-
+        inventory.setItem(
+                getSlot(),
+                new ItemStackBuilder(Material.KNOWLEDGE_BOOK, 1)
+                        .setName(Component.text("Material info").style(nonItalic(NamedTextColor.GOLD)))
+                        .addLore(Component.text("See what you can and can't sell").style(nonItalic(NamedTextColor.YELLOW)))
+                        .build()
+        );
     }
 
     @Override

@@ -137,18 +137,20 @@ public class RoyalSword extends RankedItem {
                 //If multiple goals, add bullet
                 if(multiEntry) builder.append(Component.text("• "));
 
-                builder.append(
-                        Component.text(e.getIntValue() + "/" + e.getKey().getGoal() + " ")
-                );
-
                 builder
-                        .append(e.getKey().loreDisplay())
-                        .append(Component.text(" to rank up!"));
+                        .append(
+                                Component.text(e.getIntValue() + "/" + e.getKey().getGoal() + " ")
+                        )
+                        .append(
+                                e.getKey().loreDisplay()
+                        );
+
+                if(!multiEntry) builder.append(Component.text(" to rank up!"));
 
                 lore.add(builder.build());
             }
         } else {
-            if(rank == RoyalWeapons.MAX_RANK) {
+            if(rank >= RoyalWeapons.MAX_RANK) {
                 lore.add(
                         Component.text("Max rank reached")
                                 .style(nonItalic(NamedTextColor.DARK_GRAY))
@@ -271,7 +273,7 @@ public class RoyalSword extends RankedItem {
      * @return Whether to rank up the sword.
      */
     public boolean shouldRankUp() {
-        if(rank == RoyalWeapons.MAX_RANK) return false;
+        if(rank >= RoyalWeapons.MAX_RANK) return false;
 
         for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {
             if(e.getIntValue() < e.getKey().getGoal()) return false;

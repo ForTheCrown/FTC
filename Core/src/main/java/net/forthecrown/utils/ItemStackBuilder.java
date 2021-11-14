@@ -140,7 +140,7 @@ public class ItemStackBuilder implements Cloneable {
     }
 
     public ItemStackBuilder addLore(Component lore) {
-        this.lores.add(ChatUtils.renderIfTranslatable(lore));
+        lores.add(ChatUtils.renderIfTranslatable(lore));
         return this;
     }
 

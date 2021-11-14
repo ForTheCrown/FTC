@@ -18,19 +18,19 @@ public class SignShopSession {
     private final ShopInventory inventory;
     private final ShopOwnership ownership;
 
-    private final ShopCustomer user;
+    private final ShopCustomer customer;
 
     private int amount = 0;
     private Runnable onSessionExpire;
 
-    public SignShopSession(SignShop shop, ShopCustomer user) {
+    public SignShopSession(SignShop shop, ShopCustomer customer) {
         this.shop = shop;
         this.material = shop.getInventory().getExampleItem().getType();
         this.type = shop.getType();
         this.inventory = shop.getInventory();
         this.ownership = shop.getOwnership();
 
-        this.user = user;
+        this.customer = customer;
     }
 
     /**
@@ -106,7 +106,7 @@ public class SignShopSession {
      * @return The current user
      */
     public ShopCustomer getCustomer() {
-        return user;
+        return customer;
     }
 
     /**
@@ -114,7 +114,7 @@ public class SignShopSession {
      * @return The player's inventory
      */
     public Inventory getCustomerInventory() {
-        return user.getInventory();
+        return customer.getInventory();
     }
 
     /**

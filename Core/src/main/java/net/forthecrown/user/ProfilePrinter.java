@@ -125,10 +125,10 @@ public class ProfilePrinter {
     }
 
     public ProfilePrinter optionalInfo() {
-        line("AFK", user.getAfkReason(), user.isAfk() && user.getAfkReason() != null);
+        line("AFK", user.getAfkReason(), user.isAfk());
 
         line("Allowed to swap branches in", timeThing(), !user.canSwapFaction() && (self || adminViewer));
-        line("Play time", FtcFormatter.decimalizeNumber(playTime()));
+        line("Play time", FtcFormatter.decimalizeNumber(playTime()) + " hours");
 
         line("Married to", marriedMessage());
 
