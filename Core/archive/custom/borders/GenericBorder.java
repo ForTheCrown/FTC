@@ -4,8 +4,6 @@ import net.forthecrown.inventory.FtcItems;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
-
 public class GenericBorder extends Border {
 
     @Override
