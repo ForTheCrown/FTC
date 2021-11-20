@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics;
 
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
@@ -31,7 +31,7 @@ public abstract class CosmeticEffect implements JsonSerializable, Keyed, CordedI
         this.description = description;
         this.pos = pos;
 
-        key = Crown.coreKey(name
+        key = Keys.ftc(name
                 .toLowerCase()
                 .replaceAll(" ", "_")
                 .replaceAll("'", "")

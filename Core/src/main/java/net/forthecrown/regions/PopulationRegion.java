@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
@@ -34,6 +35,7 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
     private final FtcBoundingBox region;
 
     private Component description;
+    private TextColor nameColor;
     private String name;
     private BlockVector2 polePosition;
     private BoundingBox poleBoundingBox;
@@ -74,6 +76,7 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
 
         //If has description, set it
         if(tags.contains("description")) this.description = SERIALIZER.deserialize(tags.getString("description"));
+        if(tags.contains("color")) this.nameColor = TextColor.fromHexString(tags.getString("color"));
     }
 
     //Makes a bounding box for the region, from -65 to 312
@@ -161,6 +164,14 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
         this.name = name;
     }
 
+    public TextColor getNameColor() {
+        return nameColor;
+    }
+
+    public void setNameColor(TextColor nameColor) {
+        this.nameColor = nameColor;
+    }
+
     /**
      * Gets either the name or a string representation of the position
      * @return The region's name, or it's position.
@@ -191,6 +202,7 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
      */
     public Component displayName() {
         return Component.text('[' + nameOrPos() + ']')
+                .color(nameColor)
                 .hoverEvent(this)
                 .clickEvent(hasName() ? ClickEvent.suggestCommand("/visit " + getName()) : null);
     }
@@ -233,7 +245,7 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
         if(noPos && noName) return null;
 
         //If it only has a name
-        if(noPos && description == null) {
+        if(noPos && description == null && nameColor == null) {
             return StringTag.valueOf(name);
         }
 
@@ -249,6 +261,7 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
 
         //If it also has a description
         if(description != null) tag.putString("description", SERIALIZER.serialize(description));
+        if(nameColor != null) tag.putString("color", nameColor.asHexString());
 
         return tag;
     }

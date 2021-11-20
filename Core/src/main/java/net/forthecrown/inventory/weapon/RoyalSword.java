@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.inventory.RankedItem;
+import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.LoreBuilder;
@@ -35,6 +36,7 @@ public class RoyalSword extends RankedItem {
     //I know it's flavor, not fluff, as in flavor text, but fuck you UwU
     private int lastFluffChange = 1;
 
+    private WeaponAbility ability;
     private WeaponUpgrade nextUpgrade;
     WeaponUpgrade waitingUpdate;
 
@@ -68,6 +70,12 @@ public class RoyalSword extends RankedItem {
         this.nextUpgrade = RoyalWeapons.getUpgrade(rank+1);
         this.lastFluffChange = tag.getInt("lastFluffChange");
 
+        if(tag.contains("ability")) {
+            this.ability = Registries.WEAPON_ABILITIES.get(FtcUtils.parseKey(tag.getString("ability")));
+        }
+
+        if(!tag.contains("goals")) return;
+
         //No need to null this, if it's null,
         //the tag returns an empty compound
         CompoundTag goalsTag = tag.getCompound("goals");
@@ -93,14 +101,17 @@ public class RoyalSword extends RankedItem {
         super.onUpdate(item, meta, tag);
 
         tag.putInt("lastFluffChange", lastFluffChange);
+        if(ability != null) tag.putString("ability", ability.key().asString());
 
         //Serialize goals, same as map, goal 2 progress
-        CompoundTag goalsTag = new CompoundTag();
-        for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {
-            goalsTag.putInt(e.getKey().key().asString(), e.getIntValue());
-        }
+        if(!goalsAndProgress.isEmpty()) {
+            CompoundTag goalsTag = new CompoundTag();
+            for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {
+                goalsTag.putInt(e.getKey().key().asString(), e.getIntValue());
+            }
 
-        tag.put("goals", goalsTag);
+            tag.put("goals", goalsTag);
+        }
 
         //If there's an upgrade waiting to be applied, apply it and then null it.
         if(waitingUpdate == null) return;
@@ -115,6 +126,14 @@ public class RoyalSword extends RankedItem {
 
         //The bearer of this... bla bla
         addFlavorText(lore);
+
+        if(ability != null) {
+            lore.add(
+                    Component.text("Current ability: ")
+                            .append(ability.loreDisplay())
+                            .style(nonItalic(NamedTextColor.GRAY))
+            );
+        }
 
         //Add goal text, if there are goals to go for
         if(!goalsAndProgress.isEmpty()) {
@@ -213,6 +232,8 @@ public class RoyalSword extends RankedItem {
             int newVal = e.getIntValue() + e.getKey().getIncrementAmount(context);
             goalsAndProgress.put(e.getKey(), newVal);
         }
+
+        if(ability != null) ability.onWeaponUse(context);
 
         //If we should rank up... rank up
         if(shouldRankUp()) {
@@ -334,5 +355,13 @@ public class RoyalSword extends RankedItem {
 
     public void setLastFluffChange(int lastFluffChange) {
         this.lastFluffChange = lastFluffChange;
+    }
+
+    public WeaponAbility getAbility() {
+        return ability;
+    }
+
+    public void setAbility(WeaponAbility ability) {
+        this.ability = ability;
     }
 }

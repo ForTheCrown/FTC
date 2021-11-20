@@ -1,6 +1,6 @@
 package net.forthecrown.useables.checks;
 
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckInventoryEmpty implements UsageCheckInstance {
-    public static final Key KEY = Key.key(Crown.inst(), "inventory_empty");
+    public static final Key KEY = Keys.ftc("inventory_empty");
 
     @Override
     public String asString() {

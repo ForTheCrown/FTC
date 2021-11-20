@@ -3,7 +3,7 @@ package net.forthecrown.useables.actions;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.ComponentArgument;
 import net.kyori.adventure.key.Key;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionShowText implements UsageAction<ActionShowText.ActionInstance> {
-    public static final Key KEY = Key.key(Crown.inst(), "show_text");
+    public static final Key KEY = Keys.ftc("show_text");
     private static final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 
     @Override

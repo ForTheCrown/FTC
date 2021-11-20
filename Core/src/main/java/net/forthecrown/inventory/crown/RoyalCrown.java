@@ -66,17 +66,15 @@ public class RoyalCrown extends RankedItem {
 
         Component border = Component.text("--------------------------------").style(nonItalic(NamedTextColor.DARK_GRAY));
 
-        lore.add(border);
-
         lore
+                .add(border)
                 .add(
                         Component.text("Only the worthy shall wear this").style(nonItalic(NamedTextColor.GOLD))
                 )
                 .add(
                         Component.text("symbol of strength and power.").style(nonItalic(NamedTextColor.GOLD))
-                );
-
-        lore.add(border);
+                )
+                .add(border);
 
         if(hasPlayerOwner()) {
             lore.add(

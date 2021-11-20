@@ -3,7 +3,7 @@ package net.forthecrown.useables.actions;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance> {
-    public static final Key KEY = Key.key(Crown.inst(), "teleport_user");
+    public static final Key KEY = Keys.ftc("teleport_user");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

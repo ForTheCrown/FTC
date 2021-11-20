@@ -7,7 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.utils.FtcUtils;
@@ -19,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionCommand implements UsageAction<ActionCommand.ActionInstance> {
-    public static final Key CONSOLE_KEY = Key.key(Crown.inst(), "command_console");
-    public static final Key USER_KEY = Key.key(Crown.inst(), "command_user");
+    public static final Key CONSOLE_KEY = Keys.ftc("command_console");
+    public static final Key USER_KEY = Keys.ftc("command_user");
 
     private final boolean console;
 

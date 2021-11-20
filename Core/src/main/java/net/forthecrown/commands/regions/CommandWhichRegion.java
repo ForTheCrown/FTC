@@ -47,7 +47,7 @@ public class CommandWhichRegion extends FtcCommand {
                         Component.translatable("regions.which.name",
                                 NamedTextColor.GOLD,
                                 region.displayName()
-                                        .color(NamedTextColor.YELLOW)
+                                        .colorIfAbsent(NamedTextColor.YELLOW)
                         )
                 );
             } else {

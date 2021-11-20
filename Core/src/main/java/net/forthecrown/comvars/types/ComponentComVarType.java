@@ -5,7 +5,7 @@ import com.google.gson.JsonNull;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.types.ComponentArgument;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
  * A class for the Component com var type
  */
 public class ComponentComVarType implements ComVarType<Component> {
-    private final Key key = Crown.coreKey("component_type");
+    private final Key key = Keys.ftc("component_type");
 
     ComponentComVarType() {
         Registries.COMVAR_TYPES.register(key, this);

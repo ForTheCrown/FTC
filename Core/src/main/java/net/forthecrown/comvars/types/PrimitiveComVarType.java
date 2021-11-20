@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.comvars.ParseFunction;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
@@ -39,7 +39,7 @@ class PrimitiveComVarType<T> implements ComVarType<T> {
         this.suggestionProvider = suggestionProvider;
         this.serializationFunc = json;
         deserializationFunc = func;
-        key = Crown.coreKey(clazz.getSimpleName().toLowerCase() + "_type");
+        key = Keys.ftc(clazz.getSimpleName().toLowerCase() + "_type");
 
         Registries.COMVAR_TYPES.register(key, this);
     }

@@ -5,6 +5,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionPos;
@@ -16,7 +17,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionVisitRegion implements UsageAction<ActionVisitRegion.ActionInstance> {
-    public static final Key KEY = Crown.coreKey("visit_region");
+    public static final Key KEY = Keys.ftc("visit_region");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

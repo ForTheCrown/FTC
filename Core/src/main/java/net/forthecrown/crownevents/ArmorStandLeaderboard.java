@@ -1,8 +1,8 @@
 package net.forthecrown.crownevents;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.commands.CommandHologram;
 import net.forthecrown.core.Crown;
-import net.forthecrown.core.Main;
 import net.forthecrown.utils.math.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,6 +22,7 @@ import java.util.Map;
  * A leaderboard made of ArmorStands, used for display
  */
 public class ArmorStandLeaderboard {
+    private static final List<ArmorStandLeaderboard> LEADERBOARDS = new ObjectArrayList<>();
 
     private Component[] title;
     private Order order;
@@ -46,8 +47,12 @@ public class ArmorStandLeaderboard {
         setFormat(LeaderboardFormatter.defaultFormat());
         setScoreFormatter(ScoreFormatter.defaultFormat());
 
-        Main.LEADERBOARDS.add(this);
+        LEADERBOARDS.add(this);
         getLocation().getChunk().addPluginChunkTicket(Crown.inst());
+    }
+
+    public static void destroyAll() {
+        LEADERBOARDS.forEach(ArmorStandLeaderboard::destroy);
     }
 
     /**

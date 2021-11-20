@@ -1,7 +1,7 @@
 package net.forthecrown.registry;
 
 import net.forthecrown.comvars.types.ComVarType;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.npc.InteractableNPC;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
@@ -10,6 +10,7 @@ import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.economy.guild.topics.VoteTopicType;
 import net.forthecrown.economy.houses.House;
+import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.WeaponGoal;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
@@ -24,7 +25,7 @@ public interface Registries {
     /**
      * A registry of registries, master registry
      */
-    Registry<Registry<?>> MASTER_REGISTRY = new BaseRegistry<>(Crown.coreKey("master_registry"));
+    Registry<Registry<?>> MASTER_REGISTRY = new BaseRegistry<>(Keys.ftc("master_registry"));
 
     Registry<InteractableNPC> NPCS = create("npcs");
     Registry<BlockAnimation> ANIMATIONS = create("animations");
@@ -33,6 +34,7 @@ public interface Registries {
     CloseableRegistry<House> HOUSES = createCloseable("houses");
 
     CloseableRegistry<WeaponGoal> WEAPON_GOALS = createCloseable("weapon_goals");
+    CloseableRegistry<WeaponAbility> WEAPON_ABILITIES = createCloseable("weapon_abilities");
 
     //Cosmetic things registries
     CloseableRegistry<DeathEffect> DEATH_EFFECTS = createCloseable("death_effects");

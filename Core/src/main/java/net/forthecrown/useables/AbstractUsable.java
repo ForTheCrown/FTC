@@ -7,6 +7,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.useables.actions.UsageActionInstance;
@@ -24,7 +25,7 @@ import java.util.function.Consumer;
 
 public abstract class AbstractUsable extends AbstractJsonSerializer implements Usable {
 
-    protected final List<UsageActionInstance> actions = new ArrayList<>();
+    protected final List<UsageActionInstance> actions = new ObjectArrayList<>();
     private final Object2ObjectMap<Key, UsageCheckInstance> checks = new Object2ObjectOpenHashMap<>();
     protected boolean sendFail;
 

@@ -1,7 +1,9 @@
 package net.forthecrown.user.packets.listeners;
 
+import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.shops.ShopManager;
+import net.forthecrown.economy.shops.SignShop;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.packets.PacketContext;
 import net.forthecrown.user.packets.PacketListener;
@@ -29,10 +31,10 @@ public class SignRenderPacketListener implements PacketListener<ClientboundBlock
                 tag.getInt("z")
         );
 
-        /*SignShop shop = Crown.getShopManager().getShop(pos2);
-        if(shop == null) return;*/
+        SignShop shop = Crown.getShopManager().getShop(pos2);
+        if(shop == null) return;
 
-        Component priceLine = user.nickDisplayName();
+        Component priceLine = shop.getPriceLineFor(user);
         String priceLineJson = ChatUtils.GSON.serialize(priceLine);
 
         tag.putString("Text4", priceLineJson);

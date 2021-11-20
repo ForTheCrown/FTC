@@ -37,8 +37,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import static net.forthecrown.utils.FtcUtils.safeRunnable;
@@ -81,7 +79,6 @@ public final class Main extends JavaPlugin implements Crown {
     static HazelguardTradersGuild   tradersGuild;
     static PeriodicalSaver          saver;
 
-    public static final Set<ArmorStandLeaderboard> LEADERBOARDS = new HashSet<>();
     static LuckPerms luckPerms;
 
     @Override
@@ -121,7 +118,7 @@ public final class Main extends JavaPlugin implements Crown {
         Bukkit.getScheduler().cancelTasks(this);
 
         for (Player p: Bukkit.getOnlinePlayers()) p.closeInventory();
-        for (ArmorStandLeaderboard a: LEADERBOARDS) a.destroy();
+        ArmorStandLeaderboard.destroyAll();
 
         //Give all the entities their names back
         MobHealthBar.NAMES.forEach(Nameable::customName);

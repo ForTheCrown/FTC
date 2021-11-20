@@ -1,7 +1,7 @@
 package net.forthecrown.inventory.weapon;
 
 import net.forthecrown.core.ComVars;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
@@ -101,7 +101,7 @@ public interface WeaponGoal extends Keyed {
         public ChargedCreeperGoal(int goal, int rank) {
             this.rank = rank;
             this.goal = goal;
-            this.key = Crown.coreKey("goal_charged_creeper");
+            this.key = Keys.ftc("goal_charged_creeper");
         }
 
         @Override
@@ -142,7 +142,7 @@ public interface WeaponGoal extends Keyed {
             this.goal = goal;
             this.type = type;
             this.rank = rank;
-            this.key = Crown.coreKey("goal_" + (type == null ? "any" : type.name().toLowerCase()));
+            this.key = Keys.ftc("goal_" + (type == null ? "any" : type.name().toLowerCase()));
         }
 
         @Override
@@ -181,7 +181,7 @@ public interface WeaponGoal extends Keyed {
             this.rank = rank;
             this.type = type;
 
-            this.key = Crown.coreKey("goal_boss_" + type.name().toLowerCase() + '_' + rank);
+            this.key = Keys.ftc("goal_boss_" + type.name().toLowerCase() + '_' + rank);
         }
 
         @Override
@@ -218,7 +218,7 @@ public interface WeaponGoal extends Keyed {
             this.rank = rank;
             this.goal = goal;
 
-            this.key = Crown.coreKey("goal_damage_" + rank);
+            this.key = Keys.ftc("goal_damage_" + rank);
         }
 
         @Override
