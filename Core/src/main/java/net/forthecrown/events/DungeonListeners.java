@@ -7,18 +7,19 @@ import net.forthecrown.core.CrownException;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.DungeonAreas;
+import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.bosses.Skalatan;
 import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.squire.enchantment.RoyalEnchant;
 import net.forthecrown.squire.enchantment.RoyalEnchants;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.user.data.Faction;
 import net.forthecrown.user.data.Rank;
+import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.dungeons.DungeonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -161,7 +162,7 @@ public class DungeonListeners implements Listener, ClickEventTask {
             inv.removeItemAnySlot(BossItems.SKALATAN.item());
             inv.removeItemAnySlot(BossItems.HIDEY_SPIDEY.item());
             
-            inv.addItem(FtcItems.royalSword());
+            inv.addItem(RoyalWeapons.make(player.getUniqueId()));
             
             player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1.2f);
             player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);

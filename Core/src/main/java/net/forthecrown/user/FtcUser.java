@@ -12,6 +12,7 @@ import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.JoinInfo;
+import net.forthecrown.core.chat.ProfilePrinter;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.cosmetics.PlayerRidingManager;
 import net.forthecrown.economy.selling.UserSellResult;

@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.weapon.abilities.WeaponAbilities;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 import static net.forthecrown.inventory.weapon.WeaponGoal.*;
 import static net.forthecrown.inventory.weapon.WeaponUpgrade.reforge;
+import static net.forthecrown.utils.FtcUtils.safeRunnable;
 
 public final class RoyalWeapons {
     public static final Component RANK_1_NAME = makeName("Traveller's", NamedTextColor.GRAY, NamedTextColor.DARK_GRAY, false);
@@ -133,6 +135,7 @@ public final class RoyalWeapons {
             if(i != rank) UPGRADES.put(i, WeaponUpgrade.endBoss(i));
         }
 
+        safeRunnable(WeaponAbilities::init);
         Registries.WEAPON_GOALS.close();
     }
 

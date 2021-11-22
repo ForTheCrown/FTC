@@ -9,7 +9,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.ProfilePrinter;
+import net.forthecrown.core.chat.ProfilePrinter;
 import net.forthecrown.user.manager.UserManager;
 
 public class CommandProfile extends FtcCommand {

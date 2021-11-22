@@ -21,7 +21,6 @@ import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.Events;
 import net.forthecrown.inventory.crown.Crowns;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
-import net.forthecrown.inventory.weapon.abilities.WeaponAbilities;
 import net.forthecrown.regions.FtcRegionManager;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.useables.FtcUsablesManager;
@@ -64,7 +63,6 @@ final class FtcBootStrap {
         economy = new FtcEconomy();
         regionManager = new FtcRegionManager(Worlds.OVERWORLD);
 
-        //Instantiate managers
         userManager = new FtcUserManager();
         shopManager = new FtcShopManager();
         punishmentManager = new FtcPunishmentManager();
@@ -84,7 +82,6 @@ final class FtcBootStrap {
         }
 
         //Initialize modules
-        safeRunnable(WeaponAbilities::init);
         safeRunnable(CorePacketListeners::init);
         safeRunnable(Houses::init);
         safeRunnable(RoyalWeapons::init);

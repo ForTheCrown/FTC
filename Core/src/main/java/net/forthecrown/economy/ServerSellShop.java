@@ -37,6 +37,10 @@ public final class ServerSellShop {
 
     public static final InventoryPos SELL_ALL_POS = new InventoryPos(8, 0);
     public static final InventoryPos INFO_POS = new InventoryPos(8, 1);
+
+    static boolean isLegalSlot(int slot) {
+        return slot != SELL_ALL_POS.getSlot() && slot != INFO_POS.getSlot();
+    }
 }
 
 class SellShopCloseListener implements InventoryCloseAction {
@@ -48,7 +52,7 @@ class SellShopCloseListener implements InventoryCloseAction {
         World world = player.getWorld();
 
         for (int i = 0; i < inventory.getSize(); i++) {
-            if(i == ServerSellShop.SELL_ALL_POS.getSlot() || i == ServerSellShop.INFO_POS.getSlot()) continue;
+            if(!ServerSellShop.isLegalSlot(i)) continue;
 
             ItemStack item = inventory.getItem(i);
             if(FtcItems.isEmpty(item)) continue;
@@ -64,6 +68,8 @@ class SellShopCloseListener implements InventoryCloseAction {
 class SellShopPlaceListener implements InventoryRunnable {
     @Override
     public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
+        if(!ServerSellShop.isLegalSlot(context.getSlot())) return;
+        context.setCancelEvent(false);
     }
 }
 
@@ -98,11 +104,16 @@ class SellAllOption implements CordedInventoryOption {
 
     @Override
     public void place(FtcInventory inventory, CrownUser user) {
-
+        inventory.setItem(
+                getPos(),
+                new ItemStackBuilder(Material.GREEN_CONCRETE)
+                        .setName(Component.text("Sell all").style(nonItalic(NamedTextColor.AQUA)))
+                        .addLore(Component.text("Sell all materials in the inventory.").style(nonItalic(NamedTextColor.WHITE)))
+                        .build()
+        );
     }
 
     @Override
     public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
-
     }
 }

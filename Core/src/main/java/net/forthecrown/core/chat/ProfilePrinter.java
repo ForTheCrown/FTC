@@ -1,15 +1,16 @@
-package net.forthecrown.user;
+package net.forthecrown.core.chat;
 
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
-import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.crownevents.EventTimer;
 import net.forthecrown.economy.market.MarketDisplay;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.FtcUser;
+import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.data.Faction;
 import net.forthecrown.user.data.Rank;
 import net.forthecrown.user.manager.UserManager;

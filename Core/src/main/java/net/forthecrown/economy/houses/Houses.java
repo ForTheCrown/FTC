@@ -5,12 +5,13 @@ import net.forthecrown.registry.Registries;
 public final class Houses {
     private Houses() {}
 
-    public static final House KETIL =       register("Ketil");
-    public static final House SOMERS =      register("Somers");
-    public static final House STEDVOR =     register("Stedvor");
-    public static final House FERNIMORE =   register("Fernimore");
-    public static final House DAWSEY =      register("Dawsey");
-    public static final House LAGGARD =     register("Laggard");
+    public static final House
+            KETIL       = register("Ketil"),
+            SOMERS      = register("Somers"),
+            STEDVOR     = register("Stedvor"),
+            FERNIMORE   = register("Fernimore"),
+            DAWSEY      = register("Dawsey"),
+            LAGGARD     = register("Laggard");
 
     public static void init() {
         Registries.HOUSES.close();
