@@ -1,7 +1,7 @@
 package net.forthecrown.crownevents;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.forthecrown.commands.CommandHologram;
+import net.forthecrown.commands.admin.CommandHologram;
 import net.forthecrown.core.Crown;
 import net.forthecrown.utils.math.FtcBoundingBox;
 import net.kyori.adventure.text.Component;

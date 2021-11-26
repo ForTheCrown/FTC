@@ -12,6 +12,7 @@ import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.events.dynamic.RegionVisitListener;
 import net.forthecrown.regions.RegionConstants;
+import net.forthecrown.regions.RegionPoleGenerator;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserMail;
@@ -25,6 +26,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -296,6 +298,8 @@ public class FtcUserActionHandler implements UserActionHandler {
             player.sendMessage(
                     Component.translatable("commands.teleport.error.passengers", NamedTextColor.GRAY)
             );
+
+            return;
         }
 
         CrownUser user = visit.getVisitor();
@@ -309,11 +313,15 @@ public class FtcUserActionHandler implements UserActionHandler {
         Location teleportLoc = new Location(
                 world,
                 poleCords.getX() + 0.5D,
-                world.getHighestBlockYAt(poleCords.getX(), poleCords.getZ()) + 1,
+                world.getHighestBlockYAt(poleCords.getX(), poleCords.getZ(), HeightMap.WORLD_SURFACE) + 1,
                 poleCords.getZ() + 0.5D,
                 loc.getYaw(),
                 loc.getPitch()
         );
+
+        //Generate pole in case it doesn't exist
+        RegionPoleGenerator generator = Crown.getRegionManager().getGenerator();
+        generator.generate(visit.getRegion());
 
         //If near the pole, teleport tamed and/or owned entities at the pole
         if(user.get2DLocation().distance(poleCords) <= RegionConstants.DISTANCE_TO_POLE) {
@@ -321,7 +329,7 @@ public class FtcUserActionHandler implements UserActionHandler {
             //For entities which should be teleported along with the player
             List<Entity> toTeleport = new ObjectArrayList<>();
             FtcBoundingBox box = FtcBoundingBox.of(world, visit.getRegion().getPoleBoundingBox());
-            box.expand(2.5);
+            box.expand(2);
 
             for (Entity e: box.getEntities()) {
                 //If the entity is tameable and has been tamed
@@ -414,21 +422,25 @@ public class FtcUserActionHandler implements UserActionHandler {
 
         @Override
         public void run() {
-            //If they have travel effect, run it
-            if(cosmetics.hasActiveTravel()) {
-                cosmetics.getActiveTravel().onHulkTickUp(user, user.getLocation());
-            }
+            try {
+                //If they have travel effect, run it
+                if(cosmetics.hasActiveTravel()) {
+                    cosmetics.getActiveTravel().onHulkTickUp(user, user.getLocation());
+                }
 
-            tick--;
+                tick--;
 
-            //If we're below the tick limit, stop and move on to fall listener
-            if(tick < 0) {
+                //If we're below the tick limit, stop and move on to fall listener
+                if(tick < 0) {
+                    task.cancel();
+
+                    user.getPlayer().teleport(tp);
+
+                    RegionVisitListener listener = new RegionVisitListener(user);
+                    listener.beginListening();
+                }
+            } catch (Exception e) {
                 task.cancel();
-
-                user.getPlayer().teleport(tp);
-
-                RegionVisitListener listener = new RegionVisitListener(user);
-                listener.beginListening();
             }
         }
     }

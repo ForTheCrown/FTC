@@ -1,6 +1,6 @@
 package net.forthecrown.dungeons;
 
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.forthecrown.utils.math.FtcBoundingBox;
 
 public interface DungeonAreas {

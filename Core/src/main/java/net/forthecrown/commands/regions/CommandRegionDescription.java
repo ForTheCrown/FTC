@@ -1,6 +1,6 @@
 package net.forthecrown.commands.regions;
 
-import net.forthecrown.commands.CommandLore;
+import net.forthecrown.commands.admin.CommandLore;
 import net.forthecrown.commands.arguments.RegionArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;

@@ -15,7 +15,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.TimeUtil;
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;

@@ -6,7 +6,7 @@ import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.dungeons.DungeonUtils;
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;

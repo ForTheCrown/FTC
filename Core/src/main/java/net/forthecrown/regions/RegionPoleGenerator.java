@@ -1,6 +1,8 @@
 package net.forthecrown.regions;
 
+import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.math.WorldVec3i;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.BlockFace;
 
 /**
@@ -8,6 +10,8 @@ import org.bukkit.block.BlockFace;
  * A special class... that's slower than population density's (._. )
  */
 public interface RegionPoleGenerator {
+    NamespacedKey TOP_SIGN_KEY = Squire.createFtcKey("region_pole_top");
+
     /**
      * Generates the pole for the given region
      * @param region The region to generate a pole for
@@ -26,7 +30,6 @@ public interface RegionPoleGenerator {
      * @param pos The position to place the sign at
      * @param signFace On what block face to put the sign on
      * @param direction The direction to get the neighboring region from
-     * @param origin The cords the direction will be added to.
      */
     void generateNextRegion(WorldVec3i pos, BlockFace signFace, BlockFace direction, RegionPos origin);
 

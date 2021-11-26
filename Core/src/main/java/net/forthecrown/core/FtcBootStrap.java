@@ -30,7 +30,6 @@ import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
 import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.user.packets.listeners.CorePacketListeners;
-import net.forthecrown.utils.Worlds;
 
 import static net.forthecrown.core.Main.*;
 import static net.forthecrown.utils.FtcUtils.safeRunnable;

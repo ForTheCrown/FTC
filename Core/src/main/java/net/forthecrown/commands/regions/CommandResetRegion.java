@@ -43,7 +43,7 @@ public class CommandResetRegion extends FtcCommand {
                     PopulationRegion region = manager.get(user.getRegionCords());
                     String name = region.nameOrPos();
 
-                    manager.reset(region, false);
+                    manager.reset(region);
 
                     c.getSource().sendAdmin("Reset region " + name);
                     return 0;

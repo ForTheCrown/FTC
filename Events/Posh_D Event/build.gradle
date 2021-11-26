@@ -1,0 +1,23 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+    id 'java'
+}
+
+group 'net.forthecrown'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation files('/libs/Grenadier.jar')
+    compileOnly files('/libs/Paper.jar')
+    compileOnly files('/libs/Core.jar')
+}
+
+shadowJar {
+    relocate('net.forthecrown.crownevent',  'net.forthecrown.poshd.crown')
+}
+
+assemble.dependsOn(shadowJar)

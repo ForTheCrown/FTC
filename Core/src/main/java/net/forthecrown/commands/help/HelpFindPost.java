@@ -7,7 +7,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionPos;
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

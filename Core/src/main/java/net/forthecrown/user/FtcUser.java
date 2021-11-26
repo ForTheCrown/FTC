@@ -27,7 +27,7 @@ import net.forthecrown.user.data.*;
 import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
@@ -676,6 +676,7 @@ public class FtcUser implements CrownUser {
 
         interactions.clearIncoming();
         interactions.clearOutgoing();
+        interactions.clearInvites();
         marketOwnership.clearIncoming();
 
         if(lastTeleport != null) lastTeleport.interrupt(false);

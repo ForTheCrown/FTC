@@ -1,6 +1,6 @@
 package net.forthecrown.utils.math;
 
-import org.bukkit.Bukkit;
+import com.google.gson.JsonElement;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
@@ -10,11 +10,13 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -22,13 +24,20 @@ import java.util.function.Predicate;
  * Like a regular BoundingBox, but it's tied to a world, so it has more operational abilities
  * And it can be iterated through
  */
-public class FtcBoundingBox extends BoundingBox implements Iterable<Block> {
+public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
 
     private final World world;
+    private int
+            minX, minY, minZ,
+            maxX, maxY, maxZ;
 
-    public FtcBoundingBox(World world, double x1, double y1, double z1, double x2, double y2, double z2) {
-        super(x1, y1, z1, x2, y2, z2);
+    public FtcBoundingBox(World world, int x1, int y1, int z1, int x2, int y2, int z2) {
         this.world = Validate.notNull(world, "World is null");
+        resize(x1, y1, z1, x2, y2, z2);
+    }
+
+    public FtcBoundingBox(World world, double x, double y, double z, double x1, double y1, double z1) {
+        this(world, (int) x, (int) y, (int) z, (int) x1, (int) y1, (int) z1);
     }
 
     public static FtcBoundingBox of(Block block){
@@ -42,7 +51,7 @@ public class FtcBoundingBox extends BoundingBox implements Iterable<Block> {
     public static FtcBoundingBox of(Location loc1, Location loc2){
         Validate.isTrue(loc1.getWorld().equals(loc2.getWorld()), "Given locations had different worlds");
 
-        return new FtcBoundingBox(loc1.getWorld(), loc1.getX(), loc1.getY(), loc1.getZ(), loc2.getX(), loc2.getY(), loc2.getZ());
+        return new FtcBoundingBox(loc1.getWorld(), loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ());
     }
 
     public static FtcBoundingBox of(Location location, double xRadius, double height, double zRadius){
@@ -74,39 +83,38 @@ public class FtcBoundingBox extends BoundingBox implements Iterable<Block> {
         return new FtcBoundingBox(world, x - radius, y - radius, z - radius, x + radius, y + radius, z + radius);
     }
 
-    public static FtcBoundingBox deserialize(Map<String, Object> args) {
-        double minX = 0.0D;
-        double minY = 0.0D;
-        double minZ = 0.0D;
-        double maxX = 0.0D;
-        double maxY = 0.0D;
-        double maxZ = 0.0D;
-        World world = Bukkit.getWorld(String.valueOf(args.get("world")));
-        if (args.containsKey("minX")) {
-            minX = ((Number)args.get("minX")).doubleValue();
-        }
+    public FtcBoundingBox resize(int x1, int y1, int z1, int x2, int y2, int z2) {
+        this.minX = Math.min(x1, x2);
+        this.minY = Math.min(y1, y2);
+        this.minZ = Math.min(z1, z2);
+        this.maxX = Math.max(x1, x2);
+        this.maxY = Math.max(y1, y2);
+        this.maxZ = Math.max(z1, z2);
+        return this;
+    }
 
-        if (args.containsKey("minY")) {
-            minY = ((Number)args.get("minY")).doubleValue();
-        }
+    public int getMaxX() {
+        return maxX;
+    }
 
-        if (args.containsKey("minZ")) {
-            minZ = ((Number)args.get("minZ")).doubleValue();
-        }
+    public int getMaxY() {
+        return maxY;
+    }
 
-        if (args.containsKey("maxX")) {
-            maxX = ((Number)args.get("maxX")).doubleValue();
-        }
+    public int getMaxZ() {
+        return maxZ;
+    }
 
-        if (args.containsKey("maxY")) {
-            maxY = ((Number)args.get("maxY")).doubleValue();
-        }
+    public int getMinX() {
+        return minX;
+    }
 
-        if (args.containsKey("maxZ")) {
-            maxZ = ((Number)args.get("maxZ")).doubleValue();
-        }
+    public int getMinY() {
+        return minY;
+    }
 
-        return new FtcBoundingBox(world, minX, minY, minZ, maxX, maxY, maxZ);
+    public int getMinZ() {
+        return minZ;
     }
 
     @NotNull
@@ -126,67 +134,65 @@ public class FtcBoundingBox extends BoundingBox implements Iterable<Block> {
         return new FtcBoundingBox(world, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public Location getCenterLocation(){
-        return getCenterLocation(0, 0);
-    }
-
-    public Location getMinLocation(){
-        return getMinLocation(0, 0);
-    }
-
-    public Location getMaxLocation(){
-        return getMaxLocation(0, 0);
-    }
-
-    public Location getCenterLocation(float yaw, float pitch){
-        return getCenter().toLocation(getWorld(), yaw, pitch);
-    }
-
-    public Location getMinLocation(float yaw, float pitch){
-        return getMin().toLocation(getWorld(), yaw, pitch);
-    }
-
-    public Location getMaxLocation(float yaw, float pitch){
-        return getMax().toLocation(getWorld(), yaw, pitch);
-    }
-
     public Collection<Player> getPlayers(){
         return getEntitiesByType(Player.class);
     }
 
     public Collection<Entity> getEntities(){
-        return getWorld().getNearbyEntities(this);
+        return getWorld().getNearbyEntities(toBukkit());
     }
 
     public <T extends Entity> Collection<T> getEntitiesByType(Class<? extends T> type){
-        return getWorld().getNearbyEntitiesByType(type, getCenterLocation(), getWidthX()/2, getHeight()/2, getWidthZ()/2);
+        return getWorld().getNearbyEntitiesByType(type, getCenterLocation(), sizeX()/2, sizeY()/2, sizeZ()/2);
     }
 
     public Collection<LivingEntity> getLivingEntities(){
         return getEntitiesByType(LivingEntity.class);
     }
 
-    public boolean contains(FtcBoundingBox box){
-        if(!getWorld().equals(box.getWorld())) return false;
-        return super.contains(box);
+    public boolean contains(int x, int y, int z) {
+        return x >= minX && x < maxX && y >= minY && y < maxY && z >= minZ && z < maxZ;
     }
 
-    public boolean overlaps(FtcBoundingBox box){
-        if(!getWorld().equals(box.getWorld())) return false;
-        return super.overlaps(box);
+    public boolean contains(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        return this.minX <= minX && this.maxX >= maxX && this.minY <= minY && this.maxY >= maxY && this.minZ <= minZ && this.maxZ >= maxZ;
     }
 
-    public boolean contains(Location location){
-        if(!getWorld().equals(location.getWorld())) return false;
-        return super.contains(location.toVector());
+    public boolean overlaps(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        return this.minX < maxX && this.maxX > minX && this.minY < maxY && this.maxY > minY && this.minZ < maxZ && this.maxZ > minZ;
     }
 
-    public boolean contains(Block block){
-        return contains(block.getLocation());
+    @Override
+    public FtcBoundingBox getThis() {
+        return this;
     }
 
-    public boolean contains(Entity entity){
-        return contains(entity.getLocation());
+    @Override
+    public FtcBoundingBox shrink(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        return resize(
+                getMinX() - minX,
+                getMinY() - minY,
+                getMinZ() - minZ,
+                getMaxX() - maxX,
+                getMaxY() - maxY,
+                getMaxZ() - maxZ
+        );
+    }
+
+    @Override
+    public FtcBoundingBox expand(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        return resize(
+                getMinX() + minX,
+                getMinY() + minY,
+                getMinZ() + minZ,
+                getMaxX() + maxX,
+                getMaxY() + maxY,
+                getMaxZ() + maxZ
+        );
+    }
+
+    public BoundingBox toBukkit() {
+        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @Override
@@ -221,33 +227,25 @@ public class FtcBoundingBox extends BoundingBox implements Iterable<Block> {
     @Override
     public String toString() {
         return getClass().getSimpleName() + '{' +
-                "world=" + world.getName() +
-                ",minX=" + getMinX() +
-                ",minY=" + getMinY() +
-                ",minZ=" + getMinZ() +
-                ",maxX=" + getMaxX() +
-                ",maxY=" + getMaxY() +
-                ",maxZ=" + getMaxZ() +
-                '}';
+                world.getName() + ' ' +
+                minX + ' ' +
+                minY + ' ' +
+                minZ + ' ' +
+                " | " +
+                maxX + ' ' +
+                maxY + ' ' +
+                maxZ + '}';
     }
 
     @Override
     public @NotNull FtcBoundingBox clone() {
-        return of(getWorld(), this);
+        return new FtcBoundingBox(world, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @NotNull
     @Override
-    public BoundingBoxIterator iterator() {
-        return new BoundingBoxIterator(this);
-    }
-
-    @Override
-    public @NotNull Map<String, Object> serialize() {
-        Map<String, Object> result = super.serialize();
-        result.put("world", world.getName());
-
-        return result;
+    public BlockIterator iterator() {
+        return new BlockIterator(this);
     }
 
     public void copyTo(Vector3i pos) { copyTo(world, pos); }
@@ -257,9 +255,19 @@ public class FtcBoundingBox extends BoundingBox implements Iterable<Block> {
     }
 
     public net.minecraft.world.level.levelgen.structure.BoundingBox toVanilla() {
-        Vector min = getMin();
-        Vector max = getMax();
+        Vector3i min = getMin();
+        Vector3i max = getMax();
 
-        return new net.minecraft.world.level.levelgen.structure.BoundingBox(min.getBlockX(), min.getBlockY(), min.getBlockZ(), max.getBlockX(), max.getBlockY(), max.getBlockZ());
+        return new net.minecraft.world.level.levelgen.structure.BoundingBox(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
+    }
+
+    @Override
+    public void deserialize(JsonElement element) {
+
+    }
+
+    @Override
+    public JsonElement serialize() {
+        return null;
     }
 }

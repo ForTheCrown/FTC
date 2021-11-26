@@ -32,6 +32,8 @@ public interface RegionManager extends CrownSerializer, NbtCompoundSavable {
      */
     PopulationRegion get(String name);
 
+    RegionData getData(RegionPos pos);
+
     /**
      * Renames a given region to the given name.
      * @param region The region to rename
@@ -56,9 +58,8 @@ public interface RegionManager extends CrownSerializer, NbtCompoundSavable {
      * <p></p>
      * Warning: resetLand does not currently function
      * @param region The region to reset
-     * @param resetLand Whether the reset should also reset the land
      */
-    void reset(PopulationRegion region, boolean resetLand);
+    void reset(PopulationRegion region);
 
     /**
      * Gets all region names

@@ -6,7 +6,7 @@ import net.forthecrown.core.ForTheCrown;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonBuf;
 import net.forthecrown.serializer.SerializerType;
-import net.forthecrown.utils.animation.BlockAnimation;
+import net.forthecrown.core.animation.BlockAnimation;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.valhalla.Valhalla;
 import net.forthecrown.valhalla.active.ActiveRaid;

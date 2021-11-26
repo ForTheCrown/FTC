@@ -1,8 +1,6 @@
 package net.forthecrown.crownevents;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -17,7 +15,6 @@ public class EventTimer {
     private boolean stopped;
 
     private final Player player;
-    private final CrownUser user;
 
     private final TimerMessageFormatter messageFormatter;
     private final Consumer<Player> onTimerExpire;
@@ -26,7 +23,6 @@ public class EventTimer {
 
     public EventTimer(Player p, TimerMessageFormatter messageFormatter, Consumer<Player> onTimerExpire){
         this.player = p;
-        this.user = UserManager.getUser(p);
         this.messageFormatter = messageFormatter;
         this.onTimerExpire = onTimerExpire;
 
@@ -103,10 +99,6 @@ public class EventTimer {
         return player;
     }
 
-    public CrownUser getUser() {
-        return user;
-    }
-
     public Consumer<Player> getOnTimerExpire() {
         return onTimerExpire;
     }
@@ -116,7 +108,7 @@ public class EventTimer {
     }
 
     private void sendActionBar(){
-        user.sendActionBar(messageFormatter.format(getTimerCounter(elapsedTime).toString(), elapsedTime));
+        player.sendActionBar(messageFormatter.format(getTimerCounter(elapsedTime).toString(), elapsedTime));
     }
 
     public static StringBuilder getTimerCounter(final long timeInMillis){
@@ -124,12 +116,10 @@ public class EventTimer {
         long seconds = (timeInMillis / 1000) % 60;
         long milliseconds = (timeInMillis /10) % 100;
 
-        final StringBuilder message = new StringBuilder()
+        return new StringBuilder()
                 .append(String.format("%02d", minutes)).append(":")
                 .append(String.format("%02d", seconds)).append(":")
                 .append(String.format("%02d", milliseconds));
-
-        return message;
     }
 
     @Override

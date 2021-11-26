@@ -1,6 +1,7 @@
 package net.forthecrown.commands.regions;
 
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -31,6 +32,7 @@ public class CommandWhichRegion extends FtcCommand {
      * /WhichRegion
      *
      * Permissions used:
+     * ftc.regions
      *
      * Main Author: Julie
      */
@@ -51,6 +53,8 @@ public class CommandWhichRegion extends FtcCommand {
                         )
                 );
             } else {
+                if(!user.hasPermission(Permissions.REGIONS_ADMIN)) throw FtcExceptionProvider.translatable("regions.which.none");
+
                 user.sendMessage(
                         Component.translatable("regions.which.cords",
                                 NamedTextColor.GOLD,

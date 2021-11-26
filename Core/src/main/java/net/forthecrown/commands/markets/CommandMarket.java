@@ -39,7 +39,6 @@ public class CommandMarket extends FtcCommand {
         super("market");
 
         setPermission(Permissions.FTC_ADMIN);
-        setAliases("shops");
 
         register();
     }
@@ -61,6 +60,24 @@ public class CommandMarket extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
+                .then(literal("save")
+                        .executes(c -> {
+                            Crown.getMarkets().save();
+
+                            c.getSource().sendMessage("Saved markets");
+                            return 0;
+                        })
+                )
+
+                .then(literal("reload")
+                        .executes(c -> {
+                            Crown.getMarkets().reload();
+
+                            c.getSource().sendMessage("Reloaded markets");
+                            return 0;
+                        })
+                )
+
                 .then(literal("create")
                         .then(argument("wg_region", StringArgumentType.word())
 
@@ -223,7 +240,7 @@ public class CommandMarket extends FtcCommand {
                                 )
                         )
 
-                        .then(literal("evict")
+                        .then(literal("unclaim_complete")
                                 .executes(c -> {
                                     MarketShop shop = get(c);
                                     Markets region = Crown.getMarkets();
@@ -417,7 +434,7 @@ public class CommandMarket extends FtcCommand {
         MarketShop shop = get(c);
         Markets region = Crown.getMarkets();
 
-        Location noticeLoc = usePlayerPos ? c.getSource().asPlayer().getLocation() : PositionArgument.getLocation(c, "notice_pos");
+        Location noticeLoc = usePlayerPos ? c.getSource().asPlayer().getLocation().add(0, 1, 0) : PositionArgument.getLocation(c, "notice_pos");
         Location doorSignLoc = usePlayerPos ? figureSignLoc(c.getSource().asPlayer()) : PositionArgument.getLocation(c, "doorSign_pos");
 
         Vector3i noticePos = Vector3i.of(noticeLoc);

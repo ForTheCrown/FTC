@@ -13,7 +13,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.Rank;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;

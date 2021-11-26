@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
@@ -78,7 +79,7 @@ public class RegionArgument implements ArgumentType<RegionParseResult> {
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         //List players and target selector
-        UserArgument.onlineUser().listSuggestions(context, builder);
+        FtcSuggestionProvider.suggestPlayerNames((CommandSource) context.getSource(), builder);
 
         //List regions
         String token = builder.getRemainingLowerCase();

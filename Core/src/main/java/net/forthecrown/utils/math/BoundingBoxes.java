@@ -1,14 +1,27 @@
 package net.forthecrown.utils.math;
 
+import com.fastasyncworldedit.core.util.EditSessionBuilder;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.session.PasteBuilder;
+import net.forthecrown.core.Crown;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.apache.commons.lang.math.IntRange;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 /**
  * Class for utility and other methods relating to bounding boxes.
@@ -62,11 +75,49 @@ public final class BoundingBoxes {
                         WorldVec3i destination = relative.apply(min);
                         WorldVec3i origin = relative.apply(area.minX(), area.minY(), area.minZ()).toWorldVector(world);
 
-                        destination.getBlock().setBlockData(origin.getBlock().getBlockData().clone());
+                        destination.getBlock().setBlockData(origin.getBlock().getBlockData(), false);
                     }
                 }
             }
         };
+    }
+
+    static void copyPaste(World world, BoundingBox area, WorldVec3i destination) {
+        copyPaste(world, area, destination, null, null);
+    }
+
+    static void copyPaste(World world, BoundingBox area, WorldVec3i destination, @Nullable Consumer<ForwardExtentCopy> copyConsumer, @Nullable Consumer<PasteBuilder> pasteConsumer) {
+        CuboidRegion region = new CuboidRegion(
+                BukkitAdapter.adapt(world),
+                BlockVector3.at(area.minX(), area.minY(), area.minZ()),
+                BlockVector3.at(area.maxX(), area.maxY(), area.maxZ())
+        );
+        BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+
+        try (EditSession session = editSession(world)) {
+            ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
+                    session, region, clipboard, region.getMinimumPoint()
+            );
+
+            if(copyConsumer != null) copyConsumer.accept(forwardExtentCopy);
+
+            // configure here
+            Operations.complete(forwardExtentCopy);
+        }
+
+        try (EditSession session = editSession(destination.getWorld())) {
+            PasteBuilder builder = new ClipboardHolder(clipboard)
+                    .createPaste(session)
+                    .to(destination.toWE());
+
+            if(pasteConsumer != null) pasteConsumer.accept(builder);
+
+            Operations.complete(builder.build());
+        }
+    }
+
+    static EditSession editSession(World world) {
+        return new EditSession(new EditSessionBuilder(BukkitAdapter.adapt(world)));
     }
 
     /**
@@ -77,7 +128,10 @@ public final class BoundingBoxes {
      * @param toMin The position to copy to
      */
     public static void mainThreadCopy(World world, BoundingBox area, WorldVec3i toMin) {
-        sectionRunnable(world, area, toMin.clone().subtract(0, toMin.y, 0), new IntRange(area.minY(), area.maxY())).run();
+        Bukkit.getScheduler()
+                .runTask(Crown.inst(),
+                        sectionRunnable(world, area, toMin.clone().subtract(0, toMin.y, 0), new IntRange(area.minY(), area.maxY()))
+                );
     }
 
     /**

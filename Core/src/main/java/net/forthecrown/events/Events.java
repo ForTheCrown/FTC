@@ -27,7 +27,6 @@ public final class Events {
 
         register(new RegionsListener());
         register(new GuildListener());
-        register(new PirateEvents());
 
         register(new MobHealthBar());
         register(new SmokeBomb());

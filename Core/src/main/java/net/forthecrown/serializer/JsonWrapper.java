@@ -335,7 +335,7 @@ public class JsonWrapper {
     }
 
     public void addDate(String name, Date date) {
-        add(name, date.toString());
+        add(name, DateFormat.getInstance().format(date));
     }
 
     public Date getDate(String name) { return getDate(name, null); }

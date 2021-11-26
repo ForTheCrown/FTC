@@ -4,7 +4,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionPos;
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.minecraft.core.BlockPos;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -29,7 +29,7 @@ public class RegionsListener implements Listener {
         if(player.hasPermission(Permissions.REGIONS_ADMIN)) return;
         if(!player.getWorld().equals(Worlds.OVERWORLD)) return;
 
-        PopulationRegion region = Crown.getRegionManager().get(RegionPos.fromAbsolute(block.getX(), block.getZ()));
+        PopulationRegion region = Crown.getRegionManager().get(RegionPos.toRelative(block.getX(), block.getZ()));
 
         if(region.getPoleBoundingBox().isInside(new BlockPos(block.getX(), block.getY(), block.getZ()))) {
             event.setCancelled(true);

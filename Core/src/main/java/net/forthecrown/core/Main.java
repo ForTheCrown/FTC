@@ -24,7 +24,6 @@ import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
 import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.user.packets.PacketListeners;
-import net.forthecrown.utils.Worlds;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Bukkit;

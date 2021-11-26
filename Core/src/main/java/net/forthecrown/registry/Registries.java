@@ -15,7 +15,7 @@ import net.forthecrown.inventory.weapon.WeaponGoal;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.animation.BlockAnimation;
+import net.forthecrown.core.animation.BlockAnimation;
 import net.kyori.adventure.key.Key;
 
 /**
