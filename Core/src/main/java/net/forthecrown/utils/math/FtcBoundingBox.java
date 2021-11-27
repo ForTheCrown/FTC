@@ -84,12 +84,12 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
     }
 
     public FtcBoundingBox resize(int x1, int y1, int z1, int x2, int y2, int z2) {
-        this.minX = Math.min(x1, x2);
-        this.minY = Math.min(y1, y2);
-        this.minZ = Math.min(z1, z2);
-        this.maxX = Math.max(x1, x2);
-        this.maxY = Math.max(y1, y2);
-        this.maxZ = Math.max(z1, z2);
+        minX = Math.min(x1, x2);
+        minY = Math.min(y1, y2);
+        minZ = Math.min(z1, z2);
+        maxX = Math.max(x1, x2);
+        maxY = Math.max(y1, y2);
+        maxZ = Math.max(z1, z2);
         return this;
     }
 
@@ -170,9 +170,9 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
     @Override
     public FtcBoundingBox shrink(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         return resize(
-                getMinX() - minX,
-                getMinY() - minY,
-                getMinZ() - minZ,
+                getMinX() + minX,
+                getMinY() + minY,
+                getMinZ() + minZ,
                 getMaxX() - maxX,
                 getMaxY() - maxY,
                 getMaxZ() - maxZ
@@ -182,9 +182,9 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
     @Override
     public FtcBoundingBox expand(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         return resize(
-                getMinX() + minX,
-                getMinY() + minY,
-                getMinZ() + minZ,
+                getMinX() - minX,
+                getMinY() - minY,
+                getMinZ() - minZ,
                 getMaxX() + maxX,
                 getMaxY() + maxY,
                 getMaxZ() + maxZ

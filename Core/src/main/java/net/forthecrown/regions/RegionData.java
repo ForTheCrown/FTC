@@ -125,10 +125,6 @@ public class RegionData implements Nameable, HoverEventSource<Component>, NbtSer
         return nameColor;
     }
 
-    public BlockVector2 getPoleCords() {
-        return polePosition;
-    }
-
     /**
      * Gets the region's display name
      * @return The region's display name with a hover event and a click event, if the region has a name.

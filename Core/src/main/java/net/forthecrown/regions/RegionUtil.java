@@ -5,7 +5,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
@@ -38,7 +37,6 @@ public final class RegionUtil {
     }
 
     private static WorldVec3i findBottom(WorldVec3i p) {
-        Announcer.debug(p);
         if(p.getY() < FtcUtils.MIN_Y) return null;
 
         Block b = p.getBlock();
@@ -46,8 +44,6 @@ public final class RegionUtil {
         Sign sign = (Sign) b.getState();
 
         if(sign.getPersistentDataContainer().has(RegionPoleGenerator.TOP_SIGN_KEY, PersistentDataType.BYTE)) {
-            Announcer.debug("Found sign");
-            Announcer.debug(p);
             return p.below(4);
         }
 

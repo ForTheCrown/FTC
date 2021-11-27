@@ -17,7 +17,6 @@ dependencies {
 }
 
 shadowJar {
-    relocate('net.forthecrown.crownevent',  'net.forthecrown.poshd.crown')
 }
 
 assemble.dependsOn(shadowJar)

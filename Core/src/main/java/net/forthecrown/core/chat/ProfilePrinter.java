@@ -11,7 +11,6 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.UserInteractions;
-import net.forthecrown.user.data.Faction;
 import net.forthecrown.user.data.Rank;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
@@ -116,7 +115,6 @@ public class ProfilePrinter {
     }
 
     public ProfilePrinter basicInfo() {
-        line("Branch", user.getFaction().getName(), user.getFaction() != Faction.DEFAULT);
         line("Rank", user.getRank().noEndSpacePrefix(), user.getRank() != Rank.DEFAULT);
 
         line("Gems", FtcFormatter.gems(user.getGems()), user.getGems() > 0);

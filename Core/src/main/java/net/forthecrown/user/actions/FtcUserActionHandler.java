@@ -9,9 +9,12 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.events.dynamic.RegionVisitListener;
+import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionConstants;
+import net.forthecrown.regions.RegionManager;
 import net.forthecrown.regions.RegionPoleGenerator;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
@@ -29,16 +32,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Tameable;
+import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FtcUserActionHandler implements UserActionHandler {
     @Override
@@ -320,57 +321,74 @@ public class FtcUserActionHandler implements UserActionHandler {
         );
 
         //Generate pole in case it doesn't exist
-        RegionPoleGenerator generator = Crown.getRegionManager().getGenerator();
+        RegionManager manager = Crown.getRegionManager();
+        RegionPoleGenerator generator = manager.getGenerator();
         generator.generate(visit.getRegion());
 
+        PopulationRegion localRegion = manager.get(user.getRegionCords());
+        BlockVector2 localPole = localRegion.getPolePosition();
+
+        List<Entity> toTeleport = new ObjectArrayList<>();
+        AtomicBoolean hasLeashed = new AtomicBoolean(false);
+
         //If near the pole, teleport tamed and/or owned entities at the pole
-        if(user.get2DLocation().distance(poleCords) <= RegionConstants.DISTANCE_TO_POLE) {
+        if(user.get2DLocation().distance(localPole) <= RegionConstants.DISTANCE_TO_POLE) {
 
             //For entities which should be teleported along with the player
-            List<Entity> toTeleport = new ObjectArrayList<>();
-            FtcBoundingBox box = FtcBoundingBox.of(world, visit.getRegion().getPoleBoundingBox());
+            FtcBoundingBox box = FtcBoundingBox.of(world, localRegion.getPoleBoundingBox());
             box.expand(2);
 
-            for (Entity e: box.getEntities()) {
-                //If the entity is tameable and has been tamed
-                //by the visitor
-                if(e instanceof Tameable) {
-                    Tameable tameable = (Tameable) e;
-                    if(!tameable.isTamed()) continue;
+            toTeleport.addAll(
+                    world.getNearbyEntities(box.toBukkit(), e -> {
+                        Announcer.debug("entity: " + e);
 
-                    if(tameable.getOwnerUniqueId().equals(user.getUniqueId())) {
-                        toTeleport.add(e);
-                    }
-                }
+                        //Skip players
+                        if(e.getType() == EntityType.PLAYER) return false;
 
-                //If entity is being ridden by player, and is not a player, tp it
-                if(e.getPassengers().contains(player)) toTeleport.add(e);
+                        //If the entity is tameable and has been tamed
+                        //by the visitor
+                        if(e instanceof Tameable) {
+                            Tameable tameable = (Tameable) e;
+                            if(!tameable.isTamed()) return false;
 
-                //Remove player as passenger so it could be teleported
-                e.removePassenger(player);
-
-                //If they're leashed by the visitor
-                if(e instanceof LivingEntity) {
-                    LivingEntity living = (LivingEntity) e;
-
-                    try {
-                        Entity leashHolder = living.getLeashHolder();
-                        if(leashHolder.getUniqueId().equals(user.getUniqueId())) {
-                            toTeleport.add(e);
+                            if(tameable.getOwnerUniqueId().equals(user.getUniqueId())) {
+                                return true;
+                            }
                         }
 
-                    } catch (IllegalStateException e1) {
-                    }
-                }
-            }
+                        //If entity is being ridden by player, and is not a player, tp it
+                        if(e.getPassengers().contains(player)) {
+                            //Remove player as passenger so it could be teleported
+                            e.removePassenger(player);
 
-            //Teleport all entities there
-            toTeleport.forEach(e -> e.teleport(teleportLoc));
+                            return true;
+                        }
+
+                        //If they're leashed by the visitor
+                        if(e instanceof LivingEntity) {
+                            LivingEntity living = (LivingEntity) e;
+
+                            try {
+                                Entity leashHolder = living.getLeashHolder();
+                                if(leashHolder.getUniqueId().equals(user.getUniqueId())) {
+                                    hasLeashed.set(true);
+                                    return true;
+                                }
+
+                            } catch (IllegalStateException e1) {
+                            }
+                        }
+
+                        return false;
+                    })
+            );
         }
 
         //If the comvar to allow hulk smashing is on, the user allows it and the sky above the destination
         //is clear then do a hulk smash, else just teleport
-        if(ComVars.shouldHulkSmashPoles() && user.hulkSmashesPoles() && FtcUtils.hasOnlyAirAbove(WorldVec3i.of(teleportLoc))) {
+        if(!hasLeashed.get() && ComVars.shouldHulkSmashPoles() && user.hulkSmashesPoles() && FtcUtils.hasOnlyAirAbove(WorldVec3i.of(teleportLoc))) {
+            Location entityLoc = teleportLoc.clone();
+
             //Move TP loc to sky since hulk smash
             teleportLoc.setY(256);
             teleportLoc.setPitch(90f);
@@ -387,7 +405,7 @@ public class FtcUserActionHandler implements UserActionHandler {
             }
 
             //Tick task for them going up
-            new GoingUp(teleportLoc, user);
+            new GoingUp(teleportLoc, user, toTeleport, entityLoc);
         } else {
             //Execute travel effect, if they have one
             if(cosmetics.hasActiveTravel()) {
@@ -398,7 +416,16 @@ public class FtcUserActionHandler implements UserActionHandler {
 
             //Just TP them to pole... boring
             player.teleport(teleportLoc);
+
+            //Teleport all entities there
+            tpDelayed(toTeleport, teleportLoc);
         }
+    }
+
+    static void tpDelayed(List<Entity> entities, Location location) {
+        Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
+            entities.forEach(e -> e.teleport(location));
+        }, 10);
     }
 
     private static class GoingUp implements Runnable {
@@ -406,12 +433,18 @@ public class FtcUserActionHandler implements UserActionHandler {
         private final CrownUser user;
         private final CosmeticData cosmetics;
 
+        private final List<Entity> toTeleport;
+        private final Location entityTP;
+
         private final BukkitTask task;
 
-        private GoingUp(Location tp, CrownUser user) {
+        private GoingUp(Location tp, CrownUser user, List<Entity> toTeleport, Location entityTP) {
             this.tp = tp;
             this.user = user;
             cosmetics = user.getCosmeticData();
+
+            this.toTeleport = toTeleport;
+            this.entityTP = entityTP;
 
             task = Bukkit.getScheduler().runTaskTimer(Crown.inst(), this,
                     RegionVisitListener.TICKS_PER_TICK, RegionVisitListener.TICKS_PER_TICK
@@ -435,6 +468,7 @@ public class FtcUserActionHandler implements UserActionHandler {
                     task.cancel();
 
                     user.getPlayer().teleport(tp);
+                    tpDelayed(toTeleport, entityTP);
 
                     RegionVisitListener listener = new RegionVisitListener(user);
                     listener.beginListening();

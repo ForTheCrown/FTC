@@ -118,7 +118,9 @@ public final class FtcUtils {
         return Bukkit.getScoreboardManager().getMainScoreboard().getTeam("NoClip");
     }
 
-    public static boolean hasOnlyAirAbove(WorldVec3i pos) {
+    public static boolean hasOnlyAirAbove(WorldVec3i pos1) {
+        WorldVec3i pos = pos1.clone();
+
         for (int i = pos.getY(); i < MAX_Y; i++) {
             pos.above();
 

@@ -53,7 +53,7 @@ public class BlockIterator implements Iterator<Block> {
 
     @Override
     public boolean hasNext() {
-        return zIteration < requiredIterations;
+        return zIteration <= requiredIterations;
     }
 
     @Override
