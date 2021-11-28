@@ -1,24 +1,26 @@
 package net.forthecrown.poshd.command;
 
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.crownevents.CrownEventUtils;
-import net.forthecrown.crownevents.EventTimer;
+import net.forthecrown.crown.CrownEventUtils;
+import net.forthecrown.crown.EventTimer;
+import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.grenadier.types.scoreboard.ObjectiveArgument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.poshd.Main;
+import net.forthecrown.poshd.Messages;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
-public class CommandStopTimer extends FtcCommand {
+public class CommandStopTimer extends AbstractCommand {
 
     public CommandStopTimer() {
-        super("StopTimer");
+        super("StopTimer", Main.inst);
 
+        setPermission("ftc.commands.starttimer");
         register();
     }
 
@@ -60,14 +62,12 @@ public class CommandStopTimer extends FtcCommand {
                                                 if(CrownEventUtils.isNewRecord(score, scoreVal)) {
                                                     score.setScore(scoreVal);
 
-                                                    message = Component.text("New record! ");
+                                                    message = Messages.timerRecord(timer);
                                                 } else {
-                                                    message = Component.text("Better luck next time :D ");
+                                                    message = Messages.timerNotNew(timer);
                                                 }
 
-                                                player.sendMessage(
-                                                        message.append(Component.text(EventTimer.getTimerCounter(timer.getTime()).toString()))
-                                                );
+                                                player.sendMessage(message);
                                             } else Main.logger.warning(player.getName() + " did not have EventTimer");
 
                                             Main.logger.info(player.getName() + " left " + objective.getName());

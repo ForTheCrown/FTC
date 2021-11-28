@@ -1,9 +1,9 @@
 package net.forthecrown.poshd;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.forthecrown.crown.EventTimer;
 import net.forthecrown.poshd.command.CommandStartTimer;
 import net.forthecrown.poshd.command.CommandStopTimer;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.forthecrown.crownevents.EventTimer;
 import net.forthecrown.royalgrenadier.RoyalGrenadier;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -21,6 +21,9 @@ public class Main extends JavaPlugin {
         inst = this;
         logger = getLogger();
         RoyalGrenadier.initialize();
+
+        saveResource("messages.properties", false);
+        Messages.load(this);
 
         new CommandStartTimer();
         new CommandStopTimer();

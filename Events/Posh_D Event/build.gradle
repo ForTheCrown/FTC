@@ -13,7 +13,6 @@ repositories {
 dependencies {
     implementation files('/libs/Grenadier.jar')
     compileOnly files('/libs/Paper.jar')
-    compileOnly files('/libs/Core.jar')
 }
 
 shadowJar {
