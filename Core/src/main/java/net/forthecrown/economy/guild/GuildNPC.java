@@ -2,7 +2,7 @@ package net.forthecrown.economy.guild;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.click.ClickableTexts;
-import net.forthecrown.commands.click.TextNode;
+import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
@@ -23,7 +23,7 @@ import java.util.UUID;
 public class GuildNPC implements InteractableNPC {
     GuildNPC() {}
 
-    private final TextNode guildInfo = new TextNode("info_guild")
+    private final ClickableTextNode guildInfo = new ClickableTextNode("info_guild")
             .setExecutor(user -> user.sendMessage(
                     "To keep the market fresh, this group of players can close inactive shops.",
                     "To join them, you must have had a shop in this region for atleast 6 months.",
@@ -31,7 +31,7 @@ public class GuildNPC implements InteractableNPC {
             ))
             .setPrompt(user -> Component.translatable("guildmaster.infoGuild"));
 
-    private final TextNode marketInfo = new TextNode("info_market")
+    private final ClickableTextNode marketInfo = new ClickableTextNode("info_market")
             .setExecutor(user -> user.sendMessage(
                     "Houses in this region can be used as player shops.",
                     "Add members to your shop using these commands:",
@@ -41,7 +41,7 @@ public class GuildNPC implements InteractableNPC {
             ))
             .setPrompt(user -> Component.translatable("guildmaster.infoMarket"));
 
-    private final TextNode proposeMotion = new TextNode("propose_motion")
+    private final ClickableTextNode proposeMotion = new ClickableTextNode("propose_motion")
             .setExecutor(user -> {
                 TradersGuild guild = Crown.getTradersGuild();
                 validateMember(guild, user.getUniqueId());
@@ -66,7 +66,7 @@ public class GuildNPC implements InteractableNPC {
                 return prompt.color(NamedTextColor.YELLOW);
             });
 
-    private final TextNode joinGuild = new TextNode("join_guild")
+    private final ClickableTextNode joinGuild = new ClickableTextNode("join_guild")
             .setExecutor(user -> {
                 TradersGuild guild = Crown.getTradersGuild();
                 if(guild.isMember(user.getUniqueId())) return;
@@ -139,7 +139,7 @@ public class GuildNPC implements InteractableNPC {
                 return prompt.color(NamedTextColor.YELLOW);
             });
 
-    private final TextNode leaveGuildConfirm = new TextNode("confirm_leave_guild")
+    private final ClickableTextNode leaveGuildConfirm = new ClickableTextNode("confirm_leave_guild")
             .setExecutor(user -> {
                 TradersGuild guild = Crown.getTradersGuild();
                 validateMember(guild, user.getUniqueId());
@@ -164,7 +164,7 @@ public class GuildNPC implements InteractableNPC {
                 return Component.translatable("guildmaster.leave.confirm", NamedTextColor.YELLOW);
             });
 
-    private final TextNode leaveGuild = new TextNode("leave_guild")
+    private final ClickableTextNode leaveGuild = new ClickableTextNode("leave_guild")
             .addNode(leaveGuildConfirm)
             .setExecutor(user -> {
                 TradersGuild guild = Crown.getTradersGuild();
@@ -183,8 +183,8 @@ public class GuildNPC implements InteractableNPC {
                 return Component.translatable("guildmaster.leave", NamedTextColor.YELLOW);
             });
 
-    private final TextNode baseNode = ClickableTexts.register(
-            new TextNode("guild_npc")
+    private final ClickableTextNode baseNode = ClickableTexts.register(
+            new ClickableTextNode("guild_npc")
                     .addNode(leaveGuild)
                     .addNode(joinGuild)
                     .addNode(proposeMotion)

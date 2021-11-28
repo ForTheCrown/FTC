@@ -97,95 +97,6 @@ public interface CrownUser extends
     OfflinePlayer getOfflinePlayer();
 
     /**
-     * Gets all the ranks the user has
-     * @return The user's ranks
-     */
-    Set<Rank> getAvailableRanks();
-
-    /**
-     * Checks if the user has a certain rank
-     * @param rank The rank to check for
-     * @return Whether they have it or not
-     */
-    boolean hasRank(Rank rank);
-
-    /**
-     * Gives the user a rank
-     * @param rank The rank to give
-     */
-    default void addRank(Rank rank) {
-        addRank(rank, true);
-    }
-
-    /**
-     * Gives the user a rank, Also gives the permission
-     * @param rank The rank to give
-     * @param givePermission Whether to also give the rank's permission
-     */
-    void addRank(Rank rank, boolean givePermission);
-
-    /**
-     * Removes a rank from the user along with the ranks permission
-     * @param rank The rank to remove
-     */
-    default void removeRank(Rank rank) {
-        removeRank(rank, true);
-    }
-
-    /**
-     * Removes a rank from the user
-     * @param rank The ran to remove
-     * @param removePermission Whether to also remove the permission
-     */
-    void removeRank(Rank rank, boolean removePermission);
-
-    /**
-     * Gets the user's currently active rank
-     * @return The user's active rank
-     */
-    Rank getRank();
-
-    /**
-     * Sets the user's active rank and tab prefix
-     * @param rank The user's new rank
-     */
-    default void setRank(Rank rank) {
-        setRank(rank, true);
-    }
-
-    /**
-     * Sets the user's active rank
-     * @param rank The user's new rank
-     * @param setPrefix Whether the user's TabPrefix should be updated
-     */
-    void setRank(Rank rank, boolean setPrefix);
-
-    /**
-     * Gets if the user is allowed to swap branches
-     * @return Whether the user is allowed to swap branches
-     */
-    boolean canSwapFaction();
-
-    /**
-     * Sets if the user is allowed to swap branches
-     * @param canSwapBranch Whether the user is allowed to swap branches
-     */
-    void setCanSwapBranch(boolean canSwapBranch, boolean addToCooldown);
-
-    /**
-     * Gets when the branch swapping cooldown will expire in milli seconds
-     * @return The system time of the next time the player is allowed to swap branches
-     */
-    long getNextAllowedBranchSwap();
-
-    /**
-     * Checks if the user can swap branches and sends them a message if they can't
-     * <p>Used by the Smith and Jerome interactions</p>
-     * @return Whether the user is allowed to swap branches
-     */
-    boolean performBranchSwappingCheck();
-
-    /**
      * Gets a list of all pets belonging to the user
      * <p>The strings are arbitrary, don't try to guess them :(</p>
      * @return The list of pets belonging to the user
@@ -435,18 +346,6 @@ public interface CrownUser extends
      * <p>Can't be arsed to change it</p>
      */
     void resetEarnings();
-
-    /**
-     * Gets the user's branch
-     * @return The current branch of the player
-     */
-    Faction getFaction();
-
-    /**
-     * Sets the user's branch
-     * @param faction The new branch of the user
-     */
-    void setFaction(Faction faction);
 
     /**
      * Sends the user a message, works just like the sendMessage in Player, but it also translates hexcodes and '&amp;' chars as color codes

@@ -8,7 +8,6 @@ import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.Struct;
 import net.forthecrown.utils.math.Vector3i;
-import net.kyori.adventure.inventory.Book;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
@@ -120,8 +119,6 @@ public interface MarketShop extends JsonSerializable, Nameable, Struct {
     default boolean isMerged() {
         return getMerged() != null;
     }
-
-    Book getPurchaseBook();
 
     /**
      * Gets the current shop owner

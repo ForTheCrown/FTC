@@ -18,8 +18,9 @@ import org.bukkit.block.BlockFace;
 import java.util.UUID;
 
 public interface Guilds {
-    NamespacedKey VOTE_BOX_KEY = Squire.createFtcKey("vote_box");
-    NamespacedKey GUILD_MASTER = Squire.createFtcKey("hazel_guild_master");
+    NamespacedKey
+            VOTE_BOX_KEY    = Squire.createFtcKey("vote_box"),
+            GUILD_MASTER    = Squire.createFtcKey("hazel_guild_master");
 
     VoteBox VOTE_BOX = new VoteBox(
             new Vector3i(12, 12, 12),

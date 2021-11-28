@@ -11,23 +11,33 @@ import net.kyori.adventure.text.event.ClickEvent;
 public final class ClickableTexts {
     private ClickableTexts() {}
 
-    private static final TextNode ROOT_NODE = new TextNode("root");
+    private static final ClickableTextNode ROOT_NODE = new ClickableTextNode("root");
 
-    public static TextNode register(TextNode node) {
+    public static ClickableTextNode register(ClickableTextNode node) {
         ROOT_NODE.addNode(node);
 
         return node;
     }
 
-    public static Int2ObjectMap<TextNode> getNodes() {
+    public static void unregister(ClickableTextNode node) {
+        ROOT_NODE.removeNode(node);
+    }
+
+    public static void unregister(String name) {
+        ROOT_NODE.removeNode(name);
+    }
+
+    public static Int2ObjectMap<ClickableTextNode> getNodes() {
         return ROOT_NODE.getNodes();
     }
 
     public static void execute(CrownUser user, int initialID, String args) {
         StringReader reader = new StringReader(FtcUtils.isNullOrBlank(args) ? "" : args);
 
-        TextNode node = ROOT_NODE.getNodes().get(initialID);
-        if(node == null) return;
+        ClickableTextNode node = ROOT_NODE.getNodes().get(initialID);
+        if(node == null) {
+            return;
+        }
 
         try {
             node.execute(user, reader);

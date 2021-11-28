@@ -82,8 +82,8 @@ public class CommandBecomeBaron extends FtcCommand {
 
                             bals.add(p.getUniqueId(), -baronPrice);
 
-                            p.addRank(Rank.BARON);
-                            p.addRank(Rank.BARONESS);
+                            p.addTitle(Rank.BARON);
+                            p.addTitle(Rank.BARONESS);
                             p.setBaron(true);
 
                             Component text = Component.text()

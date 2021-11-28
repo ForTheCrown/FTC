@@ -173,7 +173,7 @@ public class DungeonListeners implements Listener, ClickEventTask {
             if(user.getFaction() == Faction.DEFAULT || user.getFaction() == Faction.ROYALS || !user.hasRank(Rank.KNIGHT)){
                 player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "[FTC] " + ChatColor.WHITE + "You've been promoted to " + ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "Knight" + ChatColor.DARK_GRAY + "]" + ChatColor.WHITE + " !");
                 player.sendMessage(ChatColor.WHITE + "You can select the tag in " + ChatColor.YELLOW + "/rank" + ChatColor.WHITE + " now.");
-                user.addRank(Rank.KNIGHT);
+                user.addTitle(Rank.KNIGHT);
             }
 
             Bukkit.dispatchCommand(getServer().getConsoleSender(), "lp user " + player.getName() + " parent add free-rank");

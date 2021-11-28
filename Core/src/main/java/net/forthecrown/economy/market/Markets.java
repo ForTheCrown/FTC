@@ -1,11 +1,14 @@
 package net.forthecrown.economy.market;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.MarketOwnership;
+import net.kyori.adventure.inventory.Book;
 import org.bukkit.World;
 
 import java.util.Collection;
@@ -193,9 +196,12 @@ public interface Markets extends CrownSerializer {
      */
     static void checkCanChangeStatus(MarketOwnership ownership) throws CommandSyntaxException {
         if(!ownership.canChangeStatus()) {
-            long remaining = System.currentTimeMillis() - ownership.getLastStatusChange();
+            long nextAllowed = ownership.getLastStatusChange() + ComVars.getMarketStatusCooldown();
+            long remaining = nextAllowed - System.currentTimeMillis();
 
             throw FtcExceptionProvider.translatable("market.cannotChangeStatus", FtcFormatter.millisIntoTime(remaining));
         }
     }
+
+    Book getPurchaseBook(MarketShop shop, CrownUser user, ClickableTextNode node);
 }

@@ -91,10 +91,13 @@ public class FtcMarketOwnership extends AbstractUserAttachment implements Market
     @Override
     public void deserialize(JsonElement element) {
         ownershipBegan = 0L;
+        ownedName = null;
+        lastAction = 0L;
 
         if(element == null) return;
         JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
+        lastAction = json.getLong("lastAction");
         ownershipBegan = json.getLong("ownershipBegan");
         ownedName = json.getString("ownedName");
     }
@@ -103,6 +106,7 @@ public class FtcMarketOwnership extends AbstractUserAttachment implements Market
     public JsonObject serialize() {
         JsonWrapper json = JsonWrapper.empty();
 
+        if(lastAction != 0L) json.add("lastAction", lastAction);
         if(ownershipBegan != 0L) json.add("ownershipBegan", ownershipBegan);
         if(currentlyOwnsShop()) json.add("ownedName", ownedName);
 

@@ -5,8 +5,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
@@ -14,7 +16,13 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.MarketOwnership;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.core.Worlds;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.BoundingBoxes;
+import net.kyori.adventure.inventory.Book;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
 
@@ -81,6 +89,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         economy.remove(user.getUniqueId(), claim.getPrice());
 
         //Claim it
+        user.sendMessage(Component.translatable("market.bought", NamedTextColor.YELLOW));
         claim(claim, user);
     }
 
@@ -314,14 +323,52 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
     }
 
     @Override
+    public Book getPurchaseBook(MarketShop shop, CrownUser user, ClickableTextNode node) {
+        Book.Builder builder = Book.builder()
+                .title(Component.text("Purchase shop?"));
+
+        Component newLine = Component.newline();
+        Component tripleNew = Component.text("\n\n\n");
+
+        TextComponent.Builder textBuilder = Component.text()
+                .content("Purchase shop?")
+
+                .append(tripleNew)
+                .append(Component.text("Price: ").append(FtcFormatter.rhinesNonTrans(shop.getPrice())))
+                .append(tripleNew);
+
+        int entranceAmount = shop.getEntrances().size();
+
+        textBuilder.append(
+                Component.text(entranceAmount + " entrance" + FtcUtils.addAnS(entranceAmount))
+        );
+
+        BoundingBox box = shop.getVoidExample();
+        String dimensions = box.getXSpan() + "x" + box.getYSpan() + "x" + box.getYSpan() + " blocks";
+
+        textBuilder
+                .append(newLine)
+                .append(Component.text(dimensions));
+
+        textBuilder
+                .append(tripleNew)
+                .append(newLine)
+                .append(newLine);
+
+        textBuilder.append(node.prompt(user));
+
+        builder.addPage(textBuilder.build());
+        return builder.build();
+    }
+
+    @Override
     protected void save(JsonWrapper json) {
         json.addList("entries", byName.values());
     }
 
     @Override
     protected void reload(JsonWrapper json) {
-        byName.clear();
-        byOwner.clear();
+        clear();
 
         if(json.has("entries")) {
             for (JsonElement e: json.getArray("entries")) {

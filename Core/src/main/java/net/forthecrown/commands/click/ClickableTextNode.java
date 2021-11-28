@@ -12,15 +12,15 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
 
-public class TextNode {
+public class ClickableTextNode {
     private final String name;
-    private final Int2ObjectMap<TextNode> nameHash2Node = new Int2ObjectOpenHashMap<>();
-    private TextNode parent;
+    private final Int2ObjectMap<ClickableTextNode> nameHash2Node = new Int2ObjectOpenHashMap<>();
+    private ClickableTextNode parent;
 
     private PromptCreator promptCreator;
     private TextExecutor executor;
 
-    public TextNode(String name) {
+    public ClickableTextNode(String name) {
         this.name = name;
     }
 
@@ -32,7 +32,7 @@ public class TextNode {
         return promptCreator;
     }
 
-    public TextNode setPrompt(PromptCreator promptCreator) {
+    public ClickableTextNode setPrompt(PromptCreator promptCreator) {
         this.promptCreator = promptCreator;
         return this;
     }
@@ -41,12 +41,12 @@ public class TextNode {
         return executor;
     }
 
-    public TextNode setExecutor(TextExecutor executor) {
+    public ClickableTextNode setExecutor(TextExecutor executor) {
         this.executor = executor;
         return this;
     }
 
-    public TextNode addNode(TextNode node) {
+    public ClickableTextNode addNode(ClickableTextNode node) {
         Validate.isTrue(node != this, "Bruh");
 
         nameHash2Node.put(node.getName().hashCode(), node);
@@ -54,7 +54,7 @@ public class TextNode {
         return this;
     }
 
-    public void removeNode(TextNode node) {
+    public void removeNode(ClickableTextNode node) {
         removeNode(node.getName());
     }
 
@@ -63,7 +63,7 @@ public class TextNode {
         nameHash2Node.remove(name.hashCode());
     }
 
-    public Int2ObjectMap<TextNode> getNodes() {
+    public Int2ObjectMap<ClickableTextNode> getNodes() {
         return nameHash2Node;
     }
 
@@ -73,7 +73,7 @@ public class TextNode {
 
             int hash = reader.readInt();
 
-            TextNode node = getNodes().get(hash);
+            ClickableTextNode node = getNodes().get(hash);
             if(node != null) node.execute(user, reader);
 
             return;
@@ -87,7 +87,7 @@ public class TextNode {
     public Component presentPrompts(CrownUser user) {
         TextComponent.Builder builder = Component.text();
 
-        for (TextNode n: getNodes().values()) {
+        for (ClickableTextNode n: getNodes().values()) {
             Component prompt = n.prompt(user);
 
             if(prompt != null) {
@@ -124,7 +124,7 @@ public class TextNode {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        TextNode node = (TextNode) o;
+        ClickableTextNode node = (ClickableTextNode) o;
 
         return new EqualsBuilder()
                 .append(getName(), node.getName())

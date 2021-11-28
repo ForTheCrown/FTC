@@ -568,7 +568,7 @@ public class CommandFtcCore extends FtcCommand {
                                                             CrownUser user = getUser(c);
                                                             Rank rank = c.getArgument("rankToAdd", Rank.class);
 
-                                                            user.addRank(rank);
+                                                            user.addTitle(rank);
                                                             c.getSource().sendAdmin( user.getName() + " now has " + rank.getPrefix());
                                                             return 0;
                                                         })

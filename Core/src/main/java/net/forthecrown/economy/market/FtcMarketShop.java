@@ -17,7 +17,6 @@ import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.math.Vector3i;
-import net.kyori.adventure.inventory.Book;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
@@ -113,11 +112,6 @@ public class FtcMarketShop implements MarketShop {
     @Override
     public void setMerged(MarketShop shop) {
         mergedName = shop == null ? null : shop.getName();
-    }
-
-    @Override
-    public Book getPurchaseBook() {
-        return null;
     }
 
     @Override

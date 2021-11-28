@@ -101,9 +101,9 @@ public class FtcUser implements CrownUser {
     public final FtcUserHomes homes;
 
     //Faction and rank stuff
-    public Rank currentRank = Rank.DEFAULT;
-    public Faction faction = Faction.DEFAULT;
-    public ObjectSet<Rank> ranks = new ObjectOpenHashSet<>();
+    public RankTier tier = RankTier.NONE;
+    public RankTitle currentRank = RankTitle.DEFAULT;
+    public ObjectSet<RankTitle> ranks = new ObjectOpenHashSet<>();
 
     public final ObjectList<Pet> pets = new ObjectArrayList<>();
     public final ObjectSet<UserPref> prefs = new ObjectOpenHashSet<>();
@@ -255,22 +255,6 @@ public class FtcUser implements CrownUser {
         return dataContainer;
     }
 
-    @Override
-    public Set<Rank> getAvailableRanks(){
-        return ranks;
-    }
-
-    @Override
-    public boolean hasRank(Rank rank){
-        return ranks.contains(rank);
-    }
-
-    @Override
-    public void addRank(Rank rank, boolean givePermission){
-        ranks.add(rank);
-        if(givePermission) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + getName() + " parent add " + rank.getLpRank());
-    }
-
     private User getLuckPermsUser(){
         UserManager manager = Crown.getLuckPerms().getUserManager();
         if(!manager.isLoaded(getUniqueId())) manager.loadUser(getUniqueId());
@@ -279,38 +263,6 @@ public class FtcUser implements CrownUser {
 
     private CachedPermissionData getPerms(){
         return getLuckPermsUser().getCachedData().getPermissionData();
-    }
-
-    @Override
-    public void removeRank(Rank rank, boolean removePermission){
-        ranks.remove(rank);
-        if(removePermission) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + getName() + " parent remove " + rank.getLpRank());
-    }
-
-    @Override
-    public Rank getRank(){
-        return currentRank;
-    }
-
-    @Override
-    public void setRank(Rank rank, boolean setPrefix){
-        currentRank = rank;
-
-        if(setPrefix && rank != Rank.DEFAULT) setCurrentPrefix(rank.prefix());
-    }
-
-    @Override
-    public boolean canSwapFaction() {
-        checkBranchSwapping();
-        return !hasPref(UserPref.CANNOT_SWAP_BRANCH);
-    }
-
-    @Override
-    public void setCanSwapBranch(boolean canSwapBranch, boolean addToCooldown) {
-        setPref(!canSwapBranch, UserPref.CANNOT_SWAP_BRANCH);
-
-        if(addToCooldown) nextAllowedBranchSwap = System.currentTimeMillis() + ComVars.getBranchSwapCooldown();
-        else nextAllowedBranchSwap = 0;
     }
 
     @Override
@@ -379,8 +331,8 @@ public class FtcUser implements CrownUser {
         getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName()).setScore(yayNay);
 
         if(baron) {
-            addRank(Rank.BARON, true);
-            addRank(Rank.BARONESS, false);
+            addTitle(Rank.BARON, true);
+            addTitle(Rank.BARONESS, false);
         } else {
              removeRank(Rank.BARON, true);
              removeRank(Rank.BARONESS, false);
@@ -437,16 +389,6 @@ public class FtcUser implements CrownUser {
     public String getName(){
         if(FtcUtils.isNullOrBlank(name)) name = getOfflinePlayer().getName();
         return name;
-    }
-
-    @Override
-    public Faction getFaction(){
-        return faction;
-    }
-
-    @Override
-    public void setFaction(Faction faction){
-        this.faction = faction;
     }
 
     @Override
@@ -1141,28 +1083,28 @@ public class FtcUser implements CrownUser {
 
     protected void permsCheck(){
         if(!isOnline()) return;
-        if(getName().contains("Paranor") && !hasRank(Rank.LEGEND)) addRank(Rank.LEGEND); //fuckin para lmao
+        if(getName().contains("Paranor") && !hasRank(Rank.LEGEND)) addTitle(Rank.LEGEND); //fuckin para lmao
 
         if(isBaron() && !hasRank(Rank.BARON)){
-            addRank(Rank.BARON, true);
-            addRank(Rank.BARONESS, false);
+            addTitle(Rank.BARON, true);
+            addTitle(Rank.BARONESS, false);
         }
 
         if(getPlayer().hasPermission(Permissions.DONATOR_3) && (!hasRank(Rank.PRINCE) || !hasRank(Rank.ADMIRAL))){
-            addRank(Rank.PRINCE, true);
-            addRank(Rank.PRINCESS, false);
-            addRank(Rank.ADMIRAL, false);
+            addTitle(Rank.PRINCE, true);
+            addTitle(Rank.PRINCESS, false);
+            addTitle(Rank.ADMIRAL, false);
         }
 
         if(getPlayer().hasPermission(Permissions.DONATOR_2) && (!hasRank(Rank.DUKE) || !hasRank(Rank.CAPTAIN))){
-            addRank(Rank.DUKE, true);
-            addRank(Rank.DUCHESS, false);
-            addRank(Rank.CAPTAIN, false);
+            addTitle(Rank.DUKE, true);
+            addTitle(Rank.DUCHESS, false);
+            addTitle(Rank.CAPTAIN, false);
         }
 
         if(getPlayer().hasPermission(Permissions.DONATOR_1) && !hasRank(Rank.LORD)){
-            addRank(Rank.LORD, true);
-            addRank(Rank.LADY, false);
+            addTitle(Rank.LORD, true);
+            addTitle(Rank.LADY, false);
         }
     }
 
