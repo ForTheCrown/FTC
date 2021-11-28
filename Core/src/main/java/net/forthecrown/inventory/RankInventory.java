@@ -11,6 +11,7 @@ import net.forthecrown.inventory.builder.options.SimpleCordedOption;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.RankTier;
 import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -35,6 +36,14 @@ public final class RankInventory {
     private static final ItemStack yellowBorder = InventoryBorder.createBorderItem(Material.YELLOW_STAINED_GLASS_PANE);
     private static final ItemStack blackBorder = InventoryBorder.createBorderItem(Material.BLACK_STAINED_GLASS_PANE);
 
+    public static void openInventory(CrownUser user) {
+        switch(user.getRankTier()) {
+            case TIER_1 -> RankInventory.GUI_TIER1.open(user);
+            case TIER_2 -> RankInventory.GUI_TIER2.open(user);
+            case TIER_3 -> RankInventory.GUI_TIER3.open(user);
+            default -> RankInventory.GUI_FREE_RANKS.open(user);
+        }
+    }
 
     public static final BuiltInventory GUI_FREE_RANKS = createBase(RankTier.FREE, Component.text("Free ranks"), builder ->
         builder.add(new SelectRankOption(RankTitle.KNIGHT, new InventoryPos(2, 2)))

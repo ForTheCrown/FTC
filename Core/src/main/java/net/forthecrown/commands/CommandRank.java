@@ -37,10 +37,7 @@ public class CommandRank extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command.executes(c ->{
             Player player = getPlayerSender(c);
-
-            Bukkit.getPluginManager().registerEvents(new RankGuiUseEvent(player), Crown.inst());
-            new RankInventory(UserManager.getUser(player)).getUsersRankGUI().open(player);
-            //player.openInventory(new RankInventory(UserManager.getUser(player)).getUsersRankGUI());
+            RankInventory.openInventory(UserManager.getUser(player));
             return 0;
         });
     }
