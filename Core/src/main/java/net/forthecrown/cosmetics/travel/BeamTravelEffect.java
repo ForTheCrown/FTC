@@ -1,5 +1,9 @@
 package net.forthecrown.cosmetics.travel;
 
+import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.user.CrownUser;
@@ -62,18 +66,19 @@ public class BeamTravelEffect extends TravelEffect {
         loc.getWorld().spawnParticle(Particle.WARPED_SPORE, loc, particleAmount, 0.05, 50, 0.05, 0, null, true);
     }
 
-    private final Map<UUID, Integer> counters = new HashMap<>();
+    private final Object2IntMap<UUID> counters = new Object2IntOpenHashMap<>();
+
     private void summonRepeatingBeam(UUID id, Location loc, int duration) {
         counters.put(id, 0); // Use uuid to track duration per user.
         new BukkitRunnable() {
             public void run() {
-                if (counters.get(id) < duration) {
+                if (counters.containsKey(id) && counters.getOrDefault(id, 99999) < duration) {
                     summonBeam(loc, 1024);
                     counters.replace(id, counters.get(id) + 1);
                 }
                 else {
                     this.cancel();
-                    counters.remove(id);
+                    counters.remove(id, counters.getOrDefault(id, 99999));
                 }
             }
         }.runTaskTimer(Crown.inst(), 0, 1);

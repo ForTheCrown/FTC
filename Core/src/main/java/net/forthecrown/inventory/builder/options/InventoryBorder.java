@@ -61,4 +61,10 @@ public class InventoryBorder implements InventoryOption {
     public int getSlot() {
         return -1;
     }
+
+    public static ItemStack createBorderItem(Material glassType) {
+        return new ItemStackBuilder(glassType)
+                .setName(Component.space())
+                .build();
+    }
 }
