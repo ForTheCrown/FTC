@@ -38,7 +38,6 @@ import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.title.Title;
 import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
@@ -68,7 +67,6 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -100,10 +98,10 @@ public class FtcUser implements CrownUser {
     public final FtcUserMail mail;
     public final FtcUserHomes homes;
 
-    //Faction and rank stuff
+    //Rank stuff
     public RankTier tier = RankTier.NONE;
-    public RankTitle currentRank = RankTitle.DEFAULT;
-    public ObjectSet<RankTitle> ranks = new ObjectOpenHashSet<>();
+    public RankTitle currentTitle = RankTitle.DEFAULT;
+    public ObjectSet<RankTitle> titles = new ObjectOpenHashSet<>();
 
     public final ObjectList<Pet> pets = new ObjectArrayList<>();
     public final ObjectSet<UserPref> prefs = new ObjectOpenHashSet<>();
@@ -321,21 +319,57 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public boolean isBaron() {
-        Score score = getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName());
-        return score.isScoreSet() && score.getScore() == 1;
+    public RankTier getRankTier() {
+        return tier;
     }
-    @Override
-    public void setBaron(boolean baron) {
-        int yayNay = baron ? 1 : 0;
-        getServer().getScoreboardManager().getMainScoreboard().getObjective("Baron").getScore(getName()).setScore(yayNay);
 
-        if(baron) {
-            addTitle(Rank.BARON, true);
-            addTitle(Rank.BARONESS, false);
-        } else {
-             removeRank(Rank.BARON, true);
-             removeRank(Rank.BARONESS, false);
+    @Override
+    public void setRankTier(RankTier tier, boolean givePermission) {
+        this.tier = tier;
+
+        if(givePermission) {
+            Bukkit.dispatchCommand(
+                    Bukkit.getConsoleSender(),
+                    "lp user " + getName() + " parent add " + tier.luckPermsGroup
+            );
+        }
+    }
+
+    @Override
+    public RankTitle getTitle() {
+        return currentTitle;
+    }
+
+    @Override
+    public void setTitle(RankTitle title, boolean setPrefix) {
+        currentTitle = title;
+
+        if(setPrefix && title != RankTitle.DEFAULT) setCurrentPrefix(title.prefix());
+    }
+
+    @Override
+    public ObjectSet<RankTitle> getAvailableTitles() {
+        return titles;
+    }
+
+    @Override
+    public void addTitle(RankTitle title, boolean givePermissions, boolean setTierIfHigher) {
+        titles.add(title);
+
+        if(setTierIfHigher && title.getTier().isHigherTierThan(getRankTier())) {
+            setRankTier(title.getTier(), givePermissions);
+        }
+    }
+
+    @Override
+    public void removeTitle(RankTitle title, boolean removePermission) {
+        titles.remove(title);
+
+        if(removePermission) {
+            Bukkit.dispatchCommand(
+                    Bukkit.getConsoleSender(),
+                    "lp user " + getName() + " parent remove " + title.getTier().luckPermsGroup
+            );
         }
     }
 
@@ -574,22 +608,6 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public long getNextAllowedBranchSwap() {
-        return nextAllowedBranchSwap;
-    }
-
-    @Override
-    public boolean performBranchSwappingCheck(){
-        if(canSwapFaction()) return true;
-
-        final long timUntil = getNextAllowedBranchSwap() - System.currentTimeMillis();
-
-        sendMessage("&7You cannot currently swap branches!");
-        sendMessage("&7You can swap your branch in &e" + FtcFormatter.convertMillisIntoTime(timUntil) + "&7.");
-        return false;
-    }
-
-    @Override
     public Location getLocation() {
         if(!isOnline()) return entityLocation == null ? null : entityLocation.clone();
         Entity entity = getHandle(); //Inheritance mapping is a bitch, I wish it would peg me instead of ripping me to pieces with a hacksaw
@@ -664,7 +682,6 @@ public class FtcUser implements CrownUser {
         updateGodMode();
         updateTabName();
 
-        permsCheck();
         if(shouldResetEarnings()) resetEarnings();
 
         lastLoad = System.currentTimeMillis();
@@ -716,7 +733,7 @@ public class FtcUser implements CrownUser {
     @Override
     public Component getCurrentPrefix(){
         if(currentPrefix != null) return currentPrefix;
-        if(currentRank != Rank.DEFAULT) return currentRank.prefix();
+        if(currentTitle != RankTitle.DEFAULT) return currentTitle.prefix();
 
         return Component.empty();
     }
@@ -989,7 +1006,7 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public void showTitle(@NonNull Title title) {
+    public void showTitle(net.kyori.adventure.title.Title title) {
         checkOnline();
         getPlayer().showTitle(title);
     }
@@ -1061,14 +1078,12 @@ public class FtcUser implements CrownUser {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(uniqueId)
-                .append(getFaction())
                 .append(getGems())
                 .append(prefs)
                 .append(isAfk())
                 .append(getTotalEarnings())
                 .append(getNextResetTime())
                 .append(lastLoad)
-                .append(getNextAllowedBranchSwap())
                 .append(nextAllowedTeleport)
                 .toHashCode();
     }
@@ -1079,33 +1094,6 @@ public class FtcUser implements CrownUser {
                 "UUID=" + uniqueId +
                 ",name='" + name + '\'' +
                 '}';
-    }
-
-    protected void permsCheck(){
-        if(!isOnline()) return;
-        if(getName().contains("Paranor") && !hasRank(Rank.LEGEND)) addTitle(Rank.LEGEND); //fuckin para lmao
-
-        if(isBaron() && !hasRank(Rank.BARON)){
-            addTitle(Rank.BARON, true);
-            addTitle(Rank.BARONESS, false);
-        }
-
-        if(getPlayer().hasPermission(Permissions.DONATOR_3) && (!hasRank(Rank.PRINCE) || !hasRank(Rank.ADMIRAL))){
-            addTitle(Rank.PRINCE, true);
-            addTitle(Rank.PRINCESS, false);
-            addTitle(Rank.ADMIRAL, false);
-        }
-
-        if(getPlayer().hasPermission(Permissions.DONATOR_2) && (!hasRank(Rank.DUKE) || !hasRank(Rank.CAPTAIN))){
-            addTitle(Rank.DUKE, true);
-            addTitle(Rank.DUCHESS, false);
-            addTitle(Rank.CAPTAIN, false);
-        }
-
-        if(getPlayer().hasPermission(Permissions.DONATOR_1) && !hasRank(Rank.LORD)){
-            addTitle(Rank.LORD, true);
-            addTitle(Rank.LADY, false);
-        }
     }
 
     protected boolean shouldResetEarnings(){

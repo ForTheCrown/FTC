@@ -2,7 +2,6 @@ package net.forthecrown.commands;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.events.dynamic.RankGuiUseEvent;
 import net.forthecrown.inventory.RankInventory;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.grenadier.command.BrigadierCommand;

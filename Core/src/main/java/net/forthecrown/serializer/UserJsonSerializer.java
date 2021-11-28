@@ -46,15 +46,15 @@ public class UserJsonSerializer implements UserSerializer {
         //Basic stuff
         json.add("name", user.getName());
         json.add("lastOnlineName", user.lastOnlineName);
-        json.addEnum("branch", user.faction);
-        json.addEnum("rank", user.currentRank);
+        json.addEnum("title", user.currentTitle);
+        json.addEnum("tier", user.tier);
         json.addEnum("sellAmount", user.sellAmount);
 
-        if(!user.ranks.isEmpty()){
-            Set<Rank> ranks = new HashSet<>(user.ranks);
-            ranks.remove(Rank.DEFAULT);
+        if(!user.titles.isEmpty()){
+            Set<RankTitle> ranks = new HashSet<>(user.titles);
+            ranks.removeIf(RankTitle::isDefaultTitle);
 
-            if(!ranks.isEmpty()) json.addList("ranks", ranks);
+            if(!ranks.isEmpty()) json.addList("titles", ranks);
         }
 
         //Stuff
@@ -72,7 +72,6 @@ public class UserJsonSerializer implements UserSerializer {
         JsonWrapper timeStamps = JsonWrapper.empty();
         timeStamps.add("nextReset", user.nextResetTime);
         timeStamps.add("lastLoad", user.lastLoad);
-        if(!user.canSwapFaction()) timeStamps.add("nextBranchSwap", user.nextAllowedBranchSwap);
 
         json.add("timeStamps", timeStamps);
 
@@ -135,19 +134,19 @@ public class UserJsonSerializer implements UserSerializer {
         if(json == null) return;
 
         user.lastOnlineName = json.getString("lastOnlineName");
-        user.faction = json.getEnum("branch", Faction.class, Faction.DEFAULT);
-        user.currentRank = json.getEnum("rank", Rank.class, Rank.DEFAULT);
+        user.currentTitle = json.getEnum("title", RankTitle.class, RankTitle.DEFAULT);
         user.sellAmount = json.getEnum("sellAmount", SellAmount.class, SellAmount.PER_1);
+        user.tier = json.getEnum("tier", RankTier.class, RankTier.NONE);
         user.ip = json.getString("ipAddress");
         user.totalEarnings = json.getLong("totalEarnings");
         user.setGems(json.getInt("gems"));
 
         //ranks
-        user.ranks.clear();
-        user.ranks.add(Rank.DEFAULT);
-        if(json.has("ranks")) {
-            List<Rank> ranks = ListUtils.fromIterable(json.getArray("ranks"), e -> JsonUtils.readEnum(Rank.class, e));
-            user.ranks.addAll(ranks);
+        user.titles.clear();
+        user.titles.addAll(RankTitle.getDefaultsFor(user.tier));
+        if(json.has("titles")) {
+            List<RankTitle> ranks = ListUtils.fromIterable(json.getArray("titles"), e -> JsonUtils.readEnum(RankTitle.class, e));
+            user.titles.addAll(ranks);
         }
 
         //Nickname

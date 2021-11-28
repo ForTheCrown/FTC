@@ -4,6 +4,7 @@ import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.sk89q.worldedit.math.BlockVector2;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.selling.UserSellResult;
@@ -34,7 +35,6 @@ import org.bukkit.util.Vector;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -284,18 +284,43 @@ public interface CrownUser extends
      */
     void setMatData(SoldMaterialData data);
 
-    /**
-     * Gets if the player is a baron
-     * <p>Note: Why does this exist???? we have <code>hasRank(Rank rank)</code></p>
-     * @return Whether the user is a baron or not
-     */
-    boolean isBaron();
+    RankTier getRankTier();
 
-    /**
-     * Sets if the user is a baron or not
-     * @param baron Whether the user is a baron or not
-     */
-    void setBaron(boolean baron);
+    void setRankTier(RankTier tier, boolean givePermission);
+
+    default void setRankTier(RankTier tier) {
+        setRankTier(tier, true);
+    }
+
+    RankTitle getTitle();
+
+    void setTitle(RankTitle title, boolean setPrefix);
+
+    default void setTitle(RankTitle title) {
+        setTitle(title, true);
+    }
+
+    ObjectSet<RankTitle> getAvailableTitles();
+
+    void addTitle(RankTitle title, boolean givePermissions, boolean setTier);
+
+    default void addTitle(RankTitle title, boolean givePermission) {
+        addTitle(title, givePermission, false);
+    }
+
+    default void addTitle(RankTitle title) {
+        addTitle(title, true);
+    }
+
+    void removeTitle(RankTitle title, boolean removePermission);
+
+    default void removeTitle(RankTitle title) {
+        removeTitle(title, false);
+    }
+
+    default boolean hasTitle(RankTitle title) {
+        return getAvailableTitles().contains(title);
+    }
 
     /**
      * Gets the user's sell amount in /shop
@@ -494,7 +519,7 @@ public interface CrownUser extends
      * @return The user's display name
      */
     default Component coloredNickDisplayName(){
-        return nickDisplayName().color(getHighestTierRank().tier.color);
+        return nickDisplayName().color(getRankTier().color);
     }
 
     /**
@@ -519,25 +544,6 @@ public interface CrownUser extends
      */
     default Component nickOrName() {
         return Component.text(getNickOrName());
-    }
-
-    /**
-     * Gets the user's highest tier rank
-     * @return The user's highest tier rank
-     */
-    default Rank getHighestTierRank() {
-        Rank highest = null;
-
-        for (Rank r: getAvailableRanks()){
-            if(highest == null){
-                highest = r;
-                continue;
-            }
-
-            if(r.getTier().isHigherTierThan(highest.getTier())) highest = r;
-        }
-
-        return highest;
     }
 
     /**

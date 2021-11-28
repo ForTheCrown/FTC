@@ -8,9 +8,7 @@ import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryBorder;
 import net.forthecrown.inventory.builder.options.SimpleCordedOption;
-import net.forthecrown.inventory.builder.options.SimpleOption;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.Rank;
 import net.forthecrown.user.data.RankTier;
 import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.utils.ItemStackBuilder;
@@ -54,7 +52,7 @@ public final class RankInventory {
         builder.add(new SelectRankOption(RankTitle.LORD, new InventoryPos(2, 2)))
                 .add(new SelectRankOption(RankTitle.LADY, new InventoryPos(2, 3)))
                 .add(new SelectRankOption(RankTitle.PIRATE, new InventoryPos(4, 2)))
-                .add(new SelectRankOption(RankTitle.LEGACY_1, new InventoryPos(7, 4)));
+                .add(new SelectRankOption(RankTitle.LEGACY_TIER_1, new InventoryPos(7, 4)));
     });
 
     public static final BuiltInventory GUI_TIER2 = createBase(RankTier.TIER_2, Component.text("Free ranks"), builder -> {
@@ -68,7 +66,7 @@ public final class RankInventory {
                 .add(new SelectRankOption(RankTitle.DUCHESS, new InventoryPos(2, 3)))
                 .add(new SelectRankOption(RankTitle.CAPTAIN, new InventoryPos(4, 2)))
                 .add(new SelectRankOption(RankTitle.ELITE, new InventoryPos(6, 2)))
-                .add(new SelectRankOption(RankTitle.LEGACY_2, new InventoryPos(7, 4)));
+                .add(new SelectRankOption(RankTitle.LEGACY_TIER_2, new InventoryPos(7, 4)));
     });
 
     public static final BuiltInventory GUI_TIER3 = createBase(RankTier.TIER_3, Component.text("Free ranks"), builder -> {
@@ -87,7 +85,7 @@ public final class RankInventory {
                 .add(new SelectRankOption(RankTitle.ADMIRAL, new InventoryPos(4, 2)))
                 .add(new SelectRankOption(RankTitle.ROYAL, new InventoryPos(4, 3)))
                 .add(new SelectRankOption(RankTitle.LEGEND, new InventoryPos(6, 2)))
-                .add(new SelectRankOption(RankTitle.LEGACY_3, new InventoryPos(7, 4)));
+                .add(new SelectRankOption(RankTitle.LEGACY_TIER_3, new InventoryPos(7, 4)));
     });
 
     private static BuiltInventory createBase(RankTier tier, TextComponent title, Consumer<InventoryBuilder> factory){
@@ -149,7 +147,7 @@ public final class RankInventory {
                 .build(), (user, context) -> getNextInventory(tier).open(user));
     }
 
-    private BuiltInventory getNextInventory(RankTier currentInvTier) {
+    private static BuiltInventory getNextInventory(RankTier currentInvTier) {
         return switch (currentInvTier) {
             case TIER_1 -> GUI_TIER2;
             case TIER_2 -> GUI_TIER3;
@@ -157,9 +155,6 @@ public final class RankInventory {
             default -> GUI_TIER1;
         };
     }
-
-    // TODO: getTitle doesn't exist yet lol
-    private static Boolean isCurrentTitle(CrownUser user, RankTitle title) { return user.getTitle() == title; }
 
     // Default title
     private static CordedInventoryOption getDefaultTitleOption() {
@@ -169,7 +164,7 @@ public final class RankInventory {
     static class DefaultRankOption implements CordedInventoryOption {
         private final InventoryPos pos;
 
-        public DefaultRankOption(InventoryPos pos) {
+        DefaultRankOption(InventoryPos pos) {
             this.pos = pos;
         }
 
@@ -184,7 +179,7 @@ public final class RankInventory {
                     .setName(Component.text("Default").style(nonItalic(NamedTextColor.WHITE)))
                     .addLore(Component.text("This is the default title!").style(nonItalic(NamedTextColor.GRAY)));
 
-            if (isCurrentTitle(user, RankTitle.DEFAULT)) item.addEnchant(Enchantment.BINDING_CURSE, 1);
+            if (user.getTitle() == RankTitle.DEFAULT) item.addEnchant(Enchantment.BINDING_CURSE, 1);
             inventory.setItem(pos, item);
         }
 
@@ -223,7 +218,7 @@ public final class RankInventory {
                     // .setName(title.getDisplayName or something
                     .addLore(lore);
 
-            if (isCurrentTitle(user, title)) item.addEnchant(Enchantment.BINDING_CURSE, 1);
+            if (user.getTitle() == title) item.addEnchant(Enchantment.BINDING_CURSE, 1);
             inventory.setItem(pos, item);
         }
 

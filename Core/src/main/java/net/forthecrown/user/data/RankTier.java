@@ -11,20 +11,20 @@ import net.kyori.adventure.text.format.TextColor;
  */
 public enum RankTier implements Comparable<RankTier>, JsonSerializable {
 
-    NONE (1, -1, NamedTextColor.WHITE),
-    FREE (2, 0, NamedTextColor.GRAY),
+    NONE (1, NamedTextColor.WHITE, "default"),
+    FREE (2, NamedTextColor.GRAY, "free-rank"),
 
-    TIER_1 (3, 1, NamedTextColor.GRAY),
-    TIER_2 (4, 2, NamedTextColor.GOLD),
-    TIER_3 (5, 3, NamedTextColor.YELLOW);
+    TIER_1 (3, NamedTextColor.GRAY, "donator-tier-1"),
+    TIER_2 (4, NamedTextColor.GOLD, "donator-tier-2"),
+    TIER_3 (5, NamedTextColor.YELLOW, "donator-tier-3");
 
     public final byte maxHomes;
-    public final byte asByte;
     public final TextColor color;
+    public final String luckPermsGroup;
 
-    RankTier(int maxHomes, int asByte, TextColor color){
+    RankTier(int maxHomes, TextColor color, String luckPermsGroup){
         this.maxHomes = (byte) maxHomes;
-        this.asByte = (byte) asByte;
+        this.luckPermsGroup = luckPermsGroup;
         this.color = color;
     }
 
@@ -42,7 +42,14 @@ public enum RankTier implements Comparable<RankTier>, JsonSerializable {
      * @return Whether this tier is higher than the given tier
      */
     public boolean isHigherTierThan(RankTier tier){
-        return asByte > tier.asByte;
+        return ordinal() > tier.ordinal();
+    }
+
+    public RankTier getLowerTier() {
+        int ordinal = ordinal() - 1;
+        if(ordinal == -1) return null;
+
+        return values()[ordinal];
     }
 
     @Override
