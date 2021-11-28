@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.economy.houses.Relation;
@@ -38,7 +39,7 @@ import java.util.UUID;
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 public class EvictTopic implements VoteTopicType<EvictTopic.TopicInstance> {
-    public static final Key KEY = Crown.coreKey("evict_owner");
+    public static final Key KEY = Keys.ftc("evict_owner");
     public static final EvictTopic INSTANCE = new EvictTopic();
 
     @Override

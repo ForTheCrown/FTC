@@ -8,6 +8,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.actions.TeleportRequest;
+import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.JsonUtils;
 
 import java.util.*;
@@ -281,6 +282,24 @@ public class FtcUserInteractions extends AbstractUserAttachment implements UserI
     @Override
     public void removeInvitedTo(UUID from) {
         invitedTo.remove(from);
+    }
+
+    public void clearInvites() {
+        UUID owner = user.getUniqueId();
+
+        for (UUID id: invitedTo) {
+            CrownUser user = UserManager.getUser(id);
+            user.getInteractions().removeInvite(owner);
+        }
+
+        invitedTo.clear();
+
+        for (UUID id: invites) {
+            CrownUser user = UserManager.getUser(id);
+            user.getInteractions().removeInvitedTo(owner);
+        }
+
+        invitedTo.clear();
     }
 
     @Override

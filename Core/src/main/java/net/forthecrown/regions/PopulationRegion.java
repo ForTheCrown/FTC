@@ -7,73 +7,32 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.serializer.NbtSerializable;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.math.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.event.HoverEventSource;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.StringTag;
+import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.UnaryOperator;
-
-public class PopulationRegion implements Nameable, HoverEventSource<Component>, NbtSerializable {
-    private static final GsonComponentSerializer SERIALIZER = GsonComponentSerializer.gson();
-
-    private final RegionPos pos;
+public class PopulationRegion extends RegionData implements NbtSerializable {
     private final FtcBoundingBox region;
 
-    private Component description;
-    private String name;
-    private BlockVector2 polePosition;
     private BoundingBox poleBoundingBox;
 
-    public PopulationRegion(RegionPos pos, World world) {
-        this.pos = pos;
+    PopulationRegion(RegionPos pos, World world) {
+        super(null, pos, null, null, null);
         this.region = makeRegion(world);
-
-        updatePoleBounds();
     }
 
     public PopulationRegion(RegionPos pos, World world, Tag tag) {
         this(pos, world);
 
-        //If the only thing serialized is, is a name
-        if(tag.getId() == Tag.TAG_STRING) {
-            setName(tag.getAsString());
-            return;
-        }
+        readTag(tag, this::setPolePosition0);
 
-        //If the only thing serialized is, is a custom pole position
-        if(tag.getId() == Tag.TAG_INT_ARRAY) {
-            IntArrayTag intArr = (IntArrayTag) tag;
-            int[] arr = intArr.getAsIntArray();
-
-            setPolePosition0(BlockVector2.at(arr[0], arr[1]));
-            return;
-        }
-
-        //Both name and pole position have been serialized, maybe description too
-        CompoundTag tags = (CompoundTag) tag;
-
-        this.name = tags.getString("name");
-
-        //Set pole position
-        int[] arr = tags.getIntArray("polePosition");
-        setPolePosition0(BlockVector2.at(arr[0], arr[1]));
-
-        //If has description, set it
-        if(tags.contains("description")) this.description = SERIALIZER.deserialize(tags.getString("description"));
+        if(poleBoundingBox == null) updatePoleBounds();
     }
 
     //Makes a bounding box for the region, from -65 to 312
@@ -85,14 +44,6 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
         int maxZ = pos.getCenterZ() + RegionConstants.HALF_REGION_SIZE;
 
         return new FtcBoundingBox(world, minX, -65, minZ, maxX, 312, maxZ);
-    }
-
-    /**
-     * Gets the position of this region
-     * @return The region's position
-     */
-    public RegionPos getPos() {
-        return pos;
     }
 
     /**
@@ -120,14 +71,6 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
     }
 
     /**
-     * Gets the absolute position of this region's pole
-     * @return This region's pole position
-     */
-    public @NotNull BlockVector2 getPolePosition() {
-        return polePosition == null ? pos.toCenter() : polePosition;
-    }
-
-    /**
      * Sets the position of this region's pole.
      * @param polePosition The new pole position.
      */
@@ -148,33 +91,16 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
     }
 
     //Updates the pole's bounding box
-    private void updatePoleBounds() {
+    void updatePoleBounds() {
         poleBoundingBox = RegionUtil.poleBoundingBox(this);
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * Gets either the name or a string representation of the position
-     * @return The region's name, or it's position.
-     */
-    public String nameOrPos() {
-        return hasName() ? getName() : getPos().toString();
-    }
-
-    /**
-     * Gets the region's description
-     * @return The region's description, or null, if there's no description
-     */
-    public Component getDescription() {
-        return description;
+    public void setNameColor(TextColor nameColor) {
+        this.nameColor = nameColor;
     }
 
     /**
@@ -183,29 +109,6 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
      */
     public void setDescription(Component description) {
         this.description = description;
-    }
-
-    /**
-     * Gets the region's display name
-     * @return The region's display name with a hover event and a click event, if the region has a name.
-     */
-    public Component displayName() {
-        return Component.text('[' + nameOrPos() + ']')
-                .hoverEvent(this)
-                .clickEvent(hasName() ? ClickEvent.suggestCommand("/visit " + getName()) : null);
-    }
-
-    @Override
-    public @NotNull HoverEvent<Component> asHoverEvent(@NotNull UnaryOperator<Component> op) {
-        return HoverEvent.showText(
-                op.apply(
-                        Component.text()
-                                .append(Component.text("x: " + getPos().getCenterX()))
-                                .append(Component.newline())
-                                .append(Component.text("z: " + getPos().getCenterZ()))
-                                .build()
-                )
-        );
     }
 
     /**
@@ -219,44 +122,6 @@ public class PopulationRegion implements Nameable, HoverEventSource<Component>, 
         return new LiteralMessage("x: " + polePos.getX() + ", z: " + polePos.getZ());
     }
 
-    /**
-     * Saves the region as an NBT tag
-     * @see PopulationRegion#shouldSerialize()
-     * @return The region's NBT representation, or null, if the region doesn't have enough data to serialize.
-     */
-    @Override
-    public Tag saveAsTag() {
-        boolean noPos = polePosition == null;
-        boolean noName = FtcUtils.isNullOrBlank(name);
-
-        //Shouldn't serialize
-        if(noPos && noName) return null;
-
-        //If it only has a name
-        if(noPos && description == null) {
-            return StringTag.valueOf(name);
-        }
-
-        //If it only has a position
-        if(!noPos && noName) {
-            return writeColumn(polePosition);
-        }
-
-        //It has a both a name and a custom position.
-        CompoundTag tag = new CompoundTag();
-        tag.putString("name", name);
-        tag.put("polePosition", writeColumn(polePosition));
-
-        //If it also has a description
-        if(description != null) tag.putString("description", SERIALIZER.serialize(description));
-
-        return tag;
-    }
-
-    //Write a block vec 2 as an int array for NBT
-    private static IntArrayTag writeColumn(BlockVector2 pos) {
-        return new IntArrayTag(new int[] {pos.getX(), pos.getZ()});
-    }
 
     /**
      * Gets whether the region should be serialized

@@ -21,7 +21,6 @@ import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -44,7 +43,9 @@ import static org.bukkit.Bukkit.getServer;
 public final class FtcUtils {
     private FtcUtils() {}
 
-    public static final int MAX_Y = 312;
+    public static final int
+            MAX_Y = 312,
+            MIN_Y = -32;
 
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
     private static final Predicate ALWAYS_TRUE = o -> true;
@@ -117,7 +118,9 @@ public final class FtcUtils {
         return Bukkit.getScoreboardManager().getMainScoreboard().getTeam("NoClip");
     }
 
-    public static boolean hasOnlyAirAbove(WorldVec3i pos) {
+    public static boolean hasOnlyAirAbove(WorldVec3i pos1) {
+        WorldVec3i pos = pos1.clone();
+
         for (int i = pos.getY(); i < MAX_Y; i++) {
             pos.above();
 

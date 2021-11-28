@@ -1,6 +1,6 @@
 package net.forthecrown.useables.checks;
 
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class CheckNoRiders implements UsageCheckInstance {
-    public static final Key KEY = Crown.coreKey("no_riders");
+    public static final Key KEY = Keys.ftc("no_riders");
 
     @Override
     public @Nullable Component failMessage(Player player) {

@@ -8,7 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.registry.Registries;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 public class WorldComVarType implements ComVarType<World> {
-    private final Key key = Crown.coreKey("world_type");
+    private final Key key = Keys.ftc("world_type");
 
     WorldComVarType() {
         Registries.COMVAR_TYPES.register(key, this);

@@ -11,15 +11,14 @@ public final class TravelEffects {
 
     private static BuiltInventory INVENTORY;
 
-    public static TravelEffect SMOKE, HEART, PINK_ROCKET, BEAM;
+    public static final TravelEffect
+            SMOKE           = register(new SmokeTravelEffect()),
+            HEART           = register(new HeartTravelEffect()),
+            PINK_ROCKET     = register(new PinkRocketTravelEffect()),
+            BEAM            = register(new BeamTravelEffect());
 
     public static void init() {
-        //Register here with register() method :D
-        SMOKE = register(new SmokeTravelEffect());
-        HEART = register(new HeartTravelEffect());
-        PINK_ROCKET = register(new PinkRocketTravelEffect());
-        BEAM = register(new BeamTravelEffect());
-
+        //Class variables are initialized before this method is ran
         //Final thing
         Registries.TRAVEL_EFFECTS.close();
         INVENTORY = CosmeticConstants.baseInventory(36, Component.text("Region pole effects"), true)

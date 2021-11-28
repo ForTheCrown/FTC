@@ -32,7 +32,6 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.npc.NpcDirectory;
 import net.forthecrown.economy.selling.SellShops;
 import net.forthecrown.inventory.crown.Crowns;
-import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.user.CrownUser;
@@ -42,7 +41,7 @@ import net.forthecrown.user.actions.UserActionHandler;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.user.packets.PacketListeners;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -55,7 +54,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.TrapDoor;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -64,7 +62,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -167,23 +164,6 @@ public class CoreListener implements Listener {
                 event.line(2),
                 event.line(3)
         );
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if(!(event.getDamager() instanceof Player)) return;
-        if(event.getEntity() instanceof ArmorStand) return;
-
-        Player damager = (Player) event.getDamager();
-        ItemStack swordItem = damager.getInventory().getItemInMainHand();
-
-        if(!RoyalWeapons.isRoyalSword(swordItem)) return;
-
-        RoyalSword sword = new RoyalSword(swordItem);
-
-        if(!ComVars.allowNonOwnerSwords() && !sword.getOwner().equals(damager.getUniqueId())) return;
-
-        sword.damage(damager, event);
     }
 
     @EventHandler(ignoreCancelled = true)

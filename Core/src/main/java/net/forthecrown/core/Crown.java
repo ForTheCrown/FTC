@@ -132,7 +132,4 @@ public interface Crown extends Plugin, Namespaced {
                 .hoverEvent(Component.text("For The Crown").color(NamedTextColor.YELLOW));
     }
 
-    static Key coreKey(String value){
-        return Key.key(inst(), value);
-    }
 }

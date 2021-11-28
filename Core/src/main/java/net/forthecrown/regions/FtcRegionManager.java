@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.AbstractNbtSerializer;
+import net.forthecrown.utils.FtcUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.bukkit.World;
@@ -19,6 +20,7 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
 
     private final Object2ObjectMap<String, PopulationRegion> byName = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectMap<RegionPos, PopulationRegion> byCords = new Object2ObjectOpenHashMap<>();
+
 
     public FtcRegionManager(World world) {
         super("regions_" + world.getName());
@@ -72,7 +74,12 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
     @Override
     public PopulationRegion get(RegionPos cords) {
         //Get a region by the given cords or add and then get the new addition
-        return byCords.computeIfAbsent(cords, c -> new PopulationRegion(c, world));
+        return byCords.computeIfAbsent(cords, c -> {
+            PopulationRegion region = new PopulationRegion(c, world);
+            region.updatePoleBounds();
+
+            return region;
+        });
     }
 
     @Override
@@ -81,13 +88,23 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
     }
 
     @Override
+    public RegionData getData(RegionPos pos) {
+        PopulationRegion region = byCords.get(pos);
+        if(region != null) return region;
+
+        return new RegionData(null, pos, null, null, null);
+    }
+
+    @Override
     public void rename(PopulationRegion region, String newName) {
+        boolean hasName = region.hasName();
+        boolean nullNew = FtcUtils.isNullOrBlank(newName);
         //Remove it from name tracker if it already has
-        if(region.hasName()) byName.remove(region.getName());
+        if(hasName) byName.remove(region.getName());
 
         //Set the name and add it with the new name to the tracker
         region.setName(newName);
-        byName.put(newName, region);
+        if(!nullNew) byName.put(newName, region);
 
         getGenerator().generate(region);
 
@@ -118,17 +135,13 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
     }
 
     @Override
-    public void reset(PopulationRegion region, boolean resetLand) {
+    public void reset(PopulationRegion region) {
         //Remove it
         remove(region);
 
         //Reset name and pole position
         region.setName(null);
         region.setPolePosition(null);
-
-        //TODO? idk if I should
-        /*if(resetLand) {
-        }*/
     }
 
     @Override

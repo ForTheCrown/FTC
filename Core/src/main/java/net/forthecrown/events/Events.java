@@ -27,7 +27,6 @@ public final class Events {
 
         register(new RegionsListener());
         register(new GuildListener());
-        register(new PirateEvents());
 
         register(new MobHealthBar());
         register(new SmokeBomb());
@@ -38,7 +37,6 @@ public final class Events {
         register(new MarriageListener());
 
         register(new CosmeticsListener());
-        register(new CustomInventoryClickListener());
         register(new InventoryBuilderListener());
 
         register(new DungeonListeners());

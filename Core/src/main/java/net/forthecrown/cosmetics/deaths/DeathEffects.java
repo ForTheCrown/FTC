@@ -11,17 +11,13 @@ public final class DeathEffects {
 
     private static BuiltInventory INVENTORY;
 
-    public static DeathEffect SOUL;
-    public static DeathEffect TOTEM;
-    public static DeathEffect EXPLOSION;
-    public static DeathEffect ENDER_RING;
+    public static final DeathEffect
+            SOUL        = register(new SoulDeathEffect()),
+            TOTEM       = register(new TotemDeathEffect()),
+            EXPLOSION   = register(new ExplosionDeathEffect()),
+            ENDER_RING  = register(new EnderRingDeathEffect());
 
     public static void init(){
-        SOUL = register(new SoulDeathEffect());
-        TOTEM = register(new TotemDeathEffect());
-        EXPLOSION = register(new ExplosionDeathEffect());
-        ENDER_RING = register(new EnderRingDeathEffect());
-
         INVENTORY = CosmeticConstants.baseInventory(36, Component.text("Death effects"), true)
                 .addAll(Registries.DEATH_EFFECTS)
                 .add(CosmeticConstants.NO_DEATH)

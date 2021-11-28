@@ -16,6 +16,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.item.ItemArgument;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.actions.UsageActionInstance;
@@ -25,7 +26,6 @@ import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -232,7 +232,7 @@ public final class InteractionUtils {
 
         Player player = c.asPlayer();
         ItemStack main = player.getInventory().getItemInMainHand();
-        if(main == null || main.getType() == Material.AIR) throw FtcExceptionProvider.create("You must be holding an item");
+        if(FtcItems.isEmpty(main)) throw FtcExceptionProvider.create("You must be holding an item");
 
         return main.clone();
     }

@@ -6,13 +6,11 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-
 public class PinkRocketTravelEffect extends TravelEffect {
 
     // Simple rocket-like particles when going up, nothing more.
     PinkRocketTravelEffect() {
-        super("Pink Rocket", new InventoryPos(2, 1),
+        super("Pink Rocket", new InventoryPos(1, 1),
                 Component.text("idk what to put "),
                 Component.text("here yet.")
         );

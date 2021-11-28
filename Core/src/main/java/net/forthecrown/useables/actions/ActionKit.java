@@ -5,6 +5,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.KitArgument;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.utils.JsonUtils;
@@ -14,7 +15,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionKit implements UsageAction<ActionKit.ActionInstance> {
-    public static final Key KEY = Key.key(Crown.inst(), "give_kit");
+    public static final Key KEY = Keys.ftc("give_kit");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

@@ -7,13 +7,18 @@ import net.forthecrown.inventory.builder.*;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryRunnable;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+
+import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 //Mmmm yes, internal classes
 public final class ServerSellShop {
@@ -32,6 +37,10 @@ public final class ServerSellShop {
 
     public static final InventoryPos SELL_ALL_POS = new InventoryPos(8, 0);
     public static final InventoryPos INFO_POS = new InventoryPos(8, 1);
+
+    static boolean isLegalSlot(int slot) {
+        return slot != SELL_ALL_POS.getSlot() && slot != INFO_POS.getSlot();
+    }
 }
 
 class SellShopCloseListener implements InventoryCloseAction {
@@ -43,7 +52,7 @@ class SellShopCloseListener implements InventoryCloseAction {
         World world = player.getWorld();
 
         for (int i = 0; i < inventory.getSize(); i++) {
-            if(i == ServerSellShop.SELL_ALL_POS.getSlot() || i == ServerSellShop.INFO_POS.getSlot()) continue;
+            if(!ServerSellShop.isLegalSlot(i)) continue;
 
             ItemStack item = inventory.getItem(i);
             if(FtcItems.isEmpty(item)) continue;
@@ -59,6 +68,8 @@ class SellShopCloseListener implements InventoryCloseAction {
 class SellShopPlaceListener implements InventoryRunnable {
     @Override
     public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
+        if(!ServerSellShop.isLegalSlot(context.getSlot())) return;
+        context.setCancelEvent(false);
     }
 }
 
@@ -70,7 +81,13 @@ class SellShopInfoOption implements CordedInventoryOption {
 
     @Override
     public void place(FtcInventory inventory, CrownUser user) {
-
+        inventory.setItem(
+                getSlot(),
+                new ItemStackBuilder(Material.KNOWLEDGE_BOOK, 1)
+                        .setName(Component.text("Material info").style(nonItalic(NamedTextColor.GOLD)))
+                        .addLore(Component.text("See what you can and can't sell").style(nonItalic(NamedTextColor.YELLOW)))
+                        .build()
+        );
     }
 
     @Override
@@ -87,11 +104,16 @@ class SellAllOption implements CordedInventoryOption {
 
     @Override
     public void place(FtcInventory inventory, CrownUser user) {
-
+        inventory.setItem(
+                getPos(),
+                new ItemStackBuilder(Material.GREEN_CONCRETE)
+                        .setName(Component.text("Sell all").style(nonItalic(NamedTextColor.AQUA)))
+                        .addLore(Component.text("Sell all materials in the inventory.").style(nonItalic(NamedTextColor.WHITE)))
+                        .build()
+        );
     }
 
     @Override
     public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
-
     }
 }

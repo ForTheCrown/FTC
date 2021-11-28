@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.guild.GuildVoter;
 import net.forthecrown.economy.guild.VoteState;
@@ -49,7 +49,7 @@ public class House implements
 
     public House(String name) {
         this.name = name;
-        this.key = Crown.coreKey("house_" + name.toLowerCase().replaceAll(" ", "_"));
+        this.key = Keys.ftc("house_" + name.toLowerCase().replaceAll(" ", "_"));
     }
 
     public Relation getRelationWith(House house) {

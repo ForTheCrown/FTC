@@ -5,6 +5,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
@@ -13,8 +14,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionRemoveNumber implements UsageAction<ActionRemoveNumber.ActionInstance> {
-    public static final Key BAL_KEY = Key.key(Crown.inst(), "remove_balance");
-    public static final Key GEM_KEY = Key.key(Crown.inst(), "remove_gems");
+    public static final Key BAL_KEY = Keys.ftc("remove_balance");
+    public static final Key GEM_KEY = Keys.ftc("remove_gems");
 
     private final boolean fromBal;
 

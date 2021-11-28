@@ -2,6 +2,7 @@ package net.forthecrown.commands.regions;
 
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -44,15 +45,23 @@ public class CommandInvite extends FtcCommand {
                             CrownUser user = getUserSender(c);
                             Collection<CrownUser> users = UserArgument.getUsers(c, "users");
 
-                            users.remove(user);
-                            if(users.isEmpty()) throw UserArgument.NO_USERS_FOUND.create();
+                            boolean selfRemoved = users.remove(user);
+                            if(users.isEmpty()) {
+                                if(selfRemoved) throw FtcExceptionProvider.translatable("commands.cannotInviteSelf");
+                                throw UserArgument.NO_USERS_FOUND.create();
+                            }
                             UserActionHandler handler = Crown.getUserManager().getActionHandler();
 
+                            byte inviteCount = 0;
                             //Invite all of them
                             for (CrownUser u: users) {
+                                if(u.getInteractions().hasBeenInvited(user.getUniqueId())) continue;
+
+                                inviteCount++;
                                 handler.handle(new InviteToRegion(user, u));
                             }
 
+                            if(inviteCount < 1) throw FtcExceptionProvider.translatable("commands.invite.notAgain");
                             return 0;
                         })
                 );

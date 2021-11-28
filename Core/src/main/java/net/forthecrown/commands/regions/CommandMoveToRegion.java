@@ -15,7 +15,7 @@ public class CommandMoveToRegion extends FtcCommand {
     public CommandMoveToRegion() {
         super("movetoregion");
 
-        setAliases("sendtoregion");
+        setAliases("sendtoregion", "sendregion");
         setPermission(Permissions.REGIONS_ADMIN);
 
         register();

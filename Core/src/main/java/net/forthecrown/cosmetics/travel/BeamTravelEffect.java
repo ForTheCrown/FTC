@@ -1,8 +1,7 @@
 package net.forthecrown.cosmetics.travel;
 
-import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
+
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.inventory.builder.InventoryPos;
@@ -17,7 +16,7 @@ public class BeamTravelEffect extends TravelEffect {
 
     // Simple rocket-like particles when going up, nothing more.
     BeamTravelEffect() {
-        super("Beam", new InventoryPos(2, 1),
+        super("Beam", new InventoryPos(3, 1),
                 Component.text("idk what to put "),
                 Component.text("here yet.")
         );
@@ -72,13 +71,14 @@ public class BeamTravelEffect extends TravelEffect {
         counters.put(id, 0); // Use uuid to track duration per user.
         new BukkitRunnable() {
             public void run() {
-                if (counters.containsKey(id) && counters.getOrDefault(id, 99999) < duration) {
+                int got = counters.getInt(id);
+                if (got < duration) {
                     summonBeam(loc, 1024);
-                    counters.replace(id, counters.get(id) + 1);
+                    counters.put(id, got + 1);
                 }
                 else {
-                    this.cancel();
-                    counters.remove(id, counters.getOrDefault(id, 99999));
+                    cancel();
+                    counters.removeInt(id);
                 }
             }
         }.runTaskTimer(Crown.inst(), 0, 1);

@@ -2,6 +2,7 @@ package net.forthecrown.dungeons.bosses;
 
 import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.utils.CrownRandom;
@@ -58,7 +59,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
         this.requiredToSpawn = ImmutableList.copyOf(requiredItems);
         this.updaterDelay = updaterDelay;
 
-        key = Crown.coreKey(name.toLowerCase().replaceAll(" ", "_"));
+        key = Keys.ftc(name.toLowerCase().replaceAll(" ", "_"));
     }
 
     protected abstract T onSummon(BossFightContext context);

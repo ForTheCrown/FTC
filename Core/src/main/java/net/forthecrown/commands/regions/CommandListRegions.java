@@ -54,7 +54,7 @@ public class CommandListRegions extends FtcCommand {
                     while (iterator.hasNext()) {
                         PopulationRegion r = iterator.next();
 
-                        builder.append(r.displayName().color(NamedTextColor.AQUA));
+                        builder.append(r.displayName().colorIfAbsent(NamedTextColor.AQUA));
 
                         if(iterator.hasNext()) builder.append(Component.text(", "));
                     }

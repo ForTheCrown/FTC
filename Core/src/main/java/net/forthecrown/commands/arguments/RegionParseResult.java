@@ -53,9 +53,12 @@ public class RegionParseResult {
             if(homeCords == null) throw RegionArgument.NO_HOME.create(user.nickDisplayName());
 
             region = Crown.getRegionManager().get(homeCords);
+            if(region.hasName()) return region;
 
             //Check if source can access the region
             if(source.isPlayer() && checkInvite && !source.hasPermission(Permissions.REGIONS_ADMIN)) {
+                if(source.textName().equals(user.getName())) return region;
+
                 CrownUser sourceUser = UserManager.getUser(source.asPlayer());
 
                 //If source is not allowed to access the region

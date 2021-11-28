@@ -1,12 +1,10 @@
 package net.forthecrown.user.packets.listeners;
 
-import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.packets.PacketContext;
 import net.forthecrown.user.packets.PacketListener;
 import net.forthecrown.utils.math.WorldVec3i;
-import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 
@@ -30,13 +28,13 @@ public class SignRenderPacketListener implements PacketListener<ClientboundBlock
         );
 
         /*SignShop shop = Crown.getShopManager().getShop(pos2);
-        if(shop == null) return;*/
+        if(shop == null) return;
 
-        Component priceLine = user.nickDisplayName();
+        Component priceLine = shop.getPriceLineFor(user);
         String priceLineJson = ChatUtils.GSON.serialize(priceLine);
 
         tag.putString("Text4", priceLineJson);
-        if(tag.contains("FilteredText4")) tag.putString("FilteredText4", priceLineJson);
+        if(tag.contains("FilteredText4")) tag.putString("FilteredText4", priceLineJson);*/
     }
 
     static boolean isShopTag(CompoundTag tag) {

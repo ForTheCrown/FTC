@@ -7,13 +7,18 @@ import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.FtcBoundingBox;
 import net.forthecrown.utils.math.MathUtil;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.bukkit.HeightMap;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
+import org.bukkit.persistence.PersistentDataType;
 
 import static net.forthecrown.regions.RegionConstants.DISTANCE_TO_POLE;
 
@@ -26,23 +31,44 @@ public final class RegionUtil {
      * @return The bounding box
      */
     public static BoundingBox poleBoundingBox(PopulationRegion region) {
-        BlockVector2 cords = region.getPolePosition();
-        int y = region.getWorld().getHighestBlockYAt(cords.getX(), cords.getZ());
-
-        WorldVec3i p = findBottomOfPole(new WorldVec3i(region.getWorld(), cords.getX(), y, cords.getZ()));
+        WorldVec3i p = bottomOfPole(region.getWorld(), region.getPolePosition());
 
         return new BoundingBox(p.x - 2, p.y, p.z-2, p.x + 2, p.y + 5, p.z + 2);
     }
 
-    public static WorldVec3i findBottomOfPole(WorldVec3i p) {
-        Material mat = p.getMaterial();
+    private static WorldVec3i findBottom(WorldVec3i p) {
+        if(p.getY() < FtcUtils.MIN_Y) return null;
+
+        Block b = p.getBlock();
+        if(b.getType() != Material.OAK_SIGN) return findBottom(p.below());
+        Sign sign = (Sign) b.getState();
+
+        if(sign.getPersistentDataContainer().has(RegionPoleGenerator.TOP_SIGN_KEY, PersistentDataType.BYTE)) {
+            return p.below(4);
+        }
+
+        return findBottom(p.below());
+    }
+
+    public static WorldVec3i findBottomLazy(WorldVec3i vec3i) {
+        Material mat = vec3i.getMaterial();
+
+        if(mat.isAir()) return findBottomLazy(vec3i.below());
 
         return switch (mat) {
-            case OAK_SIGN -> p.subtract(0, 4, 0);
-            case SEA_LANTERN -> p.subtract(0, 3, 0);
-            case GLOWSTONE -> findBottomOfPole(p.below());
-            default -> p;
+            case OAK_SIGN -> vec3i.subtract(0, 4, 0);
+            case SEA_LANTERN -> vec3i.subtract(0, 3, 0);
+            case GLOWSTONE -> findBottomLazy(vec3i.below());
+            default -> vec3i;
         };
+    }
+
+    public static WorldVec3i bottomOfPole(World world, BlockVector2 vec2) {
+        int y = world.getHighestBlockYAt(vec2.getX(), vec2.getZ(), HeightMap.WORLD_SURFACE);
+        WorldVec3i vec3i = new WorldVec3i(world, vec2.getX(), y, vec2.getZ());
+        WorldVec3i result = findBottom(vec3i.clone());
+
+        return result == null ? findBottomLazy(vec3i.clone()) : result;
     }
 
     public static boolean isValidPolePosition(PopulationRegion region, BlockVector2 vec) {

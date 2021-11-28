@@ -21,7 +21,7 @@ import net.forthecrown.registry.Registry;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
-import net.forthecrown.utils.animation.BlockAnimation;
+import net.forthecrown.core.animation.BlockAnimation;
 import org.bukkit.NamespacedKey;
 
 import java.util.concurrent.CompletableFuture;

@@ -1,5 +1,6 @@
 package net.forthecrown.useables;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.Location;
@@ -9,13 +10,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class FtcUsablesManager implements UsablesManager {
-    final Map<WorldVec3i, UsableBlock> signs = new HashMap<>();
-    final Map<UUID, UsableEntity> entities = new HashMap<>();
+    final Map<WorldVec3i, UsableBlock> signs = new Object2ObjectOpenHashMap<>();
+    final Map<UUID, UsableEntity> entities = new Object2ObjectOpenHashMap<>();
 
     @Override
     public UsableBlock getBlock(Location l){

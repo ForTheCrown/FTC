@@ -169,6 +169,11 @@ public class FtcSignShop implements SignShop {
     }
 
     @Override
+    public int getPrice(ShopCustomer customer) {
+        return getPrice();
+    }
+
+    @Override
     public Component getPriceLineFor(CrownUser user) {
         return Crown.getShopManager().getPriceLine(getPrice());
     }

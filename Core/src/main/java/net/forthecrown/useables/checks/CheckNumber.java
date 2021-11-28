@@ -5,6 +5,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.manager.UserManager;
@@ -17,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public class CheckNumber implements UsageCheck<CheckNumber.CheckInstance> {
-    public static final Key BAL_KEY = Key.key(Crown.inst(), "required_balance");
-    public static final Key GEM_KEY = Key.key(Crown.inst(), "required_gems");
+    public static final Key BAL_KEY = Keys.ftc("required_balance");
+    public static final Key GEM_KEY = Keys.ftc("required_gems");
 
     private final boolean checkBal;
 

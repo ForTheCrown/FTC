@@ -36,11 +36,11 @@ public interface CrownRank {
 
         @Override
         public void apply(ItemStack item, RoyalCrown crown, ItemMeta meta) {
+            meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 5, true);
+
             if(enchantRank > 0) {
-                meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, enchantRank, true);
                 meta.addEnchant(Enchantment.PROTECTION_PROJECTILE, enchantRank, true);
                 meta.addEnchant(Enchantment.PROTECTION_EXPLOSIONS, enchantRank, true);
-                meta.addEnchant(Enchantment.PROTECTION_FALL, enchantRank, true);
                 meta.addEnchant(Enchantment.PROTECTION_FIRE, enchantRank, true);
             }
 

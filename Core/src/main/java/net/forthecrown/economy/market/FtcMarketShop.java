@@ -10,18 +10,18 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Worlds;
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
-import net.forthecrown.utils.Worlds;
 import net.forthecrown.utils.math.Vector3i;
+import net.kyori.adventure.inventory.Book;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -116,6 +116,11 @@ public class FtcMarketShop implements MarketShop {
     }
 
     @Override
+    public Book getPurchaseBook() {
+        return null;
+    }
+
+    @Override
     public UUID getOwner() {
         return owner;
     }
@@ -123,6 +128,8 @@ public class FtcMarketShop implements MarketShop {
     @Override
     public void setOwner(UUID uuid) {
         this.owner = uuid;
+
+        Announcer.debug("owner set: " + owner);
     }
 
     @Override
@@ -151,15 +158,15 @@ public class FtcMarketShop implements MarketShop {
         if(hasOwner()) {
             JsonWrapper ownership = JsonWrapper.empty();
 
-            ownership.addUUID("owner", owner);
-            ownership.add("dateOfPurchase", dateOfPurchase.toString());
+            ownership.addUUID("owner", getOwner());
+            ownership.addDate("dateOfPurchase", getDateOfPurchase());
 
             if(mergedName != null) {
                 ownership.add("merged", mergedName);
             }
 
-            if(!ListUtils.isNullOrEmpty(coOwners)) {
-                ownership.addList("coOwners", coOwners, JsonUtils::writeUUID);
+            if(!ListUtils.isNullOrEmpty(getCoOwners())) {
+                ownership.addList("coOwners", getCoOwners(), JsonUtils::writeUUID);
             }
 
             json.add("ownershipData", ownership);
@@ -197,12 +204,7 @@ public class FtcMarketShop implements MarketShop {
             JsonWrapper ownership = json.getWrapped("ownershipData");
 
             market.owner = ownership.getUUID("owner");
-
-            try {
-                market.dateOfPurchase = DateFormat.getDateInstance().parse(json.getString("dateOfPurchase"));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            market.dateOfPurchase = json.getDate("dateOfPurchase");
 
             if(ownership.has("coOwners")) {
                 market.coOwners.addAll(ownership.getList("coOwners", JsonUtils::readUUID));

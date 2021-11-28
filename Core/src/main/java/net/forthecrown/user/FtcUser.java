@@ -12,6 +12,7 @@ import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.JoinInfo;
+import net.forthecrown.core.chat.ProfilePrinter;
 import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.cosmetics.PlayerRidingManager;
 import net.forthecrown.economy.selling.UserSellResult;
@@ -26,7 +27,7 @@ import net.forthecrown.user.data.*;
 import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
@@ -675,6 +676,7 @@ public class FtcUser implements CrownUser {
 
         interactions.clearIncoming();
         interactions.clearOutgoing();
+        interactions.clearInvites();
         marketOwnership.clearIncoming();
 
         if(lastTeleport != null) lastTeleport.interrupt(false);

@@ -1,7 +1,7 @@
 package net.forthecrown.events;
 
 import net.forthecrown.core.MiniGameRegion;
-import net.forthecrown.commands.CommandVolleyBall;
+import net.forthecrown.commands.admin.CommandVolleyBall;
 import org.bukkit.entity.Chicken;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -269,15 +269,11 @@ public interface FtcFormatter {
         int gStep = (end.green() - start.green()) / length;
         int bStep = (end.blue() - start.blue()) / length;
 
-        TextComponent.Builder builder = Component.text();
+        TextComponent.Builder builder = Component.text()
+                .append(Component.text(chars[0]).color(start));
 
         //Create text
-        for (int i = 0; i < length; i++) {
-            if(i == length - 1) { //Ensure last letter has the end color
-                builder.append(Component.text(chars[i]).color(end));
-                break;
-            }
-
+        for (int i = 1; i < length - 1; i++) {
             int r = start.red() + (i * rStep);
             int g = start.green() + (i * gStep);
             int b = start.blue() + (i * bStep);
@@ -285,7 +281,9 @@ public interface FtcFormatter {
             builder.append(Component.text(chars[i]).color(TextColor.color(r, g, b)));
         }
 
-        return builder.build();
+        return builder
+                .append(Component.text(chars[length - 1]).color(end))
+                .build();
     }
 
     /**

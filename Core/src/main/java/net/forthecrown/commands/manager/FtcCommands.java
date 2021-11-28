@@ -2,9 +2,11 @@ package net.forthecrown.commands.manager;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.forthecrown.commands.*;
+import net.forthecrown.commands.admin.*;
 import net.forthecrown.commands.arguments.*;
 import net.forthecrown.commands.click.CommandClickableText;
 import net.forthecrown.commands.clickevent.ClickEventCommand;
+import net.forthecrown.commands.economy.*;
 import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.help.*;
 import net.forthecrown.commands.markets.*;
@@ -130,7 +132,7 @@ public final class FtcCommands {
         new CommandList();
         new CommandMe();
         new CommandVolleyBall();
-        new CommandParrot();
+        //new CommandParrot();
         new CommandCosmetics();
         new CommandClickableText();
 

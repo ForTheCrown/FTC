@@ -1,6 +1,6 @@
 package net.forthecrown.economy.shops;
 
-import org.bukkit.inventory.Inventory;
+import net.forthecrown.inventory.FtcInventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * <p></p>
  * Implementation: {@link FtcShopInventory}
  */
-public interface ShopInventory extends Inventory {
+public interface ShopInventory extends FtcInventory {
     /**
      * Gets if the shop is full or not
      * @return Whether the shop is full or not, aka, if there's more than 27 ItemStacks

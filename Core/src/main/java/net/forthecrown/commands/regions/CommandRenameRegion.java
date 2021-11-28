@@ -38,6 +38,8 @@ public class CommandRenameRegion extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("name", StringArgumentType.word())
+                        .suggests(suggestMatching("-clear"))
+
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
                             RegionUtil.validateWorld(user.getWorld());
@@ -47,9 +49,14 @@ public class CommandRenameRegion extends FtcCommand {
                             RegionManager manager = Crown.getRegionManager();
                             PopulationRegion region = manager.get(user.getRegionCords());
 
-                            manager.rename(region, name);
+                            if(name.equals("-clear")) {
+                                manager.rename(region, null);
+                                c.getSource().sendAdmin("Removed name of region " + name);
+                            } else {
+                                manager.rename(region, name);
+                                c.getSource().sendAdmin("Set name of region to " + name);
+                            }
 
-                            c.getSource().sendAdmin("Set name of region to " + name);
                             return 0;
                         })
                 );

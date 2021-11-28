@@ -12,7 +12,7 @@ import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;

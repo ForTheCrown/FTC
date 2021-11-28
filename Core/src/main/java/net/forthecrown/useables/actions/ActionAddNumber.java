@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.manager.UserManager;
@@ -12,8 +13,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstance> {
-    public static final Key GEM_KEY = Crown.coreKey("add_gems");
-    public static final Key BAL_KEY = Crown.coreKey("add_bal");
+    public static final Key GEM_KEY = Keys.ftc("add_gems");
+    public static final Key BAL_KEY = Keys.ftc("add_bal");
 
     private final boolean toBal;
 

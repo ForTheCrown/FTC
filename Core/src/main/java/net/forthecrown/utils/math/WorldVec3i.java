@@ -104,4 +104,9 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
 
         return json;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + '{' + world.getName() + ' ' + x + ' ' + y + ' ' + z + '}';
+    }
 }

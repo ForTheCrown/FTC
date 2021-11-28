@@ -3,7 +3,7 @@ package net.forthecrown.useables.checks;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.scoreboard.ObjectiveArgument;
 import net.forthecrown.serializer.JsonWrapper;
@@ -16,7 +16,7 @@ import org.bukkit.scoreboard.Score;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckHasScore implements UsageCheck<CheckHasScore.CheckInstance> {
-    private static final Key KEY = Crown.coreKey("has_score");
+    private static final Key KEY = Keys.ftc("has_score");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

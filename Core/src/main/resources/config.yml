@@ -1,45 +1,6 @@
 Prefix: '&6[FTC]&r '
 Discord: 'Join our discord server:&b https://discord.gg/wXjHNdp'
-StartRhines: 100
-BaronPrice: 500000
-MaxMoneyAmount: 50000000
-UserDataResetInterval: 5356800000
-BranchSwapCooldown: 172800000
-Taxes: false
-HoppersInOneChunk: 64
-TeleportTickDelay: 60
-TeleportCooldown: 60
-TpaExpiryTime: 2400
-OnJoinKit: 'noobs'
-MaxNickLength: 16
-NearRadius: 200
-AllowOtherPlayerNicks: false
-MarriageStatusCooldown: 259200000
-CrownEventActive: false
-EventScoreIsTimer: false
-MaxBossDifficulty: 5
-MaxShopEarnings: 500000
-HulkSmashPoles: true
-MaxSignShopPrice: 1000000
-RegionWorld: world
-MarketEvictionTime: 259200000
 Day: 1
-
-MiniGameRegion:
-  ChickenLevitation: 5
-  ChickenLevitationTime: 10
-
-Auctions:
-  ExpirationTime: 604800000
-  PickUpTime: 259200000
-
-Pirates:
-  TreasureWorld: world_resource
-  SpecialReward: 25000
-  FinalReward: 50000
-  MaxTreasureItems: 5
-  MaxTreasurePrize: 10000
-  MinTreasurePrize: 50000
 
 ServerSpawn:
   ==: org.bukkit.Location
@@ -49,10 +10,6 @@ ServerSpawn:
   z: 353.5
   pitch: 0
   yaw: 90
-
-Shops:
-  log-admin-purchases: true
-  log-normal-purchases: false
 
 System:
   save-on-disable: true

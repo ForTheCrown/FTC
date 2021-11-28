@@ -8,7 +8,6 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.pirates.Pirates;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.Faction;
 import net.forthecrown.user.data.Pet;
@@ -70,8 +69,6 @@ public class CommandParrot extends FtcCommand {
         parrot.setOwner(player);
         parrot.setSilent(silent);
 
-        Pirates.getParrotTracker().add(player.getUniqueId());
-
         player.setShoulderEntityLeft(parrot);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1.0f);
 
@@ -85,7 +82,6 @@ public class CommandParrot extends FtcCommand {
     private void removeOldParrot(Player player, Parrot parrot) {
         player.setShoulderEntityLeft(null);
         if (parrot != null) {
-            Pirates.getParrotTracker().remove(player.getUniqueId());
             parrot.remove();
         }
     }

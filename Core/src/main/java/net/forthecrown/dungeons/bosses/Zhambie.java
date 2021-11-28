@@ -5,7 +5,7 @@ import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.DungeonUtils;
-import net.forthecrown.utils.Worlds;
+import net.forthecrown.core.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;

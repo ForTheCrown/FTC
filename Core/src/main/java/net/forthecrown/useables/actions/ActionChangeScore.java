@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.scoreboard.ObjectiveArgument;
 import net.forthecrown.serializer.JsonWrapper;
@@ -19,9 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionInstance> {
-    public static final Key ADD_KEY = Key.key(Crown.inst(), "add_score");
-    public static final Key REMOVE_KEY = Key.key(Crown.inst(), "remove_score");
-    public static final Key SET_KEY = Key.key(Crown.inst(), "set_score");
+    public static final Key ADD_KEY = Keys.ftc("add_score");
+    public static final Key REMOVE_KEY = Keys.ftc("remove_score");
+    public static final Key SET_KEY = Keys.ftc("set_score");
 
     private final Action action;
     //private Objective objective;
