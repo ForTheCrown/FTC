@@ -2,6 +2,8 @@ package net.forthecrown.inventory.weapon;
 
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Keys;
+import net.forthecrown.dungeons.Bosses;
+import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
@@ -9,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,6 +80,10 @@ public interface WeaponGoal extends Keyed {
 
     static WeaponGoal endBoss(EntityType type, int goal, int rank) {
         return new EndBossGoal(type, goal, rank);
+    }
+
+    static WeaponGoal dungeonBoss(DungeonBoss<?> boss, int goal, int rank) {
+        return new DungeonBossGoal(boss, goal, rank);
     }
 
     static WeaponGoal damage(int goal, int rank) {
@@ -249,6 +256,37 @@ public interface WeaponGoal extends Keyed {
         @Override
         public Component loreDisplay() {
             return Component.text("Dealt damage");
+        }
+    }
+
+    class DungeonBossGoal implements WeaponKillGoal {
+        private final Key key;
+        private final int rank, goal;
+        private final DungeonBoss<?> boss;
+
+        public DungeonBossGoal(DungeonBoss<?> boss, int goal, int rank) {
+            this.rank = rank;
+            this.goal = goal;
+            this.boss = boss;
+
+            this.key = Keys.ftc("goal_kill_" + boss.getName().toLowerCase().replaceAll(" ", "_"));
+        }
+        @Override
+        public int getGoal() { return goal; }
+
+        @Override
+        public int getRank() { return rank; }
+
+        @Override
+        public @NotNull Key key() { return key; }
+
+        @Override
+        public Component loreDisplay() { return Component.text("Kill " + boss.getName()); }
+
+        @Override
+        public boolean test(Entity entity) {
+            return entity.getPersistentDataContainer().has(Bosses.BOSS_TAG, PersistentDataType.BYTE)
+                    && entity.getType() == boss.getBossEntity().getType();
         }
     }
 }

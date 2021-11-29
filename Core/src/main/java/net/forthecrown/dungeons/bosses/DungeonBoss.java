@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.dungeons.BossFightContext;
+import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
@@ -31,6 +32,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.loot.LootTables;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +42,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
 
     protected static final CrownRandom random = new CrownRandom();
 
+    protected final String name;
     protected final Location spawnLocation;
     protected final FtcBoundingBox bossRoom;
     protected final ImmutableList<ItemStack> requiredToSpawn;
@@ -54,6 +57,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
     protected BossFightContext context;
 
     protected DungeonBoss(String name, Location spawnLocation, short updaterDelay, FtcBoundingBox bossRoom, Collection<ItemStack> requiredItems){
+        this.name = name;
         this.spawnLocation = spawnLocation;
         this.bossRoom = bossRoom;
         this.requiredToSpawn = ImmutableList.copyOf(requiredItems);
@@ -78,6 +82,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
         //Summon boss with context and create bossbar
         context = new BossFightContext(this);
         bossEntity = onSummon(context);
+        bossEntity.getPersistentDataContainer().set(Bosses.BOSS_TAG, PersistentDataType.BYTE, (byte) 1);
         bossEntity.setLootTable(LootTables.EMPTY.getLootTable());
 
         createBossbar(context);
@@ -132,6 +137,8 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
     private void updateBossbar(){
         bossBar.setProgress(bossEntity.getHealth() / (bossEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
     }
+
+    public String getName() { return name; }
 
     public BossFightContext getContext() {
         return context;

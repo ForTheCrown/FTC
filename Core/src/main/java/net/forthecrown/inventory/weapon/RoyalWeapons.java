@@ -3,6 +3,7 @@ package net.forthecrown.inventory.weapon;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbilities;
 import net.forthecrown.registry.Registries;
@@ -94,6 +95,11 @@ public final class RoyalWeapons {
                 "diamonds blinds enemies"
         ));
 
+        register(anyEntity(5000, rank));
+        register(dungeonBoss(Bosses.zhambie(), 1, rank));
+        register(dungeonBoss(Bosses.skalatan(), 1, rank));
+        register(dungeonBoss(Bosses.hideySpidey(), 1, rank));
+
         //Royal
         UPGRADES.put(++rank, reforge(
                 Material.GOLDEN_SWORD,
@@ -123,6 +129,17 @@ public final class RoyalWeapons {
                 "The bearer of this weapon has",
                 "proven themselves to the Crown..."
         ));
+
+        register(anyEntity(25000, ++rank));
+
+        register(simple(EntityType.WANDERING_TRADER, 20, ++rank));
+
+        ++rank;
+        register(simple(EntityType.RAVAGER, 50, rank));
+        register(simple(EntityType.EVOKER, 50, rank));
+        register(simple(EntityType.WITCH, 50, rank));
+        register(simple(EntityType.PILLAGER, 250, rank));
+        register(simple(EntityType.VINDICATOR, 250, rank));
 
         //Endless dragon stuf
         for (int i = rank; i < MAX_RANK; i++) {
