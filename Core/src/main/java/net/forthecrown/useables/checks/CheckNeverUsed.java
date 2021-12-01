@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public class CheckNeverUsed implements UsageCheck<CheckNeverUsed.CheckInstance> {
-    public static final Key KEY = Keys.ftc("never_used");
+    public static final Key KEY = Keys.ftccore("never_used");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

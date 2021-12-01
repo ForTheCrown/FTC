@@ -1,7 +1,9 @@
 package net.forthecrown.inventory.weapon;
 
+import net.forthecrown.commands.emotes.EmoteSmooch;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Keys;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.kyori.adventure.key.Key;
@@ -101,6 +103,40 @@ public interface WeaponGoal extends Keyed {
         }
     }
 
+    class DonatorWeaponGoal implements WeaponGoal {
+        private final int rank;
+        private final Key key = Keys.ftccore("goal_donator");
+
+        public DonatorWeaponGoal(int rank) {
+            this.rank = rank;
+        }
+
+        @Override
+        public int getGoal() {
+            return 1;
+        }
+
+        @Override
+        public int getRank() {
+            return rank;
+        }
+
+        @Override
+        public boolean test(WeaponUseContext event) {
+            return event.player.hasPermission(Permissions.DONATOR_1);
+        }
+
+        @Override
+        public @NotNull Key key() {
+            return key;
+        }
+
+        @Override
+        public Component loreDisplay() {
+            return Component.text("Bought Tier-1 Donator ").append(EmoteSmooch.HEART);
+        }
+    }
+
     class ChargedCreeperGoal implements WeaponKillGoal {
         private final Key key;
         private final int rank, goal;
@@ -108,7 +144,7 @@ public interface WeaponGoal extends Keyed {
         public ChargedCreeperGoal(int goal, int rank) {
             this.rank = rank;
             this.goal = goal;
-            this.key = Keys.ftc("goal_charged_creeper");
+            this.key = Keys.ftccore("goal_charged_creeper");
         }
 
         @Override
@@ -149,7 +185,7 @@ public interface WeaponGoal extends Keyed {
             this.goal = goal;
             this.type = type;
             this.rank = rank;
-            this.key = Keys.ftc("goal_" + (type == null ? "any" : type.name().toLowerCase()));
+            this.key = Keys.ftccore("goal_" + (type == null ? "any" : type.name().toLowerCase()));
         }
 
         @Override
@@ -188,7 +224,7 @@ public interface WeaponGoal extends Keyed {
             this.rank = rank;
             this.type = type;
 
-            this.key = Keys.ftc("goal_boss_" + type.name().toLowerCase() + '_' + rank);
+            this.key = Keys.ftccore("goal_boss_" + type.name().toLowerCase() + '_' + rank);
         }
 
         @Override
@@ -225,7 +261,7 @@ public interface WeaponGoal extends Keyed {
             this.rank = rank;
             this.goal = goal;
 
-            this.key = Keys.ftc("goal_damage_" + rank);
+            this.key = Keys.ftccore("goal_damage_" + rank);
         }
 
         @Override
@@ -269,7 +305,7 @@ public interface WeaponGoal extends Keyed {
             this.goal = goal;
             this.boss = boss;
 
-            this.key = Keys.ftc("goal_kill_" + boss.getName().toLowerCase().replaceAll(" ", "_"));
+            this.key = Keys.ftccore("goal_kill_" + boss.getName().toLowerCase().replaceAll(" ", "_"));
         }
         @Override
         public int getGoal() { return goal; }

@@ -13,8 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionItem implements UsageAction<ActionItem.ActionInstance> {
-    public static final Key ADD_KEY = Keys.ftc("give_item");
-    public static final Key REMOVE_KEY = Keys.ftc("remove_item");
+    public static final Key ADD_KEY = Keys.ftccore("give_item");
+    public static final Key REMOVE_KEY = Keys.ftccore("remove_item");
 
     private final boolean add;
 

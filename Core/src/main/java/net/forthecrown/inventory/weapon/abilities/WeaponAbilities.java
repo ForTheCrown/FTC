@@ -7,7 +7,6 @@ public final class WeaponAbilities {
     private WeaponAbilities() {}
 
     public static void init() {
-        register(new PoofWeaponAbility());
 
         Crown.logger().info("WeaponAbilities initialized");
     }

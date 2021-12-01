@@ -230,7 +230,7 @@ public class RoyalSword extends RankedItem {
 
             //If we did, increment goal count by the amount stated in ComVar
             int newVal = e.getIntValue() + e.getKey().getIncrementAmount(context);
-            goalsAndProgress.put(e.getKey(), newVal);
+            goalsAndProgress.put(e.getKey(), Math.min(e.getKey().getGoal(), newVal));
         }
 
         if(ability != null) ability.onWeaponUse(context);
@@ -298,10 +298,6 @@ public class RoyalSword extends RankedItem {
 
         for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {
             if(e.getIntValue() < e.getKey().getGoal()) return false;
-        }
-
-        if(!getOwnerUser().hasPermission(Permissions.DONATOR_1) && item.getType() == RoyalWeapons.NON_DONATOR_LIMIT_MAT) {
-            return false;
         }
 
         return true;

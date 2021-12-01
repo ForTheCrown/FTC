@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckBranch implements UsageCheck<CheckBranch.CheckInstance> {
-    public static final Key KEY = Keys.ftc("required_branch");
+    public static final Key KEY = Keys.ftccore("required_branch");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

@@ -19,9 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionInstance> {
-    public static final Key ADD_KEY = Keys.ftc("add_score");
-    public static final Key REMOVE_KEY = Keys.ftc("remove_score");
-    public static final Key SET_KEY = Keys.ftc("set_score");
+    public static final Key ADD_KEY = Keys.ftccore("add_score");
+    public static final Key REMOVE_KEY = Keys.ftccore("remove_score");
+    public static final Key SET_KEY = Keys.ftccore("set_score");
 
     private final Action action;
     //private Objective objective;

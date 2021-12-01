@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public class CheckNumber implements UsageCheck<CheckNumber.CheckInstance> {
-    public static final Key BAL_KEY = Keys.ftc("required_balance");
-    public static final Key GEM_KEY = Keys.ftc("required_gems");
+    public static final Key BAL_KEY = Keys.ftccore("required_balance");
+    public static final Key GEM_KEY = Keys.ftccore("required_gems");
 
     private final boolean checkBal;
 

@@ -19,7 +19,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class CheckNotUsedBefore implements UsageCheck<CheckNotUsedBefore.CheckInstance> {
-    public static final Key KEY = Keys.ftc("not_used_before");
+    public static final Key KEY = Keys.ftccore("not_used_before");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

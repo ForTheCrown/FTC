@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance> {
-    public static final Key KEY = Keys.ftc("teleport_user");
+    public static final Key KEY = Keys.ftccore("teleport_user");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

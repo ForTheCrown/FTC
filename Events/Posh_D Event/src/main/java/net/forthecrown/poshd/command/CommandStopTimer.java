@@ -1,6 +1,5 @@
 package net.forthecrown.poshd.command;
 
-import net.forthecrown.crown.CrownEventUtils;
 import net.forthecrown.crown.EventTimer;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -20,7 +19,6 @@ public class CommandStopTimer extends AbstractCommand {
     public CommandStopTimer() {
         super("StopTimer", Main.inst);
 
-        setPermission("ftc.commands.starttimer");
         register();
     }
 
@@ -59,7 +57,7 @@ public class CommandStopTimer extends AbstractCommand {
 
                                                 Component message;
 
-                                                if(CrownEventUtils.isNewRecord(score, scoreVal)) {
+                                                if(Main.isBetterScore(score, scoreVal)) {
                                                     score.setScore(scoreVal);
 
                                                     message = Messages.timerRecord(timer);

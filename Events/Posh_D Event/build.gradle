@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation files('/libs/Grenadier.jar')
+    implementation files('/libs/Grenadier-Standalone-1.0-SNAPSHOT-remapped.jar')
     compileOnly files('/libs/Paper.jar')
 }
 

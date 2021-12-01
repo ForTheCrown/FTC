@@ -31,7 +31,7 @@ public abstract class CosmeticEffect implements JsonSerializable, Keyed, CordedI
         this.description = description;
         this.pos = pos;
 
-        key = Keys.ftc(name
+        key = Keys.ftccore(name
                 .toLowerCase()
                 .replaceAll(" ", "_")
                 .replaceAll("'", "")

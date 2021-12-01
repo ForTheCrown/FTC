@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class CheckCooldown implements UsageCheck<CheckCooldown.CheckInstance> {
-    public static final Key KEY = Keys.ftc("cooldown");
+    public static final Key KEY = Keys.ftccore("cooldown");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

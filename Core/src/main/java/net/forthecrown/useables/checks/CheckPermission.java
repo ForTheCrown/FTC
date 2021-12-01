@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckPermission implements UsageCheck<CheckPermission.CheckInstance> {
-    public static final Key KEY = Keys.ftc("required_permission");
+    public static final Key KEY = Keys.ftccore("required_permission");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

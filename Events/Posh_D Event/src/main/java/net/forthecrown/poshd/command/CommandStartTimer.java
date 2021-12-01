@@ -10,14 +10,13 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.poshd.Main;
 import net.forthecrown.poshd.Messages;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class CommandStartTimer extends AbstractCommand {
 
     public CommandStartTimer() {
         super("StartTimer", Main.inst);
-
-        setPermission("ftc.commands.starttimer");
         register();
     }
 
@@ -53,11 +52,10 @@ public class CommandStartTimer extends AbstractCommand {
         return c -> {
             Player player = EntityArgument.getPlayer(c, "player");
             int maxMins = maxMinsGiven ? c.getArgument("maxMins", Integer.class) : 5;
+            Location loc = PositionArgument.getLocation(c, "destination");
 
-            EventTimer timer = new EventTimer(player, Messages.timerFormatter(), plr -> {});
+            EventTimer timer = Main.createTimer(player, plr -> plr.teleport(loc));
             timer.start(maxMins * 60 * 20);
-
-            Main.TIMERS.put(player.getUniqueId(), timer);
 
             player.sendMessage(Messages.timerStart());
             player.teleport(PositionArgument.getLocation(c, "destination"));

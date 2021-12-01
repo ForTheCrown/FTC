@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class CheckNoRiders implements UsageCheckInstance {
-    public static final Key KEY = Keys.ftc("no_riders");
+    public static final Key KEY = Keys.ftccore("no_riders");
 
     @Override
     public @Nullable Component failMessage(Player player) {

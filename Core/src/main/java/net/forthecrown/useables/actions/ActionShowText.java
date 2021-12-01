@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionShowText implements UsageAction<ActionShowText.ActionInstance> {
-    public static final Key KEY = Keys.ftc("show_text");
+    public static final Key KEY = Keys.ftccore("show_text");
     private static final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 
     @Override

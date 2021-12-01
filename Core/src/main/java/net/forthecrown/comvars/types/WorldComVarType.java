@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 public class WorldComVarType implements ComVarType<World> {
-    private final Key key = Keys.ftc("world_type");
+    private final Key key = Keys.ftccore("world_type");
 
     WorldComVarType() {
         Registries.COMVAR_TYPES.register(key, this);

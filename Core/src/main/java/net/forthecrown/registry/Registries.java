@@ -25,7 +25,7 @@ public interface Registries {
     /**
      * A registry of registries, master registry
      */
-    Registry<Registry<?>> MASTER_REGISTRY = new BaseRegistry<>(Keys.ftc("master_registry"));
+    Registry<Registry<?>> MASTER_REGISTRY = new BaseRegistry<>(Keys.ftccore("master_registry"));
 
     Registry<InteractableNPC> NPCS = create("npcs");
     Registry<BlockAnimation> ANIMATIONS = create("animations");

@@ -38,7 +38,7 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
     private boolean check(){
         if(getUser().hasPermission(Permissions.FTC_ADMIN)) return false;
 
-        int max = user.getHighestTierRank().tier.maxHomes;
+        int max = user.getRankTier().maxHomes;
         int current = size();
 
         return max < current;
@@ -64,7 +64,7 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
         if(user.isOp()) return true;
 
         int currentHomes = size();
-        int maxHomes = user.getHighestTierRank().tier.maxHomes;
+        int maxHomes = user.getRankTier().maxHomes;
 
         return currentHomes <= maxHomes;
     }

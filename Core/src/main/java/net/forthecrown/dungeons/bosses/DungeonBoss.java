@@ -63,7 +63,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
         this.requiredToSpawn = ImmutableList.copyOf(requiredItems);
         this.updaterDelay = updaterDelay;
 
-        key = Keys.ftc(name.toLowerCase().replaceAll(" ", "_"));
+        key = Keys.ftccore(name.toLowerCase().replaceAll(" ", "_"));
     }
 
     protected abstract T onSummon(BossFightContext context);

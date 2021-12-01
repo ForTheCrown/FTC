@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class CheckHasitem implements UsageCheck<CheckHasitem.CheckInstance> {
-    public static Key KEY = Keys.ftc("has_item");
+    public static Key KEY = Keys.ftccore("has_item");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

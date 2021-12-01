@@ -1,11 +1,10 @@
 package net.forthecrown.commands;
 
-import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.Crown;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.inventory.RankInventory;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.grenadier.command.BrigadierCommand;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class CommandRank extends FtcCommand {

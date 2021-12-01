@@ -12,7 +12,6 @@ ServerSpawn:
   yaw: 90
 
 System:
-  save-on-disable: true
   save-periodically: true
   save-interval-mins: 60
   run-deleter-on-startup: true

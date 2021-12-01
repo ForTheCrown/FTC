@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class CheckHasAllItems implements UsageCheck<CheckHasAllItems.CheckInstance> {
-    public static final Key KEY = Keys.ftc("has_all_items");
+    public static final Key KEY = Keys.ftccore("has_all_items");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

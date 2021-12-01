@@ -1,12 +1,12 @@
 package net.forthecrown.events.dynamic;
 
 import net.forthecrown.core.CrownException;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.inventory.RankInventory;
-import net.forthecrown.user.data.Faction;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.data.Faction;
 import net.forthecrown.user.data.Rank;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.core.chat.ChatUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

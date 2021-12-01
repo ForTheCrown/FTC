@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class FtcJailManager extends AbstractJsonSerializer implements JailManager {
-    private static final Key KEY = Keys.ftc("jails");
+    private static final Key KEY = Keys.ftccore("jails");
 
     private final Map<Key, Location> jails = new HashMap<>();
     private final Map<Player, JailListener> onlineInJail = new HashMap<>();

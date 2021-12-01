@@ -78,7 +78,7 @@ public final class Main extends JavaPlugin implements Crown {
     static HazelguardTradersGuild   tradersGuild;
     static PeriodicalSaver          saver;
 
-    static LuckPerms luckPerms;
+    static LuckPerms                luckPerms;
 
     @Override
     public void onEnable() {
@@ -112,7 +112,7 @@ public final class Main extends JavaPlugin implements Crown {
 
     @Override
     public void onDisable() {
-        if(getConfig().getBoolean("System.save-on-disable")) Crown.saveFTC();
+        Crown.saveFTC();
 
         Bukkit.getScheduler().cancelTasks(this);
 

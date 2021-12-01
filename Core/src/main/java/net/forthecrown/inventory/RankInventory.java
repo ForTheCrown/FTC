@@ -224,7 +224,7 @@ public final class RankInventory {
         @Override
         public void place(FtcInventory inventory, CrownUser user) {
             ItemStackBuilder item = new ItemStackBuilder(Material.GLOBE_BANNER_PATTERN)
-                    // .setName(title.getDisplayName or something
+                    .setName(title.noEndSpacePrefix().style(nonItalic(NamedTextColor.WHITE)))
                     .addLore(lore);
 
             if (user.getTitle() == title) item.addEnchant(Enchantment.BINDING_CURSE, 1);

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class KeyComVarType implements ComVarType<Key> {
-    private final Key key = Keys.ftc("key_type");
+    private final Key key = Keys.ftccore("key_type");
 
     KeyComVarType() {
         Registries.COMVAR_TYPES.register(key, this);

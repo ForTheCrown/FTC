@@ -7,7 +7,7 @@ import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
-import net.forthecrown.user.data.Rank;
+import net.forthecrown.user.data.RankTier;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
@@ -210,9 +210,9 @@ public interface FtcFormatter {
      * @return The join color.
      */
     static TextColor getJoinColor(CrownUser user){
-        Rank r = user.getHighestTierRank();
+        RankTier r = user.getRankTier();
 
-        if(r.getTier().shouldUseColor()) return r.getTier().color;
+        if(r.shouldUseColor()) return r.color;
         return NamedTextColor.YELLOW;
     }
 
@@ -526,6 +526,10 @@ public interface FtcFormatter {
 
     static Style nonItalic(TextColor color){
         return Style.style(color).decoration(TextDecoration.ITALIC, false);
+    }
+
+    static Style nonItalic() {
+        return Style.style().decoration(TextDecoration.ITALIC, false).build();
     }
 
     /**

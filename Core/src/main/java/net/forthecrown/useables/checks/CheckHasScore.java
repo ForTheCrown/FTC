@@ -16,7 +16,7 @@ import org.bukkit.scoreboard.Score;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckHasScore implements UsageCheck<CheckHasScore.CheckInstance> {
-    private static final Key KEY = Keys.ftc("has_score");
+    private static final Key KEY = Keys.ftccore("has_score");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

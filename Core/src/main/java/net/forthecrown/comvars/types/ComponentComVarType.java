@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
  * A class for the Component com var type
  */
 public class ComponentComVarType implements ComVarType<Component> {
-    private final Key key = Keys.ftc("component_type");
+    private final Key key = Keys.ftccore("component_type");
 
     ComponentComVarType() {
         Registries.COMVAR_TYPES.register(key, this);

@@ -112,6 +112,7 @@ public final class RoyalWeapons {
 
         register(simple(EntityType.SNOWMAN, 100, rank));
         register(simple(EntityType.GHAST, 200, ++rank));
+        register(new WeaponGoal.DonatorWeaponGoal(rank));
         register(new WeaponGoal.ChargedCreeperGoal(25, ++rank));
         register(simple(EntityType.WITHER, 10, ++rank));
 

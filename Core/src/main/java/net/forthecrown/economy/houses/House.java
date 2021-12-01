@@ -49,7 +49,7 @@ public class House implements
 
     public House(String name) {
         this.name = name;
-        this.key = Keys.ftc("house_" + name.toLowerCase().replaceAll(" ", "_"));
+        this.key = Keys.ftccore("house_" + name.toLowerCase().replaceAll(" ", "_"));
     }
 
     public Relation getRelationWith(House house) {
