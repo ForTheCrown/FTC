@@ -11,7 +11,6 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.UserInteractions;
-import net.forthecrown.user.data.Rank;
 import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;

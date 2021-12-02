@@ -8,7 +8,6 @@ import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.data.Rank;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;

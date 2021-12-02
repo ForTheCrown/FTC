@@ -19,8 +19,6 @@ import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.KeyArgument;
 import net.forthecrown.royalgrenadier.arguments.RoyalArgumentsImpl;
-import net.forthecrown.user.data.Faction;
-import net.forthecrown.user.data.Rank;
 import net.forthecrown.user.data.RankTitle;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.TimeArgument;
@@ -82,9 +80,9 @@ public final class FtcCommands {
         new CommandSudo();
         new CommandSetSpawn();
         new CommandRoyals();
-        new CommandCosmeticEffects();
 
         //Admin utility
+        new CommandFtcUser();
         new CommandSpeed();
         new CommandItemName();
         new CommandLore();

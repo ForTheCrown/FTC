@@ -23,10 +23,10 @@ public enum Pet implements JsonSerializable {
     BLUE_PARROT (Parrot.Variant.BLUE, NamedTextColor.BLUE, null, 100000,
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjk0YmQzZmNmNGQ0NjM1NGVkZThmZWY3MzEyNmRiY2FiNTJiMzAxYTFjOGMyM2I2Y2RmYzEyZDYxMmI2MWJlYSJ9fX0="
     ),
-    RED_PARROT (Parrot.Variant.RED, NamedTextColor.RED, "ftc.donator2", Rank.CAPTAIN,
+    RED_PARROT (Parrot.Variant.RED, NamedTextColor.RED, "ftc.donator2", RankTitle.CAPTAIN,
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDBhM2Q0N2Y1NGU3MWE1OGJmOGY1N2M1MjUzZmIyZDIxM2Y0ZjU1YmI3OTM0YTE5MTA0YmZiOTRlZGM3NmVhYSJ9fX0="
     ),
-    AQUA_PARROT (Parrot.Variant.CYAN, NamedTextColor.AQUA, "ftc.donator3", Rank.ADMIRAL,
+    AQUA_PARROT (Parrot.Variant.CYAN, NamedTextColor.AQUA, "ftc.donator3", RankTitle.ADMIRAL,
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzI2OGNlMzdiZTg1MDdlZDY3ZTNkNDBiNjE3ZTJkNzJmNjZmOWQyMGIxMDZlZmIwOGU2YmEwNDFmOWI5ZWYxMCJ9fX0="
     );
 
@@ -35,10 +35,10 @@ public enum Pet implements JsonSerializable {
     private final String permission;
     private final String texture;
 
-    private final Rank required;
+    private final RankTitle required;
     private final int requiredBal;
 
-    Pet(Parrot.Variant variant, TextColor color, String permission, Rank required, String texture){
+    Pet(Parrot.Variant variant, TextColor color, String permission, RankTitle required, String texture){
         this.variant = variant;
         this.name = Component.text(FtcFormatter.normalEnum(this)).color(color);
         this.permission = permission;
@@ -97,7 +97,7 @@ public enum Pet implements JsonSerializable {
         return requiredBal;
     }
 
-    public Rank getRequiredRank() {
+    public RankTitle getRequiredRank() {
         return required;
     }
 

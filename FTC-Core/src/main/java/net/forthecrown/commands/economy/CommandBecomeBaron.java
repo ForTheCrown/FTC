@@ -1,15 +1,14 @@
 package net.forthecrown.commands.economy;
 
+import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.Rank;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.RankTitle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -59,7 +58,7 @@ public class CommandBecomeBaron extends FtcCommand {
                     //Tell em cost and ask for confirmation
                     TextComponent message = Component.text()
                             .append(Crown.prefix())
-                            .append(Component.translatable("commands.becomeBaron.confirm", Rank.BARON.noEndSpacePrefix(), FtcFormatter.rhines(baronPrice).color(NamedTextColor.YELLOW)))
+                            .append(Component.translatable("commands.becomeBaron.confirm", RankTitle.BARON.noEndSpacePrefix(), FtcFormatter.rhines(baronPrice).color(NamedTextColor.YELLOW)))
                             .append(Component.space())
                             .append(Component.translatable("buttons.confirm")
                                     .color(NamedTextColor.GREEN)

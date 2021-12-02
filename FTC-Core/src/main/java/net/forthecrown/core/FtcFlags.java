@@ -6,7 +6,6 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
-import net.forthecrown.utils.FactionFlag;
 import org.bukkit.Location;
 
 /**
@@ -14,9 +13,6 @@ import org.bukkit.Location;
  */
 public final class FtcFlags {
     private FtcFlags() {}
-
-    public static final FactionFlag SHOP_USAGE_FLAG = new FactionFlag("shop-usage");
-    public static final FactionFlag SHOP_OWNERSHIP_FLAG = new FactionFlag("shop-ownership");
 
     public static final StateFlag SHOP_CREATION = new StateFlag("shop-creation", true);
     public static final StateFlag TRAPDOOR_USE = new StateFlag("trapdoor-use", true);
@@ -26,8 +22,6 @@ public final class FtcFlags {
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
 
         try {
-            registry.register(SHOP_OWNERSHIP_FLAG);
-            registry.register(SHOP_USAGE_FLAG);
             registry.register(SHOP_CREATION);
             registry.register(TRAPDOOR_USE);
             registry.register(RIDING_ALLOWED);

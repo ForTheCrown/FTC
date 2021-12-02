@@ -6,14 +6,14 @@ import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.comvars.types.ComVarTypes;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Worlds;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.Rank;
+import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.core.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -177,7 +177,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
         array.add(ser(
                 Component.text("You can get the ")
-                        .append(Rank.KNIGHT.prefix())
+                        .append(RankTitle.KNIGHT.prefix())
                         .append(Component.text("tag and a "))
                         .append(FtcItems.royalSword().getItemMeta().displayName().hoverEvent(FtcItems.royalSword()))
                         .append(Component.text(" for completing the Dungeons."))

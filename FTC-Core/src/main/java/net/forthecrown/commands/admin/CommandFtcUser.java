@@ -12,6 +12,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.cosmetics.CosmeticEffect;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
@@ -32,6 +33,7 @@ public class CommandFtcUser extends FtcCommand {
     public CommandFtcUser() {
         super("FtcUser");
 
+        setPermission(Permissions.FTC_ADMIN);
         register();
     }
 
