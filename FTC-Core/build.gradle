@@ -1,0 +1,141 @@
+import java.time.Month
+import java.time.format.TextStyle
+import java.util.function.Consumer
+
+plugins {
+    id 'java'
+}
+
+group = 'net.forthecrown'
+version = buildVersion()
+
+compileJava.options.encoding = 'UTF-8'
+javadoc.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+
+    maven { url = 'https://papermc.io/repo/repository/maven-public/' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public/' }
+    maven { url = 'https://maven.enginehub.org/repo/' }
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://mvn.intellectualsites.com/content/repositories/releases/' }
+    maven { url = 'https://libraries.minecraft.net' }
+}
+
+dependencies {
+    //DO NO CHANGE VERSIONS, Paper has these exact versions shaded into it
+    compileOnly 'io.netty:netty-all:4.1.68.Final'
+    compileOnly 'io.papermc.paper:paper-api:1.18-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-mojangapi:1.18-R0.1-SNAPSHOT'
+    compileOnly 'org.apache.commons:commons-lang3:3.12.0'
+
+    compileOnly 'com.mojang:brigadier:1.0.18'
+    compileOnly 'com.mojang:authlib:3.2.38'
+    compileOnly 'com.mojang:datafixerupper:4.0.26'
+
+    //Annotations????
+    compileOnly 'org.jetbrains:annotations:19.0.0'
+
+    //LuckPerms and WorldGuard
+    compileOnly 'com.github.lucko:LuckPerms:5.3'
+    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT'
+
+    //Paper, Grenadier, Squire, FAWE
+    libJar('Paper')
+    libJar('Grenadier')
+    libJar('Squire')
+    libJar('FAWE')
+    libJar('DiscordSRV')
+}
+
+void libJar(String s) {
+    dependencies.compileOnly(files('/libs/' + s + '.jar'))
+}
+
+tasks.jar {
+    archiveFileName.set("${project.name}.jar")
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+//Does the building and remapping all in one click of a button. :DDDDD
+tasks.register('remap', Copy) {
+    incrementBuildID()
+
+    it.dependsOn(build)
+    it.from "$buildDir/libs" into "/remapping"
+
+    it.doLast {
+        exec {
+            workingDir '/remapping'
+            commandLine 'cmd', '/c', 'remap.bat'
+        }
+    }
+}
+
+tasks.register('resetBuildID') {
+    resetBuildID()
+}
+
+tasks.register('incrementBuildID') {
+    incrementBuildID()
+}
+
+
+processResources {
+    File pluginYml = new File('build/resources/main/plugin.yml')
+    if(pluginYml.exists()) pluginYml.delete()
+
+    def props = [version: version, buildID : buildID() + "", buildDate : new Date().toString()]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+
+String buildVersion() {
+    Calendar cal = Calendar.getInstance()
+    Month month = Month.values()[cal.get(Calendar.MONTH)]
+    int day = cal.get(Calendar.DAY_OF_MONTH)
+    int year = cal.get(Calendar.YEAR)
+
+    return month.getDisplayName(TextStyle.SHORT, Locale.ROOT).toUpperCase() + '-' + day + '-' + year
+}
+
+int buildID() {
+    int result = 1
+
+    consumeProperties(p -> {
+        result = Integer.parseInt(p.getProperty("buildID"))
+    })
+
+    return result
+}
+
+void incrementBuildID() {
+    consumeProperties(properties -> {
+        int id = Integer.parseInt(properties.getProperty("buildID"))
+        id++
+
+        properties.setProperty("buildID", id + "")
+    });
+}
+
+void resetBuildID() {
+    consumeProperties(p -> p.setProperty("buildID", "1"))
+}
+
+void consumeProperties(Consumer<Properties> propertiesConsumer) {
+    File f = new File('buildver.properties')
+    Properties properties = new Properties()
+    properties.load(new FileReader(f))
+
+    propertiesConsumer.accept(properties)
+
+    properties.save(new FileOutputStream(f), "Saves the last build ID, last edited:")
+}
