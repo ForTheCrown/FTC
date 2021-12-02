@@ -1,9 +1,0 @@
-name: Squire
-main: net.forthecrown.squire.SquireMain
-version: 1.0.0-SNAPSHOT
-load: STARTUP
-api-version: 1.16
-loadbefore:
-  - LuckPerms
-  - Harbor
-  - RoyalGrenadier
