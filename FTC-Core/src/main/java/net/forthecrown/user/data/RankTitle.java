@@ -15,36 +15,33 @@ import static net.forthecrown.user.data.RankTier.*;
 public enum RankTitle implements JsonSerializable {
     DEFAULT         (true,      NONE,      null),
 
-    //Legacy ranks
-    LEGACY_FREE     (false,     FREE,      ""),
-    LEGACY_TIER_1   (false,     TIER_1,    ""),
-    LEGACY_TIER_2   (false,     TIER_2,    ""),
-    LEGACY_TIER_3   (false,     TIER_3,    ""),
-
+    LEGACY_FREE     (false,     FREE,      "&8[&7Legacy&8]"),
     KNIGHT          (true,      FREE,      "&8[&7Knight&8]"),
-    BARON           (true,      FREE,      "&8[&7Baron&8]"),
-    BARONESS        (true,      FREE,      "&8[&7Baroness&8]"),
-    SAILOR          (false,     FREE,      "&8&l{&7Sailor&8&l}"),
-    VIKING          (false,     FREE,      ""),
-    BERSERKER       (false,     FREE,      ""),
+    BARON           (false,     FREE,      "&8[&7Baron&8]"),
+    BARONESS        (false,     FREE,      "&8[&7Baroness&8]"),
+    VIKING          (false,     FREE,      "&8[&7Viking&8]"), // how earn?
+    BERSERKER       (false,     FREE,      "&8[&7Berserker&8]"), // how earn?
 
+    LEGACY_TIER_1   (false,     TIER_1,    "&#959595[&6Legacy&#959595]"),
     LORD            (true,      TIER_1,    "&#959595[&6Lord&#959595]"),
     LADY            (true,      TIER_1,    "&#959595[&6Lady&#959595]"),
-    PIRATE          (false,     TIER_1,    "&8&l{&7Pirate&8&l}"),
-    WARRIOR         (false,     TIER_1,    ""),
-    SHIELD_MAIDEN   (false,     TIER_1,    ""),
+    SAILOR          (false,     TIER_1,    "&#959595[&6Sailor&#959595]"),
+    WARRIOR         (false,     TIER_1,    "&#959595[&6Warrior&#959595]"),
+    SHIELD_MAIDEN   (false,     TIER_1,    "&#959595[&6ShieldMaden&#959595]"),
 
+    LEGACY_TIER_2   (false,     TIER_2,    "&7[&#ffbf15Legacy&7]"),
     DUKE            (true,      TIER_2,    "&7[&#ffbf15Duke&7]"),
     DUCHESS         (true,      TIER_2,    "&7[&#ffbf15Duchess&7]"),
-    CAPTAIN         (false,     TIER_2,    "&7{&6Captain&7}"),
-    ELITE           (false,     TIER_2,    ""),
-    HERSIR          (false,     TIER_2,    ""),
+    CAPTAIN         (false,     TIER_2,    "&7[&#ffbf15Captain&7]"),
+    ELITE           (false,     TIER_2,    "&7[&#ffbf15Elite&7]"),
+    HERSIR          (false,     TIER_2,    "&7[&#ffbf15Hersir&7]"),
 
+    LEGACY_TIER_3   (false,     TIER_3,    "[&#FBFF0FLegacy&f]"),
     PRINCE          (true,      TIER_3,    "[&#FBFF0FPrince&f]"),
     PRINCESS        (true,      TIER_3,    "[&#FBFF0FPrincess&f]"),
-    ADMIRAL         (false,     TIER_3,    "{&eAdmiral&f}"),
-    ROYAL           (false,     TIER_3,    ""),
-    JARL            (false,     TIER_3,    ""),
+    ADMIRAL         (false,     TIER_3,    "[&#FBFF0FAdmiral&f]"),
+    ROYAL           (false,     TIER_3,    "[&#FBFF0FRoyal&f]"),
+    JARL            (false,     TIER_3,    "[&#FBFF0FJarl&f]"),
     LEGEND          (false,     TIER_3,    "&#dfdfdf[&#fff147Legend&#dfdfdf]");
 
     private final boolean defaultTitle;
