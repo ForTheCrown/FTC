@@ -1,7 +1,6 @@
 package net.forthecrown.regions;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import net.forthecrown.core.Crown;
 import net.forthecrown.utils.math.FtcBoundingBox;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
@@ -12,7 +11,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.WallSign;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
 public class FtcRegionPoleGenerator implements RegionPoleGenerator {
@@ -87,7 +85,6 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
         pos.subtract(0, 0, 4).getBlock().setType(Material.CHISELED_STONE_BRICKS, false);
 
         pos.subtract(1, 1, 1).getBlock().getState().update(false, false);
-        bottom.getBlock().setMetadata(RegionConstants.METADATA_KEY, new FixedMetadataValue(Crown.inst(), true));
     }
 
 

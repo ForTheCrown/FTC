@@ -83,9 +83,9 @@ final class FtcBootStrap {
         //Initialize modules
         safeRunnable(CorePacketListeners::init);
         safeRunnable(Houses::init);
+        safeRunnable(Bosses::init);
         safeRunnable(RoyalWeapons::init);
         safeRunnable(Crowns::init);
-        safeRunnable(Bosses::init);
         safeRunnable(Cosmetics::init);
         safeRunnable(UsageChecks::init);
         safeRunnable(UsageActions::init);

@@ -157,22 +157,21 @@ public class CommandKingMaker extends FtcCommand {
         CrownUser king = UserArgument.getUser(c, "player");
 
         CrownUser previous = kingship.getUser();
-        if(previous != null) previous.setCurrentPrefix(null);
+        if(previous != null) {
+            String addGroupCmd = "lp user " + previous.getName() + " parent remove " + ( kingship.isFemale() ? "queen" : "king" );
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), addGroupCmd);
+        }
 
         kingship.set(king.getUniqueId());
         kingship.setFemale(isQueen);
 
         String addGroupCmd = "lp user " + king.getName() + " parent add " + ( isQueen ? "queen" : "king" );
-        Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), addGroupCmd);
-
-        Component prefix = isQueen ? Kingship.queenTitle() : Kingship.kingTitle();
-
-        king.setCurrentPrefix(prefix);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), addGroupCmd);
 
         c.getSource().sendAdmin(
                 king.displayName()
                         .append(Component.text(" is the new "))
-                        .append(prefix)
+                        .append(kingship.getPrefix())
                         .append(Component.text(":D"))
         );
         return 0;

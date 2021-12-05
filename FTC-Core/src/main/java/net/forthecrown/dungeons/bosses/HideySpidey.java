@@ -30,7 +30,7 @@ import java.util.Set;
 
 public class HideySpidey extends DungeonBoss<Spider> {
 
-    private Set<CaveSpider> helpers = new HashSet<>();
+    private final Set<CaveSpider> helpers = new HashSet<>();
 
     public HideySpidey() {
         super("Hidey Spidey", new Location(Worlds.VOID, -78.5, 55, 284.5), (short) 20, DungeonAreas.SPIDEY_ROOM,
@@ -83,7 +83,8 @@ public class HideySpidey extends DungeonBoss<Spider> {
         }
         tillSpawn--;
         if(tillSpawn == 0){
-            if(helpers.size() < 11) spawnHelper(random.nextInt(100) < 50 ? SpawnPart.WEST : SpawnPart.EAST);
+            SpawnPart[] values = SpawnPart.values();
+            if(helpers.size() < 11) spawnHelper(values[RANDOM.intInRange(0, values.length)]);
             tillSpawn = 5;
         }
 
@@ -110,9 +111,8 @@ public class HideySpidey extends DungeonBoss<Spider> {
         helpers.clear();
     }
 
-    public void spawnHelper(SpawnPart part){
+    public void spawnHelper(SpawnPart part) {
         CaveSpider spider = part.spawnLocation.getWorld().spawn(part.spawnLocation, CaveSpider.class, caveSpider -> {
-
             Vector pos = part.spawnLocation.clone().toVector();
             Vector target = SpawnPart.EAST.trackLocation.clone().add(0, 2, 0).toVector();
             Vector velocity = target.subtract(pos);
@@ -122,9 +122,6 @@ public class HideySpidey extends DungeonBoss<Spider> {
             double health = context.getModifier() + 12;
             caveSpider.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
             caveSpider.setHealth(health);
-            caveSpider.setLootTable(LootTables.EMPTY.getLootTable());
-            caveSpider.getPathfinder().findPath(part.trackLocation);
-            caveSpider.getPathfinder().moveTo(part.trackLocation);
             caveSpider.setLootTable(LootTables.EMPTY.getLootTable());
         });
         helpers.add(spider);
@@ -136,7 +133,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
         helpers.remove(event.getEntity());
     }
 
-    public enum SpawnPart{
+    public enum SpawnPart {
         WEST (
                 new Location(Worlds.VOID, -71.5, 55, 284, 0, -90),
                 new Location(Worlds.VOID, -89.5, 57, 284.5)
@@ -148,7 +145,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
 
         public final Location trackLocation;
         public final Location spawnLocation;
-        SpawnPart(Location location, Location spawnLocation){
+        SpawnPart(Location location, Location spawnLocation) {
             this.trackLocation = location;
             this.spawnLocation = spawnLocation;
         }

@@ -2,9 +2,11 @@ package net.forthecrown.commands;
 
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.manager.UserManager;
@@ -57,8 +59,12 @@ public class CommandIgnoreList extends FtcCommand {
                 );
     }
 
-    private int displayIgnored(CommandSource source, CrownUser user){
+    private int displayIgnored(CommandSource source, CrownUser user) throws RoyalCommandException {
         UserInteractions interactions = user.getInteractions();
+
+        if(interactions.getBlockedUsers().isEmpty()) {
+            throw FtcExceptionProvider.translatable("commands.ignoredList.noBlocked");
+        }
 
         TextComponent.Builder builder = Component.text()
                 .append(Component.translatable("commands.ignoredList").color(NamedTextColor.GOLD));

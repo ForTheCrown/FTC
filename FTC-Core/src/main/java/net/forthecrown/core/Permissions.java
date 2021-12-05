@@ -12,118 +12,113 @@ public final class Permissions {
 
     public static final String COMMAND_PREFIX = "ftc.commands.";
 
-    public static final Permission EAVESDROP =          register("ftc.eavesdrop");
-    public static final Permission EAVESDROP_DM =       register("ftc.eavesdrop.dm");
-    public static final Permission EAVESDROP_SIGNS =    register("ftc.eavesdrop.signs");
-    public static final Permission EAVESDROP_ADMIN =    register("ftc.eavesdrop.admin");
-    public static final Permission EAVESDROP_MUTED =    register("ftc.eavesdrop.muted");
-    public static final Permission EAVESDROP_MARRIAGE = register("ftc.eavesdrop.marriage");
+    public static final Permission
+            EAVESDROP               = register("ftc.eavesdrop"),
+            EAVESDROP_DM            = register("ftc.eavesdrop.dm"),
+            EAVESDROP_SIGNS         = register("ftc.eavesdrop.signs"),
+            EAVESDROP_ADMIN         = register("ftc.eavesdrop.admin"),
+            EAVESDROP_MUTED         = register("ftc.eavesdrop.muted"),
+            EAVESDROP_MARRIAGE      = register("ftc.eavesdrop.marriage"),
 
-    public static final Permission HELPER =             register("ftc.helper");
-    public static final Permission POLICE =             register("ftc.police");
+            HELPER                  = register("ftc.helper"),
+            POLICE                  = register("ftc.police"),
+            VANISH                  = register("ftc.vanish"),
+            VANISH_SEE              = register("ftc.vanish.see"),
 
-    public static final Permission MUTE_BYPASS =        register("ftc.mute.bypass");
-    public static final Permission KICK_BYPASS =        register("ftc.kick.bypass");
-    public static final Permission BAN_BYPASS =         register("ftc.ban.bypass");
-    public static final Permission JAIL_BYPASS =        register("ftc.jail.bypass");
+            STAFF_CHAT              = register("ftc.staffchat"),
+            FTC_ADMIN               = register("ftc.admin"),
+            GAMEMODES               = register("ftc.gamemodes"),
+            KING_MAKER              = register("ftc.kingmaker"),
+            IGNORE_CHAT_CASE        = register("ftc.chatcaseignore"),
+            IGNORE_SWEARS           = register("ftc.ignorebannedwords"),
+            BROADCAST               = register("ftc.broadcast"),
 
-    public static final Permission VANISH =             register("ftc.vanish");
-    public static final Permission VANISH_SEE =         register("ftc.vanish.see");
+            SHOP_ADMIN              = register("ftc.shops.admin"),
 
-    public static final Permission STAFF_CHAT =         register("ftc.staffchat");
-    public static final Permission FTC_ADMIN =          register("ftc.admin");
-    public static final Permission GAMEMODES =          register("ftc.gamemodes");
-    public static final Permission KING_MAKER =         register("ftc.kingmaker");
-    public static final Permission IGNORE_CHAT_CASE =   register("ftc.chatcaseignore");
-    public static final Permission IGNORE_SWEARS =      register("ftc.ignorebannedwords");
-    public static final Permission BROADCAST =          register("ftc.broadcast");
+            DONATOR_1               = register("ftc.donator1"),
+            DONATOR_2               = register("ftc.donator2"),
+            DONATOR_3               = register("ftc.donator3"),
 
-    public static final Permission SHOP_ADMIN =         register("ftc.shops.admin");
+            TP_BYPASS               = register("ftc.teleports.bypass"),
+            WORLD_BYPASS            = register("ftc.teleports.worldbypass"),
 
-    public static final Permission DONATOR_1 =          register("ftc.donator1");
-    public static final Permission DONATOR_2 =          register("ftc.donator2");
-    public static final Permission DONATOR_3 =          register("ftc.donator3");
+            MARRY                   = register("ftc.marry"),
 
-    public static final Permission TP_BYPASS =          register("ftc.teleports.bypass");
-    public static final Permission WORLD_BYPASS =       register("ftc.teleports.worldbypass");
+            EMOTE_IGNORE            = register("ftc.emotes.cooldown.ignore"),
+            EMOTES                  = register("ftc.emotes"),
+            EMOTE_JINGLE            = register("ftc.emotes.jingle"),
+            EMOTE_POG               = register("ftc.emotes.pog"),
+            EMOTE_SCARE             = register("ftc.emotes.scare"),
+            EMOTE_HUG               = register("ftc.emotes.hug"),
 
-    public static final Permission MARRY =              register("ftc.marry");
+            MAIL                    = register("ftc.mail"),
+            MAIL_OTHERS             = register("ftc.mail.others"),
 
-    public static final Permission EMOTE_IGNORE =       register("ftc.emotes.cooldown.ignore");
-    public static final Permission EMOTES =             register("ftc.emotes");
-    public static final Permission EMOTE_JINGLE =       register("ftc.emotes.jingle");
-    public static final Permission EMOTE_POG =          register("ftc.emotes.pog");
-    public static final Permission EMOTE_SCARE =        register("ftc.emotes.scare");
-    public static final Permission EMOTE_HUG =          register("ftc.emotes.hug");
+            NEARBY                  = register(COMMAND_PREFIX + "near"),
+            NEARBY_IGNORE           = register(COMMAND_PREFIX + "near.ignore"),
 
-    public static final Permission MAIL =               register("ftc.mail");
-    public static final Permission MAIL_OTHERS =        register("ftc.mail.others");
+            WARP                    = register(COMMAND_PREFIX + "warp"),
+            WARP_ADMIN              = register(COMMAND_PREFIX + "warp.admin"),
 
-    public static final Permission NEARBY =             register(COMMAND_PREFIX + "near");
-    public static final Permission NEARBY_IGNORE =      register(COMMAND_PREFIX + "near.ignore");
+            KIT                     = register(COMMAND_PREFIX + "kit"),
+            KIT_ADMIN               = register(COMMAND_PREFIX + "kit.admin"),
 
-    public static final Permission WARP =               register(COMMAND_PREFIX + "warp");
-    public static final Permission WARP_ADMIN =         register(COMMAND_PREFIX + "warp.admin");
+            PROFILE                 = register(COMMAND_PREFIX + "profile"),
+            PROFILE_BYPASS          = register(COMMAND_PREFIX + "profile.bypass"),
 
-    public static final Permission KIT =                register(COMMAND_PREFIX + "kit");
-    public static final Permission KIT_ADMIN =          register(COMMAND_PREFIX + "kit.admin");
+            BACK                    = register(COMMAND_PREFIX + "back"),
 
-    public static final Permission PROFILE =            register(COMMAND_PREFIX + "profile");
-    public static final Permission PROFILE_BYPASS =     register(COMMAND_PREFIX + "profile.bypass");
+            TPA                     = register(COMMAND_PREFIX + "tpa"),
+            TPA_HERE                = register(COMMAND_PREFIX + "tpahere"),
 
-    public static final Permission BACK =               register(COMMAND_PREFIX + "back");
+            HELP                    = register(COMMAND_PREFIX + "help"),
 
-    public static final Permission TPA =                register(COMMAND_PREFIX + "tpa");
-    public static final Permission TPA_HERE =           register(COMMAND_PREFIX + "tpahere");
+            PAY_TOGGLE              = register(COMMAND_PREFIX + "pay.toggle"),
+            PAY                     = register(COMMAND_PREFIX + "pay"),
 
-    public static final Permission HELP =               register(COMMAND_PREFIX + "help");
+            MESSAGE                 = register(COMMAND_PREFIX + "message"),
 
-    public static final Permission PAY_TOGGLE =         register(COMMAND_PREFIX + "pay.toggle");
-    public static final Permission PAY =                register(COMMAND_PREFIX + "pay");
+            WORKBENCH               = register(COMMAND_PREFIX + "workbench"),
+            WORKBENCH_OTHERS        = register(COMMAND_PREFIX + "workbench.others"),
 
-    public static final Permission MESSAGE =            register(COMMAND_PREFIX + "message");
+            ENDER_CHEST             = register(COMMAND_PREFIX + "enderchest"),
+            ENDER_CHEST_OTHERS      = register(COMMAND_PREFIX + "enderchest.others"),
 
-    public static final Permission WORKBENCH =          register(COMMAND_PREFIX + "workbench");
-    public static final Permission WORKBENCH_OTHERS =   register(COMMAND_PREFIX + "workbench.others");
+            STONE_CUTTER            = register(COMMAND_PREFIX + "stonecutter"),
+            STONE_CUTTER_OTHERS     = register(COMMAND_PREFIX + "stonecutter.others"),
 
-    public static final Permission ENDER_CHEST =        register(COMMAND_PREFIX + "enderchest");
-    public static final Permission ENDER_CHEST_OTHERS = register(COMMAND_PREFIX + "enderchest.others");
+            GRINDSTONE              = register(COMMAND_PREFIX + "grindstone"),
+            GRINDSTONE_OTHERS       = register(COMMAND_PREFIX + "grindstone.others"),
 
-    public static final Permission STONE_CUTTER =       register(COMMAND_PREFIX + "stonecutter");
-    public static final Permission STONE_CUTTER_OTHERS =register(COMMAND_PREFIX + "stonecutter.others");
+            SMITHING                = register(COMMAND_PREFIX + "smithingtable"),
+            SMITHING_OTHERS         = register(COMMAND_PREFIX + "smithingtable.others"),
 
-    public static final Permission GRINDSTONE =         register(COMMAND_PREFIX + "grindstone");
-    public static final Permission GRINDSTONE_OTHERS =  register(COMMAND_PREFIX + "grindstone.others");
+            CARTOGRAPHY             = register(COMMAND_PREFIX + "cartography"),
+            CARTOGRAPHY_OTHERS      = register(COMMAND_PREFIX + "cartography.others"),
 
-    public static final Permission SMITHING =           register(COMMAND_PREFIX + "smithingtable");
-    public static final Permission SMITHING_OTHERS =    register(COMMAND_PREFIX + "smithingtable.others");
+            REPAIR                  = register(COMMAND_PREFIX + "repair"),
 
-    public static final Permission CARTOGRAPHY =        register(COMMAND_PREFIX + "cartography");
-    public static final Permission CARTOGRAPHY_OTHERS = register(COMMAND_PREFIX + "cartography.others");
+            LOOM                    = register(COMMAND_PREFIX + "loom"),
+            LOOM_OTHERS             = register(COMMAND_PREFIX + "loom.others"),
 
-    public static final Permission REPAIR =             register(COMMAND_PREFIX + "repair");
+            DISPOSAL                = register(COMMAND_PREFIX + "disposal"),
+            FEED                    = register(COMMAND_PREFIX + "feed"),
+            HEAL                    = register(COMMAND_PREFIX + "heal"),
 
-    public static final Permission LOOM =               register(COMMAND_PREFIX + "loom");
-    public static final Permission LOOM_OTHERS =        register(COMMAND_PREFIX + "loom.others");
+            HOME                    = register(COMMAND_PREFIX + "home"),
+            HOME_OTHERS             = register(COMMAND_PREFIX + "home.others"),
 
-    public static final Permission DISPOSAL =           register(COMMAND_PREFIX + "disposal");
-    public static final Permission FEED =               register(COMMAND_PREFIX + "feed");
-    public static final Permission HEAL =               register(COMMAND_PREFIX + "heal");
+            BECOME_BARON            = register(COMMAND_PREFIX + "becomebaron"),
 
-    public static final Permission HOME =               register(COMMAND_PREFIX + "home");
-    public static final Permission HOME_OTHERS =        register(COMMAND_PREFIX + "home.others");
+            IGNORE                  = register(COMMAND_PREFIX + "ignore"),
+            IGNORE_AC               = register(COMMAND_PREFIX + "ignoreac"),
 
-    public static final Permission BECOME_BARON =       register(COMMAND_PREFIX + "becomebaron");
+            REGIONS                 = register("ftc.regions"),
+            REGIONS_ADMIN           = register("ftc.regions.admin"),
 
-    public static final Permission IGNORE =             register(COMMAND_PREFIX + "ignore");
-    public static final Permission IGNORE_AC =          register(COMMAND_PREFIX + "ignoreac");
+            MARKETS                 = register("ftc.markets"),
 
-    public static final Permission REGIONS =            register("ftc.regions");
-    public static final Permission REGIONS_ADMIN =      register("ftc.regions.admin");
-
-    public static final Permission MARKETS =             register("ftc.markets");
-
-    public static final Permission DEFAULT =            register("ftc.default");
+            DEFAULT                 = register("ftc.default");
 
     /**
      * Registers a string permission

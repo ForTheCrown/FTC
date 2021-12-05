@@ -23,7 +23,6 @@ public enum UserPref implements JsonSerializable {
 
     NON_HULK_SMASHER,
 
-    SPOUSE_SEE_MAIL,
     IGNORING_BROADCASTS,
     CANNOT_SWAP_BRANCH,
     PROFILE_PRIVATE,

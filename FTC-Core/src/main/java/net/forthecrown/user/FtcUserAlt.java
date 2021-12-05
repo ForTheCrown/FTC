@@ -67,41 +67,20 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
     public CosmeticData getCosmeticData() { return getMain().getCosmeticData(); }
     @Override
     public UserInteractions getInteractions() { return getMain().getInteractions(); }
-
     @Override
-    public RankTitle getTitle() {
-        return getMain().getTitle();
-    }
-
+    public RankTitle getTitle() { return getMain().getTitle(); }
     @Override
-    public void setTitle(RankTitle title, boolean setPrefix) {
-        getMain().setTitle(title, setPrefix);
-    }
-
+    public void setTitle(RankTitle title) { getMain().setTitle(title); }
     @Override
-    public ObjectSet<RankTitle> getAvailableTitles() {
-        return getMain().getAvailableTitles();
-    }
-
+    public ObjectSet<RankTitle> getAvailableTitles() { return getMain().getAvailableTitles();}
     @Override
-    public void addTitle(RankTitle title, boolean givePermissions, boolean setTierIfHigher) {
-        getMain().addTitle(title, givePermissions, setTierIfHigher);
-    }
-
+    public void addTitle(RankTitle title, boolean givePermissions, boolean setTierIfHigher) { getMain().addTitle(title, givePermissions, setTierIfHigher); }
     @Override
-    public void removeTitle(RankTitle title, boolean removePermission) {
-        getMain().removeTitle(title, removePermission);
-    }
-
+    public void removeTitle(RankTitle title, boolean removePermission) { getMain().removeTitle(title, removePermission); }
     @Override
-    public RankTier getRankTier() {
-        return getMain().getRankTier();
-    }
-
+    public RankTier getRankTier() { return getMain().getRankTier(); }
     @Override
-    public void setRankTier(RankTier tier, boolean perms) {
-        getMain().setRankTier(tier, perms);
-    }
+    public void setRankTier(RankTier tier, boolean perms) { getMain().setRankTier(tier, perms); }
 
     @Override
     public boolean equals(Object o) {

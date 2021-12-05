@@ -53,7 +53,7 @@ public interface FtcFormatter {
     });
 
     Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
-    Component AFK_SUFFIX = Component.text(" [AFK]").style(nonItalic(NamedTextColor.GRAY));
+    TextComponent AFK_SUFFIX = Component.text(" [AFK]").style(nonItalic(NamedTextColor.GRAY));
 
     /* If you wanna welcome someone, just welcome them, this is dumb
     public static String[] RANDOM_AFK_GREETINGS = {
@@ -136,7 +136,7 @@ public interface FtcFormatter {
      * @param user The joining user
      * @return The join message
      */
-    static Component joinMessage(CrownUser user){
+    static TranslatableComponent joinMessage(CrownUser user){
         return Component.translatable("multiplayer.player.joined", user.nickDisplayName().color(getJoinColor(user)))
                 //.hoverEvent(Component.text("Click to say hello!"))
                 //.clickEvent(ClickEvent.runCommand(hello(user.getNickOrName())))
@@ -157,7 +157,7 @@ public interface FtcFormatter {
      * @param user1 The joining user
      * @return The formatted message
      */
-    static Component newNameJoinMessage(CrownUser user1){
+    static TranslatableComponent newNameJoinMessage(CrownUser user1){
         FtcUser user = (FtcUser) user1;
 
         return Component.translatable("multiplayer.player.joined.renamed",
@@ -174,14 +174,14 @@ public interface FtcFormatter {
      * @param user The leaving user
      * @return the formatted message
      */
-    static Component leaveMessage(CrownUser user){
+    static TranslatableComponent leaveMessage(CrownUser user){
         return Component.translatable("multiplayer.player.left",
                 NamedTextColor.YELLOW,
                 user.nickDisplayName().color(getJoinColor(user))
         );
     }
 
-    static Component banMessage(PunishmentRecord record){
+    static TextComponent banMessage(PunishmentRecord record){
         Validate.isTrue(record.type == PunishmentType.BAN, "Given record was not a ban record");
 
         TextComponent.Builder builder = Component.text()
@@ -222,7 +222,7 @@ public interface FtcFormatter {
      * @param sender The sender to check
      * @return The modified input, or the same if the user didn't meet the required permissions
      */
-    static Component formatIfAllowed(String msg, CommandSender sender){
+    static TextComponent formatIfAllowed(String msg, CommandSender sender){
         return formatString(msg, sender, false);
     }
 
@@ -235,7 +235,7 @@ public interface FtcFormatter {
      * @param ignorePerms Whether to ignore permissions when formatting
      * @return The formatted input, or the input itself if formatting checks were not passed
      */
-    static Component formatString(String msg, @Nullable CommandSender sender, boolean ignorePerms){
+    static TextComponent formatString(String msg, @Nullable CommandSender sender, boolean ignorePerms){
         msg = Crown.getEmotes().format(msg, sender, ignorePerms);
 
         return ChatUtils.convertString(msg, ignorePerms || sender == null || sender.hasPermission(Permissions.DONATOR_2));
@@ -294,7 +294,7 @@ public interface FtcFormatter {
      * @param amount The amount to format and decimalize
      * @return The formatted amount.
      */
-    static Component queryGems(int amount){
+    static TranslatableComponent queryGems(int amount){
         if(amount == 1 || amount == -1) return Component.translatable("user.gems.singular", Component.text(amount));
         return Component.translatable("user.gems.multiple", Component.text(decimalizeNumber(amount)));
     }
@@ -398,7 +398,7 @@ public interface FtcFormatter {
      * @param includeWorld Whether to include the world's name in the message
      * @return The formatted easily readable location message
      */
-    static Component prettyLocationMessage(Location l, boolean includeWorld){
+    static TextComponent prettyLocationMessage(Location l, boolean includeWorld){
         return Component.text("" +
                 "X: " + l.getBlockX() + " " +
                 "Y: " + l.getBlockY() + " " +
@@ -413,7 +413,7 @@ public interface FtcFormatter {
      * @param includeWorld Whether to include the world in the message
      * @return The formatted and clickable message
      */
-    static Component clickableLocationMessage(Location l, boolean includeWorld){
+    static TextComponent clickableLocationMessage(Location l, boolean includeWorld){
         return prettyLocationMessage(l, includeWorld)
                 .hoverEvent(Component.text("Click to teleport!"))
                 .clickEvent(ClickEvent.runCommand("/tp_exact " + l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ() + " " + l.getPitch() + " " + l.getYaw() + " " + l.getWorld().getName()));
@@ -427,7 +427,7 @@ public interface FtcFormatter {
      * @param amount The amount to show
      * @return The formatted message
      */
-    static Component itemAndAmount(ItemStack itemStack, int amount){
+    static TextComponent itemAndAmount(ItemStack itemStack, int amount){
         Validate.notNull(itemStack);
         return Component.text()
                 .hoverEvent(itemStack)
@@ -442,7 +442,7 @@ public interface FtcFormatter {
      * @param item The item to format for
      * @return The formatted message with the item's amount.
      */
-    static Component itemAndAmount(ItemStack item) {
+    static TextComponent itemAndAmount(ItemStack item) {
         Validate.notNull(item);
         return itemAndAmount(item, item.getAmount());
     }
@@ -493,7 +493,7 @@ public interface FtcFormatter {
         return Component.translatable(Bukkit.getUnsafe().getTranslationKey(entity));
     }
 
-    static Component formatNameForTeam(Component initialName, Team team){
+    static TextComponent formatNameForTeam(Component initialName, Team team){
         TextColor color;
         try { //tEaM cOloRs mUsT hAvE hEX vAlUeS, what a fucking retarded place to throw an exception, in a getter
             color = team.color();
@@ -571,17 +571,10 @@ public interface FtcFormatter {
      * @param amount The amount to format
      * @return A formatted, translatable, component
      */
-    static Component rhines(long amount){
+    static TextComponent rhines(long amount){
         return Component.text()
                 .content(decimalizeNumber(amount) + " ")
                 .append(Component.translatable("economy.currency." + (amount == 1 || amount == -1 ? "singular" : "multiple")))
-                .build();
-    }
-
-    static Component piratePoints(int amount) {
-        return Component.text()
-                .content(decimalizeNumber(amount) + " ")
-                .append(Component.translatable("pirates.pp." + (amount == 1 || amount == -1 ? "single" : "multiple")))
                 .build();
     }
 }

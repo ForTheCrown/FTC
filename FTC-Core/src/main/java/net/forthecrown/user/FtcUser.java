@@ -341,10 +341,10 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public void setTitle(RankTitle title, boolean setPrefix) {
+    public void setTitle(RankTitle title) {
         currentTitle = title;
 
-        if(setPrefix && title != RankTitle.DEFAULT) setCurrentPrefix(title.prefix());
+        if(isOnline()) updateTabName();
     }
 
     @Override
@@ -731,7 +731,12 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public Component getCurrentPrefix(){
+    public Component getCurrentPrefix() {
+        if(isKing()) {
+            Kingship kingship = Crown.getKingship();
+            return kingship.getPrefix();
+        }
+
         if(currentPrefix != null) return currentPrefix;
         if(currentTitle != RankTitle.DEFAULT) return currentTitle.prefix();
 

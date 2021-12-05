@@ -13,7 +13,7 @@ import java.util.List;
 import static net.forthecrown.user.data.RankTier.*;
 
 public enum RankTitle implements JsonSerializable {
-    DEFAULT         (true,      NONE,      null),
+    DEFAULT         (true,      NONE,      "default"),
 
     LEGACY_FREE     (false,     FREE,      "&8[&7Legacy&8]"),
     KNIGHT          (true,      FREE,      "&8[&7Knight&8]"),

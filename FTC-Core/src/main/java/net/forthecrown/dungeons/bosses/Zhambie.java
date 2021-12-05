@@ -67,7 +67,7 @@ public class Zhambie extends DungeonBoss<Husk> {
 
     @Override
     protected void onUpdate() {
-        if(helpers.size() <= 3 && random.nextBoolean()) spawnHelper(bossEntity.getLocation().clone());
+        if(helpers.size() <= 3 && RANDOM.nextBoolean()) spawnHelper(bossEntity.getLocation().clone());
     }
 
     @Override

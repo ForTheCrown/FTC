@@ -1,6 +1,5 @@
 package net.forthecrown.core.kingship;
 
-import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.Nameable;
@@ -19,21 +18,19 @@ import java.util.UUID;
 public interface Kingship extends Nameable, CrownSerializer {
     static Component queenTitle(){
         return Component.text("[")
+                .color(NamedTextColor.WHITE)
                 .append(Component.text("Queen").color(NamedTextColor.YELLOW))
                 .append(Component.text("] "))
                 .decorate(TextDecoration.BOLD);
     }
 
-    static String getQueenTitle(){ return ChatUtils.getString(queenTitle()); }
-
     static Component kingTitle(){
         return Component.text("[")
+                .color(NamedTextColor.WHITE)
                 .append(Component.text("King").color(NamedTextColor.YELLOW))
                 .append(Component.text("] "))
                 .decorate(TextDecoration.BOLD);
     }
-
-    static String getKingTitle(){ return ChatUtils.getString(kingTitle()); }
 
     boolean hasKing();
 
@@ -45,4 +42,8 @@ public interface Kingship extends Nameable, CrownSerializer {
     void setFemale(boolean female);
 
     CrownUser getUser();
+
+    default Component getPrefix() {
+        return isFemale() ? queenTitle() : kingTitle();
+    }
 }

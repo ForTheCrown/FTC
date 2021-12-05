@@ -123,6 +123,7 @@ public final class FtcCommands {
         new CommandLeave();
         new CommandWild();
         new CommandIgnore();
+        new CommandIgnoreList();
         new CommandNear();
         new CommandNickname();
         new CommandSuicide();

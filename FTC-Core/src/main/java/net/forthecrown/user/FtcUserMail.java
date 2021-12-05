@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.ListUtils;
+import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,10 +22,7 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
 
     @Override
     public boolean canSee(UUID id) {
-        if(id.equals(user.getUniqueId())) return true;
-        if(user.getInteractions().getSpouse() == null) return false;
-
-        return user.spouseCanSeeMail() && id.equals(user.getInteractions().getSpouse());
+        return getUser().getUniqueId().equals(id);
     }
     
     @Override
@@ -67,7 +65,7 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
     }
 
     @Override
-    public MailMessage get(int index) {
+    public MailMessage get(int index) throws IndexOutOfBoundsException {
         return mail.get(index);
     }
 
@@ -85,16 +83,19 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
 
         for (JsonElement e: array) {
             JsonWrapper json = JsonWrapper.of(e.getAsJsonObject());
-
-            mail.add(
-                    new MailMessage(
-                            ChatUtils.fromJson(json.get("msg")),
-                            json.getUUID("sender"),
-                            json.getLong("sent"),
-                            json.has("read")
-                    )
+            MailMessage message = new MailMessage(
+                    ChatUtils.fromJson(json.get("msg")),
+                    json.getUUID("sender"),
+                    json.getLong("sent"),
+                    json.has("read")
             );
+
+            if(!messageTooOld(message)) mail.add(message);
         }
+    }
+
+    boolean messageTooOld(MailMessage message) {
+        return (System.currentTimeMillis() - message.sent) > TimeUtil.MONTH_IN_MILLIS;
     }
 
     @Override
@@ -104,6 +105,8 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
         JsonArray array = new JsonArray();
 
         for (MailMessage m: getMail()) {
+            if(messageTooOld(m)) continue;
+
             JsonWrapper json = JsonWrapper.empty();
 
             json.add("msg", ChatUtils.toJson(m.message));

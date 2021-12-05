@@ -44,8 +44,8 @@ public final class FtcUtils {
     private FtcUtils() {}
 
     public static final int
-            MAX_Y = 312,
-            MIN_Y = -32;
+            MAX_Y   = 312,
+            MIN_Y   = -64;
 
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
     private static final Predicate ALWAYS_TRUE = o -> true;
@@ -154,7 +154,7 @@ public final class FtcUtils {
 
         newObj.setDisplaySlot(DisplaySlot.SIDEBAR);
         player.setScoreboard(scoreboard);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Crown.inst(), () -> player.setScoreboard(mainScoreboard), 300L);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Crown.inst(), () -> player.setScoreboard(mainScoreboard), 15 * 20);
     }
 
     public static Key parseKey(String str) throws IllegalStateException {

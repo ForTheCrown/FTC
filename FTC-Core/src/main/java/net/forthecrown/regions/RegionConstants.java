@@ -24,9 +24,4 @@ public final class RegionConstants {
      * The default name of the server's spawn region
      */
     public static final String DEFAULT_SPAWN_NAME = "Hazelguard";
-
-    /**
-     * The metadata key used to identify the bottom of a pole
-     */
-    public static final String METADATA_KEY = "poleBottom";
 }

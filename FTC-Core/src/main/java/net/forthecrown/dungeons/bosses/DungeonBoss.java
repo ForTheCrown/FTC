@@ -40,7 +40,7 @@ import java.util.Collection;
 
 public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
 
-    protected static final CrownRandom random = new CrownRandom();
+    protected static final CrownRandom RANDOM = new CrownRandom();
 
     protected final String name;
     protected final Location spawnLocation;

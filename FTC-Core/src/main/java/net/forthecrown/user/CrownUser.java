@@ -299,11 +299,7 @@ public interface CrownUser extends
 
     RankTitle getTitle();
 
-    void setTitle(RankTitle title, boolean setPrefix);
-
-    default void setTitle(RankTitle title) {
-        setTitle(title, true);
-    }
+    void setTitle(RankTitle title);
 
     ObjectSet<RankTitle> getAvailableTitles();
 
@@ -770,14 +766,6 @@ public interface CrownUser extends
 
     default void setHulkPoles(boolean hulk) {
         setPref(!hulk, UserPref.NON_HULK_SMASHER);
-    }
-
-    default boolean spouseCanSeeMail() {
-        return hasPref(UserPref.SPOUSE_SEE_MAIL);
-    }
-
-    default void setSpouseCanSeeMail(boolean canSee) {
-        setPref(canSee, UserPref.SPOUSE_SEE_MAIL);
     }
 
     /**

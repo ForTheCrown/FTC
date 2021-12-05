@@ -1,6 +1,9 @@
 package net.forthecrown.inventory;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.Crown;
+import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.inventory.builder.InventoryBuilder;
@@ -59,7 +62,6 @@ public final class RankInventory {
         // Title options
         builder.add(new SelectRankOption(RankTitle.LORD, new InventoryPos(2, 2)))
                 .add(new SelectRankOption(RankTitle.LADY, new InventoryPos(2, 3)))
-                .add(new SelectRankOption(RankTitle.PIRATE, new InventoryPos(4, 2)))
                 .add(new SelectRankOption(RankTitle.LEGACY_TIER_1, new InventoryPos(7, 4)));
     });
 
@@ -164,6 +166,27 @@ public final class RankInventory {
         };
     }
 
+    static void setTitle(RankTitle title, CrownUser user) {
+        Kingship kingship = Crown.getKingship();
+        boolean isKing = user.isKing();
+        user.setTitle(title);
+
+        if(isKing) {
+            user.sendMessage(
+                    Component.translatable("rankSelector.kingWarning", NamedTextColor.GRAY, kingship.getPrefix())
+            );
+        }
+
+        user.sendMessage(
+                Component.translatable("rankSelector.set", NamedTextColor.GRAY,
+                        Component.text()
+                                .color(NamedTextColor.WHITE)
+                                .append(title.noEndSpacePrefix())
+                                .build()
+                )
+        );
+    }
+
     // Default title
     private static CordedInventoryOption getDefaultTitleOption() {
         return new DefaultRankOption(new InventoryPos(1, 1));
@@ -193,7 +216,8 @@ public final class RankInventory {
 
         @Override
         public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
-            //default selection logic
+            if(user.getTitle() == RankTitle.DEFAULT) throw FtcExceptionProvider.translatable("rankSelector.alreadySelected");
+            setTitle(RankTitle.DEFAULT, user);
         }
     }
 
@@ -222,7 +246,7 @@ public final class RankInventory {
 
         @Override
         public void place(FtcInventory inventory, CrownUser user) {
-            ItemStackBuilder item = new ItemStackBuilder(Material.GLOBE_BANNER_PATTERN)
+            ItemStackBuilder item = new ItemStackBuilder(user.hasTitle(title) ? Material.GLOBE_BANNER_PATTERN : Material.PAPER)
                     .setName(title.noEndSpacePrefix().style(nonItalic(NamedTextColor.WHITE)))
                     .addLore(lore);
 
@@ -232,7 +256,10 @@ public final class RankInventory {
 
         @Override
         public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
-            //rank selection logic
+            if(!user.hasTitle(title)) throw FtcExceptionProvider.translatable("rankSelector.notOwned");
+            if(user.getTitle() == title) throw FtcExceptionProvider.translatable("rankSelector.alreadySelected");
+
+            setTitle(title, user);
         }
     }
 }
