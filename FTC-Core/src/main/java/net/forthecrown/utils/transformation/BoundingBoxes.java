@@ -1,4 +1,4 @@
-package net.forthecrown.utils.math;
+package net.forthecrown.utils.transformation;
 
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
@@ -11,11 +11,12 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.PasteBuilder;
-import net.forthecrown.core.Crown;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.forthecrown.utils.math.Vector3i;
+import net.forthecrown.utils.math.Vector3iOffset;
+import net.forthecrown.utils.math.WorldVec3i;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import org.apache.commons.lang.math.IntRange;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,51 +43,25 @@ public final class BoundingBoxes {
      * Copies a bounding box to a given location
      * @param world The world to perform the action in
      * @param area The area to copy
-     * @param toMin The copy destination
+     * @param toMin The copy paste
      */
     public static void copyTo(World world, BoundingBox area, WorldVec3i toMin) {
-        int totalArea = area.getXSpan() * area.getYSpan() * area.getZSpan();
-
-        //If it's too small to warrant using 3 threads, use one only
-        if(totalArea < MIN_MULTI_THREAD) {
-            mainThreadCopy(world, area, toMin);
-            return;
-        }
-
-        int divided = area.getYSpan() / COUNT;
-        int current = area.minY();
-
-        //Create executors for the amount of threads
-        for (int i = 0; i < COUNT; i++) {
-            IntRange range = new IntRange(current, current += divided);
-            COPY_EXECUTOR.execute(sectionRunnable(world, area, toMin, range));
-        }
+        RegionCopyPaste paste = createPaste(world, area, toMin);
+        paste.run();
     }
 
-    private static Runnable sectionRunnable(World world, BoundingBox area, WorldVec3i min, IntRange yRange) {
-        return () -> {
-            int maxY = yRange.getMaximumInteger() - yRange.getMinimumInteger();
-
-            for (int x = 0; x < area.getXSpan(); x++) {
-                for (int y = 0; y < maxY; y++) {
-                    for (int z = 0; z < area.getZSpan(); z++) {
-                        Vector3iOffset relative = new Vector3iOffset(x, y + yRange.getMinimumInteger(), z);
-
-                        WorldVec3i destination = relative.apply(min);
-                        WorldVec3i origin = relative.apply(area.minX(), area.minY(), area.minZ()).toWorldVector(world);
-
-                        destination.getBlock().setBlockData(origin.getBlock().getBlockData(), false);
-                    }
-                }
-            }
-        };
+    public static RegionCopyPaste createPaste(World world, BoundingBox area, WorldVec3i toMin) {
+        return new RegionCopyPaste(
+                toMin.getWorld(), toMin.toNonWorld(),
+                FtcBoundingBox.of(world, area)
+        );
     }
 
-    static void copyPaste(World world, BoundingBox area, WorldVec3i destination) {
+    public static void copyPaste(World world, BoundingBox area, WorldVec3i destination) {
         copyPaste(world, area, destination, null, null);
     }
 
-    static void copyPaste(World world, BoundingBox area, WorldVec3i destination, @Nullable Consumer<ForwardExtentCopy> copyConsumer, @Nullable Consumer<PasteBuilder> pasteConsumer) {
+    public static void copyPaste(World world, BoundingBox area, WorldVec3i destination, @Nullable Consumer<ForwardExtentCopy> copyConsumer, @Nullable Consumer<PasteBuilder> pasteConsumer) {
         CuboidRegion region = new CuboidRegion(
                 BukkitAdapter.adapt(world),
                 BlockVector3.at(area.minX(), area.minY(), area.minZ()),
@@ -128,10 +103,8 @@ public final class BoundingBoxes {
      * @param toMin The position to copy to
      */
     public static void mainThreadCopy(World world, BoundingBox area, WorldVec3i toMin) {
-        Bukkit.getScheduler()
-                .runTask(Crown.inst(),
-                        sectionRunnable(world, area, toMin.clone().subtract(0, toMin.y, 0), new IntRange(area.minY(), area.maxY()))
-                );
+        RegionCopyPaste paste = createPaste(world, area, toMin);
+        paste.runSync();
     }
 
     /**
@@ -174,5 +147,17 @@ public final class BoundingBoxes {
         BlockVector3 max = region.getMaximumPoint();
 
         return new BoundingBox(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
+    }
+
+    public static BoundingBox regionToNms(BlockVector3 min, BlockVector3 max) {
+        return new BoundingBox(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
+    }
+
+    public static BoundingBox regionToNms(Region region) {
+        return regionToNms(region.getMinimumPoint(), region.getMaximumPoint());
+    }
+
+    public static BoundingBox wgToNms(ProtectedRegion region) {
+        return regionToNms(region.getMinimumPoint(), region.getMaximumPoint());
     }
 }

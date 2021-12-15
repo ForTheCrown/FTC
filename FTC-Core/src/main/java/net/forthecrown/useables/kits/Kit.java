@@ -4,7 +4,7 @@ import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.SilentPredicate;
 import net.forthecrown.serializer.Deletable;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.useables.Preconditionable;
+import net.forthecrown.useables.Checkable;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -20,7 +20,7 @@ import java.util.function.Predicate;
  * A kit, aka a group of items which can be gotten with the /kit command
  */
 public interface Kit extends
-        JsonSerializable, Preconditionable, Predicate<Player>,
+        JsonSerializable, Checkable, Predicate<Player>,
         SilentPredicate<Player>, Nameable, Keyed,
         HoverEventSource<Component>, Deletable
 {

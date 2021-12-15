@@ -17,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * Represents the class manages users and their ALT accounts
@@ -60,7 +59,7 @@ public interface UserManager extends CrownSerializer {
         Validate.notNull(base, "UUID cannot be null");
         Validate.isTrue(isPlayerID(base), "Given UUID did not belong to a player");
 
-        return FtcUserManager.LOADED_USERS.computeIfAbsent(base, (Function<UUID, FtcUser>) uuid -> {
+        return FtcUserManager.LOADED_USERS.computeIfAbsent(base, uuid -> {
             UserManager manager = inst();
             return manager.isAlt(uuid) ? new FtcUserAlt(uuid, manager.getMain(uuid)) : new FtcUser(uuid);
         });

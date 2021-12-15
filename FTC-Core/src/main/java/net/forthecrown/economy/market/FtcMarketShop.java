@@ -2,6 +2,7 @@ package net.forthecrown.economy.market;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -16,10 +17,8 @@ import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
-import net.forthecrown.utils.math.Vector3i;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import org.apache.commons.lang3.Validate;
-import org.jetbrains.annotations.NotNull;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Date;
 import java.util.UUID;
@@ -27,8 +26,6 @@ import java.util.UUID;
 public class FtcMarketShop implements MarketShop {
     private final ProtectedRegion worldGuard;
 
-    private BoundingBox voidExample;
-    private Vector3i resetPos;
     private final ObjectList<ShopEntrance> entrances = new ObjectArrayList<>();
     private final ObjectList<String> connected = new ObjectArrayList<>();
 
@@ -39,10 +36,8 @@ public class FtcMarketShop implements MarketShop {
     private int price = 35000;
     private String mergedName;
 
-    public FtcMarketShop(ProtectedRegion worldGuard, BoundingBox voidExample, Vector3i resetPos) {
+    public FtcMarketShop(ProtectedRegion worldGuard) {
         this.worldGuard = worldGuard;
-        this.voidExample = voidExample;
-        this.resetPos = resetPos;
     }
 
     @Override
@@ -53,26 +48,6 @@ public class FtcMarketShop implements MarketShop {
     @Override
     public ObjectList<ShopEntrance> getEntrances() {
         return entrances;
-    }
-
-    @Override
-    public BoundingBox getVoidExample() {
-        return voidExample;
-    }
-
-    @Override
-    public void setVoidExample(@NotNull BoundingBox voidExample) {
-        this.voidExample = Validate.notNull(voidExample, "Void example was null");
-    }
-
-    @Override
-    public Vector3i getResetPos() {
-        return resetPos;
-    }
-
-    @Override
-    public void setResetPos(Vector3i resetPos) {
-        this.resetPos = resetPos;
     }
 
     @Override
@@ -141,19 +116,21 @@ public class FtcMarketShop implements MarketShop {
         JsonWrapper json = JsonWrapper.empty();
 
         json.add("name", getName());
-        json.add("resetPos", resetPos);
-        json.add("voidExample", JsonUtils.writeVanillaBoundingBox(voidExample));
         json.add("price", price);
 
         if(!ListUtils.isNullOrEmpty(entrances)) {
             json.addList("entrances", entrances);
         }
 
+        if (!ListUtils.isNullOrEmpty(connected)) {
+            json.addList("connected", connected, JsonPrimitive::new);
+        }
+
         if(hasOwner()) {
             JsonWrapper ownership = JsonWrapper.empty();
 
             ownership.addUUID("owner", getOwner());
-            ownership.addDate("dateOfPurchase", getDateOfPurchase());
+            if(getDateOfPurchase() != null) ownership.addDate("dateOfPurchase", getDateOfPurchase());
 
             if(mergedName != null) {
                 ownership.add("merged", mergedName);
@@ -182,11 +159,7 @@ public class FtcMarketShop implements MarketShop {
                 );
 
         ProtectedRegion region = manager.getRegion(name);
-
-        Vector3i resetPos = Vector3i.of(json.get("resetPos"));
-        BoundingBox box = JsonUtils.readVanillaBoundingBox(json.getObject("voidExample"));
-
-        FtcMarketShop market = new FtcMarketShop(region, box, resetPos);
+        FtcMarketShop market = new FtcMarketShop(region);
 
         market.price = json.getInt("price");
 
@@ -194,11 +167,15 @@ public class FtcMarketShop implements MarketShop {
             market.entrances.addAll(json.getList("entrances", ShopEntrance::fromJson));
         }
 
+        if(json.has("connected")) {
+            market.connected.addAll(json.getList("connected", JsonElement::getAsString));
+        }
+
         if(json.has("ownershipData")) {
             JsonWrapper ownership = json.getWrapped("ownershipData");
 
             market.owner = ownership.getUUID("owner");
-            market.dateOfPurchase = json.getDate("dateOfPurchase");
+            market.dateOfPurchase = ownership.getDate("dateOfPurchase");
 
             if(ownership.has("coOwners")) {
                 market.coOwners.addAll(ownership.getList("coOwners", JsonUtils::readUUID));
@@ -210,5 +187,21 @@ public class FtcMarketShop implements MarketShop {
         }
 
         return market;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FtcMarketShop shop = (FtcMarketShop) o;
+
+        return new EqualsBuilder().append(getPrice(), shop.getPrice()).append(getWorldGuard(), shop.getWorldGuard()).append(getEntrances(), shop.getEntrances()).append(getOwner(), shop.getOwner()).append(getCoOwners(), shop.getCoOwners()).append(mergedName, shop.mergedName).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(getWorldGuard()).append(getEntrances()).append(getOwner()).append(getCoOwners()).append(getPrice()).toHashCode();
     }
 }

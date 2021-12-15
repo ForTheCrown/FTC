@@ -2,6 +2,7 @@ package net.forthecrown.user.actions;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 
 public interface UserActionHandler {
 
@@ -52,9 +53,13 @@ public interface UserActionHandler {
 
     void handleMailAdd(MailAddAction action) throws CommandSyntaxException;
 
+    void handleDivorce(DivorceAction action) throws RoyalCommandException;
+
+    void handleMarry(MarryAction action);
+
     /**
      * Handles a region visit
      * @param visit The visit to handle
      */
-    void handleVisit(RegionVisit visit);
+    void handleVisit(RegionVisitAction visit);
 }

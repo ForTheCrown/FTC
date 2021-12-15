@@ -53,6 +53,7 @@ public class ItemStackBuilder implements Cloneable {
     private boolean ambientEffects = true;
 
     private PlayerProfile profile;
+    private Integer customModelData = null;
 
     private Map<Attribute, AttributeModifier> modifiers = new Object2ObjectOpenHashMap<>();
     private Object2ByteMap<NamespacedKey> persistentData = new Object2ByteOpenHashMap<>();
@@ -290,9 +291,20 @@ public class ItemStackBuilder implements Cloneable {
         return setProfile(user.getProfile());
     }
 
+    public Integer getModelData() {
+        return customModelData;
+    }
+
+    public ItemStackBuilder setModelData(Integer customModelData) {
+        this.customModelData = customModelData;
+        return this;
+    }
+
     public ItemStack build() {
         ItemStack result = new ItemStack(material, amount);
         ItemMeta meta = result.getItemMeta();
+
+        meta.setCustomModelData(customModelData);
 
         if(!ListUtils.isNullOrEmpty(flags)) meta.addItemFlags(flags);
         if(name != null) meta.displayName(name);

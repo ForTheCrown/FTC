@@ -1,7 +1,5 @@
 package net.forthecrown.useables;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.LocationFileName;
@@ -17,14 +15,13 @@ public class FtcUsableBlock extends AbstractUsable implements UsableBlock {
 
         if(!fileExists && !create) throw new IllegalStateException(fileName + " doesn't exist");
 
-        Crown.getUsablesManager().addBlock(this);
+        Crown.getUsables().addBlock(this);
         reload();
     }
 
     @Override
     protected void save(JsonWrapper json) {
-        json.add("location", location);
-
+        json.add("location", getLocation());
         saveInto(json);
     }
 
@@ -35,9 +32,7 @@ public class FtcUsableBlock extends AbstractUsable implements UsableBlock {
 
     @Override
     protected void createDefaults(JsonWrapper json) {
-        json.add("location", location);
-        json.add("preconditions", new JsonObject());
-        json.add("actions", new JsonArray());
+        json.add("location", getLocation());
     }
 
     @Override
@@ -54,7 +49,7 @@ public class FtcUsableBlock extends AbstractUsable implements UsableBlock {
     public void delete() {
         deleteFile();
 
-        Crown.getUsablesManager().removeBlock(this);
+        Crown.getUsables().removeBlock(this);
         TileState sign = getBlock();
         sign.getPersistentDataContainer().remove(UsablesManager.USABLE_KEY);
         sign.update();

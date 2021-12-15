@@ -84,7 +84,7 @@ public abstract class AbstractJsonSerializer implements CrownSerializer {
         }
 
         try {
-            JsonObject json = JsonUtils.readFile(file);
+            JsonObject json = JsonUtils.readFileObject(file);
             reload(JsonWrapper.of(json));
         } catch (IOException e){
             e.printStackTrace();

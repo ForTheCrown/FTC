@@ -1,8 +1,9 @@
 package net.forthecrown.utils.math;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.sk89q.worldedit.math.BlockVector3;
+import net.forthecrown.serializer.JsonWrapper;
+import net.forthecrown.utils.JsonUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.Location;
@@ -53,14 +54,23 @@ public class Vector3i extends AbstractVector3i<Vector3i> {
         return new Vector3i(vector3.getBlockX(), vector3.getBlockY(), vector3.getBlockZ());
     }
 
+    // Deserialization function
+    // If it's legacy, aka an object, deserialize
+    // from the x y z values in the object
+    // if it's not, deserialize from an int array
     public static Vector3i of(JsonElement element){
-        JsonObject json = element.getAsJsonObject();
+        if(element.isJsonObject()) {
+            JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
-        final int x = json.get("x").getAsInt();
-        final int y = json.get("y").getAsInt();
-        final int z = json.get("z").getAsInt();
+            return new Vector3i(
+                    json.getInt("x"),
+                    json.getInt("y"),
+                    json.getInt("z")
+            );
+        }
 
-        return new Vector3i(x, y, z);
+        int[] cords = JsonUtils.readIntArray(element.getAsJsonArray());
+        return new Vector3i(cords[0], cords[1], cords[2]);
     }
 
     public Block getBlock(World world){

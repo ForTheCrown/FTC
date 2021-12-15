@@ -1,5 +1,7 @@
-package net.forthecrown.utils.math;
+package net.forthecrown.utils.transformation;
 
+import net.forthecrown.utils.math.Vector3i;
+import net.forthecrown.utils.math.Vector3iOffset;
 import org.bukkit.Location;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;

@@ -24,6 +24,8 @@ public class MailAddAction implements UserAction, Struct {
         this.sender = sender;
 
         mail = user.getMail();
+
+        setValidateSender(hasSender());
     }
 
     public MailAddAction(Component text, CrownUser user) {

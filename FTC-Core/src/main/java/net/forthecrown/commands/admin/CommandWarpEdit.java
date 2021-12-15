@@ -52,7 +52,7 @@ public class CommandWarpEdit extends FtcCommand {
                 .then(argument("warp", WarpArgument.warp())
                         .suggests((c, b) -> WarpArgument.warp().listSuggestions(c, b, true))
 
-                        .then(literal("destination")
+                        .then(literal("paste")
                                 .executes(c -> moveDest(
                                         c.getSource(),
                                         get(c),
@@ -101,7 +101,7 @@ public class CommandWarpEdit extends FtcCommand {
     public int moveDest(CommandSource source, Warp warp, Location location){
         warp.setDestination(location);
 
-        source.sendAdmin(Component.text("Moved destination of ").append(warp.displayName()));
+        source.sendAdmin(Component.text("Moved paste of ").append(warp.displayName()));
         return 0;
     }
 

@@ -1,14 +1,13 @@
 package net.forthecrown.core;
 
+import net.forthecrown.commands.CommandArkBox;
 import net.forthecrown.commands.manager.FtcCommands;
 import net.forthecrown.core.admin.FtcPunishmentManager;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.FtcJailManager;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.FtcKingship;
-import net.forthecrown.core.transformers.Homes_PopDensityToFTC;
-import net.forthecrown.core.transformers.Regions_PopDensityToFTC;
-import net.forthecrown.core.transformers.Shops_YamlToJson;
+import net.forthecrown.core.transformers.CorrectLegacyData;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
@@ -60,7 +59,7 @@ final class FtcBootStrap {
         joinInfo = new JoinInfo();
 
         economy = new FtcEconomy();
-        regionManager = new FtcRegionManager(Worlds.OVERWORLD);
+        regionManager = new FtcRegionManager(ComVars.getRegionWorld());
 
         userManager = new FtcUserManager();
         shopManager = new FtcShopManager();
@@ -68,17 +67,11 @@ final class FtcBootStrap {
         usablesManager = new FtcUsablesManager();
         jailManager = new FtcJailManager();
 
-        Regions_PopDensityToFTC.checkAndRun();
-        Homes_PopDensityToFTC.checkAndRun();
-        Shops_YamlToJson.checkAndRun();
-
         kingship = new FtcKingship();
         rules = new ServerRules();
 
-        if(Crown.inDebugMode()) {
-            markets = new FtcMarkets();
-            tradersGuild = new HazelguardTradersGuild();
-        }
+        markets = new FtcMarkets();
+        tradersGuild = new HazelguardTradersGuild();
 
         //Initialize modules
         safeRunnable(CorePacketListeners::init);
@@ -92,6 +85,9 @@ final class FtcBootStrap {
         safeRunnable(VoteTopics::init);
         safeRunnable(FtcCommands::init);
         safeRunnable(Events::init);
+        safeRunnable(CommandArkBox::load);
+
+        CorrectLegacyData.runAsync();
 
         //These must be last, since usage actions and checks are registered before them
         warpRegistry = new FtcWarpManager();

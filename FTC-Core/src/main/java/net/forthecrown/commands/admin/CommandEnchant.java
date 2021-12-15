@@ -25,7 +25,7 @@ public class CommandEnchant extends FtcCommand {
     public CommandEnchant(){
         super("enchant", Crown.inst());
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 

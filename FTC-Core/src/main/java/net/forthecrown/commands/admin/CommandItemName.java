@@ -1,14 +1,11 @@
 package net.forthecrown.commands.admin;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.ComponentArgument;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -24,15 +21,7 @@ public class CommandItemName extends FtcCommand {
 
     @Override
     protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("name", StringArgumentType.greedyString())
-                        .executes(c -> rename(c.getSource(), ChatUtils.convertString(c.getArgument("name", String.class))))
-                )
-                .then(literal("-component")
-                        .then(argument("cName", ComponentArgument.component())
-                                .executes(c -> rename(c.getSource(), c.getArgument("cName", Component.class)))
-                        )
-                );
+        CommandLore.addCompOrStringArg(command, null, (context, lore) -> rename(context.getSource(), lore));
     }
 
     private int rename(CommandSource source, Component name) throws CommandSyntaxException {

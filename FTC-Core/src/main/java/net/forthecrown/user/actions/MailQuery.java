@@ -11,13 +11,11 @@ public class MailQuery implements UserAction, Struct {
     private final CommandSource source;
     private final CrownUser mailUser;
     private final UserMail mail;
-    private final boolean onlyUnread;
     private final boolean self;
     private final int page;
 
-    public MailQuery(CommandSource source, CrownUser user, boolean onlyUnread, int page) {
+    public MailQuery(CommandSource source, CrownUser user, int page) {
         this.source = source;
-        this.onlyUnread = onlyUnread;
         this.page = page;
 
         self = user.getName().equalsIgnoreCase(source.textName());
@@ -31,10 +29,6 @@ public class MailQuery implements UserAction, Struct {
 
     public boolean isSelfQuery() {
         return self;
-    }
-
-    public boolean onlyUnread() {
-        return onlyUnread;
     }
 
     public CommandSource getSource() {

@@ -1,4 +1,4 @@
-package net.forthecrown.utils.math;
+package net.forthecrown.utils.transformation;
 
 import org.bukkit.block.Block;
 

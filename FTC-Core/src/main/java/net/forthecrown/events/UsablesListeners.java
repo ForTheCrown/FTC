@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 public class UsablesListeners implements Listener {
-    private final UsablesManager manager = Crown.getUsablesManager();
+    private final UsablesManager manager = Crown.getUsables();
     private static final String cooldownCategory = "Core_Interactables";
 
     @EventHandler(ignoreCancelled = true)

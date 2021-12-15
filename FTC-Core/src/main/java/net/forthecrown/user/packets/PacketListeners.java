@@ -35,7 +35,7 @@ public final class PacketListeners {
         pipeline.addBefore("packet_handler", player.getName(), handler);
     }
 
-    public static void unInject(Player player) {
+    public static void remove(Player player) {
         Channel channel = ((CraftPlayer) player).getHandle().connection.connection.channel;
         channel.eventLoop().submit(() -> {
             channel.pipeline().remove(player.getName());
@@ -44,7 +44,7 @@ public final class PacketListeners {
     }
 
     public static void removeAll() {
-        Bukkit.getOnlinePlayers().forEach(PacketListeners::unInject);
+        Bukkit.getOnlinePlayers().forEach(PacketListeners::remove);
     }
 
     public static <T extends Packet<ClientGamePacketListener>> void register(Class<T> clazz, PacketListener<T> listener) {

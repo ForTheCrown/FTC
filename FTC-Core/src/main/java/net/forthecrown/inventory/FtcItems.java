@@ -329,13 +329,15 @@ public final class FtcItems {
 
     private static Class metaClass() {
         try {
-            return Class.forName("org.bukkit.craftbukkit.v1_17_R1.inventory.CraftMetaItem");
+            // This will have to be updated with each MC update,
+            // because the package name will change
+            return Class.forName("org.bukkit.craftbukkit.v1_18_R1.inventory.CraftMetaItem");
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Couldn't find class for item meta??????", e);
         }
     }
 
     public static boolean isEmpty(ItemStack itemStack) {
-        return itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0;
+        return itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() < 1;
     }
 }

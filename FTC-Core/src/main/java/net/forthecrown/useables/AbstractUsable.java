@@ -1,8 +1,5 @@
 package net.forthecrown.useables;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -19,7 +16,6 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -42,53 +38,20 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
     protected void saveInto(JsonWrapper json){
         json.add("sendFail", new JsonPrimitive(sendFail));
 
-        JsonObject preconditions = new JsonObject();
-        for (UsageCheckInstance p: getChecks()){
-            preconditions.add(p.typeKey().asString(), InteractionUtils.writeCheck(p));
-        }
-        json.add("preconditions", preconditions);
-
-        JsonArray array = new JsonArray();
-
-        for (UsageActionInstance a: getActions()){
-            JsonObject object = new JsonObject();
-            object.add("type", new JsonPrimitive(a.typeKey().asString()));
-            object.add("value", InteractionUtils.writeAction(a));
-
-            array.add(object);
-        }
-
-        json.add("actions", array);
+        InteractionUtils.saveChecks(this, json.getSource());
+        InteractionUtils.saveActions(this, json.getSource());
     }
 
     protected void reloadFrom(JsonWrapper json) {
         sendFail = json.get("sendFail").getAsBoolean();
 
-        checks.clear();
-        JsonElement precons = json.get("preconditions");
-        if(precons != null && precons.isJsonObject()){
-            for (Map.Entry<String, JsonElement> e: precons.getAsJsonObject().entrySet()){
-                try {
-                    addCheck(InteractionUtils.readCheck(e.getKey(), e.getValue()));
-                } catch (CommandSyntaxException exception) {
-                    exception.printStackTrace();
-                }
-            }
+        try {
+            InteractionUtils.loadChecks(this, json.getSource());
+        } catch (CommandSyntaxException e) {
+            e.printStackTrace();
         }
 
-        actions.clear();
-        JsonElement actionsElement = json.get("actions");
-        if(actionsElement == null || !actionsElement.isJsonArray()) return;
-
-        for (JsonElement e: actionsElement.getAsJsonArray()){
-            JsonWrapper j = JsonWrapper.of(e.getAsJsonObject());
-
-            try {
-                addAction(InteractionUtils.readAction(j.getString("type"), j.get("value")));
-            } catch (CommandSyntaxException exception) {
-                exception.printStackTrace();
-            }
-        }
+        InteractionUtils.loadActions(this, json.getSource());
     }
 
     @Override

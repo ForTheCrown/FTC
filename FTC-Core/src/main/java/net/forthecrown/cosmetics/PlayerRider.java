@@ -1,6 +1,8 @@
 package net.forthecrown.cosmetics;
 
 import net.forthecrown.core.Crown;
+import net.forthecrown.squire.Squire;
+import net.forthecrown.utils.FtcUtils;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
@@ -8,6 +10,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Slime;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -18,9 +21,11 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.persistence.PersistentDataType;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 public class PlayerRider implements Listener {
+    public static final NamespacedKey SLIME_KEY = Squire.createFtcKey("riding_slime");
 
     public final Player rider;
     public final Player ridden;
@@ -59,7 +64,10 @@ public class PlayerRider implements Listener {
 
         level.addFreshEntity(slime, CreatureSpawnEvent.SpawnReason.CUSTOM);
 
-        return nms.getBukkitEntity();
+        Entity entity = nms.getBukkitEntity();
+        entity.getPersistentDataContainer().set(SLIME_KEY, PersistentDataType.BYTE, (byte) 1);
+
+        return entity;
     }
 
     public void startRiding(){
@@ -67,18 +75,20 @@ public class PlayerRider implements Listener {
         ridden.addPassenger(seat);
     }
 
-    public void stopRiding() {
+    public void stopRiding() { stopRiding(true); }
+
+    public void stopRiding(boolean ensureSafe) {
         seat.eject();
         ridden.eject();
         seat.remove();
 
         HandlerList.unregisterAll(this);
-        Bukkit.getScheduler().runTaskLater(Crown.inst(), this::preventBadLocation, 5);
+        if (ensureSafe) Bukkit.getScheduler().runTaskLater(Crown.inst(), this::preventBadLocation, 5);
         Cosmetics.getRideManager().removeRider(this);
     }
 
     private void preventBadLocation(){
-        if(ridden.getLocation().getBlockY() <= 0 || rider.getLocation().getBlockY() <= 0){
+        if(ridden.getLocation().getBlockY() <= FtcUtils.MIN_Y || rider.getLocation().getBlockY() <= FtcUtils.MIN_Y){
             ridden.teleport(PlayerRidingManager.RETREAT_LOCATION);
             rider.teleport(PlayerRidingManager.RETREAT_LOCATION);
         }

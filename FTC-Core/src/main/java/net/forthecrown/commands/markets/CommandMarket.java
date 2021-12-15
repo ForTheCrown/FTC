@@ -28,7 +28,6 @@ import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -38,7 +37,7 @@ public class CommandMarket extends FtcCommand {
     public CommandMarket() {
         super("market");
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
 
         register();
     }
@@ -78,55 +77,39 @@ public class CommandMarket extends FtcCommand {
                         })
                 )
 
+                .then(literal("refresh_all")
+                        .executes(c -> {
+                            Markets markets = Crown.getMarkets();
+
+                            for (MarketShop s: markets.getAllShops()) {
+                                markets.refresh(s);
+                            }
+
+                            c.getSource().sendAdmin("Refreshed all shops");
+                            return 0;
+                        })
+                )
+
                 .then(literal("create")
                         .then(argument("wg_region", StringArgumentType.word())
+                                .executes(c -> {
+                                    //Get region
+                                    String rgName = c.getArgument("wg_region", String.class);
+                                    RegionManager manager = WorldGuard.getInstance()
+                                            .getPlatform()
+                                            .getRegionContainer()
+                                            .get(BukkitAdapter.adapt(Crown.getMarkets().getWorld()));
 
-                                //2 pos arguments, for min-max for bounding box
-                                .then(argument("box_1", PositionArgument.blockPos())
-                                        .then(argument("box_2", PositionArgument.blockPos())
+                                    ProtectedRegion region = manager.getRegion(rgName);
 
-                                                //Position the shop uses to reset, basically the min position of
-                                                //the bounding box, but in the normal world
-                                                .then(argument("reset_pos", PositionArgument.blockPos())
+                                    if(region == null) throw FtcExceptionProvider.create("Unknown region: " + rgName);
 
-                                                        .executes(c -> {
-                                                            Location b1 = PositionArgument.getLocation(c, "box_1");
-                                                            Location b2 = PositionArgument.getLocation(c, "box_2");
+                                    MarketShop shop = new FtcMarketShop(region);
+                                    Crown.getMarkets().add(shop);
 
-                                                            //Void example
-                                                            BoundingBox voidExample = new BoundingBox(
-                                                                    Math.min(b1.getBlockX(), b2.getBlockX()),
-                                                                    Math.min(b1.getBlockY(), b2.getBlockY()),
-                                                                    Math.min(b1.getBlockZ(), b2.getBlockZ()),
-
-                                                                    Math.max(b1.getBlockX(), b2.getBlockX()),
-                                                                    Math.max(b1.getBlockY(), b2.getBlockY()),
-                                                                    Math.max(b1.getBlockZ(), b2.getBlockZ())
-                                                            );
-
-                                                            //Reset pos
-                                                            Vector3i resetPos = Vector3i.of(PositionArgument.getLocation(c, "reset_pos"));
-
-                                                            //Get region
-                                                            String rgName = c.getArgument("wg_region", String.class);
-                                                            RegionManager manager = WorldGuard.getInstance()
-                                                                    .getPlatform()
-                                                                    .getRegionContainer()
-                                                                    .get(BukkitAdapter.adapt(Crown.getMarkets().getWorld()));
-
-                                                            ProtectedRegion region = manager.getRegion(rgName);
-
-                                                            if(region == null) throw FtcExceptionProvider.create("Unknown region: " + rgName);
-
-                                                            MarketShop shop = new FtcMarketShop(region, voidExample, resetPos);
-                                                            Crown.getMarkets().add(shop);
-
-                                                            c.getSource().sendAdmin("Created market shop tied to region '" + rgName + '\'');
-                                                            return 0;
-                                                        })
-                                                )
-                                        )
-                                )
+                                    c.getSource().sendAdmin("Created market shop tied to region '" + rgName + '\'');
+                                    return 0;
+                                })
                         )
                 )
 
@@ -175,6 +158,21 @@ public class CommandMarket extends FtcCommand {
                                 })
                         )
 
+                        .then(literal("refresh")
+                                .executes(c -> {
+                                    MarketShop shop = get(c);
+                                    Markets region = Crown.getMarkets();
+
+                                    region.refresh(shop);
+
+                                    c.getSource().sendAdmin(
+                                            Component.text("Refreshed shop ")
+                                                    .append(MarketDisplay.displayName(shop))
+                                    );
+                                    return 0;
+                                })
+                        )
+
                         .then(literal("unclaim")
                                 .executes(c -> {
                                     MarketShop shop = get(c);
@@ -187,57 +185,6 @@ public class CommandMarket extends FtcCommand {
                                     );
                                     return 0;
                                 })
-                        )
-
-                        .then(literal("void_example")
-                                .then(argument("box_1", PositionArgument.blockPos())
-                                        .then(argument("box_2", PositionArgument.blockPos())
-                                                .executes(c -> {
-                                                    MarketShop shop = get(c);
-
-                                                    Location b1 = PositionArgument.getLocation(c, "box_1");
-                                                    Location b2 = PositionArgument.getLocation(c, "box_2");
-
-                                                    //Void example
-                                                    BoundingBox voidExample = new BoundingBox(
-                                                            Math.min(b1.getBlockX(), b2.getBlockX()),
-                                                            Math.min(b1.getBlockY(), b2.getBlockY()),
-                                                            Math.min(b1.getBlockZ(), b2.getBlockZ()),
-
-                                                            Math.max(b1.getBlockX(), b2.getBlockX()),
-                                                            Math.max(b1.getBlockY(), b2.getBlockY()),
-                                                            Math.max(b1.getBlockZ(), b2.getBlockZ())
-                                                    );
-
-                                                    shop.setVoidExample(voidExample);
-
-                                                    c.getSource().sendAdmin(
-                                                            Component.text("Set void example of ")
-                                                                    .append(MarketDisplay.displayName(shop))
-                                                    );
-                                                    return 0;
-                                                })
-                                        )
-                                )
-                        )
-
-                        .then(literal("reset_pos")
-                                .then(argument("pos", PositionArgument.blockPos())
-                                        .executes(c -> {
-                                            MarketShop shop = get(c);
-
-                                            //Reset pos
-                                            Vector3i resetPos = Vector3i.of(PositionArgument.getLocation(c, "pos"));
-
-                                            shop.setResetPos(resetPos);
-
-                                            c.getSource().sendAdmin(
-                                                    Component.text("Set resetPos of ")
-                                                            .append(MarketDisplay.displayName(shop))
-                                            );
-                                            return 0;
-                                        })
-                                )
                         )
 
                         .then(literal("unclaim_complete")

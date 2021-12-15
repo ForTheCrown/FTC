@@ -1,5 +1,6 @@
 package net.forthecrown.core;
 
+import net.forthecrown.commands.CommandArkBox;
 import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.comvars.types.ComVarTypes;
@@ -125,6 +126,7 @@ public final class Main extends JavaPlugin implements Crown {
         safeRunnable(Bosses::shutDown);
         safeRunnable(Cosmetics::shutDown);
         safeRunnable(PacketListeners::removeAll);
+        safeRunnable(CommandArkBox::save);
 
         FtcUserManager.LOADED_USERS.clear();
         FtcUserManager.LOADED_ALTS.clear();
@@ -150,7 +152,6 @@ public final class Main extends JavaPlugin implements Crown {
 
         Location defSpawnLoc = new Location(Worlds.VOID, 153.5, 5, 353.5, 90, 0);
         serverSpawn = config.getLocation("ServerSpawn", defSpawnLoc);
-
         dayUpdate = new DayUpdate((byte) config.getInt("Day"));
 
         if(saver != null){

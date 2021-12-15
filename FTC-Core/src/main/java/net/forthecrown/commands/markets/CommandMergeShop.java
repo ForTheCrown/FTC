@@ -181,12 +181,9 @@ public class CommandMergeShop extends FtcCommand {
     }
 
     private Component cancel(MarketMerger r) {
-        return buttonComponent(r,
-                "buttons.cancel",
-                "market.merge.cancel.hover",
-                "cancel",
-                NamedTextColor.AQUA
-        );
+        return Component.translatable("buttons.cancel", NamedTextColor.AQUA)
+                .hoverEvent(Component.translatable("market.merge.cancel.hover"))
+                .clickEvent(ClickEvent.runCommand('/' + getName() + ' ' + r.target.getName() + ' ' + "cancel"));
     }
 
     private Component accept(MarketMerger r) {
@@ -210,7 +207,7 @@ public class CommandMergeShop extends FtcCommand {
     private Component buttonComponent(MarketMerger r, String key, String hoverKey, String cmdSuffix, TextColor color) {
         return Component.translatable(key, color)
                 .hoverEvent(Component.translatable(hoverKey))
-                .clickEvent(ClickEvent.runCommand('/' + getName() + ' ' + r.target.getName() + ' ' + cmdSuffix));
+                .clickEvent(ClickEvent.runCommand('/' + getName() + ' ' + r.user.getName() + ' ' + cmdSuffix));
     }
 
     private static class MarketMerger implements Struct {

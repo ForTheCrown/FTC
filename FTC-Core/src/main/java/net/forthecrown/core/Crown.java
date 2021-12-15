@@ -39,29 +39,30 @@ import java.util.logging.Logger;
 public interface Crown extends Plugin, Namespaced {
     static Crown inst(){ return Main.inst; }
 
-    static PunishmentManager getPunishmentManager() { return Main.punishmentManager; }
-    static UsablesManager getUsablesManager() { return Main.usablesManager; }
-    static RegionManager getRegionManager() { return Main.regionManager; }
-    static JailManager getJailManager() { return Main.jailManager; }
-    static ShopManager getShopManager() { return Main.shopManager; }
-    static UserManager getUserManager(){ return Main.userManager; }
-    static WarpManager getWarpManager() { return Main.warpRegistry; }
-    static KitManager getKitManager() { return Main.kitRegistry; }
+    // Feels like I'm violating syntax by aligning the methods like this
+    static PunishmentManager    getPunishmentManager()  { return Main.punishmentManager; }
+    static UsablesManager       getUsables()            { return Main.usablesManager; }
+    static RegionManager        getRegionManager()      { return Main.regionManager; }
+    static JailManager          getJailManager()        { return Main.jailManager; }
+    static ShopManager          getShopManager()        { return Main.shopManager; }
+    static UserManager          getUserManager()        { return Main.userManager; }
+    static WarpManager          getWarpManager()        { return Main.warpRegistry; }
+    static KitManager           getKitManager()         { return Main.kitRegistry; }
 
-    static TradersGuild getTradersGuild() { return Main.tradersGuild; }
-    static Markets getMarkets() { return Main.markets; }
-    static LuckPerms getLuckPerms() { return Main.luckPerms; }
-    static Announcer getAnnouncer(){ return Main.announcer; }
-    static ItemPriceMap getPriceMap() { return Main.prices; }
-    static Economy getEconomy(){ return Main.economy; }
-    static Kingship getKingship(){ return Main.kingship; }
-    static TabList getTabList() { return Main.tabList; }
+    static TradersGuild         getTradersGuild()       { return Main.tradersGuild; }
+    static Markets              getMarkets()            { return Main.markets; }
+    static LuckPerms            getLuckPerms()          { return Main.luckPerms; }
+    static Announcer            getAnnouncer()          { return Main.announcer; }
+    static ItemPriceMap         getPriceMap()           { return Main.prices; }
+    static Economy              getEconomy()            { return Main.economy; }
+    static Kingship             getKingship()           { return Main.kingship; }
+    static TabList              getTabList()            { return Main.tabList; }
 
-    static FtcMessages getMessages() { return Main.messages; }
-    static DayUpdate getDayUpdate() { return Main.dayUpdate; }
-    static JoinInfo getJoinInfo() { return Main.joinInfo; }
-    static ChatEmotes getEmotes() { return Main.emotes; }
-    static ServerRules getRules() { return Main.rules; }
+    static FtcMessages          getMessages()           { return Main.messages; }
+    static DayUpdate            getDayUpdate()          { return Main.dayUpdate; }
+    static JoinInfo             getJoinInfo()           { return Main.joinInfo; }
+    static ChatEmotes           getEmotes()             { return Main.emotes; }
+    static ServerRules          getRules()              { return Main.rules; }
 
     static Logger logger() { return Main.logger; }
     static File dataFolder() { return inst().getDataFolder(); }
@@ -93,10 +94,8 @@ public interface Crown extends Plugin, Namespaced {
 
         Main.regionManager.save();
 
-        if(inDebugMode()) {
-            Main.markets.save();
-            Main.tradersGuild.save();
-        }
+        Main.markets.save();
+        Main.tradersGuild.save();
 
         HouseSerializer.serialize();
         ComVars.save();

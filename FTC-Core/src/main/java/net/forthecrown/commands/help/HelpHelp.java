@@ -63,13 +63,13 @@ public class HelpHelp extends FtcCommand {
                                                         lookup.getAliases(),
                                                         lookup.getDescription(),
                                                         "FTC",
-                                                        source.hasPermission(Permissions.FTC_ADMIN)
+                                                        source.hasPermission(Permissions.ADMIN)
                                                 )
                                         );
                                         return 0;
                                     }
 
-                                    if(!source.hasPermission(Permissions.FTC_ADMIN)){
+                                    if(!source.hasPermission(Permissions.ADMIN)){
                                         source.sendMessage(Component.translatable("commands.generic.permission", NamedTextColor.RED));
                                         return 0;
                                     }

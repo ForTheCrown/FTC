@@ -63,7 +63,7 @@ public class GuildNPC implements InteractableNPC {
                             .hoverEvent(Component.translatable("guildmaster.voteMenu.notYet"));
                 }
 
-                return prompt.color(NamedTextColor.YELLOW);
+                return prompt.color(NamedTextColor.AQUA);
             });
 
     private final ClickableTextNode joinGuild = new ClickableTextNode("join_guild")
@@ -136,7 +136,7 @@ public class GuildNPC implements InteractableNPC {
                             .hoverEvent(Component.translatable("guilds.join.error.shopOwnDuration", FtcFormatter.millisIntoTime(ComVars.getGuildJoinRequirement())));
                 }
 
-                return prompt.color(NamedTextColor.YELLOW);
+                return prompt.color(NamedTextColor.AQUA);
             });
 
     private final ClickableTextNode leaveGuildConfirm = new ClickableTextNode("confirm_leave_guild")
@@ -161,7 +161,7 @@ public class GuildNPC implements InteractableNPC {
                 TradersGuild guild = Crown.getTradersGuild();
                 if(!guild.isMember(user.getUniqueId())) return null;
 
-                return Component.translatable("guildmaster.leave.confirm", NamedTextColor.YELLOW);
+                return Component.translatable("guildmaster.leave.confirm", NamedTextColor.AQUA);
             });
 
     private final ClickableTextNode leaveGuild = new ClickableTextNode("leave_guild")
@@ -180,7 +180,7 @@ public class GuildNPC implements InteractableNPC {
                 TradersGuild guild = Crown.getTradersGuild();
                 if(!guild.isMember(user.getUniqueId())) return null;
 
-                return Component.translatable("guildmaster.leave", NamedTextColor.YELLOW);
+                return Component.translatable("guildmaster.leave", NamedTextColor.AQUA);
             });
 
     private final ClickableTextNode baseNode = ClickableTexts.register(

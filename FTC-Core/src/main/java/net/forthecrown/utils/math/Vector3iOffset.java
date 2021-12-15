@@ -2,10 +2,11 @@ package net.forthecrown.utils.math;
 
 import com.google.common.base.MoreObjects;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import net.forthecrown.utils.JsonUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.util.Vector;
 
 /**
@@ -47,14 +48,10 @@ public class Vector3iOffset implements ImmutableVector3i {
         return new Vector3iOffset(x - min.getBlockX(), y - min.getBlockY(), z - min.getBlockZ());
     }
 
-    public static Vector3iOffset deserialize(JsonElement element){
-        JsonObject json = element.getAsJsonObject();
-
-        int x = json.get("xOffset").getAsInt();
-        int y = json.get("yOffset").getAsInt();
-        int z = json.get("zOffset").getAsInt();
-
-        return new Vector3iOffset(x, y, z);
+    //Deserialize from int[] instead of object
+    public static Vector3iOffset deserialize(JsonElement element) {
+        int[] cords = JsonUtils.readIntArray(element.getAsJsonArray());
+        return new Vector3iOffset(cords[0], cords[1], cords[2]);
     }
 
     public int getXOffset() {
@@ -103,6 +100,10 @@ public class Vector3iOffset implements ImmutableVector3i {
         return new Vector(vector.getX() + xOffset, vector.getY() + yOffset, vector.getZ() + zOffset);
     }
 
+    public WorldVec3i apply(World world, int x, int y, int z) {
+        return new WorldVec3i(world, xOffset + x, yOffset + y, zOffset + z);
+    }
+
     @Override
     public int getX() {
         return xOffset;
@@ -121,17 +122,6 @@ public class Vector3iOffset implements ImmutableVector3i {
     @Override
     public Vector3iOffset clone() {
         return new Vector3iOffset(xOffset, yOffset, zOffset);
-    }
-
-    @Override
-    public JsonObject serialize() {
-        JsonObject json = new JsonObject();
-
-        json.addProperty("xOffset", xOffset);
-        json.addProperty("yOffset", yOffset);
-        json.addProperty("zOffset", zOffset);
-
-        return json;
     }
 
     @Override
@@ -165,5 +155,9 @@ public class Vector3iOffset implements ImmutableVector3i {
                 .append(yOffset)
                 .append(zOffset)
                 .toHashCode();
+    }
+
+    public WorldVec3i apply(World world, Vector3i destination) {
+        return apply(world, destination.getX(), destination.getY(), destination.getZ());
     }
 }

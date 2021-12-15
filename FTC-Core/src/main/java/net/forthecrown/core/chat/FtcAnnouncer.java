@@ -80,7 +80,6 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
                 for (CrownUser player : UserManager.getOnlineUsers()) {
                     // Don't broadcast info messages to players in the Senate.
-                    if (player.getWorld().equals(Worlds.SENATE)) continue;
                     if (player.ignoringBroadcasts()) continue;
 
                     player.sendMessage(broadcast);

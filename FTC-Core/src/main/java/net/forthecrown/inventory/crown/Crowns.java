@@ -12,6 +12,7 @@ import java.util.UUID;
 public final class Crowns {
     private Crowns() {}
 
+    public static final int MODEL_DATA = 1478819153;
     public static final String TAG_KEY = "royal_crown";
     private static final Int2ObjectMap<CrownRank> RANKS = new Int2ObjectOpenHashMap<>();
 
@@ -41,6 +42,7 @@ public final class Crowns {
     public static ItemStack make(UUID owner, boolean queen) {
         ItemStack item = new ItemStackBuilder(Material.GOLDEN_HELMET)
                 .setName(FtcItems.CROWN_TITLE)
+                .setModelData(MODEL_DATA)
                 .setUnbreakable(true)
                 .build();
 

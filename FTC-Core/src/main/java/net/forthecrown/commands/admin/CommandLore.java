@@ -24,6 +24,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class CommandLore extends FtcCommand {
         super("lore", Crown.inst());
 
         setAliases("itemlore");
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 
@@ -114,15 +115,20 @@ public class CommandLore extends FtcCommand {
         if(itemStack == null || itemStack.getType() == Material.AIR) throw FtcExceptionProvider.create("You must be holding an item");
     }
 
-    public static <T extends ArgumentBuilder<CommandSource, T>> T compOrStringArg(T arg, SuggestionProvider<CommandSource> s, ComponentCommand runnable){
-        return arg
-                .then(arg("string", StringArgumentType.greedyString())
-                        .suggests(s)
+    public static <T extends ArgumentBuilder<CommandSource, T>> T compOrStringArg(T arg, @Nullable SuggestionProvider<CommandSource> s, ComponentCommand runnable){
+        addCompOrStringArg(arg, s, runnable);
+        return arg;
+    }
 
-                        .executes(c -> runnable.run(c, ChatUtils.convertString(c.getArgument("string", String.class))))
+    public static void addCompOrStringArg(ArgumentBuilder<CommandSource, ?> arg, @Nullable SuggestionProvider<CommandSource> s, ComponentCommand command) {
+        arg
+                .then(arg("string", StringArgumentType.greedyString())
+                        .suggests(s == null ? (c, b) -> Suggestions.empty() : s)
+
+                        .executes(c -> command.run(c, ChatUtils.stringToNonItalic(c.getArgument("string", String.class))))
                 )
 
-                .then(componentArg("cLore", c-> runnable.run(c, c.getArgument("cLore", Component.class))));
+                .then(componentArg("cLore", c-> command.run(c, c.getArgument("cLore", Component.class))));
     }
 
     public static LiteralArgumentBuilder<CommandSource> componentArg(String argName, Command<CommandSource> cmd){

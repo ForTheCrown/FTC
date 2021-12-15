@@ -18,7 +18,7 @@ public class CommandComVar extends FtcCommand {
     public CommandComVar(){
         super("comvar", Crown.inst());
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 

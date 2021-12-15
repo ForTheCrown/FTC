@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Represents an object which has UsageChecks.
  */
-public interface Preconditionable {
+public interface Checkable {
 
     /**
      * Lists all the usage checks this object has

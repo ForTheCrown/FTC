@@ -30,7 +30,7 @@ public class CommandInteractable extends FtcCommand {
         super("interactable", Crown.inst());
 
         setAliases("usable");
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 
@@ -45,9 +45,9 @@ public class CommandInteractable extends FtcCommand {
                                             Location l = c.getArgument("location", Position.class).getLocation(source);
 
                                             if(!(l.getBlock().getState() instanceof TileState)) throw FtcExceptionProvider.create("Block is not sign");
-                                            if(Crown.getUsablesManager().isInteractableSign(l.getBlock())) throw FtcExceptionProvider.create("Block is already an interactable sign");
+                                            if(Crown.getUsables().isInteractableSign(l.getBlock())) throw FtcExceptionProvider.create("Block is already an interactable sign");
 
-                                            Crown.getUsablesManager().createBlock((TileState) l.getBlock().getState());
+                                            Crown.getUsables().createBlock((TileState) l.getBlock().getState());
                                             c.getSource().sendAdmin("Creating interactable sign");
                                             return 0;
                                         })
@@ -65,9 +65,9 @@ public class CommandInteractable extends FtcCommand {
                                             Entity entity = c.getArgument("selector", EntitySelector.class).getEntity(source);
 
                                             if(entity instanceof Player) throw FtcExceptionProvider.create("Players cannot be interactable");
-                                            if(Crown.getUsablesManager().isInteractableEntity(entity)) throw FtcExceptionProvider.create("Entity is already interactable");
+                                            if(Crown.getUsables().isInteractableEntity(entity)) throw FtcExceptionProvider.create("Entity is already interactable");
 
-                                            Crown.getUsablesManager().createEntity(entity);
+                                            Crown.getUsables().createEntity(entity);
 
                                             c.getSource().sendAdmin("Creating interactable entity");
                                             return 0;
@@ -114,16 +114,16 @@ public class CommandInteractable extends FtcCommand {
 
     private UsableEntity entity(CommandContext<CommandSource> c) throws CommandSyntaxException {
         Entity entity = c.getArgument("selector", EntitySelector.class).getEntity(c.getSource());
-        if(!Crown.getUsablesManager().isInteractableEntity(entity)) throw FtcExceptionProvider.create("Given entity is not an interactable entity");
+        if(!Crown.getUsables().isInteractableEntity(entity)) throw FtcExceptionProvider.create("Given entity is not an interactable entity");
 
-        return Crown.getUsablesManager().getEntity(entity);
+        return Crown.getUsables().getEntity(entity);
     }
 
     private UsableBlock getSign(CommandContext<CommandSource> c) throws CommandSyntaxException {
         Location l = c.getArgument("location", Position.class).getLocation(c.getSource());
         Block b = l.getBlock();
-        if(!Crown.getUsablesManager().isInteractableSign(b)) throw FtcExceptionProvider.create("Specified location is not an interactable sign");
+        if(!Crown.getUsables().isInteractableSign(b)) throw FtcExceptionProvider.create("Specified location is not an interactable sign");
 
-        return Crown.getUsablesManager().getBlock(b.getLocation());
+        return Crown.getUsables().getBlock(b.getLocation());
     }
 }

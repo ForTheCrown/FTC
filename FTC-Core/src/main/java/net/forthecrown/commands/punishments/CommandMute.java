@@ -56,7 +56,7 @@ public class CommandMute extends FtcCommand implements TempPunisher {
         } else {
             long totalTime = lengthTranslate(length);
 
-            manager.punish(user.getUniqueId(), PunishmentType.MUTE, source, null, totalTime);
+            manager.punish(user.getUniqueId(), PunishmentType.MUTE, source, reason, totalTime);
         }
 
         source.sendAdmin(

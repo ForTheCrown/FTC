@@ -100,7 +100,7 @@ public class CommandSelfOrUser extends FtcCommand {
         );
 
         new CommandSelfOrUser("fly",
-                Permissions.FTC_ADMIN,
+                Permissions.ADMIN,
                 (user, source, self) -> {
                     boolean flying = !user.isFlying();
                     user.setFlying(flying);
@@ -115,7 +115,7 @@ public class CommandSelfOrUser extends FtcCommand {
         );
 
         new CommandSelfOrUser("godmode",
-                Permissions.FTC_ADMIN,
+                Permissions.ADMIN,
                 (user, source, self) -> {
                     boolean inv = !user.godMode();
                     user.setGodMode(inv);

@@ -8,7 +8,7 @@ import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.math.FtcBoundingBox;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;

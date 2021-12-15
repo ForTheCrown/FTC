@@ -94,28 +94,12 @@ public interface FtcExceptionProvider {
         return CANNOT_TP_TO_SELF.create();
     }
 
-    static CommandSyntaxException cannotMute(CrownUser user){
-        return CANNOT_MUTE.create(user);
-    }
-
     static RoyalCommandException noReplyTargets(){
         return NO_REPLY_TARGETS.create();
     }
 
     static RoyalCommandException nickTooLong(int length){
         return NICK_TOO_LONG.create(Component.text(length), Component.text(ComVars.getMaxNickLength()));
-    }
-
-    static CommandSyntaxException cannotBan(CrownUser user){
-        return CANNOT_BAN.create(user);
-    }
-
-    static CommandSyntaxException cannotKick(CrownUser user){
-        return CANNOT_KICK.create(user);
-    }
-    
-    static CommandSyntaxException cannotJail(CrownUser user){
-        return CANNOT_JAIL.create(user);
     }
 
     static RoyalCommandException mustHoldItem(){

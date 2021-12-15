@@ -17,7 +17,9 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.MarketOwnership;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.math.BoundingBoxes;
+import net.forthecrown.utils.math.Vector3i;
+import net.forthecrown.utils.math.WorldVec3i;
+import net.forthecrown.utils.transformation.RegionCopyPaste;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -25,11 +27,16 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
+
+import static net.forthecrown.utils.transformation.BoundingBoxes.createPaste;
+import static net.forthecrown.utils.transformation.BoundingBoxes.wgToNms;
 
 public class FtcMarkets extends AbstractJsonSerializer implements Markets {
     //2 maps for tracking shops, byName stores all saved shops
@@ -60,8 +67,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
     @Override
     public void add(MarketShop claim) {
-        if(claim.getOwner() != null) byOwner.put(claim.getOwner(), claim);
-
+        if(claim.hasOwner()) byOwner.put(claim.getOwner(), claim);
         byName.put(claim.getName(), claim);
     }
 
@@ -78,7 +84,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         if(claim.hasOwner()) throw FtcExceptionProvider.translatable("market.alreadyOwned");
 
         //Check if they can even buy it
-        Markets.checkCanChangeStatus(ownership);
+        Markets.checkCanPurchase(ownership);
 
         //Check if they can afford it
         Economy economy = Crown.getEconomy();
@@ -107,9 +113,21 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
         claim.getWorldGuard().getMembers().addPlayer(user.getUniqueId());
 
+        byOwner.put(user.getUniqueId(), claim);
+
         for (ShopEntrance e: claim.getEntrances()) {
             e.onClaim(user, getWorld());
         }
+
+        //make backup underground to reset store later
+        createPaste(
+                getWorld(),
+                wgToNms(claim.getWorldGuard()),
+                claim.getBackupPos().toWorldVector(getWorld())
+        )
+                .addFilter(new MarketFilters.IgnoreCopyEntrance())
+                .addFilter(new MarketFilters.IgnoreShop())
+                .runSync();
     }
 
     @Override
@@ -132,8 +150,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
         if(complete) {
             ownership.setOwnershipBegan(0L);
-
-            reset(shop);
+            resetFromBackup(shop);
         }
 
         for (ShopEntrance e: shop.getEntrances()) {
@@ -143,10 +160,13 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
     @Override
     public void merge(MarketShop shop, MarketShop merged) {
-        Validate.isTrue(shop.equals(merged), "Same shops given in parameters");
+        Validate.isTrue(!shop.equals(merged), "Same shops given in parameters");
 
         shop.setMerged(merged);
         merged.setMerged(shop);
+
+        merged.getWorldGuard().getMembers().addPlayer(shop.getOwner());
+        shop.getWorldGuard().getMembers().addPlayer(merged.getOwner());
 
         for (UUID id: shop.getCoOwners()) {
             merged.getWorldGuard().getMembers().addPlayer(id);
@@ -165,6 +185,9 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
         merged.setMerged(null);
         shop.setMerged(null);
+
+        shop.getWorldGuard().getMembers().removePlayer(merged.getOwner());
+        merged.getWorldGuard().getMembers().removePlayer(shop.getOwner());
 
         for (UUID id: merged.getCoOwners()) {
             shop.getWorldGuard().getMembers().removePlayer(id);
@@ -283,12 +306,35 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
     }
 
     @Override
-    public void reset(MarketShop shop) {
-        BoundingBoxes.mainThreadCopy(
-                Worlds.VOID,
-                shop.getVoidExample(),
-                shop.getResetPos().toWorldVector(getWorld())
+    public void resetFromBackup(MarketShop shop) {
+        //Figure out positions for pasting
+        WorldVec3i pastePos = shop.getMin().toWorldVector(getWorld());
+        Vector3i size = shop.getSize();
+        Vector3i backup = shop.getBackupPos();
+
+        BoundingBox box = new BoundingBox(
+                backup.getX(), backup.getY(), backup.getZ(),
+                size.getX() + backup.getX(),
+                size.getY() + backup.getY(),
+                size.getZ() + backup.getZ()
         );
+
+        RegionCopyPaste paste = createPaste(getWorld(), box, pastePos)
+                // ignore any notice heads or door signs
+                .addFilter(new MarketFilters.IgnoreNotice())
+                .addFilter(new MarketFilters.IgnorePasteEntrance())
+
+                // destroy shops before pasting
+                .addPreProcessor(new ShopDestroyPreprocessor());
+
+        paste.runSync();
+
+        paste
+                .getOrigin()
+                .getLivingEntities()
+                .stream()
+                .filter(e -> e.getType() != EntityType.PLAYER)
+                .forEach(Entity::remove);
     }
 
     @Override
@@ -343,8 +389,8 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
                 Component.text(entranceAmount + " entrance" + FtcUtils.addAnS(entranceAmount))
         );
 
-        BoundingBox box = shop.getVoidExample();
-        String dimensions = box.getXSpan() + "x" + box.getYSpan() + "x" + box.getYSpan() + " blocks";
+        Vector3i size = shop.getSize();
+        String dimensions = size.getX() + "x" + size.getY() + "x" + size.getY() + " blocks";
 
         textBuilder
                 .append(newLine)
@@ -359,6 +405,14 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
         builder.addPage(textBuilder.build());
         return builder.build();
+    }
+
+    @Override
+    public void refresh(MarketShop shop) {
+        for (ShopEntrance e: shop.getEntrances()) {
+            if(shop.hasOwner()) e.onClaim(shop.ownerUser(), getWorld());
+            else e.onUnclaim(getWorld(), shop);
+        }
     }
 
     @Override

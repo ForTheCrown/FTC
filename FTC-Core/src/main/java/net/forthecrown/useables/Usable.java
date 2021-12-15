@@ -12,7 +12,7 @@ import java.util.function.Predicate;
  * UsableEntity and UsableBlock are currently the only sub classes of this
  * </p>
  */
-public interface Usable extends Predicate<Player>, CrownSerializer, Deletable, Preconditionable, Actionable {
+public interface Usable extends Predicate<Player>, CrownSerializer, Deletable, Checkable, Actionable {
 
     /**
      * Interacts with this usable

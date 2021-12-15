@@ -15,7 +15,7 @@ public class CommandAnimation extends FtcCommand {
     public CommandAnimation() {
         super("animation");
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 

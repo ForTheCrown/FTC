@@ -17,7 +17,7 @@ public class CommandBalance extends FtcCommand {
         super("balance", Crown.inst());
 
         setAliases("bal", "cash", "money", "ebal", "ebalance", "emoney");
-        setDescription("Displays a player's balance");
+        setDescription("Shows a player's balance");
 
         register();
     }

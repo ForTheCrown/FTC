@@ -4,7 +4,7 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.utils.math.FtcBoundingBox;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;

@@ -47,7 +47,7 @@ public class BlockAnimationFrame implements Struct {
     }
 
     /**
-     * Gets the origin of the frame, aka, the place where the original blocks for the frame are.
+     * Gets the origin of the frame, aka, the place where the copy blocks for the frame are.
      * @return The place where the frame's blocks are
      */
     public BoundingBox getFrameOrigin() {

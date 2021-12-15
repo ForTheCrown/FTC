@@ -1,7 +1,5 @@
 package net.forthecrown.economy.market;
 
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.text.Component;
@@ -57,17 +55,9 @@ public interface MarketDisplay {
         TextComponent.Builder builder = Component.text();
 
         builder
-                .append(Component.text("Region: " + shop.getName()))
+                .append(Component.text("Region: ").append(shop.wgDisplayName()))
                 .append(Component.newline())
-                .append(Component.text("Price: " + shop.getPrice()))
-                .append(Component.newline())
-                .append(Component.text("voidExample: " + shop.getVoidExample()))
-                .append(Component.newline())
-                .append(Component.text("resetPos: ").append(
-                        FtcFormatter.clickableLocationMessage(
-                                shop.getResetPos().toLoc(Crown.getMarkets().getWorld()), false)
-                        )
-                );
+                .append(Component.text("Price: " + shop.getPrice()));
 
         if(shop.hasOwner()) {
             CrownUser owner = shop.ownerUser();
@@ -129,7 +119,8 @@ public interface MarketDisplay {
         if(!shop.getEntrances().isEmpty()) {
             TextComponent.Builder entranceBuilder = Component.text()
                     .append(Component.newline())
-                    .append(Component.text("Entrances: "));
+                    .append(Component.text("Entrances: "))
+                    .append(Component.newline());
 
             Iterator<ShopEntrance> iterator = shop.getEntrances().iterator();
             int index = 0;

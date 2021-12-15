@@ -57,7 +57,7 @@ public class CommandUnclaimShop extends FtcCommand {
                                                     .clickEvent(ClickEvent.runCommand('/' + getName() + " confirm"))
                                     )
                                     .append(Component.newline())
-                                    .append(Component.translatable("market.unclaimed", NamedTextColor.RED))
+                                    .append(Component.translatable("market.unclaim2", NamedTextColor.RED))
                     );
 
                     return 0;
@@ -76,7 +76,6 @@ public class CommandUnclaimShop extends FtcCommand {
                             user.sendMessage(
                                     Component.translatable("market.unclaimed", NamedTextColor.GRAY)
                             );
-
                             return 0;
                         })
                 );
@@ -86,6 +85,6 @@ public class CommandUnclaimShop extends FtcCommand {
         MarketOwnership ownership = user.getMarketOwnership();
 
         if(!ownership.currentlyOwnsShop()) throw FtcExceptionProvider.noShopOwned();
-        Markets.checkCanChangeStatus(ownership);
+        Markets.checkStatusChange(ownership);
     }
 }

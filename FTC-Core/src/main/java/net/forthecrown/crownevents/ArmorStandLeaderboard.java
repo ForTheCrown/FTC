@@ -3,7 +3,7 @@ package net.forthecrown.crownevents;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.commands.admin.CommandHologram;
 import net.forthecrown.core.Crown;
-import net.forthecrown.utils.math.FtcBoundingBox;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;

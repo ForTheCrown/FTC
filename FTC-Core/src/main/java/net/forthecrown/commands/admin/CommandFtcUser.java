@@ -20,20 +20,31 @@ import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.EnumArgument;
+import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserInteractions;
+import net.forthecrown.user.actions.ActionFactory;
+import net.forthecrown.user.data.RankTier;
+import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.data.SellAmount;
+import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Location;
 
 import java.util.Collection;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class CommandFtcUser extends FtcCommand {
 
     public CommandFtcUser() {
         super("FtcUser");
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 
@@ -70,8 +81,8 @@ public class CommandFtcUser extends FtcCommand {
 
                         .then(literal("delete")
                                 .executes(userCmd((user, c) -> {
-                                    user.delete();
                                     user.unload();
+                                    user.delete();
 
                                     c.getSource().sendAdmin("Deleted data of " + user.getName());
                                 }))
@@ -207,63 +218,96 @@ public class CommandFtcUser extends FtcCommand {
                                 )
                         )
 
-                        .then(
-                                CommandLore.compOrStringArg(
-                                        literal("prefix")
-                                                .executes(userCmd((user, c) -> {
-                                                    Component prefix = user.getCurrentPrefix();
+                        .then(literal("createTeleport")
+                                .then(argument("destination", PositionArgument.position())
+                                        .executes(createTeleport(true))
 
-                                                    if(prefix == null) throw FtcExceptionProvider.create(user.getName() + " has no prefix");
-
-                                                    c.getSource().sendAdmin(
-                                                            Component.text("Prefix of ")
-                                                                    .append(user.displayName())
-                                                                    .append(Component.text(" is "))
-                                                                    .append(prefix)
-                                                    );
-                                                })),
-                                        (c, b) -> b.buildFuture(),
-                                        (context, lore) -> {
-                                            CrownUser user = get(context);
-
-                                            user.setCurrentPrefix(lore);
-
-                                            context.getSource().sendAdmin(
-                                                    Component.text("Set prefix of ")
-                                                            .append(user.displayName())
-                                                            .append(Component.text(" to "))
-                                                            .append(lore)
-                                            );
-                                            return 0;
-                                        }
+                                        .then(literal("with_cooldown").executes(createTeleport(true)))
+                                        .then(literal("no_cooldown").executes(createTeleport(false)))
                                 )
                         )
 
-                        .then(cosmeticsArg())
+                        .then(literal("reset_market_cooldown")
+                                .executes(userCmd((user, c) -> {
+                                    user.getMarketOwnership().setLastStatusChange(0L);
+
+                                    c.getSource().sendAdmin("Reset " + user.getName() + "'s market status cooldown");
+                                }))
+                        )
+
+                        .then(componentArg("prefix", CrownUser::getCurrentPrefix, CrownUser::setCurrentPrefix))
+                        .then(componentArg("nickname", CrownUser::nickname, CrownUser::setNickname))
+
+                        .then(userProperty(UserAccessor.SELL_AMOUNT))
+                        .then(userProperty(UserAccessor.TIER))
+                        .then(userProperty(UserAccessor.TITLE))
+
+                        .then(listArgument(ListAccessor.TITLES))
+
+                        .then(literal("cosmetics")
+                                .then(cosmeticDataArg(CosmeticDataAccessor.ARROW))
+                                .then(cosmeticDataArg(CosmeticDataAccessor.TRAVEL))
+                                .then(cosmeticDataArg(CosmeticDataAccessor.DEATH))
+                        )
+
+                        .then(interactionsArg())
                 );
     }
 
-    CrownUser get(CommandContext<CommandSource> c) throws CommandSyntaxException {
+    static CrownUser get(CommandContext<CommandSource> c) throws CommandSyntaxException {
         return UserArgument.getUser(c, "user");
     }
-
-    public interface UserCommandConsumer {
+    public interface UserCommandConsumer extends Command<CommandSource> {
         void run(CrownUser user, CommandContext<CommandSource> c) throws CommandSyntaxException;
-    }
 
-    Command<CommandSource> userCmd(UserCommandConsumer consumer) {
-        return c -> {
-            CrownUser user = get(c);
-            consumer.run(user, c);
+        @Override
+        default int run(CommandContext<CommandSource> context) throws CommandSyntaxException {
+            CrownUser user = get(context);
+
+            run(user, context);
             return 0;
-        };
+        }
+    }
+    Command<CommandSource> userCmd(UserCommandConsumer consumer) {
+        return consumer;
     }
 
-    private LiteralArgumentBuilder<CommandSource> cosmeticsArg() {
-        return literal("cosmetics")
-                .then(cosmeticDataArg(CosmeticDataAccessor.ARROW))
-                .then(cosmeticDataArg(CosmeticDataAccessor.TRAVEL))
-                .then(cosmeticDataArg(CosmeticDataAccessor.DEATH));
+    private LiteralArgumentBuilder<CommandSource> componentArg(String name,
+                                                               Function<CrownUser, Component> getter,
+                                                               BiConsumer<CrownUser, Component> setter
+    ) {
+        return CommandLore.compOrStringArg(
+                literal(name.toLowerCase())
+                        .executes(userCmd((user, c) -> {
+                            Component text = getter.apply(user);
+                            if(text == null) text = Component.text("null");
+
+                            c.getSource().sendMessage(
+                                    Component.text(user.getName() + "'s " + name + ": ")
+                                            .append(text)
+                            );
+                        }))
+                        .then(literal("-clear")
+                                .executes(userCmd((user, c) -> {
+                                    setter.accept(user, null);
+
+                                    c.getSource().sendAdmin("Removed " + user.getName() + "'s " + name);
+                                }))
+                        )
+
+                ,
+                ((context, builder) -> builder.buildFuture()),
+                (context, lore) -> {
+                    CrownUser user = get(context);
+                    setter.accept(user, lore);
+
+                    context.getSource().sendAdmin(
+                            Component.text("Set " + user.getName() + "'s " + name + " to ")
+                                    .append(lore)
+                    );
+                    return 0;
+                }
+        );
     }
 
     private <T extends CosmeticEffect> LiteralArgumentBuilder<CommandSource> cosmeticDataArg(CosmeticDataAccessor<T> accessor) {
@@ -357,7 +401,6 @@ public class CommandFtcUser extends FtcCommand {
                         )
                 );
     }
-
     private interface CosmeticDataAccessor<T extends CosmeticEffect> {
         CosmeticDataAccessor<TravelEffect> TRAVEL = new CosmeticDataAccessor<>() {
             @Override
@@ -512,5 +555,258 @@ public class CommandFtcUser extends FtcCommand {
         String getName();
         ArgumentType<T> getArgumentType();
         Class<T> getCosmeticClass();
+    }
+
+    private <T> LiteralArgumentBuilder<CommandSource> listArgument(ListAccessor<T> accessor) {
+        return literal(accessor.getName().toLowerCase() + "s")
+                .then(argument("value", accessor.getArgumentType())
+                        .then(literal("add")
+                                .executes(userCmd((user, c) -> {
+                                    T val = c.getArgument("value", accessor.getTypeClass());
+                                    accessor.add(val, user);
+
+                                    c.getSource().sendAdmin("Added " + accessor.toString(val) + " to " + user.getName() + "'s " + accessor.getName() + "s");
+                                }))
+                        )
+
+                        .then(literal("remove")
+                                .executes(userCmd((user, c) -> {
+                                    T val = c.getArgument("value", accessor.getTypeClass());
+                                    accessor.remove(val, user);
+
+                                    c.getSource().sendAdmin("Removed " + accessor.toString(val) + " from " + user.getName() + "'s " + accessor.getName() + "s");
+                                }))
+                        )
+                )
+
+                .then(literal("list")
+                        .executes(userCmd((user, c) -> {
+                            Collection<T> values = accessor.list(user);
+                            String str = ListUtils.join(values, accessor::toString);
+
+                            c.getSource().sendMessage(user.getName() + "s " + accessor.getName() + "s: " + str);
+                        }))
+                );
+    }
+    private interface ListAccessor<T> {
+        ListAccessor<RankTitle> TITLES = new ListAccessor<>() {
+            @Override
+            public Collection<RankTitle> list(CrownUser user) {
+                return user.getAvailableTitles();
+            }
+
+            @Override
+            public void add(RankTitle val, CrownUser user) {
+                user.addTitle(val, true, false);
+            }
+
+            @Override
+            public void remove(RankTitle val, CrownUser user) {
+                user.removeTitle(val, false);
+            }
+
+            @Override
+            public String toString(RankTitle value) {
+                return value.name().toLowerCase();
+            }
+
+            @Override
+            public ArgumentType<RankTitle> getArgumentType() {
+                return EnumArgument.of(RankTitle.class);
+            }
+
+            @Override
+            public Class<RankTitle> getTypeClass() {
+                return RankTitle.class;
+            }
+
+            @Override
+            public String getName() {
+                return "Title";
+            }
+        };
+
+        Collection<T> list(CrownUser user);
+
+        void add(T val, CrownUser user);
+        void remove(T val, CrownUser user);
+
+        String toString(T value);
+        ArgumentType<T> getArgumentType();
+        Class<T> getTypeClass();
+
+        String getName();
+    }
+
+    private <T> LiteralArgumentBuilder<CommandSource> userProperty(UserAccessor<T> acc) {
+        return literal(acc.getName().toLowerCase())
+                .executes(userCmd((user, c) -> {
+                    T val = acc.get(user);
+
+                    c.getSource().sendMessage(user.getName() + "'s " + acc.getName() + ": " + acc.toString(val));
+                }))
+
+                .then(argument("value", acc.getArgumentType())
+                        .executes(userCmd((user, c) -> {
+                            T val = c.getArgument("value", acc.getTypeClass());
+                            acc.set(val, user);
+
+                            c.getSource().sendAdmin("Set " + user.getName() + "'s to " + acc.toString(val));
+                        }))
+                );
+    }
+    private interface UserAccessor<T> {
+        UserAccessor<RankTitle> TITLE = new UserAccessor<RankTitle>() {
+            @Override
+            public void set(RankTitle val, CrownUser user) {
+                user.setTitle(val);
+            }
+
+            @Override
+            public RankTitle get(CrownUser user) {
+                return user.getTitle();
+            }
+
+            @Override
+            public String toString(RankTitle val) {
+                return val.name().toLowerCase();
+            }
+
+            @Override
+            public ArgumentType<RankTitle> getArgumentType() {
+                return EnumArgument.of(RankTitle.class);
+            }
+
+            @Override
+            public Class<RankTitle> getTypeClass() {
+                return RankTitle.class;
+            }
+
+            @Override
+            public String getName() {
+                return "Title";
+            }
+        };
+
+        UserAccessor<RankTier> TIER = new UserAccessor<RankTier>() {
+            @Override
+            public void set(RankTier val, CrownUser user) {
+                user.setRankTier(val, true);
+            }
+
+            @Override
+            public RankTier get(CrownUser user) {
+                return user.getRankTier();
+            }
+
+            @Override
+            public String toString(RankTier val) {
+                return val.name().toLowerCase();
+            }
+
+            @Override
+            public ArgumentType<RankTier> getArgumentType() {
+                return EnumArgument.of(RankTier.class);
+            }
+
+            @Override
+            public Class<RankTier> getTypeClass() {
+                return RankTier.class;
+            }
+
+            @Override
+            public String getName() {
+                return "Tier";
+            }
+        };
+
+        UserAccessor<SellAmount> SELL_AMOUNT = new UserAccessor<SellAmount>() {
+            @Override
+            public void set(SellAmount val, CrownUser user) {
+                user.setSellAmount(val);
+            }
+
+            @Override
+            public SellAmount get(CrownUser user) {
+                return user.getSellAmount();
+            }
+
+            @Override
+            public String toString(SellAmount val) {
+                return val.text;
+            }
+
+            @Override
+            public ArgumentType<SellAmount> getArgumentType() {
+                return EnumArgument.of(SellAmount.class);
+            }
+
+            @Override
+            public Class<SellAmount> getTypeClass() {
+                return SellAmount.class;
+            }
+
+            @Override
+            public String getName() {
+                return getTypeClass().getSimpleName();
+            }
+        };
+
+        void set(T val, CrownUser user);
+        T get(CrownUser user);
+
+        String toString(T val);
+        ArgumentType<T> getArgumentType();
+        Class<T> getTypeClass();
+        String getName();
+    }
+
+    private UserCommandConsumer createTeleport(boolean cooldown) {
+        return (user, c) -> {
+            if(!user.isOnline()) {
+                throw FtcExceptionProvider.create(user.getName() + " is not online");
+            }
+
+            Location dest = PositionArgument.getLocation(c, "destination");
+            user.createTeleport(() -> dest, true, !cooldown, UserTeleport.Type.TELEPORT)
+                    .start(true);
+        };
+    }
+
+    private LiteralArgumentBuilder<CommandSource> interactionsArg() {
+        return literal("interactions")
+                .then(literal("marry")
+                        .then(argument("user_1", UserArgument.user())
+                                .executes(userCmd((user, c) -> {
+                                    CrownUser target = UserArgument.getUser(c, "user_1");
+
+                                    if(target.equals(user)) {
+                                        throw FtcExceptionProvider.create("Cannot make a user marry themselves");
+                                    }
+
+                                    ActionFactory.marry(user, target, true);
+                                    c.getSource().sendAdmin("Married " + user.getName() + " and " + target.getName());
+                                }))
+                        )
+                )
+
+                .then(literal("divorce")
+                        .executes(userCmd((user, c) -> {
+                            UserInteractions interactions = user.getInteractions();
+                            if(!interactions.isMarried()) {
+                                throw FtcExceptionProvider.create(user.getName() + " is not married");
+                            }
+
+                            ActionFactory.divorce(user, true);
+                            c.getSource().sendAdmin(user.getName() + " is now divorced");
+                        }))
+                )
+
+                .then(literal("reset_cooldown")
+                        .executes(userCmd((user, c) -> {
+                            user.getInteractions().setLastMarriageChange(0L);
+                            c.getSource().sendAdmin("Reset " + user.getName() + "'s marriage cooldown");
+                        }))
+                );
     }
 }

@@ -1,7 +1,7 @@
 package net.forthecrown.regions;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import net.forthecrown.utils.math.FtcBoundingBox;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;

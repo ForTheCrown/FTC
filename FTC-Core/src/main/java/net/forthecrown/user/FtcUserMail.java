@@ -48,6 +48,11 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
     }
 
     @Override
+    public int size() {
+        return mail.size();
+    }
+
+    @Override
     public ObjectList<MailMessage> getUnread() {
         ObjectList<MailMessage> unread = new ObjectArrayList<>();
 

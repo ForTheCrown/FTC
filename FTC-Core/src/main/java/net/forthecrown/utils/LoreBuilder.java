@@ -60,7 +60,7 @@ public class LoreBuilder {
         return add(
                 Component.text()
                         .decoration(TextDecoration.ITALIC, false)
-                        .append(ChatUtils.convertString(s, true))
+                        .append(ChatUtils.stringToNonItalic(s, true))
                         .build()
         );
     }

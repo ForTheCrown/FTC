@@ -7,7 +7,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.serializer.NbtSerializable;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.math.FtcBoundingBox;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.nbt.Tag;
@@ -23,14 +23,14 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
     private BoundingBox poleBoundingBox;
 
     PopulationRegion(RegionPos pos, World world) {
-        super(null, pos, null, null, null);
+        super(pos);
         this.region = makeRegion(world);
     }
 
     public PopulationRegion(RegionPos pos, World world, Tag tag) {
         this(pos, world);
 
-        readTag(tag, this::setPolePosition0);
+        readTag(tag);
 
         if(poleBoundingBox == null) updatePoleBounds();
     }
@@ -43,7 +43,7 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
         int maxX = pos.getCenterX() + RegionConstants.HALF_REGION_SIZE;
         int maxZ = pos.getCenterZ() + RegionConstants.HALF_REGION_SIZE;
 
-        return new FtcBoundingBox(world, minX, -65, minZ, maxX, 312, maxZ);
+        return new FtcBoundingBox(world, minX, FtcUtils.MIN_Y, minZ, maxX, FtcUtils.MAX_Y, maxZ);
     }
 
     /**
@@ -84,8 +84,8 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
         Crown.getRegionManager().getGenerator().generate(this);
     }
 
-    //sets the pole position without generating a new pole or removing the old one
-    private void setPolePosition0(@Nullable BlockVector2 polePosition) {
+    // sets the pole position without generating a new pole or removing the old one
+    protected void setPolePosition0(@Nullable BlockVector2 polePosition) {
         this.polePosition = polePosition;
         updatePoleBounds();
     }

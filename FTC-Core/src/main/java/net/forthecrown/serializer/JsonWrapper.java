@@ -8,8 +8,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
-import net.forthecrown.utils.math.FtcBoundingBox;
 import net.forthecrown.utils.math.Vector3i;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.key.Key;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
@@ -18,8 +18,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -98,19 +96,20 @@ public class JsonWrapper {
     }
 
     public void addRegion(String name, FtcBoundingBox box){
-        json.add(name, writeRegion(box));
+        json.add(name, box.serialize());
     }
 
     public FtcBoundingBox getRegion(String name){
-        return get(name, e -> readRegion(e.getAsJsonObject()));
+        return FtcBoundingBox.of(get(name));
     }
 
     public void addItem(String name, ItemStack item){
         json.add(name, writeItem(item));
     }
 
-    public ItemStack getItem(String name){
-        if(missingOrNull(name)) return null;
+    public ItemStack getItem(String name) { return getItem(name, null); }
+    public ItemStack getItem(String name, ItemStack def){
+        if(missingOrNull(name)) return def;
         return readItem(get(name));
     }
 
@@ -334,19 +333,18 @@ public class JsonWrapper {
         return arr;
     }
 
+    public int[] getIntArray(String name) {
+        JsonArray array = getArray(name);
+        return JsonUtils.readIntArray(array);
+    }
+
     public void addDate(String name, Date date) {
-        add(name, DateFormat.getInstance().format(date));
+        add(name, JsonUtils.writeDate(date));
     }
 
     public Date getDate(String name) { return getDate(name, null); }
     public Date getDate(String name, Date def) {
-        return get(name, e -> {
-            try {
-              return DateFormat.getInstance().parse(e.getAsString());
-            } catch (ParseException e1) {
-                return null;
-            }
-        }, def);
+        return get(name, JsonUtils::readDate, def);
     }
 
     //------------------ Delegate Methods -----------------//

@@ -22,7 +22,7 @@ public class CommandJails extends FtcCommand {
     public CommandJails(){
         super("jails", Crown.inst());
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 

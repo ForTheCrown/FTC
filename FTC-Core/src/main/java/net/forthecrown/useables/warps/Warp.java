@@ -3,7 +3,7 @@ package net.forthecrown.useables.warps;
 import net.forthecrown.utils.SilentPredicate;
 import net.forthecrown.serializer.Deletable;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.useables.Preconditionable;
+import net.forthecrown.useables.Checkable;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEventSource;
@@ -16,19 +16,19 @@ import java.util.function.Predicate;
  * A location to which one can warp using the /warp command
  */
 public interface Warp extends
-        Predicate<Player>, Preconditionable, Deletable,
+        Predicate<Player>, Checkable, Deletable,
         JsonSerializable, HoverEventSource<Component>, SilentPredicate<Player>,
         Keyed
 {
     /**
-     * Sets the destination
-     * @param location The new destination
+     * Sets the paste
+     * @param location The new paste
      */
     void setDestination(Location location);
 
     /**
-     * Gets a the current destination of the warp
-     * @return The warp's destination
+     * Gets a the current paste of the warp
+     * @return The warp's paste
      */
     Location getDestination();
 

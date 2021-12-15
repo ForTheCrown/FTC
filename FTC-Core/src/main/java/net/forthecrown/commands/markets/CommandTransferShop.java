@@ -87,7 +87,7 @@ public class CommandTransferShop extends FtcCommand {
                                     user.sendMessage(
                                             Component.translatable("market.transferred",
                                                     NamedTextColor.YELLOW,
-                                                    user.nickDisplayName()
+                                                    target.nickDisplayName()
                                                             .color(NamedTextColor.GOLD)
                                             )
                                     );
@@ -113,7 +113,7 @@ public class CommandTransferShop extends FtcCommand {
             throw FtcExceptionProvider.translatable("market.transfer.error.targetHasShop");
         }
 
-        Markets.checkCanChangeStatus(user.getMarketOwnership());
+        Markets.checkStatusChange(user.getMarketOwnership());
 
         if(!target.getMarketOwnership().canChangeStatus()) {
             throw FtcExceptionProvider.translatable("market.transfer.error.targetStatus", target.nickDisplayName());

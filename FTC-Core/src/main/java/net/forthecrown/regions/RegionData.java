@@ -16,10 +16,9 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
-public class RegionData implements Nameable, HoverEventSource<Component>, NbtSerializable {
+public abstract class RegionData implements Nameable, HoverEventSource<Component>, NbtSerializable {
     private static final GsonComponentSerializer SERIALIZER = GsonComponentSerializer.gson();
 
     protected final RegionPos pos;
@@ -29,12 +28,8 @@ public class RegionData implements Nameable, HoverEventSource<Component>, NbtSer
     protected TextColor nameColor;
     protected Component description;
 
-    public RegionData(String name, RegionPos pos, BlockVector2 polePosition, TextColor nameColor, Component description) {
-        this.name = name;
+    public RegionData(RegionPos pos) {
         this.pos = pos;
-        this.polePosition = polePosition;
-        this.nameColor = nameColor;
-        this.description = description;
     }
 
     @Override
@@ -66,7 +61,7 @@ public class RegionData implements Nameable, HoverEventSource<Component>, NbtSer
         return tag;
     }
 
-    protected void readTag(Tag tag, Consumer<BlockVector2> polePositionConsumer) {
+    protected void readTag(Tag tag) {
         //If the only thing serialized is, is a name
         if(tag.getId() == Tag.TAG_STRING) {
             name = tag.getAsString();
@@ -78,7 +73,7 @@ public class RegionData implements Nameable, HoverEventSource<Component>, NbtSer
             IntArrayTag intArr = (IntArrayTag) tag;
             int[] arr = intArr.getAsIntArray();
 
-            polePositionConsumer.accept((BlockVector2.at(arr[0], arr[1])));
+            setPolePosition0(BlockVector2.at(arr[0], arr[1]));
             return;
         }
 
@@ -89,12 +84,14 @@ public class RegionData implements Nameable, HoverEventSource<Component>, NbtSer
 
         //Set pole position
         int[] arr = tags.getIntArray("polePosition");
-        polePositionConsumer.accept(BlockVector2.at(arr[0], arr[1]));
+        setPolePosition0(BlockVector2.at(arr[0], arr[1]));
 
         //If has description, set it
         if(tags.contains("description")) this.description = SERIALIZER.deserialize(tags.getString("description"));
         if(tags.contains("color")) this.nameColor = TextColor.fromHexString(tags.getString("color"));
     }
+
+    protected abstract void setPolePosition0(BlockVector2 vector2);
 
     private static IntArrayTag writeColumn(BlockVector2 pos) {
         return new IntArrayTag(new int[] {pos.getX(), pos.getZ()});
@@ -168,5 +165,16 @@ public class RegionData implements Nameable, HoverEventSource<Component>, NbtSer
      */
     public @NotNull BlockVector2 getPolePosition() {
         return polePosition == null ? pos.toCenter() : polePosition;
+    }
+
+    public static class Empty extends RegionData {
+        public Empty(RegionPos pos) {
+            super(pos);
+        }
+
+        @Override
+        protected void setPolePosition0(BlockVector2 vector2) {
+            this.polePosition = vector2;
+        }
     }
 }

@@ -5,6 +5,7 @@ import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
 import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataHolder;
@@ -57,8 +58,10 @@ public class FtcUsablesManager implements UsablesManager {
     @Override
     public boolean isInteractableSign(Block block){
         if(block == null) return false;
-        if (!(block.getState() instanceof TileState)) return false;
-        return isInteractable((TileState) block.getState());
+        BlockState state = block.getState();
+
+        if (!(state instanceof TileState)) return false;
+        return isInteractable((TileState) state);
     }
 
     @Override

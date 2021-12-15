@@ -175,7 +175,7 @@ public final class ComVars {
     private static void readJson() {
         File f = getFile();
         try {
-            j = new ComVarJson(JsonUtils.readFile(f));
+            j = new ComVarJson(JsonUtils.readFileObject(f));
         } catch (IOException e) {
             throw new IllegalStateException("Unable to read JSON from ComVar file", e);
         }

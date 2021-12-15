@@ -9,7 +9,7 @@ import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.math.FtcBoundingBox;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.forthecrown.utils.math.Vector3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -35,6 +35,7 @@ import java.util.UUID;
  */
 public class ShopEntrance implements JsonSerializable {
     public static final NamespacedKey NOTICE_KEY = Squire.createFtcKey("market_notice");
+    public static final NamespacedKey DOOR_SIGN = Squire.createFtcKey("door_sign");
     public static final CraftPlayerProfile NOTICE_PROFILE = FtcUtils.profileWithTextureID(
             "Pearl", UUID.randomUUID(),
             "7d16ae951120394f368f2250b7c3ad3fb12cea55ec1b2db5a94d1fb7fd4b6fa"
@@ -150,6 +151,7 @@ public class ShopEntrance implements JsonSerializable {
         sign.line(1, signTitle);
         sign.line(2, Component.text("shop"));
         sign.line(3, Component.empty());
+        sign.getPersistentDataContainer().set(DOOR_SIGN, PersistentDataType.BYTE, (byte) 1);
 
         sign.update();
     }

@@ -26,7 +26,7 @@ public final class Permissions {
             VANISH_SEE              = register("ftc.vanish.see"),
 
             STAFF_CHAT              = register("ftc.staffchat"),
-            FTC_ADMIN               = register("ftc.admin"),
+            ADMIN                   = register("ftc.admin"),
             GAMEMODES               = register("ftc.gamemodes"),
             KING_MAKER              = register("ftc.kingmaker"),
             IGNORE_CHAT_CASE        = register("ftc.chatcaseignore"),

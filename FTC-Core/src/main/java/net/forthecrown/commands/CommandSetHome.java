@@ -18,7 +18,7 @@ public class CommandSetHome extends FtcCommand {
         super("sethome", Crown.inst());
 
         setPermission(Permissions.HOME);
-        setDescription("Sets a home where your standing");
+        setDescription("Sets a home where you're standing");
 
         register();
     }

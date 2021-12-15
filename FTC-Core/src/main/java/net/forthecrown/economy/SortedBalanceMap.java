@@ -1,6 +1,5 @@
 package net.forthecrown.economy;
 
-import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.chat.FtcFormatter;
@@ -9,13 +8,14 @@ import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.IntSupplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A constantly sorted map of balances.
@@ -28,7 +28,7 @@ import java.util.function.IntSupplier;
  * two entries with the same UUID to exist. So uhh TODO: fix multiple entries for one UUID.
  */
 public class SortedBalanceMap implements BalanceMap {
-    private Balance[] entries = new Balance[300];
+    private Balance[] entries = new Balance[30];
     private int size;
 
     private final IntSupplier defaultAmount;
@@ -55,18 +55,18 @@ public class SortedBalanceMap implements BalanceMap {
         //Remove entry
         entries[index] = null;
 
+        //Decrement size
+        size--;
+
         //If the index wasn't the last entry in the list,
-        //collapse array a bit
-        if(index < entries.length - 1) {
+        //collapse array at index
+        if(size != index) {
             //Collapse array at index so there's no empty spaces
-            System.arraycopy(entries, index+1, entries, index, entries.length-index);
+            System.arraycopy(entries, index+1, entries, index, entries.length-index - 1);
 
             //Nullify last entry, as it's a copy of length - 2 now
             entries[entries.length - 1] = null;
         }
-
-        //Decrement size
-        size--;
     }
 
     @Override
@@ -94,13 +94,9 @@ public class SortedBalanceMap implements BalanceMap {
         validateIndex(index);
 
         Balance entry = getEntry(index);
-        OfflinePlayer player = Bukkit.getOfflinePlayer(entry.getUniqueId());
+        if(!UserManager.isPlayerID(entry.getUniqueId())) return null;
 
-        //This can happen when non player UUID's get stored
-        //in the map... somehow
-        if(player == null || player.getName() == null) return null;
-
-        CrownUser user = UserManager.getUser(player);
+        CrownUser user = UserManager.getUser(entry.getUniqueId());
         Component displayName = user.nickDisplayName();
 
         user.unloadIfOffline();
@@ -119,15 +115,18 @@ public class SortedBalanceMap implements BalanceMap {
         //To find the entry
 
         int half = size >> 1;
-        for (int i = 0; i < half; i++){
+        boolean divisible = half * 2 == size;
+
+        //Use divisible variable to correct for odd sizes
+        for (int i = 0; i < half + (divisible ? 0 : 1); i++) {
             //Check front half
             Balance entry = getEntry(i);
-            if(entry.getUniqueId().equals(id)) return i;
+            if(entry != null && entry.getUniqueId().equals(id)) return i;
 
             //Check last half
             int oppositeEnd = size - 1 - i;
             entry = getEntry(oppositeEnd);
-            if(entry.getUniqueId().equals(id)) return oppositeEnd;
+            if(entry != null && entry.getUniqueId().equals(id)) return oppositeEnd;
         }
 
         //Not found
@@ -141,7 +140,8 @@ public class SortedBalanceMap implements BalanceMap {
 
     @Override
     public void clear() {
-        entries = new Balance[entries.length];
+        entries = new Balance[0];
+        size = 0;
     }
 
     @Override
@@ -199,13 +199,13 @@ public class SortedBalanceMap implements BalanceMap {
         int towardsTop = index + 1;
         if(isInList(towardsTop)){
             Balance top = getEntry(towardsTop);
-            if(top.compareTo(entry) == 1) return 1;
+            if(top != null && top.compareTo(entry) == 1) return 1;
         }
 
         int towardsBottom = index - 1;
         if(isInList(towardsBottom)){
             Balance bottom = getEntry(towardsBottom);
-            if(bottom.compareTo(entry) == -1) return -1;
+            if(bottom != null && bottom.compareTo(entry) == -1) return -1;
         }
 
         return 0;
@@ -233,12 +233,21 @@ public class SortedBalanceMap implements BalanceMap {
 
     @Override
     public List<UUID> keys(){
-        return ImmutableList.copyOf(ListUtils.arrayToList(entries, Balance::getUniqueId));
+        return nonNullEntries()
+                .map(Balance::getUniqueId)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Integer> values(){
-        return ImmutableList.copyOf(ListUtils.arrayToList(entries, Balance::getValue));
+        return nonNullEntries()
+                .map(Balance::getValue)
+                .collect(Collectors.toList());
+    }
+
+    private Stream<Balance> nonNullEntries() {
+        return Arrays.stream(entries)
+                .filter(Objects::nonNull);
     }
 
     @Override

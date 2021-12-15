@@ -29,7 +29,7 @@ public class CheckCooldown implements UsageCheck<CheckCooldown.CheckInstance> {
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
-        return new CheckInstance(TimeArgument.time().parse(reader) * 50L);
+        return new CheckInstance(TimeArgument.time().parse(reader));
     }
 
     @Override

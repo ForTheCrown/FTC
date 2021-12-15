@@ -93,7 +93,7 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
         PopulationRegion region = byCords.get(pos);
         if(region != null) return region;
 
-        return new RegionData(null, pos, null, null, null);
+        return new RegionData.Empty(pos);
     }
 
     @Override

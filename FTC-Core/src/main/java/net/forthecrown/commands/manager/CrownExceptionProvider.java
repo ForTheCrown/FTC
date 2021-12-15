@@ -1,17 +1,11 @@
 package net.forthecrown.commands.manager;
 
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
-import net.kyori.adventure.text.Component;
 
 /**
  * Class for storing exception constants
  */
-public class CrownExceptionProvider {
-    static final UserCommandExceptionType CANNOT_MUTE =                 new UserCommandExceptionType(u -> Component.text("Cannot mute ").append(u.displayName()));
-    static final UserCommandExceptionType CANNOT_BAN =                  new UserCommandExceptionType(u -> Component.text("Cannot ban ").append(u.displayName()));
-    static final UserCommandExceptionType CANNOT_KICK =                 new UserCommandExceptionType(u -> Component.text("Cannot kick ").append(u.displayName()));
-    static final UserCommandExceptionType CANNOT_JAIL =                 new UserCommandExceptionType(u -> Component.text("Cannot jail ").append(u.displayName()));
-
+class CrownExceptionProvider {
     static final TranslatableExceptionType REGIONS_WRONG_WORLD =        new TranslatableExceptionType("regions.wrongWorld");
 
     static final TranslatableExceptionType NO_REPLY_TARGETS =           new TranslatableExceptionType("commands.noReply");

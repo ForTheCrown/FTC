@@ -2,9 +2,9 @@ package net.forthecrown.utils.math;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import github.scarsz.discordsrv.dependencies.commons.lang3.builder.HashCodeBuilder;
 import net.minecraft.core.Vec3i;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;

@@ -29,7 +29,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -900,7 +900,7 @@ public interface CrownUser extends
     String toString();
 
     @Override
-    default Inventory getInventory() throws UserNotOnlineException {
+    default PlayerInventory getInventory() throws UserNotOnlineException {
         return getPlayer().getInventory();
     }
 

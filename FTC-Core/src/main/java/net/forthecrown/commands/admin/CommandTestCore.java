@@ -1,5 +1,6 @@
 package net.forthecrown.commands.admin;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -15,7 +16,12 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.math.*;
+import net.forthecrown.utils.transformation.BlockIterator;
+import net.forthecrown.utils.transformation.BoundingBoxes;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -28,6 +34,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class CommandTestCore extends FtcCommand {
 
@@ -45,7 +52,7 @@ public class CommandTestCore extends FtcCommand {
         super("coretest", Crown.inst());
 
         setAliases("testcore");
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 
@@ -88,6 +95,23 @@ public class CommandTestCore extends FtcCommand {
                                                 })
                                         )
                                 )
+                        )
+                )
+
+                .then(literal("skin_profile_test")
+                        .then(argument("id", StringArgumentType.greedyString())
+                                .executes(c -> {
+                                    CrownUser user = getUserSender(c);
+                                    PlayerProfile profile = FtcUtils.profileWithTextureID("test", UUID.randomUUID(), StringArgumentType.getString(c, "id"));
+                                    ItemStack item = new ItemStackBuilder(Material.PLAYER_HEAD, 1)
+                                            .setProfile(profile)
+                                            .build();
+
+                                    user.getInventory().addItem(item);
+
+                                    user.sendMessage("idk, I tired");
+                                    return 0;
+                                })
                         )
                 )
 

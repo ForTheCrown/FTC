@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
@@ -13,8 +14,9 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserMail;
 import net.forthecrown.user.actions.ActionFactory;
+import net.forthecrown.user.actions.MailQuery;
+import net.forthecrown.user.actions.UserActionHandler;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandMail extends FtcCommand {
@@ -45,41 +47,63 @@ public class CommandMail extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .executes(c -> readMail(c, false, true))
+                .executes(c -> readMail(c, 0))
 
-                .then(literal("read_other")
-                        .requires(s -> s.hasPermission(Permissions.MAIL_OTHERS))
+                .then(argument("page", IntegerArgumentType.integer(1))
+                        .executes(c -> {
+                            int page = c.getArgument("page", Integer.class) - 1;
+                            return readMail(c, page);
+                        })
+                )
 
-                        .then(argument("user", UserArgument.user())
-                                .executes(c -> readMail(c, false, false))
+                .then(literal("mark_read")
+                        .then(argument("index", IntegerArgumentType.integer(0))
+                                .executes(c -> {
+                                    CrownUser user = getUserSender(c);
+                                    UserMail mail = user.getMail();
+                                    int index = c.getArgument("index", Integer.class);
 
-                                .then(argument("page", IntegerArgumentType.integer(1))
-                                        .executes(c -> readMail(c, true, false))
-                                )
+                                    if(!mail.isValidIndex(index)) {
+                                        throw FtcExceptionProvider.translatable("mail.invalidIndex", Component.text(index));
+                                    }
+
+                                    UserMail.MailMessage message = mail.get(index);
+                                    message.read = !message.read;
+
+                                    user.sendMessage(
+                                            Component.translatable("mail.marked",
+                                                    NamedTextColor.YELLOW,
+                                                    Component.translatable("mail." + (message.read ? "read" : "unread"))
+                                            )
+                                    );
+                                    return 0;
+                                })
                         )
                 )
 
-                .then(literal("read")
-                        .executes(c -> readMail(c, false, true))
+                .then(literal("clear")
+                        .executes(c -> {
+                            CrownUser user = getUserSender(c);
+                            user.getMail().clear();
 
-                        .then(argument("page", IntegerArgumentType.integer(1))
-                                .executes(c -> readMail(c, true, true))
-                        )
+                            user.sendMessage(
+                                    Component.translatable("mail.cleared", NamedTextColor.YELLOW)
+                            );
+                            return 0;
+                        })
                 )
 
                 .then(literal("send")
-                        .then(argument("target", UserArgument.users())
+                        .then(argument("target", UserArgument.user())
                                 .then(argument("message", StringArgumentType.greedyString())
                                         .executes(c -> {
                                             CrownUser user = getUserSender(c);
                                             CrownUser target = UserArgument.getUser(c, "target");
 
-                                            Component message = FtcFormatter.formatIfAllowed(
-                                                    c.getArgument("message", String.class),
-                                                    user
-                                            );
+                                            String rawMessage = c.getArgument("message", String.class);
+                                            Component message = FtcFormatter.formatIfAllowed(rawMessage, user);
 
-                                            ActionFactory.addMail(user, message, target.getUniqueId());
+                                            ActionFactory.addMail(target, message, user.getUniqueId());
                                             return 0;
                                         })
                                 )
@@ -87,37 +111,9 @@ public class CommandMail extends FtcCommand {
                 );
     }
 
-    private int readMail(CommandContext<CommandSource> context, boolean pageGiven, boolean userIsViewer) throws CommandSyntaxException {
-        MailReadContext c = new MailReadContext(context, pageGiven, userIsViewer);
-        TextComponent.Builder builder = Component.text()
-                .append(
-                        c.user.nickDisplayName()
-                                .color(NamedTextColor.YELLOW)
-                                .append(Component.text("'s mail"))
-                );
-
-        c.viewer.sendMessage(builder.build());
-        return 0;
-    }
-
-    private class MailReadContext {
-        final int page;
-        final int firstIndex;
-        final boolean userIsViewing;
-
-        final CommandSource viewer;
-
-        final CrownUser user;
-        final UserMail mail;
-
-        MailReadContext(CommandContext<CommandSource> c, boolean pageGiven, boolean userIsViewer) throws CommandSyntaxException {
-            page = pageGiven ? c.getArgument("page", Integer.class)-1 : 0;
-            firstIndex = page * ENTRIES_PER_PAGE;
-
-            this.viewer = c.getSource();
-            this.user = userIsViewer ? getUserSender(c) : UserArgument.getUser(c, "user");
-            this.mail = user.getMail();
-            this.userIsViewing = userIsViewer;
-        }
+    private static int readMail(CommandContext<CommandSource> c, int page) throws CommandSyntaxException {
+        MailQuery query = new MailQuery(c.getSource(), getUserSender(c), page);
+        UserActionHandler.handleAction(query);
+        return 1;
     }
 }

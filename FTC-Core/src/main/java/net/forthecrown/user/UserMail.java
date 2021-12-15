@@ -35,11 +35,17 @@ public interface UserMail {
     void readAll();
     void clear();
 
+    int size();
+
     ObjectList<MailMessage> getUnread();
     ObjectList<MailMessage> getMail();
 
     MailMessage get(int index) throws IndexOutOfBoundsException;
     int indexOf(MailMessage message);
+
+    default boolean isValidIndex(int index) {
+        return index >= 0 && index <= size();
+    }
 
     class MailMessage implements Struct {
         public final Component message;

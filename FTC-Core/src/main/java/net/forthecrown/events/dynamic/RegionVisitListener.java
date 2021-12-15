@@ -19,9 +19,9 @@ public class RegionVisitListener implements Listener {
     private final FtcUser user;
     private final TravelEffect effect;
 
-    public RegionVisitListener(CrownUser user) {
+    public RegionVisitListener(CrownUser user, TravelEffect effect) {
         this.user = (FtcUser) user;
-        this.effect = user.getCosmeticData().getActiveTravel();
+        this.effect = effect;
     }
 
     public void beginListening() {
@@ -41,7 +41,11 @@ public class RegionVisitListener implements Listener {
             return;
         }
 
-        if(effect != null) effect.onHulkTickDown(user, user.getLocation());
+        try {
+            if(effect != null) effect.onHulkTickDown(user, user.getLocation());
+        } catch (Exception e) {
+            unregister();
+        }
     }
 
     public void unregister() {
@@ -49,8 +53,6 @@ public class RegionVisitListener implements Listener {
 
         user.visitListener = null;
         if(!tickTask.isCancelled()) tickTask.cancel();
-
-        TravelEffect effect = user.getCosmeticData().getActiveTravel();
         if(effect != null) effect.onHulkLand(user, user.getLocation());
     }
 

@@ -6,7 +6,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.utils.math.FtcBoundingBox;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 

@@ -15,9 +15,9 @@ import java.util.Set;
 
 public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
 
-    //They shouldn't be able to input this in a command
-    //Hacky solution, but it'll work, and it also won't require me to transform the way
-    //homes are stored, meaning no data transformers or adapters :DDDD
+    // They shouldn't be able to input this in a command
+    // Hacky solution, but it'll work, and it also won't require me to transform the way
+    // homes are stored
     public static final String HOME_REGION_JSON_NAME = "user:home:region";
 
     public Map<String, Location> homes = new HashMap<>();
@@ -36,7 +36,7 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
     }
 
     private boolean check(){
-        if(getUser().hasPermission(Permissions.FTC_ADMIN)) return false;
+        if(getUser().hasPermission(Permissions.ADMIN)) return false;
 
         int max = user.getRankTier().maxHomes;
         int current = size();
@@ -135,6 +135,7 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
     @Override
     public void deserialize(JsonElement element) {
         homes.clear();
+        homeRegion = null;
 
         if(element == null) return;
         JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());

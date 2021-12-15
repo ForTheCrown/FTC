@@ -1,8 +1,5 @@
 package net.forthecrown.useables;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.useables.checks.UsageCheckInstance;
@@ -11,29 +8,10 @@ import net.kyori.adventure.key.Key;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-public abstract class CheckableBase implements Preconditionable {
+public abstract class CheckableBase implements Checkable {
     protected final Object2ObjectMap<Key, UsageCheckInstance> checks = new Object2ObjectOpenHashMap<>();
-
-    protected void saveChecksInto(JsonObject json){
-        JsonObject preconditions = new JsonObject();
-        for (UsageCheckInstance p: getChecks()){
-            preconditions.add(p.typeKey().asString(), InteractionUtils.writeCheck(p));
-        }
-        json.add("preconditions", preconditions);
-    }
-
-    protected void reloadChecksFrom(JsonObject json) throws CommandSyntaxException {
-        checks.clear();
-        JsonElement precons = json.get("preconditions");
-        if(precons != null && precons.isJsonObject()){
-            for (Map.Entry<String, JsonElement> e: precons.getAsJsonObject().entrySet()){
-                addCheck(InteractionUtils.readCheck(e.getKey(), e.getValue()));
-            }
-        }
-    }
 
     @Override
     public List<UsageCheckInstance> getChecks() {

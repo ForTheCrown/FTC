@@ -17,6 +17,9 @@ import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
 import org.bukkit.entity.Player;
 
+/**
+ * Utility class for adapting bukkit objects to vanilla MC
+ */
 public interface Bukkit2NMS {
     static Entity getEntity(org.bukkit.entity.Entity entity) {
         return ((CraftEntity) entity).getHandle();

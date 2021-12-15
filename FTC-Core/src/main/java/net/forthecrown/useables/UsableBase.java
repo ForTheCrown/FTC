@@ -1,11 +1,5 @@
 package net.forthecrown.useables;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
@@ -13,45 +7,11 @@ import net.kyori.adventure.key.Key;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class UsableBase extends CheckableBase implements Actionable, Preconditionable {
+public abstract class UsableBase extends CheckableBase implements Actionable, Checkable {
 
     protected final List<UsageActionInstance> actions = new ArrayList<>();
 
     protected UsableBase(){}
-
-    public void saveInto(JsonObject json){
-        saveChecksInto(json);
-
-        JsonArray array = new JsonArray();
-
-        for (UsageActionInstance a: getActions()){
-            JsonObject object = new JsonObject();
-            object.add("type", new JsonPrimitive(a.typeKey().asString()));
-            object.add("value", InteractionUtils.writeAction(a));
-
-            array.add(object);
-        }
-
-        json.add("actions", array);
-    }
-
-    public void reloadFrom(JsonObject json) throws CommandSyntaxException {
-        reloadChecksFrom(json);
-
-        actions.clear();
-        JsonElement actionsElement = json.get("actions");
-        if(actionsElement == null || !actionsElement.isJsonArray()) return;
-
-        for (JsonElement e: actionsElement.getAsJsonArray()){
-            JsonWrapper j = JsonWrapper.of(e.getAsJsonObject());
-
-            try {
-                addAction(InteractionUtils.readAction(j.getString("type"), j.get("value")));
-            } catch (CommandSyntaxException exception) {
-                exception.printStackTrace();
-            }
-        }
-    }
 
     @Override
     public void addAction(UsageActionInstance action) {

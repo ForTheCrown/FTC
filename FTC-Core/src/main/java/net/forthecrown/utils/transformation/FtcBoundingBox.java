@@ -1,7 +1,11 @@
-package net.forthecrown.utils.math;
+package net.forthecrown.utils.transformation;
 
 import com.google.gson.JsonElement;
+import net.forthecrown.serializer.JsonWrapper;
+import net.forthecrown.utils.math.ImmutableVector3i;
+import net.forthecrown.utils.math.Vector3i;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
@@ -16,14 +20,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 
-/**
- * FtcAxisAlignedBoundingBox
- * Like a regular BoundingBox, but it's tied to a world, so it has more operational abilities
- * And it can be iterated through
- */
 public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
 
     private final World world;
@@ -38,10 +36,6 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
 
     public FtcBoundingBox(World world, double x, double y, double z, double x1, double y1, double z1) {
         this(world, (int) x, (int) y, (int) z, (int) x1, (int) y1, (int) z1);
-    }
-
-    public static FtcBoundingBox of(Block block){
-        return new FtcBoundingBox(block.getWorld(), block.getX(), block.getY(), block.getZ(), block.getX()+1, block.getY()+1, block.getZ()+1);
     }
 
     public static FtcBoundingBox of(Location location, double radius){
@@ -81,6 +75,23 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
         int z = center.getZ();
 
         return new FtcBoundingBox(world, x - radius, y - radius, z - radius, x + radius, y + radius, z + radius);
+    }
+
+    public static FtcBoundingBox of(World world, ImmutableVector3i min, ImmutableVector3i max) {
+        return new FtcBoundingBox(
+                world,
+                min.getX(), min.getY(), min.getZ(),
+                max.getX(), max.getY(), max.getZ()
+        );
+    }
+
+    public static FtcBoundingBox of(JsonElement element) {
+        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
+
+        Vector3i min = Vector3i.of(json.get("min"));
+        Vector3i max = Vector3i.of(json.get("max"));
+
+        return of(Bukkit.getWorld(json.getString("world")), min, max);
     }
 
     public FtcBoundingBox resize(int x1, int y1, int z1, int x2, int y2, int z2) {
@@ -150,6 +161,10 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
         return getEntitiesByType(LivingEntity.class);
     }
 
+    public Collection<Entity> getEntities(@Nullable Predicate<Entity> predicate) {
+        return getWorld().getNearbyEntities(toBukkit(), predicate);
+    }
+
     public boolean contains(int x, int y, int z) {
         return x >= minX && x < maxX && y >= minY && y < maxY && z >= minZ && z < maxZ;
     }
@@ -199,14 +214,28 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        FtcBoundingBox that = (FtcBoundingBox) o;
-        return getWorld().equals(that.getWorld());
+
+        FtcBoundingBox blocks = (FtcBoundingBox) o;
+
+        if (getMinX() != blocks.getMinX()) return false;
+        if (getMinY() != blocks.getMinY()) return false;
+        if (getMinZ() != blocks.getMinZ()) return false;
+        if (getMaxX() != blocks.getMaxX()) return false;
+        if (getMaxY() != blocks.getMaxY()) return false;
+        if (getMaxZ() != blocks.getMaxZ()) return false;
+        return getWorld().equals(blocks.getWorld());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getWorld());
+        int result = getWorld().hashCode();
+        result = 31 * result + getMinX();
+        result = 31 * result + getMinY();
+        result = 31 * result + getMinZ();
+        result = 31 * result + getMaxX();
+        result = 31 * result + getMaxY();
+        result = 31 * result + getMaxZ();
+        return result;
     }
 
     public List<Block> getBlocks(){
@@ -262,12 +291,13 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
     }
 
     @Override
-    public void deserialize(JsonElement element) {
-
-    }
-
-    @Override
     public JsonElement serialize() {
-        return null;
+        JsonWrapper json = JsonWrapper.empty();
+
+        json.add("world", getWorld().getName());
+        json.add("min", getMin());
+        json.add("max", getMax());
+
+        return json.getSource();
     }
 }

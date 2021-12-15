@@ -59,27 +59,27 @@ public interface Markets extends CrownSerializer {
      * @param shop The shop to claim
      * @param user The user claiming
      */
-    void claim(MarketShop shop, CrownUser user);
+    void claim(MarketShop shop, CrownUser user) throws IllegalArgumentException;
 
     /**
      * unclaims the given shop
      * @param shop The shop to unclaim
      * @param complete Whether to also reset the shop
      */
-    void unclaim(MarketShop shop, boolean complete);
+    void unclaim(MarketShop shop, boolean complete) throws IllegalArgumentException;
 
     /**
      * Merges the given shop with the other shop
      * @param shop The first shop
      * @param merged The second shop
      */
-    void merge(MarketShop shop, MarketShop merged);
+    void merge(MarketShop shop, MarketShop merged) throws IllegalArgumentException;
 
     /**
      * Unmerges the given shop
      * @param shop The shop to unmerge
      */
-    void unmerge(MarketShop shop);
+    void unmerge(MarketShop shop) throws IllegalArgumentException;
 
     /**
      * Trusts the given UUID in the shop
@@ -149,7 +149,7 @@ public interface Markets extends CrownSerializer {
      */
     void remove(MarketShop shop);
 
-    void reset(MarketShop shop);
+    void resetFromBackup(MarketShop shop);
 
     /**
      * Clears all the shops from this manager
@@ -194,14 +194,30 @@ public interface Markets extends CrownSerializer {
      * @param ownership The market ownership to check
      * @throws CommandSyntaxException If the given owner can't change status
      */
-    static void checkCanChangeStatus(MarketOwnership ownership) throws CommandSyntaxException {
-        if(!ownership.canChangeStatus()) {
-            long nextAllowed = ownership.getLastStatusChange() + ComVars.getMarketStatusCooldown();
-            long remaining = nextAllowed - System.currentTimeMillis();
+    static void checkStatusChange(MarketOwnership ownership) throws CommandSyntaxException {
+        checkStatusChange(ownership,"market.cannot.changeStatus");
+    }
 
-            throw FtcExceptionProvider.translatable("market.cannotChangeStatus", FtcFormatter.millisIntoTime(remaining));
-        }
+    static void checkCanPurchase(MarketOwnership ownership) throws CommandSyntaxException {
+        checkStatusChange(ownership,"market.cannot.purchase");
+    }
+
+    static void checkStatusChange(MarketOwnership ownership, String transKey) throws CommandSyntaxException {
+        if(ownership.canChangeStatus()) return;
+
+        long nextAllowed = ownership.getLastStatusChange() + ComVars.getMarketStatusCooldown();
+        long remaining = nextAllowed - System.currentTimeMillis();
+
+        throw FtcExceptionProvider.translatable(transKey, FtcFormatter.millisIntoTime(remaining));
     }
 
     Book getPurchaseBook(MarketShop shop, CrownUser user, ClickableTextNode node);
+
+    /**
+     * Refreshes a shop
+     * <p></p>
+     * Aka, makes sure all the entrances exist
+     * @param shop The shop to refresh
+     */
+    void refresh(MarketShop shop);
 }

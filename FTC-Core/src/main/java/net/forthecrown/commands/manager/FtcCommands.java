@@ -9,6 +9,7 @@ import net.forthecrown.commands.clickevent.ClickEventCommand;
 import net.forthecrown.commands.economy.*;
 import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.help.*;
+import net.forthecrown.commands.mail.CommandMail;
 import net.forthecrown.commands.markets.*;
 import net.forthecrown.commands.marriage.*;
 import net.forthecrown.commands.punishments.*;
@@ -57,15 +58,15 @@ public final class FtcCommands {
         //Debug command
         if(Crown.inDebugMode()) {
             new CommandTestCore();
-
-            //Market commands
-            new CommandMarket();
-            new CommandShopTrust();
-            new CommandMergeShop();
-            new CommandUnmerge();
-            new CommandTransferShop();
-            new CommandUnclaimShop();
         }
+
+        //Market commands
+        new CommandMarket();
+        new CommandShopTrust();
+        new CommandMergeShop();
+        new CommandUnmerge();
+        new CommandTransferShop();
+        new CommandUnclaimShop();
 
         //admin commands
         new CommandKingMaker();
@@ -80,6 +81,7 @@ public final class FtcCommands {
         new CommandSudo();
         new CommandSetSpawn();
         new CommandRoyals();
+        new CommandFtcUser();
 
         //Admin utility
         new CommandFtcUser();
@@ -131,7 +133,8 @@ public final class FtcCommands {
         new CommandList();
         new CommandMe();
         new CommandVolleyBall();
-        //new CommandParrot();
+        new CommandArkBox();
+        new CommandMail();
         new CommandCosmetics();
         new CommandClickableText();
 

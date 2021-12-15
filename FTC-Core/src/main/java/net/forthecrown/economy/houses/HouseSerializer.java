@@ -31,7 +31,7 @@ public final class HouseSerializer {
         JsonWrapper json;
 
         try {
-            json = JsonWrapper.of(JsonUtils.readFile(getFile()));
+            json = JsonWrapper.of(JsonUtils.readFileObject(getFile()));
         } catch (IOException e) {
             e.printStackTrace();
             return;

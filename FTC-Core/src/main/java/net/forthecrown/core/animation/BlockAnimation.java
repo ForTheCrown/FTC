@@ -1,7 +1,7 @@
 package net.forthecrown.core.animation;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.utils.math.BoundingBoxes;
+import net.forthecrown.utils.transformation.BoundingBoxes;
 import net.forthecrown.utils.math.Vector3i;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;

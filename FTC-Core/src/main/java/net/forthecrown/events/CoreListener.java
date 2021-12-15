@@ -41,7 +41,6 @@ import net.forthecrown.user.actions.UserActionHandler;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.user.packets.PacketListeners;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.core.Worlds;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -90,12 +89,16 @@ public class CoreListener implements Listener {
 
         PacketListeners.inject(event.getPlayer());
 
-        if(!event.getPlayer().hasPlayedBefore()){
+        if(!event.getPlayer().hasPlayedBefore()) {
             event.getPlayer().teleport(Crown.getServerSpawn());
 
             Component welcomeMsg = Component.translatable("user.firstJoin", NamedTextColor.YELLOW, user.nickDisplayName());
             Crown.getAnnouncer().announceRaw(welcomeMsg);
             event.joinMessage(null);
+
+            // Give royal sword
+            ItemStack sword = RoyalWeapons.make(user.getUniqueId());
+            user.getInventory().addItem(sword);
 
             //Give join kit
             Kit kit = Crown.getKitManager().get(ComVars.onFirstJoinKit());
@@ -107,8 +110,6 @@ public class CoreListener implements Listener {
             else event.joinMessage(nameChanged ? FtcFormatter.newNameJoinMessage(user) : FtcFormatter.joinMessage(user));
         }
 
-        //Pirates.getParrotTracker().check(user.getPlayer());
-
         UserManager.updateVanishedFromPerspective(user);
         Bukkit.getScheduler().scheduleSyncDelayedTask(Crown.inst(), user::onJoinLater, 1);
     }
@@ -118,9 +119,7 @@ public class CoreListener implements Listener {
         CrownUser user = UserManager.getUser(event.getPlayer());
         user.onLeave();
 
-        PacketListeners.unInject(event.getPlayer());
-
-        //Pirates.getParrotTracker().check(user.getPlayer());
+        PacketListeners.remove(event.getPlayer());
 
         if(user.isVanished()) event.quitMessage(null);
         else event.quitMessage(FtcFormatter.leaveMessage(user));
@@ -239,22 +238,6 @@ public class CoreListener implements Listener {
             });
             return;
         }
-
-        if(player.getWorld().equals(Worlds.SENATE)){
-            event.viewers().removeIf(a -> {
-                Player p = fromAudience(a);
-                if(p == null) return false;
-
-                return !p.getWorld().equals(Worlds.SENATE);
-            });
-            return;
-        } else event.viewers().removeIf(a -> {
-            Player p = fromAudience(a);
-            if(p == null) return false;
-
-            return p.getWorld().equals(Worlds.SENATE);
-        });
-
         //Remove ignored
         event.viewers().removeIf(a -> {
             Player p = fromAudience(a);
@@ -370,17 +353,15 @@ public class CoreListener implements Listener {
             CrownUser user = UserManager.getUser(source);
 
             String strMessage = ChatUtils.getString(message);
-            boolean inSenateWorld = source.getWorld().equals(Worlds.SENATE);
             boolean staffChat = StaffChat.toggledPlayers.contains(source);
 
-            if(source.hasPermission(Permissions.DONATOR_2) || inSenateWorld || staffChat) strMessage = formatColorCodes(strMessage);
-            if(source.hasPermission(Permissions.DONATOR_3) || inSenateWorld || staffChat) strMessage = Crown.getEmotes().format(strMessage, source, true);
+            if(source.hasPermission(Permissions.DONATOR_2) || staffChat) strMessage = formatColorCodes(strMessage);
+            if(source.hasPermission(Permissions.DONATOR_3) || staffChat) strMessage = Crown.getEmotes().format(strMessage, source, true);
 
             strMessage = checkUppercase(source, strMessage);
             message = ChatUtils.convertString(strMessage);
 
-            TextColor playerColor = inSenateWorld ? NamedTextColor.YELLOW : TextColor.color(240, 240, 240);
-            if(staffChat) playerColor = NamedTextColor.GRAY;
+            TextColor playerColor = staffChat ? NamedTextColor.GRAY : TextColor.color(230, 230, 230);
 
             return Component.text()
                     .append(StaffChat.toggledPlayers.contains(source) ? StaffChat.PREFIX : Component.empty())

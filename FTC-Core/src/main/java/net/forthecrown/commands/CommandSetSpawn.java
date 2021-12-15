@@ -15,7 +15,7 @@ public class CommandSetSpawn extends FtcCommand {
     public CommandSetSpawn(){
         super("setspawn", Crown.inst());
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
 
         register();
     }

@@ -6,6 +6,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
+import net.forthecrown.user.actions.ActionFactory;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
@@ -68,31 +69,8 @@ public class CommandDivorce extends FtcCommand {
                 .then(literal("confirm")
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
-                            UserInteractions inter = user.getInteractions();
 
-                            if(inter.getSpouse() == null) throw FtcExceptionProvider.notMarried();
-                            if(!inter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
-
-                            CrownUser spouse = UserManager.getUser(inter.getSpouse());
-                            if(!spouse.getInteractions().canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(spouse);
-
-                            inter.setSpouse(null);
-                            inter.setMChatToggled(false);
-                            inter.setLastMarriageChange(System.currentTimeMillis());
-
-                            UserInteractions tInter = spouse.getInteractions();
-
-                            tInter.setMChatToggled(false);
-                            tInter.setSpouse(null);
-                            tInter.setLastMarriageChange(System.currentTimeMillis());
-
-                            user.sendMessage(Component.translatable("marriage.divorce", spouse.nickDisplayName().color(NamedTextColor.GOLD)).color(NamedTextColor.YELLOW));
-
-                            spouse.sendMessage(
-                                    Component.translatable("marriage.divorce.target",
-                                            user.nickDisplayName().color(NamedTextColor.GOLD)
-                                    ).color(NamedTextColor.YELLOW)
-                            );
+                            ActionFactory.divorce(user, true);
                             return 0;
                         })
                 );

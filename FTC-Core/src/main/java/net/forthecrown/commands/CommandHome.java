@@ -12,7 +12,7 @@ import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserHomes;
-import net.forthecrown.user.actions.RegionVisit;
+import net.forthecrown.user.actions.RegionVisitAction;
 import net.forthecrown.user.actions.UserActionHandler;
 import net.forthecrown.user.data.UserTeleport;
 import net.kyori.adventure.text.Component;
@@ -45,7 +45,7 @@ public class CommandHome extends FtcCommand {
 
                         //If they're close to pole, tp them to home pole
                         if(RegionUtil.isCloseToPole(region.getPolePosition(), user)) {
-                            RegionVisit visit = new RegionVisit(user, region);
+                            RegionVisitAction visit = new RegionVisitAction(user, region);
                             UserActionHandler.handleAction(visit);
 
                             return 0;

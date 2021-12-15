@@ -12,7 +12,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.actions.ActionFactory;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.math.FtcBoundingBox;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 
 public class CommandRandomRegion extends FtcCommand {

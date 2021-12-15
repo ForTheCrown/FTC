@@ -12,7 +12,7 @@ public class CommandSmite extends FtcCommand {
     public CommandSmite() {
         super("smite");
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 

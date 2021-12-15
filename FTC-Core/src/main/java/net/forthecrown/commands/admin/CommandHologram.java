@@ -25,7 +25,7 @@ public class CommandHologram extends FtcCommand {
     public CommandHologram(){
         super("hologram", Crown.inst());
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 

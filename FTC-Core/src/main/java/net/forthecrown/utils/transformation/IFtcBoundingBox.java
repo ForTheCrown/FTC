@@ -1,7 +1,7 @@
-package net.forthecrown.utils.math;
+package net.forthecrown.utils.transformation;
 
-import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.utils.math.Vector3i;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -10,7 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 public interface IFtcBoundingBox<T extends IFtcBoundingBox<T>> extends
-        JsonSerializable, JsonDeserializable,
+        JsonSerializable,
         Iterable<Block>, Cloneable
 {
     int getMinX();

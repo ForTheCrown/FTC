@@ -20,7 +20,7 @@ public class CommandSpeed extends FtcCommand {
     public CommandSpeed(){
         super("speed", Crown.inst());
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 

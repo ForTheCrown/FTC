@@ -283,7 +283,7 @@ public class UserJsonSerializer implements UserSerializer {
             }
         } else {
             try {
-                JsonObject jsonO = JsonUtils.readFile(f);
+                JsonObject jsonO = JsonUtils.readFileObject(f);
                 json = JsonWrapper.of(jsonO);
             } catch (IOException e) {
                 logger.severe("Exception while reading user data for " + id);

@@ -62,8 +62,8 @@ public class CommandSpecificGameMode extends FtcCommand {
 
     public static void init(){
         new CommandSpecificGameMode("survival", Permissions.HELPER, FtcGameMode.SURVIVAL, "gms");
-        new CommandSpecificGameMode("creative", Permissions.FTC_ADMIN, FtcGameMode.CREATIVE, "gmc");
+        new CommandSpecificGameMode("creative", Permissions.ADMIN, FtcGameMode.CREATIVE, "gmc");
         new CommandSpecificGameMode("spectator", Permissions.HELPER, FtcGameMode.SPECTATOR, "gmsp");
-        new CommandSpecificGameMode("adventure", Permissions.FTC_ADMIN, FtcGameMode.ADVENTURE, "gma");
+        new CommandSpecificGameMode("adventure", Permissions.ADMIN, FtcGameMode.ADVENTURE, "gma");
     }
 }

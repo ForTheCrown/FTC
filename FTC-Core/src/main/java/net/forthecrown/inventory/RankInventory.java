@@ -65,7 +65,7 @@ public final class RankInventory {
                 .add(new SelectRankOption(RankTitle.LEGACY_TIER_1, new InventoryPos(7, 4)));
     });
 
-    public static final BuiltInventory GUI_TIER2 = createBase(RankTier.TIER_2, Component.text("Free ranks"), builder -> {
+    public static final BuiltInventory GUI_TIER2 = createBase(RankTier.TIER_2, Component.text("Tier 2"), builder -> {
         // Border decorations
         builder.add(3, orangeBorder)
                 .add(5, orangeBorder)
@@ -79,7 +79,7 @@ public final class RankInventory {
                 .add(new SelectRankOption(RankTitle.LEGACY_TIER_2, new InventoryPos(7, 4)));
     });
 
-    public static final BuiltInventory GUI_TIER3 = createBase(RankTier.TIER_3, Component.text("Free ranks"), builder -> {
+    public static final BuiltInventory GUI_TIER3 = createBase(RankTier.TIER_3, Component.text("Tier 3"), builder -> {
         // Border decorations
         builder.add(3, yellowBorder)
                 .add(5, yellowBorder)

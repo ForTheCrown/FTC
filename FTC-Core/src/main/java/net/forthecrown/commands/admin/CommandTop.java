@@ -13,7 +13,7 @@ public class CommandTop extends FtcCommand {
     public CommandTop(){
         super("top", Crown.inst());
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         register();
     }
 

@@ -1,45 +1,31 @@
 package net.forthecrown.user.actions;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.sk89q.worldedit.math.BlockVector2;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.chat.BannedWords;
-import net.forthecrown.events.dynamic.RegionVisitListener;
-import net.forthecrown.regions.PopulationRegion;
-import net.forthecrown.regions.RegionConstants;
-import net.forthecrown.regions.RegionManager;
-import net.forthecrown.regions.RegionPoleGenerator;
-import net.forthecrown.user.CosmeticData;
+import net.forthecrown.grenadier.exceptions.RoyalCommandException;
+import net.forthecrown.regions.visit.RegionVisit;
+import net.forthecrown.regions.visit.VisitPredicate;
+import net.forthecrown.regions.visit.handlers.OwnedEntityHandler;
+import net.forthecrown.regions.visit.handlers.RidingVehicleHandler;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserMail;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.ListUtils;
-import net.forthecrown.utils.math.FtcBoundingBox;
-import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.HeightMap;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.*;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
+import org.bukkit.entity.Player;
 
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FtcUserActionHandler implements UserActionHandler {
     @Override
@@ -136,12 +122,12 @@ public class FtcUserActionHandler implements UserActionHandler {
 
     @Override
     public void handleRegionInvite(InviteToRegion invite) {
-        CrownUser sender = invite.getSender();
-        CrownUser target = invite.getTarget();
+        CrownUser sender = invite.sender();
+        CrownUser target = invite.target();
 
         //Add the invites
-        sender.getInteractions().addInvite(invite.getTarget().getUniqueId());
-        target.getInteractions().addInvitedTo(invite.getSender().getUniqueId());
+        sender.getInteractions().addInvite(invite.target().getUniqueId());
+        target.getInteractions().addInvitedTo(invite.sender().getUniqueId());
 
         //Tell sender they invited
         sender.sendMessage(
@@ -178,12 +164,11 @@ public class FtcUserActionHandler implements UserActionHandler {
         }
 
         boolean self = query.isSelfQuery();
-        boolean onlyUnread = query.onlyUnread();
 
-        List<UserMail.MailMessage> messages = onlyUnread ? query.getMail().getUnread() : query.getMail().getMail();
+        List<UserMail.MailMessage> messages = query.getMail().getMail();
 
         if(messages.isEmpty()) {
-            throw FtcExceptionProvider.translatable("mail.none." + (self ? "self" : "other") + (onlyUnread ? ".unread" : ""));
+            throw FtcExceptionProvider.translatable("mail.none." + (self ? "self" : "other"));
         }
 
         TextComponent.Builder builder = Component.text()
@@ -208,7 +193,7 @@ public class FtcUserActionHandler implements UserActionHandler {
                     Component.text()
                             .color(NamedTextColor.WHITE)
                             .append(
-                                    Component.text(index + ")")
+                                    Component.text("\n" + index + ")")
                                             .color(NamedTextColor.GOLD)
                                             .hoverEvent(
                                                     Component.translatable(
@@ -221,11 +206,11 @@ public class FtcUserActionHandler implements UserActionHandler {
 
                             .append(
                                     Component.text()
-                                            .color(NamedTextColor.GRAY)
+                                            .color(m.read ? NamedTextColor.GRAY : NamedTextColor.YELLOW)
                                             .content(" [")
                                             .append(
-                                                    Component.translatable(m.read ? "mail.read" : "m.unread")
-                                                            .clickEvent(ClickEvent.runCommand("/mail read " + query.getMail().getMail().indexOf(m)))
+                                                    Component.translatable(m.read ? "mail.read" : "mail.unread")
+                                                            .clickEvent(ClickEvent.runCommand("/mail mark_read " + query.getMail().indexOf(m)))
                                                             .hoverEvent(Component.translatable(m.read ? "mail.read.hover" : "mail.unread.hover"))
                                             )
                                             .append(Component.text("] "))
@@ -248,7 +233,7 @@ public class FtcUserActionHandler implements UserActionHandler {
         Component text = action.getText();
         Component senderDisplay = null;
 
-        if(action.getSender() != null && action.shouldValidateSender()) {
+        if(action.hasSender() && action.shouldValidateSender()) {
             UUID sender = action.getSender();
             CrownUser senderUser = UserManager.getUser(sender);
             senderDisplay = senderUser.nickDisplayName().color(NamedTextColor.YELLOW);
@@ -267,7 +252,7 @@ public class FtcUserActionHandler implements UserActionHandler {
                 senderUser.sendMessage(
                         Component.translatable("mail.sent",
                                 NamedTextColor.YELLOW,
-                                senderDisplay.color(NamedTextColor.GOLD),
+                                user.nickDisplayName().color(NamedTextColor.GOLD),
                                 action.getText().color(NamedTextColor.WHITE)
                         )
                 );
@@ -292,190 +277,92 @@ public class FtcUserActionHandler implements UserActionHandler {
         }
     }
 
+    // Handle divorce hahahahahaha
+    // What has this server come to lmao
     @Override
-    public void handleVisit(RegionVisit visit) {
-        Player player = visit.getVisitor().getPlayer();
-        if(!ListUtils.isNullOrEmpty(player.getPassengers())) {
-            player.sendMessage(
-                    Component.translatable("commands.teleport.error.passengers", NamedTextColor.GRAY)
-            );
+    public void handleDivorce(DivorceAction action) throws RoyalCommandException {
+        CrownUser user = action.user();
+        UserInteractions inter = user.getInteractions();
 
-            return;
+        if(inter.getSpouse() == null) throw FtcExceptionProvider.notMarried();
+        if(!inter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
+
+        CrownUser spouse = UserManager.getUser(inter.getSpouse());
+        if(!spouse.getInteractions().canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(spouse);
+
+        inter.setSpouse(null);
+        inter.setMChatToggled(false);
+        inter.setLastMarriageChange(System.currentTimeMillis());
+
+        UserInteractions tInter = spouse.getInteractions();
+
+        tInter.setMChatToggled(false);
+        tInter.setSpouse(null);
+        tInter.setLastMarriageChange(System.currentTimeMillis());
+
+        if(action.informUsers()) {
+            user.sendMessage(Component.translatable("marriage.divorce", spouse.nickDisplayName().color(NamedTextColor.GOLD)).color(NamedTextColor.YELLOW));
+
+            spouse.sendOrMail(
+                    Component.translatable("marriage.divorce.target",
+                            user.nickDisplayName().color(NamedTextColor.GOLD)
+                    ).color(NamedTextColor.YELLOW)
+            );
+        }
+    }
+
+    @Override
+    public void handleMarry(MarryAction action) {
+        CrownUser user = action.user();
+        CrownUser target = action.target();
+
+        UserInteractions inter = user.getInteractions();
+        UserInteractions tInter = target.getInteractions();
+
+        inter.setSpouse(target.getUniqueId());
+        inter.setWaitingFinish(null);
+        inter.setLastMarriageChange(System.currentTimeMillis());
+
+        tInter.setSpouse(user.getUniqueId());
+        tInter.setWaitingFinish(null);
+        tInter.setLastMarriageChange(System.currentTimeMillis());
+
+        if(action.informUsers()) {
+            target.sendMessage(
+                    Component.translatable("marriage.priestText.married", user.nickDisplayName().color(NamedTextColor.YELLOW)).color(NamedTextColor.GOLD)
+            );
+            user.sendMessage(
+                    Component.translatable("marriage.priestText.married", target.nickDisplayName().color(NamedTextColor.YELLOW)).color(NamedTextColor.GOLD)
+            );
         }
 
-        CrownUser user = visit.getVisitor();
-        CosmeticData cosmetics = user.getCosmeticData();
-
-        World world = visit.getRegion().getWorld();
-        BlockVector2 poleCords = visit.getRegion().getPolePosition();
-        Location loc = player.getLocation();
-
-        //Declare the teleportation location
-        Location teleportLoc = new Location(
-                world,
-                poleCords.getX() + 0.5D,
-                world.getHighestBlockYAt(poleCords.getX(), poleCords.getZ(), HeightMap.WORLD_SURFACE) + 1,
-                poleCords.getZ() + 0.5D,
-                loc.getYaw(),
-                loc.getPitch()
+        Crown.getAnnouncer().announceToAll(
+                Component.text()
+                        .append(user.nickDisplayName())
+                        .append(Component.text(" is now married to "))
+                        .append(target.nickDisplayName())
+                        .append(giveItAWeek())
+                        .build()
         );
-
-        //Generate pole in case it doesn't exist
-        RegionManager manager = Crown.getRegionManager();
-        RegionPoleGenerator generator = manager.getGenerator();
-        generator.generate(visit.getRegion());
-
-        PopulationRegion localRegion = manager.get(user.getRegionCords());
-        BlockVector2 localPole = localRegion.getPolePosition();
-
-        List<Entity> toTeleport = new ObjectArrayList<>();
-        AtomicBoolean hasLeashed = new AtomicBoolean(false);
-
-        //If near the pole, teleport tamed and/or owned entities at the pole
-        if(user.get2DLocation().distance(localPole) <= RegionConstants.DISTANCE_TO_POLE) {
-
-            //For entities which should be teleported along with the player
-            FtcBoundingBox box = FtcBoundingBox.of(world, localRegion.getPoleBoundingBox());
-            box.expand(2);
-
-            toTeleport.addAll(
-                    world.getNearbyEntities(box.toBukkit(), e -> {
-                        Announcer.debug("entity: " + e);
-
-                        //Skip players
-                        if(e.getType() == EntityType.PLAYER) return false;
-
-                        //If the entity is tameable and has been tamed
-                        //by the visitor
-                        if(e instanceof Tameable) {
-                            Tameable tameable = (Tameable) e;
-                            if(!tameable.isTamed()) return false;
-
-                            if(tameable.getOwnerUniqueId().equals(user.getUniqueId())) {
-                                return true;
-                            }
-                        }
-
-                        //If entity is being ridden by player, and is not a player, tp it
-                        if(e.getPassengers().contains(player)) {
-                            //Remove player as passenger so it could be teleported
-                            e.removePassenger(player);
-
-                            return true;
-                        }
-
-                        //If they're leashed by the visitor
-                        if(e instanceof LivingEntity) {
-                            LivingEntity living = (LivingEntity) e;
-
-                            try {
-                                Entity leashHolder = living.getLeashHolder();
-                                if(leashHolder.getUniqueId().equals(user.getUniqueId())) {
-                                    hasLeashed.set(true);
-                                    return true;
-                                }
-
-                            } catch (IllegalStateException e1) {
-                            }
-                        }
-
-                        return false;
-                    })
-            );
-        }
-
-        //If the comvar to allow hulk smashing is on, the user allows it and the sky above the destination
-        //is clear then do a hulk smash, else just teleport
-        if(!hasLeashed.get() && ComVars.shouldHulkSmashPoles() && user.hulkSmashesPoles() && FtcUtils.hasOnlyAirAbove(WorldVec3i.of(teleportLoc))) {
-            Location entityLoc = teleportLoc.clone();
-
-            //Move TP loc to sky since hulk smash
-            teleportLoc.setY(256);
-            teleportLoc.setPitch(90f);
-
-            //Rocket vector
-            Vector vector = new Vector(0, 20, 0);
-
-            //Rocket them into the sky
-            user.setVelocity(vector);
-
-            //If they have cosmetic effect, execute it
-            if(cosmetics.hasActiveTravel()) {
-                cosmetics.getActiveTravel().onHulkStart(user, loc);
-            }
-
-            //Tick task for them going up
-            new GoingUp(teleportLoc, user, toTeleport, entityLoc);
-        } else {
-            //Execute travel effect, if they have one
-            if(cosmetics.hasActiveTravel()) {
-                Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
-                    cosmetics.getActiveTravel().onPoleTeleport(user, loc, teleportLoc.clone());
-                }, 2);
-            }
-
-            //Just TP them to pole... boring
-            player.teleport(teleportLoc);
-
-            //Teleport all entities there
-            tpDelayed(toTeleport, teleportLoc);
-        }
     }
 
-    static void tpDelayed(List<Entity> entities, Location location) {
-        Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
-            entities.forEach(e -> e.teleport(location));
-        }, 10);
+    private Component giveItAWeek() {
+        return FtcUtils.randomInRange(0, 1000) != 1 ? Component.text("!") :
+                Component.text("... I give it a week").color(NamedTextColor.GRAY);
     }
 
-    private static class GoingUp implements Runnable {
-        private final Location tp;
-        private final CrownUser user;
-        private final CosmeticData cosmetics;
+    @Override
+    public void handleVisit(RegionVisitAction visitAction) {
+        new RegionVisit(visitAction.getVisitor(), visitAction.getRegion(), Crown.getRegionManager())
+                .addPredicate(VisitPredicate.ensureRidingVehicle())
+                .addPredicate(VisitPredicate.ensureNoPassengers())
 
-        private final List<Entity> toTeleport;
-        private final Location entityTP;
+                // This order matters, vehicles must be handled before
+                // other passengers
+                .addHandler(new RidingVehicleHandler())
+                //.addHandler(new PassengerHandler())
+                .addHandler(new OwnedEntityHandler())
 
-        private final BukkitTask task;
-
-        private GoingUp(Location tp, CrownUser user, List<Entity> toTeleport, Location entityTP) {
-            this.tp = tp;
-            this.user = user;
-            cosmetics = user.getCosmeticData();
-
-            this.toTeleport = toTeleport;
-            this.entityTP = entityTP;
-
-            task = Bukkit.getScheduler().runTaskTimer(Crown.inst(), this,
-                    RegionVisitListener.TICKS_PER_TICK, RegionVisitListener.TICKS_PER_TICK
-            );
-        }
-
-        byte tick = (byte) (0.75 * (20 / RegionVisitListener.TICKS_PER_TICK));
-
-        @Override
-        public void run() {
-            try {
-                //If they have travel effect, run it
-                if(cosmetics.hasActiveTravel()) {
-                    cosmetics.getActiveTravel().onHulkTickUp(user, user.getLocation());
-                }
-
-                tick--;
-
-                //If we're below the tick limit, stop and move on to fall listener
-                if(tick < 0) {
-                    task.cancel();
-
-                    user.getPlayer().teleport(tp);
-                    tpDelayed(toTeleport, entityTP);
-
-                    RegionVisitListener listener = new RegionVisitListener(user);
-                    listener.beginListening();
-                }
-            } catch (Exception e) {
-                task.cancel();
-            }
-        }
+                .run();
     }
 }

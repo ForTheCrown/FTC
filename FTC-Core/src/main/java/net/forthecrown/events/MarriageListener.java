@@ -4,14 +4,13 @@ import net.forthecrown.commands.clickevent.ClickEventManager;
 import net.forthecrown.commands.clickevent.ClickEventTask;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
-import net.forthecrown.core.Crown;
 import net.forthecrown.cosmetics.emotes.CosmeticEmotes;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
+import net.forthecrown.user.actions.ActionFactory;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -88,7 +87,7 @@ public class MarriageListener implements Listener, ClickEventTask {
 
         CrownUser target = UserManager.getUser(inter.getWaitingFinish());
 
-        if(firstArg.contains("marry")){
+        if(firstArg.contains("marry")) {
             Component message = Component.translatable("marriage.priestText.confirm",
                     user.nickDisplayName().color(NamedTextColor.YELLOW),
                     target.nickDisplayName().color(NamedTextColor.YELLOW)
@@ -101,34 +100,10 @@ public class MarriageListener implements Listener, ClickEventTask {
                     );
 
             user.sendMessage(message);
-        } else if(firstArg.contains("marriageConfirm")){
+        } else if(firstArg.contains("marriageConfirm")) {
             if(awaitingFinishSet.contains(user.getUniqueId())) throw FtcExceptionProvider.translatable("marriage.priestText.alreadyAccepted");
-            if(awaitingFinishSet.contains(target.getUniqueId())){
-                inter.setSpouse(target.getUniqueId());
-                inter.setWaitingFinish(null);
-                inter.setLastMarriageChange(System.currentTimeMillis());
-
-                UserInteractions tInter = target.getInteractions();
-                tInter.setSpouse(user.getUniqueId());
-                tInter.setWaitingFinish(null);
-                tInter.setLastMarriageChange(System.currentTimeMillis());
-
-                target.sendMessage(
-                        Component.translatable("marriage.priestText.married", user.nickDisplayName().color(NamedTextColor.YELLOW)).color(NamedTextColor.GOLD)
-                );
-                user.sendMessage(
-                        Component.translatable("marriage.priestText.married", target.nickDisplayName().color(NamedTextColor.YELLOW)).color(NamedTextColor.GOLD)
-                );
-
-                Crown.getAnnouncer().announceToAll(
-                        Component.text()
-                                .append(user.nickDisplayName())
-                                .append(Component.text(" is now married to "))
-                                .append(target.nickDisplayName())
-                                .append(Component.text("!"))
-                                .append(giveItAWeek())
-                                .build()
-                );
+            if(awaitingFinishSet.contains(target.getUniqueId())) {
+                ActionFactory.marry(user, target, true);
                 awaitingFinishSet.remove(target.getUniqueId());
                 return;
             }
@@ -138,10 +113,5 @@ public class MarriageListener implements Listener, ClickEventTask {
                     Component.translatable("marriage.priestText.waiting").color(NamedTextColor.YELLOW)
             );
         }
-    }
-
-    private Component giveItAWeek() {
-        return FtcUtils.randomInRange(0, 1000) != 1 ? Component.empty() :
-                Component.text(" I give it a week").color(NamedTextColor.GRAY);
     }
 }

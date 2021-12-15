@@ -70,7 +70,11 @@ public class PlayerRidingManager implements Listener {
             return;
         }
 
-        PlayerRider riderM = new PlayerRider(rider, riddenPlayer);
+        startRiding(rider, riddenPlayer);
+    }
+
+    public void startRiding(Player rider, Player passenger) {
+        PlayerRider riderM = new PlayerRider(rider, passenger);
         Bukkit.getPluginManager().registerEvents(riderM, Crown.inst());
         addRider(riderM);
     }

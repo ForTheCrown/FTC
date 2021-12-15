@@ -1,10 +1,13 @@
 package net.forthecrown.user.data;
 
 import com.google.gson.JsonElement;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+
+import java.util.List;
 
 /**
  * Represents a rank's tier
@@ -50,6 +53,36 @@ public enum RankTier implements Comparable<RankTier>, JsonSerializable {
         if(ordinal == -1) return null;
 
         return values()[ordinal];
+    }
+
+    /**
+     * Get all the titles for this tier
+      * @return The tier's titles
+     */
+    public List<RankTitle> getTitlesFor() {
+        List<RankTitle> titles = new ObjectArrayList<>();
+
+        for (RankTitle t: RankTitle.values()) {
+            if(t.getTier() == this) titles.add(t);
+        }
+
+        return titles;
+    }
+
+    /**
+     * Get all the titles for this tier and the tiers below it
+     * @return This tier's and below's ranks
+     */
+    public List<RankTitle> getTitlesForAndBelow() {
+        RankTier tier = this;
+        List<RankTitle> titles = new ObjectArrayList<>();
+
+        while (tier != null) {
+            titles.addAll(tier.getTitlesFor());
+            tier = tier.getLowerTier();
+        }
+
+        return titles;
     }
 
     @Override

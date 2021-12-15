@@ -265,4 +265,12 @@ public interface UserInteractions extends UserAttachment {
      * @param from the sender of the invite to remove
      */
     void removeInvitedTo(UUID from);
+
+    /**
+     * Checks if the user is married
+     * @return true if married, false if not
+     */
+    default boolean isMarried() {
+        return getSpouse() != null;
+    }
 }

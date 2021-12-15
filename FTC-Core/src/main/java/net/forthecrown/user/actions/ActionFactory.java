@@ -18,6 +18,14 @@ public abstract class ActionFactory {
     }
 
     public static void visitRegion(CrownUser user, PopulationRegion region) {
-        UserActionHandler.handleAction(new RegionVisit(user, region));
+        UserActionHandler.handleAction(new RegionVisitAction(user, region));
+    }
+
+    public static void divorce(CrownUser user, boolean informUsers) {
+        UserActionHandler.handleAction(new DivorceAction(user, informUsers));
+    }
+
+    public static void marry(CrownUser user, CrownUser target, boolean informUsers) {
+        UserActionHandler.handleAction(new MarryAction(user, target, informUsers));
     }
 }

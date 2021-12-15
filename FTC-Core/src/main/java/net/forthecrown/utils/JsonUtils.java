@@ -5,18 +5,15 @@ import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.core.nbt.NbtHandler;
-import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.utils.math.FtcBoundingBox;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.nbt.TagParser;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -24,10 +21,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Collection;
-import java.util.Objects;
+import java.util.Date;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -69,62 +67,6 @@ public final class JsonUtils {
         return new Location(world, x, y, z, yaw, pitch);
     }
 
-    public static JsonObject writeRegion(FtcBoundingBox box){
-        JsonObject json = new JsonObject();
-
-        json.addProperty("world", box.getWorld().getName());
-
-        json.addProperty("minX", box.getMinX());
-        json.addProperty("minY", box.getMinY());
-        json.addProperty("minZ", box.getMinZ());
-
-        json.addProperty("maxX", box.getMaxX());
-        json.addProperty("maxY", box.getMaxY());
-        json.addProperty("maxZ", box.getMaxZ());
-
-        return json;
-    }
-
-    public static FtcBoundingBox readRegion(JsonObject json){
-        World world = Objects.requireNonNull(Bukkit.getWorld(json.get("world").getAsString()));
-
-        double minX = json.get("minX").getAsDouble();
-        double minY = json.get("minY").getAsDouble();
-        double minZ = json.get("minZ").getAsDouble();
-
-        double maxX = json.get("maxX").getAsDouble();
-        double maxY = json.get("maxY").getAsDouble();
-        double maxZ = json.get("maxZ").getAsDouble();
-
-        return new FtcBoundingBox(world, minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    public static JsonObject writeBoundingBox(BoundingBox box) {
-        JsonWrapper json = JsonWrapper.empty();
-
-        json.add("minX", box.getMinX());
-        json.add("minY", box.getMinY());
-        json.add("minZ", box.getMinZ());
-
-        json.add("maxX", box.getMaxX());
-        json.add("maxY", box.getMaxY());
-        json.add("maxZ", box.getMaxZ());
-
-        return json.getSource();
-    }
-
-    public static BoundingBox readBoundingBox(JsonObject json) {
-        double minX = json.get("minX").getAsDouble();
-        double minY = json.get("minY").getAsDouble();
-        double minZ = json.get("minZ").getAsDouble();
-
-        double maxX = json.get("maxX").getAsDouble();
-        double maxY = json.get("maxY").getAsDouble();
-        double maxZ = json.get("maxZ").getAsDouble();
-
-        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
     public static <T> JsonArray writeCollection(@NotNull Collection<T> collection, @NotNull Function<T, JsonElement> converter){
         Validate.notNull(collection, "Collection was null");
         Validate.notNull(converter, "Converter was null");
@@ -135,11 +77,6 @@ public final class JsonUtils {
             result.add(converter.apply(t));
         }
         return result;
-    }
-
-    public static <T> void readList(JsonElement element, Function<JsonElement, T> func, Consumer<T> adder){
-        JsonArray array = element.getAsJsonArray();
-        array.forEach(e -> adder.accept(func.apply(e)));
     }
 
     public static <T extends Enum<T>> T readEnum(Class<T> clazz, JsonElement element){
@@ -165,7 +102,7 @@ public final class JsonUtils {
         }
     }
 
-    //Writes the item using it's NBT
+    //Writes the item using its NBT
     public static JsonPrimitive writeItem(ItemStack itemStack){
         return new JsonPrimitive(NbtHandler.ofItem(itemStack).serialize());
     }
@@ -182,81 +119,88 @@ public final class JsonUtils {
         return FtcUtils.parseKey(element.getAsString());
     }
 
+    // Read the UUID from the element
+    // if element is a number, the ID is stored as a BigInteger
+    // if it's a string, it's stored as a string representation
+    // of the uuid
     public static UUID readUUID(JsonElement element){
         JsonPrimitive primitive = element.getAsJsonPrimitive();
 
         if(primitive.isNumber()) {
             BigInteger bigInt = primitive.getAsBigInteger();
-            byte[] data = bigInt.toByteArray();
-
-            long msb = 0;
-            long lsb = 0;
-            assert data.length == 16 : "data must be 16 bytes in length";
-            for (int i=0; i<8; i++)  msb = (msb << 8) | (data[i] & 0xff);
-            for (int i=8; i<16; i++) lsb = (lsb << 8) | (data[i] & 0xff);
-
-            return new UUID(msb, lsb);
+            return convertFromBigInteger(bigInt);
         } else return UUID.fromString(primitive.getAsString());
     }
 
-    private static byte[] toByteArray(UUID uuid) {
-        byte[] result = new byte[16];
-
-        long most = uuid.getMostSignificantBits();
-        long least = uuid.getLeastSignificantBits();
-
-        int i = 0;
-        result[i]   = (byte)(most >>> 56);
-        result[++i] = (byte)(most >>> 48);
-        result[++i] = (byte)(most >>> 40);
-        result[++i] = (byte)(most >>> 32);
-        result[++i] = (byte)(most >>> 24);
-        result[++i] = (byte)(most >>> 16);
-        result[++i] = (byte)(most >>>  8);
-        result[++i] = (byte)(most >>>  0);
-
-        result[++i] = (byte)(least >>> 56);
-        result[++i] = (byte)(least >>> 48);
-        result[++i] = (byte)(least >>> 40);
-        result[++i] = (byte)(least >>> 32);
-        result[++i] = (byte)(least >>> 24);
-        result[++i] = (byte)(least >>> 16);
-        result[++i] = (byte)(least >>>  8);
-        result[++i] = (byte)(least >>>  0);
-
-        return result;
-    }
-
+    //Writes the UUID as a BigInteger using the byte[] gotten from toByteArray(UUID)
     public static JsonPrimitive writeUUID(UUID id){
-        return new JsonPrimitive(new BigInteger(1, toByteArray(id)));
+        return new JsonPrimitive(convertToBigInteger(id));
     }
 
-    public static JsonObject writeVanillaBoundingBox(net.minecraft.world.level.levelgen.structure.BoundingBox box) {
-        JsonWrapper json = JsonWrapper.empty();
+    private static final BigInteger B = BigInteger.ONE.shiftLeft(64); // 2^64
+    private static final BigInteger L = BigInteger.valueOf(Long.MAX_VALUE);
 
-        json.add("minX", box.minX());
-        json.add("minY", box.minY());
-        json.add("minZ", box.minZ());
+    public static BigInteger convertToBigInteger(UUID id) {
+        BigInteger lo = BigInteger.valueOf(id.getLeastSignificantBits());
+        BigInteger hi = BigInteger.valueOf(id.getMostSignificantBits());
 
-        json.add("maxX", box.maxX());
-        json.add("maxY", box.maxY());
-        json.add("maxZ", box.maxZ());
+        // If any of lo/hi parts is negative interpret as unsigned
 
-        return json.getSource();
+        if (hi.signum() < 0)
+            hi = hi.add(B);
+
+        if (lo.signum() < 0)
+            lo = lo.add(B);
+
+        return lo.add(hi.multiply(B));
     }
 
-    public static net.minecraft.world.level.levelgen.structure.BoundingBox readVanillaBoundingBox(JsonObject element) {
-        JsonWrapper j = JsonWrapper.of(element);
+    public static UUID convertFromBigInteger(BigInteger x) {
+        BigInteger[] parts = x.divideAndRemainder(B);
+        BigInteger hi = parts[0];
+        BigInteger lo = parts[1];
 
-        return new net.minecraft.world.level.levelgen.structure.BoundingBox(
-                j.getInt("minX"),
-                j.getInt("minY"),
-                j.getInt("minZ"),
+        if (L.compareTo(lo) < 0)
+            lo = lo.subtract(B);
 
-                j.getInt("maxX"),
-                j.getInt("maxY"),
-                j.getInt("maxZ")
-        );
+        if (L.compareTo(hi) < 0)
+            hi = hi.subtract(B);
+
+        return new UUID(hi.longValueExact(), lo.longValueExact());
+    }
+
+    public static int[] readIntArray(JsonArray array) {
+        int[] arr = new int[array.size()];
+
+        for (int i = 0; i < array.size(); i++) {
+            arr[i] = array.get(i).getAsInt();
+        }
+
+        return arr;
+    }
+
+    public static JsonArray writeIntArray(int... arr) {
+        JsonArray array = new JsonArray();
+
+        for (int j : arr) {
+            array.add(j);
+        }
+
+        return array;
+    }
+
+    private static final DateFormat DATE_FORMAT = DateFormat.getDateInstance();
+
+    public static Date readDate(JsonElement element) {
+        try {
+            return DATE_FORMAT.parse(element.getAsString());
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Error parsing date: " + element.getAsString(), e);
+        }
+    }
+
+    public static JsonElement writeDate(Date date) {
+        return new JsonPrimitive(DATE_FORMAT.format(date));
     }
 
     static final Gson gson = new GsonBuilder()
@@ -275,14 +219,13 @@ public final class JsonUtils {
     }
 
     //Reads json from a file
-    public static JsonObject readFile(File file) throws IOException {
-        return readFileElement(file).getAsJsonObject();
+    public static JsonObject readFileObject(File file) throws IOException {
+        return readFile(file).getAsJsonObject();
     }
 
-    public static JsonElement readFileElement(File file) throws IOException {
+    public static JsonElement readFile(File file) throws IOException {
         FileReader reader = new FileReader(file);
-        JsonParser parser = new JsonParser();
-        JsonElement json = parser.parse(reader);
+        JsonElement json = JsonParser.parseReader(reader);
 
         reader.close();
 

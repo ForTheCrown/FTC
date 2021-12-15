@@ -2,6 +2,7 @@ package net.forthecrown.utils.math;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.sk89q.worldedit.math.BlockVector3;
 import net.forthecrown.serializer.JsonWrapper;
 import net.minecraft.core.SectionPos;
 import org.apache.commons.lang3.Validate;
@@ -21,11 +22,12 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
     public static WorldVec3i of(JsonElement element) {
         JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
+        //Save cords as an array, instead of an object with x y z key-values
+        int[] cords = json.getIntArray("cords");
+
         return new WorldVec3i(
                 Bukkit.getWorld(json.getString("world")),
-                json.getInt("x"),
-                json.getInt("y"),
-                json.getInt("z")
+                cords[0], cords[1], cords[2]
         );
     }
 
@@ -39,6 +41,11 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
 
     public static WorldVec3i of(Entity entity){
         return of(entity.getLocation());
+    }
+
+    // WorldEdit adapter
+    public static WorldVec3i of(World world, BlockVector3 point) {
+        return new WorldVec3i(world, point.getX(), point.getY(), point.getZ());
     }
 
     public Location toLocation() {
@@ -98,9 +105,10 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
 
     @Override
     public JsonObject serialize() {
-        JsonObject json = super.serialize();
+        JsonObject json = new JsonObject();
 
         json.addProperty("world", world.getName());
+        json.add("cords", super.serialize());
 
         return json;
     }

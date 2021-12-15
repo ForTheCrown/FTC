@@ -37,11 +37,14 @@ public abstract class FtcCommand extends AbstractCommand {
     protected FtcCommand(@NotNull String name, @NotNull Plugin plugin) {
         super(name, plugin);
 
+        // unknown command for permission message cuz you
+        // don't need to know what kinds of commands we have
         setPermissionMessage(ChatColor.WHITE + "Unknown command. Type \"/help\" for help");
-        setDescription("An FTC command");
-        setPermission(Permissions.COMMAND_PREFIX + name);
 
-        FtcCommands.BY_NAME.put(name, this);
+        setPermission(Permissions.COMMAND_PREFIX + getName());
+        setDescription("An FTC command");
+
+        FtcCommands.BY_NAME.put(getName(), this);
     }
 
     protected FtcCommand(String name){ this(name, Crown.inst()); }
@@ -50,7 +53,7 @@ public abstract class FtcCommand extends AbstractCommand {
         return c.getSource().asPlayer();
     }
 
-    protected CrownUser getUserSender(CommandContext<CommandSource> c) throws CommandSyntaxException {
+    protected static CrownUser getUserSender(CommandContext<CommandSource> c) throws CommandSyntaxException {
         return UserManager.getUser(c.getSource().asPlayer());
     }
 

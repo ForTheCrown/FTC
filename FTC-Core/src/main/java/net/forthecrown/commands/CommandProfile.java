@@ -6,11 +6,10 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.chat.ProfilePrinter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.core.chat.ProfilePrinter;
-import net.forthecrown.user.manager.UserManager;
 
 public class CommandProfile extends FtcCommand {
 
@@ -18,7 +17,7 @@ public class CommandProfile extends FtcCommand {
         super("profile", Crown.inst());
 
         setAliases("user", "playerprofile", "gameprofile");
-        setDescription("Displays a user's user information");
+        setDescription("Displays a user's information");
         setPermission(Permissions.PROFILE);
 
         register();
@@ -49,10 +48,10 @@ public class CommandProfile extends FtcCommand {
     public Command<CommandSource> command(boolean userGiven) {
         return c -> {
             CommandSource s = c.getSource();
-            CrownUser user = userGiven ? UserArgument.getUser(c, "player") : UserManager.getUser(s.asPlayer());
+            CrownUser user = userGiven ? UserArgument.getUser(c, "player") : getUserSender(c);
             ProfilePrinter printer = new ProfilePrinter(user, s);
 
-            if(!printer.isViewingAllowed()){
+            if(!printer.isViewingAllowed()) {
                 throw FtcExceptionProvider.translatable("commands.profileNotPublic", user.nickDisplayName());
             }
 

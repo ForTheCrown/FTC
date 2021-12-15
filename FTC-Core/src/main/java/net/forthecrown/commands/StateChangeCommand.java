@@ -76,7 +76,7 @@ public class StateChangeCommand extends FtcCommand {
                 })
 
                 .then(argument("user", UserArgument.user())
-                        .requires(s -> s.hasPermission(Permissions.FTC_ADMIN))
+                        .requires(s -> s.hasPermission(Permissions.ADMIN))
 
                         .executes(c -> {
                             CrownUser user = UserArgument.getUser(c, "user");

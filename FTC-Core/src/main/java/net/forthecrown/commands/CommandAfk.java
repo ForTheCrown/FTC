@@ -29,10 +29,10 @@ public class CommandAfk extends FtcCommand {
                 .executes(c -> afk(getUserSender(c), null))
 
                 .then(literal("-other")
-                        .requires(s -> s.hasPermission(Permissions.FTC_ADMIN))
+                        .requires(s -> s.hasPermission(Permissions.ADMIN))
 
                         .then(argument("user", UserArgument.onlineUser())
-                                .requires(s -> s.hasPermission(Permissions.FTC_ADMIN))
+                                .requires(s -> s.hasPermission(Permissions.ADMIN))
 
                                 .executes(c -> afk(
                                         UserArgument.getUser(c, "user"),

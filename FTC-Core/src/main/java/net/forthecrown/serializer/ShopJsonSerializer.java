@@ -118,7 +118,7 @@ public class ShopJsonSerializer implements ShopSerializer {
             File f = getFile(shop);
             Validate.isTrue(f.exists(), shop.getFileName() + " has no file");
 
-            return JsonWrapper.of(JsonUtils.readFile(f));
+            return JsonWrapper.of(JsonUtils.readFileObject(f));
         } catch (IOException e) {
             throw new IllegalStateException("Couldn't read shop file for " + shop.getFileName(), e);
         }

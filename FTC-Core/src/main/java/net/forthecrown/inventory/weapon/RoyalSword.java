@@ -6,6 +6,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.inventory.RankedItem;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
+import net.forthecrown.inventory.weapon.click.ClickHistory;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.LoreBuilder;
@@ -221,8 +222,8 @@ public class RoyalSword extends RankedItem {
         lore.add(border);
     }
 
-    public void damage(Player killer, EntityDamageByEntityEvent event) {
-        WeaponUseContext context = new WeaponUseContext(killer, this, (LivingEntity) event.getEntity(), event.getFinalDamage());
+    public void damage(Player killer, EntityDamageByEntityEvent event, ClickHistory history) {
+        WeaponUseContext context = new WeaponUseContext(killer, this, (LivingEntity) event.getEntity(), event.getFinalDamage(), history);
 
         //Test all goals to see if we damaged any matching entities
         for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {

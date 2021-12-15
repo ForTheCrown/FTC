@@ -41,7 +41,10 @@ public class FtcWarpManager extends AbstractJsonSerializer implements WarpManage
         warps.clear();
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
             try {
-                warps.put(Key.key(e.getKey()), new FtcWarp(e.getValue()));
+                Key key = FtcUtils.parseKey(e.getKey());
+                FtcWarp warp = new FtcWarp(key, e.getValue());
+
+                warps.put(key, warp);
             } catch (CommandSyntaxException exception) {
                 exception.printStackTrace();
             }

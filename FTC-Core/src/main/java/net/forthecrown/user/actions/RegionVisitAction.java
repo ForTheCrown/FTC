@@ -7,11 +7,11 @@ import net.forthecrown.utils.Struct;
 /**
  * Struct for a user vising a region
  */
-public class RegionVisit implements UserAction, Struct {
+public class RegionVisitAction implements UserAction, Struct {
     private final CrownUser visitor;
     private final PopulationRegion region;
 
-    public RegionVisit(CrownUser visitor, PopulationRegion region) {
+    public RegionVisitAction(CrownUser visitor, PopulationRegion region) {
         this.visitor = visitor;
         this.region = region;
     }

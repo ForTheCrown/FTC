@@ -43,6 +43,7 @@ import static org.bukkit.Bukkit.getServer;
 public final class FtcUtils {
     private FtcUtils() {}
 
+    //The max and min Y level constants
     public static final int
             MAX_Y   = 312,
             MIN_Y   = -64;
@@ -107,7 +108,9 @@ public final class FtcUtils {
         profile.setProperty(
                 new ProfileProperty(
                         "textures",
-                        Base64.getEncoder().encodeToString(("{\"SKIN\":{\"url\":\"" + textureLink + "\"}}").getBytes())
+                        Base64.getEncoder().encodeToString(
+                                ("{\"textures\":{\"SKIN\":{\"url\":\"" + textureLink + "\"}}}").getBytes()
+                        )
                 )
         );
 
@@ -118,9 +121,15 @@ public final class FtcUtils {
         return Bukkit.getScoreboardManager().getMainScoreboard().getTeam("NoClip");
     }
 
-    public static boolean hasOnlyAirAbove(WorldVec3i pos1) {
-        WorldVec3i pos = pos1.clone();
+    public static boolean hasOnlyAirAbove(Location location) {
+        return hasOnlyAirAbove0(WorldVec3i.of(location));
+    }
 
+    public static boolean hasOnlyAirAbove(WorldVec3i pos1) {
+        return hasOnlyAirAbove0(pos1.clone());
+    }
+
+    private static boolean hasOnlyAirAbove0(WorldVec3i pos) {
         for (int i = pos.getY(); i < MAX_Y; i++) {
             pos.above();
 

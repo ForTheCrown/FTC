@@ -8,8 +8,9 @@ import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.Struct;
 import net.forthecrown.utils.math.Vector3i;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import org.jetbrains.annotations.NotNull;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.Date;
 import java.util.UUID;
@@ -33,41 +34,18 @@ public interface MarketShop extends JsonSerializable, Nameable, Struct {
         return getWorldGuard().getId();
     }
 
+    default Component wgDisplayName() {
+        return Component.text('[' + getName() + ']')
+                .color(NamedTextColor.AQUA)
+                .hoverEvent(Component.text("Click for info"))
+                .clickEvent(ClickEvent.runCommand("/rg info " + getName()));
+    }
+
     /**
      * Gets all the entrances to the shop
      * @return Mutable list of entrances to this shop
      */
     ObjectList<ShopEntrance> getEntrances();
-
-    /**
-     * Gets this shop's void example
-     * <p></p>
-     * This tells us where we can get a clean version of the shop from
-     * to reset the shop in the normal world.
-     * @return The shop's clean example in the void world
-     */
-    BoundingBox getVoidExample();
-
-    /**
-     * Sets the void example
-     * @param voidExample The new example
-     */
-    void setVoidExample(@NotNull BoundingBox voidExample);
-
-    /**
-     * Gets the position the shop will be reset at
-     * <p></p>
-     * Essentially the place the {@link MarketShop#getVoidExample()}
-     * will be pasted to.
-     * @return The shop's reset position
-     */
-    Vector3i getResetPos();
-
-    /**
-     * Sets the shop's reset pos
-     * @param resetPos The new reset pos
-     */
-    void setResetPos(Vector3i resetPos);
 
     /**
      * Gets the price of the shop used by people
@@ -165,4 +143,21 @@ public interface MarketShop extends JsonSerializable, Nameable, Struct {
      * @return
      */
     ObjectList<String> getConnectedNames();
+
+    default Vector3i getBackupPos() {
+        return Vector3i.of(getWorldGuard().getMinimumPoint())
+                .subtract(0, 30, 0);
+    }
+
+    default Vector3i getMin() {
+        return Vector3i.of(getWorldGuard().getMinimumPoint());
+    }
+
+    default Vector3i getMax() {
+        return Vector3i.of(getWorldGuard().getMaximumPoint());
+    }
+
+    default Vector3i getSize() {
+        return getMax().subtract(getMin());
+    }
 }

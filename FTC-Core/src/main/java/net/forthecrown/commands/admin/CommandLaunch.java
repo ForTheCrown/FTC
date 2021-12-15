@@ -19,7 +19,7 @@ public class CommandLaunch extends FtcCommand {
     public CommandLaunch() {
         super("launch");
 
-        setPermission(Permissions.FTC_ADMIN);
+        setPermission(Permissions.ADMIN);
         setAliases("rocket");
         register();
     }

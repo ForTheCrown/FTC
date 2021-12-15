@@ -72,10 +72,10 @@ public class CommandWild extends FtcCommand {
                     return 0;
                 })
                 .then(argument("player", EntityArgument.multipleEntities())
-                        .requires(c -> c.hasPermission(Permissions.FTC_ADMIN))
+                        .requires(c -> c.hasPermission(Permissions.ADMIN))
 
                         .then(argument("world", WorldArgument.world())
-                                .requires(c -> c.hasPermission(Permissions.FTC_ADMIN))
+                                .requires(c -> c.hasPermission(Permissions.ADMIN))
 
                                 .executes(c -> {
                                     Collection<? extends Entity> players = c.getArgument("player", EntitySelector.class).getEntities(c.getSource());

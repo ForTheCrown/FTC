@@ -678,7 +678,7 @@ public class FtcUser implements CrownUser {
         updateFlying();
         afk = false;
 
-        if(!hasPermission(Permissions.FTC_ADMIN)) setGodMode(false);
+        if(!hasPermission(Permissions.ADMIN)) setGodMode(false);
         updateGodMode();
         updateTabName();
 

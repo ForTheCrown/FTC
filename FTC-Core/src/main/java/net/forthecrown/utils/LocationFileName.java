@@ -9,30 +9,29 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-public class LocationFileName {
-    public final String world;
-    public final int x, y, z;
-
-    public LocationFileName(String world, int x, int y, int z) {
-        this.world = world;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
+public record LocationFileName(String world,
+                               int x, int y, int z)
+{
 
     public static LocationFileName parse(String fName) {
         try {
+            // lastIndex meaning the index before the file type, so we don't read the .json at the end
+            // or something like that
             int lastIndex = fName.lastIndexOf('.');
-            if(lastIndex == -1) lastIndex = fName.length();
+            if (lastIndex == -1) lastIndex = fName.length();
 
             StringReader reader = new StringReader(fName.substring(0, lastIndex));
 
-            while(reader.canRead() && !StringReader.isAllowedNumber(reader.peek())) {
+            //Read the world name at the start
+            while (reader.canRead() && !StringReader.isAllowedNumber(reader.peek())) {
                 reader.skip();
             }
 
+            // Get the world name, - 1 from the length since it ends with the "_" before the integer
             String read = reader.getRead();
             String world = read.substring(0, read.length() - 1);
+
+            //Read cords
             int x = reader.readInt();
             reader.skip();
             int y = reader.readInt();

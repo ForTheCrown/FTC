@@ -1,6 +1,5 @@
 package net.forthecrown.user.manager;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.AbstractYamlSerializer;
@@ -18,8 +17,8 @@ import java.util.*;
 
 public final class FtcUserManager extends AbstractYamlSerializer implements UserManager {
 
-    public static final Object2ObjectMap<UUID, FtcUser> LOADED_USERS = new Object2ObjectOpenHashMap<>();
-    public static final Object2ObjectMap<UUID, FtcUserAlt> LOADED_ALTS = new Object2ObjectOpenHashMap<>();
+    public static final Map<UUID, FtcUser> LOADED_USERS = new Object2ObjectOpenHashMap<>();
+    public static final Map<UUID, FtcUserAlt> LOADED_ALTS = new Object2ObjectOpenHashMap<>();
 
     private final FtcUserActionHandler actionHandler = new FtcUserActionHandler();
     private final UserJsonSerializer serializer = new UserJsonSerializer();
