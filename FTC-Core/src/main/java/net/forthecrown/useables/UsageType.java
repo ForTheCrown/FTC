@@ -50,6 +50,14 @@ public interface UsageType<T extends UsageTypeInstance> extends SuggestionProvid
     }
 
     /**
+     * Checks whether the type requires parsing input
+     * @return True if parse input is required by this type, false if not
+     */
+    default boolean requiresInput() {
+        return true;
+    }
+
+    /**
      * Gets the key of this implementation of the type.
      * @return The key
      */

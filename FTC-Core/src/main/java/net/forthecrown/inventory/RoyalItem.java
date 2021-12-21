@@ -32,7 +32,7 @@ public abstract class RoyalItem {
     }
 
     protected void load() {
-        CompoundTag tag = FtcItems.getTagElement(item.getItemMeta(), tagKey);
+        CompoundTag tag = getData();
         this.owner = tag.getUUID("owner");
         this.loreStart = tag.getInt("lore_start");
         this.loreEnd = tag.getInt("lore_end");
@@ -92,5 +92,9 @@ public abstract class RoyalItem {
 
     public ItemStack getItem() {
         return item;
+    }
+
+    public CompoundTag getData() {
+        return FtcItems.getTagElement(item.getItemMeta(), tagKey);
     }
 }

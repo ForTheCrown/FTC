@@ -43,6 +43,8 @@ public final class Events {
         register(new DungeonListeners());
         register(new EnchantListeners());
 
+        register(new WeaponListener());
+
         main = null;
         pm = null;
     }

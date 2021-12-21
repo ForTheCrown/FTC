@@ -2,17 +2,16 @@ package net.forthecrown.commands.admin;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.KitArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.Crown;
+import net.forthecrown.core.Permissions;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.useables.InteractionUtils;
-import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -43,7 +42,7 @@ public class CommandKitEdit extends FtcCommand {
 
                                     for (ItemStack i: player.getInventory()){
                                         if(FtcItems.isEmpty(i)) continue;
-                                        items.add(i);
+                                        items.add(i.clone());
                                     }
 
                                     Kit kit = Crown.getKitManager().register(key, items);
@@ -82,7 +81,7 @@ public class CommandKitEdit extends FtcCommand {
                                 })
                         )
 
-                        .then(InteractionUtils.checksArguments(this::get))
+                        .then(CommandInteractable.getInstance().checksArgument(this::get))
                 );
     }
 

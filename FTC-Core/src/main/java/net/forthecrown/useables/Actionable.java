@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Represents an object which holds actions
  */
-public interface Actionable {
+public interface Actionable extends UsableObject {
 
     /**
      * Adds an action to this objects action list

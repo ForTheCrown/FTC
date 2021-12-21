@@ -82,45 +82,28 @@ public class RegionsListener implements Listener {
     private final RegionManager manager = Crown.getRegionManager();
 
     /*@EventHandler(ignoreCancelled = true)
-    public void onChunkLoad(PlayerChunkLoadEvent event) {
-        Chunk chunk = event.getChunk();
+    public void onChunkLoad(ChunkLoadEvent event) {
+        //if(event.isNewChunk()) return;
 
-        //Get block cords from chunk cords
-        int x = chunk.getX() << 4;
-        int z = chunk.getZ() << 4;
+        int absoluteX = event.getChunk().getX() << 2;
+        int absoluteZ = event.getChunk().getZ() << 2;
 
-        //Get pos from those cords
-        RegionPos pos = RegionPos.fromAbsolute(x, z);
+        RegionPos pos = RegionPos.toRelative(absoluteX, absoluteZ);
+        RegionData data = manager.getData(pos);
+
+        if(!chunkContainsPole(data, absoluteX, absoluteZ)) return;
+
         PopulationRegion region = manager.get(pos);
-
-        //Get chunk's 2D bounding box
-        BoundingBox2D chunkRegion = new BoundingBox2D(x, z, x + 16, z + 16);
-
-        //If it doesn't contain the region pole, stop
-        if(!chunkRegion.contains(region.getPolePosition())) return;
-
-        //If it does, however, generate a region pole
         manager.getGenerator().generate(region);
     }
 
-    private static class BoundingBox2D {
-        private final int minX;
-        private final int minZ;
-        private final int maxX;
-        private final int maxZ;
+    private boolean chunkContainsPole(RegionData data, int absoluteX, int absoluteZ) {
+        int maxX = absoluteX + 16;
+        int maxZ = absoluteZ + 16;
 
-        private BoundingBox2D(int minX, int minZ, int maxX, int maxZ) {
-            this.minX = minX;
-            this.minZ = minZ;
-            this.maxX = maxX;
-            this.maxZ = maxZ;
-        }
+        BlockVector2 pos = data.getPolePosition();
 
-        public boolean contains(BlockVector2 vec2) {
-            int x = vec2.getX();
-            int z = vec2.getZ();
-
-            return MathUtil.isInRange(x, minX, maxX) && MathUtil.isInRange(z, minZ, maxZ);
-        }
+        return MathUtil.isInRange(pos.getX(), absoluteX, maxX) &&
+                MathUtil.isInRange(pos.getZ(), absoluteZ, maxZ);
     }*/
 }

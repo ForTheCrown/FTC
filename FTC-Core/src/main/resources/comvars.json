@@ -52,5 +52,6 @@
     "maxTreasurePrize": 50000,
     "minTreasurePrize": 10000,
     "maxShopEarnings": 500000,
-    "maxSignShopPrice": 1000000
+    "maxSignShopPrice": 1000000,
+    "defaultShopPrice": 55000
 }

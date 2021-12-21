@@ -1,17 +1,17 @@
 package net.forthecrown.useables;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public abstract class UsableBase extends CheckableBase implements Actionable, Checkable {
+public abstract class ActionableBase extends CheckableBase implements Actionable, Checkable {
 
-    protected final List<UsageActionInstance> actions = new ArrayList<>();
+    protected final List<UsageActionInstance> actions = new ObjectArrayList<>();
 
-    protected UsableBase(){}
+    protected ActionableBase(){}
 
     @Override
     public void addAction(UsageActionInstance action) {

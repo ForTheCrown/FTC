@@ -8,6 +8,7 @@ import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.events.dynamic.RegionVisitListener;
 import net.forthecrown.regions.*;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.data.FtcGameMode;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.Bukkit;
@@ -48,7 +49,7 @@ public class RegionVisit implements Runnable {
         // the same world as the region pole and less than DISTANCE_TO_POLE
         // from the pole. Mainly used by OwnedEntityHandler to check if it should
         // scan for entities or not
-        nearPole = (user.get2DLocation().distance(localRegion.getPolePosition()) <= RegionConstants.DISTANCE_TO_POLE) && getOriginWorld().equals(getDestWorld());
+        nearPole = RegionUtil.isCloseToPole(localRegion.getPolePosition(), user) && getOriginWorld().equals(getDestWorld());
 
         // For hulk smashing to be allowed we must pass 4 checks:
         // The first two are obvious lol
@@ -57,7 +58,8 @@ public class RegionVisit implements Runnable {
         hulkSmash = ComVars.shouldHulkSmashPoles()
                 && user.hulkSmashesPoles()
                 && FtcUtils.hasOnlyAirAbove(getTeleportLocation())
-                && FtcUtils.hasOnlyAirAbove(user.getLocation());
+                && FtcUtils.hasOnlyAirAbove(user.getLocation())
+                && user.getGameMode() != FtcGameMode.SPECTATOR;
     }
 
     public CrownUser getUser() {

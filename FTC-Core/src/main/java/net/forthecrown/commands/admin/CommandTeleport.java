@@ -1,5 +1,7 @@
 package net.forthecrown.commands.admin;
 
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -82,24 +84,36 @@ public class CommandTeleport extends FtcCommand {
                 )
 
                 .then(argument("location", PositionArgument.position())
-                        .executes(c -> {
-                            CrownUser user = getUserSender(c);
-                            Location loc = PositionArgument.getLocation(c, "location");
+                        .executes(c -> teleport(c, false, false))
 
-                            if(user.isTeleporting()) throw FtcExceptionProvider.create("You are already teleporting");
+                        .then(argument("yaw", FloatArgumentType.floatArg(-180f, 180f))
+                                .executes(c -> teleport(c, true, false))
 
-                            user.createTeleport(() -> loc, false, true, UserTeleport.Type.TELEPORT)
-                                    .start(false);
-
-                            c.getSource().sendAdmin(
-                                    Component.text("Teleported ")
-                                            .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
-                                            .append(Component.text(" to "))
-                                            .append(FtcFormatter.clickableLocationMessage(loc, false).color(NamedTextColor.YELLOW))
-                            );
-                            return 0;
-                        })
+                                .then(argument("pitch", FloatArgumentType.floatArg(-90f, 90f))
+                                        .executes(c -> teleport(c, true, true))
+                                )
+                        )
                 );
+    }
+
+    private int teleport(CommandContext<CommandSource> c, boolean yawGiven, boolean pitchGiven) throws CommandSyntaxException {
+        CrownUser user = getUserSender(c);
+        Location loc = PositionArgument.getLocation(c, "location");
+        if(yawGiven) loc.setYaw(c.getArgument("yaw", Float.class));
+        if(pitchGiven) loc.setPitch(c.getArgument("pitch", Float.class));
+
+        if(user.isTeleporting()) throw FtcExceptionProvider.create("You are already teleporting");
+
+        user.createTeleport(() -> loc, false, true, UserTeleport.Type.TELEPORT)
+                .start(false);
+
+        c.getSource().sendAdmin(
+                Component.text("Teleported ")
+                        .append(user.nickDisplayName().color(NamedTextColor.YELLOW))
+                        .append(Component.text(" to "))
+                        .append(FtcFormatter.clickableLocationMessage(loc, false).color(NamedTextColor.YELLOW))
+        );
+        return 0;
     }
 
     private int teleport(Collection<Entity> entities, Location location, Component destDisplayName, CommandSource source) throws CommandSyntaxException {

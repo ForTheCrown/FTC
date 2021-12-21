@@ -297,6 +297,10 @@ public interface CrownUser extends
         setRankTier(tier, true);
     }
 
+    default boolean hasTier(RankTier tier) {
+        return getRankTier().ordinal() <= tier.ordinal();
+    }
+
     RankTitle getTitle();
 
     void setTitle(RankTitle title);
@@ -306,7 +310,7 @@ public interface CrownUser extends
     void addTitle(RankTitle title, boolean givePermissions, boolean setTier);
 
     default void addTitle(RankTitle title, boolean givePermission) {
-        addTitle(title, givePermission, false);
+        addTitle(title, givePermission, true);
     }
 
     default void addTitle(RankTitle title) {

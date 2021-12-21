@@ -5,11 +5,10 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.market.MarketShop;
+import net.forthecrown.economy.market.Markets;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.MarketOwnership;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -46,7 +45,6 @@ public class CommandShopTrust extends FtcCommand {
                 .then(argument("user", UserArgument.user())
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
-                            UserInteractions inter = user.getInteractions();
                             MarketOwnership ownership = user.getMarketOwnership();
 
                             CrownUser target = UserArgument.getUser(c, "user");

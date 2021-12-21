@@ -6,6 +6,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
+import net.forthecrown.regions.RegionData;
 import net.forthecrown.regions.RegionPos;
 import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
@@ -47,9 +48,11 @@ public class CommandHomePole extends FtcCommand {
                     RegionPos cords = user.getHomes().getHomeRegion();
                     if(cords == null) throw FtcExceptionProvider.translatable("regions.noHome");
 
-                    PopulationRegion region = Crown.getRegionManager().get(cords);
+                    RegionPos local = user.getRegionCords();
+                    RegionData localRegion = Crown.getRegionManager().get(local);
+                    RegionUtil.validateDistance(localRegion.getPolePosition(), user);
 
-                    RegionUtil.validateDistance(region.getPolePosition(), user);
+                    PopulationRegion region = Crown.getRegionManager().get(cords);
                     ActionFactory.visitRegion(user, region);
 
                     return 0;

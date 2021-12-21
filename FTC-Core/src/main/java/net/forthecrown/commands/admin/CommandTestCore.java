@@ -9,6 +9,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.animation.AnimationBuilder;
 import net.forthecrown.core.animation.BlockAnimation;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
@@ -16,6 +17,7 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.math.*;
@@ -38,7 +40,7 @@ import java.util.UUID;
 
 public class CommandTestCore extends FtcCommand {
 
-    static final BlockAnimation TEST_ANIM = new AnimationBuilder("ftccore:test_animation")
+    static final BlockAnimation TEST_ANIM = new AnimationBuilder("test_animation")
             .setTicksPerFrame(10)
             .addFrames(BoundingBoxes.createArray(
                     new Vector3i(273, 4, 219),
@@ -98,6 +100,37 @@ public class CommandTestCore extends FtcCommand {
                         )
                 )
 
+                .then(literal("time_test")
+                        .executes(c -> {
+                            CrownRandom random = new CrownRandom();
+                            CommandSource source = c.getSource();
+
+                            for (int i = 0; i < 100; i++) {
+                                long time = random.nextLong(1, Long.MAX_VALUE);
+
+                                String oldVal = tOldValue(time);
+                                String newVal = new TimePrinter(time).printString();
+
+                                source.sendMessage("time: " + time);
+                                source.sendMessage("oldValue: " + oldVal);
+                                source.sendMessage("newValue: " + newVal);
+                                source.sendMessage("--------------------------------");
+                            }
+
+                            long time = 100L;
+
+                            String oldVal = tOldValue(time);
+                            String newVal = new TimePrinter(time).printString();
+
+                            source.sendMessage("time: " + time);
+                            source.sendMessage("oldValue: " + oldVal);
+                            source.sendMessage("newValue: " + newVal);
+                            source.sendMessage("--------------------------------");
+
+                            return 0;
+                        })
+                )
+
                 .then(literal("skin_profile_test")
                         .then(argument("id", StringArgumentType.greedyString())
                                 .executes(c -> {
@@ -148,5 +181,25 @@ public class CommandTestCore extends FtcCommand {
                                 )
                         )
                 );
+    }
+
+    private String tOldValue(long millis) {
+        long hours = (millis / 3600000);
+        long minutes = (millis /60000) % 60;
+        long seconds = (millis / 1000) % 60;
+        long days = hours / 24;
+        hours -= days*24;
+
+        StringBuilder stringBuilder = new StringBuilder();
+        if(days != 0) stringBuilder.append(days).append(" day").append(s(days)).append(", ");
+        if(hours != 0) stringBuilder.append(hours).append(" hour").append(s(hours)).append(", ");
+        if(minutes != 0) stringBuilder.append(minutes).append(" minute").append(s(minutes)).append(" and ");
+        if(seconds != 0) stringBuilder.append(seconds).append(" second").append(s(seconds));
+
+        return stringBuilder.toString();
+    }
+
+    private static String s(long l){
+        return l == 1 ? "" : "s";
     }
 }

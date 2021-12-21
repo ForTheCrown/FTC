@@ -36,6 +36,11 @@ public class SimpleCheckType implements UsageCheck<UsageCheckInstance> {
     }
 
     @Override
+    public boolean requiresInput() {
+        return false;
+    }
+
+    @Override
     public @NotNull Key key() {
         return key;
     }

@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents a rank's tier
@@ -63,7 +64,7 @@ public enum RankTier implements Comparable<RankTier>, JsonSerializable {
         List<RankTitle> titles = new ObjectArrayList<>();
 
         for (RankTitle t: RankTitle.values()) {
-            if(t.getTier() == this) titles.add(t);
+            if(t.getTier().ordinal() <= ordinal()) titles.add(t);
         }
 
         return titles;
@@ -83,6 +84,13 @@ public enum RankTier implements Comparable<RankTier>, JsonSerializable {
         }
 
         return titles;
+    }
+
+    public List<RankTitle> getApplicableDefaults() {
+        return getTitlesForAndBelow()
+                .stream()
+                .filter(RankTitle::isDefaultTitle)
+                .collect(Collectors.toList());
     }
 
     @Override

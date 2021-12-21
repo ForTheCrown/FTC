@@ -3,20 +3,19 @@ package net.forthecrown.commands.admin;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.chat.Announcer;
+import net.forthecrown.commands.arguments.WarpArgument;
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.arguments.WarpArgument;
-import net.forthecrown.useables.warps.Warp;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.UserTeleport;
-import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.useables.InteractionUtils;
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.useables.warps.Warp;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 
@@ -78,7 +77,7 @@ public class CommandWarpEdit extends FtcCommand {
                                 })
                         )
 
-                        .then(InteractionUtils.checksArguments(this::get))
+                        .then(CommandInteractable.getInstance().checksArgument(this::get))
 
                         .then(literal("delete")
                                 .executes(c -> {

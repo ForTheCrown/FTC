@@ -3,6 +3,7 @@ package net.forthecrown.inventory.weapon;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbilities;
@@ -35,7 +36,6 @@ public final class RoyalWeapons {
     public static final Component RANK_FINAL_NAME = makeName("Dragon's", NamedTextColor.RED, NamedTextColor.DARK_RED, true);
 
     public static final int MAX_RANK = 30;
-    public static final Material NON_DONATOR_LIMIT_MAT = Material.GOLDEN_SWORD;
     public static final String TAG_KEY = "royal_weapon";
 
     private RoyalWeapons() {}
@@ -45,6 +45,7 @@ public final class RoyalWeapons {
     public static void init() {
         int rank = 1;
 
+        //Traveller
         UPGRADES.put(rank, reforge(
                 Material.WOODEN_SWORD,
                 RANK_1_NAME,
@@ -52,11 +53,9 @@ public final class RoyalWeapons {
                 "The sword of an aspiring", "adventurer"
         ));
 
-        //Traveller
         register(anyEntity(100, rank));
 
         //Squire
-        int goal = 150;
         UPGRADES.put(++rank, reforge(
                 Material.STONE_SWORD,
                 RANK_2_NAME,
@@ -65,26 +64,25 @@ public final class RoyalWeapons {
                 "it carries the hero on"
         ));
 
-        register(simple(EntityType.ZOMBIE, goal, rank));
-        register(simple(EntityType.CREEPER, goal, rank));
-        register(simple(EntityType.SKELETON, goal, rank));
-        register(simple(EntityType.SPIDER, goal, rank));
+        register(simple(EntityType.ZOMBIE, 100, rank));
+        register(simple(EntityType.CREEPER, 50, rank));
+        register(simple(EntityType.SKELETON, 150, rank));
+        register(simple(EntityType.SPIDER, 75, rank));
 
         //Knight
-        goal = 200;
         UPGRADES.put(++rank, reforge(
                 Material.IRON_SWORD,
                 RANK_3_NAME,
                 Component.text("Iron"),
-                "Progress, as stone is left",
-                "in favor of unbreaking iron"
+                "A magnificent, unbreaking sword",
+                "of a true hero"
         ));
 
-        register(simple(EntityType.BLAZE, goal, rank));
-        register(simple(EntityType.WITHER_SKELETON, goal, rank));
-        register(simple(EntityType.MAGMA_CUBE, goal, rank));
-        register(simple(EntityType.PIGLIN, goal, rank));
-        register(simple(EntityType.ENDERMAN, goal, rank));
+        register(simple(EntityType.BLAZE, 200, rank));
+        register(simple(EntityType.WITHER_SKELETON, 200, rank));
+        register(simple(EntityType.MAGMA_CUBE, 200, rank));
+        register(simple(EntityType.PIGLIN, 200, rank));
+        register(simple(EntityType.ENDERMAN, 200, rank));
 
         //Lord
         UPGRADES.put(++rank, reforge(
@@ -95,7 +93,7 @@ public final class RoyalWeapons {
                 "diamonds blinds enemies"
         ));
 
-        register(anyEntity(5000, rank));
+        register(anyEntity(500, rank));
         register(dungeonBoss(Bosses.zhambie(), 1, rank));
         register(dungeonBoss(Bosses.skalatan(), 1, rank));
         register(dungeonBoss(Bosses.hideySpidey(), 1, rank));
@@ -158,6 +156,7 @@ public final class RoyalWeapons {
     }
 
     private static void register(WeaponGoal goal) {
+        Announcer.debug("Rank: " + goal.getRank() + ", key: " + goal.key());
         Registries.WEAPON_GOALS.register(goal.key(), goal);
     }
 
@@ -199,11 +198,12 @@ public final class RoyalWeapons {
 
         ItemStack result = builder.build();
         RoyalSword sword = new RoyalSword(owner, result);
-        sword.waitingUpdate = getUpgrade(sword.getRank());
-        sword.setNextUpgrade(getUpgrade(sword.getRank() + 1));
+
+        sword.setRank(0);
+        sword.setNextUpgrade(getUpgrade(1));
+        sword.incrementGoal();
 
         sword.update();
-
         return result;
     }
 

@@ -456,27 +456,11 @@ public interface FtcFormatter {
     }
 
     static String convertMillisIntoTime(long millis){
-        long hours = (millis / 3600000);
-        long minutes = (millis /60000) % 60;
-        long seconds = (millis / 1000) % 60;
-        long days = hours / 24;
-        hours -= days*24;
-
-        StringBuilder stringBuilder = new StringBuilder();
-        if(days != 0) stringBuilder.append(days).append(" day").append(s(days)).append(", ");
-        if(hours != 0) stringBuilder.append(hours).append(" hour").append(s(hours)).append(", ");
-        if(minutes != 0) stringBuilder.append(minutes).append(" minute").append(s(minutes)).append(" and ");
-        if(seconds != 0) stringBuilder.append(seconds).append(" second").append(s(seconds));
-
-        return stringBuilder.toString();
+        return new TimePrinter(millis).printString();
     }
 
     static Component millisIntoTime(long millis){
-        return Component.text(convertMillisIntoTime(millis));
-    }
-
-    private static String s(long l){
-        return l == 1 ? "" : "s";
+        return new TimePrinter(millis).print();
     }
 
     static Component displayName(Entity entity){

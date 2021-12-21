@@ -74,6 +74,7 @@ public final class ComVars {
     static ComVar<Integer>          minTreasurePrize;
     static ComVar<Integer>          maxShopEarnings;
     static ComVar<Integer>          maxSignShopPrice;
+    static ComVar<Integer>          defaultShopPrice;
 
     private ComVars() {}
 
@@ -138,6 +139,7 @@ public final class ComVars {
         read("minTreasurePrize",            ComVarTypes.INTEGER);
         read("maxShopEarnings",             ComVarTypes.INTEGER);
         read("maxSignShopPrice",            ComVarTypes.INTEGER);
+        read("defaultShopPrice",            ComVarTypes.INTEGER);
 
         j = null;
     }
@@ -392,6 +394,9 @@ public final class ComVars {
         return maxSignShopPrice.getValue(1000000);
     }
 
+    public static int defaultShopPrice() {
+        return defaultShopPrice.getValue(55000);
+    }
 
 
 

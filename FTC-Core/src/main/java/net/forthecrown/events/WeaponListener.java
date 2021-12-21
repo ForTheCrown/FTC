@@ -25,6 +25,10 @@ import java.util.function.Consumer;
 public class WeaponListener implements Listener {
     public static final Map<UUID, ClickHistory> CLICK_HISTORIES = new Object2ObjectOpenHashMap<>();
 
+    public WeaponListener() {
+
+    }
+
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if(!(event.getDamager() instanceof Player)) return;

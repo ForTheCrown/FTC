@@ -38,7 +38,8 @@ public class CommandSetHome extends FtcCommand {
 
 
     private int attemptHomeSetting(HomeCreationContext context) throws RoyalCommandException {
-        if(!context.homes.canMakeMore()) throw FtcExceptionProvider.overHomeLimit(context.user);
+        boolean contains = context.homes.contains(context.name);
+        if(!contains && !context.homes.canMakeMore()) throw FtcExceptionProvider.overHomeLimit(context.user);
 
         if(!context.user.hasPermission(Permissions.WORLD_BYPASS)){
             if(CommandTpask.isInvalidWorld(context.loc.getWorld())) throw FtcExceptionProvider.cannotSetHomeHere();

@@ -143,7 +143,7 @@ public class UserJsonSerializer implements UserSerializer {
 
         //ranks
         user.titles.clear();
-        user.titles.addAll(RankTitle.getDefaultsFor(user.tier));
+        user.titles.addAll(user.tier.getApplicableDefaults());
         if(json.has("titles")) {
             List<RankTitle> ranks = ListUtils.fromIterable(json.getArray("titles"), e -> JsonUtils.readEnum(RankTitle.class, e));
             user.titles.addAll(ranks);

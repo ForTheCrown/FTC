@@ -210,14 +210,20 @@ public final class RankInventory {
                     .setName(Component.text("Default").style(nonItalic(NamedTextColor.WHITE)))
                     .addLore(Component.text("This is the default title!").style(nonItalic(NamedTextColor.GRAY)));
 
-            if (user.getTitle() == RankTitle.DEFAULT) item.addEnchant(Enchantment.BINDING_CURSE, 1);
+            if (user.getTitle() == RankTitle.DEFAULT) {
+                item
+                        .setFlags(ItemFlag.HIDE_ENCHANTS)
+                        .addEnchant(Enchantment.BINDING_CURSE, 1);
+            }
             inventory.setItem(pos, item);
         }
 
         @Override
         public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
             if(user.getTitle() == RankTitle.DEFAULT) throw FtcExceptionProvider.translatable("rankSelector.alreadySelected");
+
             setTitle(RankTitle.DEFAULT, user);
+            context.setReloadInventory(true);
         }
     }
 
@@ -250,7 +256,11 @@ public final class RankInventory {
                     .setName(title.noEndSpacePrefix().style(nonItalic(NamedTextColor.WHITE)))
                     .addLore(lore);
 
-            if (user.getTitle() == title) item.addEnchant(Enchantment.BINDING_CURSE, 1);
+            if (user.getTitle() == title) {
+                item
+                        .setFlags(ItemFlag.HIDE_ENCHANTS)
+                        .addEnchant(Enchantment.BINDING_CURSE, 1);
+            }
             inventory.setItem(pos, item);
         }
 
@@ -260,6 +270,7 @@ public final class RankInventory {
             if(user.getTitle() == title) throw FtcExceptionProvider.translatable("rankSelector.alreadySelected");
 
             setTitle(title, user);
+            context.setReloadInventory(true);
         }
     }
 }

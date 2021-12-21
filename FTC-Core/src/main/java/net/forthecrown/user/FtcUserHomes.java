@@ -66,7 +66,7 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
         int currentHomes = size();
         int maxHomes = user.getRankTier().maxHomes;
 
-        return currentHomes <= maxHomes;
+        return currentHomes < maxHomes;
     }
 
     @Override

@@ -60,8 +60,6 @@ public class RoyalSword extends RankedItem {
      */
     public RoyalSword(UUID owner, ItemStack item) {
         super(owner, item, RoyalWeapons.TAG_KEY);
-
-        setGoals(RoyalWeapons.getGoalsAtRank(1));
     }
 
     @Override
@@ -252,7 +250,6 @@ public class RoyalSword extends RankedItem {
     }
 
     public void incrementGoal() {
-        goalsAndProgress.clear();
         rank++;
 
         this.waitingUpdate = nextUpgrade;
@@ -341,6 +338,7 @@ public class RoyalSword extends RankedItem {
      * @param goals The goals to set for the sword
      */
     public void setGoals(List<WeaponGoal> goals) {
+        this.goalsAndProgress.clear();
         for (WeaponGoal g: goals) {
             this.goalsAndProgress.put(g, 0);
         }

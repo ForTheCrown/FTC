@@ -82,15 +82,19 @@ public final class RegionUtil {
         if(!world.equals(ComVars.getRegionWorld())) throw FtcExceptionProvider.regionsWrongWorld();
     }
 
-    public static boolean isCloseToPole(BlockVector2 pole, CrownUser user) {
+    public static boolean isCloseToPoleOrOp(BlockVector2 pole, CrownUser user) {
         if(user.hasPermission(Permissions.REGIONS_ADMIN)) return true;
 
+        return isCloseToPole(pole, user);
+    }
+
+    public static boolean isCloseToPole(BlockVector2 pole, CrownUser user) {
         BlockVector2 vec2 = user.get2DLocation();
         return vec2.distance(pole) <= DISTANCE_TO_POLE;
     }
 
     public static void validateDistance(BlockVector2 pole, CrownUser user) throws RoyalCommandException {
-        if(!isCloseToPole(pole, user)) {
+        if(!isCloseToPoleOrOp(pole, user)) {
             throw FtcExceptionProvider.translatable("regions.tooFar",
                     Component.text("x = " + pole.getX() + " z = " + pole.getZ())
             );

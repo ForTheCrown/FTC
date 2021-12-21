@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Represents an object which has UsageChecks.
  */
-public interface Checkable {
+public interface Checkable extends UsableObject {
 
     /**
      * Lists all the usage checks this object has

@@ -12,11 +12,11 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Worlds;
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
+import net.forthecrown.utils.math.MathUtil;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -33,7 +33,7 @@ public class FtcMarketShop implements MarketShop {
     private Date dateOfPurchase;
     private final ObjectList<UUID> coOwners = new ObjectArrayList<>();
 
-    private int price = 35000;
+    private int price = -1;
     private String mergedName;
 
     public FtcMarketShop(ProtectedRegion worldGuard) {
@@ -52,12 +52,12 @@ public class FtcMarketShop implements MarketShop {
 
     @Override
     public int getPrice() {
-        return price;
+        return price == -1 ? ComVars.defaultShopPrice() : price;
     }
 
     @Override
     public void setPrice(int price) {
-        this.price = price;
+        this.price = MathUtil.clamp(price, -1, ComVars.getMaxMoneyAmount());
     }
 
     @Override
@@ -97,8 +97,6 @@ public class FtcMarketShop implements MarketShop {
     @Override
     public void setOwner(UUID uuid) {
         this.owner = uuid;
-
-        Announcer.debug("owner set: " + owner);
     }
 
     @Override

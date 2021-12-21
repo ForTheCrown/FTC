@@ -62,7 +62,7 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
 
     public static FtcBoundingBox of(World world){
         WorldBorder border = world.getWorldBorder();
-        return of(border.getCenter(), border.getSize());
+        return of(border.getCenter(), border.getSize() / 2);
     }
 
     public static FtcBoundingBox of(Block b1, Block b2) {

@@ -17,6 +17,7 @@ import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,24 @@ public class CommandEnchant extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
+                .then(literal("clear")
+                        .executes(c -> {
+                            CrownUser user = getUserSender(c);
+                            ItemStack item = user.getInventory().getItemInMainHand();
+                            if(FtcItems.isEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
+
+                            ItemMeta meta = item.getItemMeta();
+
+                            for (Enchantment e: meta.getEnchants().keySet()) {
+                                meta.removeEnchant(e);
+                            }
+
+                            item.setItemMeta(meta);
+                            c.getSource().sendAdmin("Removed all enchantments");
+                            return 0;
+                        })
+                )
+
                 .then(argument("enchant", EnchantArgument.enchantment())
                         .executes(c -> enchant(
                                 c.getSource(),

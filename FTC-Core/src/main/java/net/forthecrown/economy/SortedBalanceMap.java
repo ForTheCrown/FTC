@@ -54,8 +54,6 @@ public class SortedBalanceMap implements BalanceMap {
 
         //Remove entry
         entries[index] = null;
-
-        //Decrement size
         size--;
 
         //If the index wasn't the last entry in the list,

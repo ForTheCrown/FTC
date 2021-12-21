@@ -41,6 +41,11 @@ public class CheckNotUsedBefore implements UsageCheck<CheckNotUsedBefore.CheckIn
         return KEY;
     }
 
+    @Override
+    public boolean requiresInput() {
+        return false;
+    }
+
     public static class CheckInstance implements UsageCheckInstance {
         private final List<UUID> used;
 
@@ -78,53 +83,4 @@ public class CheckNotUsedBefore implements UsageCheck<CheckNotUsedBefore.CheckIn
             return plr -> used.add(plr.getUniqueId());
         }
     }
-
-    /*private final List<UUID> list = new ArrayList<>();
-
-    @Override
-    public void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException { }
-
-    @Override
-    public void parse(JsonElement json) throws CommandSyntaxException {
-        JsonArray array = json.getAsJsonArray();
-
-        list.clear();
-        for (JsonElement j: array){
-            list.add(UUID.fromString(j.getAsString()));
-        }
-    }
-
-    @Override
-    public Key key() {
-        return KEY;
-    }
-
-    @Override
-    public String asString() {
-        return key().asString();
-    }
-
-    @Override
-    public Component failMessage() {
-        return Component.text("You have already used this").color(NamedTextColor.GRAY);
-    }
-
-    @Override
-    public boolean test(Player player) {
-        return !list.contains(player.getUniqueId());
-    }
-
-    @Override
-    public Consumer<Player> onSuccess() {
-        return plr -> list.add(plr.getUniqueId());
-    }
-
-    @Override
-    public JsonElement serialize() {
-        return JsonUtils.writeCollection(list, id -> new JsonPrimitive(id.toString()));
-    }
-
-    public List<UUID> getList() {
-        return list;
-    }*/
 }

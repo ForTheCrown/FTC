@@ -1,14 +1,10 @@
 package net.forthecrown.user.data;
 
 import com.google.gson.JsonElement;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-
-import java.util.Collection;
-import java.util.List;
 
 import static net.forthecrown.user.data.RankTier.*;
 
@@ -79,15 +75,5 @@ public enum RankTitle implements JsonSerializable {
     @Override
     public JsonElement serialize() {
         return JsonUtils.writeEnum(this);
-    }
-
-    public static Collection<RankTitle> getDefaultsFor(RankTier tier) {
-        List<RankTitle> titles = new ObjectArrayList<>();
-
-        for (RankTitle t: values()) {
-            if(t.isDefaultTitle() && tier == t.getTier()) titles.add(t);
-        }
-
-        return titles;
     }
 }

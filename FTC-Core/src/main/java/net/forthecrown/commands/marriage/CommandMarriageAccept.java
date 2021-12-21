@@ -57,7 +57,7 @@ public class CommandMarriageAccept extends FtcCommand {
 
                             user.sendMessage(
                                     Component.translatable("marriage.request.accepted.target",
-                                            Component.text("/visit cathedral").color(NamedTextColor.YELLOW))
+                                            Component.text("the chapel in Hazelguard").color(NamedTextColor.YELLOW))
                                             .color(NamedTextColor.GRAY)
                             );
 
@@ -65,7 +65,7 @@ public class CommandMarriageAccept extends FtcCommand {
                                 target.sendMessage(
                                         Component.translatable("marriage.request.accepted.sender",
                                                 user.nickDisplayName().color(NamedTextColor.GOLD),
-                                                Component.text("/visit cathedral").color(NamedTextColor.YELLOW)
+                                                Component.text("the chapel in Hazelguard").color(NamedTextColor.YELLOW)
                                         ).color(NamedTextColor.GRAY)
                                 );
                             }

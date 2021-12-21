@@ -85,7 +85,7 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
 
     @Override
     public PopulationRegion get(String name) {
-        return byName.get(name);
+        return byName.get(name.toLowerCase());
     }
 
     @Override
@@ -101,11 +101,11 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
         boolean hasName = region.hasName();
         boolean nullNew = FtcUtils.isNullOrBlank(newName);
         //Remove it from name tracker if it already has
-        if(hasName) byName.remove(region.getName());
+        if(hasName) byName.remove(region.getName().toLowerCase());
 
         //Set the name and add it with the new name to the tracker
         region.setName(newName);
-        if(!nullNew) byName.put(newName, region);
+        if(!nullNew) byName.put(newName.toLowerCase(), region);
 
         getGenerator().generate(region);
 
@@ -124,14 +124,14 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
     @Override
     public void add(PopulationRegion region) {
         //If has name, add to name tracker, always add to cord tracker
-        if(region.hasName()) byName.put(region.getName(), region);
+        if(region.hasName()) byName.put(region.getName().toLowerCase(), region);
         byCords.put(region.getPos(), region);
     }
 
     @Override
     public void remove(PopulationRegion region) {
         //Removes the region
-        if(region.hasName()) byName.remove(region.getName());
+        if(region.hasName()) byName.remove(region.getName().toLowerCase());
         byCords.remove(region.getPos());
     }
 

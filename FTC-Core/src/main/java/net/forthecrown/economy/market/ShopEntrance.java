@@ -103,6 +103,7 @@ public class ShopEntrance implements JsonSerializable {
 
             slime.setAI(false);
             slime.setGravity(false);
+            slime.setInvulnerable(true);
             slime.setRemoveWhenFarAway(false);
 
             //Add to no clip team

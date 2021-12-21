@@ -26,8 +26,10 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
@@ -91,6 +93,42 @@ public class CommandArkBox extends FtcCommand {
                     );
                     return 0;
                 })
+
+                .then(literal("filter")
+                        .requires(s -> s.hasPermission(Permissions.ADMIN))
+
+                        .then(literal("block")
+                                .requires(s -> s.hasPermission(Permissions.ADMIN))
+
+                                .executes(c -> {
+                                    Player player = c.getSource().asPlayer();
+                                    Block block = player.getTargetBlock(5);
+
+                                    if(block == null || !(block.getState() instanceof ShulkerBox box)) throw FtcExceptionProvider.create("You must be looking at a shulker");
+
+                                    FILTER.checkInventory(box.getInventory());
+
+                                    c.getSource().sendAdmin("Filtered targetted shulker");
+                                    return 0;
+                                })
+                        )
+
+                        .then(literal("held_shulker")
+                                .requires(s -> s.hasPermission(Permissions.ADMIN))
+
+                                .executes(c -> {
+                                    CrownUser user = getUserSender(c);
+                                    ItemStack item = user.getInventory().getItemInMainHand();
+
+                                    if(FtcItems.isEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
+
+                                    FILTER.checkItems(item);
+
+                                    c.getSource().sendAdmin("Filtered held item");
+                                    return 0;
+                                })
+                        )
+                )
 
                 .then(literal("load")
                         .requires(s -> s.hasPermission(Permissions.ADMIN))
@@ -216,6 +254,10 @@ public class CommandArkBox extends FtcCommand {
         public ArkBoxInfo(ItemStack item, RankTier tier) {
             this.item = item;
             this.tier = tier;
+
+            if (!FtcItems.isEmpty(item)) {
+                FILTER.checkItems(item);
+            }
         }
 
         public ArkBoxInfo(JsonElement element) {
@@ -249,6 +291,10 @@ public class CommandArkBox extends FtcCommand {
             ShulkerBox box = (ShulkerBox) blockStateMeta.getBlockState();
             Inventory inventory = box.getInventory();
 
+            checkInventory(inventory);
+        }
+
+        void checkInventory(Inventory inventory) {
             for (ItemStack i: inventory) {
                 if(FtcItems.isEmpty(i)) continue;
                 filterItem(i);
@@ -258,6 +304,16 @@ public class CommandArkBox extends FtcCommand {
         void filterItem(ItemStack item) {
             ItemMeta meta = item.getItemMeta();
             if(!meta.getPersistentDataContainer().has(FtcItems.ITEM_KEY, PersistentDataType.BYTE)) return;
+
+            for (Enchantment e: meta.getEnchants().keySet()) {
+                meta.removeEnchant(e);
+            }
+
+            if(meta.hasAttributeModifiers()) {
+                for (Map.Entry<Attribute, AttributeModifier> e: meta.getAttributeModifiers().entries()) {
+                    meta.removeAttributeModifier(e.getKey(), e.getValue());
+                }
+            }
 
             switch (item.getType()) {
                 case GOLDEN_HELMET -> filter(RoyalItemFilter.CROWN, meta);
@@ -295,12 +351,6 @@ public class CommandArkBox extends FtcCommand {
 
                 @Override
                 public void accept(ItemMeta meta) {
-                    AttributeModifier modifier = new AttributeModifier(
-                            UUID.randomUUID(), "generic.attack_damage", 0, AttributeModifier.Operation.ADD_NUMBER,
-                            EquipmentSlot.HAND
-                    );
-
-                    meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, modifier);
                 }
             },
                     CUTLASS = new RoyalItemFilter() {
@@ -342,17 +392,10 @@ public class CommandArkBox extends FtcCommand {
 
                         @Override
                         public void accept(ItemMeta meta) {
-                            AttributeModifier modifier = new AttributeModifier(
-                                    UUID.randomUUID(), "generic.knockback_resistance", 0, AttributeModifier.Operation.ADD_NUMBER,
-                                    EquipmentSlot.HEAD
-                            );
-
-                            meta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, modifier);
                         }
                     };
 
             Component displayName();
-
             void accept(ItemMeta meta);
         }
     }

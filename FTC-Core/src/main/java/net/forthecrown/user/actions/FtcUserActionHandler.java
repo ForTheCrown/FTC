@@ -211,7 +211,7 @@ public class FtcUserActionHandler implements UserActionHandler {
                                             .append(
                                                     Component.translatable(m.read ? "mail.read" : "mail.unread")
                                                             .clickEvent(ClickEvent.runCommand("/mail mark_read " + query.getMail().indexOf(m)))
-                                                            .hoverEvent(Component.translatable(m.read ? "mail.read.hover" : "mail.unread.hover"))
+                                                            .hoverEvent(Component.translatable(!m.read ? "mail.read.hover" : "mail.unread.hover"))
                                             )
                                             .append(Component.text("] "))
                             )

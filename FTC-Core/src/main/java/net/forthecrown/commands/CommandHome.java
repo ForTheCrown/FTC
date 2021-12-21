@@ -9,6 +9,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
+import net.forthecrown.regions.RegionData;
 import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserHomes;
@@ -41,10 +42,11 @@ public class CommandHome extends FtcCommand {
 
                     //Check if they have home pole, and if they're in the correct world
                     if(homes.getHomeRegion() != null && user.getWorld().equals(ComVars.getRegionWorld())) {
+                        RegionData local = Crown.getRegionManager().getData(user.getRegionCords());
                         PopulationRegion region = Crown.getRegionManager().get(homes.getHomeRegion());
 
                         //If they're close to pole, tp them to home pole
-                        if(RegionUtil.isCloseToPole(region.getPolePosition(), user)) {
+                        if(RegionUtil.isCloseToPole(local.getPolePosition(), user)) {
                             RegionVisitAction visit = new RegionVisitAction(user, region);
                             UserActionHandler.handleAction(visit);
 
@@ -79,7 +81,7 @@ public class CommandHome extends FtcCommand {
 
                             //Check if the home's world is invalid
                             if(!user.hasPermission(Permissions.WORLD_BYPASS) && CommandTpask.isInvalidWorld(l.getWorld())){
-                                throw FtcExceptionProvider.badWorldHome(DEFAULT);
+                                throw FtcExceptionProvider.badWorldHome(result.getName());
                             }
 
                             //Teleport them to home

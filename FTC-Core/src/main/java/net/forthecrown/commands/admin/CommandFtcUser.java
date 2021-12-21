@@ -651,7 +651,7 @@ public class CommandFtcUser extends FtcCommand {
                             T val = c.getArgument("value", acc.getTypeClass());
                             acc.set(val, user);
 
-                            c.getSource().sendAdmin("Set " + user.getName() + "'s to " + acc.toString(val));
+                            c.getSource().sendAdmin("Set " + user.getName() + "'s" + acc.getName() + " to " + acc.toString(val));
                         }))
                 );
     }

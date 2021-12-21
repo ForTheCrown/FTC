@@ -4,9 +4,8 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.arguments.UserParseResult;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
@@ -25,11 +24,16 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+
+import java.util.Map;
 
 import static net.forthecrown.core.Crown.*;
 
@@ -43,8 +47,6 @@ public class CommandFtcCore extends FtcCommand {
 
         register();
     }
-
-    private static final String USER_ARG = "user";
 
     /*
      * ----------------------------------------
@@ -61,6 +63,46 @@ public class CommandFtcCore extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
+                .then(literal("maxPlayers")
+                        .then(argument("limit", IntegerArgumentType.integer(1))
+                                .executes(c -> {
+                                    int max = c.getArgument("limit", Integer.class);
+
+                                    Bukkit.setMaxPlayers(max);
+
+                                    c.getSource().sendAdmin("Set max player limit to " + max);
+                                    return 0;
+                                })
+                        )
+                )
+
+                .then(literal("clear_attribute_modifiers")
+                        .executes(c -> {
+                            CrownUser user = getUserSender(c);
+
+                            ItemStack item = user.getInventory().getItemInMainHand();
+
+                            if (FtcItems.isEmpty(item)) {
+                                throw FtcExceptionProvider.mustHoldItem();
+                            }
+
+                            ItemMeta meta = item.getItemMeta();
+
+                            if(meta.hasAttributeModifiers()) {
+                                for (Map.Entry<Attribute, AttributeModifier> e: meta.getAttributeModifiers().entries()) {
+                                    meta.removeAttributeModifier(e.getKey(), e.getValue());
+                                }
+                            } else {
+                                throw FtcExceptionProvider.create("Item has no attribute modifiers");
+                            }
+
+                            item.setItemMeta(meta);
+
+                            c.getSource().sendAdmin("Removed all attribute modifiers from held item");
+                            return 0;
+                        })
+                )
+
                 .then(CommandLore.compOrStringArg(literal("tablist_score"),
                         (c, b) -> CompletionProvider.suggestMatching(b,"Deaths", " Crown Score"),
                         (c, field) -> {
@@ -237,10 +279,6 @@ public class CommandFtcCore extends FtcCommand {
         getAnnouncer().stop();
         c.getSource().sendAdmin( "Announcer stopped");
         return 0;
-    }
-
-    private CrownUser getUser(CommandContext<CommandSource> c) throws CommandSyntaxException {
-        return c.getArgument(USER_ARG, UserParseResult.class).getUser(c.getSource(), false);
     }
 
     private int saveOrReload(CommandSource sender, SaveReloadPart thingTo, boolean save){

@@ -1,14 +1,21 @@
 package net.forthecrown.commands;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.core.Worlds;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.grenadier.types.selectors.EntitySelector;
+import net.forthecrown.utils.Cooldown;
+import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.transformation.BoundingBoxes;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -57,11 +64,7 @@ public class CommandWild extends FtcCommand {
                 .executes(c -> {
                     Player p = getPlayerSender(c);
 
-                    if (!p.getWorld().getName().equalsIgnoreCase("world_resource")) {
-                        p.sendMessage(ChatColor.GRAY + "You can only do this in the resource world.");
-                        p.sendMessage(ChatColor.GRAY + "The portal to get there is in Hazelguard.");
-                        return 0;
-                    }
+                    if (!test(p)) return 0;
 
                     if (Cooldown.contains(p, "RandomFeatures_Wild")) {
                         p.sendMessage(ChatColor.GRAY + "You can only do this command every 30 seconds.");
@@ -89,6 +92,31 @@ public class CommandWild extends FtcCommand {
                                 })
                         )
                      );
+    }
+
+    boolean test(Player p) {
+        FtcBoundingBox hazelguard = hazelguardRegion(Worlds.OVERWORLD);
+
+        if(p.getWorld().equals(Worlds.RESOURCE)) return true;
+
+        if(!hazelguard.contains(p)) {
+            p.sendMessage(ChatColor.GRAY + "You can only do this in the resource world or at Hazelguard.");
+            p.sendMessage(ChatColor.GRAY + "The portal to get there is in Hazelguard.");
+            return false;
+        }
+
+        return true;
+    }
+
+    FtcBoundingBox hazelguardRegion(World world) {
+        RegionManager manager = WorldGuard.getInstance()
+                .getPlatform()
+                .getRegionContainer()
+                .get(BukkitAdapter.adapt(world));
+
+        ProtectedRegion region = manager.getRegion("hazelguard");
+
+        return FtcBoundingBox.of(world, BoundingBoxes.wgToNms(region));
     }
 
     private static final Component rwWildMessage = Component.text("You've been teleported, do ")

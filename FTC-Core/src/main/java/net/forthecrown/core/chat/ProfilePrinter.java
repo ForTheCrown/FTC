@@ -27,7 +27,7 @@ import org.bukkit.scoreboard.Score;
 import java.util.Date;
 import java.util.function.Function;
 
-public class ProfilePrinter {
+public class ProfilePrinter implements ComponentPrinter {
     private final FtcUser user;
     private final boolean self;
     private final boolean adminViewer;
@@ -264,6 +264,11 @@ public class ProfilePrinter {
         long time = interactions.getLastMarriageChange();
         return Component.text(FtcFormatter.getDateFromMillis(time))
                 .hoverEvent(Component.text(new Date(time).toString()));
+    }
+
+    @Override
+    public Component print() {
+        return printFull();
     }
 
     public Component printCurrent() {

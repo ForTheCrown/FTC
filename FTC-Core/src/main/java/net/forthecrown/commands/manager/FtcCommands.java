@@ -89,6 +89,7 @@ public final class FtcCommands {
         new CommandItemName();
         new CommandLore();
         new CommandSign();
+        new CommandRoyalSword();
         new CommandGameMode();
         new CommandWorld();
         new CommandWeather();
@@ -166,6 +167,7 @@ public final class FtcCommands {
         new HelpBank();
         new HelpShop();
         new HelpRules();
+        new HelpIp();
 
         //teleportation commands
         new CommandTpask();

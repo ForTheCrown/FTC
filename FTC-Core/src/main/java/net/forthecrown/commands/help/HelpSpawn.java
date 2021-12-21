@@ -7,7 +7,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
-import net.forthecrown.regions.RegionConstants;
+import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.actions.ActionFactory;
 import net.md_5.bungee.api.ChatColor;
@@ -48,10 +48,9 @@ public class HelpSpawn extends FtcCommand {
 
             PopulationRegion region = Crown.getRegionManager().get(ComVars.getSpawnRegion());
             if (region != null) {
-                BlockVector2 pole = region.getPolePosition();
-                BlockVector2 senderPos = sender.get2DLocation();
+                BlockVector2 pole = Crown.getRegionManager().getData(sender.getRegionCords()).getPolePosition();
 
-                if(pole.distance(senderPos) < RegionConstants.DISTANCE_TO_POLE) {
+                if(RegionUtil.isCloseToPole(pole, sender)) {
                     ActionFactory.visitRegion(sender, region);
                     return 0;
                 }

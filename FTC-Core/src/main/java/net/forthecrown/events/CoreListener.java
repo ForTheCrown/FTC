@@ -355,8 +355,8 @@ public class CoreListener implements Listener {
             String strMessage = ChatUtils.getString(message);
             boolean staffChat = StaffChat.toggledPlayers.contains(source);
 
-            if(source.hasPermission(Permissions.DONATOR_2) || staffChat) strMessage = formatColorCodes(strMessage);
             if(source.hasPermission(Permissions.DONATOR_3) || staffChat) strMessage = Crown.getEmotes().format(strMessage, source, true);
+            if(source.hasPermission(Permissions.DONATOR_2) || staffChat) strMessage = formatColorCodes(strMessage);
 
             strMessage = checkUppercase(source, strMessage);
             message = ChatUtils.convertString(strMessage);

@@ -16,7 +16,7 @@ import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 
 public class CommandRandomRegion extends FtcCommand {
-    private static final int COOLDOWN_SECONDS = 30;
+    private static final int COOLDOWN_SECONDS = 10;
 
     public CommandRandomRegion() {
         super("randomregion");
@@ -58,8 +58,8 @@ public class CommandRandomRegion extends FtcCommand {
                     RegionPos min = RegionPos.of(box.getMinLocation());
 
                     RegionPos cords = new RegionPos(
-                            random.intInRange(max.getX(), min.getX()),
-                            random.intInRange(max.getZ(), min.getZ())
+                            random.intInRange(max.getX()-1, min.getX()+1),
+                            random.intInRange(max.getZ()-1, min.getZ()+1)
                     );
 
                     PopulationRegion region = Crown.getRegionManager().get(cords);

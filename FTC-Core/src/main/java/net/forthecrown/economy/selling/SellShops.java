@@ -34,8 +34,8 @@ public class SellShops {
     public static final Component WEB_MESSAGE = Component.text()
             .append(Component.translatable("commands.shop.web", NamedTextColor.GRAY))
             .append(Component.newline())
-            .append(Component.text("https://for-the-crown.tebex.io/").color(NamedTextColor.AQUA)
-                    .clickEvent(ClickEvent.openUrl("https://for-the-crown.tebex.io/"))
+            .append(Component.text("forthecrown.buycraft.net").color(NamedTextColor.AQUA)
+                    .clickEvent(ClickEvent.openUrl("https://forthecrown.buycraft.net/"))
                     .hoverEvent(Component.translatable("commands.shop.web.hover")))
             .build();
 

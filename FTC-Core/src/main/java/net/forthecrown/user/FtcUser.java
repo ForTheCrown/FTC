@@ -325,13 +325,34 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void setRankTier(RankTier tier, boolean givePermission) {
-        this.tier = tier;
-
         if(givePermission) {
+            if(getRankTier() != RankTier.NONE) {
+                removeDefaults(this.tier);
+                Bukkit.dispatchCommand(
+                        Bukkit.getConsoleSender(),
+                        "lp user " + getName() + " parent remove " + getRankTier().luckPermsGroup
+                );
+            }
+
+            addDefaults(tier);
             Bukkit.dispatchCommand(
                     Bukkit.getConsoleSender(),
                     "lp user " + getName() + " parent add " + tier.luckPermsGroup
             );
+        }
+
+        this.tier = tier;
+    }
+
+    private void addDefaults(RankTier tier) {
+        for (RankTitle t: tier.getApplicableDefaults()) {
+            addTitle(t, false, false);
+        }
+    }
+
+    private void removeDefaults(RankTier tier) {
+        for (RankTitle t: tier.getApplicableDefaults()) {
+            removeTitle(t, false);
         }
     }
 

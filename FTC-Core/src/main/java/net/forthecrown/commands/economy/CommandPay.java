@@ -9,6 +9,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
@@ -99,7 +100,8 @@ public class CommandPay extends FtcCommand {
             if(target.getInteractions().isBlockedPlayer(user.getUniqueId())) throw FtcExceptionProvider.cannotPayBlocked();
         }
 
-        Component messageActual = message == null || !user.getInteractions().muteStatusSilent().maySpeak || BannedWords.contains(message) ?
+        MuteStatus status = user.getInteractions().muteStatusSilent();
+        Component messageActual = message == null || !status.maySpeak || BannedWords.contains(message) ?
                 Component.text(".").color(NamedTextColor.GRAY) :
                 Component.text(": ").append(message.color(NamedTextColor.WHITE));
 
@@ -116,7 +118,7 @@ public class CommandPay extends FtcCommand {
                             NamedTextColor.GRAY,
                             formattedAmount,
                             target.nickDisplayName().color(NamedTextColor.YELLOW),
-                            message == null ? messageActual : message.color(NamedTextColor.WHITE)
+                            status.senderMaySee ? messageActual : Component.text(".").color(NamedTextColor.GRAY)
                     )
             );
 

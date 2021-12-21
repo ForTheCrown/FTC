@@ -59,6 +59,8 @@ public class HelpFindPost extends FtcCommand {
 
             RegionPos cords = RegionPos.of(loc);
             PopulationRegion region = Crown.getRegionManager().get(cords);
+            Crown.getRegionManager().getGenerator().generate(region);
+            
             BlockVector2 vec2 = region.getPolePosition();
 
             player.sendMessage(Crown.getPrefix()+ ChatColor.YELLOW + "The region pole closest to you:");

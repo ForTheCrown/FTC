@@ -70,6 +70,10 @@ public interface WeaponGoal extends Keyed {
         return new SimpleGoal(goal, rank, type);
     }
 
+    private static Key createKey(int rank, String value) {
+        return Keys.ftccore("goal_r" + rank + "_" + value);
+    }
+
     /**
      * Creates a weapon goal that allows any entity
      * @param goal The kill goal
@@ -105,10 +109,11 @@ public interface WeaponGoal extends Keyed {
 
     class DonatorWeaponGoal implements WeaponGoal {
         private final int rank;
-        private final Key key = Keys.ftccore("goal_donator");
+        private final Key key;
 
         public DonatorWeaponGoal(int rank) {
             this.rank = rank;
+            key = WeaponGoal.createKey(rank, "donator");
         }
 
         @Override
@@ -144,7 +149,7 @@ public interface WeaponGoal extends Keyed {
         public ChargedCreeperGoal(int goal, int rank) {
             this.rank = rank;
             this.goal = goal;
-            this.key = Keys.ftccore("goal_charged_creeper");
+            this.key = WeaponGoal.createKey(rank, "charged_creeper");
         }
 
         @Override
@@ -185,7 +190,7 @@ public interface WeaponGoal extends Keyed {
             this.goal = goal;
             this.type = type;
             this.rank = rank;
-            this.key = Keys.ftccore("goal_" + (type == null ? "any" : type.name().toLowerCase()));
+            this.key = WeaponGoal.createKey(rank, type == null ? "any" : type.name().toLowerCase());
         }
 
         @Override
@@ -224,7 +229,7 @@ public interface WeaponGoal extends Keyed {
             this.rank = rank;
             this.type = type;
 
-            this.key = Keys.ftccore("goal_boss_" + type.name().toLowerCase() + '_' + rank);
+            this.key = WeaponGoal.createKey(rank, "boss_" + type.name().toLowerCase());
         }
 
         @Override
@@ -261,7 +266,7 @@ public interface WeaponGoal extends Keyed {
             this.rank = rank;
             this.goal = goal;
 
-            this.key = Keys.ftccore("goal_damage_" + rank);
+            this.key = WeaponGoal.createKey(rank, "damage");
         }
 
         @Override
@@ -305,7 +310,7 @@ public interface WeaponGoal extends Keyed {
             this.goal = goal;
             this.boss = boss;
 
-            this.key = Keys.ftccore("goal_kill_" + boss.getName().toLowerCase().replaceAll(" ", "_"));
+            this.key = WeaponGoal.createKey(rank, "dboss_" + boss.getName().toLowerCase().replaceAll(" ", "_"));
         }
         @Override
         public int getGoal() { return goal; }

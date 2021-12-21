@@ -33,6 +33,11 @@ public class CheckNeverUsed implements UsageCheck<CheckNeverUsed.CheckInstance> 
     }
 
     @Override
+    public boolean requiresInput() {
+        return false;
+    }
+
+    @Override
     public @NotNull Key key() {
         return KEY;
     }
