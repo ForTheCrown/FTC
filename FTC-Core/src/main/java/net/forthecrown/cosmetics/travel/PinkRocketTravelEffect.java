@@ -11,8 +11,8 @@ public class PinkRocketTravelEffect extends TravelEffect {
     // Simple rocket-like particles when going up, nothing more.
     PinkRocketTravelEffect() {
         super("Pink Rocket", new InventoryPos(1, 1),
-                Component.text("idk what to put "),
-                Component.text("here yet.")
+                Component.text("Fly to the moon "),
+                Component.text("with sprinkles :D.")
         );
     }
 

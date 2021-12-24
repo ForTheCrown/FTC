@@ -17,9 +17,8 @@ public class BeamTravelEffect extends TravelEffect {
     // Simple rocket-like particles when going up, nothing more.
     BeamTravelEffect() {
         super("Beam", new InventoryPos(3, 1),
-                Component.text("idk what to put "),
-                Component.text("here yet.")
-        );
+                Component.text("Beam me up, Scotty ")
+                );
     }
 
     private void playSound(Location loc) {

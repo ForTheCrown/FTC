@@ -43,6 +43,8 @@ public class RoyalSword extends RankedItem {
 
     private Object2IntMap<WeaponGoal> goalsAndProgress = new Object2IntOpenHashMap<>();
 
+    private CompoundTag extraData;
+
     /**
      * Load constructor, loads all needed data from item's NBT
      * @param item The item to load from
@@ -60,12 +62,14 @@ public class RoyalSword extends RankedItem {
      */
     public RoyalSword(UUID owner, ItemStack item) {
         super(owner, item, RoyalWeapons.TAG_KEY);
+        this.extraData = new CompoundTag();
     }
 
     @Override
     protected void readNBT(CompoundTag tag) {
         super.readNBT(tag);
 
+        this.extraData = tag.getCompound("extra_data");
         this.nextUpgrade = RoyalWeapons.getUpgrade(rank+1);
         this.lastFluffChange = tag.getInt("lastFluffChange");
 
@@ -99,6 +103,7 @@ public class RoyalSword extends RankedItem {
     protected void onUpdate(ItemStack item, ItemMeta meta, CompoundTag tag) {
         super.onUpdate(item, meta, tag);
 
+        tag.put("extra_data", extraData);
         tag.putInt("lastFluffChange", lastFluffChange);
         if(ability != null) tag.putString("ability", ability.key().asString());
 
@@ -358,5 +363,9 @@ public class RoyalSword extends RankedItem {
 
     public void setAbility(WeaponAbility ability) {
         this.ability = ability;
+    }
+
+    public CompoundTag getExtraData() {
+        return extraData;
     }
 }

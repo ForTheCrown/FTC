@@ -27,8 +27,7 @@ public class HeartTravelEffect extends TravelEffect {
 
     HeartTravelEffect() {
         super("Hearts", new InventoryPos(2, 1),
-                Component.text("you are a lover "),
-                Component.text("really.")
+                Component.text("Fly in a blaze of love ")
         );
     }
 

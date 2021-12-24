@@ -1,7 +1,9 @@
 package net.forthecrown.inventory.weapon;
 
 import net.forthecrown.inventory.weapon.click.ClickHistory;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -19,11 +21,11 @@ public abstract class AltAttackContext extends WeaponContext {
         this.interactionPoint = interactionPoint;
     }
 
-    public static class Block extends AltAttackContext {
-        public final org.bukkit.block.Block block;
+    public static class c_Block extends AltAttackContext {
+        public final Block block;
         public final BlockFace blockFace;
 
-        public Block(PlayerInteractEvent event, RoyalSword sword, ClickHistory history) {
+        public c_Block(PlayerInteractEvent event, RoyalSword sword, ClickHistory history) {
             super(event.getPlayer(), sword, event.getHand(), event.getItem(), event.getInteractionPoint().toVector(), history);
 
             this.block = event.getClickedBlock();
@@ -31,10 +33,10 @@ public abstract class AltAttackContext extends WeaponContext {
         }
     }
 
-    public static class Entity extends AltAttackContext {
-        public final org.bukkit.entity.Entity entity;
+    public static class c_Entity extends AltAttackContext {
+        public final Entity entity;
 
-        public Entity(PlayerInteractEntityEvent event, RoyalSword sword, ClickHistory history) {
+        public c_Entity(PlayerInteractEntityEvent event, RoyalSword sword, ClickHistory history) {
             super(event.getPlayer(), sword, event.getHand(), event.getPlayer().getInventory().getItemInMainHand(), event.getRightClicked().getLocation().add(0, 1, 0).toVector(), history);
 
             this.entity = event.getRightClicked();

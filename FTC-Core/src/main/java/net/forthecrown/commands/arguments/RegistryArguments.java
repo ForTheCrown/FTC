@@ -16,6 +16,8 @@ import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.inventory.weapon.WeaponGoal;
+import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
@@ -39,6 +41,9 @@ public class RegistryArguments<T> implements ArgumentType<T> {
     private static final RegistryArguments<UsageCheck> USAGE_CHECK =   new RegistryArguments<>(Registries.USAGE_CHECKS, "Usage check");
 
     private static final RegistryArguments<House> HOUSE = new RegistryArguments<>(Registries.HOUSES, "Dynasty");
+
+    public static final RegistryArguments<WeaponGoal> WEAPON_GOAL = new RegistryArguments<>(Registries.WEAPON_GOALS, "Weapon goal");
+    public static final RegistryArguments<WeaponAbility> WEAPON_ABILITY = new RegistryArguments<>(Registries.WEAPON_ABILITIES, "Weapon ability");
 
     public static RegistryArguments<BlockAnimation> animation() {
         return ANIMATION;
@@ -78,6 +83,14 @@ public class RegistryArguments<T> implements ArgumentType<T> {
 
     public static RegistryArguments<House> house() {
         return HOUSE;
+    }
+
+    public static RegistryArguments<WeaponAbility> weaponAbility() {
+        return WEAPON_ABILITY;
+    }
+
+    public static RegistryArguments<WeaponGoal> weaponGoal() {
+        return WEAPON_GOAL;
     }
 
     private final Registry<T> registry;

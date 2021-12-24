@@ -174,7 +174,7 @@ public class FtcUser implements CrownUser {
                 if(!obj.getScore(name).isScoreSet()) continue;
 
                 obj.getScore(getPlayer().getName()).setScore(obj.getScore(name).getScore());
-                obj.getScore(name).setScore(0);
+                obj.getScore(name).resetScore();
             }
         }
     }

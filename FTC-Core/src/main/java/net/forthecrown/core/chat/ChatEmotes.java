@@ -37,7 +37,7 @@ public class ChatEmotes implements SuggestionProvider<CommandSource> {
         register("pleased", "(ᵔᴥᵔ)");
         register("fedup", "(¬_¬)");
         register("reallysad", "(◉︵◉ )");
-        register("heart", "&4❤&r    ");
+        register("heart", "&4❤&r");
 
         Crown.logger().info("Emotes registered");
     }

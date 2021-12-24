@@ -1,6 +1,5 @@
 package net.forthecrown.commands.admin;
 
-import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
@@ -36,10 +35,9 @@ public class CommandBroadcast extends FtcCommand {
 
     @Override
     protected void createCommand(BrigadierCommand command) {
-        command
-                .then(CommandLore.compOrStringArg(literal("ac"), (c, b) -> Suggestions.empty(), ((context, lore) -> {
-                    Crown.getAnnouncer().announce(lore);
-                    return 0;
-                })));
+        CommandLore.addCompOrStringArg(command, (context, builder) -> builder.buildFuture(), (context, lore) -> {
+            Crown.getAnnouncer().announce(lore);
+            return 0;
+        });
     }
 }

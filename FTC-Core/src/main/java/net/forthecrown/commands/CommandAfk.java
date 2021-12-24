@@ -79,10 +79,13 @@ public class CommandAfk extends FtcCommand {
         user.sendMessage(userMsg);
         user.setAfk(!alreadyAFK, message);
 
-        Component finalBroadcastMsg = broadcastMsg;
-        Bukkit.getOnlinePlayers().stream()
-                .filter(plr -> !plr.getUniqueId().equals(user.getUniqueId()))
-                .forEach(p -> p.sendMessage(finalBroadcastMsg));
+        if(broadcastMsg != null) {
+            Component finalBroadcastMsg = broadcastMsg;
+            Bukkit.getOnlinePlayers().stream()
+                    .filter(plr -> !plr.getUniqueId().equals(user.getUniqueId()))
+                    .forEach(p -> p.sendMessage(finalBroadcastMsg));
+        }
+
         return 0;
     }
 }

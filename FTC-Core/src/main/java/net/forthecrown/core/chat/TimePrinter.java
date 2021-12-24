@@ -47,6 +47,69 @@ public class TimePrinter implements ComponentPrinter {
         return time;
     }
 
+    public int getMillis() {
+        return millis;
+    }
+
+    public TimePrinter setMillis(int millis) {
+        this.millis = millis;
+        return this;
+    }
+
+    public int getSeconds() {
+        return seconds;
+    }
+
+    public TimePrinter setSeconds(int seconds) {
+        this.seconds = seconds;
+        return this;
+    }
+
+    public int getMinutes() {
+        return minutes;
+    }
+
+    public TimePrinter setMinutes(int minutes) {
+        this.minutes = minutes;
+        return this;
+    }
+
+    public int getHours() {
+        return hours;
+    }
+
+    public TimePrinter setHours(int hours) {
+        this.hours = hours;
+        return this;
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public TimePrinter setDays(int days) {
+        this.days = days;
+        return this;
+    }
+
+    public int getMonths() {
+        return months;
+    }
+
+    public TimePrinter setMonths(int months) {
+        this.months = months;
+        return this;
+    }
+
+    public int getYears() {
+        return years;
+    }
+
+    public TimePrinter setYears(int years) {
+        this.years = years;
+        return this;
+    }
+
     public StringBuilder getBuilder() {
         return builder;
     }
@@ -91,7 +154,7 @@ public class TimePrinter implements ComponentPrinter {
             write(finalValue ? " and " : ", ");
         }
 
-        valueWritten = true;
+        valueWritten = val > 0;
         return write(val + " " + field + FtcUtils.addAnS(val));
     }
 

@@ -143,10 +143,7 @@ public final class FtcCommands {
         CommandToolBlock.init();
         CommandSelfOrUser.init();
         StateChangeCommand.init();
-
-        //top me daddy xD
-        new CommandDeathTop();
-        new CommandCrownTop();
+        CommandLeaderboard.init();
 
         //economy commands
         new CommandShop();

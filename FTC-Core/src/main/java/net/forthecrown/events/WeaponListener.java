@@ -59,7 +59,7 @@ public class WeaponListener implements Listener {
 
                     WeaponAbility ability = sword.getAbility();
                     if(ability != null) {
-                        AltAttackContext.Block block = new AltAttackContext.Block(event, sword, history);
+                        AltAttackContext.c_Block block = new AltAttackContext.c_Block(event, sword, history);
 
                         ability.onBlockAltAttack(block);
                         ability.onAltAttack(block);
@@ -78,7 +78,7 @@ public class WeaponListener implements Listener {
 
                     WeaponAbility ability = sword.getAbility();
                     if(ability != null) {
-                        AltAttackContext.Entity entity = new AltAttackContext.Entity(event, sword, history);
+                        AltAttackContext.c_Entity entity = new AltAttackContext.c_Entity(event, sword, history);
 
                         ability.onEntityAltAttack(entity);
                         ability.onAltAttack(entity);

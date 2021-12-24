@@ -15,6 +15,7 @@ import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
+import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -117,6 +118,20 @@ public class ProfilePrinter implements ComponentPrinter {
     public ProfilePrinter basicInfo() {
         line("Rank", user.getTitle().noEndSpacePrefix(), user.getTitle() != RankTitle.DEFAULT);
 
+        if(!user.isOnline()) {
+            long offlineTime = System.currentTimeMillis() - user.getOfflinePlayer().getLastLogin();
+
+            if(offlineTime >= TimeUtil.HOUR_IN_MILLIS) {
+                TimePrinter printer = new TimePrinter(offlineTime)
+                        .setSeconds(0)
+                        .setMinutes(0)
+                        .setMillis(0);
+
+                String printed = printer.printString();
+                line("Last online", printed);
+            }
+        }
+
         line("Gems", FtcFormatter.gems(user.getGems()), user.getGems() > 0);
         line("Rhines", FtcFormatter.rhines(Crown.getEconomy().get(user.getUniqueId())));
 
@@ -171,7 +186,7 @@ public class ProfilePrinter implements ComponentPrinter {
 
         line(" OwnedShop",
                 user.marketOwnership.currentlyOwnsShop() ?
-                        MarketDisplay.infoText(Crown.getMarkets().get(user.getUniqueId())) :
+                        MarketDisplay.displayName(Crown.getMarkets().get(user.getUniqueId())) :
                         null
         );
 

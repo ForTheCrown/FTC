@@ -11,8 +11,8 @@ import static net.forthecrown.cosmetics.travel.TravelUtil.spawnOnCircle;
 public class SmokeTravelEffect extends TravelEffect {
     SmokeTravelEffect() {
         super("Smoke", new InventoryPos(4, 1),
-                Component.text("you are a smoker "),
-                Component.text("really.")
+                Component.text("Hit that vape, yo "),
+                Component.text("amirite kids ")
         );
     }
 

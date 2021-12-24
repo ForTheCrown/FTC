@@ -56,7 +56,7 @@ public class CrownRandom extends Random {
      * @return A random entry from the given collection
      */
     public <T> T pickRandomEntry(Collection<T> from){
-        if(from.size() == 0) return null;
+        if(from.isEmpty()) return null;
         if(from.size() == 1) return new ArrayList<>(from).get(0);
 
         return new ArrayList<>(from).get(intInRange(0, from.size()-1));

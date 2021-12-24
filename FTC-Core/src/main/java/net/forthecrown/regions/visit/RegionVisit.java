@@ -57,8 +57,8 @@ public class RegionVisit implements Runnable {
         // 4) The area above the user must only be air
         hulkSmash = ComVars.shouldHulkSmashPoles()
                 && user.hulkSmashesPoles()
-                && FtcUtils.hasOnlyAirAbove(getTeleportLocation())
-                && FtcUtils.hasOnlyAirAbove(user.getLocation())
+                && FtcUtils.isClearAbove(getTeleportLocation())
+                && FtcUtils.isClearAbove(user.getLocation())
                 && user.getGameMode() != FtcGameMode.SPECTATOR;
     }
 

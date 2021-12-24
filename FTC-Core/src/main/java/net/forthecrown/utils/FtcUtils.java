@@ -12,18 +12,12 @@ import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,8 +28,6 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static org.bukkit.Bukkit.getServer;
 
 /**
  * General Utility functions as well as some useful variables, like variables for the two main worlds, world and world_void and the server's time zone lol
@@ -121,15 +113,15 @@ public final class FtcUtils {
         return Bukkit.getScoreboardManager().getMainScoreboard().getTeam("NoClip");
     }
 
-    public static boolean hasOnlyAirAbove(Location location) {
-        return hasOnlyAirAbove0(WorldVec3i.of(location));
+    public static boolean isClearAbove(Location location) {
+        return isClearAbove0(WorldVec3i.of(location));
     }
 
-    public static boolean hasOnlyAirAbove(WorldVec3i pos1) {
-        return hasOnlyAirAbove0(pos1.clone());
+    public static boolean isClearAbove(WorldVec3i pos1) {
+        return isClearAbove0(pos1.clone());
     }
 
-    private static boolean hasOnlyAirAbove0(WorldVec3i pos) {
+    private static boolean isClearAbove0(WorldVec3i pos) {
         for (int i = pos.getY(); i < MAX_Y; i++) {
             pos.above();
 
@@ -139,31 +131,11 @@ public final class FtcUtils {
         return true;
     }
 
-    //Shows a leaderboard, used by /deathtop and /crowntop
-    public static void showLeaderboard(Player player, String objectiveName){
-        Scoreboard mainScoreboard = getServer().getScoreboardManager().getMainScoreboard();
-        Objective objective = mainScoreboard.getObjective(objectiveName);
+    private static boolean isClear(Material material) {
+        if(!material.isBlock()) return true;
+        if(material.isCollidable()) return false;
 
-        TextComponent displayName = Component.text()
-                .color(NamedTextColor.GOLD)
-                .append(Component.text("---"))
-                .append(Component.text("Leaderboard").color(NamedTextColor.YELLOW))
-                .append(Component.text("---"))
-                .build();
-
-        Scoreboard scoreboard = getServer().getScoreboardManager().getNewScoreboard();
-        Objective newObj = scoreboard.registerNewObjective(player.getName(), "dummy", displayName);
-
-        for(String name : objective.getScoreboard().getEntries()) {
-            //If you don't have a set score, or your score is 0, dont' show it
-            if(!objective.getScore(name).isScoreSet() || objective.getScore(name).getScore() == 0) continue;
-
-            newObj.getScore(name).setScore(objective.getScore(name).getScore());
-        }
-
-        newObj.setDisplaySlot(DisplaySlot.SIDEBAR);
-        player.setScoreboard(scoreboard);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Crown.inst(), () -> player.setScoreboard(mainScoreboard), 15 * 20);
+        return material.isAir();
     }
 
     public static Key parseKey(String str) throws IllegalStateException {
