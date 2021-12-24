@@ -9,6 +9,7 @@ import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.click.Click;
 import net.forthecrown.inventory.weapon.click.ClickHistory;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,10 +32,9 @@ public class WeaponListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if(!(event.getDamager() instanceof Player)) return;
+        if(!(event.getDamager() instanceof Player damager)) return;
+        if(!(event.getEntity() instanceof LivingEntity)) return;
         if(event.getEntity() instanceof ArmorStand) return;
-
-        Player damager = (Player) event.getDamager();
 
         consumeSword(
                 damager.getInventory().getItemInMainHand(),
