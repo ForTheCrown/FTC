@@ -119,17 +119,10 @@ public class ProfilePrinter implements ComponentPrinter {
         line("Rank", user.getTitle().noEndSpacePrefix(), user.getTitle() != RankTitle.DEFAULT);
 
         if(!user.isOnline()) {
-            long offlineTime = System.currentTimeMillis() - user.getOfflinePlayer().getLastLogin();
+            long offlineTime = TimeUtil.timeSince(user.getOfflinePlayer().getLastLogin());
+            TimePrinter printer = new TimePrinter(offlineTime);
 
-            if(offlineTime >= TimeUtil.HOUR_IN_MILLIS) {
-                TimePrinter printer = new TimePrinter(offlineTime)
-                        .setSeconds(0)
-                        .setMinutes(0)
-                        .setMillis(0);
-
-                String printed = printer.printString();
-                line("Last online", printed);
-            }
+            line("Last online", printer.printStringBiggest() + " ago");
         }
 
         line("Gems", FtcFormatter.gems(user.getGems()), user.getGems() > 0);
@@ -140,9 +133,7 @@ public class ProfilePrinter implements ComponentPrinter {
 
     public ProfilePrinter optionalInfo() {
         line("AFK", user.getAfkReason(), user.isAfk());
-
         line("Play time", FtcFormatter.decimalizeNumber(playTime()) + " hours");
-
         line("Married to", marriedMessage());
 
         Objective crown = user.getScoreboard().getObjective("crown");

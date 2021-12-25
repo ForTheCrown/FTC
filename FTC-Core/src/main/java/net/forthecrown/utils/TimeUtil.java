@@ -19,4 +19,20 @@ public final class TimeUtil {
     public static long ticksToMillis(long ticks) {
         return ticks * TICKS_IN_MILLIS;
     }
+
+    public static long timeSince(long timeStamp) {
+        return System.currentTimeMillis() - timeStamp;
+    }
+
+    public static boolean isPast(long timeStamp) {
+        return timeStamp <= System.currentTimeMillis();
+    }
+
+    public static boolean hasCooldownEnded(long length, long started) {
+        return isPast(length + started);
+    }
+
+    public static long timeUntil(long timeStamp) {
+        return -timeSince(timeStamp);
+    }
 }

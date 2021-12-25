@@ -2,8 +2,8 @@ package net.forthecrown.user;
 
 import net.forthecrown.core.ComVars;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.TimeUtil;
 
-import java.util.Date;
 import java.util.UUID;
 
 public interface MarketOwnership extends UserAttachment {
@@ -34,9 +34,6 @@ public interface MarketOwnership extends UserAttachment {
     }
 
     default boolean canChangeStatus() {
-        Date nextAllowed = new Date(getLastStatusChange() + ComVars.getMarketStatusCooldown());
-        Date current = new Date();
-
-        return nextAllowed.before(current);
+        return TimeUtil.hasCooldownEnded(ComVars.getMarketStatusCooldown(), getLastStatusChange());
     }
 }

@@ -28,6 +28,7 @@ import net.forthecrown.user.data.*;
 import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
@@ -112,7 +113,6 @@ public class FtcUser implements CrownUser {
     public long totalEarnings = 0L;
     public long nextResetTime = 0L;
     public long lastLoad = 0L;
-    public long nextAllowedBranchSwap = 0L;
     public String ip;
 
     //Economy stuff
@@ -844,7 +844,7 @@ public class FtcUser implements CrownUser {
             sendMessage(
                     Component.text("You can teleport again in ")
                             .color(NamedTextColor.GRAY)
-                            .append(Component.text(FtcFormatter.convertMillisIntoTime(nextAllowedTeleport - System.currentTimeMillis())).color(NamedTextColor.GOLD))
+                            .append(Component.text(FtcFormatter.convertMillisIntoTime(TimeUtil.timeUntil(nextAllowedTeleport))).color(NamedTextColor.GOLD))
             );
             return false;
         }
@@ -1124,10 +1124,6 @@ public class FtcUser implements CrownUser {
 
     protected boolean shouldResetEarnings(){
         return System.currentTimeMillis() > getNextResetTime();
-    }
-
-    private void checkBranchSwapping(){
-        setPref(nextAllowedBranchSwap != 0 && nextAllowedBranchSwap <= System.currentTimeMillis(), UserPref.CANNOT_SWAP_BRANCH);
     }
 
     public void sendPacket(Packet<ClientGamePacketListener> packet){

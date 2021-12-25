@@ -98,6 +98,7 @@ public final class Main extends JavaPlugin implements Crown {
 
     @Override
     public void onLoad() {
+        DeepslateChange.change();
         inst = this;
 
         //Hacky way of determining if we're on the test server or not

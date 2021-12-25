@@ -83,7 +83,7 @@ public class UserJsonSerializer implements UserSerializer {
         if(lastLoc != null) json.addLocation("lastLocation", lastLoc);
 
         //Last known location
-        Location entLoc = user.entityLocation;
+        Location entLoc = user.getLocation();
         if(entLoc != null) json.addLocation("lastKnowLoc", entLoc);
 
         //Sold materials
@@ -183,7 +183,6 @@ public class UserJsonSerializer implements UserSerializer {
         JsonWrapper timeStamps = json.getWrapped("timeStamps");
         user.lastLoad = timeStamps.getLong("lastLoad");
         user.nextResetTime = timeStamps.getLong("nextReset");
-        user.nextAllowedBranchSwap = timeStamps.getLong("nextBranchSwap");
 
         //Last location
         if(json.has("lastLocation")) {

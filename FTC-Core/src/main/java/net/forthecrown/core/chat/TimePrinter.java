@@ -185,6 +185,15 @@ public class TimePrinter implements ComponentPrinter {
         if (years > 0) addYears();
     }
 
+    private void buildBiggest() {
+        if(months > 0) addMonths();
+        else if(days > 0) addDays();
+        else if(hours > 0) addHours();
+        else if(minutes > 0) addMinutes();
+        else if(seconds > 0) addSeconds();
+        else if(millis > 0) addMillis();
+    }
+
     @Override
     public Component print() {
         build();
@@ -193,6 +202,16 @@ public class TimePrinter implements ComponentPrinter {
 
     public String printString() {
         build();
+        return toString();
+    }
+
+    public Component printBiggest() {
+        buildBiggest();
+        return printCurrent();
+    }
+
+    public String printStringBiggest() {
+        buildBiggest();
         return toString();
     }
 
