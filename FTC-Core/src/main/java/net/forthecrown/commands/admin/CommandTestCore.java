@@ -20,8 +20,8 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.utils.math.*;
-import net.forthecrown.utils.transformation.BlockIterator;
+import net.forthecrown.utils.math.Vector3i;
+import net.forthecrown.utils.math.Vector3iOffset;
 import net.forthecrown.utils.transformation.BoundingBoxes;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
@@ -84,11 +84,8 @@ public class CommandTestCore extends FtcCommand {
                                                     Material mat = c.getArgument("mat", Material.class);
 
                                                     FtcBoundingBox box = FtcBoundingBox.of(pos1, pos2);
-                                                    BlockIterator iterator = box.iterator();
 
-                                                    while(iterator.hasNext()) {
-                                                        Block b = iterator.next();
-
+                                                    for (Block b : box) {
                                                         b.setType(mat);
                                                     }
 

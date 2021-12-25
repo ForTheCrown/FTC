@@ -1,9 +1,9 @@
 package net.forthecrown.inventory.weapon;
 
+import it.unimi.dsi.fastutil.doubles.Double2DoubleFunction;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbilities;
@@ -28,35 +28,37 @@ import static net.forthecrown.inventory.weapon.WeaponUpgrade.reforge;
 import static net.forthecrown.utils.FtcUtils.safeRunnable;
 
 public final class RoyalWeapons {
-    public static final Component RANK_1_NAME = makeName("Traveller's", NamedTextColor.GRAY, NamedTextColor.DARK_GRAY, false);
-    public static final Component RANK_2_NAME = makeName("Squire's", NamedTextColor.YELLOW, NamedTextColor.GRAY, false);
-    public static final Component RANK_3_NAME = makeName("Knight's", NamedTextColor.YELLOW, NamedTextColor.YELLOW, false);
-    public static final Component RANK_4_NAME = makeName("Lord's", NamedTextColor.YELLOW, NamedTextColor.YELLOW, true);
-    public static final Component RANK_5_NAME = makeName("Royal", NamedTextColor.YELLOW, NamedTextColor.GOLD, true);
-    public static final Component RANK_FINAL_NAME = makeName("Dragon's", NamedTextColor.RED, NamedTextColor.DARK_RED, true);
+    public static final Component
+            RANK_1_NAME     = makeName("Traveller's",   NamedTextColor.GRAY,    NamedTextColor.DARK_GRAY,   false),
+            RANK_2_NAME     = makeName("Squire's",      NamedTextColor.YELLOW,  NamedTextColor.GRAY,        false),
+            RANK_3_NAME     = makeName("Knight's",      NamedTextColor.YELLOW,  NamedTextColor.YELLOW,      false),
+            RANK_4_NAME     = makeName("Lord's",        NamedTextColor.YELLOW,  NamedTextColor.YELLOW,      true),
+            RANK_5_NAME     = makeName("Royal",         NamedTextColor.YELLOW,  NamedTextColor.GOLD,        true),
+            RANK_FINAL_NAME = makeName("Dragon's",      NamedTextColor.RED,     NamedTextColor.DARK_RED,    true);
 
     public static final int MAX_RANK = 30;
     public static final String TAG_KEY = "royal_weapon";
 
     private RoyalWeapons() {}
 
-    private static final Int2ObjectMap<WeaponUpgrade> UPGRADES = new Int2ObjectOpenHashMap<>();
+    private static final Int2ObjectMap<CachedUpgrades> UPGRADES = new Int2ObjectOpenHashMap<>();
 
     public static void init() {
         int rank = 1;
 
         //Traveller
-        UPGRADES.put(rank, reforge(
+        putUpgrade(rank, reforge(
                 Material.WOODEN_SWORD,
                 RANK_1_NAME,
                 Component.text("Why are you even seeing this???"),
                 "The sword of an aspiring", "adventurer"
         ));
+        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(0, 1));
 
         register(anyEntity(100, rank));
 
         //Squire
-        UPGRADES.put(++rank, reforge(
+        putUpgrade(++rank, reforge(
                 Material.STONE_SWORD,
                 RANK_2_NAME,
                 Component.text("Stone"),
@@ -70,13 +72,14 @@ public final class RoyalWeapons {
         register(simple(EntityType.SPIDER, 75, rank));
 
         //Knight
-        UPGRADES.put(++rank, reforge(
+        putUpgrade(++rank, reforge(
                 Material.IRON_SWORD,
                 RANK_3_NAME,
                 Component.text("Iron"),
-                "A magnificent, unbreaking sword",
+                "The magnificent, unbreaking sword",
                 "of a true hero"
         ));
+        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(0.5, 1));
 
         register(simple(EntityType.BLAZE, 200, rank));
         register(simple(EntityType.WITHER_SKELETON, 200, rank));
@@ -85,28 +88,30 @@ public final class RoyalWeapons {
         register(simple(EntityType.ENDERMAN, 200, rank));
 
         //Lord
-        UPGRADES.put(++rank, reforge(
+        putUpgrade(++rank, reforge(
                 Material.DIAMOND_SWORD,
                 RANK_4_NAME,
                 Component.text("Diamond"),
                 "The shining beauty of",
-                "diamonds blinds enemies"
+                "diamonds blinds all enemies"
         ));
+        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(1, 2));
 
-        register(anyEntity(500, rank));
         register(dungeonBoss(Bosses.zhambie(), 1, rank));
         register(dungeonBoss(Bosses.skalatan(), 1, rank));
         register(dungeonBoss(Bosses.hideySpidey(), 1, rank));
+        register(anyEntity(500, rank));
 
         //Royal
-        UPGRADES.put(++rank, reforge(
+        putUpgrade(++rank, reforge(
                 Material.GOLDEN_SWORD,
-                Enchantment.LOOT_BONUS_MOBS, 4,
                 RANK_5_NAME,
                 Component.text("Gold"),
                 "The bearer of this weapon has",
                 "proven themselves to the Crown..."
         ));
+        putUpgrade(rank, new WeaponUpgrade.EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 4));
+        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(((double) rank) / 10, rank));
 
         register(simple(EntityType.SNOWMAN, 100, rank));
         register(simple(EntityType.GHAST, 200, ++rank));
@@ -120,18 +125,26 @@ public final class RoyalWeapons {
         //be leveled up with kills to dragon
         ++rank;
 
-        UPGRADES.put(++rank, reforge(
+        putUpgrade(++rank, reforge(
                 Material.NETHERITE_SWORD,
-                Enchantment.LOOT_BONUS_MOBS, 5,
                 RANK_FINAL_NAME,
                 Component.text("Netherite"),
                 "The bearer of this weapon has",
                 "proven themselves to the Crown..."
         ));
 
-        register(anyEntity(25000, ++rank));
+        Double2DoubleFunction
+                speed   = i -> (i / 10) + 0.8,   // Speed = rank / 10 + 0.8
+                attack  = i -> (i / 5) + 2;      // attack = rank / 5 + 2
+
+        putUpgrade(rank, new WeaponUpgrade.EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 5));
+        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(speed.get(rank), attack.get(rank)));
+
+        register(anyEntity(2500, ++rank));
+        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(speed.get(rank), attack.get(rank)));
 
         register(simple(EntityType.WANDERING_TRADER, 20, ++rank));
+        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(speed.get(rank), attack.get(rank)));
 
         ++rank;
         register(simple(EntityType.RAVAGER, 50, rank));
@@ -139,6 +152,7 @@ public final class RoyalWeapons {
         register(simple(EntityType.WITCH, 50, rank));
         register(simple(EntityType.PILLAGER, 250, rank));
         register(simple(EntityType.VINDICATOR, 250, rank));
+        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(speed.get(rank), attack.get(rank)));
 
         //Endless dragon stuf
         for (int i = rank; i < MAX_RANK; i++) {
@@ -148,15 +162,22 @@ public final class RoyalWeapons {
             register(endBoss(EntityType.WITHER, endGoal, i));
             register(damage((int) (1000 * i * 1.25D), i));
 
-            if(i != rank) UPGRADES.put(i, WeaponUpgrade.endBoss(i));
+            if(i != rank) {
+                putUpgrade(i, new WeaponUpgrade.ModifierUpgrade(speed.get(i), attack.get(i)));
+                putUpgrade(i, WeaponUpgrade.endBoss(i));
+            }
         }
 
         safeRunnable(WeaponAbilities::init);
         Registries.WEAPON_GOALS.close();
     }
 
+    private static void putUpgrade(int rank, WeaponUpgrade upgrade) {
+        CachedUpgrades upgrades = UPGRADES.computeIfAbsent(rank, integer -> new CachedUpgrades());
+        upgrades.add(upgrade);
+    }
+
     private static void register(WeaponGoal goal) {
-        Announcer.debug("Rank: " + goal.getRank() + ", key: " + goal.key());
         Registries.WEAPON_GOALS.register(goal.key(), goal);
     }
 
@@ -180,7 +201,7 @@ public final class RoyalWeapons {
      * @param rank The rank
      * @return The upgrade recieved when getting to that level, null, if no reward for the given level.
      */
-    public static WeaponUpgrade getUpgrade(int rank) {
+    public static CachedUpgrades getUpgrades(int rank) {
         return UPGRADES.get(rank);
     }
 
@@ -193,14 +214,13 @@ public final class RoyalWeapons {
         ItemStackBuilder builder = new ItemStackBuilder(Material.GOLDEN_SWORD, 1)
                 .setName(RANK_1_NAME)
                 .setFlags(ItemFlag.HIDE_ATTRIBUTES)
-
                 .setUnbreakable(true);
 
         ItemStack result = builder.build();
         RoyalSword sword = new RoyalSword(owner, result);
 
         sword.setRank(0);
-        sword.setNextUpgrade(getUpgrade(1));
+        sword.setNextUpgrades(getUpgrades(1));
         sword.incrementGoal();
 
         sword.update();

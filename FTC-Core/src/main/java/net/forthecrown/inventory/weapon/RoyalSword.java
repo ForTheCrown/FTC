@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.inventory.RankedItem;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.click.ClickHistory;
@@ -38,12 +39,14 @@ public class RoyalSword extends RankedItem {
     private int lastFluffChange = 1;
 
     private WeaponAbility ability;
-    private WeaponUpgrade nextUpgrade;
-    WeaponUpgrade waitingUpdate;
+    private CachedUpgrades nextUpgrades;
+    CachedUpgrades waitingUpdate;
 
     private Object2IntMap<WeaponGoal> goalsAndProgress = new Object2IntOpenHashMap<>();
 
     private CompoundTag extraData;
+
+    private boolean upgradesFixed;
 
     /**
      * Load constructor, loads all needed data from item's NBT
@@ -63,6 +66,7 @@ public class RoyalSword extends RankedItem {
     public RoyalSword(UUID owner, ItemStack item) {
         super(owner, item, RoyalWeapons.TAG_KEY);
         this.extraData = new CompoundTag();
+        this.upgradesFixed = true;
     }
 
     @Override
@@ -70,8 +74,9 @@ public class RoyalSword extends RankedItem {
         super.readNBT(tag);
 
         this.extraData = tag.getCompound("extra_data");
-        this.nextUpgrade = RoyalWeapons.getUpgrade(rank+1);
+        this.nextUpgrades = RoyalWeapons.getUpgrades(rank+1);
         this.lastFluffChange = tag.getInt("lastFluffChange");
+        this.upgradesFixed = tag.getBoolean("upgrades_fixed");
 
         if(tag.contains("ability")) {
             this.ability = Registries.WEAPON_ABILITIES.get(FtcUtils.parseKey(tag.getString("ability")));
@@ -103,7 +108,14 @@ public class RoyalSword extends RankedItem {
     protected void onUpdate(ItemStack item, ItemMeta meta, CompoundTag tag) {
         super.onUpdate(item, meta, tag);
 
-        tag.put("extra_data", extraData);
+        if(!upgradesFixed) {
+            upgradesFixed = true;
+
+            RoyalWeapons.getUpgrades(rank).apply(this, item, meta, tag);
+            Announcer.debug("Fixed sword upgrades");
+        }
+        tag.putBoolean("upgrades_fixed", true);
+
         tag.putInt("lastFluffChange", lastFluffChange);
         if(ability != null) tag.putString("ability", ability.key().asString());
 
@@ -118,10 +130,13 @@ public class RoyalSword extends RankedItem {
         }
 
         //If there's an upgrade waiting to be applied, apply it and then null it.
-        if(waitingUpdate == null) return;
-        waitingUpdate.apply(this, item, meta, tag);
+        if(waitingUpdate != null) {
+            waitingUpdate.apply(this, item, meta, getExtraData());
 
-        waitingUpdate = null;
+            waitingUpdate = null;
+        }
+
+        tag.put("extra_data", extraData);
     }
 
     @Override
@@ -183,12 +198,8 @@ public class RoyalSword extends RankedItem {
 
         //If there's something we'll upgrade to once we beat the goal(s),
         //then show the upgrade
-        if(nextUpgrade != null && nextUpgrade.loreDisplay() != null) {
-            lore.add(
-                    Component.text("Next upgrade: ")
-                            .style(nonItalic(NamedTextColor.GRAY))
-                            .append(nextUpgrade.loreDisplay())
-            );
+        if(nextUpgrades != null) {
+            nextUpgrades.addLore(lore);
         }
 
         //If the owner is not a donator, tell them they could donate :)
@@ -214,13 +225,8 @@ public class RoyalSword extends RankedItem {
 
         lore.add(border);
 
-        WeaponUpgrade lastChange = RoyalWeapons.getUpgrade(lastFluffChange);
-
-        for (Component c: lastChange.loreFluff()) {
-            lore.add(
-                    c.style(nonItalic(NamedTextColor.GRAY))
-            );
-        }
+        CachedUpgrades lastChange = RoyalWeapons.getUpgrades(lastFluffChange);
+        lastChange.addFluff(lore);
 
         lore.add(border);
     }
@@ -257,10 +263,10 @@ public class RoyalSword extends RankedItem {
     public void incrementGoal() {
         rank++;
 
-        this.waitingUpdate = nextUpgrade;
-        nextUpgrade = RoyalWeapons.getUpgrade(rank + 1);
+        this.waitingUpdate = nextUpgrades;
+        nextUpgrades = RoyalWeapons.getUpgrades(rank + 1);
 
-        if(waitingUpdate != null && waitingUpdate.loreFluff() != null) lastFluffChange = rank;
+        if(waitingUpdate != null && waitingUpdate.hasFluff()) lastFluffChange = rank;
 
         setGoals(RoyalWeapons.getGoalsAtRank(rank));
     }
@@ -310,16 +316,16 @@ public class RoyalSword extends RankedItem {
      * Gets the upgrade the sword will receive when it's rank upgrades
      * @return Next rank's upgrade, null, if none
      */
-    public WeaponUpgrade getNextUpgrade() {
-        return nextUpgrade;
+    public CachedUpgrades getNextUpgrades() {
+        return nextUpgrades;
     }
 
     /**
      * Sets the next upgrade
      * @param nextUpgrade New next rank's upgrade
      */
-    public void setNextUpgrade(WeaponUpgrade nextUpgrade) {
-        this.nextUpgrade = nextUpgrade;
+    public void setNextUpgrades(CachedUpgrades nextUpgrade) {
+        this.nextUpgrades = nextUpgrade;
     }
 
     /**

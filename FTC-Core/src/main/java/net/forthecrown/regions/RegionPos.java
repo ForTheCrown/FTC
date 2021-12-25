@@ -135,7 +135,7 @@ public class RegionPos {
      * @param absolute The absolute cord
      * @return The relative region cord
      */
-    public static int toRelative(int absolute) {
+    public static int of(int absolute) {
         int relative = absolute / REGION_SIZE;
         if(absolute < 0) relative--;
 
@@ -184,7 +184,7 @@ public class RegionPos {
      * @return Region cords of the given location
      */
     public static RegionPos of(Location loc) {
-        return toRelative(loc.getBlockX(), loc.getBlockZ());
+        return of(loc.getBlockX(), loc.getBlockZ());
     }
 
     /**
@@ -193,7 +193,7 @@ public class RegionPos {
      * @return Region cords of the given BlockVector2
      */
     public static RegionPos of(BlockVector2 vec2) {
-        return toRelative(vec2.getX(), vec2.getZ());
+        return of(vec2.getX(), vec2.getZ());
     }
 
     /**
@@ -202,7 +202,7 @@ public class RegionPos {
      * @return Region cords of the given BlockPos
      */
     public static RegionPos of(Vector3i pos) {
-        return toRelative(pos.getX(), pos.getZ());
+        return of(pos.getX(), pos.getZ());
     }
 
     /**
@@ -211,10 +211,10 @@ public class RegionPos {
      * @param z The absolute z cord
      * @return The relative region cords gotten from the 2 absolute cords.
      */
-    public static RegionPos toRelative(int x, int z) {
+    public static RegionPos of(int x, int z) {
         return new RegionPos(
-                toRelative(x),
-                toRelative(z)
+                of(x),
+                of(z)
         );
     }
 

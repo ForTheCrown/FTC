@@ -49,7 +49,10 @@ public class SignChunkLoadListener implements PacketListener<ClientboundLevelChu
         ClientboundLevelChunkWithLightPacket packet = context.packet;
 
         try {
-            getBlockEntityTags(packet.getChunkData()).parallelStream()
+            List<CompoundTag> data = getBlockEntityTags(packet.getChunkData());
+            if(data.isEmpty()) return;
+
+            data.parallelStream()
                     .filter(SignRenderPacketListener::isShopTag)
                     .forEach(t -> SignRenderPacketListener.transformTag(context.target, t));
         } catch (Exception e) {

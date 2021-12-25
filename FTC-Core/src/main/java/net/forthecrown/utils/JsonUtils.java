@@ -1,5 +1,6 @@
 package net.forthecrown.utils;
 
+import com.google.common.base.Charsets;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -8,6 +9,7 @@ import net.forthecrown.core.nbt.NbtHandler;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.nbt.TagParser;
+import net.minecraft.server.players.BanListEntry;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
@@ -189,13 +192,23 @@ public final class JsonUtils {
         return array;
     }
 
-    private static final DateFormat DATE_FORMAT = DateFormat.getDateInstance();
+    private static final SimpleDateFormat DATE_FORMAT = BanListEntry.DATE_FORMAT;
+    private static final DateFormat LEGACY_FORMAT = DateFormat.getDateInstance();
 
     public static Date readDate(JsonElement element) {
         try {
             return DATE_FORMAT.parse(element.getAsString());
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Error parsing date: " + element.getAsString(), e);
+            try {
+                return LEGACY_FORMAT.parse(element.getAsString());
+            } catch (ParseException e1) {
+                return new Date(); // Fuck this horse-shit garbage
+                                   // This only works when it feels like working
+                                   // So fuck this date parsing bullshit, and
+                                   // retardedness that comes with it, why the fuck
+                                   // does DateFormat.getInstance() fail here,
+                                   // there's literally no reason for it to fail
+            }
         }
     }
 
@@ -209,7 +222,7 @@ public final class JsonUtils {
 
     //Writes json to a file
     public static void writeFile(JsonElement json, File f) throws IOException {
-        FileWriter writer = new FileWriter(f);
+        FileWriter writer = new FileWriter(f, Charsets.UTF_8);
 
         JsonWriter jWriter = gson.newJsonWriter(writer);
         gson.toJson(json, jWriter);
@@ -224,7 +237,7 @@ public final class JsonUtils {
     }
 
     public static JsonElement readFile(File file) throws IOException {
-        FileReader reader = new FileReader(file);
+        FileReader reader = new FileReader(file, Charsets.UTF_8);
         JsonElement json = JsonParser.parseReader(reader);
 
         reader.close();

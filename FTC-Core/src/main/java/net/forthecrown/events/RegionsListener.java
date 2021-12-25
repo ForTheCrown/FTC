@@ -46,7 +46,7 @@ public class RegionsListener implements Listener {
 
         while (iterator.hasNext()) {
             Block b = iterator.next();
-            PopulationRegion region = manager.get(RegionPos.toRelative(b.getX(), b.getZ()));
+            PopulationRegion region = manager.get(RegionPos.of(b.getX(), b.getZ()));
             BlockPos pos = ((CraftBlock) b).getPosition();
 
             if(region.getPoleBoundingBox().isInside(pos)) {
@@ -57,7 +57,7 @@ public class RegionsListener implements Listener {
 
     private void piston(BlockPistonEvent event, List<Block> blocks) {
         for (Block b: blocks) {
-            PopulationRegion region = manager.get(RegionPos.toRelative(b.getX(), b.getZ()));
+            PopulationRegion region = manager.get(RegionPos.of(b.getX(), b.getZ()));
             BlockPos pos = ((CraftBlock) b).getPosition();
 
             if(region.getPoleBoundingBox().isInside(pos)) {
@@ -72,7 +72,7 @@ public class RegionsListener implements Listener {
             if(!player.getWorld().equals(Worlds.OVERWORLD)) return;
         }
 
-        PopulationRegion region = manager.get(RegionPos.toRelative(block.getX(), block.getZ()));
+        PopulationRegion region = manager.get(RegionPos.of(block.getX(), block.getZ()));
 
         if(region.getPoleBoundingBox().isInside(new BlockPos(block.getX(), block.getY(), block.getZ()))) {
             event.setCancelled(true);

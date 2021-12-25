@@ -6,6 +6,7 @@ import net.forthecrown.user.packets.PacketContext;
 import net.forthecrown.user.packets.PacketListener;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
@@ -41,7 +42,7 @@ public class SignRenderPacketListener implements PacketListener<ClientboundBlock
     }
 
     static boolean isShopTag(@Nullable CompoundTag tag) {
-        if(tag == null || !tag.contains("PublicBukkitValues") || !tag.contains("GlowingText")) return false;
+        if(tag == null || !tag.contains("PublicBukkitValues", Tag.TAG_COMPOUND) || !tag.contains("GlowingText")) return false;
         CompoundTag publicBukkit = tag.getCompound("PublicBukkitValues");
 
         return publicBukkit.contains(ShopManager.SHOP_KEY.asString());

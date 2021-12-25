@@ -2,10 +2,8 @@ package net.forthecrown.inventory.weapon.abilities;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import net.forthecrown.inventory.weapon.AltAttackContext;
-import net.forthecrown.inventory.weapon.WeaponContext;
 import net.forthecrown.inventory.weapon.WeaponUseContext;
 import net.forthecrown.inventory.weapon.click.Click;
-import net.forthecrown.inventory.weapon.click.ClickHistory;
 import net.forthecrown.utils.Bukkit2NMS;
 import net.forthecrown.utils.TimeUtil;
 import net.minecraft.nbt.CompoundTag;
@@ -50,17 +48,6 @@ public class ExplodeAbility extends WeaponAbility {
     @Override
     public void onEntityAltAttack(AltAttackContext.c_Entity context) {
 
-    }
-
-    @Override
-    public boolean isValidInActivation(WeaponContext context, Click click, ClickHistory history) {
-        if(isOnCooldown(context.sword.getExtraData())) return false;
-
-        if(click == Click.RIGHT) {
-            return true;
-        } else {
-            return history.hasPattern(Click.RIGHT, Click.RIGHT);
-        }
     }
 
     boolean isOnCooldown(CompoundTag extraData) {
