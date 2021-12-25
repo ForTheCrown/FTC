@@ -1,6 +1,7 @@
 package net.forthecrown.inventory.weapon;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.forthecrown.inventory.weapon.upgrades.WeaponUpgrade;
 import net.forthecrown.utils.LoreBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

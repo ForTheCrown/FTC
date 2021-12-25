@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbilities;
+import net.forthecrown.inventory.weapon.upgrades.*;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
@@ -24,7 +25,6 @@ import java.util.UUID;
 
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 import static net.forthecrown.inventory.weapon.WeaponGoal.*;
-import static net.forthecrown.inventory.weapon.WeaponUpgrade.reforge;
 import static net.forthecrown.utils.FtcUtils.safeRunnable;
 
 public final class RoyalWeapons {
@@ -47,18 +47,18 @@ public final class RoyalWeapons {
         int rank = 1;
 
         //Traveller
-        putUpgrade(rank, reforge(
+        putUpgrade(rank, ReforgeUpgrade.reforge(
                 Material.WOODEN_SWORD,
                 RANK_1_NAME,
                 Component.text("Why are you even seeing this???"),
                 "The sword of an aspiring", "adventurer"
         ));
-        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(0, 1));
+        putUpgrade(rank, new ModifierUpgrade(0, 1));
 
         register(anyEntity(100, rank));
 
         //Squire
-        putUpgrade(++rank, reforge(
+        putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.STONE_SWORD,
                 RANK_2_NAME,
                 Component.text("Stone"),
@@ -72,14 +72,14 @@ public final class RoyalWeapons {
         register(simple(EntityType.SPIDER, 75, rank));
 
         //Knight
-        putUpgrade(++rank, reforge(
+        putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.IRON_SWORD,
                 RANK_3_NAME,
                 Component.text("Iron"),
                 "The magnificent, unbreaking sword",
                 "of a true hero"
         ));
-        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(0.5, 1));
+        putUpgrade(rank, new ModifierUpgrade(0.5, 1));
 
         register(simple(EntityType.BLAZE, 200, rank));
         register(simple(EntityType.WITHER_SKELETON, 200, rank));
@@ -88,14 +88,14 @@ public final class RoyalWeapons {
         register(simple(EntityType.ENDERMAN, 200, rank));
 
         //Lord
-        putUpgrade(++rank, reforge(
+        putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.DIAMOND_SWORD,
                 RANK_4_NAME,
                 Component.text("Diamond"),
                 "The shining beauty of",
                 "diamonds blinds all enemies"
         ));
-        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(1, 2));
+        putUpgrade(rank, new ModifierUpgrade(1, 2));
 
         register(dungeonBoss(Bosses.zhambie(), 1, rank));
         register(dungeonBoss(Bosses.skalatan(), 1, rank));
@@ -103,15 +103,15 @@ public final class RoyalWeapons {
         register(anyEntity(500, rank));
 
         //Royal
-        putUpgrade(++rank, reforge(
+        putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.GOLDEN_SWORD,
                 RANK_5_NAME,
                 Component.text("Gold"),
                 "The bearer of this weapon has",
                 "proven themselves to the Crown..."
         ));
-        putUpgrade(rank, new WeaponUpgrade.EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 4));
-        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(((double) rank) / 10, rank));
+        putUpgrade(rank, new EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 4));
+        putUpgrade(rank, new ModifierUpgrade(((double) rank) / 10, rank));
 
         register(simple(EntityType.SNOWMAN, 100, rank));
         register(simple(EntityType.GHAST, 200, ++rank));
@@ -125,7 +125,7 @@ public final class RoyalWeapons {
         //be leveled up with kills to dragon
         ++rank;
 
-        putUpgrade(++rank, reforge(
+        putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.NETHERITE_SWORD,
                 RANK_FINAL_NAME,
                 Component.text("Netherite"),
@@ -137,14 +137,14 @@ public final class RoyalWeapons {
                 speed   = i -> (i / 10) + 0.8,   // Speed = rank / 10 + 0.8
                 attack  = i -> (i / 5) + 2;      // attack = rank / 5 + 2
 
-        putUpgrade(rank, new WeaponUpgrade.EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 5));
-        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(speed.get(rank), attack.get(rank)));
+        putUpgrade(rank, new EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 5));
+        putUpgrade(rank, new ModifierUpgrade(speed.get(rank), attack.get(rank)));
 
         register(anyEntity(2500, ++rank));
-        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(speed.get(rank), attack.get(rank)));
+        putUpgrade(rank, new ModifierUpgrade(speed.get(rank), attack.get(rank)));
 
         register(simple(EntityType.WANDERING_TRADER, 20, ++rank));
-        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(speed.get(rank), attack.get(rank)));
+        putUpgrade(rank, new ModifierUpgrade(speed.get(rank), attack.get(rank)));
 
         ++rank;
         register(simple(EntityType.RAVAGER, 50, rank));
@@ -152,7 +152,7 @@ public final class RoyalWeapons {
         register(simple(EntityType.WITCH, 50, rank));
         register(simple(EntityType.PILLAGER, 250, rank));
         register(simple(EntityType.VINDICATOR, 250, rank));
-        putUpgrade(rank, new WeaponUpgrade.ModifierUpgrade(speed.get(rank), attack.get(rank)));
+        putUpgrade(rank, new ModifierUpgrade(speed.get(rank), attack.get(rank)));
 
         //Endless dragon stuf
         for (int i = rank; i < MAX_RANK; i++) {
@@ -163,8 +163,8 @@ public final class RoyalWeapons {
             register(damage((int) (1000 * i * 1.25D), i));
 
             if(i != rank) {
-                putUpgrade(i, new WeaponUpgrade.ModifierUpgrade(speed.get(i), attack.get(i)));
-                putUpgrade(i, WeaponUpgrade.endBoss(i));
+                putUpgrade(i, new ModifierUpgrade(speed.get(i), attack.get(i)));
+                putUpgrade(i, EndBossUpgrade.endBoss(i));
             }
         }
 
