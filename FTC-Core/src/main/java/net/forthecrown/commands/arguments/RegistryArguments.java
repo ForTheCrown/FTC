@@ -16,7 +16,7 @@ import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.inventory.weapon.WeaponGoal;
+import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;

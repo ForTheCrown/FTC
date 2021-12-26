@@ -7,6 +7,9 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbilities;
+import net.forthecrown.inventory.weapon.goals.ChargedCreeperGoal;
+import net.forthecrown.inventory.weapon.goals.DonatorWeaponGoal;
+import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.inventory.weapon.upgrades.*;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.ItemStackBuilder;
@@ -24,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
-import static net.forthecrown.inventory.weapon.WeaponGoal.*;
+import static net.forthecrown.inventory.weapon.goals.WeaponGoal.*;
 import static net.forthecrown.utils.FtcUtils.safeRunnable;
 
 public final class RoyalWeapons {

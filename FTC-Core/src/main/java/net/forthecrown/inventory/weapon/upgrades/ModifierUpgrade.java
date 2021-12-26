@@ -48,6 +48,25 @@ public record ModifierUpgrade(double speed, double attack) implements WeaponUpgr
     @Override
     public Component loreDisplay() {
         return Component.text("Increased attack damage")
-                .append(speed > 0 ? Component.text(" and speed.") : Component.text("."));
+                .append(speedGiven() ? Component.text(" and speed.") : Component.text("."));
+    }
+
+    boolean speedGiven() {
+        return speed > 0;
+    }
+
+    @Override
+    public Component[] statusDisplay() {
+        Component[] result = new Component[speedGiven() ? 2 : 1];
+        result[0] = status(Attribute.GENERIC_ATTACK_DAMAGE, attack);
+
+        if(speedGiven()) result[1] = status(Attribute.GENERIC_ATTACK_SPEED, speed);
+
+        return result;
+    }
+
+    Component status(Attribute attribute, double val) {
+        return Component.text("+" + String.format("$.2f", val) + " ")
+                .append(Component.translatable(attribute));
     }
 }

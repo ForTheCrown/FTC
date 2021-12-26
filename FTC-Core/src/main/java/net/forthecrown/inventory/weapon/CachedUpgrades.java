@@ -14,11 +14,13 @@ import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 public class CachedUpgrades extends ObjectArrayList<WeaponUpgrade> {
     public static final Style
-            FLUFF_STYLE = nonItalic(NamedTextColor.GRAY),
-            LORE_STYLE  = nonItalic(NamedTextColor.GRAY);
+            FLUFF_STYLE     = nonItalic(NamedTextColor.GRAY),
+            LORE_STYLE      = nonItalic(NamedTextColor.GRAY),
+            STATUS_STYLE    = nonItalic(NamedTextColor.GREEN);
 
     public boolean hasFluff() {
         if(isEmpty()) return false;
+
         for (WeaponUpgrade u: this) {
             if(u.loreFluff() != null) return true;
         }
@@ -35,17 +37,13 @@ public class CachedUpgrades extends ObjectArrayList<WeaponUpgrade> {
             Component[] fluff = u.loreFluff();
             if(fluff == null) continue;
 
-            for (Component c: fluff) {
-                builder.add(
-                        c.style(FLUFF_STYLE)
-                );
-            }
+            builder.addAll(FLUFF_STYLE, fluff);
         }
     }
 
     public void addLore(LoreBuilder builder) {
         if(isEmpty()) return;
-        builder.add(Component.empty());
+        builder.addEmpty();
 
         // single
         if(size < 2) {
@@ -66,6 +64,21 @@ public class CachedUpgrades extends ObjectArrayList<WeaponUpgrade> {
                             .style(LORE_STYLE)
                             .append(u.loreDisplay())
             );
+        }
+    }
+
+    public void addCurrentLore(LoreBuilder builder) {
+        if(isEmpty()) return;
+        builder.addEmpty();
+
+        builder.add(Component.translatable("item.modifiers.mainhand").style(LORE_STYLE));
+
+        for (WeaponUpgrade u: this) {
+            Component[] status = u.statusDisplay();
+
+            if(status == null) continue;
+
+            builder.addAll(STATUS_STYLE, status);
         }
     }
 }

@@ -125,7 +125,7 @@ public final class FtcUtils {
         for (int i = pos.getY(); i < MAX_Y; i++) {
             pos.above();
 
-            if(!pos.getMaterial().isAir()) return false;
+            if(!isClear(pos.getMaterial())) return false;
         }
 
         return true;

@@ -43,7 +43,7 @@ public class WeaponListener implements Listener {
                     history.clicks.add(Click.LEFT);
 
                     if(!ComVars.allowNonOwnerSwords() && !sword.getOwner().equals(damager.getUniqueId())) return;
-                    sword.damage(damager, event, history);
+                    event.setDamage(sword.damage(damager, event, history));
                 }
         );
     }

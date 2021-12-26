@@ -6,7 +6,10 @@ import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.events.dynamic.RegionVisitListener;
-import net.forthecrown.regions.*;
+import net.forthecrown.regions.PopulationRegion;
+import net.forthecrown.regions.RegionManager;
+import net.forthecrown.regions.RegionPoleGenerator;
+import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.FtcGameMode;
 import net.forthecrown.utils.FtcUtils;
@@ -53,12 +56,13 @@ public class RegionVisit implements Runnable {
 
         // For hulk smashing to be allowed we must pass 4 checks:
         // The first two are obvious lol
-        // 3) The pole must only be air
+        // 3) The area above the pole must only be air
         // 4) The area above the user must only be air
+        // 5) The user shouldn't be in spectator mode
         hulkSmash = ComVars.shouldHulkSmashPoles()
                 && user.hulkSmashesPoles()
                 && FtcUtils.isClearAbove(getTeleportLocation())
-                && FtcUtils.isClearAbove(user.getLocation())
+                && FtcUtils.isClearAbove(user.getLocation().add(0, Math.ceil(user.getPlayer().getHeight()), 0))
                 && user.getGameMode() != FtcGameMode.SPECTATOR;
     }
 

@@ -11,7 +11,7 @@ import net.forthecrown.core.chat.ComponentTagVisitor;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
-import net.forthecrown.inventory.weapon.WeaponGoal;
+import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;

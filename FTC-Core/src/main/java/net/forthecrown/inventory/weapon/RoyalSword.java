@@ -8,6 +8,7 @@ import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.inventory.RankedItem;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.click.ClickHistory;
+import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.LoreBuilder;
@@ -218,6 +219,11 @@ public class RoyalSword extends RankedItem {
                             .append(getOwnerUser().nickDisplayName())
             );
         }
+
+        // Add current upgrades to the lore
+        // let 'em know what their sword has
+        CachedUpgrades current = RoyalWeapons.getUpgrades(getRank());
+        current.addCurrentLore(lore);
     }
 
     private void addFlavorText(LoreBuilder lore) {
@@ -231,8 +237,11 @@ public class RoyalSword extends RankedItem {
         lore.add(border);
     }
 
-    public void damage(Player killer, EntityDamageByEntityEvent event, ClickHistory history) {
-        WeaponUseContext context = new WeaponUseContext(killer, this, (LivingEntity) event.getEntity(), event.getFinalDamage(), history);
+    public double damage(Player killer, EntityDamageByEntityEvent event, ClickHistory history) {
+        WeaponUseContext context = new WeaponUseContext(killer, this, (LivingEntity) event.getEntity(), event.getDamage(), event.getFinalDamage(), history);
+
+        // Run ability before goal check, ability can make damage go higher
+        if(ability != null) ability.onWeaponUse(context);
 
         //Test all goals to see if we damaged any matching entities
         for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {
@@ -242,8 +251,6 @@ public class RoyalSword extends RankedItem {
             int newVal = e.getIntValue() + e.getKey().getIncrementAmount(context);
             goalsAndProgress.put(e.getKey(), Math.min(e.getKey().getGoal(), newVal));
         }
-
-        if(ability != null) ability.onWeaponUse(context);
 
         //If we should rank up... rank up
         if(shouldRankUp()) {
@@ -258,6 +265,7 @@ public class RoyalSword extends RankedItem {
 
         //Always update item
         update();
+        return context.baseDamage;
     }
 
     public void incrementGoal() {

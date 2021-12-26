@@ -11,7 +11,7 @@ import net.forthecrown.dungeons.bosses.DungeonBoss;
 import net.forthecrown.economy.guild.topics.VoteTopicType;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
-import net.forthecrown.inventory.weapon.WeaponGoal;
+import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
 import net.forthecrown.utils.FtcUtils;

@@ -137,5 +137,5 @@ void consumeProperties(Consumer<Properties> propertiesConsumer) {
 
     propertiesConsumer.accept(properties)
 
-    properties.save(new FileOutputStream(f), "Saves the last build ID, last edited:")
+    properties.store(new FileOutputStream(f), "Saves the last build ID, last build:")
 }

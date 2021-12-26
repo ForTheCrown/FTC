@@ -34,4 +34,13 @@ public interface WeaponUpgrade {
     default Component[] loreFluff() {
         return null;
     }
+
+    /**
+     * Gets the display name to display under the
+     * "When in main hand" lind in the lore.
+     * @return The status display name
+     */
+    default Component[] statusDisplay() {
+        return null;
+    }
 }

@@ -3,6 +3,7 @@ package net.forthecrown.utils;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.Validate;
 
@@ -63,6 +64,18 @@ public class LoreBuilder {
                         .append(ChatUtils.stringToNonItalic(s, true))
                         .build()
         );
+    }
+
+    public LoreBuilder addEmpty() {
+        return add(Component.empty());
+    }
+
+    public LoreBuilder addAll(Style style, Component... arr) {
+        for (Component c: Validate.noNullElements(arr)) {
+            add(c.style(style));
+        }
+
+        return this;
     }
 
     public List<Component> getLore() {

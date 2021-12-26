@@ -11,7 +11,10 @@ import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Tameable;
 
 import java.util.List;
 import java.util.UUID;
