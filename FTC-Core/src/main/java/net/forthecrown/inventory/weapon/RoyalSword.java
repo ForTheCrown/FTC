@@ -206,7 +206,7 @@ public class RoyalSword extends RankedItem {
         //If the owner is not a donator, tell them they could donate :)
         if(!getOwnerUser().hasPermission(Permissions.DONATOR_1)) {
             lore.add(
-                    Component.text("Donators can upgrade Royal Tools beyond rank 5")
+                    Component.text("Donators can upgrade Royal Tools beyond rank " + FtcUtils.arabicToRoman(RoyalWeapons.DONATOR_RANK))
                             .style(nonItalic(NamedTextColor.DARK_GRAY))
             );
         }

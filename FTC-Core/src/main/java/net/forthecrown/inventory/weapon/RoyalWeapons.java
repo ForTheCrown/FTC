@@ -40,6 +40,7 @@ public final class RoyalWeapons {
             RANK_FINAL_NAME = makeName("Dragon's",      NamedTextColor.RED,     NamedTextColor.DARK_RED,    true);
 
     public static final int MAX_RANK = 30;
+    public static int DONATOR_RANK;
     public static final String TAG_KEY = "royal_weapon";
 
     private RoyalWeapons() {}
@@ -119,6 +120,7 @@ public final class RoyalWeapons {
         register(simple(EntityType.SNOWMAN, 100, rank));
         register(simple(EntityType.GHAST, 200, ++rank));
         register(new DonatorWeaponGoal(rank));
+        DONATOR_RANK = rank;
         register(new ChargedCreeperGoal(25, ++rank));
         register(simple(EntityType.WITHER, 10, ++rank));
 
