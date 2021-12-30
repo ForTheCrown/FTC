@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckInventoryEmpty implements UsageCheckInstance {
-    public static final Key KEY = Keys.ftccore("inventory_empty");
+    public static final Key KEY = Keys.forthecrown("inventory_empty");
 
     @Override
     public String asString() {

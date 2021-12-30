@@ -1,11 +1,12 @@
-package net.forthcrown.poshd.command;
+package net.forthecrown.poshd.command;
 
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import net.forthcrown.crown.EventTimer;
-import net.forthcrown.poshd.Main;
-import net.forthcrown.poshd.Messages;
+import net.forthecrown.crown.EventTimer;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
+import net.forthecrown.poshd.Main;
+import net.forthecrown.poshd.Messages;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class CommandCheckPoint extends AbstractCommand {
@@ -32,7 +33,7 @@ public class CommandCheckPoint extends AbstractCommand {
      * Main Author: Julie
      */
 
-    private static final SimpleCommandExceptionType NOT_IN_EVENT = new SimpleCommandExceptionType(() -> "You are not in a parkour course");
+    private static final TranslatableExceptionType NOT_IN_EVENT = new TranslatableExceptionType("error.notInEvent");
 
     @Override
     protected void createCommand(BrigadierCommand command) {
@@ -45,7 +46,8 @@ public class CommandCheckPoint extends AbstractCommand {
                         throw NOT_IN_EVENT.create();
                     }
 
-                    timer.getOnTimerExpire().accept(player);
+                    Location l = timer.checkPoint;
+                    player.teleport(l);
 
                     player.sendMessage(Messages.timerStart());
                     return 0;

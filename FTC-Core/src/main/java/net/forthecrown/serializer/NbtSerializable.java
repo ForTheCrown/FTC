@@ -8,5 +8,5 @@ public interface NbtSerializable {
      * Saves the object as an NBT tag
      * @return the nbt tag representation of this object
      */
-    Tag saveAsTag();
+    Tag save();
 }

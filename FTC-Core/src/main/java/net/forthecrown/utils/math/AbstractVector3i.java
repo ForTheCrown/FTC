@@ -39,8 +39,7 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
     }
 
     public T setX(int x) {
-        this.x = x;
-        return getThis();
+        return set(x, y, z);
     }
 
     public int getY() {
@@ -48,8 +47,7 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
     }
 
     public T setY(int y) {
-        this.y = y;
-        return getThis();
+        return set(x, y, z);
     }
 
     public int getZ() {
@@ -57,8 +55,7 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
     }
 
     public T setZ(int z) {
-        this.z = z;
-        return getThis();
+        return set(x, y, z);
     }
 
     public T above(int amount) { return inDirection(BlockFace.UP, amount); }

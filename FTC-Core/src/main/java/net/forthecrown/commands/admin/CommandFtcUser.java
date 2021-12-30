@@ -1,5 +1,8 @@
 package net.forthecrown.commands.admin;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -26,15 +29,13 @@ import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.actions.ActionFactory;
-import net.forthecrown.user.data.RankTier;
-import net.forthecrown.user.data.RankTitle;
-import net.forthecrown.user.data.SellAmount;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.data.*;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
 
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -232,6 +233,23 @@ public class CommandFtcUser extends FtcCommand {
                                     user.getMarketOwnership().setLastStatusChange(0L);
 
                                     c.getSource().sendAdmin("Reset " + user.getName() + "'s market status cooldown");
+                                }))
+                        )
+
+                        .then(literal("data_container")
+                                .executes(userCmd((user, c) -> {
+                                    Gson gson = new GsonBuilder()
+                                            .setPrettyPrinting()
+                                            .create();
+
+                                    StringWriter writer = new StringWriter();
+                                    FtcUserDataContainer container = (FtcUserDataContainer) user.getDataContainer();
+                                    JsonObject json = container.serialize();
+
+                                    if(json == null) throw FtcExceptionProvider.create("User has no tag");
+
+                                    gson.toJson(json, writer);
+                                    c.getSource().sendMessage(writer.toString());
                                 }))
                         )
 

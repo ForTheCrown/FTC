@@ -1,5 +1,3 @@
-import java.time.Month
-import java.time.format.TextStyle
 import java.util.function.Consumer
 
 plugins {
@@ -47,6 +45,7 @@ dependencies {
     libJar('Squire')
     libJar('FAWE')
     libJar('DiscordSRV')
+    libJar('Dynmap')
 }
 
 void libJar(String s) {
@@ -99,12 +98,12 @@ processResources {
 
 
 String buildVersion() {
-    Calendar cal = Calendar.getInstance()
-    Month month = Month.values()[cal.get(Calendar.MONTH)]
-    int day = cal.get(Calendar.DAY_OF_MONTH)
-    int year = cal.get(Calendar.YEAR)
+    Calendar cal = Calendar.getInstance();
+    int day = cal.get(Calendar.DAY_OF_MONTH);
+    int year = cal.get(Calendar.YEAR);
+    int month = cal.get(Calendar.MONTH);
 
-    return month.getDisplayName(TextStyle.SHORT, Locale.ROOT).toUpperCase() + '-' + day + '-' + year
+    return year + "-" + month + "-" + day + "-" + buildID()
 }
 
 int buildID() {
@@ -131,7 +130,7 @@ void resetBuildID() {
 }
 
 void consumeProperties(Consumer<Properties> propertiesConsumer) {
-    File f = new File('buildver.properties')
+    File f = new File(project.projectDir, 'buildver.properties')
     Properties properties = new Properties()
     properties.load(new FileReader(f))
 

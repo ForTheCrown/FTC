@@ -9,6 +9,8 @@ import net.forthecrown.inventory.RankedItem;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.click.ClickHistory;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
+import net.forthecrown.inventory.weapon.upgrades.MonetaryUpgrade;
+import net.forthecrown.inventory.weapon.upgrades.WeaponUpgrade;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.LoreBuilder;
@@ -47,7 +49,7 @@ public class RoyalSword extends RankedItem {
 
     private CompoundTag extraData;
 
-    private boolean upgradesFixed;
+    private boolean upgradesFixed, moneyRewardsFixed;
 
     /**
      * Load constructor, loads all needed data from item's NBT
@@ -68,6 +70,7 @@ public class RoyalSword extends RankedItem {
         super(owner, item, RoyalWeapons.TAG_KEY);
         this.extraData = new CompoundTag();
         this.upgradesFixed = true;
+        this.moneyRewardsFixed = true;
     }
 
     @Override
@@ -78,6 +81,7 @@ public class RoyalSword extends RankedItem {
         this.nextUpgrades = RoyalWeapons.getUpgrades(rank+1);
         this.lastFluffChange = tag.getInt("lastFluffChange");
         this.upgradesFixed = tag.getBoolean("upgrades_fixed");
+        this.moneyRewardsFixed = tag.getBoolean("money_rewards_fixed");
 
         if(tag.contains("ability")) {
             this.ability = Registries.WEAPON_ABILITIES.get(FtcUtils.parseKey(tag.getString("ability")));
@@ -97,7 +101,7 @@ public class RoyalSword extends RankedItem {
 
             //If the goal wasn't found, warn console and ignore it
             if(goal == null) {
-                Crown.logger().warning("Found null goal in RoyalSword. Owned by:" + getOwner() + " Goal: " + s);
+                Crown.logger().warning("Found unknown goal in RoyalSword. Owned by:" + getOwner() + " Goal: " + s);
                 continue;
             }
 
@@ -115,7 +119,22 @@ public class RoyalSword extends RankedItem {
             RoyalWeapons.getUpgrades(rank).apply(this, item, meta, tag);
             Announcer.debug("Fixed sword upgrades");
         }
+
+        if(!moneyRewardsFixed) {
+            for (int i = rank; i > 0; i--) {
+                CachedUpgrades upgrades = RoyalWeapons.getUpgrades(i);
+
+                for (WeaponUpgrade u: upgrades) {
+                    if(!(u instanceof MonetaryUpgrade)) continue;
+
+                    u.apply(this, item, meta, extraData);
+                }
+            }
+            moneyRewardsFixed = true;
+        }
+
         tag.putBoolean("upgrades_fixed", true);
+        tag.putBoolean("money_rewards_fixed", true);
 
         tag.putInt("lastFluffChange", lastFluffChange);
         if(ability != null) tag.putString("ability", ability.key().asString());
@@ -222,8 +241,15 @@ public class RoyalSword extends RankedItem {
 
         // Add current upgrades to the lore
         // let 'em know what their sword has
-        CachedUpgrades current = RoyalWeapons.getUpgrades(getRank());
-        current.addCurrentLore(lore);
+        CachedUpgrades[] previous = RoyalWeapons.getBelow(getRank() + 1);
+        if(previous == null || previous.length < 1) return;
+
+        for (CachedUpgrades u: previous) {
+            if(!u.hasStatusDisplay()) continue;
+
+            u.addCurrentLore(lore);
+            break;
+        }
     }
 
     private void addFlavorText(LoreBuilder lore) {

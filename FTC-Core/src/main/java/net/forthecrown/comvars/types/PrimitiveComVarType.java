@@ -39,7 +39,7 @@ class PrimitiveComVarType<T> implements ComVarType<T> {
         this.suggestionProvider = suggestionProvider;
         this.serializationFunc = json;
         deserializationFunc = func;
-        key = Keys.ftccore(clazz.getSimpleName().toLowerCase() + "_type");
+        key = Keys.forthecrown(clazz.getSimpleName().toLowerCase() + "_type");
 
         Registries.COMVAR_TYPES.register(key, this);
     }

@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.JsonUtils;
+import net.minecraft.core.Vec3i;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.Location;
@@ -18,6 +19,8 @@ import org.bukkit.util.Vector;
  * A vector with 3 integer coordinates.
  */
 public class Vector3i extends AbstractVector3i<Vector3i> {
+    public static final Vector3i ZERO = new Vector3i(0, 0, 0);
+
     public Vector3i(int x, int y, int z) {
         super(x, y, z);
     }
@@ -52,6 +55,10 @@ public class Vector3i extends AbstractVector3i<Vector3i> {
 
     public static Vector3i of(BlockVector3 vector3){
         return new Vector3i(vector3.getBlockX(), vector3.getBlockY(), vector3.getBlockZ());
+    }
+
+    public static Vector3i of(Vec3i pos) {
+        return new Vector3i(pos.getX(), pos.getY(), pos.getZ());
     }
 
     // Deserialization function

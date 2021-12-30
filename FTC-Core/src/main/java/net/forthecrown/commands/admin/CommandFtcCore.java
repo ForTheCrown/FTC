@@ -309,6 +309,7 @@ public class CommandFtcCore extends FtcCommand {
     }
 
     private enum SaveReloadPart {
+        STRUCTURES ("Structures",               getStructureManager()::save ,   getStructureManager()::reload),
         COMVARS ("ComVars",                     ComVars::save,                  ComVars::reload),
         REGIONS ("Regions",                     getRegionManager()::save,       getRegionManager()::reload),
         ITEM_PRICES ("Item Prices",             getPriceMap()::save,            getPriceMap()::reload),

@@ -21,6 +21,7 @@ import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
 import net.forthecrown.core.animation.BlockAnimation;
@@ -30,6 +31,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class RegistryArguments<T> implements ArgumentType<T> {
     private static final RegistryArguments<BlockAnimation> ANIMATION =     new RegistryArguments<>(Registries.ANIMATIONS, "Animation");
+    private static final RegistryArguments<BlockStructure> STRUCTURE = new RegistryArguments<>(Registries.STRUCTURES, "Structure");
 
     private static final RegistryArguments<ArrowEffect> ARROW_EFFECT =  new RegistryArguments<>(Registries.ARROW_EFFECTS, "Arrow Effect");
     private static final RegistryArguments<DeathEffect> DEATH_EFFECT =  new RegistryArguments<>(Registries.DEATH_EFFECTS, "Death Effect");
@@ -42,8 +44,8 @@ public class RegistryArguments<T> implements ArgumentType<T> {
 
     private static final RegistryArguments<House> HOUSE = new RegistryArguments<>(Registries.HOUSES, "Dynasty");
 
-    public static final RegistryArguments<WeaponGoal> WEAPON_GOAL = new RegistryArguments<>(Registries.WEAPON_GOALS, "Weapon goal");
-    public static final RegistryArguments<WeaponAbility> WEAPON_ABILITY = new RegistryArguments<>(Registries.WEAPON_ABILITIES, "Weapon ability");
+    private static final RegistryArguments<WeaponGoal> WEAPON_GOAL = new RegistryArguments<>(Registries.WEAPON_GOALS, "Weapon goal");
+    private static final RegistryArguments<WeaponAbility> WEAPON_ABILITY = new RegistryArguments<>(Registries.WEAPON_ABILITIES, "Weapon ability");
 
     public static RegistryArguments<BlockAnimation> animation() {
         return ANIMATION;
@@ -91,6 +93,10 @@ public class RegistryArguments<T> implements ArgumentType<T> {
 
     public static RegistryArguments<WeaponGoal> weaponGoal() {
         return WEAPON_GOAL;
+    }
+
+    public static RegistryArguments<BlockStructure> structure() {
+        return STRUCTURE;
     }
 
     private final Registry<T> registry;

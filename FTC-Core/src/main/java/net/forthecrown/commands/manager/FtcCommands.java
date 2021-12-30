@@ -104,6 +104,7 @@ public final class FtcCommands {
         new CommandNPC();
         new CommandLaunch();
         new CommandAnimation();
+        new CommandFtcStruct();
         CommandSpecificGameMode.init();
 
         //Policing commands
@@ -224,6 +225,7 @@ public final class FtcCommands {
         new CommandInvite();
         new CommandRegionData();
         new CommandWhichRegion();
+        new CommandRegionProperties();
 
         //emote
         new EmotePog();

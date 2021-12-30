@@ -51,7 +51,7 @@ public class ComponentTagVisitor implements TagVisitor {
     }
 
     private void addComma() {
-        builder.append(text("," + (format ? "" : " ")));
+        builder.append(text(", "));
     }
 
     private void newLineIndent(boolean removeIndent) {
@@ -61,8 +61,10 @@ public class ComponentTagVisitor implements TagVisitor {
         builder.append(Component.text("\n" + " ".repeat(currentIndent)));
     }
 
-    private void visitArray(CollectionTag<? extends Tag> arr, Character prefix) {
+    private void visitArray(CollectionTag<? extends Tag> arr, Character prefix, boolean allowOneLine) {
         builder.append(text("["));
+
+        boolean multiLine = !allowOneLine && arr.size() > 3;
 
         if(!arr.isEmpty()) {
             if(prefix != null) {
@@ -71,8 +73,10 @@ public class ComponentTagVisitor implements TagVisitor {
                         .append(text(": "));
             }
 
-            addIndent();
-            newLineIndent(false);
+            if(multiLine) {
+                addIndent();
+                newLineIndent(false);
+            }
 
             Iterator<? extends Tag> iterator = arr.iterator();
 
@@ -83,9 +87,9 @@ public class ComponentTagVisitor implements TagVisitor {
 
                 if(iterator.hasNext()) {
                     addComma();
-                    newLineIndent(false);
+                    if(multiLine) newLineIndent(false);
                 }
-                else newLineIndent(true);
+                else if(multiLine) newLineIndent(true);
             }
         }
 
@@ -143,22 +147,28 @@ public class ComponentTagVisitor implements TagVisitor {
 
     @Override
     public void visitByteArray(ByteArrayTag element) {
-        visitArray(element, 'b');
+        visitArray(element, 'b', true);
     }
 
     @Override
     public void visitIntArray(IntArrayTag element) {
-        visitArray(element, 'I');
+        visitArray(element, 'I', true);
     }
 
     @Override
     public void visitLongArray(LongArrayTag element) {
-        visitArray(element, 'L');
+        visitArray(element, 'L', true);
     }
 
     @Override
     public void visitList(ListTag element) {
-        visitArray(element, null);
+        int id = ((Tag) element).getId();
+
+        visitArray(element, null,
+            id == Tag.TAG_DOUBLE
+                        || id == Tag.TAG_FLOAT
+                        || id == Tag.TAG_SHORT
+        );
     }
 
     @Override

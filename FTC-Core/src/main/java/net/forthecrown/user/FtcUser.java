@@ -1123,7 +1123,7 @@ public class FtcUser implements CrownUser {
     }
 
     protected boolean shouldResetEarnings(){
-        return System.currentTimeMillis() > getNextResetTime();
+        return TimeUtil.isPast(getNextResetTime());
     }
 
     public void sendPacket(Packet<ClientGamePacketListener> packet){

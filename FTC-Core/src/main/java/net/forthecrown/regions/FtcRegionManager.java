@@ -3,12 +3,14 @@ package net.forthecrown.regions;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcDynmap;
 import net.forthecrown.serializer.AbstractNbtSerializer;
 import net.forthecrown.utils.FtcUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.dynmap.markers.Marker;
 
 import java.util.Collection;
 import java.util.Map;
@@ -39,7 +41,7 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
         //Save all regions
         for (Map.Entry<RegionPos, PopulationRegion> e: byCords.entrySet()) {
             String key = e.getKey().toString();
-            Tag serialized = e.getValue().saveAsTag();
+            Tag serialized = e.getValue().save();
 
             //If region should be serialized, serialize
             if(serialized != null) tag.put(key, serialized);
@@ -97,14 +99,32 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
     }
 
     @Override
-    public void rename(PopulationRegion region, String newName) {
+    public void rename(PopulationRegion region, String newName, boolean special) {
+        region.setProperty(RegionProperty.PAID_REGION, special);
+
         boolean hasName = region.hasName();
         boolean nullNew = FtcUtils.isNullOrBlank(newName);
+
+        String oldName = region.getName();
+        region.setName(newName);
+
         //Remove it from name tracker if it already has
-        if(hasName) byName.remove(region.getName().toLowerCase());
+        if(hasName) {
+            if(!region.hasProperty(RegionProperty.FORBIDS_MARKER)) {
+                Marker marker = region.getMarker();
+
+                if(nullNew) {
+                    marker.deleteMarker();
+                    region.setMarker(null);
+                } else marker.setLabel(newName);
+            }
+
+            byName.remove(oldName.toLowerCase());
+        } else if (!region.hasProperty(RegionProperty.FORBIDS_MARKER)) {
+            region.setMarker(FtcDynmap.findMarker(region));
+        }
 
         //Set the name and add it with the new name to the tracker
-        region.setName(newName);
         if(!nullNew) byName.put(newName.toLowerCase(), region);
 
         getGenerator().generate(region);

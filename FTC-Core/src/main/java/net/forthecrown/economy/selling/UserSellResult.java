@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.PlayerInventory;
 
 /**
- * Represents the result of a user selling some materials from his inventory
+ * Represents the result of a user selling some materials from their inventory
  */
 public class UserSellResult {
     private final int foundAmount;

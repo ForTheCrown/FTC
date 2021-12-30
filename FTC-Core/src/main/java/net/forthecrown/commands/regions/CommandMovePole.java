@@ -51,12 +51,12 @@ public class CommandMovePole extends FtcCommand {
                                 throw FtcExceptionProvider.create("Invalid position for pole, too close to the edge");
                             }
 
-                            region.setPolePosition(vec2);
+                            region.setPolePosition(vec2.equals(region.getPos().toCenter()) ? null : vec2);
 
                             c.getSource().sendAdmin(
                                     "Moved pole of region " +
                                     (region.hasName() ? region.getName() : region.getPos().toString()) +
-                                    " to " + vec2.toString()
+                                    " to " + vec2
                             );
                             return 0;
                         })

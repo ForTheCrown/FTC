@@ -7,7 +7,7 @@ public interface Keys {
         return Key.key(namespace, value);
     }
 
-    static Key ftccore(String value){
+    static Key forthecrown(String value){
         return key(Crown.inst().namespace(), value);
     }
 }

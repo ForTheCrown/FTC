@@ -16,35 +16,25 @@ import org.bukkit.util.Vector;
  * {@link Vector3iOffset#apply(Location)} method.
  * </p>
  */
-public class Vector3iOffset implements ImmutableVector3i {
+public record Vector3iOffset(int xOffset, int yOffset, int zOffset) implements ImmutableVector3i {
     public static final Vector3iOffset ZERO = new Vector3iOffset(0, 0, 0);
 
-    private final int xOffset;
-    private final int yOffset;
-    private final int zOffset;
-
-    public Vector3iOffset(int xOffset, int yOffset, int zOffset) {
-        this.xOffset = xOffset;
-        this.yOffset = yOffset;
-        this.zOffset = zOffset;
-    }
-
-    public static Vector3iOffset of(AbstractVector3i min, AbstractVector3i max){
+    public static Vector3iOffset of(AbstractVector3i min, AbstractVector3i max) {
         AbstractVector3i dif = max.clone().subtract(min);
         return new Vector3iOffset(dif.x, dif.y, dif.z);
     }
 
-    public static Vector3iOffset of(Location min, Location max){
+    public static Vector3iOffset of(Location min, Location max) {
         Location loc = max.clone().subtract(min);
         return new Vector3iOffset(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
 
-    public static Vector3iOffset of(Location min, Vector3i pos){
+    public static Vector3iOffset of(Location min, Vector3i pos) {
         Vector3i dif = pos.clone().subtract(min);
         return new Vector3iOffset(dif.x, dif.y, dif.z);
     }
 
-    public static Vector3iOffset of(Location min, int x, int y, int z){
+    public static Vector3iOffset of(Location min, int x, int y, int z) {
         return new Vector3iOffset(x - min.getBlockX(), y - min.getBlockY(), z - min.getBlockZ());
     }
 
@@ -74,7 +64,7 @@ public class Vector3iOffset implements ImmutableVector3i {
         return new Vector(x + xOffset, y + yOffset, z + zOffset);
     }
 
-    public Vector3i apply(Vector3i min){
+    public Vector3i apply(Vector3i min) {
         return min.clone().add(xOffset, yOffset, zOffset);
     }
 
@@ -82,11 +72,11 @@ public class Vector3iOffset implements ImmutableVector3i {
         return min.clone().add(xOffset, yOffset, zOffset);
     }
 
-    public Location apply(Location min){
+    public Location apply(Location min) {
         return min.clone().add(xOffset, yOffset, zOffset);
     }
 
-    public Location apply(Location min, float yaw, float pitch){
+    public Location apply(Location min, float yaw, float pitch) {
         return new Location(
                 min.getWorld(),
                 xOffset + min.getX(),
@@ -96,7 +86,7 @@ public class Vector3iOffset implements ImmutableVector3i {
         );
     }
 
-    public Vector apply(Vector vector){
+    public Vector apply(Vector vector) {
         return new Vector(vector.getX() + xOffset, vector.getY() + yOffset, vector.getZ() + zOffset);
     }
 

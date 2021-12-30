@@ -9,6 +9,7 @@ import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.FtcJailManager;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.FtcKingship;
+import net.forthecrown.core.transformers.NamespaceRenamer;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.dungeons.Bosses;
@@ -20,6 +21,7 @@ import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.regions.FtcRegionManager;
+import net.forthecrown.structure.FtcStructureManager;
 import net.forthecrown.useables.FtcUsablesManager;
 import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
@@ -35,6 +37,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.dynmap.DynmapCommonAPIListener;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -45,6 +48,7 @@ import static net.forthecrown.utils.FtcUtils.safeRunnable;
  * Main class that does all the dirty internal stuff
  */
 public final class Main extends JavaPlugin implements Crown {
+    public static final String NAME = "ForTheCrown";
 
     static ComVar<Boolean>          inDebugMode;
 
@@ -67,6 +71,7 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcJailManager           jailManager;
     static FtcWarpManager           warpRegistry;
     static FtcKitManager            kitRegistry;
+    static FtcStructureManager      structureManager;
 
     static FtcMessages              messages;
     static FtcTabList               tabList;
@@ -94,12 +99,20 @@ public final class Main extends JavaPlugin implements Crown {
         dayUpdate.checkDay();
 
         logger.info("FTC startup completed");
+
+        /*if(RwResetter.shouldReset()) {
+            RwResetter.reset();
+        }*/
     }
 
     @Override
     public void onLoad() {
-        DeepslateChange.change();
+        NamespaceRenamer.run(getLogger(), getDataFolder());
+
+        VanillaChanges.softerDeepslate();
         inst = this;
+
+        DynmapCommonAPIListener.register(new FtcDynmap());
 
         //Hacky way of determining if we're on the test server or not
         inDebugMode = ComVarRegistry.set("debugMode", ComVarTypes.BOOL, !new File("plugins/CoreProtect/config.yml").exists());
@@ -172,6 +185,6 @@ public final class Main extends JavaPlugin implements Crown {
 
     @Override
     public @NonNull String namespace() {
-        return getName().toLowerCase();
+        return NAME.toLowerCase();
     }
 }

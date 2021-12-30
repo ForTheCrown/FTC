@@ -38,8 +38,9 @@ public interface RegionManager extends CrownSerializer, NbtCompoundSavable {
      * Renames a given region to the given name.
      * @param region The region to rename
      * @param newName The new name the region will have
+     * @param special Whether the region was paid for on the web-store
      */
-    void rename(PopulationRegion region, String newName);
+    void rename(PopulationRegion region, String newName, boolean special);
 
     /**
      * Adds a region to the manager

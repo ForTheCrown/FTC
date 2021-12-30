@@ -42,6 +42,8 @@ public final class ComVars {
     static ComVar<Long>             voteInterval;
     static ComVar<Long>             guildJoinRequirement;
     static ComVar<Long>             marketStatusCooldown;
+    static ComVar<Long>             resourceWorldResetInterval;
+    static ComVar<Long>             nextResourceWorldReset;
 
     static ComVar<Boolean>          allowOtherPlayerNicks;
     static ComVar<Boolean>          taxesEnabled;
@@ -117,6 +119,8 @@ public final class ComVars {
         read("hulkSmashPoles",              ComVarTypes.BOOL);
         read("endOpen",                     ComVarTypes.BOOL);
         read("allowNonOwnerSwords",         ComVarTypes.BOOL);
+        read("resourceWorldResetInterval",  ComVarTypes.LONG);
+        read("nextResourceWorldReset",      ComVarTypes.LONG);
 
         read("effectCost_arrow",            ComVarTypes.INTEGER);
         read("effectCost_death",            ComVarTypes.INTEGER);
@@ -276,6 +280,17 @@ public final class ComVars {
         return voteTime.getValue(TimeUtil.DAY_IN_MILLIS * 3);
     }
 
+    public static long resourceWorldResetInterval() {
+        return resourceWorldResetInterval.getValue(TimeUtil.DAY_IN_MILLIS * 80);
+    }
+
+    public static long nextResourceWorldReset() {
+        return nextResourceWorldReset.getValue(-1L);
+    }
+
+    public static void nextResourceWorldReset(long time) {
+        nextResourceWorldReset.update(time);
+    }
 
 
 

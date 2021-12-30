@@ -12,6 +12,7 @@ import net.forthecrown.economy.houses.HouseSerializer;
 import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.regions.RegionManager;
+import net.forthecrown.structure.FtcStructureManager;
 import net.forthecrown.useables.UsablesManager;
 import net.forthecrown.useables.kits.KitManager;
 import net.forthecrown.useables.warps.WarpManager;
@@ -48,6 +49,7 @@ public interface Crown extends Plugin, Namespaced {
     static UserManager          getUserManager()        { return Main.userManager; }
     static WarpManager          getWarpManager()        { return Main.warpRegistry; }
     static KitManager           getKitManager()         { return Main.kitRegistry; }
+    static FtcStructureManager  getStructureManager()   { return Main.structureManager; }
 
     static TradersGuild         getTradersGuild()       { return Main.tradersGuild; }
     static Markets              getMarkets()            { return Main.markets; }
@@ -93,6 +95,7 @@ public interface Crown extends Plugin, Namespaced {
         Main.tabList.save();
 
         Main.regionManager.save();
+        Main.structureManager.save();
 
         Main.markets.save();
         Main.tradersGuild.save();

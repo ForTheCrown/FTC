@@ -7,11 +7,13 @@ import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.BitUtil;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.MathUtil;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
+import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.HeightMap;
 import org.bukkit.Material;
@@ -19,6 +21,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static net.forthecrown.regions.RegionConstants.DISTANCE_TO_POLE;
 
@@ -99,5 +104,31 @@ public final class RegionUtil {
                     Component.text("x = " + pole.getX() + " z = " + pole.getZ())
             );
         }
+    }
+
+    static IntArrayTag writeColumn(BlockVector2 pos) {
+        return new IntArrayTag(new int[] {pos.getX(), pos.getZ()});
+    }
+
+    // Serialize properties as a boolean array with each bit corresponding to the
+    // ordinal of the enum
+    static short writeProperties(Set<RegionProperty> properties) {
+        short val = 0;
+
+        for (RegionProperty p: properties) {
+            val = BitUtil.setBit(val, (short) p.ordinal(), true);
+        }
+
+        return val;
+    }
+
+    static Set<RegionProperty> readProperties(short val) {
+        Set<RegionProperty> properties = new HashSet<>();
+
+        for (RegionProperty p: RegionProperty.values()) {
+            if(BitUtil.readBit(val, p.ordinal())) properties.add(p);
+        }
+
+        return properties;
     }
 }

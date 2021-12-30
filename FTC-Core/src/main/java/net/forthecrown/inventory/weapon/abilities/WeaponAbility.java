@@ -14,7 +14,7 @@ public abstract class WeaponAbility implements Keyed {
 
     WeaponAbility(String name) {
         this.name = name;
-        this.key = Keys.ftccore(
+        this.key = Keys.forthecrown(
                 name.toLowerCase().replaceAll(" ", "_")
         );
     }

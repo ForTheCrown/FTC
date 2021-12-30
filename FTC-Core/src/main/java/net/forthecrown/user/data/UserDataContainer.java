@@ -1,6 +1,7 @@
-package net.forthecrown.user;
+package net.forthecrown.user.data;
 
 import com.google.gson.JsonElement;
+import net.forthecrown.user.UserAttachment;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +17,10 @@ public interface UserDataContainer extends UserAttachment {
      */
     void set(Key key, JsonElement section);
 
+    default void set(UserDataAccessor a, JsonElement element) {
+        set(a.accessKey(), element);
+    }
+
     /**
      * Gets a plugin's section.
      * <p>Returns an empty section if the plugin has no set section</p>
@@ -23,6 +28,19 @@ public interface UserDataContainer extends UserAttachment {
      * @return The plugin's section
      */
     @Nullable JsonElement get(Key key);
+
+    default @Nullable JsonElement get(UserDataAccessor a) {
+        return get(a.accessKey());
+    }
+
+    default JsonElement getOrDefault(Key key, JsonElement def) {
+        JsonElement result = get(key);
+        return result == null ? def : result;
+    }
+
+    default JsonElement getOrDefault(UserDataAccessor a, JsonElement def) {
+        return getOrDefault(a.accessKey(), def);
+    }
 
     /**
      * returns if the data container is empty
@@ -36,10 +54,20 @@ public interface UserDataContainer extends UserAttachment {
      */
     void remove(Key key);
 
+    default void remove(UserDataAccessor a) {
+        remove(a.accessKey());
+    }
+
     /**
      * Checks if the container contains the given key
      * @param key The key to check
      * @return Whether the container has the given key
      */
     boolean has(Key key);
+
+    default boolean has(UserDataAccessor a) {
+        return has(a.accessKey());
+    }
+
+    int size();
 }

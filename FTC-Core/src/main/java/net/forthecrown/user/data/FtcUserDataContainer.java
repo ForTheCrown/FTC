@@ -1,8 +1,10 @@
-package net.forthecrown.user;
+package net.forthecrown.user.data;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.forthecrown.user.AbstractUserAttachment;
+import net.forthecrown.user.FtcUser;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 
@@ -16,7 +18,7 @@ public class FtcUserDataContainer extends AbstractUserAttachment implements User
 
     private final Map<Key, JsonElement> data = new Object2ObjectOpenHashMap<>();
 
-    FtcUserDataContainer(FtcUser user){
+    public FtcUserDataContainer(FtcUser user){
         super(user);
     }
 
@@ -44,6 +46,11 @@ public class FtcUserDataContainer extends AbstractUserAttachment implements User
     @Override
     public boolean has(Key key) {
         return data.containsKey(key);
+    }
+
+    @Override
+    public int size() {
+        return data.size();
     }
 
     @Override

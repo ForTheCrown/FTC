@@ -1,5 +1,5 @@
 {
-    "onFirstJoinKit": "ftccore:noobs",
+    "onFirstJoinKit": "forthecrown:noobs",
     "treasureWorld": "world_resource",
     "regionWorld": "world",
     "spawnRegion": "Hazelguard",
@@ -8,7 +8,7 @@
     "maxTreasureItems": 5,
 
     "nearRadius": 200,
-    "hoppersInOneChunk": 64,
+    "hoppersInOneChunk": 128,
     "maxGuildMembers": 7,
 
     "marriageCooldown": 259200000,
@@ -21,6 +21,8 @@
     "voteInterval": 259200000,
     "guildJoinRequirement": 172800000,
     "marketStatusCooldown": 172800000,
+    "resourceWorldResetInterval": 6912000000,
+    "nextResourceWorldReset": -1,
 
     "allowOtherPlayerNicks": false,
     "taxesEnabled": false,

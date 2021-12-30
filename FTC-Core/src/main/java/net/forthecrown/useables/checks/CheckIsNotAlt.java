@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckIsNotAlt implements UsageCheckInstance {
-    public static final Key KEY = Keys.ftccore("not_alt");
+    public static final Key KEY = Keys.forthecrown("not_alt");
 
     @Override
     public String asString() {

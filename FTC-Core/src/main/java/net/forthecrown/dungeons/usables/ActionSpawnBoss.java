@@ -38,7 +38,7 @@ public class ActionSpawnBoss implements UsageAction<ActionSpawnBoss.ActionInstan
 
     @Override
     public JsonElement serialize(ActionInstance value) {
-        return JsonUtils.writeKey(value.getBoss().key());
+        return value.getBoss().serialize();
     }
 
     @Override

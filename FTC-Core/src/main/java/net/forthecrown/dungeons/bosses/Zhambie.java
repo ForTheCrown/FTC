@@ -3,7 +3,6 @@ package net.forthecrown.dungeons.bosses;
 import net.forthecrown.core.Crown;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.BossFightContext;
-import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.core.Worlds;
 import net.kyori.adventure.text.Component;
@@ -83,7 +82,7 @@ public class Zhambie extends DungeonBoss<Husk> {
 
     @Override
     protected void onDeath(BossFightContext context) {
-        giveRewards("adventure:zhambie", BossItems.ZHAMBIE.item(), context);
+        finalizeKill(context);
         for (Husk s: helpers){
             s.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 99999, 254, false, false));
         }

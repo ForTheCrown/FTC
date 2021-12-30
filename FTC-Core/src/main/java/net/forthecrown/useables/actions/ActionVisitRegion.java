@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionVisitRegion implements UsageAction<ActionVisitRegion.ActionInstance> {
-    public static final Key KEY = Keys.ftccore("visit_region");
+    public static final Key KEY = Keys.forthecrown("visit_region");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

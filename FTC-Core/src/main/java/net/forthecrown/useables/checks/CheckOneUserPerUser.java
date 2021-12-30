@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class CheckNotUsedBefore implements UsageCheck<CheckNotUsedBefore.CheckInstance> {
-    public static final Key KEY = Keys.ftccore("not_used_before");
+public class CheckOneUserPerUser implements UsageCheck<CheckOneUserPerUser.CheckInstance> {
+    public static final Key KEY = Keys.forthecrown("one_use_per_user");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

@@ -1,6 +1,8 @@
 package net.forthecrown.regions;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.forthecrown.core.FtcDynmap;
 import net.forthecrown.serializer.NbtSerializable;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Nameable;
@@ -10,30 +12,31 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.*;
+import org.dynmap.markers.Marker;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 public abstract class RegionData implements Nameable, HoverEventSource<Component>, NbtSerializable {
     private static final GsonComponentSerializer SERIALIZER = GsonComponentSerializer.gson();
 
     protected final RegionPos pos;
+    protected final Set<RegionProperty> properties = new ObjectOpenHashSet<>();
 
     protected String name;
     protected BlockVector2 polePosition;
     protected TextColor nameColor;
     protected Component description;
+    protected Marker marker;
 
     public RegionData(RegionPos pos) {
         this.pos = pos;
     }
 
     @Override
-    public Tag saveAsTag() {
+    public Tag save() {
         boolean noPos = polePosition == null;
         boolean noName = FtcUtils.isNullOrBlank(name);
 
@@ -41,20 +44,21 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
         if(noPos && noName) return null;
 
         //If it only has a name
-        if(noPos && description == null && nameColor == null) {
+        if(noPos && description == null && nameColor == null && !hasProperties()) {
             return StringTag.valueOf(name);
         }
 
         //If it only has a position
         if(!noPos && noName) {
-            return writeColumn(polePosition);
+            return RegionUtil.writeColumn(polePosition);
         }
 
         //It has a both a name and a custom position.
         CompoundTag tag = new CompoundTag();
         tag.putString("name", name);
 
-        if(polePosition != null) tag.put("polePosition", writeColumn(polePosition));
+        if(hasProperties()) tag.putInt("properties", RegionUtil.writeProperties(properties));
+        if(polePosition != null) tag.put("polePosition", RegionUtil.writeColumn(polePosition));
         if(description != null) tag.putString("description", SERIALIZER.serialize(description));
         if(nameColor != null) tag.putString("color", nameColor.asHexString());
 
@@ -64,7 +68,7 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
     protected void readTag(Tag tag) {
         //If the only thing serialized is, is a name
         if(tag.getId() == Tag.TAG_STRING) {
-            name = tag.getAsString();
+            setName0(tag.getAsString());
             return;
         }
 
@@ -80,11 +84,19 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
         //Both name and pole position have been serialized, maybe description too
         CompoundTag tags = (CompoundTag) tag;
 
-        this.name = tags.getString("name");
-
         //Set pole position
-        int[] arr = tags.getIntArray("polePosition");
-        setPolePosition0(BlockVector2.at(arr[0], arr[1]));
+        if(tags.contains("polePosition")) {
+            int[] arr = tags.getIntArray("polePosition");
+            setPolePosition0(BlockVector2.at(arr[0], arr[1]));
+        }
+
+        // Properties must be deserialized before name
+        if(tags.contains("properties")) {
+            properties.clear();
+            properties.addAll(RegionUtil.readProperties(tags.getShort("properties")));
+        }
+
+        setName0(tags.getString("name"));
 
         //If has description, set it
         if(tags.contains("description")) this.description = SERIALIZER.deserialize(tags.getString("description"));
@@ -93,13 +105,43 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
 
     protected abstract void setPolePosition0(BlockVector2 vector2);
 
-    private static IntArrayTag writeColumn(BlockVector2 pos) {
-        return new IntArrayTag(new int[] {pos.getX(), pos.getZ()});
+    private void setName0(String name) {
+        this.name = name;
+
+        if(hasProperty(RegionProperty.FORBIDS_MARKER)) return;
+        this.marker = FtcDynmap.findMarker(this);
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    public boolean hasProperty(RegionProperty property) {
+        return properties.contains(property);
+    }
+
+    public void addProperty(RegionProperty property) {
+        if(hasProperty(property)) return;
+
+        property.onAdd(this);
+        properties.add(property);
+    }
+
+    public void removeProperty(RegionProperty property) {
+        if(!hasProperty(property)) return;
+
+        property.onRemove(this);
+        properties.remove(property);
+    }
+
+    public boolean hasProperties() {
+        return !properties.isEmpty();
+    }
+
+    public void setProperty(RegionProperty property, boolean state) {
+        if(state) addProperty(property);
+        else removeProperty(property);
     }
 
     /**
@@ -165,6 +207,14 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
      */
     public @NotNull BlockVector2 getPolePosition() {
         return polePosition == null ? pos.toCenter() : polePosition;
+    }
+
+    public Marker getMarker() {
+        return marker;
+    }
+
+    public void setMarker(Marker marker) {
+        this.marker = marker;
     }
 
     public static class Empty extends RegionData {

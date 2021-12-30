@@ -64,7 +64,7 @@ public interface WeaponGoal extends Keyed {
     }
 
     static Key createKey(int rank, String value) {
-        return Keys.ftccore("goal_r" + rank + "_" + value);
+        return Keys.forthecrown("goal_r" + rank + "_" + value);
     }
 
     /**

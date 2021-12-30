@@ -68,7 +68,7 @@ public class CommandInteractable extends FtcCommand {
                                             if(Crown.getUsables().isInteractableSign(l.getBlock())) throw FtcExceptionProvider.create("Block is already an interactable sign");
 
                                             Crown.getUsables().createBlock((TileState) l.getBlock().getState());
-                                            c.getSource().sendAdmin("Creating interactable sign");
+                                            c.getSource().sendAdmin("Creating interactable block");
                                             return 0;
                                         })
                                 )

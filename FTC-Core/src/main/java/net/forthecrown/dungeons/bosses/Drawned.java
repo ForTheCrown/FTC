@@ -1,12 +1,11 @@
 package net.forthecrown.dungeons.bosses;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.dungeons.DungeonAreas;
-import net.forthecrown.dungeons.BossFightContext;
-import net.forthecrown.dungeons.BossItems;
-import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.core.Worlds;
+import net.forthecrown.dungeons.BossFightContext;
+import net.forthecrown.dungeons.DungeonAreas;
+import net.forthecrown.dungeons.DungeonUtils;
+import net.forthecrown.utils.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
@@ -114,7 +113,7 @@ public class Drawned extends DungeonBoss<Drowned> {
 
     @Override
     protected void onDeath(BossFightContext context) {
-        giveRewards(null, BossItems.DRAWNED.item(), context);
+        finalizeKill(context);
         for (Guardian s: guardians){
             s.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 99999, 254, false, false));
         }
@@ -127,7 +126,7 @@ public class Drawned extends DungeonBoss<Drowned> {
         guardians.remove(event.getEntity());
     }
 
-    public enum Artifacts{
+    public enum Artifacts {
         IRON (DungeonUtils.makeDungeonItem(Material.IRON_NUGGET, 1, "Iron Artifact")),
         ELDER (DungeonUtils.makeDungeonItem(Material.PRISMARINE_CRYSTALS, 1, "Elder Artifact")),
         TURTLE (DungeonUtils.makeDungeonItem(Material.SCUTE, 1, "Turtle Artifact")),

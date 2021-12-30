@@ -15,7 +15,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionKit implements UsageAction<ActionKit.ActionInstance> {
-    public static final Key KEY = Keys.ftccore("give_kit");
+    public static final Key KEY = Keys.forthecrown("give_kit");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

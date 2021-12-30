@@ -14,8 +14,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionRemoveNumber implements UsageAction<ActionRemoveNumber.ActionInstance> {
-    public static final Key BAL_KEY = Keys.ftccore("remove_balance");
-    public static final Key GEM_KEY = Keys.ftccore("remove_gems");
+    public static final Key BAL_KEY = Keys.forthecrown("remove_balance");
+    public static final Key GEM_KEY = Keys.forthecrown("remove_gems");
 
     private final boolean fromBal;
 

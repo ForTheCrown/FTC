@@ -59,6 +59,22 @@ public class CommandEnchant extends FtcCommand {
                                 c.getArgument("enchant", Enchantment.class))
                         )
 
+                        .then(literal("remove")
+                                .executes(c -> {
+                                    CrownUser user = getUserSender(c);
+                                    Enchantment ench = EnchantArgument.getEnchantment(c, "enchant");
+
+                                    ItemStack item = user.getInventory().getItemInMainHand();
+
+                                    if(FtcItems.isEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
+
+                                    item.removeEnchantment(ench);
+
+                                    c.getSource().sendAdmin("Removed enchantment: " + ench.getKey().asString());
+                                    return 0;
+                                })
+                        )
+
                         .then(argument("level", IntegerArgumentType.integer(1))
                                 .suggests((c, b) -> {
                                     try {
@@ -96,7 +112,7 @@ public class CommandEnchant extends FtcCommand {
         if(ench instanceof RoyalEnchant) RoyalEnchant.addCrownEnchant(inHand, (RoyalEnchant) ench, level);
         else inHand.addUnsafeEnchantment(ench, level);
 
-        source.sendAdmin(Component.text("Enchanted item in main hand"));
+        source.sendAdmin(Component.text("Enchanted item in main hand with " + ench.getKey().asString()));
         return 0;
     }
 }

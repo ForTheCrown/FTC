@@ -301,6 +301,11 @@ public interface CrownUser extends
         return getRankTier().ordinal() <= tier.ordinal();
     }
 
+    default void addTier(RankTier tier) {
+        if(hasTier(tier)) return;
+        setRankTier(tier);
+    }
+
     RankTitle getTitle();
 
     void setTitle(RankTitle title);

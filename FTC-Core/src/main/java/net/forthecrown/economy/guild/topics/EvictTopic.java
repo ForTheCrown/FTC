@@ -39,7 +39,7 @@ import java.util.UUID;
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 public class EvictTopic implements VoteTopicType<EvictTopic.TopicInstance> {
-    public static final Key KEY = Keys.ftccore("evict_owner");
+    public static final Key KEY = Keys.forthecrown("evict_owner");
     public static final EvictTopic INSTANCE = new EvictTopic();
 
     @Override

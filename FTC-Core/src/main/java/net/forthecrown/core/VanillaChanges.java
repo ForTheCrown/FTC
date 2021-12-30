@@ -8,8 +8,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.lang.reflect.Field;
 
-class DeepslateChange {
-    public static void change() {
+class VanillaChanges {
+    public static void softerDeepslate() {
         RotatedPillarBlock block = (RotatedPillarBlock) Blocks.DEEPSLATE;
         BlockBehaviour.Properties properties = properties(block);
         properties.strength(1.5F, 6F);

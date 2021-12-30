@@ -3,7 +3,6 @@ package net.forthecrown.events;
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -17,15 +16,11 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.emotes.EmoteSmooch;
-import net.forthecrown.core.ComVars;
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.FtcFlags;
-import net.forthecrown.core.Permissions;
+import net.forthecrown.core.*;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.StaffChat;
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
@@ -49,6 +44,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -75,7 +71,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.logging.Level;
 
 import static net.forthecrown.core.chat.FtcFormatter.checkUppercase;
 import static net.forthecrown.core.chat.FtcFormatter.formatColorCodes;
@@ -171,7 +166,7 @@ public class CoreListener implements Listener {
         BlockData data = event.getClickedBlock().getBlockData();
         if(!(data instanceof TrapDoor)) return;
 
-        Location weLoc = BukkitAdapter.adapt(block.getLocation());
+        com.sk89q.worldedit.util.Location weLoc = BukkitAdapter.adapt(block.getLocation());
         LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
 
         WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
@@ -379,16 +374,15 @@ public class CoreListener implements Listener {
         if(event.getKeepInventory()) return;
 
         CrownUser user = UserManager.getUser(event.getEntity());
-        org.bukkit.Location loc = user.getLocation();
+        Location loc = user.getLocation();
 
         user.setLastLocation(loc);
 
         // Tell the Player where they died, but ignore world_void deaths.
-        String diedAt = "died at x=" + loc.getBlockX() + ", y=" + loc.getBlockY() + ", z=" + loc.getBlockZ() + ".";
-        if (!loc.getWorld().getName().equalsIgnoreCase("world_void"))
-            user.sendMessage(ChatColor.GRAY + "[FTC] You " + diedAt);
+        String diedAt = "died at x=" + loc.getBlockX() + ", y=" + loc.getBlockY() + ", z=" + loc.getBlockZ();
+        if (!loc.getWorld().equals(Worlds.VOID)) user.sendMessage(ChatColor.GRAY + "[FTC] You " + diedAt + ".");
 
-        Announcer.log(Level.INFO, "! " + user.getName() + " " + diedAt);
+        Crown.logger().info("! " + user.getName() + " " + diedAt + ", world=" + loc.getWorld().getName());
 
         PlayerInventory inventory = event.getEntity().getInventory();
         Int2ObjectMap<ItemStack> items = new Int2ObjectOpenHashMap<>();

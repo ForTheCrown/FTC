@@ -1,8 +1,9 @@
-package net.forthcrown.crown;
+package net.forthecrown.crown;
 
-import net.forthcrown.poshd.Main;
+import net.forthecrown.poshd.Main;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -11,6 +12,7 @@ import java.util.TimerTask;
 import java.util.function.Consumer;
 
 public class EventTimer {
+    public static final long MILLIS_PER_TICK = 100;
 
     private long elapsedTime = 0;
     private boolean stopped;
@@ -19,6 +21,7 @@ public class EventTimer {
 
     private final TimerMessageFormatter messageFormatter;
     private final Consumer<Player> onTimerExpire;
+    public Location checkPoint;
 
     private final Timer timer;
 
@@ -40,7 +43,7 @@ public class EventTimer {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                elapsedTime += 100;
+                elapsedTime += MILLIS_PER_TICK;
                 if(elapsedTime >= maxTicks * 50){
                     Bukkit.getScheduler().runTask(Main.inst, () -> onTimerExpire.accept(getPlayer()));
                     stop();
@@ -48,7 +51,7 @@ public class EventTimer {
 
                 sendActionBar();
             }
-        }, 0, 100);
+        }, 0, MILLIS_PER_TICK);
     }
 
     public void startTickingDown(int ticks){
@@ -58,7 +61,7 @@ public class EventTimer {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                elapsedTime -= 100;
+                elapsedTime -= MILLIS_PER_TICK;
 
                 if(elapsedTime <= 0){
                     Bukkit.getScheduler().runTask(Main.inst, () -> onTimerExpire.accept(getPlayer()));
@@ -67,7 +70,7 @@ public class EventTimer {
 
                 sendActionBar();
             }
-        }, 0, 100);
+        }, 0, MILLIS_PER_TICK);
     }
 
     public void stop(){

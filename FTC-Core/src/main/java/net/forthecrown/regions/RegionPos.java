@@ -135,7 +135,7 @@ public class RegionPos {
      * @param absolute The absolute cord
      * @return The relative region cord
      */
-    public static int of(int absolute) {
+    public static int toRegion(int absolute) {
         int relative = absolute / REGION_SIZE;
         if(absolute < 0) relative--;
 
@@ -213,8 +213,8 @@ public class RegionPos {
      */
     public static RegionPos of(int x, int z) {
         return new RegionPos(
-                of(x),
-                of(z)
+                toRegion(x),
+                toRegion(z)
         );
     }
 

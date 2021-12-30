@@ -19,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionCommand implements UsageAction<ActionCommand.ActionInstance> {
-    public static final Key CONSOLE_KEY = Keys.ftccore("command_console");
-    public static final Key USER_KEY = Keys.ftccore("command_user");
+    public static final Key CONSOLE_KEY = Keys.forthecrown("command_console");
+    public static final Key USER_KEY = Keys.forthecrown("command_user");
 
     private final boolean console;
 

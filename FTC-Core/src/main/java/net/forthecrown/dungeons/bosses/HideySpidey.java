@@ -2,7 +2,6 @@ package net.forthecrown.dungeons.bosses;
 
 import com.destroystokyo.paper.entity.Pathfinder;
 import net.forthecrown.dungeons.BossFightContext;
-import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.dungeons.DungeonUtils;
@@ -104,7 +103,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
 
     @Override
     protected void onDeath(BossFightContext context) {
-        giveRewards("adventure:hideyspidey", BossItems.HIDEY_SPIDEY.item(), context);
+        finalizeKill(context);
         for (CaveSpider s: helpers){
             s.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 99999, 254, false, false));
         }

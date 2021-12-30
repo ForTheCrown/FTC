@@ -133,7 +133,7 @@ public class ItemStackBuilder implements Cloneable {
     }
 
     public ItemStackBuilder addLore(String lore, boolean translateColors){
-        return addLore(ChatUtils.convertString(lore, translateColors));
+        return addLore(ChatUtils.stringToNonItalic(lore, translateColors));
     }
 
     public ItemStackBuilder setLore(Collection<String> lores, boolean translateColors){

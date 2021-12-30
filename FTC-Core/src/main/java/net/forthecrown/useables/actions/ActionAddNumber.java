@@ -13,8 +13,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstance> {
-    public static final Key GEM_KEY = Keys.ftccore("add_gems");
-    public static final Key BAL_KEY = Keys.ftccore("add_bal");
+    public static final Key GEM_KEY = Keys.forthecrown("add_gems");
+    public static final Key BAL_KEY = Keys.forthecrown("add_bal");
 
     private final boolean toBal;
 

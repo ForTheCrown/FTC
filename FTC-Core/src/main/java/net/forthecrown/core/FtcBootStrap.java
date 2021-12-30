@@ -22,6 +22,7 @@ import net.forthecrown.inventory.crown.Crowns;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.regions.FtcRegionManager;
 import net.forthecrown.registry.Registries;
+import net.forthecrown.structure.FtcStructureManager;
 import net.forthecrown.useables.FtcUsablesManager;
 import net.forthecrown.useables.actions.UsageActions;
 import net.forthecrown.useables.checks.UsageChecks;
@@ -66,6 +67,7 @@ final class FtcBootStrap {
         punishmentManager = new FtcPunishmentManager();
         usablesManager = new FtcUsablesManager();
         jailManager = new FtcJailManager();
+        structureManager = new FtcStructureManager();
 
         kingship = new FtcKingship();
         rules = new ServerRules();

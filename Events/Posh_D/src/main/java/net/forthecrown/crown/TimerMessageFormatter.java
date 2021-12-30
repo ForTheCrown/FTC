@@ -1,4 +1,4 @@
-package net.forthcrown.crown;
+package net.forthecrown.crown;
 
 import net.kyori.adventure.text.Component;
 

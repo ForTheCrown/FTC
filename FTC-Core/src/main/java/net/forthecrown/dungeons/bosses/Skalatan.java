@@ -1,10 +1,9 @@
 package net.forthecrown.dungeons.bosses;
 
-import net.forthecrown.dungeons.DungeonAreas;
-import net.forthecrown.dungeons.BossFightContext;
-import net.forthecrown.dungeons.BossItems;
-import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.core.Worlds;
+import net.forthecrown.dungeons.BossFightContext;
+import net.forthecrown.dungeons.DungeonAreas;
+import net.forthecrown.dungeons.DungeonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -92,7 +91,7 @@ public class Skalatan extends DungeonBoss<WitherSkeleton> {
 
     @Override
     protected void onDeath(BossFightContext context) {
-        giveRewards("adventure:skalatan", BossItems.SKALATAN.item(), context);
+        finalizeKill(context);
     }
 
     public static ItemStack witherGoo(){

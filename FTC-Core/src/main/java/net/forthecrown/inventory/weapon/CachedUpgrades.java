@@ -56,19 +56,32 @@ public class CachedUpgrades extends ObjectArrayList<WeaponUpgrade> {
         }
 
         // multiple upgrades
-        builder.add(Component.text("Next upgrades: ").style(nonItalic(NamedTextColor.GRAY)));
+        builder.add(Component.text("Next rank: ").style(nonItalic(NamedTextColor.GRAY)));
 
         for (WeaponUpgrade u: this) {
+            Component display = u.loreDisplay();
+            if(display == null) continue;
+
             builder.add(
                     Component.text("• ")
                             .style(LORE_STYLE)
-                            .append(u.loreDisplay())
+                            .append(display)
             );
         }
     }
 
+    public boolean hasStatusDisplay() {
+        if(isEmpty()) return false;
+
+        for (WeaponUpgrade u: this) {
+            if(u.statusDisplay() != null) return true;
+        }
+
+        return false;
+    }
+
     public void addCurrentLore(LoreBuilder builder) {
-        if(isEmpty()) return;
+        if(!hasStatusDisplay()) return;
         builder.addEmpty();
 
         builder.add(Component.translatable("item.modifiers.mainhand").style(LORE_STYLE));

@@ -1,10 +1,10 @@
 package net.forthecrown.dungeons;
 
 import net.forthecrown.dungeons.bosses.*;
-import net.forthecrown.dungeons.usables.ActionGiveArtifact;
-import net.forthecrown.dungeons.usables.ActionSpawnBoss;
+import net.forthecrown.dungeons.usables.*;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.squire.Squire;
+import net.forthecrown.useables.actions.SimpleAction;
 import net.forthecrown.useables.actions.UsageAction;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Drowned;
@@ -16,6 +16,7 @@ public class Bosses {
 
     public static final NamespacedKey KEY = Squire.createRoyalKey("bossitem");
     public static final NamespacedKey BOSS_TAG = Squire.createRoyalKey("bosstag");
+    private static final DungeonUserDataAccessor accessor = new DungeonUserDataAccessor();
 
     private static Zhambie zhambie;
     private static Skalatan skalatan;
@@ -35,6 +36,11 @@ public class Bosses {
 
         register(new ActionGiveArtifact());
         register(new ActionSpawnBoss());
+        register(new SimpleAction<>(ActionDiego.KEY, ActionDiego::new));
+        register(new ActionEntranceInfo());
+        register(new ActionShowBossInfo());
+
+        Registries.USAGE_CHECKS.register(CheckBeatenBoss.KEY, new CheckBeatenBoss());
     }
 
     private static void register(UsageAction<?> action){
@@ -63,5 +69,9 @@ public class Bosses {
 
     public static DungeonBoss<Drowned> drawned() {
         return drawned;
+    }
+
+    public static DungeonUserDataAccessor getAccessor() {
+        return accessor;
     }
 }

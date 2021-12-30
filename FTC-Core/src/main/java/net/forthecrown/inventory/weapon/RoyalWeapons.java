@@ -1,8 +1,6 @@
 package net.forthecrown.inventory.weapon;
 
 import it.unimi.dsi.fastutil.doubles.Double2DoubleFunction;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.inventory.FtcItems;
@@ -17,6 +15,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -45,7 +44,7 @@ public final class RoyalWeapons {
 
     private RoyalWeapons() {}
 
-    private static final Int2ObjectMap<CachedUpgrades> UPGRADES = new Int2ObjectOpenHashMap<>();
+    static final CachedUpgrades[] UPGRADES = new CachedUpgrades[MAX_RANK + 1];
 
     public static void init() {
         int rank = 1;
@@ -65,10 +64,12 @@ public final class RoyalWeapons {
         putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.STONE_SWORD,
                 RANK_2_NAME,
-                Component.text("Stone"),
+                Component.text("Stone upgrade"),
                 "Forged from grand rock",
                 "it carries the hero on"
         ));
+        putUpgrade(rank, new MonetaryUpgrade(10000, MonetaryUpgrade.Type.RHINES));
+        putUpgrade(rank, new MonetaryUpgrade(4000, MonetaryUpgrade.Type.GEMS));
 
         register(simple(EntityType.ZOMBIE, 100, rank));
         register(simple(EntityType.CREEPER, 50, rank));
@@ -79,11 +80,12 @@ public final class RoyalWeapons {
         putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.IRON_SWORD,
                 RANK_3_NAME,
-                Component.text("Iron"),
+                Component.text("Iron upgrade"),
                 "The magnificent, unbreaking sword",
                 "of a true hero"
         ));
         putUpgrade(rank, new ModifierUpgrade(0.5, 1));
+        putUpgrade(rank, new MonetaryUpgrade(15000, MonetaryUpgrade.Type.RHINES));
 
         register(simple(EntityType.BLAZE, 200, rank));
         register(simple(EntityType.WITHER_SKELETON, 200, rank));
@@ -95,11 +97,13 @@ public final class RoyalWeapons {
         putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.DIAMOND_SWORD,
                 RANK_4_NAME,
-                Component.text("Diamond"),
+                Component.text("Diamond upgrade"),
                 "The shining beauty of",
                 "diamonds blinds all enemies"
         ));
         putUpgrade(rank, new ModifierUpgrade(1, 2));
+        putUpgrade(rank, new MonetaryUpgrade(12500, MonetaryUpgrade.Type.RHINES));
+        putUpgrade(rank, new MonetaryUpgrade(4000, MonetaryUpgrade.Type.GEMS));
 
         register(dungeonBoss(Bosses.zhambie(), 1, rank));
         register(dungeonBoss(Bosses.skalatan(), 1, rank));
@@ -110,12 +114,14 @@ public final class RoyalWeapons {
         putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.GOLDEN_SWORD,
                 RANK_5_NAME,
-                Component.text("Gold"),
+                Component.text("Gold upgrade"),
                 "The bearer of this weapon has",
                 "proven themselves to the Crown..."
         ));
         putUpgrade(rank, new EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 4));
         putUpgrade(rank, new ModifierUpgrade(((double) rank) / 10, rank));
+        putUpgrade(rank, new MonetaryUpgrade(10000, MonetaryUpgrade.Type.RHINES));
+        putUpgrade(rank, new MonetaryUpgrade(1000, MonetaryUpgrade.Type.GEMS));
 
         register(simple(EntityType.SNOWMAN, 100, rank));
         register(simple(EntityType.GHAST, 200, ++rank));
@@ -133,7 +139,7 @@ public final class RoyalWeapons {
         putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.NETHERITE_SWORD,
                 RANK_FINAL_NAME,
-                Component.text("Netherite"),
+                Component.text("Netherite upgrade"),
                 "The bearer of this weapon has",
                 "proven themselves to the Crown..."
         ));
@@ -144,12 +150,18 @@ public final class RoyalWeapons {
 
         putUpgrade(rank, new EnchantUpgrade(Enchantment.LOOT_BONUS_MOBS, 5));
         putUpgrade(rank, new ModifierUpgrade(speed.get(rank), attack.get(rank)));
+        putUpgrade(rank, new MonetaryUpgrade(15000, MonetaryUpgrade.Type.RHINES));
+        putUpgrade(rank, new MonetaryUpgrade(1000, MonetaryUpgrade.Type.GEMS));
 
-        register(anyEntity(2500, ++rank));
+        register(anyEntity(25000, ++rank));
         putUpgrade(rank, new ModifierUpgrade(speed.get(rank), attack.get(rank)));
+        putUpgrade(rank, new MonetaryUpgrade(25000, MonetaryUpgrade.Type.RHINES));
+        putUpgrade(rank, new MonetaryUpgrade(1000, MonetaryUpgrade.Type.GEMS));
 
         register(simple(EntityType.WANDERING_TRADER, 20, ++rank));
         putUpgrade(rank, new ModifierUpgrade(speed.get(rank), attack.get(rank)));
+        putUpgrade(rank, new MonetaryUpgrade(35000, MonetaryUpgrade.Type.RHINES));
+        putUpgrade(rank, new MonetaryUpgrade(1000, MonetaryUpgrade.Type.GEMS));
 
         ++rank;
         register(simple(EntityType.RAVAGER, 50, rank));
@@ -158,6 +170,9 @@ public final class RoyalWeapons {
         register(simple(EntityType.PILLAGER, 250, rank));
         register(simple(EntityType.VINDICATOR, 250, rank));
         putUpgrade(rank, new ModifierUpgrade(speed.get(rank), attack.get(rank)));
+
+        putUpgrade(rank, new MonetaryUpgrade(100000, MonetaryUpgrade.Type.RHINES));
+        putUpgrade(rank, new MonetaryUpgrade(2000, MonetaryUpgrade.Type.GEMS));
 
         //Endless dragon stuf
         for (int i = rank; i < MAX_RANK; i++) {
@@ -170,15 +185,23 @@ public final class RoyalWeapons {
             if(i != rank) {
                 putUpgrade(i, new ModifierUpgrade(speed.get(i), attack.get(i)));
                 putUpgrade(i, EndBossUpgrade.endBoss(i));
+
+                putUpgrade(i, new MonetaryUpgrade(i * 5000, MonetaryUpgrade.Type.RHINES));
+                putUpgrade(i, new MonetaryUpgrade(i * 100, MonetaryUpgrade.Type.GEMS));
             }
         }
 
         safeRunnable(WeaponAbilities::init);
+
         Registries.WEAPON_GOALS.close();
     }
 
     private static void putUpgrade(int rank, WeaponUpgrade upgrade) {
-        CachedUpgrades upgrades = UPGRADES.computeIfAbsent(rank, integer -> new CachedUpgrades());
+        CachedUpgrades upgrades = UPGRADES[rank];
+        if(upgrades == null) {
+            UPGRADES[rank] = upgrades = new CachedUpgrades();
+        }
+
         upgrades.add(upgrade);
     }
 
@@ -207,7 +230,11 @@ public final class RoyalWeapons {
      * @return The upgrade recieved when getting to that level, null, if no reward for the given level.
      */
     public static CachedUpgrades getUpgrades(int rank) {
-        return UPGRADES.get(rank);
+        return UPGRADES[rank];
+    }
+
+    public static CachedUpgrades[] getBelow(int rank) {
+        return ArrayUtils.subarray(UPGRADES, 0, rank);
     }
 
     /**

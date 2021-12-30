@@ -20,7 +20,7 @@ public final class UsageChecks {
         register(new CheckInWorld());
 
         register(new CheckNeverUsed());
-        register(new CheckNotUsedBefore());
+        register(new CheckOneUserPerUser());
 
         register(new CheckRank());
         register(new CheckPermission());

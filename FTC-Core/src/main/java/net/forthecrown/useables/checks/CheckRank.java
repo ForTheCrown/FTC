@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckRank implements UsageCheck<CheckRank.CheckInstance> {
-    public static final Key KEY = Keys.ftccore("required_rank");
+    public static final Key KEY = Keys.forthecrown("required_rank");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

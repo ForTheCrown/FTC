@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class CheckInWorld implements UsageCheck<CheckInWorld.CheckInstance> {
-    public static final Key KEY = Keys.ftccore("in_world");
+    public static final Key KEY = Keys.forthecrown("in_world");
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

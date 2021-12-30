@@ -1,13 +1,19 @@
 package net.forthecrown.dungeons.bosses;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonElement;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.dungeons.BossFightContext;
+import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.DungeonUtils;
+import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.data.UserDataContainer;
+import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -16,7 +22,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -34,11 +43,10 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.loot.LootTables;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
+public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, JsonSerializable {
 
     protected static final CrownRandom RANDOM = new CrownRandom();
 
@@ -47,6 +55,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
     protected final FtcBoundingBox bossRoom;
     protected final ImmutableList<ItemStack> requiredToSpawn;
     protected final Key key;
+    protected final BossItems items;
 
     protected T bossEntity;
     protected BossBar bossBar;
@@ -60,10 +69,11 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
         this.name = name;
         this.spawnLocation = spawnLocation;
         this.bossRoom = bossRoom;
+        this.items = BossItems.valueOf(name.toUpperCase().replaceAll(" ", "_"));
         this.requiredToSpawn = ImmutableList.copyOf(requiredItems);
         this.updaterDelay = updaterDelay;
 
-        key = Keys.ftccore(name.toLowerCase().replaceAll(" ", "_"));
+        key = Keys.forthecrown(name.toLowerCase().replaceAll(" ", "_"));
     }
 
     protected abstract T onSummon(BossFightContext context);
@@ -164,21 +174,47 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
         return bossBar;
     }
 
+    public BossItems getItems() {
+        return items;
+    }
+
     @Override
     public @NotNull Key key() {
         return key;
     }
 
-    protected void giveRewards(@Nullable String achievement, @NotNull ItemStack reward, @NotNull BossFightContext context){
+    protected void finalizeKill(@NotNull BossFightContext context){
         for (Player p: context.getPlayers()){
             if(!getBossRoom().contains(p)) continue;
             if(Crown.getUserManager().isAltForAny(p.getUniqueId(), context.getPlayers())) continue;
 
+            CrownUser user = UserManager.getUser(p);
+            UserDataContainer container = user.getDataContainer();
+            Bosses.getAccessor().setStatus(container, this, true);
 
-            if(!FtcUtils.isNullOrBlank(achievement)) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only " + achievement);
-            if(p.getInventory().firstEmpty() == -1) bossEntity.getWorld().dropItemNaturally(bossEntity.getLocation(), reward.clone());
-            else p.getInventory().addItem(reward.clone());
+            awardAdvancement(p);
+
+            if(p.getInventory().firstEmpty() == -1) bossEntity.getWorld().dropItemNaturally(bossEntity.getLocation(), items.item());
+            else p.getInventory().addItem(items.item());
         }
+    }
+
+    private void awardAdvancement(Player player) {
+        Advancement advancement = Bukkit.getAdvancement(advancementKey());
+        if(advancement == null) {
+            Crown.logger().warning(key() + " has no advancement");
+            return;
+        }
+
+        AdvancementProgress progress = player.getAdvancementProgress(advancement);
+
+        for (String s: progress.getRemainingCriteria()) {
+            progress.awardCriteria(s);
+        }
+    }
+
+    public NamespacedKey advancementKey() {
+        return new NamespacedKey(Crown.inst(), "dungeons/" + key().value());
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -217,5 +253,10 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed {
 
         inv.removeItemAnySlot(items.toArray(ItemStack[]::new));
         summon();
+    }
+
+    @Override
+    public JsonElement serialize() {
+        return JsonUtils.writeKey(key);
     }
 }

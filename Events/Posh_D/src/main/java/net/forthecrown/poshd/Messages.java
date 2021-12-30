@@ -1,7 +1,7 @@
-package net.forthcrown.poshd;
+package net.forthecrown.poshd;
 
-import net.forthcrown.crown.EventTimer;
-import net.forthcrown.crown.TimerMessageFormatter;
+import net.forthecrown.crown.EventTimer;
+import net.forthecrown.crown.TimerMessageFormatter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;

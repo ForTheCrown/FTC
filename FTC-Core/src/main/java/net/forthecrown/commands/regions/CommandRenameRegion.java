@@ -1,9 +1,12 @@
 package net.forthecrown.commands.regions;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionManager;
@@ -40,25 +43,31 @@ public class CommandRenameRegion extends FtcCommand {
                 .then(argument("name", StringArgumentType.word())
                         .suggests(suggestMatching("-clear"))
 
-                        .executes(c -> {
-                            CrownUser user = getUserSender(c);
-                            RegionUtil.validateWorld(user.getWorld());
+                        .then(literal("-paid")
+                                .executes(c -> setName(c, true))
+                        )
 
-                            String name = c.getArgument("name", String.class);
-
-                            RegionManager manager = Crown.getRegionManager();
-                            PopulationRegion region = manager.get(user.getRegionCords());
-
-                            if(name.equals("-clear")) {
-                                manager.rename(region, null);
-                                c.getSource().sendAdmin("Removed name of region " + name);
-                            } else {
-                                manager.rename(region, name);
-                                c.getSource().sendAdmin("Set name of region to " + name);
-                            }
-
-                            return 0;
-                        })
+                        .executes(c -> setName(c, false))
                 );
+    }
+
+    private int setName(CommandContext<CommandSource> c, boolean special) throws CommandSyntaxException {
+        CrownUser user = getUserSender(c);
+        RegionUtil.validateWorld(user.getWorld());
+
+        String name = c.getArgument("name", String.class);
+
+        RegionManager manager = Crown.getRegionManager();
+        PopulationRegion region = manager.get(user.getRegionCords());
+
+        if(name.equals("-clear")) {
+            manager.rename(region, null, false);
+            c.getSource().sendAdmin("Removed name of region " + name);
+        } else {
+            manager.rename(region, name, special);
+            c.getSource().sendAdmin("Set name of region to " + name);
+        }
+
+        return 0;
     }
 }

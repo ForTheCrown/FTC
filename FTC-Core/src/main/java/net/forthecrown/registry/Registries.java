@@ -12,6 +12,7 @@ import net.forthecrown.economy.guild.topics.VoteTopicType;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
+import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
 import net.forthecrown.utils.FtcUtils;
@@ -25,10 +26,11 @@ public interface Registries {
     /**
      * A registry of registries, master registry
      */
-    Registry<Registry<?>> MASTER_REGISTRY = new BaseRegistry<>(Keys.ftccore("master_registry"));
+    Registry<Registry<?>> MASTER_REGISTRY = new BaseRegistry<>(Keys.forthecrown("master_registry"));
 
     Registry<InteractableNPC> NPCS = create("npcs");
     Registry<BlockAnimation> ANIMATIONS = create("animations");
+    Registry<BlockStructure> STRUCTURES = create("structures");
 
     CloseableRegistry<VoteTopicType> VOTE_TOPICS = createCloseable("vote_topics");
     CloseableRegistry<House> HOUSES = createCloseable("houses");

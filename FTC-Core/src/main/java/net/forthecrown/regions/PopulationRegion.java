@@ -3,6 +3,7 @@ package net.forthecrown.regions;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.Message;
 import com.sk89q.worldedit.math.BlockVector2;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.serializer.NbtSerializable;
@@ -79,6 +80,13 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
         prev.expand(BlockFace.SOUTH_EAST, 1);
         prev.forEach(b -> b.setType(Material.AIR));
 
+        if(marker != null && !hasProperty(RegionProperty.FORBIDS_MARKER)) {
+            BlockVector2 pos = polePosition == null ? getPos().toCenter() : polePosition;
+            marker.setLocation(ComVars.getRegionWorld().getUID().toString(),
+                    pos.getX() + 0.5D, FtcUtils.MAX_Y, pos.getZ() + 0.5D
+            );
+        }
+
         setPolePosition0(polePosition);
 
         Crown.getRegionManager().getGenerator().generate(this);
@@ -121,7 +129,6 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
 
         return new LiteralMessage("x: " + polePos.getX() + ", z: " + polePos.getZ());
     }
-
 
     /**
      * Gets whether the region should be serialized

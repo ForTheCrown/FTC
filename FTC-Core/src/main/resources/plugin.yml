@@ -1,9 +1,9 @@
-name: FTCCore
+name: ForTheCrown
 version: '${version}'
 main: net.forthecrown.core.Main
 api-version: 1.18
 loadbefore: [ OpenInv, GriefPrevention, PopulationDensity, DiscordSRV ]
-depend: [ RoyalGrenadier, WorldGuard, LuckPerms ]
+depend: [ RoyalGrenadier, WorldGuard, LuckPerms, dynmap ]
 authors: [ Julie, Wout ]
 
 buildTime: '${buildDate}'

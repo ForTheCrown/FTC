@@ -66,7 +66,7 @@ public record ModifierUpgrade(double speed, double attack) implements WeaponUpgr
     }
 
     Component status(Attribute attribute, double val) {
-        return Component.text("+" + String.format("$.2f", val) + " ")
+        return Component.text(" +" + String.format("%.1f", val) + " ")
                 .append(Component.translatable(attribute));
     }
 }
