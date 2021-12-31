@@ -32,7 +32,6 @@ public enum SellAmount implements JsonSerializable {
      * Gets the sell amount as an integer
      * <p>
      * @see SellAmount#PER_1 and {@link SellAmount#ALL} return the same value, 1
-     * </p>
      * @return A numeric representation of the sell amount
      */
     public byte getValue(){

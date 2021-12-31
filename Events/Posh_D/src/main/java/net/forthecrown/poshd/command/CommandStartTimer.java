@@ -6,6 +6,7 @@ import net.forthecrown.crown.EventTimer;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.poshd.EventUtil;
@@ -53,6 +54,8 @@ public class CommandStartTimer extends AbstractCommand {
                 );
     }
 
+    public static final TranslatableExceptionType INV_NOT_EMPTY = new TranslatableExceptionType("error.itemsInInv");
+
     Command<CommandSource> startTimer(boolean maxMinsGiven) {
         return c -> {
             Player player = EntityArgument.getPlayer(c, "player");
@@ -60,6 +63,13 @@ public class CommandStartTimer extends AbstractCommand {
             Location loc = PositionArgument.getLocation(c, "destination");
             Location exit = PositionArgument.getLocation(c, "exit");
 
+            // Move them away if their inventory is empty
+            if(!player.getInventory().isEmpty()) {
+                player.teleport(exit);
+                throw INV_NOT_EMPTY.create();
+            }
+
+            // Create timer
             EventTimer timer = EventUtil.createTimer(player, plr -> plr.teleport(exit));
             timer.checkPoint = loc;
             timer.start(maxMins * 60 * 20);
