@@ -25,7 +25,7 @@ public class CommandLeaveParkour extends AbstractCommand {
                 throw CommandCheckPoint.NOT_IN_EVENT.create();
             }
 
-            if(timer.wasStopped()) timer.stop();
+            if(!timer.wasStopped()) timer.stop();
 
             player.teleport(timer.exitLocation);
             player.sendMessage(Messages.leftEvent());
