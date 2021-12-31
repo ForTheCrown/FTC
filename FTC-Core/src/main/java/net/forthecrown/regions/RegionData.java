@@ -57,7 +57,7 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
         CompoundTag tag = new CompoundTag();
         tag.putString("name", name);
 
-        if(hasProperties()) tag.putInt("properties", RegionUtil.writeProperties(properties));
+        if(hasProperties()) tag.putShort("properties", RegionUtil.writeProperties(properties));
         if(polePosition != null) tag.put("polePosition", RegionUtil.writeColumn(polePosition));
         if(description != null) tag.putString("description", SERIALIZER.serialize(description));
         if(nameColor != null) tag.putString("color", nameColor.asHexString());

@@ -2,6 +2,7 @@ package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.core.transformers.NamespaceRenamer;
 import net.forthecrown.serializer.ShopSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.math.WorldVec3i;
@@ -14,6 +15,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collection;
@@ -25,6 +27,7 @@ import java.util.UUID;
  * Implementation: {@link FtcShopManager}
  */
 public interface ShopManager {
+    NamespacedKey LEGACY_SHOP_KEY = new NamespacedKey(NamespaceRenamer.OLD_NAMESPACE, "signshop");
     NamespacedKey SHOP_KEY = new NamespacedKey(Crown.inst(), "signshop");
 
     String BUY_LABEL = "=[Buy]=";
@@ -43,10 +46,25 @@ public interface ShopManager {
      * @param block The block to check
      * @return Whether the block is a shop or not
      */
-    static boolean isShop(Block block){
+
+    static boolean isShop(Block block, boolean fixLegacy){
         if(block == null) return false;
-        if(!(block.getState() instanceof Sign)) return false;
-        return ((Sign) block.getState()).getPersistentDataContainer().has(SHOP_KEY, PersistentDataType.BYTE);
+        if (block.getState() instanceof Sign sign) {
+            PersistentDataContainer container = sign.getPersistentDataContainer();
+
+            boolean hasLegacy = container.has(LEGACY_SHOP_KEY, PersistentDataType.BYTE);
+            if(hasLegacy && fixLegacy) {
+                container.remove(LEGACY_SHOP_KEY);
+                container.set(SHOP_KEY, PersistentDataType.BYTE, (byte) 1);
+                sign.update();
+
+                return true;
+            }
+
+            return container.has(SHOP_KEY, PersistentDataType.BYTE) || hasLegacy;
+        } else {
+            return false;
+        }
     }
 
     /**

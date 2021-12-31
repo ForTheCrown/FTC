@@ -22,7 +22,7 @@ public class ShopInteractionListener implements Listener {
     @EventHandler
     public void onSignShopUser(PlayerInteractEvent event){
         if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if (!ShopManager.isShop(event.getClickedBlock())) return;
+        if (!ShopManager.isShop(event.getClickedBlock(), true)) return;
         if(Cooldown.containsOrAdd(event.getPlayer(), 6)) return;
 
         ShopManager manager = Crown.getShopManager();

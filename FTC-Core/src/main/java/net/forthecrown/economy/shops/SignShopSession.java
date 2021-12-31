@@ -141,6 +141,10 @@ public class SignShopSession {
         setAmount(getAmount() + amount);
     }
 
+    public boolean customerIsOwner() {
+        return getOwnership().isOwner(getCustomer().getUniqueId());
+    }
+
     /**
      * Gets the code to run when the session expires or ends
      * @return The code to run on this session's expiry or end

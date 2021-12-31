@@ -46,7 +46,7 @@ class MarketFilters {
     public static class IgnoreShop implements BlockFilter {
         @Override
         public boolean test(BlockCopyInfo info, RegionCopyPaste paste, boolean async) {
-            return !ShopManager.isShop(info.copy());
+            return !ShopManager.isShop(info.copy(), true);
         }
     }
 }

@@ -197,9 +197,9 @@ public final class RoyalWeapons {
     }
 
     private static void putUpgrade(int rank, WeaponUpgrade upgrade) {
-        CachedUpgrades upgrades = UPGRADES[rank];
+        CachedUpgrades upgrades = UPGRADES[rank-1];
         if(upgrades == null) {
-            UPGRADES[rank] = upgrades = new CachedUpgrades();
+            UPGRADES[rank-1] = upgrades = new CachedUpgrades();
         }
 
         upgrades.add(upgrade);
@@ -230,11 +230,11 @@ public final class RoyalWeapons {
      * @return The upgrade recieved when getting to that level, null, if no reward for the given level.
      */
     public static CachedUpgrades getUpgrades(int rank) {
-        return UPGRADES[rank];
+        return UPGRADES[rank-1];
     }
 
     public static CachedUpgrades[] getBelow(int rank) {
-        return ArrayUtils.subarray(UPGRADES, 0, rank);
+        return ArrayUtils.subarray(UPGRADES, 0, rank-1);
     }
 
     /**

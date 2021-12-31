@@ -32,7 +32,9 @@ public class AdminBuyInteraction implements ShopInteraction {
         );
 
         //Remove money
-        customer.removeBalance(session.getPrice());
+        if(!session.customerIsOwner()) {
+            customer.removeBalance(session.getPrice());
+        }
 
         //Give item
         int amount = exampleItem.getAmount();

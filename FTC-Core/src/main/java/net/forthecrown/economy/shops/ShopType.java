@@ -15,10 +15,8 @@ public enum ShopType {
     BUY(ShopManager.BUY_LABEL, ShopManager.NORMAL_STYLE, false, new BuyInteraction()),
     ADMIN_BUY(ShopManager.BUY_LABEL, ShopManager.ADMIN_STYLE, true, new AdminBuyInteraction());
 
-    private final Component inStock;
-    private final Component outStock;
-    private final boolean isAdmin;
-    private final boolean buyType;
+    private final Component inStock, outStock;
+    private final boolean isAdmin, buyType;
     private final ShopInteraction interaction;
 
     ShopType(@NotNull String label, @NotNull Style style, boolean isAdmin, ShopInteraction interaction){

@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
 import org.bukkit.entity.Entity;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -60,13 +61,32 @@ public class FtcUsablesManager implements UsablesManager {
         if(block == null) return false;
         BlockState state = block.getState();
 
-        if (!(state instanceof TileState)) return false;
-        return isInteractable((TileState) state);
+        if (state instanceof TileState tile) {
+            PersistentDataContainer c = tile.getPersistentDataContainer();
+            if(c.has(LEGACY_KEY, PersistentDataType.BYTE)) {
+                c.remove(LEGACY_KEY);
+                c.set(USABLE_KEY, PersistentDataType.BYTE, (byte) 1);
+
+                return true;
+            }
+
+            return isInteractable(tile);
+        }
+        return false;
     }
 
     @Override
     public boolean isInteractableEntity(Entity entity){
         if(entity == null) return false;
+
+        if(entity.getPersistentDataContainer().has(LEGACY_KEY, PersistentDataType.BYTE)) {
+            PersistentDataContainer c = entity.getPersistentDataContainer();
+            c.remove(LEGACY_KEY);
+            c.set(USABLE_KEY, PersistentDataType.BYTE, (byte) 1);
+
+            return true;
+        }
+
         return isInteractable(entity);
     }
 

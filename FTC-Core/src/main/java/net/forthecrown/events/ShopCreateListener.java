@@ -119,7 +119,6 @@ public class ShopCreateListener implements Listener {
     }
 
     public class ExampleItemSelectionListener implements Listener{
-
         private final Player player;
         private final SignShop shop;
 

@@ -11,7 +11,7 @@ import net.forthecrown.utils.math.WorldVec3i;
 public class ShopDestroyPreprocessor implements CopyPreProcessor {
     @Override
     public void process(BlockCopyInfo block, RegionCopyPaste paste, boolean async) {
-        if(!ShopManager.isShop(block.paste())) return;
+        if(!ShopManager.isShop(block.paste(), true)) return;
 
         ShopManager manager = Crown.getShopManager();
         SignShop shop = manager.getShop(WorldVec3i.of(block.paste()));

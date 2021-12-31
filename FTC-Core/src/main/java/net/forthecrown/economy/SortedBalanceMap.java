@@ -28,7 +28,7 @@ import java.util.stream.Stream;
  * two entries with the same UUID to exist. So uhh TODO: fix multiple entries for one UUID.
  */
 public class SortedBalanceMap implements BalanceMap {
-    private Balance[] entries = new Balance[30];
+    private Balance[] entries = new Balance[100];
     private int size;
 
     private final IntSupplier defaultAmount;
