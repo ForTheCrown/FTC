@@ -31,6 +31,7 @@ public class Main extends JavaPlugin {
         saveResource("messages.properties", false);
         Messages.load(this);
 
+        new CommandLeaveParkour();
         new CommandStartTimer();
         new CommandStopTimer();
         new CommandCheckPoint();
