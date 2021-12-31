@@ -56,6 +56,8 @@ public class CommandStopTimer extends AbstractCommand {
                                             for (PotionEffect t: player.getActivePotionEffects()) {
                                                 player.removePotionEffect(t.getType());
                                             }
+                                            // Nice and ugly call to another command class c:
+                                            CommandLeaveParkour.leaveTeams(player);                                           
 
                                             // Remove them from the parkour objective
                                             Objective parkour = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("parkour");
