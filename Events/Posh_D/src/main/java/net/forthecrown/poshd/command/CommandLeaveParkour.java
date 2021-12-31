@@ -3,6 +3,7 @@ package net.forthecrown.poshd.command;
 import net.forthecrown.crown.EventTimer;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.poshd.EventUtil;
 import net.forthecrown.poshd.Main;
 import net.forthecrown.poshd.Messages;
 import org.bukkit.Bukkit;
@@ -29,21 +30,10 @@ public class CommandLeaveParkour extends AbstractCommand {
 
             if(!timer.wasStopped()) timer.stop();
 
-            player.teleport(timer.exitLocation);
+            EventUtil.leave(player, timer.exitLocation);
             player.sendMessage(Messages.leftEvent());
-            clearEffects(player);
-            leaveTeams(player);
             return 0;
         });
     }
 
-    public static void clearEffects(Player player) {
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-            player.removePotionEffect(effect.getType());
-        }
-    }
-    
-    public static void leaveTeams(Player player) {
-        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team leave " + player.getName());
-    }
 }

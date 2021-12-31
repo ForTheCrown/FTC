@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import net.forthecrown.crown.EventTimer;
+import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -12,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.Score;
 
 import java.io.File;
@@ -102,5 +104,21 @@ public final class EventUtil {
         int recordInt = record.getScore();
 
         return recordInt > score;
+    }
+
+    public static void leave(Player player, Location exitLocation) {
+        clearEffects(player);
+        leaveTeams(player);
+        player.teleport(exitLocation);
+    }
+
+    public static void clearEffects(Player player) {
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
+    }
+
+    public static void leaveTeams(Player player) {
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team leave " + player.getName());
     }
 }

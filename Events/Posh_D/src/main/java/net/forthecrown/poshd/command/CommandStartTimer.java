@@ -12,6 +12,7 @@ import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.poshd.EventUtil;
 import net.forthecrown.poshd.Main;
 import net.forthecrown.poshd.Messages;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -66,11 +67,14 @@ public class CommandStartTimer extends AbstractCommand {
             // Move them away if their inventory is empty
             if(!player.getInventory().isEmpty()) {
                 player.teleport(exit);
+                // Can't be bothered to figure out how to display that INV_NOT_EMPTY msg to the player in a cool way
+                // so I just stole this from way of doing it from Messages
+                player.sendMessage(Component.translatable("error.itemsInInv"));
                 throw INV_NOT_EMPTY.create();
             }
 
             // Create timer
-            EventTimer timer = EventUtil.createTimer(player,    plr -> plr.teleport(exit));
+            EventTimer timer = EventUtil.createTimer(player,    plr -> EventUtil.leave(plr, exit));
             timer.checkPoint = loc;
             timer.exitLocation = exit;
             timer.start(maxMins * 60 * 20);
