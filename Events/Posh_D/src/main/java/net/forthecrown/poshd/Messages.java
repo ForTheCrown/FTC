@@ -47,4 +47,8 @@ public class Messages {
     public static TimerMessageFormatter timerFormatter() {
         return (timer, millis) -> Component.translatable("timer.format", Component.text(timer));
     }
+
+    public static TranslatableComponent leftEvent() {
+        return Component.translatable("leftEvent");
+    }
 }

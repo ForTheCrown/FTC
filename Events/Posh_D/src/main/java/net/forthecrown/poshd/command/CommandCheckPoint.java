@@ -33,7 +33,7 @@ public class CommandCheckPoint extends AbstractCommand {
      * Main Author: Julie
      */
 
-    private static final TranslatableExceptionType NOT_IN_EVENT = new TranslatableExceptionType("error.notInEvent");
+    public static final TranslatableExceptionType NOT_IN_EVENT = new TranslatableExceptionType("error.notInEvent");
 
     @Override
     protected void createCommand(BrigadierCommand command) {

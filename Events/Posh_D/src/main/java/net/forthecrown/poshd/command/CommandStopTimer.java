@@ -1,14 +1,15 @@
 package net.forthecrown.poshd.command;
 
 import net.forthecrown.crown.EventTimer;
-import net.forthecrown.poshd.EventUtil;
-import net.forthecrown.poshd.Main;
-import net.forthecrown.poshd.Messages;
+import net.forthecrown.crown.ObjectiveLeaderboard;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.grenadier.types.scoreboard.ObjectiveArgument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
+import net.forthecrown.poshd.EventUtil;
+import net.forthecrown.poshd.Main;
+import net.forthecrown.poshd.Messages;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -86,6 +87,10 @@ public class CommandStopTimer extends AbstractCommand {
 
                                             Main.logger.info(player.getName() + " left " + objective.getName());
                                             player.teleport(destination);
+
+                                            ObjectiveLeaderboard l = Main.leaderboards.get(objective);
+                                            if(l != null) l.create();
+
                                             return 0;
                                         })
                                 )

@@ -21,7 +21,7 @@ public class EventTimer {
 
     private final TimerMessageFormatter messageFormatter;
     private final Consumer<Player> onTimerExpire;
-    public Location checkPoint;
+    public Location checkPoint, exitLocation;
 
     private final Timer timer;
 

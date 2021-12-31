@@ -70,8 +70,9 @@ public class CommandStartTimer extends AbstractCommand {
             }
 
             // Create timer
-            EventTimer timer = EventUtil.createTimer(player, plr -> plr.teleport(exit));
+            EventTimer timer = EventUtil.createTimer(player,    plr -> plr.teleport(exit));
             timer.checkPoint = loc;
+            timer.exitLocation = exit;
             timer.start(maxMins * 60 * 20);
 
             player.sendMessage(Messages.timerStart());
