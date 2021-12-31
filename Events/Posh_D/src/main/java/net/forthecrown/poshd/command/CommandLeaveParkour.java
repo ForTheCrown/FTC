@@ -29,7 +29,19 @@ public class CommandLeaveParkour extends AbstractCommand {
 
             player.teleport(timer.exitLocation);
             player.sendMessage(Messages.leftEvent());
+            clearEffects(player);
+            leaveTeams(player);
             return 0;
         });
+    }
+
+    public static void clearEffects(Player player) {
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
+    }
+    
+    public static void leaveTeams(Player player) {
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team leave " + player.getName());
     }
 }
