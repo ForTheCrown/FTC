@@ -6,11 +6,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import org.bukkit.Location;
@@ -345,6 +347,14 @@ public class JsonWrapper {
     public Date getDate(String name) { return getDate(name, null); }
     public Date getDate(String name, Date def) {
         return get(name, JsonUtils::readDate, def);
+    }
+
+    public Component getComponent(String name) {
+        return missingOrNull(name) ? null : ChatUtils.fromJson(get(name));
+    }
+
+    public void addComponent(String name, Component component) {
+        add(name, ChatUtils.toJson(component));
     }
 
     //------------------ Delegate Methods -----------------//

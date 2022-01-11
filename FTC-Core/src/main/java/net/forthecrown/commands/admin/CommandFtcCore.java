@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
@@ -14,7 +15,6 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.ComponentArgument;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.CrownUser;
@@ -117,15 +117,6 @@ public class CommandFtcCore extends FtcCommand {
                         })
                 )
 
-                .then(literal("updateDate")
-                        .executes(c -> {
-                            getDayUpdate().update();
-
-                            c.getSource().sendAdmin("Updated day");
-                            return 0;
-                        })
-                )
-
                 .then(literal("resetcrown") //Resets the crown objective, aka, destroys and re creates it
                         .executes(c -> {
                             Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -143,7 +134,7 @@ public class CommandFtcCore extends FtcCommand {
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
 
-                            user.createTeleport(Crown::getServerSpawn, true, true, UserTeleport.Type.TELEPORT)
+                            user.createTeleport(Crown.config()::getServerSpawn, true, true, UserTeleport.Type.TELEPORT)
                                     .start(true);
 
                             user.sendMessage(Component.text("Going to spawn").color(NamedTextColor.GRAY));
@@ -159,7 +150,7 @@ public class CommandFtcCore extends FtcCommand {
                                 })
                         )
 
-                        .then(literal("show")
+                        .then(literal("should_show")
                                 .executes(c -> {
                                     c.getSource().sendMessage(
                                             Component.text("Should show join info: ")
@@ -182,14 +173,52 @@ public class CommandFtcCore extends FtcCommand {
                                 )
                         )
 
+                        .then(literal("should_show_end")
+                                .executes(c -> {
+                                    c.getSource().sendMessage(
+                                            Component.text("Should show join end info: ")
+                                                    .append(Component.text(getJoinInfo().shouldShow()))
+                                    );
+                                    return 0;
+                                })
+
+                                .then(argument("shouldShow", BoolArgumentType.bool())
+                                        .executes(c -> {
+                                            boolean bool = c.getArgument("shouldShow", Boolean.class);
+                                            getJoinInfo().setShouldShowEnd(bool);
+
+                                            c.getSource().sendAdmin(
+                                                    Component.text("Set should show join end message: ")
+                                                            .append(Component.text(bool))
+                                            );
+                                            return 0;
+                                        })
+                                )
+                        )
+
                         .then(literal("set")
-                                .then(argument("component", ComponentArgument.component())
+                                .then(argument("component", ChatArgument.chat())
                                         .executes(c -> {
                                             Component component = c.getArgument("component", Component.class);
-                                            getJoinInfo().setDisplay(component);
+                                            getJoinInfo().setInfo(component);
 
                                             c.getSource().sendMessage(
                                                     Component.text("Set join info to ")
+                                                            .append(component)
+                                            );
+                                            return 0;
+                                        })
+                                )
+                        )
+
+                        .then(literal("set_end")
+                                .then(argument("component", ChatArgument.chat())
+                                        .executes(c -> {
+                                            Component component = c.getArgument("component", Component.class);
+                                            getJoinInfo().setEndInfo(component);
+
+                                            c.getSource().sendMessage(
+                                                    Component.text("Set join end info to ")
                                                             .append(component)
                                             );
                                             return 0;
@@ -314,10 +343,7 @@ public class CommandFtcCore extends FtcCommand {
         REGIONS ("Regions",                     getRegionManager()::save,       getRegionManager()::reload),
         ITEM_PRICES ("Item Prices",             getPriceMap()::save,            getPriceMap()::reload),
         MARKETS("Markets",                      getMarkets()::save,             getMarkets()::reload),
-        JOIN_INFO ("Join info",                 getJoinInfo()::save,            getJoinInfo()::save),
         MESSAGES ("Messages",                   () -> {},                       getMessages()::reload),
-        RULES ("Rules",                         getRules()::save,               getRules()::reload),
-        KING ("Kingship",                       getKingship()::save,            getKingship()::reload),
         PUNISHMENTS("Punishments",              getPunishmentManager()::save,   getPunishmentManager()::reload),
         KITS("Kits",                            getKitManager()::save,          getKitManager()::reload),
         WARPS("Warps",                          getWarpManager()::save,         getWarpManager()::reload),
@@ -326,7 +352,7 @@ public class CommandFtcCore extends FtcCommand {
         BALANCES ("Balances",                   getEconomy()::save,             getEconomy()::reload),
         USERS ("Users",                         getUserManager()::saveUsers,    getUserManager()::reloadUsers),
         SHOPS ("Signshops",                     getShopManager()::save,         getShopManager()::reload),
-        CONFIG ("Main Config",                  inst()::saveConfig,             inst()::reloadConfig),
+        CONFIG ("Main Config",                  config()::save,                 config()::reload),
         USER_MANAGER("User Manager",            getUserManager()::save,         getUserManager()::reload);
 
         private final String msg;

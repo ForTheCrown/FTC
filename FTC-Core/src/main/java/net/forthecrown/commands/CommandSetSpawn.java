@@ -47,7 +47,7 @@ public class CommandSetSpawn extends FtcCommand {
     }
 
     private int setServerSpawn(Location l, CommandSource source){
-        Crown.setServerSpawn(l);
+        Crown.config().setServerSpawn(l);
 
         source.sendMessage(
                 Component.text("Set server spawn to ")

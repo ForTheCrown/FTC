@@ -1,6 +1,5 @@
 package net.forthecrown.core.kingship;
 
-import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.Nameable;
 import net.kyori.adventure.text.Component;
@@ -15,7 +14,7 @@ import java.util.UUID;
  * <p></p>
  * Implementation: {@link FtcKingship}
  */
-public interface Kingship extends Nameable, CrownSerializer {
+public interface Kingship extends Nameable {
     static Component queenTitle(){
         return Component.text("[")
                 .color(NamedTextColor.WHITE)

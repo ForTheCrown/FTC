@@ -53,7 +53,7 @@ public class CommandEditShop extends FtcCommand {
                 .build();
 
         final Component footer = Component.text()
-                .append(Component.text("                                    ").decorate(TextDecoration.STRIKETHROUGH))
+                .append(Component.text("                                                                        ").decorate(TextDecoration.STRIKETHROUGH))
                 .color(NamedTextColor.DARK_GRAY)
                 .build();
 

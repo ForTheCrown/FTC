@@ -219,6 +219,10 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
         this.marker = marker;
     }
 
+    public String getMarkerID() {
+        return getPos().toString();
+    }
+
     public static class Empty extends RegionData {
         public Empty(RegionPos pos) {
             super(pos);

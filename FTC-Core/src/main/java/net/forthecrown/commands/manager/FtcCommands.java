@@ -44,6 +44,7 @@ public final class FtcCommands {
         RoyalArgumentsImpl.register(TimeArgument.class, t -> t, true);
 
         RoyalArguments.register(BaltopArgument.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, BaltopArgument.MAX)));
+        RoyalArguments.register(ChatArgument.class, VanillaArgumentType.GREEDY_STRING);
         RoyalArguments.register(ComVarArgument.class, VanillaArgumentType.WORD);
         RoyalArguments.register(PetArgument.class, VanillaArgumentType.WORD);
 
@@ -84,6 +85,7 @@ public final class FtcCommands {
         new CommandFtcUser();
 
         //Admin utility
+        new CommandEndOpener();
         new CommandFtcUser();
         new CommandSpeed();
         new CommandItemName();

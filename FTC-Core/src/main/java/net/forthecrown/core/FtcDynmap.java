@@ -19,7 +19,7 @@ public class FtcDynmap extends DynmapCommonAPIListener {
             SPECIAL_LABEL   = "region_pole_special",
             SET_NAME        = "region_poles";
 
-    public static boolean enabled;
+    private static boolean enabled;
 
     @Override
     public void apiEnabled(DynmapCommonAPI api) {
@@ -65,7 +65,7 @@ public class FtcDynmap extends DynmapCommonAPIListener {
     }
 
     public static Marker findMarker(RegionData data) {
-        Marker marker = getRegionPoleSet().findMarker(data.getPos().toString());
+        Marker marker = getRegionPoleSet().findMarker(data.getMarkerID());
 
         BlockVector2 vec2 = data.getPolePosition();
 

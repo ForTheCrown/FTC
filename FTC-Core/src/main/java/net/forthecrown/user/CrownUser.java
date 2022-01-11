@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.sk89q.worldedit.math.BlockVector2;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
+import net.forthecrown.core.AfkKicker;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.selling.UserSellResult;
@@ -958,5 +959,9 @@ public interface CrownUser extends
     default long getLastSeen() {
         if(isOnline()) return System.currentTimeMillis();
         return getLastLogin();
+    }
+
+    default void delayAfkKick() {
+        AfkKicker.delay(getUniqueId());
     }
 }

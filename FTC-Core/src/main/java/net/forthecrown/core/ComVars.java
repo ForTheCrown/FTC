@@ -43,7 +43,7 @@ public final class ComVars {
     static ComVar<Long>             marketStatusCooldown;
     static ComVar<Long>             resourceWorldResetInterval;
     static ComVar<Long>             nextResourceWorldReset;
-    static ComVar<Long>             afkScanIntervalTicks;
+    static ComVar<Long>             afkScanInterval;
 
     static ComVar<Boolean>          allowOtherPlayerNicks;
     static ComVar<Boolean>          taxesEnabled;
@@ -105,7 +105,7 @@ public final class ComVars {
         read("voteInterval",                ComVarTypes.TIME);
         read("guildJoinRequirement",        ComVarTypes.TIME);
         read("marketStatusCooldown",        ComVarTypes.TIME);
-        read("afkScanIntervalTicks",        ComVarTypes.TIME);
+        read("afkScanInterval",             ComVarTypes.TIME);
 
         read("allowOtherPlayerNicks",       ComVarTypes.BOOL);
         read("taxesEnabled",                ComVarTypes.BOOL);
@@ -286,8 +286,8 @@ public final class ComVars {
         nextResourceWorldReset.update(time);
     }
 
-    public static long afkScanIntervalTicks() {
-        return afkScanIntervalTicks.getValue(TimeUtil.millisToTicks(TimeUtil.HOUR_IN_MILLIS));
+    public static long afkScanInterval() {
+        return afkScanInterval.getValue(TimeUtil.HOUR_IN_MILLIS);
     }
 
 

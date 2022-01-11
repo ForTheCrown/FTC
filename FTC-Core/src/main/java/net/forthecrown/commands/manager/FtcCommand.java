@@ -15,7 +15,6 @@ import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -63,7 +62,7 @@ public abstract class FtcCommand extends AbstractCommand {
             if(!c.getSource().isPlayer()) return Suggestions.empty();
             UUID id = getPlayerSender(c).getUniqueId();
 
-            suggestIf(id, new Pair<>(bals.get(id), new LiteralMessage("Your entire balance")), b);
+            suggestIf(id, new BalSuggestion(bals.get(id), new LiteralMessage("Your entire balance")), b);
 
             suggestIf(id, 1, b);
             suggestIf(id, 10, b);
@@ -80,13 +79,15 @@ public abstract class FtcCommand extends AbstractCommand {
     }
 
     private static void suggestIf(UUID id, int amount, SuggestionsBuilder builder){
-        suggestIf(id, new Pair<>(amount, null), builder);
+        suggestIf(id, new BalSuggestion(amount, null), builder);
     }
 
-    private static void suggestIf(UUID id, Pair<Integer, Message> pair, SuggestionsBuilder builder){
-        int amount = pair.getFirst();
-        if(bals.has(id, amount) && (amount + "").toLowerCase().startsWith(builder.getRemaining().toLowerCase())) builder.suggest(amount, pair.getSecond());
+    private static void suggestIf(UUID id, BalSuggestion pair, SuggestionsBuilder builder){
+        int amount = pair.money();
+        if(bals.has(id, amount) && (amount + "").toLowerCase().startsWith(builder.getRemaining().toLowerCase())) builder.suggest(amount, pair.message());
     }
+
+    static record BalSuggestion(int money, Message message) {}
 
     public void setHelpListName(String descriptionName) {
         this.helpListName = descriptionName;

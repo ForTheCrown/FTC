@@ -29,10 +29,7 @@ import net.forthecrown.user.packets.PacketListeners;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Nameable;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -55,10 +52,7 @@ public final class Main extends JavaPlugin implements Crown {
     static ComVar<Boolean>          inDebugMode;
 
     static Main                     inst;
-
-    static Location                 serverSpawn;
     static Logger                   logger;
-    static String                   prefix = "&6[FTC]&r  ";
 
     static FtcEconomy               economy;
     static FtcAnnouncer             announcer;
@@ -84,21 +78,21 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcMarkets               markets;
     static HazelguardTradersGuild   tradersGuild;
     static PeriodicalSaver          saver;
-    static AfkScanner               afkScanner;
+    static EndOpener                endOpener;
 
     static LuckPerms                luckPerms;
+    static FtcConfigImpl            config;
 
     @Override
     public void onEnable() {
         luckPerms = LuckPermsProvider.get();
 
-        saveDefaultConfig();
-        getConfig().options().copyDefaults(true);
-
         FtcBootStrap.enableBootStrap();
 
         announcer.doBroadcasts();
-        dayUpdate.checkDay();
+        dayUpdate.schedule();
+
+        saverLogic();
 
         /*if(RwResetter.shouldReset()) {
             RwResetter.reset();
@@ -146,34 +140,16 @@ public final class Main extends JavaPlugin implements Crown {
         FtcUserManager.LOADED_ALTS.clear();
     }
 
-    @Override
-    public void saveConfig() {
-        FileConfiguration config = getConfig();
-        config.set("ServerSpawn", serverSpawn);
-
-        super.saveConfig();
-    }
-
-    @Override
-    public void reloadConfig() {
-        super.reloadConfig();
-        Configuration config = getConfig();
-
-        prefix = config.getString("Prefix");
-
-        ComVars.reload();
-
-        Location defSpawnLoc = new Location(Worlds.VOID, 153.5, 5, 353.5, 90, 0);
-        serverSpawn = config.getLocation("ServerSpawn", defSpawnLoc);
-        dayUpdate = new DayUpdate((byte) config.getInt("Day"));
-
+    // IDK why this method has logic in the name, when there's
+    // clearly no logic being used here, it's dumb af
+    void saverLogic() {
         if(saver != null){
             try {
                 saver.cancel();
             } catch (IllegalStateException ignored){}
         }
 
-        if(config.getBoolean("System.save-periodically")) {
+        if(config.getJson().getBool("save_periodically")) {
             saver = new PeriodicalSaver(this);
             saver.start();
         } else if (saver != null && !saver.isCancelled()){

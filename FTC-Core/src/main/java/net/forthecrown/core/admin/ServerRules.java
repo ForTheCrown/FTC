@@ -3,28 +3,23 @@ package net.forthecrown.core.admin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.forthecrown.core.Crown;
-import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonWrapper;
+import net.forthecrown.core.FtcConfig;
+import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerRules extends AbstractJsonSerializer {
-
+public class ServerRules extends FtcConfig.ConfigSection {
     private final List<Component> rules = new ArrayList<>();
-    private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 
     public ServerRules(){
         super("rules");
 
-        if(!fileExists) reload();
-        reload();
         Crown.logger().info("Server rules loaded");
     }
 
@@ -53,44 +48,24 @@ public class ServerRules extends AbstractJsonSerializer {
     }
 
     @Override
-    protected void save(JsonWrapper json) {
-        JsonArray array = new JsonArray();
-
-        for (Component c: rules){
-            array.add(serializer.serializeToTree(c));
-        }
-
-        json.add("rules", array);
-    }
-
-    @Override
-    protected void reload(JsonWrapper json) {
-        JsonArray array = json.getArray("rules");
-
+    public void deserialize(JsonElement element) {
         rules.clear();
-        for (JsonElement e: array){
-            rules.add(serializer.deserializeFromTree(e));
+
+        JsonArray array = element.getAsJsonArray();
+
+        for (JsonElement e: array) {
+            rules.add(ChatUtils.fromJson(e));
         }
     }
 
     @Override
-    protected void createDefaults(JsonWrapper json) {
+    public JsonElement serialize() {
         JsonArray array = new JsonArray();
 
-        array.add(ser(Component.text("No hacking or using xray")));
-        array.add(ser(Component.text("Be respectful to other players")));
-        array.add(ser(Component.text("No spamming or advertising")));
-        array.add(ser(Component.text("No unwanted PvP")));
-        array.add(ser(Component.text("No impersonating other players")));
-        array.add(ser(Component.text("No auto-clickers")));
-        array.add(ser(Component.text("No gameplay altering mods, which give you an unfair advantage")));
-        array.add(ser(Component.text("Only play on 1 account at a time")));
-        array.add(ser(Component.text("No lag machines")));
+        for (Component c: rules) {
+            array.add(ChatUtils.toJson(c));
+        }
 
-        json.add("rules", array);
-    }
-
-    private JsonElement ser(Component component){
-        return serializer.serializeToTree(component);
+        return array;
     }
 }

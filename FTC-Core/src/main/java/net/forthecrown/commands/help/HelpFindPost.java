@@ -8,6 +8,8 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionPos;
 import net.forthecrown.core.Worlds;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -63,8 +65,13 @@ public class HelpFindPost extends FtcCommand {
             
             BlockVector2 vec2 = region.getPolePosition();
 
-            player.sendMessage(Crown.getPrefix()+ ChatColor.YELLOW + "The region pole closest to you:");
-            player.sendMessage(ChatColor.YELLOW + "x = " + vec2.getX() + ", z = " + vec2.getZ());
+            player.sendMessage(
+                    Component.text()
+                            .append(Crown.prefix())
+                            .append(Component.text("Closest region pole: ").color(NamedTextColor.YELLOW))
+                            .append(Component.newline())
+                            .append(Component.text("x= " + vec2.getX() + " z= " + vec2.getZ()))
+            );
 
             return 0;
         });

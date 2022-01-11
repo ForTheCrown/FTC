@@ -29,6 +29,7 @@ import net.forthecrown.economy.selling.SellShops;
 import net.forthecrown.inventory.crown.Crowns;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.useables.kits.Kit;
+import net.forthecrown.core.AfkKicker;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.actions.MarriageMessage;
@@ -58,10 +59,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -85,7 +83,7 @@ public class CoreListener implements Listener {
         PacketListeners.inject(event.getPlayer());
 
         if(!event.getPlayer().hasPlayedBefore()) {
-            event.getPlayer().teleport(Crown.getServerSpawn());
+            event.getPlayer().teleport(Crown.config().getServerSpawn());
 
             Component welcomeMsg = Component.translatable("user.firstJoin", NamedTextColor.YELLOW, user.nickDisplayName());
             Crown.getAnnouncer().announceRaw(welcomeMsg);
@@ -105,6 +103,7 @@ public class CoreListener implements Listener {
             else event.joinMessage(nameChanged ? FtcFormatter.newNameJoinMessage(user) : FtcFormatter.joinMessage(user));
         }
 
+        user.delayAfkKick();
         UserManager.updateVanishedFromPerspective(user);
         Bukkit.getScheduler().scheduleSyncDelayedTask(Crown.inst(), user::onJoinLater, 1);
     }
@@ -115,6 +114,8 @@ public class CoreListener implements Listener {
         user.onLeave();
 
         PacketListeners.remove(event.getPlayer());
+
+        AfkKicker.remove(user.getUniqueId());
 
         if(user.isVanished()) event.quitMessage(null);
         else event.quitMessage(FtcFormatter.leaveMessage(user));
@@ -192,6 +193,7 @@ public class CoreListener implements Listener {
     public void onPlayerChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
         CrownUser user = UserManager.getUser(player);
+        user.delayAfkKick();
 
         event.renderer(new FtcChatRenderer());
 
@@ -284,6 +286,14 @@ public class CoreListener implements Listener {
             MarriageMessage message = new MarriageMessage(user, UserManager.getUser(inter.getSpouse()), ChatUtils.getString(event.message()));
             UserActionHandler.handleAction(message);
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerMove(PlayerMoveEvent event) {
+        // If you haven't moved a block, not good enough
+        if (!event.hasChangedBlock()) return;
+
+        AfkKicker.delay(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(ignoreCancelled = true)

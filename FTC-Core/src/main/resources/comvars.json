@@ -22,7 +22,7 @@
     "marketStatusCooldown": 172800000,
     "resourceWorldResetInterval": 6912000000,
     "nextResourceWorldReset": -1,
-    "afkScanIntervalTicks": 6000,
+    "afkScanInterval": 72000,
 
     "allowOtherPlayerNicks": false,
     "taxesEnabled": false,

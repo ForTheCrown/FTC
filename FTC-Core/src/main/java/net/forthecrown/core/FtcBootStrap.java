@@ -49,35 +49,49 @@ final class FtcBootStrap {
         emotes = new ChatEmotes();
         emotes.registerEmotes();
 
+        // Initialize and read the config
+        config = new FtcConfigImpl();
+        config.read();
+
         prices = new ServerItemPriceMap();
         tabList = new FtcTabList();
 
         FtcFlags.init();
+        ComVars.reload();
     }
 
     static void enableBootStrap() {
-        joinInfo = new JoinInfo();
+        // Initialize config sections
+        joinInfo    = new JoinInfo();
+        dayUpdate   = new DayUpdate();
+        kingship    = new FtcKingship();
+        rules       = new ServerRules();
+        endOpener   = new EndOpener();
+
+        // Add config sections
+        config.addSection(endOpener);
+        config.addSection(joinInfo);
+        config.addSection(kingship);
+        config.addSection(rules);
+        config.addSection(tabList);
+
+        // Only load here, cuz we've already read the JSON
+        config.load();
 
         economy = new FtcEconomy();
+        shopManager = new FtcShopManager();
+
         regionManager = new FtcRegionManager(ComVars.getRegionWorld());
 
         userManager = new FtcUserManager();
-        shopManager = new FtcShopManager();
         punishmentManager = new FtcPunishmentManager();
-        usablesManager = new FtcUsablesManager();
         jailManager = new FtcJailManager();
-        structureManager = new FtcStructureManager();
 
-        kingship = new FtcKingship();
-        rules = new ServerRules();
+        usablesManager = new FtcUsablesManager();
+        structureManager = new FtcStructureManager();
 
         markets = new FtcMarkets();
         tradersGuild = new HazelguardTradersGuild();
-
-        if(FtcFeatures.AFK_SCANNER) {
-            afkScanner = new AfkScanner();
-            afkScanner.schedule();
-        }
 
         //Initialize modules
         safeRunnable(CorePacketListeners::init);

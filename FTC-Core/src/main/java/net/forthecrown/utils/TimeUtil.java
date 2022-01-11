@@ -34,6 +34,6 @@ public final class TimeUtil {
     }
 
     public static long timeUntil(long timeStamp) {
-        return -timeSince(timeStamp);
+        return timeStamp - System.currentTimeMillis();
     }
 }

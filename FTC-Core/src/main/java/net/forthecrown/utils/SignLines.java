@@ -4,9 +4,7 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.block.Sign;
 
-public class SignLines implements Struct {
-    public final Component line0, line1, line2, line3;
-
+public record SignLines(Component line0, Component line1, Component line2, Component line3) implements Struct {
     public SignLines(String s1, String s2, String s3, String s4) {
         this(convert(s1), convert(s2), convert(s3), convert(s4));
     }

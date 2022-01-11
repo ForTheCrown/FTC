@@ -1,10 +1,8 @@
 package net.forthecrown.core.kingship;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.Crown;
-import net.forthecrown.serializer.AbstractJsonSerializer;
+import net.forthecrown.core.FtcConfig;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
@@ -12,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class FtcKingship extends AbstractJsonSerializer implements Kingship {
+public class FtcKingship extends FtcConfig.ConfigSection implements Kingship {
 
     private UUID id;
     private boolean female;
@@ -20,16 +18,7 @@ public class FtcKingship extends AbstractJsonSerializer implements Kingship {
     public FtcKingship(){
         super("king");
 
-        reload();
         Crown.logger().info("Kingship loaded");
-    }
-
-    private void attemptSetting(String from){
-        try {
-            this.id = UUID.fromString(from);
-        } catch (IllegalArgumentException e){
-            this.id = null;
-        }
     }
 
     @Override
@@ -70,23 +59,29 @@ public class FtcKingship extends AbstractJsonSerializer implements Kingship {
     }
 
     @Override
-    protected void save(JsonWrapper json) {
-        json.add("uuid", (id == null ? null : id.toString()));
+    public void deserialize(JsonElement element) {
+        if(element == null) {
+            female = false;
+            id = null;
+
+            return;
+        }
+
+        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
+
+        this.female = json.getBool("female");
+        this.id = json.getUUID("uuid");
+    }
+
+    @Override
+    public JsonElement serialize() {
+        if(id == null) return null;
+
+        JsonWrapper json = JsonWrapper.empty();
+
+        json.addUUID("uuid", id);
         json.add("female", female);
-    }
 
-    @Override
-    protected void reload(JsonWrapper json) {
-        JsonElement uuid = json.get("uuid");
-        if(uuid != null && uuid.isJsonPrimitive()) attemptSetting(uuid.getAsString());
-        else this.id = null;
-
-        this.female = json.get("female").getAsBoolean();
-    }
-
-    @Override
-    protected void createDefaults(JsonWrapper json) {
-        json.add("uuid", JsonNull.INSTANCE);
-        json.add("female", new JsonPrimitive(female));
+        return json.getSource();
     }
 }

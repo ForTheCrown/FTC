@@ -19,11 +19,7 @@ import net.forthecrown.useables.warps.WarpManager;
 import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.key.Namespaced;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.LuckPerms;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -59,24 +55,23 @@ public interface Crown extends Plugin, Namespaced {
     static Economy              getEconomy()            { return Main.economy; }
     static Kingship             getKingship()           { return Main.kingship; }
     static TabList              getTabList()            { return Main.tabList; }
+    static FtcConfig            config()                { return Main.config; }
 
     static FtcMessages          getMessages()           { return Main.messages; }
     static DayUpdate            getDayUpdate()          { return Main.dayUpdate; }
     static JoinInfo             getJoinInfo()           { return Main.joinInfo; }
     static ChatEmotes           getEmotes()             { return Main.emotes; }
     static ServerRules          getRules()              { return Main.rules; }
+    static EndOpener            getEndOpener()          { return Main.endOpener; }
 
     static Logger               logger()                { return Main.logger; }
     static File                 dataFolder()            { return inst().getDataFolder(); }
-    static FileConfiguration    config()                { return inst().getConfig(); }
     static InputStream          resource(String name)   { return inst().getResource(name); }
 
     static PluginDescriptionFile description()          { return inst().getDescription(); }
     static void saveResource(boolean replace, String name) { inst().saveResource(name, replace); }
 
     static void saveFTC(){
-        Main.kingship.save();
-
         Main.userManager.save();
         Main.userManager.saveUsers();
 
@@ -91,43 +86,26 @@ public interface Crown extends Plugin, Namespaced {
         Main.shopManager.save();
         Main.usablesManager.saveAll();
 
-        Main.joinInfo.save();
         Main.prices.save();
-        Main.tabList.save();
 
         Main.regionManager.save();
         Main.structureManager.save();
 
         Main.markets.save();
         Main.tradersGuild.save();
+        Main.config.save();
 
         HouseSerializer.serialize();
         ComVars.save();
-        Main.inst.saveConfig();
 
         logger().log(Level.INFO, "FTC-Core saved");
     }
 
-    static Location getServerSpawn(){
-        return Main.serverSpawn;
-    }
-
-    static void setServerSpawn(Location l){
-        Main.serverSpawn = l;
-    }
-
-    static String getPrefix(){
-        return FtcFormatter.formatColorCodes(Main.prefix);
-    }
-
-    static boolean inDebugMode(){
+    static boolean inDebugMode() {
         return Main.inDebugMode.getValue(false);
     }
 
-    static Component prefix(){
-        return Component.text(ChatColor.stripColor(getPrefix()))
-                .color(NamedTextColor.GOLD)
-                .hoverEvent(Component.text("For The Crown").color(NamedTextColor.YELLOW));
+    static Component prefix() {
+        return config().prefix();
     }
-
 }

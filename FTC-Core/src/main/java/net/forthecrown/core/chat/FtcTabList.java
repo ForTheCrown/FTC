@@ -1,8 +1,8 @@
 package net.forthecrown.core.chat;
 
+import com.google.gson.JsonElement;
 import net.forthecrown.core.Crown;
-import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonWrapper;
+import net.forthecrown.core.FtcConfig;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;
@@ -10,31 +10,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class FtcTabList extends AbstractJsonSerializer implements TabList {
+public class FtcTabList extends FtcConfig.ConfigSection implements TabList {
 
     private Component score;
 
     public FtcTabList(){
         super("tab_list");
 
-        reload();
         Crown.logger().info("Tab list loaded");
-    }
-
-    @Override
-    protected void save(JsonWrapper json) {
-        json.add("score", ChatUtils.toJson(score));
-    }
-
-    @Override
-    protected void reload(JsonWrapper json) {
-        setScore(ChatUtils.fromJson(json.get("score")));
-    }
-
-    @Override
-    protected void createDefaults(JsonWrapper json) {
-        this.score = Component.text("Deaths").color(NamedTextColor.GRAY);
-        save(json);
     }
 
     @Override
@@ -69,5 +52,15 @@ public class FtcTabList extends AbstractJsonSerializer implements TabList {
         for (Player p: Bukkit.getOnlinePlayers()){
             p.sendPlayerListHeader(formatted);
         }
+    }
+
+    @Override
+    public void deserialize(JsonElement element) {
+        this.score = ChatUtils.fromJson(element);
+    }
+
+    @Override
+    public JsonElement serialize() {
+        return ChatUtils.toJson(score);
     }
 }

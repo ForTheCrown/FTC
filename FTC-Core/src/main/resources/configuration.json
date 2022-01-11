@@ -1,0 +1,72 @@
+{
+  "save_periodically": true,
+  "prefix": {
+    "text": "[FTC] ",
+    "color": "gold"
+  },
+  "server_spawn": {
+    "world": "world",
+    "x": 267.5,
+    "y": 77,
+    "z": 267.5,
+    "pitch": 0,
+    "yaw": -180
+  },
+  "end_opener": {
+    "enabled": true,
+    "open": false,
+    "lever": {
+      "world": "world",
+      "cords": [ 257, 82, 197 ]
+    },
+    "open_message": {
+      "text": "The End is now open!",
+      "color": "yellow"
+    },
+    "close_message": {
+      "text": "The End is now closed!",
+      "color": "yellow"
+    }
+  },
+  "join_info": {
+    "should_show": false,
+    "should_show_end": false,
+    "info": {
+      "text": ""
+    },
+    "end_info": {
+      "text": "The end is open!",
+      "color": "gray"
+    }
+  },
+  "tab_list": { "text": "Deaths" },
+  "rules": [
+    {
+      "text": "No hacking or using xray"
+    },
+    {
+      "text": "Be respectful to other players"
+    },
+    {
+      "text": "No spamming or advertising"
+    },
+    {
+      "text": "No unwanted PvP"
+    },
+    {
+      "text": "No impersonating other players"
+    },
+    {
+      "text": "No auto-clickers"
+    },
+    {
+      "text": "No gameplay altering mods, which give you an unfair advantage"
+    },
+    {
+      "text": "Only play on 1 account at a time"
+    },
+    {
+      "text": "No lag machines"
+    }
+  ]
+}

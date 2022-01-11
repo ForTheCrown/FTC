@@ -39,8 +39,6 @@ public final class FtcUtils {
             MAX_Y   = 312,
             MIN_Y   = -64;
 
-    public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
-
     public static void sendPacket(Player player, Packet<ClientGamePacketListener> packet) {
         CraftPlayer craftPlayer = (CraftPlayer) player;
         craftPlayer.getHandle().networkManager.send(packet);

@@ -1,10 +1,12 @@
 package net.forthecrown.commands.help;
 
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 
 public class HelpPost extends FtcCommand {
@@ -42,15 +44,31 @@ public class HelpPost extends FtcCommand {
         command.executes(c ->{
             CommandSender sender = c.getSource().asBukkit();
 
-            // Send information
-            sender.sendMessage(Crown.getPrefix() + ChatColor.YELLOW + "Information about regionpoles:");
-            sender.sendMessage("You can only teleport between regionpoles.");
-            sender.sendMessage("Use " + ChatColor.YELLOW + "/findpole" + ChatColor.RESET + " to find the closest pole.");
-            sender.sendMessage("Use " + ChatColor.YELLOW + "/visit" + ChatColor.RESET + " to travel between them.");
-            sender.sendMessage("Use " + ChatColor.YELLOW + "/movein" + ChatColor.RESET + " to make a pole your home.");
-            sender.sendMessage("Then use " + ChatColor.YELLOW + "/home" + ChatColor.RESET + " to go there.");
+            sender.sendMessage(
+                    Component.text()
+                            .append(Crown.prefix())
+                            .append(Component.text("Info about poles: ").color(NamedTextColor.YELLOW))
+
+                            .append(line("Use", "findpole", "to find the closest pole"))
+                            .append(line("Use", "visit", "to travel between them"))
+                            .append(line("Use", "movein", "to make a pole your home"))
+                            .append(line("Then use", "home", "to go there"))
+            );
 
             return 0;
         });
+    }
+
+    private Component line(String pre, String cmd, String post) {
+        return Component.text()
+                .append(Component.newline())
+                .append(Component.text(pre))
+                .append(Component.text(" [" + cmd + "] ")
+                        .color(NamedTextColor.YELLOW)
+                        .hoverEvent(Component.text("Click me :D"))
+                        .clickEvent(ClickEvent.suggestCommand("/" + cmd))
+                )
+                .append(Component.text(post + "."))
+                .build();
     }
 }
