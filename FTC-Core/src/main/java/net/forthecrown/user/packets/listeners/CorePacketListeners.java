@@ -1,8 +1,6 @@
 package net.forthecrown.user.packets.listeners;
 
 import net.forthecrown.user.packets.PacketListeners;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
 
 public final class CorePacketListeners {
@@ -14,7 +12,7 @@ public final class CorePacketListeners {
                 new GameModePacketListener()
         );
 
-        PacketListeners.register(
+        /*PacketListeners.register(
                 ClientboundBlockEntityDataPacket.class,
                 new SignRenderPacketListener()
         );
@@ -22,6 +20,6 @@ public final class CorePacketListeners {
         PacketListeners.register(
                 ClientboundLevelChunkWithLightPacket.class,
                 new SignChunkLoadListener()
-        );
+        );*/
     }
 }

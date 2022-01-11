@@ -70,4 +70,6 @@ public interface UserDataContainer extends UserAttachment {
     }
 
     int size();
+
+    void clear();
 }

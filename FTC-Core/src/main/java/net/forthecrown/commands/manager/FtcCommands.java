@@ -9,7 +9,7 @@ import net.forthecrown.commands.clickevent.ClickEventCommand;
 import net.forthecrown.commands.economy.*;
 import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.help.*;
-import net.forthecrown.commands.mail.CommandMail;
+import net.forthecrown.commands.CommandMail;
 import net.forthecrown.commands.markets.*;
 import net.forthecrown.commands.marriage.*;
 import net.forthecrown.commands.punishments.*;
@@ -41,7 +41,6 @@ public final class FtcCommands {
         VanillaArgumentType key = VanillaArgumentType.custom(ResourceLocationArgument::id);
 
         RoyalArgumentsImpl.register(UserArgument.class, UserArgument::getHandle, false);
-        RoyalArgumentsImpl.register(NBTArgument.class, NBTArgument::getHandle, true);
         RoyalArgumentsImpl.register(TimeArgument.class, t -> t, true);
 
         RoyalArguments.register(BaltopArgument.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, BaltopArgument.MAX)));
@@ -67,6 +66,7 @@ public final class FtcCommands {
         new CommandUnmerge();
         new CommandTransferShop();
         new CommandUnclaimShop();
+        new CommandMarketWarning();
 
         //admin commands
         new CommandKingMaker();

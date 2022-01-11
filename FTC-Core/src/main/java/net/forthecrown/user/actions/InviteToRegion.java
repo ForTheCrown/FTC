@@ -7,9 +7,8 @@ import net.forthecrown.utils.Struct;
  * struct for an invite from one user to another
  */
 public record InviteToRegion(CrownUser sender,
-                             CrownUser target)
-        implements UserAction, Struct
-{
+                             CrownUser target
+) implements UserAction, Struct {
     @Override
     public void handle(UserActionHandler handler) {
         handler.handleRegionInvite(this);

@@ -92,7 +92,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         //Summon boss with context and create bossbar
         context = new BossFightContext(this);
         bossEntity = onSummon(context);
-        bossEntity.getPersistentDataContainer().set(Bosses.BOSS_TAG, PersistentDataType.BYTE, (byte) 1);
+        bossEntity.getPersistentDataContainer().set(Bosses.BOSS_TAG, PersistentDataType.STRING, key.asString());
         bossEntity.setLootTable(LootTables.EMPTY.getLootTable());
 
         createBossbar(context);

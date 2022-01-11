@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents the class manages users and their ALT accounts
@@ -185,6 +186,25 @@ public interface UserManager extends CrownSerializer {
      */
     void removeEntry(UUID alt);
 
+    /**
+     * Gets all uses that have ever logged onto the server.
+     * This WILL load all user files into the manager's tracking.
+     * <p></p>
+     * This is run async because I this can't be good to run sync lmao,
+     * there's so many users and this has to load each one of their
+     * files.
+     * <p></p>
+     * It is heavily adviseable to unload all non-online users after
+     * any modification or interaction with the user objects
+     * @return All users that have ever been on the server
+     */
+    CompletableFuture<List<CrownUser>> getAllUsers();
+
     UserActionHandler getActionHandler();
     UserSerializer getSerializer();
+
+    /**
+     * Unloads all offline users
+     */
+    void unloadOffline();
 }

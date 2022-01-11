@@ -5,6 +5,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.key.Key;
@@ -28,9 +29,9 @@ public class CheckHasAllItems implements UsageCheck<CheckHasAllItems.CheckInstan
 
         List<ItemStack> items = new ArrayList<>();
         for (ItemStack i: player.getInventory()){
-            if(i == null) continue;
+            if(FtcItems.isEmpty(i)) continue;
 
-            items.add(i);
+            items.add(i.clone());
         }
 
         return new CheckInstance(items);

@@ -1,8 +1,9 @@
 package net.forthecrown.core.chat;
 
+import com.google.common.base.Predicates;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.serializer.CrownSerializer;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -61,6 +62,46 @@ public interface Announcer extends CrownSerializer {
      */
     void start();
 
+    default void announce(Component message) { announceRaw(formatMessage(message), Predicates.alwaysTrue()); }
+    default void announce(Component message, Permission permission) { announce(message, permission.getName()); }
+    default void announce(Component message, String permission) { announceRaw(formatMessage(message), plr -> plr.hasPermission(permission)); }
+
+    default void announceToAll(Component message) { announceToAllRaw(formatMessage(message), Predicates.alwaysTrue()); }
+    default void announceToAll(Component message, Permission perm) { announceToAll(message, perm.getName()); }
+    default void announceToAll(Component message, String permission) { announceToAllRaw(formatMessage(message), plr -> plr.hasPermission(permission)); }
+
+    default void announceRaw(Component message) { announceRaw(message, Predicates.alwaysTrue()); }
+    default void announceRaw(Component message, Permission permission) { announce(message, permission.getName()); }
+    default void announceRaw(Component message, String permission) { announceRaw(message, plr -> plr.hasPermission(permission)); }
+
+    default void announceToAllRaw(Component message) { announceToAllRaw(message, Predicates.alwaysTrue()); }
+    default void announceToAllRaw(Component message, Permission perm) { announceToAll(message, perm.getName()); }
+    default void announceToAllRaw(Component message, String permission) { announceToAllRaw(message, plr -> plr.hasPermission(permission)); }
+
+    void announceRaw(Component announcement, @Nullable Predicate<Player> predicate);
+    void announceToAllRaw(Component announcement, @Nullable Predicate<CommandSender> predicate);
+
+    Component formatMessage(Component message);
+
+    /**
+     * Logs or announces a debug message, won't broadcast if on actual server
+     * @param message The message to log, gets toString'ed, or just prints "null" if null
+     */
+    static <T> T debug(T message){
+        String stringMessage = String.valueOf(message);
+
+        if(Crown.inDebugMode()) acLiteral(stringMessage);
+        else {
+            log(DebugLevel.DEBUG, stringMessage);
+            for (Player p: Bukkit.getOnlinePlayers()) {
+                if(!p.hasPermission(Permissions.ADMIN)) continue;
+                p.sendMessage("[DEBUG INFO]: " + stringMessage);
+            }
+        }
+
+        return message;
+    }
+
     /**
      * Broadcasts a message without formatting hex colors or emojis
      * @param message The message to broadcast
@@ -78,43 +119,6 @@ public interface Announcer extends CrownSerializer {
     static void log(Level level, String message){
         if(message == null) message = "null";
         Crown.logger().log(level, message);
-    }
-
-    default void announce(Component message) { announceRaw(formatMessage(message), FtcUtils.alwaysAccept()); }
-    default void announce(Component message, Permission permission) { announce(message, permission.getName()); }
-    default void announce(Component message, String permission) { announceRaw(formatMessage(message), plr -> plr.hasPermission(permission)); }
-
-    default void announceToAll(Component message) { announceToAllRaw(formatMessage(message), FtcUtils.alwaysAccept()); }
-    default void announceToAll(Component message, Permission perm) { announceToAll(message, perm.getName()); }
-    default void announceToAll(Component message, String permission) { announceToAllRaw(formatMessage(message), plr -> plr.hasPermission(permission)); }
-
-    default void announceRaw(Component message) { announceRaw(message, FtcUtils.alwaysAccept()); }
-    default void announceRaw(Component message, Permission permission) { announce(message, permission.getName()); }
-    default void announceRaw(Component message, String permission) { announceRaw(message, plr -> plr.hasPermission(permission)); }
-
-    default void announceToAllRaw(Component message) { announceToAllRaw(message, FtcUtils.alwaysAccept()); }
-    default void announceToAllRaw(Component message, Permission perm) { announceToAll(message, perm.getName()); }
-    default void announceToAllRaw(Component message, String permission) { announceToAllRaw(message, plr -> plr.hasPermission(permission)); }
-
-    void announceRaw(Component announcement, @Nullable Predicate<Player> predicate);
-    void announceToAllRaw(Component announcement, @Nullable Predicate<CommandSender> predicate);
-
-    Component formatMessage(Component message);
-
-    /**
-     * Logs or announces a debug message, won't broadcast if on actual server
-     * @param message The message to log, gets toString'ed, or just prints "null" if null
-     */
-    static void debug(Object message){
-        String stringMessage = message == null ? "null" : message.toString();
-
-        if(Crown.inDebugMode()) acLiteral(stringMessage);
-        else log(DebugLevel.DEBUG, stringMessage);
-    }
-
-    static <T> T debugAndReturn(T message){
-        debug(message);
-        return message;
     }
 
     class DebugLevel extends Level {

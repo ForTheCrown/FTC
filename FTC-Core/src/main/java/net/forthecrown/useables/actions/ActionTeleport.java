@@ -22,6 +22,8 @@ public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
+        if(!reader.canRead()) return new ActionInstance(source.getLocation());
+
         Location location = PositionArgument.position().parse(reader).getLocation(source);
 
         if(reader.canRead() && reader.peek() == ' '){
@@ -47,6 +49,11 @@ public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance
     @Override
     public @NotNull Key key() {
         return KEY;
+    }
+
+    @Override
+    public boolean requiresInput() {
+        return false;
     }
 
     public static class ActionInstance implements UsageActionInstance {

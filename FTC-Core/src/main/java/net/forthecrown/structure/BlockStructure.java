@@ -15,22 +15,30 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.bukkit.World;
+import net.minecraft.world.phys.Vec3;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
+import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 /**
  * A structure of blocks that can be placed within a world
  */
 public class BlockStructure implements NbtSerializable, Keyed {
+    public static String
+            PALETTE_TAG = "palettes",
+            ENTITY_TAG = "entities",
+            HEADER_TAG = "header";
+
     private final Key key;
     private final Map<BlockState, BlockPalette> palettes = new Object2ObjectOpenHashMap<>();
+    private final List<StructureEntityInfo> entityInfos = new ObjectArrayList<>();
+    private final CompoundTag header = new CompoundTag();
 
     public BlockStructure(Key key) {
         this.key = FtcUtils.checkNotBukkit(key);
@@ -39,20 +47,15 @@ public class BlockStructure implements NbtSerializable, Keyed {
     /**
      * Scans the given area for blocks which will be added into
      * this structure
-     *
-     * @param world The world to perform the scan in
-     * @param size The dimensions of the scan
-     * @param start The origin point of the scan
-     *
-     * @param filter The filter, may be null. This will determine
-     *               which blocks are added into the structure
      */
-    public void scanFromWorld(World world, Vector3i size, Vector3i start, @Nullable Predicate<Block> filter) {
+    public void scanFromWorld(StructureScanContext context) {
         clear();
-        FtcBoundingBox box = FtcBoundingBox.of(world, start, start.clone().add(size));
+
+        FtcBoundingBox box = FtcBoundingBox.of(context.world(), context.start(), context.start().clone().add(context.size()));
+        Vector3i start = context.start();
 
         for (Block b: box) {
-            if (filter != null && !filter.test(b)) continue;
+            if (!context.filterBlock(b)) continue;
 
             Vector3i offset = Vector3i.of(b).subtract(start);
             BlockState state = Bukkit2NMS.getState(b);
@@ -64,6 +67,26 @@ public class BlockStructure implements NbtSerializable, Keyed {
             }
 
             add(state, tag, offset);
+        }
+
+        if(context.includeEntities()) {
+            for (Entity e: box.getEntities()) {
+                if(!context.filterEntity(e)) continue;
+
+                Location l = e.getLocation();
+                Vec3 offset = new Vec3(
+                        l.getX() - start.getX(),
+                        l.getY() - start.getY(),
+                        l.getZ() - start.getZ()
+                );
+
+                net.minecraft.world.entity.Entity entity = Bukkit2NMS.getEntity(e);
+                CompoundTag data = new CompoundTag();
+                data.putString("id", entity.getMinecraftKeyString());
+                data = entity.saveWithoutId(data);
+
+                entityInfos.add(new StructureEntityInfo(offset, data));
+            }
         }
     }
 
@@ -104,14 +127,44 @@ public class BlockStructure implements NbtSerializable, Keyed {
             FtcBlockData placeable = d.toPlaceable();
             context.getPlacer().place(d.absolutePos(), placeable);
         }
+
+        if(entityInfos.isEmpty() || !context.placeEntities()) return;
     }
 
     public void clear() {
+        entityInfos.clear();
         palettes.clear();
     }
 
+    public CompoundTag getHeader() {
+        return header;
+    }
+
     @Override
-    public ListTag save() {
+    public Tag save() {
+        if(entityInfos.isEmpty()) return savePalettes();
+
+        CompoundTag result = new CompoundTag();
+
+        if(!header.isEmpty()) result.put(HEADER_TAG, header);
+        if(!entityInfos.isEmpty()) result.put(ENTITY_TAG, saveEntities());
+
+        result.put(PALETTE_TAG, savePalettes());
+
+        return result;
+    }
+
+    private ListTag saveEntities() {
+        ListTag list = new ListTag();
+
+        for (StructureEntityInfo e: entityInfos) {
+            list.add(e.save());
+        }
+
+        return list;
+    }
+
+    private ListTag savePalettes() {
         ListTag list = new ListTag();
 
         for (BlockPalette p: palettes.values()) {
@@ -121,7 +174,32 @@ public class BlockStructure implements NbtSerializable, Keyed {
         return list;
     }
 
-    public void load(ListTag tag) {
+    public void load(Tag tag) {
+        if (tag.getId() == Tag.TAG_LIST) {
+            loadPalettes((ListTag) tag);
+            return;
+        }
+
+        CompoundTag data = (CompoundTag) tag;
+
+        header.tags.clear();
+        header.merge(data.getCompound(HEADER_TAG));
+
+        loadPalettes(data.getList(PALETTE_TAG, Tag.TAG_COMPOUND));
+
+        if(data.contains(ENTITY_TAG)) {
+            loadEntities(data.getList(ENTITY_TAG, Tag.TAG_COMPOUND));
+        }
+    }
+
+    private void loadEntities(ListTag tag) {
+        for (Tag t: tag) {
+            CompoundTag data = (CompoundTag) t;
+            this.entityInfos.add(StructureEntityInfo.of(data));
+        }
+    }
+
+    private void loadPalettes(ListTag tag) {
         for (Tag t: tag) {
             CompoundTag data = (CompoundTag) t;
 

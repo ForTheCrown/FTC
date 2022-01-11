@@ -2,7 +2,10 @@ package net.forthecrown.useables.actions;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.arguments.KitArgument;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
@@ -13,6 +16,8 @@ import net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.CompletableFuture;
 
 public class ActionKit implements UsageAction<ActionKit.ActionInstance> {
     public static final Key KEY = Keys.forthecrown("give_kit");
@@ -37,6 +42,11 @@ public class ActionKit implements UsageAction<ActionKit.ActionInstance> {
     @Override
     public @NotNull Key key() {
         return KEY;
+    }
+
+    @Override
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        return Crown.getKitManager().getSuggestions(context, builder);
     }
 
     public static class ActionInstance implements UsageActionInstance {

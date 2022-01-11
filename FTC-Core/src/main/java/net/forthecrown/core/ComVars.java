@@ -19,10 +19,10 @@ import java.lang.reflect.Field;
 public final class ComVars {
     static ComVar<Key>              onFirstJoinKit;
 
-    static ComVar<World>            treasureWorld;
     static ComVar<World>            regionWorld;
 
     static ComVar<String>           spawnRegion;
+    static ComVar<String>           discordLink;
 
     static ComVar<Byte>             maxNickLength;
     static ComVar<Byte>             maxBossDifficulty;
@@ -34,7 +34,6 @@ public final class ComVars {
 
     static ComVar<Long>             marriageCooldown;
     static ComVar<Long>             userDataResetInterval;
-    static ComVar<Long>             branchSwapCooldown;
     static ComVar<Long>             autoSaveIntervalMins;
     static ComVar<Long>             marketOwnershipSafeTime;
     static ComVar<Long>             evictionCleanupTime;
@@ -44,6 +43,7 @@ public final class ComVars {
     static ComVar<Long>             marketStatusCooldown;
     static ComVar<Long>             resourceWorldResetInterval;
     static ComVar<Long>             nextResourceWorldReset;
+    static ComVar<Long>             afkScanIntervalTicks;
 
     static ComVar<Boolean>          allowOtherPlayerNicks;
     static ComVar<Boolean>          taxesEnabled;
@@ -59,9 +59,6 @@ public final class ComVars {
     static ComVar<Integer>          effectCost_death;
     static ComVar<Integer>          effectCost_travel;
     static ComVar<Integer>          swordGoalGainPerKill;
-    static ComVar<Integer>          advReward_task;
-    static ComVar<Integer>          advReward_challenge;
-    static ComVar<Integer>          advReward_goal;
     static ComVar<Integer>          houses_startingSupply;
     static ComVar<Integer>          houses_startingDemand;
     static ComVar<Integer>          tpTickDelay;
@@ -86,10 +83,10 @@ public final class ComVars {
 
         read("onFirstJoinKit",              ComVarTypes.KEY);
 
-        read("treasureWorld",               ComVarTypes.WORLD);
         read("regionWorld",                 ComVarTypes.WORLD);
 
         read("spawnRegion",                 ComVarTypes.STRING);
+        read("discordLink",                 ComVarTypes.STRING);
 
         read("maxNickLength",               ComVarTypes.BYTE);
         read("maxBossDifficulty",           ComVarTypes.BYTE);
@@ -99,16 +96,16 @@ public final class ComVars {
         read("hoppersInOneChunk",           ComVarTypes.SHORT);
         read("maxGuildMembers",             ComVarTypes.SHORT);
 
-        read("marriageCooldown",            ComVarTypes.LONG);
-        read("userDataResetInterval",       ComVarTypes.LONG);
-        read("branchSwapCooldown",          ComVarTypes.LONG);
         read("autoSaveIntervalMins",        ComVarTypes.LONG);
-        read("marketOwnershipSafeTime",     ComVarTypes.LONG);
-        read("evictionCleanupTime",         ComVarTypes.LONG);
-        read("voteTime",                    ComVarTypes.LONG);
-        read("voteInterval",                ComVarTypes.LONG);
-        read("guildJoinRequirement",        ComVarTypes.LONG);
-        read("marketStatusCooldown",        ComVarTypes.LONG);
+        read("marriageCooldown",            ComVarTypes.TIME);
+        read("userDataResetInterval",       ComVarTypes.TIME);
+        read("marketOwnershipSafeTime",     ComVarTypes.TIME);
+        read("evictionCleanupTime",         ComVarTypes.TIME);
+        read("voteTime",                    ComVarTypes.TIME);
+        read("voteInterval",                ComVarTypes.TIME);
+        read("guildJoinRequirement",        ComVarTypes.TIME);
+        read("marketStatusCooldown",        ComVarTypes.TIME);
+        read("afkScanIntervalTicks",        ComVarTypes.TIME);
 
         read("allowOtherPlayerNicks",       ComVarTypes.BOOL);
         read("taxesEnabled",                ComVarTypes.BOOL);
@@ -126,9 +123,6 @@ public final class ComVars {
         read("effectCost_death",            ComVarTypes.INTEGER);
         read("effectCost_travel",           ComVarTypes.INTEGER);
         read("swordGoalGainPerKill",        ComVarTypes.INTEGER);
-        read("advReward_task",              ComVarTypes.INTEGER);
-        read("advReward_challenge",         ComVarTypes.INTEGER);
-        read("advReward_goal",              ComVarTypes.INTEGER);
         read("houses_startingSupply",       ComVarTypes.INTEGER);
         read("houses_startingDemand",       ComVarTypes.INTEGER);
         read("tpTickDelay",                 ComVarTypes.INTEGER);
@@ -208,6 +202,10 @@ public final class ComVars {
         return spawnRegion.getValue(RegionConstants.DEFAULT_SPAWN_NAME);
     }
 
+    public static String discordLink() {
+        return discordLink.getValue("https://discord.gg/wXjHNdp");
+    }
+
     public static World getRegionWorld() {
         return regionWorld.getValue(Worlds.OVERWORLD);
     }
@@ -252,10 +250,6 @@ public final class ComVars {
         return userDataResetInterval.getValue(5356800000L);
     }
 
-    public static long getBranchSwapCooldown()  {
-        return branchSwapCooldown.getValue(TimeUtil.DAY_IN_MILLIS * 2);
-    }
-
     public static long getShopOwnershipSafeTime() {
         return marketOwnershipSafeTime.getValue(TimeUtil.WEEK_IN_MILLIS * 2);
     }
@@ -290,6 +284,10 @@ public final class ComVars {
 
     public static void nextResourceWorldReset(long time) {
         nextResourceWorldReset.update(time);
+    }
+
+    public static long afkScanIntervalTicks() {
+        return afkScanIntervalTicks.getValue(TimeUtil.millisToTicks(TimeUtil.HOUR_IN_MILLIS));
     }
 
 
@@ -349,18 +347,6 @@ public final class ComVars {
         return swordGoalGainPerKill.getValue(1);
     }
 
-    public static int getTaskAdvReward() {
-        return advReward_task.getValue(100);
-    }
-
-    public static int getChallengeAdvReward() {
-        return advReward_challenge.getValue(250);
-    }
-
-    public static int getGoalAdvReward() {
-        return advReward_goal.getValue(500);
-    }
-
     public static int getHousesStartingSupply() {
         return houses_startingSupply.getValue(250);
     }
@@ -411,12 +397,6 @@ public final class ComVars {
 
     public static int defaultShopPrice() {
         return defaultShopPrice.getValue(55000);
-    }
-
-
-
-    public static World getTreasureWorld() {
-        return treasureWorld.getValue();
     }
 
     public static Key onFirstJoinKit() {

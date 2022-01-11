@@ -26,12 +26,13 @@ public class RegionVisitListener implements Listener {
 
     public void beginListening() {
         user.visitListener = this;
+        user.hulkSmashing = true;
 
         getPluginManager().registerEvents(this, Crown.inst());
         tickTask = getScheduler().runTaskTimer(Crown.inst(), this::tick, TICKS_PER_TICK, TICKS_PER_TICK);
     }
 
-    private short ticks = 10 * (20 / TICKS_PER_TICK);
+    private short ticks = 30 * (20 / TICKS_PER_TICK);
     private BukkitTask tickTask;
 
     private void tick() {
@@ -52,6 +53,7 @@ public class RegionVisitListener implements Listener {
         HandlerList.unregisterAll(this);
 
         user.visitListener = null;
+        user.hulkSmashing = false;
         if(!tickTask.isCancelled()) tickTask.cancel();
         if(effect != null) effect.onHulkLand(user, user.getLocation());
     }

@@ -110,8 +110,10 @@ public class FtcUser implements CrownUser {
     //Primitive variables, idk
     private int gems = 0;
     public boolean afk = false;
+    public boolean hulkSmashing = false;
     public long totalEarnings = 0L;
     public long nextResetTime = 0L;
+    public long lastLogin = -1L;
     public long lastLoad = 0L;
     public String ip;
 
@@ -124,6 +126,8 @@ public class FtcUser implements CrownUser {
 
     //Region visit listener
     public RegionVisitListener visitListener;
+
+    public UserVanishTicker vanishTicker;
 
     //Afk stuff
     public AfkListener afkListener;
@@ -653,6 +657,12 @@ public class FtcUser implements CrownUser {
 
         if(visitListener != null) {
             visitListener.unregister();
+            hulkSmashing = true;
+        }
+
+        if(vanishTicker != null) {
+            vanishTicker.stop();
+            vanishTicker = null;
         }
 
         interactions.clearIncoming();
@@ -672,7 +682,13 @@ public class FtcUser implements CrownUser {
 
     @Override
     public boolean onJoin(){
+        this.lastLogin = System.currentTimeMillis();
         this.handle = getOnlineHandle().getHandle();
+
+        if(hulkSmashing) {
+            RegionVisitListener listener = new RegionVisitListener(this, cosmeticData.getActiveTravel());
+            listener.beginListening();
+        }
 
         if(!getName().equalsIgnoreCase(lastOnlineName)){
             updateName(lastOnlineName);
@@ -711,6 +727,8 @@ public class FtcUser implements CrownUser {
         if(getWorld().equals(Worlds.END) && !ComVars.isEndOpen()) {
             getPlayer().teleport(PlayerRidingManager.HAZELGUARD);
         }
+
+        mail.informOfUnread();
 
         PunishmentManager manager = Crown.getPunishmentManager();
         PunishmentEntry entry = manager.getEntry(getUniqueId());
@@ -943,6 +961,13 @@ public class FtcUser implements CrownUser {
     public void updateVanished(){
         checkOnline();
 
+        if(isVanished()) {
+            vanishTicker = new UserVanishTicker(this);
+        } else if(vanishTicker != null) {
+            vanishTicker.stop();
+            vanishTicker = null;
+        }
+
         for (CrownUser u: net.forthecrown.user.manager.UserManager.getOnlineUsers()){
             if(u.hasPermission(Permissions.VANISH_SEE)) continue;
             if(u.equals(this)) continue;
@@ -1090,6 +1115,12 @@ public class FtcUser implements CrownUser {
         checkOnline();
 
         getHandle().stopRiding();
+    }
+
+    @Override
+    public long getLastLogin() {
+        if(lastLogin == -1) return getOfflinePlayer().getLastLogin();
+        return lastLogin;
     }
 
     @Override

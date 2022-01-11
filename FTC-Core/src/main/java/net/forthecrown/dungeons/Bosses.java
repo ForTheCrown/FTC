@@ -4,7 +4,6 @@ import net.forthecrown.dungeons.bosses.*;
 import net.forthecrown.dungeons.usables.*;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.squire.Squire;
-import net.forthecrown.useables.actions.SimpleAction;
 import net.forthecrown.useables.actions.UsageAction;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Drowned;
@@ -15,7 +14,7 @@ import org.bukkit.entity.WitherSkeleton;
 public class Bosses {
 
     public static final NamespacedKey KEY = Squire.createRoyalKey("bossitem");
-    public static final NamespacedKey BOSS_TAG = Squire.createRoyalKey("bosstag");
+    public static final NamespacedKey BOSS_TAG = Squire.createRoyalKey("boss_tag");
     private static final DungeonUserDataAccessor accessor = new DungeonUserDataAccessor();
 
     private static Zhambie zhambie;
@@ -36,10 +35,10 @@ public class Bosses {
 
         register(new ActionGiveArtifact());
         register(new ActionSpawnBoss());
-        register(new SimpleAction<>(ActionDiego.KEY, ActionDiego::new));
         register(new ActionEntranceInfo());
         register(new ActionShowBossInfo());
 
+        Registries.NPCS.register(DiegoNPC.KEY, new DiegoNPC());
         Registries.USAGE_CHECKS.register(CheckBeatenBoss.KEY, new CheckBeatenBoss());
     }
 

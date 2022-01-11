@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -51,6 +52,8 @@ public interface FtcFormatter {
         format.setGroupingUsed(true);
         format.setGroupingSize(3);
     });
+
+    SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d MMM yyyy HH:mm z");
 
     Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
     TextComponent AFK_SUFFIX = Component.text(" [AFK]").style(nonItalic(NamedTextColor.GRAY));
@@ -241,6 +244,10 @@ public interface FtcFormatter {
         return ChatUtils.convertString(msg, ignorePerms || sender == null || sender.hasPermission(Permissions.DONATOR_2));
     }
 
+    static TextComponent formatString(String message) {
+        return formatString(message, null, true);
+    }
+
     /**
      * Creates a text with a gradient color
      * @param input The input
@@ -308,8 +315,10 @@ public interface FtcFormatter {
      * <p></p>
      * This sucks ass, too vague of a result. Use {@link Date#toString()} for precision.
      * @param millis The millis
+     * @deprecated use {@link FtcFormatter#formatDate(long)}
      * @return The date
      */
+    @Deprecated
     static String getDateFromMillis(long millis){
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(millis);
@@ -353,7 +362,10 @@ public interface FtcFormatter {
 
         net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
         Component hoverName = ChatUtils.vanillaToAdventure(nms.getHoverName());
-        if(nms.hasCustomHoverName()) hoverName = hoverName.decorate(TextDecoration.ITALIC);
+
+        if(nms.hasCustomHoverName() && hoverName.decoration(TextDecoration.ITALIC) == TextDecoration.State.NOT_SET) {
+            hoverName = hoverName.decorate(TextDecoration.ITALIC);
+        }
 
         return hoverName
                 .hoverEvent(item);
@@ -560,5 +572,13 @@ public interface FtcFormatter {
                 .content(decimalizeNumber(amount) + " ")
                 .append(Component.translatable("economy.currency." + (amount == 1 || amount == -1 ? "singular" : "multiple")))
                 .build();
+    }
+
+    static Component formatDate(long time) {
+        return formatDate(new Date(time));
+    }
+
+    static Component formatDate(Date date) {
+        return Component.text(DATE_FORMAT.format(date));
     }
 }

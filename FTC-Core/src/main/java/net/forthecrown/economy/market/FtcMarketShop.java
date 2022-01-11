@@ -19,6 +19,7 @@ import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.math.MathUtil;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.UUID;
@@ -31,6 +32,7 @@ public class FtcMarketShop implements MarketShop {
 
     private UUID owner;
     private Date dateOfPurchase;
+    private EvictionData evictionData;
     private final ObjectList<UUID> coOwners = new ObjectArrayList<>();
 
     private int price = -1;
@@ -110,6 +112,25 @@ public class FtcMarketShop implements MarketShop {
     }
 
     @Override
+    public void setEvictionDate(@Nullable Date date) {
+        if(evictionData != null) {
+            evictionData.cancel();
+        }
+
+        if(date != null) {
+            this.evictionData = new EvictionData(this, date);
+            evictionData.start();
+        } else {
+            evictionData = null;
+        }
+    }
+
+    @Override
+    public Date getEvictionDate() {
+        return evictionData == null ? null : evictionData.getDate();
+    }
+
+    @Override
     public JsonObject serialize() {
         JsonWrapper json = JsonWrapper.empty();
 
@@ -129,6 +150,10 @@ public class FtcMarketShop implements MarketShop {
 
             ownership.addUUID("owner", getOwner());
             if(getDateOfPurchase() != null) ownership.addDate("dateOfPurchase", getDateOfPurchase());
+
+            if(markedForEviction()) {
+                ownership.addDate("evictionDate", evictionData.getDate());
+            }
 
             if(mergedName != null) {
                 ownership.add("merged", mergedName);
@@ -175,6 +200,10 @@ public class FtcMarketShop implements MarketShop {
             market.owner = ownership.getUUID("owner");
             market.dateOfPurchase = ownership.getDate("dateOfPurchase");
 
+            if(ownership.has("evictionDate")) {
+                market.setEvictionDate(ownership.getDate("evictionDate"));
+            }
+
             if(ownership.has("coOwners")) {
                 market.coOwners.addAll(ownership.getList("coOwners", JsonUtils::readUUID));
             }
@@ -195,11 +224,24 @@ public class FtcMarketShop implements MarketShop {
 
         FtcMarketShop shop = (FtcMarketShop) o;
 
-        return new EqualsBuilder().append(getPrice(), shop.getPrice()).append(getWorldGuard(), shop.getWorldGuard()).append(getEntrances(), shop.getEntrances()).append(getOwner(), shop.getOwner()).append(getCoOwners(), shop.getCoOwners()).append(mergedName, shop.mergedName).isEquals();
+        return new EqualsBuilder()
+                .append(getPrice(), shop.getPrice())
+                .append(getWorldGuard(), shop.getWorldGuard())
+                .append(getEntrances(), shop.getEntrances())
+                .append(getOwner(), shop.getOwner())
+                .append(getCoOwners(), shop.getCoOwners())
+                .append(mergedName, shop.mergedName)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getWorldGuard()).append(getEntrances()).append(getOwner()).append(getCoOwners()).append(getPrice()).toHashCode();
+        return new HashCodeBuilder(17, 37)
+                .append(getWorldGuard())
+                .append(getEntrances())
+                .append(getOwner())
+                .append(getCoOwners())
+                .append(getPrice())
+                .toHashCode();
     }
 }

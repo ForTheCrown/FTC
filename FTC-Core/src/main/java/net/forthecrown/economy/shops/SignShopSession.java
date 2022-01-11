@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * A shop session.
  * <p></p>
- * A session is a the period of time where a user is buying from one store.
+ * A session is the period of time when a user is buying from one store.
  * Like holding right click to mass buy from one shop or just buying once.
  *
  */
@@ -70,7 +70,7 @@ public class SignShopSession {
      * @return The current shop's price
      */
     public int getPrice() {
-        return shop.getPrice();
+        return shop.getPrice(getCustomer());
     }
 
     /**
@@ -142,6 +142,7 @@ public class SignShopSession {
     }
 
     public boolean customerIsOwner() {
+        if(getType().isAdmin()) return false;
         return getOwnership().isOwner(getCustomer().getUniqueId());
     }
 

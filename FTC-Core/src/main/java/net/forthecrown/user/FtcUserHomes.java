@@ -24,7 +24,7 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
     public RegionPos homeRegion;
 
     public FtcUserHomes(FtcUser user){
-        super(user);
+        super(user, "homes");
 
         checkOverLimit();
     }

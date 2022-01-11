@@ -2,7 +2,7 @@ package net.forthecrown.economy.shops;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonDeserializable;
@@ -14,13 +14,13 @@ import net.forthecrown.utils.JsonUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class ShopOwnership implements JsonSerializable, JsonDeserializable {
     private UUID owner;
     private House owningHouse;
-    private final List<UUID> coOwners = new ObjectArrayList<>();
+    private final Set<UUID> coOwners = new ObjectOpenHashSet<>();
 
     public boolean hasOwner() {
         return owner != null;
@@ -70,7 +70,7 @@ public class ShopOwnership implements JsonSerializable, JsonDeserializable {
         coOwners.clear();
     }
 
-    public List<UUID> getCoOwners() {
+    public Set<UUID> getCoOwners() {
         return coOwners;
     }
 
@@ -145,5 +145,9 @@ public class ShopOwnership implements JsonSerializable, JsonDeserializable {
     public boolean isOwner(UUID id) {
         if(owner == null) return false;
         return id.equals(getOwner());
+    }
+
+    public boolean mayEditShop(UUID uuid) {
+        return isOwner(uuid) || isCoOwner(uuid);
     }
 }

@@ -1,11 +1,15 @@
 package net.forthecrown.commands.help;
 
 import github.scarsz.discordsrv.commands.CommandLink;
+import github.scarsz.discordsrv.commands.CommandUnlink;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class HelpDiscord extends FtcCommand {
     public HelpDiscord(){
@@ -26,11 +30,24 @@ public class HelpDiscord extends FtcCommand {
             c.getSource().sendMessage(
                     Component.text()
                             .append(Crown.prefix())
-                            .append(Component.text(Crown.getDiscord()))
+                            .append(Component.text("Join our discord: "))
+                            .append(
+                                    Component.text(ComVars.discordLink())
+                                            .color(NamedTextColor.AQUA)
+                                            .clickEvent(ClickEvent.openUrl(ComVars.discordLink()))
+                                            .hoverEvent(Component.text("Click to join :D"))
+                            )
                             .build()
             );
             return 0;
         })
+                .then(literal("unlink")
+                        .executes(c -> {
+                            CommandUnlink.execute(c.getSource().asPlayer(), new String[0]);
+                            return 0;
+                        })
+                )
+
                 .then(literal("link")
                         .executes(c -> {
                             CommandLink.execute(c.getSource().asPlayer(), new String[0]);

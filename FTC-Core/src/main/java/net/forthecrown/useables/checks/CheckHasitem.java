@@ -12,6 +12,7 @@ import net.forthecrown.useables.InteractionUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +47,11 @@ public class CheckHasitem implements UsageCheck<CheckHasitem.CheckInstance> {
         return InteractionUtils.listItems(context, builder);
     }
 
+    @Override
+    public boolean requiresInput() {
+        return false;
+    }
+
     public static class CheckInstance implements UsageCheckInstance {
         private final ItemStack item;
 
@@ -64,7 +70,8 @@ public class CheckHasitem implements UsageCheck<CheckHasitem.CheckInstance> {
 
         @Override
         public Component failMessage(Player player) {
-            return Component.text("You don't have the required item");
+            return Component.text("You don't have the required item")
+                    .color(NamedTextColor.GRAY);
         }
 
         @Override

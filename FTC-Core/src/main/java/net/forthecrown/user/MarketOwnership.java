@@ -36,4 +36,8 @@ public interface MarketOwnership extends UserAttachment {
     default boolean canChangeStatus() {
         return TimeUtil.hasCooldownEnded(ComVars.getMarketStatusCooldown(), getLastStatusChange());
     }
+
+    default void setLastStatusChange() {
+        setLastStatusChange(System.currentTimeMillis());
+    }
 }

@@ -46,7 +46,7 @@ public class FtcShopManager implements ShopManager {
 
     @Override
     public SignShop getShop(String name) {
-        return getShop(LocationFileName.parse(name).toLocation());
+        return getShop(LocationFileName.parse(name).toVector());
     }
 
     @Override

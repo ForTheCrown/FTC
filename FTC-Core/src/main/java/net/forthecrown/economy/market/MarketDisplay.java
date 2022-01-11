@@ -1,5 +1,6 @@
 package net.forthecrown.economy.market;
 
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.text.Component;
@@ -67,7 +68,13 @@ public interface MarketDisplay {
                     .append(Component.newline())
                     .append(Component.text("Owner: ").append(owner.nickDisplayName()))
                     .append(Component.newline())
-                    .append(Component.text("dateOfPurchase: " + shop.getDateOfPurchase()));
+                    .append(Component.text("dateOfPurchase: ").append(FtcFormatter.formatDate(shop.getDateOfPurchase())));
+
+            if(shop.markedForEviction()) {
+                builder
+                        .append(Component.newline())
+                        .append(Component.text("evictionDate: ").append(FtcFormatter.formatDate(shop.getEvictionDate())));
+            }
 
             if(!shop.getCoOwners().isEmpty()) {
                 TextComponent.Builder coOwnerBuilder = Component.text()

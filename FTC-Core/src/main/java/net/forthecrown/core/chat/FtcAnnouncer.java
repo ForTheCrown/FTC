@@ -1,5 +1,6 @@
 package net.forthecrown.core.chat;
 
+import com.google.common.base.Predicates;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.forthecrown.comvars.ComVar;
@@ -13,7 +14,6 @@ import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -142,7 +142,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
     @Override
     public void announceToAllRaw(Component announcement, @Nullable Predicate<CommandSender> predicate) {
-        announceRaw(announcement, predicate == null ? FtcUtils.alwaysAccept() : predicate::test);
+        announceRaw(announcement, predicate == null ? Predicates.alwaysTrue() : predicate::test);
         if(predicate == null || predicate.test(Bukkit.getConsoleSender())) Bukkit.getConsoleSender().sendMessage(announcement);
     }
 

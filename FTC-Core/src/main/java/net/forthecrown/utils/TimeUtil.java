@@ -10,7 +10,8 @@ public final class TimeUtil {
             HOUR_IN_MILLIS      = MINUTE_IN_MILLIS * 60,
             DAY_IN_MILLIS       = HOUR_IN_MILLIS * 24,
             WEEK_IN_MILLIS      = DAY_IN_MILLIS * 7,
-            MONTH_IN_MILLIS     = WEEK_IN_MILLIS * 4;
+            MONTH_IN_MILLIS     = WEEK_IN_MILLIS * 4,
+            YEAR_IN_MILLIS      = DAY_IN_MILLIS * 365;
 
     public static long millisToTicks(long millis) {
         return millis / TICKS_IN_MILLIS;

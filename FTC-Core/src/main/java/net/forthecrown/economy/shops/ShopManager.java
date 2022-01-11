@@ -1,8 +1,8 @@
 package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Main;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.core.transformers.NamespaceRenamer;
 import net.forthecrown.serializer.ShopSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.math.WorldVec3i;
@@ -27,7 +27,7 @@ import java.util.UUID;
  * Implementation: {@link FtcShopManager}
  */
 public interface ShopManager {
-    NamespacedKey LEGACY_SHOP_KEY = new NamespacedKey(NamespaceRenamer.OLD_NAMESPACE, "signshop");
+    NamespacedKey LEGACY_SHOP_KEY = new NamespacedKey(Main.OLD_NAMESPACE, "signshop");
     NamespacedKey SHOP_KEY = new NamespacedKey(Crown.inst(), "signshop");
 
     String BUY_LABEL = "=[Buy]=";
@@ -61,7 +61,7 @@ public interface ShopManager {
                 return true;
             }
 
-            return container.has(SHOP_KEY, PersistentDataType.BYTE) || hasLegacy;
+            return hasLegacy || container.has(SHOP_KEY, PersistentDataType.BYTE);
         } else {
             return false;
         }

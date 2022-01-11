@@ -4,7 +4,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.CrownRandom;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Bee;
@@ -15,6 +15,7 @@ import org.bukkit.permissions.Permission;
 import java.util.function.Function;
 
 public class CommandDumbThing extends FtcCommand {
+    private static final CrownRandom RANDOM = new CrownRandom();
 
     private final Function<Player, Integer> func;
 
@@ -66,7 +67,7 @@ public class CommandDumbThing extends FtcCommand {
                     Cat cat = l.getWorld().spawn(l, Cat.class);
                     cat.setBaby();
                     cat.setTamed(true);
-                    cat.setCatType(Cat.Type.values()[FtcUtils.randomInRange(0, Cat.Type.values().length-1)]);
+                    cat.setCatType(Cat.Type.values()[RANDOM.intInRange(0, Cat.Type.values().length-1)]);
 
                     cat.setVelocity(player.getEyeLocation().getDirection().multiply(2));
 

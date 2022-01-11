@@ -35,7 +35,7 @@ public class FtcUserInteractions extends AbstractUserAttachment implements UserI
     private transient final List<TeleportRequest> outgoing = new ArrayList<>();
 
     public FtcUserInteractions(FtcUser user){
-        super(user);
+        super(user, "interactions");
     }
 
     @Override

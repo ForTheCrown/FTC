@@ -7,7 +7,6 @@ import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.FtcJailManager;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.FtcKingship;
-import net.forthecrown.core.transformers.CorrectLegacyData;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
@@ -41,7 +40,7 @@ import static net.forthecrown.utils.FtcUtils.safeRunnable;
 final class FtcBootStrap {
     private FtcBootStrap() {}
 
-    static void firstPhase() {
+    static void loadBootStrap() {
         announcer = new FtcAnnouncer();
 
         messages = new FtcMessages();
@@ -56,7 +55,7 @@ final class FtcBootStrap {
         FtcFlags.init();
     }
 
-    static void secondPhase() {
+    static void enableBootStrap() {
         joinInfo = new JoinInfo();
 
         economy = new FtcEconomy();
@@ -75,6 +74,11 @@ final class FtcBootStrap {
         markets = new FtcMarkets();
         tradersGuild = new HazelguardTradersGuild();
 
+        if(FtcFeatures.AFK_SCANNER) {
+            afkScanner = new AfkScanner();
+            afkScanner.schedule();
+        }
+
         //Initialize modules
         safeRunnable(CorePacketListeners::init);
         safeRunnable(Houses::init);
@@ -88,8 +92,6 @@ final class FtcBootStrap {
         safeRunnable(FtcCommands::init);
         safeRunnable(Events::init);
         safeRunnable(CommandArkBox::load);
-
-        CorrectLegacyData.runAsync();
 
         //These must be last, since usage actions and checks are registered before them
         warpRegistry = new FtcWarpManager();

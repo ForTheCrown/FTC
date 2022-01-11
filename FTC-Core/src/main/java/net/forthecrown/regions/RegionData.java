@@ -68,6 +68,7 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
     protected void readTag(Tag tag) {
         //If the only thing serialized is, is a name
         if(tag.getId() == Tag.TAG_STRING) {
+            updatePoleBounds();
             setName0(tag.getAsString());
             return;
         }
@@ -104,6 +105,7 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
     }
 
     protected abstract void setPolePosition0(BlockVector2 vector2);
+    protected abstract void updatePoleBounds();
 
     private void setName0(String name) {
         this.name = name;
@@ -225,6 +227,11 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
         @Override
         protected void setPolePosition0(BlockVector2 vector2) {
             this.polePosition = vector2;
+        }
+
+        @Override
+        protected void updatePoleBounds() {
+
         }
     }
 }

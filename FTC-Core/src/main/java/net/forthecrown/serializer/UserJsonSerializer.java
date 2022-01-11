@@ -6,6 +6,7 @@ import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.user.AbstractUserAttachment;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.data.*;
 import net.forthecrown.utils.FtcUtils;
@@ -64,6 +65,7 @@ public class UserJsonSerializer implements UserSerializer {
         if(user.getGems() != 0) json.add("gems", user.getGems());
         if(!user.pets.isEmpty()) json.addList("pets", user.pets);
         if(user.currentPrefix != null) json.add("currentPrefix", ChatUtils.toJson(user.currentPrefix));
+        if(user.hulkSmashing) json.add("hulkSmashing", true);
 
         //Properties
         if(!user.prefs.isEmpty()) json.addList("properties", user.prefs);
@@ -72,6 +74,10 @@ public class UserJsonSerializer implements UserSerializer {
         JsonWrapper timeStamps = JsonWrapper.empty();
         timeStamps.add("nextReset", user.nextResetTime);
         timeStamps.add("lastLoad", user.lastLoad);
+
+        if(user.lastLogin != -1) {
+            timeStamps.add("lastLogin", user.lastLogin);
+        }
 
         json.add("timeStamps", timeStamps);
 
@@ -99,31 +105,19 @@ public class UserJsonSerializer implements UserSerializer {
             json.add("soldData", sold);
         }
 
-        //Cosmetic data
-        JsonObject cosmetics = user.cosmeticData.serialize();
-        if(cosmetics != null) json.add("cosmeticData", cosmetics);
-
-        //Homes
-        JsonObject homeData = user.homes.serialize();
-        if(homeData != null) json.add("homes", homeData);
-
-        //interactions
-        JsonObject interactions = user.interactions.serialize();
-        if(interactions != null) json.add("interactions", interactions);
-
-        //Data container
-        JsonObject dataContainer = user.dataContainer.serialize();
-        if(dataContainer != null) json.add("dataContainer", dataContainer);
-
-        //Market ownership
-        JsonObject ownership = user.marketOwnership.serialize();
-        if(ownership != null) json.add("marketOwnership", ownership);
-
-        //Mail
-        JsonElement mail = user.mail.serialize();
-        if(mail != null) json.add("mail", mail);
+        saveAttach(json, user.cosmeticData);
+        saveAttach(json, user.homes);
+        saveAttach(json, user.interactions);
+        saveAttach(json, user.dataContainer);
+        saveAttach(json, user.marketOwnership);
+        saveAttach(json, user.mail);
 
         writeJson(json, user.getUniqueId());
+    }
+
+    private void saveAttach(JsonWrapper json, AbstractUserAttachment a) {
+        JsonElement element = a.serialize();
+        if(element != null) json.add(a.serialKey, element);
     }
 
     @Override
@@ -140,6 +134,7 @@ public class UserJsonSerializer implements UserSerializer {
         user.ip = json.getString("ipAddress");
         user.totalEarnings = json.getLong("totalEarnings");
         user.setGems(json.getInt("gems"));
+        user.hulkSmashing = json.getBool("hulkSmashing", false);
 
         //ranks
         user.titles.clear();
@@ -183,6 +178,7 @@ public class UserJsonSerializer implements UserSerializer {
         JsonWrapper timeStamps = json.getWrapped("timeStamps");
         user.lastLoad = timeStamps.getLong("lastLoad");
         user.nextResetTime = timeStamps.getLong("nextReset");
+        user.lastLogin = timeStamps.getLong("lastLogin", -1);
 
         //Last location
         if(json.has("lastLocation")) {
@@ -194,13 +190,12 @@ public class UserJsonSerializer implements UserSerializer {
             user.entityLocation = json.getLocation("lastKnowLoc");
         }
 
-        //User data type things
-        user.cosmeticData.deserialize(json.get("cosmeticData"));
-        user.homes.deserialize(json.get("homes"));
-        user.interactions.deserialize(json.get("interactions"));
-        user.dataContainer.deserialize(json.get("dataContainer"));
-        user.marketOwnership.deserialize(json.get("marketOwnership"));
-        user.mail.deserialize(json.get("mail"));
+        loadAttach(json, user.cosmeticData);
+        loadAttach(json, user.homes);
+        loadAttach(json, user.interactions);
+        loadAttach(json, user.dataContainer);
+        loadAttach(json, user.marketOwnership);
+        loadAttach(json, user.mail);
 
         //Material data
         user.matData.clear();
@@ -218,6 +213,10 @@ public class UserJsonSerializer implements UserSerializer {
                 user.matData.put(material, data);
             }
         }
+    }
+
+    private void loadAttach(JsonWrapper json, AbstractUserAttachment a) {
+        a.deserialize(json.get(a.serialKey));
     }
 
     @Override

@@ -101,7 +101,7 @@ public class RegionVisit implements Runnable {
     }
 
     void findInitialTeleport() {
-        WorldVec3i poleBottom = RegionUtil.bottomOfPole(getDestWorld(), getRegion().getPolePosition());
+        WorldVec3i poleBottom = getRegion().getPoleBottom();
         Location playerLoc = user.getLocation();
 
         setTeleportLocation(

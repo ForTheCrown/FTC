@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  * Implementation: {@link Main}
  */
 public interface Crown extends Plugin, Namespaced {
-    static Crown inst(){ return Main.inst; }
+    static Crown                inst()                  { return Main.inst; }
 
     // Feels like I'm violating syntax by aligning the methods like this
     static PunishmentManager    getPunishmentManager()  { return Main.punishmentManager; }
@@ -66,11 +66,12 @@ public interface Crown extends Plugin, Namespaced {
     static ChatEmotes           getEmotes()             { return Main.emotes; }
     static ServerRules          getRules()              { return Main.rules; }
 
-    static Logger logger() { return Main.logger; }
-    static File dataFolder() { return inst().getDataFolder(); }
-    static FileConfiguration config() { return inst().getConfig(); }
-    static InputStream resource(String name) { return inst().getResource(name); }
-    static PluginDescriptionFile description() { return inst().getDescription(); }
+    static Logger               logger()                { return Main.logger; }
+    static File                 dataFolder()            { return inst().getDataFolder(); }
+    static FileConfiguration    config()                { return inst().getConfig(); }
+    static InputStream          resource(String name)   { return inst().getResource(name); }
+
+    static PluginDescriptionFile description()          { return inst().getDescription(); }
     static void saveResource(boolean replace, String name) { inst().saveResource(name, replace); }
 
     static void saveFTC(){
@@ -121,10 +122,6 @@ public interface Crown extends Plugin, Namespaced {
 
     static boolean inDebugMode(){
         return Main.inDebugMode.getValue(false);
-    }
-
-    static String getDiscord(){
-        return FtcFormatter.formatColorCodes(Main.discord);
     }
 
     static Component prefix(){

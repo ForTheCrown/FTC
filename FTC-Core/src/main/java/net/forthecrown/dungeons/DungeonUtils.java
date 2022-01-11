@@ -40,20 +40,20 @@ public final class DungeonUtils {
     }
 
     public static TextComponent itemRequiredMessage(DungeonBoss<?> boss){
-        TextComponent text = Component.text()
+        TextComponent.Builder text = Component.text()
                 .color(NamedTextColor.AQUA)
-                .append(Component.translatable("dungeons.neededItems"))
-                .build();
+                .append(Component.translatable("dungeons.neededItems"));
+
         for (ItemStack i: boss.getSpawningItems()){
-            text = text.append(Component.newline());
-            text = text.append(
-                    Component.text()
-                            .hoverEvent(i.asHoverEvent())
-                            .append(Component.text("- " + i.getAmount() + " "))
-                            .append(FtcFormatter.itemDisplayName(i).color(NamedTextColor.DARK_AQUA))
-            );
+            text.append(Component.newline())
+                    .append(
+                            Component.text()
+                                    .hoverEvent(i.asHoverEvent())
+                                    .append(Component.text("- " + i.getAmount() + " "))
+                                    .append(FtcFormatter.itemDisplayName(i).color(NamedTextColor.DARK_AQUA))
+                    );
         }
-        return text;
+        return text.build();
     }
 
     public static @Nullable Player getNearestVisiblePlayer(Location location, FtcBoundingBox inBox){

@@ -1,11 +1,9 @@
 package net.forthecrown.regions;
 
-import com.sk89q.worldedit.math.BlockVector2;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.forthecrown.utils.math.WorldVec3i;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
@@ -24,12 +22,8 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
     //Vanilla structures weren't working :(
     @Override
     public void generate(PopulationRegion region) {
-        World world = manager.getWorld();
-        BlockVector2 place = region.getPolePosition();
-
         //Get the center bottom the pole should be placed at
-        WorldVec3i pos = RegionUtil.bottomOfPole(world, place);
-        WorldVec3i bottom = pos.clone();
+        WorldVec3i pos = region.getPoleBottom();
 
         //bounding box for the region pole
         FtcBoundingBox box = FtcBoundingBox.of(region.getWorld(), region.getPoleBoundingBox());

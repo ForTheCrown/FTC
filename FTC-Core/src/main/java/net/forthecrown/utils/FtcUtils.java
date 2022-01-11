@@ -26,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -41,11 +40,6 @@ public final class FtcUtils {
             MIN_Y   = -64;
 
     public static final TimeZone SERVER_TIME_ZONE = TimeZone.getTimeZone("GMT+01:00");
-    private static final Predicate ALWAYS_TRUE = o -> true;
-
-    public static <T> Predicate<T> alwaysAccept() {
-        return ALWAYS_TRUE;
-    }
 
     public static void sendPacket(Player player, Packet<ClientGamePacketListener> packet) {
         CraftPlayer craftPlayer = (CraftPlayer) player;
@@ -54,11 +48,6 @@ public final class FtcUtils {
 
     public static int worldTimeToYears(World world){
         return (int) ((world.getFullTime()/1000)/24)/365;
-    }
-
-    @Deprecated
-    public static int randomInRange(int min, int max) {
-        return new CrownRandom().intInRange(min, max);
     }
 
     //True if the string is null or contains only blank spaces
@@ -72,7 +61,7 @@ public final class FtcUtils {
     }
 
     public static String addAnS(long amount){
-        if(amount == 1 || amount == -1) return "";
+        if(amount == 1) return "";
         return "s";
     }
 
@@ -152,8 +141,7 @@ public final class FtcUtils {
     }
 
     public static void handleSyntaxException(Audience sender, CommandSyntaxException exception) {
-        if(exception instanceof RoyalCommandException) {
-            RoyalCommandException e = (RoyalCommandException) exception;
+        if(exception instanceof RoyalCommandException e) {
             sender.sendMessage(e.formattedText());
             return;
         }

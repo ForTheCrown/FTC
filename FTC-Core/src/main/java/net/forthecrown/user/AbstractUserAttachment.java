@@ -8,9 +8,11 @@ public abstract class AbstractUserAttachment
         JsonSerializable, JsonDeserializable
 {
     protected final FtcUser user;
+    public final String serialKey;
 
-    public AbstractUserAttachment(FtcUser user) {
+    public AbstractUserAttachment(FtcUser user, String serialKey) {
         this.user = user;
+        this.serialKey = serialKey;
     }
 
     @Override

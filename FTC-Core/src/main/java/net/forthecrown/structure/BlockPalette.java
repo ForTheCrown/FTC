@@ -37,7 +37,7 @@ public class BlockPalette implements NbtSerializable {
             stateDataTag.remove("Y");
             stateDataTag.remove("Z");
 
-            add(Vector3i.of(pos), stateDataTag.size() > 3 ? stateDataTag : null);
+            add(Vector3i.of(pos), stateDataTag.isEmpty() ? null : stateDataTag);
         }
     }
 

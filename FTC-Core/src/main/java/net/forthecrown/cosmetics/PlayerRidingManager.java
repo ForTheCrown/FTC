@@ -8,14 +8,17 @@ import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcFlags;
+import net.forthecrown.core.Worlds;
 import net.forthecrown.inventory.FtcItems;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.core.Worlds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,8 +29,8 @@ import java.util.Set;
 
 public class PlayerRidingManager implements Listener {
 
-    static final Location RETREAT_LOCATION = new Location(Bukkit.getWorld("world"), 200.5, 71, 1000.5);
-    public static final Location HAZELGUARD = new Location(Worlds.OVERWORLD, 200.5, 70, 1000.5);
+    static final Location RETREAT_LOCATION = new Location(Bukkit.getWorld("world"), 200.5, 74, 200.5);
+    public static final Location HAZELGUARD = new Location(Worlds.OVERWORLD, 200.5, 74, 200.5);
 
     private final ObjectSet<PlayerRider> riders;
 
@@ -56,8 +59,7 @@ public class PlayerRidingManager implements Listener {
         CrownUser ridden  = UserManager.getUser(riddenPlayer);
 
         if(!canRide(user, ridden)) return;
-        if(Cooldown.contains(user)) return;
-        Cooldown.add(user, 20);
+        if(Cooldown.containsOrAdd(user, 20)) return;
 
         if(rider.isInsideVehicle() || riddenPlayer.getPassengers().size() > 0 || rider.getPassengers().size() > 0) return;
         if(!riddenPlayer.getPassengers().isEmpty()) return;

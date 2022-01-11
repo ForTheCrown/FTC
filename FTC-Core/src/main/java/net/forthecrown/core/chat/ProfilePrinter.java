@@ -25,7 +25,6 @@ import org.bukkit.Statistic;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
-import java.util.Date;
 import java.util.function.Function;
 
 public class ProfilePrinter implements ComponentPrinter {
@@ -91,7 +90,7 @@ public class ProfilePrinter implements ComponentPrinter {
         headerLength = header.length();
 
         append(
-                Component.text("----")
+                Component.text("    ")
                         .style(borderStyle)
         );
 
@@ -100,7 +99,7 @@ public class ProfilePrinter implements ComponentPrinter {
         append(Component.space());
 
         append(
-                Component.text("----")
+                Component.text("    ")
                         .style(borderStyle)
         );
 
@@ -110,7 +109,7 @@ public class ProfilePrinter implements ComponentPrinter {
     public ProfilePrinter footer() {
         newLine();
         return append(
-                Component.text("-".repeat(headerLength < 1 ? 10 : headerLength))
+                Component.text(" ".repeat(headerLength < 1 ? 10 : headerLength))
                         .style(borderStyle)
         );
     }
@@ -119,7 +118,7 @@ public class ProfilePrinter implements ComponentPrinter {
         line("Rank", user.getTitle().noEndSpacePrefix(), user.getTitle() != RankTitle.DEFAULT);
 
         if(!user.isOnline()) {
-            long offlineTime = TimeUtil.timeSince(user.getOfflinePlayer().getLastLogin());
+            long offlineTime = TimeUtil.timeSince(user.getLastLogin());
             TimePrinter printer = new TimePrinter(offlineTime);
 
             line("Last online", printer.printStringBiggest() + " ago");
@@ -246,20 +245,17 @@ public class ProfilePrinter implements ComponentPrinter {
     }
 
     private void onlineTimeThing() {
-        if(user.isOnline()){
-            append(
-                    Component.text(" Has been online for ")
-                            .color(NamedTextColor.YELLOW)
-                            .append(FtcFormatter.millisIntoTime(System.currentTimeMillis() - user.getPlayer().getLastLogin()).color(NamedTextColor.WHITE))
-            );
-        } else {
-            append(
-                    Component.text(" Has been offline for ")
-                            .color(NamedTextColor.YELLOW)
-                            .hoverEvent(Component.text(new Date(user.getOfflinePlayer().getLastLogin()).toString()))
-                            .append(FtcFormatter.millisIntoTime(System.currentTimeMillis() - user.getOfflinePlayer().getLastLogin()).color(NamedTextColor.WHITE))
-            );
-        }
+        long lastOnline = user.getLastLogin();
+        Component time = new TimePrinter(TimeUtil.timeSince(lastOnline))
+                .print()
+                .color(NamedTextColor.WHITE)
+                .hoverEvent(FtcFormatter.formatDate(lastOnline));
+
+        append(
+                Component.text(" Has been " + (user.isOnline() ? "online" : "offline") + " for ")
+                        .color(NamedTextColor.YELLOW)
+                        .append(time)
+        );
     }
 
     private Component marriageCooldown() {
@@ -268,8 +264,7 @@ public class ProfilePrinter implements ComponentPrinter {
         if(interactions.canChangeMarriageStatus()) return null;
 
         long time = interactions.getLastMarriageChange();
-        return Component.text(FtcFormatter.getDateFromMillis(time))
-                .hoverEvent(Component.text(new Date(time).toString()));
+        return FtcFormatter.formatDate(time);
     }
 
     @Override

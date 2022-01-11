@@ -15,6 +15,14 @@ import org.bukkit.generator.LimitedRegion;
  * block at set of given coordinates.
  */
 public interface BlockPlacer {
+
+    /**
+     * Places a block at the absolute coordinates given
+     * @param x The X cord
+     * @param y The Y cord
+     * @param z The Z cord
+     * @param data The block data to set
+     */
     void place(int x, int y, int z, FtcBlockData data);
 
     default void place(Vector3i pos, FtcBlockData data) {

@@ -26,4 +26,5 @@ public interface ComVarTypes {
     ComVarType<World>       WORLD       = new WorldComVarType();
     ComVarType<Key>         KEY         = new KeyComVarType();
     ComVarType<Component>   COMPONENT   = new ComponentComVarType();
+    ComVarType<Long>        TIME        = new TimeIntervalComVarType();
 }

@@ -34,8 +34,8 @@ import java.util.concurrent.CompletableFuture;
 public final class InteractionUtils {
     private InteractionUtils() {}
 
-    private static boolean isUsingFlag(StringReader reader){
-        return reader.peek() == '-';
+    private static boolean isUsingHeldItem(StringReader reader) {
+        return !reader.canRead() || reader.peek() == '-';
     }
 
     public static ItemStack parseItem(StringReader reader) throws CommandSyntaxException {
@@ -46,20 +46,17 @@ public final class InteractionUtils {
     }
 
     public static ItemStack parseGivenItem(CommandSource c, StringReader reader) throws CommandSyntaxException {
-        if(isUsingFlag(reader)) return getReferencedItem(c, reader);
+        if(isUsingHeldItem(reader)) return getReferencedItem(c, reader);
 
         return parseItem(reader);
     }
 
     public static ItemStack getReferencedItem(CommandSource c, StringReader reader) throws CommandSyntaxException {
-        if(!isUsingFlag(reader)) return null;
-
-        String reed = reader.readUnquotedString();
-        if(!reed.contains("heldItem")) throw FtcExceptionProvider.createWithContext("Invalid flag: " + reed, reader);
+        if(!isUsingHeldItem(reader)) return null;
 
         Player player = c.asPlayer();
         ItemStack main = player.getInventory().getItemInMainHand();
-        if(FtcItems.isEmpty(main)) throw FtcExceptionProvider.create("You must be holding an item");
+        if(FtcItems.isEmpty(main)) throw FtcExceptionProvider.mustHoldItem();
 
         return main.clone();
     }

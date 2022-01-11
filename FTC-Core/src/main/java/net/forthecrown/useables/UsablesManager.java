@@ -1,7 +1,7 @@
 package net.forthecrown.useables;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.core.transformers.NamespaceRenamer;
+import net.forthecrown.core.Main;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -14,7 +14,7 @@ public interface UsablesManager {
      * The key that blocks and entities have to make sure they're interactable
      */
     NamespacedKey USABLE_KEY = new NamespacedKey(Crown.inst(), "useablesign");
-    NamespacedKey LEGACY_KEY = new NamespacedKey(NamespaceRenamer.OLD_NAMESPACE, "useablesign");
+    NamespacedKey LEGACY_KEY = new NamespacedKey(Main.OLD_NAMESPACE, "useablesign");
 
     /**
      * Gets a block from the given location

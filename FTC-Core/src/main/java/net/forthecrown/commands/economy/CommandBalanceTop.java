@@ -54,10 +54,12 @@ public class CommandBalanceTop extends FtcCommand {
     private int sendBaltopMessage(CommandSender sender, @Nonnegative int page){
         BalanceMap balMap = Crown.getEconomy().getMap();
 
-        final TextComponent border = Component.text(" --------- ").style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
+        final TextComponent border = Component.text("          ").style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
         TextComponent.Builder text = Component.text()
                 .append(border)
+                .append(Component.space())
                 .append(Component.translatable("commands.baltop.header").color(NamedTextColor.YELLOW))
+                .append(Component.space())
                 .append(border)
                 .append(Component.newline());
 

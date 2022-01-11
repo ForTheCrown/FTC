@@ -1,12 +1,11 @@
 package net.forthecrown.commands;
 
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.arguments.UserArgument;
-import net.forthecrown.user.CrownUser;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -43,7 +42,7 @@ public class CommandToolBlock extends FtcCommand {
         command
                 .executes(c -> function.run(c.getSource(), getUserSender(c), true))
 
-                .then(argument("user", UserArgument.user())
+                /*.then(argument("user", UserArgument.user())
                         .requires(s -> s.hasPermission(othersPerm))
 
                         .executes(c -> {
@@ -53,7 +52,7 @@ public class CommandToolBlock extends FtcCommand {
                             source.sendAdmin(adminMessageFunc.apply(user.nickDisplayName()));
                             return function.run(source, user, false);
                         })
-                );
+                )*/;
     }
 
     public interface UtilityBlockFunction{

@@ -3,22 +3,16 @@ package net.forthecrown.events;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
 import net.forthecrown.utils.FtcUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerEvent;
-import org.bukkit.plugin.PluginManager;
 
 public final class Events {
     private Events() {}
 
-    private static PluginManager pm;
-    private static Crown main;
-
     public static void init() {
-        main = Crown.inst();
-        pm = main.getServer().getPluginManager();
-
         register(new CoreListener());
 
         register(new ShopCreateListener());
@@ -44,13 +38,10 @@ public final class Events {
         register(new EnchantListeners());
 
         register(new WeaponListener());
-
-        main = null;
-        pm = null;
     }
 
     private static void register(Listener listener) {
-        pm.registerEvents(listener, main);
+        Bukkit.getPluginManager().registerEvents(listener, Crown.inst());
     }
 
     public static <E extends PlayerEvent> void handlePlayer(E event, ExceptionedListener<E> executor) {

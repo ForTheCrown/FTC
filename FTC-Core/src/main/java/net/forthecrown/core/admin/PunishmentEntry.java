@@ -112,6 +112,14 @@ public class PunishmentEntry implements JsonSerializable {
         return builder.build();
     }
 
+    public Collection<PunishmentRecord> getPast() {
+        return records;
+    }
+
+    public Collection<PunishmentRecord> getCurrent() {
+        return current.values();
+    }
+
     @Override //Serialize
     public JsonElement serialize() {
         JsonObject json = new JsonObject();

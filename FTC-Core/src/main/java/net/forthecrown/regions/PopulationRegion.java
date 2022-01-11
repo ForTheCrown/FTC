@@ -8,6 +8,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.serializer.NbtSerializable;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.math.WorldVec3i;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -15,7 +16,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.jetbrains.annotations.Nullable;
 
 public class PopulationRegion extends RegionData implements NbtSerializable {
@@ -76,18 +76,27 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
      * @param polePosition The new pole position.
      */
     public void setPolePosition(@Nullable BlockVector2 polePosition) {
+        //prev must be created before polePosition0 is called
         FtcBoundingBox prev = FtcBoundingBox.of(getWorld(), poleBoundingBox);
-        prev.expand(BlockFace.SOUTH_EAST, 1);
-        prev.forEach(b -> b.setType(Material.AIR));
 
+        // Actually sets the pole's position and updates the
+        // pole's bounding box
+        setPolePosition0(polePosition);
+
+        // But the pole must be destroyed after the pole position is set
+        // If this is done before setPolePosition0 is called, the
+        // generator will think the poleBottom position is below
+        // where it actually is, since we just destroyed the pole
+        prev.forEach(b -> b.setType(Material.AIR, false));
+
+        // If the marker isn't null and we're allowed to have marker, move it
         if(marker != null && !hasProperty(RegionProperty.FORBIDS_MARKER)) {
             BlockVector2 pos = polePosition == null ? getPos().toCenter() : polePosition;
+
             marker.setLocation(ComVars.getRegionWorld().getUID().toString(),
-                    pos.getX() + 0.5D, FtcUtils.MAX_Y, pos.getZ() + 0.5D
+                    pos.getX() + 0.5D, getPoleBoundingBox().maxY(), pos.getZ() + 0.5D
             );
         }
-
-        setPolePosition0(polePosition);
 
         Crown.getRegionManager().getGenerator().generate(this);
     }
@@ -99,7 +108,8 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
     }
 
     //Updates the pole's bounding box
-    void updatePoleBounds() {
+    @Override
+    protected void updatePoleBounds() {
         poleBoundingBox = RegionUtil.poleBoundingBox(this);
     }
 
@@ -140,5 +150,11 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
      */
     public boolean shouldSerialize() {
         return polePosition != null || !FtcUtils.isNullOrBlank(name);
+    }
+
+    public WorldVec3i getPoleBottom() {
+        BlockVector2 vec2 = getPolePosition();
+
+        return new WorldVec3i(getWorld(), vec2.getX(), getPoleBoundingBox().minY(), vec2.getZ());
     }
 }

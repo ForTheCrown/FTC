@@ -5,6 +5,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.manager.FtcUserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -47,6 +48,14 @@ public class CommandMemory extends FtcCommand {
 
                             .append(Component.text("Free memory: "))
                             .append(Component.text(Runtime.getRuntime().freeMemory()/1000000 + " MB").color(gold))
+                            .append(Component.newline())
+
+                            .append(Component.text("Loaded shops: "))
+                            .append(Component.text(Crown.getShopManager().getShops().size()).color(gold))
+                            .append(Component.newline())
+
+                            .append(Component.text("Loaded users: "))
+                            .append(Component.text(FtcUserManager.LOADED_USERS.size()).color(gold))
                             .append(Component.newline())
 
                             .append(Component.text("Worlds: "));

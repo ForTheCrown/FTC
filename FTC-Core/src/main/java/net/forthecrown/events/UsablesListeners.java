@@ -23,17 +23,17 @@ public class UsablesListeners implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        check(event.getClickedBlock(), event.getPlayer());
+        event.setCancelled(check(event.getClickedBlock(), event.getPlayer()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        check(event.getRightClicked(), event.getPlayer(), event.getHand());
+        event.setCancelled(check(event.getRightClicked(), event.getPlayer(), event.getHand()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
-        check(event.getRightClicked(), event.getPlayer(), event.getHand());
+        event.setCancelled(check(event.getRightClicked(), event.getPlayer(), event.getHand()));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -45,26 +45,36 @@ public class UsablesListeners implements Listener {
         }
     }
 
-    public void check(Entity entity, Player player, EquipmentSlot slot){
-        if(slot != EquipmentSlot.HAND) return;
-        if(player.getGameMode() == GameMode.SPECTATOR) return;
-
-        if(Cooldown.contains(player, cooldownCategory)) return;
-        Cooldown.add(player, cooldownCategory, 10);
+    public boolean check(Entity entity, Player player, EquipmentSlot slot){
+        if(slot != EquipmentSlot.HAND) return false;
+        if(!check0(player)) return false;
 
         try {
-            if(manager.isInteractableEntity(entity)) manager.getEntity(entity).interact(player);
+            if(manager.isInteractableEntity(entity)) {
+                manager.getEntity(entity).interact(player);
+                return true;
+            }
         } catch (NullPointerException ignored) {}
+
+        return false;
     }
 
-    public void check(Block block, Player player){
-        if(player.getGameMode() == GameMode.SPECTATOR) return;
+    private boolean check0(Player player) {
+        if(player.getGameMode() == GameMode.SPECTATOR) return false;
+        return !Cooldown.containsOrAdd(player, cooldownCategory, 10);
+    }
 
-        if(Cooldown.contains(player, cooldownCategory)) return;
-        Cooldown.add(player, cooldownCategory, 10);
+    // Returns whether the event should be cancelled
+    public boolean check(Block block, Player player){
+        if(!check0(player)) return false;
 
         try {
-            if(manager.isInteractableSign(block)) manager.getBlock(block.getLocation()).interact(player);
+            if(manager.isInteractableSign(block)) {
+                manager.getBlock(block.getLocation()).interact(player);
+                return true;
+            }
         } catch (NullPointerException ignored) {}
+
+        return false;
     }
 }

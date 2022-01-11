@@ -9,7 +9,6 @@ import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.FtcJailManager;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.core.kingship.FtcKingship;
-import net.forthecrown.core.transformers.NamespaceRenamer;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.dungeons.Bosses;
@@ -48,7 +47,10 @@ import static net.forthecrown.utils.FtcUtils.safeRunnable;
  * Main class that does all the dirty internal stuff
  */
 public final class Main extends JavaPlugin implements Crown {
-    public static final String NAME = "ForTheCrown";
+    public static final String
+            NAME            = "ForTheCrown",
+            NAMESPACE       = NAME.toLowerCase(),
+            OLD_NAMESPACE   = "ftccore";
 
     static ComVar<Boolean>          inDebugMode;
 
@@ -57,7 +59,6 @@ public final class Main extends JavaPlugin implements Crown {
     static Location                 serverSpawn;
     static Logger                   logger;
     static String                   prefix = "&6[FTC]&r  ";
-    static String                   discord;
 
     static FtcEconomy               economy;
     static FtcAnnouncer             announcer;
@@ -83,6 +84,7 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcMarkets               markets;
     static HazelguardTradersGuild   tradersGuild;
     static PeriodicalSaver          saver;
+    static AfkScanner               afkScanner;
 
     static LuckPerms                luckPerms;
 
@@ -93,22 +95,20 @@ public final class Main extends JavaPlugin implements Crown {
         saveDefaultConfig();
         getConfig().options().copyDefaults(true);
 
-        FtcBootStrap.secondPhase();
+        FtcBootStrap.enableBootStrap();
 
         announcer.doBroadcasts();
         dayUpdate.checkDay();
 
-        logger.info("FTC startup completed");
-
         /*if(RwResetter.shouldReset()) {
             RwResetter.reset();
         }*/
+
+        logger.info("FTC startup completed");
     }
 
     @Override
     public void onLoad() {
-        NamespaceRenamer.run(getLogger(), getDataFolder());
-
         VanillaChanges.softerDeepslate();
         inst = this;
 
@@ -122,7 +122,7 @@ public final class Main extends JavaPlugin implements Crown {
         saveResource("banned_words.json", true);
 
         RoyalCommandException.ENABLE_HOVER_STACK_TRACE = Crown.inDebugMode();
-        FtcBootStrap.firstPhase();
+        FtcBootStrap.loadBootStrap();
     }
 
     @Override
@@ -160,7 +160,6 @@ public final class Main extends JavaPlugin implements Crown {
         Configuration config = getConfig();
 
         prefix = config.getString("Prefix");
-        discord = config.getString("Discord");
 
         ComVars.reload();
 
@@ -185,6 +184,6 @@ public final class Main extends JavaPlugin implements Crown {
 
     @Override
     public @NonNull String namespace() {
-        return NAME.toLowerCase();
+        return NAMESPACE;
     }
 }

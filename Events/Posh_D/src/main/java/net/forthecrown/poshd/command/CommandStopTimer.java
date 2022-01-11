@@ -58,7 +58,7 @@ public class CommandStopTimer extends AbstractCommand {
                                             }
 
                                             // Remove them from the parkour objective
-                                            Objective parkour = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("parkour");
+                                            Objective parkour = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("parkourt");
                                             if(parkour != null) {
                                                 Score score = parkour.getScore(player.getName());
                                                 score.resetScore();

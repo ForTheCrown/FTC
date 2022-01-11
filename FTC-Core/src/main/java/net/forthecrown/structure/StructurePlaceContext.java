@@ -12,16 +12,22 @@ import java.util.List;
 public class StructurePlaceContext {
     private final BlockStructure structure;
     private final List<BlockProcessor> processors = new ObjectArrayList<>();
+    private final List<StructureTransform> transforms = new ObjectArrayList<>();
+    private final List<EntityProcessor> entityProcessors = new ObjectArrayList<>();
     private final Vector3i destination;
     private final BlockPlacer placer;
     private PlaceRotation rotation;
     private Vector3i pivot;
+    private boolean placeEntities;
 
     public StructurePlaceContext(BlockStructure structure, Vector3i destination, BlockPlacer placer) {
         this.structure = structure;
         this.destination = destination;
         this.placer = placer;
         this.pivot = Vector3i.ZERO;
+        this.rotation = PlaceRotation.D_0;
+
+        addTransform(StructureTransform.DEFAULT);
     }
 
     public BlockStructure getStructure() {
@@ -39,9 +45,13 @@ public class StructurePlaceContext {
      * @return The absolute coordinate
      */
     public Vector3i toAbsolute(Vector3i relative) {
-        // TODO This is where rotations and any other
-        // potential position modifers should be applied
-        return getDestination().add(relative);
+        Vector3i result = relative.clone();
+
+        for (StructureTransform t: transforms) {
+            result = t.apply(getDestination(), relative.clone(), result);
+        }
+
+        return result == null ? StructureTransform.DEFAULT.apply(getDestination(), relative.clone(), null) : result;
     }
 
     public StructurePlaceContext setRotation(PlaceRotation rotation) {
@@ -53,6 +63,11 @@ public class StructurePlaceContext {
         return rotation;
     }
 
+    public StructurePlaceContext addTransform(StructureTransform transform) {
+        transforms.add(transform);
+        return this;
+    }
+
     public StructurePlaceContext addProccessor(BlockProcessor processor) {
         this.processors.add(processor);
         return this;
@@ -61,6 +76,15 @@ public class StructurePlaceContext {
     public StructurePlaceContext addEmptyProcessor() {
         return addProccessor(new EmptyBlockProcessor());
     }
+
+    public StructurePlaceContext addEntityProcessor(EntityProcessor processor) {
+        this.entityProcessors.add(processor);
+        return this;
+    }
+
+    /*public StructurePlaceContext addEmptyEntityProcessor() {
+        return addEntityProcessor(new EmptyEntityProcessor());
+    }*/
 
     public StructurePlaceContext setPivot(Vector3i pivot) {
         this.pivot = pivot;
@@ -77,6 +101,15 @@ public class StructurePlaceContext {
 
     public BlockPlacer getPlacer() {
         return placer;
+    }
+
+    public StructurePlaceContext placeEntities(boolean placeEntities) {
+        this.placeEntities = placeEntities;
+        return this;
+    }
+
+    public boolean placeEntities() {
+        return placeEntities;
     }
 
     BlockPlaceData runProccessors(BlockPalette palette, BlockPalette.StateData data) {

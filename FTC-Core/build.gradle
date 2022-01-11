@@ -2,6 +2,7 @@ import java.util.function.Consumer
 
 plugins {
     id 'java'
+    id 'io.papermc.paperweight.userdev' version '1.3.3'
 }
 
 group = 'net.forthecrown'
@@ -22,6 +23,9 @@ repositories {
 }
 
 dependencies {
+    //Paper and NMS dependency
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.18.1-R0.1-SNAPSHOT")
+
     //DO NO CHANGE VERSIONS, Paper has these exact versions shaded into it
     compileOnly 'io.netty:netty-all:4.1.68.Final'
     compileOnly 'io.papermc.paper:paper-api:1.18-R0.1-SNAPSHOT'
@@ -33,14 +37,13 @@ dependencies {
     compileOnly 'com.mojang:datafixerupper:4.0.26'
 
     //Annotations????
-    compileOnly 'org.jetbrains:annotations:19.0.0'
+    compileOnly 'org.jetbrains:annotations:22.0.0'
 
     //LuckPerms and WorldGuard
     compileOnly 'com.github.lucko:LuckPerms:5.3'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT'
 
-    //Paper, Grenadier, Squire, FAWE
-    libJar('Paper')
+    //Grenadier, Squire, FAWE
     libJar('Grenadier')
     libJar('Squire')
     libJar('FAWE')
@@ -52,37 +55,9 @@ void libJar(String s) {
     dependencies.compileOnly(files('/libs/' + s + '.jar'))
 }
 
-tasks.jar {
-    archiveFileName.set("${project.name}.jar")
-}
-
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 }
-
-//Does the building and remapping all in one click of a button. :DDDDD
-tasks.register('remap', Copy) {
-    incrementBuildID()
-
-    it.dependsOn(build)
-    it.from "$buildDir/libs" into "/remapping"
-
-    it.doLast {
-        exec {
-            workingDir '/remapping'
-            commandLine 'cmd', '/c', 'remap.bat'
-        }
-    }
-}
-
-tasks.register('resetBuildID') {
-    resetBuildID()
-}
-
-tasks.register('incrementBuildID') {
-    incrementBuildID()
-}
-
 
 processResources {
     File pluginYml = new File('build/resources/main/plugin.yml')
@@ -101,7 +76,7 @@ String buildVersion() {
     Calendar cal = Calendar.getInstance();
     int day = cal.get(Calendar.DAY_OF_MONTH);
     int year = cal.get(Calendar.YEAR);
-    int month = cal.get(Calendar.MONTH);
+    int month = cal.get(Calendar.MONTH) + 1;
 
     return year + "-" + month + "-" + day + "-" + buildID()
 }
@@ -125,10 +100,6 @@ void incrementBuildID() {
     });
 }
 
-void resetBuildID() {
-    consumeProperties(p -> p.setProperty("buildID", "1"))
-}
-
 void consumeProperties(Consumer<Properties> propertiesConsumer) {
     File f = new File(project.projectDir, 'buildver.properties')
     Properties properties = new Properties()
@@ -137,4 +108,13 @@ void consumeProperties(Consumer<Properties> propertiesConsumer) {
     propertiesConsumer.accept(properties)
 
     properties.store(new FileOutputStream(f), "Saves the last build ID, last build:")
+}
+
+assemble {
+    archivesBaseName = 'ForTheCrown-Plugin'
+    dependsOn(reobfJar)
+}
+
+build {
+    incrementBuildID()
 }

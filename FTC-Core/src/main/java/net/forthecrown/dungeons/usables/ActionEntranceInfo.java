@@ -71,6 +71,7 @@ public class ActionEntranceInfo implements UsageAction<ActionEntranceInfo.Action
 
     public enum Type implements Translatable {
         BOSS_SPAWN,
+        DEATH,
         LEVEL_INFO;
 
         private final String translationKey;

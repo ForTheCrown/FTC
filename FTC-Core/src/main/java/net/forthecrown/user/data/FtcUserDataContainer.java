@@ -19,7 +19,7 @@ public class FtcUserDataContainer extends AbstractUserAttachment implements User
     private final Map<Key, JsonElement> data = new Object2ObjectOpenHashMap<>();
 
     public FtcUserDataContainer(FtcUser user){
-        super(user);
+        super(user, "dataContainer");
     }
 
     @Override
@@ -51,6 +51,11 @@ public class FtcUserDataContainer extends AbstractUserAttachment implements User
     @Override
     public int size() {
         return data.size();
+    }
+
+    @Override
+    public void clear() {
+        data.clear();
     }
 
     @Override

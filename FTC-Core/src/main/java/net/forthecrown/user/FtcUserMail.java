@@ -17,7 +17,7 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
     private final ObjectList<MailMessage> mail = new ObjectArrayList<>();
 
     public FtcUserMail(FtcUser user) {
-        super(user);
+        super(user, "mail");
     }
 
     @Override

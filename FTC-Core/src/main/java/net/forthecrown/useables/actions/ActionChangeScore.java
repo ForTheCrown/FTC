@@ -24,8 +24,6 @@ public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionIn
     public static final Key SET_KEY = Keys.forthecrown("set_score");
 
     private final Action action;
-    //private Objective objective;
-    //private int amount;
 
     public ActionChangeScore(Action action){
         this.action = action;
@@ -124,53 +122,6 @@ public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionIn
         }
     }
 
-    /*@Override
-    public void onInteract(Player player) {
-        Score score = objective.getScore(player.getName());
-
-        int newScore = score.isScoreSet() ? score.getScore() : 0;
-        newScore = action.apply(newScore, amount);
-
-        score.setScore(newScore);
-    }
-
-    @Override
-    public String asString() {
-        return key().asString() + "{" +
-                "amount=" + amount +
-                ",objective=" + objective.getName() +
-                "}";
-    }
-
-    @Override
-    public @NonNull Key key() {
-        return switch (action) {
-            case DECREMENT -> REMOVE_KEY;
-            case SET -> SET_KEY;
-            case INCREMENT -> ADD_KEY;
-        };
-    }
-
-    public Action getAction() {
-        return action;
-    }
-
-    public Objective getObjective() {
-        return objective;
-    }
-
-    public void setObjective(Objective objective) {
-        this.objective = objective;
-    }
-
-    public int getAmount() {
-        return amount;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }*/
-
     public interface IntBiOperator {
         int apply(int score, int amount);
     }
@@ -191,41 +142,3 @@ public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionIn
         }
     }
 }
-
-
-    /*@Override
-    public void parse(JsonElement element) throws CommandSyntaxException {
-        JsonObject json = element.getAsJsonObject();
-
-        amount = json.get("amount").getAsInt();
-
-        String objName = json.get("objective").getAsString();
-
-        this.objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(objName);
-        if(objective == null) throw ObjectiveArgumentImpl.UNKNOWN_OBJECTIVE.create(objName);
-    }
-
-    @Override
-    public void parse(CommandContext<CommandSource> context, StringReader reader) throws CommandSyntaxException {
-        String obj = reader.readUnquotedString();
-        if(!reader.canRead()) throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherExpectedArgumentSeparator().createWithContext(reader);
-        reader.skipWhitespace();
-
-        int amount = reader.readInt();
-
-        Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(obj);
-        if(objective == null) throw ObjectiveArgumentImpl.UNKNOWN_OBJECTIVE.createWithContext(reader, obj);
-
-        this.objective = objective;
-        this.amount = amount;
-    }
-
-        @Override
-    public JsonElement serialize() {
-        JsonObject json = new JsonObject();
-
-        json.add("objective", new JsonPrimitive(objective.getName()));
-        json.add("amount", new JsonPrimitive(amount));
-
-        return json;
-    }*/

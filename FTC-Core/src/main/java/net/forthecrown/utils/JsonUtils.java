@@ -5,9 +5,9 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Worlds;
-import net.forthecrown.core.nbt.NbtHandler;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.server.players.BanListEntry;
 import org.apache.commons.lang3.Validate;
@@ -107,7 +107,7 @@ public final class JsonUtils {
 
     //Writes the item using its NBT
     public static JsonPrimitive writeItem(ItemStack itemStack){
-        return new JsonPrimitive(NbtHandler.ofItem(itemStack).serialize());
+        return new JsonPrimitive(CraftItemStack.asNMSCopy(itemStack).save(new CompoundTag()).toString());
     }
 
     public static JsonPrimitive writeKey(Keyed keyed) {
@@ -124,7 +124,7 @@ public final class JsonUtils {
 
     // Read the UUID from the element
     // if element is a number, the ID is stored as a BigInteger
-    // if it's a string, it's stored as a string representation
+    // if it's a string, it's read as a string representation
     // of the uuid
     public static UUID readUUID(JsonElement element){
         JsonPrimitive primitive = element.getAsJsonPrimitive();
@@ -135,7 +135,8 @@ public final class JsonUtils {
         } else return UUID.fromString(primitive.getAsString());
     }
 
-    //Writes the UUID as a BigInteger using the byte[] gotten from toByteArray(UUID)
+    // Writes the UUID as a BigInteger using some code I copied
+    // and pasted from Google
     public static JsonPrimitive writeUUID(UUID id){
         return new JsonPrimitive(convertToBigInteger(id));
     }
@@ -149,11 +150,8 @@ public final class JsonUtils {
 
         // If any of lo/hi parts is negative interpret as unsigned
 
-        if (hi.signum() < 0)
-            hi = hi.add(B);
-
-        if (lo.signum() < 0)
-            lo = lo.add(B);
+        if (hi.signum() < 0) hi = hi.add(B);
+        if (lo.signum() < 0) lo = lo.add(B);
 
         return lo.add(hi.multiply(B));
     }
@@ -163,11 +161,8 @@ public final class JsonUtils {
         BigInteger hi = parts[0];
         BigInteger lo = parts[1];
 
-        if (L.compareTo(lo) < 0)
-            lo = lo.subtract(B);
-
-        if (L.compareTo(hi) < 0)
-            hi = hi.subtract(B);
+        if (L.compareTo(lo) < 0) lo = lo.subtract(B);
+        if (L.compareTo(hi) < 0) hi = hi.subtract(B);
 
         return new UUID(hi.longValueExact(), lo.longValueExact());
     }
@@ -219,6 +214,10 @@ public final class JsonUtils {
     static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();
+
+    public static Gson getGSON() {
+        return gson;
+    }
 
     //Writes json to a file
     public static void writeFile(JsonElement json, File f) throws IOException {

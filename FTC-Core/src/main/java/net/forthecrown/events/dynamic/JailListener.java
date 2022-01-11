@@ -29,13 +29,17 @@ public class JailListener implements Listener {
         record = Crown.getPunishmentManager().getEntry(player.getUniqueId()).getCurrent(PunishmentType.JAIL);
         Crown.getJailManager().addListener(this);
 
-        checkDistance();
+        player.teleport(jail);
     }
 
-    public boolean invertedPlayerCheck(Player player){ return !player.equals(this.player); }
+    public boolean isNotPlayer(Player player){ return !player.equals(this.player); }
     public void checkDistance(){
         if(!checkJailed()) return;
-        if(player.getLocation().distance(jail) > 7.5) player.teleport(jail);
+        Location pLoc = player.getLocation();
+
+        if(!pLoc.getWorld().equals(jail.getWorld()) || player.getLocation().distance(jail) > 7.5) {
+            player.teleport(jail);
+        }
     }
     public boolean checkJailed(){
         if(Crown.getPunishmentManager().checkJailed(player)) return true;
@@ -58,7 +62,7 @@ public class JailListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-        if(invertedPlayerCheck(event.getPlayer())) return;
+        if(isNotPlayer(event.getPlayer())) return;
 
         player.sendMessage(Component.text("Cannot use commands while jailed").color(NamedTextColor.RED));
         event.setCancelled(true);
@@ -66,7 +70,7 @@ public class JailListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
-        if(invertedPlayerCheck(event.getPlayer())) return;
+        if(isNotPlayer(event.getPlayer())) return;
 
         checkDistance();
     }

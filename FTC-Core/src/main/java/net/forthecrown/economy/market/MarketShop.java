@@ -11,6 +11,7 @@ import net.forthecrown.utils.math.Vector3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.UUID;
@@ -143,6 +144,13 @@ public interface MarketShop extends JsonSerializable, Nameable, Struct {
      * @return
      */
     ObjectList<String> getConnectedNames();
+
+    void setEvictionDate(@Nullable Date date);
+    Date getEvictionDate();
+
+    default boolean markedForEviction() {
+        return getEvictionDate() != null;
+    }
 
     default Vector3i getBackupPos() {
         return Vector3i.of(getWorldGuard().getMinimumPoint())

@@ -62,9 +62,6 @@ class CrownExceptionProvider {
     static final TranslatableExceptionType MARRIAGE_CANNOT_CHANGE_T =   new TranslatableExceptionType("marriage.cannotChange.target");
     static final TranslatableExceptionType NOT_MARRIED =                new TranslatableExceptionType("marriage.notMarried");
 
-    static final TranslatableExceptionType NOT_PIRATE =                 new TranslatableExceptionType("pirates.exclusive");
-    static final TranslatableExceptionType GOTTA_BE_PIRATE =            new TranslatableExceptionType("pirates.wrongBranch");
-
     static final TranslatableExceptionType SHOP_OUT_OF_STOCK =          new TranslatableExceptionType("shops.error.outOfStock");
     static final TranslatableExceptionType SHOP_DONT_HAVE_ITEM =        new TranslatableExceptionType("shops.error.dontHaveItem");
     static final TranslatableExceptionType SHOP_OWNER_CANNOT_AFFORD =   new TranslatableExceptionType("shops.error.ownerCannotAfford");

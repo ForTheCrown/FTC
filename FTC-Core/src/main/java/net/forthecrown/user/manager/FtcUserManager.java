@@ -1,10 +1,12 @@
 package net.forthecrown.user.manager;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.AbstractYamlSerializer;
 import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.serializer.UserSerializer;
+import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.FtcUserAlt;
 import net.forthecrown.user.actions.FtcUserActionHandler;
@@ -13,7 +15,9 @@ import net.forthecrown.utils.MapUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public final class FtcUserManager extends AbstractYamlSerializer implements UserManager {
 
@@ -113,6 +117,28 @@ public final class FtcUserManager extends AbstractYamlSerializer implements User
     }
 
     @Override
+    public CompletableFuture<List<CrownUser>> getAllUsers() {
+        return CompletableFuture.supplyAsync(() -> {
+            File userDir = UserJsonSerializer.USER_DIR;
+            List<CrownUser> users = new ObjectArrayList<>();
+
+            for (File f: userDir.listFiles()) {
+                String fName = f.getName();
+                UUID id = UUID.fromString(fName.substring(0, fName.indexOf('.')));
+
+                try {
+                    users.add(UserManager.getUser(id));
+                } catch (Exception e) {
+                    Crown.logger().warning("Couldn't load data of user " + id + ". Corrupted or invalid data?");
+                    e.printStackTrace();
+                }
+            }
+
+            return users;
+        });
+    }
+
+    @Override
     public UserActionHandler getActionHandler() {
         return actionHandler;
     }
@@ -120,5 +146,15 @@ public final class FtcUserManager extends AbstractYamlSerializer implements User
     @Override
     public UserSerializer getSerializer() {
         return serializer;
+    }
+
+    @Override
+    public void unloadOffline() {
+        Iterator<Map.Entry<UUID, FtcUser>> iterator = LOADED_USERS.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            FtcUser u = iterator.next().getValue();
+            if(!u.isOnline()) iterator.remove();
+        }
     }
 }

@@ -3,7 +3,7 @@ package net.forthecrown.core;
 import com.sk89q.worldedit.math.BlockVector2;
 import net.forthecrown.regions.RegionData;
 import net.forthecrown.regions.RegionProperty;
-import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.regions.RegionUtil;
 import org.dynmap.DynmapCommonAPI;
 import org.dynmap.DynmapCommonAPIListener;
 import org.dynmap.markers.Marker;
@@ -30,6 +30,7 @@ public class FtcDynmap extends DynmapCommonAPIListener {
     @Override
     public void apiDisabled(DynmapCommonAPI api) {
         enabled = false;
+        FtcDynmap.api = null;
     }
 
     static MarkerIcon getOrCreate(String id) {
@@ -70,7 +71,7 @@ public class FtcDynmap extends DynmapCommonAPIListener {
 
         return marker != null ? marker : getRegionPoleSet().createMarker(
                 data.getPos().toString(), data.getName(), ComVars.getRegionWorld().getName(),
-                vec2.getX() + 0.5D, FtcUtils.MAX_Y, vec2.getZ() + 0.5D,
+                vec2.getX() + 0.5D, RegionUtil.getPoleTop(data), vec2.getZ() + 0.5D,
                 data.hasProperty(RegionProperty.PAID_REGION) ? getSpecialIcon() : getNormalIcon(),
                 true
         );

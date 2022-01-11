@@ -55,7 +55,7 @@ public final class RegionUtil {
         return findBottom(p.below());
     }
 
-    public static WorldVec3i findBottomLazy(WorldVec3i vec3i) {
+    private static WorldVec3i findBottomLazy(WorldVec3i vec3i) {
         Material mat = vec3i.getMaterial();
 
         if(mat.isAir()) return findBottomLazy(vec3i.below());
@@ -130,5 +130,9 @@ public final class RegionUtil {
         }
 
         return properties;
+    }
+
+    public static int getPoleTop(RegionData data) {
+        return data instanceof PopulationRegion ? ((PopulationRegion) data).getPoleBoundingBox().maxY() : FtcUtils.MAX_Y;
     }
 }

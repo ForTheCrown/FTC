@@ -13,7 +13,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 import static net.forthecrown.commands.manager.CrownExceptionProvider.*;
@@ -200,14 +199,6 @@ public interface FtcExceptionProvider {
 
     static RoyalCommandException notMarried(){
         return NOT_MARRIED.create();
-    }
-
-    static RoyalCommandException notPirate(){
-        return NOT_PIRATE.create(NamedTextColor.YELLOW, Component.text("/visit Questmoor").color(NamedTextColor.GOLD));
-    }
-
-    static RoyalCommandException realPirate(Entity name) {
-        return GOTTA_BE_PIRATE.create(NamedTextColor.YELLOW, FtcFormatter.displayName(name).color(NamedTextColor.YELLOW));
     }
 
     static RoyalCommandException cannotPayBlocked() {

@@ -1,8 +1,8 @@
 {
     "onFirstJoinKit": "forthecrown:noobs",
-    "treasureWorld": "world_resource",
     "regionWorld": "world",
     "spawnRegion": "Hazelguard",
+    "discordLink": "https://discord.gg/wXjHNdp",
     "maxNickLength": 16,
     "maxBossDifficulty": 7,
     "maxTreasureItems": 5,
@@ -13,7 +13,6 @@
 
     "marriageCooldown": 259200000,
     "userDataResetInterval": 5356800000,
-    "branchSwapCooldown": 172800000,
     "autoSaveIntervalMins": 60,
     "marketOwnershipSafeTime": 1209600000,
     "evictionCleanupTime": 259200000,
@@ -23,6 +22,7 @@
     "marketStatusCooldown": 172800000,
     "resourceWorldResetInterval": 6912000000,
     "nextResourceWorldReset": -1,
+    "afkScanIntervalTicks": 6000,
 
     "allowOtherPlayerNicks": false,
     "taxesEnabled": false,
@@ -32,15 +32,12 @@
     "crownEventIsTimed": false,
     "hulkSmashPoles": true,
     "endOpen": false,
-    "allowNonOwnerSwords": true,
+    "allowNonOwnerSwords": false,
 
     "effectCost_arrow": 1000,
     "effectCost_death": 2000,
     "effectCost_travel": 2500,
     "swordGoalGainPerKill": 1,
-    "advReward_task": 100,
-    "advReward_challenge": 200,
-    "advReward_goal": 500,
     "houses_startingSupply": 250,
     "houses_startingDemand": 0,
     "tpTickDelay": 60,

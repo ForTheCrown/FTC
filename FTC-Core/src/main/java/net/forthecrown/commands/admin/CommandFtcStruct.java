@@ -13,6 +13,7 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.StructurePlaceContext;
+import net.forthecrown.structure.StructureScanContext;
 import net.forthecrown.utils.BlockPlacer;
 import net.forthecrown.utils.math.Vector3i;
 import org.bukkit.Location;
@@ -65,7 +66,12 @@ public class CommandFtcStruct extends FtcCommand {
                                     Vector3i size = Vector3i.of(region.getDimensions());
 
                                     BlockStructure structure = new BlockStructure(c.getArgument("key", NamespacedKey.class));
-                                    structure.scanFromWorld(world, size, start, block -> block.getType() != Material.STRUCTURE_VOID);
+
+                                    StructureScanContext context = new StructureScanContext(world, start, size)
+                                            .blockFilter(block -> block.getType() != Material.STRUCTURE_VOID)
+                                            /*.includeEntities(true)*/;
+
+                                    structure.scanFromWorld(context);
 
                                     Registries.STRUCTURES.register(structure.key(), structure);
 

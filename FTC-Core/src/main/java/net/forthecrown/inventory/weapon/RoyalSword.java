@@ -4,9 +4,9 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
+import net.forthecrown.core.Main;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.Announcer;
-import net.forthecrown.core.transformers.NamespaceRenamer;
 import net.forthecrown.inventory.RankedItem;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.click.ClickHistory;
@@ -97,7 +97,7 @@ public class RoyalSword extends RankedItem {
 
         for (String s: goalsTag.getAllKeys()) {
             Key k = FtcUtils.parseKey(s);
-            if(k.namespace().equals(NamespaceRenamer.OLD_NAMESPACE)) k = Keys.forthecrown(k.value());
+            if(k.namespace().equals(Main.OLD_NAMESPACE)) k = Keys.forthecrown(k.value());
             int progress = goalsTag.getInt(s);
 
             WeaponGoal goal = Registries.WEAPON_GOALS.get(k);

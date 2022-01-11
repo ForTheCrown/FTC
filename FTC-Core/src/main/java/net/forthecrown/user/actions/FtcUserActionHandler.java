@@ -7,6 +7,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.chat.BannedWords;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.regions.visit.RegionVisit;
 import net.forthecrown.regions.visit.VisitPredicate;
@@ -16,14 +17,15 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserMail;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.CrownRandom;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -171,15 +173,21 @@ public class FtcUserActionHandler implements UserActionHandler {
             throw FtcExceptionProvider.translatable("mail.none." + (self ? "self" : "other"));
         }
 
+        final Component border = Component.text("               ")
+                .style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
         TextComponent.Builder builder = Component.text()
                 .color(NamedTextColor.YELLOW)
+                .append(border)
+                .append(Component.space())
                 .append(
                         Component.translatable(
                                 "mail.header." + (self ? "self" : "other"),
                                 query.getUser().nickDisplayName()
                                         .color(NamedTextColor.GOLD)
                         )
-                );
+                )
+                .append(Component.space())
+                .append(border);
 
         int index = 0;
         for (UserMail.MailMessage m: messages) {
@@ -198,7 +206,7 @@ public class FtcUserActionHandler implements UserActionHandler {
                                             .hoverEvent(
                                                     Component.translatable(
                                                             "mail.metadata.date",
-                                                            Component.text(new Date(m.sent).toString())
+                                                            FtcFormatter.formatDate(m.sent)
                                                     )
                                                             .append(senderMetadata)
                                             )
@@ -210,7 +218,7 @@ public class FtcUserActionHandler implements UserActionHandler {
                                             .content(" [")
                                             .append(
                                                     Component.translatable(m.read ? "mail.read" : "mail.unread")
-                                                            .clickEvent(ClickEvent.runCommand("/mail mark_read " + query.getMail().indexOf(m)))
+                                                            .clickEvent(ClickEvent.runCommand("/mail mark_" + (m.read ? "un" : "") + "read " + query.getMail().indexOf(m)))
                                                             .hoverEvent(Component.translatable(!m.read ? "mail.read.hover" : "mail.unread.hover"))
                                             )
                                             .append(Component.text("] "))
@@ -218,10 +226,17 @@ public class FtcUserActionHandler implements UserActionHandler {
 
                             .append(m.message)
             );
+
+            //m.read = true;
         }
 
         query.getSource().sendMessage(
-                builder.build()
+                builder
+                        .append(Component.newline())
+                        .append(border)
+                        .append(border)
+                        .append(border)
+                        .build()
         );
     }
 
@@ -346,8 +361,9 @@ public class FtcUserActionHandler implements UserActionHandler {
         );
     }
 
+    private static final CrownRandom RANDOM = new CrownRandom();
     private Component giveItAWeek() {
-        return FtcUtils.randomInRange(0, 1000) != 1 ? Component.text("!") :
+        return RANDOM.intInRange(0, 1000) != 1 ? Component.text("!") :
                 Component.text("... I give it a week").color(NamedTextColor.GRAY);
     }
 

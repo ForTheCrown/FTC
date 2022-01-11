@@ -509,9 +509,7 @@ public interface CrownUser extends
      * @return The user's display name
      */
     default Component displayName(){
-        return Component.text(getName())
-                .hoverEvent(this)
-                .clickEvent(asClickEvent());
+        return makeDisplayName(this, getName());
     }
 
     /**
@@ -519,9 +517,14 @@ public interface CrownUser extends
      * @return The user's display name, possibly with a nickname
      */
     default Component nickDisplayName(){
-        return Component.text(getNickOrName())
-                .hoverEvent(this)
-                .clickEvent(asClickEvent());
+        return makeDisplayName(this, getNickOrName());
+    }
+
+    private static Component makeDisplayName(CrownUser user, String text) {
+        return Component.text(text)
+                .hoverEvent(user)
+                .insertion(user.getUniqueId().toString())
+                .clickEvent(user.asClickEvent());
     }
 
     /**
@@ -877,6 +880,18 @@ public interface CrownUser extends
         sendOrMail(message, null);
     }
 
+    default void sendAndMail(Component message, @Nullable UUID sender) {
+        if(isOnline()) {
+            sendBlockableMessage(sender, message);
+        }
+
+        getMail().add(message, sender);
+    }
+
+    default void sendAndMail(Component message) {
+        sendAndMail(message, null);
+    }
+
     /**
      * Stops all riding the user might be doing
      * @param suppressCancellation Whether to ignore the result of {@link org.spigotmc.event.entity.EntityDismountEvent}, which might stop the function call
@@ -936,5 +951,12 @@ public interface CrownUser extends
     @Override
     default Component shopDisplayName() {
         return nickDisplayName();
+    }
+
+    long getLastLogin();
+
+    default long getLastSeen() {
+        if(isOnline()) return System.currentTimeMillis();
+        return getLastLogin();
     }
 }

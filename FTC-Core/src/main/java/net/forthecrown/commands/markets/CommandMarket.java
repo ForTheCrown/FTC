@@ -174,6 +174,21 @@ public class CommandMarket extends FtcCommand {
                                 })
                         )
 
+                        .then(literal("reset")
+                                .executes(c -> {
+                                    MarketShop shop = get(c);
+                                    Markets region = Crown.getMarkets();
+
+                                    region.resetFromBackup(shop);
+
+                                    c.getSource().sendAdmin(
+                                            Component.text("Reset ")
+                                                    .append(MarketDisplay.displayName(shop))
+                                    );
+                                    return 0;
+                                })
+                        )
+
                         .then(literal("unclaim")
                                 .executes(c -> {
                                     MarketShop shop = get(c);

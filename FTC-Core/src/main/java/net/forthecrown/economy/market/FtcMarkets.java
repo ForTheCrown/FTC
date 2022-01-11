@@ -27,7 +27,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import java.util.Collection;
@@ -106,7 +105,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         MarketOwnership ownership = user.getMarketOwnership();
         if(!ownership.hasOwnedBefore()) ownership.setOwnershipBegan(System.currentTimeMillis());
         ownership.setOwnedName(claim.getName());
-        ownership.setLastStatusChange(System.currentTimeMillis());
+        ownership.setLastStatusChange();
 
         claim.setOwner(user.getUniqueId());
         claim.setDateOfPurchase(new Date());
@@ -138,12 +137,13 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
         CrownUser owner = shop.ownerUser();
         MarketOwnership ownership = owner.getMarketOwnership();
-
         ownership.setOwnedName(null);
+        ownership.setLastStatusChange();
 
         shop.setDateOfPurchase(null);
         shop.setMerged(null);
         shop.setOwner(null);
+        shop.setEvictionDate(null);
 
         shop.getWorldGuard().getMembers().clear();
         shop.getCoOwners().clear();
@@ -334,11 +334,15 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
                 .getLivingEntities()
                 .stream()
                 .filter(e -> e.getType() != EntityType.PLAYER)
-                .forEach(Entity::remove);
+                .forEach(entity -> entity.setHealth(0D));
     }
 
     @Override
     public void clear() {
+        for (MarketShop m: getAllShops()) {
+            m.setEvictionDate(null);
+        }
+
         byName.clear();
         byOwner.clear();
     }

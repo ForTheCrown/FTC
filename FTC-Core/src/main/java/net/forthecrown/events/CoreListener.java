@@ -140,7 +140,7 @@ public class CoreListener implements Listener {
         if(hopperAmount <= ComVars.getHoppersInOneChunk()) return;
 
         event.setCancelled(true);
-        event.getPlayer().sendMessage(Component.text("Too many hoppers (Max " + ComVars.getHoppersInOneChunk() + ")").color(NamedTextColor.RED));
+        event.getPlayer().sendMessage(Component.text("Too many hoppers in chunk (Max " + ComVars.getHoppersInOneChunk() + ")").color(NamedTextColor.RED));
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -190,11 +190,14 @@ public class CoreListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncChatEvent event) {
+        Player player = event.getPlayer();
+        CrownUser user = UserManager.getUser(player);
+
         event.renderer(new FtcChatRenderer());
 
         //Check to make sure no bad bad's were said
-        Component rendered = event.renderer().render(event.getPlayer(), event.getPlayer().displayName(), event.message(), event.getPlayer());
-        if(BannedWords.checkAndWarn(event.getPlayer(), rendered)) {
+        Component rendered = event.renderer().render(player, player.displayName(), event.message(), player);
+        if(BannedWords.checkAndWarn(player, rendered)) {
             EavesDropper.bannedWordChat(rendered);
 
             event.setCancelled(true);
@@ -202,7 +205,6 @@ public class CoreListener implements Listener {
         }
 
         PunishmentManager punishments = Crown.getPunishmentManager();
-        Player player = event.getPlayer();
         MuteStatus status = punishments.checkMute(player);
 
         if(status != MuteStatus.NONE){
@@ -233,6 +235,16 @@ public class CoreListener implements Listener {
             });
             return;
         }
+
+        if(user.isVanished()) {
+            // Gonna make staff regret seeing this message so much
+            // they'll never again accidentally type while vanished
+            user.sendMessage("You're in vanish, no speaky speaky, cutie");
+
+            event.setCancelled(true);
+            return;
+        }
+
         //Remove ignored
         event.viewers().removeIf(a -> {
             Player p = fromAudience(a);
@@ -243,7 +255,6 @@ public class CoreListener implements Listener {
             return inter.isBlockedPlayer(player.getUniqueId());
         });
 
-        CrownUser user = UserManager.getUser(player);
         UserInteractions inter = user.getInteractions();
 
         if(inter.mChatToggled()){
@@ -354,7 +365,7 @@ public class CoreListener implements Listener {
             if(source.hasPermission(Permissions.DONATOR_2) || staffChat) strMessage = formatColorCodes(strMessage);
 
             strMessage = checkUppercase(source, strMessage);
-            message = ChatUtils.convertString(strMessage);
+            message = ChatUtils.convertString(strMessage, false);
 
             TextColor playerColor = staffChat ? NamedTextColor.GRAY : TextColor.color(230, 230, 230);
 

@@ -1,6 +1,5 @@
 package net.forthecrown.core;
 
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -15,7 +14,7 @@ class VanillaChanges {
         properties.strength(1.5F, 6F);
 
         reassign(block, properties);
-        stateReassign(((Block) block).defaultBlockState(), 1.5F);
+        stateReassign(block.defaultBlockState(), 1.5F);
     }
 
     private static BlockBehaviour.Properties properties(BlockBehaviour behaviour) {

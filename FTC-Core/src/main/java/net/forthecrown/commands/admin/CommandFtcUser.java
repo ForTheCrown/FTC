@@ -1,7 +1,5 @@
 package net.forthecrown.commands.admin;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -30,6 +28,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.actions.ActionFactory;
 import net.forthecrown.user.data.*;
+import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -238,19 +237,23 @@ public class CommandFtcUser extends FtcCommand {
 
                         .then(literal("data_container")
                                 .executes(userCmd((user, c) -> {
-                                    Gson gson = new GsonBuilder()
-                                            .setPrettyPrinting()
-                                            .create();
-
                                     StringWriter writer = new StringWriter();
                                     FtcUserDataContainer container = (FtcUserDataContainer) user.getDataContainer();
                                     JsonObject json = container.serialize();
 
-                                    if(json == null) throw FtcExceptionProvider.create("User has no tag");
+                                    if(json == null) throw FtcExceptionProvider.create("User has no dataContainer data");
 
-                                    gson.toJson(json, writer);
+                                    JsonUtils.getGSON().toJson(json, writer);
                                     c.getSource().sendMessage(writer.toString());
                                 }))
+
+                                .then(literal("clear")
+                                        .executes(userCmd((user, c) -> {
+                                            user.getDataContainer().clear();
+
+                                            c.getSource().sendAdmin("Cleared " + user.getName() + "'s dataContainer");
+                                        }))
+                                )
                         )
 
                         .then(componentArg("prefix", CrownUser::getCurrentPrefix, CrownUser::setCurrentPrefix))

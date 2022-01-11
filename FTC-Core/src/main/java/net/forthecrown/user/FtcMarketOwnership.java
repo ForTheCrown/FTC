@@ -18,7 +18,7 @@ public class FtcMarketOwnership extends AbstractUserAttachment implements Market
     private UUID outgoing;
 
     public FtcMarketOwnership(FtcUser user) {
-        super(user);
+        super(user, "marketOwnership");
     }
 
     @Override

@@ -26,7 +26,7 @@ public class TimePrinter implements ComponentPrinter {
     private void calculateUnits() {
         AtomicLong time = new AtomicLong(this.time);
 
-        years = calculate(time, TimeUtil.DAY_IN_MILLIS * 365);
+        years = calculate(time, TimeUtil.YEAR_IN_MILLIS);
         months = calculate(time, TimeUtil.MONTH_IN_MILLIS);
         days = calculate(time, TimeUtil.DAY_IN_MILLIS);
         hours = calculate(time, TimeUtil.HOUR_IN_MILLIS);
@@ -141,12 +141,12 @@ public class TimePrinter implements ComponentPrinter {
 
     public TimePrinter addMonths() {
         finalValue = areZero(years);
-        return add(days, "month");
+        return add(months, "month");
     }
 
     public TimePrinter addYears() {
         finalValue = true;
-        return add(days, "year");
+        return add(years, "year");
     }
 
     private TimePrinter add(int val, String field) {

@@ -13,7 +13,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -41,7 +40,7 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource>, Keyed,
      * @param value The value to turn into a string
      * @return The string representation of the value
      */
-    String asParsableString(@Nullable T value);
+    String asParsableString(T value);
 
     /**
      * Parses The given input into the object
@@ -52,7 +51,7 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource>, Keyed,
     @Override
     T parse(StringReader reader) throws CommandSyntaxException;
 
-    default Component display(@Nullable T value){
+    default Component display(T value){
         if(value == null) return Component.text("null");
         return Component.text(asParsableString(value));
     }
@@ -62,7 +61,7 @@ public interface ComVarType<T> extends SuggestionProvider<CommandSource>, Keyed,
      * @param value the value to serialize
      * @return The JSON representation of the given object
      */
-    JsonElement serialize(@Nullable T value);
+    JsonElement serialize(T value);
 
     /**
      * Deserializes the object from the given JSON input

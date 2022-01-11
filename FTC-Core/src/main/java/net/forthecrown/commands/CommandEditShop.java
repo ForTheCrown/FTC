@@ -43,7 +43,7 @@ public class CommandEditShop extends FtcCommand {
     }
 
     private Component makeUsageMessage(){
-        final Component border = Component.text("------------").color(NamedTextColor.DARK_GRAY).decorate(TextDecoration.STRIKETHROUGH);
+        final Component border = Component.text("                  ").color(NamedTextColor.DARK_GRAY).decorate(TextDecoration.STRIKETHROUGH);
 
         final Component header = Component.text()
                 .append(border)
@@ -53,7 +53,7 @@ public class CommandEditShop extends FtcCommand {
                 .build();
 
         final Component footer = Component.text()
-                .append(Component.text("---------------------------------------").decorate(TextDecoration.STRIKETHROUGH))
+                .append(Component.text("                                    ").decorate(TextDecoration.STRIKETHROUGH))
                 .color(NamedTextColor.DARK_GRAY)
                 .build();
 

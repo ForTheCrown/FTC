@@ -23,7 +23,7 @@ public class FtcUserCosmeticData extends AbstractUserAttachment implements Cosme
     public TravelEffect travel;
 
     FtcUserCosmeticData(FtcUser user){
-        super(user);
+        super(user, "cosmeticData");
     }
 
     @Override
