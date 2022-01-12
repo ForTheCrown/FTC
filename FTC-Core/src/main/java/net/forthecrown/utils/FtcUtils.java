@@ -39,6 +39,8 @@ public final class FtcUtils {
             MAX_Y   = 312,
             MIN_Y   = -64;
 
+    public static final CrownRandom RANDOM = new CrownRandom();
+
     public static void sendPacket(Player player, Packet<ClientGamePacketListener> packet) {
         CraftPlayer craftPlayer = (CraftPlayer) player;
         craftPlayer.getHandle().networkManager.send(packet);

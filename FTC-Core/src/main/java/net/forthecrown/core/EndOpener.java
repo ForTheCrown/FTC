@@ -3,6 +3,7 @@ package net.forthecrown.core;
 import com.google.gson.JsonElement;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.Bukkit2NMS;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.Range;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlock;
@@ -64,6 +66,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements Runnable {
         if(!setLever(open)) return;
 
         this.open = open;
+        PortalRoad.set(leverPos.getWorld(), open);
 
         Crown.getJoinInfo().setShouldShowEnd(open);
 
@@ -172,5 +175,59 @@ public class EndOpener extends FtcConfig.ConfigSection implements Runnable {
         json.addComponent("open_message", openMessage);
 
         return json.getSource();
+    }
+
+    static class PortalRoad {
+        static final Material[] ROAD_MATERIALS = {
+                Material.COBBLESTONE,
+                Material.GRAVEL,
+                Material.STONE_BRICKS,
+                Material.CRACKED_STONE_BRICKS
+        };
+
+        // Hardcoded road entry values, cuz I can't be arsed
+        // doing this in other, more dynamic, ways
+        public static final PortalRoadEntry[] ROAD_ENTRIES = {
+                //castle courtyard
+                new PortalRoadEntry(240, 77, 198),
+                new PortalRoadEntry(239, 77, 198),
+
+                new PortalRoadEntry(234, 77, 200),
+                new PortalRoadEntry(233, 77, 200),
+                new PortalRoadEntry(232, 77, 200),
+
+                new PortalRoadEntry(227, 77, 200),
+                new PortalRoadEntry(226, 77, 200),
+
+                new PortalRoadEntry(221, 77, 200),
+                new PortalRoadEntry(221, 77, 200),
+
+                //near pole
+                new PortalRoadEntry(207, 69, 200, Material.POLISHED_ANDESITE),
+                new PortalRoadEntry(206, 69, 200, Material.POLISHED_ANDESITE),
+
+                //stairs
+                new PortalRoadEntry(217, 75, 200, Material.POLISHED_ANDESITE),
+                new PortalRoadEntry(212, 71, 200, Material.POLISHED_ANDESITE),
+        };
+
+        public static void set(World world, boolean glass) {
+            for (PortalRoadEntry e: ROAD_ENTRIES) {
+                Block b = world.getBlockAt(e.x, e.y, e.z);
+
+                b.setType(glass ? Material.PURPLE_STAINED_GLASS : e.material());
+            }
+        }
+
+        record PortalRoadEntry(int x, int y, int z, Material material) {
+            PortalRoadEntry(int x, int y, int z) {
+                this(x, y, z, null);
+            }
+
+            @Override
+            public Material material() {
+                return material == null ? ROAD_MATERIALS[FtcUtils.RANDOM.nextInt(ROAD_MATERIALS.length)] : material;
+            }
+        }
     }
 }

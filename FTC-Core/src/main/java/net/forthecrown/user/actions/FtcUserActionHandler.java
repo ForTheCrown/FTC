@@ -17,7 +17,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserMail;
 import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -361,9 +361,8 @@ public class FtcUserActionHandler implements UserActionHandler {
         );
     }
 
-    private static final CrownRandom RANDOM = new CrownRandom();
     private Component giveItAWeek() {
-        return RANDOM.intInRange(0, 1000) != 1 ? Component.text("!") :
+        return FtcUtils.RANDOM.intInRange(0, 1000) != 1 ? Component.text("!") :
                 Component.text("... I give it a week").color(NamedTextColor.GRAY);
     }
 
