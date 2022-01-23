@@ -23,15 +23,6 @@ import java.util.concurrent.CompletableFuture;
  * Represents the class manages users and their ALT accounts
  */
 public interface UserManager extends CrownSerializer {
-
-    /**
-     * Gets the current instance of the UserManager
-     * @return the current UserManager instance, same as FtcCore.getUserManager(); lol
-     */
-    static @NotNull UserManager inst(){
-        return Crown.getUserManager();
-    }
-
     /**
      * Gets a user for a player
      * @param base The player to get the user of
@@ -61,7 +52,7 @@ public interface UserManager extends CrownSerializer {
         Validate.isTrue(isPlayerID(base), "Given UUID did not belong to a player");
 
         return FtcUserManager.LOADED_USERS.computeIfAbsent(base, uuid -> {
-            UserManager manager = inst();
+            UserManager manager = Crown.getUserManager();
             return manager.isAlt(uuid) ? new FtcUserAlt(uuid, manager.getMain(uuid)) : new FtcUser(uuid);
         });
     }
@@ -190,13 +181,14 @@ public interface UserManager extends CrownSerializer {
      * Gets all uses that have ever logged onto the server.
      * This WILL load all user files into the manager's tracking.
      * <p></p>
-     * This is run async because I this can't be good to run sync lmao,
-     * there's so many users and this has to load each one of their
-     * files.
+     * This is run async because I this can't be good to run sync
+     * lmao, there's so many users and this has to load each one of
+     * their files.
      * <p></p>
-     * It is heavily adviseable to unload all non-online users after
-     * any modification or interaction with the user objects
-     * @return All users that have ever been on the server
+     * It is heavily adviseable to unload all non-online users
+     * after any modification or interaction with the user objects
+     *
+     * @return All users that have user files in the user data directory
      */
     CompletableFuture<List<CrownUser>> getAllUsers();
 

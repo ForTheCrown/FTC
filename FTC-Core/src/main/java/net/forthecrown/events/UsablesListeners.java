@@ -11,7 +11,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -20,20 +19,18 @@ public class UsablesListeners implements Listener {
     private final UsablesManager manager = Crown.getUsables();
     private static final String cooldownCategory = "Core_Interactables";
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        event.setCancelled(check(event.getClickedBlock(), event.getPlayer()));
+
+        boolean b = check(event.getClickedBlock(), event.getPlayer());
+        if(b && !event.isCancelled()) event.setCancelled(true);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        event.setCancelled(check(event.getRightClicked(), event.getPlayer(), event.getHand()));
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
-        event.setCancelled(check(event.getRightClicked(), event.getPlayer(), event.getHand()));
+        boolean b = check(event.getRightClicked(), event.getPlayer(), event.getHand());
+        if(b && !event.isCancelled()) event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -47,7 +44,7 @@ public class UsablesListeners implements Listener {
 
     public boolean check(Entity entity, Player player, EquipmentSlot slot){
         if(slot != EquipmentSlot.HAND) return false;
-        if(!check0(player)) return false;
+        if(check0(player)) return false;
 
         try {
             if(manager.isInteractableEntity(entity)) {
@@ -60,13 +57,13 @@ public class UsablesListeners implements Listener {
     }
 
     private boolean check0(Player player) {
-        if(player.getGameMode() == GameMode.SPECTATOR) return false;
-        return !Cooldown.containsOrAdd(player, cooldownCategory, 10);
+        if(player.getGameMode() == GameMode.SPECTATOR) return true;
+        return Cooldown.containsOrAdd(player, cooldownCategory, 10);
     }
 
     // Returns whether the event should be cancelled
     public boolean check(Block block, Player player){
-        if(!check0(player)) return false;
+        if(check0(player)) return false;
 
         try {
             if(manager.isInteractableSign(block)) {

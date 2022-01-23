@@ -33,8 +33,6 @@ public final class Permissions {
             IGNORE_SWEARS           = register("ftc.ignorebannedwords"),
             BROADCAST               = register("ftc.broadcast"),
 
-            SHOP_ADMIN              = register("ftc.shops.admin"),
-
             DONATOR_1               = register("ftc.donator1"),
             DONATOR_2               = register("ftc.donator2"),
             DONATOR_3               = register("ftc.donator3"),
@@ -53,6 +51,13 @@ public final class Permissions {
 
             MAIL                    = register("ftc.mail"),
             MAIL_OTHERS             = register("ftc.mail.others"),
+
+            GUILD                   = register("ftc.guilds"),
+            GUILD_ADMIN             = register(GUILD.getName() + ".admin"),
+
+            SHOP_ADMIN              = register("ftc.shops.admin"),
+            SHOP_EDIT               = register(COMMAND_PREFIX + "shopedit"),
+            SHOP_HISTORY            = register(COMMAND_PREFIX + "shophistory"),
 
             NEARBY                  = register(COMMAND_PREFIX + "near"),
             NEARBY_IGNORE           = register(COMMAND_PREFIX + "near.ignore"),

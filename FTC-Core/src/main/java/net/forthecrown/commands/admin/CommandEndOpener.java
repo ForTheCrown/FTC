@@ -2,6 +2,7 @@ package net.forthecrown.commands.admin;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.commands.arguments.ChatArgument;
@@ -16,6 +17,7 @@ import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
+import net.minecraft.world.level.Level;
 
 public class CommandEndOpener extends FtcCommand {
 
@@ -43,11 +45,42 @@ public class CommandEndOpener extends FtcCommand {
 
     @Override
     protected void createCommand(BrigadierCommand command) {
+        if(Crown.inDebugMode()) {
+            command
+                    .then(literal("regen")
+                            .executes(c -> {
+                                c.getSource().sendAdmin("Starting remake");
+
+                                EndOpener opener = opener();
+                                opener.regen();
+
+                                c.getSource().sendAdmin("Remaking The End async");
+                                return 0;
+                            })
+                    );
+        }
+
         command
+                .then(literal("close")
+                        .executes(c -> setOpen(c, false))
+                )
+                .then(literal("open")
+                        .executes(c -> setOpen(c, true))
+                )
+
                 .then(accessorArg(OpenerAccessor.CLOSE_MESSAGE))
                 .then(accessorArg(OpenerAccessor.OPEN_MESSAGE))
+                .then(accessorArg(OpenerAccessor.LEVER_POS))
                 .then(accessorArg(OpenerAccessor.ENABLED))
-                .then(accessorArg(OpenerAccessor.LEVER_POS));
+                .then(accessorArg(OpenerAccessor.SIZE));
+    }
+
+    int setOpen(CommandContext<CommandSource> c, boolean open) {
+        EndOpener opener = opener();
+        opener.setOpen(open);
+
+        c.getSource().sendAdmin((open ? "Opened" : "Closed") + " The End");
+        return 0;
     }
 
     private <T> LiteralArgumentBuilder<CommandSource> accessorArg(OpenerAccessor<T> p) {
@@ -82,6 +115,33 @@ public class CommandEndOpener extends FtcCommand {
     }
 
     private interface OpenerAccessor<T> {
+        OpenerAccessor<Integer> SIZE = new OpenerAccessor<Integer>() {
+            @Override
+            public String getName() {
+                return "size";
+            }
+
+            @Override
+            public ArgumentType<Integer> getType() {
+                return IntegerArgumentType.integer(1, Level.MAX_LEVEL_SIZE - 12);
+            }
+
+            @Override
+            public Class<Integer> getTypeClass() {
+                return Integer.class;
+            }
+
+            @Override
+            public Component display(EndOpener opener) {
+                return Component.text(opener.getEndSize());
+            }
+
+            @Override
+            public void set(EndOpener opener, Integer val, CommandContext<CommandSource> c) {
+                opener.setEndSize(val);
+            }
+        };
+
         OpenerAccessor<Boolean> ENABLED = new OpenerAccessor<>() {
             @Override
             public String getName() {

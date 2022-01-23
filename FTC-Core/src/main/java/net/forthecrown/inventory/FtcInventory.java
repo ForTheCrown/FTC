@@ -6,14 +6,15 @@ import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.utils.ItemStackBuilder;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
+import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 public interface FtcInventory extends Inventory, JsonSerializable, JsonDeserializable {
@@ -63,6 +64,24 @@ public interface FtcInventory extends Inventory, JsonSerializable, JsonDeseriali
         return firstEmpty() == -1;
     }
 
+    default @Nullable Component title() {
+        if(this instanceof CraftInventoryCustom custom) {
+            return titleFrom(custom);
+        }
+
+        return null;
+    }
+
+    static Component titleFrom(CraftInventoryCustom custom) {
+        try {
+            Class mcClass = Class.forName(CraftInventoryCustom.class.getName() + ".MinecraftInventory");
+            return (Component) mcClass.getMethod("title").invoke(custom.getInventory());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Override
     default void deserialize(JsonElement element) {
         JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
@@ -74,17 +93,25 @@ public interface FtcInventory extends Inventory, JsonSerializable, JsonDeseriali
             setItem(index, item);
         }
     }
-
-    @Override
-    default JsonObject serialize() {
+    default JsonObject serializeContents() {
         JsonWrapper json = JsonWrapper.empty();
 
         for (int i = 0; i < getSize(); i++) {
             ItemStack item = getItem(i);
-            if(FtcItems.isEmpty(item)) continue;
+            if(ItemStacks.isEmpty(item)) continue;
 
             json.addItem(i + "", getItem(i));
         }
+
+        return json.getSource();
+    }
+
+    @Override
+    default JsonElement serialize() {
+        JsonWrapper json = JsonWrapper.empty();
+
+        json.add("size", getSize());
+        json.add("contents", serializeContents());
 
         return json.getSource();
     }

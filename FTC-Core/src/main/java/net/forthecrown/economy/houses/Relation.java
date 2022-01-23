@@ -39,10 +39,6 @@ public class Relation implements JsonSerializable {
         setValue(type.getMin());
     }
 
-    public boolean isPositive() {
-        return value > 0;
-    }
-
     @Override
     public JsonElement serialize() {
         return new JsonPrimitive(value);

@@ -39,6 +39,8 @@ public class CommandEditShop extends FtcCommand {
 
         setDescription("Allows you edit a shop");
         setAliases("shopedit", "signshop");
+        setPermission(Permissions.SHOP_EDIT);
+
         register();
     }
 

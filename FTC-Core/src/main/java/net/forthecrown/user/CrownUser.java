@@ -737,7 +737,7 @@ public interface CrownUser extends
     void updateGodMode() throws UserNotOnlineException;
 
     UserDataContainer getDataContainer();
-    MarketOwnership getMarketOwnership();
+    UserMarketData getMarketData();
     CosmeticData getCosmeticData();
     UserInteractions getInteractions();
     UserHomes getHomes();
@@ -962,6 +962,6 @@ public interface CrownUser extends
     }
 
     default void delayAfkKick() {
-        AfkKicker.delay(getUniqueId());
+        AfkKicker.addOrDelay(getUniqueId());
     }
 }

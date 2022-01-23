@@ -5,14 +5,17 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.*;
+import net.forthecrown.core.ComVars;
+import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcFlags;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.shops.ShopInventory;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.economy.shops.ShopType;
 import net.forthecrown.economy.shops.SignShop;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -148,7 +151,7 @@ public class ShopCreateListener implements Listener {
             ShopInventory shopInv = shop.getInventory();
 
             ItemStack item = inv.getContents()[2];
-            if(FtcItems.isEmpty(item)){ //If example item was not found: destroy shop and tell them why they failed
+            if(ItemStacks.isEmpty(item)){ //If example item was not found: destroy shop and tell them why they failed
                 shop.destroy(false);
 
                 player.sendMessage(

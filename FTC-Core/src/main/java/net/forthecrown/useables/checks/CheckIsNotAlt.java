@@ -1,7 +1,7 @@
 package net.forthecrown.useables.checks;
 
+import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
-import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,6 +29,6 @@ public class CheckIsNotAlt implements UsageCheckInstance {
 
     @Override
     public boolean test(Player player) {
-        return !UserManager.inst().isAlt(player.getUniqueId());
+        return !Crown.getUserManager().isAlt(player.getUniqueId());
     }
 }

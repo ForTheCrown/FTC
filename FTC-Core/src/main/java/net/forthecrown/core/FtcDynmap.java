@@ -17,7 +17,8 @@ public class FtcDynmap extends DynmapCommonAPIListener {
     public static final String
             NORMAL_LABEL    = "region_pole_normal",
             SPECIAL_LABEL   = "region_pole_special",
-            SET_NAME        = "region_poles";
+            SET_NAME        = "region_poles",
+            SET_LABEL       = "Region Poles";
 
     private static boolean enabled;
 
@@ -25,6 +26,9 @@ public class FtcDynmap extends DynmapCommonAPIListener {
     public void apiEnabled(DynmapCommonAPI api) {
         FtcDynmap.api = api;
         enabled = true;
+
+        getRegionPoleSet().setHideByDefault(false);
+        getRegionPoleSet().setLabelShow(true);
     }
 
     @Override
@@ -61,16 +65,18 @@ public class FtcDynmap extends DynmapCommonAPIListener {
 
     public static MarkerSet getRegionPoleSet() {
         MarkerSet set = getMarkerAPI().getMarkerSet(SET_NAME);
-        return set == null ? getMarkerAPI().createMarkerSet(SET_NAME, SET_NAME, null, true) : set;
+        return set == null ? getMarkerAPI().createMarkerSet(SET_NAME, SET_LABEL, null, true) : set;
     }
 
-    public static Marker findMarker(RegionData data) {
-        Marker marker = getRegionPoleSet().findMarker(data.getMarkerID());
+    public static Marker getMarker(RegionData data) {
+        return getRegionPoleSet().findMarker(data.getMarkerID());
+    }
 
+    public static Marker createMarker(RegionData data) {
         BlockVector2 vec2 = data.getPolePosition();
 
-        return marker != null ? marker : getRegionPoleSet().createMarker(
-                data.getPos().toString(), data.getName(), ComVars.getRegionWorld().getName(),
+        return getRegionPoleSet().createMarker(
+                data.getMarkerID(), data.getName(), ComVars.getRegionWorld().getName(),
                 vec2.getX() + 0.5D, RegionUtil.getPoleTop(data), vec2.getZ() + 0.5D,
                 data.hasProperty(RegionProperty.PAID_REGION) ? getSpecialIcon() : getNormalIcon(),
                 true

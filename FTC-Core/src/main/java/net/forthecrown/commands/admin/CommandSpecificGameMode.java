@@ -46,7 +46,7 @@ public class CommandSpecificGameMode extends FtcCommand {
         user.setGameMode(gameMode);
         user.updateFlying();
 
-        if(broadcast) source.sendAdmin(message(user.nickDisplayName()));
+        if(broadcast) source.sendAdmin(message(source.textName().equals(user.getName()) ? Component.text("own") : user.nickDisplayName()));
         else user.sendMessage(message(Component.text("own")));
 
         return 0;

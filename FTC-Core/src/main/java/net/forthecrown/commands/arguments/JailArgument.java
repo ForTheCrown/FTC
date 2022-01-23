@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
-import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.kyori.adventure.key.Key;
@@ -34,7 +34,7 @@ public class JailArgument implements ArgumentType<Key> {
     @Override
     public Key parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
-        Key key = FtcUtils.parseKey(reader);
+        Key key = Keys.parse(reader);
 
         if(!Crown.getJailManager().contains(key)){
             throw UNKNOWN_JAIL.createWithContext(GrenadierUtils.correctReader(reader, cursor), key.asString());

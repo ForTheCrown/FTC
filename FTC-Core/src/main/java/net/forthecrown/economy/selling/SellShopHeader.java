@@ -8,7 +8,7 @@ import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryRunnable;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;

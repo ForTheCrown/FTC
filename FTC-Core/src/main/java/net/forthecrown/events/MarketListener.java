@@ -61,7 +61,7 @@ public class MarketListener implements Listener {
                                 .hoverEvent(Component.text("Cannot afford ").append(FtcFormatter.rhinesNonTrans(shop.getPrice())));
                     }
 
-                    if(!u.getMarketOwnership().canChangeStatus()) {
+                    if(!u.getMarketData().canChangeStatus()) {
                         purchase = purchase.color(NamedTextColor.GOLD)
                                 .hoverEvent(Component.text("Cannot currently purchase shop"));
                     }

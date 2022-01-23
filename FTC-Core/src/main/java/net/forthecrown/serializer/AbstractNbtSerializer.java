@@ -6,10 +6,8 @@ import net.minecraft.nbt.NbtIo;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
-public abstract class AbstractNbtSerializer implements CrownSerializer {
-    private static final Logger logger = Crown.logger();
+public abstract class AbstractNbtSerializer extends AbstractSerializer implements CrownSerializer {
 
     private final File file;
 
@@ -40,14 +38,13 @@ public abstract class AbstractNbtSerializer implements CrownSerializer {
 
         if(!fileExists){
             if(stopIfFileDoesntExist) return;
-            if(!file.getParentFile().exists() && !file.getParentFile().mkdir()) logger.severe("Could not create directories for " + file.getPath());
+            if(!file.getParentFile().exists() && !file.getParentFile().mkdir()) LOGGER.error("Could not create directories for " + file.getPath());
 
             try {
                 file.createNewFile();
-                logger.info("Created file " + file.getPath());
+                LOGGER.info("Created file " + file.getPath());
             } catch (IOException e) {
-                logger.severe("Failed to create " + file.getPath());
-                e.printStackTrace();
+                LOGGER.error("Failed to create " + file.getPath(), e);
             }
         }
     }

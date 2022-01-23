@@ -7,8 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 public class UserVanishTicker implements Runnable {
-    public static final int TICK_INTERVAL = 3 * 20;
-    public static final Component TEXT = Component.text("YOU ARE IN VANISH").color(NamedTextColor.WHITE);
+    public static final int TICK_INTERVAL = 2 * 20;
+    public static final Component TEXT = Component.text("YOU ARE IN VANISH").color(NamedTextColor.RED);
 
     private final BukkitTask task;
     private final FtcUser user;

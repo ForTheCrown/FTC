@@ -2,8 +2,8 @@ package net.forthecrown.core.animation;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.forthecrown.core.Keys;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.apache.commons.lang3.Validate;
@@ -28,7 +28,7 @@ public class AnimationBuilder {
     }
 
     public AnimationBuilder(String strKey) {
-        this.key = FtcUtils.parseKey(strKey);
+        this.key = Keys.parse(strKey);
     }
 
     /**

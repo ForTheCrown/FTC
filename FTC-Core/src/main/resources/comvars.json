@@ -11,6 +11,9 @@
     "hoppersInOneChunk": 128,
     "maxGuildMembers": 7,
 
+    "houses_startindDemand": 1.0,
+    "guildWageModifier": 0.05,
+
     "marriageCooldown": 259200000,
     "userDataResetInterval": 5356800000,
     "autoSaveIntervalMins": 60,
@@ -22,7 +25,9 @@
     "marketStatusCooldown": 172800000,
     "resourceWorldResetInterval": 6912000000,
     "nextResourceWorldReset": -1,
-    "afkScanInterval": 72000,
+    "afkKickDelay": 7200000,
+    "dataRetentionTime": 2678400000,
+    "guildJoinTime": 1209600000,
 
     "allowOtherPlayerNicks": false,
     "taxesEnabled": false,
@@ -45,12 +50,12 @@
     "tpaExpiryTime": 2400,
     "startRhines": 100,
     "baronPrice": 500000,
-    "chickenLevitation": 5,
-    "chickenLevitationTime": 10,
     "maxMoneyAmount": 50000000,
     "maxTreasurePrize": 50000,
     "minTreasurePrize": 10000,
     "maxShopEarnings": 500000,
     "maxSignShopPrice": 1000000,
-    "defaultShopPrice": 55000
+    "defaultShopPrice": 55000,
+    "guildPayIntervalDays": 14,
+    "guildBaseWage": 25000
 }

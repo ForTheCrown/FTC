@@ -2,8 +2,8 @@ package net.forthecrown.inventory.crown;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.forthecrown.inventory.FtcItems;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStacks;
+import net.forthecrown.inventory.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -35,13 +35,13 @@ public final class Crowns {
     }
 
     public static boolean isCrown(ItemStack item) {
-        if(FtcItems.isEmpty(item)) return false;
-        return FtcItems.hasTagElement(item.getItemMeta(), TAG_KEY);
+        if(ItemStacks.isEmpty(item)) return false;
+        return ItemStacks.hasTagElement(item.getItemMeta(), TAG_KEY);
     }
 
     public static ItemStack make(UUID owner, boolean queen) {
         ItemStack item = new ItemStackBuilder(Material.GOLDEN_HELMET)
-                .setName(FtcItems.CROWN_TITLE)
+                .setName(ItemStacks.CROWN_TITLE)
                 .setModelData(MODEL_DATA)
                 .setUnbreakable(true)
                 .build();

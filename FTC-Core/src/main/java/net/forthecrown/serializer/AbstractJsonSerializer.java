@@ -7,20 +7,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A class for easily serializing things into Json
  */
-public abstract class AbstractJsonSerializer implements CrownSerializer {
+public abstract class AbstractJsonSerializer extends AbstractSerializer implements CrownSerializer {
 
     private File file;
 
     protected final String fileName;
     private final String directory;
     private final String fullFileDirectory;
-    protected final Logger logger;
     private final boolean stopIfFileDoesntExist;
 
     protected boolean fileExists;
@@ -36,7 +33,6 @@ public abstract class AbstractJsonSerializer implements CrownSerializer {
         this.fileName = fileName.endsWith(".json") ? fileName : fileName + ".json";
         this.directory = directory;
         this.stopIfFileDoesntExist = stopIfFileDoesntExist;
-        this.logger = Crown.logger();
 
         this.fullFileDirectory = (directory == null ? "" : directory + File.separator) + this.fileName;
         load();
@@ -48,14 +44,13 @@ public abstract class AbstractJsonSerializer implements CrownSerializer {
 
         if(!fileExists){
             if(stopIfFileDoesntExist) return;
-            if(!file.getParentFile().exists() && !file.getParentFile().mkdir()) logger.severe("Could not create directories for " + fileName);
+            if(!file.getParentFile().exists() && !file.getParentFile().mkdir()) LOGGER.error("Could not create directories for " + fileName);
 
             try {
                 file.createNewFile();
-                logger.info("Created file " + fileName + (directory != null ? " in " + file.getParent() : ""));
+                LOGGER.info("Created file " + fileName + (directory != null ? " in " + file.getParent() : ""));
             } catch (IOException e) {
-                logger.severe("Failed to create " + fileName + (directory != null ? " in " + file.getParent() : ""));
-                e.printStackTrace();
+                LOGGER.error("Failed to create " + fileName + (directory != null ? " in " + file.getParent() : ""), e);
             }
         }
     }
@@ -101,8 +96,8 @@ public abstract class AbstractJsonSerializer implements CrownSerializer {
     protected void createDefaults(final JsonWrapper json) {}
 
     protected void delete(){
-        if(!file.delete()) logger.log(Level.WARNING, "Couldn't delete file named " + fileName);
+        if(!file.delete()) LOGGER.warn("Couldn't delete file named " + fileName);
         deleted = true;
-        logger.log(Level.INFO, "Deleting file named " + fileName + " in " + directory);
+        LOGGER.info("Deleting file named " + fileName + " in " + directory);
     }
 }

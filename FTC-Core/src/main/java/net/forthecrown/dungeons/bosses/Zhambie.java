@@ -82,7 +82,6 @@ public class Zhambie extends DungeonBoss<Husk> {
 
     @Override
     protected void onDeath(BossFightContext context) {
-        finalizeKill(context);
         for (Husk s: helpers){
             s.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 99999, 254, false, false));
         }

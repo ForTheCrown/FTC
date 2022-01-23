@@ -73,7 +73,7 @@ public class CommandAfk extends FtcCommand {
                     hasMessage && status.maySpeak ? Component.text(": " + message) : Component.empty())
                     .color(NamedTextColor.GRAY);
 
-            broadcastMsg = status.maySpeak && BannedWords.contains(broadcastMsg) ? broadcastMsg : null;
+            broadcastMsg = status.maySpeak && !BannedWords.checkAndWarn(user, broadcastMsg) ? broadcastMsg : null;
         }
 
         user.sendMessage(userMsg);

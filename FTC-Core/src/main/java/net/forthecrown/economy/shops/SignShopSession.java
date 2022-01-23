@@ -154,6 +154,10 @@ public class SignShopSession {
         return onSessionExpire;
     }
 
+    public int getTotalEarned() {
+        return getPrice() * (getAmount() / getExampleItem().getAmount());
+    }
+
     /**
      * Sets the code to run on the session's expiry or end.
      * @param onSessionExpire The code to run on session expiry

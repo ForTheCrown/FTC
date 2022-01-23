@@ -13,6 +13,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionKit implements UsageAction<ActionKit.ActionInstance> {
-    public static final Key KEY = Keys.forthecrown("give_kit");
+    public static final NamespacedKey KEY = Keys.forthecrown("give_kit");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
@@ -60,7 +61,7 @@ public class ActionKit implements UsageAction<ActionKit.ActionInstance> {
         public void onInteract(Player player) {
             Kit kit = Crown.getKitManager().get(kitKey);
             if(kit == null){
-                Crown.logger().warning("Null kit in action!");
+                Crown.logger().warn("Null kit in action!");
                 return;
             }
 

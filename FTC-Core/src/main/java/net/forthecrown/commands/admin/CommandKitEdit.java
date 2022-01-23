@@ -6,12 +6,12 @@ import net.forthecrown.commands.arguments.KitArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.useables.kits.Kit;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -36,12 +36,12 @@ public class CommandKitEdit extends FtcCommand {
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
                                     String name = c.getArgument("name", String.class);
-                                    Key key = FtcUtils.parseKey(name);
+                                    Key key = Keys.parse(name);
 
                                     List<ItemStack> items = new ArrayList<>();
 
                                     for (ItemStack i: player.getInventory()){
-                                        if(FtcItems.isEmpty(i)) continue;
+                                        if(ItemStacks.isEmpty(i)) continue;
                                         items.add(i.clone());
                                     }
 

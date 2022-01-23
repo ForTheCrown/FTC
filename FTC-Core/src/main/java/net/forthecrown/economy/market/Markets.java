@@ -7,7 +7,7 @@ import net.forthecrown.core.ComVars;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.MarketOwnership;
+import net.forthecrown.user.UserMarketData;
 import net.kyori.adventure.inventory.Book;
 import org.bukkit.World;
 
@@ -194,15 +194,15 @@ public interface Markets extends CrownSerializer {
      * @param ownership The market ownership to check
      * @throws CommandSyntaxException If the given owner can't change status
      */
-    static void checkStatusChange(MarketOwnership ownership) throws CommandSyntaxException {
+    static void checkStatusChange(UserMarketData ownership) throws CommandSyntaxException {
         checkStatusChange(ownership,"market.cannot.changeStatus");
     }
 
-    static void checkCanPurchase(MarketOwnership ownership) throws CommandSyntaxException {
+    static void checkCanPurchase(UserMarketData ownership) throws CommandSyntaxException {
         checkStatusChange(ownership,"market.cannot.purchase");
     }
 
-    static void checkStatusChange(MarketOwnership ownership, String transKey) throws CommandSyntaxException {
+    static void checkStatusChange(UserMarketData ownership, String transKey) throws CommandSyntaxException {
         if(ownership.canChangeStatus()) return;
 
         long nextAllowed = ownership.getLastStatusChange() + ComVars.getMarketStatusCooldown();

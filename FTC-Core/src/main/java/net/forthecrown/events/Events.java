@@ -20,12 +20,10 @@ public final class Events {
         register(new ShopDestroyListener());
 
         register(new RegionsListener());
-        register(new GuildListener());
         register(new MarketListener());
 
         register(new MobHealthBar());
         register(new SmokeBomb());
-        register(new VolleyBallListener());
 
         register(new UsablesListeners());
 

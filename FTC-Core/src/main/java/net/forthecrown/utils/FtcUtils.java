@@ -2,9 +2,7 @@ package net.forthecrown.utils;
 
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.manager.FtcCommands;
 import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.grenadier.types.pos.Position;
@@ -15,6 +13,8 @@ import net.kyori.adventure.key.Key;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import org.bukkit.*;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -46,8 +46,12 @@ public final class FtcUtils {
         craftPlayer.getHandle().networkManager.send(packet);
     }
 
-    public static int worldTimeToYears(World world){
-        return (int) ((world.getFullTime()/1000)/24)/365;
+    public static long worldTimeToYears(World world){
+        return worldTimeToDays(world) / 365;
+    }
+
+    public static long worldTimeToDays(World world) {
+        return ((world.getFullTime() / 1000) / 24);
     }
 
     //True if the string is null or contains only blank spaces
@@ -127,19 +131,6 @@ public final class FtcUtils {
         return material.isAir();
     }
 
-    public static Key parseKey(String str) throws IllegalStateException {
-        return parseKey(new StringReader(str));
-    }
-
-    public static Key parseKey(StringReader reader) throws IllegalStateException {
-        try {
-            NamespacedKey key = FtcCommands.ftcKeyType().parse(reader);
-            return Key.key(key.namespace(), key.value());
-        } catch (CommandSyntaxException e) {
-            throw new IllegalStateException("Invalid string to parse");
-        }
-    }
-
     public static void handleSyntaxException(Audience sender, CommandSyntaxException exception) {
         if(exception instanceof RoyalCommandException e) {
             sender.sendMessage(e.formattedText());
@@ -147,12 +138,6 @@ public final class FtcUtils {
         }
 
         sender.sendMessage(GrenadierUtils.formatCommandException(exception));
-    }
-
-    //Makes sure the given key is not a bukkit key, since different hash result
-    public static Key checkNotBukkit(Key key){
-        if(!(key instanceof NamespacedKey)) return key;
-        return Key.key(key.namespace(), key.value());
     }
 
     //Clears all the effects on a living entity
@@ -177,6 +162,14 @@ public final class FtcUtils {
                 start.getYaw(),
                 start.getPitch()
         );
+    }
+
+    public static void grantAdvancement(Advancement advancement, Player player) {
+        AdvancementProgress progress = player.getAdvancementProgress(advancement);
+
+        for (String s: progress.getRemainingCriteria()) {
+            progress.awardCriteria(s);
+        }
     }
 
     /*
@@ -209,7 +202,7 @@ public final class FtcUtils {
         return result;
     }
 
-    public static String arabicToRoman(int number) {
+    public static String arabicToRoman(long number) {
         StringBuilder sb = new StringBuilder();
 
         if (number == 0) return "0";
@@ -218,7 +211,7 @@ public final class FtcUtils {
             number = -number;
         }
         if (number > 4000) {
-            sb.append("MMMM".repeat(number / 4000));
+            sb.append("MMMM".repeat((int) (number / 4000)));
             number = number % 4000;
         }
 
@@ -237,6 +230,10 @@ public final class FtcUtils {
         }
 
         return sb.toString();
+    }
+
+    public static NamespacedKey ensureBukkit(Key key) {
+        return key instanceof NamespacedKey ? (NamespacedKey) key : new NamespacedKey(key.namespace(), key.value());
     }
 
     public enum RomanNumeral {

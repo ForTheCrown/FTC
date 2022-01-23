@@ -2,12 +2,13 @@ package net.forthecrown.registry;
 
 import net.kyori.adventure.key.Key;
 import org.apache.commons.lang.Validate;
+import org.bukkit.NamespacedKey;
 
 public class CloseableRegistryBase<T> extends BaseRegistry<T> implements CloseableRegistry<T> {
 
     private boolean open = true;
 
-    public CloseableRegistryBase(Key key) {
+    public CloseableRegistryBase(NamespacedKey key) {
         super(key);
     }
 

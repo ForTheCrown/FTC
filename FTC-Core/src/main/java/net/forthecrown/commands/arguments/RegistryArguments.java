@@ -8,8 +8,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.commands.manager.FtcCommands;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
+import net.forthecrown.core.Keys;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.travel.TravelEffect;
@@ -113,7 +113,7 @@ public class RegistryArguments<T> implements ArgumentType<T> {
     @Override
     public T parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
-        NamespacedKey key = FtcCommands.ftcKeyType().parse(reader);
+        NamespacedKey key = Keys.argumentType().parse(reader);
 
         T val = registry.get(key);
         if(val == null) throw unknown.createWithContext(GrenadierUtils.correctReader(reader, cursor), key);

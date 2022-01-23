@@ -173,10 +173,6 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '{' +
-                "x=" + x +
-                ",y=" + y +
-                ",z=" + z +
-                '}';
+        return "[" + getX() + ", " + getY() + ", " + getZ() + "]";
     }
 }

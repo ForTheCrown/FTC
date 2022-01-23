@@ -4,11 +4,11 @@ import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.JailManager;
 import net.forthecrown.core.chat.*;
-import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.ItemPriceMap;
-import net.forthecrown.economy.guild.TradersGuild;
+import net.forthecrown.economy.guilds.TradeGuild;
 import net.forthecrown.economy.houses.HouseSerializer;
+import net.forthecrown.economy.houses.Houses;
 import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.regions.RegionManager;
@@ -20,13 +20,12 @@ import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.key.Namespaced;
 import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPerms;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Main class that looks nice and does all the api stuff
@@ -34,6 +33,7 @@ import java.util.logging.Logger;
  * Implementation: {@link Main}
  */
 public interface Crown extends Plugin, Namespaced {
+
     static Crown                inst()                  { return Main.inst; }
 
     // Feels like I'm violating syntax by aligning the methods like this
@@ -47,7 +47,6 @@ public interface Crown extends Plugin, Namespaced {
     static KitManager           getKitManager()         { return Main.kitRegistry; }
     static FtcStructureManager  getStructureManager()   { return Main.structureManager; }
 
-    static TradersGuild         getTradersGuild()       { return Main.tradersGuild; }
     static Markets              getMarkets()            { return Main.markets; }
     static LuckPerms            getLuckPerms()          { return Main.luckPerms; }
     static Announcer            getAnnouncer()          { return Main.announcer; }
@@ -58,9 +57,10 @@ public interface Crown extends Plugin, Namespaced {
     static FtcConfig            config()                { return Main.config; }
 
     static FtcMessages          getMessages()           { return Main.messages; }
-    static DayUpdate            getDayUpdate()          { return Main.dayUpdate; }
+    static DayChange            getDayChange()          { return Main.dayChange; }
     static JoinInfo             getJoinInfo()           { return Main.joinInfo; }
     static ChatEmotes           getEmotes()             { return Main.emotes; }
+    static TradeGuild           getGuild()              { return Main.guild; }
     static ServerRules          getRules()              { return Main.rules; }
     static EndOpener            getEndOpener()          { return Main.endOpener; }
 
@@ -71,7 +71,7 @@ public interface Crown extends Plugin, Namespaced {
     static PluginDescriptionFile description()          { return inst().getDescription(); }
     static void saveResource(boolean replace, String name) { inst().saveResource(name, replace); }
 
-    static void saveFTC(){
+    static void saveFTC() {
         Main.userManager.save();
         Main.userManager.saveUsers();
 
@@ -92,13 +92,16 @@ public interface Crown extends Plugin, Namespaced {
         Main.structureManager.save();
 
         Main.markets.save();
-        Main.tradersGuild.save();
+        Main.guild.save();
         Main.config.save();
 
-        HouseSerializer.serialize();
+        if(Houses.ENABLED) {
+            HouseSerializer.serialize();
+        }
+
         ComVars.save();
 
-        logger().log(Level.INFO, "FTC-Core saved");
+        logger().info("FTC-Core saved");
     }
 
     static boolean inDebugMode() {

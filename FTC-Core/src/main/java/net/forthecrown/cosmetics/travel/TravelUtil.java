@@ -2,7 +2,7 @@ package net.forthecrown.cosmetics.travel;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,21 +43,20 @@ public final class TravelUtil {
     };
 
     /**
-     * @param world the world of the locations
      * @param radius the radius of the circle
      * @param amountPoints the amount of points that make up the circle
      * @param extraY Extra y to add to the locs
      * @return a list of locations that make up a circle
      */
-    static List<Location> getOnCircle(World world, double extraY, double radius, short amountPoints) {
-        List<Location> result = new ArrayList<>();
+    static List<Vector> getOnCircle(double extraY, double radius, short amountPoints) {
+        List<Vector> result = new ArrayList<>();
         for (int i = 0; i < amountPoints; ++i) {
             final double angle = Math.toRadians(((double) i / amountPoints) * 360d);
 
             double x = Math.cos(angle) * radius;
             double z = Math.sin(angle) * radius;
 
-            result.add(new Location(world, x, extraY, z));
+            result.add(new Vector(x, extraY, z));
         }
         return result;
     }

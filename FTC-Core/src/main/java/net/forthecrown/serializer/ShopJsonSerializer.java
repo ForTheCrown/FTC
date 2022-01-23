@@ -1,5 +1,6 @@
 package net.forthecrown.serializer;
 
+import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -7,7 +8,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.economy.shops.ShopInventory;
 import net.forthecrown.economy.shops.ShopType;
 import net.forthecrown.economy.shops.SignShop;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.LocationFileName;
 import net.minecraft.Util;
@@ -45,6 +46,10 @@ public class ShopJsonSerializer implements ShopSerializer {
         if(!sInv.isEmpty()) inv.addList("items", sInv.getShopContents(), JsonUtils::writeItem);
         json.add("inventory", inv);
 
+        // Serialize history
+        JsonElement historyElement = shop.getHistory().serialize();
+        if(historyElement != null) json.add("history", historyElement);
+
         writeShop(json, shop);
     }
 
@@ -61,12 +66,14 @@ public class ShopJsonSerializer implements ShopSerializer {
 
         ItemStack item = inv.getItem("exampleItem");
 
-        if(FtcItems.isEmpty(item)) {
-            Crown.logger().warning("Found null exampleItem in " + shop.getFileName() + "'s file, bad touch lol");
+        if(ItemStacks.isEmpty(item)) {
+            Crown.logger().warn("Found null exampleItem in " + shop.getFileName() + "'s file, bad touch lol");
         }
 
         sInv.setExampleItem(item);
         sInv.setShopContents(inv.getList("items", JsonUtils::readItem, new ObjectArrayList<>()));
+
+        shop.getHistory().deserialize(json.get("history"));
     }
 
     @Override

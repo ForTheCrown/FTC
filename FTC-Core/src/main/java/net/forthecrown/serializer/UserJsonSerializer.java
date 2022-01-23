@@ -13,19 +13,20 @@ import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.MapUtils;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Logger;
 
 public class UserJsonSerializer implements UserSerializer {
+    private static final Logger LOGGER = Crown.logger();
+
     private final Map<UUID, File> userFiles = new HashMap<>();
     private final Set<UUID> deletedFiles = new HashSet<>();
 
-    private static final Logger logger = Crown.logger();
     public static final File USER_DIR;
 
     static {
@@ -246,8 +247,7 @@ public class UserJsonSerializer implements UserSerializer {
         try {
             JsonUtils.writeFile(json.getSource(), f);
         } catch (IOException e){
-            logger.severe("Exception while attempting write user data for " + id);
-            e.printStackTrace();
+            LOGGER.error("Exception while attempting write user data for " + id, e);
         }
     }
 
@@ -272,20 +272,18 @@ public class UserJsonSerializer implements UserSerializer {
 
             try {
                 f.createNewFile();
-                logger.info("Created user file for " + id);
+                LOGGER.info("Created user file for " + id);
 
                 writeJson(json, id.getUniqueId());
             } catch (IOException e) {
-                logger.severe("Could not create user file for " + id);
-                e.printStackTrace();
+                LOGGER.error("Could not create user file for " + id, e);
             }
         } else {
             try {
                 JsonObject jsonO = JsonUtils.readFileObject(f);
                 json = JsonWrapper.of(jsonO);
             } catch (IOException e) {
-                logger.severe("Exception while reading user data for " + id);
-                e.printStackTrace();
+                LOGGER.error("Exception while reading user data for " + id, e);
                 return null;
             }
         }

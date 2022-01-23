@@ -13,11 +13,12 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.actions.ActionFactory;
 import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionVisitRegion implements UsageAction<ActionVisitRegion.ActionInstance> {
-    public static final Key KEY = Keys.forthecrown("visit_region");
+    public static final NamespacedKey KEY = Keys.forthecrown("visit_region");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

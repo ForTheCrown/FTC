@@ -92,7 +92,7 @@ public interface Announcer extends CrownSerializer {
 
         if(Crown.inDebugMode()) acLiteral(stringMessage);
         else {
-            log(DebugLevel.DEBUG, stringMessage);
+            Crown.logger().debug(stringMessage);
             for (Player p: Bukkit.getOnlinePlayers()) {
                 if(!p.hasPermission(Permissions.ADMIN)) continue;
                 p.sendMessage("[DEBUG INFO]: " + stringMessage);
@@ -109,16 +109,6 @@ public interface Announcer extends CrownSerializer {
     static void acLiteral(Object message){
         if(message == null) message = "null";
         Bukkit.getServer().sendMessage(ChatUtils.convertString(message.toString(), false));
-    }
-
-    /**
-     * Logs a message in the console
-     * @param level the level on which to log
-     * @param message The message to log
-     */
-    static void log(Level level, String message){
-        if(message == null) message = "null";
-        Crown.logger().log(level, message);
     }
 
     class DebugLevel extends Level {

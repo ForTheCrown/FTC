@@ -20,12 +20,10 @@ import java.util.stream.Stream;
 /**
  * A constantly sorted map of balances.
  * <p></p>
- * This implementation isn't actually a map, rather it is a list of entries
- * that is constantly reorganized and sorted whenever a balance is modified,
- * added or removed. This keeps the map sorted at all times.
- * <p></p>
- * The downside of this implementation is that currently it is possible for
- * two entries with the same UUID to exist. So uhh TODO: fix multiple entries for one UUID.
+ * This implementation isn't actually a map, rather it is a
+ * list of entries that is constantly reorganized and sorted
+ * whenever a balance is modified, added or removed. This
+ * keeps the map sorted at all times.
  */
 public class SortedBalanceMap implements BalanceMap {
     private Balance[] entries = new Balance[100];
@@ -108,15 +106,17 @@ public class SortedBalanceMap implements BalanceMap {
 
     @Override
     public int getIndex(UUID id) {
-        //Slow, but idk how better to do it
-        //Go through list, checking each end of the list
-        //To find the entry
+        // Slow, but IDK how better to do it.
+        // Go through list, checking each end of the list
+        // to find the entry
 
         int half = size >> 1;
-        boolean divisible = half * 2 == size;
 
-        //Use divisible variable to correct for odd sizes
-        for (int i = 0; i < half + (divisible ? 0 : 1); i++) {
+        // Will be 1 if not divisible, 0 if divisible
+        int divCorrection = size - (half + half);
+
+        // Use divCorrection to account for odd sized lists
+        for (int i = 0; i < half + divCorrection; i++) {
             //Check front half
             Balance entry = getEntry(i);
             if(entry != null && entry.getUniqueId().equals(id)) return i;
@@ -145,7 +145,7 @@ public class SortedBalanceMap implements BalanceMap {
     @Override
     public void put(UUID id, int amount) {
         int index = getIndex(id);
-        //Either get the entry, and update it's value, or create it
+        //Either get the entry, and update its value, or create it
         Balance entry = index == -1 ? new Balance(id, amount) : getEntry(index).setValue(amount);
 
         //If new entry
@@ -157,9 +157,9 @@ public class SortedBalanceMap implements BalanceMap {
 
             //If array size has to be increased
             if(size >= entries.length) {
-                Balance[] copy = entries;                                               //Copy old entries
-                entries = new Balance[copy.length + 1];                                 //Make new array with bigger size
-                System.arraycopy(copy, 0, entries, 0, copy.length);     //Copy all entries from copy to new array
+                Balance[] copy = entries;                           //Copy old entries
+                entries = new Balance[copy.length + 1];             //Make new array with bigger size
+                System.arraycopy(copy, 0, entries, 0, copy.length); //Copy all entries from copy to new array
             }
 
             setEntry(index, entry);
@@ -262,6 +262,6 @@ public class SortedBalanceMap implements BalanceMap {
     }
 
     private void validateIndex(int index) {
-        if(!isInList(index)) throw new IndexOutOfBoundsException(index);
+        if(!isInList(index)) throw new IndexOutOfBoundsException("Index " + index + " not in range [0 " + size + ")");
     }
 }

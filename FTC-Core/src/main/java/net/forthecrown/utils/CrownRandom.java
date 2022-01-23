@@ -1,5 +1,6 @@
 package net.forthecrown.utils;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.apache.commons.lang.Validate;
 
 import java.util.*;
@@ -36,7 +37,7 @@ public class CrownRandom extends Random {
         Validate.isTrue(from.size() > size, "Collection size was smaller than specified size");
 
         List<T> orig = from instanceof List ? (List<T>) from : new ArrayList<>(from);
-        List<T> result = new ArrayList<>();
+        List<T> result = new ObjectArrayList<>();
 
         while(result.size() < size){
             T value = orig.get(nextInt(orig.size()));
@@ -57,7 +58,7 @@ public class CrownRandom extends Random {
      */
     public <T> T pickRandomEntry(Collection<T> from){
         if(from.isEmpty()) return null;
-        if(from.size() == 1) return new ArrayList<>(from).get(0);
+        if(from.size() == 1) return from.iterator().next();
 
         return new ArrayList<>(from).get(intInRange(0, from.size()-1));
     }

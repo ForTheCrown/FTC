@@ -32,6 +32,9 @@ public final class ComVars {
     static ComVar<Short>            hoppersInOneChunk;
     static ComVar<Short>            maxGuildMembers;
 
+    static ComVar<Float>            houses_startingDemand;
+    static ComVar<Float>            guildWageModifier;
+
     static ComVar<Long>             marriageCooldown;
     static ComVar<Long>             userDataResetInterval;
     static ComVar<Long>             autoSaveIntervalMins;
@@ -43,7 +46,9 @@ public final class ComVars {
     static ComVar<Long>             marketStatusCooldown;
     static ComVar<Long>             resourceWorldResetInterval;
     static ComVar<Long>             nextResourceWorldReset;
-    static ComVar<Long>             afkScanInterval;
+    static ComVar<Long>             afkKickDelay;
+    static ComVar<Long>             dataRetentionTime;
+    static ComVar<Long>             guildJoinTime;
 
     static ComVar<Boolean>          allowOtherPlayerNicks;
     static ComVar<Boolean>          taxesEnabled;
@@ -60,20 +65,19 @@ public final class ComVars {
     static ComVar<Integer>          effectCost_travel;
     static ComVar<Integer>          swordGoalGainPerKill;
     static ComVar<Integer>          houses_startingSupply;
-    static ComVar<Integer>          houses_startingDemand;
     static ComVar<Integer>          tpTickDelay;
     static ComVar<Integer>          tpCooldown;
     static ComVar<Integer>          tpaExpiryTime;
     static ComVar<Integer>          startRhines;
     static ComVar<Integer>          baronPrice;
-    static ComVar<Integer>          chickenLevitation;
-    static ComVar<Integer>          chickenLevitationTime;
     static ComVar<Integer>          maxMoneyAmount;
     static ComVar<Integer>          maxTreasurePrize;
     static ComVar<Integer>          minTreasurePrize;
     static ComVar<Integer>          maxShopEarnings;
     static ComVar<Integer>          maxSignShopPrice;
     static ComVar<Integer>          defaultShopPrice;
+    static ComVar<Integer>          guildPayIntervalDays;
+    static ComVar<Integer>          guildBaseWage;
 
     private ComVars() {}
 
@@ -96,7 +100,13 @@ public final class ComVars {
         read("hoppersInOneChunk",           ComVarTypes.SHORT);
         read("maxGuildMembers",             ComVarTypes.SHORT);
 
+        read("houses_startingDemand",       ComVarTypes.FLOAT);
+        read("guildWageModifier",           ComVarTypes.FLOAT);
+
+        read("resourceWorldResetInterval",  ComVarTypes.LONG);
+        read("nextResourceWorldReset",      ComVarTypes.LONG);
         read("autoSaveIntervalMins",        ComVarTypes.LONG);
+
         read("marriageCooldown",            ComVarTypes.TIME);
         read("userDataResetInterval",       ComVarTypes.TIME);
         read("marketOwnershipSafeTime",     ComVarTypes.TIME);
@@ -105,7 +115,9 @@ public final class ComVars {
         read("voteInterval",                ComVarTypes.TIME);
         read("guildJoinRequirement",        ComVarTypes.TIME);
         read("marketStatusCooldown",        ComVarTypes.TIME);
-        read("afkScanInterval",             ComVarTypes.TIME);
+        read("afkKickDelay",                ComVarTypes.TIME);
+        read("dataRetentionTime",           ComVarTypes.TIME);
+        read("guildJoinTime",               ComVarTypes.TIME);
 
         read("allowOtherPlayerNicks",       ComVarTypes.BOOL);
         read("taxesEnabled",                ComVarTypes.BOOL);
@@ -116,28 +128,25 @@ public final class ComVars {
         read("hulkSmashPoles",              ComVarTypes.BOOL);
         read("endOpen",                     ComVarTypes.BOOL);
         read("allowNonOwnerSwords",         ComVarTypes.BOOL);
-        read("resourceWorldResetInterval",  ComVarTypes.LONG);
-        read("nextResourceWorldReset",      ComVarTypes.LONG);
 
         read("effectCost_arrow",            ComVarTypes.INTEGER);
         read("effectCost_death",            ComVarTypes.INTEGER);
         read("effectCost_travel",           ComVarTypes.INTEGER);
         read("swordGoalGainPerKill",        ComVarTypes.INTEGER);
         read("houses_startingSupply",       ComVarTypes.INTEGER);
-        read("houses_startingDemand",       ComVarTypes.INTEGER);
         read("tpTickDelay",                 ComVarTypes.INTEGER);
         read("tpCooldown",                  ComVarTypes.INTEGER);
         read("tpaExpiryTime",               ComVarTypes.INTEGER);
         read("startRhines",                 ComVarTypes.INTEGER);
         read("baronPrice",                  ComVarTypes.INTEGER);
-        read("chickenLevitation",           ComVarTypes.INTEGER);
-        read("chickenLevitationTime",       ComVarTypes.INTEGER);
         read("maxMoneyAmount",              ComVarTypes.INTEGER);
         read("maxTreasurePrize",            ComVarTypes.INTEGER);
         read("minTreasurePrize",            ComVarTypes.INTEGER);
         read("maxShopEarnings",             ComVarTypes.INTEGER);
         read("maxSignShopPrice",            ComVarTypes.INTEGER);
         read("defaultShopPrice",            ComVarTypes.INTEGER);
+        read("guildPayIntervalDays",        ComVarTypes.INTEGER);
+        read("guildBaseWage",               ComVarTypes.INTEGER);
 
         j = null;
     }
@@ -146,14 +155,15 @@ public final class ComVars {
         ComVarJson json = createJson();
 
         //Fuck you, I cannot be bothered to write all the variables again
-        try {
-            for (Field f: ComVars.class.getDeclaredFields()) {
-                if(f.getType() != ComVar.class) continue;
+        for (Field f: ComVars.class.getDeclaredFields()) {
+            if(f.getType() != ComVar.class) continue;
 
+            try {
                 json.addVar((ComVar) f.get(null));
+            } catch (Exception e) {
+                Crown.logger().error("Could not save comvar: " + f.getName());
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         writeJson(json);
@@ -240,14 +250,22 @@ public final class ComVars {
 
 
 
+    public static float getHousesStartingDemand() {
+        return houses_startingDemand.getValue(0F);
+    }
+
+    public static float guildWageModifier() {
+        return guildWageModifier.getValue(0.25F);
+    }
+
+
 
     public static long getMarriageCooldown() {
         return marriageCooldown.getValue(259200000L);
     }
 
     public static long getUserResetInterval() {
-        //Default: 2 months
-        return userDataResetInterval.getValue(5356800000L);
+        return userDataResetInterval.getValue(TimeUtil.MONTH_IN_MILLIS * 2);
     }
 
     public static long getShopOwnershipSafeTime() {
@@ -286,8 +304,16 @@ public final class ComVars {
         nextResourceWorldReset.update(time);
     }
 
-    public static long afkScanInterval() {
-        return afkScanInterval.getValue(TimeUtil.HOUR_IN_MILLIS);
+    public static long afkKickDelay() {
+        return afkKickDelay.getValue(TimeUtil.HOUR_IN_MILLIS);
+    }
+
+    public static long dataRetentionTime() {
+        return dataRetentionTime.getValue(TimeUtil.MONTH_IN_MILLIS);
+    }
+
+    public static long guildKickSafeTime() {
+        return guildJoinTime.getValue(TimeUtil.WEEK_IN_MILLIS);
     }
 
 
@@ -351,10 +377,6 @@ public final class ComVars {
         return houses_startingSupply.getValue(250);
     }
 
-    public static int getHousesStartingDemand() {
-        return houses_startingDemand.getValue(0);
-    }
-
     public static int getTpTickDelay() {
         return tpTickDelay.getValue(60);
     }
@@ -397,6 +419,14 @@ public final class ComVars {
 
     public static int defaultShopPrice() {
         return defaultShopPrice.getValue(55000);
+    }
+
+    public static int guildPayIntervalDays() {
+        return guildPayIntervalDays.getValue(14);
+    }
+
+    public static int guildBaseWage() {
+        return guildBaseWage.getValue(25000);
     }
 
     public static Key onFirstJoinKit() {

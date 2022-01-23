@@ -4,7 +4,7 @@ import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.ClickContext;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

@@ -13,14 +13,16 @@ import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
 public class ActionCommand implements UsageAction<ActionCommand.ActionInstance> {
-    public static final Key CONSOLE_KEY = Keys.forthecrown("command_console");
-    public static final Key USER_KEY = Keys.forthecrown("command_user");
+    public static final NamespacedKey
+            CONSOLE_KEY = Keys.forthecrown("command_console"),
+            USER_KEY    = Keys.forthecrown("command_user");
 
     private final boolean console;
 
@@ -30,6 +32,7 @@ public class ActionCommand implements UsageAction<ActionCommand.ActionInstance> 
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
+        reader.setCursor(reader.getTotalLength());
         return new ActionInstance(reader.getString(), console);
     }
 

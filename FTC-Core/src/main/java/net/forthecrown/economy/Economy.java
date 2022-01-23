@@ -86,7 +86,7 @@ public interface Economy extends CrownSerializer {
      */
     static void checkUnderMax(UUID uuid, int amount) {
         if(amount > ComVars.getMaxMoneyAmount()) {
-            Crown.logger().warning(Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
+            Crown.logger().warn(Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
         }
     }
 

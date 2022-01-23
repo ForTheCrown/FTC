@@ -6,6 +6,9 @@ import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.World;
+
+import java.util.Set;
 
 /**
  * Class representing the configuration.json file
@@ -40,6 +43,42 @@ public interface FtcConfig extends CrownSerializer {
      * @param location The spawn location
      */
     void setServerSpawn(Location location);
+
+    /**
+     * Gets all 'illegal' worlds.
+     * <p></p>
+     * Illegal worlds are worlds which normal users
+     * cannot set homes in, go /home or /back to or
+     * tpa into or tpahere other people to.
+     *
+     * @return Mutable list of illegal worlds
+     */
+    Set<World> getIllegalWorlds();
+
+    /**
+     * Marks a world as illegal
+     * @param world The world to mark
+     */
+    default void addIllegalWorld(World world) {
+        getIllegalWorlds().add(world);
+    }
+
+    /**
+     * Unmarks a world as illegal
+     * @param world The world to unmark
+     */
+    default void removeIllegalWorld(World world) {
+        getIllegalWorlds().remove(world);
+    }
+
+    /**
+     * Checks if the given world is an illegal world
+     * @param world The world to check
+     * @return Whether the world is illegal
+     */
+    default boolean isIllegalWorld(World world) {
+        return getIllegalWorlds().contains(world);
+    }
 
     /**
      * Adds a section to the config

@@ -2,7 +2,6 @@ package net.forthecrown.regions;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.forthecrown.core.FtcDynmap;
 import net.forthecrown.serializer.NbtSerializable;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Nameable;
@@ -12,9 +11,12 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.nbt.*;
-import org.dynmap.markers.Marker;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.function.UnaryOperator;
@@ -29,7 +31,6 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
     protected BlockVector2 polePosition;
     protected TextColor nameColor;
     protected Component description;
-    protected Marker marker;
 
     public RegionData(RegionPos pos) {
         this.pos = pos;
@@ -69,7 +70,7 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
         //If the only thing serialized is, is a name
         if(tag.getId() == Tag.TAG_STRING) {
             updatePoleBounds();
-            setName0(tag.getAsString());
+            this.name = tag.getAsString();
             return;
         }
 
@@ -97,22 +98,20 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
             properties.addAll(RegionUtil.readProperties(tags.getShort("properties")));
         }
 
-        setName0(tags.getString("name"));
+        this.name = tags.getString("name");
 
         //If has description, set it
         if(tags.contains("description")) this.description = SERIALIZER.deserialize(tags.getString("description"));
         if(tags.contains("color")) this.nameColor = TextColor.fromHexString(tags.getString("color"));
     }
 
-    protected abstract void setPolePosition0(BlockVector2 vector2);
-    protected abstract void updatePoleBounds();
-
-    private void setName0(String name) {
-        this.name = name;
-
-        if(hasProperty(RegionProperty.FORBIDS_MARKER)) return;
-        this.marker = FtcDynmap.findMarker(this);
+    // sets the pole position without generating a new pole or removing the old one
+    protected void setPolePosition0(@Nullable BlockVector2 polePosition) {
+        this.polePosition = polePosition;
+        updatePoleBounds();
     }
+
+    protected abstract void updatePoleBounds();
 
     @Override
     public String getName() {
@@ -211,16 +210,15 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
         return polePosition == null ? pos.toCenter() : polePosition;
     }
 
-    public Marker getMarker() {
-        return marker;
-    }
-
-    public void setMarker(Marker marker) {
-        this.marker = marker;
-    }
-
+    /**
+     * Gets the string used for marker ID's.
+     * Will always return a non null string.
+     * <p></p>
+     * Example: region_pole_1_4
+     * @return This region's marker ID
+     */
     public String getMarkerID() {
-        return getPos().toString();
+        return "region_pole_" + getPos().getX() + "_" + getPos().getZ();
     }
 
     public static class Empty extends RegionData {

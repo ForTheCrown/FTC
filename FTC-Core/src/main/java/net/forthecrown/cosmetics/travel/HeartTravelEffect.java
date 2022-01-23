@@ -5,6 +5,7 @@ import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class HeartTravelEffect extends TravelEffect {
     private final byte amountSpiralPoints = 16;
 
     // Points on a circle that will form a spiral around player.
-    private List<Location> circleLocs;
+    private List<Vector> circleLocs;
 
     // Points to a location from circleLocs.
     private int pointer = 0;
@@ -40,7 +41,7 @@ public class HeartTravelEffect extends TravelEffect {
     @Override
     public void onHulkStart(CrownUser user, Location loc) {
         // Prepare tick locations
-        circleLocs = TravelUtil.getOnCircle(loc.getWorld(), -2.5, 1.5, amountSpiralPoints);
+        circleLocs = TravelUtil.getOnCircle(-2.5, 1.5, amountSpiralPoints);
 
         TravelUtil.spawnOnHearts(loc, 0.2, Particle.END_ROD);
     }

@@ -10,23 +10,28 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.marriage.CommandMarry;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcConfig;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.grenadier.types.WorldArgument;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.generator.WorldInfo;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -82,7 +87,7 @@ public class CommandFtcCore extends FtcCommand {
 
                             ItemStack item = user.getInventory().getItemInMainHand();
 
-                            if (FtcItems.isEmpty(item)) {
+                            if (ItemStacks.isEmpty(item)) {
                                 throw FtcExceptionProvider.mustHoldItem();
                             }
 
@@ -101,6 +106,51 @@ public class CommandFtcCore extends FtcCommand {
                             c.getSource().sendAdmin("Removed all attribute modifiers from held item");
                             return 0;
                         })
+                )
+
+                .then(literal("illegal_worlds")
+                        .executes(c -> {
+                            String joined = ListUtils.join(Crown.config().getIllegalWorlds(), WorldInfo::getName);
+
+                            c.getSource().sendMessage("Illegal worlds: " + joined);
+                            return 0;
+                        })
+
+                        .then(literal("add")
+                                .then(argument("world", WorldArgument.world())
+                                        .executes(c -> {
+                                            World world = WorldArgument.getWorld(c, "world");
+                                            FtcConfig config = Crown.config();
+
+                                            if(config.isIllegalWorld(world)) {
+                                                throw FtcExceptionProvider.create(world.getName() + " is already marked as illegal");
+                                            }
+
+                                            config.addIllegalWorld(world);
+
+                                            c.getSource().sendAdmin("Added illegal world: " + world.getName());
+                                            return 0;
+                                        })
+                                )
+                        )
+
+                        .then(literal("remove")
+                                .then(argument("world", WorldArgument.world())
+                                        .executes(c -> {
+                                            World world = WorldArgument.getWorld(c, "world");
+                                            FtcConfig config = Crown.config();
+
+                                            if(!config.isIllegalWorld(world)) {
+                                                throw FtcExceptionProvider.create(world.getName() + " is already a legal world");
+                                            }
+
+                                            config.removeIllegalWorld(world);
+
+                                            c.getSource().sendAdmin("Removed illegal world: " + world.getName());
+                                            return 0;
+                                        })
+                                )
+                        )
                 )
 
                 .then(CommandLore.compOrStringArg(literal("tablist_score"),
@@ -282,8 +332,8 @@ public class CommandFtcCore extends FtcCommand {
 
     private int giveTicket(boolean elite, Player player, CommandSource source){
         try {
-            if(elite) player.getInventory().addItem(FtcItems.eliteVoteTicket());
-            else player.getInventory().addItem(FtcItems.voteTicket());
+            if(elite) player.getInventory().addItem(ItemStacks.eliteVoteTicket());
+            else player.getInventory().addItem(ItemStacks.voteTicket());
         } catch (Exception e){
             player.sendMessage("Inventory full");
             return 0;
@@ -293,7 +343,7 @@ public class CommandFtcCore extends FtcCommand {
     }
 
     private int giveCoins(Player player, int amount){
-        player.getInventory().addItem(FtcItems.makeCoins(amount, 1));
+        player.getInventory().addItem(ItemStacks.makeCoins(amount, 1));
         player.sendMessage("You got " + amount + " Rhines worth of coins");
         return 0;
     }

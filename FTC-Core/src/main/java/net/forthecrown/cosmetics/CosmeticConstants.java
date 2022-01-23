@@ -13,7 +13,7 @@ import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.options.InventoryBorder;
 import net.forthecrown.inventory.builder.InventoryBuilder;
 import net.forthecrown.inventory.builder.options.SimpleOption;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;

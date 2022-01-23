@@ -142,6 +142,8 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable, De
 
     Component getPriceLineFor(CrownUser user);
 
+    ShopHistory getHistory();
+
     @Override
     boolean equals(Object o);
 

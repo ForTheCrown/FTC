@@ -3,9 +3,9 @@ package net.forthecrown.user.data;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.forthecrown.core.Keys;
 import net.forthecrown.user.AbstractUserAttachment;
 import net.forthecrown.user.FtcUser;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 
 import javax.annotation.Nullable;
@@ -78,7 +78,7 @@ public class FtcUserDataContainer extends AbstractUserAttachment implements User
         JsonObject json = element.getAsJsonObject();
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
-            data.put(FtcUtils.parseKey(e.getKey()), e.getValue());
+            data.put(Keys.parse(e.getKey()), e.getValue());
         }
     }
 }

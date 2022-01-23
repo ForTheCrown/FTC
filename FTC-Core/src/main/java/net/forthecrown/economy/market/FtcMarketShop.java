@@ -16,6 +16,7 @@ import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
+import net.forthecrown.utils.TimeUtil;
 import net.forthecrown.utils.math.MathUtil;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -75,10 +76,7 @@ public class FtcMarketShop implements MarketShop {
     @Override
     public boolean canBeEvicted() {
         if(dateOfPurchase == null || owner == null) return false;
-        Date validRemoval = new Date(dateOfPurchase.getTime() + ComVars.getShopOwnershipSafeTime());
-        Date current = new Date();
-
-        return validRemoval.before(current);
+        return TimeUtil.hasCooldownEnded(ComVars.getShopOwnershipSafeTime(), getDateOfPurchase().getTime());
     }
 
     @Override

@@ -22,6 +22,8 @@ import java.util.Map;
  * A leaderboard made of ArmorStands, used for display
  */
 public class ArmorStandLeaderboard {
+    public static final double DISTANCE_BETWEEN = 0.25D;
+
     private static final List<ArmorStandLeaderboard> LEADERBOARDS = new ObjectArrayList<>();
 
     private Component[] title;
@@ -40,7 +42,7 @@ public class ArmorStandLeaderboard {
         this.list = list;
         this.location = location;
 
-        setOrder(Order.HIGH_TO_LOW);
+        setOrder(Order.DESCENDING);
         setSize((byte) 10);
         setBorder(Component.text("-----=o=O=o=-----").color(NamedTextColor.YELLOW));
 
@@ -73,30 +75,26 @@ public class ArmorStandLeaderboard {
 
         Location loc = getLocation().clone();
 
-        createTitleStands(loc);
-        createStand(getBorder(), loc.subtract(0, 0.25, 0));
+        for (Component c: title){
+            createStand(c, loc);
+            loc.subtract(0, DISTANCE_BETWEEN, 0);
+        }
+
+        createStand(getBorder(), loc);
 
         Map<String, Integer> sorted = getSortedMap();
         List<String> stringList = new ArrayList<>(sorted.keySet());
 
         for (int i = 0; i < getSize(); i++) {
             int toGet = i;
-            if(getOrder() != Order.LOW_TO_HIGH) toGet = sorted.size() - i-1;
+            if(getOrder() != Order.ASCENDING) toGet = sorted.size() - i-1;
             if(toGet >= stringList.size() || toGet <= -1) break;
 
             String name = stringList.get(toGet);
-            createStand(formatString(i+1, name, sorted.get(name)), loc.subtract(0, 0.25, 0));
+            createStand(formatString(i+1, name, sorted.get(name)), loc.subtract(0, DISTANCE_BETWEEN, 0));
         }
 
-        createStand(getBorder(), loc.subtract(0, 0.25, 0));
-    }
-
-    protected void createTitleStands(Location location){
-        location.add(0, 0.25, 0);
-        for (Component c: title){
-            location.subtract(0, 0.25, 0);
-            createStand(c, location);
-        }
+        createStand(getBorder(), loc.subtract(0, DISTANCE_BETWEEN, 0));
     }
 
     protected Component formatString(int pos, String name, int score){
@@ -133,7 +131,10 @@ public class ArmorStandLeaderboard {
      */
     public void destroy(){
         Location l = getLocation().clone();
-        FtcBoundingBox area = new FtcBoundingBox(l.getWorld(), l.getX()+1, l.getY()+1, l.getZ()+1, l.getX()-1, l.getY()-(0.25*getSize()+1), l.getZ()-1);
+        FtcBoundingBox area = new FtcBoundingBox(l.getWorld(),
+                l.getX()+1, l.getY()+1, l.getZ()+1,
+                l.getX()-1, l.getY()-(DISTANCE_BETWEEN * getSize() + 1), l.getZ()-1
+        );
 
         for (ArmorStand stand : area.getEntitiesByType(ArmorStand.class)){
             if(!stand.getPersistentDataContainer().has(CommandHologram.HOLOGRAM_KEY, PersistentDataType.BYTE)) continue;
@@ -207,8 +208,8 @@ public class ArmorStandLeaderboard {
         this.scoreFormatter = scoreFormatter;
     }
 
-    public enum Order{
-        LOW_TO_HIGH,
-        HIGH_TO_LOW
+    public enum Order {
+        ASCENDING,
+        DESCENDING
     }
 }

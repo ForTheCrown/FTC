@@ -4,16 +4,11 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.block.Sign;
 
-public record SignLines(Component line0, Component line1, Component line2, Component line3) implements Struct {
+public record SignLines(Component line0, Component line1, Component line2, Component line3) {
+    public static final SignLines EMPTY = new SignLines(Component.empty(), Component.empty(), Component.empty(), Component.empty());
+
     public SignLines(String s1, String s2, String s3, String s4) {
         this(convert(s1), convert(s2), convert(s3), convert(s4));
-    }
-
-    public SignLines(Component line0, Component line1, Component line2, Component line3) {
-        this.line0 = line0;
-        this.line1 = line1;
-        this.line2 = line2;
-        this.line3 = line3;
     }
 
     public SignLines(Sign sign) {

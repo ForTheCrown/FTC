@@ -10,17 +10,17 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.item.ItemArgument;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.actions.UsageActionInstance;
 import net.forthecrown.useables.checks.UsageCheck;
 import net.forthecrown.useables.checks.UsageCheckInstance;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -56,7 +56,7 @@ public final class InteractionUtils {
 
         Player player = c.asPlayer();
         ItemStack main = player.getInventory().getItemInMainHand();
-        if(FtcItems.isEmpty(main)) throw FtcExceptionProvider.mustHoldItem();
+        if(ItemStacks.isEmpty(main)) throw FtcExceptionProvider.mustHoldItem();
 
         return main.clone();
     }
@@ -80,7 +80,7 @@ public final class InteractionUtils {
     }
 
     public static UsageActionInstance readAction(String strKey, JsonElement element) throws CommandSyntaxException {
-        Key key = FtcUtils.parseKey(strKey);
+        Key key = Keys.parse(strKey);
 
         return (UsageActionInstance) Registries.USAGE_ACTIONS.get(key).deserialize(element);
     }
@@ -92,7 +92,7 @@ public final class InteractionUtils {
     }
 
     public static UsageCheckInstance readCheck(String strKey, JsonElement element) throws CommandSyntaxException {
-        Key key = FtcUtils.parseKey(strKey);
+        Key key = Keys.parse(strKey);
 
         return (UsageCheckInstance) Registries.USAGE_CHECKS.get(key).deserialize(element);
     }

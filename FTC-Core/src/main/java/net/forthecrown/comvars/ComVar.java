@@ -21,7 +21,7 @@ public final class ComVar<T> implements JsonSerializable {
     private T value;
     private final ComVarType<T> type;
     private final String name;
-    private Consumer<T> onUpdate;
+    private Consumer<T> updateListener;
 
     ComVar(ComVarType<T> type, String name, T value){
         this.value = value;
@@ -50,18 +50,18 @@ public final class ComVar<T> implements JsonSerializable {
         return type;
     }
 
-    public Consumer<T> getOnUpdate() {
-        return onUpdate;
+    public Consumer<T> getUpdateListener() {
+        return updateListener;
     }
 
-    public ComVar<T> setOnUpdate(Consumer<T> onUpdate) {
-        this.onUpdate = onUpdate;
+    public ComVar<T> setUpdateListener(Consumer<T> onUpdate) {
+        this.updateListener = onUpdate;
         return this;
     }
 
     public ComVar<T> update(T newValue){
         this.value = newValue;
-        if(onUpdate != null) onUpdate.accept(value);
+        if(updateListener != null) updateListener.accept(value);
         return this;
     }
 

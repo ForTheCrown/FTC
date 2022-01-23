@@ -33,7 +33,13 @@ public abstract class RoyalItem {
 
     protected void load() {
         CompoundTag tag = getData();
-        this.owner = tag.getUUID("owner");
+
+        if(tag.hasUUID("owner")) {
+            this.owner = tag.getUUID("owner");
+        } else {
+            this.owner = Util.NIL_UUID;
+        }
+
         this.loreStart = tag.getInt("lore_start");
         this.loreEnd = tag.getInt("lore_end");
 
@@ -68,12 +74,15 @@ public abstract class RoyalItem {
         CompoundTag tag = new CompoundTag();
         tag.putInt("lore_start", loreStart);
         tag.putInt("lore_end", loreEnd);
-        tag.putUUID("owner", owner);
+
+        if(owner != null) {
+            tag.putUUID("owner", owner);
+        }
 
         onUpdate(item, meta, tag);
 
         meta.lore(lore);
-        FtcItems.setTagElement(meta, tagKey, tag);
+        ItemStacks.setTagElement(meta, tagKey, tag);
         item.setItemMeta(meta);
     }
 
@@ -95,6 +104,6 @@ public abstract class RoyalItem {
     }
 
     public CompoundTag getData() {
-        return FtcItems.getTagElement(item.getItemMeta(), tagKey);
+        return ItemStacks.getTagElement(item.getItemMeta(), tagKey);
     }
 }

@@ -6,9 +6,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.poshd.EventUtil;
 import net.forthecrown.poshd.Main;
 import net.forthecrown.poshd.Messages;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
 
 public class CommandLeaveParkour extends AbstractCommand {
     public CommandLeaveParkour() {

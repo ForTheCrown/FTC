@@ -20,7 +20,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
@@ -86,7 +85,7 @@ public class RoyalSword extends RankedItem {
         this.moneyRewardsFixed = tag.getBoolean("money_rewards_fixed");
 
         if(tag.contains("ability")) {
-            this.ability = Registries.WEAPON_ABILITIES.get(FtcUtils.parseKey(tag.getString("ability")));
+            this.ability = Registries.WEAPON_ABILITIES.get(Keys.parse(tag.getString("ability")));
         }
 
         if(!tag.contains("goals")) return;
@@ -96,7 +95,7 @@ public class RoyalSword extends RankedItem {
         CompoundTag goalsTag = tag.getCompound("goals");
 
         for (String s: goalsTag.getAllKeys()) {
-            Key k = FtcUtils.parseKey(s);
+            Key k = Keys.parse(s);
             if(k.namespace().equals(Main.OLD_NAMESPACE)) k = Keys.forthecrown(k.value());
             int progress = goalsTag.getInt(s);
 
@@ -104,7 +103,7 @@ public class RoyalSword extends RankedItem {
 
             //If the goal wasn't found, warn console and ignore it
             if(goal == null) {
-                Crown.logger().warning("Found unknown goal in RoyalSword. Owned by:" + getOwner() + " Goal: " + s);
+                Crown.logger().warn("Found unknown goal in RoyalSword. Owned by:" + getOwner() + " Goal: " + s);
                 continue;
             }
 
@@ -227,7 +226,7 @@ public class RoyalSword extends RankedItem {
         }
 
         //If the owner is not a donator, tell them they could donate :)
-        if(!getOwnerUser().hasPermission(Permissions.DONATOR_1)) {
+        if(hasPlayerOwner() && !getOwnerUser().hasPermission(Permissions.DONATOR_1)) {
             lore.add(
                     Component.text("Donators can upgrade Royal Tools beyond rank " + FtcUtils.arabicToRoman(RoyalWeapons.DONATOR_RANK))
                             .style(nonItalic(NamedTextColor.DARK_GRAY))
@@ -235,7 +234,7 @@ public class RoyalSword extends RankedItem {
         }
 
         //Could be NIL, because that's used for a generic display version of the sword.
-        if(getOwner() != Util.NIL_UUID) {
+        if(hasPlayerOwner()) {
             lore.add(
                     Component.text("Owner: ")
                             .style(nonItalic(NamedTextColor.DARK_GRAY))

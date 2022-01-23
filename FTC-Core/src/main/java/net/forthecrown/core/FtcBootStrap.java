@@ -6,14 +6,14 @@ import net.forthecrown.core.admin.FtcPunishmentManager;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.FtcJailManager;
 import net.forthecrown.core.chat.*;
-import net.forthecrown.core.kingship.FtcKingship;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
 import net.forthecrown.economy.ServerItemPriceMap;
-import net.forthecrown.economy.guild.HazelguardTradersGuild;
-import net.forthecrown.economy.guild.topics.VoteTopics;
+import net.forthecrown.economy.guilds.TradeGuild;
+import net.forthecrown.economy.guilds.topics.VoteTopics;
 import net.forthecrown.economy.houses.Houses;
+import net.forthecrown.economy.houses.Properties;
 import net.forthecrown.economy.market.FtcMarkets;
 import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.Events;
@@ -63,7 +63,7 @@ final class FtcBootStrap {
     static void enableBootStrap() {
         // Initialize config sections
         joinInfo    = new JoinInfo();
-        dayUpdate   = new DayUpdate();
+        dayChange   = new DayChange();
         kingship    = new FtcKingship();
         rules       = new ServerRules();
         endOpener   = new EndOpener();
@@ -91,10 +91,14 @@ final class FtcBootStrap {
         structureManager = new FtcStructureManager();
 
         markets = new FtcMarkets();
-        tradersGuild = new HazelguardTradersGuild();
+
+        saver = new PeriodicalSaver();
+
+        guild = new TradeGuild();
 
         //Initialize modules
         safeRunnable(CorePacketListeners::init);
+        safeRunnable(Properties::init);
         safeRunnable(Houses::init);
         safeRunnable(Bosses::init);
         safeRunnable(RoyalWeapons::init);

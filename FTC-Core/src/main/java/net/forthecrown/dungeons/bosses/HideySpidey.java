@@ -3,7 +3,7 @@ package net.forthecrown.dungeons.bosses;
 import com.destroystokyo.paper.entity.Pathfinder;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.dungeons.DungeonAreas;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.core.Worlds;
 import net.kyori.adventure.text.Component;
@@ -76,7 +76,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
     @Override
     protected void onUpdate() {
         for (CaveSpider s: helpers){
-            Player nearest = DungeonUtils.getNearestVisiblePlayer(s.getLocation(), getBossRoom());
+            Player nearest = DungeonUtils.getNearestVisiblePlayer(s, getBossRoom());
             if(s.getTarget() != null && s.getTarget().equals(nearest)) continue;
             s.setTarget(nearest);
         }
@@ -103,7 +103,6 @@ public class HideySpidey extends DungeonBoss<Spider> {
 
     @Override
     protected void onDeath(BossFightContext context) {
-        finalizeKill(context);
         for (CaveSpider s: helpers){
             s.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 99999, 254, false, false));
         }

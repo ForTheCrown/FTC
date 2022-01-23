@@ -2,20 +2,21 @@ package net.forthecrown.economy.houses;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.forthecrown.core.Crown;
+import net.forthecrown.core.DayChangeListener;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.economy.guild.GuildVoter;
-import net.forthecrown.economy.guild.VoteState;
+import net.forthecrown.economy.BalanceHolder;
+import net.forthecrown.economy.guilds.VoteState;
+import net.forthecrown.economy.houses.components.HouseComponent;
+import net.forthecrown.registry.BaseRegistry;
 import net.forthecrown.registry.Registries;
+import net.forthecrown.registry.Registry;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.JsonUtils;
-import net.forthecrown.utils.ListUtils;
-import net.forthecrown.utils.Nameable;
+import net.forthecrown.utils.*;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
@@ -26,7 +27,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -34,9 +38,12 @@ import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 public class House implements
-        Keyed, Nameable, HoverEventSource<Component>, GuildVoter,
+        Keyed, Nameable, HoverEventSource<Component>,
+        DayChangeListener, BalanceHolder,
         JsonSerializable, JsonDeserializable
 {
+    private static final NamespacedKey REGISTRY_KEY = Keys.forthecrown("house_components");
+
     private final Key key;
     private final String name;
 
@@ -47,7 +54,14 @@ public class House implements
 
     private final Map<Material, HouseMaterialData> matData = new Object2ObjectOpenHashMap<>();
 
-    public House(String name) {
+    private final Registry<HouseComponent> components = new BaseRegistry<>(REGISTRY_KEY);
+    private Map<Property, Object> properties = null;
+    private int balance;
+
+    long voteTime;
+    private BukkitTask voteTask;
+
+    House(String name) {
         this.name = name;
         this.key = Keys.forthecrown("house_" + name.toLowerCase().replaceAll(" ", "_"));
     }
@@ -81,12 +95,22 @@ public class House implements
         this.description = Validate.notEmpty(description, "description was null");
     }
 
-    @Override
-    public void vote(VoteState state) {
-        VoteModifier modifier = state.getTopic().makeModifier(this);
+    public <T extends HouseComponent> T getComponent(Key key) {
+        return (T) components.get(key);
+    }
 
-        if(modifier.shouldVoteFor()) state.voteFor(this);
-        else state.voteAgainst(this);
+    public void addComponent(HouseComponent component) {
+        components.register(component.key(), component);
+    }
+
+    public <T> T getProperty(Property<T> property) {
+        if(properties == null) return property.defaultValue;
+        return (T) properties.getOrDefault(property, property.defaultValue);
+    }
+
+    public <T> void setProperty(Property<T> property, T value) {
+        if(properties == null) properties = new Object2ObjectOpenHashMap<>();
+        properties.put(property, value);
     }
 
     public Component displayName() {
@@ -94,8 +118,72 @@ public class House implements
     }
 
     @Override
+    public void onDayChange() {
+        // This is where material data should be ticked, aka
+        // demand and supply adjusted and slightly randomized
+        // to make sure houses don't rely 100% on the player
+        // run economy to keep supply and demand going.
+        //
+        // We could have some random ass attributes like
+        // 'material-gathering-speed' to calculate the rate
+        // at which a house can regenerate supply.
+
+
+
+        // Run component updates
+        if(components.isEmpty()) return;
+
+        for (HouseComponent c: components) {
+            c.onDayChange();
+        }
+    }
+
+    public void vote(VoteState state) {
+        voteTime = -1;
+        VoteModifier modifier = state.getTopic().createModifier(this, state.getData());
+
+        if(modifier.shouldVoteFor()) state.votePro(this);
+        else state.voteAgainst(this);
+    }
+
+    void scheduleVoteTask() {
+        cancelVoteTask();
+
+        if(voteTime == -1) return;
+
+        long executeIn = TimeUtil.timeUntil(voteTime);
+
+        if(executeIn <= 0) {
+            vote(Crown.getGuild().getCurrentState());
+            return;
+        }
+
+        executeIn = TimeUtil.millisToTicks(executeIn);
+        Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> vote(Crown.getGuild().getCurrentState()), executeIn);
+    }
+
+    @Override
+    public int getBalance() {
+        return balance;
+    }
+
+    @Override
+    public void setBalance(int balance) {
+        this.balance = balance;
+    }
+
+    private void cancelVoteTask() {
+        if (voteTask == null || voteTask.isCancelled()) return;
+        voteTask.cancel();
+        voteTask = null;
+    }
+
+    @Override
     public @NotNull HoverEvent<Component> asHoverEvent(@NotNull UnaryOperator<Component> op) {
-        if(ListUtils.isNullOrEmpty(description)) return HoverEvent.showText(op.apply(Component.text("Error: " + getName() + " has no description")));
+        if(ListUtils.isNullOrEmpty(description)) {
+            Crown.logger().warn("House " + getName() + " has no description");
+            return HoverEvent.showText(op.apply(Component.text("Error: " + getName() + " has no description")));
+        }
 
         TextComponent.Builder builder = Component.text()
                 .append(Component.text("House of " + getName()).color(NamedTextColor.YELLOW));
@@ -117,10 +205,18 @@ public class House implements
             setDescription(json.getArray("description", ChatUtils::fromJson, Component[]::new));
         }
 
+        cancelVoteTask();
+        voteTime = -1;
+
+        if(json.has("voteTime")) {
+            voteTime = json.getLong("voteTime");
+            scheduleVoteTask();
+        }
+
         houseRelations.clear();
         houseRelations.putAll(
                 json.getMap("houseRelations",
-                        s -> Registries.HOUSES.get(FtcUtils.parseKey(s)),
+                        s -> Registries.HOUSES.get(Keys.parse(s)),
                         e -> new Relation(e.getAsByte()),
                         true
                 )
@@ -146,6 +242,8 @@ public class House implements
                 matData.put(material, data);
             }
         }
+
+        readProperties(json.get("properties"));
     }
 
     public JsonElement serializeFull() {
@@ -155,6 +253,30 @@ public class House implements
         if(relations.isEmpty()) json.addMap("relations", relations, UUID::toString, Relation::serialize);
         if(matData.isEmpty()) json.addMap("materialData", matData, d -> d.name().toLowerCase(), HouseMaterialData::serialize);
         if(description != null) json.addArray("description", description, ChatUtils::toJson);
+        if(voteTime != -1) json.add("voteTime", voteTime);
+
+        json.add("properties", writeProperties());
+
+        return json.getSource();
+    }
+
+    public void readProperties(JsonElement element) {
+        for (Map.Entry<String, JsonElement> e: element.getAsJsonObject().entrySet()) {
+            Property property = Properties.get(e.getKey());
+            Object val = property.deserialize(e.getValue());
+
+            setProperty(property, val);
+        }
+    }
+
+    public JsonElement writeProperties() {
+        JsonWrapper json = JsonWrapper.empty();
+
+        for (Map.Entry<Property, Object> e: properties.entrySet()) {
+            JsonElement element = e.getKey().serialize(e.getValue());
+
+            json.add(e.getKey().name, element);
+        }
 
         return json.getSource();
     }
@@ -177,8 +299,8 @@ public class House implements
     }
 
     @Override
-    public JsonPrimitive serialize() {
-        return JsonUtils.writeKey(key());
+    public JsonElement serialize() {
+        return HouseUtil.write(this);
     }
 
     @Override

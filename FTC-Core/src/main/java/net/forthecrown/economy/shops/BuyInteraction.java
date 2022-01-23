@@ -49,7 +49,7 @@ public class BuyInteraction implements ShopInteraction {
         //When the session expires, tell the shop's owner
         session.onSessionExpire(() -> {
             //Get the total earned amount from the session
-            int totalEarned = session.getPrice() * (session.getAmount() / session.getExampleItem().getAmount());
+            int totalEarned = session.getTotalEarned();
 
             owner.sendMessage(
                     Component.translatable("shops.used.buy.owner",

@@ -90,9 +90,7 @@ public class Skalatan extends DungeonBoss<WitherSkeleton> {
     }
 
     @Override
-    protected void onDeath(BossFightContext context) {
-        finalizeKill(context);
-    }
+    protected void onDeath(BossFightContext context) {}
 
     public static ItemStack witherGoo(){
         return WITHER_GOO.clone();

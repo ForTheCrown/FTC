@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
  */
 public enum RankTier implements Comparable<RankTier>, JsonSerializable {
 
-    NONE (1, NamedTextColor.WHITE, "default"),
+    NONE (1, NamedTextColor.DARK_GRAY, "default"),
     FREE (2, NamedTextColor.GRAY, "free-rank"),
 
-    TIER_1 (3, NamedTextColor.GRAY, "donator-tier-1"),
+    TIER_1 (3, NamedTextColor.WHITE, "donator-tier-1"),
     TIER_2 (4, NamedTextColor.GOLD, "donator-tier-2"),
     TIER_3 (5, NamedTextColor.YELLOW, "donator-tier-3");
 

@@ -12,11 +12,11 @@ import java.util.List;
 public class StructurePlaceContext {
     private final BlockStructure structure;
     private final List<BlockProcessor> processors = new ObjectArrayList<>();
-    private final List<StructureTransform> transforms = new ObjectArrayList<>();
-    private final List<EntityProcessor> entityProcessors = new ObjectArrayList<>();
+    private StructureTransform transform;
     private final Vector3i destination;
     private final BlockPlacer placer;
     private PlaceRotation rotation;
+    private PlaceMirror mirror;
     private Vector3i pivot;
     private boolean placeEntities;
 
@@ -26,8 +26,8 @@ public class StructurePlaceContext {
         this.placer = placer;
         this.pivot = Vector3i.ZERO;
         this.rotation = PlaceRotation.D_0;
-
-        addTransform(StructureTransform.DEFAULT);
+        this.mirror = PlaceMirror.NONE;
+        this.transform = StructureTransform.DEFAULT;
     }
 
     public BlockStructure getStructure() {
@@ -44,14 +44,26 @@ public class StructurePlaceContext {
      * @param relative The relative coordinate
      * @return The absolute coordinate
      */
-    public Vector3i toAbsolute(Vector3i relative) {
-        Vector3i result = relative.clone();
+    public Vector3i transform(Vector3i relative) {
+        return transform.transform(getDestination(), relative.clone(), getPivot(), getMirror(), getRotation());
+    }
 
-        for (StructureTransform t: transforms) {
-            result = t.apply(getDestination(), relative.clone(), result);
-        }
+    public StructureTransform getTransform() {
+        return transform;
+    }
 
-        return result == null ? StructureTransform.DEFAULT.apply(getDestination(), relative.clone(), null) : result;
+    public StructurePlaceContext setTransform(StructureTransform transform) {
+        this.transform = transform;
+        return this;
+    }
+
+    public PlaceMirror getMirror() {
+        return mirror;
+    }
+
+    public StructurePlaceContext setMirror(PlaceMirror mirror) {
+        this.mirror = mirror;
+        return this;
     }
 
     public StructurePlaceContext setRotation(PlaceRotation rotation) {
@@ -63,11 +75,6 @@ public class StructurePlaceContext {
         return rotation;
     }
 
-    public StructurePlaceContext addTransform(StructureTransform transform) {
-        transforms.add(transform);
-        return this;
-    }
-
     public StructurePlaceContext addProccessor(BlockProcessor processor) {
         this.processors.add(processor);
         return this;
@@ -77,22 +84,13 @@ public class StructurePlaceContext {
         return addProccessor(new EmptyBlockProcessor());
     }
 
-    public StructurePlaceContext addEntityProcessor(EntityProcessor processor) {
-        this.entityProcessors.add(processor);
-        return this;
-    }
-
-    /*public StructurePlaceContext addEmptyEntityProcessor() {
-        return addEntityProcessor(new EmptyEntityProcessor());
-    }*/
-
     public StructurePlaceContext setPivot(Vector3i pivot) {
         this.pivot = pivot;
         return this;
     }
 
     public Vector3i getPivot() {
-        return pivot;
+        return pivot.clone();
     }
 
     public Vector3i getAbsolutePivot() {

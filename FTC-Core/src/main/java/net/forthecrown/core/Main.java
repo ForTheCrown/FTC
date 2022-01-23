@@ -8,13 +8,12 @@ import net.forthecrown.core.admin.FtcPunishmentManager;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.admin.jails.FtcJailManager;
 import net.forthecrown.core.chat.*;
-import net.forthecrown.core.kingship.FtcKingship;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
 import net.forthecrown.economy.ServerItemPriceMap;
-import net.forthecrown.economy.guild.HazelguardTradersGuild;
+import net.forthecrown.economy.guilds.TradeGuild;
 import net.forthecrown.economy.market.FtcMarkets;
 import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.MobHealthBar;
@@ -26,8 +25,10 @@ import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
 import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.user.packets.PacketListeners;
+import net.forthecrown.utils.world.WorldLoader;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Nameable;
 import org.bukkit.entity.Player;
@@ -36,7 +37,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.dynmap.DynmapCommonAPIListener;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import static net.forthecrown.utils.FtcUtils.safeRunnable;
 
@@ -57,6 +57,9 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcEconomy               economy;
     static FtcAnnouncer             announcer;
     static FtcKingship              kingship;
+    static FtcTabList               tabList;
+    static FtcMarkets               markets;
+    static FtcConfigImpl            config;
 
     static FtcUserManager           userManager;
     static FtcRegionManager         regionManager;
@@ -69,19 +72,16 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcStructureManager      structureManager;
 
     static FtcMessages              messages;
-    static FtcTabList               tabList;
     static ServerRules              rules;
     static ServerItemPriceMap       prices;
     static JoinInfo                 joinInfo;
     static ChatEmotes               emotes;
-    static DayUpdate                dayUpdate;
-    static FtcMarkets               markets;
-    static HazelguardTradersGuild   tradersGuild;
+    static DayChange                dayChange;
+    static TradeGuild               guild;
     static PeriodicalSaver          saver;
     static EndOpener                endOpener;
 
     static LuckPerms                luckPerms;
-    static FtcConfigImpl            config;
 
     @Override
     public void onEnable() {
@@ -90,7 +90,7 @@ public final class Main extends JavaPlugin implements Crown {
         FtcBootStrap.enableBootStrap();
 
         announcer.doBroadcasts();
-        dayUpdate.schedule();
+        dayChange.schedule();
 
         saverLogic();
 
@@ -111,7 +111,7 @@ public final class Main extends JavaPlugin implements Crown {
         //Hacky way of determining if we're on the test server or not
         inDebugMode = ComVarRegistry.set("debugMode", ComVarTypes.BOOL, !new File("plugins/CoreProtect/config.yml").exists());
 
-        logger = getLogger();
+        logger = getLog4JLogger();
 
         saveResource("banned_words.json", true);
 
@@ -135,6 +135,7 @@ public final class Main extends JavaPlugin implements Crown {
         safeRunnable(Cosmetics::shutDown);
         safeRunnable(PacketListeners::removeAll);
         safeRunnable(CommandArkBox::save);
+        safeRunnable(WorldLoader::shutdown);
 
         FtcUserManager.LOADED_USERS.clear();
         FtcUserManager.LOADED_ALTS.clear();
@@ -143,18 +144,12 @@ public final class Main extends JavaPlugin implements Crown {
     // IDK why this method has logic in the name, when there's
     // clearly no logic being used here, it's dumb af
     void saverLogic() {
-        if(saver != null){
-            try {
-                saver.cancel();
-            } catch (IllegalStateException ignored){}
-        }
+        boolean savePeriodically = config.getJson().getBool("save_periodically");
 
-        if(config.getJson().getBool("save_periodically")) {
-            saver = new PeriodicalSaver(this);
-            saver.start();
-        } else if (saver != null && !saver.isCancelled()){
-            saver.cancel();
-            saver = null;
+        if(savePeriodically) {
+            if(!saver.isScheduled()) saver.start();
+        } else {
+            if(saver.isScheduled()) saver.cancel();
         }
     }
 

@@ -107,15 +107,15 @@ public class CommandTransferShop extends FtcCommand {
     }
 
     private void check(CrownUser user, CrownUser target) throws CommandSyntaxException {
-        if(!user.getMarketOwnership().currentlyOwnsShop()) throw FtcExceptionProvider.noShopOwned();
+        if(!user.getMarketData().currentlyOwnsShop()) throw FtcExceptionProvider.noShopOwned();
 
-        if(target.getMarketOwnership().currentlyOwnsShop()) {
+        if(target.getMarketData().currentlyOwnsShop()) {
             throw FtcExceptionProvider.translatable("market.transfer.error.targetHasShop");
         }
 
-        Markets.checkStatusChange(user.getMarketOwnership());
+        Markets.checkStatusChange(user.getMarketData());
 
-        if(!target.getMarketOwnership().canChangeStatus()) {
+        if(!target.getMarketData().canChangeStatus()) {
             throw FtcExceptionProvider.translatable("market.transfer.error.targetStatus", target.nickDisplayName());
         }
     }

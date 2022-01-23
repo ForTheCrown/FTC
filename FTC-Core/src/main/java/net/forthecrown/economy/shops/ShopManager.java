@@ -5,6 +5,7 @@ import net.forthecrown.core.Main;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.serializer.ShopSerializer;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -118,7 +119,18 @@ public interface ShopManager {
      * @param name The shop's name
      * @return The shop with the given name
      */
-    SignShop getShop(String name);
+    default SignShop getShop(String name) {
+        return getShop(LocationFileName.parse(name));
+    }
+
+    /**
+     * Gets a shop from a given name
+     * @param name The shop's name
+     * @return The shop with the given name
+     */
+    default SignShop getShop(LocationFileName name) {
+        return getShop(name.toVector());
+    }
 
     /**
      * Creates a sign shop at the given location

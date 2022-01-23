@@ -1,6 +1,7 @@
 package net.forthecrown.structure;
 
 import net.forthecrown.utils.math.MathUtil;
+import net.minecraft.world.level.block.Rotation;
 
 /**
  * The rotation of a build,
@@ -36,5 +37,14 @@ public enum PlaceRotation {
 
         if(newOrdinal < 0) return values[newOrdinal + values.length];
         else return values[newOrdinal - values.length];
+    }
+
+    public Rotation toVanilla() {
+        return switch (this) {
+            case D_0 -> Rotation.NONE;
+            case D_90 -> Rotation.CLOCKWISE_90;
+            case D_180 -> Rotation.CLOCKWISE_180;
+            case D_270 -> Rotation.COUNTERCLOCKWISE_90;
+        };
     }
 }

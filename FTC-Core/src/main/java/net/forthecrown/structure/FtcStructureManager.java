@@ -1,12 +1,11 @@
 package net.forthecrown.structure;
 
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.AbstractNbtSerializer;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 
 import java.util.Map;
@@ -31,11 +30,13 @@ public class FtcStructureManager extends AbstractNbtSerializer {
         Registries.STRUCTURES.clear();
 
         for (Map.Entry<String, Tag> e: tag.tags.entrySet()) {
-            Key key = FtcUtils.parseKey(e.getKey());
-            ListTag data = (ListTag) e.getValue();
+            Key key = Keys.parse(e.getKey());
+            Tag data = e.getValue();
 
             BlockStructure structure = new BlockStructure(key);
             structure.load(data);
+
+            Registries.STRUCTURES.register(key, structure);
         }
     }
 }

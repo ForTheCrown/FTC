@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.Worlds;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -13,6 +14,7 @@ import net.minecraft.server.players.BanListEntry;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -118,8 +120,8 @@ public final class JsonUtils {
         return new JsonPrimitive(key.asString());
     }
 
-    public static Key readKey(JsonElement element){
-        return FtcUtils.parseKey(element.getAsString());
+    public static NamespacedKey readKey(JsonElement element){
+        return Keys.parse(element.getAsString());
     }
 
     // Read the UUID from the element

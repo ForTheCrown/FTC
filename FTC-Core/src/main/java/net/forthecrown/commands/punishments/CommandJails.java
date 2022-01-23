@@ -4,11 +4,11 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.arguments.JailArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;
@@ -122,7 +122,7 @@ public class CommandJails extends FtcCommand {
     }
 
     private int createJail(Location loc, String name, CommandSource source, float yaw, float pitch) {
-        Key key = FtcUtils.parseKey(name);
+        Key key = Keys.parse(name);
 
         loc.setYaw(yaw);
         loc.setPitch(pitch);

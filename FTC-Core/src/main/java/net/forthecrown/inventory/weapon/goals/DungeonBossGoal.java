@@ -1,8 +1,8 @@
 package net.forthecrown.inventory.weapon.goals;
 
+import net.forthecrown.core.Keys;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
@@ -38,7 +38,7 @@ public class DungeonBossGoal implements WeaponKillGoal {
     public boolean test(Entity entity) {
         // onDeath in DungeonBoss gets called before the weapon listener, getBossEntity() returns null
         if(!entity.getPersistentDataContainer().has(Bosses.BOSS_TAG, PersistentDataType.STRING)) return false;
-        Key bossKey = FtcUtils.parseKey(entity.getPersistentDataContainer().get(Bosses.BOSS_TAG, PersistentDataType.STRING));
+        Key bossKey = Keys.parse(entity.getPersistentDataContainer().get(Bosses.BOSS_TAG, PersistentDataType.STRING));
 
         return boss.key().equals(bossKey);
     }

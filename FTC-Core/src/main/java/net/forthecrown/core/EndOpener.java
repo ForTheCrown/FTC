@@ -5,6 +5,8 @@ import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.Bukkit2NMS;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.WorldVec3i;
+import net.forthecrown.utils.world.WorldLoader;
+import net.forthecrown.utils.world.WorldReCreator;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -12,35 +14,42 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.dimension.end.EndDragonFight;
 import org.apache.commons.lang3.Range;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlock;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.time.YearMonth;
 import java.util.Calendar;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The end opener should automatically close and open the end portal in
  * Hazelguard.
  * It should be kept open for the last 7 days of each week, aka, end week.
  */
-public class EndOpener extends FtcConfig.ConfigSection implements Runnable {
+public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListener {
     private Component openMessage, closeMessage;
     private WorldVec3i leverPos;
     private boolean open;
     private boolean enabled;
+    private int endSize;
 
     public EndOpener() {
         super("end_opener");
 
-        Crown.getDayUpdate().addListener(this);
+        Crown.getDayChange().addListener(this);
     }
 
     @Override
-    public void run() {
+    public void onDayChange() {
         // If we've disabled this, don't run
         if(!enabled) return;
 
@@ -53,6 +62,12 @@ public class EndOpener extends FtcConfig.ConfigSection implements Runnable {
         // portal should be closed
         Range<Byte> closedRange = Range.between(first, openingDay);
 
+        // idk, if it's the middle of the month, reset the end
+        // Preferably perform the resetting asynchronously.
+        int rangeDif = closedRange.getMaximum() - closedRange.getMinimum();
+        int resetDay = closedRange.getMinimum() + (rangeDif / 2);
+        if(day == resetDay) regen();
+
         // If current day is a closed day, but portal not closed,
         // close it, if not close day and portal not open, open it
         // This is messy, but IDK how to do it better
@@ -61,6 +76,42 @@ public class EndOpener extends FtcConfig.ConfigSection implements Runnable {
         } else if(!open) setOpen(true);
     }
 
+    /**
+     * Regenerates the end with a new seed and {@link EndOpener#getEndSize()} size.
+     */
+    public CompletableFuture<Void> regen() {
+        WorldReCreator reCreator = WorldReCreator.of(Worlds.END)
+                .preserveSeed(false)
+                .preserveWorldBorder(true);
+
+        World world = reCreator.run();
+        world.getWorldBorder().setSize(endSize);
+
+        return WorldLoader.loadAsync(world)
+                .whenComplete((unused, throwable) -> {
+                    // Run sync
+                    Bukkit.getScheduler().runTask(Crown.inst(), () -> {
+                        try {
+                            EndDragonFight fight = Bukkit2NMS.getLevel(world).dragonFight();
+
+                            // Create exit portal
+                            fight.spawnExitPortal(true);
+
+                            // Place gateways
+                            new EndGateWayPlacer().place(fight);
+                        } catch (ReflectiveOperationException e) {
+                            e.printStackTrace();
+                        }
+
+                        Crown.logger().info("Placed end exit portal and gateways");
+                    });
+                });
+    }
+
+    /**
+     * Opens or closes the end
+     * @param open Whether the end is to be open
+     */
     public void setOpen(boolean open) {
         // If lever setting fails, don't proceed
         if(!setLever(open)) return;
@@ -82,7 +133,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements Runnable {
         Block b = leverPos.getBlock();
 
         if(b.getType() != Material.LEVER) {
-            Crown.logger().severe("Given EndOpener lever position is not a lever! Cannot close/open end");
+            Crown.logger().error("Given EndOpener lever position: {} is not a lever! Cannot close/open end", leverPos);
             return false;
         }
 
@@ -151,12 +202,25 @@ public class EndOpener extends FtcConfig.ConfigSection implements Runnable {
         return leverPos;
     }
 
+    public int getEndSize() {
+        return endSize;
+    }
+
+    public void setEndSize(int endSize) {
+        this.endSize = endSize;
+
+        if(isOpen()) {
+            Worlds.END.getWorldBorder().setSize(endSize);
+        }
+    }
+
     @Override
     public void deserialize(JsonElement element) {
         JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
         this.enabled = json.getBool("enabled");
         this.open = json.getBool("open");
+        this.endSize = json.getInt("size");
 
         this.leverPos = WorldVec3i.of(json.get("lever"));
         this.closeMessage = json.getComponent("close_message");
@@ -169,6 +233,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements Runnable {
 
         json.add("enabled", enabled);
         json.add("open", open);
+        json.add("size", endSize);
 
         json.add("lever", leverPos);
         json.addComponent("close_message", closeMessage);
@@ -227,6 +292,28 @@ public class EndOpener extends FtcConfig.ConfigSection implements Runnable {
             @Override
             public Material material() {
                 return material == null ? ROAD_MATERIALS[FtcUtils.RANDOM.nextInt(ROAD_MATERIALS.length)] : material;
+            }
+        }
+    }
+
+    private static class EndGateWayPlacer {
+        private final Method newGateway;
+        private final Field possibleGateways;
+
+        private EndGateWayPlacer() throws ReflectiveOperationException {
+            newGateway = EndDragonFight.class.getDeclaredMethod("n");
+            newGateway.setAccessible(true);
+
+            possibleGateways = EndDragonFight.class.getDeclaredField("m");
+            possibleGateways.setAccessible(true);
+        }
+
+        private void place(EndDragonFight fight) throws ReflectiveOperationException {
+            List<Integer> possible = (List<Integer>) possibleGateways.get(fight);
+            int length = possible.size();
+
+            for (int i = 0; i < length; i++) {
+                newGateway.invoke(fight);
             }
         }
     }

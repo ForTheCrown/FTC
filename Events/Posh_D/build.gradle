@@ -1,5 +1,4 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '7.1.0'
     id 'java'
 }
 
@@ -17,11 +16,9 @@ dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT'
     compileOnly 'com.mojang:brigadier:1.0.18'
 
-    implementation files("/libs/Grenadier.jar")
+    compileOnly files("/libs/Grenadier.jar")
 }
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 }
-
-shadowJar {}

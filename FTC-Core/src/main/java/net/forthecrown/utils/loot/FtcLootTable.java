@@ -3,9 +3,9 @@ package net.forthecrown.utils.loot;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.forthecrown.core.Keys;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.NamespacedKey;
@@ -51,7 +51,7 @@ public interface FtcLootTable extends LootTable, JsonSerializable {
     static FtcLootTable deserialize(JsonElement element){
         JsonObject json = element.getAsJsonObject();
 
-        Key key = FtcUtils.parseKey(json.get("key").getAsString());
+        Key key = Keys.parse(json.get("key").getAsString());
 
         JsonArray array = json.getAsJsonArray("items");
         List<ItemStack> items = new ArrayList<>();

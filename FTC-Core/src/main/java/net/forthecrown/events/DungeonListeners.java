@@ -4,12 +4,12 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.bosses.Skalatan;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.squire.enchantment.RoyalEnchant;
 import net.forthecrown.squire.enchantment.RoyalEnchants;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -117,7 +117,7 @@ public class DungeonListeners implements Listener {
         boolean found = false;
 
         for (ItemStack item : event.getEntity().getInventory().getContents()) {
-            if(FtcItems.isEmpty(item)) continue;
+            if(ItemStacks.isEmpty(item)) continue;
 
             if (item.getItemMeta().getLore() != null && item.getItemMeta().getLore().contains("Dungeon Item")) {
                 found = true;

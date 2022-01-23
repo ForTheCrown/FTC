@@ -28,6 +28,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.actions.ActionFactory;
 import net.forthecrown.user.data.*;
+import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
@@ -36,6 +37,8 @@ import org.bukkit.Location;
 
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -159,6 +162,66 @@ public class CommandFtcUser extends FtcCommand {
                                 )
                         )
 
+                        .then(literal("alts")
+                                .executes(userCmd((user, c) -> {
+                                    UserManager manager = Crown.getUserManager();
+                                    List<UUID> alts = manager.getAlts(user.getUniqueId());
+
+                                    if(alts.isEmpty()) {
+                                        throw FtcExceptionProvider.create(user.getName() + " has no alts");
+                                    }
+
+                                    TextComponent.Builder builder = Component.text()
+                                            .append(user.displayName())
+                                            .append(Component.text("'s alts:"));
+
+                                    for (UUID id: alts) {
+                                        CrownUser u = UserManager.getUser(id);
+
+                                        builder
+                                                .append(Component.text(" "))
+                                                .append(u.displayName());
+                                    }
+
+                                    c.getSource().sendMessage(builder.build());
+                                }))
+
+                                .then(literal("add")
+                                        .then(argument("alt", UserArgument.user())
+                                                .executes(userCmd((user, c) -> {
+                                                    UserManager manager = Crown.getUserManager();
+                                                    CrownUser alt = UserArgument.getUser(c, "alt");
+
+                                                    if(manager.isAlt(alt.getUniqueId())) {
+                                                        CrownUser main = UserManager.getUser(manager.getMain(alt.getUniqueId()));
+                                                        throw FtcExceptionProvider.create(alt.getName() + " is already alt for: " + main.getName());
+                                                    }
+
+                                                    manager.addEntry(alt.getUniqueId(), user.getUniqueId());
+
+                                                    c.getSource().sendAdmin(alt.getName() + " is now an alt for " + user.getName());
+                                                }))
+                                        )
+                                )
+
+                                .then(literal("remove")
+                                        .then(argument("alt", UserArgument.user())
+                                                .executes(userCmd((user, c) -> {
+                                                    UserManager manager = Crown.getUserManager();
+                                                    CrownUser alt = UserArgument.getUser(c, "alt");
+
+                                                    if(!manager.isAlt(alt.getUniqueId())) {
+                                                        throw FtcExceptionProvider.create(alt.getName() + " is not an alt");
+                                                    }
+
+                                                    manager.removeEntry(alt.getUniqueId());
+
+                                                    c.getSource().sendAdmin(alt.getName() + " is no longer an alt");
+                                                }))
+                                        )
+                                )
+                        )
+
                         .then(literal("gems")
                                 .executes(userCmd((user, c) -> c.getSource().sendMessage(
                                         Component.text()
@@ -229,7 +292,7 @@ public class CommandFtcUser extends FtcCommand {
 
                         .then(literal("reset_market_cooldown")
                                 .executes(userCmd((user, c) -> {
-                                    user.getMarketOwnership().setLastStatusChange(0L);
+                                    user.getMarketData().setLastStatusChange(0L);
 
                                     c.getSource().sendAdmin("Reset " + user.getName() + "'s market status cooldown");
                                 }))

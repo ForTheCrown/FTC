@@ -5,7 +5,7 @@ import net.forthecrown.core.Worlds;
 import net.forthecrown.dungeons.BossFightContext;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.DungeonUtils;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
@@ -113,7 +113,6 @@ public class Drawned extends DungeonBoss<Drowned> {
 
     @Override
     protected void onDeath(BossFightContext context) {
-        finalizeKill(context);
         for (Guardian s: guardians){
             s.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 99999, 254, false, false));
         }

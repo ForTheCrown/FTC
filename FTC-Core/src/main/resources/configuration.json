@@ -12,9 +12,11 @@
     "pitch": 0,
     "yaw": -180
   },
+  "illegal_worlds": [ "world_void" ],
   "end_opener": {
     "enabled": true,
     "open": false,
+    "size": 1600,
     "lever": {
       "world": "world",
       "cords": [ 257, 82, 197 ]

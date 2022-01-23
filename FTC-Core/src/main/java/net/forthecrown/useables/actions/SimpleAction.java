@@ -4,12 +4,12 @@ import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.grenadier.CommandSource;
-import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
-public record SimpleAction<T extends UsageActionInstance>(Key key,
+public record SimpleAction<T extends UsageActionInstance>(NamespacedKey key,
                                                           Supplier<T> supplier) implements UsageAction<T> {
 
     @Override
@@ -29,7 +29,7 @@ public record SimpleAction<T extends UsageActionInstance>(Key key,
 
     @Override
     public @NotNull
-    Key key() {
+    NamespacedKey key() {
         return key;
     }
 }

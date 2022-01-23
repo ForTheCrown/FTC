@@ -4,17 +4,17 @@ import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Keys;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.ComponentArgument;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionShowText implements UsageAction<ActionShowText.ActionInstance> {
-    public static final Key KEY = Keys.forthecrown("show_text");
-    private static final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
+    public static final NamespacedKey KEY = Keys.forthecrown("show_text");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
@@ -23,12 +23,12 @@ public class ActionShowText implements UsageAction<ActionShowText.ActionInstance
 
     @Override
     public ActionInstance deserialize(JsonElement element) throws CommandSyntaxException {
-        return new ActionInstance(serializer.deserializeFromTree(element));
+        return new ActionInstance(ChatUtils.fromJson(element));
     }
 
     @Override
     public JsonElement serialize(ActionInstance value) {
-        return serializer.serializeToTree(value.getComponent());
+        return ChatUtils.toJson(value.getComponent());
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ActionShowText implements UsageAction<ActionShowText.ActionInstance
 
         @Override
         public String asString() {
-            return typeKey().asString() + "{" + "component=" + serializer.serialize(component) + '}';
+            return typeKey().asString() + "{" + "component=" + ChatUtils.toJson(component) + '}';
         }
 
         public Component getComponent() {

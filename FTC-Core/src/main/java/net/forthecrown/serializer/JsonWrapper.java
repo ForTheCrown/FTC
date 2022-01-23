@@ -16,6 +16,7 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
@@ -93,7 +94,7 @@ public class JsonWrapper {
         json.add(name, writeKey(key));
     }
 
-    public Key getKey(String name){
+    public NamespacedKey getKey(String name){
         return get(name, JsonUtils::readKey);
     }
 

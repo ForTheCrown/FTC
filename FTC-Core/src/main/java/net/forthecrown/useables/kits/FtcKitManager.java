@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.serializer.AbstractJsonSerializer;
@@ -41,7 +42,7 @@ public class FtcKitManager extends AbstractJsonSerializer implements KitManager 
         kits.clear();
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
             try {
-                Key key = Key.key(e.getKey());
+                Key key = Keys.parse(e.getKey());
                 kits.put(key, new FtcKit(key, e.getValue()));
             } catch (CommandSyntaxException exception) {
                 exception.printStackTrace();
@@ -51,13 +52,13 @@ public class FtcKitManager extends AbstractJsonSerializer implements KitManager 
 
     @Override
     public Kit get(Key key) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         return kits.get(key);
     }
 
     @Override
     public Kit register(Key key, List<ItemStack> value) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         FtcKit kit = new FtcKit(key, value);
         kits.put(key, kit);
 
@@ -66,7 +67,7 @@ public class FtcKitManager extends AbstractJsonSerializer implements KitManager 
 
     @Override
     public void remove(Key key) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         kits.remove(key);
     }
 
@@ -77,7 +78,7 @@ public class FtcKitManager extends AbstractJsonSerializer implements KitManager 
 
     @Override
     public boolean contains(Key key) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         return kits.containsKey(key);
     }
 

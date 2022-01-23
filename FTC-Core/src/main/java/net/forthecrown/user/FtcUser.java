@@ -2,10 +2,7 @@ package net.forthecrown.user;
 
 import io.papermc.paper.adventure.AdventureComponent;
 import it.unimi.dsi.fastutil.objects.*;
-import net.forthecrown.core.ComVars;
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.Permissions;
-import net.forthecrown.core.Worlds;
+import net.forthecrown.core.*;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentManager;
 import net.forthecrown.core.admin.record.PunishmentRecord;
@@ -14,14 +11,13 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.JoinInfo;
 import net.forthecrown.core.chat.ProfilePrinter;
-import net.forthecrown.core.kingship.Kingship;
 import net.forthecrown.cosmetics.PlayerRidingManager;
 import net.forthecrown.economy.selling.UserSellResult;
 import net.forthecrown.events.dynamic.AfkListener;
 import net.forthecrown.events.dynamic.RegionVisitListener;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.royalgrenadier.source.CommandSources;
 import net.forthecrown.user.data.*;
@@ -92,7 +88,7 @@ public class FtcUser implements CrownUser {
     public Component currentPrefix;
 
     //Attachments
-    public final FtcMarketOwnership marketOwnership;
+    public final FtcUserMarketData marketOwnership;
     public final FtcUserDataContainer dataContainer;
     public final FtcUserInteractions interactions;
     public final FtcUserCosmeticData cosmeticData;
@@ -147,7 +143,7 @@ public class FtcUser implements CrownUser {
     public FtcUser(@NotNull UUID uniqueId){
         this.uniqueId = uniqueId;
 
-        marketOwnership = new FtcMarketOwnership(this);
+        marketOwnership = new FtcUserMarketData(this);
         dataContainer = new FtcUserDataContainer(this);
         interactions = new FtcUserInteractions(this);
         cosmeticData = new FtcUserCosmeticData(this);
@@ -243,7 +239,7 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public MarketOwnership getMarketOwnership() {
+    public UserMarketData getMarketData() {
         return marketOwnership;
     }
 
@@ -737,7 +733,7 @@ public class FtcUser implements CrownUser {
             if(record == null) return;
 
             try {
-                Key key = FtcUtils.parseKey(record.extra);
+                Key key = Keys.parse(record.extra);
                 manager.jail(key, getPlayer());
             } catch (Exception ignored) {}
         }
@@ -1030,7 +1026,7 @@ public class FtcUser implements CrownUser {
 
         if(targetAmount == -1) {
             for (ItemStack i: inv) {
-                if(FtcItems.isEmpty(i)) continue;
+                if(ItemStacks.isEmpty(i)) continue;
                 if(i.getType() != material) continue;
 
                 foundAmount += i.getAmount();

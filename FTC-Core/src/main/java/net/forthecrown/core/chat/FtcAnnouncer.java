@@ -8,7 +8,8 @@ import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.comvars.types.ComVarTypes;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Worlds;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.ItemStacks;
+import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
@@ -39,7 +40,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
         reload();
 
-        delay.setOnUpdate(val -> start());
+        delay.setUpdateListener(val -> start());
         Crown.logger().info("Announcer loaded");
     }
 
@@ -178,7 +179,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
                 Component.text("You can get the ")
                         .append(RankTitle.KNIGHT.prefix())
                         .append(Component.text("tag and a "))
-                        .append(FtcItems.royalSword().getItemMeta().displayName().hoverEvent(FtcItems.royalSword()))
+                        .append(RoyalWeapons.displaySword().displayName())
                         .append(Component.text(" for completing the Dungeons."))
         ));
         array.add(ser(Component.text("There is a skeleton farm in Hazelguard if you need xp or bones.")));
@@ -208,7 +209,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
                         .append(Component.text(" to receive "))
                         .append(Component.text("Bank Tickets ")
                                 .color(NamedTextColor.GOLD)
-                                .hoverEvent(FtcItems.voteTicket().asHoverEvent())
+                                .hoverEvent(ItemStacks.voteTicket().asHoverEvent())
                         )
                         .append(Component.text("used in the "))
                         .append(Component.text("[bank]")

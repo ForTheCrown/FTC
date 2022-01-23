@@ -35,7 +35,7 @@ public abstract class ActionableBase extends CheckableBase implements Actionable
 
     @Override
     public <T extends UsageActionInstance> T getAction(Key key, Class<T> clazz) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         for (UsageActionInstance a: actions){
             if(!a.typeKey().equals(key)) continue;
             if(!clazz.isAssignableFrom(a.getClass())) continue;

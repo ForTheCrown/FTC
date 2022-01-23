@@ -70,12 +70,10 @@ public class StructureScanContext {
     }
 
     boolean filterBlock(Block block) {
-        if(blockFilter == null) return true;
-        return blockFilter.test(block);
+        return blockFilter == null || blockFilter.test(block);
     }
 
     boolean filterEntity(Entity entity) {
-        if(entityFilter == null) return true;
-        return entityFilter.test(entity);
+        return entityFilter == null || entityFilter.test(entity);
     }
 }

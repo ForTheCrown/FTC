@@ -9,7 +9,6 @@ import net.forthecrown.commands.clickevent.ClickEventCommand;
 import net.forthecrown.commands.economy.*;
 import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.help.*;
-import net.forthecrown.commands.CommandMail;
 import net.forthecrown.commands.markets.*;
 import net.forthecrown.commands.marriage.*;
 import net.forthecrown.commands.punishments.*;
@@ -18,7 +17,6 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.RoyalArguments;
 import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.grenadier.types.KeyArgument;
 import net.forthecrown.royalgrenadier.arguments.RoyalArgumentsImpl;
 import net.forthecrown.user.data.RankTitle;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -26,13 +24,11 @@ import net.minecraft.commands.arguments.TimeArgument;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 public final class FtcCommands {
 
     public static final Map<String, FtcCommand> BY_NAME = new HashMap<>();
     public static final EnumArgument<RankTitle> RANK = EnumArgument.of(RankTitle.class);
-    public static final KeyArgument FTC_KEY_PARSER = KeyArgument.key(Crown.inst());
 
     private FtcCommands(){}
 
@@ -83,6 +79,7 @@ public final class FtcCommands {
         new CommandSetSpawn();
         new CommandRoyals();
         new CommandFtcUser();
+        new CommandPlayerTime();
 
         //Admin utility
         new CommandEndOpener();
@@ -136,7 +133,6 @@ public final class FtcCommands {
         new CommandAfk();
         new CommandList();
         new CommandMe();
-        new CommandVolleyBall();
         new CommandArkBox();
         new CommandMail();
         new CommandCosmetics();
@@ -157,6 +153,7 @@ public final class FtcCommands {
         new CommandDeposit();
         new CommandBecomeBaron();
         new CommandEditShop();
+        new CommandShopHistory();
 
         //help commands
         new HelpDiscord();
@@ -237,10 +234,6 @@ public final class FtcCommands {
 
         new HelpHelp();
 
-        Crown.logger().log(Level.INFO, "Commands loaded");
-    }
-
-    public static KeyArgument ftcKeyType() {
-        return FTC_KEY_PARSER;
+        Crown.logger().info("Commands loaded");
     }
 }

@@ -5,10 +5,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.forthecrown.core.Keys;
 import net.forthecrown.utils.CrownRandom;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
-import net.kyori.adventure.key.Key;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -35,8 +34,7 @@ public class FtcWeightedLootTable implements WeightedLootTable {
     public FtcWeightedLootTable(JsonElement element){
         JsonObject json = element.getAsJsonObject();
 
-        Key temp = FtcUtils.parseKey(json.get("key").getAsString());
-        this.key = new NamespacedKey(temp.namespace(), temp.value());
+        this.key = Keys.parse(json.get("key").getAsString());
         this.maxItemsToGive = json.get("maxToGive").getAsInt();
 
         Map<ItemStack, Integer> tempMap = new HashMap<>();

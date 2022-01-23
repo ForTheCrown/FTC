@@ -5,12 +5,13 @@ import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
+import net.forthecrown.utils.math.MathUtil;
 import org.bukkit.Material;
 
 public class HouseMaterialData implements JsonSerializable {
     private final Material material;
+    private float demand;
     private int price;
-    private int demand;
     private int supply;
 
     public HouseMaterialData(Material material) {
@@ -35,12 +36,12 @@ public class HouseMaterialData implements JsonSerializable {
         return material;
     }
 
-    public int getDemand() {
+    public float getDemand() {
         return demand;
     }
 
-    public void setDemand(int demand) {
-        this.demand = demand;
+    public void setDemand(float demand) {
+        this.demand = (float) MathUtil.clamp(demand, -1F, 1F);
     }
 
     public int getSupply() {
@@ -63,8 +64,8 @@ public class HouseMaterialData implements JsonSerializable {
         this.price = price;
     }
 
-    public void addDemand(int amount) {
-        this.demand += amount;
+    public void addDemand(float amount) {
+        setDemand(demand + amount);
     }
 
     public void addSupply(int amount) {
@@ -72,7 +73,7 @@ public class HouseMaterialData implements JsonSerializable {
     }
 
     public void recalculate() {
-
+        // uhuh yeah, how doe
     }
 
     public void reset() {

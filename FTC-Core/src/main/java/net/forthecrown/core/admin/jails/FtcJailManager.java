@@ -6,7 +6,6 @@ import net.forthecrown.core.Keys;
 import net.forthecrown.events.dynamic.JailListener;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
@@ -40,7 +39,7 @@ public class FtcJailManager extends AbstractJsonSerializer implements JailManage
         jails.clear();
 
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
-            Key key = FtcUtils.parseKey(e.getKey());
+            Key key = Keys.parse(e.getKey());
             Location loc = JsonUtils.readLocation(e.getValue().getAsJsonObject());
 
             jails.put(key, loc);

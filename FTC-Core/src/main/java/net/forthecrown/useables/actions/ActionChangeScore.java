@@ -11,6 +11,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.scoreboard.ObjectiveArgument;
 import net.forthecrown.serializer.JsonWrapper;
 import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -19,9 +20,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionInstance> {
-    public static final Key ADD_KEY = Keys.forthecrown("add_score");
-    public static final Key REMOVE_KEY = Keys.forthecrown("remove_score");
-    public static final Key SET_KEY = Keys.forthecrown("set_score");
+    public static final NamespacedKey
+            ADD_KEY     = Keys.forthecrown("add_score"),
+            REMOVE_KEY  = Keys.forthecrown("remove_score"),
+            SET_KEY     = Keys.forthecrown("set_score");
 
     private final Action action;
 

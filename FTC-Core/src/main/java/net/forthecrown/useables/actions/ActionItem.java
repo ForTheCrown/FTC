@@ -11,6 +11,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.InteractionUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -18,8 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class ActionItem implements UsageAction<ActionItem.ActionInstance> {
-    public static final Key ADD_KEY = Keys.forthecrown("give_item");
-    public static final Key REMOVE_KEY = Keys.forthecrown("remove_item");
+    public static final NamespacedKey
+            ADD_KEY     = Keys.forthecrown("give_item"),
+            REMOVE_KEY  = Keys.forthecrown("remove_item");
 
     private final boolean add;
 

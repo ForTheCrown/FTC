@@ -6,7 +6,7 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.Nameable;
 import net.kyori.adventure.key.Key;

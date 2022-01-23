@@ -19,7 +19,7 @@ import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.math.Vector3iOffset;
 import net.forthecrown.utils.transformation.BoundingBoxes;

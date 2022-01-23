@@ -1,6 +1,6 @@
 package net.forthecrown.dungeons;
 
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
@@ -16,7 +16,7 @@ public enum BossItems {
 
     private final ItemStack itemCreator;
 
-    BossItems(String name, String tagLine){
+    BossItems(String name, String tagLine) {
         this.itemCreator = new ItemStackBuilder(Material.GOLDEN_APPLE, 1)
                 .setName(Component.text(name).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE))
                 .addLore(Component.text(tagLine))
@@ -25,7 +25,7 @@ public enum BossItems {
     }
 
     @NotNull
-    public ItemStack item(){
+    public ItemStack item() {
         return itemCreator.clone();
     }
 }

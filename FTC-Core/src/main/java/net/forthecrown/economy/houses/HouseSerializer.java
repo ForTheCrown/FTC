@@ -14,6 +14,7 @@ public final class HouseSerializer {
     private HouseSerializer() {}
 
     public static void serialize() {
+        if(!Houses.ENABLED) return;
         JsonWrapper json = JsonWrapper.empty();
 
         for (House h: Registries.HOUSES) {
@@ -28,6 +29,7 @@ public final class HouseSerializer {
     }
 
     public static void deserialize() {
+        if(!Houses.ENABLED) return;
         JsonWrapper json;
 
         try {

@@ -7,6 +7,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.serializer.AbstractJsonSerializer;
@@ -41,7 +42,7 @@ public class FtcWarpManager extends AbstractJsonSerializer implements WarpManage
         warps.clear();
         for (Map.Entry<String, JsonElement> e: json.entrySet()){
             try {
-                Key key = FtcUtils.parseKey(e.getKey());
+                Key key = Keys.parse(e.getKey());
                 FtcWarp warp = new FtcWarp(key, e.getValue());
 
                 warps.put(key, warp);
@@ -81,13 +82,13 @@ public class FtcWarpManager extends AbstractJsonSerializer implements WarpManage
 
     @Override
     public Warp get(Key key) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         return warps.get(key);
     }
 
     @Override
     public Warp register(Key key, Location value) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         FtcWarp warp = new FtcWarp(key, value);
         warps.put(key, warp);
         return warp;
@@ -95,7 +96,7 @@ public class FtcWarpManager extends AbstractJsonSerializer implements WarpManage
 
     @Override
     public void remove(Key key) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         warps.remove(key);
     }
 
@@ -106,7 +107,7 @@ public class FtcWarpManager extends AbstractJsonSerializer implements WarpManage
 
     @Override
     public boolean contains(Key key) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         return warps.containsKey(key);
     }
 

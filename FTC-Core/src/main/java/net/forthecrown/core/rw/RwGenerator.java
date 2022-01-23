@@ -12,9 +12,33 @@ public class RwGenerator extends ChunkGenerator {
     @Override
     public @NotNull List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
         return List.of(
-                new SpawnPopulator(),
                 new OrePopulator(Material.COAL_ORE, 12, 0, 320, 15),
                 new OrePopulator(Material.LAPIS_ORE, 12, -64, 64, 6)
         );
+    }
+
+    @Override
+    public boolean shouldGenerateBedrock() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldGenerateSurface() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldGenerateCaves() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldGenerateMobs() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldGenerateStructures() {
+        return true;
     }
 }

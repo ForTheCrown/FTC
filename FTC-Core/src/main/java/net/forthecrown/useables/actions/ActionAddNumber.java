@@ -9,12 +9,14 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstance> {
-    public static final Key GEM_KEY = Keys.forthecrown("add_gems");
-    public static final Key BAL_KEY = Keys.forthecrown("add_bal");
+    public static final NamespacedKey
+            GEM_KEY = Keys.forthecrown("add_gems"),
+            BAL_KEY = Keys.forthecrown("add_bal");
 
     private final boolean toBal;
 

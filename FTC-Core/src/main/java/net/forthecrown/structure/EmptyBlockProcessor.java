@@ -10,6 +10,6 @@ import org.jetbrains.annotations.Nullable;
 public class EmptyBlockProcessor implements BlockProcessor {
     @Override
     public @Nullable BlockPlaceData process(BlockPalette palette, BlockPalette.StateData data, StructurePlaceContext context, @Nullable BlockPlaceData previousResult) {
-        return previousResult == null ? new BlockPlaceData(context.toAbsolute(data.offset()), palette.getState(), data.tag()) : previousResult;
+        return previousResult == null ? new BlockPlaceData(context.transform(data.offset()), palette.getState(), data.tag()) : previousResult;
     }
 }

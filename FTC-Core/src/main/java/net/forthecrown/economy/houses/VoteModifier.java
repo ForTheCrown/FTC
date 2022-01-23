@@ -1,6 +1,6 @@
 package net.forthecrown.economy.houses;
 
-import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.MathUtil;
 
 public class VoteModifier {
@@ -8,7 +8,6 @@ public class VoteModifier {
 
     //Negative against, positive pro
     private final byte value;
-    private final CrownRandom random = new CrownRandom();
 
     public VoteModifier(int value) {
         this.value = (byte) MathUtil.clamp(value, -MAX_VALUE, MAX_VALUE);
@@ -19,8 +18,8 @@ public class VoteModifier {
     }
 
     public boolean shouldVoteFor() {
-        if(MathUtil.isInRange(value, -15, 15)) return random.nextBoolean();
+        if(MathUtil.isInRange(value, -15, 15)) return FtcUtils.RANDOM.nextBoolean();
 
-        return value + random.intInRange(-15, 15) > 0;
+        return value + FtcUtils.RANDOM.intInRange(-15, 15) > 0;
     }
 }

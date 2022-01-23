@@ -3,14 +3,14 @@ package net.forthecrown.inventory.weapon;
 import it.unimi.dsi.fastutil.doubles.Double2DoubleFunction;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.dungeons.Bosses;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbilities;
 import net.forthecrown.inventory.weapon.goals.ChargedCreeperGoal;
 import net.forthecrown.inventory.weapon.goals.DonatorWeaponGoal;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.inventory.weapon.upgrades.*;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -45,6 +45,8 @@ public final class RoyalWeapons {
     private RoyalWeapons() {}
 
     static final CachedUpgrades[] UPGRADES = new CachedUpgrades[MAX_RANK + 1];
+
+    static ItemStack DISPLAY_SWORD;
 
     public static void init() {
         int rank = 1;
@@ -193,6 +195,16 @@ public final class RoyalWeapons {
 
         safeRunnable(WeaponAbilities::init);
 
+        ItemStack item = make(null);
+        RoyalSword sword = new RoyalSword(item);
+
+        for (int i = 1; i <= DONATOR_RANK; i++) {
+            sword.incrementGoal();
+        }
+
+        sword.update();
+        DISPLAY_SWORD = item;
+
         Registries.WEAPON_GOALS.close();
     }
 
@@ -265,8 +277,8 @@ public final class RoyalWeapons {
      * @return True if the item is not null or empty and has the {@link RoyalWeapons#TAG_KEY} tag
      */
     public static boolean isRoyalSword(ItemStack item) {
-        if(FtcItems.isEmpty(item)) return false;
-        return FtcItems.hasTagElement(item.getItemMeta(), TAG_KEY) && item.getType().name().contains("SWORD");
+        if(ItemStacks.isEmpty(item)) return false;
+        return ItemStacks.hasTagElement(item.getItemMeta(), TAG_KEY) && item.getType().name().contains("SWORD");
     }
 
     private static Component makeName(String name, TextColor nameColor, TextColor borderColor, boolean bold) {
@@ -276,5 +288,9 @@ public final class RoyalWeapons {
                 .append(Component.text(name + " Sword"))
                 .append(Component.text("-").color(borderColor))
                 .build();
+    }
+
+    public static ItemStack displaySword() {
+        return DISPLAY_SWORD.clone();
     }
 }

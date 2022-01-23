@@ -24,6 +24,7 @@ public class FtcSignShop implements SignShop {
     private final Block block;
     private final FtcShopInventory inventory;
     private final ShopOwnership ownership;
+    private final ShopHistory history;
 
     private ShopType type;
     private int price;
@@ -38,9 +39,10 @@ public class FtcSignShop implements SignShop {
 
         this.loc = loc;
         block = loc.getBlock();
-        this.ownership = new ShopOwnership();
 
+        ownership = new ShopOwnership();
         inventory = new FtcShopInventory(this);
+        history = new ShopHistory(this);
 
         reload();
     }
@@ -55,6 +57,8 @@ public class FtcSignShop implements SignShop {
 
         this.ownership = new ShopOwnership();
         ownership.setOwner(shopOwner);
+
+        history = new ShopHistory(this);
 
         if(type != ShopType.ADMIN_BUY && type != ShopType.ADMIN_SELL) this.outOfStock = true;
 
@@ -176,6 +180,11 @@ public class FtcSignShop implements SignShop {
     @Override
     public Component getPriceLineFor(CrownUser user) {
         return Crown.getShopManager().getPriceLine(getPrice());
+    }
+
+    @Override
+    public ShopHistory getHistory() {
+        return history;
     }
 
     @Override

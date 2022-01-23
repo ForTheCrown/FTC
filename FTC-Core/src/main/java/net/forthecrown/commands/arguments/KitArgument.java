@@ -7,9 +7,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.commands.manager.FtcCommands;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.useables.kits.Kit;
@@ -34,7 +34,7 @@ public class KitArgument implements ArgumentType<Key> {
     @Override
     public Key parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();
-        Key key = FtcCommands.ftcKeyType().parse(reader);
+        Key key = Keys.argumentType().parse(reader);
 
         if(!Crown.getKitManager().contains(key)) throw UNKNOWN_KIT.createWithContext(GrenadierUtils.correctReader(reader, cursor), key);
 

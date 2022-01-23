@@ -13,18 +13,21 @@ import net.forthecrown.user.data.UserTeleport;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance> {
-    public static final Key KEY = Keys.forthecrown("teleport_user");
+    public static final NamespacedKey KEY = Keys.forthecrown("teleport_user");
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
         if(!reader.canRead()) return new ActionInstance(source.getLocation());
 
         Location location = PositionArgument.position().parse(reader).getLocation(source);
+        float yaw = location.getYaw();
+        float pitch = location.getPitch();
 
         if(reader.canRead() && reader.peek() == ' '){
             reader.skipWhitespace();
@@ -32,6 +35,19 @@ public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance
             World world = WorldArgument.world().parse(reader);
             location.setWorld(world);
         }
+
+        if(reader.canRead()) {
+            reader.skipWhitespace();
+            yaw = reader.readFloat();
+
+            if(reader.canRead()) {
+                reader.skipWhitespace();
+                pitch = reader.readFloat();
+            }
+        }
+
+        location.setYaw(yaw);
+        location.setPitch(pitch);
 
         return new ActionInstance(location);
     }

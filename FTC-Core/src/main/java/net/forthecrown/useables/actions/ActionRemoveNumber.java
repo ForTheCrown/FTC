@@ -10,12 +10,14 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.manager.UserManager;
 import net.kyori.adventure.key.Key;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionRemoveNumber implements UsageAction<ActionRemoveNumber.ActionInstance> {
-    public static final Key BAL_KEY = Keys.forthecrown("remove_balance");
-    public static final Key GEM_KEY = Keys.forthecrown("remove_gems");
+    public static final NamespacedKey
+            BAL_KEY = Keys.forthecrown("remove_balance"),
+            GEM_KEY = Keys.forthecrown("remove_gems");
 
     private final boolean fromBal;
 

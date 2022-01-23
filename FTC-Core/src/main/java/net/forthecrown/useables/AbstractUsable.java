@@ -87,12 +87,12 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
 
     @Override
     public void addCheck(UsageCheckInstance precondition) {
-        checks.put(FtcUtils.checkNotBukkit(precondition.typeKey()), precondition);
+        checks.put(FtcUtils.ensureBukkit(precondition.typeKey()), precondition);
     }
 
     @Override
     public void removeCheck(Key name) {
-        checks.remove(FtcUtils.checkNotBukkit(name));
+        checks.remove(FtcUtils.ensureBukkit(name));
     }
 
     @Override
@@ -137,7 +137,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
 
     @Override
     public <T extends UsageActionInstance> T getAction(Key key, Class<T> clazz) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         for (UsageActionInstance a: actions){
             if(!a.typeKey().equals(key)) continue;
             if(!clazz.isAssignableFrom(a.getClass())) continue;
@@ -149,7 +149,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
 
     @Override
     public <T extends UsageCheckInstance> T getCheck(Key key, Class<T> clazz) {
-        key = FtcUtils.checkNotBukkit(key);
+        key = FtcUtils.ensureBukkit(key);
         if(!checks.containsKey(key)) return null;
 
         UsageCheckInstance c = checks.get(key);

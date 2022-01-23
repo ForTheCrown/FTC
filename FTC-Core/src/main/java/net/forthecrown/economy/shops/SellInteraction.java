@@ -37,7 +37,7 @@ public class SellInteraction implements ShopInteraction {
 
         //When session expires, tell the owner what occurred lol
         session.onSessionExpire(() -> {
-            int totalEarned = session.getPrice() * (session.getAmount() / session.getExampleItem().getAmount());
+            int totalEarned = session.getTotalEarned();
 
             owner.sendMessage(
                     Component.translatable("shops.used.sell.owner",

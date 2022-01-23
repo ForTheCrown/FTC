@@ -14,7 +14,7 @@ import net.forthecrown.economy.Economy;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.MarketOwnership;
+import net.forthecrown.user.UserMarketData;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.Vector3i;
@@ -72,7 +72,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
     @Override
     public void attemptPurchase(MarketShop claim, CrownUser user) throws CommandSyntaxException {
-        MarketOwnership ownership = user.getMarketOwnership();
+        UserMarketData ownership = user.getMarketData();
 
         //If they already own a shop
         if(ownership.currentlyOwnsShop()) {
@@ -102,7 +102,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
     public void claim(MarketShop claim, CrownUser user) {
         Validate.isTrue(!claim.hasOwner(), "Market already has owner");
 
-        MarketOwnership ownership = user.getMarketOwnership();
+        UserMarketData ownership = user.getMarketData();
         if(!ownership.hasOwnedBefore()) ownership.setOwnershipBegan(System.currentTimeMillis());
         ownership.setOwnedName(claim.getName());
         ownership.setLastStatusChange();
@@ -117,6 +117,8 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         for (ShopEntrance e: claim.getEntrances()) {
             e.onClaim(user, getWorld());
         }
+
+        Crown.getGuild().checkVoteShouldContinue();
 
         //make backup underground to reset store later
         createPaste(
@@ -136,7 +138,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         if(shop.isMerged()) unmerge(shop);
 
         CrownUser owner = shop.ownerUser();
-        MarketOwnership ownership = owner.getMarketOwnership();
+        UserMarketData ownership = owner.getMarketData();
         ownership.setOwnedName(null);
         ownership.setLastStatusChange();
 
@@ -147,6 +149,8 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
         shop.getWorldGuard().getMembers().clear();
         shop.getCoOwners().clear();
+
+        Crown.getGuild().checkVoteShouldContinue();
 
         if(complete) {
             ownership.setOwnershipBegan(0L);
@@ -175,6 +179,8 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         for (UUID id: merged.getCoOwners()) {
             shop.getWorldGuard().getMembers().addPlayer(id);
         }
+
+        Crown.getGuild().checkVoteShouldContinue();
     }
 
     @Override
@@ -196,6 +202,8 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         for (UUID id: shop.getCoOwners()) {
             merged.getWorldGuard().getMembers().removePlayer(id);
         }
+
+        Crown.getGuild().checkVoteShouldContinue();
     }
 
     @Override
@@ -273,7 +281,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
             region.getMembers().removePlayer(user.getUniqueId());
 
-            MarketOwnership ownership = user.getMarketOwnership();
+            UserMarketData ownership = user.getMarketData();
             ownership.setOwnedName(null);
             ownership.setOwnershipBegan(0L);
 
@@ -303,6 +311,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         }
 
         user.unloadIfOffline();
+        Crown.getGuild().checkVoteShouldContinue();
     }
 
     @Override

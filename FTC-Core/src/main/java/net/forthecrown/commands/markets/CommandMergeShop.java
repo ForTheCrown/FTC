@@ -10,7 +10,7 @@ import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.economy.market.Markets;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.MarketOwnership;
+import net.forthecrown.user.UserMarketData;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.Struct;
@@ -79,12 +79,12 @@ public class CommandMergeShop extends FtcCommand {
                                     CrownUser user = getUserSender(c);
                                     CrownUser target = UserArgument.getUser(c, "user");
 
-                                    if(!user.getMarketOwnership().hasIncoming(target.getUniqueId())) {
+                                    if(!user.getMarketData().hasIncoming(target.getUniqueId())) {
                                         throw FtcExceptionProvider.translatable("market.merge.error.noIncoming", target.nickDisplayName());
                                     }
 
-                                    target.getMarketOwnership().setOutgoing(null);
-                                    user.getMarketOwnership().removeIncoming(target.getUniqueId());
+                                    target.getMarketData().setOutgoing(null);
+                                    user.getMarketData().removeIncoming(target.getUniqueId());
 
                                     sendMessages(user, target, "market.merge.deny");
                                     return 0;
@@ -96,12 +96,12 @@ public class CommandMergeShop extends FtcCommand {
                                     CrownUser user = getUserSender(c);
                                     CrownUser target = UserArgument.getUser(c, "user");
 
-                                    if(!target.getUniqueId().equals(user.getMarketOwnership().getOutgoing())) {
+                                    if(!target.getUniqueId().equals(user.getMarketData().getOutgoing())) {
                                         throw FtcExceptionProvider.translatable("market.merge.error.noOutgoing", target.nickDisplayName());
                                     }
 
-                                    user.getMarketOwnership().setOutgoing(null);
-                                    target.getMarketOwnership().removeIncoming(target.getUniqueId());
+                                    user.getMarketData().setOutgoing(null);
+                                    target.getMarketData().removeIncoming(target.getUniqueId());
 
                                     sendMessages(user, target, "market.merge.cancel");
                                     return 0;
@@ -213,11 +213,11 @@ public class CommandMergeShop extends FtcCommand {
     private static class MarketMerger implements Struct {
         final CrownUser user;
         final UserInteractions inter;
-        final MarketOwnership ownership;
+        final UserMarketData ownership;
 
         final CrownUser target;
         final UserInteractions targetInter;
-        final MarketOwnership targetOwnership;
+        final UserMarketData targetOwnership;
 
         final Markets markets;
         final MarketShop shop;
@@ -226,11 +226,11 @@ public class CommandMergeShop extends FtcCommand {
         private MarketMerger(CrownUser user, CrownUser target) {
             this.user = user;
             this.inter = user.getInteractions();
-            this.ownership = user.getMarketOwnership();
+            this.ownership = user.getMarketData();
 
             this.target = target;
             this.targetInter = target.getInteractions();
-            this.targetOwnership = target.getMarketOwnership();
+            this.targetOwnership = target.getMarketData();
 
             this.markets = Crown.getMarkets();
             this.shop = markets.get(user.getUniqueId());

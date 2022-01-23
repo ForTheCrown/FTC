@@ -1,5 +1,6 @@
 package net.forthecrown.commands.regions;
 
+import com.sk89q.worldedit.math.BlockVector2;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
@@ -55,10 +56,11 @@ public class CommandWhichRegion extends FtcCommand {
             } else {
                 if(!user.hasPermission(Permissions.REGIONS_ADMIN)) throw FtcExceptionProvider.translatable("regions.which.none");
 
+                BlockVector2 pos = cords.toCenter();
                 user.sendMessage(
                         Component.translatable("regions.which.cords",
                                 NamedTextColor.GOLD,
-                                Component.text(region.getPos().toString())
+                                Component.text(pos.getX() + " " + pos.getZ())
                         )
                 );
             }

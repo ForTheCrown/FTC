@@ -1,25 +1,36 @@
 package net.forthecrown.core;
 
-import org.bukkit.scheduler.BukkitRunnable;
+import net.forthecrown.utils.TimeUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.concurrent.TimeUnit;
 
 /**
- * Class which saves the FTC-Core in the interval given in the core_autoSaveIntervalMins comvar
+ * Class which saves the FTC-Core in the interval given in the autoSaveIntervalMins comvar
  */
-final class PeriodicalSaver extends BukkitRunnable {
-    private final Crown core;
+final class PeriodicalSaver {
+    private BukkitTask task;
 
-    PeriodicalSaver(Crown core) {
-        this.core = core;
+    PeriodicalSaver() {
+        ComVars.autoSaveIntervalMins.setUpdateListener(aLong -> start());
     }
 
     public void start() {
-        final long inter = ComVars.autoSaveIntervalMins.getValue(60L) * 60 * 20;
+        cancel();
+        long interval = TimeUnit.MINUTES.toMillis(ComVars.autoSaveIntervalMins.getValue(60L));
+        interval = TimeUtil.millisToTicks(interval);
 
-        runTaskTimerAsynchronously(core, inter, inter);
+        task = Bukkit.getScheduler().runTaskLater(Crown.inst(), Crown::saveFTC, interval);
     }
 
-    @Override
-    public void run() {
-        Crown.saveFTC();
+    public void cancel() {
+        if(task == null || task.isCancelled()) return;
+        task.cancel();
+        task = null;
+    }
+
+    public boolean isScheduled() {
+        return task != null && !task.isCancelled();
     }
 }

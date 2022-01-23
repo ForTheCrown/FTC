@@ -1,9 +1,9 @@
 package net.forthecrown.commands.admin;
 
-import net.forthecrown.commands.manager.FtcCommands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.npc.NpcDirectory;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.KeyArgument;
@@ -12,7 +12,6 @@ import net.forthecrown.registry.Registries;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collection;
 
@@ -40,7 +39,7 @@ public class CommandNPC extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("entities", EntityArgument.multipleEntities())
-                        .then(argument("key", FtcCommands.ftcKeyType())
+                        .then(argument("key", Keys.argumentType())
                                 .suggests((c, b) -> FtcSuggestionProvider.suggestRegistry(b, Registries.NPCS))
 
                                 .executes(c -> {
@@ -51,7 +50,7 @@ public class CommandNPC extends FtcCommand {
 
                                     entities.forEach(e -> {
                                         if(e.getType() == EntityType.PLAYER) return;
-                                        e.getPersistentDataContainer().set(NpcDirectory.KEY, PersistentDataType.STRING, key.asString());
+                                        NpcDirectory.make(key, e);
                                     });
 
                                     c.getSource().sendAdmin("Added " + key.asString() + " tag to " + entities.size() + " entities");

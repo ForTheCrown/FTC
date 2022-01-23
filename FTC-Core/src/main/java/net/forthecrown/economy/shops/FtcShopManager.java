@@ -3,8 +3,7 @@ package net.forthecrown.economy.shops;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.serializer.ShopJsonSerializer;
 import net.forthecrown.serializer.ShopSerializer;
-import net.forthecrown.utils.ItemStackBuilder;
-import net.forthecrown.utils.LocationFileName;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -42,11 +41,6 @@ public class FtcShopManager implements ShopManager {
         }
 
         return null;
-    }
-
-    @Override
-    public SignShop getShop(String name) {
-        return getShop(LocationFileName.parse(name).toVector());
     }
 
     @Override

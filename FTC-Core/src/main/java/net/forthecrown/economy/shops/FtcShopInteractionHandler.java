@@ -117,6 +117,9 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
         //If the session has expiry code to execute, run it
         if(session.getOnSessionExpire() != null) session.getOnSessionExpire().run();
 
+        // Record session in history
+        session.getShop().getHistory().addEntry(session);
+
         //Log interaction data if needed
         if(session.getType().isAdmin()) {
             if(ComVars.logAdminShopUsage()) Crown.logger().info(logInfo(session));

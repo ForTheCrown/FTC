@@ -29,11 +29,11 @@ public enum RelationType {
     }
 
     public boolean isPositive() {
-        return min > 25;
+        return min > NEUTRAL.getMax();
     }
 
     public boolean isNegative() {
-        return max < -25;
+        return max < NEUTRAL.getMin();
     }
 
     public boolean isNeutral() {

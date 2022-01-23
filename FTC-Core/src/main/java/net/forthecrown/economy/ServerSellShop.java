@@ -2,12 +2,12 @@ package net.forthecrown.economy;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.inventory.FtcInventory;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.inventory.builder.*;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryRunnable;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -55,7 +55,7 @@ class SellShopCloseListener implements InventoryCloseAction {
             if(!ServerSellShop.isLegalSlot(i)) continue;
 
             ItemStack item = inventory.getItem(i);
-            if(FtcItems.isEmpty(item)) continue;
+            if(ItemStacks.isEmpty(item)) continue;
 
             if(firstEmpty == -1) world.dropItem(pLoc, item);
             else pInv.addItem(item);

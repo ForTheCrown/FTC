@@ -1,19 +1,20 @@
 package net.forthecrown.commands.admin;
 
+import com.mojang.brigadier.context.CommandContext;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.regions.Region;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.manager.FtcCommands;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.structure.BlockStructure;
-import net.forthecrown.structure.StructurePlaceContext;
-import net.forthecrown.structure.StructureScanContext;
+import net.forthecrown.structure.*;
 import net.forthecrown.utils.BlockPlacer;
 import net.forthecrown.utils.math.Vector3i;
 import org.bukkit.Location;
@@ -49,7 +50,7 @@ public class CommandFtcStruct extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(literal("create")
-                        .then(argument("key", FtcCommands.ftcKeyType())
+                        .then(argument("key", Keys.argumentType())
                                 .executes(c -> {
                                     Player player = c.getSource().asPlayer();
                                     com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
@@ -84,20 +85,36 @@ public class CommandFtcStruct extends FtcCommand {
                 .then(literal("place")
                         .then(argument("struct", RegistryArguments.structure())
                                 .then(argument("pos", PositionArgument.position())
-                                        .executes(c -> {
-                                            Location l = PositionArgument.getLocation(c, "pos");
-                                            BlockStructure structure = c.getArgument("struct", BlockStructure.class);
+                                        .executes(c -> place(c, PlaceMirror.NONE, PlaceRotation.D_0))
 
-                                            StructurePlaceContext context = new StructurePlaceContext(structure, Vector3i.of(l), BlockPlacer.world(l.getWorld()))
-                                                    .addEmptyProcessor();
+                                        .then(argument("mirror", EnumArgument.of(PlaceMirror.class))
+                                                .executes(c -> place(c, c.getArgument("mirror", PlaceMirror.class), PlaceRotation.D_0))
 
-                                            structure.place(context);
-
-                                            c.getSource().sendAdmin("Placed structure");
-                                            return 0;
-                                        })
+                                                .then(argument("rotation", EnumArgument.of(PlaceRotation.class))
+                                                        .executes(c -> place(c,
+                                                                c.getArgument("mirror", PlaceMirror.class),
+                                                                c.getArgument("rotation", PlaceRotation.class)
+                                                        ))
+                                                )
+                                        )
                                 )
                         )
                 );
+    }
+
+    private int place(CommandContext<CommandSource> c, PlaceMirror mirror, PlaceRotation rotation) {
+        Location l = PositionArgument.getLocation(c, "pos");
+        BlockStructure structure = c.getArgument("struct", BlockStructure.class);
+
+        StructurePlaceContext context = new StructurePlaceContext(structure, Vector3i.of(l), BlockPlacer.world(l.getWorld()))
+                .setMirror(mirror)
+                .setRotation(rotation)
+                .addEmptyProcessor()
+                .addProccessor(new BlockTransformProcessor());
+
+        structure.place(context);
+
+        c.getSource().sendAdmin("Placed structure");
+        return 0;
     }
 }

@@ -1,6 +1,7 @@
 package net.forthecrown.user;
 
 import it.unimi.dsi.fastutil.objects.ObjectSet;
+import net.forthecrown.core.Crown;
 import net.forthecrown.user.data.*;
 import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.user.manager.UserManager;
@@ -22,8 +23,14 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
     }
 
     @Override
+    public void unload() {
+        super.unload();
+        FtcUserManager.LOADED_ALTS.remove(getUniqueId());
+    }
+
+    @Override
     public UUID getMainUniqueID() {
-        return mainID == null ? mainID = UserManager.inst().getMain(getUniqueId()) : mainID;
+        return mainID == null ? mainID = Crown.getUserManager().getMain(getUniqueId()) : mainID;
     }
 
     @Override

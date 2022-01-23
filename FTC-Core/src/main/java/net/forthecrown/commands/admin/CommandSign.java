@@ -41,12 +41,7 @@ public class CommandSign extends FtcCommand {
                                 .executes(c -> {
                                     Sign sign = get(c);
 
-                                    Component empty = Component.empty();
-
-                                    sign.line(0, empty);
-                                    sign.line(1, empty);
-                                    sign.line(2, empty);
-                                    sign.line(3, empty);
+                                    SignLines.EMPTY.apply(sign);
                                     sign.update();
 
                                     c.getSource().sendAdmin("Cleared sign");

@@ -29,14 +29,13 @@ import net.forthecrown.economy.selling.SellShops;
 import net.forthecrown.inventory.crown.Crowns;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.useables.kits.Kit;
-import net.forthecrown.core.AfkKicker;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.actions.MarriageMessage;
 import net.forthecrown.user.actions.UserActionHandler;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.user.packets.PacketListeners;
-import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -114,7 +113,6 @@ public class CoreListener implements Listener {
         user.onLeave();
 
         PacketListeners.remove(event.getPlayer());
-
         AfkKicker.remove(user.getUniqueId());
 
         if(user.isVanished()) event.quitMessage(null);
@@ -241,7 +239,7 @@ public class CoreListener implements Listener {
         if(user.isVanished()) {
             // Gonna make staff regret seeing this message so much
             // they'll never again accidentally type while vanished
-            user.sendMessage("You're in vanish, no speaky speaky, cutie");
+            user.sendMessage("&7You're in vanish, no speaky speaky, cutie pie");
 
             event.setCancelled(true);
             return;
@@ -293,7 +291,7 @@ public class CoreListener implements Listener {
         // If you haven't moved a block, not good enough
         if (!event.hasChangedBlock()) return;
 
-        AfkKicker.delay(event.getPlayer().getUniqueId());
+        AfkKicker.addOrDelay(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -308,12 +306,10 @@ public class CoreListener implements Listener {
         );
     }
 
-    private final CrownRandom random = new CrownRandom();
-
     @EventHandler(ignoreCancelled = true)
     public void onPaperServerListPing(PaperServerListPingEvent event) {
         int max = Bukkit.getMaxPlayers();
-        int newMax = random.intInRange(max, max + 20);
+        int newMax = FtcUtils.RANDOM.intInRange(max, max + 20);
 
         event.setMaxPlayers(newMax);
 
@@ -344,7 +340,7 @@ public class CoreListener implements Listener {
         if(Crown.inDebugMode()) return Component.text("Test server").color(NamedTextColor.GREEN);
         if(Bukkit.hasWhitelist()) return Component.text("Maintenance").color(NamedTextColor.RED);
 
-        if(random.nextInt(50) == 45) return Component.text("You're amazing ")
+        if(FtcUtils.RANDOM.nextInt(50) == 45) return Component.text("You're amazing ")
                 .append(EmoteSmooch.HEART)
                 .color(NamedTextColor.RED);
 

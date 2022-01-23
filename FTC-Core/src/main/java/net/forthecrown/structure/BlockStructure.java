@@ -41,7 +41,7 @@ public class BlockStructure implements NbtSerializable, Keyed {
     private final CompoundTag header = new CompoundTag();
 
     public BlockStructure(Key key) {
-        this.key = FtcUtils.checkNotBukkit(key);
+        this.key = FtcUtils.ensureBukkit(key);
     }
 
     /**
@@ -142,7 +142,7 @@ public class BlockStructure implements NbtSerializable, Keyed {
 
     @Override
     public Tag save() {
-        if(entityInfos.isEmpty()) return savePalettes();
+        if(entityInfos.isEmpty() && header.isEmpty()) return savePalettes();
 
         CompoundTag result = new CompoundTag();
 

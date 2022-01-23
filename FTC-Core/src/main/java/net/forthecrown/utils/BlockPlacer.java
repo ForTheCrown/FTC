@@ -1,8 +1,9 @@
 package net.forthecrown.utils;
 
-import net.forthecrown.utils.math.Vector3i;
+import net.forthecrown.utils.math.ImmutableVector3i;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
@@ -25,7 +26,7 @@ public interface BlockPlacer {
      */
     void place(int x, int y, int z, FtcBlockData data);
 
-    default void place(Vector3i pos, FtcBlockData data) {
+    default void place(ImmutableVector3i pos, FtcBlockData data) {
         place(pos.getX(), pos.getY(), pos.getZ(), data);
     }
 
@@ -37,12 +38,20 @@ public interface BlockPlacer {
         place(x, y, z, FtcBlockData.of(state));
     }
 
-    default void place(Vector3i p, BlockData data) {
+    default void place(ImmutableVector3i p, BlockData data) {
         place(p.getX(), p.getY(), p.getZ(), data);
     }
 
-    default void place(Vector3i p, TileState state) {
+    default void place(ImmutableVector3i p, TileState state) {
         place(p.getX(), p.getY(), p.getZ(), state);
+    }
+
+    default void place(int x, int y, int z, Material mat) {
+        place(x, y, z, mat.createBlockData());
+    }
+
+    default void place(ImmutableVector3i p, Material mat) {
+        place(p.getX(), p.getY(), p.getZ(), mat.createBlockData());
     }
 
     /**
@@ -81,7 +90,7 @@ public interface BlockPlacer {
                 // apply it using NMS
                 if(data.getTag() != null) {
                     CraftLimitedRegion limitedRegion = (CraftLimitedRegion) region;
-                    BlockEntity entity = limitedRegion.getHandle().getBlockEntity(new BlockPos(x , y, z));
+                    BlockEntity entity = limitedRegion.getHandle().getBlockEntity(new BlockPos(x, y, z));
                     entity.load(data.getTag());
                 }
             }

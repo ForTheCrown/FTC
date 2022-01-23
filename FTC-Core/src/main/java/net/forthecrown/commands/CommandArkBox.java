@@ -10,7 +10,7 @@ import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.UUIDArgument;
-import net.forthecrown.inventory.FtcItems;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
@@ -73,7 +73,7 @@ public class CommandArkBox extends FtcCommand {
 
                     if(info == null) throw FtcExceptionProvider.create("No ark box");
 
-                    if(!FtcItems.isEmpty(info.item)) {
+                    if(!ItemStacks.isEmpty(info.item)) {
                         user.getInventory().addItem(info.item.clone());
                     }
 
@@ -120,7 +120,7 @@ public class CommandArkBox extends FtcCommand {
                                     CrownUser user = getUserSender(c);
                                     ItemStack item = user.getInventory().getItemInMainHand();
 
-                                    if(FtcItems.isEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
+                                    if(ItemStacks.isEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
 
                                     FILTER.checkItems(item);
 
@@ -186,7 +186,7 @@ public class CommandArkBox extends FtcCommand {
                                             RankTier tier = c.getArgument("tier", RankTier.class);
                                             ItemStack item = user.getInventory().getItemInMainHand();
 
-                                            ArkBoxInfo info = new ArkBoxInfo(FtcItems.isEmpty(item) ? null : item.clone(), tier);
+                                            ArkBoxInfo info = new ArkBoxInfo(ItemStacks.isEmpty(item) ? null : item.clone(), tier);
                                             ID_2_DATA.put(target, info);
 
                                             user.sendMessage("Made ark box");
@@ -255,7 +255,7 @@ public class CommandArkBox extends FtcCommand {
             this.item = item;
             this.tier = tier;
 
-            if (!FtcItems.isEmpty(item)) {
+            if (!ItemStacks.isEmpty(item)) {
                 FILTER.checkItems(item);
             }
         }
@@ -266,7 +266,7 @@ public class CommandArkBox extends FtcCommand {
             this.item = json.getItem("item");
             this.tier = json.getEnum("tier", RankTier.class);
 
-            if (!FtcItems.isEmpty(item)) {
+            if (!ItemStacks.isEmpty(item)) {
                 FILTER.checkItems(item);
             }
         }
@@ -275,7 +275,7 @@ public class CommandArkBox extends FtcCommand {
         public JsonElement serialize() {
             JsonWrapper json = JsonWrapper.empty();
 
-            if(!FtcItems.isEmpty(item)) json.addItem("item", item);
+            if(!ItemStacks.isEmpty(item)) json.addItem("item", item);
             if(tier != null && tier != RankTier.NONE) json.addEnum("tier", tier);
 
             return json.nullIfEmpty();
@@ -296,14 +296,14 @@ public class CommandArkBox extends FtcCommand {
 
         void checkInventory(Inventory inventory) {
             for (ItemStack i: inventory) {
-                if(FtcItems.isEmpty(i)) continue;
+                if(ItemStacks.isEmpty(i)) continue;
                 filterItem(i);
             }
         }
 
         void filterItem(ItemStack item) {
             ItemMeta meta = item.getItemMeta();
-            if(!meta.getPersistentDataContainer().has(FtcItems.ITEM_KEY, PersistentDataType.BYTE)) return;
+            if(!meta.getPersistentDataContainer().has(ItemStacks.ITEM_KEY, PersistentDataType.BYTE)) return;
 
             for (Enchantment e: meta.getEnchants().keySet()) {
                 meta.removeEnchant(e);
@@ -322,7 +322,7 @@ public class CommandArkBox extends FtcCommand {
                 default -> {}
             }
 
-            meta.getPersistentDataContainer().remove(FtcItems.ITEM_KEY);
+            meta.getPersistentDataContainer().remove(ItemStacks.ITEM_KEY);
             item.setItemMeta(meta);
         }
 

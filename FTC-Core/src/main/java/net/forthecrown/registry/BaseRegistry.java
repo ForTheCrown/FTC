@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.key.Key;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -13,10 +14,10 @@ import java.util.Set;
 
 public class BaseRegistry<V> implements Registry<V> {
     private final Object2ObjectMap<Key, V> entries = new Object2ObjectOpenHashMap<>();
-    private final Key key;
+    private final NamespacedKey key;
 
-    public BaseRegistry(Key key) {
-        this.key = FtcUtils.checkNotBukkit(key);
+    public BaseRegistry(NamespacedKey key) {
+        this.key = key;
     }
 
     @NotNull
@@ -27,18 +28,18 @@ public class BaseRegistry<V> implements Registry<V> {
 
     @Override
     public V get(Key key) {
-        return entries.get(FtcUtils.checkNotBukkit(key));
+        return entries.get(FtcUtils.ensureBukkit(key));
     }
 
     @Override
     public V register(Key key, V value) {
-        entries.put(FtcUtils.checkNotBukkit(key), value);
+        entries.put(FtcUtils.ensureBukkit(key), value);
         return value;
     }
 
     @Override
     public void remove(Key key) {
-        entries.remove(FtcUtils.checkNotBukkit(key));
+        entries.remove(FtcUtils.ensureBukkit(key));
     }
 
     @Override
@@ -48,7 +49,7 @@ public class BaseRegistry<V> implements Registry<V> {
 
     @Override
     public boolean contains(Key key) {
-        return entries.containsKey(FtcUtils.checkNotBukkit(key));
+        return entries.containsKey(FtcUtils.ensureBukkit(key));
     }
 
     @Override
@@ -101,7 +102,7 @@ public class BaseRegistry<V> implements Registry<V> {
     }
 
     @Override
-    public @NotNull Key key() {
+    public @NotNull NamespacedKey key() {
         return key;
     }
 }

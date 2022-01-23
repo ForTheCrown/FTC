@@ -5,8 +5,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.ListUtils;
-import net.kyori.adventure.text.event.ClickEvent;
 
 public final class ClickableTexts {
     private ClickableTexts() {}
@@ -44,24 +42,5 @@ public final class ClickableTexts {
         } catch (CommandSyntaxException e) {
             FtcUtils.handleSyntaxException(user, e);
         }
-    }
-
-    public static String getCommand(String id, String... args) {
-        StringBuilder builder = new StringBuilder("/clickable_text ")
-                .append(id.hashCode());
-
-        if(!ListUtils.isNullOrEmpty(args)) {
-            for (String s: args) {
-                builder
-                        .append(" ")
-                        .append(s.hashCode());
-            }
-        }
-
-        return builder.toString();
-    }
-
-    public static ClickEvent getClickEvent(String id, String... args) {
-        return ClickEvent.runCommand(getCommand(id, args));
     }
 }

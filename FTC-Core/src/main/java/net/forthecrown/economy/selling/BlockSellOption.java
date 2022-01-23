@@ -7,7 +7,7 @@ import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.SoldMaterialData;
 import net.forthecrown.user.data.SellAmount;
-import net.forthecrown.utils.ItemStackBuilder;
+import net.forthecrown.inventory.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

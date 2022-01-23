@@ -1,9 +1,9 @@
 package net.forthecrown.utils;
 
 import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
@@ -29,7 +29,7 @@ public interface Bukkit2NMS {
         return (ServerPlayer) getEntity(player);
     }
 
-    static Level getLevel(World world) {
+    static ServerLevel getLevel(World world) {
         return ((CraftWorld) world).getHandle();
     }
 

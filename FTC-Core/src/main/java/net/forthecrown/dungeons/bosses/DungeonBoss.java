@@ -13,6 +13,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.UserDataContainer;
 import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.key.Key;
@@ -25,7 +26,6 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.advancement.Advancement;
-import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -42,6 +42,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.loot.LootTables;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -59,7 +60,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
 
     protected T bossEntity;
     protected BossBar bossBar;
-    protected int loopID = 0;
+    protected BukkitTask tickTask;
 
     private boolean alive;
     private final short updaterDelay;
@@ -87,7 +88,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         if(isAlive()) return;
         //Register events and start updater loop
         Bukkit.getPluginManager().registerEvents(this, Crown.inst());
-        loopID = startUpdater();
+        tickTask = startUpdater();
 
         //Summon boss with context and create bossbar
         context = new BossFightContext(this);
@@ -108,7 +109,12 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         if(!isAlive()) return;
         //Unregister events and stop updater loop
         HandlerList.unregisterAll(this);
-        Bukkit.getScheduler().cancelTask(loopID);
+
+        // Stop tick updater
+        if (tickTask != null && !tickTask.isCancelled()) {
+            tickTask.cancel();
+            tickTask = null;
+        }
 
         //Destroy bossbar
         bossBar.removeAll();
@@ -118,7 +124,11 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         bossEntity.getWorld().createExplosion(bossEntity.getLocation().add(0, 1, 0), 2.0f, false, false, bossEntity);
         bossEntity.getWorld().playSound(bossEntity.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1.0f, 1.0f);
 
-        if(!server) onDeath(context);
+        if(!server) {
+            onDeath(context);
+            finalizeKill(context);
+        }
+
         bossEntity.remove();
         bossEntity = null;
         alive = false;
@@ -135,10 +145,14 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         }
     }
 
-    private int startUpdater(){
-        return Bukkit.getScheduler().scheduleSyncRepeatingTask(Crown.inst(), () ->{
+    private BukkitTask startUpdater(){
+        return Bukkit.getScheduler().runTaskTimer(Crown.inst(), () -> {
             Player target = DungeonUtils.getOptimalTarget(bossEntity, getBossRoom());
-            if(target != null && (bossEntity.getTarget() == null || !bossEntity.getTarget().equals(target))) bossEntity.setTarget(target);
+
+            // Change target only if found target is not already target
+            if(target != null && (bossEntity.getTarget() == null || !bossEntity.getTarget().equals(target))) {
+                bossEntity.setTarget(target);
+            }
 
             onUpdate();
         }, updaterDelay, updaterDelay);
@@ -183,7 +197,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         return key;
     }
 
-    protected void finalizeKill(@NotNull BossFightContext context){
+    private void finalizeKill(@NotNull BossFightContext context){
         for (Player p: context.getPlayers()){
             if(!getBossRoom().contains(p)) continue;
             if(Crown.getUserManager().isAltForAny(p.getUniqueId(), context.getPlayers())) continue;
@@ -202,19 +216,15 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
     private void awardAdvancement(Player player) {
         Advancement advancement = Bukkit.getAdvancement(advancementKey());
         if(advancement == null) {
-            Crown.logger().warning(key() + " has no advancement");
+            Crown.logger().warn(key() + " has no advancement");
             return;
         }
 
-        AdvancementProgress progress = player.getAdvancementProgress(advancement);
-
-        for (String s: progress.getRemainingCriteria()) {
-            progress.awardCriteria(s);
-        }
+        FtcUtils.grantAdvancement(advancement, player);
     }
 
     public NamespacedKey advancementKey() {
-        return new NamespacedKey(Crown.inst(), "dungeons/" + key().value());
+        return Keys.forthecrown("dungeons/" + key().value());
     }
 
     @EventHandler(ignoreCancelled = true)

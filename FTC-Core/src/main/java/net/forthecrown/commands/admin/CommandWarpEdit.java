@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.WarpArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.grenadier.CommandSource;
@@ -15,7 +16,6 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.useables.warps.Warp;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.data.UserTeleport;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 
@@ -92,7 +92,7 @@ public class CommandWarpEdit extends FtcCommand {
     }
 
     private int createWarp(CommandSource c, String name, Location location) throws CommandSyntaxException {
-        Warp warp = Crown.getWarpManager().register(FtcUtils.parseKey(name), location);
+        Warp warp = Crown.getWarpManager().register(Keys.parse(name), location);
         c.sendAdmin(Component.text("Creating warp named ").append(warp.displayName()));
         return 0;
     }

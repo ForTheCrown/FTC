@@ -5,6 +5,7 @@ import com.mojang.brigadier.Message;
 import com.sk89q.worldedit.math.BlockVector2;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcDynmap;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.serializer.NbtSerializable;
 import net.forthecrown.utils.FtcUtils;
@@ -16,6 +17,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.dynmap.markers.Marker;
 import org.jetbrains.annotations.Nullable;
 
 public class PopulationRegion extends RegionData implements NbtSerializable {
@@ -90,21 +92,16 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
         prev.forEach(b -> b.setType(Material.AIR, false));
 
         // If the marker isn't null and we're allowed to have marker, move it
-        if(marker != null && !hasProperty(RegionProperty.FORBIDS_MARKER)) {
+        if(hasName() && !hasProperty(RegionProperty.FORBIDS_MARKER)) {
             BlockVector2 pos = polePosition == null ? getPos().toCenter() : polePosition;
 
+            Marker marker = FtcDynmap.getMarker(this);
             marker.setLocation(ComVars.getRegionWorld().getUID().toString(),
                     pos.getX() + 0.5D, getPoleBoundingBox().maxY(), pos.getZ() + 0.5D
             );
         }
 
         Crown.getRegionManager().getGenerator().generate(this);
-    }
-
-    // sets the pole position without generating a new pole or removing the old one
-    protected void setPolePosition0(@Nullable BlockVector2 polePosition) {
-        this.polePosition = polePosition;
-        updatePoleBounds();
     }
 
     //Updates the pole's bounding box

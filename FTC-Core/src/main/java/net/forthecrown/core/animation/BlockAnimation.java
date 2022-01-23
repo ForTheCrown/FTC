@@ -104,8 +104,8 @@ public class BlockAnimation implements Keyed {
             //If somehow the frame is null, else do the animation
             //It must always move on to the next frame or to the end of the animation
             if(frame == null) {
-                Crown.logger().warning("Found null frame at index " + currentFrame);
-                Crown.logger().warning(Arrays.toString(frames));
+                Crown.logger().warn("Found null frame at index " + currentFrame);
+                Crown.logger().warn(Arrays.toString(frames));
             } else  {
                 //Apply offset
                 Vector3i at = frame.getOffset().apply(pos);

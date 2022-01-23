@@ -4,9 +4,7 @@ import net.forthecrown.commands.arguments.HomeArgument;
 import net.forthecrown.commands.arguments.HomeParseResult;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.Permissions;
+import net.forthecrown.core.*;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionData;
@@ -60,8 +58,14 @@ public class CommandHome extends FtcCommand {
                     Location l = homes.get(DEFAULT);
 
                     //Invalid world for home
-                    if(!user.hasPermission(Permissions.WORLD_BYPASS) && CommandTpask.isInvalidWorld(l.getWorld())){
-                        throw FtcExceptionProvider.badWorldHome(DEFAULT);
+                    if(!user.hasPermission(Permissions.WORLD_BYPASS)) {
+                        if(CommandTpask.isInvalidWorld(l.getWorld())) throw FtcExceptionProvider.badWorldHome(DEFAULT);
+
+                        //Don't allow visiting end homes if end closed
+                        EndOpener opener = Crown.getEndOpener();
+                        if(l.getWorld().equals(Worlds.END) && opener.isEnabled() && !opener.isOpen()) {
+                            throw FtcExceptionProvider.create("The End is currently closed");
+                        }
                     }
 
                     //Teleport them there

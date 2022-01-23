@@ -95,11 +95,7 @@ public class CommandTpask extends FtcCommand {
     }
 
     public static boolean isInvalidWorld(World world){
-        String name = world.getName();
-        return name.contains("senate")
-                || name.contains("void")
-                || name.contains("raids")
-                || name.contains("event");
+        return Crown.config().isIllegalWorld(world);
     }
 
     public static TextComponent acceptButton(CrownUser target){

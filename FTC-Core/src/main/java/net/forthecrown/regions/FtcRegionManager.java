@@ -110,22 +110,28 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
 
         //Remove it from name tracker if it already has
         if(hasName) {
-            if(!region.hasProperty(RegionProperty.FORBIDS_MARKER)) {
-                Marker marker = region.getMarker();
-
-                if(nullNew) {
-                    marker.deleteMarker();
-                    region.setMarker(null);
-                } else marker.setLabel(newName);
-            }
-
             byName.remove(oldName.toLowerCase());
-        } else if (!region.hasProperty(RegionProperty.FORBIDS_MARKER)) {
-            region.setMarker(FtcDynmap.findMarker(region));
+
+            if(nullNew && !region.hasProperty(RegionProperty.FORBIDS_MARKER)) {
+                FtcDynmap.getMarker(region).deleteMarker();
+            }
+        }
+
+        if(!hasName && !nullNew) {
+            FtcDynmap.createMarker(region);
         }
 
         //Set the name and add it with the new name to the tracker
-        if(!nullNew) byName.put(newName.toLowerCase(), region);
+        if(!nullNew) {
+            byName.put(newName.toLowerCase(), region);
+
+            if(!region.hasProperty(RegionProperty.FORBIDS_MARKER)) {
+                Marker marker = FtcDynmap.getMarker(region);
+                if(marker == null) marker = FtcDynmap.createMarker(region);
+
+                marker.setLabel(newName);
+            }
+        }
 
         getGenerator().generate(region);
 

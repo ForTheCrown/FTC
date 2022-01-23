@@ -6,10 +6,11 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.regions.RegionData;
 import net.forthecrown.utils.TimeUtil;
-import org.bukkit.*;
+import net.forthecrown.utils.world.WorldLoader;
+import net.forthecrown.utils.world.WorldReCreator;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
-
-import java.io.File;
 
 public class RwResetter {
     public static boolean shouldReset() {
@@ -19,20 +20,18 @@ public class RwResetter {
 
     public static void reset() {
         kickPlayers();
-        File dir = Worlds.RESOURCE.getWorldFolder();
-        Bukkit.unloadWorld(Worlds.RESOURCE, true);
+        WorldReCreator creator = WorldReCreator.of(Worlds.RESOURCE)
+                .preserveWorldBorder(true);
+                //.generator(new RwGenerator());
 
-        dir.delete();
+        World world = creator.run();
+        ComVars.nextResourceWorldReset(System.currentTimeMillis() + ComVars.resourceWorldResetInterval());
 
-        WorldCreator creator = new WorldCreator("world_resource")
-                .generateStructures(true)
-                .environment(World.Environment.NORMAL)
-                .type(WorldType.NORMAL)
-                .generator(new RwGenerator());
-
-        World world = creator.createWorld();
-
-        RwLoader.load(world);
+        WorldLoader.loadAsync(world).whenComplete((unused, throwable) -> {
+            if (throwable != null) {
+                Crown.logger().error("Could not regen Resource World", throwable);
+            }
+        });
     }
 
     static void kickPlayers() {
