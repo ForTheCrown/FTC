@@ -23,12 +23,9 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
-import net.forthecrown.user.CosmeticData;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.UserInteractions;
+import net.forthecrown.user.*;
 import net.forthecrown.user.actions.ActionFactory;
-import net.forthecrown.user.data.*;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
@@ -227,7 +224,7 @@ public class CommandFtcUser extends FtcCommand {
                                         Component.text()
                                                 .append(user.displayName())
                                                 .append(Component.text(" has "))
-                                                .append(FtcFormatter.gems(user.getGems()))
+                                                .append(FtcFormatter.gemsNonTrans(user.getGems()))
                                                 .build()
                                 )))
 
@@ -241,7 +238,7 @@ public class CommandFtcUser extends FtcCommand {
                                                             Component.text("Gave ")
                                                                     .append(user.displayName())
                                                                     .append(Component.space())
-                                                                    .append(FtcFormatter.gems(user.getGems()))
+                                                                    .append(FtcFormatter.gemsNonTrans(user.getGems()))
                                                     );
                                                 }))
                                         )
@@ -255,7 +252,7 @@ public class CommandFtcUser extends FtcCommand {
 
                                                     c.getSource().sendMessage(
                                                             Component.text("Took ")
-                                                                    .append(FtcFormatter.gems(user.getGems()))
+                                                                    .append(FtcFormatter.gemsNonTrans(user.getGems()))
                                                                     .append(Component.text(" from "))
                                                                     .append(user.displayName())
                                                     );
@@ -273,7 +270,7 @@ public class CommandFtcUser extends FtcCommand {
                                                             Component.text()
                                                                     .append(user.displayName())
                                                                     .append(Component.text(" now has "))
-                                                                    .append(FtcFormatter.gems(amount))
+                                                                    .append(FtcFormatter.gemsNonTrans(amount))
                                                                     .build()
                                                     );
                                                 }))

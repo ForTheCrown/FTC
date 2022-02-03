@@ -1,11 +1,11 @@
 package net.forthecrown.events.dynamic;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.core.admin.record.PunishmentRecord;
-import net.forthecrown.core.admin.record.PunishmentType;
+import net.forthecrown.core.admin.PunishmentRecord;
+import net.forthecrown.core.admin.PunishmentType;
 import net.forthecrown.cosmetics.PlayerRidingManager;
-import net.forthecrown.user.manager.UserManager;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.user.UserTeleport;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -26,7 +26,7 @@ public class JailListener implements Listener {
         this.player = player;
         this.jail = jail;
 
-        record = Crown.getPunishmentManager().getEntry(player.getUniqueId()).getCurrent(PunishmentType.JAIL);
+        record = Crown.getPunishments().getEntry(player.getUniqueId()).getCurrent(PunishmentType.JAIL);
         Crown.getJailManager().addListener(this);
 
         player.teleport(jail);
@@ -42,7 +42,7 @@ public class JailListener implements Listener {
         }
     }
     public boolean checkJailed(){
-        if(Crown.getPunishmentManager().checkJailed(player)) return true;
+        if(Crown.getPunishments().checkJailed(player)) return true;
 
         release();
         return false;

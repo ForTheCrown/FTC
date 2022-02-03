@@ -11,7 +11,7 @@ import net.forthecrown.core.FtcFlags;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -50,7 +50,7 @@ public class PlayerRidingManager implements Listener {
         if(!(event.getRightClicked() instanceof Player)) return;
         if(event.getHand() == EquipmentSlot.OFF_HAND) return;
         if(!ItemStacks.isEmpty(event.getPlayer().getInventory().getItemInMainHand())) return;
-        if(event.getPlayer().getWorld().equals(Worlds.VOID)) return;
+        if(event.getPlayer().getWorld().equals(Worlds.voidWorld())) return;
         if(event.getPlayer().getGameMode() == GameMode.SPECTATOR) return;
 
         Player rider = event.getPlayer();

@@ -9,7 +9,7 @@ import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.events.DungeonListeners;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

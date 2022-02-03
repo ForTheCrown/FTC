@@ -13,7 +13,7 @@ import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.grenadier.types.selectors.EntitySelector;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.arguments.ScoreHolderArgument;

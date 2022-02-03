@@ -1,34 +1,37 @@
 package net.forthecrown.events;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.Worlds;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MobHealthBar implements Listener {
     public static final Map<LivingEntity, Component> NAMES = new HashMap<>();
-    public static final Map<LivingEntity, BukkitRunnable> hitmobs = new HashMap<>();
+    public static final Map<LivingEntity, BukkitTask> HITMOBS = new HashMap<>();
 
     @EventHandler(ignoreCancelled = true)
     public void onMobDamage(EntityDamageByEntityEvent event){
-        if(!(event.getDamager() instanceof Player)){                            //Check damager is player or arrow shot by player
+        if(!(event.getDamager() instanceof Player)){                            // Check damager is player or arrow shot by player
             if(!(event.getDamager() instanceof Arrow)) return;
             if(!(((Arrow) event.getDamager()).getShooter() instanceof Player)) return;
-        }                                                                       //Damager gotta either be a player or an arrow fired by the player
-        if(event.getEntity().getWorld().equals(Worlds.VOID)) return;            //Not in world_void
-        if(!(event.getEntity() instanceof LivingEntity)) return;                //Must be alive
-        if(event.getEntity() instanceof Player                                  //But not another player, armor stand or Boss mob
+        }
+
+        if(event.getEntity().getWorld().equals(Worlds.voidWorld())) return;     // Not in world_void
+        if(!(event.getEntity() instanceof LivingEntity)) return;                // Must be alive
+
+        if(event.getEntity() instanceof Player                                  // But not another player, armor stand or Boss mob
                 || event.getEntity() instanceof ArmorStand
                 || event.getEntity() instanceof EnderDragon
                 || event.getEntity() instanceof Wither
@@ -38,19 +41,18 @@ public class MobHealthBar implements Listener {
         showHealthbar(damaged, event.getFinalDamage());
     }
 
-    private static void delay(LivingEntity damaged){
-        if(hitmobs.containsKey(damaged)) hitmobs.get(damaged).cancel(); //Cancel if already in map
-        BukkitRunnable runnable = new BukkitRunnable() { //Create new delay
-            @Override
-            public void run() {
-                damaged.setCustomNameVisible(false);
-                damaged.customName(NAMES.getOrDefault(damaged, null));
-                NAMES.remove(damaged);
-                hitmobs.remove(damaged);
-            }
-        };
-        runnable.runTaskLater(Crown.inst(), 5*20); //Start new delay
-        hitmobs.put(damaged, runnable); //Put delay in map
+    private static void delay(LivingEntity damaged) {
+        BukkitTask task = HITMOBS.get(damaged);
+        if(task != null) task.cancel(); //Cancel if already in map
+
+        task = Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
+            damaged.setCustomNameVisible(false);
+            damaged.customName(NAMES.get(damaged));
+            NAMES.remove(damaged);
+            HITMOBS.remove(damaged);
+        }, 5 * 20);
+
+        HITMOBS.put(damaged, task); //Put delay in map
     }
 
     public static void showHealthbar(LivingEntity damaged, double finalDamage){

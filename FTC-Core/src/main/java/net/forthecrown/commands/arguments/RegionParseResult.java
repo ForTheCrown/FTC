@@ -7,7 +7,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionPos;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 
 import javax.annotation.Nullable;
 

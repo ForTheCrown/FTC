@@ -19,7 +19,7 @@ import net.forthecrown.user.UserMail;
 import net.forthecrown.user.actions.ActionFactory;
 import net.forthecrown.user.actions.MailQuery;
 import net.forthecrown.user.actions.UserActionHandler;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -137,13 +137,14 @@ public class CommandMail extends FtcCommand {
 
                                     UserManager m = Crown.getUserManager();
                                     m.getAllUsers()
-                                            .exceptionally(throwable -> {
-                                                throwable.printStackTrace();
-                                                context.getSource().sendAdmin("Error while sending mail");
+                                            .whenComplete((users, throwable) -> {
+                                                if(throwable != null) {
+                                                    context.getSource().sendAdmin("Error sending mail to all users, check console");
+                                                    Crown.logger().error(throwable);
 
-                                                throw new IllegalStateException(throwable);
-                                            })
-                                            .thenAccept(users -> {
+                                                    return;
+                                                }
+
                                                 users.forEach(user -> {
                                                     user.sendAndMail(lore, null);
                                                 });

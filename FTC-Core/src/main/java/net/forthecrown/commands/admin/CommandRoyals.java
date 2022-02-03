@@ -20,7 +20,6 @@ import net.forthecrown.squire.enchantment.RoyalEnchant;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -180,22 +179,6 @@ public class CommandRoyals extends FtcCommand {
                                             }
 
                                             c.getSource().sendAdmin( "Giving items");
-                                            return 0;
-                                        })
-                                )
-                                .then(literal("context")
-                                        .executes(c -> {
-                                            DungeonBoss<?> boss = c.getArgument(bossArg, DungeonBoss.class);
-                                            if(!boss.isAlive()) throw FtcExceptionProvider.create("Boss has not been spawned");
-
-                                            c.getSource().sendAdmin("boss: " + boss.getBossEntity().getCustomName());
-                                            c.getSource().sendAdmin("health: " + boss.getBossEntity().getHealth());
-                                            c.getSource().sendAdmin("final_mod: " + boss.getContext().getModifier());
-                                            c.getSource().sendAdmin("max_health: " + boss.getBossEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-                                            c.getSource().sendAdmin("attack_damage: " + boss.getBossEntity().getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getBaseValue());
-                                            c.getSource().sendAdmin("armor_amount: " + boss.getContext().getArmorAmount());
-                                            c.getSource().sendAdmin("enchant_amount: " + boss.getContext().getEnchantAmount());
-
                                             return 0;
                                         })
                                 )

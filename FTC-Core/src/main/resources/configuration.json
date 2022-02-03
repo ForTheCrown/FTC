@@ -30,6 +30,20 @@
       "color": "yellow"
     }
   },
+  "resource_world": {
+    "enabled": true,
+    "last_reset": 0,
+    "size": 4000,
+    "spawn_structure": "forthecrown:rw_spawn",
+    "rw_to_haz_gate": "res_to_haz",
+    "haz_to_rw_gate": "haz_to_res",
+    "reset_end_message": {
+      "text": "Resource World reset has opened!"
+    },
+    "reset_start_message": {
+      "text": "Resource World is now closed to regen, opening later!"
+    }
+  },
   "join_info": {
     "should_show": false,
     "should_show_end": false,

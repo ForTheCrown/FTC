@@ -15,7 +15,7 @@ import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.useables.warps.Warp;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.UserTeleport;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 

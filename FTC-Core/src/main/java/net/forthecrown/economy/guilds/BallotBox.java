@@ -16,7 +16,7 @@ import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.SignLines;
 import net.forthecrown.utils.math.Vector3i;

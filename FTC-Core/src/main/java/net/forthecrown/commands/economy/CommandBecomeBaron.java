@@ -9,7 +9,7 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.RankTitle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -58,7 +58,7 @@ public class CommandBecomeBaron extends FtcCommand {
                     //Tell em cost and ask for confirmation
                     TextComponent message = Component.text()
                             .append(Crown.prefix())
-                            .append(Component.translatable("commands.becomeBaron.confirm", RankTitle.BARON.noEndSpacePrefix(), FtcFormatter.rhines(baronPrice).color(NamedTextColor.YELLOW)))
+                            .append(Component.translatable("commands.becomeBaron.confirm", RankTitle.BARON.truncatedPrefix(), FtcFormatter.rhines(baronPrice).color(NamedTextColor.YELLOW)))
                             .append(Component.space())
                             .append(Component.translatable("buttons.confirm")
                                     .color(NamedTextColor.GREEN)
@@ -80,7 +80,7 @@ public class CommandBecomeBaron extends FtcCommand {
                             if(p.hasTitle(RankTitle.BARON)) throw FtcExceptionProvider.alreadyBaron();
                             if(!bals.has(p.getUniqueId(), baronPrice)) throw FtcExceptionProvider.cannotAfford(baronPrice);
 
-                            bals.add(p.getUniqueId(), -baronPrice);
+                            bals.remove(p.getUniqueId(), baronPrice);
 
                             p.addTitle(RankTitle.BARON);
                             p.addTitle(RankTitle.BARONESS);

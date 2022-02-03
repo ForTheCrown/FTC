@@ -14,8 +14,8 @@ import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.RankTier;
-import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.RankTier;
+import net.forthecrown.user.RankTitle;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.Struct;
@@ -303,7 +303,7 @@ public class CommandArkBox extends FtcCommand {
 
         void filterItem(ItemStack item) {
             ItemMeta meta = item.getItemMeta();
-            if(!meta.getPersistentDataContainer().has(ItemStacks.ITEM_KEY, PersistentDataType.BYTE)) return;
+            if(!meta.getPersistentDataContainer().has(ItemStacks.GENERIC_ITEM_KEY, PersistentDataType.BYTE)) return;
 
             for (Enchantment e: meta.getEnchants().keySet()) {
                 meta.removeEnchant(e);
@@ -322,7 +322,7 @@ public class CommandArkBox extends FtcCommand {
                 default -> {}
             }
 
-            meta.getPersistentDataContainer().remove(ItemStacks.ITEM_KEY);
+            meta.getPersistentDataContainer().remove(ItemStacks.GENERIC_ITEM_KEY);
             item.setItemMeta(meta);
         }
 
@@ -334,25 +334,25 @@ public class CommandArkBox extends FtcCommand {
         private interface RoyalItemFilter {
             RoyalItemFilter
                     SWORD   = new RoyalItemFilter() {
-                @Override
-                public Component displayName() {
-                    return Component.text("-")
-                            .color(NamedTextColor.GOLD)
-                            .decoration(TextDecoration.ITALIC, false)
+                        @Override
+                        public Component displayName() {
+                            return Component.text("-")
+                                    .color(NamedTextColor.GOLD)
+                                    .decoration(TextDecoration.ITALIC, false)
 
-                            .append(
-                                    Component.text("Legacy Royal Sword")
-                                            .style(Style.style(NamedTextColor.YELLOW, TextDecoration.BOLD)
-                                                    .decoration(TextDecoration.ITALIC, false)
-                                            )
-                            )
-                            .append(Component.text("-"));
-                }
+                                    .append(
+                                            Component.text("Legacy Royal Sword")
+                                                    .style(Style.style(NamedTextColor.YELLOW, TextDecoration.BOLD)
+                                                            .decoration(TextDecoration.ITALIC, false)
+                                                    )
+                                    )
+                                    .append(Component.text("-"));
+                        }
 
-                @Override
-                public void accept(ItemMeta meta) {
-                }
-            },
+                        @Override
+                        public void accept(ItemMeta meta) {
+                        }
+                    },
                     CUTLASS = new RoyalItemFilter() {
                         @Override
                         public Component displayName() {

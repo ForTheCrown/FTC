@@ -9,7 +9,7 @@ import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.actions.ActionFactory;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

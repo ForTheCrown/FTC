@@ -2,7 +2,9 @@ package net.forthecrown.utils.world;
 
 import net.forthecrown.utils.Bukkit2NMS;
 import net.forthecrown.utils.FtcUtils;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.phys.Vec2;
 import org.apache.commons.io.FileUtils;
@@ -23,13 +25,16 @@ public class WorldReCreator {
     private final World world;
     private final Vec2 worldBorderPos;
     private final double worldBorderSize;
+    private final GameRules rules;
     private final String name;
-    private final long seed;
 
+    private long seed;
     private BiomeProvider biomeProvider;
     private ChunkGenerator generator;
     private boolean preserveWorldBorder;
     private boolean preserveSeed;
+    private boolean preserveGameRules;
+    private boolean seedSet;
 
     private WorldReCreator(World world) {
         this.world = world;
@@ -41,6 +46,8 @@ public class WorldReCreator {
         WorldBorder border = level.getWorldBorder();
         this.worldBorderPos = new Vec2((float) border.getCenterX(), (float) border.getCenterZ());
         this.worldBorderSize = border.getSize();
+
+        this.rules = level.getGameRules().copy();
     }
 
     public boolean preserveWorldBorder() {
@@ -79,6 +86,26 @@ public class WorldReCreator {
         return this;
     }
 
+    public boolean preserveGameRules() {
+        return preserveGameRules;
+    }
+
+    public WorldReCreator preserveGameRules(boolean preserveGameRules) {
+        this.preserveGameRules = preserveGameRules;
+        return this;
+    }
+
+    public boolean isSeedSet() {
+        return seedSet;
+    }
+
+    public WorldReCreator seed(long seed) {
+        this.seedSet = true;
+        this.seed = seed;
+
+        return this;
+    }
+
     public World run() {
         WorldCreator creator = new WorldCreator(name)
                 .copy(world);
@@ -86,7 +113,7 @@ public class WorldReCreator {
         if(generator != null) creator.generator(generator);
         if(biomeProvider != null) creator.biomeProvider(biomeProvider);
 
-        if(preserveSeed) creator.seed(seed);
+        if(preserveSeed || seedSet) creator.seed(seed);
         else creator.seed(FtcUtils.RANDOM.nextLong());
 
         File f = world.getWorldFolder();
@@ -106,6 +133,10 @@ public class WorldReCreator {
 
              border.setCenter(worldBorderPos.x, worldBorderPos.y);
              border.setSize(worldBorderSize);
+        }
+
+        if(preserveGameRules) {
+            level.getGameRules().assignFrom(rules, MinecraftServer.getServer());
         }
 
         return world;

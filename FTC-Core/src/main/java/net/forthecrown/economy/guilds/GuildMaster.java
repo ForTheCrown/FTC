@@ -17,7 +17,7 @@ import net.forthecrown.economy.guilds.screen.TopicSelectionScreen;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserMarketData;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

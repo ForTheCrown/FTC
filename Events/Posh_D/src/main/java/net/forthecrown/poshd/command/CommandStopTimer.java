@@ -64,12 +64,12 @@ public class CommandStopTimer extends AbstractCommand {
                                                 score.resetScore();
                                             }
 
-                                            EventTimer timer = Main.TIMERS.get(player.getUniqueId());
+                                            EventTimer timer = Main.TIMERS.remove(player.getUniqueId());
                                             if(timer != null) {
                                                 if(!timer.wasStopped()) timer.stop();
-                                                Main.TIMERS.remove(player.getUniqueId());
 
-                                                int scoreVal = (int) timer.getTime();
+                                                long scoreTime = System.currentTimeMillis() - timer.getStartTime();
+                                                int scoreVal = (int) scoreTime;
                                                 Score score = objective.getScore(player.getName());
 
                                                 Component message;

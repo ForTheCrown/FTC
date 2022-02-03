@@ -1,6 +1,5 @@
 package net.forthecrown.useables;
 
-import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -23,7 +22,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
 
     protected final List<UsageActionInstance> actions = new ObjectArrayList<>();
     private final Object2ObjectMap<Key, UsageCheckInstance> checks = new Object2ObjectOpenHashMap<>();
-    protected boolean sendFail;
+    protected boolean sendFail, cancelVanilla = true;
 
     protected AbstractUsable(String fileName, String directory, boolean stopIfFileDoesntExist) {
         super(fileName, directory, stopIfFileDoesntExist);
@@ -36,7 +35,8 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
     public abstract void delete();
 
     protected void saveInto(JsonWrapper json){
-        json.add("sendFail", new JsonPrimitive(sendFail));
+        json.add("sendFail", sendFail);
+        json.add("cancelVanilla", cancelVanilla);
 
         InteractionUtils.saveChecks(this, json.getSource());
         InteractionUtils.saveActions(this, json.getSource());
@@ -44,6 +44,7 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
 
     protected void reloadFrom(JsonWrapper json) {
         sendFail = json.get("sendFail").getAsBoolean();
+        cancelVanilla = json.getBool("cancelVanilla");
 
         try {
             InteractionUtils.loadChecks(this, json.getSource());
@@ -113,6 +114,16 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
     @Override
     public void setSendFail(boolean send) {
         this.sendFail = send;
+    }
+
+    @Override
+    public void setCancelVanilla(boolean cancelVanilla) {
+        this.cancelVanilla = cancelVanilla;
+    }
+
+    @Override
+    public boolean cancelVanillaInteraction() {
+        return cancelVanilla;
     }
 
     @Override

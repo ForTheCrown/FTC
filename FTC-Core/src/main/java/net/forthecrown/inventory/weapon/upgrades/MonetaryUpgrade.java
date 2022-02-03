@@ -39,7 +39,7 @@ public record MonetaryUpgrade(int amount, Type type) implements WeaponUpgrade {
 
             @Override
             public Component format(int amount) {
-                return FtcFormatter.gems(amount);
+                return FtcFormatter.gemsNonTrans(amount);
             }
         },
         RHINES {

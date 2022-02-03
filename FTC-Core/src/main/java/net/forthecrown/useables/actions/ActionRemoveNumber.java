@@ -8,7 +8,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.key.Key;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -56,7 +56,7 @@ public class ActionRemoveNumber implements UsageAction<ActionRemoveNumber.Action
 
         @Override
         public void onInteract(Player player) {
-            if (fromBal) Crown.getEconomy().add(player.getUniqueId(), -amount);
+            if (fromBal) Crown.getEconomy().remove(player.getUniqueId(), amount);
             else {
                 CrownUser user = UserManager.getUser(player);
                 user.setGems(user.getGems() - amount);

@@ -8,7 +8,7 @@ import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.market.ShopEntrance;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.BlockState;

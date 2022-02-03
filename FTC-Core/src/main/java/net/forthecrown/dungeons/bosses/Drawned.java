@@ -28,7 +28,7 @@ public class Drawned extends DungeonBoss<Drowned> {
     private final Set<Guardian> guardians = new HashSet<>();
 
     public Drawned() {
-        super("Drawned", new Location(Worlds.VOID, -123.5, 25.5, 38.5), (short) 300, DungeonAreas.DRAWNED_ROOM,
+        super("Drawned", new Location(Worlds.voidWorld(), -123.5, 25.5, 38.5), (short) 300, DungeonAreas.DRAWNED_ROOM,
                 Arrays.asList(
                         Artifacts.ELDER.item(),
                         Artifacts.HIDDEN.item(),

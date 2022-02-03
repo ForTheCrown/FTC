@@ -1,5 +1,6 @@
 package net.forthecrown.inventory.weapon.goals;
 
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -31,7 +32,7 @@ public class EndBossGoal implements WeaponKillGoal {
     }
 
     @Override
-    public boolean test(Entity killed) {
+    public boolean test(CrownUser user, Entity killed) {
         return killed.getType() == type;
     }
 

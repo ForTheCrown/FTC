@@ -15,7 +15,7 @@ import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.structure.*;
-import net.forthecrown.utils.BlockPlacer;
+import net.forthecrown.structure.BlockPlacer;
 import net.forthecrown.utils.math.Vector3i;
 import org.bukkit.Location;
 import org.bukkit.Material;

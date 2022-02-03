@@ -4,7 +4,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.Struct;
 import net.forthecrown.utils.math.Vector3i;

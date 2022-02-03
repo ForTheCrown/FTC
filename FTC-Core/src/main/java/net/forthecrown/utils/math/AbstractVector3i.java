@@ -3,6 +3,8 @@ package net.forthecrown.utils.math;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.Tag;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.Location;
@@ -145,6 +147,11 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
 
     public T zero() {
         return cloneAt(0, 0, 0);
+    }
+
+    public Tag saveAsTag() {
+        int[] cords = {x, y, z};
+        return new IntArrayTag(cords);
     }
 
     @Override

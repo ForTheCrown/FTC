@@ -35,6 +35,7 @@ public final class Events {
         register(new DungeonListeners());
         register(new EnchantListeners());
 
+        register(new ResourceWorldListener());
         register(new WeaponListener());
     }
 

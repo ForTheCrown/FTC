@@ -8,7 +8,6 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.actions.TeleportRequest;
-import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.utils.JsonUtils;
 
 import java.util.*;
@@ -40,12 +39,12 @@ public class FtcUserInteractions extends AbstractUserAttachment implements UserI
 
     @Override
     public MuteStatus muteStatusSilent() {
-        return Crown.getPunishmentManager().checkMuteSilent(user.getUniqueId());
+        return Crown.getPunishments().checkMuteSilent(user.getUniqueId());
     }
 
     @Override
     public MuteStatus muteStatus() {
-        return Crown.getPunishmentManager().checkMute(getUser());
+        return Crown.getPunishments().checkMute(getUser());
     }
 
     @Override

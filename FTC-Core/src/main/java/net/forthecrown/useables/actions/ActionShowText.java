@@ -3,10 +3,10 @@ package net.forthecrown.useables.actions;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.types.ComponentArgument;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
@@ -18,7 +18,7 @@ public class ActionShowText implements UsageAction<ActionShowText.ActionInstance
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
-        return new ActionInstance(ComponentArgument.component().parse(reader));
+        return new ActionInstance(ChatArgument.chat().parse(reader));
     }
 
     @Override

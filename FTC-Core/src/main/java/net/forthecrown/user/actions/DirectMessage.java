@@ -29,7 +29,7 @@ public class DirectMessage implements UserAction, Struct {
         this.input = input;
 
         formattedText = FtcFormatter.formatIfAllowed(input, sender.asBukkit());
-        muteStatus = Crown.getPunishmentManager().checkMute(sender.asBukkit());
+        muteStatus = Crown.getPunishments().checkMute(sender.asBukkit());
     }
 
     public CommandSource getSender() {

@@ -1,7 +1,7 @@
 package net.forthecrown.core.chat;
 
 import net.forthecrown.core.admin.PunishmentEntry;
-import net.forthecrown.core.admin.record.PunishmentRecord;
+import net.forthecrown.core.admin.PunishmentRecord;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 

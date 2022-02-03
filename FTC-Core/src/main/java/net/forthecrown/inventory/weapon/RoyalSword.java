@@ -7,6 +7,7 @@ import net.forthecrown.core.Keys;
 import net.forthecrown.core.Main;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.Announcer;
+import net.forthecrown.events.custom.SwordRankUpEvent;
 import net.forthecrown.inventory.RankedItem;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.click.ClickHistory;
@@ -283,7 +284,7 @@ public class RoyalSword extends RankedItem {
 
         //If we should rank up... rank up
         if(shouldRankUp()) {
-            incrementGoal();
+            incrementRank();
 
             doEffects(
                     killer,
@@ -297,7 +298,9 @@ public class RoyalSword extends RankedItem {
         return context.baseDamage;
     }
 
-    public void incrementGoal() {
+    public void incrementRank() {
+        new SwordRankUpEvent(rank, rank + 1, this).callEvent();
+
         rank++;
 
         this.waitingUpdate = nextUpgrades;

@@ -12,8 +12,8 @@ import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryBorder;
 import net.forthecrown.inventory.builder.options.SimpleCordedOption;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.RankTier;
-import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.RankTier;
+import net.forthecrown.user.RankTitle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -180,7 +180,7 @@ public final class RankInventory {
                 Component.translatable("rankSelector.set", NamedTextColor.GRAY,
                         Component.text()
                                 .color(NamedTextColor.WHITE)
-                                .append(title.noEndSpacePrefix())
+                                .append(title.truncatedPrefix())
                                 .build()
                 )
         );
@@ -252,7 +252,7 @@ public final class RankInventory {
         @Override
         public void place(FtcInventory inventory, CrownUser user) {
             ItemStackBuilder item = new ItemStackBuilder(user.hasTitle(title) ? Material.GLOBE_BANNER_PATTERN : Material.PAPER)
-                    .setName(title.noEndSpacePrefix().style(nonItalic(NamedTextColor.WHITE)))
+                    .setName(title.truncatedPrefix().style(nonItalic(NamedTextColor.WHITE)))
                     .addLore(lore);
 
             if (user.getTitle() == title) {

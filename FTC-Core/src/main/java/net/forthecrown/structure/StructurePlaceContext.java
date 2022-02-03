@@ -1,8 +1,8 @@
 package net.forthecrown.structure;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.forthecrown.utils.BlockPlacer;
 import net.forthecrown.utils.math.Vector3i;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -12,9 +12,12 @@ import java.util.List;
 public class StructurePlaceContext {
     private final BlockStructure structure;
     private final List<BlockProcessor> processors = new ObjectArrayList<>();
-    private StructureTransform transform;
+    private final List<EntityProcessor> entityProcessors = new ObjectArrayList<>();
     private final Vector3i destination;
     private final BlockPlacer placer;
+
+    private EntityPlacer entityPlacer;
+    private StructureTransform transform;
     private PlaceRotation rotation;
     private PlaceMirror mirror;
     private Vector3i pivot;
@@ -24,6 +27,7 @@ public class StructurePlaceContext {
         this.structure = structure;
         this.destination = destination;
         this.placer = placer;
+
         this.pivot = Vector3i.ZERO;
         this.rotation = PlaceRotation.D_0;
         this.mirror = PlaceMirror.NONE;
@@ -46,6 +50,10 @@ public class StructurePlaceContext {
      */
     public Vector3i transform(Vector3i relative) {
         return transform.transform(getDestination(), relative.clone(), getPivot(), getMirror(), getRotation());
+    }
+
+    public Vec3 transform(Vec3 vec3) {
+        return transform.transformDecimal(getDestination(), new Vec3(vec3.x, vec3.y, vec3.z), getPivot(), getMirror(), getRotation());
     }
 
     public StructureTransform getTransform() {
@@ -84,6 +92,15 @@ public class StructurePlaceContext {
         return addProccessor(new EmptyBlockProcessor());
     }
 
+    public StructurePlaceContext addEntityProcessor(EntityProcessor processor) {
+        this.entityProcessors.add(processor);
+        return this;
+    }
+
+    public StructurePlaceContext addEmptyEntityProcessor() {
+        return addEntityProcessor(new EmptyEntityProcessor());
+    }
+
     public StructurePlaceContext setPivot(Vector3i pivot) {
         this.pivot = pivot;
         return this;
@@ -107,7 +124,28 @@ public class StructurePlaceContext {
     }
 
     public boolean placeEntities() {
-        return placeEntities;
+        return placeEntities && entityPlacer != null;
+    }
+
+    public EntityPlacer getEntityPlacer() {
+        return entityPlacer;
+    }
+
+    public StructurePlaceContext setEntityPlacer(EntityPlacer entityPlacer) {
+        this.entityPlacer = entityPlacer;
+        return this;
+    }
+
+    EntityPlaceData runProcessors(StructureEntityInfo info) {
+        if(entityProcessors.isEmpty()) return null;
+
+        EntityPlaceData data = null;
+
+        for (EntityProcessor p: entityProcessors) {
+            data = p.process(info, this, data);
+        }
+
+        return data;
     }
 
     BlockPlaceData runProccessors(BlockPalette palette, BlockPalette.StateData data) {

@@ -3,7 +3,7 @@ package net.forthecrown.user.actions;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.UserTeleport;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.scheduler.BukkitRunnable;

@@ -14,7 +14,7 @@ import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.minecraft.nbt.CompoundTag;
@@ -138,7 +138,7 @@ public class CommandRoyalSword extends FtcCommand {
                             CrownUser user = getUserSender(c);
                             RoyalSword sword = getSword(user);
 
-                            sword.incrementGoal();
+                            sword.incrementRank();
                             sword.update();
 
                             c.getSource().sendAdmin("Upgraded held sword");

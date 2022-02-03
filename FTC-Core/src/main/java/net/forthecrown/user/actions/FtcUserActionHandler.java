@@ -16,7 +16,7 @@ import net.forthecrown.regions.visit.handlers.RidingVehicleHandler;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserMail;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;

@@ -6,7 +6,12 @@ import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.core.Worlds;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.RankTier;
+import net.forthecrown.user.RankTitle;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -32,7 +37,7 @@ public class HideySpidey extends DungeonBoss<Spider> {
     private final Set<CaveSpider> helpers = new HashSet<>();
 
     public HideySpidey() {
-        super("Hidey Spidey", new Location(Worlds.VOID, -78.5, 55, 284.5), (short) 20, DungeonAreas.SPIDEY_ROOM,
+        super("Hidey Spidey", new Location(Worlds.voidWorld(), -78.5, 55, 284.5), (short) 20, DungeonAreas.SPIDEY_ROOM,
                 Arrays.asList(
                         DungeonUtils.makeDungeonItem(Material.SPIDER_EYE, 45, (Component) null),
                         DungeonUtils.makeDungeonItem(Material.FERMENTED_SPIDER_EYE, 20, (Component) null),
@@ -82,8 +87,11 @@ public class HideySpidey extends DungeonBoss<Spider> {
         }
         tillSpawn--;
         if(tillSpawn == 0){
-            SpawnPart[] values = SpawnPart.values();
-            if(helpers.size() < 11) spawnHelper(values[RANDOM.intInRange(0, values.length)]);
+            if(helpers.size() < 11) {
+                SpawnPart[] values = SpawnPart.values();
+                spawnHelper(values[RANDOM.intInRange(0, values.length)]);
+            }
+
             tillSpawn = 5;
         }
 
@@ -107,6 +115,19 @@ public class HideySpidey extends DungeonBoss<Spider> {
             s.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 99999, 254, false, false));
         }
         helpers.clear();
+
+        // Give knight tier
+        for (Player p: context.getPlayers()) {
+            if(!getBossRoom().contains(p)) continue;
+
+            CrownUser user = UserManager.getUser(p);
+            user.addTier(RankTier.FREE);
+
+            user.sendMessage(Component.translatable("dungeons.gotRank",
+                    NamedTextColor.GOLD,
+                    RankTitle.KNIGHT.truncatedPrefix()
+            ));
+        }
     }
 
     public void spawnHelper(SpawnPart part) {
@@ -133,12 +154,12 @@ public class HideySpidey extends DungeonBoss<Spider> {
 
     public enum SpawnPart {
         WEST (
-                new Location(Worlds.VOID, -71.5, 55, 284, 0, -90),
-                new Location(Worlds.VOID, -89.5, 57, 284.5)
+                new Location(Worlds.voidWorld(), -71.5, 55, 284, 0, -90),
+                new Location(Worlds.voidWorld(), -89.5, 57, 284.5)
         ),
         EAST (
-                new Location(Worlds.VOID, -85.5, 55, 284.5, 0, 90),
-                new Location(Worlds.VOID, -67.5, 57, 284.5)
+                new Location(Worlds.voidWorld(), -85.5, 55, 284.5, 0, 90),
+                new Location(Worlds.voidWorld(), -67.5, 57, 284.5)
         );
 
         public final Location trackLocation;

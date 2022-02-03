@@ -31,4 +31,8 @@ public interface Usable extends Predicate<Player>, CrownSerializer, Deletable, C
      * @param send Whether failure messages should be sent after failing a check
      */
     void setSendFail(boolean send);
+
+    void setCancelVanilla(boolean cancelVanilla);
+
+    boolean cancelVanillaInteraction();
 }

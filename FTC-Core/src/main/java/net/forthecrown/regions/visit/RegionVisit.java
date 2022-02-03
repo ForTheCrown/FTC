@@ -5,13 +5,14 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.cosmetics.travel.TravelEffect;
+import net.forthecrown.events.custom.RegionVisitEvent;
 import net.forthecrown.events.dynamic.RegionVisitListener;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionManager;
 import net.forthecrown.regions.RegionPoleGenerator;
 import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.FtcGameMode;
+import net.forthecrown.user.FtcGameMode;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.Bukkit;
@@ -51,7 +52,8 @@ public class RegionVisit implements Runnable {
         // If the user is near the pole determined by seeing if the user is in
         // the same world as the region pole and less than DISTANCE_TO_POLE
         // from the pole. Mainly used by OwnedEntityHandler to check if it should
-        // scan for entities or not
+        // scan for entities or not. Pole distance check for non staff players
+        // is ran in CommandVisit
         nearPole = RegionUtil.isCloseToPole(localRegion.getPolePosition(), user) && getOriginWorld().equals(getDestWorld());
 
         // For hulk smashing to be allowed we must pass 4 checks:
@@ -209,13 +211,18 @@ public class RegionVisit implements Runnable {
             // Just TP them to pole... boring
             user.getPlayer().teleport(getTeleportLocation());
 
-            runHandlers(h -> h.onTeleport(this));
+            runTpHandlers();
         }
     }
 
     void runHandlers(Consumer<VisitHandler> consumer) {
         if(getHandlers().isEmpty()) return;
         getHandlers().forEach(consumer);
+    }
+
+    void runTpHandlers() {
+        new RegionVisitEvent(user, getLocalRegion().getPos(), getRegion().getPos(), getRegion(), hulkSmash()).callEvent();
+        runHandlers(h -> h.onTeleport(this));
     }
 
     private class GoingUp implements Consumer<BukkitTask> {
@@ -235,7 +242,7 @@ public class RegionVisit implements Runnable {
 
                     user.getPlayer().teleport(getTeleportLocation());
 
-                    runHandlers(h -> h.onTeleport(RegionVisit.this));
+                    runTpHandlers();
 
                     RegionVisitListener listener = new RegionVisitListener(user, getActiveEffect());
                     listener.beginListening();

@@ -1,7 +1,7 @@
 package net.forthecrown.crownevents.entries;
 
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import org.bukkit.entity.Player;
 
 public abstract class SingleEntry implements EventEntry {

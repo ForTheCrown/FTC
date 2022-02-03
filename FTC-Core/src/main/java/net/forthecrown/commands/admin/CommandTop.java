@@ -4,7 +4,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.UserTeleport;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;

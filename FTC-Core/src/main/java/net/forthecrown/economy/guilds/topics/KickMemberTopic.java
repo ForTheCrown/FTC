@@ -18,7 +18,7 @@ import net.forthecrown.inventory.builder.InventoryPos;
 import net.forthecrown.inventory.builder.options.CordedInventoryOption;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserMarketData;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;

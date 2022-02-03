@@ -65,7 +65,7 @@ public class CommandWithdraw extends FtcCommand {
                 .color(NamedTextColor.GRAY)
                 .append(itemAmount > 1 ? Component.space().append(text) : Component.empty());
 
-        bals.add(user.getUniqueId(), -totalAmount);
+        bals.remove(user.getUniqueId(), totalAmount);
         user.getPlayer().getInventory().addItem(ItemStacks.makeCoins(amount, itemAmount));
         user.sendMessage(message);
         return 0;

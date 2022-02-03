@@ -2,16 +2,16 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.actions.DirectMessage;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
+import net.forthecrown.core.Crown;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.royalgrenadier.source.CommandSources;
+import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.actions.DirectMessage;
 import net.forthecrown.user.actions.UserActionHandler;
 
 public class CommandReply extends FtcCommand {
@@ -37,7 +37,7 @@ public class CommandReply extends FtcCommand {
                     if(source == null || !sourceIsOnline(source)) throw FtcExceptionProvider.noReplyTargets();
 
                     UserActionHandler.handleAction(
-                            new DirectMessage(CommandSources.getOrCreate(user.getPlayer(), this), source, true, c.getArgument("message", String.class))
+                            new DirectMessage(GrenadierUtils.wrap(GrenadierUtils.senderToWrapper(user.getPlayer()), this), source, true, c.getArgument("message", String.class))
                     );
                     return 0;
                 })

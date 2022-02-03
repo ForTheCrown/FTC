@@ -1,5 +1,6 @@
 package net.forthecrown.inventory.weapon.goals;
 
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Creeper;
@@ -28,7 +29,7 @@ public class ChargedCreeperGoal implements WeaponKillGoal {
     }
 
     @Override
-    public boolean test(Entity killed) {
+    public boolean test(CrownUser user, Entity killed) {
         if (killed.getType() != EntityType.CREEPER) return false;
         Creeper creeper = (Creeper) killed;
 

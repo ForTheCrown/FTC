@@ -2,9 +2,9 @@ package net.forthecrown.core;
 
 import net.forthecrown.commands.CommandArkBox;
 import net.forthecrown.commands.manager.FtcCommands;
-import net.forthecrown.core.admin.FtcPunishmentManager;
+import net.forthecrown.core.admin.FtcJailManager;
+import net.forthecrown.core.admin.FtcPunishments;
 import net.forthecrown.core.admin.ServerRules;
-import net.forthecrown.core.admin.jails.FtcJailManager;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
@@ -27,7 +27,7 @@ import net.forthecrown.useables.actions.UsageActions;
 import net.forthecrown.useables.checks.UsageChecks;
 import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
-import net.forthecrown.user.manager.FtcUserManager;
+import net.forthecrown.user.FtcUserManager;
 import net.forthecrown.user.packets.listeners.CorePacketListeners;
 
 import static net.forthecrown.core.Main.*;
@@ -41,34 +41,32 @@ final class FtcBootStrap {
     private FtcBootStrap() {}
 
     static void loadBootStrap() {
-        announcer = new FtcAnnouncer();
+        announcer   = new FtcAnnouncer();
+        messages    = new FtcMessages();
+        emotes      = new ChatEmotes();
+        prices      = new ServerItemPriceMap();
+        tabList     = new FtcTabList();
 
-        messages = new FtcMessages();
         messages.load();
-
-        emotes = new ChatEmotes();
         emotes.registerEmotes();
 
-        // Initialize and read the config
-        config = new FtcConfigImpl();
-        config.read();
-
-        prices = new ServerItemPriceMap();
-        tabList = new FtcTabList();
-
         FtcFlags.init();
+
+        ComVars.ensureDefaultsExist();
         ComVars.reload();
     }
 
     static void enableBootStrap() {
         // Initialize config sections
-        joinInfo    = new JoinInfo();
-        dayChange   = new DayChange();
-        kingship    = new FtcKingship();
-        rules       = new ServerRules();
-        endOpener   = new EndOpener();
+        joinInfo        = new JoinInfo();
+        dayChange       = new DayChange();
+        kingship        = new FtcKingship();
+        rules           = new ServerRules();
+        endOpener       = new EndOpener();
+        resourceWorld   = new ResourceWorld();
 
         // Add config sections
+        config.addSection(resourceWorld);
         config.addSection(endOpener);
         config.addSection(joinInfo);
         config.addSection(kingship);
@@ -79,22 +77,18 @@ final class FtcBootStrap {
         config.load();
 
         economy = new FtcEconomy();
-        shopManager = new FtcShopManager();
 
-        regionManager = new FtcRegionManager(ComVars.getRegionWorld());
-
-        userManager = new FtcUserManager();
-        punishmentManager = new FtcPunishmentManager();
-        jailManager = new FtcJailManager();
-
-        usablesManager = new FtcUsablesManager();
-        structureManager = new FtcStructureManager();
+        shopManager         = new FtcShopManager();
+        regionManager       = new FtcRegionManager(ComVars.getRegionWorld());
+        userManager         = new FtcUserManager();
+        punishmentManager   = new FtcPunishments();
+        jailManager         = new FtcJailManager();
+        usablesManager      = new FtcUsablesManager();
+        structureManager    = new FtcStructureManager();
 
         markets = new FtcMarkets();
-
-        saver = new PeriodicalSaver();
-
-        guild = new TradeGuild();
+        saver   = new PeriodicalSaver();
+        guild   = new TradeGuild();
 
         //Initialize modules
         safeRunnable(CorePacketListeners::init);

@@ -7,6 +7,7 @@ import net.forthecrown.comvars.types.ComVarType;
 import net.forthecrown.comvars.types.ComVarTypes;
 import net.forthecrown.regions.RegionConstants;
 import net.forthecrown.serializer.JsonWrapper;
+import net.forthecrown.utils.FileDefaults;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.key.Key;
@@ -17,6 +18,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 public final class ComVars {
+    static ComVar<Boolean>          inDebugMode;
+
     static ComVar<Key>              onFirstJoinKit;
 
     static ComVar<World>            regionWorld;
@@ -34,6 +37,7 @@ public final class ComVars {
 
     static ComVar<Float>            houses_startingDemand;
     static ComVar<Float>            guildWageModifier;
+    static ComVar<Float>            rwDoubleDropRate;
 
     static ComVar<Long>             marriageCooldown;
     static ComVar<Long>             userDataResetInterval;
@@ -45,10 +49,10 @@ public final class ComVars {
     static ComVar<Long>             guildJoinRequirement;
     static ComVar<Long>             marketStatusCooldown;
     static ComVar<Long>             resourceWorldResetInterval;
-    static ComVar<Long>             nextResourceWorldReset;
     static ComVar<Long>             afkKickDelay;
     static ComVar<Long>             dataRetentionTime;
     static ComVar<Long>             guildJoinTime;
+    static ComVar<Long>             gb_donorTimeLength;     // How long do bought gb passes last
 
     static ComVar<Boolean>          allowOtherPlayerNicks;
     static ComVar<Boolean>          taxesEnabled;
@@ -59,6 +63,7 @@ public final class ComVars {
     static ComVar<Boolean>          hulkSmashPoles;
     static ComVar<Boolean>          endOpen;
     static ComVar<Boolean>          allowNonOwnerSwords;
+    static ComVar<Boolean>          gb_extraExpGivesRhines;
 
     static ComVar<Integer>          effectCost_arrow;
     static ComVar<Integer>          effectCost_death;
@@ -102,11 +107,11 @@ public final class ComVars {
 
         read("houses_startingDemand",       ComVarTypes.FLOAT);
         read("guildWageModifier",           ComVarTypes.FLOAT);
+        read("rwDoubleDropRate",            ComVarTypes.FLOAT);
 
-        read("resourceWorldResetInterval",  ComVarTypes.LONG);
-        read("nextResourceWorldReset",      ComVarTypes.LONG);
         read("autoSaveIntervalMins",        ComVarTypes.LONG);
 
+        read("resourceWorldResetInterval",  ComVarTypes.TIME);
         read("marriageCooldown",            ComVarTypes.TIME);
         read("userDataResetInterval",       ComVarTypes.TIME);
         read("marketOwnershipSafeTime",     ComVarTypes.TIME);
@@ -118,6 +123,7 @@ public final class ComVars {
         read("afkKickDelay",                ComVarTypes.TIME);
         read("dataRetentionTime",           ComVarTypes.TIME);
         read("guildJoinTime",               ComVarTypes.TIME);
+        read("gb_donorTimeLength",          ComVarTypes.TIME);
 
         read("allowOtherPlayerNicks",       ComVarTypes.BOOL);
         read("taxesEnabled",                ComVarTypes.BOOL);
@@ -128,6 +134,7 @@ public final class ComVars {
         read("hulkSmashPoles",              ComVarTypes.BOOL);
         read("endOpen",                     ComVarTypes.BOOL);
         read("allowNonOwnerSwords",         ComVarTypes.BOOL);
+        read("gb_extraExpGivesRhines",      ComVarTypes.BOOL);
 
         read("effectCost_arrow",            ComVarTypes.INTEGER);
         read("effectCost_death",            ComVarTypes.INTEGER);
@@ -149,6 +156,14 @@ public final class ComVars {
         read("guildBaseWage",               ComVarTypes.INTEGER);
 
         j = null;
+    }
+
+    static void ensureDefaultsExist() {
+        try {
+            FileDefaults.JSON.compareAndSave(getFile(), Crown.resource("comvars.json"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void save() {
@@ -258,6 +273,10 @@ public final class ComVars {
         return guildWageModifier.getValue(0.25F);
     }
 
+    public static float rwDoubleDropRate() {
+        return rwDoubleDropRate.getValue(0.5F);
+    }
+
 
 
     public static long getMarriageCooldown() {
@@ -296,16 +315,8 @@ public final class ComVars {
         return resourceWorldResetInterval.getValue(TimeUtil.DAY_IN_MILLIS * 80);
     }
 
-    public static long nextResourceWorldReset() {
-        return nextResourceWorldReset.getValue(-1L);
-    }
-
-    public static void nextResourceWorldReset(long time) {
-        nextResourceWorldReset.update(time);
-    }
-
     public static long afkKickDelay() {
-        return afkKickDelay.getValue(TimeUtil.HOUR_IN_MILLIS);
+        return afkKickDelay.getValue(TimeUtil.HOUR_IN_MILLIS * 3);
     }
 
     public static long dataRetentionTime() {
@@ -314,6 +325,10 @@ public final class ComVars {
 
     public static long guildKickSafeTime() {
         return guildJoinTime.getValue(TimeUtil.WEEK_IN_MILLIS);
+    }
+
+    public static long goalBookDonorTimeLength() {
+        return gb_donorTimeLength.getValue(TimeUtil.MONTH_IN_MILLIS * 3);
     }
 
 
@@ -352,6 +367,10 @@ public final class ComVars {
 
     public static boolean allowNonOwnerSwords() {
         return allowNonOwnerSwords.getValue(true);
+    }
+
+    public static boolean goalBookExtraExpGivesRhines() {
+        return gb_extraExpGivesRhines.getValue(true);
     }
 
 

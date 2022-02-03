@@ -111,7 +111,7 @@ public class CommandPay extends FtcCommand {
             if(target.getInteractions().isBlockedPlayer(user.getUniqueId())) continue;
 
             bals.add(target.getUniqueId(), amount);
-            bals.add(id, -amount);
+            bals.remove(id, amount);
 
             user.sendMessage(
                     Component.translatable("economy.pay.sender",

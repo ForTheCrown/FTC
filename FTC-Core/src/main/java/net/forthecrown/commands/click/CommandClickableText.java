@@ -1,17 +1,15 @@
 package net.forthecrown.commands.click;
 
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandClickableText extends FtcCommand {
+    public static final String NAME = "clickable_test";
 
     public CommandClickableText() {
-        super("clickable_text");
+        super(NAME);
 
         setPermission(Permissions.DEFAULT);
         register();
@@ -33,24 +31,13 @@ public class CommandClickableText extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
-                .then(argument("firstID", IntegerArgumentType.integer())
-                        .executes(cmd(false))
+                .then(argument("args", StringArgumentType.greedyString())
+                        .executes(c -> {
+                            String args = c.getArgument("args", String.class);
+                            ClickableTexts.execute(getUserSender(c), args);
 
-                        .then(argument("string", StringArgumentType.greedyString())
-                                .executes(cmd(true))
-                        )
+                            return 0;
+                        })
                 );
-    }
-
-    private Command<CommandSource> cmd(boolean args) {
-        return c -> {
-            ClickableTexts.execute(
-                    getUserSender(c),
-                    c.getArgument("firstID", Integer.class),
-                    args ? c.getArgument("string", String.class) : null
-            );
-
-            return 0;
-        };
     }
 }

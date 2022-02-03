@@ -11,7 +11,7 @@ import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionPos;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.actions.ActionFactory;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.key.Key;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;

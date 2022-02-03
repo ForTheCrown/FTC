@@ -11,8 +11,8 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.Pet;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.Pet;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.ListUtils;
 import org.bukkit.entity.Player;
 

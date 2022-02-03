@@ -40,21 +40,8 @@ public class DayChange {
             updateTask.cancel();
             updateTask = null;
         }
-
-        // Configure calendar to be at the start of the next day
-        // So we can run day update exactly on time. As always,
-        // there's probably a better way of doing this, but IDK lol
-        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MILLISECOND, 1);
-        calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
-
-        long tomorrow = calendar.getTimeInMillis();
-
         // Find difference between now and tomorrow
-        long difference = TimeUtil.timeUntil(tomorrow);
+        long difference = TimeUtil.timeUntil(getNextDayChange());
 
         Crown.logger().info("DayUpdate scheduled, executing in: " + new TimePrinter(difference).printString());
 
@@ -66,6 +53,20 @@ public class DayChange {
         // a second time cuz of daily restart, but whatever lol
         // future-proof :D
         updateTask = Bukkit.getScheduler().runTaskTimer(Crown.inst(), this::changeDay, difference, TimeUtil.millisToTicks(TimeUtil.DAY_IN_MILLIS));
+    }
+
+    public long getNextDayChange() {
+        // Configure calendar to be at the start of the next day
+        // So we can run day update exactly on time. As always,
+        // there's probably a better way of doing this, but IDK lol
+        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MILLISECOND, 1);
+        calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
+
+        return calendar.getTimeInMillis();
     }
 
     public void addListener(DayChangeListener runnable){

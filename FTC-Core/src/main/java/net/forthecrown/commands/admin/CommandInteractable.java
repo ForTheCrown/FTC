@@ -105,6 +105,20 @@ public class CommandInteractable extends FtcCommand {
                 .then(actionsArgument(supplier::apply))
                 .then(checksArgument(supplier::apply))
 
+                .then(literal("cancelVanilla")
+                        .then(argument("bool", BoolArgumentType.bool())
+                                .executes(c -> {
+                                    Usable usable = supplier.apply(c);
+                                    boolean state = c.getArgument("bool", Boolean.class);
+
+                                    usable.setCancelVanilla(state);
+
+                                    c.getSource().sendAdmin("Interaction result will cancel vanilla interaction: " + state);
+                                    return 0;
+                                })
+                        )
+                )
+
                 .then(literal("sendFail")
                         .then(argument("bool", BoolArgumentType.bool())
                                 .executes(c -> {

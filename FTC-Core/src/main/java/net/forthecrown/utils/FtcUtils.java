@@ -3,9 +3,14 @@ package net.forthecrown.utils;
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.coreprotect.CoreProtect;
+import net.coreprotect.CoreProtectAPI;
+import net.coreprotect.database.lookup.BlockLookupAPI;
+import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.grenadier.types.pos.Position;
+import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.audience.Audience;
@@ -15,6 +20,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -170,6 +176,44 @@ public final class FtcUtils {
         for (String s: progress.getRemainingCriteria()) {
             progress.awardCriteria(s);
         }
+    }
+
+    public static Location findHazelLocation() {
+        PopulationRegion region = Crown.getRegionManager().get(ComVars.getSpawnRegion());
+        return region.getPoleBottom().add(0, 6, 0).toLocation();
+    }
+
+    public static boolean isNaturallyPlaced(Block b) {
+        // This could be a List<BlockLookupResult> but no, everything
+        // must become string, so says the almighty dumdum that made
+        // CoreProtect
+        List<String[]> lookup = BlockLookupAPI.performLookup(b, 0);
+        if(ListUtils.isNullOrEmpty(lookup)) return true;
+
+        CoreProtectAPI.ParseResult firstResult = CoreProtect.getInstance().getAPI().parseResult(lookup.get(0));
+
+        // Why doesn't CoreProtect have something like this themselves, I get saving it
+        // as an int, but no wrapper for that int to make the API more understandable???
+        CoreProtectAction action = CoreProtectAction.values()[Math.min(firstResult.getActionId(), CoreProtectAction.values().length - 1)];
+
+        // I need to learn to use less words to explain myself
+        //
+        // If we reset a world, CoreProtect won't erase the
+        // world from its database, so we gotta check if the
+        // last thing done at the block's location was a block
+        // being broken, cuz if it was broken, and now there's
+        // something being mined here, then it's gotta be
+        // natural, right? Totally not a piston which pushed
+        // a block here
+        return action == CoreProtectAction.BROKE;
+    }
+
+    public enum CoreProtectAction {
+        BROKE,
+        PLACED,
+        CLICK,
+        KILL,
+        UNKNOWN;
     }
 
     /*

@@ -4,6 +4,8 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Kingship;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.inventory.crown.Crowns;
+import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -32,7 +34,7 @@ public final class ItemStacks {
     /**
      * Key used by persistent data container to store stuff
      */
-    public static final NamespacedKey ITEM_KEY = new NamespacedKey(Crown.inst(), "crownitem");
+    public static final NamespacedKey GENERIC_ITEM_KEY = new NamespacedKey(Crown.inst(), "crownitem");
 
     private static final ItemStack VOTE_TICKET;
     private static final ItemStack ELITE_VOTE_TICKET;
@@ -196,7 +198,29 @@ public final class ItemStacks {
         }
     }
 
+    /**
+     * Checks if the item is 'empty'
+     * <p></p>
+     * An empty item is an item that's either null,
+     * has a type == air or an amount that's less
+     * than 1.
+     *
+     * @param itemStack The item to check
+     * @return Whether the item is 'empty'
+     */
     public static boolean isEmpty(ItemStack itemStack) {
         return itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() < 1;
+    }
+
+    /**
+     * A special item is something like a sword or crown,
+     * that doesn't leave your inventory when you die.
+     *
+     * @param item The item to check
+     * @return Whether it's a sword or crown
+     */
+    public static boolean isSpecial(ItemStack item) {
+        if(isEmpty(item)) return false;
+        return RoyalWeapons.isRoyalSword(item) || Crowns.isCrown(item);
     }
 }

@@ -18,7 +18,7 @@ import net.forthecrown.grenadier.RoyalArguments;
 import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.royalgrenadier.arguments.RoyalArgumentsImpl;
-import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.RankTitle;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.TimeArgument;
 

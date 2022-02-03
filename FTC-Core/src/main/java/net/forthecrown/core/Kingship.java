@@ -15,18 +15,14 @@ import java.util.UUID;
  * Implementation: {@link FtcKingship}
  */
 public interface Kingship extends Nameable {
-    static Component queenTitle(){
-        return Component.text("[")
-                .color(NamedTextColor.WHITE)
-                .append(Component.text("Queen").color(NamedTextColor.YELLOW))
-                .append(Component.text("] "))
-                .decorate(TextDecoration.BOLD);
-    }
+    Component
+            QUEEN_TITLE = makeTitle("Queen"),
+            KING_TITLE  = makeTitle("King");
 
-    static Component kingTitle(){
+    private static Component makeTitle(String text) {
         return Component.text("[")
                 .color(NamedTextColor.WHITE)
-                .append(Component.text("King").color(NamedTextColor.YELLOW))
+                .append(Component.text(text).color(NamedTextColor.YELLOW))
                 .append(Component.text("] "))
                 .decorate(TextDecoration.BOLD);
     }
@@ -38,11 +34,23 @@ public interface Kingship extends Nameable {
 
     boolean isFemale();
 
+    /**
+     * 
+     * @param female
+     */
     void setFemale(boolean female);
 
+    /**
+     * Gets the king's user object
+     * @return King's user object, null, if there's no king
+     */
     CrownUser getUser();
 
+    /**
+     * Gets the current monarch's title.
+     * @return {@link Kingship#QUEEN_TITLE} if {@link Kingship#isFemale()} is true, {@link Kingship#KING_TITLE} if false
+     */
     default Component getPrefix() {
-        return isFemale() ? queenTitle() : kingTitle();
+        return isFemale() ? QUEEN_TITLE : KING_TITLE;
     }
 }

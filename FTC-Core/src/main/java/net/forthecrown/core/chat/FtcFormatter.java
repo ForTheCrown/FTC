@@ -2,13 +2,13 @@ package net.forthecrown.core.chat;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.admin.record.PunishmentRecord;
-import net.forthecrown.core.admin.record.PunishmentType;
+import net.forthecrown.core.admin.PunishmentRecord;
+import net.forthecrown.core.admin.PunishmentType;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
-import net.forthecrown.user.data.RankTier;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.RankTier;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
@@ -35,10 +35,8 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -301,52 +299,13 @@ public interface FtcFormatter {
      * @param amount The amount to format and decimalize
      * @return The formatted amount.
      */
-    static TranslatableComponent queryGems(int amount){
+    static TranslatableComponent gems(int amount){
         if(amount == 1 || amount == -1) return Component.translatable("user.gems.singular", Component.text(amount));
         return Component.translatable("user.gems.multiple", Component.text(decimalizeNumber(amount)));
     }
 
-    static Component gems(int amount) {
-        return GlobalTranslator.render(queryGems(amount), Locale.ROOT);
-    }
-
-    /**
-     * Gets a date from milliseconds
-     * <p></p>
-     * This sucks ass, too vague of a result. Use {@link Date#toString()} for precision.
-     * @param millis The millis
-     * @deprecated use {@link FtcFormatter#formatDate(long)}
-     * @return The date
-     */
-    @Deprecated
-    static String getDateFromMillis(long millis){
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(millis);
-
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        String s = day + "";
-
-        DateFormatSymbols sF = DateFormatSymbols.getInstance();
-
-        s += daySuffix(day);
-        s += "of ";
-        s += sF.getMonths()[c.get(Calendar.MONTH)];
-        s += " " + c.get(Calendar.YEAR);
-
-        return s;
-    }
-
-    private static String daySuffix(int day){
-        if (day >= 11 && day <= 13) {
-            return "th ";
-        }
-
-        return switch (day % 10) {
-            case 1 -> "st ";
-            case 2 -> "nd ";
-            case 3 -> "rd ";
-            default -> "th ";
-        };
+    static Component gemsNonTrans(int amount) {
+        return GlobalTranslator.render(gems(amount), Locale.ROOT);
     }
 
     /**

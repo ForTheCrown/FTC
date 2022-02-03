@@ -4,7 +4,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.economy.shops.ShopInventory;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.economy.shops.SignShop;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Cooldown;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;

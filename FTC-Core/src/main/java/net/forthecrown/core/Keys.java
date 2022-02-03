@@ -16,6 +16,10 @@ public interface Keys {
         return key(Crown.inst().namespace(), value);
     }
 
+    static NamespacedKey minecraft(String name) {
+        return NamespacedKey.minecraft(name);
+    }
+
     static NamespacedKey parse(String str) throws IllegalStateException {
         return parse(new StringReader(str));
     }

@@ -5,11 +5,12 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.user.CosmeticData;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,6 +33,7 @@ public class CosmeticsListener implements Listener {
 
     @EventHandler
     public void onPlayerShootsBow(EntityShootBowEvent event) {
+        if (event.getProjectile() instanceof Firework) return;
         if (event.getEntity().getType() != EntityType.PLAYER) return;
 
         CrownUser user = UserManager.getUser(event.getEntity().getUniqueId());

@@ -8,6 +8,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.events.ShopInteractionListener;
+import net.forthecrown.events.custom.SignShopUseEvent;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
 import org.bukkit.Bukkit;
@@ -52,6 +53,8 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
             //Exception thrown, check failed
             return;
         }
+
+        new SignShopUseEvent(session).callEvent();
 
         interaction.interact(session, economy);
     }

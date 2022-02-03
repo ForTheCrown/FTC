@@ -2,7 +2,6 @@ package net.forthecrown.user;
 
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.user.actions.TeleportRequest;
-import net.forthecrown.user.manager.UserManager;
 
 import java.util.List;
 import java.util.Set;

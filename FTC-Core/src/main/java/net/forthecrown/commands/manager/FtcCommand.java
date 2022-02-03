@@ -13,7 +13,7 @@ import net.forthecrown.economy.Economy;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

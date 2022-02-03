@@ -58,7 +58,7 @@ public class ArrowEffect extends CosmeticEffect {
             user.sendMessage(Component.translatable("cosmetics.set.arrow", NamedTextColor.YELLOW, name()));
         } else {
             if(user.getGems() < ComVars.arrowEffectCost()){
-                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.queryGems(ComVars.arrowEffectCost())));
+                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.gems(ComVars.arrowEffectCost())));
                 return;
             }
 

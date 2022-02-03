@@ -28,13 +28,16 @@ public class Main extends JavaPlugin {
         leaderboards = new Leaderboards();
         leaderboards.reload();
 
-        saveResource("messages.properties", false);
         Messages.load(this);
 
+        // Register Listener
+        getServer().getPluginManager().registerEvents(new EventListener(), this);
+
+        //new CommandMoveCheckPoint();
         new CommandLeaveParkour();
         new CommandStartTimer();
         new CommandStopTimer();
-        new CommandCheckPoint();
+        //new CommandCheckPoint();
         new CommandLeaderboard();
     }
 

@@ -30,7 +30,7 @@ public class Zhambie extends DungeonBoss<Husk> {
     private final Set<Husk> helpers = new HashSet<>();
 
     public Zhambie() {
-        super("Zhambie", new Location(Worlds.VOID, -191.5, 80, 157.5),
+        super("Zhambie", new Location(Worlds.voidWorld(), -191.5, 80, 157.5),
                 (short) 60, DungeonAreas.ZHAMBIE_ROOM,
                 Arrays.asList( //Required items
                         DungeonUtils.makeDungeonItem(Material.DRIED_KELP, 45,  (Component) null),

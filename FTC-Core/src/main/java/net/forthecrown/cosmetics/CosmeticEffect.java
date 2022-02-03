@@ -105,7 +105,7 @@ public abstract class CosmeticEffect implements JsonSerializable, Keyed, CordedI
             builder.addLore(
                     Component.text("Click to purchase for ")
                             .style(FtcFormatter.nonItalic(NamedTextColor.GRAY))
-                            .append(FtcFormatter.gems(price).style(FtcFormatter.nonItalic(NamedTextColor.GOLD)))
+                            .append(FtcFormatter.gemsNonTrans(price).style(FtcFormatter.nonItalic(NamedTextColor.GOLD)))
             );
         }
 

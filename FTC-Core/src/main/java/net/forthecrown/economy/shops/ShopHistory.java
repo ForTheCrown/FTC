@@ -117,10 +117,6 @@ public class ShopHistory implements JsonSerializable, JsonDeserializable {
                 .decorate(TextDecoration.BOLD);
     }
 
-    int maxPage() {
-        return (int) Math.ceil(((float) size())/PAGE_SIZE);
-    }
-
     public boolean isValidPage(int page) {
         return !isInvalidIndex(PAGE_SIZE * page);
     }

@@ -3,7 +3,7 @@ package net.forthecrown.user.actions;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserMail;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Struct;
 import net.kyori.adventure.text.Component;

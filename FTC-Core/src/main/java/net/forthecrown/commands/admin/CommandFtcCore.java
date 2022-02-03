@@ -20,7 +20,7 @@ import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.UserTeleport;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -394,7 +394,7 @@ public class CommandFtcCore extends FtcCommand {
         ITEM_PRICES ("Item Prices",             getPriceMap()::save,            getPriceMap()::reload),
         MARKETS("Markets",                      getMarkets()::save,             getMarkets()::reload),
         MESSAGES ("Messages",                   () -> {},                       getMessages()::reload),
-        PUNISHMENTS("Punishments",              getPunishmentManager()::save,   getPunishmentManager()::reload),
+        PUNISHMENTS("Punishments",              getPunishments()::save,         getPunishments()::reload),
         KITS("Kits",                            getKitManager()::save,          getKitManager()::reload),
         WARPS("Warps",                          getWarpManager()::save,         getWarpManager()::reload),
         INTERACTABLES("Interactable Manager",   getUsables()::saveAll,          getUsables()::reloadAll),

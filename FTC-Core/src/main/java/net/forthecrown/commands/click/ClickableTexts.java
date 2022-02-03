@@ -9,6 +9,8 @@ import net.forthecrown.utils.FtcUtils;
 public final class ClickableTexts {
     private ClickableTexts() {}
 
+    public static final int RADIX = Character.MAX_RADIX;
+
     private static final ClickableTextNode ROOT_NODE = new ClickableTextNode("root");
 
     public static ClickableTextNode register(ClickableTextNode node) {
@@ -29,18 +31,16 @@ public final class ClickableTexts {
         return ROOT_NODE.getNodes();
     }
 
-    public static void execute(CrownUser user, int initialID, String args) {
+    public static void execute(CrownUser user, String args) throws CommandSyntaxException {
         StringReader reader = new StringReader(FtcUtils.isNullOrBlank(args) ? "" : args);
+        int initialID = Integer.valueOf(reader.readString(), RADIX);
+        reader.skipWhitespace();
 
         ClickableTextNode node = ROOT_NODE.getNodes().get(initialID);
         if(node == null) {
             return;
         }
 
-        try {
-            node.execute(user, reader);
-        } catch (CommandSyntaxException e) {
-            FtcUtils.handleSyntaxException(user, e);
-        }
+        node.execute(user, reader);
     }
 }

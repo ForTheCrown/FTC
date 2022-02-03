@@ -51,7 +51,7 @@ public abstract class TravelEffect extends CosmeticEffect {
             user.sendMessage(Component.translatable("cosmetics.set.travel", NamedTextColor.YELLOW, name()));
         } else {
             if(user.getGems() < ComVars.travelEffectCost()){
-                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.queryGems(ComVars.travelEffectCost())));
+                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.gems(ComVars.travelEffectCost())));
                 return;
             }
 

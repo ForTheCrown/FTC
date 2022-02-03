@@ -3,7 +3,7 @@ version: '${version}'
 main: net.forthecrown.core.Main
 api-version: 1.18
 loadbefore: [ OpenInv, GriefPrevention, PopulationDensity, DiscordSRV ]
-depend: [ RoyalGrenadier, WorldGuard, LuckPerms, dynmap ]
+depend: [ RoyalGrenadier, WorldGuard, LuckPerms, dynmap, CoreProtect, AncientGates ]
 authors: [ Julie, Wout ]
 
 buildTime: '${buildDate}'

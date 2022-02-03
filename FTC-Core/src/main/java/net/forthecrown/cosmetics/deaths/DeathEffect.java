@@ -52,7 +52,7 @@ public abstract class DeathEffect extends CosmeticEffect {
             user.sendMessage(Component.translatable("cosmetics.set.death", NamedTextColor.YELLOW, name()));
         } else {
             if(user.getGems() < ComVars.deathEffectCost()){
-                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.queryGems(ComVars.deathEffectCost())));
+                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.gems(ComVars.deathEffectCost())));
                 return;
             }
 

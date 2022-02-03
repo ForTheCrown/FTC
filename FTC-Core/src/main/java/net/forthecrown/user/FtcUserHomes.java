@@ -36,6 +36,7 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
     }
 
     private boolean check(){
+        if(!getUser().isOnline()) return false;
         if(getUser().hasPermission(Permissions.ADMIN)) return false;
 
         int max = user.getRankTier().maxHomes;

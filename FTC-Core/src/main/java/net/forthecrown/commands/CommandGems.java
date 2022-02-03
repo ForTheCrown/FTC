@@ -41,7 +41,7 @@ public class CommandGems extends FtcCommand {
                             c.getSource().sendMessage(
                                     Component.translatable("user.valueQuery.other",
                                             other.nickDisplayName().color(NamedTextColor.GOLD),
-                                            FtcFormatter.queryGems(other.getGems()).color(NamedTextColor.YELLOW)
+                                            FtcFormatter.gems(other.getGems()).color(NamedTextColor.YELLOW)
                                     ).color(NamedTextColor.GRAY)
                             );
                             return 0;
@@ -50,7 +50,7 @@ public class CommandGems extends FtcCommand {
                 .executes(c ->{
                     CrownUser user = getUserSender(c);
                     user.sendMessage(
-                            Component.translatable("user.valueQuery.self", FtcFormatter.queryGems(user.getGems()).color(NamedTextColor.YELLOW))
+                            Component.translatable("user.valueQuery.self", FtcFormatter.gems(user.getGems()).color(NamedTextColor.YELLOW))
                                     .color(NamedTextColor.GRAY)
                     );
                     return 1000;

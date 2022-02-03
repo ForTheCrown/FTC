@@ -7,7 +7,7 @@ import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.arguments.WarpArgument;
 import net.forthecrown.useables.warps.Warp;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.UserTeleport;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

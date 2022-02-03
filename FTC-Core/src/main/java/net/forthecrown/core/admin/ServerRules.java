@@ -25,10 +25,10 @@ public class ServerRules extends FtcConfig.ConfigSection {
 
     //Displays the rules
     public Component display(){
-        Component border = Component.text(" -------- ").style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
+        Component border = Component.text("          ").style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
         TextComponent.Builder builder = Component.text()
                 .append(border)
-                .append(Component.text("Rules"))
+                .append(Component.text(" Rules "))
                 .append(border);
 
         for (int index = 0; index < rules.size(); index++){

@@ -8,10 +8,10 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
-import net.forthecrown.core.admin.PunishmentManager;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.admin.StaffChat;
-import net.forthecrown.core.admin.record.PunishmentRecord;
-import net.forthecrown.core.admin.record.PunishmentType;
+import net.forthecrown.core.admin.PunishmentRecord;
+import net.forthecrown.core.admin.PunishmentType;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -58,7 +58,7 @@ public class CommandTempBan extends FtcCommand implements TempPunisher {
 
     @Override
     public int punish(CrownUser user, CommandSource source, long length, String reason) throws CommandSyntaxException {
-        PunishmentManager manager = Crown.getPunishmentManager();
+        Punishments manager = Crown.getPunishments();
         BanList list = Bukkit.getBanList(BanList.Type.NAME);
         long until = lengthTranslate(length);
 

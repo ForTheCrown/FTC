@@ -4,15 +4,15 @@ import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
-import net.forthecrown.core.admin.PunishmentManager;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.crownevents.EventTimer;
 import net.forthecrown.economy.market.MarketDisplay;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
 import net.forthecrown.user.UserInteractions;
-import net.forthecrown.user.data.RankTitle;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.RankTitle;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.TimeUtil;
@@ -115,7 +115,7 @@ public class ProfilePrinter implements ComponentPrinter {
     }
 
     public ProfilePrinter basicInfo() {
-        line("Rank", user.getTitle().noEndSpacePrefix(), user.getTitle() != RankTitle.DEFAULT);
+        line("Rank", user.getTitle().truncatedPrefix(), user.getTitle() != RankTitle.DEFAULT);
 
         if(!user.isOnline()) {
             long offlineTime = TimeUtil.timeSince(user.getLastLogin());
@@ -124,7 +124,7 @@ public class ProfilePrinter implements ComponentPrinter {
             line("Last online", printer.printStringBiggest() + " ago");
         }
 
-        line("Gems", FtcFormatter.gems(user.getGems()), user.getGems() > 0);
+        line("Gems", FtcFormatter.gemsNonTrans(user.getGems()), user.getGems() > 0);
         line("Rhines", FtcFormatter.rhines(Crown.getEconomy().get(user.getUniqueId())));
 
         return this;
@@ -146,7 +146,7 @@ public class ProfilePrinter implements ComponentPrinter {
     }
 
     public ProfilePrinter adminInfo() {
-        PunishmentManager list = Crown.getPunishmentManager();
+        Punishments list = Crown.getPunishments();
         PunishmentEntry entry = list.getEntry(user.getUniqueId());
 
         Component locMessage = user.getLocation() == null ? null : FtcFormatter.clickableLocationMessage(user.getLocation(), true);

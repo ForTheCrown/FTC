@@ -20,7 +20,7 @@ public class CommandLeaveParkour extends AbstractCommand {
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
             Player player = c.getSource().asPlayer();
-            EventTimer timer = Main.TIMERS.get(player.getUniqueId());
+            EventTimer timer = Main.TIMERS.remove(player.getUniqueId());
 
             if(timer == null) {
                 throw CommandCheckPoint.NOT_IN_EVENT.create();

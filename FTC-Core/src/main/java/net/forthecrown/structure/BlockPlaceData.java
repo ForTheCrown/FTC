@@ -1,6 +1,5 @@
 package net.forthecrown.structure;
 
-import net.forthecrown.utils.FtcBlockData;
 import net.forthecrown.utils.math.Vector3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;

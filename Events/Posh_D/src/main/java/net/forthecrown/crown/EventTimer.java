@@ -24,8 +24,9 @@ public class EventTimer {
     public Location checkPoint, exitLocation;
 
     private final Timer timer;
+    private long startTime;
 
-    public EventTimer(Player p, TimerMessageFormatter messageFormatter, Consumer<Player> onTimerExpire){
+    public EventTimer(Player p, TimerMessageFormatter messageFormatter, Consumer<Player> onTimerExpire) {
         this.player = p;
         this.messageFormatter = messageFormatter;
         this.onTimerExpire = onTimerExpire;
@@ -33,18 +34,20 @@ public class EventTimer {
         timer = new Timer();
     }
 
-    public EventTimer(Player p, Consumer<Player> onTimerExpire){
+    public EventTimer(Player p, Consumer<Player> onTimerExpire) {
         this(p, TimerMessageFormatter.defaultTimer(), onTimerExpire);
     }
 
-    public void start(int maxTicks){
+    public void start(int maxTicks) {
         stopped = false;
+        startTime = System.currentTimeMillis();
+        long maxMillis = maxTicks * 50L;
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 elapsedTime += MILLIS_PER_TICK;
-                if(elapsedTime >= maxTicks * 50){
+                if(elapsedTime >= maxMillis) {
                     Bukkit.getScheduler().runTask(Main.inst, () -> onTimerExpire.accept(getPlayer()));
                     stop();
                 }
@@ -54,68 +57,29 @@ public class EventTimer {
         }, 0, MILLIS_PER_TICK);
     }
 
-    public void startTickingDown(int ticks){
-        elapsedTime = ticks * 50;
-        stopped = false;
-
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                elapsedTime -= MILLIS_PER_TICK;
-
-                if(elapsedTime <= 0){
-                    Bukkit.getScheduler().runTask(Main.inst, () -> onTimerExpire.accept(getPlayer()));
-                    stop();
-                }
-
-                sendActionBar();
-            }
-        }, 0, MILLIS_PER_TICK);
-    }
-
-    public void stop(){
+    public void stop() {
         timer.cancel();
         timer.purge();
         stopped = true;
     }
 
-    public boolean wasStopped(){
+    public boolean wasStopped() {
         return stopped;
     }
 
-    public long getTime(){
-        return elapsedTime;
-    }
-
-    public void setTime(long millis) {
-        this.elapsedTime = millis;
-    }
-
-    public long getTimeInTicks() {
-        return getTime() / 50;
-    }
-
-    public void setTimeInTicks(long time) {
-        this.elapsedTime = time * 50;
+    public long getStartTime() {
+        return startTime;
     }
 
     public Player getPlayer() {
         return player;
     }
 
-    public Consumer<Player> getOnTimerExpire() {
-        return onTimerExpire;
-    }
-
-    public TimerMessageFormatter getMessageFormatter() {
-        return messageFormatter;
-    }
-
     public Component getFormattedMessage() {
         return messageFormatter.format(getTimerCounter(elapsedTime).toString(), elapsedTime);
     }
 
-    private void sendActionBar(){
+    private void sendActionBar() {
         player.sendActionBar(getFormattedMessage());
     }
 
@@ -125,8 +89,10 @@ public class EventTimer {
         long milliseconds = (timeInMillis /10) % 100;
 
         return new StringBuilder()
-                .append(String.format("%02d", minutes)).append(":")
-                .append(String.format("%02d", seconds)).append(":")
+                .append(String.format("%02d", minutes))
+                .append(":")
+                .append(String.format("%02d", seconds))
+                .append(":")
                 .append(String.format("%02d", milliseconds));
     }
 

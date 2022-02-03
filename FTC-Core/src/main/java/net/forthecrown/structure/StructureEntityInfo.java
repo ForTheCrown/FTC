@@ -1,11 +1,10 @@
 package net.forthecrown.structure;
 
 import net.forthecrown.serializer.NbtSerializable;
-import net.minecraft.commands.CommandSource;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.phys.Vec3;
 
-public record StructureEntityInfo(Vec3 offset, CompoundTag data) implements NbtSerializable {
+public record StructureEntityInfo(Vec3 offset, CompoundTag entityData) implements NbtSerializable {
     public static StructureEntityInfo of(CompoundTag data) {
         Vec3 offset = new Vec3(
                 data.getDouble("X"),
@@ -22,7 +21,7 @@ public record StructureEntityInfo(Vec3 offset, CompoundTag data) implements NbtS
 
     @Override
     public CompoundTag save() {
-        CompoundTag data = this.data.copy();
+        CompoundTag data = this.entityData.copy();
         data.putDouble("X", offset.x);
         data.putDouble("Y", offset.y);
         data.putDouble("Z", offset.z);

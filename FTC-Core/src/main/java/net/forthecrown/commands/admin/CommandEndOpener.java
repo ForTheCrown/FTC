@@ -45,22 +45,22 @@ public class CommandEndOpener extends FtcCommand {
 
     @Override
     protected void createCommand(BrigadierCommand command) {
-        if(Crown.inDebugMode()) {
-            command
-                    .then(literal("regen")
-                            .executes(c -> {
-                                c.getSource().sendAdmin("Starting remake");
-
-                                EndOpener opener = opener();
-                                opener.regen();
-
-                                c.getSource().sendAdmin("Remaking The End async");
-                                return 0;
-                            })
-                    );
-        }
-
         command
+                .then(literal("regen")
+                        .executes(c -> {
+                            c.getSource().sendAdmin("Starting remake");
+
+                            c.getSource().sendAdmin("Starting end regeneration");
+                            EndOpener opener = opener();
+                            opener.regen()
+                                    .whenComplete((unused, throwable) -> {
+                                        c.getSource().sendAdmin("Regenerated end");
+                                    });
+
+                            return 0;
+                        })
+                )
+
                 .then(literal("close")
                         .executes(c -> setOpen(c, false))
                 )

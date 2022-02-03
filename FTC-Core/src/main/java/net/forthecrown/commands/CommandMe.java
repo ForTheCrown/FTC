@@ -6,7 +6,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.chat.BannedWords;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -47,7 +47,7 @@ public class CommandMe extends FtcCommand {
                             boolean mayBroadcast = true;
 
                             if(source.isPlayer()){
-                                MuteStatus status = Crown.getPunishmentManager().checkMute(source.asBukkit());
+                                MuteStatus status = Crown.getPunishments().checkMute(source.asBukkit());
 
                                 if(status == MuteStatus.HARD) return 0;
                                 if(status == MuteStatus.SOFT) mayBroadcast = false;

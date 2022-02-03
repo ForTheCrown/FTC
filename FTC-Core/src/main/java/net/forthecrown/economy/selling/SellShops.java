@@ -9,8 +9,8 @@ import net.forthecrown.inventory.builder.options.InventoryBorder;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.inventory.builder.options.SimpleCordedOption;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.SoldMaterialData;
-import net.forthecrown.user.data.SellAmount;
+import net.forthecrown.user.SoldMaterialData;
+import net.forthecrown.user.SellAmount;
 import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -138,7 +138,7 @@ public class SellShops {
     public static final BuiltInventory CROPS = baseInventory("Crops", 54, true)
             .add(SellShopHeader.CROPS)
 
-            .add(itemSell(2, 2, BAMBOO))
+            .add(itemSell(2, 2, STICK))
             .add(itemSell(3, 2, KELP))
             .add(itemSell(4, 2, CACTUS))
             .add(itemSell(5, 2, MELON))

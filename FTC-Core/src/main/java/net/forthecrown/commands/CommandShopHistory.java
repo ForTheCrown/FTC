@@ -71,7 +71,15 @@ public class CommandShopHistory extends FtcCommand {
                                     }
 
                                     int page = c.getArgument("page", Integer.class);
-                                    SignShop shop = Crown.getShopManager().getShop(name);
+                                    SignShop shop;
+
+                                    try {
+                                        shop = Crown.getShopManager().getShop(name);
+                                    } catch (IllegalArgumentException e) {
+                                        throw INVALID.create();
+                                    }
+
+                                    if(shop == null) throw INVALID.create();
 
                                     ShopOwnership ownership = shop.getOwnership();
 
@@ -99,9 +107,7 @@ public class CommandShopHistory extends FtcCommand {
             throw FtcExceptionProvider.translatable("shops.history.invalidPage", Component.text(page));
         }
 
-        Component display = history.display(page);
-
-        player.sendMessage(display);
+        player.sendMessage(history.display(page));
         return 0;
     }
 

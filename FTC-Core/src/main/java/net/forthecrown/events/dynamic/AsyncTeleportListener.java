@@ -2,7 +2,7 @@ package net.forthecrown.events.dynamic;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.UserTeleport;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

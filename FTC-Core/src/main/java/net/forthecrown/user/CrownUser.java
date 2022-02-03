@@ -12,9 +12,9 @@ import net.forthecrown.economy.selling.UserSellResult;
 import net.forthecrown.economy.shops.ShopCustomer;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
+import net.forthecrown.protection.UserClaimSession;
 import net.forthecrown.regions.RegionPos;
 import net.forthecrown.serializer.Deletable;
-import net.forthecrown.user.data.*;
 import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.math.ImmutableVector3i;
 import net.kyori.adventure.text.Component;
@@ -299,7 +299,7 @@ public interface CrownUser extends
     }
 
     default boolean hasTier(RankTier tier) {
-        return getRankTier().ordinal() <= tier.ordinal();
+        return getRankTier().ordinal() > tier.ordinal();
     }
 
     default void addTier(RankTier tier) {
@@ -914,6 +914,18 @@ public interface CrownUser extends
      * @throws UserNotOnlineException If the user is not online
      */
     void sendPacket(Packet<ClientGamePacketListener> packet) throws UserNotOnlineException;
+
+    boolean isGoalBookDonator();
+
+    void setLastGuildPassDonation(long timeStamp);
+
+    long getLastGuildPassDonation();
+
+    UserClaimSession getClaimSession();
+
+    UserClaimSession createClaimSession();
+
+    void closeClaimSession();
 
     @Override
     boolean equals(Object o);

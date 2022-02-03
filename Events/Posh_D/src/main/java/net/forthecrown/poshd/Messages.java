@@ -9,18 +9,39 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import org.bukkit.plugin.Plugin;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.PropertyResourceBundle;
 
 public class Messages {
-    private static final Key KEY = Key.key("posh_d", "translations");
+    public static final String FILE_NAME = "messages.properties";
+    public static final Charset CHARSET = StandardCharsets.UTF_8;
+
+    private static final Key KEY = Key.key("posh_d", "messages");
     private static final TranslationRegistry TRANSLATOR = TranslationRegistry.create(KEY);
 
-    static void load(Plugin plugin) {
+    public static void load(Plugin plugin) {
         try {
-            InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(plugin.getResource("messages.properties")));
+            File f = new File(plugin.getDataFolder(), FILE_NAME);
+            Reader reader;
+
+            if(f.exists()) {
+                reader = new FileReader(f, CHARSET);
+            } else {
+                plugin.saveResource(FILE_NAME, false);
+
+                reader = new InputStreamReader(
+                        Objects.requireNonNull(plugin.getResource(FILE_NAME)),
+                        CHARSET
+                );
+            }
+
             PropertyResourceBundle bundle = new PropertyResourceBundle(reader);
 
             TRANSLATOR.registerAll(Locale.ENGLISH, bundle, true);
@@ -42,6 +63,10 @@ public class Messages {
 
     public static TranslatableComponent timerStart() {
         return Component.translatable("timer.start");
+    }
+
+    public static TranslatableComponent invNotEmpty() {
+        return Component.translatable("error.itemsInInv");
     }
 
     public static TimerMessageFormatter timerFormatter() {

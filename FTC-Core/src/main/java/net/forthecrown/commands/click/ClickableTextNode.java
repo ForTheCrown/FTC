@@ -14,7 +14,7 @@ import org.apache.commons.lang3.Validate;
 
 public class ClickableTextNode {
     private final String name;
-    private final String hexName;
+    private final String hashedName;
     private final Int2ObjectMap<ClickableTextNode> nameHash2Node = new Int2ObjectOpenHashMap<>();
     private ClickableTextNode parent;
 
@@ -23,7 +23,7 @@ public class ClickableTextNode {
 
     public ClickableTextNode(String name) {
         this.name = name;
-        this.hexName = Integer.toString(name.hashCode(), 16);
+        this.hashedName = Integer.toString(name.hashCode(), ClickableTexts.RADIX);
     }
 
     public String getName() {
@@ -73,7 +73,7 @@ public class ClickableTextNode {
         if(reader.canRead()) {
             if(reader.peek() == ' ') reader.skipWhitespace();
 
-            int hash = Integer.valueOf(reader.readString(), 16);
+            int hash = Integer.valueOf(reader.readString(), ClickableTexts.RADIX);
 
             ClickableTextNode node = getNodes().get(hash);
             if(node != null) node.execute(user, reader);
@@ -111,9 +111,9 @@ public class ClickableTextNode {
 
     public String getCommand() {
         boolean root = name.equals("root");
-        String parentCmd = parent == null || root ? "/clickable_text" : parent.getCommand();
+        String parentCmd = parent == null || root ? ("/" + CommandClickableText.NAME) : parent.getCommand();
 
-        return root ? parentCmd : parentCmd + " " + hexName;
+        return root ? parentCmd : parentCmd + " " + hashedName;
     }
 
     public ClickEvent getClickEvent() {

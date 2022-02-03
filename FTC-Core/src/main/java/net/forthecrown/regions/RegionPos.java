@@ -222,6 +222,7 @@ public class RegionPos {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         RegionPos cords = (RegionPos) o;
         return getX() == cords.getX() &&
                 getZ() == cords.getZ();

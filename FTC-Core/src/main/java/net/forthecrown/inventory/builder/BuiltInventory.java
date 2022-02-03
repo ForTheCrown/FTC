@@ -10,7 +10,7 @@ import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryRunnable;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;

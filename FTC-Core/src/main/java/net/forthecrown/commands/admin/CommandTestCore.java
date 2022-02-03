@@ -14,12 +14,12 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.math.Vector3iOffset;
 import net.forthecrown.utils.transformation.BoundingBoxes;
@@ -28,14 +28,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.core.Direction;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.UUID;
 
 public class CommandTestCore extends FtcCommand {
@@ -74,6 +72,15 @@ public class CommandTestCore extends FtcCommand {
             user.sendMessage(gradient);
             return 0;
         })
+                .then(literal("keys")
+                        .executes(c -> {
+                            for (World w: Bukkit.getWorlds()) {
+                                Crown.logger().info(w.key().asString());
+                            }
+                            return 0;
+                        })
+                )
+
                 .then(literal("block_iterator_test")
                         .then(argument("pos1", PositionArgument.blockPos())
                                 .then(argument("pos2", PositionArgument.blockPos())
@@ -152,7 +159,7 @@ public class CommandTestCore extends FtcCommand {
                             if(!RoyalWeapons.isRoyalSword(sword)) throw FtcExceptionProvider.create("Not holding sword");
 
                             RoyalSword sword1 = new RoyalSword(sword);
-                            sword1.incrementGoal();
+                            sword1.incrementRank();
                             sword1.update();
 
                             c.getSource().sendAdmin("Upgraded sword");

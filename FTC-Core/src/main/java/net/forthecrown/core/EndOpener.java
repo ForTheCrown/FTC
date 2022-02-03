@@ -17,11 +17,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
 import org.apache.commons.lang3.Range;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlock;
+import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -79,23 +81,35 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
     /**
      * Regenerates the end with a new seed and {@link EndOpener#getEndSize()} size.
      */
-    public CompletableFuture<Void> regen() {
-        WorldReCreator reCreator = WorldReCreator.of(Worlds.END)
+    public CompletableFuture<World> regen() {
+        // Kick any players out of the end
+        kickPlayers();
+
+        // Re-create world
+        WorldReCreator reCreator = WorldReCreator.of(Worlds.end())
+                .preserveGameRules(true)
                 .preserveSeed(false)
                 .preserveWorldBorder(true);
 
-        World world = reCreator.run();
+        final World world = reCreator.run();
+
+        // Sometimes the border size is incorrect
+        // so gotta call this with our manually
+        // set size
         world.getWorldBorder().setSize(endSize);
 
+        // Load the world and create the crucial
+        // End Features needed for the end to
+        // function properly
         return WorldLoader.loadAsync(world)
-                .whenComplete((unused, throwable) -> {
+                .whenComplete((world1, throwable) -> {
                     // Run sync
                     Bukkit.getScheduler().runTask(Crown.inst(), () -> {
                         try {
                             EndDragonFight fight = Bukkit2NMS.getLevel(world).dragonFight();
 
                             // Create exit portal
-                            fight.spawnExitPortal(true);
+                            world.getEnderDragonBattle().generateEndPortal(true);
 
                             // Place gateways
                             new EndGateWayPlacer().place(fight);
@@ -106,6 +120,14 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
                         Crown.logger().info("Placed end exit portal and gateways");
                     });
                 });
+    }
+
+    private void kickPlayers() {
+        Location exitLocation = FtcUtils.findHazelLocation();
+
+        for (Player p: Worlds.end().getPlayers()) {
+            p.teleport(exitLocation);
+        }
     }
 
     /**
@@ -126,7 +148,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
     }
 
     // Lever on = closed, lever off = open. AKA, flip the input
-    // True, if successfully changed lever, false otherwise
+    // Returns: True, if successfully changed lever, false otherwise
     private boolean setLever(boolean open) {
         boolean on = !open;
 
@@ -210,7 +232,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
         this.endSize = endSize;
 
         if(isOpen()) {
-            Worlds.END.getWorldBorder().setSize(endSize);
+            Worlds.end().getWorldBorder().setSize(endSize);
         }
     }
 

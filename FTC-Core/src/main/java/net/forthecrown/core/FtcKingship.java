@@ -3,7 +3,7 @@ package net.forthecrown.core;
 import com.google.gson.JsonElement;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;

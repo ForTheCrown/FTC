@@ -60,7 +60,7 @@ public class CrownRandom extends Random {
         if(from.isEmpty()) return null;
         if(from.size() == 1) return from.iterator().next();
 
-        return new ArrayList<>(from).get(intInRange(0, from.size()-1));
+        return new ArrayList<>(from).get(nextInt(from.size()));
     }
 
     private <T> boolean attemptAdding(Collection<T> to, T value){

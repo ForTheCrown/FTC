@@ -4,9 +4,9 @@ import io.papermc.paper.adventure.AdventureComponent;
 import it.unimi.dsi.fastutil.objects.*;
 import net.forthecrown.core.*;
 import net.forthecrown.core.admin.PunishmentEntry;
-import net.forthecrown.core.admin.PunishmentManager;
-import net.forthecrown.core.admin.record.PunishmentRecord;
-import net.forthecrown.core.admin.record.PunishmentType;
+import net.forthecrown.core.admin.PunishmentRecord;
+import net.forthecrown.core.admin.PunishmentType;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.JoinInfo;
@@ -18,10 +18,8 @@ import net.forthecrown.events.dynamic.RegionVisitListener;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
 import net.forthecrown.inventory.ItemStacks;
+import net.forthecrown.protection.UserClaimSession;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
-import net.forthecrown.royalgrenadier.source.CommandSources;
-import net.forthecrown.user.data.*;
-import net.forthecrown.user.manager.FtcUserManager;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.TimeUtil;
@@ -35,10 +33,6 @@ import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.luckperms.api.cacheddata.CachedPermissionData;
-import net.luckperms.api.model.user.User;
-import net.luckperms.api.model.user.UserManager;
-import net.luckperms.api.util.Tristate;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.Connection;
@@ -111,6 +105,7 @@ public class FtcUser implements CrownUser {
     public long nextResetTime = 0L;
     public long lastLogin = -1L;
     public long lastLoad = 0L;
+    public long lastGuildPassDonation = 0L;
     public String ip;
 
     //Economy stuff
@@ -139,6 +134,8 @@ public class FtcUser implements CrownUser {
 
     //Last command sender they sent or received a message from
     private CommandSender lastMessage;
+
+    public UserClaimSession claimSession;
 
     public FtcUser(@NotNull UUID uniqueId){
         this.uniqueId = uniqueId;
@@ -209,7 +206,7 @@ public class FtcUser implements CrownUser {
     @Override
     public CommandSource getCommandSource(AbstractCommand command){
         checkOnline();
-        return CommandSources.getOrCreate(getPlayer(), command);
+        return GrenadierUtils.wrap(GrenadierUtils.senderToWrapper(getPlayer()), command);
     }
 
     @Override
@@ -251,16 +248,6 @@ public class FtcUser implements CrownUser {
     @Override
     public UserDataContainer getDataContainer() {
         return dataContainer;
-    }
-
-    private User getLuckPermsUser(){
-        UserManager manager = Crown.getLuckPerms().getUserManager();
-        if(!manager.isLoaded(getUniqueId())) manager.loadUser(getUniqueId());
-        return manager.getUser(getUniqueId());
-    }
-
-    private CachedPermissionData getPerms(){
-        return getLuckPermsUser().getCachedData().getPermissionData();
     }
 
     @Override
@@ -543,68 +530,68 @@ public class FtcUser implements CrownUser {
 
     @Override
     public boolean isPermissionSet(@Nonnull String name) {
-        if(!isOnline()) return getPerms().checkPermission(name) != Tristate.UNDEFINED;
+        checkOnline();
         return getOnlineHandle().isPermissionSet(name);
     }
 
     @Override
-    public boolean isPermissionSet(@Nonnull Permission perm) {
-        if(isOnline()) return getOnlineHandle().hasPermission(perm.getName());
-        return getPerms().checkPermission(perm.getName()).asBoolean();
+    public boolean isPermissionSet(@Nonnull Permission perm) throws UserNotOnlineException {
+        checkOnline();
+        return getOnlineHandle().hasPermission(perm.getName());
     }
 
     @Override
-    public boolean hasPermission(@Nonnull String name) {
-        if(isOnline()) return getOnlineHandle().hasPermission(name);
-        return getPerms().checkPermission(name).asBoolean();
+    public boolean hasPermission(@Nonnull String name) throws UserNotOnlineException {
+        checkOnline();
+        return getOnlineHandle().hasPermission(name);
     }
 
     @Override
-    public boolean hasPermission(@Nonnull Permission perm) {
+    public boolean hasPermission(@Nonnull Permission perm) throws UserNotOnlineException {
         return hasPermission(perm.getName());
     }
 
     @Nonnull
     @Override
-    public PermissionAttachment addAttachment(@Nonnull Plugin plugin, @Nonnull String name, boolean value) {
+    public PermissionAttachment addAttachment(@Nonnull Plugin plugin, @Nonnull String name, boolean value) throws UserNotOnlineException {
         checkOnline();
         return getOnlineHandle().addAttachment(plugin, name, value);
     }
 
     @Nonnull
     @Override
-    public PermissionAttachment addAttachment(@Nonnull Plugin plugin) {
+    public PermissionAttachment addAttachment(@Nonnull Plugin plugin) throws UserNotOnlineException {
         checkOnline();
         return getOnlineHandle().addAttachment(plugin);
     }
 
     @Override
-    public PermissionAttachment addAttachment(@Nonnull Plugin plugin, @Nonnull String name, boolean value, int ticks) {
+    public PermissionAttachment addAttachment(@Nonnull Plugin plugin, @Nonnull String name, boolean value, int ticks) throws UserNotOnlineException {
         checkOnline();
         return getOnlineHandle().addAttachment(plugin, name, value, ticks);
     }
 
     @Override
-    public PermissionAttachment addAttachment(@Nonnull Plugin plugin, int ticks) {
+    public PermissionAttachment addAttachment(@Nonnull Plugin plugin, int ticks) throws UserNotOnlineException {
         checkOnline();
         return getOnlineHandle().addAttachment(plugin, ticks);
     }
 
     @Override
-    public void removeAttachment(@Nonnull PermissionAttachment attachment) {
+    public void removeAttachment(@Nonnull PermissionAttachment attachment) throws UserNotOnlineException {
         checkOnline();
         getOnlineHandle().removeAttachment(attachment);
     }
 
     @Override
-    public void recalculatePermissions() {
+    public void recalculatePermissions() throws UserNotOnlineException {
         checkOnline();
         getOnlineHandle().recalculatePermissions();
     }
 
     @Nonnull
     @Override
-    public Set<PermissionAttachmentInfo> getEffectivePermissions() {
+    public Set<PermissionAttachmentInfo> getEffectivePermissions() throws UserNotOnlineException {
         checkOnline();
         return getOnlineHandle().getEffectivePermissions();
     }
@@ -624,7 +611,7 @@ public class FtcUser implements CrownUser {
         getOnlineHandle().sendMessage(identity, message, type);
     }
 
-    protected void checkOnline(){
+    protected void checkOnline() throws UserNotOnlineException {
         if(!isOnline()) throw new UserNotOnlineException(this);
     }
 
@@ -668,7 +655,7 @@ public class FtcUser implements CrownUser {
 
         if(lastTeleport != null) lastTeleport.interrupt(false);
 
-        if(Crown.getPunishmentManager().checkJailed(getPlayer())){
+        if(Crown.getPunishments().checkJailed(getPlayer())){
             Crown.getJailManager().getListener(getPlayer()).unreg();
         }
 
@@ -694,7 +681,7 @@ public class FtcUser implements CrownUser {
             return true;
         }
 
-        if(isKing()) currentPrefix = Crown.getKingship().isFemale() ? Kingship.queenTitle() : Kingship.kingTitle();
+        if(isKing()) currentPrefix = Crown.getKingship().getPrefix();
 
         sendPlayerListHeader(Crown.getTabList().format());
 
@@ -720,13 +707,13 @@ public class FtcUser implements CrownUser {
         lastLoad = System.currentTimeMillis();
 
         //If in end, but end not open, leave end lol
-        if(getWorld().equals(Worlds.END) && !ComVars.isEndOpen()) {
+        if(getWorld().equals(Worlds.end()) && !ComVars.isEndOpen()) {
             getPlayer().teleport(PlayerRidingManager.HAZELGUARD);
         }
 
         mail.informOfUnread();
 
-        PunishmentManager manager = Crown.getPunishmentManager();
+        Punishments manager = Crown.getPunishments();
         PunishmentEntry entry = manager.getEntry(getUniqueId());
         if(entry != null){
             PunishmentRecord record = entry.getCurrent(PunishmentType.JAIL);
@@ -880,7 +867,7 @@ public class FtcUser implements CrownUser {
         if(lastMessage == null) return null;
         CommandSourceStack wrapper = GrenadierUtils.senderToWrapper(lastMessage);
 
-        return CommandSources.getOrCreate(wrapper, null);
+        return GrenadierUtils.wrap(wrapper, null);
     }
 
     @Override
@@ -964,7 +951,7 @@ public class FtcUser implements CrownUser {
             vanishTicker = null;
         }
 
-        for (CrownUser u: net.forthecrown.user.manager.UserManager.getOnlineUsers()){
+        for (CrownUser u: net.forthecrown.user.UserManager.getOnlineUsers()){
             if(u.hasPermission(Permissions.VANISH_SEE)) continue;
             if(u.equals(this)) continue;
 
@@ -1117,6 +1104,37 @@ public class FtcUser implements CrownUser {
     public long getLastLogin() {
         if(lastLogin == -1) return getOfflinePlayer().getLastLogin();
         return lastLogin;
+    }
+
+    @Override
+    public boolean isGoalBookDonator() {
+        if(lastGuildPassDonation == 0L) return false;
+        return !TimeUtil.hasCooldownEnded(ComVars.goalBookDonorTimeLength(), getLastGuildPassDonation());
+    }
+
+    @Override
+    public void setLastGuildPassDonation(long timeStamp) {
+        this.lastGuildPassDonation = timeStamp;
+    }
+
+    @Override
+    public long getLastGuildPassDonation() {
+        return lastGuildPassDonation;
+    }
+
+    @Override
+    public UserClaimSession getClaimSession() {
+        return claimSession;
+    }
+
+    @Override
+    public UserClaimSession createClaimSession() {
+        return claimSession = new UserClaimSession(this);
+    }
+
+    @Override
+    public void closeClaimSession() {
+        claimSession = null;
     }
 
     @Override

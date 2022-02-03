@@ -2,7 +2,7 @@ package net.forthecrown.inventory;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.LoreBuilder;
 import net.kyori.adventure.text.Component;
 import net.minecraft.Util;

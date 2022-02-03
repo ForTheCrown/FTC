@@ -60,7 +60,7 @@ public interface Economy extends CrownSerializer {
      * @param uuid The UUID of the player
      * @return the tax bracket of the person
      */
-    int getTax(UUID uuid, int currentBal);
+    int getIncomeTax(UUID uuid, int currentBal);
 
     /**
      * Sets a user's balance, ignoring the maximum balance limit

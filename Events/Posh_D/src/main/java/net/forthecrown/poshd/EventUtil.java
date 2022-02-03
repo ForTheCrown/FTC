@@ -4,7 +4,6 @@ import com.google.common.base.Charsets;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import net.forthecrown.crown.EventTimer;
-import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -20,6 +19,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public final class EventUtil {
@@ -65,7 +65,7 @@ public final class EventUtil {
     }
 
     public static Location readLocation(JsonObject json) {
-        World world = Bukkit.getWorld(json.get("world").getAsString());
+        World world = Objects.requireNonNull(Bukkit.getWorld(json.get("world").getAsString()));
 
         double x = json.get("x").getAsDouble();
         double y = json.get("y").getAsDouble();

@@ -5,7 +5,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.user.manager.FtcUserManager;
+import net.forthecrown.user.FtcUserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;

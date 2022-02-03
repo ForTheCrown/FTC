@@ -6,9 +6,7 @@ import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.user.AbstractUserAttachment;
-import net.forthecrown.user.FtcUser;
-import net.forthecrown.user.data.*;
+import net.forthecrown.user.*;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
@@ -78,6 +76,10 @@ public class UserJsonSerializer implements UserSerializer {
 
         if(user.lastLogin != -1) {
             timeStamps.add("lastLogin", user.lastLogin);
+        }
+
+        if(user.lastGuildPassDonation != 0) {
+            timeStamps.add("lastGuildPassDonation", user.lastGuildPassDonation);
         }
 
         json.add("timeStamps", timeStamps);
@@ -180,6 +182,7 @@ public class UserJsonSerializer implements UserSerializer {
         user.lastLoad = timeStamps.getLong("lastLoad");
         user.nextResetTime = timeStamps.getLong("nextReset");
         user.lastLogin = timeStamps.getLong("lastLogin", -1);
+        user.lastGuildPassDonation = timeStamps.getLong("lastGuildPassDonation", 0L);
 
         //Last location
         if(json.has("lastLocation")) {

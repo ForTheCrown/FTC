@@ -3,10 +3,11 @@ package net.forthecrown.economy;
 import com.google.gson.JsonElement;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.events.custom.BalanceChangeEvent;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import org.apache.commons.lang.Validate;
 
 import java.util.HashSet;
@@ -80,29 +81,39 @@ public class FtcEconomy extends AbstractJsonSerializer implements Economy {
 
     @Override
     public synchronized void remove(UUID id, int amount) {
-        validateID(id);
+        validate(id, amount);
 
         int bal = get(id);
+
+        new BalanceChangeEvent(id, BalanceChangeEvent.Action.REMOVE, bal, amount).callEvent();
+
         set(id, bal - amount);
     }
 
     @Override
     public synchronized void add(UUID uuid, int amount ) {
-        validateID(uuid);
+        validate(uuid, amount);
 
         int current = get(uuid);
         CrownUser user = UserManager.getUser(uuid);
 
-        //If it's more than 0, add earnings
-        if(amount > 0) user.addTotalEarnings(amount);
+        // Add earnings
+        user.addTotalEarnings(amount);
         user.unloadIfOffline();
 
+        new BalanceChangeEvent(uuid, BalanceChangeEvent.Action.ADD, current, amount).callEvent();
         int actual = current + amount;
         set(uuid, actual);
     }
 
+    private void validate(UUID id, int amount) {
+        validateID(id);
+        Validate.isTrue(amount > 0, "Amount cannot be less than 1");
+    }
+
     @Override
-    public int getTax(UUID uuid, int currentBal){
+    public int getIncomeTax(UUID uuid, int currentBal){
+        if(!ComVars.areTaxesEnabled()) return 0;
         if(currentBal < 500000) return 0; //if the player has less thank 500k rhines, no tax
 
         int percent = (int) (UserManager.getUser(uuid).getTotalEarnings() / 50000 * 10);

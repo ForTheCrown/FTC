@@ -39,27 +39,27 @@ public class HelpPost extends FtcCommand {
      * Author: Wout
      */
 
+    public static final Component MESSAGE = Component.text()
+            .append(Crown.prefix())
+            .append(Component.text("Info about poles: ").color(NamedTextColor.YELLOW))
+
+            .append(line("Use", "findpole", "to find the closest pole"))
+            .append(line("Use", "visit", "to travel between them"))
+            .append(line("Use", "movein", "to make a pole your home"))
+            .append(line("Then use", "home", "to go there"))
+            .build();
+
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.executes(c ->{
             CommandSender sender = c.getSource().asBukkit();
 
-            sender.sendMessage(
-                    Component.text()
-                            .append(Crown.prefix())
-                            .append(Component.text("Info about poles: ").color(NamedTextColor.YELLOW))
-
-                            .append(line("Use", "findpole", "to find the closest pole"))
-                            .append(line("Use", "visit", "to travel between them"))
-                            .append(line("Use", "movein", "to make a pole your home"))
-                            .append(line("Then use", "home", "to go there"))
-            );
-
+            sender.sendMessage(MESSAGE);
             return 0;
         });
     }
 
-    private Component line(String pre, String cmd, String post) {
+    private static Component line(String pre, String cmd, String post) {
         return Component.text()
                 .append(Component.newline())
                 .append(Component.text(pre))

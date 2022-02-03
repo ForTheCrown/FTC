@@ -71,7 +71,7 @@ public final class RoyalWeapons {
                 "it carries the hero on"
         ));
         putUpgrade(rank, new MonetaryUpgrade(10000, MonetaryUpgrade.Type.RHINES));
-        putUpgrade(rank, new MonetaryUpgrade(4000, MonetaryUpgrade.Type.GEMS));
+        putUpgrade(rank, new MonetaryUpgrade(500, MonetaryUpgrade.Type.GEMS));
 
         register(simple(EntityType.ZOMBIE, 100, rank));
         register(simple(EntityType.CREEPER, 50, rank));
@@ -105,7 +105,7 @@ public final class RoyalWeapons {
         ));
         putUpgrade(rank, new ModifierUpgrade(1, 2));
         putUpgrade(rank, new MonetaryUpgrade(12500, MonetaryUpgrade.Type.RHINES));
-        putUpgrade(rank, new MonetaryUpgrade(4000, MonetaryUpgrade.Type.GEMS));
+        putUpgrade(rank, new MonetaryUpgrade(1000, MonetaryUpgrade.Type.GEMS));
 
         register(dungeonBoss(Bosses.zhambie(), 1, rank));
         register(dungeonBoss(Bosses.skalatan(), 1, rank));
@@ -199,7 +199,7 @@ public final class RoyalWeapons {
         RoyalSword sword = new RoyalSword(item);
 
         for (int i = 1; i <= DONATOR_RANK; i++) {
-            sword.incrementGoal();
+            sword.incrementRank();
         }
 
         sword.update();
@@ -265,7 +265,7 @@ public final class RoyalWeapons {
 
         sword.setRank(0);
         sword.setNextUpgrades(getUpgrades(1));
-        sword.incrementGoal();
+        sword.incrementRank();
 
         sword.update();
         return result;

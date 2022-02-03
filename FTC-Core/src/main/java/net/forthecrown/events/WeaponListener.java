@@ -40,7 +40,7 @@ public class WeaponListener implements Listener {
                 damager.getInventory().getItemInMainHand(),
                 sword -> {
                     ClickHistory history = getHistory(damager);
-                    history.clicks.add(Click.LEFT);
+                    history.clicks.add(0, Click.LEFT);
 
                     if(!ComVars.allowNonOwnerSwords() && !sword.getOwner().equals(damager.getUniqueId())) return;
                     event.setDamage(sword.damage(damager, event, history));
@@ -50,12 +50,13 @@ public class WeaponListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
+
         consumeSword(
                 event.getItem(),
 
                 sword -> {
                     ClickHistory history = getHistory(event.getPlayer());
-                    history.clicks.add(Click.RIGHT);
+                    history.clicks.add(0, Click.RIGHT);
 
                     WeaponAbility ability = sword.getAbility();
                     if(ability != null) {
@@ -74,7 +75,7 @@ public class WeaponListener implements Listener {
                 event.getPlayer().getInventory().getItemInMainHand(),
                 sword -> {
                     ClickHistory history = getHistory(event.getPlayer());
-                    history.clicks.add(Click.RIGHT);
+                    history.clicks.add(0, Click.RIGHT);
 
                     WeaponAbility ability = sword.getAbility();
                     if(ability != null) {

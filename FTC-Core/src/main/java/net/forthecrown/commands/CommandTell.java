@@ -11,7 +11,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.actions.UserActionHandler;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.user.actions.DirectMessage;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
 

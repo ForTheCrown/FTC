@@ -38,6 +38,39 @@ public class HelpSpawn extends FtcCommand {
      * Author: Wout
      */
 
+    public static final Component MESSAGE = Component.text()
+            .append(Crown.prefix())
+            .append(Component.text("Info about spawn: ").color(NamedTextColor.YELLOW))
+
+            .append(Component.newline())
+            .append(Component.text("Spawn is called Hazelguard, you can tp to it using region poles."))
+
+            .append(Component.newline())
+            .append(Component.text("Use"))
+            .append(Component.text(" /findpole ")
+                    .color(NamedTextColor.YELLOW)
+                    .hoverEvent(Component.text("Click me :D"))
+                    .clickEvent(ClickEvent.runCommand("/findpole"))
+            )
+
+            .append(Component.text("to find the closest pole."))
+
+            .append(Component.newline())
+            .append(Component.text("Then use"))
+            .append(Component.text(" /visit Hazelguard or /spawn ")
+                    .color(NamedTextColor.YELLOW)
+                    .hoverEvent(Component.text("Click Me :D"))
+                    .clickEvent(ClickEvent.runCommand("/vr Hazelguard"))
+            )
+
+            .append(Component.newline())
+            .append(Component.text("[For more help, click here!]")
+                    .clickEvent(ClickEvent.runCommand("/posthelp"))
+                    .hoverEvent(Component.text("Click me for region pole info :D"))
+                    .color(NamedTextColor.GRAY)
+            )
+            .build();
+
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.executes(c ->{
@@ -53,40 +86,7 @@ public class HelpSpawn extends FtcCommand {
                 }
             }
 
-            sender.sendMessage(
-                    Component.text()
-                            .append(Crown.prefix())
-                            .append(Component.text("Info about spawn: ").color(NamedTextColor.YELLOW))
-
-                            .append(Component.newline())
-                            .append(Component.text("Spawn is called Hazelguard, you can tp to it using region poles."))
-
-                            .append(Component.newline())
-                            .append(Component.text("Use"))
-                            .append(Component.text(" /findpole ")
-                                    .color(NamedTextColor.YELLOW)
-                                    .hoverEvent(Component.text("Click me :D"))
-                                    .clickEvent(ClickEvent.runCommand("/findpole"))
-                            )
-
-                            .append(Component.text("to find the closest pole."))
-
-                            .append(Component.newline())
-                            .append(Component.text("Then use"))
-                            .append(Component.text(" /visit Hazelguard or /spawn ")
-                                    .color(NamedTextColor.YELLOW)
-                                    .hoverEvent(Component.text("Click Me :D"))
-                                    .clickEvent(ClickEvent.runCommand("/vr Hazelguard"))
-                            )
-
-                            .append(Component.newline())
-                            .append(Component.text("For more help, click here!")
-                                    .clickEvent(ClickEvent.runCommand("/posthelp"))
-                                    .hoverEvent(Component.text("Click me for region pole info :D"))
-                                    .color(NamedTextColor.GRAY)
-                            )
-            );
-
+            sender.sendMessage(MESSAGE);
             return 0;
         });
     }

@@ -30,7 +30,7 @@ public interface PagedDisplay {
 
         return builder
                 .append(Component.newline())
-                .append(footer.createFooter(page + 1, page <= 0, endIndex >= list.size(), maxPage))
+                .append(footer.createFooter(page + 1, endIndex >= list.size() - 1, page <= 0, maxPage))
                 .build();
     }
 

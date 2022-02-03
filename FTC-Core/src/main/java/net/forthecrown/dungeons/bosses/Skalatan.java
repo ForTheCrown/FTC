@@ -29,7 +29,7 @@ public class Skalatan extends DungeonBoss<WitherSkeleton> {
     private static final ItemStack WITHER_GOO = DungeonUtils.makeDungeonItem(Material.BLACK_DYE, 30, "Wither Goo");
 
     public Skalatan() {
-        super("Skalatan", new Location(Worlds.VOID, -103.5, 67, 184.5), (short) 100, DungeonAreas.SKALATAN_ROOM,
+        super("Skalatan", new Location(Worlds.voidWorld(), -103.5, 67, 184.5), (short) 100, DungeonAreas.SKALATAN_ROOM,
                 Arrays.asList(
                         WITHER_GOO,
                         DungeonUtils.makeDungeonItem(Material.BONE, 30, "Floaty Bones"),

@@ -7,10 +7,10 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
-import net.forthecrown.core.admin.PunishmentManager;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.admin.StaffChat;
-import net.forthecrown.core.admin.record.PunishmentRecord;
-import net.forthecrown.core.admin.record.PunishmentType;
+import net.forthecrown.core.admin.PunishmentRecord;
+import net.forthecrown.core.admin.PunishmentType;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -58,7 +58,7 @@ public class CommandPunishment extends FtcCommand {
                 "ban_ftc",
                 Permissions.POLICE,
                 (user, source, reason) -> {
-                    PunishmentManager manager = Crown.getPunishmentManager();
+                    Punishments manager = Crown.getPunishments();
                     PunishmentEntry entry = manager.getEntry(user.getUniqueId());
                     if(entry != null && entry.checkPunished(PunishmentType.BAN)) throw FtcExceptionProvider.create("User has already been banned");
 

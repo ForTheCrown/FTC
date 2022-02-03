@@ -8,7 +8,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -75,7 +75,7 @@ public class CheckNumber implements UsageCheck<CheckNumber.CheckInstance> {
         public Component failMessage(Player player) {
             return Component.text("You need at least ")
                 .color(NamedTextColor.GRAY)
-                .append((checkBal ? FtcFormatter.rhines(amount) : FtcFormatter.queryGems(amount)).color(NamedTextColor.GOLD))
+                .append((checkBal ? FtcFormatter.rhines(amount) : FtcFormatter.gems(amount)).color(NamedTextColor.GOLD))
                 .append(Component.text(" to use this."));
         }
 

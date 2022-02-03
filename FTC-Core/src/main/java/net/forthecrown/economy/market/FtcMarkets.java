@@ -15,7 +15,7 @@ import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserMarketData;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.math.WorldVec3i;

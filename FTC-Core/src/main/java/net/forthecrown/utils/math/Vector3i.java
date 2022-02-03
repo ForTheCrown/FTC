@@ -5,6 +5,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.JsonUtils;
 import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.Tag;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.Location;
@@ -59,6 +61,13 @@ public class Vector3i extends AbstractVector3i<Vector3i> {
 
     public static Vector3i of(Vec3i pos) {
         return new Vector3i(pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    public static Vector3i of(Tag tag) {
+        IntArrayTag arr = (IntArrayTag) tag;
+        int[] val = arr.getAsIntArray();
+
+        return new Vector3i(val[0], val[1], val[2]);
     }
 
     // Deserialization function

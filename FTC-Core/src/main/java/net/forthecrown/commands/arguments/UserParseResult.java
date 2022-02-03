@@ -6,7 +6,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.selectors.EntitySelector;
 import net.forthecrown.royalgrenadier.types.selector.EntityArgumentImpl;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.ListUtils;
 
 import java.util.ArrayList;

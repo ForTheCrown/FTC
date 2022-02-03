@@ -19,21 +19,21 @@ import net.forthecrown.commands.emotes.EmoteSmooch;
 import net.forthecrown.core.*;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
-import net.forthecrown.core.admin.PunishmentManager;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.npc.NpcDirectory;
 import net.forthecrown.economy.selling.SellShops;
-import net.forthecrown.inventory.crown.Crowns;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.useables.kits.Kit;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.user.actions.MarriageMessage;
 import net.forthecrown.user.actions.UserActionHandler;
-import net.forthecrown.user.manager.UserManager;
 import net.forthecrown.user.packets.PacketListeners;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.audience.Audience;
@@ -204,7 +204,7 @@ public class CoreListener implements Listener {
             return;
         }
 
-        PunishmentManager punishments = Crown.getPunishmentManager();
+        Punishments punishments = Crown.getPunishments();
         MuteStatus status = punishments.checkMute(player);
 
         if(status != MuteStatus.NONE){
@@ -397,7 +397,7 @@ public class CoreListener implements Listener {
 
         // Tell the Player where they died, but ignore world_void deaths.
         String diedAt = "died at x=" + loc.getBlockX() + ", y=" + loc.getBlockY() + ", z=" + loc.getBlockZ();
-        if (!loc.getWorld().equals(Worlds.VOID)) user.sendMessage(ChatColor.GRAY + "[FTC] You " + diedAt + ".");
+        if (!loc.getWorld().equals(Worlds.voidWorld())) user.sendMessage(ChatColor.GRAY + "[FTC] You " + diedAt + ".");
 
         Crown.logger().info("! " + user.getName() + " " + diedAt + ", world=" + loc.getWorld().getName());
 
@@ -407,7 +407,7 @@ public class CoreListener implements Listener {
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack item = inventory.getItem(i);
 
-            if(RoyalWeapons.isRoyalSword(item) || Crowns.isCrown(item)) {
+            if(ItemStacks.isSpecial(item)) {
                 items.put(i, item);
             }
         }

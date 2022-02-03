@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.serializer.NbtSerializable;
 import net.forthecrown.utils.Bukkit2NMS;
-import net.forthecrown.utils.FtcBlockData;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
@@ -39,6 +38,7 @@ public class BlockStructure implements NbtSerializable, Keyed {
     private final Map<BlockState, BlockPalette> palettes = new Object2ObjectOpenHashMap<>();
     private final List<StructureEntityInfo> entityInfos = new ObjectArrayList<>();
     private final CompoundTag header = new CompoundTag();
+    private Vector3i size;
 
     public BlockStructure(Key key) {
         this.key = FtcUtils.ensureBukkit(key);
@@ -53,6 +53,7 @@ public class BlockStructure implements NbtSerializable, Keyed {
 
         FtcBoundingBox box = FtcBoundingBox.of(context.world(), context.start(), context.start().clone().add(context.size()));
         Vector3i start = context.start();
+        this.size = context.size();
 
         for (Block b: box) {
             if (!context.filterBlock(b)) continue;
@@ -129,6 +130,19 @@ public class BlockStructure implements NbtSerializable, Keyed {
         }
 
         if(entityInfos.isEmpty() || !context.placeEntities()) return;
+
+        List<EntityPlaceData> entityPlaceData = new ObjectArrayList<>();
+        for (StructureEntityInfo i: entityInfos) {
+            if(i.entityData().isEmpty()) continue;
+
+            EntityPlaceData data = context.runProcessors(i);
+            if(data != null) entityPlaceData.add(data);
+        }
+
+        EntityPlacer placer = context.getEntityPlacer();
+        for (EntityPlaceData d: entityPlaceData) {
+            placer.place(d.data(), d.absolute());
+        }
     }
 
     public void clear() {
@@ -140,6 +154,10 @@ public class BlockStructure implements NbtSerializable, Keyed {
         return header;
     }
 
+    public Vector3i getSize() {
+        return size;
+    }
+
     @Override
     public Tag save() {
         if(entityInfos.isEmpty() && header.isEmpty()) return savePalettes();
@@ -148,6 +166,9 @@ public class BlockStructure implements NbtSerializable, Keyed {
 
         if(!header.isEmpty()) result.put(HEADER_TAG, header);
         if(!entityInfos.isEmpty()) result.put(ENTITY_TAG, saveEntities());
+
+        int[] sizeTag = new int[] {size.z, size.y, size.z};
+        result.putIntArray("size", sizeTag);
 
         result.put(PALETTE_TAG, savePalettes());
 
@@ -175,17 +196,15 @@ public class BlockStructure implements NbtSerializable, Keyed {
     }
 
     public void load(Tag tag) {
-        if (tag.getId() == Tag.TAG_LIST) {
-            loadPalettes((ListTag) tag);
-            return;
-        }
-
         CompoundTag data = (CompoundTag) tag;
 
         header.tags.clear();
         header.merge(data.getCompound(HEADER_TAG));
 
         loadPalettes(data.getList(PALETTE_TAG, Tag.TAG_COMPOUND));
+
+        int[] sizeTag = data.getIntArray("size");
+        this.size = new Vector3i(sizeTag[0], sizeTag[1], sizeTag[2]);
 
         if(data.contains(ENTITY_TAG)) {
             loadEntities(data.getList(ENTITY_TAG, Tag.TAG_COMPOUND));

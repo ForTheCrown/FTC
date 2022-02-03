@@ -1,6 +1,5 @@
 package net.forthecrown.inventory.weapon.abilities;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import net.forthecrown.inventory.weapon.AltAttackContext;
 import net.forthecrown.inventory.weapon.WeaponUseContext;
 import net.forthecrown.inventory.weapon.click.Click;
@@ -10,12 +9,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 
 public class ExplodeAbility extends WeaponAbility {
     public static final long COOLDOWN_MILLIS = TimeUtil.SECOND_IN_MILLIS * 5;
-    private static final ParticleBuilder BUILDER = new ParticleBuilder(Particle.EXPLOSION_HUGE)
-            .count(15);
 
     ExplodeAbility() {
         super("Explode");

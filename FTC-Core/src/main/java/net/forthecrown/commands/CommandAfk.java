@@ -63,7 +63,7 @@ public class CommandAfk extends FtcCommand {
                     //.clickEvent(ChatFormatter.unAfkClickEvent())
                     .color(NamedTextColor.GRAY);
         } else {
-            MuteStatus status = Crown.getPunishmentManager().checkMuteSilent(user.getUniqueId());
+            MuteStatus status = Crown.getPunishments().checkMuteSilent(user.getUniqueId());
 
             userMsg = Component.translatable("afk.self",
                     (hasMessage ? Component.text(": " + message) : Component.empty())

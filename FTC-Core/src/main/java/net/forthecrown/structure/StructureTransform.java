@@ -1,6 +1,7 @@
 package net.forthecrown.structure;
 
 import net.forthecrown.utils.math.Vector3i;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public interface StructureTransform {
@@ -30,4 +31,34 @@ public interface StructureTransform {
     };
 
     @NotNull Vector3i transform(Vector3i start, Vector3i offset, Vector3i pivot, PlaceMirror mirror, PlaceRotation rotation);
+
+    default @NotNull Vec3 transformDecimal(Vector3i start, Vec3 offset, Vector3i pivot, PlaceMirror mirror, PlaceRotation rotation) {
+        // Hacky af approach of preserving the decimal
+        // exactness of the Vec3 in an integer block
+        // context
+
+        // Get each cord's decimal numbers
+        Vec3 decimalPlaces = new Vec3(
+                offset.x - (long) offset.x,
+                offset.y - (long) offset.y,
+                offset.z - (long) offset.z
+        );
+
+        // Get the start block
+        Vector3i offsetBlock = new Vector3i(
+                (int) offset.x,
+                (int) offset.y,
+                (int) offset.z
+        );
+
+        // Transform block
+        Vector3i transformed = transform(start, offsetBlock, pivot, mirror, rotation);
+
+        // Re-add decimal places to block pos
+        return decimalPlaces.add(
+                transformed.x,
+                transformed.y,
+                transformed.z
+        );
+    }
 }

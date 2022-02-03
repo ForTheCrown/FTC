@@ -19,6 +19,10 @@ public enum PlaceRotation {
         this.degrees = d;
     }
 
+    public int getDegrees() {
+        return degrees;
+    }
+
     public PlaceRotation add(PlaceRotation other) {
         return add0(other.ordinal());
     }

@@ -103,6 +103,7 @@ public class ServerItemPriceMap extends AbstractJsonSerializer implements ItemPr
 
         //crops
         def(BAMBOO, 2);
+        def(STICK, 4);
         def(KELP, 2);
         def(CACTUS, 2);
         def(MELON, 8);

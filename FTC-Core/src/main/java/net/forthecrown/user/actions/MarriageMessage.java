@@ -37,7 +37,7 @@ public class MarriageMessage implements UserAction, Struct {
         this.target = target;
         this.input = input;
         this.formatted = FtcFormatter.formatIfAllowed(input, sender.getPlayer());
-        status = Crown.getPunishmentManager().checkMute(sender.getPlayer());
+        status = Crown.getPunishments().checkMute(sender.getPlayer());
     }
 
     public static Component format(Component displayName, Component message){

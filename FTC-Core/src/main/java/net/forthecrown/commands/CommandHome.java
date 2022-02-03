@@ -13,7 +13,7 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserHomes;
 import net.forthecrown.user.actions.RegionVisitAction;
 import net.forthecrown.user.actions.UserActionHandler;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.UserTeleport;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -63,7 +63,7 @@ public class CommandHome extends FtcCommand {
 
                         //Don't allow visiting end homes if end closed
                         EndOpener opener = Crown.getEndOpener();
-                        if(l.getWorld().equals(Worlds.END) && opener.isEnabled() && !opener.isOpen()) {
+                        if(l.getWorld().equals(Worlds.end()) && opener.isEnabled() && !opener.isOpen()) {
                             throw FtcExceptionProvider.create("The End is currently closed");
                         }
                     }

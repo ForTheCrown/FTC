@@ -3,8 +3,8 @@ package net.forthecrown.dungeons;
 import com.google.gson.JsonArray;
 import net.forthecrown.core.Keys;
 import net.forthecrown.dungeons.bosses.DungeonBoss;
-import net.forthecrown.user.data.BooleanDataAccessor;
-import net.forthecrown.user.data.UserDataContainer;
+import net.forthecrown.user.BooleanDataAccessor;
+import net.forthecrown.user.UserDataContainer;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 

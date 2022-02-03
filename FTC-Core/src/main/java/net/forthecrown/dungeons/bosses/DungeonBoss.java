@@ -10,8 +10,8 @@ import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.UserDataContainer;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserDataContainer;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
@@ -163,10 +163,6 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
     }
 
     public String getName() { return name; }
-
-    public BossFightContext getContext() {
-        return context;
-    }
 
     public boolean isAlive() {
         return alive;

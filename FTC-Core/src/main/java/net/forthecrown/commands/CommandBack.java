@@ -5,7 +5,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.UserTeleport;
+import net.forthecrown.user.UserTeleport;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandBack extends FtcCommand {

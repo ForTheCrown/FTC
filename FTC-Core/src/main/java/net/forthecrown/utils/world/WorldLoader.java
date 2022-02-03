@@ -25,7 +25,7 @@ public class WorldLoader {
     private static final Logger LOGGER = Crown.logger();
 
     public static boolean VERBOSE = false;
-    public static int LOG_EVERY = 100; //How many chunks should be loaded between each progress log
+    public static int LOG_INTERVAL = 100; //How many chunks should be loaded between each progress log
 
     private static final int
             SECTION_SIZE        = 50, // Size of a single load section, in chunks
@@ -48,7 +48,7 @@ public class WorldLoader {
      * @return A completable future that will be complete once
      *         the entire world has finished loading
      */
-    public static CompletableFuture<Void> loadAsync(World world) {
+    public static CompletableFuture<World> loadAsync(World world) {
         Validate.isTrue(!ONGOING.containsKey(world.getKey()), "World is already being loaded");
 
         LoaderInstance instance = new LoaderInstance(world);
@@ -103,11 +103,11 @@ public class WorldLoader {
     // a world load.
     private static class LoadProgress {
         private final World world;
-        private final int chunkCount;
+        private final long chunkCount;
         private final long started = System.currentTimeMillis();
 
-        private int loaded;
-        private int lastLog;
+        private long loaded;
+        private long lastLog;
 
         public LoadProgress(World world, int chunkCount) {
             this.world = world;
@@ -118,24 +118,29 @@ public class WorldLoader {
             lastLog++;
             loaded++;
 
-            if(lastLog >= LOG_EVERY) {
+            if(lastLog >= LOG_INTERVAL) {
                 lastLog = 0;
                 float progressPercent = (float) loaded / (float) chunkCount * 100;
 
-                LOGGER.info("Loading progress of {} is {} / {}, or {}%", world.getName(), loaded, chunkCount, String.format("%.2f", progressPercent));
+                LOGGER.info("[{}] Loading progress: is {} / {}, or {}%", world.getName(), loaded, chunkCount, String.format("%.2f", progressPercent));
             }
         }
 
         void onFinish() {
             long interval = System.currentTimeMillis() - started;
             long msPerChunk = interval / loaded;
-            LOGGER.info("Finished load of {}, took {} or {}ms", world.getName(), new TimePrinter(interval).printString(), interval);
-            LOGGER.info("Average of {}ms per chunk", msPerChunk);
+
+            LOGGER.info("[{}] Finished load: took {} or {}ms, average of {} / chunk",
+                    world.getName(),
+                    new TimePrinter(interval).printString(),
+                    interval,
+                    new TimePrinter(msPerChunk).printString()
+            );
         }
     }
 
     private static class LoaderInstance implements Runnable {
-        private final CompletableFuture<Void> result = new CompletableFuture<>();
+        private final CompletableFuture<World> result = new CompletableFuture<>();
         private final ExecutorService executor;
         private final LoadSection[] sections;
         private final Semaphore semaphore;
@@ -204,7 +209,7 @@ public class WorldLoader {
         // Method called by sections to invoke a
         // check if all sections are done or not
         // if all have finished, complete the
-        // result CompletableFuture with null
+        // CompletableFuture with null
         synchronized void completeSection() {
             for (LoadSection s: sections) {
                 if(!s.completed) return;

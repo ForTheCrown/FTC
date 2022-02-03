@@ -13,6 +13,7 @@
 
     "houses_startindDemand": 1.0,
     "guildWageModifier": 0.05,
+    "rwDoubleDropRate": 0.5,
 
     "marriageCooldown": 259200000,
     "userDataResetInterval": 5356800000,
@@ -38,6 +39,7 @@
     "hulkSmashPoles": true,
     "endOpen": false,
     "allowNonOwnerSwords": false,
+    "gb_extraExpGivesRhines": true,
 
     "effectCost_arrow": 1000,
     "effectCost_death": 2000,

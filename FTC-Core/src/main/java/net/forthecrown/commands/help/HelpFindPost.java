@@ -47,7 +47,7 @@ public class HelpFindPost extends FtcCommand {
             Location loc = player.getLocation();
 
             // Players in the wrong world get information:
-            if (loc.getWorld().equals(Worlds.RESOURCE)) {
+            if (loc.getWorld().equals(Worlds.resource())) {
                 player.sendMessage(ChatColor.RED + "You are currently in the resource world!");
                 player.sendMessage(ChatColor.GRAY + "There are no regions here.");
                 player.sendMessage(ChatColor.GRAY + "Try " + ChatColor.YELLOW + "/warp portal" + ChatColor.GRAY + " to get back to the normal world.");

@@ -1,5 +1,7 @@
  package net.forthecrown.registry;
 
+import com.google.gson.JsonElement;
+import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Keyed;
 
 /**
@@ -23,4 +25,8 @@ public interface Registry<T> extends FtcRegistry<T, T>, Iterable<T>, Keyed {
      * @return Whether the registry is empty or not
      */
     boolean isEmpty();
+
+    default T read(JsonElement element) {
+        return get(JsonUtils.readKey(element));
+    }
 }

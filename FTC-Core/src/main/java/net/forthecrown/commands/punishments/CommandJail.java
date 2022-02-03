@@ -7,10 +7,10 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.admin.PunishmentManager;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.admin.StaffChat;
-import net.forthecrown.core.admin.jails.JailManager;
-import net.forthecrown.core.admin.record.PunishmentType;
+import net.forthecrown.core.admin.JailManager;
+import net.forthecrown.core.admin.PunishmentType;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.events.dynamic.JailListener;
 import net.forthecrown.grenadier.CommandSource;
@@ -55,7 +55,7 @@ public class CommandJail extends FtcCommand implements GenericPunisher {
     }
 
     public int punish(CrownUser user, CommandSource source, long length, Key jail) throws CommandSyntaxException {
-        PunishmentManager manager = Crown.getPunishmentManager();
+        Punishments manager = Crown.getPunishments();
         JailManager jails = Crown.getJailManager();
 
         if(manager.checkJailed(user.getPlayer())) throw FtcExceptionProvider.create("Player is already jailed");

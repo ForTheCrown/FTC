@@ -1,13 +1,13 @@
 package net.forthecrown.core;
 
 import net.forthecrown.commands.CommandArkBox;
-import net.forthecrown.comvars.ComVar;
 import net.forthecrown.comvars.ComVarRegistry;
 import net.forthecrown.comvars.types.ComVarTypes;
-import net.forthecrown.core.admin.FtcPunishmentManager;
+import net.forthecrown.core.admin.FtcJailManager;
+import net.forthecrown.core.admin.FtcPunishments;
 import net.forthecrown.core.admin.ServerRules;
-import net.forthecrown.core.admin.jails.FtcJailManager;
 import net.forthecrown.core.chat.*;
+import net.forthecrown.core.goalbook.GoalBookImpl;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.dungeons.Bosses;
@@ -23,7 +23,7 @@ import net.forthecrown.structure.FtcStructureManager;
 import net.forthecrown.useables.FtcUsablesManager;
 import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
-import net.forthecrown.user.manager.FtcUserManager;
+import net.forthecrown.user.FtcUserManager;
 import net.forthecrown.user.packets.PacketListeners;
 import net.forthecrown.utils.world.WorldLoader;
 import net.luckperms.api.LuckPerms;
@@ -36,8 +36,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.dynmap.DynmapCommonAPIListener;
 
-import java.io.File;
-
 import static net.forthecrown.utils.FtcUtils.safeRunnable;
 
 /**
@@ -48,8 +46,6 @@ public final class Main extends JavaPlugin implements Crown {
             NAME            = "ForTheCrown",
             NAMESPACE       = NAME.toLowerCase(),
             OLD_NAMESPACE   = "ftccore";
-
-    static ComVar<Boolean>          inDebugMode;
 
     static Main                     inst;
     static Logger                   logger;
@@ -65,12 +61,14 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcRegionManager         regionManager;
     static FtcUsablesManager        usablesManager;
     static FtcShopManager           shopManager;
-    static FtcPunishmentManager     punishmentManager;
+    static FtcPunishments           punishmentManager;
     static FtcJailManager           jailManager;
     static FtcWarpManager           warpRegistry;
     static FtcKitManager            kitRegistry;
     static FtcStructureManager      structureManager;
 
+    static ResourceWorld            resourceWorld;
+    static GoalBookImpl             goalBook;
     static FtcMessages              messages;
     static ServerRules              rules;
     static ServerItemPriceMap       prices;
@@ -94,10 +92,6 @@ public final class Main extends JavaPlugin implements Crown {
 
         saverLogic();
 
-        /*if(RwResetter.shouldReset()) {
-            RwResetter.reset();
-        }*/
-
         logger.info("FTC startup completed");
     }
 
@@ -109,7 +103,11 @@ public final class Main extends JavaPlugin implements Crown {
         DynmapCommonAPIListener.register(new FtcDynmap());
 
         //Hacky way of determining if we're on the test server or not
-        inDebugMode = ComVarRegistry.set("debugMode", ComVarTypes.BOOL, !new File("plugins/CoreProtect/config.yml").exists());
+        config = new FtcConfigImpl();
+        config.ensureDefaultsExist();
+        config.read();
+
+        ComVars.inDebugMode = ComVarRegistry.set("debugMode", ComVarTypes.BOOL, config.getJson().getBool("debug_mode", false));
 
         logger = getLog4JLogger();
 

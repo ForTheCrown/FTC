@@ -49,7 +49,7 @@ public class HelpShop extends FtcCommand {
                     .append(lineText(4, Component.text("Item Price").color(NamedTextColor.YELLOW)))
 
                     .append(Component.text("If you're a Tier-1 Donator, you can use "))
-                    .append((sender.hasPermission("ftc.commands.editshop") ? edit_message : Component.text("/editshop")).color(NamedTextColor.YELLOW))
+                    .append((sender.hasPermission(Permissions.SHOP_EDIT) ? edit_message : Component.text("/editshop")).color(NamedTextColor.YELLOW))
                     .append(Component.text(" to make changes to your shop."))
 
                     .build();

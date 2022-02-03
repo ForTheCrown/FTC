@@ -1,6 +1,5 @@
 package net.forthecrown.regions;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcDynmap;
@@ -15,14 +14,13 @@ import org.dynmap.markers.Marker;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 public class FtcRegionManager extends AbstractNbtSerializer implements RegionManager {
     private final World world;
     private final FtcRegionPoleGenerator generator;
 
-    private final Object2ObjectMap<String, PopulationRegion> byName = new Object2ObjectOpenHashMap<>();
-    private final Object2ObjectMap<RegionPos, PopulationRegion> byCords = new Object2ObjectOpenHashMap<>();
+    private final Map<String, PopulationRegion> byName = new Object2ObjectOpenHashMap<>();
+    private final Map<RegionPos, PopulationRegion> byCords = new Object2ObjectOpenHashMap<>();
 
 
     public FtcRegionManager(World world) {
@@ -77,7 +75,7 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
     @Override
     public PopulationRegion get(RegionPos cords) {
         //Get a region by the given cords or add and then get the new addition
-        return byCords.computeIfAbsent(cords, (Function<RegionPos, PopulationRegion>) c -> {
+        return byCords.computeIfAbsent(cords, c -> {
             PopulationRegion region = new PopulationRegion(c, world);
             region.updatePoleBounds();
 
@@ -183,7 +181,7 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
 
     @Override
     public void dropUnimportantRegions() {
-        byCords.object2ObjectEntrySet().removeIf(e -> !e.getValue().shouldSerialize());
+        byCords.entrySet().removeIf(e -> !e.getValue().shouldSerialize());
     }
 
     @Override

@@ -5,7 +5,7 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -52,7 +52,7 @@ public record HistoryEntry(long date, UUID customer, int amount, int earned, boo
                 json.getUUID("customer"),
                 json.getInt("amount"),
                 json.getInt("earned"),
-                json.getEnum("type", Type.class)
+                json.getEnum("type", Type.class, Type.BUY)
         );
     }
 
@@ -64,7 +64,10 @@ public record HistoryEntry(long date, UUID customer, int amount, int earned, boo
         json.addUUID("customer", customer);
         json.add("amount", amount);
         json.add("earned", earned);
-        json.addEnum("type", type());
+
+        if(!wasBuy) {
+            json.addEnum("type", type());
+        }
 
         return json.getSource();
     }

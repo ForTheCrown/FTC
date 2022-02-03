@@ -7,7 +7,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.key.Key;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;

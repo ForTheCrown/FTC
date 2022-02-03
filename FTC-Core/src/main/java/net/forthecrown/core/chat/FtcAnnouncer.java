@@ -13,8 +13,8 @@ import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.data.RankTitle;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.RankTitle;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -85,7 +85,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
                     player.sendMessage(broadcast);
 
-                    if (player.getWorld().equals(Worlds.RESOURCE)){
+                    if (player.getWorld().equals(Worlds.resource())){
                         player.sendMessage(Component.text("You're in the resource world! To get back to the normal survival world, do /warp portal.").color(NamedTextColor.GRAY));
                     }
                 }

@@ -1,9 +1,10 @@
 package net.forthecrown.core;
 
-import net.forthecrown.core.admin.PunishmentManager;
+import net.forthecrown.core.admin.JailManager;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.admin.ServerRules;
-import net.forthecrown.core.admin.jails.JailManager;
 import net.forthecrown.core.chat.*;
+import net.forthecrown.core.goalbook.GoalBook;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.ItemPriceMap;
 import net.forthecrown.economy.guilds.TradeGuild;
@@ -16,7 +17,7 @@ import net.forthecrown.structure.FtcStructureManager;
 import net.forthecrown.useables.UsablesManager;
 import net.forthecrown.useables.kits.KitManager;
 import net.forthecrown.useables.warps.WarpManager;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.key.Namespaced;
 import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPerms;
@@ -33,11 +34,9 @@ import java.io.InputStream;
  * Implementation: {@link Main}
  */
 public interface Crown extends Plugin, Namespaced {
-
     static Crown                inst()                  { return Main.inst; }
 
     // Feels like I'm violating syntax by aligning the methods like this
-    static PunishmentManager    getPunishmentManager()  { return Main.punishmentManager; }
     static UsablesManager       getUsables()            { return Main.usablesManager; }
     static RegionManager        getRegionManager()      { return Main.regionManager; }
     static JailManager          getJailManager()        { return Main.jailManager; }
@@ -47,6 +46,7 @@ public interface Crown extends Plugin, Namespaced {
     static KitManager           getKitManager()         { return Main.kitRegistry; }
     static FtcStructureManager  getStructureManager()   { return Main.structureManager; }
 
+    static Punishments          getPunishments()        { return Main.punishmentManager; }
     static Markets              getMarkets()            { return Main.markets; }
     static LuckPerms            getLuckPerms()          { return Main.luckPerms; }
     static Announcer            getAnnouncer()          { return Main.announcer; }
@@ -54,7 +54,7 @@ public interface Crown extends Plugin, Namespaced {
     static Economy              getEconomy()            { return Main.economy; }
     static Kingship             getKingship()           { return Main.kingship; }
     static TabList              getTabList()            { return Main.tabList; }
-    static FtcConfig            config()                { return Main.config; }
+    static GoalBook             getGoalBook()           { return Main.goalBook; }
 
     static FtcMessages          getMessages()           { return Main.messages; }
     static DayChange            getDayChange()          { return Main.dayChange; }
@@ -64,6 +64,7 @@ public interface Crown extends Plugin, Namespaced {
     static ServerRules          getRules()              { return Main.rules; }
     static EndOpener            getEndOpener()          { return Main.endOpener; }
 
+    static FtcConfig            config()                { return Main.config; }
     static Logger               logger()                { return Main.logger; }
     static File                 dataFolder()            { return inst().getDataFolder(); }
     static InputStream          resource(String name)   { return inst().getResource(name); }
@@ -105,7 +106,7 @@ public interface Crown extends Plugin, Namespaced {
     }
 
     static boolean inDebugMode() {
-        return Main.inDebugMode.getValue(false);
+        return ComVars.inDebugMode.getValue(false);
     }
 
     static Component prefix() {

@@ -6,8 +6,6 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.core.admin.record.PunishmentRecord;
-import net.forthecrown.core.admin.record.PunishmentType;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -110,6 +108,10 @@ public class PunishmentEntry implements JsonSerializable {
         }
 
         return builder.build();
+    }
+
+    public boolean shouldSerialize() {
+        return !current.isEmpty() || !records.isEmpty();
     }
 
     public Collection<PunishmentRecord> getPast() {

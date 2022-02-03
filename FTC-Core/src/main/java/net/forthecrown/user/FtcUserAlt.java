@@ -2,9 +2,6 @@ package net.forthecrown.user;
 
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.forthecrown.core.Crown;
-import net.forthecrown.user.data.*;
-import net.forthecrown.user.manager.FtcUserManager;
-import net.forthecrown.user.manager.UserManager;
 import org.bukkit.Material;
 
 import java.util.Objects;

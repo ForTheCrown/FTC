@@ -6,6 +6,7 @@ import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.forthecrown.serializer.JsonWrapper;
+import net.forthecrown.utils.FileDefaults;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -50,6 +51,14 @@ class FtcConfigImpl implements FtcConfig {
         }
 
         write();
+    }
+
+    void ensureDefaultsExist() {
+        try {
+            FileDefaults.JSON.compareAndSave(fileOrCreate(), Crown.resource("configuration.json"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

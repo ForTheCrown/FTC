@@ -97,7 +97,7 @@ public class CommandWild extends FtcCommand {
     boolean test(Player p) {
         FtcBoundingBox hazelguard = hazelguardRegion(Worlds.OVERWORLD);
 
-        if(p.getWorld().equals(Worlds.RESOURCE)) return true;
+        if(p.getWorld().equals(Worlds.resource())) return true;
 
         if(!hazelguard.contains(p)) {
             p.sendMessage(ChatColor.GRAY + "You can only do this in the resource world or at Hazelguard.");

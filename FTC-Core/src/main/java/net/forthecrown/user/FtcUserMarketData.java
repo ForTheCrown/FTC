@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.user.manager.UserManager;
 
 import java.util.UUID;
 

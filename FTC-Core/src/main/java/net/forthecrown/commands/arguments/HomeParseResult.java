@@ -4,7 +4,7 @@ import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.manager.UserManager;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.kyori.adventure.text.Component;
