@@ -21,7 +21,7 @@ final class PeriodicalSaver {
         long interval = TimeUnit.MINUTES.toMillis(ComVars.autoSaveIntervalMins.getValue(60L));
         interval = TimeUtil.millisToTicks(interval);
 
-        task = Bukkit.getScheduler().runTaskLater(Crown.inst(), Crown::saveFTC, interval);
+        task = Bukkit.getScheduler().runTaskTimer(Crown.inst(), Crown::saveFTC, interval, interval);
     }
 
     public void cancel() {

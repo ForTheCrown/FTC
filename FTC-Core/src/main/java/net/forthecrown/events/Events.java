@@ -37,6 +37,8 @@ public final class Events {
 
         register(new ResourceWorldListener());
         register(new WeaponListener());
+
+        Crown.logger().info("Events registered");
     }
 
     private static void register(Listener listener) {

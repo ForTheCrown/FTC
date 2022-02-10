@@ -42,8 +42,8 @@ public class SellShops {
     public static InventoryOption WEB_SHOP = new SimpleCordedOption(
             4, 1,
             new ItemStackBuilder(EMERALD_BLOCK, 1)
-                    .setName(Component.text("-Web Shop-").style(FtcFormatter.nonItalic(NamedTextColor.GREEN)))
-                    .addLore(Component.text("Show's the server's webstore link").style(FtcFormatter.nonItalic(NamedTextColor.GRAY)))
+                    .setName(Component.text("-Web Shop-", FtcFormatter.nonItalic(NamedTextColor.GREEN)))
+                    .addLore(Component.text("Show's the server's webstore link", FtcFormatter.nonItalic(NamedTextColor.GRAY)))
                     .build(),
 
             (user, context) -> {
@@ -161,11 +161,11 @@ public class SellShops {
     public static final BuiltInventory MAIN = baseInventory("FTC", 36, false)
             .add(WEB_SHOP)
 
-            .add(SellShopHeader.DROPS.slotClone(2, 2))
-            .add(SellShopHeader.MINERALS.slotClone(3, 2))
-            .add(SellShopHeader.MINING.slotClone(4, 2))
-            .add(SellShopHeader.CRAFTABLE_BLOCKS.slotClone(5, 2))
-            .add(SellShopHeader.CROPS.slotClone(6, 2))
+            .add(SellShopHeader.DROPS.cloneAt(2, 2))
+            .add(SellShopHeader.MINERALS.cloneAt(3, 2))
+            .add(SellShopHeader.MINING.cloneAt(4, 2))
+            .add(SellShopHeader.CRAFTABLE_BLOCKS.cloneAt(5, 2))
+            .add(SellShopHeader.CROPS.cloneAt(6, 2))
 
             .build();
 
@@ -177,8 +177,12 @@ public class SellShops {
             builder.add(PreviousPageOption.OPTION);
 
             for (SellAmount a: SellAmount.values()) {
-                builder.add(a.invOption);
+                builder.add(a.getInvOption());
             }
+
+            builder
+                    .add(ItemFilterOption.LORE_OPTION)
+                    .add(ItemFilterOption.NAME_OPTION);
         }
 
         return builder;
@@ -192,34 +196,49 @@ public class SellShops {
      * @param data The data to add earnings to and change the price of
      * @return The amount of items sold.
      */
-    public static int sell(CrownUser user, Material toRemove, int priceScalar, SoldMaterialData data) {
+    public static int sell(CrownUser user, Material toRemove, float priceScalar, SoldMaterialData data) {
         SellAmount sellAmount = user.getSellAmount();
         Economy economy = Crown.getEconomy();
 
-        ItemStack sellItem = new ItemStack(toRemove, sellAmount.value);
-        UserSellResult result = user.sellMaterial(toRemove);
+        // The sellItem will just be used to display the item they're selling
+        ItemStack sellItem = new ItemStack(toRemove, sellAmount.getItemAmount());
 
-        if(!result.foundAnything()) {
+        SellResult result = SellResult.create(user.getInventory(), user.getSellShopFilter(), toRemove, sellAmount.getValue());
+
+        // If we didn't find enough items to sell
+        if(result.foundNothing()) {
             user.sendMessage(Component.translatable("economy.sellshop.noItems", NamedTextColor.GRAY));
             return 0;
         }
 
-        int totalEarned = result.getFoundAmount() * data.getPrice() * priceScalar;
+        // Remove the items we found
+        result.removeItems();
 
+        int totalEarned = (int) (result.getAmount() * data.getPrice() * priceScalar);
+
+        // Give money and track their total earned
+        // Why do we track earnings again? Taxes?
         economy.add(user.getUniqueId(), totalEarned);
         user.addTotalEarnings(totalEarned);
 
+        // Inform this good person that they've made
+        // quite a bit of mulaa
         user.sendMessage(
                 Component.translatable("economy.sellshop.sold",
                         NamedTextColor.GRAY,
-                        Component.text()
-                                .color(NamedTextColor.YELLOW)
-                                .append(FtcFormatter.itemAndAmount(sellItem, result.getFoundAmount()))
-                                .build(),
+                        FtcFormatter.itemAndAmount(sellItem, result.getAmount())
+                                        .color(NamedTextColor.YELLOW),
                         FtcFormatter.rhines(totalEarned).color(NamedTextColor.GOLD)
                 )
         );
-        Crown.logger().info(user.getName() + " sold " + result.getFoundAmount() + " " + FtcFormatter.normalEnum(toRemove) + " for " + FtcFormatter.getRhines(totalEarned));
+
+        // Tell console they sold stuff
+        Crown.logger().info("{} sold {} {} for {}",
+                user.getName(),
+                result.getAmount(),
+                FtcFormatter.normalEnum(toRemove),
+                FtcFormatter.getRhines(totalEarned)
+        );
 
         int initPrice = data.getPrice();
 
@@ -229,14 +248,15 @@ public class SellShops {
 
         int comparison = data.getPrice();
 
+        // If price dropped, tell them
         if(comparison < initPrice) {
             user.sendMessage(Component.translatable("economy.sellshop.priceDrop",
                     NamedTextColor.GRAY,
-                    Component.translatable(toRemove.getTranslationKey()).color(NamedTextColor.YELLOW),
-                    FtcFormatter.rhines(comparison * priceScalar).color(NamedTextColor.GOLD)
+                    Component.translatable(toRemove.translationKey()).color(NamedTextColor.YELLOW),
+                    FtcFormatter.rhines((long) (comparison * priceScalar)).color(NamedTextColor.GOLD)
             ));
         }
 
-        return result.getFoundAmount();
+        return result.getAmount();
     }
 }

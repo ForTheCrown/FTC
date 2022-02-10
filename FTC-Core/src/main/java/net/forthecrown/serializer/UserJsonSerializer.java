@@ -74,10 +74,6 @@ public class UserJsonSerializer implements UserSerializer {
         timeStamps.add("nextReset", user.nextResetTime);
         timeStamps.add("lastLoad", user.lastLoad);
 
-        if(user.lastLogin != -1) {
-            timeStamps.add("lastLogin", user.lastLogin);
-        }
-
         if(user.lastGuildPassDonation != 0) {
             timeStamps.add("lastGuildPassDonation", user.lastGuildPassDonation);
         }
@@ -107,6 +103,9 @@ public class UserJsonSerializer implements UserSerializer {
 
             json.add("soldData", sold);
         }
+
+        JsonElement filter = user.filter.serialize();
+        if(filter != null) json.add("sellShopFilter", filter);
 
         saveAttach(json, user.cosmeticData);
         saveAttach(json, user.homes);
@@ -181,7 +180,6 @@ public class UserJsonSerializer implements UserSerializer {
         JsonWrapper timeStamps = json.getWrapped("timeStamps");
         user.lastLoad = timeStamps.getLong("lastLoad");
         user.nextResetTime = timeStamps.getLong("nextReset");
-        user.lastLogin = timeStamps.getLong("lastLogin", -1);
         user.lastGuildPassDonation = timeStamps.getLong("lastGuildPassDonation", 0L);
 
         //Last location
@@ -217,6 +215,8 @@ public class UserJsonSerializer implements UserSerializer {
                 user.matData.put(material, data);
             }
         }
+
+        user.filter.deserialize(json.get("sellShopFilter"));
     }
 
     private void loadAttach(JsonWrapper json, AbstractUserAttachment a) {

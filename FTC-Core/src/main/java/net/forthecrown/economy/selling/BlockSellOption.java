@@ -14,14 +14,14 @@ import org.bukkit.inventory.ItemStack;
 public class BlockSellOption implements InventoryOption {
 
     private final int slot;
-    private final Material blockMat;
-    private final Material actualMat;
+    private final Material blockMaterial;
+    private final Material ingredientMaterial;
     private final int scalar;
 
-    private BlockSellOption(int slot, Material blockMat, Material actualMat, int scalar) {
+    private BlockSellOption(int slot, Material blockMaterial, Material ingredientMaterial, int scalar) {
         this.slot = slot;
-        this.blockMat = blockMat;
-        this.actualMat = actualMat;
+        this.blockMaterial = blockMaterial;
+        this.ingredientMaterial = ingredientMaterial;
         this.scalar = scalar;
     }
 
@@ -37,12 +37,12 @@ public class BlockSellOption implements InventoryOption {
         return scalar;
     }
 
-    public Material getActualMat() {
-        return actualMat;
+    public Material getIngredientMaterial() {
+        return ingredientMaterial;
     }
 
-    public Material getBlockMat() {
-        return blockMat;
+    public Material getBlockMaterial() {
+        return blockMaterial;
     }
 
     @Override
@@ -52,11 +52,11 @@ public class BlockSellOption implements InventoryOption {
 
     @Override
     public void place(FtcInventory inventory, CrownUser user) {
-        inventory.setItem(getSlot(), makeItem(user.getMatData(getActualMat()), user.getSellAmount(), getBlockMat(), getScalar()));
+        inventory.setItem(getSlot(), makeItem(user.getMatData(getIngredientMaterial()), user.getSellAmount(), getBlockMaterial(), getScalar()));
     }
 
     public static ItemStack makeItem(SoldMaterialData data, SellAmount sellAmount, Material blockMat, int timer) {
-        ItemStackBuilder builder = new ItemStackBuilder(blockMat, sellAmount.value);
+        ItemStackBuilder builder = new ItemStackBuilder(blockMat, sellAmount.getItemAmount());
 
         ItemSellOption.addLore(data, sellAmount, builder, timer);
         return builder.build();
@@ -65,7 +65,7 @@ public class BlockSellOption implements InventoryOption {
     @Override
     public void onClick(CrownUser user, ClickContext context) throws RoyalCommandException {
         context.setReloadInventory(
-                SellShops.sell(user, getBlockMat(), getScalar(), user.getMatData(getActualMat())) > 0
+                SellShops.sell(user, getBlockMaterial(), getScalar(), user.getMatData(getIngredientMaterial())) > 0
         );
     }
 }

@@ -134,7 +134,7 @@ public final class ItemStacks {
             .append(Component.text("-"))
             .build();
 
-    static void setTags(ItemMeta meta, CompoundTag tag) {
+    public static void setTags(ItemMeta meta, CompoundTag tag) {
         try {
             Field f = getTagField();
             f.setAccessible(true);

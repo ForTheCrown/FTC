@@ -5,14 +5,9 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.Punishments;
-import net.forthecrown.crownevents.EventTimer;
 import net.forthecrown.economy.market.MarketDisplay;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.FtcUser;
-import net.forthecrown.user.UserInteractions;
-import net.forthecrown.user.RankTitle;
-import net.forthecrown.user.UserManager;
+import net.forthecrown.user.*;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.TimeUtil;
@@ -118,7 +113,7 @@ public class ProfilePrinter implements ComponentPrinter {
         line("Rank", user.getTitle().truncatedPrefix(), user.getTitle() != RankTitle.DEFAULT);
 
         if(!user.isOnline()) {
-            long offlineTime = TimeUtil.timeSince(user.getLastLogin());
+            long offlineTime = TimeUtil.timeSince(user.getLastOnline());
             TimePrinter printer = new TimePrinter(offlineTime);
 
             line("Last online", printer.printStringBiggest() + " ago");
@@ -138,11 +133,23 @@ public class ProfilePrinter implements ComponentPrinter {
         Objective crown = user.getScoreboard().getObjective("crown");
         Score crownScore = crown.getScore(user.getName());
         line("Crown score",
-                Component.text(ComVars.isEventTimed() ? EventTimer.getTimerCounter(crownScore.getScore()).toString() : crownScore.getScore() + ""),
+                Component.text(ComVars.isEventTimed() ? timer(crownScore.getScore()) : crownScore.getScore() + ""),
                 crownScore.getScore() > 0 && ComVars.isEventActive()
         );
 
         return this;
+    }
+
+    private String timer(long timeInMillis) {
+        long minutes = (timeInMillis / 60000) % 60;
+        long seconds = (timeInMillis / 1000) % 60;
+        long milliseconds = (timeInMillis /10) % 100;
+
+        return new StringBuilder()
+                .append(String.format("%02d", minutes)).append(":")
+                .append(String.format("%02d", seconds)).append(":")
+                .append(String.format("%02d", milliseconds))
+                .toString();
     }
 
     public ProfilePrinter adminInfo() {
@@ -245,7 +252,7 @@ public class ProfilePrinter implements ComponentPrinter {
     }
 
     private void onlineTimeThing() {
-        long lastOnline = user.getLastLogin();
+        long lastOnline = user.getLastOnline();
         Component time = new TimePrinter(TimeUtil.timeSince(lastOnline))
                 .print()
                 .color(NamedTextColor.WHITE)

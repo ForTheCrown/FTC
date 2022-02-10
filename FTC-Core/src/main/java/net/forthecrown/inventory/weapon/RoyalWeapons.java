@@ -7,6 +7,7 @@ import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbilities;
 import net.forthecrown.inventory.weapon.goals.ChargedCreeperGoal;
 import net.forthecrown.inventory.weapon.goals.DonatorWeaponGoal;
+import net.forthecrown.inventory.weapon.goals.HouseReforgeGoal;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.inventory.weapon.upgrades.*;
 import net.forthecrown.registry.Registries;
@@ -133,10 +134,7 @@ public final class RoyalWeapons {
         register(simple(EntityType.WITHER, 10, ++rank));
 
         //Dragon
-
-        //Rank it up so sword can't simply
-        //be leveled up with kills to dragon
-        ++rank;
+        register(new HouseReforgeGoal(++rank));
 
         putUpgrade(++rank, ReforgeUpgrade.reforge(
                 Material.NETHERITE_SWORD,

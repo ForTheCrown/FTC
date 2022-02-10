@@ -287,7 +287,6 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
                 new PortalRoadEntry(226, 77, 200),
 
                 new PortalRoadEntry(221, 77, 200),
-                new PortalRoadEntry(221, 77, 200),
 
                 //near pole
                 new PortalRoadEntry(207, 69, 200, Material.POLISHED_ANDESITE),
@@ -296,6 +295,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
                 //stairs
                 new PortalRoadEntry(217, 75, 200, Material.POLISHED_ANDESITE),
                 new PortalRoadEntry(212, 71, 200, Material.POLISHED_ANDESITE),
+                new PortalRoadEntry(221, 77, 200, Material.POLISHED_ANDESITE)
         };
 
         public static void set(World world, boolean glass) {

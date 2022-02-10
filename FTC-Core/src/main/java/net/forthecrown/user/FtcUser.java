@@ -12,13 +12,11 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.JoinInfo;
 import net.forthecrown.core.chat.ProfilePrinter;
 import net.forthecrown.cosmetics.PlayerRidingManager;
-import net.forthecrown.economy.selling.UserSellResult;
+import net.forthecrown.economy.selling.ItemFilter;
 import net.forthecrown.events.dynamic.AfkListener;
 import net.forthecrown.events.dynamic.RegionVisitListener;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
-import net.forthecrown.inventory.ItemStacks;
-import net.forthecrown.protection.UserClaimSession;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
@@ -42,7 +40,6 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundChatPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -51,8 +48,6 @@ import org.bukkit.craftbukkit.v1_18_R1.CraftOfflinePlayer;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -103,7 +98,6 @@ public class FtcUser implements CrownUser {
     public boolean hulkSmashing = false;
     public long totalEarnings = 0L;
     public long nextResetTime = 0L;
-    public long lastLogin = -1L;
     public long lastLoad = 0L;
     public long lastGuildPassDonation = 0L;
     public String ip;
@@ -111,6 +105,7 @@ public class FtcUser implements CrownUser {
     //Economy stuff
     public Object2ObjectMap<Material, SoldMaterialData> matData = new Object2ObjectOpenHashMap<>();
     public SellAmount sellAmount = SellAmount.PER_1;
+    public ItemFilter filter = new ItemFilter();
 
     //NMS handle
     private ServerPlayer handle;
@@ -134,8 +129,6 @@ public class FtcUser implements CrownUser {
 
     //Last command sender they sent or received a message from
     private CommandSender lastMessage;
-
-    public UserClaimSession claimSession;
 
     public FtcUser(@NotNull UUID uniqueId){
         this.uniqueId = uniqueId;
@@ -205,7 +198,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public CommandSource getCommandSource(AbstractCommand command){
-        checkOnline();
+        ensureOnline();
         return GrenadierUtils.wrap(GrenadierUtils.senderToWrapper(getPlayer()), command);
     }
 
@@ -382,6 +375,11 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
+    public ItemFilter getSellShopFilter() {
+        return filter;
+    }
+
+    @Override
     public SellAmount getSellAmount() {
         return sellAmount;
     }
@@ -524,25 +522,25 @@ public class FtcUser implements CrownUser {
     @Nonnull
     @Override
     public Spigot spigot() {
-        checkOnline();
+        ensureOnline();
         return getOnlineHandle().spigot();
     }
 
     @Override
     public boolean isPermissionSet(@Nonnull String name) {
-        checkOnline();
+        ensureOnline();
         return getOnlineHandle().isPermissionSet(name);
     }
 
     @Override
     public boolean isPermissionSet(@Nonnull Permission perm) throws UserNotOnlineException {
-        checkOnline();
+        ensureOnline();
         return getOnlineHandle().hasPermission(perm.getName());
     }
 
     @Override
     public boolean hasPermission(@Nonnull String name) throws UserNotOnlineException {
-        checkOnline();
+        ensureOnline();
         return getOnlineHandle().hasPermission(name);
     }
 
@@ -554,45 +552,45 @@ public class FtcUser implements CrownUser {
     @Nonnull
     @Override
     public PermissionAttachment addAttachment(@Nonnull Plugin plugin, @Nonnull String name, boolean value) throws UserNotOnlineException {
-        checkOnline();
+        ensureOnline();
         return getOnlineHandle().addAttachment(plugin, name, value);
     }
 
     @Nonnull
     @Override
     public PermissionAttachment addAttachment(@Nonnull Plugin plugin) throws UserNotOnlineException {
-        checkOnline();
+        ensureOnline();
         return getOnlineHandle().addAttachment(plugin);
     }
 
     @Override
     public PermissionAttachment addAttachment(@Nonnull Plugin plugin, @Nonnull String name, boolean value, int ticks) throws UserNotOnlineException {
-        checkOnline();
+        ensureOnline();
         return getOnlineHandle().addAttachment(plugin, name, value, ticks);
     }
 
     @Override
     public PermissionAttachment addAttachment(@Nonnull Plugin plugin, int ticks) throws UserNotOnlineException {
-        checkOnline();
+        ensureOnline();
         return getOnlineHandle().addAttachment(plugin, ticks);
     }
 
     @Override
     public void removeAttachment(@Nonnull PermissionAttachment attachment) throws UserNotOnlineException {
-        checkOnline();
+        ensureOnline();
         getOnlineHandle().removeAttachment(attachment);
     }
 
     @Override
     public void recalculatePermissions() throws UserNotOnlineException {
-        checkOnline();
+        ensureOnline();
         getOnlineHandle().recalculatePermissions();
     }
 
     @Nonnull
     @Override
     public Set<PermissionAttachmentInfo> getEffectivePermissions() throws UserNotOnlineException {
-        checkOnline();
+        ensureOnline();
         return getOnlineHandle().getEffectivePermissions();
     }
 
@@ -611,7 +609,8 @@ public class FtcUser implements CrownUser {
         getOnlineHandle().sendMessage(identity, message, type);
     }
 
-    protected void checkOnline() throws UserNotOnlineException {
+    @Override
+    public void ensureOnline() throws UserNotOnlineException {
         if(!isOnline()) throw new UserNotOnlineException(this);
     }
 
@@ -665,7 +664,6 @@ public class FtcUser implements CrownUser {
 
     @Override
     public boolean onJoin(){
-        this.lastLogin = System.currentTimeMillis();
         this.handle = getOnlineHandle().getHandle();
 
         if(hulkSmashing) {
@@ -734,7 +732,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void updateTabName(){
-        checkOnline();
+        ensureOnline();
 
         Component displayName = listDisplayName();
         getOnlineHandle().playerListName(displayName);
@@ -754,12 +752,13 @@ public class FtcUser implements CrownUser {
 
     @Override
     public Component getCurrentPrefix() {
+        if(currentPrefix != null) return currentPrefix;
+
         if(isKing()) {
             Kingship kingship = Crown.getKingship();
             return kingship.getPrefix();
         }
 
-        if(currentPrefix != null) return currentPrefix;
         if(currentTitle != RankTitle.DEFAULT) return currentTitle.prefix();
 
         return Component.empty();
@@ -809,7 +808,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public UserTeleport createTeleport(Supplier<Location> destination, boolean tell, boolean bypassCooldown, UserTeleport.Type type){
-        checkOnline();
+        ensureOnline();
 
         if(lastTeleport != null) lastTeleport.interrupt(tell);
         return lastTeleport = new UserTeleport(this, destination, bypassCooldown, type);
@@ -854,7 +853,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public Location getLastLocation() {
-        return lastLocation;
+        return lastLocation == null ? null : lastLocation.clone();
     }
 
     @Override
@@ -889,7 +888,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void setVelocity(double x, double y, double z) {
-        checkOnline();
+        ensureOnline();
 
         Entity entity = getHandle();
         entity.setDeltaMovement(x, y, z);
@@ -929,20 +928,20 @@ public class FtcUser implements CrownUser {
 
     @Override
     public FtcGameMode getGameMode() {
-        checkOnline();
+        ensureOnline();
         return FtcGameMode.wrap(getPlayer().getGameMode());
     }
 
     @Override
     public void setGameMode(FtcGameMode gameMode) {
-        checkOnline();
+        ensureOnline();
 
         getOnlineHandle().setGameMode(gameMode.bukkit);
     }
 
     @Override
     public void updateVanished(){
-        checkOnline();
+        ensureOnline();
 
         if(isVanished()) {
             vanishTicker = new UserVanishTicker(this);
@@ -962,7 +961,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void updateAfk(){
-        checkOnline();
+        ensureOnline();
 
         if(afk){
             afkListener = new AfkListener(this);
@@ -977,7 +976,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void updateFlying() {
-        checkOnline();
+        ensureOnline();
 
         boolean fly = getGameMode().canFly || isFlying();
         getPlayer().setAllowFlight(fly);
@@ -985,7 +984,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void updateGodMode() {
-        checkOnline();
+        ensureOnline();
 
         if(godMode()){
             getPlayer().setHealth(getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
@@ -996,114 +995,82 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public UserSellResult sellMaterial(Material material, int targetAmount) {
-        Validate.isTrue(targetAmount != 0, "Target amount cannot be 0");
-        Validate.isTrue(targetAmount > -2, "Target amount cannot be less than -1");
-        Validate.isTrue(targetAmount <= material.getMaxStackSize(), "Cannot remove more than a stack of one type");
-
-        int foundAmount = 0;
-        int filteredTarget = Math.max(1, targetAmount);
-        PlayerInventory inv = getPlayer().getInventory();
-
-        ItemStack item = new ItemStack(material, filteredTarget);
-
-        if(!inv.containsAtLeast(item, filteredTarget)) {
-            return UserSellResult.foundNone(this, targetAmount, material);
-        }
-
-        if(targetAmount == -1) {
-            for (ItemStack i: inv) {
-                if(ItemStacks.isEmpty(i)) continue;
-                if(i.getType() != material) continue;
-
-                foundAmount += i.getAmount();
-                inv.removeItemAnySlot(i);
-            }
-        } else {
-            inv.removeItemAnySlot(item);
-            foundAmount = filteredTarget;
-        }
-
-        return new UserSellResult(foundAmount, targetAmount, this, material);
-    }
-
-    @Override
     public void sendActionBar(@NonNull Component message) {
-        checkOnline();
+        ensureOnline();
         sendMessage(new AdventureComponent(message), ChatType.GAME_INFO);
     }
 
     @Override
     public void sendPlayerListHeaderAndFooter(@NonNull Component header, @NonNull Component footer) {
-        checkOnline();
+        ensureOnline();
         getPlayer().sendPlayerListHeaderAndFooter(header, footer);
     }
 
     @Override
     public void showTitle(net.kyori.adventure.title.Title title) {
-        checkOnline();
+        ensureOnline();
         getPlayer().showTitle(title);
     }
 
     @Override
     public void clearTitle() {
-        checkOnline();
+        ensureOnline();
         getPlayer().clearTitle();
     }
 
     @Override
     public void resetTitle() {
-        checkOnline();
+        ensureOnline();
         getPlayer().resetTitle();
     }
 
     @Override
     public void showBossBar(@NonNull BossBar bar) {
-        checkOnline();
+        ensureOnline();
         getPlayer().showBossBar(bar);
     }
 
     @Override
     public void hideBossBar(@NonNull BossBar bar) {
-        checkOnline();
+        ensureOnline();
         getPlayer().hideBossBar(bar);
     }
 
     @Override
     public void playSound(@NonNull Sound sound) {
-        checkOnline();
+        ensureOnline();
         getPlayer().playSound(sound);
     }
 
     @Override
     public void playSound(@NonNull Sound sound, double x, double y, double z) {
-        checkOnline();
+        ensureOnline();
         getPlayer().playSound(sound, x, y, z);
     }
 
     @Override
     public void stopSound(@NonNull SoundStop stop) {
-        checkOnline();
+        ensureOnline();
         getPlayer().stopSound(stop);
     }
 
     @Override
     public void openBook(@NonNull Book book) {
-        checkOnline();
+        ensureOnline();
         getPlayer().openBook(book);
     }
 
     @Override
     public void stopRiding(boolean suppressCancellation) throws UserNotOnlineException {
-        checkOnline();
+        ensureOnline();
 
         getHandle().stopRiding();
     }
 
     @Override
-    public long getLastLogin() {
-        if(lastLogin == -1) return getOfflinePlayer().getLastLogin();
-        return lastLogin;
+    public long getLastOnline() {
+        if(lastLoad == 0) return getOfflinePlayer().getLastSeen();
+        return lastLoad;
     }
 
     @Override
@@ -1120,21 +1087,6 @@ public class FtcUser implements CrownUser {
     @Override
     public long getLastGuildPassDonation() {
         return lastGuildPassDonation;
-    }
-
-    @Override
-    public UserClaimSession getClaimSession() {
-        return claimSession;
-    }
-
-    @Override
-    public UserClaimSession createClaimSession() {
-        return claimSession = new UserClaimSession(this);
-    }
-
-    @Override
-    public void closeClaimSession() {
-        claimSession = null;
     }
 
     @Override
@@ -1172,7 +1124,7 @@ public class FtcUser implements CrownUser {
     }
 
     public void sendPacket(Packet<ClientGamePacketListener> packet){
-        checkOnline();
+        ensureOnline();
         Connection connection = getHandle().connection.connection;
         connection.send(packet);
     }

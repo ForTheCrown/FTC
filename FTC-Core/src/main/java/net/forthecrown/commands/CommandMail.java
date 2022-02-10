@@ -60,15 +60,34 @@ public class CommandMail extends FtcCommand {
                         })
                 )
 
+                .then(literal("read_other")
+                        .requires(source -> source.hasPermission(Permissions.POLICE))
+
+                        .then(argument("user", UserArgument.user())
+                                .requires(source -> source.hasPermission(Permissions.POLICE))
+
+                                .executes(c -> readMailOther(c, 0))
+
+                                .then(argument("page", IntegerArgumentType.integer(1))
+                                        .requires(source -> source.hasPermission(Permissions.POLICE))
+
+                                        .executes(c -> {
+                                            int page = c.getArgument("page", Integer.class) - 1;
+                                            return readMailOther(c, page);
+                                        })
+                                )
+                        )
+                )
+
                 .then(literal("mark_unread")
-                        .then(argument("index", IntegerArgumentType.integer(0))
+                        .then(argument("index", IntegerArgumentType.integer(1))
                                 .executes(c -> {
                                     CrownUser user = getUserSender(c);
                                     UserMail mail = user.getMail();
-                                    int index = c.getArgument("index", Integer.class);
+                                    int index = c.getArgument("index", Integer.class) - 1;
 
                                     if(!mail.isValidIndex(index)) {
-                                        throw FtcExceptionProvider.translatable("mail.invalidIndex", Component.text(index));
+                                        throw FtcExceptionProvider.translatable("mail.invalidIndex", Component.text(index + 1));
                                     }
 
                                     UserMail.MailMessage message = mail.get(index);
@@ -86,14 +105,14 @@ public class CommandMail extends FtcCommand {
                 )
 
                 .then(literal("mark_read")
-                        .then(argument("index", IntegerArgumentType.integer(0))
+                        .then(argument("index", IntegerArgumentType.integer(1))
                                 .executes(c -> {
                                     CrownUser user = getUserSender(c);
                                     UserMail mail = user.getMail();
-                                    int index = c.getArgument("index", Integer.class);
+                                    int index = c.getArgument("index", Integer.class) - 1;
 
                                     if(!mail.isValidIndex(index)) {
-                                        throw FtcExceptionProvider.translatable("mail.invalidIndex", Component.text(index));
+                                        throw FtcExceptionProvider.translatable("mail.invalidIndex", Component.text(index + 1));
                                     }
 
                                     UserMail.MailMessage message = mail.get(index);
@@ -174,6 +193,15 @@ public class CommandMail extends FtcCommand {
                                 )
                         )
                 );
+    }
+
+    private int readMailOther(CommandContext<CommandSource> c, int page) throws CommandSyntaxException {
+        CrownUser user = UserArgument.getUser(c, "user");
+
+        MailQuery query = new MailQuery(c.getSource(), user, page);
+        UserActionHandler.handleAction(query);
+
+        return 0;
     }
 
     private static int readMail(CommandContext<CommandSource> c, int page) throws CommandSyntaxException {

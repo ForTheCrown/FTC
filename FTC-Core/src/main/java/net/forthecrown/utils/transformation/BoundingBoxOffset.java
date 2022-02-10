@@ -53,7 +53,7 @@ public class BoundingBoxOffset {
     }
 
     public BoundingBox apply(Vector3i pos){
-        return apply(new Vector(pos.x, pos.y, pos.z));
+        return apply(new Vector(pos.getX(), pos.getY(), pos.getZ()));
     }
 
     public BoundingBox apply(double x, double y, double z) {

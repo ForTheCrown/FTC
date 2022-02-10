@@ -71,9 +71,9 @@ public class BlockPalette implements NbtSerializable {
         for (StateData d: stateData) {
             // Serialize everything into one compound to save a bit of data
             CompoundTag data = d.tag() == null ? new CompoundTag() : d.tag();
-            data.putInt("X", d.offset().x);
-            data.putInt("Y", d.offset().y);
-            data.putInt("Z", d.offset().z);
+            data.putInt("X", d.offset().getX());
+            data.putInt("Y", d.offset().getY());
+            data.putInt("Z", d.offset().getZ());
 
             list.add(data);
         }

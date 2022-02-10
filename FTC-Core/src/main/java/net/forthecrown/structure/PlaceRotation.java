@@ -1,6 +1,5 @@
 package net.forthecrown.structure;
 
-import net.forthecrown.utils.math.MathUtil;
 import net.minecraft.world.level.block.Rotation;
 
 /**
@@ -35,10 +34,14 @@ public enum PlaceRotation {
         int newOrdinal = ordinal() + add;
         PlaceRotation[] values = values();
 
-        if(MathUtil.isInRange(add, 0, values.length - 1)) {
+        // If added ordinals are within value bounds
+        // return given value
+        if(newOrdinal >= 0 && newOrdinal < values.length) {
             return values[newOrdinal];
         }
 
+        // If not within bounds check which side it goes over
+        // and return corresponding value
         if(newOrdinal < 0) return values[newOrdinal + values.length];
         else return values[newOrdinal - values.length];
     }

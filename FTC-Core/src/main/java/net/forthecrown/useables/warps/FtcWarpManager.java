@@ -95,9 +95,9 @@ public class FtcWarpManager extends AbstractJsonSerializer implements WarpManage
     }
 
     @Override
-    public void remove(Key key) {
+    public Warp remove(Key key) {
         key = FtcUtils.ensureBukkit(key);
-        warps.remove(key);
+        return warps.remove(key);
     }
 
     @Override

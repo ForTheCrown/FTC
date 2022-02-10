@@ -1,9 +1,9 @@
 package net.forthecrown.economy.shops;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.serializer.ShopJsonSerializer;
 import net.forthecrown.serializer.ShopSerializer;
-import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,14 +29,15 @@ public class FtcShopManager implements ShopManager {
 
     @Override
     public SignShop getShop(WorldVec3i vec) {
-        if(loadedShops.containsKey(vec)) return loadedShops.get(vec);
+        SignShop result = loadedShops.get(vec);
+        if (result != null) return result;
 
         try {
             FtcSignShop shop = new FtcSignShop(vec);
             addShop(shop);
 
             return shop;
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -52,7 +53,7 @@ public class FtcShopManager implements ShopManager {
     }
 
     @Override
-    public Component getPriceLine(int amount){
+    public Component getPriceLine(int amount) {
         return PRICE_LINE
                 .append(Component.text("$" + amount)
                         .color(NamedTextColor.BLACK)
@@ -71,8 +72,8 @@ public class FtcShopManager implements ShopManager {
     }
 
     @Override
-    public void save(){
-        for (SignShop shop: loadedShops.values()){
+    public void save() {
+        for (SignShop shop : loadedShops.values()) {
             try {
                 shop.save();
             } catch (Exception e) {
@@ -82,8 +83,8 @@ public class FtcShopManager implements ShopManager {
     }
 
     @Override
-    public void reload(){
-        for (SignShop shop: loadedShops.values()){
+    public void reload() {
+        for (SignShop shop : loadedShops.values()) {
             try {
                 shop.reload();
             } catch (Exception e) {
@@ -93,12 +94,12 @@ public class FtcShopManager implements ShopManager {
     }
 
     @Override
-    public void addShop(SignShop shop){
+    public void addShop(SignShop shop) {
         loadedShops.put(shop.getPosition(), shop);
     }
 
     @Override
-    public void removeShop(SignShop shop){
+    public void removeShop(SignShop shop) {
         loadedShops.remove(shop.getPosition());
     }
 

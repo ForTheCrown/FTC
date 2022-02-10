@@ -176,8 +176,7 @@ public final class ComVars {
             try {
                 json.addVar((ComVar) f.get(null));
             } catch (Exception e) {
-                Crown.logger().error("Could not save comvar: " + f.getName());
-                e.printStackTrace();
+                Crown.logger().error("Could not save comvar: " + f.getName(), e);
             }
         }
 
@@ -189,7 +188,7 @@ public final class ComVars {
             Field f = ComVars.class.getDeclaredField(name);
             f.set(null, j.getVar(name, type));
         } catch (Exception e) {
-            e.printStackTrace();
+            Crown.logger().error("Could not read comvar: " + name, e);
         }
     }
 

@@ -22,7 +22,8 @@ public final class MathUtil {
     }
 
     public static boolean isInRange(double check, double min, double max) {
-        return check >= min && check <= max;
+        if(check > max) return false;
+        return check >= min;
     }
 
     public static Vector vectorBetweenPoints(Location l1, Location l2) {

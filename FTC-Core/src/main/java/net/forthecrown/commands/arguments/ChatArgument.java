@@ -18,8 +18,17 @@ public class ChatArgument implements ArgumentType<Component> {
     public Component parse(StringReader reader) throws CommandSyntaxException {
         char peek = reader.peek();
 
-        if(peek == '{' || peek == '[') {
-            return ComponentArgument.component().parse(reader);
+        if(peek == '{' || peek == '[' || peek == '"') {
+            Component c = ComponentArgument.component().parse(reader);
+
+            // If there's any leftover text
+            if(reader.canRead()) {
+                throw CommandSyntaxException.BUILT_IN_EXCEPTIONS
+                        .dispatcherExpectedArgumentSeparator()
+                        .createWithContext(reader);
+            }
+
+            return c;
         }
 
         String all = reader.getRemaining();

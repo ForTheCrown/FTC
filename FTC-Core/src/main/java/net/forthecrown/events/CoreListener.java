@@ -58,10 +58,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.*;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -284,6 +283,32 @@ public class CoreListener implements Listener {
             MarriageMessage message = new MarriageMessage(user, UserManager.getUser(inter.getSpouse()), ChatUtils.getString(event.message()));
             UserActionHandler.handleAction(message);
         }
+    }
+
+    public static final int
+            CART_TABLE_SLOT_RESULT = 2,
+            CART_TABLE_SLOT_TOP_INPUT = 0;
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if(!(event.getView().getTopInventory() instanceof CartographyInventory cart)) return;
+
+        ItemStack item = cart.getItem(CART_TABLE_SLOT_TOP_INPUT);
+
+        if(ItemStacks.isEmpty(item)) {
+            item = event.getCursor();
+            if(ItemStacks.isEmpty(item)) return;
+        }
+
+        if(ItemStacks.hasTagElement(item.getItemMeta(), "no_copies")) {
+            setNull(cart, CART_TABLE_SLOT_RESULT);
+        }
+    }
+
+    private void setNull(Inventory inventory, int slot) {
+        Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
+            inventory.setItem(slot, null);
+        }, 1);
     }
 
     @EventHandler(ignoreCancelled = true)

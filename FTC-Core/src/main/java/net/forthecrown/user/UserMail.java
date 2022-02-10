@@ -12,6 +12,8 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 public interface UserMail extends UserAttachment {
+    int PAGE_SIZE = 10;
+
     boolean canSee(UUID id);
 
     default boolean canSee(CommandSender sender) {

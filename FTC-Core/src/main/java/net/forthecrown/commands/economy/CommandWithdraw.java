@@ -3,17 +3,16 @@ package net.forthecrown.commands.economy;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.ComVars;
-import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.ComVars;
+import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.Economy;
+import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -31,7 +30,6 @@ public class CommandWithdraw extends FtcCommand {
         register();
     }
 
-    private final Economy bals = Crown.getEconomy();
     private final int maxMoney;
 
     @Override
@@ -52,7 +50,7 @@ public class CommandWithdraw extends FtcCommand {
         int amount = c.getArgument("amount", Integer.class);
         int totalAmount = amount * itemAmount;
 
-        if(!bals.has(user.getUniqueId(), totalAmount)) throw FtcExceptionProvider.cannotAfford(totalAmount);
+        if(!economy.has(user.getUniqueId(), totalAmount)) throw FtcExceptionProvider.cannotAfford(totalAmount);
         if(user.getPlayer().getInventory().firstEmpty() == -1) throw FtcExceptionProvider.inventoryFull();
 
         Component text = Component.translatable("economy.withdraw.total", FtcFormatter.rhines(totalAmount).color(NamedTextColor.YELLOW))
@@ -65,7 +63,7 @@ public class CommandWithdraw extends FtcCommand {
                 .color(NamedTextColor.GRAY)
                 .append(itemAmount > 1 ? Component.space().append(text) : Component.empty());
 
-        bals.remove(user.getUniqueId(), totalAmount);
+        economy.remove(user.getUniqueId(), totalAmount);
         user.getPlayer().getInventory().addItem(ItemStacks.makeCoins(amount, itemAmount));
         user.sendMessage(message);
         return 0;

@@ -344,6 +344,7 @@ public class RoyalSword extends RankedItem {
      */
     public boolean shouldRankUp() {
         if(rank >= RoyalWeapons.MAX_RANK) return false;
+        if(goalsAndProgress.isEmpty()) return false;
 
         for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {
             if(e.getIntValue() < e.getKey().getGoal()) return false;

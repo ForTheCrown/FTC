@@ -2,7 +2,7 @@ package net.forthecrown.commands.click;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
 
@@ -10,6 +10,7 @@ public final class ClickableTexts {
     private ClickableTexts() {}
 
     public static final int RADIX = Character.MAX_RADIX;
+    public static final int RANDOM_KEY = FtcUtils.RANDOM.nextInt(1000000);
 
     private static final ClickableTextNode ROOT_NODE = new ClickableTextNode("root");
 
@@ -27,13 +28,13 @@ public final class ClickableTexts {
         ROOT_NODE.removeNode(name);
     }
 
-    public static Int2ObjectMap<ClickableTextNode> getNodes() {
+    public static Long2ObjectMap<ClickableTextNode> getNodes() {
         return ROOT_NODE.getNodes();
     }
 
     public static void execute(CrownUser user, String args) throws CommandSyntaxException {
         StringReader reader = new StringReader(FtcUtils.isNullOrBlank(args) ? "" : args);
-        int initialID = Integer.valueOf(reader.readString(), RADIX);
+        long initialID = Long.valueOf(reader.readString(), RADIX);
         reader.skipWhitespace();
 
         ClickableTextNode node = ROOT_NODE.getNodes().get(initialID);
@@ -42,5 +43,11 @@ public final class ClickableTexts {
         }
 
         node.execute(user, reader);
+    }
+
+    // Takes the given hash and multiplies it with
+    // the given RANDOM_KEY of the current session
+    static long toCodedHash(int hash) {
+        return (long) hash * RANDOM_KEY;
     }
 }

@@ -23,7 +23,7 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
     @Override
     public void generate(PopulationRegion region) {
         //Get the center bottom the pole should be placed at
-        WorldVec3i pos = region.getPoleBottom();
+        WorldVec3i pos = region.getPoleBottom().mutable();
 
         //bounding box for the region pole
         FtcBoundingBox box = FtcBoundingBox.of(region.getWorld(), region.getPoleBoundingBox());

@@ -29,9 +29,9 @@ public class CloseableRegistryBase<T> extends BaseRegistry<T> implements Closeab
     }
 
     @Override
-    public void remove(Key key) {
+    public T remove(Key key) {
         validateOpen();
-        super.remove(key);
+        return super.remove(key);
     }
 
     @Override

@@ -155,19 +155,17 @@ public class BlockStructure implements NbtSerializable, Keyed {
     }
 
     public Vector3i getSize() {
-        return size;
+        return size == null ? null : size.immutable();
     }
 
     @Override
     public Tag save() {
-        if(entityInfos.isEmpty() && header.isEmpty()) return savePalettes();
-
         CompoundTag result = new CompoundTag();
 
         if(!header.isEmpty()) result.put(HEADER_TAG, header);
         if(!entityInfos.isEmpty()) result.put(ENTITY_TAG, saveEntities());
 
-        int[] sizeTag = new int[] {size.z, size.y, size.z};
+        int[] sizeTag = new int[] {size.getX(), size.getY(), size.getZ()};
         result.putIntArray("size", sizeTag);
 
         result.put(PALETTE_TAG, savePalettes());
@@ -196,6 +194,11 @@ public class BlockStructure implements NbtSerializable, Keyed {
     }
 
     public void load(Tag tag) {
+        if(tag.getId() == Tag.TAG_LIST) {
+            loadPalettes((ListTag) tag);
+            return;
+        }
+
         CompoundTag data = (CompoundTag) tag;
 
         header.tags.clear();

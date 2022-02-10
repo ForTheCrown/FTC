@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.JsonUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.Tag;
@@ -21,13 +22,15 @@ import org.bukkit.util.Vector;
  * A vector with 3 integer coordinates.
  */
 public class Vector3i extends AbstractVector3i<Vector3i> {
-    public static final Vector3i ZERO = new Vector3i(0, 0, 0);
+    public static final Vector3i ZERO = new Vector3i(0, 0, 0, true);
 
     public Vector3i(int x, int y, int z) {
         super(x, y, z);
     }
 
-    public Vector3i() {}
+    Vector3i(int x, int y, int z, boolean immutable) {
+        super(x, y, z, immutable);
+    }
 
     @Override
     protected Vector3i getThis() {
@@ -35,8 +38,8 @@ public class Vector3i extends AbstractVector3i<Vector3i> {
     }
 
     @Override
-    protected Vector3i cloneAt(int x, int y, int z) {
-        return new Vector3i(x, y, z);
+    protected Vector3i cloneAt(int x, int y, int z, boolean immutable) {
+        return new Vector3i(x, y, z, immutable);
     }
 
     public static Vector3i of(Block block){
@@ -68,6 +71,10 @@ public class Vector3i extends AbstractVector3i<Vector3i> {
         int[] val = arr.getAsIntArray();
 
         return new Vector3i(val[0], val[1], val[2]);
+    }
+
+    public static Vector3i of(long l) {
+        return of(BlockPos.of(l));
     }
 
     // Deserialization function

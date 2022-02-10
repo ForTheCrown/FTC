@@ -2,8 +2,8 @@ package net.forthecrown.commands.click;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -15,7 +15,8 @@ import org.apache.commons.lang3.Validate;
 public class ClickableTextNode {
     private final String name;
     private final String hashedName;
-    private final Int2ObjectMap<ClickableTextNode> nameHash2Node = new Int2ObjectOpenHashMap<>();
+    private final long hashedNameLong;
+    private final Long2ObjectMap<ClickableTextNode> nameHash2Node = new Long2ObjectOpenHashMap<>();
     private ClickableTextNode parent;
 
     private PromptCreator promptCreator;
@@ -23,7 +24,8 @@ public class ClickableTextNode {
 
     public ClickableTextNode(String name) {
         this.name = name;
-        this.hashedName = Integer.toString(name.hashCode(), ClickableTexts.RADIX);
+        this.hashedNameLong = ClickableTexts.toCodedHash(name.hashCode());
+        this.hashedName = Long.toString(hashedNameLong, ClickableTexts.RADIX);
     }
 
     public String getName() {
@@ -51,7 +53,7 @@ public class ClickableTextNode {
     public ClickableTextNode addNode(ClickableTextNode node) {
         Validate.isTrue(node != this, "Bruh");
 
-        nameHash2Node.put(node.getName().hashCode(), node);
+        nameHash2Node.put(node.hashedNameLong, node);
         node.parent = this;
         return this;
     }
@@ -65,7 +67,7 @@ public class ClickableTextNode {
         nameHash2Node.remove(name.hashCode());
     }
 
-    public Int2ObjectMap<ClickableTextNode> getNodes() {
+    public Long2ObjectMap<ClickableTextNode> getNodes() {
         return nameHash2Node;
     }
 
@@ -73,7 +75,7 @@ public class ClickableTextNode {
         if(reader.canRead()) {
             if(reader.peek() == ' ') reader.skipWhitespace();
 
-            int hash = Integer.valueOf(reader.readString(), ClickableTexts.RADIX);
+            long hash = Long.valueOf(reader.readString(), ClickableTexts.RADIX);
 
             ClickableTextNode node = getNodes().get(hash);
             if(node != null) node.execute(user, reader);

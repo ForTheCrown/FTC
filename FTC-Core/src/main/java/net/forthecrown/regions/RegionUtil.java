@@ -38,10 +38,11 @@ public final class RegionUtil {
     public static BoundingBox poleBoundingBox(PopulationRegion region) {
         WorldVec3i p = bottomOfPole(region.getWorld(), region.getPolePosition());
 
-        return new BoundingBox(p.x - 2, p.y, p.z-2, p.x + 2, p.y + 5, p.z + 2);
+        return new BoundingBox(p.getX() - 2, p.getY(), p.getZ()-2, p.getX() + 2, p.getY() + 5, p.getZ() + 2);
     }
 
     private static WorldVec3i findBottom(WorldVec3i p) {
+        p = p.mutable();
         if(p.getY() < FtcUtils.MIN_Y) return null;
 
         Block b = p.getBlock();
@@ -71,9 +72,9 @@ public final class RegionUtil {
     public static WorldVec3i bottomOfPole(World world, BlockVector2 vec2) {
         int y = world.getHighestBlockYAt(vec2.getX(), vec2.getZ(), HeightMap.WORLD_SURFACE);
         WorldVec3i vec3i = new WorldVec3i(world, vec2.getX(), y, vec2.getZ());
-        WorldVec3i result = findBottom(vec3i.clone());
+        WorldVec3i result = findBottom(vec3i);
 
-        return result == null ? findBottomLazy(vec3i.clone()) : result;
+        return result == null ? findBottomLazy(vec3i) : result;
     }
 
     public static boolean isValidPolePosition(PopulationRegion region, BlockVector2 vec) {
@@ -112,17 +113,17 @@ public final class RegionUtil {
 
     // Serialize properties as a boolean array with each bit corresponding to the
     // ordinal of the enum
-    static short writeProperties(Set<RegionProperty> properties) {
-        short val = 0;
+    static byte writeProperties(Set<RegionProperty> properties) {
+        byte val = 0;
 
         for (RegionProperty p: properties) {
-            val = BitUtil.setBit(val, (short) p.ordinal(), true);
+            val = (byte) BitUtil.setBit(val, (short) p.ordinal(), true);
         }
 
         return val;
     }
 
-    static Set<RegionProperty> readProperties(short val) {
+    static Set<RegionProperty> readProperties(byte val) {
         Set<RegionProperty> properties = new HashSet<>();
 
         for (RegionProperty p: RegionProperty.values()) {

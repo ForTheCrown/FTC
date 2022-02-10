@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.forthecrown.serializer.JsonWrapper;
 import net.minecraft.core.SectionPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -17,6 +19,11 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
     public WorldVec3i(World world, int x, int y, int z) {
         super(x, y, z);
         this.world = Validate.notNull(world);
+    }
+
+    private WorldVec3i(World world, int x, int y, int z, boolean immutable) {
+        super(x, y, z, immutable);
+        this.world = world;
     }
 
     public static WorldVec3i of(JsonElement element) {
@@ -86,7 +93,7 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
     }
 
     public Vector3i toNonWorld() {
-        return new Vector3i(getX(), getY(), getZ());
+        return new Vector3i(getX(), getY(), getZ(), immutable);
     }
 
     public Material getMaterial() {
@@ -99,8 +106,8 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
     }
 
     @Override
-    protected WorldVec3i cloneAt(int x, int y, int z) {
-        return new WorldVec3i(world, x, y, z);
+    protected WorldVec3i cloneAt(int x, int y, int z, boolean immutable) {
+        return new WorldVec3i(world, x, y, z, immutable);
     }
 
     @Override
@@ -111,6 +118,15 @@ public class WorldVec3i extends AbstractVector3i<WorldVec3i> {
         json.add("cords", super.serialize());
 
         return json;
+    }
+
+    @Override
+    public Tag saveAsTag() {
+        CompoundTag tag = new CompoundTag();
+        tag.putString("world", world.getName());
+        tag.put("cords", super.saveAsTag());
+
+        return tag;
     }
 
     @Override

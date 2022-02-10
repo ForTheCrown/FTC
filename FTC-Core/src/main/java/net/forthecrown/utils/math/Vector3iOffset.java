@@ -65,11 +65,11 @@ public record Vector3iOffset(int xOffset, int yOffset, int zOffset) implements I
     }
 
     public Vector3i apply(Vector3i min) {
-        return min.clone().add(xOffset, yOffset, zOffset);
+        return min.immutable().add(xOffset, yOffset, zOffset);
     }
 
     public WorldVec3i apply(WorldVec3i min) {
-        return min.clone().add(xOffset, yOffset, zOffset);
+        return min.immutable().add(xOffset, yOffset, zOffset);
     }
 
     public Location apply(Location min) {

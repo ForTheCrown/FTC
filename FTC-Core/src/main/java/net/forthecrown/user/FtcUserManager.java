@@ -160,8 +160,7 @@ public final class FtcUserManager extends AbstractJsonSerializer implements User
                     // It appears some user files were created wrongly,
                     // Like there's a 'Wou' user file, IDK how that exists,
                     // but it does lol, so gotta check for them
-                    Crown.logger().warn("Couldn't load data of user " + id + ". Corrupted or invalid data?");
-                    e.printStackTrace();
+                    Crown.logger().error("Couldn't load data of user " + id + ". Corrupted or invalid data?", e);
                 }
             }
 

@@ -81,7 +81,7 @@ public class SellShopHeader implements CordedInventoryOption {
      * @param row The row to create it at
      * @return The header at the given cords.
      */
-    SellShopHeader slotClone(int column, int row){
+    SellShopHeader cloneAt(int column, int row){
         return new SellShopHeader(column, row, runnable, getItem());
     }
 

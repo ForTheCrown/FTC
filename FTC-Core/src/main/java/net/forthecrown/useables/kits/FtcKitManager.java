@@ -66,9 +66,9 @@ public class FtcKitManager extends AbstractJsonSerializer implements KitManager 
     }
 
     @Override
-    public void remove(Key key) {
+    public Kit remove(Key key) {
         key = FtcUtils.ensureBukkit(key);
-        kits.remove(key);
+        return kits.remove(key);
     }
 
     @Override

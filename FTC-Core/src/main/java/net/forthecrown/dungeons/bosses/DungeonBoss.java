@@ -154,6 +154,11 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
                 bossEntity.setTarget(target);
             }
 
+            // Do not allow boss entity to leave room
+            if(!getBossRoom().contains(bossEntity)) {
+                bossEntity.teleport(getSpawnLocation());
+            }
+
             onUpdate();
         }, updaterDelay, updaterDelay);
     }
@@ -191,6 +196,10 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
     @Override
     public @NotNull Key key() {
         return key;
+    }
+
+    public Location getSpawnLocation() {
+        return spawnLocation.clone();
     }
 
     private void finalizeKill(@NotNull BossFightContext context){

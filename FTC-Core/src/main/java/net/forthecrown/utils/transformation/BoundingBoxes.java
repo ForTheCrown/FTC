@@ -15,12 +15,15 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.math.Vector3iOffset;
 import net.forthecrown.utils.math.WorldVec3i;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
@@ -34,7 +37,7 @@ public final class BoundingBoxes {
     static final byte COUNT = 3;
 
     //Threads
-    static final Executor COPY_EXECUTOR = Executors.newFixedThreadPool(COUNT);
+    static final ExecutorService COPY_EXECUTOR = Executors.newFixedThreadPool(COUNT);
 
     //The minimum area of a bounding box for it to warrant using 3 threads.
     static final int MIN_MULTI_THREAD = 15 * 15 * 15;
@@ -131,7 +134,7 @@ public final class BoundingBoxes {
             Vector3i boxEnd = size.apply(boxStart);
 
             //Set the box at the index to be the one we just calculated
-            result[i] = new BoundingBox(boxStart.x, boxStart.y, boxStart.z, boxEnd.x, boxEnd.y, boxEnd.z);
+            result[i] = new BoundingBox(boxStart.getX(), boxStart.getY(), boxStart.getZ(), boxEnd.getX(), boxEnd.getY(), boxEnd.getZ());
         }
 
         return result;
@@ -159,5 +162,50 @@ public final class BoundingBoxes {
 
     public static BoundingBox wgToNms(ProtectedRegion region) {
         return regionToNms(region.getMinimumPoint(), region.getMaximumPoint());
+    }
+    
+    public static boolean overlaps(BoundingBox b1, BoundingBox b2) {
+        for (BlockPos p: corners(b1)) {
+            if(b2.isInside(p)) return true;
+        }
+
+        return false;
+    }
+    
+    public static BlockPos[] corners(BoundingBox b) {
+        return new BlockPos[] {
+                new BlockPos(b.maxX(), b.maxY(), b.maxZ()),
+                new BlockPos(b.minX(), b.maxY(), b.maxZ()),
+                new BlockPos(b.maxX(), b.minY(), b.maxZ()),
+                new BlockPos(b.minX(), b.minY(), b.maxZ()),
+                new BlockPos(b.maxX(), b.maxY(), b.minZ()),
+                new BlockPos(b.minX(), b.maxY(), b.minZ()),
+                new BlockPos(b.maxX(), b.minY(), b.minZ()),
+                new BlockPos(b.minX(), b.minY(), b.minZ())
+        };
+    }
+
+    public static IntArrayTag save(BoundingBox box) {
+        return new IntArrayTag(toIntArray(box));
+    }
+
+    public static BoundingBox load(Tag tag) {
+        IntArrayTag intArr = (IntArrayTag) tag;
+
+        return ofIntArray(intArr.getAsIntArray());
+    }
+
+    public static int[] toIntArray(BoundingBox box) {
+        return new int[] {
+                box.minX(), box.minY(), box.minZ(),
+                box.maxX(), box.maxY(), box.maxZ()
+        };
+    }
+
+    public static BoundingBox ofIntArray(int... ints) {
+        return new BoundingBox(
+                ints[0], ints[1], ints[2],
+                ints[3], ints[4], ints[5]
+        );
     }
 }

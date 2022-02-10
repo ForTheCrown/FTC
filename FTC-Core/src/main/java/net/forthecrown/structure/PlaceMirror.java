@@ -3,11 +3,14 @@ package net.forthecrown.structure;
 import net.minecraft.world.level.block.Mirror;
 
 public enum PlaceMirror {
-    NONE,
-    LEFT_RIGHT,
-    FRONT_BACK;
+    // DO NOT CHANGE ORDER OF VALUES
+    // toVanilla method requires these
+    // to not change
+    NONE,   // Vanilla: NONE
+    Z_AXIS, // Vanilla: LEFT_RIGHT
+    X_AXIS; // Vanilla: FRONT_BACK
 
     public Mirror toVanilla() {
-        return Mirror.valueOf(name());
+        return Mirror.values()[ordinal()];
     }
 }

@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.Validate;
 
 import java.util.List;
@@ -58,12 +57,7 @@ public class LoreBuilder {
     }
 
     public LoreBuilder add(String s) {
-        return add(
-                Component.text()
-                        .decoration(TextDecoration.ITALIC, false)
-                        .append(ChatUtils.stringToNonItalic(s, true))
-                        .build()
-        );
+        return add(ChatUtils.stringToNonItalic(s, true));
     }
 
     public LoreBuilder addEmpty() {

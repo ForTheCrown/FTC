@@ -11,24 +11,38 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
+import java.util.function.IntBinaryOperator;
+
 public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements ImmutableVector3i {
-    public int x;
-    public int y;
-    public int z;
+    protected int x;
+    protected int y;
+    protected int z;
+
+    protected final boolean immutable;
 
     public AbstractVector3i(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
+
+        immutable = true;
     }
 
-    public AbstractVector3i() {
+    public AbstractVector3i(int x, int y, int z, boolean immutable) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.immutable = immutable;
     }
 
     protected abstract T getThis();
-    protected abstract T cloneAt(int x, int y, int z);
+    protected abstract T cloneAt(int x, int y, int z, boolean immutable);
 
     public T set(int x, int y, int z) {
+        if(immutable) {
+            return cloneAt(x, y, z, true);
+        }
+
         this.x = x;
         this.y = y;
         this.z = z;
@@ -126,7 +140,16 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
 
     @Override
     public T clone() {
-        return cloneAt(getX(), getY(), getZ());
+        return cloneAt(getX(), getY(), getZ(), immutable);
+    }
+
+    public T immutable() {
+        return immutable ? getThis() : cloneAt(getX(), getY(), getZ(), true);
+    }
+
+    public T mutable() {
+        if(!immutable) return getThis();
+        return cloneAt(getX(), getY(), getZ(), false);
     }
 
     public Vector toVec(){
@@ -146,12 +169,32 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
     }
 
     public T zero() {
-        return cloneAt(0, 0, 0);
+        return cloneAt(0, 0, 0, immutable);
+    }
+
+    public T getMinimum(T o) {
+        return apply(Math::min, o);
+    }
+
+    public T getMaximum(T o) {
+        return apply(Math::max, o);
+    }
+
+    public T apply(IntBinaryOperator o, T other) {
+        return set(
+                o.applyAsInt(other.x, x),
+                o.applyAsInt(other.y, y),
+                o.applyAsInt(other.z, z)
+        );
     }
 
     public Tag saveAsTag() {
         int[] cords = {x, y, z};
         return new IntArrayTag(cords);
+    }
+
+    public long toLong() {
+        return toNms().asLong();
     }
 
     @Override

@@ -11,10 +11,8 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.NamespacedKey;
 
 public class CommandMarry extends FtcCommand {
-    public static final NamespacedKey KEY = new NamespacedKey(Crown.inst(), "marriage");
 
     public CommandMarry() {
         super("marry", Crown.inst());

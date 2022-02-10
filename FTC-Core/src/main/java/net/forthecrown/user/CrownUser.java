@@ -8,11 +8,10 @@ import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.forthecrown.core.AfkKicker;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.economy.selling.UserSellResult;
+import net.forthecrown.economy.selling.ItemFilter;
 import net.forthecrown.economy.shops.ShopCustomer;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.AbstractCommand;
-import net.forthecrown.protection.UserClaimSession;
 import net.forthecrown.regions.RegionPos;
 import net.forthecrown.serializer.Deletable;
 import net.forthecrown.utils.Nameable;
@@ -332,6 +331,8 @@ public interface CrownUser extends
     default boolean hasTitle(RankTitle title) {
         return getAvailableTitles().contains(title);
     }
+
+    ItemFilter getSellShopFilter();
 
     /**
      * Gets the user's sell amount in /shop
@@ -782,23 +783,6 @@ public interface CrownUser extends
     }
 
     /**
-     * Creates a sell result by attempting to sell items in the user's inventory
-     * @param material The material to sell aka remove
-     * @param targetAmount The amount of items to remove, -1 for unlimited
-     * @return The sell result
-     */
-    UserSellResult sellMaterial(Material material, int targetAmount) throws UserNotOnlineException;
-
-    /**
-     * Creates a sell result and uses the user's sell amount for the target
-     * @param material The material to sell
-     * @return The sell result
-     */
-    default UserSellResult sellMaterial(Material material) throws UserNotOnlineException {
-        return sellMaterial(material, getSellAmount() == SellAmount.ALL ? -1 : getSellAmount().getValue());
-    }
-
-    /**
      * Gets the user's 2d block location
      * @return The user's 2d block location
      */
@@ -921,12 +905,6 @@ public interface CrownUser extends
 
     long getLastGuildPassDonation();
 
-    UserClaimSession getClaimSession();
-
-    UserClaimSession createClaimSession();
-
-    void closeClaimSession();
-
     @Override
     boolean equals(Object o);
 
@@ -966,14 +944,16 @@ public interface CrownUser extends
         return nickDisplayName();
     }
 
-    long getLastLogin();
+    long getLastOnline();
 
     default long getLastSeen() {
         if(isOnline()) return System.currentTimeMillis();
-        return getLastLogin();
+        return getLastOnline();
     }
 
     default void delayAfkKick() {
         AfkKicker.addOrDelay(getUniqueId());
     }
+
+    void ensureOnline() throws UserNotOnlineException;
 }

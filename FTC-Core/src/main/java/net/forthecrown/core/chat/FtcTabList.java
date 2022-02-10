@@ -3,11 +3,11 @@ package net.forthecrown.core.chat;
 import com.google.gson.JsonElement;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcConfig;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class FtcTabList extends FtcConfig.ConfigSection implements TabList {
@@ -49,8 +49,8 @@ public class FtcTabList extends FtcConfig.ConfigSection implements TabList {
     public void updateList() {
         Component formatted = format();
 
-        for (Player p: Bukkit.getOnlinePlayers()){
-            p.sendPlayerListHeader(formatted);
+        for (CrownUser u: UserManager.getOnlineUsers()) {
+            u.sendPlayerListHeader(formatted);
         }
     }
 

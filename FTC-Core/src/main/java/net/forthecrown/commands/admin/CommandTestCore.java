@@ -17,6 +17,7 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
+import net.forthecrown.structure.tree.test.TestNodes;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
@@ -72,6 +73,17 @@ public class CommandTestCore extends FtcCommand {
             user.sendMessage(gradient);
             return 0;
         })
+                .then(literal("test_struct_nodes")
+                        .executes(c -> {
+                            CrownUser user = getUserSender(c);
+
+                            TestNodes.generateAndPlace(user.getWorld(), Vector3i.of(user.getLocation()));
+
+                            c.getSource().sendAdmin("Attempted to generate and place structures");
+                            return 0;
+                        })
+                )
+
                 .then(literal("keys")
                         .executes(c -> {
                             for (World w: Bukkit.getWorlds()) {

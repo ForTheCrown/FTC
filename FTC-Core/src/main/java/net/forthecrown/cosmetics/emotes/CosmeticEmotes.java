@@ -29,7 +29,7 @@ public final class CosmeticEmotes {
             )),
 
             HUG         = register(new CosmeticEmote(23, new EmoteHug(), "hug", Permissions.EMOTE_HUG,
-                    Component.text("Can bea earned around Valentine's Day."),
+                    Component.text("Can be earned around Valentine's Day."),
                     Component.text("Hugs someone :D")
             ));
 

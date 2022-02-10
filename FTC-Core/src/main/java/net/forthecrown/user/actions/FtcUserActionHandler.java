@@ -8,6 +8,7 @@ import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.core.chat.PagedDisplay;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.regions.visit.RegionVisit;
 import net.forthecrown.regions.visit.VisitPredicate;
@@ -19,10 +20,8 @@ import net.forthecrown.user.UserMail;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
@@ -166,78 +165,95 @@ public class FtcUserActionHandler implements UserActionHandler {
         }
 
         boolean self = query.isSelfQuery();
+        String selfTranslationKey = self ? "self" : "other";
 
         List<UserMail.MailMessage> messages = query.getMail().getMail();
 
         if(messages.isEmpty()) {
-            throw FtcExceptionProvider.translatable("mail.none." + (self ? "self" : "other"));
+            throw FtcExceptionProvider.translatable("mail.none." + selfTranslationKey);
         }
 
-        final Component border = Component.text("               ")
-                .style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
-        TextComponent.Builder builder = Component.text()
-                .color(NamedTextColor.YELLOW)
-                .append(border)
-                .append(Component.space())
-                .append(
-                        Component.translatable(
-                                "mail.header." + (self ? "self" : "other"),
-                                query.getUser().nickDisplayName()
-                                        .color(NamedTextColor.GOLD)
-                        )
-                )
-                .append(Component.space())
-                .append(border);
-
-        int index = 0;
-        for (UserMail.MailMessage m: messages) {
-            index++;
-
-            Component senderMetadata = m.sender == null ? Component.empty() :
-                    Component.newline()
-                            .append(Component.translatable("mail.metadata.sender", UserManager.getUser(m.sender).nickDisplayName()));
-
-            builder.append(
-                    Component.text()
-                            .color(NamedTextColor.WHITE)
-                            .append(
-                                    Component.text("\n" + index + ")")
-                                            .color(NamedTextColor.GOLD)
-                                            .hoverEvent(
-                                                    Component.translatable(
-                                                            "mail.metadata.date",
-                                                            FtcFormatter.formatDate(m.sent)
-                                                    )
-                                                            .append(senderMetadata)
-                                            )
-                            )
-
-                            .append(
-                                    Component.text()
-                                            .color(m.read ? NamedTextColor.GRAY : NamedTextColor.YELLOW)
-                                            .content(" [")
-                                            .append(
-                                                    Component.translatable(m.read ? "mail.read" : "mail.unread")
-                                                            .clickEvent(ClickEvent.runCommand("/mail mark_" + (m.read ? "un" : "") + "read " + query.getMail().indexOf(m)))
-                                                            .hoverEvent(Component.translatable(!m.read ? "mail.read.hover" : "mail.unread.hover"))
-                                            )
-                                            .append(Component.text("] "))
-                            )
-
-                            .append(m.message)
-            );
-
-            //m.read = true;
-        }
+        final Component border = Component.text("               ", NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH);
 
         query.getSource().sendMessage(
-                builder
-                        .append(Component.newline())
-                        .append(border)
-                        .append(border)
-                        .append(border)
-                        .build()
+                PagedDisplay.create(
+                        query.getPage(),
+                        UserMail.PAGE_SIZE,
+                        query.getMail().getMail(),
+
+                        // Entry
+                        (m, index) -> {
+                            Component senderMetadata = m.sender == null ? Component.empty() :
+                                    Component.newline()
+                                            .append(Component.translatable("mail.metadata.sender", UserManager.getUser(m.sender).nickDisplayName()));
+
+                            return Component.text()
+                                    .append(
+                                            Component.text("" + index + ")", NamedTextColor.GOLD)
+                                                    .hoverEvent(
+                                                            Component.translatable(
+                                                                            "mail.metadata.date",
+                                                                            FtcFormatter.formatDate(m.sent)
+                                                                    )
+                                                                    .append(senderMetadata)
+                                                    )
+                                    )
+
+                                    .append(
+                                            Component.text(" [", m.read ? NamedTextColor.GRAY : NamedTextColor.YELLOW)
+                                                    .append(
+                                                            Component.translatable(m.read ? "mail.read" : "mail.unread")
+                                                                    .clickEvent(ClickEvent.runCommand("/mail mark_" + (m.read ? "un" : "") + "read " + index))
+                                                                    .hoverEvent(Component.translatable(!m.read ? "mail.read.hover" : "mail.unread.hover"))
+                                                    )
+                                                    .append(Component.text("] "))
+                                    )
+
+                                    .append(m.message)
+                                    .build();
+                        },
+
+                        // Header
+                        () -> {
+                            return Component.text()
+                                    .color(NamedTextColor.YELLOW)
+                                    .append(border)
+                                    .append(Component.space())
+                                    .append(
+                                            Component.translatable(
+                                                    "mail.header." + selfTranslationKey,
+                                                    query.getUser().nickDisplayName()
+                                                            .color(NamedTextColor.GOLD)
+                                            )
+                                    )
+                                    .append(Component.space())
+                                    .append(border)
+                                    .build();
+                        },
+
+                        // Footer
+                        (currentPage, lastPage, firstPage, maxPage) -> {
+                            Component nextPage = lastPage ? Component.space() : pageButton(currentPage + 1, '>', query);
+                            Component prevPage = firstPage ? Component.space() : pageButton(currentPage - 1, '<', query);
+
+                            return Component.text()
+                                    .append(border)
+                                    .append(prevPage)
+                                    .append(Component.text(currentPage + "/" + maxPage))
+                                    .append(nextPage)
+                                    .append(border)
+                                    .build();
+                        }
+                )
         );
+    }
+
+    private Component pageButton(int page, char pointer, MailQuery query) {
+        String cmdTxt = !query.isSelfQuery() ? "read_other " + query.getUser().getName() + " " + page : "" + page;
+
+        return Component.text(" " + pointer + " ", NamedTextColor.YELLOW, TextDecoration.BOLD)
+                .clickEvent(ClickEvent.runCommand("/mail " + cmdTxt))
+                .hoverEvent(Component.text("Click me :D"));
     }
 
     @Override

@@ -814,7 +814,7 @@ public class CommandFtcUser extends FtcCommand {
 
             @Override
             public String toString(SellAmount val) {
-                return val.text;
+                return val.getText();
             }
 
             @Override

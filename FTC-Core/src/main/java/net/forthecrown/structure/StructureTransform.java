@@ -1,36 +1,61 @@
 package net.forthecrown.structure;
 
 import net.forthecrown.utils.math.Vector3i;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public interface StructureTransform {
     StructureTransform DEFAULT = (start, offset, pivot, mirror, rotation) -> {
-        int i = offset.getX();
-        int j = offset.getY();
-        int k = offset.getZ();
+        int x = offset.getX();
+        int y = offset.getY();
+        int z = offset.getZ();
         boolean flag = true;
 
         switch (mirror) {
-            case LEFT_RIGHT -> k = -k;
-            case FRONT_BACK -> i = -i;
+            case Z_AXIS -> z = -z;
+            case X_AXIS -> x = -x;
             default -> flag = false;
         }
 
-        int l = pivot.getX();
-        int i1 = pivot.getZ();
+        int pivotX = pivot.getX();
+        int pivotZ = pivot.getZ();
 
         Vector3i pos = switch (rotation) {
-            case D_270 -> new Vector3i(l - i1 + k, j, l + i1 - i);
-            case D_90 -> new Vector3i(l + i1 - k, j, i1 - l + i);
-            case D_180 -> new Vector3i(l + l - i, j, i1 + i1 - k);
-            default -> flag ? new Vector3i(i, j, k) : offset;
+            case D_270 -> new Vector3i(pivotX - pivotZ + z, y, pivotX + pivotZ - x);
+            case D_90 -> new Vector3i(pivotX + pivotZ - z, y, pivotZ - pivotX + x);
+            case D_180 -> new Vector3i(pivotX + pivotX - x, y, pivotZ + pivotZ - z);
+            default -> flag ? new Vector3i(x, y, z) : offset;
         };
 
         return pos.add(start);
     };
 
     @NotNull Vector3i transform(Vector3i start, Vector3i offset, Vector3i pivot, PlaceMirror mirror, PlaceRotation rotation);
+
+    default @NotNull Vector3i transform(Vector3i start, Vector3i offset, PlaceRotation rotation) {
+        return transform(start, offset, Vector3i.ZERO, PlaceMirror.NONE, rotation);
+    }
+
+    default @NotNull Vector3i transform(Vector3i offset, PlaceRotation rotation) {
+        return transform(Vector3i.ZERO, offset, rotation);
+    }
+
+    default @NotNull BoundingBox transform(Vector3i start, Vector3i pivot, BoundingBox offset, PlaceRotation rotation) {
+        Vector3i min = new Vector3i(offset.minY(), offset.minY(), offset.minZ());
+        Vector3i max = new Vector3i(offset.maxX(), offset.maxY(), offset.maxZ());
+
+        min = transform(start, min, rotation);
+        max = transform(start, max, rotation);
+
+        min = min.getMinimum(max);
+        max = max.getMaximum(min);
+
+        return new BoundingBox(
+                min.getX(), min.getY(), min.getZ(),
+                max.getX(), max.getY(), max.getZ()
+        );
+    }
 
     default @NotNull Vec3 transformDecimal(Vector3i start, Vec3 offset, Vector3i pivot, PlaceMirror mirror, PlaceRotation rotation) {
         // Hacky af approach of preserving the decimal
@@ -56,9 +81,9 @@ public interface StructureTransform {
 
         // Re-add decimal places to block pos
         return decimalPlaces.add(
-                transformed.x,
-                transformed.y,
-                transformed.z
+                transformed.getX(),
+                transformed.getY(),
+                transformed.getZ()
         );
     }
 }

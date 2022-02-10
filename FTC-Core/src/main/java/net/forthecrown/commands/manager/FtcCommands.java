@@ -5,7 +5,6 @@ import net.forthecrown.commands.*;
 import net.forthecrown.commands.admin.*;
 import net.forthecrown.commands.arguments.*;
 import net.forthecrown.commands.click.CommandClickableText;
-import net.forthecrown.commands.clickevent.ClickEventCommand;
 import net.forthecrown.commands.economy.*;
 import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.help.*;
@@ -42,7 +41,6 @@ public final class FtcCommands {
         RoyalArguments.register(BaltopArgument.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, BaltopArgument.MAX)));
         RoyalArguments.register(ChatArgument.class, VanillaArgumentType.GREEDY_STRING);
         RoyalArguments.register(ComVarArgument.class, VanillaArgumentType.WORD);
-        RoyalArguments.register(PetArgument.class, VanillaArgumentType.WORD);
 
         RoyalArguments.register(RegistryArguments.class, key);
 
@@ -104,6 +102,8 @@ public final class FtcCommands {
         new CommandLaunch();
         new CommandAnimation();
         new CommandFtcStruct();
+        new CommandGetOffset();
+        new CommandItemStacks();
         CommandSpecificGameMode.init();
 
         //Policing commands
@@ -191,9 +191,6 @@ public final class FtcCommands {
         new CommandTell();
         new CommandReply();
 
-        //Click event command
-        new ClickEventCommand();
-
         //Marriage commands ¬_¬
         new CommandDivorce();
         new CommandMarriageAccept();
@@ -226,7 +223,7 @@ public final class FtcCommands {
         new CommandWhichRegion();
         new CommandRegionProperties();
 
-        //emote
+        //emote, other emotes are initialized by cosmetics in CosmeticEmotes.init()
         new EmotePog();
 
         HelpPageArgument.MAX = Math.round(((float) FtcCommands.BY_NAME.size())/10);

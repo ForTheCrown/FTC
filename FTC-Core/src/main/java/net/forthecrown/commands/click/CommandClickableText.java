@@ -6,7 +6,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandClickableText extends FtcCommand {
-    public static final String NAME = "clickable_test";
+    public static final String NAME = "clickable_text";
 
     public CommandClickableText() {
         super(NAME);

@@ -53,7 +53,7 @@ public class ItemSellOption implements CordedInventoryOption {
     }
 
     public static ItemStack makeItem(SoldMaterialData data, SellAmount sellAmount) {
-        ItemStackBuilder builder = new ItemStackBuilder(data.getMaterial(), sellAmount.getValue());
+        ItemStackBuilder builder = new ItemStackBuilder(data.getMaterial(), sellAmount.getItemAmount());
 
         addLore(data, sellAmount, builder, 1);
         return builder.build();

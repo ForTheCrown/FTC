@@ -219,7 +219,7 @@ public class WorldLoader {
             executor.shutdownNow();
             complete(world);
 
-            result.complete(null);
+            result.complete(world);
         }
 
         @Override

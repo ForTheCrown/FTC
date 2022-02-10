@@ -22,7 +22,7 @@ public interface CloseableRegistry<T> extends Registry<T> {
     T register(Key key, T value);
 
     @Override
-    void remove(Key key);
+    T remove(Key key);
 
     @Override
     void clear();

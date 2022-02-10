@@ -113,11 +113,11 @@ public final class FtcUtils {
     }
 
     public static boolean isClearAbove(Location location) {
-        return isClearAbove0(WorldVec3i.of(location));
+        return isClearAbove0(WorldVec3i.of(location).mutable());
     }
 
     public static boolean isClearAbove(WorldVec3i pos1) {
-        return isClearAbove0(pos1.clone());
+        return isClearAbove0(pos1.mutable());
     }
 
     private static boolean isClearAbove0(WorldVec3i pos) {
@@ -155,7 +155,7 @@ public final class FtcUtils {
         try {
             runnable.run();
         } catch (Throwable e){
-            e.printStackTrace();
+            Crown.logger().error("Error while running safeRunnable", e);
         }
     }
 

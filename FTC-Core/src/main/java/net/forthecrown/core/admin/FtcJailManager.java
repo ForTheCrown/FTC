@@ -64,8 +64,8 @@ public class FtcJailManager extends AbstractJsonSerializer implements JailManage
     }
 
     @Override
-    public void remove(Key key) {
-        jails.remove(key);
+    public Location remove(Key key) {
+        return jails.remove(key);
     }
 
     @Override

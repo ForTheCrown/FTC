@@ -4,6 +4,7 @@ import net.forthecrown.utils.math.Vector3i;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.util.function.Predicate;
 
@@ -74,6 +75,8 @@ public class StructureScanContext {
     }
 
     boolean filterEntity(Entity entity) {
+        if(entity instanceof Player) return true;
+
         return entityFilter == null || entityFilter.test(entity);
     }
 }

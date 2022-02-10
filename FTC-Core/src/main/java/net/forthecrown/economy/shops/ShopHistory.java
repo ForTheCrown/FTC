@@ -68,7 +68,7 @@ public class ShopHistory implements JsonSerializable, JsonDeserializable {
 
     /**
      * Creates a display of the shop's history
-     * @param page The page of history to show, range: [0 {@link ShopHistory#maxPage()}]
+     * @param page The page of history to show
      * @return The display of the shop's history for the given page
      */
     public Component display(int page) {
@@ -93,14 +93,14 @@ public class ShopHistory implements JsonSerializable, JsonDeserializable {
 
                 // Footer
                 (currentPage, lastPage, firstPage, maxPage) -> {
-                    Component nextPage = lastPage  ? Component.space() : createPageButton(page + 1, '>', "Next");
-                    Component prevPage = firstPage ? Component.space() : createPageButton(page - 1, '<', "Previous");
+                    Component nextPage = lastPage  ? Component.space() : createPageButton(currentPage + 1, '>', "Next");
+                    Component prevPage = firstPage ? Component.space() : createPageButton(currentPage - 1, '<', "Previous");
 
                     return Component.text()
                             .append(BORDER)
 
                             .append(prevPage)
-                            .append(Component.text((page + 1) + "/" + maxPage).color(NamedTextColor.YELLOW))
+                            .append(Component.text(currentPage + "/" + maxPage).color(NamedTextColor.YELLOW))
                             .append(nextPage)
 
                             .append(BORDER)

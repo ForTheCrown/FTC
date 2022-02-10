@@ -3,8 +3,6 @@ package net.forthecrown.utils;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.utils.math.WorldVec3i;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -71,31 +69,5 @@ public record LocationFileName(String world,
 
     public String toString(String suffix) {
         return this + suffix;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        LocationFileName name = (LocationFileName) o;
-
-        return new EqualsBuilder()
-                .append(x, name.x)
-                .append(y, name.y)
-                .append(z, name.z)
-                .append(world, name.world)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(world)
-                .append(x)
-                .append(y)
-                .append(z)
-                .toHashCode();
     }
 }

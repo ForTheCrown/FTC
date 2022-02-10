@@ -7,7 +7,6 @@ import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.commands.marriage.CommandMarry;
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcConfig;
@@ -25,16 +24,13 @@ import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
@@ -154,7 +150,7 @@ public class CommandFtcCore extends FtcCommand {
                 )
 
                 .then(CommandLore.compOrStringArg(literal("tablist_score"),
-                        (c, b) -> CompletionProvider.suggestMatching(b,"Deaths", " Crown Score"),
+                        (c, b) -> CompletionProvider.suggestMatching(b,"Deaths", "Crown Score"),
                         (c, field) -> {
                             getTabList().setScore(field);
                             getTabList().updateList();
@@ -275,30 +271,6 @@ public class CommandFtcCore extends FtcCommand {
                                         })
                                 )
                         )
-                )
-
-                .then(literal("marriagePriest")
-                        .executes(c -> {
-                            CrownUser user = getUserSender(c);
-                            Location location = user.getLocation();
-
-                            location.getWorld().spawn(location, Villager.class, villie -> {
-                                villie.setProfession(Villager.Profession.CLERIC);
-                                villie.setVillagerType(Villager.Type.PLAINS);
-                                villie.setVillagerLevel(5);
-
-                                villie.setInvulnerable(true);
-                                villie.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
-
-                                villie.customName(Component.text("Father Ted").color(NamedTextColor.AQUA));
-                                villie.setCustomNameVisible(true);
-
-                                villie.getPersistentDataContainer().set(CommandMarry.KEY, PersistentDataType.BYTE, (byte) 1);
-                            });
-
-                            c.getSource().sendAdmin(Component.text("Spawned marriage priest"));
-                            return 0;
-                        })
                 )
 
                 .then(saveReloadArgEffortless(true))

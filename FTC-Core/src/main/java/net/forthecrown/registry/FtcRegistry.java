@@ -11,7 +11,7 @@ public interface FtcRegistry<T, R> {
 
     T register(Key key, R value);
 
-    void remove(Key key);
+    T remove(Key key);
 
     Set<Key> keySet();
 

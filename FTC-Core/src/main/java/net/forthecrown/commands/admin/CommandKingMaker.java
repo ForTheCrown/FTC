@@ -160,6 +160,10 @@ public class CommandKingMaker extends FtcCommand {
         if(previous != null) {
             String addGroupCmd = "lp user " + previous.getName() + " parent remove " + ( kingship.isFemale() ? "queen" : "king" );
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), addGroupCmd);
+
+            if(previous.isOnline()) {
+                previous.updateTabName();
+            }
         }
 
         kingship.set(king.getUniqueId());
@@ -167,6 +171,10 @@ public class CommandKingMaker extends FtcCommand {
 
         String addGroupCmd = "lp user " + king.getName() + " parent add " + ( isQueen ? "queen" : "king" );
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), addGroupCmd);
+
+        if(king.isOnline()) {
+            king.updateTabName();
+        }
 
         c.getSource().sendAdmin(
                 king.displayName()

@@ -56,13 +56,13 @@ public abstract class FtcCommand extends AbstractCommand {
         return UserManager.getUser(c.getSource().asPlayer());
     }
 
-    private static Economy bals = Crown.getEconomy();
+    protected static Economy economy = Crown.getEconomy();
     public static SuggestionProvider<CommandSource> suggestMonies(){
         return (c, b) -> {
             if(!c.getSource().isPlayer()) return Suggestions.empty();
             UUID id = getPlayerSender(c).getUniqueId();
 
-            suggestIf(id, new BalSuggestion(bals.get(id), new LiteralMessage("Your entire balance")), b);
+            suggestIf(id, new BalSuggestion(economy.get(id), new LiteralMessage("Your entire balance")), b);
 
             suggestIf(id, 1, b);
             suggestIf(id, 10, b);
@@ -84,7 +84,7 @@ public abstract class FtcCommand extends AbstractCommand {
 
     private static void suggestIf(UUID id, BalSuggestion pair, SuggestionsBuilder builder){
         int amount = pair.money();
-        if(bals.has(id, amount) && (amount + "").toLowerCase().startsWith(builder.getRemaining().toLowerCase())) builder.suggest(amount, pair.message());
+        if(economy.has(id, amount) && (amount + "").toLowerCase().startsWith(builder.getRemaining().toLowerCase())) builder.suggest(amount, pair.message());
     }
 
     static record BalSuggestion(int money, Message message) {}

@@ -9,7 +9,6 @@ import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.core.goalbook.GoalBookImpl;
 import net.forthecrown.cosmetics.Cosmetics;
-import net.forthecrown.crownevents.ArmorStandLeaderboard;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
 import net.forthecrown.economy.ServerItemPriceMap;
@@ -20,6 +19,7 @@ import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.regions.FtcRegionManager;
 import net.forthecrown.structure.FtcStructureManager;
+import net.forthecrown.structure.tree.test.TestNodes;
 import net.forthecrown.useables.FtcUsablesManager;
 import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
@@ -92,6 +92,10 @@ public final class Main extends JavaPlugin implements Crown {
 
         saverLogic();
 
+        if(Crown.inDebugMode()) {
+            TestNodes.init();
+        }
+
         logger.info("FTC startup completed");
     }
 
@@ -124,7 +128,6 @@ public final class Main extends JavaPlugin implements Crown {
         Bukkit.getScheduler().cancelTasks(this);
 
         for (Player p: Bukkit.getOnlinePlayers()) p.closeInventory();
-        ArmorStandLeaderboard.destroyAll();
 
         //Give all the entities their names back
         MobHealthBar.NAMES.forEach(Nameable::customName);
@@ -145,9 +148,9 @@ public final class Main extends JavaPlugin implements Crown {
         boolean savePeriodically = config.getJson().getBool("save_periodically");
 
         if(savePeriodically) {
-            if(!saver.isScheduled()) saver.start();
+            saver.start();
         } else {
-            if(saver.isScheduled()) saver.cancel();
+            saver.cancel();
         }
     }
 

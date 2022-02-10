@@ -29,6 +29,7 @@
     "afkKickDelay": 7200000,
     "dataRetentionTime": 2678400000,
     "guildJoinTime": 1209600000,
+    "gb_donorTimeLength": 2419200000,
 
     "allowOtherPlayerNicks": false,
     "taxesEnabled": false,

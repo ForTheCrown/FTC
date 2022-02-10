@@ -37,8 +37,8 @@ public interface MarketDisplay {
      */
     static Component displayName(ShopEntrance e) {
         return Component.text()
-                .append(Component.text("sign={" + e.doorSign.x + ", " + e.doorSign.y + ", " + e.doorSign.z + "}, "))
-                .append(Component.text("notice={" + e.notice.x + ", " + e.notice.y + ", " + e.notice.z + "}, "))
+                .append(Component.text("sign={" + e.doorSign.getX() + ", " + e.doorSign.getY() + ", " + e.doorSign.getZ() + "}, "))
+                .append(Component.text("notice={" + e.notice.getX() + ", " + e.notice.getY() + ", " + e.notice.getZ() + "}, "))
                 .append(Component.text("direction=" + e.direction.name().toLowerCase()))
                 .build();
     }

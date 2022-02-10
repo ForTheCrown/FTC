@@ -16,6 +16,8 @@ import net.forthecrown.economy.houses.House;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.structure.BlockStructure;
+import net.forthecrown.structure.tree.StructureNodeType;
+import net.forthecrown.structure.tree.StructureType;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
 import org.bukkit.NamespacedKey;
@@ -31,7 +33,10 @@ public interface Registries {
 
     Registry<InteractableNPC>               NPCS                = create("npcs");
     Registry<BlockAnimation>                ANIMATIONS          = create("animations");
+
     Registry<BlockStructure>                STRUCTURES          = create("structures");
+    Registry<StructureType>                 STRUCTURE_TYPES     = createCloseable("structure_types");
+    Registry<StructureNodeType>             STRUCTURE_NODE_TYPES= createCloseable("structure_node_types");
 
     CloseableRegistry<VoteTopic>            VOTE_TOPICS         = createCloseable("vote_topics");
     CloseableRegistry<House>                HOUSES              = createCloseable("houses");

@@ -49,7 +49,7 @@ dependencies {
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT'
 
     //Grenadier, Squire, FAWE
-    libJar('Grenadier')
+    libJar('Grenadier-dev')
     libJar('Squire')
     libJar('FAWE')
     libJar('DiscordSRV')

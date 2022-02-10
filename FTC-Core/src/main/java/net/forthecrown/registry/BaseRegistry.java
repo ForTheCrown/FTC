@@ -38,8 +38,8 @@ public class BaseRegistry<V> implements Registry<V> {
     }
 
     @Override
-    public void remove(Key key) {
-        entries.remove(FtcUtils.ensureBukkit(key));
+    public V remove(Key key) {
+        return entries.remove(FtcUtils.ensureBukkit(key));
     }
 
     @Override
