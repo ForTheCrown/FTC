@@ -1,6 +1,7 @@
 package net.forthecrown.core;
 
 import com.google.gson.JsonElement;
+import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.Bukkit2NMS;
 import net.forthecrown.utils.FtcUtils;
@@ -46,8 +47,6 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
 
     public EndOpener() {
         super("end_opener");
-
-        Crown.getDayChange().addListener(this);
     }
 
     @Override
@@ -82,6 +81,8 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
      * Regenerates the end with a new seed and {@link EndOpener#getEndSize()} size.
      */
     public CompletableFuture<World> regen() {
+        StaffChat.send(Component.text("Starting End reset"), false);
+
         // Kick any players out of the end
         kickPlayers();
 

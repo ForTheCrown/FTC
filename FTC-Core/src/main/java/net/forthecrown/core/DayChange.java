@@ -53,7 +53,7 @@ public class DayChange {
         updateTask = Bukkit.getScheduler().runTaskTimer(Crown.inst(), this::changeDay, difference, TimeUtil.millisToTicks(TimeUtil.DAY_IN_MILLIS));
     }
 
-    public long getNextDayChange() {
+    public static long getNextDayChange() {
         // Configure calendar to be at the start of the next day
         // So we can run day update exactly on time. As always,
         // there's probably a better way of doing this, but IDK lol

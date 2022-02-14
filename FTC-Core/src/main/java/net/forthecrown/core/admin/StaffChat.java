@@ -1,5 +1,6 @@
 package net.forthecrown.core.admin;
 
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.UserManager;
@@ -76,7 +77,7 @@ public final class StaffChat {
 
         for (Player p : Bukkit.getOnlinePlayers()){
             if(ignoring.contains(p)) continue;
-            if(p.hasPermission("ftc.staffchat")) p.sendMessage(message);
+            if(p.hasPermission(Permissions.STAFF_CHAT)) p.sendMessage(message);
         }
 
         if(log) Bukkit.getConsoleSender().sendMessage(message);

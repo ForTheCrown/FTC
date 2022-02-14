@@ -124,7 +124,7 @@ public class WorldLoader {
                 lastLog = 0;
                 float progressPercent = (float) loaded / (float) chunkCount * 100;
 
-                LOGGER.info("[{}] Loading progress: is {} / {}, or {}%", world.getName(), loaded, chunkCount, String.format("%.2f", progressPercent));
+                LOGGER.info("[{}] Loading progress: {} / {}, or {}%", world.getName(), loaded, chunkCount, String.format("%.2f", progressPercent));
             }
         }
 
@@ -149,7 +149,7 @@ public class WorldLoader {
         private final LoadProgress progress;
 
         private final CraftWorld world;
-        private boolean cancelled;
+        private boolean stopped;
 
         public LoaderInstance(World world) {
             this.world = (CraftWorld) world;
@@ -215,8 +215,8 @@ public class WorldLoader {
                 if(!s.completed) return;
             }
 
+            onCancel();
             progress.onFinish();
-            executor.shutdownNow();
             complete(world);
 
             result.complete(world);
@@ -233,7 +233,7 @@ public class WorldLoader {
         }
 
         public void onCancel() {
-            this.cancelled = true;
+            this.stopped = true;
             executor.shutdownNow();
         }
     }
@@ -253,7 +253,7 @@ public class WorldLoader {
         public void run() {
             for (int x = 0; x < SECTION_SIZE; x++) {
                 for (int z = 0; z < SECTION_SIZE; z++) {
-                    if(loader.cancelled) return;
+                    if(loader.stopped) return;
                     ChunkPos p = new ChunkPos(start.x + x, start.z + z);
 
                     // In the case that we're loading a massive world

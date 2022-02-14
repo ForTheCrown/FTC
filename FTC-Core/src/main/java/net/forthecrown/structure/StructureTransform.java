@@ -82,7 +82,7 @@ public interface StructureTransform {
         // Re-add decimal places to block pos
         return decimalPlaces.add(
                 transformed.getX(),
-                start.getY() + offset.y(),
+                transformed.getY(),
                 transformed.getZ()
         );
     }

@@ -73,6 +73,10 @@ final class FtcBootStrap {
         config.addSection(rules);
         config.addSection(tabList);
 
+        // Register day change listeners
+        dayChange.addListener(resourceWorld);
+        dayChange.addListener(endOpener);
+
         // Only load here, cuz we've already read the JSON
         config.load();
 
