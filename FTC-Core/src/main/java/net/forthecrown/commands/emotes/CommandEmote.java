@@ -59,7 +59,7 @@ public abstract class CommandEmote extends FtcCommand {
                             if(!recipient.allowsEmotes()) throw FtcExceptionProvider.targetEmoteDisabled(recipient);
 
                             //If return value is more than or equal to 0, add to cooldown
-                            if(execute(sender, recipient) >= 0 && !sender.hasPermission(Permissions.EMOTE_IGNORE)){
+                            if(execute(sender, recipient) >= 0 && !sender.hasPermission(Permissions.EMOTE_IGNORE) && cooldownTime > 0){
                                 Cooldown.add(sender, cooldownCategory, cooldownTime);
                             }
 

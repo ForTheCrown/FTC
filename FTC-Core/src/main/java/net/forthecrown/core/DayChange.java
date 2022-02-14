@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 /**
- * DayUpdate listens to a change in the day, by using the
- * server's restart time to change day stuff.
+ * DayUpdate listens to a change in the day.
  */
 public class DayChange {
     private final List<DayChangeListener> listeners = new ArrayList<>();
@@ -28,8 +27,7 @@ public class DayChange {
             try {
                 r.onDayChange();
             } catch (Exception e){
-                Crown.logger().error("Could not update date of " + r.getClass().getSimpleName());
-                e.printStackTrace();
+                Crown.logger().error("Could not update date of " + r.getClass().getSimpleName(), e);
             }
         });
     }

@@ -48,10 +48,10 @@ public class CommandGetOffset extends FtcCommand {
                         throw FtcExceptionProvider.create("No WorldEdit selection found");
                     }
 
-                    BlockVector3 max = region.getMaximumPoint();
-                    BlockVector3 min = region.getMinimumPoint();
-                    BlockVector3 dif = max.subtract(min);
+                    BlockVector3 dif = region.getMaximumPoint().subtract(region.getMinimumPoint());
+                    BlockVector3 dimensions = region.getDimensions();
 
+                    player.sendMessage("dimensions: " + dimensions);
                     player.sendMessage("dif: " + dif);
                     player.sendMessage("distance: " + dif.length());
 

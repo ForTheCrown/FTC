@@ -110,6 +110,10 @@ public class RegistryArguments<T> implements ArgumentType<T> {
         );
     }
 
+    public Registry<T> getRegistry() {
+        return registry;
+    }
+
     @Override
     public T parse(StringReader reader) throws CommandSyntaxException {
         int cursor = reader.getCursor();

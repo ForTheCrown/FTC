@@ -1,11 +1,14 @@
 package net.forthecrown.structure.tree;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.forthecrown.core.Crown;
 import net.forthecrown.structure.PlaceRotation;
 import net.forthecrown.structure.StructureTransform;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.transformation.BoundingBoxes;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.StackLocatorUtil;
 import org.bukkit.World;
 
 import java.util.List;
@@ -80,8 +83,14 @@ public class NodePlaceContext {
         this.offset = offset;
     }
 
+    private static final Logger LOGGER = Crown.logger();
+
     public void addOffset(Vector3i offset) {
+        LOGGER.info("addOffset called, addition: {}, current: {}, caller: {}", offset, getOffset(), StackLocatorUtil.getCallerClass(2));
+
         setOffset(getOffset().add(offset));
+
+        LOGGER.info("new offset: {}", getOffset());
     }
 
     public int getDepth() {

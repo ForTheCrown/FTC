@@ -13,7 +13,7 @@ import org.bukkit.Sound;
 public class EmoteSmooch extends CommandEmote {
 
     public EmoteSmooch(){
-        super("mwah", 3*20, Component.translatable("emotes.smooch.cooldown"));
+        super("mwah", /*3*20*/ 0, Component.translatable("emotes.smooch.cooldown"));
 
         setAliases("smooch", "kiss");
         setDescription("Kisses another player.");

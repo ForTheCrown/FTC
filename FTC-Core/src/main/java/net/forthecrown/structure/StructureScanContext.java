@@ -75,7 +75,7 @@ public class StructureScanContext {
     }
 
     boolean filterEntity(Entity entity) {
-        if(entity instanceof Player) return true;
+        if(entity instanceof Player) return false;
 
         return entityFilter == null || entityFilter.test(entity);
     }

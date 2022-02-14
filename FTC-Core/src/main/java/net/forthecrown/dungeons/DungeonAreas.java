@@ -9,7 +9,8 @@ public interface DungeonAreas {
             ZHAMBIE_ROOM       = create(-174, 92, 171, -207, 76, 142),
             SKALATAN_ROOM      = create(-114, 80, 173, -91, 62, 195),
             SPIDEY_ROOM        = create(-64, 65, 296, -95, 52, 273),
-            DRAWNED_ROOM       = create(-139, 18, 23, -109, 46, 52);
+            DRAWNED_ROOM       = create(-139, 18, 23, -109, 46, 52),
+            IRONY_ROOM         = create(-296, 32, 26, -260, 48, 62);
 
     private static FtcBoundingBox create(int x, int y, int z, int x1, int y1, int z1) {
         return new FtcBoundingBox(Worlds.voidWorld(), x, y, z, x1, y1, z1);

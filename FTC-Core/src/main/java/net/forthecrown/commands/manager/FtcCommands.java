@@ -68,6 +68,7 @@ public final class FtcCommands {
         new CommandBroadcast();
         new CommandFtcCore();
         new CommandStaffChat();
+        new CommandResourceWorld();
         new CommandStaffChatToggle();
         new CommandHologram();
         new CommandComVar();
@@ -80,6 +81,7 @@ public final class FtcCommands {
         new CommandPlayerTime();
 
         //Admin utility
+
         new CommandEndOpener();
         new CommandFtcUser();
         new CommandSpeed();

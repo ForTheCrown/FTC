@@ -45,7 +45,7 @@ public class StructureTree<T extends StructureNode> {
     }
 
     public void place(NodePlaceContext context) {
-        start.generate(context);
+        start.generate(context, true);
     }
 
     public CompoundTag save() {
@@ -102,7 +102,7 @@ public class StructureTree<T extends StructureNode> {
             children.add(entry);
         }
 
-        public boolean generate(NodePlaceContext context) {
+        public boolean generate(NodePlaceContext context, boolean genChildren) {
             if(!parent.place(context, false)) {
                 // If we can't place
                 /*parent.getType()
@@ -111,16 +111,20 @@ public class StructureTree<T extends StructureNode> {
                         .createEmpty()
                         .place(context, true);*/
 
+                LOGGER.info("Couldn't place parent {}", parent.getType().key().asString());
                 return false;
             }
+
+            if(!genChildren) return true;
 
             ListIterator<Entry<T>> iterator = children.listIterator();
 
             while (iterator.hasNext()) {
                 Entry<T> e = iterator.next();
 
-                if (e.generate(context.copy())) continue;
+                if (e.generate(context.copy(), true)) continue;
 
+                LOGGER.info("Couldn't place child {}", e.parent.getType().key().asString());
                 iterator.remove();
                 T node = (T) parent.getType().getStructureType().getEndType().createEmpty();
                 node.place(context.copy(), false);

@@ -38,10 +38,10 @@
     "rw_to_haz_gate": "res_to_haz",
     "haz_to_rw_gate": "haz_to_res",
     "reset_end_message": {
-      "text": "Resource World reset has opened!"
+      "text": "The Resource World reset has finished!"
     },
     "reset_start_message": {
-      "text": "Resource World is now closed to regen, opening later!"
+      "text": "Resource World is now closed to reset, opening later!"
     }
   },
   "join_info": {

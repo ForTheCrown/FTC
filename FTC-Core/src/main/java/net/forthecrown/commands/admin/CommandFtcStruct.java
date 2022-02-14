@@ -141,7 +141,8 @@ public class CommandFtcStruct extends FtcCommand {
 
         Predicate<Block> blockFilter = block -> block.getType() != Material.STRUCTURE_VOID;
         if(filterGiven) {
-            blockFilter = blockFilter.and(c.getArgument("filter", ParsedBlock.class)::test);
+            ParsedBlock b = BlockArgument.getBlock(c, "filter");
+            blockFilter = blockFilter.and(block -> !b.test(block));
         }
 
         StructureScanContext context = new StructureScanContext(world, start, size)

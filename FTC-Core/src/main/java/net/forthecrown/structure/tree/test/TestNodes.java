@@ -15,6 +15,7 @@ import org.bukkit.World;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public final class TestNodes {
     private TestNodes() {}
@@ -36,6 +37,69 @@ public final class TestNodes {
         TestStructure.INSTANCE.types.add(FOUR_WAY);
 
         Crown.logger().info("TestNodes initialized");
+    }
+
+    public static StructureTree<TestNode> createDoubleHallway() {
+        StructureTree<TestNode> nodes = new StructureTree<>();
+        StructureTree.Entry<TestNode> parent = new StructureTree.Entry<>(HALLWAY.createEmpty());
+
+        TestNode node = HALLWAY.createEmpty();
+        HALLWAY.getConnectors().get(0).apply(node);
+
+        TestNode hallway2 = HALLWAY.createEmpty();
+        hallway2.setOffset(Vector3i.ZERO);
+        hallway2.setRotation(PlaceRotation.D_180);
+
+        parent.addChild(hallway2);
+        parent.addChild(node);
+
+        nodes.setStart(parent);
+
+        return nodes;
+    }
+
+    public static StructureTree<TestNode> createTestTree() {
+        StructureTree<TestNode> testTree = new StructureTree<>();
+        StructureTree.Entry<TestNode> parent = new StructureTree.Entry<>(THREE_WAY.createEmpty());
+        parent.getParent().setRotation(PlaceRotation.D_90);
+        addEnd(parent);
+
+        /*for (NodeConnector c: FOUR_WAY.getConnectors()) {
+            TestNode node = HALLWAY.createEmpty();
+            c.apply(node);
+
+            StructureTree.Entry<TestNode> entry = new StructureTree.Entry<>(node);
+            addEnd(entry);
+
+            parent.addChild(entry);
+        }
+
+        TestNode node = HALLWAY.createEmpty();
+        node.setRotation(PlaceRotation.D_180);
+        node.setOffset(new Vector3i(0, 0, 2));
+
+        StructureTree.Entry<TestNode> entry = new StructureTree.Entry<>(node);
+        addEnd(entry);
+
+        parent.addChild(entry);*/
+
+        testTree.setStart(parent);
+        return testTree;
+    }
+
+    private static void addEnd(StructureTree.Entry<TestNode> entry) {
+        TestNode node = entry.getParent();
+        List<NodeConnector> connectors = node.getType().getConnectors();
+
+        for (NodeConnector c: connectors) {
+            TestNode n = END.createEmpty();
+            PlaceRotation rotation = node.getRotation().add(c.rotation());
+
+            n.setOffset(c.offset(rotation));
+            n.setRotation(rotation);
+
+            entry.addChild(n);
+        }
     }
 
     public static void generateAndPlace(World world, Vector3i destination) {
@@ -91,7 +155,7 @@ public final class TestNodes {
     public static class TestHallwayType extends TestNodeType<TestNodeImpl> {
         public TestHallwayType() {
             super("test_hallway",
-                    new NodeConnector(new Vector3i(21, 0, 0), PlaceRotation.D_0)
+                    new NodeConnector(new Vector3i(22, 0, 0), PlaceRotation.D_0)
             );
         }
 
@@ -112,7 +176,7 @@ public final class TestNodes {
 
         @Override
         public Vector3i createPivot() {
-            return new Vector3i(10, 0, 5);
+            return new Vector3i(10, 0, 6);
         }
     }
     public static class TestEndType extends TestNodeType<TestNodeImpl> {
@@ -137,14 +201,14 @@ public final class TestNodes {
 
         @Override
         public Vector3i createPivot() {
-            return new Vector3i(5, 0, 5);
+            return new Vector3i(6, 0, 6);
         }
     }
     public static class Test3WayType extends TestNodeType<TestNodeImpl> {
         public Test3WayType() {
             super("3_way_type",
-                    new NodeConnector(new Vector3i(13, 0, 16), PlaceRotation.D_90),
-                    new NodeConnector(new Vector3i(3, 0, 0), PlaceRotation.D_270)
+                    new NodeConnector(new Vector3i(13, 0, 17), PlaceRotation.D_90),
+                    new NodeConnector(new Vector3i(3, 0, -1), PlaceRotation.D_270)
             );
         }
 
@@ -160,21 +224,21 @@ public final class TestNodes {
 
         @Override
         public Vector3i getEntrancePos() {
-            return new Vector3i(0, 0, 4);
+            return new Vector3i(0, 0, 5);
         }
 
         @Override
         public Vector3i createPivot() {
-            return new Vector3i(8, 0, 9);
+            return new Vector3i(9, 0, 10);
         }
     }
 
     public static class Test4WayType extends TestNodeType<TestNodeImpl> {
         public Test4WayType() {
             super("test_4_way_type",
-                    new NodeConnector(new Vector3i(12, 0, 17), PlaceRotation.D_90),
-                    new NodeConnector(new Vector3i(14, 0, 2), PlaceRotation.D_0),
-                    new NodeConnector(new Vector3i(2, 0, 0), PlaceRotation.D_270)
+                    new NodeConnector(new Vector3i(12, 0, 18), PlaceRotation.D_90),
+                    new NodeConnector(new Vector3i(15, 0, 2), PlaceRotation.D_0),
+                    new NodeConnector(new Vector3i(2, 0, -1), PlaceRotation.D_270)
             );
         }
 
@@ -190,12 +254,12 @@ public final class TestNodes {
 
         @Override
         public Vector3i getEntrancePos() {
-            return new Vector3i(0, 0, 2);
+            return new Vector3i(0, 0, 3);
         }
 
         @Override
         public Vector3i createPivot() {
-            return new Vector3i(7, 0, 7);
+            return new Vector3i(8, 0, 8);
         }
     }
 }

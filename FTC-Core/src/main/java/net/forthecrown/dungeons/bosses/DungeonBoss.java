@@ -57,22 +57,20 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
     protected final ImmutableList<ItemStack> requiredToSpawn;
     protected final Key key;
     protected final BossItems items;
-
+    private final short tickInterval;
     protected T bossEntity;
     protected BossBar bossBar;
     protected BukkitTask tickTask;
-
-    private boolean alive;
-    private final short updaterDelay;
     protected BossFightContext context;
+    private boolean alive;
 
-    protected DungeonBoss(String name, Location spawnLocation, short updaterDelay, FtcBoundingBox bossRoom, Collection<ItemStack> requiredItems){
+    protected DungeonBoss(String name, Location spawnLocation, short tickInterval, FtcBoundingBox bossRoom, Collection<ItemStack> requiredItems) {
         this.name = name;
         this.spawnLocation = spawnLocation;
         this.bossRoom = bossRoom;
         this.items = BossItems.valueOf(name.toUpperCase().replaceAll(" ", "_"));
         this.requiredToSpawn = ImmutableList.copyOf(requiredItems);
-        this.updaterDelay = updaterDelay;
+        this.tickInterval = tickInterval;
 
         key = Keys.forthecrown(name.toLowerCase().replaceAll(" ", "_"));
     }
@@ -83,9 +81,9 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
 
     public void onHit(EntityDamageEvent event) {}
 
-    public void summon(){
+    public void summon() {
         //Only 1 boss can exist and a time
-        if(isAlive()) return;
+        if (isAlive()) return;
         //Register events and start updater loop
         Bukkit.getPluginManager().registerEvents(this, Crown.inst());
         tickTask = startUpdater();
@@ -100,13 +98,13 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         alive = true;
     }
 
-    public void kill(){
+    public void kill() {
         kill(false);
     }
 
-    public void kill(boolean server){
+    public void kill(boolean server) {
         //Just to prevent exceptions
-        if(!isAlive()) return;
+        if (!isAlive()) return;
         //Unregister events and stop updater loop
         HandlerList.unregisterAll(this);
 
@@ -124,7 +122,7 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         bossEntity.getWorld().createExplosion(bossEntity.getLocation().add(0, 1, 0), 2.0f, false, false, bossEntity);
         bossEntity.getWorld().playSound(bossEntity.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1.0f, 1.0f);
 
-        if(!server) {
+        if (!server) {
             onDeath(context);
             finalizeKill(context);
         }
@@ -135,39 +133,41 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         context = null;
     }
 
-    public void createBossbar(BossFightContext context){
+    public void createBossbar(BossFightContext context) {
         bossBar = Bukkit.createBossBar(bossEntity.getCustomName(), BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC, BarFlag.DARKEN_SKY, BarFlag.CREATE_FOG); //<- Should play some epic orchestral music lol
         bossBar.setProgress(1.0);
         bossBar.setVisible(true);
 
-        for (Player p: context.getPlayers()){
+        for (Player p : context.getPlayers()) {
             bossBar.addPlayer(p);
         }
     }
 
-    private BukkitTask startUpdater(){
+    private BukkitTask startUpdater() {
         return Bukkit.getScheduler().runTaskTimer(Crown.inst(), () -> {
             Player target = DungeonUtils.getOptimalTarget(bossEntity, getBossRoom());
 
             // Change target only if found target is not already target
-            if(target != null && (bossEntity.getTarget() == null || !bossEntity.getTarget().equals(target))) {
+            if (target != null && (bossEntity.getTarget() == null || !bossEntity.getTarget().equals(target))) {
                 bossEntity.setTarget(target);
             }
 
             // Do not allow boss entity to leave room
-            if(!getBossRoom().contains(bossEntity)) {
+            if (!getBossRoom().contains(bossEntity)) {
                 bossEntity.teleport(getSpawnLocation());
             }
 
             onUpdate();
-        }, updaterDelay, updaterDelay);
+        }, tickInterval, tickInterval);
     }
 
-    private void updateBossbar(){
+    private void updateBossbar() {
         bossBar.setProgress(bossEntity.getHealth() / (bossEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
     }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
     public boolean isAlive() {
         return alive;
@@ -202,10 +202,10 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         return spawnLocation.clone();
     }
 
-    private void finalizeKill(@NotNull BossFightContext context){
-        for (Player p: context.getPlayers()){
-            if(!getBossRoom().contains(p)) continue;
-            if(Crown.getUserManager().isAltForAny(p.getUniqueId(), context.getPlayers())) continue;
+    private void finalizeKill(@NotNull BossFightContext context) {
+        for (Player p : context.getPlayers()) {
+            if (!getBossRoom().contains(p)) continue;
+            if (Crown.getUserManager().isAltForAny(p.getUniqueId(), context.getPlayers())) continue;
 
             CrownUser user = UserManager.getUser(p);
             UserDataContainer container = user.getDataContainer();
@@ -213,14 +213,17 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
 
             awardAdvancement(p);
 
-            if(p.getInventory().firstEmpty() == -1) bossEntity.getWorld().dropItemNaturally(bossEntity.getLocation(), items.item());
-            else p.getInventory().addItem(items.item());
+            if (p.getInventory().firstEmpty() == -1) {
+                bossEntity.getWorld().dropItemNaturally(bossEntity.getLocation(), items.item());
+            } else {
+                p.getInventory().addItem(items.item());
+            }
         }
     }
 
     private void awardAdvancement(Player player) {
         Advancement advancement = Bukkit.getAdvancement(advancementKey());
-        if(advancement == null) {
+        if (advancement == null) {
             Crown.logger().warn(key() + " has no advancement");
             return;
         }
@@ -234,21 +237,21 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
-        if(!event.getEntity().equals(bossEntity)) return;
+        if (!event.getEntity().equals(bossEntity)) return;
         onHit(event);
         updateBossbar();
     }
 
     @EventHandler
     public void onBossDeath(EntityDeathEvent event) {
-        if(!event.getEntity().equals(bossEntity)) return;
+        if (!event.getEntity().equals(bossEntity)) return;
         kill();
     }
 
-    public void attemptSpawn(Player player){
+    public void attemptSpawn(Player player) {
         Validate.notNull(player, "Player is null");
 
-        if(isAlive()){
+        if (isAlive()) {
             player.sendMessage(Component.translatable("dungeons.alreadySpawned").color(NamedTextColor.GRAY));
             return;
         }
@@ -256,10 +259,10 @@ public abstract class DungeonBoss<T extends Mob> implements Listener, Keyed, Jso
         Collection<ItemStack> items = getSpawningItems();
         PlayerInventory inv = player.getInventory();
 
-        for (ItemStack it: items){
+        for (ItemStack it : items) {
             ItemStack i = it.clone();
 
-            if(!inv.containsAtLeast(i, i.getAmount())){
+            if (!inv.containsAtLeast(i, i.getAmount())) {
                 player.sendMessage(Component.translatable("dungeons.notEnoughItems").color(NamedTextColor.GRAY));
                 player.sendMessage(DungeonUtils.itemRequiredMessage(this));
                 return;

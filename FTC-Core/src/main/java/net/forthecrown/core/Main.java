@@ -119,6 +119,8 @@ public final class Main extends JavaPlugin implements Crown {
 
         RoyalCommandException.ENABLE_HOVER_STACK_TRACE = Crown.inDebugMode();
         FtcBootStrap.loadBootStrap();
+
+        logger.info("onLoad finished");
     }
 
     @Override

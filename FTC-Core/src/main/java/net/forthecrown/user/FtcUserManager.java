@@ -184,6 +184,8 @@ public final class FtcUserManager extends AbstractJsonSerializer implements User
 
         while (iterator.hasNext()) {
             FtcUser u = iterator.next().getValue();
+            u.save();
+
             if(!u.isOnline()) iterator.remove();
         }
     }

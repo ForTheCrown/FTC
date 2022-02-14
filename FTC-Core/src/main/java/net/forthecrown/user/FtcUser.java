@@ -679,8 +679,6 @@ public class FtcUser implements CrownUser {
             return true;
         }
 
-        if(isKing()) currentPrefix = Crown.getKingship().getPrefix();
-
         sendPlayerListHeader(Crown.getTabList().format());
 
         ip = getPlayer().getAddress().getHostString();

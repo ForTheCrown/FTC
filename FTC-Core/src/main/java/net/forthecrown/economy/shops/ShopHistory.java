@@ -141,6 +141,7 @@ public class ShopHistory implements JsonSerializable, JsonDeserializable {
             HistoryEntry entry = HistoryEntry.of(e);
 
             if(isTooOld(entry)) continue;
+            if(entry.amount() < 1) continue;
 
             entries.add(entry);
         }
@@ -154,6 +155,7 @@ public class ShopHistory implements JsonSerializable, JsonDeserializable {
 
         for (HistoryEntry e: entries) {
             if(isTooOld(e)) continue;
+            if(e.amount() < 1) continue;
 
             array.add(e.serialize());
         }

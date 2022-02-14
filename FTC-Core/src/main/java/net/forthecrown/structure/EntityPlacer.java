@@ -23,8 +23,9 @@ public interface EntityPlacer {
             @Override
             public void place(CompoundTag tag, double x, double y, double z) {
                 Entity entity = EntityType.create(tag, level).orElseThrow(() -> new IllegalArgumentException("Attempted to place unknown entity type in NBT"));
-                entity.setPos(x, y, z);
                 level.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+                entity.moveTo(x, y, z);
             }
         };
     }

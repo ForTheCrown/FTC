@@ -3,10 +3,12 @@ package net.forthecrown.utils.world;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.TimePrinter;
+import net.forthecrown.utils.Bukkit2NMS;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.ChunkPos;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
@@ -29,7 +31,7 @@ public class WorldLoader {
 
     private static final int
             SECTION_SIZE        = 50, // Size of a single load section, in chunks
-            MAX_LOADING_CHUNKS  = 25; // The max chunks we can be loading at any time
+            MAX_LOADING_CHUNKS  = 20; // The max chunks we can be loading at any time
 
     private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool(r -> {
         Thread t = new Thread(r);
@@ -160,8 +162,6 @@ public class WorldLoader {
             int chunkSize = SectionPos.blockToSectionCoord((int) (border.getSize() / 2));
             this.progress = new LoadProgress(world, (chunkSize * 2) * (chunkSize * 2));
 
-            Validate.isTrue(chunkSize >= SECTION_SIZE, "Chunk size cannot be less than " + SECTION_SIZE);
-
             // Offset position to correct for negative cords
             ChunkPos start = new ChunkPos(-chunkSize, -chunkSize);
 
@@ -262,7 +262,7 @@ public class WorldLoader {
                     // ensure we're not loading too many chunks at once
                     loader.semaphore.acquireUninterruptibly();
 
-                    loader.world.getChunkAtAsync(p.x, p.z)
+                    loader.world.getChunkAtAsync(p.x, p.z, true, false)
                                     .whenComplete((chunk, throwable) -> {
                                         if(throwable != null) {
                                             LOGGER.error("Error while loading chunk", throwable);
@@ -276,7 +276,9 @@ public class WorldLoader {
                                         }
 
                                         // Unload the chunk to make sure it doesn't stay in RAM
-                                        chunk.unload(true);
+                                        if(!Bukkit.isPrimaryThread()) {
+                                            Bukkit2NMS.getServer().execute(() -> chunk.unload(true));
+                                        }
 
                                         //Update progress tracker and release the semaphore permit
                                         loader.progress.onChunkLoaded();

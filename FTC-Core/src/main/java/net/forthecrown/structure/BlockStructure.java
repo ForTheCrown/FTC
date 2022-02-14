@@ -29,7 +29,7 @@ import java.util.Map;
  * A structure of blocks that can be placed within a world
  */
 public class BlockStructure implements NbtSerializable, Keyed {
-    public static String
+    public static final String
             PALETTE_TAG = "palettes",
             ENTITY_TAG = "entities",
             HEADER_TAG = "header";
@@ -76,9 +76,9 @@ public class BlockStructure implements NbtSerializable, Keyed {
 
                 Location l = e.getLocation();
                 Vec3 offset = new Vec3(
-                        l.getX() - start.getX(),
-                        l.getY() - start.getY(),
-                        l.getZ() - start.getZ()
+                        l.getX() - (double) start.getX(),
+                        l.getY() - (double) start.getY(),
+                        l.getZ() - (double) start.getZ()
                 );
 
                 net.minecraft.world.entity.Entity entity = Bukkit2NMS.getEntity(e);

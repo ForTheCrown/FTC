@@ -43,7 +43,8 @@ public final class FtcUtils {
     //The max and min Y level constants
     public static final int
             MAX_Y   = 312,
-            MIN_Y   = -64;
+            MIN_Y   = -64,
+            Y_SIZE  = MAX_Y - MIN_Y;
 
     public static final CrownRandom RANDOM = new CrownRandom();
 

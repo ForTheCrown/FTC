@@ -121,7 +121,11 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
         if(session.getOnSessionExpire() != null) session.getOnSessionExpire().run();
 
         // Record session in history
-        session.getShop().getHistory().addEntry(session);
+        // Amount will be 0 for sessions that didn't pass the
+        // interaction test
+        if(session.getAmount() > 0) {
+            session.getShop().getHistory().addEntry(session);
+        }
 
         //Log interaction data if needed
         if(session.getType().isAdmin()) {

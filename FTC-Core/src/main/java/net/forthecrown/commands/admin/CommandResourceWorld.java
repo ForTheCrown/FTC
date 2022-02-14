@@ -10,12 +10,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.Keys;
-import net.forthecrown.core.Permissions;
-import net.forthecrown.core.ResourceWorld;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
+import net.forthecrown.core.*;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -23,6 +24,7 @@ import net.forthecrown.registry.Registries;
 import net.kyori.adventure.text.Component;
 import net.minecraft.world.level.Level;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.mcteam.ancientgates.Gate;
 
 import java.util.concurrent.CompletableFuture;
@@ -69,6 +71,7 @@ public class CommandResourceWorld extends FtcCommand {
                 .then(accessor(RwAccessor.RESET_START_MESSAGE))
                 .then(accessor(RwAccessor.TO_HAZ_GATE))
                 .then(accessor(RwAccessor.TO_RES_GATE))
+                .then(accessor(RwAccessor.WG_REGION_NAME))
                 .then(accessor(RwAccessor.SIZE))
                 .then(accessor(RwAccessor.SPAWN_STRUCTURE));
     }
@@ -87,6 +90,8 @@ public class CommandResourceWorld extends FtcCommand {
                 })
 
                 .then(argument("val", acc.getArgumentType())
+                        .suggests(acc)
+
                         .executes(c -> {
                             T val = c.getArgument("val", acc.getTypeClass());
                             ResourceWorld rw = rw();
@@ -103,10 +108,47 @@ public class CommandResourceWorld extends FtcCommand {
     }
 
     private ResourceWorld rw() {
-        return null;
+        return Crown.getResourceWorld();
     }
 
     private interface RwAccessor<T> extends SuggestionProvider<CommandSource> {
+        RwAccessor<String> WG_REGION_NAME = new RwAccessor<>() {
+            @Override
+            public Component display(ResourceWorld world) {
+                return Component.text(world.getWorldGuardSpawn());
+            }
+
+            @Override
+            public void set(String val, ResourceWorld world) throws CommandSyntaxException {
+                world.setWorldGuardSpawn(val);
+            }
+
+            @Override
+            public ArgumentType<String> getArgumentType() {
+                return StringArgumentType.word();
+            }
+
+            @Override
+            public String getName() {
+                return "world_guard_spawn";
+            }
+
+            @Override
+            public Class<String> getTypeClass() {
+                return String.class;
+            }
+
+            @Override
+            public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+                World world = Worlds.resource();
+
+                return CompletionProvider.suggestMatching(builder,
+                        WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world))
+                                .getRegions().keySet()
+                );
+            }
+        };
+
         RwAccessor<Component> RESET_START_MESSAGE = new RwComponentAccessor() {
             @Override
             public Component display(ResourceWorld world) {
@@ -206,6 +248,11 @@ public class CommandResourceWorld extends FtcCommand {
             public Class<NamespacedKey> getTypeClass() {
                 return NamespacedKey.class;
             }
+
+            @Override
+            public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+                return FtcSuggestionProvider.suggestRegistry(builder, Registries.STRUCTURES);
+            }
         };
 
         RwAccessor<Boolean> ENABLED = new RwAccessor<Boolean>() {
@@ -259,6 +306,11 @@ public class CommandResourceWorld extends FtcCommand {
             @Override
             public Class<Integer> getTypeClass() {
                 return Integer.class;
+            }
+
+            @Override
+            public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+                return CompletionProvider.suggestMatching(builder, "1600", "2000", "3000", "4000");
             }
         };
 

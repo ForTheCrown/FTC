@@ -63,6 +63,7 @@ public interface Crown extends Plugin, Namespaced {
     static TradeGuild           getGuild()              { return Main.guild; }
     static ServerRules          getRules()              { return Main.rules; }
     static EndOpener            getEndOpener()          { return Main.endOpener; }
+    static ResourceWorld        getResourceWorld()      { return Main.resourceWorld; }
 
     static FtcConfig            config()                { return Main.config; }
     static Logger               logger()                { return Main.logger; }

@@ -138,6 +138,22 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
         );
     }
 
+    public T shiftLeft(int amount) {
+        return set(
+                getX() << amount,
+                getY() << amount,
+                getZ() << amount
+        );
+    }
+
+    public T shiftRight(int amount) {
+        return set(
+                getX() >> amount,
+                getY() >> amount,
+                getZ() >> amount
+        );
+    }
+
     @Override
     public T clone() {
         return cloneAt(getX(), getY(), getZ(), immutable);
@@ -188,6 +204,10 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
         );
     }
 
+    public T invert() {
+        return set(-getX(), -getY(), -getZ());
+    }
+
     public Tag saveAsTag() {
         int[] cords = {x, y, z};
         return new IntArrayTag(cords);
@@ -223,6 +243,6 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
 
     @Override
     public String toString() {
-        return "[" + getX() + ", " + getY() + ", " + getZ() + "]";
+        return "(" + getX() + ", " + getY() + ", " + getZ() + ")";
     }
 }

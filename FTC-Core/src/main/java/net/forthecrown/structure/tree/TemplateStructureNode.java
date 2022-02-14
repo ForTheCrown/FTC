@@ -1,10 +1,8 @@
 package net.forthecrown.structure.tree;
 
 import net.forthecrown.registry.Registries;
-import net.forthecrown.structure.BlockPlacer;
-import net.forthecrown.structure.BlockStructure;
-import net.forthecrown.structure.BlockTransformProcessor;
-import net.forthecrown.structure.StructurePlaceContext;
+import net.forthecrown.structure.*;
+import net.forthecrown.utils.math.Vector3i;
 import net.minecraft.nbt.CompoundTag;
 
 public abstract class TemplateStructureNode extends StructureNode {
@@ -22,12 +20,19 @@ public abstract class TemplateStructureNode extends StructureNode {
 
     @Override
     public boolean onPlace(NodePlaceContext context) {
+        Vector3i add = Vector3i.ZERO;
+        if(rotation == PlaceRotation.D_180) {
+            add = new Vector3i(-1, 0, getStructure().getSize().getZ() - 1);
+        }
+
+        context.addOffset(add);
+
         StructurePlaceContext structContext = new StructurePlaceContext(
                 structure,
                 context.getEffectivePlacePos(),
                 BlockPlacer.world(context.getWorld())
         )
-                .setPivot(getType().createPivot())
+                //.setPivot(getType().createPivot())
                 .placeEntities(true)
                 .setRotation(rotation)
                 .addEmptyEntityProcessor()

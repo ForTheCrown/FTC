@@ -2,6 +2,7 @@ package net.forthecrown.commands.admin;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
@@ -17,6 +18,11 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
+import net.forthecrown.structure.PlaceRotation;
+import net.forthecrown.structure.StructureTransform;
+import net.forthecrown.structure.tree.NodePlaceContext;
+import net.forthecrown.structure.tree.StructureTree;
+import net.forthecrown.structure.tree.test.TestNode;
 import net.forthecrown.structure.tree.test.TestNodes;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.CrownRandom;
@@ -35,6 +41,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.awt.Color;
+import java.util.List;
 import java.util.UUID;
 
 public class CommandTestCore extends FtcCommand {
@@ -62,6 +69,10 @@ public class CommandTestCore extends FtcCommand {
         return sender.asBukkit().isOp() && testPermissionSilent(sender.asBukkit());
     }
 
+    public static final Vector3i PLACE_POS = new Vector3i(200, 24, -587);
+    private static final List<StructureTree.Entry<TestNode>> entries = new ObjectArrayList<>();
+    private static int index;
+
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
@@ -73,6 +84,34 @@ public class CommandTestCore extends FtcCommand {
             user.sendMessage(gradient);
             return 0;
         })
+                .then(literal("hardcoded_node_step")
+                        .executes(c -> {
+                            CrownUser user = getUserSender(c);
+                            NodePlaceContext context = new NodePlaceContext(user.getWorld(), StructureTransform.DEFAULT, PLACE_POS, PlaceRotation.D_0);
+
+                            if(entries.isEmpty()) {
+                                StructureTree<TestNode> tree = TestNodes.createTestTree();
+
+                                entries.add(tree.getStart());
+                                tree.forEachEntry(entries::add);
+
+                                index = 0;
+                            }
+
+                            StructureTree.Entry<TestNode> n = entries.get(index);
+                            n.generate(context, false);
+
+                            index++;
+
+                            if (index <= 0 || index >= entries.size()) {
+                                index = 0;
+                            }
+
+                            c.getSource().sendAdmin("Attempted to take structure placement step");
+                            return 0;
+                        })
+                )
+
                 .then(literal("test_struct_nodes")
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
