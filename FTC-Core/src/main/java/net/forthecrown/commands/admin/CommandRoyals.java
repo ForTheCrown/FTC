@@ -11,7 +11,7 @@ import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.DungeonUtils;
-import net.forthecrown.dungeons.bosses.DungeonBoss;
+import net.forthecrown.dungeons.boss.DungeonBoss;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
@@ -150,16 +150,16 @@ public class CommandRoyals extends FtcCommand {
                         .then(argument(bossArg, RegistryArguments.dungeonBoss())
                                 .then(literal("spawn")
                                         .executes(c -> {
-                                            DungeonBoss<?> boss = c.getArgument(bossArg, DungeonBoss.class);
+                                            DungeonBoss boss = c.getArgument(bossArg, DungeonBoss.class);
 
-                                            boss.summon();
+                                            boss.spawn();
                                             c.getSource().sendAdmin( "Spawning boss");
                                             return 0;
                                         })
                                 )
                                 .then(literal("kill")
                                         .executes(c -> {
-                                            DungeonBoss<?> boss = c.getArgument(bossArg, DungeonBoss.class);
+                                            DungeonBoss boss = c.getArgument(bossArg, DungeonBoss.class);
                                             if(!boss.isAlive()) throw FtcExceptionProvider.create("Boss isn't alive");
 
                                             boss.kill(false);
@@ -170,7 +170,7 @@ public class CommandRoyals extends FtcCommand {
                                 .then(literal("giveitems")
                                         .executes(c -> {
                                             Player player = getPlayerSender(c);
-                                            DungeonBoss<?> boss = c.getArgument(bossArg, DungeonBoss.class);
+                                            DungeonBoss boss = c.getArgument(bossArg, DungeonBoss.class);
 
                                             for (ItemStack i: boss.getSpawningItems()){
                                                 try {
@@ -185,7 +185,7 @@ public class CommandRoyals extends FtcCommand {
                                 .then(literal("attemptSpawn")
                                         .executes(c -> {
                                             Player player = getPlayerSender(c);
-                                            DungeonBoss<?> boss = c.getArgument(bossArg, DungeonBoss.class);
+                                            DungeonBoss boss = c.getArgument(bossArg, DungeonBoss.class);
 
                                             boss.attemptSpawn(player);
                                             c.getSource().sendAdmin( "Attempting boss spawn");

@@ -8,7 +8,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
-import net.forthecrown.dungeons.bosses.DungeonBoss;
+import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.squire.Squire;
@@ -52,13 +52,13 @@ public class ActionSpawnBoss implements UsageAction<ActionSpawnBoss.ActionInstan
     }
 
     public static class ActionInstance implements UsageActionInstance {
-        private final DungeonBoss<?> boss;
+        private final KeyedBoss boss;
 
-        public ActionInstance(DungeonBoss<?> boss) {
+        public ActionInstance(KeyedBoss boss) {
             this.boss = boss;
         }
 
-        public DungeonBoss<?> getBoss() {
+        public KeyedBoss getBoss() {
             return boss;
         }
 

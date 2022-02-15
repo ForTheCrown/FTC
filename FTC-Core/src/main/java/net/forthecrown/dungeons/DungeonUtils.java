@@ -1,13 +1,10 @@
 package net.forthecrown.dungeons;
 
-import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.dungeons.bosses.DungeonBoss;
-import net.forthecrown.squire.Squire;
 import net.forthecrown.inventory.ItemStackBuilder;
+import net.forthecrown.squire.Squire;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
@@ -15,10 +12,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Husk;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
@@ -38,23 +38,6 @@ public final class DungeonUtils {
                 .setName(name)
                 .addLore(DUNGEON_LORE)
                 .build();
-    }
-
-    public static TextComponent itemRequiredMessage(DungeonBoss<?> boss){
-        TextComponent.Builder text = Component.text()
-                .color(NamedTextColor.AQUA)
-                .append(Component.translatable("dungeons.neededItems"));
-
-        for (ItemStack i: boss.getSpawningItems()){
-            text.append(Component.newline())
-                    .append(
-                            Component.text()
-                                    .hoverEvent(i.asHoverEvent())
-                                    .append(Component.text("- " + i.getAmount() + " "))
-                                    .append(FtcFormatter.itemDisplayName(i).color(NamedTextColor.DARK_AQUA))
-                    );
-        }
-        return text.build();
     }
 
     public static @Nullable Player getNearestVisiblePlayer(LivingEntity origin, FtcBoundingBox inBox){
@@ -109,5 +92,21 @@ public final class DungeonUtils {
             zomzom.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
             zomzom.getPersistentDataContainer().set(PUNCHING_BAG_KEY, PersistentDataType.BYTE, (byte) 1);
         });
+    }
+
+    public static void giveOrDropItem(Inventory inv, Location loc, ItemStack item) {
+        if(inv.firstEmpty() == -1) {
+            loc.getWorld().dropItem(loc, item);
+        } else {
+            inv.addItem(item);
+        }
+    }
+
+    // getModifiers().clear() doesn't work because the returned list of
+    // getModifiers() is a copied collection
+    public static void clearModifiers(AttributeInstance instance) {
+        for (AttributeModifier m: instance.getModifiers()) {
+            instance.removeModifier(m);
+        }
     }
 }

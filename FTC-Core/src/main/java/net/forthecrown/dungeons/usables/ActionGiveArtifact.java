@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.forthecrown.dungeons.bosses.Drawned;
+import net.forthecrown.dungeons.boss.DrawnedBoss;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.squire.Squire;
@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class ActionGiveArtifact implements UsageAction<ActionGiveArtifact.ActionInstance> {
     public static final Key KEY = Squire.createRoyalKey("give_artifact");
-    public static final EnumArgument<Drawned.Artifacts> ARTIFACTS_PARSER = EnumArgument.of(Drawned.Artifacts.class);
+    public static final EnumArgument<DrawnedBoss.Artifacts> ARTIFACTS_PARSER = EnumArgument.of(DrawnedBoss.Artifacts.class);
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
@@ -32,7 +32,7 @@ public class ActionGiveArtifact implements UsageAction<ActionGiveArtifact.Action
 
     @Override
     public ActionInstance deserialize(JsonElement element) throws CommandSyntaxException {
-        return new ActionInstance(JsonUtils.readEnum(Drawned.Artifacts.class, element));
+        return new ActionInstance(JsonUtils.readEnum(DrawnedBoss.Artifacts.class, element));
     }
 
     @Override
@@ -51,13 +51,13 @@ public class ActionGiveArtifact implements UsageAction<ActionGiveArtifact.Action
     }
 
     public static class ActionInstance implements UsageActionInstance {
-        private final Drawned.Artifacts artifact;
+        private final DrawnedBoss.Artifacts artifact;
 
-        public ActionInstance(Drawned.Artifacts artifact) {
+        public ActionInstance(DrawnedBoss.Artifacts artifact) {
             this.artifact = artifact;
         }
 
-        public Drawned.Artifacts getArtifact() {
+        public DrawnedBoss.Artifacts getArtifact() {
             return artifact;
         }
 

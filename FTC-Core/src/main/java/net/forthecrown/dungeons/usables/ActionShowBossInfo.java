@@ -8,14 +8,12 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
-import net.forthecrown.dungeons.DungeonUtils;
-import net.forthecrown.dungeons.bosses.DungeonBoss;
+import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.actions.UsageActionInstance;
-import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +30,7 @@ public class ActionShowBossInfo implements UsageAction<ActionShowBossInfo.Action
 
     @Override
     public ActionInstance deserialize(JsonElement element) throws CommandSyntaxException {
-        return new ActionInstance(Registries.DUNGEON_BOSSES.get(JsonUtils.readKey(element)));
+        return new ActionInstance(Registries.DUNGEON_BOSSES.read(element));
     }
 
     @Override
@@ -50,7 +48,7 @@ public class ActionShowBossInfo implements UsageAction<ActionShowBossInfo.Action
         return KEY;
     }
 
-    public record ActionInstance(DungeonBoss boss) implements UsageActionInstance {
+    public record ActionInstance(KeyedBoss boss) implements UsageActionInstance {
 
         @Override
         public String asString() {
@@ -64,7 +62,7 @@ public class ActionShowBossInfo implements UsageAction<ActionShowBossInfo.Action
 
         @Override
         public void onInteract(Player player) {
-            player.sendMessage(DungeonUtils.itemRequiredMessage(boss));
+            player.sendMessage(boss.itemMessage(player.getInventory()));
         }
     }
 }

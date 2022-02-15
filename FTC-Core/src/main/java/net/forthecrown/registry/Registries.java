@@ -10,7 +10,7 @@ import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.emotes.CosmeticEmote;
 import net.forthecrown.cosmetics.travel.TravelEffect;
-import net.forthecrown.dungeons.bosses.DungeonBoss;
+import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.economy.guilds.topics.VoteTopic;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
@@ -58,7 +58,7 @@ public interface Registries {
     CloseableRegistry<ComVarType<?>>        COMVAR_TYPES        = createCloseable("comvar_types");
 
     //Dungeons
-    CloseableRegistry<DungeonBoss<?>>       DUNGEON_BOSSES      = createCloseable("dungeon_bosses");
+    CloseableRegistry<KeyedBoss>            DUNGEON_BOSSES      = createCloseable("dungeon_bosses");
 
     //Battle pass
     CloseableRegistry<GoalBookChallenge>    GOAL_BOOK           = createCloseable("battle_pass_challenges");

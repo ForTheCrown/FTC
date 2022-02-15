@@ -2,7 +2,7 @@ package net.forthecrown.inventory.weapon.goals;
 
 import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Keys;
-import net.forthecrown.dungeons.bosses.DungeonBoss;
+import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.inventory.weapon.WeaponUseContext;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -81,7 +81,7 @@ public interface WeaponGoal extends Keyed {
         return new EndBossGoal(type, goal, rank);
     }
 
-    static WeaponGoal dungeonBoss(DungeonBoss<?> boss, int goal, int rank) {
+    static WeaponGoal dungeonBoss(KeyedBoss boss, int goal, int rank) {
         return new DungeonBossGoal(boss, goal, rank);
     }
 

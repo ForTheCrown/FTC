@@ -5,7 +5,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.core.Crown;
-import net.forthecrown.dungeons.bosses.DungeonBoss;
+import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.squire.Squire;
@@ -43,7 +43,7 @@ public class CheckBeatenBoss implements UsageCheck<CheckBeatenBoss.CheckInstance
         return KEY;
     }
 
-    public record CheckInstance(DungeonBoss boss) implements UsageCheckInstance {
+    public record CheckInstance(KeyedBoss boss) implements UsageCheckInstance {
         @Override
         public boolean test(Player player) {
             Advancement advancement = Bukkit.getAdvancement(boss.advancementKey());

@@ -3,7 +3,7 @@ package net.forthecrown.core.goalbook;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.forthecrown.core.Crown;
-import net.forthecrown.dungeons.bosses.DungeonBoss;
+import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.events.custom.*;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.user.UserManager;
@@ -209,14 +209,16 @@ public final class Challenges {
 
         @EventHandler(ignoreCancelled = true)
         public void onDungeonBossDeath(DungeonBossDeathEvent event) {
-            for (Player p: event.getContext().getPlayers()) {
-                if(!event.getBoss().getBossRoom().contains(p)) continue;
+            if(!(event.getBoss() instanceof KeyedBoss boss)) return;
 
-                run(p, event.getBoss());
+            for (Player p: event.getContext().players()) {
+                if(!boss.getRoom().contains(p)) continue;
+
+                run(p, boss);
             }
         }
 
-        private void run(Player player, DungeonBoss boss) {
+        private void run(Player player, KeyedBoss boss) {
             GoalBook.Progress progress = getProgress(player.getUniqueId());
             JsonArray arr = progress.extraData().getArray("beaten_bosses");
             JsonElement bossElement = boss.serialize();

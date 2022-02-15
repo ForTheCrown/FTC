@@ -108,9 +108,9 @@ public final class RoyalWeapons {
         putUpgrade(rank, new MonetaryUpgrade(12500, MonetaryUpgrade.Type.RHINES));
         putUpgrade(rank, new MonetaryUpgrade(1000, MonetaryUpgrade.Type.GEMS));
 
-        register(dungeonBoss(Bosses.zhambie(), 1, rank));
-        register(dungeonBoss(Bosses.skalatan(), 1, rank));
-        register(dungeonBoss(Bosses.hideySpidey(), 1, rank));
+        register(dungeonBoss(Bosses.ZHAMBIE, 1, rank));
+        register(dungeonBoss(Bosses.SKALATAN, 1, rank));
+        register(dungeonBoss(Bosses.HIDEY_SPIDEY, 1, rank));
         register(anyEntity(500, rank));
 
         //Royal

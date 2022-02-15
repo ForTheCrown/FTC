@@ -3,13 +3,13 @@ package net.forthecrown.events;
 import net.forthecrown.core.Crown;
 import net.forthecrown.dungeons.DungeonAreas;
 import net.forthecrown.dungeons.DungeonUtils;
-import net.forthecrown.dungeons.bosses.Skalatan;
+import net.forthecrown.dungeons.boss.SkalatanBoss;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.squire.enchantment.RoyalEnchant;
 import net.forthecrown.squire.enchantment.RoyalEnchants;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -64,7 +64,7 @@ public class DungeonListeners implements Listener {
             if(random.nextInt(4) > 0) return;
 
             WitherSkeleton skeleton = (WitherSkeleton) event.getEntity();
-            ItemStack item = Skalatan.witherGoo();
+            ItemStack item = SkalatanBoss.witherGoo();
             item.setAmount(1);
             skeleton.getWorld().dropItemNaturally(skeleton.getLocation(), item);
         }

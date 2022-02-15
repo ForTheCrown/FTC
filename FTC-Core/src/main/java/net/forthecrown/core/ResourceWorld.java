@@ -341,7 +341,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
     @Override
     public void onDayChange() {
         if (!isAutoResetEnabled()) return;
-        if (!TimeUtil.hasCooldownEnded(ComVars.resourceWorldResetInterval(), lastSeed)) return;
+        if (!TimeUtil.hasCooldownEnded(ComVars.resourceWorldResetInterval(), lastReset)) return;
 
         resetAndLoad();
     }

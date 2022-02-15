@@ -2,7 +2,7 @@ package net.forthecrown.inventory.weapon.goals;
 
 import net.forthecrown.core.Keys;
 import net.forthecrown.dungeons.Bosses;
-import net.forthecrown.dungeons.bosses.DungeonBoss;
+import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -13,9 +13,9 @@ import org.jetbrains.annotations.NotNull;
 public class DungeonBossGoal implements WeaponKillGoal {
     private final Key key;
     private final int rank, goal;
-    private final DungeonBoss<?> boss;
+    private final KeyedBoss boss;
 
-    public DungeonBossGoal(DungeonBoss<?> boss, int goal, int rank) {
+    public DungeonBossGoal(KeyedBoss boss, int goal, int rank) {
         this.rank = rank;
         this.goal = goal;
         this.boss = boss;

@@ -1,36 +1,28 @@
 package net.forthecrown.dungeons;
 
-import net.forthecrown.dungeons.bosses.*;
+import net.forthecrown.dungeons.boss.*;
 import net.forthecrown.dungeons.usables.*;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.squire.Squire;
 import net.forthecrown.useables.actions.UsageAction;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Drowned;
-import org.bukkit.entity.Husk;
-import org.bukkit.entity.Spider;
-import org.bukkit.entity.WitherSkeleton;
 
 public class Bosses {
 
-    public static final NamespacedKey KEY = Squire.createRoyalKey("bossitem");
+    public static final NamespacedKey KEY = Squire.createRoyalKey("bossitem"); // God, I wish there was an underscore in this
     public static final NamespacedKey BOSS_TAG = Squire.createRoyalKey("boss_tag");
-    private static final DungeonUserDataAccessor accessor = new DungeonUserDataAccessor();
+    public static final DungeonUserDataAccessor ACCESSOR = new DungeonUserDataAccessor();
 
-    private static Zhambie zhambie;
-    private static Skalatan skalatan;
-    private static HideySpidey hideySpidey;
-    private static Drawned drawned;
+    public static final SimpleBoss
+            ZHAMBIE         = register(new ZhambieBoss()),
+            SKALATAN        = register(new SkalatanBoss()),
+            HIDEY_SPIDEY    = register(new HideySpideyBoss()),
+            DRAWNED         = register(new DrawnedBoss());
 
     private Bosses(){
     }
 
-    public static void init(){
-        zhambie = register(new Zhambie());
-        skalatan = register(new Skalatan());
-        hideySpidey = register(new HideySpidey());
-        drawned = register(new Drawned());
-
+    public static void init() {
         Registries.DUNGEON_BOSSES.close();
 
         register(new ActionGiveArtifact());
@@ -46,31 +38,11 @@ public class Bosses {
         Registries.USAGE_ACTIONS.register(action.key(), action);
     }
 
-    private static <T extends DungeonBoss> T register(T boss) {
+    private static <T extends KeyedBoss> T register(T boss) {
         return (T) Registries.DUNGEON_BOSSES.register(boss.key(), boss);
     }
 
     public static void shutDown() {
         Registries.DUNGEON_BOSSES.forEach(boss -> boss.kill(true));
-    }
-
-    public static DungeonBoss<Husk> zhambie() {
-        return zhambie;
-    }
-
-    public static DungeonBoss<WitherSkeleton> skalatan() {
-        return skalatan;
-    }
-
-    public static DungeonBoss<Spider> hideySpidey() {
-        return hideySpidey;
-    }
-
-    public static DungeonBoss<Drowned> drawned() {
-        return drawned;
-    }
-
-    public static DungeonUserDataAccessor getAccessor() {
-        return accessor;
     }
 }
