@@ -48,7 +48,7 @@ public class BookBuilder implements Builder<BuiltBook> {
 
     // Add text to current page
     public BookBuilder addText(Component line) {
-        // TextComponent.content() only returns the direct content ot a text component
+        // TextComponent.content() only returns the direct content of a text component
         // children are not included, this turns the entire component into a plain string,
         // so stuff like color codes don't interfere
         String text = ChatUtils.plainText(line);
@@ -67,7 +67,7 @@ public class BookBuilder implements Builder<BuiltBook> {
 
         lineCount += extraLines;
 
-        this.currentPage.append(line).append(NEW_LINE);
+        this.currentPage.append(ChatUtils.renderToSimple(line)).append(NEW_LINE);
         return this;
     }
 

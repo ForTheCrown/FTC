@@ -9,6 +9,7 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.permissions.Permission;
@@ -57,6 +58,22 @@ public class StateChangeCommand extends FtcCommand {
         register();
     }
 
+    public boolean getState(CrownUser user) {
+        return getter.getState(user);
+    }
+
+    public void setState(CrownUser user, boolean state) {
+        if(validator != null) {
+            try {
+                validator.test(user, state);
+            } catch (CommandSyntaxException e) {
+                FtcUtils.handleSyntaxException(user, e);
+            }
+        }
+
+        setter.setState(user, state);
+    }
+
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
@@ -95,127 +112,7 @@ public class StateChangeCommand extends FtcCommand {
                 );
     }
 
-    public static void init() {
-        new StateChangeCommand(
-                "profiletoggle",
-                CrownUser::isProfilePublic, CrownUser::setProfilePublic,
-                "user.profile.public", "user.profile.private",
-                Permissions.PROFILE,
-                "Toggles your profile being private or public",
-                "profileprivate", "profilepublic"
-        );
-
-        new StateChangeCommand(
-                "ignoreac",
-                CrownUser::ignoringBroadcasts, CrownUser::setIgnoringBroadcasts,
-                "user.acIgnore.on", "user.acIgnore.off",
-                Permissions.IGNORE_AC,
-                "Toggles seeing automated server announcements",
-                "ignorebroadcasts", "ignorebc", "ignoreannouncements"
-        );
-
-        new StateChangeCommand(
-                "paytoggle",
-                CrownUser::allowsPaying, CrownUser::setAllowsPay,
-                "commands.payToggle.on", "commands.payToggle.off",
-                Permissions.PAY_TOGGLE,
-                "Toggles being able to pay and be payed"
-        );
-
-        new StateChangeCommand(
-                "toggleriding",
-                CrownUser::allowsRiding, CrownUser::setAllowsRiding,
-                "user.riding.allow", "user.riding.deny",
-                Permissions.DEFAULT,
-                "Toggles being able to ride and be ridden by players",
-                "ridingtoggle"
-        );
-
-        new StateChangeCommand(
-                "tpatoggle",
-                CrownUser::allowsTPA, CrownUser::setAllowsTPA,
-                "tpa.toggle.on", "tpa.toggle.off",
-                Permissions.TPA,
-                "Toggles being able to tpa to people",
-                "toggletpa"
-        );
-
-        new StateChangeCommand(
-                "marriagechattoggle",
-                (user, toggled) -> {
-                    UserInteractions inter = user.getInteractions();
-
-                    if(inter.getSpouse() == null) throw FtcExceptionProvider.notMarried();
-
-                    if(toggled){
-                        CrownUser spouse = UserManager.getUser(inter.getSpouse());
-                        if(!spouse.isOnline()) throw UserArgument.USER_NOT_ONLINE.create(spouse.nickDisplayName());
-                    }
-                },
-
-                user -> {
-                  UserInteractions inter = user.getInteractions();
-
-                  return inter.mChatToggled();
-                },
-
-                (user, newState) -> {
-                    UserInteractions inter = user.getInteractions();
-
-                    inter.setMChatToggled(newState);
-                },
-
-                "marriage.chat.on", "marriage.chat.off",
-                Permissions.MARRY,
-                "Toggles all your messages going to marriage chat",
-                "mchattoggle", "mct", "mctoggle"
-        );
-
-        new StateChangeCommand(
-                "toggleemotes",
-                CrownUser::allowsEmotes, CrownUser::setAllowsEmotes,
-                "emotes.toggle.on", "emotes.toggle.off",
-                Permissions.EMOTES,
-                "Toggles being able to emote to people and for people to emote at you",
-                "emotetoggle"
-        );
-
-        new StateChangeCommand(
-                "marrytoggle",
-
-                user -> user.getInteractions().acceptingProposals(),
-                (user, newState) -> user.getInteractions().setAcceptingProposals(newState),
-
-                "marriage.toggle.on", "marriage.toggle.off",
-                Permissions.MARRY,
-                "Toggles being able to marry and have people send you proposals",
-                "togglemarry"
-        );
-
-        new StateChangeCommand(
-                "toggleinvites",
-
-                CrownUser::allowsRegionInvites,
-                CrownUser::setAllowsRegionInvites,
-
-                "regions.invite.toggle.on", "regions.invite.toggle.off",
-                Permissions.REGIONS,
-                "Toggles being able to invite and be invited to regions",
-                "allowinvites", "denyinvites"
-        );
-
-        new StateChangeCommand(
-                "hulksmash",
-
-                CrownUser::hulkSmashesPoles,
-                CrownUser::setHulkPoles,
-
-                "regions.hulk.on", "regions.hulk.off",
-                Permissions.REGIONS,
-                "Toggles whether you quickly teleport to poles to hulk smash onto them",
-                "togglehulk", "togglehulksmash"
-        );
-    }
+    public static void init() {}
 
     //Tests if a user is allowed to change the state
     //Fails if exception is thrown
@@ -232,4 +129,124 @@ public class StateChangeCommand extends FtcCommand {
     public interface StateSetter {
         void setState(CrownUser user, boolean newState);
     }
+
+    public static final StateChangeCommand PROFILE_PRIVATE = new StateChangeCommand(
+            "profiletoggle",
+            CrownUser::isProfilePublic, CrownUser::setProfilePublic,
+            "user.profile.public", "user.profile.private",
+            Permissions.PROFILE,
+            "Toggles your profile being private or public",
+            "profileprivate", "profilepublic"
+    );
+
+    public static final StateChangeCommand IGNORE_BROADCASTS = new StateChangeCommand(
+            "ignoreac",
+            CrownUser::ignoringBroadcasts, CrownUser::setIgnoringBroadcasts,
+            "user.acIgnore.on", "user.acIgnore.off",
+            Permissions.IGNORE_AC,
+            "Toggles seeing automated server announcements",
+            "ignorebroadcasts", "ignorebc", "ignoreannouncements"
+    );
+
+    public static final StateChangeCommand TOGGLE_PAY = new StateChangeCommand(
+            "paytoggle",
+            CrownUser::allowsPaying, CrownUser::setAllowsPay,
+            "commands.payToggle.on", "commands.payToggle.off",
+            Permissions.PAY_TOGGLE,
+            "Toggles being able to pay and be payed"
+    );
+
+    public static final StateChangeCommand TOGGLE_RIDING = new StateChangeCommand(
+            "toggleriding",
+            CrownUser::allowsRiding, CrownUser::setAllowsRiding,
+            "user.riding.allow", "user.riding.deny",
+            Permissions.DEFAULT,
+            "Toggles being able to ride and be ridden by players",
+            "ridingtoggle"
+    );
+
+    public static final StateChangeCommand TOGGLE_TPA = new StateChangeCommand(
+            "tpatoggle",
+            CrownUser::allowsTPA, CrownUser::setAllowsTPA,
+            "tpa.toggle.on", "tpa.toggle.off",
+            Permissions.TPA,
+            "Toggles being able to tpa to people",
+            "toggletpa"
+    );
+
+    public static final StateChangeCommand TOGGLE_MARRIAGE_CHAT = new StateChangeCommand(
+            "marriagechattoggle",
+            (user, toggled) -> {
+                UserInteractions inter = user.getInteractions();
+
+                if(inter.getSpouse() == null) throw FtcExceptionProvider.notMarried();
+
+                if(toggled){
+                    CrownUser spouse = UserManager.getUser(inter.getSpouse());
+                    if(!spouse.isOnline()) throw UserArgument.USER_NOT_ONLINE.create(spouse.nickDisplayName());
+                }
+            },
+
+            user -> {
+                UserInteractions inter = user.getInteractions();
+
+                return inter.mChatToggled();
+            },
+
+            (user, newState) -> {
+                UserInteractions inter = user.getInteractions();
+
+                inter.setMChatToggled(newState);
+            },
+
+            "marriage.chat.on", "marriage.chat.off",
+            Permissions.MARRY,
+            "Toggles all your messages going to marriage chat",
+            "mchattoggle", "mct", "mctoggle"
+    );
+
+    public static final StateChangeCommand TOGGLE_EMOTES = new StateChangeCommand(
+            "toggleemotes",
+            CrownUser::allowsEmotes, CrownUser::setAllowsEmotes,
+            "emotes.toggle.on", "emotes.toggle.off",
+            Permissions.EMOTES,
+            "Toggles being able to emote to people and for people to emote at you",
+            "emotetoggle"
+    );
+
+    public static final StateChangeCommand TOGGLE_MARRYING = new StateChangeCommand(
+            "marrytoggle",
+
+            user -> user.getInteractions().acceptingProposals(),
+            (user, newState) -> user.getInteractions().setAcceptingProposals(newState),
+
+            "marriage.toggle.on", "marriage.toggle.off",
+            Permissions.MARRY,
+            "Toggles being able to marry and have people send you proposals",
+            "togglemarry"
+    );
+
+    public static final StateChangeCommand TOGGLE_REGION_INVITES = new StateChangeCommand(
+            "toggleinvites",
+
+            CrownUser::allowsRegionInvites,
+            CrownUser::setAllowsRegionInvites,
+
+            "regions.invite.toggle.on", "regions.invite.toggle.off",
+            Permissions.REGIONS,
+            "Toggles being able to invite and be invited to regions",
+            "allowinvites", "denyinvites"
+    );
+
+    public static final StateChangeCommand TOGGLE_HULK_SMASHING = new StateChangeCommand(
+            "hulksmash",
+
+            CrownUser::hulkSmashesPoles,
+            CrownUser::setHulkPoles,
+
+            "regions.hulk.on", "regions.hulk.off",
+            Permissions.REGIONS,
+            "Toggles whether you quickly teleport to poles to hulk smash onto them",
+            "togglehulk", "togglehulksmash"
+    );
 }
