@@ -6,7 +6,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.regions.visit.RegionVisit;
 import net.forthecrown.regions.visit.VisitHandler;
-import net.forthecrown.utils.Bukkit2NMS;
+import net.forthecrown.utils.VanillaAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.DoubleTag;
 import net.minecraft.nbt.ListTag;
@@ -123,8 +123,8 @@ public class PassengerHandler implements VisitHandler {
         // at the destination, cuz teleporting it is way too
         // slow. Aka, the boat moves slowly
         private Entity moveVehicle(Entity entity, Location dest) {
-            Level level = Bukkit2NMS.getLevel(dest.getWorld());
-            net.minecraft.world.entity.Entity nms = Bukkit2NMS.getEntity(entity);
+            Level level = VanillaAccess.getLevel(dest.getWorld());
+            net.minecraft.world.entity.Entity nms = VanillaAccess.getEntity(entity);
 
             CompoundTag saved = new CompoundTag();
             nms.saveWithoutId(saved);

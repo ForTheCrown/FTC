@@ -1,7 +1,7 @@
 package net.forthecrown.inventory.crown;
 
 import net.forthecrown.inventory.RankedItem;
-import net.forthecrown.utils.LoreBuilder;
+import net.forthecrown.utils.ItemLoreBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.nbt.CompoundTag;
@@ -61,7 +61,7 @@ public class RoyalCrown extends RankedItem {
     }
 
     @Override
-    protected void createLore(LoreBuilder lore) {
+    protected void createLore(ItemLoreBuilder lore) {
         super.createLore(lore);
 
         Component border = Component.text("--------------------------------").style(nonItalic(NamedTextColor.DARK_GRAY));

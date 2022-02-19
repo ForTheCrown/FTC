@@ -41,7 +41,7 @@ public class InventoryBuilder implements Builder<BuiltInventory> {
     }
 
     public static boolean isValidSize(int size) {
-        return MathUtil.isInRange(size, 9, 54) && size % 9 == 0;
+        return MathUtil.inRange(size, 9, 54) && size % 9 == 0;
     }
 
     public int size() {

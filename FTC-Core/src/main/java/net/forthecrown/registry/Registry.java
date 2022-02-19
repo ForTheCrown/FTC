@@ -10,7 +10,7 @@
  * Represents a map like object which can store object with a {@link net.kyori.adventure.key.Key} as the, well, key.
  * @param <T>
  */
-public interface Registry<T> extends FtcRegistry<T, T>, Iterable<T>, Keyed {
+public interface Registry<T> extends BaseRegistry<T, T>, Iterable<T>, Keyed {
     /**
      * Gets the size of the registry
      * @return the size of the registry

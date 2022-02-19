@@ -2,7 +2,7 @@ package net.forthecrown.useables.kits;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.registry.FtcRegistry;
+import net.forthecrown.registry.BaseRegistry;
 import net.forthecrown.serializer.CrownSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Holds and registers all the kits there are.
  */
-public interface KitManager extends CrownSerializer, FtcRegistry<Kit, List<ItemStack>>, SuggestionProvider<CommandSource> {
+public interface KitManager extends CrownSerializer, BaseRegistry<Kit, List<ItemStack>>, SuggestionProvider<CommandSource> {
 
     /**
      * Gets all the kits a given player can use

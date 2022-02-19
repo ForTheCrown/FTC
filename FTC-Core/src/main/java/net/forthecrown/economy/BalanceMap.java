@@ -5,9 +5,9 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.function.IntSupplier;
+import java.util.stream.Stream;
 
 /**
  * The map object which stores the balances of players.
@@ -113,25 +113,24 @@ public interface BalanceMap {
     String toString();
 
     /**
-     * Gets all keys,
-     * <p>Warning: The returned list is immutable</p>
-     * @return All UUID keys held by this balance map
+     * A stream of balances meant to be used for serialization
+     * <p></p>
+     * Warning: NONE OF THE ENTRIES ARE CLONES, do not cast,
+     * modify or change the balances in the returned stream
+     *
+     * @return A stream of all entries in the map,
      */
-    List<UUID> keys();
+    Stream<BalanceReader> readerStream();
 
-    /**
-     * Gets all balance values held by this map
-     * <p>Warning: The returned list is immutable</p>
-     * @return All balance values held by this map
-     */
-    List<Integer> values();
+    interface BalanceReader extends Comparable<BalanceReader> {
+        UUID getUniqueId();
+        int getValue();
 
-    /**
-     * Gets all balance entries held by this map
-     * <p>Warning: The returned list is immutable</p>
-     * @return All entries held by this map.
-     */
-    List<Balance> entries();
+        @Override
+        default int compareTo(@NotNull BalanceMap.BalanceReader o) {
+            return Integer.compare(getValue(), o.getValue());
+        }
+    }
 
     /**
      * A single balance entry in the balance map
@@ -145,7 +144,7 @@ public interface BalanceMap {
      * {@link BalanceMap} to do so, as they will ensure the
      * map stays organized and sorted.
      */
-    class Balance implements Comparable<Balance> {
+    class Balance implements BalanceReader, Cloneable {
         private final UUID id;
         private int value;
 
@@ -158,6 +157,7 @@ public interface BalanceMap {
          * Gets the ID of the holder of this balance
          * @return The holder's ID
          */
+        @Override
         public UUID getUniqueId() {
             return id;
         }
@@ -166,6 +166,7 @@ public interface BalanceMap {
          * Gets the balance value held by this entry
          * @return The entry's balance
          */
+        @Override
         public int getValue() {
             return value;
         }
@@ -188,8 +189,8 @@ public interface BalanceMap {
         }
 
         @Override
-        public int compareTo(@NotNull BalanceMap.Balance o) {
-            return Integer.compare(value, o.value);
+        protected Balance clone() {
+            return new Balance(getUniqueId(), getValue());
         }
 
         @Override

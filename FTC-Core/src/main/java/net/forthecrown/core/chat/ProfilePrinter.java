@@ -31,8 +31,8 @@ public class ProfilePrinter implements ComponentPrinter {
     private final TextComponent.Builder builder;
     private int headerLength;
 
-    private Style borderStyle = Style.style(NamedTextColor.GOLD, TextDecoration.STRIKETHROUGH);
-    private Style lineStyle = Style.style(NamedTextColor.YELLOW);
+    private static final Style BORDER_STYLE = Style.style(NamedTextColor.GOLD, TextDecoration.STRIKETHROUGH);
+    private static final Style LINE_STYLE = Style.style(NamedTextColor.YELLOW);
 
     public ProfilePrinter(CrownUser user, CommandSource source) {
         this(
@@ -86,7 +86,7 @@ public class ProfilePrinter implements ComponentPrinter {
 
         append(
                 Component.text("    ")
-                        .style(borderStyle)
+                        .style(BORDER_STYLE)
         );
 
         append(Component.space());
@@ -95,7 +95,7 @@ public class ProfilePrinter implements ComponentPrinter {
 
         append(
                 Component.text("    ")
-                        .style(borderStyle)
+                        .style(BORDER_STYLE)
         );
 
         return this;
@@ -105,7 +105,7 @@ public class ProfilePrinter implements ComponentPrinter {
         newLine();
         return append(
                 Component.text(" ".repeat(headerLength < 1 ? 10 : headerLength))
-                        .style(borderStyle)
+                        .style(BORDER_STYLE)
         );
     }
 
@@ -223,7 +223,7 @@ public class ProfilePrinter implements ComponentPrinter {
         if(!shouldInclude || text == null) return this;
 
         newLine();
-        append(Component.text(line + ": ").style(lineStyle));
+        append(Component.text(line + ": ").style(LINE_STYLE));
         return append(text);
     }
 
@@ -248,7 +248,7 @@ public class ProfilePrinter implements ComponentPrinter {
             );
         }
 
-        return result.style(lineStyle);
+        return result.style(LINE_STYLE);
     }
 
     private void onlineTimeThing() {
@@ -297,21 +297,5 @@ public class ProfilePrinter implements ComponentPrinter {
 
     public CrownUser getUser() {
         return user;
-    }
-
-    public Style getBorderStyle() {
-        return borderStyle;
-    }
-
-    public void setBorderStyle(Style borderStyle) {
-        this.borderStyle = borderStyle;
-    }
-
-    public Style getLineStyle() {
-        return lineStyle;
-    }
-
-    public void setLineStyle(Style lineStyle) {
-        this.lineStyle = lineStyle;
     }
 }

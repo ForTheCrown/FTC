@@ -88,7 +88,7 @@ public final class ChatUtils {
                 .build();
     }
 
-    public static Component renderIfTranslatable(Component component) {
+    public static Component renderToSimple(Component component) {
         return GlobalTranslator.render(component, Locale.ENGLISH);
     }
 }

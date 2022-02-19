@@ -10,7 +10,7 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.economy.BalanceHolder;
 import net.forthecrown.economy.guilds.VoteState;
 import net.forthecrown.economy.houses.components.HouseComponent;
-import net.forthecrown.registry.BaseRegistry;
+import net.forthecrown.registry.RegistryImpl;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.serializer.JsonDeserializable;
@@ -54,7 +54,7 @@ public class House implements
 
     private final Map<Material, HouseMaterialData> matData = new Object2ObjectOpenHashMap<>();
 
-    private final Registry<HouseComponent> components = new BaseRegistry<>(REGISTRY_KEY);
+    private final Registry<HouseComponent> components = new RegistryImpl<>(REGISTRY_KEY);
     private Map<Property, Object> properties = null;
     private int balance;
 

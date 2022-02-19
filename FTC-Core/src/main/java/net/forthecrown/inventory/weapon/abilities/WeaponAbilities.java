@@ -6,14 +6,15 @@ import net.forthecrown.registry.Registries;
 public final class WeaponAbilities {
     private WeaponAbilities() {}
 
-    public static final WeaponAbility
-            EXPLODE = register(new ExplodeAbility());
-
     public static void init() {
+        register(TestWeaponAbility.TYPE);
+
+        Registries.WEAPON_ABILITIES.close();
+
         Crown.logger().info("WeaponAbilities initialized");
     }
 
-    private static WeaponAbility register(WeaponAbility ability) {
-        return Registries.WEAPON_ABILITIES.register(ability.key(), ability);
+    private static void register(WeaponAbility.Type type) {
+        Registries.WEAPON_ABILITIES.register(type.key(), type);
     }
 }

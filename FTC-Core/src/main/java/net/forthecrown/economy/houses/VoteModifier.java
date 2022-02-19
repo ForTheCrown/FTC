@@ -18,7 +18,7 @@ public class VoteModifier {
     }
 
     public boolean shouldVoteFor() {
-        if(MathUtil.isInRange(value, -15, 15)) return FtcUtils.RANDOM.nextBoolean();
+        if(MathUtil.inRange(value, -15, 15)) return FtcUtils.RANDOM.nextBoolean();
 
         return value + FtcUtils.RANDOM.intInRange(-15, 15) > 0;
     }

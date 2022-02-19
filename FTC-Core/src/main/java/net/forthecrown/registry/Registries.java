@@ -29,7 +29,7 @@ public interface Registries {
     /**
      * A registry of registries, master registry
      */
-    Registry<Registry<?>>                   MASTER_REGISTRY     = new BaseRegistry<>(Keys.forthecrown("master_registry"));
+    Registry<Registry<?>>                   MASTER_REGISTRY     = new RegistryImpl<>(Keys.forthecrown("master_registry"));
 
     Registry<InteractableNPC>               NPCS                = create("npcs");
     Registry<BlockAnimation>                ANIMATIONS          = create("animations");
@@ -42,7 +42,7 @@ public interface Registries {
     CloseableRegistry<House>                HOUSES              = createCloseable("houses");
 
     CloseableRegistry<WeaponGoal>           WEAPON_GOALS        = createCloseable("weapon_goals");
-    CloseableRegistry<WeaponAbility>        WEAPON_ABILITIES    = createCloseable("weapon_abilities");
+    CloseableRegistry<WeaponAbility.Type>   WEAPON_ABILITIES    = createCloseable("weapon_abilities");
 
     //Cosmetic things registries
     CloseableRegistry<DeathEffect>          DEATH_EFFECTS       = createCloseable("death_effects");
@@ -72,7 +72,7 @@ public interface Registries {
      */
     static <T> CloseableRegistry<T> createCloseable(String strKey){
         NamespacedKey key = Keys.parse(strKey);
-        return (CloseableRegistry<T>) MASTER_REGISTRY.register(key, new CloseableRegistryBase<>(key));
+        return (CloseableRegistry<T>) MASTER_REGISTRY.register(key, new CloseableRegistryImpl<>(key));
     }
 
     /**
@@ -83,6 +83,6 @@ public interface Registries {
      */
     static <T> Registry<T> create(String strKey){
         NamespacedKey key = Keys.parse(strKey);
-        return (Registry<T>) MASTER_REGISTRY.register(key, new BaseRegistry<>(key));
+        return (Registry<T>) MASTER_REGISTRY.register(key, new RegistryImpl<>(key));
     }
 }

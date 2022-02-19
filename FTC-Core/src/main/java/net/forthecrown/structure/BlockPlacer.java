@@ -1,6 +1,6 @@
 package net.forthecrown.structure;
 
-import net.forthecrown.utils.Bukkit2NMS;
+import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.math.ImmutableVector3i;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -66,10 +66,10 @@ public interface BlockPlacer {
 
             BlockState state = world.getBlockState(x, y, z);
             if(data.getTag() != null && state instanceof TileState tileState) {
-                BlockEntity entity = Bukkit2NMS.getBlockEntity(tileState);
+                BlockEntity entity = VanillaAccess.getBlockEntity(tileState);
                 entity.load(data.getTag());
 
-                Bukkit2NMS.getLevel(world).setBlockEntity(entity);
+                VanillaAccess.getLevel(world).setBlockEntity(entity);
             }
         };
     }

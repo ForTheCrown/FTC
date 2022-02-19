@@ -1,7 +1,7 @@
 package net.forthecrown.commands.emotes;
 
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.CrownRandom;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
@@ -29,10 +29,8 @@ public class EmotePoke extends CommandEmote {
             Component.translatable(TRANS_PREFIX + "belly")
     };
 
-    private static final CrownRandom RANDOM = new CrownRandom();
-
     private static Component randomPart() {
-        return PARTS[RANDOM.intInRange(0, PARTS.length-1)];
+        return PARTS[FtcUtils.RANDOM.nextInt(PARTS.length)];
     }
 
     @Override

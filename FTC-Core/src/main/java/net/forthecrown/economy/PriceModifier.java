@@ -18,7 +18,7 @@ public interface PriceModifier {
     }
 
     static PriceModifier taxModifier(float taxAmount /* 0 - 1 */) {
-        Validate.isTrue(MathUtil.isInRange(taxAmount, 0, 1), "Given taxAmount was not in range of 0 to 1");
+        Validate.isTrue(MathUtil.inRange(taxAmount, 0, 1), "Given taxAmount was not in range of 0 to 1");
 
         return context -> {
             float current = context.currentPrice;

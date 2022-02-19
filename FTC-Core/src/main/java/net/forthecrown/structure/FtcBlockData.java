@@ -2,7 +2,7 @@ package net.forthecrown.structure;
 
 import net.forthecrown.grenadier.types.block.ParsedBlock;
 import net.forthecrown.royalgrenadier.types.block.ParsedBlockImpl;
-import net.forthecrown.utils.Bukkit2NMS;
+import net.forthecrown.utils.VanillaAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -58,7 +58,7 @@ public interface FtcBlockData {
      * @return The created data
      */
     static FtcBlockData of(TileState state) {
-        BlockEntity entity = Bukkit2NMS.getBlockEntity(state);
+        BlockEntity entity = VanillaAccess.getBlockEntity(state);
         BlockState nnmsState = entity.getBlockState();
         CompoundTag data = entity.saveWithoutMetadata();
 

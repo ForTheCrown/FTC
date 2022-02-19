@@ -32,6 +32,6 @@ public record SignLines(Component line0, Component line1, Component line2, Compo
     }
 
     private static Component emptyIfNull(Component component) {
-        return component == null ? Component.empty() : ChatUtils.renderIfTranslatable(component);
+        return component == null ? Component.empty() : ChatUtils.renderToSimple(component);
     }
 }

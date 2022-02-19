@@ -80,8 +80,8 @@ public final class RegionUtil {
     public static boolean isValidPolePosition(PopulationRegion region, BlockVector2 vec) {
         FtcBoundingBox valid = region.getBB().shrink(5);
 
-        return MathUtil.isInRange(vec.getX(), valid.getMinX(), valid.getMaxX()) &&
-                MathUtil.isInRange(vec.getZ(), valid.getMinZ(), valid.getMaxZ());
+        return MathUtil.inRange(vec.getX(), valid.getMinX(), valid.getMaxX()) &&
+                MathUtil.inRange(vec.getZ(), valid.getMinZ(), valid.getMaxZ());
     }
 
     public static void validateWorld(World world) throws CommandSyntaxException {

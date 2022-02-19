@@ -3,15 +3,14 @@ package net.forthecrown.inventory.weapon;
 import it.unimi.dsi.fastutil.doubles.Double2DoubleFunction;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.dungeons.Bosses;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.inventory.ItemStacks;
-import net.forthecrown.inventory.weapon.abilities.WeaponAbilities;
 import net.forthecrown.inventory.weapon.goals.ChargedCreeperGoal;
 import net.forthecrown.inventory.weapon.goals.DonatorWeaponGoal;
 import net.forthecrown.inventory.weapon.goals.HouseReforgeGoal;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.inventory.weapon.upgrades.*;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.inventory.ItemStackBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -28,7 +27,6 @@ import java.util.UUID;
 
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 import static net.forthecrown.inventory.weapon.goals.WeaponGoal.*;
-import static net.forthecrown.utils.FtcUtils.safeRunnable;
 
 public final class RoyalWeapons {
     public static final Component
@@ -191,7 +189,7 @@ public final class RoyalWeapons {
             }
         }
 
-        safeRunnable(WeaponAbilities::init);
+        //safeRunnable(WeaponAbilities::init);
 
         ItemStack item = make(null);
         RoyalSword sword = new RoyalSword(item);

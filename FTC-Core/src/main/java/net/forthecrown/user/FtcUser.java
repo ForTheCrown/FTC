@@ -105,7 +105,7 @@ public class FtcUser implements CrownUser {
     //Economy stuff
     public Object2ObjectMap<Material, SoldMaterialData> matData = new Object2ObjectOpenHashMap<>();
     public SellAmount sellAmount = SellAmount.PER_1;
-    public ItemFilter filter = new ItemFilter();
+    public final ItemFilter filter = new ItemFilter();
 
     //NMS handle
     private ServerPlayer handle;

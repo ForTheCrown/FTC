@@ -1,6 +1,6 @@
 package net.forthecrown.structure;
 
-import net.forthecrown.utils.Bukkit2NMS;
+import net.forthecrown.utils.VanillaAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -18,7 +18,7 @@ public interface EntityPlacer {
 
     static EntityPlacer world(World world) {
         return new EntityPlacer() {
-            private final ServerLevel level = Bukkit2NMS.getLevel(world);
+            private final ServerLevel level = VanillaAccess.getLevel(world);
 
             @Override
             public void place(CompoundTag tag, double x, double y, double z) {

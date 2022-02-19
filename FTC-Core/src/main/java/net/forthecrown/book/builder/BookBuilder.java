@@ -1,24 +1,28 @@
 package net.forthecrown.book.builder;
+
+import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.Builder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 public class BookBuilder implements Builder<BuiltBook> {
-    Component NEW_LINE = Component.newline();
+    private static final Component NEW_LINE = Component.newline();
+
+    public static final int PIXELS_PER_LINE = 114;
+    public static final int MAX_LINES = 14;
 
     String title;
     String author;
     TextComponent.Builder currentPage = Component.text();
-    int numPages = 0;
-    int numLinesOnCurrentPage = 0;
+    int pageCount = 0;
+    int lineCount = 0;
 
     ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
     BookMeta bookMeta = (BookMeta) book.getItemMeta();
-
-
 
     public BookBuilder setTitle(String title) {
         this.title = title;
@@ -33,50 +37,46 @@ public class BookBuilder implements Builder<BuiltBook> {
     }
 
 
-    public BookBuilder setNumPages(int numPages) {
-        this.numPages = numPages;
+    public BookBuilder setPageCount(int pageCount) {
+        this.pageCount = pageCount;
         return this;
     }
 
     public BookBuilder addEmptyLine() {
-        if (numLinesOnCurrentPage >= 13) {
-            addPage();
-            this.numLinesOnCurrentPage = 0;
-        }
-        ++this.numLinesOnCurrentPage;
-        this.currentPage.append(NEW_LINE);
-        return this;
+        return addText(Component.empty());
     }
 
     // Add text to current page
-    public BookBuilder addText(TextComponent line) {
-        if (line.content().length() == 0) return this; // Don't add empty lines
-        if (line.content().length() >= 14 * 114) return this; // Don't add oversized lines
+    public BookBuilder addText(Component line) {
+        // TextComponent.content() only returns the direct content ot a text component
+        // children are not included, this turns the entire component into a plain string,
+        // so stuff like color codes don't interfere
+        String text = ChatUtils.plainText(line);
+        int pxLength = TextInfo.getPxLength(text);
 
-        int futureAmountOfLines = numLinesOnCurrentPage;
+        // Ensure the text isn't larger than a single page
+        Validate.isTrue(pxLength < PIXELS_PER_LINE * MAX_LINES, "Text too big :(");
 
         // Increase numLines according to new line length
-        int lineLength = TextInfo.getPxLength(line.content());
-        while (lineLength > 0) {
-            ++futureAmountOfLines;
-            lineLength -= 114;
-        }
+        // I love integer division
+        int extraLines = (int) Math.ceil((double) pxLength / (double) PIXELS_PER_LINE);
 
         // If numLines too big, paste new line on next page
         // 14 lines of text possible (0 -> 13)
-        if (futureAmountOfLines > 13) addPage();
+        if (lineCount + extraLines > MAX_LINES) addPage();
+
+        lineCount += extraLines;
 
         this.currentPage.append(line).append(NEW_LINE);
-        numLinesOnCurrentPage += (futureAmountOfLines - numLinesOnCurrentPage);
         return this;
     }
 
     public void addPage() {
         bookMeta.addPages(currentPage.build());
-        ++numPages;
+        ++pageCount;
 
         currentPage = Component.text(); // empty page
-        numLinesOnCurrentPage = 0; // No lines yet
+        lineCount = 0; // No lines yet
     }
 
     public BookBuilder newPage() {
@@ -85,11 +85,9 @@ public class BookBuilder implements Builder<BuiltBook> {
     }
 
     public BookBuilder addAmountOfLines() {
-        int currentAmountOfLines = numLinesOnCurrentPage;
-        addText(Component.text("#Lines: " + currentAmountOfLines));
+        addText(Component.text("#Lines: " + lineCount));
         return this;
     }
-
 
     @Override
     public BuiltBook build() {

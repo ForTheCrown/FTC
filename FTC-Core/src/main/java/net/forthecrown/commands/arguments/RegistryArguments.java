@@ -45,7 +45,7 @@ public class RegistryArguments<T> implements ArgumentType<T> {
     private static final RegistryArguments<House> HOUSE = new RegistryArguments<>(Registries.HOUSES, "Dynasty");
 
     private static final RegistryArguments<WeaponGoal> WEAPON_GOAL = new RegistryArguments<>(Registries.WEAPON_GOALS, "Weapon goal");
-    private static final RegistryArguments<WeaponAbility> WEAPON_ABILITY = new RegistryArguments<>(Registries.WEAPON_ABILITIES, "Weapon ability");
+    private static final RegistryArguments<WeaponAbility.Type> WEAPON_ABILITY = new RegistryArguments<>(Registries.WEAPON_ABILITIES, "Weapon ability");
 
     public static RegistryArguments<BlockAnimation> animation() {
         return ANIMATION;
@@ -87,7 +87,7 @@ public class RegistryArguments<T> implements ArgumentType<T> {
         return HOUSE;
     }
 
-    public static RegistryArguments<WeaponAbility> weaponAbility() {
+    public static RegistryArguments<WeaponAbility.Type> weaponAbility() {
         return WEAPON_ABILITY;
     }
 

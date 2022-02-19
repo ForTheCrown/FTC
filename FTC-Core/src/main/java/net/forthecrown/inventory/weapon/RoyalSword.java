@@ -6,21 +6,19 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.Main;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.events.custom.SwordRankUpEvent;
 import net.forthecrown.inventory.RankedItem;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.click.ClickHistory;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
-import net.forthecrown.inventory.weapon.upgrades.MonetaryUpgrade;
-import net.forthecrown.inventory.weapon.upgrades.WeaponUpgrade;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.LoreBuilder;
+import net.forthecrown.utils.ItemLoreBuilder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
@@ -51,8 +49,6 @@ public class RoyalSword extends RankedItem {
 
     private CompoundTag extraData;
 
-    private boolean upgradesFixed, moneyRewardsFixed;
-
     /**
      * Load constructor, loads all needed data from item's NBT
      * @param item The item to load from
@@ -71,8 +67,6 @@ public class RoyalSword extends RankedItem {
     public RoyalSword(UUID owner, ItemStack item) {
         super(owner, item, RoyalWeapons.TAG_KEY);
         this.extraData = new CompoundTag();
-        this.upgradesFixed = true;
-        this.moneyRewardsFixed = true;
     }
 
     @Override
@@ -82,11 +76,11 @@ public class RoyalSword extends RankedItem {
         this.extraData = tag.getCompound("extra_data");
         this.nextUpgrades = RoyalWeapons.getUpgrades(rank+1);
         this.lastFluffChange = tag.getInt("lastFluffChange");
-        this.upgradesFixed = tag.getBoolean("upgrades_fixed");
-        this.moneyRewardsFixed = tag.getBoolean("money_rewards_fixed");
 
         if(tag.contains("ability")) {
-            this.ability = Registries.WEAPON_ABILITIES.get(Keys.parse(tag.getString("ability")));
+            CompoundTag abilityData = tag.getCompound("ability");
+            WeaponAbility.Type type = Registries.WEAPON_ABILITIES.read(abilityData.get("type"));
+            ability = type.load(abilityData.getCompound("data"));
         }
 
         if(!tag.contains("goals")) return;
@@ -116,32 +110,18 @@ public class RoyalSword extends RankedItem {
     protected void onUpdate(ItemStack item, ItemMeta meta, CompoundTag tag) {
         super.onUpdate(item, meta, tag);
 
-        if(!upgradesFixed) {
-            upgradesFixed = true;
-
-            RoyalWeapons.getUpgrades(rank).apply(this, item, meta, tag);
-            Announcer.debug("Fixed sword upgrades");
-        }
-
-        if(!moneyRewardsFixed) {
-            CachedUpgrades[] below = RoyalWeapons.getBelow(getRank());
-
-            for (CachedUpgrades cached: below) {
-                for (WeaponUpgrade u: cached) {
-                    if (!(u instanceof MonetaryUpgrade)) continue;
-
-                    u.apply(this, item, meta, getExtraData());
-                }
-            }
-
-            moneyRewardsFixed = true;
-        }
-
-        tag.putBoolean("upgrades_fixed", true);
-        tag.putBoolean("money_rewards_fixed", true);
-
         tag.putInt("lastFluffChange", lastFluffChange);
-        if(ability != null) tag.putString("ability", ability.key().asString());
+
+        if(ability != null) {
+            CompoundTag abilityData = new CompoundTag();
+            abilityData.putString("type", ability.getType().key().asString());
+            CompoundTag data = new CompoundTag();
+
+            ability.save(data);
+
+            abilityData.put("data", data);
+            tag.put("ability", abilityData);
+        }
 
         //Serialize goals, same as map, goal 2 progress
         if(!goalsAndProgress.isEmpty()) {
@@ -164,17 +144,20 @@ public class RoyalSword extends RankedItem {
     }
 
     @Override
-    protected void createLore(LoreBuilder lore) {
+    protected void createLore(ItemLoreBuilder lore) {
         super.createLore(lore);
 
         //The bearer of this... bla bla
         addFlavorText(lore);
 
         if(ability != null) {
+            Style style = nonItalic(NamedTextColor.GRAY);
+
+            lore.add(Component.text("Current ability: ").style(style));
             lore.add(
-                    Component.text("Current ability: ")
+                    Component.text("• ")
                             .append(ability.loreDisplay())
-                            .style(nonItalic(NamedTextColor.GRAY))
+                            .style(style)
             );
         }
 
@@ -256,7 +239,7 @@ public class RoyalSword extends RankedItem {
         }
     }
 
-    private void addFlavorText(LoreBuilder lore) {
+    private void addFlavorText(ItemLoreBuilder lore) {
         final Component border = Component.text("------------------------------").style(nonItalic(NamedTextColor.DARK_GRAY));
 
         lore.add(border);
@@ -271,7 +254,7 @@ public class RoyalSword extends RankedItem {
         WeaponUseContext context = new WeaponUseContext(killer, this, (LivingEntity) event.getEntity(), event.getDamage(), event.getFinalDamage(), history);
 
         // Run ability before goal check, ability can make damage go higher
-        if(ability != null) ability.onWeaponUse(context);
+        if(ability != null) ability.onAttack(context);
 
         //Test all goals to see if we damaged any matching entities
         for (Object2IntMap.Entry<WeaponGoal> e: goalsAndProgress.object2IntEntrySet()) {

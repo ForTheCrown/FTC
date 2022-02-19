@@ -1,11 +1,8 @@
 package net.forthecrown.core.chat;
 
 import com.google.common.base.Predicates;
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.serializer.CrownSerializer;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -13,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.logging.Level;
 
 /**
  * The class representing the ingame Announcer.
@@ -82,39 +78,4 @@ public interface Announcer extends CrownSerializer {
     void announceToAllRaw(Component announcement, @Nullable Predicate<CommandSender> predicate);
 
     Component formatMessage(Component message);
-
-    /**
-     * Logs or announces a debug message, won't broadcast if on actual server
-     * @param message The message to log, gets toString'ed, or just prints "null" if null
-     */
-    static <T> T debug(T message){
-        String stringMessage = String.valueOf(message);
-
-        if(Crown.inDebugMode()) acLiteral(stringMessage);
-        else {
-            Crown.logger().debug(stringMessage);
-            for (Player p: Bukkit.getOnlinePlayers()) {
-                if(!p.hasPermission(Permissions.ADMIN)) continue;
-                p.sendMessage("[DEBUG INFO]: " + stringMessage);
-            }
-        }
-
-        return message;
-    }
-
-    /**
-     * Broadcasts a message without formatting hex colors or emojis
-     * @param message The message to broadcast
-     */
-    static void acLiteral(Object message){
-        if(message == null) message = "null";
-        Bukkit.getServer().sendMessage(ChatUtils.convertString(message.toString(), false));
-    }
-
-    class DebugLevel extends Level {
-        public static DebugLevel DEBUG = new DebugLevel();
-        protected DebugLevel() {
-            super("DEBUG", 700);
-        }
-    }
 }

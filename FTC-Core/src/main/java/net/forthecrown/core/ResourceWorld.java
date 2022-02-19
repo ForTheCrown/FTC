@@ -11,7 +11,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonWrapper;
@@ -20,7 +19,7 @@ import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.EntityPlacer;
 import net.forthecrown.structure.StructurePlaceContext;
 import net.forthecrown.useables.warps.Warp;
-import net.forthecrown.utils.Bukkit2NMS;
+import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.TimeUtil;
 import net.forthecrown.utils.math.Vector3i;
@@ -47,7 +46,6 @@ import org.mcteam.ancientgates.Gates;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeListener {
@@ -81,7 +79,6 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
 
     // Required biome types any potential seed must have within its world borders
     public static final EnumSet<Biome.BiomeCategory> REQUIRED_CATEGORIES = EnumSet.of(
-            Biome.BiomeCategory.DESERT,
             Biome.BiomeCategory.FOREST,
             Biome.BiomeCategory.MESA,
             Biome.BiomeCategory.TAIGA,
@@ -122,7 +119,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
 
         // Kick players out and close gates
         kickPlayers(original);
-        setGatesStatus(false);
+        setGatesOpen(false);
 
         // Attempt to announce closing
         if (resetStart == null) {
@@ -147,7 +144,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
                         .preserveWorldBorder(true);
 
                 World newWorld = creator.run();
-                WorldBorder border = Bukkit2NMS.getLevel(newWorld).getWorldBorder();
+                WorldBorder border = VanillaAccess.getLevel(newWorld).getWorldBorder();
                 border.setSize(getSize());
 
                 lastSeed = newWorld.getSeed();
@@ -292,10 +289,9 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
                 Crown.getAnnouncer().announce(resetEnd);
             }
 
-            // Open gates
-            setGatesStatus(true);
-            lastReset = System.currentTimeMillis();
+            setGatesOpen(true);
 
+            lastReset = System.currentTimeMillis();
             LOGGER.info("RW reset finished");
         });
     }
@@ -308,7 +304,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         }
     }
 
-    private void setGatesStatus(boolean open) {
+    private void setGatesOpen(boolean open) {
         String status = open ? "open" : "close";
         Gate g = Gate.get(toHazGate);
 
@@ -335,7 +331,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         }
 
         Gate.save();
-        LOGGER.info("setGatesStatus set, status: {}", status);
+        LOGGER.info("setGatesOpen set, status: {}", status);
     }
 
     @Override
@@ -444,7 +440,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         if (seed == lastSeed) return false;
 
         // Create chunk generator for given seed
-        ChunkGenerator gen = WorldGenSettings.makeDefaultOverworld(Bukkit2NMS.getServer().registryAccess(), seed);
+        ChunkGenerator gen = WorldGenSettings.makeDefaultOverworld(VanillaAccess.getServer().registryAccess(), seed);
 
         // Ensure the seed has all required biomes
         // As far as I can see, this is also the most intense part
@@ -487,7 +483,8 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         // an acceptable category as well as having a height
         // difference from the base less than MAX_Y_DIF
         return LEGAL_CATEGORIES.contains(category)
-                && dif < MAX_Y_DIF;
+                && dif < MAX_Y_DIF
+                && dif > -MAX_Y_DIF;
     }
 
     private boolean hasBiomes(ChunkGenerator gen) {
@@ -502,7 +499,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         int max = QuartPos.fromBlock(halfSize);
         int min = QuartPos.fromBlock(-halfSize);
 
-        Set<Biome.BiomeCategory> result = new ObjectOpenHashSet<>();
+        EnumSet<Biome.BiomeCategory> result = EnumSet.noneOf(Biome.BiomeCategory.class);
 
         // Go through the world area and find the biome at every
         // cord. For the sake of speed, it only gets every 8th biome.
@@ -516,7 +513,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
             }
         }
 
-        return EnumSet.copyOf(result);
+        return result;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

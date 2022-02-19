@@ -106,7 +106,7 @@ public class ItemStackBuilder implements Cloneable {
     }
 
     public ItemStackBuilder setAmount(int amount) {
-        Validate.isTrue(MathUtil.isInRange(amount, 0, material.getMaxStackSize()), "Invalid stack size: " + amount);
+        Validate.isTrue(MathUtil.inRange(amount, 0, material.getMaxStackSize()), "Invalid stack size: " + amount);
         this.amount = amount;
         return this;
     }
@@ -142,20 +142,20 @@ public class ItemStackBuilder implements Cloneable {
     }
 
     public ItemStackBuilder addLore(Component lore) {
-        lores.add(ChatUtils.renderIfTranslatable(lore));
+        lores.add(ChatUtils.renderToSimple(lore));
         return this;
     }
 
     public ItemStackBuilder addLore(Iterable<Component> lore) {
         for (Component c: lore) {
-            lores.add(ChatUtils.renderIfTranslatable(c));
+            lores.add(ChatUtils.renderToSimple(c));
         }
 
         return this;
     }
 
     public ItemStackBuilder setLore(List<Component> lores) {
-        this.lores = ListUtils.convert(lores, ChatUtils::renderIfTranslatable);
+        this.lores = ListUtils.convert(lores, ChatUtils::renderToSimple);
         return this;
     }
 
@@ -164,7 +164,7 @@ public class ItemStackBuilder implements Cloneable {
     }
 
     public ItemStackBuilder setName(Component name) {
-        this.name = ChatUtils.renderIfTranslatable(name);
+        this.name = ChatUtils.renderToSimple(name);
         return this;
     }
 

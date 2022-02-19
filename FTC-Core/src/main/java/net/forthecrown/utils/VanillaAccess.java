@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 /**
  * Utility class for adapting bukkit objects to vanilla MC
  */
-public interface Bukkit2NMS {
+public interface VanillaAccess {
     static Entity getEntity(org.bukkit.entity.Entity entity) {
         return ((CraftEntity) entity).getHandle();
     }

@@ -1,6 +1,6 @@
 package net.forthecrown.utils.world;
 
-import net.forthecrown.utils.Bukkit2NMS;
+import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.FtcUtils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -41,7 +41,7 @@ public class WorldReCreator {
         this.seed = world.getSeed();
         this.name = world.getName();
 
-        ServerLevel level = Bukkit2NMS.getLevel(world);
+        ServerLevel level = VanillaAccess.getLevel(world);
 
         WorldBorder border = level.getWorldBorder();
         this.worldBorderPos = new Vec2((float) border.getCenterX(), (float) border.getCenterZ());
@@ -126,7 +126,7 @@ public class WorldReCreator {
         }
 
         World world = creator.createWorld();
-        ServerLevel level = Bukkit2NMS.getLevel(world);
+        ServerLevel level = VanillaAccess.getLevel(world);
 
         if(preserveWorldBorder) {
              WorldBorder border = level.getWorldBorder();

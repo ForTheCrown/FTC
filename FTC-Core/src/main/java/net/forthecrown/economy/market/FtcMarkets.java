@@ -401,7 +401,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         textBuilder.append(
                 Component.text(entranceAmount + " entrance" + FtcUtils.addAnS(entranceAmount))
         );
-
+        
         Vector3i size = shop.getSize();
         String dimensions = size.getX() + "x" + size.getY() + "x" + size.getY() + " blocks";
 

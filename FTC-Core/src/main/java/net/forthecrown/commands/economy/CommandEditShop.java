@@ -1,4 +1,4 @@
-package net.forthecrown.commands;
+package net.forthecrown.commands.economy;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.IntegerArgumentType;

@@ -66,6 +66,10 @@ public class Vector3i extends AbstractVector3i<Vector3i> {
         return new Vector3i(pos.getX(), pos.getY(), pos.getZ());
     }
 
+    public static Vector3i of(double x, double y, double z) {
+        return new Vector3i((int) x, (int) y, (int) z);
+    }
+
     public static Vector3i of(Tag tag) {
         IntArrayTag arr = (IntArrayTag) tag;
         int[] val = arr.getAsIntArray();

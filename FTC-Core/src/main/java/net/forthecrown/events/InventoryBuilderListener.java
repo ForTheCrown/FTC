@@ -38,7 +38,8 @@ public class InventoryBuilderListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (!(event.getInventory().getHolder() instanceof BuiltInventory)) return;
+        if (!(event.getInventory().getHolder() instanceof BuiltInventory inventory)) return;
+        if(inventory.isFreeInventory()) return;
 
         event.setCancelled(true);
     }

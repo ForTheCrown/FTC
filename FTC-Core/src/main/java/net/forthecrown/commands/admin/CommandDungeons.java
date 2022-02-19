@@ -28,10 +28,10 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandRoyals extends FtcCommand {
+public class CommandDungeons extends FtcCommand {
 
-    public CommandRoyals() {
-        super("royals");
+    public CommandDungeons() {
+        super("dungeons");
 
         setPermission(Permissions.HELPER);
         register();

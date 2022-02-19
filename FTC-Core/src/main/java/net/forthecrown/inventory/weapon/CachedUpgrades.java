@@ -2,7 +2,7 @@ package net.forthecrown.inventory.weapon;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.inventory.weapon.upgrades.WeaponUpgrade;
-import net.forthecrown.utils.LoreBuilder;
+import net.forthecrown.utils.ItemLoreBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -32,7 +32,7 @@ public class CachedUpgrades extends ObjectArrayList<WeaponUpgrade> {
         forEach(upgrade -> upgrade.apply(sword, item, meta, extraData));
     }
 
-    public void addFluff(LoreBuilder builder) {
+    public void addFluff(ItemLoreBuilder builder) {
         for (WeaponUpgrade u: this) {
             Component[] fluff = u.loreFluff();
             if(fluff == null) continue;
@@ -41,7 +41,7 @@ public class CachedUpgrades extends ObjectArrayList<WeaponUpgrade> {
         }
     }
 
-    public void addLore(LoreBuilder builder) {
+    public void addLore(ItemLoreBuilder builder) {
         if(isEmpty()) return;
         builder.addEmpty();
 
@@ -80,7 +80,7 @@ public class CachedUpgrades extends ObjectArrayList<WeaponUpgrade> {
         return false;
     }
 
-    public void addCurrentLore(LoreBuilder builder) {
+    public void addCurrentLore(ItemLoreBuilder builder) {
         if(!hasStatusDisplay()) return;
         builder.addEmpty();
 

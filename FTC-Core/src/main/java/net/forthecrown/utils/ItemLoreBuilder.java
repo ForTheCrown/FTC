@@ -8,18 +8,18 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.List;
 
-public class LoreBuilder {
+public class ItemLoreBuilder {
     private final List<Component> lore;
 
-    public LoreBuilder() {
+    public ItemLoreBuilder() {
         this(new ObjectArrayList<>());
     }
 
-    public LoreBuilder(List<Component> lore) {
+    public ItemLoreBuilder(List<Component> lore) {
         this.lore = lore;
     }
 
-    public LoreBuilder addAll(Component... lore) {
+    public ItemLoreBuilder addAll(Component... lore) {
         for (Component c: Validate.noNullElements(lore)) {
             add(c);
         }
@@ -27,7 +27,7 @@ public class LoreBuilder {
         return this;
     }
 
-    public LoreBuilder addAll(String... lore) {
+    public ItemLoreBuilder addAll(String... lore) {
         for (String s: Validate.noNullElements(lore)) {
             add(s);
         }
@@ -35,7 +35,7 @@ public class LoreBuilder {
         return this;
     }
 
-    public LoreBuilder addAll(Iterable<Component> lore) {
+    public ItemLoreBuilder addAll(Iterable<Component> lore) {
         for (Component c: Validate.notNull(lore)) {
             add(c);
         }
@@ -43,7 +43,7 @@ public class LoreBuilder {
         return this;
     }
 
-    public LoreBuilder addAllStrings(Iterable<String> lore) {
+    public ItemLoreBuilder addAllStrings(Iterable<String> lore) {
         for (String s: Validate.notNull(lore)) {
             add(s);
         }
@@ -51,20 +51,20 @@ public class LoreBuilder {
         return this;
     }
 
-    public LoreBuilder add(Component c) {
-        lore.add(ChatUtils.renderIfTranslatable(c));
+    public ItemLoreBuilder add(Component c) {
+        lore.add(ChatUtils.renderToSimple(c));
         return this;
     }
 
-    public LoreBuilder add(String s) {
+    public ItemLoreBuilder add(String s) {
         return add(ChatUtils.stringToNonItalic(s, true));
     }
 
-    public LoreBuilder addEmpty() {
+    public ItemLoreBuilder addEmpty() {
         return add(Component.empty());
     }
 
-    public LoreBuilder addAll(Style style, Component... arr) {
+    public ItemLoreBuilder addAll(Style style, Component... arr) {
         for (Component c: Validate.noNullElements(arr)) {
             add(c.style(style));
         }

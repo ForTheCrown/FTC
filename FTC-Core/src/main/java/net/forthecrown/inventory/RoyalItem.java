@@ -3,7 +3,7 @@ package net.forthecrown.inventory;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.utils.LoreBuilder;
+import net.forthecrown.utils.ItemLoreBuilder;
 import net.kyori.adventure.text.Component;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
@@ -55,7 +55,7 @@ public abstract class RoyalItem {
 
         List<Component> lore = meta.hasLore() ? meta.lore() : new ObjectArrayList<>();
 
-        LoreBuilder loreBuilder = new LoreBuilder();
+        ItemLoreBuilder loreBuilder = new ItemLoreBuilder();
         createLore(loreBuilder);
 
         List<Component> extraLore = loreBuilder.getLore();
@@ -89,7 +89,7 @@ public abstract class RoyalItem {
     protected abstract void onUpdate(ItemStack item, ItemMeta meta, CompoundTag nbt);
 
     protected abstract void readNBT(CompoundTag tag);
-    protected abstract void createLore(LoreBuilder lore);
+    protected abstract void createLore(ItemLoreBuilder lore);
 
     public CrownUser getOwnerUser() {
         return !hasPlayerOwner() ? null : UserManager.getUser(getOwner());

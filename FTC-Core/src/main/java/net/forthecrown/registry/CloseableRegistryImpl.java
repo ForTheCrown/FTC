@@ -4,11 +4,11 @@ import net.kyori.adventure.key.Key;
 import org.apache.commons.lang.Validate;
 import org.bukkit.NamespacedKey;
 
-public class CloseableRegistryBase<T> extends BaseRegistry<T> implements CloseableRegistry<T> {
+public class CloseableRegistryImpl<T> extends RegistryImpl<T> implements CloseableRegistry<T> {
 
     private boolean open = true;
 
-    public CloseableRegistryBase(NamespacedKey key) {
+    public CloseableRegistryImpl(NamespacedKey key) {
         super(key);
     }
 

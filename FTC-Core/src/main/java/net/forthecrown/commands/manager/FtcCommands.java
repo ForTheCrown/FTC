@@ -76,7 +76,7 @@ public final class FtcCommands {
         new CommandInteractable();
         new CommandSudo();
         new CommandSetSpawn();
-        new CommandRoyals();
+        new CommandDungeons();
         new CommandFtcUser();
         new CommandPlayerTime();
 

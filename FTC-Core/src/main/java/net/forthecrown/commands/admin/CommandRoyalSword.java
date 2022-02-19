@@ -11,8 +11,8 @@ import net.forthecrown.core.chat.ComponentTagVisitor;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
-import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
+import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
@@ -89,7 +89,7 @@ public class CommandRoyalSword extends FtcCommand {
                             WeaponAbility ability = sword.getAbility();
                             if(ability == null) throw FtcExceptionProvider.create("Sword has no ability");
 
-                            user.sendMessage("Ability: " + ability.key().asString());
+                            user.sendMessage("Ability: " + ability.getType().key().asString());
                             return 0;
                         })
 
@@ -106,16 +106,16 @@ public class CommandRoyalSword extends FtcCommand {
                                 })
                         )
 
-                        .then(argument("ability", RegistryArguments.weaponAbility())
+                        .then(argument("type", RegistryArguments.weaponAbility())
                                 .executes(c -> {
                                     CrownUser user = getUserSender(c);
                                     RoyalSword sword = getSword(user);
 
-                                    WeaponAbility ability = c.getArgument("ability", WeaponAbility.class);
-                                    sword.setAbility(ability);
+                                    WeaponAbility.Type type = c.getArgument("type", WeaponAbility.Type.class);
+                                    sword.setAbility(type.create());
                                     sword.update();
 
-                                    c.getSource().sendAdmin("Set sword's ability to " + ability.key().asString());
+                                    c.getSource().sendAdmin("Set sword's ability to " + type.key().asString());
                                     return 0;
                                 })
                         )

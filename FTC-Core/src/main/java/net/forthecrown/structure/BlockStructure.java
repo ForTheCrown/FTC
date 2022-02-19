@@ -3,7 +3,7 @@ package net.forthecrown.structure;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.serializer.NbtSerializable;
-import net.forthecrown.utils.Bukkit2NMS;
+import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
@@ -59,11 +59,11 @@ public class BlockStructure implements NbtSerializable, Keyed {
             if (!context.filterBlock(b)) continue;
 
             Vector3i offset = Vector3i.of(b).subtract(start);
-            BlockState state = Bukkit2NMS.getState(b);
+            BlockState state = VanillaAccess.getState(b);
             CompoundTag tag = null;
 
             if(b.getState() instanceof TileState tileState) {
-                BlockEntity entity = Bukkit2NMS.getBlockEntity(tileState);
+                BlockEntity entity = VanillaAccess.getBlockEntity(tileState);
                 tag = entity.saveWithoutMetadata();
             }
 
@@ -81,7 +81,7 @@ public class BlockStructure implements NbtSerializable, Keyed {
                         l.getZ() - (double) start.getZ()
                 );
 
-                net.minecraft.world.entity.Entity entity = Bukkit2NMS.getEntity(e);
+                net.minecraft.world.entity.Entity entity = VanillaAccess.getEntity(e);
                 CompoundTag data = new CompoundTag();
                 data.putString("id", entity.getMinecraftKeyString());
                 data = entity.saveWithoutId(data);

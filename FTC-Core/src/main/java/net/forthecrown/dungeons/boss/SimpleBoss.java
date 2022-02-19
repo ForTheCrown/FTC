@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * A simple dungeon boss used by the first 4 dungeon bosses
  */
-public abstract class SimpleBoss extends KeyedBossImpl implements KeyedBoss, SingleEntityBoss {
+public abstract class SimpleBoss extends KeyedBossImpl implements SingleEntityBoss {
     protected final Location spawnLocation;
 
     protected Mob entity;

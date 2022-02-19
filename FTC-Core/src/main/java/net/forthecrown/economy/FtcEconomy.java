@@ -30,12 +30,12 @@ public class FtcEconomy extends AbstractJsonSerializer implements Economy {
     protected void save(JsonWrapper json) {
         Set<UUID> serialized = new HashSet<>();
 
-        for (BalanceMap.Balance e: getMap().entries()) {
-            if(serialized.contains(e.getUniqueId())) continue;
+        balanceMap.readerStream().forEach(e -> {
+            if(serialized.contains(e.getUniqueId())) return;
             serialized.add(e.getUniqueId());
 
             json.add(e.getUniqueId().toString(), e.getValue());
-        }
+        });
     }
 
     @Override

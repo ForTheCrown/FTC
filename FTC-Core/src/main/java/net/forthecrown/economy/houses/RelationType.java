@@ -25,7 +25,7 @@ public enum RelationType {
     }
 
     public boolean inRange(int amount) {
-        return MathUtil.isInRange(amount, min, max);
+        return MathUtil.inRange(amount, min, max);
     }
 
     public boolean isPositive() {

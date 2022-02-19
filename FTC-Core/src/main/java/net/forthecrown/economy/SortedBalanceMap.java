@@ -1,20 +1,14 @@
 package net.forthecrown.economy;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.IntSupplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -26,12 +20,11 @@ import java.util.stream.Stream;
  * keeps the map sorted at all times.
  */
 public class SortedBalanceMap implements BalanceMap {
+    private final IntSupplier defaultAmount;
     private Balance[] entries = new Balance[100];
     private int size;
 
-    private final IntSupplier defaultAmount;
-
-    public SortedBalanceMap(IntSupplier defaultAmount){
+    public SortedBalanceMap(IntSupplier defaultAmount) {
         this.defaultAmount = defaultAmount;
     }
 
@@ -41,14 +34,14 @@ public class SortedBalanceMap implements BalanceMap {
     }
 
     @Override
-    public boolean contains(UUID id){
+    public boolean contains(UUID id) {
         return getIndex(id) != -1;
     }
 
     @Override
-    public void remove(UUID id){
+    public void remove(UUID id) {
         int index = getIndex(id);
-        if(index == -1) return;
+        if (index == -1) return;
 
         //Remove entry
         entries[index] = null;
@@ -56,9 +49,9 @@ public class SortedBalanceMap implements BalanceMap {
 
         //If the index wasn't the last entry in the list,
         //collapse array at index
-        if(size != index) {
+        if (size != index) {
             //Collapse array at index so there's no empty spaces
-            System.arraycopy(entries, index+1, entries, index, entries.length-index - 1);
+            System.arraycopy(entries, index + 1, entries, index, entries.length - index - 1);
 
             //Nullify last entry, as it's a copy of length - 2 now
             entries[entries.length - 1] = null;
@@ -68,19 +61,19 @@ public class SortedBalanceMap implements BalanceMap {
     @Override
     public int get(UUID id) {
         int index = getIndex(id);
-        if(index == -1) return getDefaultAmount();
+        if (index == -1) return getDefaultAmount();
 
         return entries[index].getValue();
     }
 
     @Override
-    public int get(int index){
+    public int get(int index) {
         validateIndex(index);
         return entries[index].getValue();
     }
 
     @Override
-    public Balance getEntry(int index){
+    public Balance getEntry(int index) {
         validateIndex(index);
         return entries[index];
     }
@@ -90,7 +83,7 @@ public class SortedBalanceMap implements BalanceMap {
         validateIndex(index);
 
         Balance entry = getEntry(index);
-        if(!UserManager.isPlayerID(entry.getUniqueId())) return null;
+        if (!UserManager.isPlayerID(entry.getUniqueId())) return null;
 
         CrownUser user = UserManager.getUser(entry.getUniqueId());
         Component displayName = user.nickDisplayName();
@@ -119,12 +112,12 @@ public class SortedBalanceMap implements BalanceMap {
         for (int i = 0; i < half + divCorrection; i++) {
             //Check front half
             Balance entry = getEntry(i);
-            if(entry != null && entry.getUniqueId().equals(id)) return i;
+            if (entry != null && entry.getUniqueId().equals(id)) return i;
 
             //Check last half
             int oppositeEnd = size - 1 - i;
             entry = getEntry(oppositeEnd);
-            if(entry != null && entry.getUniqueId().equals(id)) return oppositeEnd;
+            if (entry != null && entry.getUniqueId().equals(id)) return oppositeEnd;
         }
 
         //Not found
@@ -149,14 +142,14 @@ public class SortedBalanceMap implements BalanceMap {
         Balance entry = index == -1 ? new Balance(id, amount) : getEntry(index).setValue(amount);
 
         //If new entry
-        if(index == -1) {
+        if (index == -1) {
             index = size;
 
             //Increment size
             size++;
 
             //If array size has to be increased
-            if(size >= entries.length) {
+            if (size >= entries.length) {
                 Balance[] copy = entries;                           //Copy old entries
                 entries = new Balance[copy.length + 1];             //Make new array with bigger size
                 System.arraycopy(copy, 0, entries, 0, copy.length); //Copy all entries from copy to new array
@@ -168,9 +161,9 @@ public class SortedBalanceMap implements BalanceMap {
         checkSorted(index);
     }
 
-    private void checkSorted(int index){
+    private void checkSorted(int index) {
         int moveDir = moveDir(index);
-        if(moveDir == 0) return;
+        if (moveDir == 0) return;
 
         moveInDir(index, moveDir);
     }
@@ -179,7 +172,7 @@ public class SortedBalanceMap implements BalanceMap {
         entries[index] = bal;
     }
 
-    private void moveInDir(int index, int dir){
+    private void moveInDir(int index, int dir) {
         int newIndex = index + dir;
 
         Balance entry = getEntry(newIndex);
@@ -191,31 +184,31 @@ public class SortedBalanceMap implements BalanceMap {
         checkSorted(newIndex);
     }
 
-    private int moveDir(int index){
+    private int moveDir(int index) {
         Balance entry = getEntry(index);
 
         int towardsTop = index + 1;
-        if(isInList(towardsTop)){
+        if (isInList(towardsTop)) {
             Balance top = getEntry(towardsTop);
-            if(top != null && top.compareTo(entry) == 1) return 1;
+            if (top != null && top.compareTo(entry) == 1) return 1;
         }
 
         int towardsBottom = index - 1;
-        if(isInList(towardsBottom)){
+        if (isInList(towardsBottom)) {
             Balance bottom = getEntry(towardsBottom);
-            if(bottom != null && bottom.compareTo(entry) == -1) return -1;
+            if (bottom != null && bottom.compareTo(entry) == -1) return -1;
         }
 
         return 0;
     }
 
-    private boolean isInList(int index){
-        if(index < 0) return false;
+    private boolean isInList(int index) {
+        if (index < 0) return false;
         return index <= size - 1;
     }
 
     @Override
-    public long getTotalBalance(){
+    public long getTotalBalance() {
         int defAmount = getDefaultSupplier().getAsInt();
 
         return Arrays.stream(entries)
@@ -225,43 +218,11 @@ public class SortedBalanceMap implements BalanceMap {
     }
 
     @Override
-    public String toString(){
-        return ListUtils.join(entries(), "\n", bal -> bal.getUniqueId() + " = " + bal.getValue());
-    }
-
-    @Override
-    public List<UUID> keys(){
-        return nonNullEntries()
-                .map(Balance::getUniqueId)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Integer> values(){
-        return nonNullEntries()
-                .map(Balance::getValue)
-                .collect(Collectors.toList());
-    }
-
-    private Stream<Balance> nonNullEntries() {
-        return Arrays.stream(entries)
-                .filter(Objects::nonNull);
-    }
-
-    @Override
-    public List<Balance> entries() {
-        ObjectList<Balance> bals = new ObjectArrayList<>();
-
-        for (Balance b: entries) {
-            if(b == null) continue;
-
-            bals.add(b);
-        }
-
-        return bals;
+    public Stream<BalanceReader> readerStream() {
+        return Arrays.stream(entries, 0, size);
     }
 
     private void validateIndex(int index) {
-        if(!isInList(index)) throw new IndexOutOfBoundsException("Index " + index + " not in range [0 " + size + ")");
+        if (!isInList(index)) throw new IndexOutOfBoundsException("Index " + index + " not in range [0 " + size + ")");
     }
 }

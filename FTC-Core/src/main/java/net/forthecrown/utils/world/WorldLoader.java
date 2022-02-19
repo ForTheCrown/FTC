@@ -3,7 +3,7 @@ package net.forthecrown.utils.world;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.TimePrinter;
-import net.forthecrown.utils.Bukkit2NMS;
+import net.forthecrown.utils.VanillaAccess;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.ChunkPos;
 import org.apache.commons.lang3.Validate;
@@ -277,7 +277,7 @@ public class WorldLoader {
 
                                         // Unload the chunk to make sure it doesn't stay in RAM
                                         if(!Bukkit.isPrimaryThread()) {
-                                            Bukkit2NMS.getServer().execute(() -> chunk.unload(true));
+                                            VanillaAccess.getServer().execute(() -> chunk.unload(true));
                                         }
 
                                         //Update progress tracker and release the semaphore permit

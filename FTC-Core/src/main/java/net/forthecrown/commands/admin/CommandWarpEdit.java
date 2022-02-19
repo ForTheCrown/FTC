@@ -8,7 +8,6 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.chat.Announcer;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;
@@ -70,7 +69,6 @@ public class CommandWarpEdit extends FtcCommand {
                                 .executes(c -> {
                                     CrownUser user = getUserSender(c);
                                     Warp warp = get(c);
-                                    Announcer.debug(warp);
 
                                     user.createTeleport(warp::getDestination, true, UserTeleport.Type.WARP).start(true);
                                     return 0;

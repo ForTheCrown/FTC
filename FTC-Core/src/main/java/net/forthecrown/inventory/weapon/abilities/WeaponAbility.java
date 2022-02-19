@@ -1,35 +1,51 @@
 package net.forthecrown.inventory.weapon.abilities;
 
-import net.forthecrown.core.Keys;
 import net.forthecrown.inventory.weapon.AltAttackContext;
 import net.forthecrown.inventory.weapon.WeaponUseContext;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.nbt.CompoundTag;
 
-public abstract class WeaponAbility implements Keyed {
-    private final Key key;
-    private final String name;
+public abstract class WeaponAbility {
+    private final Type type;
+    protected int level;
 
-    WeaponAbility(String name) {
-        this.name = name;
-        this.key = Keys.forthecrown(
-                name.toLowerCase().replaceAll(" ", "_")
-        );
+    public WeaponAbility(Type type, int level) {
+        this.type = type;
+        this.level = level;
     }
 
-    public abstract void onWeaponUse(WeaponUseContext context);
+    public WeaponAbility(Type type, CompoundTag tag) {
+        this.type = type;
+        setLevel(tag.getInt("level"));
+    }
+
     public void onAltAttack(AltAttackContext context) {}
+
+    public abstract void onAttack(WeaponUseContext context);
     public abstract void onBlockAltAttack(AltAttackContext.c_Block context);
     public abstract void onEntityAltAttack(AltAttackContext.c_Entity context);
 
-    public Component loreDisplay() {
-        return Component.text(name);
+    public void save(CompoundTag tag) {
+        tag.putInt("level", level);
     }
 
-    @Override
-    public @NotNull Key key() {
-        return key;
+    public Type getType() {
+        return type;
+    }
+
+    public abstract Component loreDisplay();
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public interface Type extends Keyed {
+        WeaponAbility create();
+        WeaponAbility load(CompoundTag data);
     }
 }

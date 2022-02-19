@@ -3,8 +3,8 @@ package net.forthecrown.core;
 import com.google.gson.JsonElement;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.utils.Bukkit2NMS;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.utils.world.WorldReCreator;
@@ -92,22 +92,22 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
                 .preserveSeed(false)
                 .preserveWorldBorder(true);
 
-        final World world = reCreator.run();
+        final World created = reCreator.run();
 
         // Sometimes the border size is incorrect
         // so gotta call this with our manually
         // set size
-        world.getWorldBorder().setSize(endSize);
+        created.getWorldBorder().setSize(endSize);
 
         // Load the world and create the crucial
         // End Features needed for the end to
         // function properly
-        return WorldLoader.loadAsync(world)
-                .whenComplete((world1, throwable) -> {
+        return WorldLoader.loadAsync(created)
+                .whenComplete((world, throwable) -> {
                     // Run sync
                     Bukkit.getScheduler().runTask(Crown.inst(), () -> {
                         try {
-                            EndDragonFight fight = Bukkit2NMS.getLevel(world).dragonFight();
+                            EndDragonFight fight = VanillaAccess.getLevel(world).dragonFight();
 
                             // Create exit portal
                             world.getEnderDragonBattle().generateEndPortal(true);
@@ -169,7 +169,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
         // Thank you once more, Bukkit, for not providing
         // an API for this stuff. Cuz who could ever want
         // to update a block state
-        Level world = Bukkit2NMS.getLevel(b.getWorld());
+        Level world = VanillaAccess.getLevel(b.getWorld());
         CraftBlock craft = (CraftBlock) b;
         BlockPos pos = craft.getPosition();
         BlockState state = craft.getNMS();

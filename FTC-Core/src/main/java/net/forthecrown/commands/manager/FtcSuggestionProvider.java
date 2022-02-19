@@ -9,7 +9,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
-import net.forthecrown.registry.FtcRegistry;
+import net.forthecrown.registry.BaseRegistry;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.ListUtils;
@@ -18,7 +18,7 @@ import net.kyori.adventure.key.Key;
 import java.util.concurrent.CompletableFuture;
 
 public interface FtcSuggestionProvider {
-    static CompletableFuture<Suggestions> suggestRegistry(SuggestionsBuilder builder, FtcRegistry<?, ?> registry) {
+    static CompletableFuture<Suggestions> suggestRegistry(SuggestionsBuilder builder, BaseRegistry<?, ?> registry) {
         return CompletionProvider.suggestKeys(builder, registry.keySet());
     }
 

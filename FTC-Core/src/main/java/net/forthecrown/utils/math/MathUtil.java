@@ -21,9 +21,13 @@ public final class MathUtil {
         return val <= max ? (val >= min ? val : min) : max;
     }
 
-    public static boolean isInRange(double check, double min, double max) {
-        if(check > max) return false;
-        return check >= min;
+    public static boolean inRange(long val, long min, long max) {
+        return val >= min && val <= max;
+    }
+
+    public static boolean inRange(double check, double min, double max) {
+        if (check > max || check < min) return false;
+        return true;
     }
 
     public static Vector vectorBetweenPoints(Location l1, Location l2) {

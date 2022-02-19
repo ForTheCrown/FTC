@@ -1,6 +1,7 @@
 package net.forthecrown.commands.emotes;
 
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.math.MathUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -10,15 +11,29 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
+import java.time.Month;
+import java.util.Calendar;
+
 public class EmoteSmooch extends CommandEmote {
 
     public EmoteSmooch(){
-        super("mwah", /*3*20*/ 0, Component.translatable("emotes.smooch.cooldown"));
+        super("mwah", 3 * 20, Component.translatable("emotes.smooch.cooldown"));
 
         setAliases("smooch", "kiss");
         setDescription("Kisses another player.");
 
         register();
+    }
+
+    public static boolean isValentinesPeriod() {
+        Calendar calendar = Calendar.getInstance();
+        int month = calendar.get(Calendar.MONTH);
+
+        if(month != Month.FEBRUARY.getValue()) return false;
+
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        return MathUtil.inRange(day, 9, 17);
     }
 
     public static final Component HEART = Component.text("❤").color(NamedTextColor.RED);
@@ -64,5 +79,10 @@ public class EmoteSmooch extends CommandEmote {
         user.getPlayer().playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_UP, 3.0F, 2F);
         user.getPlayer().spawnParticle(Particle.HEART, loc.getX(), loc.getY()+1, loc.getZ(), 5, 0.5, 0.5, 0.5);
         return 0;
+    }
+
+    @Override
+    public int getCooldownTime() {
+        return isValentinesPeriod() ? 0 : cooldownTime;
     }
 }

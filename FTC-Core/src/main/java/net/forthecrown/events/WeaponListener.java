@@ -17,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -48,8 +49,9 @@ public class WeaponListener implements Listener {
         );
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if(event.getHand() == EquipmentSlot.OFF_HAND) return;
 
         consumeSword(
                 event.getItem(),
@@ -62,8 +64,8 @@ public class WeaponListener implements Listener {
                     if(ability != null) {
                         AltAttackContext.c_Block block = new AltAttackContext.c_Block(event, sword, history);
 
-                        ability.onBlockAltAttack(block);
                         ability.onAltAttack(block);
+                        ability.onBlockAltAttack(block);
                     }
                 }
         );
@@ -71,6 +73,8 @@ public class WeaponListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if(event.getHand() == EquipmentSlot.OFF_HAND) return;
+
         consumeSword(
                 event.getPlayer().getInventory().getItemInMainHand(),
                 sword -> {
@@ -81,8 +85,8 @@ public class WeaponListener implements Listener {
                     if(ability != null) {
                         AltAttackContext.c_Entity entity = new AltAttackContext.c_Entity(event, sword, history);
 
-                        ability.onEntityAltAttack(entity);
                         ability.onAltAttack(entity);
+                        ability.onEntityAltAttack(entity);
                     }
                 }
         );
