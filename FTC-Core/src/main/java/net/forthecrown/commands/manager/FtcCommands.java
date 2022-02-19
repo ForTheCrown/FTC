@@ -139,6 +139,7 @@ public final class FtcCommands {
         new CommandMail();
         new CommandCosmetics();
         new CommandClickableText();
+        new CommandSettings();
 
         CommandDumbThing.init();
         CommandToolBlock.init();
