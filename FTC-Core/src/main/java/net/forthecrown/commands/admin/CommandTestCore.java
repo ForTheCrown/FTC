@@ -2,7 +2,9 @@ package net.forthecrown.commands.admin;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.sk89q.worldedit.math.BlockVector2;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.forthecrown.book.builder.TextInfo;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
@@ -35,16 +37,21 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec2;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.awt.Color;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.UUID;
 
 public class CommandTestCore extends FtcCommand {
+    private static final Logger LOGGER = Crown.logger();
 
     static final BlockAnimation TEST_ANIM = new AnimationBuilder("test_animation")
             .setTicksPerFrame(10)
@@ -84,6 +91,49 @@ public class CommandTestCore extends FtcCommand {
             user.sendMessage(gradient);
             return 0;
         })
+                .then(literal("test_font")
+                        .then(argument("input", StringArgumentType.greedyString())
+                                .executes(c -> {
+                                    String input = c.getArgument("input", String.class);
+                                    int legacySize = TextInfo.getPixLengthLegacy(input);
+                                    int newSize = TextInfo.getPxLength(input);
+
+                                    LOGGER.info("input: '{}'", input);
+                                    LOGGER.info("legacySize: {}, newSize: {}", legacySize, newSize);
+
+                                    return 0;
+                                })
+                        )
+
+                        .executes(c -> {
+                            Font f = TextInfo.MC_FONT;
+
+                            String z = "Z";
+                            BlockVector2 exampleSize = BlockVector2.at(5, 7);
+
+                            Rectangle2D rec = f.getStringBounds(z, TextInfo.RENDER_CONTEXT);
+
+                            double xSize = rec.getWidth();
+                            double zSize = rec.getHeight();
+
+                            LOGGER.info("recX: {}", rec.getWidth());
+                            LOGGER.info("recZ: {}", rec.getHeight());
+
+                            Vec2 pixelRatio = new Vec2((float) (exampleSize.getX() / xSize), (float) (exampleSize.getZ() / zSize));
+
+                            String x = "i";
+                            BlockVector2 expectedSize = BlockVector2.at(1, 7);
+
+                            Rectangle2D gottenSize = f.getStringBounds(x, TextInfo.RENDER_CONTEXT);
+
+                            LOGGER.info("expectedSize of 'x': ({} {})", expectedSize.getX(), expectedSize.getZ());
+                            LOGGER.info("gottenSize of 'x': ({} {})", gottenSize.getWidth(), gottenSize.getHeight());
+
+                            LOGGER.info("pixelSize: ({} {})", Math.ceil(gottenSize.getWidth() * pixelRatio.x), Math.ceil(gottenSize.getHeight() * pixelRatio.y));
+                            return 0;
+                        })
+                )
+
                 .then(literal("hardcoded_node_step")
                         .executes(c -> {
                             CrownUser user = getUserSender(c);

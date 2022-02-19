@@ -7,7 +7,6 @@ import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.click.ClickableTexts;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
@@ -16,9 +15,7 @@ import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.util.Buildable;
 import org.bukkit.permissions.Permission;
 
 public class StateChangeCommand extends FtcCommand {
@@ -83,7 +80,7 @@ public class StateChangeCommand extends FtcCommand {
 
     // Here, we create a clickable text node for this command
     private ClickableTextNode createNode(boolean state) {
-        ClickableTextNode node = new ClickableTextNode(getName());
+        ClickableTextNode node = new ClickableTextNode(getName() + "_" + (state ? "allow" : "deny"));
 
         // We give the node an executor which sets the user's state
         node.setExecutor(user -> {
@@ -92,25 +89,25 @@ public class StateChangeCommand extends FtcCommand {
         });
 
         node.setPrompt(user -> {
-            TextComponent.Builder b = Component.text();
+            boolean currentState = getState(user);
+            boolean matches = currentState == state;
+
+            TextComponent.Builder text = Component.text()
+                    .content(state ? "[✔]" : "[✖]")
+                    .color(matches ? NamedTextColor.DARK_AQUA : NamedTextColor.GRAY);
+
             if (state) { // [Allow] option
-                TextComponent.Builder allowComponent = Component.text();
-                allowComponent.append(Component.text("[Allow]"));
+                if (!currentState) {
+                    text.hoverEvent(Component.text("Click to Allow"));
+                }
 
-                if (getState(user)) allowComponent.color(NamedTextColor.DARK_AQUA); // If already allowed
-                else allowComponent.hoverEvent(Component.text("Click to Allow")).color(NamedTextColor.GRAY);
-
-                return allowComponent.build();
+            } else { // [Deny] option
+                if (currentState) {
+                    text.hoverEvent(Component.text("Click to Deny"));
+                }
             }
-            else { // [Deny] option
-                TextComponent.Builder denyComponent = Component.text();
-                denyComponent.append(Component.text("[Deny]"));
 
-                if (!getState(user)) denyComponent.color(NamedTextColor.DARK_AQUA); // If already denied
-                else denyComponent.hoverEvent(Component.text("Click to Deny")).color(NamedTextColor.GRAY);
-
-                return denyComponent.build();
-            }
+            return text.build();
         });
 
         return node;
@@ -217,7 +214,8 @@ public class StateChangeCommand extends FtcCommand {
     }
 
     public static final StateChangeCommand PROFILE_PRIVATE = new StateChangeCommand(
-            "profiletoggle", "Profile",
+            "profiletoggle",
+            "Profile",
             CrownUser::isProfilePublic, CrownUser::setProfilePublic,
             "user.profile.public", "user.profile.private",
             Permissions.PROFILE,
@@ -226,7 +224,8 @@ public class StateChangeCommand extends FtcCommand {
     );
 
     public static final StateChangeCommand IGNORE_BROADCASTS = new StateChangeCommand(
-            "ignoreac", "FTC",
+            "ignoreac",
+            "Broadcasts",
             CrownUser::ignoringBroadcasts, CrownUser::setIgnoringBroadcasts,
             "user.acIgnore.on", "user.acIgnore.off",
             Permissions.IGNORE_AC,
@@ -235,7 +234,8 @@ public class StateChangeCommand extends FtcCommand {
     );
 
     public static final StateChangeCommand TOGGLE_PAY = new StateChangeCommand(
-            "paytoggle", "Pay",
+            "paytoggle",
+            "Pay",
             CrownUser::allowsPaying, CrownUser::setAllowsPay,
             "commands.payToggle.on", "commands.payToggle.off",
             Permissions.PAY_TOGGLE,
@@ -243,7 +243,8 @@ public class StateChangeCommand extends FtcCommand {
     );
 
     public static final StateChangeCommand TOGGLE_RIDING = new StateChangeCommand(
-            "toggleriding", "Riding",
+            "toggleriding",
+            "Riding",
             CrownUser::allowsRiding, CrownUser::setAllowsRiding,
             "user.riding.allow", "user.riding.deny",
             Permissions.DEFAULT,
@@ -252,7 +253,8 @@ public class StateChangeCommand extends FtcCommand {
     );
 
     public static final StateChangeCommand TOGGLE_TPA = new StateChangeCommand(
-            "tpatoggle", "Tpa",
+            "tpatoggle",
+            "TPA",
             CrownUser::allowsTPA, CrownUser::setAllowsTPA,
             "tpa.toggle.on", "tpa.toggle.off",
             Permissions.TPA,
@@ -261,7 +263,8 @@ public class StateChangeCommand extends FtcCommand {
     );
 
     public static final StateChangeCommand TOGGLE_MARRIAGE_CHAT = new StateChangeCommand(
-            "marriagechattoggle", "Mchat",
+            "marriagechattoggle",
+            "MChat",
             (user, toggled) -> {
                 UserInteractions inter = user.getInteractions();
 
@@ -292,7 +295,8 @@ public class StateChangeCommand extends FtcCommand {
     );
 
     public static final StateChangeCommand TOGGLE_EMOTES = new StateChangeCommand(
-            "toggleemotes", "Emotes",
+            "toggleemotes",
+            "Emotes",
             CrownUser::allowsEmotes, CrownUser::setAllowsEmotes,
             "emotes.toggle.on", "emotes.toggle.off",
             Permissions.EMOTES,
@@ -301,7 +305,8 @@ public class StateChangeCommand extends FtcCommand {
     );
 
     public static final StateChangeCommand TOGGLE_MARRYING = new StateChangeCommand(
-            "marrytoggle", "Marry",
+            "marrytoggle",
+            "Marrying",
 
             user -> user.getInteractions().acceptingProposals(),
             (user, newState) -> user.getInteractions().setAcceptingProposals(newState),
@@ -313,7 +318,8 @@ public class StateChangeCommand extends FtcCommand {
     );
 
     public static final StateChangeCommand TOGGLE_REGION_INVITES = new StateChangeCommand(
-            "toggleinvites", "Invites",
+            "toggleinvites",
+            "Region Invites",
 
             CrownUser::allowsRegionInvites,
             CrownUser::setAllowsRegionInvites,
@@ -325,7 +331,8 @@ public class StateChangeCommand extends FtcCommand {
     );
 
     public static final StateChangeCommand TOGGLE_HULK_SMASHING = new StateChangeCommand(
-            "hulksmash", "Hulk",
+            "hulksmash",
+            "Hulk Smashing",
 
             CrownUser::hulkSmashesPoles,
             CrownUser::setHulkPoles,

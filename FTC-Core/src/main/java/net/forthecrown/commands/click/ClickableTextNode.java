@@ -64,7 +64,7 @@ public class ClickableTextNode {
 
     public void removeNode(String name) {
         Validate.notNull(name, "Name was null");
-        nameHash2Node.remove(name.hashCode());
+        nameHash2Node.remove(ClickableTexts.toCodedHash(name.hashCode()));
     }
 
     public Long2ObjectMap<ClickableTextNode> getNodes() {

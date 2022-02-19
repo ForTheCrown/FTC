@@ -89,6 +89,14 @@ public class BookBuilder implements Builder<BuiltBook> {
         return this;
     }
 
+    public int getLineCount() {
+        return lineCount;
+    }
+
+    public int getPageCount() {
+        return pageCount;
+    }
+
     @Override
     public BuiltBook build() {
         addPage();

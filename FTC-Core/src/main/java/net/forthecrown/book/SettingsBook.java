@@ -8,17 +8,16 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingsBook {
 
     public SettingsBook() {}
 
-    private static final Set<StateChangeCommand> cmds = new HashSet<>();
+    private static final List<StateChangeCommand> cmds = new ArrayList<>();
     public static void addCmdToBook(StateChangeCommand cmd) { cmds.add(cmd); }
 
     public static void open(CrownUser user) {
@@ -33,15 +32,32 @@ public class SettingsBook {
                 .addText(Component.text("Settings:"))
                 .addEmptyLine();
 
-        for (StateChangeCommand cmd : cmds) builder.addText(getLine(cmd, user));
+        for (StateChangeCommand cmd : cmds) getLine(builder, cmd, user);
         return builder.build();
     }
 
-    private static TextComponent getLine(StateChangeCommand cmd, CrownUser user) {
-        TextComponent header = Component.text(cmd.getDisplayName() + ":").hoverEvent(HoverEvent.showText(Component.text(cmd.getDescription())));
+    private static void getLine(BookBuilder builder, StateChangeCommand cmd, CrownUser user) {
+        if(builder.getLineCount() + 1 > BookBuilder.MAX_LINES) {
+            builder.newPage();
+        }
+
+        Component header = cmd.getDisplayName().append(Component.text(":")).hoverEvent(Component.text(cmd.getDescription()));
         Component options = cmd.getButtonComponent(user); // get from StateChangeCommand?
 
-        String headerText = ChatUtils.plainText(header); // ?
+        int headerLength = TextInfo.getPxLength(ChatUtils.plainText(header));
+        int optionsLength = TextInfo.getPxLength(ChatUtils.plainText(options));
+
+        Component filler = getFiller(BookBuilder.PIXELS_PER_LINE - (headerLength + optionsLength));
+
+        builder.addText(
+                Component.text()
+                        .append(header)
+                        .append(filler)
+                        .append(options)
+                        .build()
+        );
+
+        /*String headerText = ChatUtils.plainText(header); // ?
         String optionsText = ChatUtils.plainText(header); // 68
         int pxLength = TextInfo.getPxLength(headerText) + TextInfo.getPxLength(optionsText);
 
@@ -60,7 +76,14 @@ public class SettingsBook {
             default -> indentAdjuster = Component.empty(); // uhhhh shouldn't get here, right?? let's hope so
         }
         TextComponent filler = Component.text(indent.toString()).append(indentAdjuster);
-        return Component.text().append(header).append(filler).append(options).build();
+        return Component.text().append(header).append(filler).append(options).build();*/
+    }
+
+    private static Component getFiller(int amount) {
+        int half = amount >> 1;
+
+        // All hail the single pixel I
+        return Component.text(".".repeat(half)).color(NamedTextColor.WHITE);
     }
 
     private static TextComponent getFillerChar(char c) {
