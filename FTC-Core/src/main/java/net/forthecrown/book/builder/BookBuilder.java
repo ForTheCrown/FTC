@@ -13,7 +13,7 @@ public class BookBuilder implements Builder<BuiltBook> {
     String author;
     TextComponent.Builder currentPage = Component.text();
     int numPages = 0;
-    int numLines = 0;
+    int numLinesOnCurrentPage = 0;
 
     ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
     BookMeta bookMeta = (BookMeta) book.getItemMeta();
@@ -38,28 +38,59 @@ public class BookBuilder implements Builder<BuiltBook> {
         return this;
     }
 
+    public BookBuilder addEmptyLine() {
+        if (numLinesOnCurrentPage >= 13) {
+            addPage();
+            this.numLinesOnCurrentPage = 0;
+        }
+        ++this.numLinesOnCurrentPage;
+        this.currentPage.append(NEW_LINE);
+        return this;
+    }
 
     // Add text to current page
-    public BookBuilder addToPage (TextComponent line) {
-        // 14 lines of text possible (0 -> 13)
-        if (numLines == 13) {
-            addPage();
-            this.numLines = 0;
+    public BookBuilder addText(TextComponent line) {
+        if (line.content().length() == 0) return this; // Don't add empty lines
+        if (line.content().length() >= 14 * 114) return this; // Don't add oversized lines
+
+        // Increase numLines according to new line length
+        int lineLength = TextInfo.getPxLength(line.content());
+        while (lineLength > 0) {
+            ++numLinesOnCurrentPage;
+            lineLength -= 114;
         }
+
+        // If numLines too big, paste new line on next page
+        // 14 lines of text possible (0 -> 13)
+        if (numLinesOnCurrentPage > 13) addPage();
+
         this.currentPage.append(line).append(NEW_LINE);
-        ++this.numLines;
         return this;
     }
 
     public void addPage() {
         bookMeta.addPages(currentPage.build());
-        currentPage = Component.text(); // empty page
         ++numPages;
+
+        currentPage = Component.text(); // empty page
+        numLinesOnCurrentPage = 0; // No lines yet
+    }
+
+    public BookBuilder newPage() {
+        addPage();
+        return this;
+    }
+
+    public BookBuilder addAmountOfLines() {
+        int currentAmountOfLines = numLinesOnCurrentPage;
+        addText(Component.text("#Lines: " + currentAmountOfLines));
+        return this;
     }
 
 
     @Override
     public BuiltBook build() {
+        if (currentPage.content().length() > 0) addPage();
         book.setItemMeta(bookMeta);
         return new BuiltBook(book);
     }
