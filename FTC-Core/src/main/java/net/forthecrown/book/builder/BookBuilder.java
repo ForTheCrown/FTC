@@ -53,18 +53,21 @@ public class BookBuilder implements Builder<BuiltBook> {
         if (line.content().length() == 0) return this; // Don't add empty lines
         if (line.content().length() >= 14 * 114) return this; // Don't add oversized lines
 
+        int futureAmountOfLines = numLinesOnCurrentPage;
+
         // Increase numLines according to new line length
         int lineLength = TextInfo.getPxLength(line.content());
         while (lineLength > 0) {
-            ++numLinesOnCurrentPage;
+            ++futureAmountOfLines;
             lineLength -= 114;
         }
 
         // If numLines too big, paste new line on next page
         // 14 lines of text possible (0 -> 13)
-        if (numLinesOnCurrentPage > 13) addPage();
+        if (futureAmountOfLines > 13) addPage();
 
         this.currentPage.append(line).append(NEW_LINE);
+        numLinesOnCurrentPage += (futureAmountOfLines - numLinesOnCurrentPage);
         return this;
     }
 
@@ -90,7 +93,7 @@ public class BookBuilder implements Builder<BuiltBook> {
 
     @Override
     public BuiltBook build() {
-        if (currentPage.content().length() > 0) addPage();
+        addPage();
         book.setItemMeta(bookMeta);
         return new BuiltBook(book);
     }
