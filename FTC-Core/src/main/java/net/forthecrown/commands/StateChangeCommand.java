@@ -2,8 +2,11 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.UserArgument;
+import net.forthecrown.commands.click.ClickableTextNode;
+import net.forthecrown.commands.click.ClickableTexts;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
@@ -15,12 +18,16 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.permissions.Permission;
 
 public class StateChangeCommand extends FtcCommand {
+    public static final ClickableTextNode STATE_CHANGE_ROOT = ClickableTexts.register(new ClickableTextNode("state_change_root"));
+
     private final StateGetter getter;
     private final StateSetter setter;
     private final StateUsageValidator validator;
 
     private final String onTranslationKey;
     private final String offTranslationKey;
+
+    private final ClickableTextNode allowNode, denyNode;
 
     public StateChangeCommand(
             String name,
@@ -56,6 +63,32 @@ public class StateChangeCommand extends FtcCommand {
         setAliases(aliases);
 
         register();
+
+        allowNode = createNode(true);
+        denyNode = createNode(false);
+
+        STATE_CHANGE_ROOT.addNode(allowNode);
+        STATE_CHANGE_ROOT.addNode(denyNode);
+    }
+
+    // Here, we create a clickable text node for this command
+    private ClickableTextNode createNode(boolean state) {
+        ClickableTextNode node = new ClickableTextNode(getName());
+
+        // We give the node an executor which sets the user's state
+        node.setExecutor(user -> {
+            setState(user, state);
+            // Reopen book here
+        });
+
+        node.setPrompt(user -> {
+            // Here, create a component like a '[Deny]' or '[Allow]',
+            // remember, this node will set the user's state to the given state in the parameter
+            // And if you want to modify the button's color using the current state of the user,
+            // use getState(CrownUser)
+        });
+
+        return node;
     }
 
     public boolean getState(CrownUser user) {
@@ -72,6 +105,29 @@ public class StateChangeCommand extends FtcCommand {
         }
 
         setter.setState(user, state);
+
+        user.sendMessage(
+                Component.translatable(state ? onTranslationKey : offTranslationKey)
+                        .color(state ? NamedTextColor.YELLOW : NamedTextColor.GRAY)
+        );
+    }
+
+    public ClickableTextNode getAllowNode() {
+        return allowNode;
+    }
+
+    public ClickableTextNode getDenyNode() {
+        return denyNode;
+    }
+
+    // Call this to get a component which combines both the true and false nodes into one,
+    // it should return a component like "[Deny] [Allow]"
+    public Component getButtonComponent(CrownUser user) {
+        return Component.text()
+                .append(getAllowNode().prompt(user))
+                .append(Component.space())
+                .append(getDenyNode().prompt(user))
+                .build();
     }
 
     @Override
