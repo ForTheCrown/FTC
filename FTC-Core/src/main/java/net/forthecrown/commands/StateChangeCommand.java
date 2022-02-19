@@ -1,6 +1,7 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.book.SettingsBook;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.click.ClickableTexts;
@@ -14,7 +15,10 @@ import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.util.Buildable;
 import org.bukkit.permissions.Permission;
 
 public class StateChangeCommand extends FtcCommand {
@@ -63,6 +67,7 @@ public class StateChangeCommand extends FtcCommand {
         setAliases(aliases);
 
         register();
+        SettingsBook.addCmdToBook(this);
 
         allowNode = createNode(true);
         denyNode = createNode(false);
@@ -78,14 +83,29 @@ public class StateChangeCommand extends FtcCommand {
         // We give the node an executor which sets the user's state
         node.setExecutor(user -> {
             setState(user, state);
-            // Reopen book here
+            SettingsBook.open(user); // reopen book
         });
 
         node.setPrompt(user -> {
-            // Here, create a component like a '[Deny]' or '[Allow]',
-            // remember, this node will set the user's state to the given state in the parameter
-            // And if you want to modify the button's color using the current state of the user,
-            // use getState(CrownUser)
+            TextComponent.Builder b = Component.text();
+            if (state) { // [Allow] option
+                TextComponent.Builder allowComponent = Component.text();
+                allowComponent.append(Component.text("[Allow]"));
+
+                if (getState(user)) allowComponent.color(NamedTextColor.DARK_AQUA); // If already allowed
+                else allowComponent.hoverEvent(Component.text("Click to Allow")).color(NamedTextColor.GRAY);
+
+                return allowComponent.build();
+            }
+            else { // [Deny] option
+                TextComponent.Builder allowComponent = Component.text();
+                allowComponent.append(Component.text("[Deny]"));
+
+                if (!getState(user)) allowComponent.color(NamedTextColor.DARK_AQUA); // If already denied
+                else allowComponent.hoverEvent(Component.text("Click to Deny")).color(NamedTextColor.GRAY);
+
+                return allowComponent.build();
+            }
         });
 
         return node;
@@ -101,6 +121,7 @@ public class StateChangeCommand extends FtcCommand {
                 validator.test(user, state);
             } catch (CommandSyntaxException e) {
                 FtcUtils.handleSyntaxException(user, e);
+                return;
             }
         }
 
