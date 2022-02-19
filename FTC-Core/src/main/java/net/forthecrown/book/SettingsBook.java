@@ -4,6 +4,9 @@ import net.forthecrown.book.builder.BookBuilder;
 import net.forthecrown.book.builder.BuiltBook;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class SettingsBook {
 
@@ -17,10 +20,21 @@ public class SettingsBook {
     private static BuiltBook initBook(CrownUser user) {
         return new BookBuilder()
                 .setAuthor(user.getName())
-                .setTitle("My test book")
+                .setTitle("Settings")
                 .addText(Component.text("Settings:"))
                 .addEmptyLine()
-                .addText(Component.text(2))
+                .addText(Component.text("Tpa:").hoverEvent(HoverEvent.showText(Component.text("Permit others to send you tpa requests.")))
+                        .append(Component.text(":").color(NamedTextColor.WHITE)) // One pixel adjust ._.
+                        .append(Component.text("      "))
+                        .append(Component.text("[Allow]")
+                                .hoverEvent(HoverEvent.showText(Component.text("Allow tpa requests")))
+                                .clickEvent(ClickEvent.runCommand("/toggletpa")) // todo: update color, update gui (open book)
+                                .color(NamedTextColor.GRAY)) // todo
+                        .append(Component.text(" "))
+                        .append(Component.text("[Deny]")
+                                .hoverEvent(HoverEvent.showText(Component.text("Deny tpa requests")))
+                                .clickEvent(ClickEvent.runCommand("/toggletpa")) // todo: update color, update gui (open book)
+                                .color(NamedTextColor.GRAY))) // todo
                 .addText(Component.text(3))
                 .addText(Component.text(4))
                 .addText(Component.text(5))
