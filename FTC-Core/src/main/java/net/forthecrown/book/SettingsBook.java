@@ -8,6 +8,7 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.HashSet;
@@ -37,7 +38,7 @@ public class SettingsBook {
     }
 
     private static TextComponent getLine(StateChangeCommand cmd, CrownUser user) {
-        TextComponent header = Component.text(cmd.getName() + ":");
+        TextComponent header = Component.text(cmd.getDisplayName() + ":").hoverEvent(HoverEvent.showText(Component.text(cmd.getDescription())));
         Component options = cmd.getButtonComponent(user); // get from StateChangeCommand?
 
         String headerText = ChatUtils.plainText(header); // ?
