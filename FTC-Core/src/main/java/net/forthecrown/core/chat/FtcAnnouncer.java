@@ -3,9 +3,9 @@ package net.forthecrown.core.chat;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import net.forthecrown.comvars.ComVar;
-import net.forthecrown.comvars.ComVarRegistry;
-import net.forthecrown.comvars.types.ComVarTypes;
+import net.forthecrown.vars.Var;
+import net.forthecrown.vars.VarRegistry;
+import net.forthecrown.vars.types.VarTypes;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.inventory.ItemStacks;
@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
     private final List<Component> announcements = new ArrayList<>();
-    private final ComVar<Short> delay = ComVarRegistry.set("broadcastDelay", ComVarTypes.SHORT, (short) 12000);
+    private final Var<Short> delay = VarRegistry.getSafe("broadcastDelay", VarTypes.SHORT, (short) 12000);
     private BukkitRunnable broadcaster;
 
     public FtcAnnouncer(){
@@ -46,8 +46,6 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
     @Override
     protected void save(final JsonWrapper json) {
-        json.add("delay", delay.getValue());
-
         JsonArray array = new JsonArray();
         for (Component c: announcements){
             array.add(ChatUtils.toJson(c));
@@ -58,8 +56,6 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
     @Override
     protected void reload(final JsonWrapper json) {
-        delay.setValue(json.get("delay").getAsShort());
-
         JsonArray array = json.getArray("announcements");
         announcements.clear();
         for (JsonElement j: array){
@@ -99,7 +95,7 @@ public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
     @Override
     public short getDelay() {
-        return delay.getValue((short) 12000);
+        return delay.get();
     }
 
     @Override

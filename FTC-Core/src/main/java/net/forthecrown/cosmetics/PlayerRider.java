@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.squire.Squire;
+import net.forthecrown.core.Keys;
 import net.forthecrown.utils.FtcUtils;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
@@ -11,7 +11,7 @@ import net.minecraft.world.entity.monster.Slime;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,7 +25,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 public class PlayerRider implements Listener {
-    public static final NamespacedKey SLIME_KEY = Squire.createFtcKey("riding_slime");
+    public static final NamespacedKey SLIME_KEY = Keys.key("ftc", "riding_slime");
 
     public final Player rider;
     public final Player ridden;
@@ -89,8 +89,8 @@ public class PlayerRider implements Listener {
 
     private void preventBadLocation(){
         if(ridden.getLocation().getBlockY() <= FtcUtils.MIN_Y || rider.getLocation().getBlockY() <= FtcUtils.MIN_Y){
-            ridden.teleport(PlayerRidingManager.RETREAT_LOCATION);
-            rider.teleport(PlayerRidingManager.RETREAT_LOCATION);
+            ridden.teleport(FtcUtils.findHazelLocation());
+            rider.teleport(FtcUtils.findHazelLocation());
         }
     }
 

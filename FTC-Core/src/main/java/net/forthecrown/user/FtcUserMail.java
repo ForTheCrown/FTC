@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.ListUtils;
@@ -101,7 +101,7 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
     }
 
     boolean messageTooOld(MailMessage message) {
-        return TimeUtil.hasCooldownEnded(ComVars.dataRetentionTime(), message.sent);
+        return TimeUtil.hasCooldownEnded(FtcVars.dataRetentionTime.get(), message.sent);
     }
 
     @Override

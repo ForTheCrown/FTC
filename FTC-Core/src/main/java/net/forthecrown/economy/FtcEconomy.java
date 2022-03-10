@@ -1,9 +1,8 @@
 package net.forthecrown.economy;
 
 import com.google.gson.JsonElement;
-import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
-import net.forthecrown.events.custom.BalanceChangeEvent;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
@@ -17,7 +16,7 @@ import java.util.UUID;
 
 public class FtcEconomy extends AbstractJsonSerializer implements Economy {
 
-    private BalanceMap balanceMap = new SortedBalanceMap(ComVars::getStartRhines);
+    private BalanceMap balanceMap = new SortedBalanceMap(100, FtcVars.startRhines::get);
 
     public FtcEconomy() {
         super("balances");
@@ -84,9 +83,6 @@ public class FtcEconomy extends AbstractJsonSerializer implements Economy {
         validate(id, amount);
 
         int bal = get(id);
-
-        new BalanceChangeEvent(id, BalanceChangeEvent.Action.REMOVE, bal, amount).callEvent();
-
         set(id, bal - amount);
     }
 
@@ -101,7 +97,6 @@ public class FtcEconomy extends AbstractJsonSerializer implements Economy {
         user.addTotalEarnings(amount);
         user.unloadIfOffline();
 
-        new BalanceChangeEvent(uuid, BalanceChangeEvent.Action.ADD, current, amount).callEvent();
         int actual = current + amount;
         set(uuid, actual);
     }
@@ -113,7 +108,7 @@ public class FtcEconomy extends AbstractJsonSerializer implements Economy {
 
     @Override
     public int getIncomeTax(UUID uuid, int currentBal){
-        if(!ComVars.areTaxesEnabled()) return 0;
+        if(!FtcVars.taxesEnabled.get()) return 0;
         if(currentBal < 500000) return 0; //if the player has less thank 500k rhines, no tax
 
         int percent = (int) (UserManager.getUser(uuid).getTotalEarnings() / 50000 * 10);

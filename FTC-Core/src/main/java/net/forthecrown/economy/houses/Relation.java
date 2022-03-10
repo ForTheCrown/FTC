@@ -3,7 +3,7 @@ package net.forthecrown.economy.houses;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.utils.math.MathUtil;
+import net.minecraft.util.Mth;
 
 public class Relation implements JsonSerializable {
     public static final byte MAX_RELATION = 100;
@@ -22,7 +22,7 @@ public class Relation implements JsonSerializable {
     }
 
     public void setValue(byte value) {
-        this.value = (byte) MathUtil.clamp(value, -MAX_RELATION, MAX_RELATION);
+        this.value = (byte) Mth.clamp(value, -MAX_RELATION, MAX_RELATION);
     }
 
     public RelationType getType() {

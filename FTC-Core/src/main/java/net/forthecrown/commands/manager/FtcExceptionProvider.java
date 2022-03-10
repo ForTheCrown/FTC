@@ -3,7 +3,7 @@ package net.forthecrown.commands.manager;
 import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -98,7 +98,7 @@ public interface FtcExceptionProvider {
     }
 
     static RoyalCommandException nickTooLong(int length){
-        return NICK_TOO_LONG.create(Component.text(length), Component.text(ComVars.getMaxNickLength()));
+        return NICK_TOO_LONG.create(Component.text(length), Component.text(FtcVars.maxNickLength.get()));
     }
 
     static RoyalCommandException mustHoldItem(){
@@ -222,7 +222,7 @@ public interface FtcExceptionProvider {
     }
 
     static RoyalCommandException maxShopPriceExceeded() {
-        return SHOP_PRICE_EXCEEDED.create(FtcFormatter.rhines(ComVars.getMaxSignShopPrice()));
+        return SHOP_PRICE_EXCEEDED.create(FtcFormatter.rhines(FtcVars.maxSignShopPrice.get()));
     }
 
     static RoyalCommandException regionsWrongWorld() {

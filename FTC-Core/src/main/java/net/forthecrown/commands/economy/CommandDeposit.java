@@ -61,6 +61,8 @@ public class CommandDeposit extends FtcCommand {
             Economy bals = Crown.getEconomy();
             bals.add(player.getUniqueId(), amount);
 
+            Crown.logger().info("{} deposited {} coins worth a total of {} Rhines", player.getName(), mainItem.getAmount(), amount);
+
             player.sendMessage(
                     Component.text()
                             .color(NamedTextColor.GRAY)

@@ -78,13 +78,13 @@ public interface CrownUser extends
      * @param command The command to create with
      * @return The command source for this user
      */
-    CommandSource getCommandSource(AbstractCommand command);
+    CommandSource getCommandSource(AbstractCommand command) throws UserNotOnlineException;
 
     /**
      * creates a command source with no command
      * @return The user's command source
      */
-    default CommandSource getCommandSource() {
+    default CommandSource getCommandSource() throws UserNotOnlineException {
         return getCommandSource(null);
     }
 
@@ -206,7 +206,7 @@ public interface CrownUser extends
      * Checks whether the user is ignoring broadcasts
      * @return ^^^^^^^^^
      */
-    default boolean ignoringBroadcasts(){
+    default boolean ignoringBroadcasts() {
         return hasPref(UserPref.IGNORING_BROADCASTS);
     }
 
@@ -214,7 +214,7 @@ public interface CrownUser extends
      * Sets whether the user is ignoring broadcasts
      * @param ignoring ^^^^
      */
-    default void setIgnoringBroadcasts(boolean ignoring){
+    default void setIgnoringBroadcasts(boolean ignoring) {
         setPref(ignoring, UserPref.IGNORING_BROADCASTS);
     }
 
@@ -510,7 +510,7 @@ public interface CrownUser extends
      * Gets the user's display name, click event and all
      * @return The user's display name
      */
-    default Component displayName(){
+    default Component displayName() {
         return makeDisplayName(this, getName());
     }
 
@@ -533,7 +533,7 @@ public interface CrownUser extends
      * Same as {@link CrownUser#nickDisplayName()} except it'll have the rank tier's color
      * @return The user's display name
      */
-    default Component coloredNickDisplayName(){
+    default Component coloredNickDisplayName() {
         return nickDisplayName().color(getRankTier().color);
     }
 
@@ -541,7 +541,7 @@ public interface CrownUser extends
      * Whether the user has a nickname or not
      * @return ^^^^^
      */
-    default boolean hasNickname(){
+    default boolean hasNickname() {
         return nickname() != null;
     }
 
@@ -549,7 +549,7 @@ public interface CrownUser extends
      * Gets either the name of the user, or their nickname
      * @return The user's nickname or name
      */
-    default String getNickOrName(){
+    default String getNickOrName() {
         return hasNickname() ? getNickname() : getName();
     }
 
@@ -738,9 +738,9 @@ public interface CrownUser extends
     void updateGodMode() throws UserNotOnlineException;
 
     UserDataContainer getDataContainer();
+    UserInteractions getInteractions();
     UserMarketData getMarketData();
     CosmeticData getCosmeticData();
-    UserInteractions getInteractions();
     UserHomes getHomes();
     UserMail getMail();
 

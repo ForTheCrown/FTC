@@ -14,7 +14,7 @@ import net.forthecrown.commands.arguments.MarketArgument;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
@@ -290,7 +290,7 @@ public class CommandMarket extends FtcCommand {
                         )
 
                         .then(literal("price")
-                                .then(argument("price_actual", IntegerArgumentType.integer(-1, ComVars.getMaxMoneyAmount()))
+                                .then(argument("price_actual", IntegerArgumentType.integer(-1, FtcVars.maxMoneyAmount.get()))
                                         .executes(c -> {
                                             MarketShop shop = get(c);
                                             int price = c.getArgument("price_actual", Integer.class);

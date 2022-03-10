@@ -119,6 +119,15 @@ public class FtcJailManager extends AbstractJsonSerializer implements JailManage
     }
 
     @Override
+    public Key getKey(Location val) {
+        for (Map.Entry<Key, Location> l: jails.entrySet()) {
+            if(l.getValue().equals(val)) return l.getKey();
+        }
+
+        return null;
+    }
+
+    @Override
     public @NotNull Key key() {
         return KEY;
     }

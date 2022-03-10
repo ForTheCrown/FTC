@@ -1,6 +1,6 @@
 package net.forthecrown.user.actions;
 
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserTeleport;
@@ -34,7 +34,7 @@ public class TeleportRequest implements UserAction {
     }
 
     public void startCountdown(){
-        expiry.runTaskLaterAsynchronously(Crown.inst(), ComVars.getTpaExpiryTime());
+        expiry.runTaskLaterAsynchronously(Crown.inst(), FtcVars.tpaExpiryTime.get());
     }
 
     public void onAccept(){

@@ -62,7 +62,11 @@ public class ActionShowBossInfo implements UsageAction<ActionShowBossInfo.Action
 
         @Override
         public void onInteract(Player player) {
-            player.sendMessage(boss.itemMessage(player.getInventory()));
+            if(boss.getSpawnRequirement() == null) {
+                return;
+            }
+
+            player.sendMessage(boss.getSpawnRequirement().denyMessage(player));
         }
     }
 }

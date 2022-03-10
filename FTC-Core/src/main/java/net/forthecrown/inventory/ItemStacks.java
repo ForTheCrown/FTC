@@ -97,31 +97,31 @@ public final class ItemStacks {
      * @return The created coin(s)
      */
     public static ItemStack makeCoins(int amount, int itemAmount){
-        return new ItemStackBuilder(Material.SUNFLOWER, itemAmount)
-                .setName(
-                        Component.text("Rhines").style(nonItalic(NamedTextColor.YELLOW))
-                )
-                .addLore(
-                        Component.text("Worth ")
-                                .append(FtcFormatter.rhinesNonTrans(amount))
-                                .style(nonItalic(NamedTextColor.GOLD))
-                )
-                .addLore(
-                        Component.text("Minted in the year " + FtcUtils.arabicToRoman(FtcUtils.worldTimeToYears(Worlds.OVERWORLD)) + ".")
-                                .style(NON_ITALIC_DARK_GRAY)
-                )
-                .addLore(currentKingLore())
-                .build();
+        ItemStackBuilder builder = new ItemStackBuilder(Material.SUNFLOWER, itemAmount)
+                .setName(coinName());
+
+        for (Component c: coinLore(amount)) {
+            builder.addLore(c);
+        }
+
+        return builder.build();
     }
 
-    private static Component currentKingLore() {
-        Kingship kingship = Crown.getKingship();
-        if(!kingship.hasKing()) return Component.text("During the Interregnum").color(NamedTextColor.DARK_GRAY);
+    public static Component coinName() {
+        return Component.text("Rhines").style(nonItalic(NamedTextColor.YELLOW));
+    }
 
-        return Component.text("During the reign of ")
-                .style(NON_ITALIC_DARK_GRAY)
-                .append(Component.text(kingship.isFemale() ? "Queen " : "King "))
-                .append(kingship.name());
+    public static Component[] coinLore(int worth) {
+        return new Component[] {
+                Component.text("Worth ")
+                        .append(FtcFormatter.rhinesNonTrans(worth))
+                        .style(nonItalic(NamedTextColor.GOLD)),
+
+                Component.text("Minted in the year " + FtcUtils.arabicToRoman(FtcUtils.worldTimeToYears(Worlds.OVERWORLD)) + ".")
+                        .style(NON_ITALIC_DARK_GRAY),
+
+                Kingship.coinDisplay()
+        };
     }
 
     /**
@@ -192,7 +192,7 @@ public final class ItemStacks {
         try {
             // This will have to be updated with each MC update,
             // because the package name will change
-            return Class.forName("org.bukkit.craftbukkit.v1_18_R1.inventory.CraftMetaItem");
+            return Class.forName("org.bukkit.craftbukkit.v1_18_R2.inventory.CraftMetaItem");
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Couldn't find class for item meta??????", e);
         }

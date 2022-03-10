@@ -2,10 +2,9 @@ package net.forthecrown.regions.visit;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.cosmetics.travel.TravelEffect;
-import net.forthecrown.events.custom.RegionVisitEvent;
 import net.forthecrown.events.dynamic.RegionVisitListener;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionManager;
@@ -61,7 +60,7 @@ public class RegionVisit implements Runnable {
         // 3) The area above the pole must only be air
         // 4) The area above the user must only be air
         // 5) The user shouldn't be in spectator mode
-        hulkSmash = ComVars.shouldHulkSmashPoles()
+        hulkSmash = FtcVars.hulkSmashPoles.get()
                 && user.hulkSmashesPoles()
                 && FtcUtils.isClearAbove(getTeleportLocation())
                 && FtcUtils.isClearAbove(user.getLocation().add(0, Math.ceil(user.getPlayer().getHeight()), 0))
@@ -221,7 +220,6 @@ public class RegionVisit implements Runnable {
     }
 
     void runTpHandlers() {
-        new RegionVisitEvent(user, getLocalRegion().getPos(), getRegion().getPos(), getRegion(), hulkSmash()).callEvent();
         runHandlers(h -> h.onTeleport(this));
     }
 

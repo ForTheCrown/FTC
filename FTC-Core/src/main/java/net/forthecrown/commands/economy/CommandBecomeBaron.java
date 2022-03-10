@@ -2,7 +2,7 @@ package net.forthecrown.commands.economy;
 
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
@@ -50,7 +50,7 @@ public class CommandBecomeBaron extends FtcCommand {
         command
                 .executes(c -> {
                     CrownUser p = getUserSender(c);
-                    int baronPrice = ComVars.getBaronPrice();
+                    int baronPrice = FtcVars.baronPrice.get();
 
                     if(p.hasTitle(RankTitle.BARON)) throw FtcExceptionProvider.alreadyBaron();
                     if(!bals.has(p.getUniqueId(), baronPrice)) throw FtcExceptionProvider.cannotAfford(baronPrice);
@@ -75,7 +75,7 @@ public class CommandBecomeBaron extends FtcCommand {
                 .then(literal("confirm")
                         .executes(c -> {
                             CrownUser p = getUserSender(c);
-                            int baronPrice = ComVars.getBaronPrice();
+                            int baronPrice = FtcVars.baronPrice.get();
 
                             if(p.hasTitle(RankTitle.BARON)) throw FtcExceptionProvider.alreadyBaron();
                             if(!bals.has(p.getUniqueId(), baronPrice)) throw FtcExceptionProvider.cannotAfford(baronPrice);

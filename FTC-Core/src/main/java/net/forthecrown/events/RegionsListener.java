@@ -8,7 +8,7 @@ import net.forthecrown.regions.RegionManager;
 import net.forthecrown.regions.RegionPos;
 import net.minecraft.core.BlockPos;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;

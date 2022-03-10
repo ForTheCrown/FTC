@@ -21,11 +21,15 @@ import java.util.stream.Stream;
  */
 public class SortedBalanceMap implements BalanceMap {
     private final IntSupplier defaultAmount;
-    private Balance[] entries = new Balance[100];
+    private final int expectedSize;
+
+    private Balance[] entries;
     private int size;
 
-    public SortedBalanceMap(IntSupplier defaultAmount) {
+    public SortedBalanceMap(int expectedSize, IntSupplier defaultAmount) {
         this.defaultAmount = defaultAmount;
+        this.expectedSize = expectedSize;
+        entries = new Balance[expectedSize];
     }
 
     @Override
@@ -151,7 +155,7 @@ public class SortedBalanceMap implements BalanceMap {
             //If array size has to be increased
             if (size >= entries.length) {
                 Balance[] copy = entries;                           //Copy old entries
-                entries = new Balance[copy.length + 1];             //Make new array with bigger size
+                entries = new Balance[newSize(copy.length + 1)];    //Make new array with bigger size
                 System.arraycopy(copy, 0, entries, 0, copy.length); //Copy all entries from copy to new array
             }
 
@@ -159,6 +163,10 @@ public class SortedBalanceMap implements BalanceMap {
         }
 
         checkSorted(index);
+    }
+
+    private int newSize(int length) {
+        return (size / expectedSize + 1) * expectedSize;
     }
 
     private void checkSorted(int index) {

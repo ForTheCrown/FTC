@@ -7,13 +7,11 @@ import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Husk;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -100,6 +98,11 @@ public final class DungeonUtils {
         } else {
             inv.addItem(item);
         }
+    }
+
+    public static void cannotHarmEffect(World world, Entity entity) {
+        world.playSound(entity.getLocation(), org.bukkit.Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 1.2f);
+        world.spawnParticle(Particle.SQUID_INK, entity.getLocation().add(0, entity.getHeight()*0.66, 0), 5, 0.1D, 0.1D, 0.1D, 0.05D);
     }
 
     // getModifiers().clear() doesn't work because the returned list of

@@ -7,7 +7,7 @@ import net.forthecrown.commands.click.ClickableTexts;
 import net.forthecrown.commands.click.PromptCreator;
 import net.forthecrown.commands.click.TextExecutor;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.FtcFormatter;
@@ -43,12 +43,12 @@ public class GuildMaster implements InteractableNPC {
 
                     // Info nodes
                     .addNode(infoNode(InfoSection.GUILD, null))
-                    .addNode(infoNode(InfoSection.GUILD_JOINING, () -> new Component[] {new TimePrinter(ComVars.getGuildJoinRequirement()).print()}))
+                    .addNode(infoNode(InfoSection.GUILD_JOINING, () -> new Component[] {new TimePrinter(FtcVars.guildJoinRequirement.get()).print()}))
                     .addNode(infoNode(InfoSection.VOTE_START, null))
                     .addNode(infoNode(InfoSection.SHOP_GETTING, () -> {
                         Component[] result = new Component[2];
-                        result[0] = FtcFormatter.rhines(ComVars.defaultShopPrice() - 15000).color(NamedTextColor.YELLOW);
-                        result[1] = FtcFormatter.rhines(ComVars.defaultShopPrice() + 15000).color(NamedTextColor.YELLOW);
+                        result[0] = FtcFormatter.rhines(FtcVars.defaultMarketPrice.get() - 15000).color(NamedTextColor.YELLOW);
+                        result[1] = FtcFormatter.rhines(FtcVars.defaultMarketPrice.get() + 15000).color(NamedTextColor.YELLOW);
 
                         return result;
                     }))
@@ -139,11 +139,11 @@ public class GuildMaster implements InteractableNPC {
                                         UserMarketData data = user.getMarketData();
                                         TradeGuild guild = Crown.getGuild();
 
-                                        if (!TimeUtil.hasCooldownEnded(ComVars.getGuildJoinRequirement(), data.getOwnershipBegan())) {
+                                        if (!TimeUtil.hasCooldownEnded(FtcVars.guildJoinRequirement.get(), data.getOwnershipBegan())) {
                                             return result
                                                     .color(NamedTextColor.GRAY)
                                                     .hoverEvent(Component.translatable("guilds.join.error.shopOwnDuration",
-                                                            new TimePrinter(ComVars.guildKickSafeTime()).print()
+                                                            new TimePrinter(FtcVars.guildJoinTime.get()).print()
                                                     ));
                                         }
 
@@ -153,7 +153,7 @@ public class GuildMaster implements InteractableNPC {
                                                     .hoverEvent(Component.translatable("guilds.join.error.kicked"));
                                         }
 
-                                        if(guild.memberCount() >= ComVars.getMaxGuildMembers()) {
+                                        if(guild.memberCount() >= FtcVars.maxGuildMembers.get()) {
                                             return result
                                                     .color(NamedTextColor.GRAY)
                                                     .hoverEvent(Component.translatable("guilds.join.error.memberLimit"));
@@ -173,13 +173,13 @@ public class GuildMaster implements InteractableNPC {
                                             throw FtcExceptionProvider.translatable("guilds.join.error.noShopOwned");
                                         }
 
-                                        if(!TimeUtil.hasCooldownEnded(ComVars.getGuildJoinRequirement(), data.getOwnershipBegan())) {
+                                        if(!TimeUtil.hasCooldownEnded(FtcVars.guildJoinRequirement.get(), data.getOwnershipBegan())) {
                                             throw FtcExceptionProvider.translatable("guilds.join.error.shopOwnDuration",
-                                                    new TimePrinter(ComVars.guildKickSafeTime()).print()
+                                                    new TimePrinter(FtcVars.guildJoinTime.get()).print()
                                             );
                                         }
 
-                                        if(guild.memberCount() >= ComVars.getMaxGuildMembers()) {
+                                        if(guild.memberCount() >= FtcVars.maxGuildMembers.get()) {
                                             throw FtcExceptionProvider.translatable("guilds.join.error.memberLimit");
                                         }
 

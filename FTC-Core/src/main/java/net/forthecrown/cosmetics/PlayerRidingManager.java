@@ -28,10 +28,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import java.util.Set;
 
 public class PlayerRidingManager implements Listener {
-
-    static final Location RETREAT_LOCATION = new Location(Bukkit.getWorld("world"), 200.5, 74, 200.5);
-    public static final Location HAZELGUARD = new Location(Worlds.OVERWORLD, 200.5, 74, 200.5);
-
     private final ObjectSet<PlayerRider> riders;
 
     PlayerRidingManager(){

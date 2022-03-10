@@ -40,7 +40,7 @@ public final class FtcCommands {
 
         RoyalArguments.register(BaltopArgument.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, BaltopArgument.MAX)));
         RoyalArguments.register(ChatArgument.class, VanillaArgumentType.GREEDY_STRING);
-        RoyalArguments.register(ComVarArgument.class, VanillaArgumentType.WORD);
+        RoyalArguments.register(GlobalVarArgument.class, VanillaArgumentType.WORD);
 
         RoyalArguments.register(RegistryArguments.class, key);
 
@@ -71,7 +71,7 @@ public final class FtcCommands {
         new CommandResourceWorld();
         new CommandStaffChatToggle();
         new CommandHologram();
-        new CommandComVar();
+        new CommandVar();
         new CommandGift();
         new CommandInteractable();
         new CommandSudo();

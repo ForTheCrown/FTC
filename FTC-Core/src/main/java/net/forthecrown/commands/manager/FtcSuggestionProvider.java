@@ -28,7 +28,7 @@ public interface FtcSuggestionProvider {
 
     static CompletableFuture<Suggestions> suggestPlayerNames(CommandSource c, SuggestionsBuilder builder) {
         String token = builder.getRemainingLowerCase();
-        boolean seeVanished = c.hasPermission(Permissions.VANISH_SEE);
+        boolean seeVanished = c == null || c.hasPermission(Permissions.VANISH_SEE);
 
         for (CrownUser user: UserManager.getOnlineUsers()) {
             if(user.isVanished() && !seeVanished) continue;

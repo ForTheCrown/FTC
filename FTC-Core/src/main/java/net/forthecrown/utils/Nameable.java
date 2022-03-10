@@ -26,7 +26,7 @@ public interface Nameable {
      * Gets the name of the object as a component
      * @return Component name
      */
-    default Component name(){
+    default Component name() {
         return ChatUtils.convertString(getName());
     }
 }

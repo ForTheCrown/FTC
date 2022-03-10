@@ -1,7 +1,7 @@
 package net.forthecrown.cosmetics.travel;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.cosmetics.CosmeticEffect;
 import net.forthecrown.inventory.FtcInventory;
@@ -36,7 +36,7 @@ public abstract class TravelEffect extends CosmeticEffect {
                         equals(data.getActiveTravel()),
                         data.hasTravel(this),
                         this,
-                        ComVars.travelEffectCost()
+                        FtcVars.effectCost_travel.get()
                 )
         );
     }
@@ -50,12 +50,12 @@ public abstract class TravelEffect extends CosmeticEffect {
             data.setActiveTravel(this);
             user.sendMessage(Component.translatable("cosmetics.set.travel", NamedTextColor.YELLOW, name()));
         } else {
-            if(user.getGems() < ComVars.travelEffectCost()){
-                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.gems(ComVars.travelEffectCost())));
+            if(user.getGems() < FtcVars.effectCost_travel.get()){
+                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.gems(FtcVars.effectCost_travel.get())));
                 return;
             }
 
-            user.setGems(user.getGems() - ComVars.travelEffectCost());
+            user.setGems(user.getGems() - FtcVars.effectCost_travel.get());
             data.addTravel(this);
             data.setActiveTravel(this);
 

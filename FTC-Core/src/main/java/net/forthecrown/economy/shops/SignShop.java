@@ -138,10 +138,24 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable, De
     @Override
     @NotNull ShopInventory getInventory();
 
+    /**
+     * Gets the price for the given customer
+     * @param customer The customer
+     * @return The price that applies to that customer
+     */
     int getPrice(ShopCustomer customer);
 
+    /**
+     * Gets the price display for the given customer
+     * @param user The customer
+     * @return The price display for the given customer
+     */
     Component getPriceLineFor(CrownUser user);
 
+    /**
+     * Gets the shop's history
+     * @return The shop's history
+     */
     ShopHistory getHistory();
 
     @Override

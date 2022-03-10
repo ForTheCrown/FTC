@@ -3,6 +3,7 @@
  import com.google.gson.JsonElement;
  import net.forthecrown.core.Keys;
  import net.forthecrown.utils.JsonUtils;
+ import net.kyori.adventure.key.Key;
  import net.kyori.adventure.key.Keyed;
  import net.minecraft.nbt.Tag;
 
@@ -27,6 +28,13 @@ public interface Registry<T> extends BaseRegistry<T, T>, Iterable<T>, Keyed {
      * @return Whether the registry is empty or not
      */
     boolean isEmpty();
+
+     /**
+      * Gets the key that the value is registered with
+      * @param val The value to get the key of
+      * @return The key, null, if the value is not registered in this registry
+      */
+    Key getKey(T val);
 
     default T read(JsonElement element) {
         return get(JsonUtils.readKey(element));

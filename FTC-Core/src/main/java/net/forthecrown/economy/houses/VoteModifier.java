@@ -2,6 +2,7 @@ package net.forthecrown.economy.houses;
 
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.MathUtil;
+import net.minecraft.util.Mth;
 
 public class VoteModifier {
     public static final int MAX_VALUE = 50;
@@ -10,7 +11,7 @@ public class VoteModifier {
     private final byte value;
 
     public VoteModifier(int value) {
-        this.value = (byte) MathUtil.clamp(value, -MAX_VALUE, MAX_VALUE);
+        this.value = (byte) Mth.clamp(value, -MAX_VALUE, MAX_VALUE);
     }
 
     public int getValue() {

@@ -1,7 +1,7 @@
 package net.forthecrown.events;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.utils.CrownRandom;
@@ -37,7 +37,7 @@ public class ResourceWorldListener implements Listener {
     public void onBlockBreakEvent(BlockBreakEvent event) {
         if(!testWorld(event.getBlock().getWorld())) return;
         if(event.getBlock().getState() instanceof Container) return;
-        if(ComVars.rwDoubleDropRate() < RANDOM.nextFloat(1f)) return;
+        if(FtcVars.rwDoubleDropRate.get() < RANDOM.nextFloat(1f)) return;
         if(!FtcUtils.isNaturallyPlaced(event.getBlock())) return;
         if(event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
 
@@ -72,7 +72,7 @@ public class ResourceWorldListener implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         if(ILLEGAL_ENTITIES.contains(event.getEntityType())) return;
         if(!testWorld(event.getEntity().getWorld())) return;
-        if(ComVars.rwDoubleDropRate() < RANDOM.nextFloat(1f)) return;
+        if(FtcVars.rwDoubleDropRate.get() < RANDOM.nextFloat(1f)) return;
 
         List<ItemStack> drops = processDrops(event.getDrops());
 
@@ -88,17 +88,14 @@ public class ResourceWorldListener implements Listener {
         for (ItemStack i: drops) {
             if(ItemStacks.isEmpty(i)) continue;
 
-            // If it's a special item, don't attempt processing
-            if(ItemStacks.isSpecial(i)) {
-                toDrop.add(i.clone());
-                continue;
-            }
-
             // Just add 2 of the item to the result
             // ClearLagg will merge the items anyway
             // if they can be merged
             toDrop.add(i.clone());
-            toDrop.add(i.clone());
+
+            if(!ItemStacks.isSpecial(i)) {
+                toDrop.add(i.clone());
+            }
         }
 
         return toDrop;

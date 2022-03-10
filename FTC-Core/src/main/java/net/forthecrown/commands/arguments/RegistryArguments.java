@@ -15,6 +15,7 @@ import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.boss.KeyedBoss;
+import net.forthecrown.dungeons.level.DungeonLevel;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
@@ -38,6 +39,7 @@ public class RegistryArguments<T> implements ArgumentType<T> {
     private static final RegistryArguments<TravelEffect> TRAVEL_EFFECT = new RegistryArguments<>(Registries.TRAVEL_EFFECTS, "Travel Effect");
 
     private static final RegistryArguments<KeyedBoss> DUNGEON_BOSS =  new RegistryArguments<>(Registries.DUNGEON_BOSSES, "Dungeon boss");
+    private static final RegistryArguments<DungeonLevel> DUNGEON_LEVEL = new RegistryArguments<>(Registries.DUNGEON_LEVELS, "Dungeon Level");
 
     private static final RegistryArguments<UsageAction> USAGE_ACTION =  new RegistryArguments<>(Registries.USAGE_ACTIONS, "Usage action");
     private static final RegistryArguments<UsageCheck> USAGE_CHECK =   new RegistryArguments<>(Registries.USAGE_CHECKS, "Usage check");
@@ -97,6 +99,10 @@ public class RegistryArguments<T> implements ArgumentType<T> {
 
     public static RegistryArguments<BlockStructure> structure() {
         return STRUCTURE;
+    }
+
+    public static RegistryArguments<DungeonLevel> dungeonLevel() {
+        return DUNGEON_LEVEL;
     }
 
     private final Registry<T> registry;

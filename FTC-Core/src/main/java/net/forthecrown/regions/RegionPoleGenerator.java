@@ -1,6 +1,6 @@
 package net.forthecrown.regions;
 
-import net.forthecrown.squire.Squire;
+import net.forthecrown.core.Keys;
 import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.BlockFace;
@@ -10,7 +10,7 @@ import org.bukkit.block.BlockFace;
  * A special class... that's slower than population density's (._. )
  */
 public interface RegionPoleGenerator {
-    NamespacedKey TOP_SIGN_KEY = Squire.createFtcKey("region_pole_top");
+    NamespacedKey TOP_SIGN_KEY = Keys.key("ftc", "region_pole_top");
 
     /**
      * Generates the pole for the given region

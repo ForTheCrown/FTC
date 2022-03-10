@@ -1,26 +1,31 @@
 package net.forthecrown.user;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.serializer.UserSerializer;
 import net.forthecrown.user.actions.FtcUserActionHandler;
 import net.forthecrown.user.actions.UserActionHandler;
+import net.forthecrown.utils.JsonUtils;
+import net.forthecrown.utils.TimeUtil;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public final class FtcUserManager extends AbstractJsonSerializer implements UserManager {
-
     public static final Map<UUID, FtcUser> LOADED_USERS = new Object2ObjectOpenHashMap<>();
     public static final Map<UUID, FtcUserAlt> LOADED_ALTS = new Object2ObjectOpenHashMap<>();
 
+    private final UserCacheImpl cache = new UserCacheImpl();
     private final FtcUserActionHandler actionHandler = new FtcUserActionHandler();
     private final UserJsonSerializer serializer = new UserJsonSerializer();
 
@@ -160,7 +165,7 @@ public final class FtcUserManager extends AbstractJsonSerializer implements User
                     // It appears some user files were created wrongly,
                     // Like there's a 'Wou' user file, IDK how that exists,
                     // but it does lol, so gotta check for them
-                    Crown.logger().error("Couldn't load data of user " + id + ". Corrupted or invalid data?", e);
+                    LOGGER.error("Couldn't load data of user " + id + ". Corrupted or invalid data?", e);
                 }
             }
 
@@ -176,6 +181,105 @@ public final class FtcUserManager extends AbstractJsonSerializer implements User
     @Override
     public UserSerializer getSerializer() {
         return serializer;
+    }
+
+    @Override
+    public UserCacheImpl getCache() {
+        return cache;
+    }
+
+    @Override
+    public File getCacheFile() {
+        File result = new File(Crown.dataFolder(), "usercache.json");
+
+        if(result.isDirectory()) {
+            result.delete();
+        }
+
+        if(!result.exists()) {
+            try {
+                result.createNewFile();
+                JsonUtils.writeFile(new JsonArray(), result);
+                LOGGER.info("Cache file did not exist, created new one");
+            } catch (IOException e) {
+                LOGGER.error("Could not create usercache file", e);
+            }
+        }
+
+        return result;
+    }
+
+    JsonArray readCacheFile() {
+        File f = getCacheFile();
+
+        try {
+            return (JsonArray) JsonUtils.readFile(f);
+        } catch (IOException e) {
+            LOGGER.error("Could not read usercache file", e);
+            return null;
+        }
+    }
+
+    @Override
+    public void saveCache() {
+        JsonArray array = new JsonArray();
+
+        cache.readerStream()
+                .forEach(reader -> {
+                    JsonWrapper json = JsonWrapper.empty();
+                    json.addUUID("uuid", reader.getUniqueId());
+                    json.add("name", reader.getName());
+
+                    if(reader.getNickname() != null) {
+                        json.add("nick", reader.getNickname());
+                    }
+
+                    if(reader.getLastName() != null
+                            && TimeUtil.hasCooldownEnded(FtcVars.dataRetentionTime.get(), reader.getLastNameChange())
+                    ) {
+                        json.add("lastName", reader.getLastName());
+                        json.add("lastNameChange", reader.getLastNameChange());
+                    }
+
+                    array.add(json.getSource());
+                });
+
+        try {
+            JsonUtils.writeFile(array, getCacheFile());
+            LOGGER.info("Saved user cache, savedSize: {}", array.size());
+        } catch (IOException e) {
+            LOGGER.error("Could not save user cache", e);
+        }
+    }
+
+    @Override
+    public void loadCache() {
+        JsonArray array = readCacheFile();
+        if(array == null) return;
+
+        List<UserCacheImpl.CacheEntryImpl> entries = new ObjectArrayList<>();
+
+        for (JsonElement e: array) {
+            JsonWrapper json = JsonWrapper.of(e.getAsJsonObject());
+            UserCacheImpl.CacheEntryImpl entry = new UserCacheImpl.CacheEntryImpl(json.getUUID("uuid"));
+
+            entry.name = json.getString("name");
+            entry.nickname = json.getString("nick", null);
+            entry.lastName = json.getString("lastName", null);
+            entry.lastNameChange = json.getLong("lastNameChange", -1L);
+
+            if(entry.lastNameChange != UserCache.NO_NAME_CHANGE
+                    && TimeUtil.hasCooldownEnded(FtcVars.dataRetentionTime.get(), entry.lastNameChange)
+            ) {
+                entry.lastName = null;
+                entry.lastNameChange = UserCache.NO_NAME_CHANGE;
+            }
+
+            entries.add(entry);
+        }
+
+        cache.clear();
+        cache.addAll(entries);
     }
 
     @Override

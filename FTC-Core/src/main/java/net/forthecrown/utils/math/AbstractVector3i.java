@@ -188,19 +188,19 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
         return cloneAt(0, 0, 0, immutable);
     }
 
-    public T getMinimum(T o) {
+    public T getMinimum(ImmutableVector3i o) {
         return apply(Math::min, o);
     }
 
-    public T getMaximum(T o) {
+    public T getMaximum(ImmutableVector3i o) {
         return apply(Math::max, o);
     }
 
-    public T apply(IntBinaryOperator o, T other) {
+    public T apply(IntBinaryOperator o, ImmutableVector3i other) {
         return set(
-                o.applyAsInt(other.x, x),
-                o.applyAsInt(other.y, y),
-                o.applyAsInt(other.z, z)
+                o.applyAsInt(other.getX(), x),
+                o.applyAsInt(other.getY(), y),
+                o.applyAsInt(other.getZ(), z)
         );
     }
 

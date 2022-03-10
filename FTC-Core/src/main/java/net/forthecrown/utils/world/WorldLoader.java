@@ -12,7 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -54,6 +54,8 @@ public class WorldLoader {
         Validate.isTrue(!ONGOING.containsKey(world.getKey()), "World is already being loaded");
 
         LoaderInstance instance = new LoaderInstance(world);
+        ONGOING.put(world.getKey(), instance);
+
         EXECUTOR.execute(instance);
 
         return instance.result;
@@ -69,6 +71,10 @@ public class WorldLoader {
 
     private static void complete(World world) {
         ONGOING.remove(world.getKey());
+    }
+
+    public static boolean isLoading(World world) {
+        return ONGOING.containsKey(world.getKey());
     }
 
     /**

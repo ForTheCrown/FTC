@@ -1,30 +1,23 @@
 package net.forthecrown.commands.admin;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.mojang.brigadier.suggestion.Suggestions;
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.Permissions;
+import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.Crown;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.ComponentArgument;
+import net.forthecrown.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,17 +34,21 @@ public class CommandLore extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(literal("set")
-                        .then(compOrStringArg(
-                                argument("loreIndex", IntegerArgumentType.integer(0)),
-                                (c, b) -> Suggestions.empty(),
-                                (c, l) -> set(c, c.getArgument("loreIndex", Integer.class), l)))
+                        .then(argument("index", IntegerArgumentType.integer(0))
+                                .then(argument("lore", ChatArgument.chat())
+                                        .executes(c -> set(c,
+                                                c.getArgument("index", Integer.class),
+                                                c.getArgument("lore", Component.class)
+                                        ))
+                                )
+                        )
                 )
 
-                .then(compOrStringArg(
-                        literal("add"),
-                        (c, b) -> Suggestions.empty(),
-                        this::add
-                ))
+                .then(literal("add")
+                        .then(argument("lore", ChatArgument.chat())
+                                .executes(c -> add(c, c.getArgument("lore", Component.class)))
+                        )
+                )
 
                 .then(literal("clear")
                         .executes(c -> {
@@ -112,30 +109,7 @@ public class CommandLore extends FtcCommand {
     }
 
     public static void checkItem(ItemStack itemStack) throws CommandSyntaxException {
-        if(itemStack == null || itemStack.getType() == Material.AIR) throw FtcExceptionProvider.create("You must be holding an item");
-    }
-
-    public static <T extends ArgumentBuilder<CommandSource, T>> T compOrStringArg(T arg, @Nullable SuggestionProvider<CommandSource> s, ComponentCommand runnable){
-        addCompOrStringArg(arg, s, runnable);
-        return arg;
-    }
-
-    public static void addCompOrStringArg(ArgumentBuilder<CommandSource, ?> arg, @Nullable SuggestionProvider<CommandSource> s, ComponentCommand command) {
-        arg
-                .then(arg("string", StringArgumentType.greedyString())
-                        .suggests(s == null ? (c, b) -> Suggestions.empty() : s)
-
-                        .executes(c -> command.run(c, ChatUtils.stringToNonItalic(c.getArgument("string", String.class))))
-                )
-
-                .then(componentArg("cLore", c-> command.run(c, c.getArgument("cLore", Component.class))));
-    }
-
-    public static LiteralArgumentBuilder<CommandSource> componentArg(String argName, Command<CommandSource> cmd){
-        return arg("-component")
-                .then(arg(argName, ComponentArgument.component())
-                        .executes(cmd)
-                );
+        if(ItemStacks.isEmpty(itemStack)) throw FtcExceptionProvider.mustHoldItem();
     }
 
     private static LiteralArgumentBuilder<CommandSource> arg(String name){

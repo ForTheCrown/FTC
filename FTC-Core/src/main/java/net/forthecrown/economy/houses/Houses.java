@@ -24,6 +24,7 @@ public final class Houses {
 
         if(!ENABLED) return;
         HouseSerializer.deserialize();
+        Properties.init();
 
         /*for (House h: Registries.HOUSES) {
             Crown.getDayUpdate().addListener(h::onDayUpdate);

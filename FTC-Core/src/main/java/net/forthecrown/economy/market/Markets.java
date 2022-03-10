@@ -3,7 +3,7 @@ package net.forthecrown.economy.market;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.user.CrownUser;
@@ -205,7 +205,7 @@ public interface Markets extends CrownSerializer {
     static void checkStatusChange(UserMarketData ownership, String transKey) throws CommandSyntaxException {
         if(ownership.canChangeStatus()) return;
 
-        long nextAllowed = ownership.getLastStatusChange() + ComVars.getMarketStatusCooldown();
+        long nextAllowed = ownership.getLastStatusChange() + FtcVars.marketStatusCooldown.get();
         long remaining = nextAllowed - System.currentTimeMillis();
 
         throw FtcExceptionProvider.translatable(transKey, FtcFormatter.millisIntoTime(remaining));

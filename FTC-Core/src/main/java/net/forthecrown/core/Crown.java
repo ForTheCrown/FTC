@@ -1,10 +1,12 @@
 package net.forthecrown.core;
 
+import net.forthecrown.dungeons.level.LevelSerializer;
+import net.forthecrown.vars.VarRegistry;
 import net.forthecrown.core.admin.JailManager;
 import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.chat.*;
-import net.forthecrown.core.goalbook.GoalBook;
+import net.forthecrown.core.battlepass.BattlePass;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.ItemPriceMap;
 import net.forthecrown.economy.guilds.TradeGuild;
@@ -54,7 +56,7 @@ public interface Crown extends Plugin, Namespaced {
     static Economy              getEconomy()            { return Main.economy; }
     static Kingship             getKingship()           { return Main.kingship; }
     static TabList              getTabList()            { return Main.tabList; }
-    static GoalBook             getGoalBook()           { return Main.goalBook; }
+    static BattlePass           getBattlePass()         { return Main.battlePass; }
 
     static FtcMessages          getMessages()           { return Main.messages; }
     static DayChange            getDayChange()          { return Main.dayChange; }
@@ -97,17 +99,20 @@ public interface Crown extends Plugin, Namespaced {
         Main.guild.save();
         Main.config.save();
 
+        Main.userManager.saveCache();
+
         if(Houses.ENABLED) {
             HouseSerializer.serialize();
         }
 
-        ComVars.save();
+        VarRegistry.save();
+        LevelSerializer.save();
 
         logger().info("FTC-Core saved");
     }
 
     static boolean inDebugMode() {
-        return ComVars.inDebugMode.getValue(false);
+        return FtcVars.inDebugMode.getValue(false);
     }
 
     static Component prefix() {

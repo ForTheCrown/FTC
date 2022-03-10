@@ -1,9 +1,9 @@
 package net.forthecrown.economy;
 
-import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.serializer.CrownSerializer;
-import net.forthecrown.utils.math.MathUtil;
+import net.minecraft.util.Mth;
 import org.bukkit.Bukkit;
 
 import java.util.UUID;
@@ -85,18 +85,18 @@ public interface Economy extends CrownSerializer {
      * @param amount The amount to check
      */
     static void checkUnderMax(UUID uuid, int amount) {
-        if(amount > ComVars.getMaxMoneyAmount()) {
+        if(amount > FtcVars.maxMoneyAmount.get()) {
             Crown.logger().warn(Bukkit.getOfflinePlayer(uuid).getName() + " has reached the balance limit.");
         }
     }
 
     /**
-     * Returns an amount that's within the balance bounds of 0 to {@link ComVars#getMaxMoneyAmount()}
-     * <p>Uses {@link MathUtil#clamp(long, long, long)}</p>
+     * Returns an amount that's within the balance bounds of 0 to {@link FtcVars#maxMoneyAmount}
+     * <p>Uses {@link Mth#clamp(long, long, long)}</p>
      * @param amount The amount to clamp
      * @return The amount within the bal limits, or the given amount if the given amount was already in the bounds.
      */
     static int clampToBalBounds(int amount) {
-        return MathUtil.clamp(amount, 0, ComVars.getMaxMoneyAmount());
+        return Mth.clamp(amount, 0, FtcVars.maxMoneyAmount.get());
     }
 }

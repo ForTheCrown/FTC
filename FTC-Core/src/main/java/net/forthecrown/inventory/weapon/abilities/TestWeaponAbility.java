@@ -3,8 +3,8 @@ package net.forthecrown.inventory.weapon.abilities;
 import net.forthecrown.core.Keys;
 import net.forthecrown.inventory.weapon.AltAttackContext;
 import net.forthecrown.inventory.weapon.WeaponUseContext;
+import net.forthecrown.utils.ItemLoreBuilder;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,7 +56,7 @@ public class TestWeaponAbility extends WeaponAbility {
     }
 
     @Override
-    public Component loreDisplay() {
-        return Component.text("Test weapon ability " + getLevel() + " extraData: " + extraData);
+    public void addInfo(ItemLoreBuilder builder) {
+        builder.add("Test weapon info, rank: " + level);
     }
 }

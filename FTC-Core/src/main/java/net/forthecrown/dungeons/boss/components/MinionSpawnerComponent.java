@@ -79,14 +79,18 @@ public class MinionSpawnerComponent implements BossComponent<DungeonBoss> {
     public void onDeath(DungeonBoss boss, BossContext context, boolean forced) {
         //Apply withering effect to all minions
         for (Entity e: spawnedMinions) {
-            if (!(e instanceof LivingEntity living)) continue;
-
-            living.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 99999, 254, false, false));
+            kill(e);
         }
 
         // Reset tick and minion list
         spawnedMinions.clear();
         tick = 0;
+    }
+
+    public static void kill(Entity e) {
+        if (!(e instanceof LivingEntity living)) return;
+
+        living.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 99999, 254, false, false));
     }
 
     /**

@@ -4,11 +4,11 @@ import com.google.gson.JsonElement;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.math.ImmutableVector3i;
 import net.forthecrown.utils.math.Vector3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.Tag;
 import org.apache.commons.lang3.Validate;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.WorldBorder;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -92,6 +92,14 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
         Vector3i max = Vector3i.of(json.get("max"));
 
         return of(Bukkit.getWorld(json.getString("world")), min, max);
+    }
+
+    public static FtcBoundingBox of(Tag t) {
+        CompoundTag tag = (CompoundTag) t;
+        World world = Bukkit.getWorld(tag.getString("world"));
+        int[] cords = tag.getIntArray("cords");
+
+        return new FtcBoundingBox(world, cords[0], cords[1], cords[2], cords[3], cords[4], cords[5]);
     }
 
     public FtcBoundingBox resize(int x1, int y1, int z1, int x2, int y2, int z2) {
@@ -299,5 +307,16 @@ public class FtcBoundingBox implements IFtcBoundingBox<FtcBoundingBox> {
         json.add("max", getMax());
 
         return json.getSource();
+    }
+
+    public Tag save() {
+        int[] cords = new int[] { minX, minY, minZ, maxX, maxY, maxZ };
+        IntArrayTag cordTag = new IntArrayTag(cords);
+
+        CompoundTag result = new CompoundTag();
+        result.put("cords", cordTag);
+        result.putString("world", getWorld().getName());
+
+        return result;
     }
 }

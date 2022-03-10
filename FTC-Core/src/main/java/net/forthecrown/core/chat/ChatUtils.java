@@ -10,7 +10,8 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
-import org.bukkit.craftbukkit.v1_18_R1.util.CraftChatMessage;
+import org.apache.logging.log4j.message.ParameterizedMessage;
+import org.bukkit.craftbukkit.v1_18_R2.util.CraftChatMessage;
 
 import java.util.Locale;
 
@@ -90,5 +91,15 @@ public final class ChatUtils {
 
     public static Component renderToSimple(Component component) {
         return GlobalTranslator.render(component, Locale.ENGLISH);
+    }
+
+    /**
+     * Formats the given message in Log4J format
+     * @param msg The message to format
+     * @param args the arguments
+     * @return The formatted message
+     */
+    public static String format(String msg, Object... args) {
+        return new ParameterizedMessage(msg, args).getFormattedMessage();
     }
 }

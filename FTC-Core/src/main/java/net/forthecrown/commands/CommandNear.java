@@ -2,7 +2,7 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -39,7 +39,7 @@ public class CommandNear extends FtcCommand {
         command
                 .executes(c -> {
                     CrownUser user = getUserSender(c);
-                    return showNearby(user.getLocation(), ComVars.getNearRadius(), c.getSource());
+                    return showNearby(user.getLocation(), FtcVars.nearRadius.get(), c.getSource());
                 })
 
                 .then(argument("radius", IntegerArgumentType.integer(1, 100000))
@@ -57,7 +57,7 @@ public class CommandNear extends FtcCommand {
                         .executes(c -> {
                             CrownUser user = UserArgument.getUser(c, "user");
 
-                            return showNearby(user.getLocation(), ComVars.getNearRadius(), c.getSource());
+                            return showNearby(user.getLocation(), FtcVars.nearRadius.get(), c.getSource());
                         })
 
                         .then(argument("radius", IntegerArgumentType.integer(1, 100000))

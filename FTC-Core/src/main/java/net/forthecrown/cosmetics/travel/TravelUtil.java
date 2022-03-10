@@ -48,7 +48,7 @@ public final class TravelUtil {
      * @param extraY Extra y to add to the locs
      * @return a list of locations that make up a circle
      */
-    static List<Vector> getOnCircle(double extraY, double radius, short amountPoints) {
+    public static List<Vector> getOnCircle(double extraY, double radius, short amountPoints) {
         List<Vector> result = new ArrayList<>();
         for (int i = 0; i < amountPoints; ++i) {
             final double angle = Math.toRadians(((double) i / amountPoints) * 360d);

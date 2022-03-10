@@ -2,7 +2,7 @@ package net.forthecrown.economy.guilds;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.DayChangeListener;
 import net.forthecrown.core.Worlds;
@@ -134,7 +134,7 @@ public class TradeGuild extends AbstractJsonSerializer implements DayChangeListe
     public void createVote(VoteData data, @Nullable UUID voteStarter) throws IllegalStateException {
         Validate.isTrue(!isVoteOngoing(), "There is already an ongoing vote");
 
-        currentState = new VoteState(this, data, System.currentTimeMillis(), System.currentTimeMillis() + ComVars.getVoteTime());
+        currentState = new VoteState(this, data, System.currentTimeMillis(), System.currentTimeMillis() + FtcVars.voteTime.get());
         currentState.setVoteStarter(voteStarter);
 
         if(Houses.ENABLED) {
@@ -174,7 +174,7 @@ public class TradeGuild extends AbstractJsonSerializer implements DayChangeListe
 
         if(!instant) {
             VoteCount result = countVotes();
-            nextAllowedVote = System.currentTimeMillis() + ComVars.getVoteInterval();
+            nextAllowedVote = System.currentTimeMillis() + FtcVars.voteInterval.get();
 
             DelayedVoteTask task = currentState.getTopic().onEnd(currentState.getData(), result);
             if(task != null) tasks.add(task);
@@ -332,8 +332,8 @@ public class TradeGuild extends AbstractJsonSerializer implements DayChangeListe
     public void onDayChange() {
         daysSinceWagePay++;
 
-        if(daysSinceWagePay > ComVars.guildPayIntervalDays()) {
-            Crown.logger().info("Been " + ComVars.guildPayIntervalDays() + " day(s) since last guild wage payout, paying");
+        if(daysSinceWagePay > FtcVars.guildPayIntervalDays.get()) {
+            Crown.logger().info("Been " + FtcVars.guildPayIntervalDays.get() + " day(s) since last guild wage payout, paying");
             payMembers();
         }
     }
@@ -341,8 +341,8 @@ public class TradeGuild extends AbstractJsonSerializer implements DayChangeListe
     private void payMembers() {
         daysSinceWagePay = 0;
 
-        int base = ComVars.guildBaseWage();
-        float mod = ComVars.guildWageModifier();
+        int base = FtcVars.guildBaseWage.get();
+        float mod = FtcVars.guildWageModifier.get();
 
         forEachMember(user -> {
             UserMarketData data = user.getMarketData();

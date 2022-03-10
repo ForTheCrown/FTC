@@ -3,11 +3,13 @@ package net.forthecrown.utils;
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.regions.Region;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
-import net.coreprotect.database.lookup.BlockLookupAPI;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.regions.PopulationRegion;
@@ -15,13 +17,10 @@ import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
@@ -48,11 +47,6 @@ public final class FtcUtils {
 
     public static final CrownRandom RANDOM = new CrownRandom();
 
-    public static void sendPacket(Player player, Packet<ClientGamePacketListener> packet) {
-        CraftPlayer craftPlayer = (CraftPlayer) player;
-        craftPlayer.getHandle().networkManager.send(packet);
-    }
-
     public static long worldTimeToYears(World world){
         return worldTimeToDays(world) / 365;
     }
@@ -62,7 +56,7 @@ public final class FtcUtils {
     }
 
     //True if the string is null or contains only blank spaces
-    public static boolean isNullOrBlank(String str){
+    public static boolean isNullOrBlank(String str) {
         return str == null || str.isBlank();
     }
 
@@ -180,7 +174,7 @@ public final class FtcUtils {
     }
 
     public static Location findHazelLocation() {
-        PopulationRegion region = Crown.getRegionManager().get(ComVars.getSpawnRegion());
+        PopulationRegion region = Crown.getRegionManager().get(FtcVars.spawnRegion.get());
         return region.getPoleBottom().add(0, 6, 0).toLocation();
     }
 
@@ -188,10 +182,11 @@ public final class FtcUtils {
         // This could be a List<BlockLookupResult> but no, everything
         // must become string, so says the almighty dumdum that made
         // CoreProtect
-        List<String[]> lookup = BlockLookupAPI.performLookup(b, 0);
+        CoreProtectAPI api = CoreProtect.getInstance().getAPI();
+        List<String[]> lookup = api.blockLookup(b, 0);
         if(ListUtils.isNullOrEmpty(lookup)) return true;
 
-        CoreProtectAPI.ParseResult firstResult = CoreProtect.getInstance().getAPI().parseResult(lookup.get(0));
+        CoreProtectAPI.ParseResult firstResult = api.parseResult(lookup.get(0));
 
         // Why doesn't CoreProtect have something like this themselves, I get saving it
         // as an int, but no wrapper for that int to make the API more understandable???
@@ -215,6 +210,26 @@ public final class FtcUtils {
         CLICK,
         KILL,
         UNKNOWN;
+    }
+
+    public static Region getSelectionSafe(com.sk89q.worldedit.entity.Player wePlayer) throws CommandSyntaxException {
+        Region selection;
+
+        try {
+            selection = wePlayer.getSelection();
+        } catch (IncompleteRegionException e) {
+            throw FtcExceptionProvider.create("You must select a region to scan");
+        }
+
+        return selection;
+    }
+
+    public static Region getSelectionNoExc(com.sk89q.worldedit.entity.Player wePlayer) {
+        try {
+            return getSelectionSafe(wePlayer);
+        } catch (CommandSyntaxException e) {
+            return null;
+        }
     }
 
     /*

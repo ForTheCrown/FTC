@@ -2,7 +2,7 @@ package net.forthecrown.commands.help;
 
 import github.scarsz.discordsrv.commands.CommandLink;
 import github.scarsz.discordsrv.commands.CommandUnlink;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -32,9 +32,9 @@ public class HelpDiscord extends FtcCommand {
                             .append(Crown.prefix())
                             .append(Component.text("Join our discord: "))
                             .append(
-                                    Component.text(ComVars.discordLink())
+                                    Component.text(FtcVars.discordLink.get())
                                             .color(NamedTextColor.AQUA)
-                                            .clickEvent(ClickEvent.openUrl(ComVars.discordLink()))
+                                            .clickEvent(ClickEvent.openUrl(FtcVars.discordLink.get()))
                                             .hoverEvent(Component.text("Click to join :D"))
                             )
                             .build()

@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.commands.admin.CommandLore;
+import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -16,10 +16,10 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserMail;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.user.actions.ActionFactory;
 import net.forthecrown.user.actions.MailQuery;
 import net.forthecrown.user.actions.UserActionHandler;
-import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -142,39 +142,40 @@ public class CommandMail extends FtcCommand {
                 )
 
                 .then(literal("send")
-                        .then(CommandLore.compOrStringArg(
-                                literal("all")
-                                        .requires(source -> source.hasPermission(Permissions.ADMIN)),
+                        .then(literal("all")
+                                .requires(source -> source.hasPermission(Permissions.ADMIN))
 
-                                (context, builder) -> FtcSuggestionProvider.suggestPlayerNamesAndEmotes(context, builder, true),
+                                .then(argument("message", ChatArgument.chat())
+                                        .executes(c -> {
+                                            Component message = c.getArgument("message", Component.class);
 
-                                (context, lore) -> {
-                                    context.getSource().sendAdmin(
-                                            Component.text("Sending all users mail: ")
-                                                    .append(lore)
-                                    );
+                                            c.getSource().sendAdmin(
+                                                    Component.text("Sending all users mail: ")
+                                                            .append(message)
+                                            );
 
-                                    UserManager m = Crown.getUserManager();
-                                    m.getAllUsers()
-                                            .whenComplete((users, throwable) -> {
-                                                if(throwable != null) {
-                                                    context.getSource().sendAdmin("Error sending mail to all users, check console");
-                                                    Crown.logger().error(throwable);
+                                            UserManager m = Crown.getUserManager();
+                                            m.getAllUsers()
+                                                    .whenComplete((users, throwable) -> {
+                                                        if(throwable != null) {
+                                                            c.getSource().sendAdmin("Error sending mail to all users, check console");
+                                                            Crown.logger().error(throwable);
 
-                                                    return;
-                                                }
+                                                            return;
+                                                        }
 
-                                                users.forEach(user -> {
-                                                    user.sendAndMail(lore, null);
-                                                });
+                                                        users.forEach(user -> {
+                                                            user.sendAndMail(message, null);
+                                                        });
 
-                                                m.unloadOffline();
-                                                context.getSource().sendAdmin("Sent all users mail");
-                                            });
+                                                        m.unloadOffline();
+                                                        c.getSource().sendAdmin("Sent all users mail");
+                                                    });
 
-                                    return 0;
-                                }
-                        ))
+                                            return 0;
+                                        })
+                                )
+                        )
 
                         .then(argument("target", UserArgument.user())
                                 .then(argument("message", StringArgumentType.greedyString())

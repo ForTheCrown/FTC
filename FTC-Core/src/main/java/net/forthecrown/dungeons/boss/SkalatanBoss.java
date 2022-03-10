@@ -7,8 +7,6 @@ import net.forthecrown.dungeons.DungeonUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Mob;
@@ -44,7 +42,7 @@ public class SkalatanBoss extends SimpleBoss {
     protected Mob onSpawn(BossContext context) {
         state = State.MELEE;
 
-        return getWorld().spawn(spawnLocation, WitherSkeleton.class, skeleton -> {
+        return getWorld().spawn(getSpawn(), WitherSkeleton.class, skeleton -> {
             skeleton.customName(name().color(NamedTextColor.YELLOW));
             skeleton.setCustomNameVisible(true);
             skeleton.setRemoveWhenFarAway(false);
@@ -73,8 +71,6 @@ public class SkalatanBoss extends SimpleBoss {
 
     @Override
     protected void tick() {
-        super.tick();
-
         tick--;
 
         if(tick < 0) {
@@ -99,8 +95,7 @@ public class SkalatanBoss extends SimpleBoss {
         // stop event and play effect
         event.setCancelled(true);
 
-        getWorld().playSound(entity.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 1.2f);
-        getWorld().spawnParticle(Particle.SQUID_INK, entity.getLocation().add(0, entity.getHeight()*0.66, 0), 5, 0.1D, 0.1D, 0.1D, 0.05D);
+        DungeonUtils.cannotHarmEffect(getWorld(), entity);
     }
 
     public enum State {

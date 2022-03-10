@@ -2,7 +2,9 @@ package net.forthecrown.commands.admin;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.regions.Region;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.book.builder.TextInfo;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -11,11 +13,14 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.animation.AnimationBuilder;
 import net.forthecrown.core.animation.BlockAnimation;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
+import net.forthecrown.grenadier.types.block.BlockArgument;
+import net.forthecrown.grenadier.types.block.ParsedBlock;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.inventory.weapon.RoyalSword;
@@ -31,6 +36,7 @@ import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.math.Vector3iOffset;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.transformation.BoundingBoxes;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
@@ -91,6 +97,32 @@ public class CommandTestCore extends FtcCommand {
             user.sendMessage(gradient);
             return 0;
         })
+
+                .then(literal("test_bounds")
+                        .then(argument("block", BlockArgument.block())
+                                .executes(c -> {
+                                    ParsedBlock block = c.getArgument("block", ParsedBlock.class);
+
+                                    Player player = c.getSource().asPlayer();
+                                    com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
+                                    Region selection = FtcUtils.getSelectionSafe(wePlayer);
+
+                                    WorldBounds3i bounds3i = WorldBounds3i.of(player.getWorld(), selection);
+
+                                    for (Block b: bounds3i) {
+                                        block.place(b.getWorld(), b.getX(), b.getY(), b.getZ(), true);
+                                    }
+
+                                    c.getSource().sendAdmin(
+                                            ChatUtils.format("Completed test for region {}, volume: {}, size: {}, world: {}",
+                                                    bounds3i, bounds3i.volume(), bounds3i.span(), bounds3i.getWorld().getName()
+                                            )
+                                    );
+                                    return 0;
+                                })
+                        )
+                )
+
                 .then(literal("test_font")
                         .then(argument("input", StringArgumentType.greedyString())
                                 .executes(c -> {

@@ -1,6 +1,5 @@
 package net.forthecrown.dungeons.boss;
 
-import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
@@ -8,25 +7,31 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 import java.util.function.Consumer;
 
 public abstract class AbstractBoss implements DungeonBoss {
+    protected static final Logger LOGGER = Crown.logger();
+
     // Final variables that give details about boss
     private final String name;
-    private final ImmutableList<ItemStack> spawningItems;
+    private final SpawnRequirement requirement;
     private final Set<BossComponent> components;
     private final FtcBoundingBox room;
+    private final Location spawn;
 
     // Variables used when boss is alive
     protected boolean alive;
@@ -34,10 +39,11 @@ public abstract class AbstractBoss implements DungeonBoss {
     protected BukkitTask tickTask;
     protected BossContext currentContext;
 
-    public AbstractBoss(String name, FtcBoundingBox room, ItemStack... items) {
+    public AbstractBoss(String name, Location spawn, FtcBoundingBox room, SpawnRequirement requirement) {
         this.name = name;
         this.room = room;
-        this.spawningItems = ImmutableList.copyOf(items);
+        this.spawn = spawn.clone();
+        this.requirement = requirement;
 
         ObjectSet<BossComponent> components = new ObjectOpenHashSet<>();
         createComponents(components);
@@ -64,6 +70,11 @@ public abstract class AbstractBoss implements DungeonBoss {
         for (Player p: context.players()) {
             bossBar.addPlayer(p);
         }
+    }
+
+    protected void updateBossbarViewers() {
+        bossBar.removeAll();
+        getRoom().getPlayers().forEach(bossBar::addPlayer);
     }
 
     protected void destroyBossBar() {
@@ -103,8 +114,8 @@ public abstract class AbstractBoss implements DungeonBoss {
     }
 
     @Override
-    public ImmutableList<ItemStack> getSpawningItems() {
-        return spawningItems;
+    public SpawnRequirement getSpawnRequirement() {
+        return requirement;
     }
 
     @Override
@@ -149,5 +160,21 @@ public abstract class AbstractBoss implements DungeonBoss {
     @Override
     public FtcBoundingBox getRoom() {
         return room;
+    }
+
+    @Override
+    public Location getSpawn() {
+        return spawn.clone();
+    }
+
+    @Override
+    public @NotNull World getWorld() {
+        return spawn.getWorld();
+    }
+
+    protected void logSpawn(BossContext context) {
+        String players = ListUtils.join(context.players(), ",", "[", "]", Player::getName);
+
+        LOGGER.info("{} spawned, context: players: {}, difficulty: {}", getName(), players, context.modifier());
     }
 }

@@ -3,12 +3,13 @@ package net.forthecrown.user;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.actions.TeleportRequest;
 import net.forthecrown.utils.JsonUtils;
+import net.forthecrown.utils.TimeUtil;
 
 import java.util.*;
 
@@ -193,9 +194,7 @@ public class FtcUserInteractions extends AbstractUserAttachment implements UserI
     @Override
     public boolean canChangeMarriageStatus(){
         if(lastMarriageChange == 0) return true;
-
-        long nextAllowed = lastMarriageChange + ComVars.getMarriageCooldown();
-        return System.currentTimeMillis() > nextAllowed;
+        return TimeUtil.hasCooldownEnded(FtcVars.marriageCooldown.get(), lastMarriageChange);
     }
 
     @Override

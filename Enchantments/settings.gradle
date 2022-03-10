@@ -1,2 +1,12 @@
+pluginManagement {
+    repositories {
+        it.gradlePluginPortal()
+        //it.maven 'https://papermc.io/repo/repository/maven-public/'
+        it.maven {
+            url 'https://papermc.io/repo/repository/maven-public/'
+        }
+    }
+}
+
 rootProject.name = 'Enchantments'
 

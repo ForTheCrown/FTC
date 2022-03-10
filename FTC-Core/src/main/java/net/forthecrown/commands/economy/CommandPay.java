@@ -6,7 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
@@ -24,12 +24,8 @@ import java.util.UUID;
 
 public class CommandPay extends FtcCommand {
 
-    private final int maxMoneyAmount;
-
     public CommandPay(){
         super("pay", Crown.inst());
-
-        maxMoneyAmount = ComVars.getMaxMoneyAmount();
 
         setDescription("Pay another player");
         setPermission(Permissions.PAY);
@@ -55,7 +51,7 @@ public class CommandPay extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .then(argument("players", UserArgument.users())
-                      .then(argument("amount", IntegerArgumentType.integer(1, maxMoneyAmount))
+                      .then(argument("amount", IntegerArgumentType.integer(1, FtcVars.maxMoneyAmount.get()))
                               .suggests(suggestMonies())
 
                             .executes(c -> {

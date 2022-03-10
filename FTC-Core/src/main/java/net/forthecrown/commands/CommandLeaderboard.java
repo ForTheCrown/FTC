@@ -1,7 +1,7 @@
 package net.forthecrown.commands;
 
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -79,7 +79,7 @@ public class CommandLeaderboard extends FtcCommand {
         new CommandLeaderboard("crown") {
             @Override
             public boolean test(CommandSource source) {
-                if(!ComVars.isEventActive()) return false;
+                if(!FtcVars.crownEventActive.get()) return false;
                 return super.test(source);
             }
         };

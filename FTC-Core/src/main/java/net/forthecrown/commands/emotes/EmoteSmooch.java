@@ -11,7 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
-import java.time.Month;
 import java.util.Calendar;
 
 public class EmoteSmooch extends CommandEmote {
@@ -29,10 +28,9 @@ public class EmoteSmooch extends CommandEmote {
         Calendar calendar = Calendar.getInstance();
         int month = calendar.get(Calendar.MONTH);
 
-        if(month != Month.FEBRUARY.getValue()) return false;
+        if(month != Calendar.FEBRUARY) return false;
 
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-
         return MathUtil.inRange(day, 9, 17);
     }
 

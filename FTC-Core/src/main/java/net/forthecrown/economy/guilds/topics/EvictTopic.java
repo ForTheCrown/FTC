@@ -5,7 +5,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.FtcFormatter;
@@ -49,7 +49,7 @@ public class EvictTopic implements VoteTopic<EvictTopic.EvictionData> {
     public DelayedVoteTask onEnd(EvictionData data, VoteCount count) {
         if(!count.isWin()) return null;
 
-        long time = System.currentTimeMillis() + ComVars.getEvictionCleanupTime();
+        long time = System.currentTimeMillis() + FtcVars.evictionCleanupTime.get();
         return new DelayedVoteTask(time, new JsonPrimitive(data.shopName()), this);
     }
 
@@ -61,7 +61,7 @@ public class EvictTopic implements VoteTopic<EvictTopic.EvictionData> {
                 UserManager.getUser(data.owner()).nickDisplayName()
                         .color(NamedTextColor.YELLOW),
 
-                FtcFormatter.formatDate(ComVars.getEvictionCleanupTime())
+                FtcFormatter.formatDate(FtcVars.evictionCleanupTime.get())
                         .color(NamedTextColor.GOLD)
         );
     }

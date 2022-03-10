@@ -167,21 +167,6 @@ public class CommandDungeons extends FtcCommand {
                                             return 0;
                                         })
                                 )
-                                .then(literal("giveitems")
-                                        .executes(c -> {
-                                            Player player = getPlayerSender(c);
-                                            DungeonBoss boss = c.getArgument(bossArg, DungeonBoss.class);
-
-                                            for (ItemStack i: boss.getSpawningItems()){
-                                                try {
-                                                    player.getInventory().addItem(i.clone());
-                                                } catch (Exception e) { throw FtcExceptionProvider.create("Inventory full!"); }
-                                            }
-
-                                            c.getSource().sendAdmin( "Giving items");
-                                            return 0;
-                                        })
-                                )
                                 .then(literal("attemptSpawn")
                                         .executes(c -> {
                                             Player player = getPlayerSender(c);

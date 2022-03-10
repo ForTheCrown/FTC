@@ -1,14 +1,15 @@
 package net.forthecrown.user;
 
-import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.events.dynamic.AsyncTeleportListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.HandlerList;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -17,7 +18,7 @@ import java.util.function.Supplier;
  * A user's teleport from one area to another.
  *
  */
-public class UserTeleport extends BukkitRunnable {
+public class UserTeleport {
 
     private final FtcUser user;
     private final Supplier<Location> destination;
@@ -29,6 +30,8 @@ public class UserTeleport extends BukkitRunnable {
     private Component completeMessage;
     private Component interruptMessage;
 
+    private BukkitTask task;
+
     public UserTeleport(FtcUser user, Supplier<Location> destination, boolean noCooldown, Type type) {
         this.user = user;
         this.destination = destination;
@@ -37,34 +40,31 @@ public class UserTeleport extends BukkitRunnable {
     }
 
     public void start(boolean tell){
-        if(!noCooldown) {
+        if (noCooldown) {
+            complete(tell);
+        } else {
             if(tell) {
                 user.sendMessage(Objects.requireNonNullElseGet(startMessage, () ->
                         Component.text(type.action + " in ")
                                 .color(NamedTextColor.GRAY)
-                                .append(Component.text(FtcFormatter.convertTicksIntoTime(ComVars.getTpTickDelay())).color(NamedTextColor.GOLD))
+                                .append(Component.text(FtcFormatter.convertTicksIntoTime(FtcVars.tpTickDelay.get())).color(NamedTextColor.GOLD))
                                 .append(Component.newline())
                                 .append(Component.text("Don't move!"))));
             }
 
             listener = new AsyncTeleportListener(user, this);
-            runTaskLater(Crown.inst(), ComVars.getTpTickDelay());
-        } else complete(tell);
+            task = Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> complete(tell), FtcVars.tpTickDelay.get());
+        }
     }
 
-    @Override
-    public synchronized void cancel() throws IllegalStateException {
-        if(isScheduled()) super.cancel();
-        if(listener != null) HandlerList.unregisterAll(listener);
-    }
-
-    public synchronized void stop(){
-        try {
-            super.cancel();
-        } catch (IllegalStateException ignored) {}
+    public void stop(){
+        if (isScheduled()) {
+            task.cancel();
+            task = null;
+        }
 
         user.lastTeleport = null;
-        if(listener != null) HandlerList.unregisterAll(listener);
+        if (listener != null) HandlerList.unregisterAll(listener);
     }
 
     public CrownUser getUser() {
@@ -82,11 +82,7 @@ public class UserTeleport extends BukkitRunnable {
         stop();
     }
 
-    public void complete(boolean tell){
-        if(isCancelled()){
-            stop();
-            return;
-        }
+    public void complete(boolean tell) {
         if(tell) user.sendMessage(Objects.requireNonNullElseGet(completeMessage, () ->
                 Component.text(type.action + "...").color(NamedTextColor.GRAY)
         ));
@@ -99,30 +95,11 @@ public class UserTeleport extends BukkitRunnable {
             user.setLastLocation(location);
         } catch (NullPointerException ignored){ }
 
-        if(listener != null) HandlerList.unregisterAll(listener);
-        listener = null;
-    }
-
-    @Override
-    public void run() {
-        complete(true);
-    }
-
-    @Override
-    public synchronized boolean isCancelled() throws IllegalStateException {
-        try {
-            return super.isCancelled();
-        } catch (IllegalStateException e){
-            return false;
-        }
+        stop();
     }
 
     public boolean isScheduled(){
-        try {
-            return super.isCancelled();
-        } catch (IllegalStateException e){
-            return false;
-        }
+        return task != null && !task.isCancelled();
     }
 
     public boolean shouldBypassCooldown() {

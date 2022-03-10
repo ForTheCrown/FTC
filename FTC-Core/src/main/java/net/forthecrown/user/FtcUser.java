@@ -7,11 +7,7 @@ import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentRecord;
 import net.forthecrown.core.admin.PunishmentType;
 import net.forthecrown.core.admin.Punishments;
-import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.core.chat.JoinInfo;
-import net.forthecrown.core.chat.ProfilePrinter;
-import net.forthecrown.cosmetics.PlayerRidingManager;
+import net.forthecrown.core.chat.*;
 import net.forthecrown.economy.selling.ItemFilter;
 import net.forthecrown.events.dynamic.AfkListener;
 import net.forthecrown.events.dynamic.RegionVisitListener;
@@ -44,8 +40,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_18_R1.CraftOfflinePlayer;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R2.CraftOfflinePlayer;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.Permission;
@@ -120,8 +116,8 @@ public class FtcUser implements CrownUser {
     public String afkReason;
 
     //Locations
-    public Location entityLocation;
-    public Location lastLocation;
+    public Location entityLocation; // Used for tracking the player's position
+    public Location lastLocation;   // Used by /back
 
     //Teleport stuff
     public UserTeleport lastTeleport;
@@ -156,15 +152,18 @@ public class FtcUser implements CrownUser {
         Crown.getUserManager().getSerializer().serialize(this);
     }
 
-    public void updateName(String name){
-        if(isOnline() && name != null && !name.equals(getPlayer().getName())){ //transfers all scores to new player name if player name changes
+    public void updateName(String last){
+        if(isOnline() && last != null && !last.equals(getPlayer().getName())){ //transfers all scores to new player name if player name changes
+            UserCache cache = Crown.getUserManager().getCache();
+            cache.onNameChange(cache.getEntry(getUniqueId()), getPlayer().getName());
+
             Scoreboard scoreboard = getPlayer().getScoreboard();
 
             for (Objective obj : scoreboard.getObjectives()){
-                if(!obj.getScore(name).isScoreSet()) continue;
+                if(!obj.getScore(last).isScoreSet()) continue;
 
-                obj.getScore(getPlayer().getName()).setScore(obj.getScore(name).getScore());
-                obj.getScore(name).resetScore();
+                obj.getScore(getPlayer().getName()).setScore(obj.getScore(last).getScore());
+                obj.getScore(last).resetScore();
             }
         }
     }
@@ -416,10 +415,10 @@ public class FtcUser implements CrownUser {
         matData.clear();
         setTotalEarnings(0);
 
-        nextResetTime = System.currentTimeMillis() + ComVars.getUserResetInterval();
-        Crown.logger().info(
-                getName() + " earnings reset, next reset in: " + (((((getNextResetTime() - System.currentTimeMillis())/1000)/60)/60)/24) + " days"
-        );
+        long interval = FtcVars.userDataResetInterval.get();
+        nextResetTime = System.currentTimeMillis() + interval;
+
+        Crown.logger().info("{} earnings reset, next reset in {}", getName(), new TimePrinter(interval).printString());
 
         save();
     }
@@ -428,6 +427,7 @@ public class FtcUser implements CrownUser {
     @Override
     public String getName(){
         if(FtcUtils.isNullOrBlank(name)) name = getOfflinePlayer().getName();
+
         return name;
     }
 
@@ -663,13 +663,18 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public boolean onJoin(){
+    public boolean onJoin() {
         this.handle = getOnlineHandle().getHandle();
 
         if(hulkSmashing) {
             RegionVisitListener listener = new RegionVisitListener(this, cosmeticData.getActiveTravel());
             listener.beginListening();
         }
+
+        sendPlayerListHeader(Crown.getTabList().format());
+
+        ip = getPlayer().getAddress().getHostString();
+        updateVanished();
 
         if(!getName().equalsIgnoreCase(lastOnlineName)){
             updateName(lastOnlineName);
@@ -678,11 +683,6 @@ public class FtcUser implements CrownUser {
             lastOnlineName = name;
             return true;
         }
-
-        sendPlayerListHeader(Crown.getTabList().format());
-
-        ip = getPlayer().getAddress().getHostString();
-        updateVanished();
         return false;
     }
 
@@ -703,8 +703,8 @@ public class FtcUser implements CrownUser {
         lastLoad = System.currentTimeMillis();
 
         //If in end, but end not open, leave end lol
-        if(getWorld().equals(Worlds.end()) && !ComVars.isEndOpen()) {
-            getPlayer().teleport(PlayerRidingManager.HAZELGUARD);
+        if(getWorld().equals(Worlds.end()) && !Crown.getEndOpener().isOpen()) {
+            getPlayer().teleport(FtcUtils.findHazelLocation());
         }
 
         mail.informOfUnread();
@@ -826,14 +826,13 @@ public class FtcUser implements CrownUser {
     @Override
     public void onTpComplete(){
         if(!lastTeleport.shouldBypassCooldown()){
-            long cooldownMillis = ComVars.getTpCooldown() * 50;
+            long cooldownMillis = FtcVars.tpCooldown.get() * 50;
             nextAllowedTeleport = System.currentTimeMillis() + cooldownMillis;
 
-            Cooldown.add(this, "Core_TeleportCooldown", ComVars.getTpCooldown());
+            Cooldown.add(this, "Core_TeleportCooldown", FtcVars.tpCooldown.get());
         }
 
-        if(!lastTeleport.isCancelled()) lastTeleport.stop();
-        lastTeleport = null;
+        lastTeleport.stop();
     }
 
     @Override
@@ -875,6 +874,9 @@ public class FtcUser implements CrownUser {
     @Override
     public void setNickname(Component component){
         this.nickname = component;
+
+        UserCache cache = Crown.getUserManager().getCache();
+        cache.onNickChange(cache.getEntry(getUniqueId()), component == null ? null : ChatUtils.plainText(component));
 
         if(isOnline()) updateTabName();
     }
@@ -1074,7 +1076,7 @@ public class FtcUser implements CrownUser {
     @Override
     public boolean isGoalBookDonator() {
         if(lastGuildPassDonation == 0L) return false;
-        return !TimeUtil.hasCooldownEnded(ComVars.goalBookDonorTimeLength(), getLastGuildPassDonation());
+        return !TimeUtil.hasCooldownEnded(FtcVars.gb_donorTimeLength.get(), getLastGuildPassDonation());
     }
 
     @Override

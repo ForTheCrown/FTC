@@ -1,9 +1,12 @@
 package net.forthecrown.economy.shops;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.forthecrown.core.Crown;
 import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.serializer.ShopJsonSerializer;
 import net.forthecrown.serializer.ShopSerializer;
+import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,10 +16,9 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class FtcShopManager implements ShopManager {
     private static final ItemStack EXAMPLE_BARRIER = new ItemStackBuilder(Material.BARRIER, 1)
@@ -121,5 +123,27 @@ public class FtcShopManager implements ShopManager {
     @Override
     public ShopSerializer getSerializer() {
         return serializer;
+    }
+
+    @Override
+    public CompletableFuture<List<SignShop>> getAllShops() {
+        return CompletableFuture.supplyAsync(() -> {
+            File dir = ShopJsonSerializer.SHOP_DIR;
+            List<SignShop> shops = new ObjectArrayList<>();
+
+            for (File f: dir.listFiles()) {
+                try {
+                    LocationFileName name = LocationFileName.parse(f.getName());
+                    SignShop shop = getShop(name);
+
+                    if(shop == null) continue;
+                    shops.add(shop);
+                } catch (Exception e) {
+                    Crown.logger().error("Error while loading shop file" + f.getName(), e);
+                }
+            }
+
+            return shops;
+        });
     }
 }

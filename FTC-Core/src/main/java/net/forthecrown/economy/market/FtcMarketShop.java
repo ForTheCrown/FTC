@@ -9,15 +9,15 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.TimeUtil;
-import net.forthecrown.utils.math.MathUtil;
+import net.minecraft.util.Mth;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.jetbrains.annotations.Nullable;
@@ -55,12 +55,12 @@ public class FtcMarketShop implements MarketShop {
 
     @Override
     public int getPrice() {
-        return price == -1 ? ComVars.defaultShopPrice() : price;
+        return price == -1 ? FtcVars.defaultMarketPrice.get() : price;
     }
 
     @Override
     public void setPrice(int price) {
-        this.price = MathUtil.clamp(price, -1, ComVars.getMaxMoneyAmount());
+        this.price = Mth.clamp(price, -1, FtcVars.maxMoneyAmount.get());
     }
 
     @Override
@@ -76,7 +76,7 @@ public class FtcMarketShop implements MarketShop {
     @Override
     public boolean canBeEvicted() {
         if(dateOfPurchase == null || owner == null) return false;
-        return TimeUtil.hasCooldownEnded(ComVars.getShopOwnershipSafeTime(), getDateOfPurchase().getTime());
+        return TimeUtil.hasCooldownEnded(FtcVars.marketOwnershipSafeTime.get(), getDateOfPurchase().getTime());
     }
 
     @Override

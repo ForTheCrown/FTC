@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
@@ -24,17 +24,13 @@ public class CommandWithdraw extends FtcCommand {
     public CommandWithdraw(){
         super("withdraw", Crown.inst());
 
-        maxMoney = ComVars.getMaxMoneyAmount();
-
         setDescription("Get cold coins from your balance");
         register();
     }
 
-    private final int maxMoney;
-
     @Override
     protected void createCommand(BrigadierCommand command) {
-        command.then(argument("amount", IntegerArgumentType.integer(1, maxMoney))
+        command.then(argument("amount", IntegerArgumentType.integer(1, FtcVars.maxMoneyAmount.get()))
                 .suggests(suggestMonies())
 
                 .then(argument("coinAmount", IntegerArgumentType.integer(1, Material.SUNFLOWER.getMaxStackSize()))

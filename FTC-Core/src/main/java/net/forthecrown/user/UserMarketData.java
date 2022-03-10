@@ -1,6 +1,6 @@
 package net.forthecrown.user;
 
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.TimeUtil;
 
@@ -36,7 +36,7 @@ public interface UserMarketData extends UserAttachment {
     long getKickedFromGuild();
 
     default boolean affectedByKickCooldown() {
-        return !TimeUtil.hasCooldownEnded(ComVars.guildKickSafeTime(), getKickedFromGuild());
+        return !TimeUtil.hasCooldownEnded(FtcVars.guildJoinTime.get(), getKickedFromGuild());
     }
 
     default void setJoinedGuild() {
@@ -49,7 +49,7 @@ public interface UserMarketData extends UserAttachment {
 
     default boolean canBeKickedFromGuild() {
         if(!hasJoinedGuild()) return false;
-        return TimeUtil.hasCooldownEnded(ComVars.guildKickSafeTime(), getGuildJoinDate());
+        return TimeUtil.hasCooldownEnded(FtcVars.guildJoinTime.get(), getGuildJoinDate());
     }
 
     default boolean currentlyOwnsShop() {
@@ -57,7 +57,7 @@ public interface UserMarketData extends UserAttachment {
     }
 
     default boolean canChangeStatus() {
-        return TimeUtil.hasCooldownEnded(ComVars.getMarketStatusCooldown(), getLastStatusChange());
+        return TimeUtil.hasCooldownEnded(FtcVars.marketStatusCooldown.get(), getLastStatusChange());
     }
 
     default void setLastStatusChange() {

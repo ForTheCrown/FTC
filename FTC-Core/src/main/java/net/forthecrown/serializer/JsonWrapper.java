@@ -32,7 +32,7 @@ import static net.forthecrown.utils.JsonUtils.*;
  */
 public class JsonWrapper {
 
-    //The source and handle of the buffer
+    //The source and handle of the wrapper
     private final JsonObject json;
 
     protected JsonWrapper(JsonObject json) {
@@ -41,18 +41,20 @@ public class JsonWrapper {
 
     /**
      * Creates a buf for the given JSON
+     *
      * @param json the json to create the buf for
      * @return The buf for the given JSON object
      */
-    public static JsonWrapper of(JsonObject json){
+    public static JsonWrapper of(JsonObject json) {
         return new JsonWrapper(json);
     }
 
     /**
      * Creates an empty json buf
+     *
      * @return An empty json buf
      */
-    public static JsonWrapper empty(){
+    public static JsonWrapper empty() {
         return new JsonWrapper(new JsonObject());
     }
 
@@ -64,61 +66,63 @@ public class JsonWrapper {
         json.add(name, writeEnum(anum));
     }
 
-    public <E extends Enum<E>> E getEnum(String name, Class<E> clazz){
+    public <E extends Enum<E>> E getEnum(String name, Class<E> clazz) {
         return getEnum(name, clazz, null);
     }
 
-    public <E extends Enum<E>> E getEnum(String name, Class<E> clazz, E def){
-        if(missingOrNull(name)) return def;
+    public <E extends Enum<E>> E getEnum(String name, Class<E> clazz, E def) {
+        if (missingOrNull(name)) return def;
         return readEnum(clazz, json.get(name));
     }
 
-    public void addLocation(String name, Location location){
+    public void addLocation(String name, Location location) {
         json.add(name, writeLocation(location));
     }
 
-    public Location getLocation(String name){
+    public Location getLocation(String name) {
         return get(name, e -> readLocation(e.getAsJsonObject()));
     }
 
-    public void addUUID(String name, UUID id){
-        add(name, JsonUtils.writeUUID(id));
+    public void addUUID(String name, UUID id) {
+        add(name, writeUUID(id));
     }
 
-    public UUID getUUID(String name){
-        if(missingOrNull(name)) return null;
-        return JsonUtils.readUUID(get(name));
+    public UUID getUUID(String name) {
+        if (missingOrNull(name)) return null;
+        return readUUID(get(name));
     }
 
-    public void addKey(String name, Key key){
+    public void addKey(String name, Key key) {
         json.add(name, writeKey(key));
     }
 
-    public NamespacedKey getKey(String name){
+    public NamespacedKey getKey(String name) {
         return get(name, JsonUtils::readKey);
     }
 
-    public void addRegion(String name, FtcBoundingBox box){
+    public void addRegion(String name, FtcBoundingBox box) {
         json.add(name, box.serialize());
     }
 
-    public FtcBoundingBox getRegion(String name){
+    public FtcBoundingBox getRegion(String name) {
         return FtcBoundingBox.of(get(name));
     }
 
-    public void addItem(String name, ItemStack item){
+    public void addItem(String name, ItemStack item) {
         json.add(name, writeItem(item));
     }
 
-    public ItemStack getItem(String name) { return getItem(name, null); }
-    public ItemStack getItem(String name, ItemStack def){
-        if(missingOrNull(name)) return def;
+    public ItemStack getItem(String name) {return getItem(name, null);}
+
+    public ItemStack getItem(String name, ItemStack def) {
+        if (missingOrNull(name)) return def;
         return readItem(get(name));
     }
 
-    public <T> T get(String name, Function<JsonElement, T> function) { return get(name, function, null); }
-    public <T> T get(String name, Function<JsonElement, T> function, T def){
-        if(missingOrNull(name)) return def;
+    public <T> T get(String name, Function<JsonElement, T> function) {return get(name, function, null);}
+
+    public <T> T get(String name, Function<JsonElement, T> function, T def) {
+        if (missingOrNull(name)) return def;
         T parsed = function.apply(get(name));
 
         return parsed == null ? def : parsed;
@@ -128,115 +132,120 @@ public class JsonWrapper {
         return getList(name, func, null);
     }
 
-    public <T> Collection<T> getList(String name, Function<JsonElement, T> func, Collection<T> def){
-        if(missingOrNull(name)) return def;
+    public <T> Collection<T> getList(String name, Function<JsonElement, T> func, Collection<T> def) {
+        if (missingOrNull(name)) return def;
         return ListUtils.fromIterable(getArray(name), func);
     }
-    
-    public void addList(String name, Iterable<? extends JsonSerializable> list){
+
+    public void addList(String name, Iterable<? extends JsonSerializable> list) {
         addList(name, list, JsonSerializable::serialize);
     }
-    
-    public <T> void addList(String name, Iterable<T> iterable, Function<T, JsonElement> function){
+
+    public <T> void addList(String name, Iterable<T> iterable, Function<T, JsonElement> function) {
         JsonArray array = new JsonArray();
         iterable.forEach(e -> array.add(function.apply(e)));
 
         json.add(name, array);
     }
 
-    public Vector3i getPos(String name){
-        if(missingOrNull(name)) return null;
+    public Vector3i getPos(String name) {
+        if (missingOrNull(name)) return null;
         return get(name, Vector3i::of);
     }
 
-    public String getString(String name){ return getString(name, null); }
+    public String getString(String name) {return getString(name, null);}
 
-    public String getString(String name, String def){
-        if(missingOrNull(name)) return def;
+    public String getString(String name, String def) {
+        if (missingOrNull(name)) return def;
         return json.get(name).getAsString();
     }
 
-    public boolean getBool(String name){ return getBool(name, false); }
+    public boolean getBool(String name) {return getBool(name, false);}
 
-    public boolean getBool(String name, boolean def){
-        if(missingOrNull(name)) return def;
+    public boolean getBool(String name, boolean def) {
+        if (missingOrNull(name)) return def;
         return get(name).getAsBoolean();
     }
 
-    public long getLong(String name){ return getLong(name, 0L); }
+    public long getLong(String name) {return getLong(name, 0L);}
 
-    public long getLong(String name, long def){
-        if(missingOrNull(name)) return def;
+    public long getLong(String name, long def) {
+        if (missingOrNull(name)) return def;
         return get(name).getAsLong();
     }
 
-    public double getDouble(String name){ return getDouble(name, 0D); }
+    public double getDouble(String name) {return getDouble(name, 0D);}
 
-    public double getDouble(String name, double def){
-        if(missingOrNull(name)) return def;
+    public double getDouble(String name, double def) {
+        if (missingOrNull(name)) return def;
         return get(name).getAsDouble();
     }
 
-    public float getFloat(String name){ return getFloat(name, 0f); }
+    public float getFloat(String name) {return getFloat(name, 0f);}
 
-    public float getFloat(String name, float def){
-        if(missingOrNull(name)) return def;
+    public float getFloat(String name, float def) {
+        if (missingOrNull(name)) return def;
         return get(name).getAsFloat();
     }
 
-    public BigDecimal getBigDecimal(String name){ return getBigDecimal(name, null); }
+    public BigDecimal getBigDecimal(String name) {return getBigDecimal(name, null);}
 
-    public BigDecimal getBigDecimal(String name, BigDecimal def){
-        if(missingOrNull(name)) return def;
+    public BigDecimal getBigDecimal(String name, BigDecimal def) {
+        if (missingOrNull(name)) return def;
         return get(name).getAsBigDecimal();
     }
 
-    public BigInteger getBigInt(String name){ return getBigInt(name, null); }
+    public BigInteger getBigInt(String name) {return getBigInt(name, null);}
 
-    public BigInteger getBigInt(String name, BigInteger def){
-        if(missingOrNull(name)) return def;
+    public BigInteger getBigInt(String name, BigInteger def) {
+        if (missingOrNull(name)) return def;
         return get(name).getAsBigInteger();
     }
 
-    public int getInt(String name){ return getInt(name, 0); }
+    public int getInt(String name) {return getInt(name, 0);}
 
-    public int getInt(String name, int def){
-        if(missingOrNull(name)) return def;
+    public int getInt(String name, int def) {
+        if (missingOrNull(name)) return def;
         return json.get(name).getAsInt();
     }
 
-    public short getShort(String name){ return getShort(name, (short) 0); }
+    public short getShort(String name) {return getShort(name, (short) 0);}
 
-    public short getShort(String name, short def){
-        if(missingOrNull(name)) return def;
+    public short getShort(String name, short def) {
+        if (missingOrNull(name)) return def;
         return json.get(name).getAsShort();
     }
 
-    public byte getByte(String name){ return getByte(name, (byte) 0); }
+    public byte getByte(String name) {return getByte(name, (byte) 0);}
 
-    public byte getByte(String name, byte def){
-        if(missingOrNull(name)) return def;
+    public byte getByte(String name, byte def) {
+        if (missingOrNull(name)) return def;
         return get(name).getAsByte();
     }
 
-    public JsonWrapper getWrapped(String name){
-        if(missingOrNull(name)) return null;
+    public JsonWrapper getWrapped(String name) {
+        if (missingOrNull(name)) return null;
         return of(getObject(name));
     }
 
-    public void add(String name, JsonWrapper buf){
+    public JsonWrapper getWrappedNonNull(String name) {
+        if (missingOrNull(name)) return empty();
+        return of(getObject(name));
+    }
+
+    public void add(String name, JsonWrapper buf) {
         json.add(name, buf.json);
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return size() < 1;
     }
 
-    public boolean missingOrNull(String name){
+    public boolean missingOrNull(String name) {
         return !has(name) || get(name).isJsonNull();
     }
 
-    public <T> void addMap(String name, Map<String, T> map, Function<T, JsonElement> func){
+    public <T> void addMap(String name, Map<String, T> map, Function<T, JsonElement> func) {
         addMap(name, map, Function.identity(), func);
     }
 
@@ -250,17 +259,17 @@ public class JsonWrapper {
         json.add(name, jsonMap);
     }
 
-    public <K, V> Map<K, V> getMap(String name, Function<String, K> keyFunc, Function<JsonElement, V> valueFunc){
+    public <K, V> Map<K, V> getMap(String name, Function<String, K> keyFunc, Function<JsonElement, V> valueFunc) {
         return getMap(name, keyFunc, valueFunc, false);
     }
 
     public <K, V> Map<K, V> getMap(String name, Function<String, K> keyFunc, Function<JsonElement, V> valueFunc, boolean returnEmptyIfMissing) {
-        if(missingOrNull(name)) return returnEmptyIfMissing ? new HashMap<>() : null;
+        if (missingOrNull(name)) return returnEmptyIfMissing ? new HashMap<>() : null;
 
         JsonObject json = getObject(name);
         Map<K, V> result = new HashMap<>();
 
-        for (Map.Entry<String, JsonElement> e: json.entrySet()){
+        for (Map.Entry<String, JsonElement> e : json.entrySet()) {
             result.put(keyFunc.apply(e.getKey()), valueFunc.apply(e.getValue()));
         }
 
@@ -276,7 +285,7 @@ public class JsonWrapper {
     }
 
     public <K, V> void writeMap(Map<K, V> map, Function<K, String> keyFunc, Function<V, JsonElement> valueFunc) {
-        for (Map.Entry<K, V> e: map.entrySet()) {
+        for (Map.Entry<K, V> e : map.entrySet()) {
             add(keyFunc.apply(e.getKey()), valueFunc.apply(e.getValue()));
         }
     }
@@ -288,7 +297,7 @@ public class JsonWrapper {
     public <K, V> Map<K, V> asMap(Function<String, K> keyFunc, Function<JsonElement, V> valueFunc) {
         Map<K, V> map = new Object2ObjectOpenHashMap<>();
 
-        for (Map.Entry<String, JsonElement> e: entrySet()) {
+        for (Map.Entry<String, JsonElement> e : entrySet()) {
             map.put(keyFunc.apply(e.getKey()), valueFunc.apply(e.getValue()));
         }
 
@@ -299,9 +308,10 @@ public class JsonWrapper {
         add(name, tag.toString());
     }
 
-    public CompoundTag getNBT(String name) { return getNBT(name, null); }
+    public CompoundTag getNBT(String name) {return getNBT(name, null);}
+
     public CompoundTag getNBT(String name, CompoundTag def) {
-        if(missingOrNull(name)) return def;
+        if (missingOrNull(name)) return def;
 
         try {
             return TagParser.parseTag(getString(name));
@@ -318,7 +328,7 @@ public class JsonWrapper {
     public <T> void addArray(String name, T[] arr, Function<T, JsonElement> converter) {
         JsonArray array = new JsonArray();
 
-        for (T t: arr) {
+        for (T t : arr) {
             array.add(converter.apply(t));
         }
 
@@ -345,7 +355,8 @@ public class JsonWrapper {
         add(name, JsonUtils.writeDate(date));
     }
 
-    public Date getDate(String name) { return getDate(name, null); }
+    public Date getDate(String name) {return getDate(name, null);}
+
     public Date getDate(String name, Date def) {
         return get(name, JsonUtils::readDate, def);
     }
@@ -416,19 +427,19 @@ public class JsonWrapper {
         return json;
     }
 
-    public JsonObject nullIfEmpty(){
+    public JsonObject nullIfEmpty() {
         return isEmpty() ? null : json;
     }
 
-    public String toString(){
+    public String toString() {
         return json.toString();
     }
 
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         return json.equals(o);
     }
 
-    public int hashCode(){
+    public int hashCode() {
         return json.hashCode();
     }
 }

@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public final class BannedWords {
@@ -31,10 +32,8 @@ public final class BannedWords {
     private static final int COOLDOWN_TIME = 3 * 60 * 20;
 
     public static void loadFromResource() {
-        JsonParser parser = new JsonParser();
-
         InputStream stream = FtcUtils.getFileOrResource("banned_words.json");
-        JsonElement element = parser.parse(new InputStreamReader(stream));
+        JsonElement element = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
         JsonArray array = element.getAsJsonArray();
 
         BANNED_WORDS.clear();

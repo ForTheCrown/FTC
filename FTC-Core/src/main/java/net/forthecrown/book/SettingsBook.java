@@ -13,9 +13,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SettingsBook {
-
-    public SettingsBook() {}
+public final class SettingsBook {
+    private SettingsBook() {}
 
     private static final List<StateChangeCommand> cmds = new ArrayList<>();
     public static void addCmdToBook(StateChangeCommand cmd) { cmds.add(cmd); }
@@ -32,7 +31,10 @@ public class SettingsBook {
                 .addText(Component.text("Settings:"))
                 .addEmptyLine();
 
-        for (StateChangeCommand cmd : cmds) getLine(builder, cmd, user);
+        for (StateChangeCommand cmd : cmds) {
+            if(cmd == StateChangeCommand.TOGGLE_MARRIAGE_CHAT) continue;
+            getLine(builder, cmd, user);
+        }
         return builder.build();
     }
 
@@ -82,8 +84,8 @@ public class SettingsBook {
     private static Component getFiller(int amount) {
         int half = amount >> 1;
 
-        // All hail the single pixel I
-        return Component.text(".".repeat(half)).color(NamedTextColor.WHITE);
+        // All hail the single pixel dot              \/ this piece of shit is because it gets offset by a SINGLE pixel if the value is less than 12
+        return Component.text(".".repeat(half - 7)).color(NamedTextColor.WHITE);
     }
 
     private static TextComponent getFillerChar(char c) {

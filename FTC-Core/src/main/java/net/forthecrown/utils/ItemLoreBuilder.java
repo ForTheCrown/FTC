@@ -75,4 +75,45 @@ public class ItemLoreBuilder {
     public List<Component> getLore() {
         return lore;
     }
+
+    public Prefixed withIndent(int indent) {
+        Validate.isTrue(indent > 0, "indent level cannot be less than 0");
+        return withPrefixedLines(" ".repeat(indent));
+    }
+
+    public Prefixed withPrefixedLines(String prefix) {
+        return new Prefixed(prefix, this);
+    }
+
+    public static class Prefixed extends ItemLoreBuilder {
+        private final String prefix;
+        private final ItemLoreBuilder builder;
+
+        public Prefixed(String prefix, ItemLoreBuilder builder) {
+            this.prefix = prefix;
+            this.builder = builder;
+        }
+
+        public Component indentText() {
+            return Component.text(prefix);
+        }
+
+        public ItemLoreBuilder getBuilder() {
+            return builder;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        @Override
+        public ItemLoreBuilder add(Component c) {
+            return builder.add(indentText().append(c));
+        }
+
+        @Override
+        public List<Component> getLore() {
+            return builder.lore;
+        }
+    }
 }

@@ -1,26 +1,15 @@
 package net.forthecrown.dungeons.boss;
 
-import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.forthecrown.core.Worlds;
-import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -28,11 +17,15 @@ import java.util.Set;
  * Dungeon Boss
  */
 public interface DungeonBoss extends Nameable, Listener {
+
     /**
-     * Gets the items required to spawn it
-     * @return The items required to spawn this boss
+     * Gets the check that anyone attempting to spawn the
+     * boss must pass
+     *
+     * @return The spawning requirement, null if there's
+     *         no requirement for spawning the boss
      */
-    ImmutableList<ItemStack> getSpawningItems();
+    @Nullable SpawnRequirement getSpawnRequirement();
 
     /**
      * Gets whether the boss is alive or not
@@ -84,14 +77,10 @@ public interface DungeonBoss extends Nameable, Listener {
     BossContext currentContext();
 
     /**
-     * Generic getter function, will return
-     * the world_void in most instances
-     *
+     * Gets the spawn world of this boss
      * @return The world this boss is in
      */
-    default @NotNull World getWorld() {
-        return Worlds.voidWorld();
-    }
+    @NotNull World getWorld();
 
     /**
      * Gets the bounding box of the room
@@ -101,64 +90,18 @@ public interface DungeonBoss extends Nameable, Listener {
     FtcBoundingBox getRoom();
 
     /**
-     * Attempts to spawn the boss
-     * @param player The player spawning
-     * @return True, if the player had all the items
-     *         required to spawn the boss, false otherwise
+     * Gets the location the boss is meant to spawn
+     * at
+     * @return The boss' spawn location, cloned
      */
+    Location getSpawn();
+
     default boolean attemptSpawn(Player player) {
-        PlayerInventory inventory = player.getInventory();
-        List<ItemStack> items = new ObjectArrayList<>();
-
-        for (ItemStack i: getSpawningItems()) {
-            // Check if they have the item, if not
-            // display item missing message
-            if(!inventory.containsAtLeast(i, i.getAmount())) {
-                player.sendMessage(
-                        Component.translatable("dungeons.notEnoughItems")
-                                .color(NamedTextColor.GRAY)
-                                .append(Component.newline())
-                                .append(itemMessage(inventory))
-                );
-                return false;
-            }
-
-            // I do not trust non cloned item stacks
-            items.add(i.clone());
+        if(getSpawnRequirement() == null || getSpawnRequirement().test(player)) {
+            spawn();
+            return true;
         }
 
-        // Remove all items
-        inventory.removeItemAnySlot(items.toArray(ItemStack[]::new));
-
-        spawn();
-        return true;
-    }
-
-    /**
-     * Displays the items needed to spawn
-     *
-     * @param inventory May be null, this parameter
-     *                  is here to allow for the messsage
-     *                  to display a darker or brighter
-     *                  color for each item, depending on
-     *                  if you have said item or not
-     *
-     * @return The item requirement message
-     */
-    default Component itemMessage(@Nullable Inventory inventory) {
-        TextComponent.Builder text = Component.text()
-                .color(NamedTextColor.AQUA)
-                .append(Component.translatable("dungeons.neededItems"));
-
-        for (ItemStack i: getSpawningItems()) {
-            TextColor color = inventory == null || inventory.containsAtLeast(i, i.getAmount()) ?
-                    NamedTextColor.DARK_AQUA : TextColor.color(0, 117, 117);
-
-            text.append(Component.newline())
-                    .append(Component.text("- "))
-                    .append(FtcFormatter.itemAndAmount(i).color(color));
-        }
-
-        return text.build();
+        return false;
     }
 }

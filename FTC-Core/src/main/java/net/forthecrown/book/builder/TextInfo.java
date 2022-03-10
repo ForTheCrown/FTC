@@ -4,15 +4,13 @@ import com.sk89q.worldedit.math.BlockVector2;
 import net.forthecrown.core.Crown;
 import net.minecraft.Util;
 import net.minecraft.world.phys.Vec2;
-import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 
 public final class TextInfo {
-    private static final Logger LOGGER = Crown.logger();
-
     public static final Font MC_FONT = Util.make(() -> {
         try {
             return Font.createFont(Font.TRUETYPE_FONT, Crown.resource("minecraft_font.ttf"));
@@ -23,21 +21,14 @@ public final class TextInfo {
     });
 
     public static final FontRenderContext RENDER_CONTEXT = new FontRenderContext(MC_FONT.getTransform(), false, true);
-
     public static final Vec2 SIZE_MOD = Util.make(() -> {
         String example = "i";
         BlockVector2 exampleSize = BlockVector2.at(1, 7);
 
-        Rectangle2D rec = MC_FONT.getStringBounds(example, RENDER_CONTEXT);
+        TextLayout layout = new TextLayout(example, MC_FONT, RENDER_CONTEXT);
+        Rectangle2D rec = layout.getBounds();
 
-        Vec2 result = new Vec2((float) (exampleSize.getX() / rec.getWidth()), (float) (exampleSize.getZ() / rec.getHeight()));
-
-        LOGGER.info("example letter: '{}'", example);
-        LOGGER.info("exampleSize: {}", exampleSize);
-        LOGGER.info("gottenSize: ({} {})", rec.getWidth(), rec.getHeight());
-        LOGGER.info("size_mod: ({} {})", result.x, result.y);
-
-        return result;
+        return new Vec2((float) (exampleSize.getX() / rec.getWidth()), (float) (exampleSize.getZ() / rec.getHeight()));
     });
 
     public static int getPxLength(char c) {
@@ -60,6 +51,11 @@ public final class TextInfo {
     }
 
     public static int getPxLength(String string) {
-        return string.chars().reduce(0, (p, i) -> p + getPxLengthNew((char) i) + 1);
+        if(string.length() == 0) return 0;
+
+        TextLayout layout = new TextLayout(string.replaceAll(" ", "t"), MC_FONT, RENDER_CONTEXT);
+        Rectangle2D rec = layout.getBounds();
+
+        return (int) Math.ceil(rec.getWidth() * SIZE_MOD.x);
     }
 }

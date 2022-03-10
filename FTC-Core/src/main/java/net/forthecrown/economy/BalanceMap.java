@@ -123,7 +123,16 @@ public interface BalanceMap {
     Stream<BalanceReader> readerStream();
 
     interface BalanceReader extends Comparable<BalanceReader> {
+        /**
+         * Gets the ID of the holder of this balance
+         * @return The holder's ID
+         */
         UUID getUniqueId();
+
+        /**
+         * Gets the balance value held by this entry
+         * @return The entry's balance
+         */
         int getValue();
 
         @Override

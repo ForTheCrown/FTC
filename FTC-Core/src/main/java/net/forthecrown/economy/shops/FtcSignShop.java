@@ -21,7 +21,6 @@ public class FtcSignShop implements SignShop {
 
     private final LocationFileName fileName;
     private final WorldVec3i loc;
-    private final Block block;
     private final FtcShopInventory inventory;
     private final ShopOwnership ownership;
     private final ShopHistory history;
@@ -38,7 +37,6 @@ public class FtcSignShop implements SignShop {
         Validate.isTrue(serializer.fileExists(this), getFileName() + " has no file");
 
         this.loc = loc;
-        block = loc.getBlock();
 
         ownership = new ShopOwnership();
         inventory = new FtcShopInventory(this);
@@ -52,7 +50,6 @@ public class FtcSignShop implements SignShop {
         this.fileName = LocationFileName.of(loc);
         this.loc = loc;
         this.price = price;
-        this.block = loc.getBlock();
         this.type = shopType;
 
         this.ownership = new ShopOwnership();
@@ -118,7 +115,7 @@ public class FtcSignShop implements SignShop {
 
     @Override
     public Block getBlock() {
-        return block;
+        return getPosition().getBlock();
     }
 
     @Override
@@ -195,10 +192,8 @@ public class FtcSignShop implements SignShop {
     @Override
     public void update(){
         Sign s = getSign();
-        Component ln1 = getType().inStockLabel();
-        if(isOutOfStock()) ln1 = getType().outOfStockLabel();
 
-        s.line(0, ln1);
+        s.line(0, isOutOfStock() ? getType().outOfStockLabel() : getType().inStockLabel());
         s.line(3, Crown.getShopManager().getPriceLine(price));
 
         Bukkit.getScheduler().runTask(Crown.inst(), () -> s.update(true));

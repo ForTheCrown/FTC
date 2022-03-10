@@ -5,7 +5,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcFlags;
 import net.forthecrown.core.Permissions;
@@ -85,7 +85,7 @@ public class ShopCreateListener implements Listener {
             } catch (Exception e){ throw FtcExceptionProvider.translatable("shops.created.failed.noPrice"); }
 
             //Make sure they don't exceed the max shop price
-            if(price > ComVars.getMaxSignShopPrice()) throw FtcExceptionProvider.maxShopPriceExceeded();
+            if(price > FtcVars.maxSignShopPrice.get()) throw FtcExceptionProvider.maxShopPriceExceeded();
 
             //They must give at least one line of info about the shop
             if(line2.isBlank() && line1.isBlank()) throw FtcExceptionProvider.translatable("shops.created.failed.noDesc");

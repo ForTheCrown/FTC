@@ -17,13 +17,14 @@ import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
 import org.apache.commons.lang3.Range;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Switch;
-import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -39,6 +40,8 @@ import java.util.concurrent.CompletableFuture;
  * It should be kept open for the last 7 days of each week, aka, end week.
  */
 public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListener {
+    private static final Logger LOGGER = Crown.logger();
+
     private Component openMessage, closeMessage;
     private WorldVec3i leverPos;
     private boolean open;
@@ -67,7 +70,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
         // Preferably perform the resetting asynchronously.
         int rangeDif = closedRange.getMaximum() - closedRange.getMinimum();
         int resetDay = closedRange.getMinimum() + (rangeDif / 2);
-        if(day == resetDay) regen();
+        if (day == resetDay) regen();
 
         // If current day is a closed day, but portal not closed,
         // close it, if not close day and portal not open, open it
@@ -118,7 +121,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
                             e.printStackTrace();
                         }
 
-                        Crown.logger().info("Placed end exit portal and gateways");
+                        LOGGER.info("Placed end exit portal and gateways");
                     });
                 });
     }
@@ -156,7 +159,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
         Block b = leverPos.getBlock();
 
         if(b.getType() != Material.LEVER) {
-            Crown.logger().error("Given EndOpener lever position: {} is not a lever! Cannot close/open end", leverPos);
+            LOGGER.error("Given EndOpener lever position: {} is not a lever! Cannot close/open end", leverPos);
             return false;
         }
 

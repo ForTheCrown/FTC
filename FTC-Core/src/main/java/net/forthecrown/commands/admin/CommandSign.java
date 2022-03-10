@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -87,24 +88,21 @@ public class CommandSign extends FtcCommand {
                         .then(argument("index", IntegerArgumentType.integer(1, 4))
                                 .suggests(suggestMatching("1", "2", "3", "4"))
 
-                                .then(CommandLore.compOrStringArg(
-                                        literal("set"),
+                                .then(literal("set")
+                                        .then(argument("line", ChatArgument.chat())
+                                                .suggests((c, b) -> {
+                                                    Sign sign = get(c);
+                                                    int line = c.getArgument("index", Integer.class);
+                                                    if(line < 0 || line > 4) return Suggestions.empty();
 
-                                        (c, b) -> {
-                                            try {
-                                                Sign sign = get(c);
-                                                int line = c.getArgument("index", Integer.class);
-                                                if(line < 0 || line > 4) return Suggestions.empty();
+                                                    String lineText = LegacyComponentSerializer.legacyAmpersand().serialize(sign.line(line-1));
 
-                                                String lineText = LegacyComponentSerializer.legacyAmpersand().serialize(sign.line(line-1));
+                                                    return CompletionProvider.suggestMatching(b, lineText);
+                                                })
 
-                                                return CompletionProvider.suggestMatching(b, lineText);
-                                            } catch (CommandSyntaxException ignored) {}
-                                            return Suggestions.empty();
-                                        },
-
-                                        this::set
-                                ))
+                                                .executes(c -> set(c, c.getArgument("line", Component.class)))
+                                        )
+                                )
 
                                 .then(literal("clear")
                                         .executes(c -> set(c, Component.empty()))

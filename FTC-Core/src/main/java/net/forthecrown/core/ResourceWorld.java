@@ -28,6 +28,7 @@ import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.utils.world.WorldReCreator;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -39,7 +40,7 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Orientable;
-import org.bukkit.craftbukkit.v1_18_R1.CraftHeightMap;
+import org.bukkit.craftbukkit.v1_18_R2.CraftHeightMap;
 import org.bukkit.entity.Player;
 import org.mcteam.ancientgates.Gate;
 import org.mcteam.ancientgates.Gates;
@@ -337,7 +338,14 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
     @Override
     public void onDayChange() {
         if (!isAutoResetEnabled()) return;
-        if (!TimeUtil.hasCooldownEnded(ComVars.resourceWorldResetInterval(), lastReset)) return;
+        if (!TimeUtil.hasCooldownEnded(FtcVars.resourceWorldResetInterval.get(), lastReset)) return;
+
+        if(WorldLoader.isLoading(Worlds.end())) {
+            LOGGER.warn("End is already regenerating, moving RW reset ahead by one day");
+
+            lastReset += TimeUtil.DAY_IN_MILLIS;
+            return;
+        }
 
         resetAndLoad();
     }
@@ -468,8 +476,8 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
     private boolean isAreaGood(int x, int z, ChunkGenerator gen, int baseY) {
         // Biome's use their own positioning,
         // which is 1/4 the size of a chunk
-        Biome b = gen.getNoiseBiome(x, QuartPos.fromBlock(64), z);
-        Biome.BiomeCategory category = b.getBiomeCategory();
+        Holder<Biome> b = gen.getNoiseBiome(x, QuartPos.fromBlock(64), z);
+        Biome.BiomeCategory category = Biome.getBiomeCategory(b);
 
         int blockX = x * 4;
         int blockZ = z * 4;
@@ -509,7 +517,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         // every 8 chunks
         for (int x = min; x < max; x += 8) {
             for (int z = min; z < max; z += 8) {
-                result.add(gen.getNoiseBiome(x, y, z).getBiomeCategory());
+                result.add(Biome.getBiomeCategory(gen.getNoiseBiome(x, y, z)));
             }
         }
 

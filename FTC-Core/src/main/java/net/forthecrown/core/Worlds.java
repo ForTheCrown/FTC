@@ -5,7 +5,9 @@ import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_18_R1.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
+
+import java.util.Objects;
 
 public interface Worlds {
     String
@@ -25,7 +27,7 @@ public interface Worlds {
     World   OVERWORLD       = nonNull(OVERWORLD_KEY);
 
     private static World nonNull(NamespacedKey key) {
-        return Bukkit.getWorld(key);
+        return Objects.requireNonNull(Bukkit.getWorld(key));
     }
 
     private static NamespacedKey ofLevelKey(ResourceKey<Level> key) {

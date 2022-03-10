@@ -1,6 +1,7 @@
 package net.forthecrown.squire.enchantment;
 
 import net.forthecrown.squire.Squire;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import org.bukkit.enchantments.Enchantment;
 
@@ -19,16 +20,21 @@ public class RoyalEnchants {
             f.setAccessible(true);
             f.set(null, true);
 
+            MappedRegistry<net.minecraft.world.item.enchantment.Enchantment> enchantRegistry = (MappedRegistry) Registry.ENCHANTMENT;
+            Squire.unfreezeRegistry(enchantRegistry);
+
             dolphinSwimmer = register(new DolphinSwimmer());
             poisonCrit = register(new PoisonCrit());
             healingBlock = register(new HealingBlock());
             strongAim = register(new StrongAim());
+
+            enchantRegistry.freeze();
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public <T extends RoyalEnchant> T register(final T enchant){
+    public <T extends RoyalEnchant> T register(final T enchant) {
         Registry.register(Registry.ENCHANTMENT, enchant.getKey().asString(), enchant.getHandle());
         if(Enchantment.getByKey(enchant.getKey()) == null) Enchantment.registerEnchantment(enchant);
 

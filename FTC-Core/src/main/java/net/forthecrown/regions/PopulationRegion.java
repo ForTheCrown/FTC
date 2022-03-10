@@ -3,7 +3,7 @@ package net.forthecrown.regions;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.Message;
 import com.sk89q.worldedit.math.BlockVector2;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcDynmap;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
@@ -96,7 +96,8 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
             BlockVector2 pos = polePosition == null ? getPos().toCenter() : polePosition;
 
             Marker marker = FtcDynmap.getMarker(this);
-            marker.setLocation(ComVars.getRegionWorld().getUID().toString(),
+            marker.setLocation(
+                    FtcVars.getRegionWorld().getUID().toString(),
                     pos.getX() + 0.5D, getPoleBoundingBox().maxY(), pos.getZ() + 0.5D
             );
         }

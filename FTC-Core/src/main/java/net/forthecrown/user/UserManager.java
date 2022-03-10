@@ -1,18 +1,18 @@
 package net.forthecrown.user;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.serializer.UserSerializer;
 import net.forthecrown.user.actions.UserActionHandler;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.ListUtils;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -39,13 +39,35 @@ public interface UserManager extends CrownSerializer {
     }
 
     /**
+     * Gets a loaded user
+     * @param base The UUID of the user
+     * @return The loaded user, null, if the User attached to the given UUID is not loaded
+     */
+    static CrownUser getLoadedUser(UUID base) {
+        return FtcUserManager.LOADED_USERS.get(base);
+    }
+
+    /**
      * Gets a user for the corresponding UUID
      * @param base The UUID to get the player of, will create a new user if it doesn't already exist
      * @return A user :I
      */
     static CrownUser getUser(@NotNull UUID base) {
         Validate.notNull(base, "UUID cannot be null");
-        Validate.isTrue(isPlayerID(base), "Given UUID did not belong to a player");
+        UserCache.CacheEntry entry = Crown.getUserManager().getCache().getEntry(base);
+
+        Validate.notNull(entry, "Given UUID did not belong to a player");
+
+        return getUser(entry);
+    }
+
+    /**
+     * Gets a user by the given cache entry
+     * @param reader The cache entry
+     * @return The gotten/created user
+     */
+    static CrownUser getUser(UserCache.CacheEntry reader) {
+        UUID base = reader.getUniqueId();
 
         return FtcUserManager.LOADED_USERS.computeIfAbsent(base, uuid -> {
             UserManager manager = Crown.getUserManager();
@@ -68,8 +90,7 @@ public interface UserManager extends CrownSerializer {
      * @return Whether the UUID is one of a player or not
      */
     static boolean isPlayerID(UUID id) {
-        OfflinePlayer player = Bukkit.getOfflinePlayer(id);
-        return player != null && player.getName() != null;
+        return Crown.getUserManager().getCache().getEntry(id) != null;
     }
 
     /**
@@ -85,7 +106,14 @@ public interface UserManager extends CrownSerializer {
      * @return All online users
      */
     static Set<CrownUser> getOnlineUsers() {
-        return ListUtils.convertToSet(Bukkit.getOnlinePlayers(), UserManager::getUser);
+        Set<CrownUser> online = new ObjectOpenHashSet<>();
+
+        for (FtcUser u: FtcUserManager.LOADED_USERS.values()) {
+            if(!u.isOnline()) continue;
+            online.add(u);
+        }
+
+        return online;
     }
 
     /**
@@ -188,8 +216,39 @@ public interface UserManager extends CrownSerializer {
      */
     CompletableFuture<List<CrownUser>> getAllUsers();
 
+    /**
+     * Gets the user action handler
+     * @return The user action handler
+     */
     UserActionHandler getActionHandler();
+
+    /**
+     * Gets the user serializer
+     * @return User serializer
+     */
     UserSerializer getSerializer();
+
+    /**
+     * Gets the user cache
+     * @return The user cache
+     */
+    UserCache getCache();
+
+    /**
+     * Gets the user cache file
+     * @return The user cache file
+     */
+    File getCacheFile();
+
+    /**
+     * Saves the user cache
+     */
+    void saveCache();
+
+    /**
+     * Loads the user cache
+     */
+    void loadCache();
 
     /**
      * Unloads all offline users

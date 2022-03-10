@@ -1,7 +1,8 @@
 package net.forthecrown.core.chat;
 
-import net.forthecrown.core.ComVars;
+import net.forthecrown.book.builder.TextInfo;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.Punishments;
@@ -69,6 +70,8 @@ public class ProfilePrinter implements ComponentPrinter {
     public Component printForHover() {
         append(user.nickOrName().color(NamedTextColor.GOLD));
 
+        line("Name", user.name(), user.hasNickname());
+
         if(profilePublic) {
             optionalInfo();
             basicInfo();
@@ -81,30 +84,37 @@ public class ProfilePrinter implements ComponentPrinter {
     }
 
     public ProfilePrinter header() {
-        String header = "---- " + (self ? "Your" : (user.getNickOrName() + "'s")) + " profile ----";
-        headerLength = header.length();
+        Component headerDisplay = Component.text()
+                .append(
+                        Component.text("    ")
+                                .style(BORDER_STYLE)
+                )
 
-        append(
-                Component.text("    ")
-                        .style(BORDER_STYLE)
-        );
+                .append(Component.space())
+                .append(headerDisplay())
+                .append(Component.space())
 
-        append(Component.space());
-        append(headerDisplay());
-        append(Component.space());
+                .append(
+                        Component.text("    ")
+                                .style(BORDER_STYLE)
+                )
+                .build();
 
-        append(
-                Component.text("    ")
-                        .style(BORDER_STYLE)
-        );
+        headerDisplay = ChatUtils.renderToSimple(headerDisplay);
+        String plain = ChatUtils.plainText(headerDisplay);
+        headerLength = TextInfo.getPxLength(plain);
 
-        return this;
+        return append(headerDisplay);
     }
+
+    static final int SPACE_LENGTH = TextInfo.getPxLength(" ") + 1;
 
     public ProfilePrinter footer() {
         newLine();
+        int charCount = headerLength / SPACE_LENGTH;
+
         return append(
-                Component.text(" ".repeat(headerLength < 1 ? 10 : headerLength))
+                Component.text(" ".repeat(charCount))
                         .style(BORDER_STYLE)
         );
     }
@@ -133,8 +143,8 @@ public class ProfilePrinter implements ComponentPrinter {
         Objective crown = user.getScoreboard().getObjective("crown");
         Score crownScore = crown.getScore(user.getName());
         line("Crown score",
-                Component.text(ComVars.isEventTimed() ? timer(crownScore.getScore()) : crownScore.getScore() + ""),
-                crownScore.getScore() > 0 && ComVars.isEventActive()
+                Component.text(FtcVars.crownEventIsTimed.get() ? timer(crownScore.getScore()) : crownScore.getScore() + ""),
+                crownScore.getScore() > 0 && FtcVars.crownEventActive.get()
         );
 
         return this;
@@ -188,7 +198,7 @@ public class ProfilePrinter implements ComponentPrinter {
         );
 
         line(" MarriageCooldown", marriageCooldown());
-        line(" Location", locMessage, user.isOnline());
+        line(" Location", locMessage);
 
         append(punishmentDisplay);
         return this;

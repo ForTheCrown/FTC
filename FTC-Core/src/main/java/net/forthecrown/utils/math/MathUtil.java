@@ -1,5 +1,6 @@
 package net.forthecrown.utils.math;
 
+import com.sk89q.worldedit.math.Vector3;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -9,20 +10,9 @@ import org.bukkit.util.Vector;
 public final class MathUtil {
     private MathUtil() {}
 
-    public static double clamp(double val, double min, double max) {
-        return val <= max ? (val >= min ? val : min) : max;
-    }
-
-    public static long clamp(long val, long min, long max) {
-        return val <= max ? (val >= min ? val : min) : max;
-    }
-
-    public static int clamp(int val, int min, int max) {
-        return val <= max ? (val >= min ? val : min) : max;
-    }
-
     public static boolean inRange(long val, long min, long max) {
-        return val >= min && val <= max;
+        if (val > max || val < min) return false;
+        return true;
     }
 
     public static boolean inRange(double check, double min, double max) {
@@ -30,7 +20,11 @@ public final class MathUtil {
         return true;
     }
 
-    public static Vector vectorBetweenPoints(Location l1, Location l2) {
-        return l1.toVector().clone().subtract(l2.toVector());
+    public static Vector3 toWorldEdit(Location l) {
+        return toWorldEdit(l.toVector());
+    }
+
+    public static Vector3 toWorldEdit(Vector l) {
+        return Vector3.at(l.getX(), l.getY(), l.getZ());
     }
 }

@@ -20,7 +20,9 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Manages shops n stuff
@@ -212,4 +214,10 @@ public interface ShopManager {
      * @return The shop serializer
      */
     ShopSerializer getSerializer();
+
+    /**
+     * Loads all sign shops async
+     * @return All sign shops that exist
+     */
+    CompletableFuture<List<SignShop>> getAllShops();
 }

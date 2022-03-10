@@ -3,7 +3,7 @@ package net.forthecrown.serializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.*;
@@ -57,14 +57,13 @@ public class UserJsonSerializer implements UserSerializer {
             if(!ranks.isEmpty()) json.addList("titles", ranks);
         }
 
-        //Stuff
-        if(user.hasNickname()) json.add("nickname", ChatUtils.toJson(user.nickname));
-        if(!FtcUtils.isNullOrBlank(user.ip)) json.add("ipAddress", user.ip);
-        if(user.totalEarnings > 0) json.add("totalEarnings", user.totalEarnings);
-        if(user.getGems() != 0) json.add("gems", user.getGems());
-        if(!user.pets.isEmpty()) json.addList("pets", user.pets);
-        if(user.currentPrefix != null) json.add("currentPrefix", ChatUtils.toJson(user.currentPrefix));
-        if(user.hulkSmashing) json.add("hulkSmashing", true);
+        if (user.hasNickname()) json.add("nickname", ChatUtils.toJson(user.nickname));
+        if (!FtcUtils.isNullOrBlank(user.ip)) json.add("ipAddress", user.ip);
+        if (user.totalEarnings > 0) json.add("totalEarnings", user.totalEarnings);
+        if (user.getGems() != 0) json.add("gems", user.getGems());
+        if (!user.pets.isEmpty()) json.addList("pets", user.pets);
+        if (user.currentPrefix != null) json.add("currentPrefix", ChatUtils.toJson(user.currentPrefix));
+        if (user.hulkSmashing) json.add("hulkSmashing", true);
 
         //Properties
         if(!user.prefs.isEmpty()) json.addList("properties", user.prefs);
@@ -89,7 +88,7 @@ public class UserJsonSerializer implements UserSerializer {
 
         //Last known location
         Location entLoc = user.getLocation();
-        if(entLoc != null) json.addLocation("lastKnowLoc", entLoc);
+        if(entLoc != null) json.addLocation("location", entLoc);
 
         //Sold materials
         if(!MapUtils.isNullOrEmpty(user.matData)){
@@ -187,9 +186,12 @@ public class UserJsonSerializer implements UserSerializer {
             user.lastLocation = json.getLocation("lastLocation");
         }
 
-        //Last known location
-        if(json.has("lastKnowLoc")) {
-            user.entityLocation = json.getLocation("lastKnowLoc");
+        //location
+        if(json.has("lastKnowLoc") || json.has("location")) {
+            Location l = json.getLocation("location");
+            if(l == null) l = json.getLocation("lastKnowLoc");
+
+            user.entityLocation = l;
         }
 
         loadAttach(json, user.cosmeticData);
@@ -260,7 +262,7 @@ public class UserJsonSerializer implements UserSerializer {
 
         JsonWrapper timeStamps = JsonWrapper.empty();
         timeStamps.add("lastLoad", id.getOfflinePlayer().getLastLogin());
-        timeStamps.add("nextReset", System.currentTimeMillis() + ComVars.getUserResetInterval());
+        timeStamps.add("nextReset", System.currentTimeMillis() + FtcVars.userDataResetInterval.get());
 
         json.add("timeStamps", timeStamps);
     }

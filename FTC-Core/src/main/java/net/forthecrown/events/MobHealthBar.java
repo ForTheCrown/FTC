@@ -18,32 +18,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MobHealthBar implements Listener {
+    public static final String DEF_HEART = "❤";
+
     public static final Map<LivingEntity, Component> NAMES = new HashMap<>();
     public static final Map<LivingEntity, BukkitTask> HITMOBS = new HashMap<>();
 
-    @EventHandler(ignoreCancelled = true)
-    public void onMobDamage(EntityDamageByEntityEvent event){
-        if(!(event.getDamager() instanceof Player)){                            // Check damager is player or arrow shot by player
-            if(!(event.getDamager() instanceof Arrow)) return;
-            if(!(((Arrow) event.getDamager()).getShooter() instanceof Player)) return;
-        }
-
-        if(event.getEntity().getWorld().equals(Worlds.voidWorld())) return;     // Not in world_void
-        if(!(event.getEntity() instanceof LivingEntity)) return;                // Must be alive
-
-        if(event.getEntity() instanceof Player                                  // But not another player, armor stand or Boss mob
-                || event.getEntity() instanceof ArmorStand
-                || event.getEntity() instanceof EnderDragon
-                || event.getEntity() instanceof Wither
-        ) return;
-
-        LivingEntity damaged = (LivingEntity) event.getEntity();
-        showHealthbar(damaged, event.getFinalDamage());
-    }
-
     private static void delay(LivingEntity damaged) {
         BukkitTask task = HITMOBS.get(damaged);
-        if(task != null) task.cancel(); //Cancel if already in map
+        if (task != null) task.cancel(); //Cancel if already in map
 
         task = Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
             damaged.setCustomNameVisible(false);
@@ -55,16 +37,19 @@ public class MobHealthBar implements Listener {
         HITMOBS.put(damaged, task); //Put delay in map
     }
 
-    public static void showHealthbar(LivingEntity damaged, double finalDamage){
-        if(damaged.getHealth() - finalDamage <= 0) return;
+    public static void showHealthbar(LivingEntity damaged, double finalDamage, String heartChar, boolean autoRemove) {
+        if (damaged.getHealth() - finalDamage <= 0) return;
         String name = damaged.getCustomName();
 
         // Only affect entities that only show names when player hovers mouse over them:
         // (Note: colored names can get replaced, they return properly anyway)
-        if(name != null) {
-            if (!name.contains("❤")) {
-                if (damaged.isCustomNameVisible()) return; // Don't change names of entities with always visible names (without hearts in them)
-                else NAMES.put(damaged, damaged.customName()); // Save names of player-named entities
+        if (name != null) {
+            if (!name.contains(heartChar)) {
+                if (damaged.isCustomNameVisible()) {
+                    return; // Don't change names of entities with always visible names (without hearts in them)
+                } else {
+                    NAMES.put(damaged, damaged.customName()); // Save names of player-named entities
+                }
             }
         }
 
@@ -78,12 +63,12 @@ public class MobHealthBar implements Listener {
 
         // Construct name with correct hearts:
         String healthBar = ChatColor.RED + "";
-        for (int i = 0; i < remainingHRTS; i++){
-            healthBar += "❤";
+        for (int i = 0; i < remainingHRTS; i++) {
+            healthBar += heartChar;
         }
         healthBar += ChatColor.GRAY + "";
-        for (int i = remainingHRTS; i < heartsToShow; i++){
-            healthBar += "❤";
+        for (int i = remainingHRTS; i < heartsToShow; i++) {
+            healthBar += heartChar;
         }
 
         // Show hearts + set timer to remove hearts
@@ -91,14 +76,37 @@ public class MobHealthBar implements Listener {
         // turned back into normal
         damaged.setCustomNameVisible(true);
         damaged.setCustomName(healthBar);
-        delay(damaged);
+
+        if (autoRemove) delay(damaged);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onMobDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player)) {                            // Check damager is player or arrow shot by player
+            if (!(event.getDamager() instanceof Arrow)) return;
+            if (!(((Arrow) event.getDamager()).getShooter() instanceof Player)) return;
+        }
+
+        if (event.getEntity().getWorld().equals(Worlds.voidWorld())) return;     // Not in world_void
+        if (!(event.getEntity() instanceof LivingEntity)) return;                // Must be alive
+
+        if (event.getEntity() instanceof Player                                  // But not another player, armor stand or Boss mob
+                || event.getEntity() instanceof ArmorStand
+                || event.getEntity() instanceof EnderDragon
+                || event.getEntity() instanceof Wither
+        ) {
+            return;
+        }
+
+        LivingEntity damaged = (LivingEntity) event.getEntity();
+        showHealthbar(damaged, event.getFinalDamage(), DEF_HEART, true);
     }
 
     //Death messsage
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDeath(PlayerDeathEvent event) {
         if (!event.getDeathMessage().contains("❤")) return;
-        if(!(event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent)) return;
+        if (!(event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent)) return;
 
         EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
         String name = FtcFormatter.normalEnum(damageEvent.getDamager().getType());

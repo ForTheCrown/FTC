@@ -2,8 +2,8 @@ package net.forthecrown.inventory.weapon.abilities;
 
 import net.forthecrown.inventory.weapon.AltAttackContext;
 import net.forthecrown.inventory.weapon.WeaponUseContext;
+import net.forthecrown.utils.ItemLoreBuilder;
 import net.kyori.adventure.key.Keyed;
-import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
 
 public abstract class WeaponAbility {
@@ -34,7 +34,7 @@ public abstract class WeaponAbility {
         return type;
     }
 
-    public abstract Component loreDisplay();
+    public abstract void addInfo(ItemLoreBuilder builder);
 
     public int getLevel() {
         return level;

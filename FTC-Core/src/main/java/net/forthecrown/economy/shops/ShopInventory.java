@@ -70,12 +70,6 @@ public interface ShopInventory extends FtcInventory {
     @NotNull SignShop getHolder(boolean useSnapshot);
 
     /**
-     * Gets the total amount of items in the inventory
-     * @return Total amount of items
-     */
-    int getTotalItemAmount();
-
-    /**
      * Checks if the shop has enough stock
      * And changes the ingame sign accordingly
      */

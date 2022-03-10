@@ -3,7 +3,7 @@ package net.forthecrown.regions;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldedit.math.BlockVector2;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
@@ -85,7 +85,7 @@ public final class RegionUtil {
     }
 
     public static void validateWorld(World world) throws CommandSyntaxException {
-        if(!world.equals(ComVars.getRegionWorld())) throw FtcExceptionProvider.regionsWrongWorld();
+        if(!world.equals(FtcVars.getRegionWorld())) throw FtcExceptionProvider.regionsWrongWorld();
     }
 
     public static boolean isCloseToPoleOrOp(BlockVector2 pole, CrownUser user) {

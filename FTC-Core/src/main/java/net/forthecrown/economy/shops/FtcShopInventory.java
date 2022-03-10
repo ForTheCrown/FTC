@@ -1,7 +1,7 @@
 package net.forthecrown.economy.shops;
 
 import net.forthecrown.inventory.ItemStacks;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventoryCustom;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
@@ -65,23 +65,10 @@ public class FtcShopInventory extends CraftInventoryCustom implements ShopInvent
     }
 
     @Override
-    public int getTotalItemAmount(){
-        int amount = 0;
-
-        for (ItemStack i: getContents()){
-            if(i == null) continue;
-
-            amount += i.getAmount();
-        }
-
-        return amount;
-    }
-
-    @Override
     public void checkStock(){
         if(getExampleItem() == null) return;
         if(isFull() && !owningShop.getType().isBuyType()) getHolder().setOutOfStock(true);
-        getHolder().setOutOfStock(getTotalItemAmount() < getExampleItem().getAmount());
+        getHolder().setOutOfStock(containsAtLeast(getExampleItem(), getExampleItem().getAmount()));
     }
 
     @Nonnull

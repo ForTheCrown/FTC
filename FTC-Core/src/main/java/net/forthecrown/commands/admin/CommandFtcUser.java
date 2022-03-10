@@ -7,11 +7,12 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
@@ -81,6 +82,10 @@ public class CommandFtcUser extends FtcCommand {
 
                         .then(literal("delete")
                                 .executes(userCmd((user, c) -> {
+                                    if(user.isOnline()) {
+                                        throw FtcExceptionProvider.create("Cannot delete online user's data");
+                                    }
+
                                     user.unload();
                                     user.delete();
 
@@ -98,7 +103,7 @@ public class CommandFtcUser extends FtcCommand {
                                 )))
 
                                 .then(literal("add")
-                                        .then(argument("amount", IntegerArgumentType.integer(1, ComVars.getMaxMoneyAmount()))
+                                        .then(argument("amount", IntegerArgumentType.integer(1, FtcVars.maxMoneyAmount.get()))
                                                 .executes(userCmd((user, c) -> {
                                                     int amount = c.getArgument("amount", Integer.class);
                                                     user.addBalance(c.getArgument("amount", Integer.class));
@@ -116,7 +121,7 @@ public class CommandFtcUser extends FtcCommand {
                                 )
 
                                 .then(literal("remove")
-                                        .then(argument("amount", IntegerArgumentType.integer(1, ComVars.getMaxMoneyAmount()))
+                                        .then(argument("amount", IntegerArgumentType.integer(1, FtcVars.maxMoneyAmount.get()))
                                                 .executes(userCmd((user, c) -> {
                                                     int amount = c.getArgument("amount", Integer.class);
                                                     user.removeBalance(c.getArgument("amount", Integer.class));
@@ -134,7 +139,7 @@ public class CommandFtcUser extends FtcCommand {
                                 )
 
                                 .then(literal("set")
-                                        .then(argument("amount", IntegerArgumentType.integer(0, ComVars.getMaxMoneyAmount()))
+                                        .then(argument("amount", IntegerArgumentType.integer(0, FtcVars.maxMoneyAmount.get()))
                                                 .executes(userCmd((user, c) -> {
                                                     int amount = c.getArgument("amount", Integer.class);
                                                     user.setBalance(amount);
@@ -317,7 +322,6 @@ public class CommandFtcUser extends FtcCommand {
                         )
 
                         .then(componentArg("prefix", CrownUser::getCurrentPrefix, CrownUser::setCurrentPrefix))
-                        .then(componentArg("nickname", CrownUser::nickname, CrownUser::setNickname))
 
                         .then(userProperty(UserAccessor.SELL_AMOUNT))
                         .then(userProperty(UserAccessor.TIER))
@@ -357,38 +361,37 @@ public class CommandFtcUser extends FtcCommand {
                                                                Function<CrownUser, Component> getter,
                                                                BiConsumer<CrownUser, Component> setter
     ) {
-        return CommandLore.compOrStringArg(
-                literal(name.toLowerCase())
-                        .executes(userCmd((user, c) -> {
-                            Component text = getter.apply(user);
-                            if(text == null) text = Component.text("null");
+        return literal(name.toLowerCase())
+                .executes(userCmd((user, c) -> {
+                    Component text = getter.apply(user);
+                    if(text == null) text = Component.text("null");
 
-                            c.getSource().sendMessage(
-                                    Component.text(user.getName() + "'s " + name + ": ")
-                                            .append(text)
-                            );
-                        }))
-                        .then(literal("-clear")
-                                .executes(userCmd((user, c) -> {
-                                    setter.accept(user, null);
-
-                                    c.getSource().sendAdmin("Removed " + user.getName() + "'s " + name);
-                                }))
-                        )
-
-                ,
-                ((context, builder) -> builder.buildFuture()),
-                (context, lore) -> {
-                    CrownUser user = get(context);
-                    setter.accept(user, lore);
-
-                    context.getSource().sendAdmin(
-                            Component.text("Set " + user.getName() + "'s " + name + " to ")
-                                    .append(lore)
+                    c.getSource().sendMessage(
+                            Component.text(user.getName() + "'s " + name + ": ")
+                                    .append(text)
                     );
-                    return 0;
-                }
-        );
+                }))
+                .then(literal("-clear")
+                        .executes(userCmd((user, c) -> {
+                            setter.accept(user, null);
+
+                            c.getSource().sendAdmin("Removed " + user.getName() + "'s " + name);
+                        }))
+                )
+
+                .then(argument("component", ChatArgument.chat())
+                        .executes(c -> {
+                            Component component = c.getArgument("component", Component.class);
+                            CrownUser user = get(c);
+                            setter.accept(user, component);
+
+                            c.getSource().sendAdmin(
+                                    Component.text("Set " + user.getName() + "'s " + name + " to ")
+                                            .append(component)
+                            );
+                            return 0;
+                        })
+                );
     }
 
     private <T extends CosmeticEffect> LiteralArgumentBuilder<CommandSource> cosmeticDataArg(CosmeticDataAccessor<T> accessor) {

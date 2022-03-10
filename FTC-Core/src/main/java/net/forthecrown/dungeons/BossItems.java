@@ -12,7 +12,8 @@ public enum BossItems {
     ZHAMBIE ("Zhambie Defeated!", "He only wanted to hug you..."),
     SKALATAN ("Skalatan Defeated!", "Matching outfits for extra style points..."),
     HIDEY_SPIDEY ("Hidey Spidey Defeated!", "He could run, but not hide..."),
-    DRAWNED ("Drawned Defeated!", "Never too late to learn how to swim...");
+    DRAWNED ("Drawned Defeated!", "Never too late to learn how to swim..."),
+    EVOKER ("Emo Defeated!", "It was just a phase...");
 
     private final ItemStack itemCreator;
 

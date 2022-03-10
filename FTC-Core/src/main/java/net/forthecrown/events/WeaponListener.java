@@ -1,7 +1,7 @@
 package net.forthecrown.events;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.inventory.weapon.AltAttackContext;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
@@ -43,7 +43,7 @@ public class WeaponListener implements Listener {
                     ClickHistory history = getHistory(damager);
                     history.clicks.add(0, Click.LEFT);
 
-                    if(!ComVars.allowNonOwnerSwords() && !sword.getOwner().equals(damager.getUniqueId())) return;
+                    if(!FtcVars.allowNonOwnerSwords.get() && !sword.getOwner().equals(damager.getUniqueId())) return;
                     event.setDamage(sword.damage(damager, event, history));
                 }
         );

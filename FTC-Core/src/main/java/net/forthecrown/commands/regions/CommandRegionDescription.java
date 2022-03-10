@@ -1,6 +1,6 @@
 package net.forthecrown.commands.regions;
 
-import net.forthecrown.commands.admin.CommandLore;
+import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.commands.arguments.RegionArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
@@ -36,24 +36,24 @@ public class CommandRegionDescription extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
          command
-                 .then(CommandLore.compOrStringArg(
-                         argument("region", RegionArgument.region()),
-                         (context, builder) -> RegionArgument.region().listSuggestions(context, builder),
+                 .then(argument("region", RegionArgument.region())
+                         .then(argument("desc", ChatArgument.chat())
+                                 .executes(c -> {
+                                     Component desc = c.getArgument("desc", Component.class);
+                                     PopulationRegion region = RegionArgument.regionInviteIgnore(c, "region");
+                                     if(!region.hasName()) throw FtcExceptionProvider.create("Only named regions may have descriptions");
 
-                         (c, lore) -> {
-                             PopulationRegion region = RegionArgument.regionInviteIgnore(c, "region");
-                             if(!region.hasName()) throw FtcExceptionProvider.create("Only named regions may have descriptions");
+                                     region.setDescription(desc);
 
-                             region.setDescription(lore);
-
-                             c.getSource().sendAdmin(
-                                     Component.text("Set description of ")
-                                            .append(region.displayName())
-                                            .append(Component.text(" to "))
-                                            .append(lore)
-                             );
-                             return 0;
-                         }
-                 ));
+                                     c.getSource().sendAdmin(
+                                             Component.text("Set description of ")
+                                                     .append(region.displayName())
+                                                     .append(Component.text(" to "))
+                                                     .append(desc)
+                                     );
+                                     return 0;
+                                 })
+                         )
+                 );
     }
 }

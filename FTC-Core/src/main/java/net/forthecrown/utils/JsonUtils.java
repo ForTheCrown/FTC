@@ -5,7 +5,6 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Keys;
-import net.forthecrown.core.Worlds;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.minecraft.nbt.CompoundTag;
@@ -16,7 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,8 +57,7 @@ public final class JsonUtils {
         World world = null;
 
         if(json.has("world")) {
-            World gottenWorld = Bukkit.getWorld(json.get("world").getAsString());
-            world = gottenWorld == null ? Worlds.OVERWORLD : gottenWorld;
+            world = Bukkit.getWorld(json.get("world").getAsString());
         }
 
         double x = json.get("x").getAsDouble();

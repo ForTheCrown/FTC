@@ -2,7 +2,7 @@ package net.forthecrown.commands.help;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
@@ -76,7 +76,7 @@ public class HelpSpawn extends FtcCommand {
         command.executes(c ->{
             CrownUser sender = getUserSender(c);
 
-            PopulationRegion region = Crown.getRegionManager().get(ComVars.getSpawnRegion());
+            PopulationRegion region = Crown.getRegionManager().get(FtcVars.spawnRegion.get());
             if (region != null) {
                 BlockVector2 pole = Crown.getRegionManager().getData(sender.getRegionCords()).getPolePosition();
 

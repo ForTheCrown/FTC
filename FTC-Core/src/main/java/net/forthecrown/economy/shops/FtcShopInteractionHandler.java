@@ -2,13 +2,12 @@ package net.forthecrown.economy.shops;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.events.ShopInteractionListener;
-import net.forthecrown.events.custom.SignShopUseEvent;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
 import org.bukkit.Bukkit;
@@ -53,8 +52,6 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
             //Exception thrown, check failed
             return;
         }
-
-        new SignShopUseEvent(session).callEvent();
 
         interaction.interact(session, economy);
     }
@@ -129,8 +126,8 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
 
         //Log interaction data if needed
         if(session.getType().isAdmin()) {
-            if(ComVars.logAdminShopUsage()) Crown.logger().info(logInfo(session));
-        } else if(ComVars.logNormalShopUsage()) Crown.logger().info(logInfo(session));
+            if(FtcVars.logAdminShop.get()) Crown.logger().info(logInfo(session));
+        } else if(FtcVars.logNormalShop.get()) Crown.logger().info(logInfo(session));
     }
 
     @Override

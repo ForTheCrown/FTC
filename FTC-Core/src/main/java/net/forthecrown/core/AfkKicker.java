@@ -23,7 +23,7 @@ public class AfkKicker {
     private static final Map<UUID, ScheduledFuture> KICK_TASKS = new Object2ObjectOpenHashMap<>();
 
     public static void addOrDelay(UUID uuid) {
-        ScheduledFuture future = EXECUTOR.schedule(() -> kick(uuid), ComVars.afkKickDelay(), TimeUnit.MILLISECONDS);
+        ScheduledFuture future = EXECUTOR.schedule(() -> kick(uuid), FtcVars.afkKickDelay.get(), TimeUnit.MILLISECONDS);
 
         ScheduledFuture replacing = KICK_TASKS.put(uuid, future);
         cancel(replacing);

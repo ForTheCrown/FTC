@@ -3,14 +3,14 @@ package net.forthecrown.economy.market;
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.squire.Squire;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.forthecrown.utils.math.Vector3i;
+import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -34,8 +34,9 @@ import java.util.UUID;
  * Used for setting and changing the shop's owner sign and purchase notice
  */
 public class ShopEntrance implements JsonSerializable {
-    public static final NamespacedKey NOTICE_KEY = Squire.createFtcKey("market_notice");
-    public static final NamespacedKey DOOR_SIGN = Squire.createFtcKey("door_sign");
+    public static final NamespacedKey NOTICE_KEY = Keys.key("ftc", "market_notice");
+    public static final NamespacedKey DOOR_SIGN = Keys.key("ftc", "door_sign");
+
     public static final CraftPlayerProfile NOTICE_PROFILE = FtcUtils.profileWithTextureID(
             "Pearl", UUID.randomUUID(),
             "7d16ae951120394f368f2250b7c3ad3fb12cea55ec1b2db5a94d1fb7fd4b6fa"

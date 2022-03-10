@@ -58,9 +58,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,6 +76,10 @@ public class CoreListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event){
+        if(!event.getPlayer().hasPlayedBefore()) {
+            Crown.getUserManager().getCache().createEntry(event.getPlayer());
+        }
+
         CrownUser user = UserManager.getUser(event.getPlayer());
         boolean nameChanged = user.onJoin();
 
@@ -92,7 +97,7 @@ public class CoreListener implements Listener {
             user.getInventory().addItem(sword);
 
             //Give join kit
-            Kit kit = Crown.getKitManager().get(ComVars.onFirstJoinKit());
+            Kit kit = Crown.getKitManager().get(FtcVars.onFirstJoinKit.get());
             if(kit != null) kit.attemptItemGiving(event.getPlayer());
         } else {
             user.sendMessage(Component.translatable("server.welcomeBack").color(NamedTextColor.GOLD));
@@ -133,12 +138,12 @@ public class CoreListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.getBlock().getType() != Material.HOPPER) return;
-        if(ComVars.getHoppersInOneChunk() == -1) return;
+        if(FtcVars.hoppersInOneChunk.get() == -1) return;
         int hopperAmount = event.getBlock().getChunk().getTileEntities(block -> block.getType() == Material.HOPPER, true).size();
-        if(hopperAmount <= ComVars.getHoppersInOneChunk()) return;
+        if(hopperAmount <= FtcVars.hoppersInOneChunk.get()) return;
 
         event.setCancelled(true);
-        event.getPlayer().sendMessage(Component.text("Too many hoppers in chunk (Max " + ComVars.getHoppersInOneChunk() + ")").color(NamedTextColor.RED));
+        event.getPlayer().sendMessage(Component.text("Too many hoppers in chunk (Max " + FtcVars.hoppersInOneChunk.get() + ")").color(NamedTextColor.RED));
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -285,7 +290,7 @@ public class CoreListener implements Listener {
         }
     }
 
-    public static final int
+    /*public static final int
             CART_TABLE_SLOT_RESULT = 2,
             CART_TABLE_SLOT_TOP_INPUT = 0;
 
@@ -309,7 +314,7 @@ public class CoreListener implements Listener {
         Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
             inventory.setItem(slot, null);
         }, 1);
-    }
+    }*/
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {

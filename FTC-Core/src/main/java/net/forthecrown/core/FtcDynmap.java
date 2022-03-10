@@ -76,7 +76,7 @@ public class FtcDynmap extends DynmapCommonAPIListener {
         BlockVector2 vec2 = data.getPolePosition();
 
         return getRegionPoleSet().createMarker(
-                data.getMarkerID(), data.getName(), ComVars.getRegionWorld().getName(),
+                data.getMarkerID(), data.getName(), FtcVars.getRegionWorld().getName(),
                 vec2.getX() + 0.5D, RegionUtil.getPoleTop(data), vec2.getZ() + 0.5D,
                 data.hasProperty(RegionProperty.PAID_REGION) ? getSpecialIcon() : getNormalIcon(),
                 true

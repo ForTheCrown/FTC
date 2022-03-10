@@ -1,7 +1,7 @@
 package net.forthecrown.user;
 
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.JsonSerializable;
 import org.bukkit.Material;
@@ -31,7 +31,7 @@ public class SoldMaterialData implements JsonSerializable {
      * grateful I didn't have to write this :D.
      */
     public void recalculate(){
-        if(getEarned() > ComVars.getMaxShopEarnings()) {
+        if(getEarned() > FtcVars.maxShopEarnings.get()) {
             price = 0;
             return;
         }
@@ -39,7 +39,7 @@ public class SoldMaterialData implements JsonSerializable {
         short startPrice = getOriginalPrice();
 
         if(earned <= 0) price = -1;
-        else price = (short) Math.ceil((1+startPrice)*Math.exp(-earned*Math.log(1+startPrice)/ ComVars.getMaxShopEarnings())-1);
+        else price = (short) Math.ceil((1+startPrice)*Math.exp(-earned*Math.log(1+startPrice)/ FtcVars.maxShopEarnings.get())-1);
     }
 
     /**

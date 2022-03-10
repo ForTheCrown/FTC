@@ -63,9 +63,7 @@ public class CrownRandom extends Random {
         return new ArrayList<>(from).get(nextInt(from.size()));
     }
 
-    private <T> boolean attemptAdding(Collection<T> to, T value){
-        if(to.contains(value)) return false;
-        to.add(value);
-        return true;
+    private <T> boolean attemptAdding(Collection<T> to, T value) {
+        return !to.contains(value) && to.add(value);
     }
 }

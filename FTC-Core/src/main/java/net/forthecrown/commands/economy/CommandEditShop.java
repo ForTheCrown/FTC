@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatUtils;
@@ -93,7 +93,7 @@ public class CommandEditShop extends FtcCommand {
                 .then(literal("sell").executes(c -> setType(c, true)))
 
                 .then(literal("price")
-                        .then(argument("price_actual", IntegerArgumentType.integer(0, ComVars.getMaxSignShopPrice()))
+                        .then(argument("price_actual", IntegerArgumentType.integer(0, FtcVars.maxSignShopPrice.get()))
                                 .executes(c -> {
                                     Player player = getPlayerSender(c);
                                     SignShop shop = getShop(player);

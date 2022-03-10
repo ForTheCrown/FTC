@@ -1,6 +1,6 @@
 package net.forthecrown.cosmetics.deaths;
 
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.cosmetics.CosmeticEffect;
@@ -37,7 +37,7 @@ public abstract class DeathEffect extends CosmeticEffect {
                         equals(data.getActiveDeath()),
                         data.hasDeath(this),
                         this,
-                        ComVars.deathEffectCost()
+                        FtcVars.effectCost_death.get()
                 )
         );
     }
@@ -51,12 +51,12 @@ public abstract class DeathEffect extends CosmeticEffect {
             data.setActiveDeath(this);
             user.sendMessage(Component.translatable("cosmetics.set.death", NamedTextColor.YELLOW, name()));
         } else {
-            if(user.getGems() < ComVars.deathEffectCost()){
-                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.gems(ComVars.deathEffectCost())));
+            if(user.getGems() < FtcVars.effectCost_death.get()){
+                user.sendMessage(Component.translatable("commands.cannotAfford", NamedTextColor.RED, FtcFormatter.gems(FtcVars.effectCost_death.get())));
                 return;
             }
 
-            user.setGems(user.getGems() - ComVars.deathEffectCost());
+            user.setGems(user.getGems() - FtcVars.effectCost_death.get());
             data.addDeath(this);
             data.setActiveDeath(this);
 

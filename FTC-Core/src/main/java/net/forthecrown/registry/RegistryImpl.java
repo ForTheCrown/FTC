@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+// Just kidding, registries are nothing more than a wrapper for a
+// hash map, get pranked
 public class RegistryImpl<V> implements Registry<V> {
     private final Object2ObjectMap<Key, V> entries = new Object2ObjectOpenHashMap<>();
     private final NamespacedKey key;
@@ -75,6 +77,15 @@ public class RegistryImpl<V> implements Registry<V> {
     @Override
     public boolean isEmpty() {
         return entries.isEmpty();
+    }
+
+    @Override
+    public Key getKey(V val) {
+        for (Object2ObjectMap.Entry<Key, V> e: entries.object2ObjectEntrySet()) {
+             if(e.getValue().equals(val)) return e.getKey();
+        }
+
+        return null;
     }
 
     @Override

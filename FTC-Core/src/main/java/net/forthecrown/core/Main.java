@@ -1,13 +1,16 @@
 package net.forthecrown.core;
 
 import net.forthecrown.commands.CommandArkBox;
-import net.forthecrown.comvars.ComVarRegistry;
-import net.forthecrown.comvars.types.ComVarTypes;
+import net.forthecrown.core.transformers.CacheConverter;
+import net.forthecrown.core.transformers.InvalidUserDataFilter;
+import net.forthecrown.serializer.UserJsonSerializer;
+import net.forthecrown.vars.VarRegistry;
+import net.forthecrown.vars.types.VarTypes;
 import net.forthecrown.core.admin.FtcJailManager;
 import net.forthecrown.core.admin.FtcPunishments;
 import net.forthecrown.core.admin.ServerRules;
 import net.forthecrown.core.chat.*;
-import net.forthecrown.core.goalbook.GoalBookImpl;
+import net.forthecrown.core.battlepass.BattlePassImpl;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
@@ -68,7 +71,7 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcStructureManager      structureManager;
 
     static ResourceWorld            resourceWorld;
-    static GoalBookImpl             goalBook;
+    static BattlePassImpl           battlePass;
     static FtcMessages              messages;
     static ServerRules              rules;
     static ServerItemPriceMap       prices;
@@ -85,7 +88,7 @@ public final class Main extends JavaPlugin implements Crown {
     public void onEnable() {
         luckPerms = LuckPermsProvider.get();
 
-        FtcBootStrap.enableBootStrap();
+        BootStrap.enableBootStrap();
 
         announcer.doBroadcasts();
         dayChange.schedule();
@@ -101,24 +104,36 @@ public final class Main extends JavaPlugin implements Crown {
 
     @Override
     public void onLoad() {
-        VanillaChanges.softerDeepslate();
+        // Set logger and instance
+        logger = getLog4JLogger();
         inst = this;
 
+        // Register dynmap hook connection thing
         DynmapCommonAPIListener.register(new FtcDynmap());
 
-        //Hacky way of determining if we're on the test server or not
+        // Create config
         config = new FtcConfigImpl();
         config.ensureDefaultsExist();
         config.read();
 
-        ComVars.inDebugMode = ComVarRegistry.set("debugMode", ComVarTypes.BOOL, config.getJson().getBool("debug_mode", false));
-
-        logger = getLog4JLogger();
+        // Set up Vars
+        VarTypes.init();
+        VarRegistry.load();
+        FtcVars.inDebugMode = VarRegistry.set("debugMode", VarTypes.BOOL, config.getJson().getBool("debug_mode", false));
 
         saveResource("banned_words.json", true);
 
         RoyalCommandException.ENABLE_HOVER_STACK_TRACE = Crown.inDebugMode();
-        FtcBootStrap.loadBootStrap();
+        BootStrap.loadBootStrap();
+
+        if(CacheConverter.shouldRun()) {
+            CacheConverter.run();
+        }
+
+        userManager.loadCache();
+
+        // Remove any potentially invalid user datas
+        InvalidUserDataFilter.run(UserJsonSerializer.USER_DIR, userManager);
 
         logger.info("onLoad finished");
     }

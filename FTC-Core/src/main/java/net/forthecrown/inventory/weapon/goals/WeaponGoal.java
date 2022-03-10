@@ -1,6 +1,6 @@
 package net.forthecrown.inventory.weapon.goals;
 
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Keys;
 import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.inventory.weapon.WeaponUseContext;
@@ -40,7 +40,7 @@ public interface WeaponGoal extends Keyed {
      * @return The amount to increase
      */
     default int getIncrementAmount(WeaponUseContext event) {
-        return ComVars.swordGoalGainPerKill();
+        return FtcVars.swordGoalGainPerKill.get();
     }
 
     @Override

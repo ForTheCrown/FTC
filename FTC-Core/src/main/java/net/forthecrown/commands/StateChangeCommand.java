@@ -7,6 +7,7 @@ import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.click.ClickableTexts;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.FtcDynmap;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
@@ -339,7 +340,21 @@ public class StateChangeCommand extends FtcCommand {
 
             "regions.hulk.on", "regions.hulk.off",
             Permissions.REGIONS,
-            "Toggles whether you quickly teleport to poles to hulk smash onto them",
+            "Toggles whether you quickly teleport to poles or hulk smash onto them",
             "togglehulk", "togglehulksmash"
+    );
+
+    public static final StateChangeCommand TOGGLE_DYNMAP_VIS = new StateChangeCommand(
+            "dynmapvisibility",
+            "Map Head",
+
+            user -> FtcDynmap.getDynmap().getPlayerVisbility(user.getName()),
+            (user, newState) -> {
+                FtcDynmap.getDynmap().setPlayerVisiblity(user.getName(), newState);
+            },
+            "commands.dynmap.visible.on", "commands.dynmap.visible.off",
+            Permissions.DEFAULT,
+            "Toggles whether you are visible on the Dynmap or not",
+            "dynmaphide", "dynhide", "hidedynmap", "dynmapshow", "dynshow", "showdynmap"
     );
 }

@@ -1,16 +1,20 @@
 package net.forthecrown.commands.admin;
 
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
-import net.forthecrown.utils.FtcUtils;
 import net.minecraft.world.phys.Vec3;
-import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.Collection;
 
@@ -42,24 +46,37 @@ public class CommandLaunch extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command.then(argument("entity", EntityArgument.multipleEntities())
+                .executes(c -> {
+                    Player player = c.getSource().asPlayer();
+                    Vector dir = player.getLocation().getDirection();
+
+                    return launch(c, new Vec3(dir.getX(), dir.getY(), dir.getZ()));
+                })
+
                 .then(argument("vec", PositionArgument.position())
                         .executes(c -> {
-                            Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
                             Position pos = c.getArgument("vec", Position.class);
 
-                            for (Entity e: entities) {
-                                Location loc = FtcUtils.locFromPosition(pos, e.getLocation());
-                                Vec3 velocity = new Vec3(loc.getX(), loc.getY(), loc.getZ());
-
-                                net.minecraft.world.entity.Entity nmsEnt = ((CraftEntity) e).getHandle();
-                                nmsEnt.setDeltaMovement(velocity);
-                                nmsEnt.hurtMarked = true;
+                            if(pos.isXRelative() || pos.isYRelative() || pos.isZRelative()) {
+                                throw FtcExceptionProvider.create("Cannot use relative (~) coordinates");
                             }
 
-                            c.getSource().sendAdmin("Launched " + entities.size() + " entities");
-                            return 0;
+                            return launch(c, new Vec3(pos.getX(), pos.getY(), pos.getZ()));
                         })
                 )
         );
+    }
+
+    int launch(CommandContext<CommandSource> c, Vec3 velocity) throws CommandSyntaxException {
+        Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
+
+        for (Entity e: entities) {
+            net.minecraft.world.entity.Entity nmsEnt = ((CraftEntity) e).getHandle();
+            nmsEnt.setDeltaMovement(velocity);
+            nmsEnt.hurtMarked = true;
+        }
+
+        c.getSource().sendAdmin("Launched " + entities.size() + " entities");
+        return 0;
     }
 }

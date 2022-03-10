@@ -6,7 +6,6 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.Main;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.events.custom.SwordRankUpEvent;
 import net.forthecrown.inventory.RankedItem;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.click.ClickHistory;
@@ -115,8 +114,8 @@ public class RoyalSword extends RankedItem {
         if(ability != null) {
             CompoundTag abilityData = new CompoundTag();
             abilityData.putString("type", ability.getType().key().asString());
-            CompoundTag data = new CompoundTag();
 
+            CompoundTag data = new CompoundTag();
             ability.save(data);
 
             abilityData.put("data", data);
@@ -154,11 +153,7 @@ public class RoyalSword extends RankedItem {
             Style style = nonItalic(NamedTextColor.GRAY);
 
             lore.add(Component.text("Current ability: ").style(style));
-            lore.add(
-                    Component.text("• ")
-                            .append(ability.loreDisplay())
-                            .style(style)
-            );
+            ability.addInfo(lore.withIndent(2));
         }
 
         //Add goal text, if there are goals to go for
@@ -282,8 +277,6 @@ public class RoyalSword extends RankedItem {
     }
 
     public void incrementRank() {
-        new SwordRankUpEvent(rank, rank + 1, this).callEvent();
-
         rank++;
 
         this.waitingUpdate = nextUpgrades;

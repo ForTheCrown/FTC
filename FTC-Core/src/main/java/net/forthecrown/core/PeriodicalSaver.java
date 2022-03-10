@@ -13,12 +13,12 @@ final class PeriodicalSaver {
     private BukkitTask task;
 
     PeriodicalSaver() {
-        ComVars.autoSaveIntervalMins.setUpdateListener(aLong -> start());
+        FtcVars.autoSaveIntervalMins.setUpdateListener(aLong -> start());
     }
 
     public void start() {
         cancel();
-        long interval = TimeUnit.MINUTES.toMillis(ComVars.autoSaveIntervalMins.getValue(60L));
+        long interval = TimeUnit.MINUTES.toMillis(FtcVars.autoSaveIntervalMins.getValue(60L));
         interval = TimeUtil.millisToTicks(interval);
 
         task = Bukkit.getScheduler().runTaskTimer(Crown.inst(), Crown::saveFTC, interval, interval);

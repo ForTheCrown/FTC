@@ -3,7 +3,7 @@ package net.forthecrown.economy.shops;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.chat.PagedDisplay;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class ShopHistory implements JsonSerializable, JsonDeserializable {
-    private static final Component BORDER = Component.text("                                  ")
+    private static final Component BORDER = Component.text("                        ")
             .color(NamedTextColor.GRAY)
             .decorate(TextDecoration.STRIKETHROUGH);
 
@@ -127,7 +127,7 @@ public class ShopHistory implements JsonSerializable, JsonDeserializable {
     }
 
     private boolean isTooOld(HistoryEntry entry) {
-        return TimeUtil.hasCooldownEnded(ComVars.dataRetentionTime(), entry.date());
+        return TimeUtil.hasCooldownEnded(FtcVars.dataRetentionTime.get(), entry.date());
     }
 
     @Override

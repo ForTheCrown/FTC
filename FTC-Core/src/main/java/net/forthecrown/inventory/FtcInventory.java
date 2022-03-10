@@ -8,7 +8,7 @@ import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventoryCustom;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;

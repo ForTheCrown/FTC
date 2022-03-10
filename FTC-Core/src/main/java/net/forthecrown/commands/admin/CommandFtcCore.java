@@ -7,7 +7,8 @@ import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.ComVars;
+import net.forthecrown.dungeons.level.LevelSerializer;
+import net.forthecrown.vars.VarRegistry;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcConfig;
 import net.forthecrown.core.Permissions;
@@ -149,18 +150,22 @@ public class CommandFtcCore extends FtcCommand {
                         )
                 )
 
-                .then(CommandLore.compOrStringArg(literal("tablist_score"),
-                        (c, b) -> CompletionProvider.suggestMatching(b,"Deaths", "Crown Score"),
-                        (c, field) -> {
-                            getTabList().setScore(field);
-                            getTabList().updateList();
+                .then(literal("tablist_score")
+                        .then(argument("score", ChatArgument.chat())
+                                .suggests((context, builder) -> CompletionProvider.suggestMatching(builder, "Deaths", "Crown Score"))
 
-                            c.getSource().sendAdmin(
-                                    Component.text("Set tab score field to ")
-                                            .append(field)
-                            );
-                            return 0;
-                        })
+                                .executes(c -> {
+                                    Component field = c.getArgument("score", Component.class);
+                                    getTabList().setScore(field);
+                                    getTabList().updateList();
+
+                                    c.getSource().sendAdmin(
+                                            Component.text("Set tab score field to ")
+                                                    .append(field)
+                                    );
+                                    return 0;
+                                })
+                        )
                 )
 
                 .then(literal("resetcrown") //Resets the crown objective, aka, destroys and re creates it
@@ -361,7 +366,7 @@ public class CommandFtcCore extends FtcCommand {
 
     private enum SaveReloadPart {
         STRUCTURES ("Structures",               getStructureManager()::save ,   getStructureManager()::reload),
-        COMVARS ("ComVars",                     ComVars::save,                  ComVars::reload),
+        COMVARS ("ComVars",                     VarRegistry::save,              VarRegistry::load),
         REGIONS ("Regions",                     getRegionManager()::save,       getRegionManager()::reload),
         ITEM_PRICES ("Item Prices",             getPriceMap()::save,            getPriceMap()::reload),
         MARKETS("Markets",                      getMarkets()::save,             getMarkets()::reload),
@@ -375,6 +380,7 @@ public class CommandFtcCore extends FtcCommand {
         USERS ("Users",                         getUserManager()::saveUsers,    getUserManager()::reloadUsers),
         SHOPS ("Signshops",                     getShopManager()::save,         getShopManager()::reload),
         CONFIG ("Main Config",                  config()::save,                 config()::reload),
+        DUNGEON_LEVELS ("Dungeon Levels",       LevelSerializer::save,          LevelSerializer::load),
         USER_MANAGER("User Manager",            getUserManager()::save,         getUserManager()::reload);
 
         private final String msg;

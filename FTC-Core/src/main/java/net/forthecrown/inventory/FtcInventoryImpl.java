@@ -1,7 +1,7 @@
 package net.forthecrown.inventory;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventoryCustom;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 

@@ -11,9 +11,9 @@ import net.forthecrown.regions.RegionData;
 import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserHomes;
+import net.forthecrown.user.UserTeleport;
 import net.forthecrown.user.actions.RegionVisitAction;
 import net.forthecrown.user.actions.UserActionHandler;
-import net.forthecrown.user.UserTeleport;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -39,7 +39,7 @@ public class CommandHome extends FtcCommand {
                     UserHomes homes = user.getHomes();
 
                     //Check if they have home pole, and if they're in the correct world
-                    if(homes.getHomeRegion() != null && user.getWorld().equals(ComVars.getRegionWorld())) {
+                    if(homes.getHomeRegion() != null && user.getWorld().equals(FtcVars.getRegionWorld())) {
                         RegionData local = Crown.getRegionManager().getData(user.getRegionCords());
                         PopulationRegion region = Crown.getRegionManager().get(homes.getHomeRegion());
 

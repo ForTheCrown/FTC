@@ -9,7 +9,7 @@ import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_18_R1.generator.CraftLimitedRegion;
+import org.bukkit.craftbukkit.v1_18_R2.generator.CraftLimitedRegion;
 import org.bukkit.generator.LimitedRegion;
 
 /**

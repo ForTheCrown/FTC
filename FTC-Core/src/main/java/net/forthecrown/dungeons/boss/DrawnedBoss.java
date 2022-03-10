@@ -39,7 +39,7 @@ public class DrawnedBoss extends SimpleBoss {
     protected Mob onSpawn(BossContext context) {
         tick = 0;
 
-        return getWorld().spawn(spawnLocation, Drowned.class, drawned ->{
+        return getWorld().spawn(getSpawn(), Drowned.class, drawned ->{
             drawned.getEquipment().setItemInMainHand(new ItemStack(Material.TRIDENT, 1));
             drawned.getEquipment().setItemInMainHandDropChance(0);
             drawned.setAdult();
@@ -70,8 +70,6 @@ public class DrawnedBoss extends SimpleBoss {
 
     @Override
     protected void tick() {
-        super.tick();
-
         tick++;
 
         if(tick <= MINION_SPAWN_INTERVAL) return;

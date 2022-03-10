@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+import static net.forthecrown.inventory.ItemStacks.NON_ITALIC_DARK_GRAY;
+
 /**
  * Represents the current king or queen on the server
  * <p></p>
@@ -25,6 +27,17 @@ public interface Kingship extends Nameable {
                 .append(Component.text(text).color(NamedTextColor.YELLOW))
                 .append(Component.text("] "))
                 .decorate(TextDecoration.BOLD);
+    }
+
+    static Component coinDisplay() {
+        Kingship kingship = Crown.getKingship();
+        if(!kingship.hasKing()) return Component.text("During the Interregnum")
+                .style(NON_ITALIC_DARK_GRAY);
+
+        return Component.text("During the reign of ")
+                .style(NON_ITALIC_DARK_GRAY)
+                .append(Component.text(kingship.isFemale() ? "Queen " : "King "))
+                .append(kingship.name());
     }
 
     boolean hasKing();

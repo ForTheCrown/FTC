@@ -2,14 +2,13 @@ package net.forthecrown.commands;
 
 import net.forthecrown.book.SettingsBook;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
 
 public class CommandSettings extends FtcCommand {
 
     public CommandSettings() {
-        super("settings", Crown.inst());
+        super("settings");
 
         setAliases("options");
         setDescription("Displays a user's settings");

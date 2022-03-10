@@ -1,5 +1,8 @@
 package net.forthecrown.dungeons.boss.components;
 
+import net.forthecrown.vars.Var;
+import net.forthecrown.vars.VarRegistry;
+import net.forthecrown.vars.types.VarTypes;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.SingleEntityBoss;
@@ -7,27 +10,26 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
 public class TargetUpdateComponent implements BossComponent<SingleEntityBoss> {
-    public static final int CHECK_INTERVAL = 40;
+    public static final Var<Integer> CHECK_INTERVAL = VarRegistry.getSafe("bossTargetUpdateInterval", VarTypes.INT, 40);
 
-    private static final TargetUpdateComponent INSTANCE = new TargetUpdateComponent();
     private TargetUpdateComponent() {}
 
-    public static TargetUpdateComponent getInstance() {
-        return INSTANCE;
+    public static TargetUpdateComponent create() {
+        return new TargetUpdateComponent();
     }
 
-    private int tick = CHECK_INTERVAL;
+    private int tick = CHECK_INTERVAL.get();
 
     @Override
     public void onSpawn(SingleEntityBoss boss, BossContext context) {
-        tick = CHECK_INTERVAL;
+        tick = CHECK_INTERVAL.get();
     }
 
     @Override
     public void onTick(SingleEntityBoss boss, BossContext context) {
         tick++;
 
-        if(tick <  CHECK_INTERVAL) return;
+        if(tick <  CHECK_INTERVAL.get()) return;
 
         Mob bossEntity = boss.getBossEntity();
         Player target = DungeonUtils.getOptimalTarget(bossEntity, boss.getRoom());

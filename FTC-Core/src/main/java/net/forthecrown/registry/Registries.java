@@ -1,16 +1,17 @@
 package net.forthecrown.registry;
 
-import net.forthecrown.comvars.types.ComVarType;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.animation.BlockAnimation;
-import net.forthecrown.core.goalbook.GoalBookChallenge;
-import net.forthecrown.core.goalbook.Reward;
+import net.forthecrown.core.battlepass.BattlePassChallenge;
+import net.forthecrown.core.battlepass.Reward;
 import net.forthecrown.core.npc.InteractableNPC;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.emotes.CosmeticEmote;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.boss.KeyedBoss;
+import net.forthecrown.dungeons.boss.SpawnRequirement;
+import net.forthecrown.dungeons.level.DungeonLevel;
 import net.forthecrown.economy.guilds.topics.VoteTopic;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
@@ -20,6 +21,7 @@ import net.forthecrown.structure.tree.StructureNodeType;
 import net.forthecrown.structure.tree.StructureType;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
+import net.forthecrown.vars.types.VarType;
 import org.bukkit.NamespacedKey;
 
 /**
@@ -35,8 +37,8 @@ public interface Registries {
     Registry<BlockAnimation>                ANIMATIONS          = create("animations");
 
     Registry<BlockStructure>                STRUCTURES          = create("structures");
-    Registry<StructureType>                 STRUCTURE_TYPES     = createCloseable("structure_types");
-    Registry<StructureNodeType>             STRUCTURE_NODE_TYPES= createCloseable("structure_node_types");
+    Registry<StructureType>                 STRUCTURE_TYPES     = create("structure_types");
+    Registry<StructureNodeType>             STRUCTURE_NODE_TYPES= create("structure_node_types");
 
     CloseableRegistry<VoteTopic>            VOTE_TOPICS         = createCloseable("vote_topics");
     CloseableRegistry<House>                HOUSES              = createCloseable("houses");
@@ -54,14 +56,16 @@ public interface Registries {
     CloseableRegistry<UsageCheck>           USAGE_CHECKS        = createCloseable("usage_checks");
     CloseableRegistry<UsageAction>          USAGE_ACTIONS       = createCloseable("usage_actions");
 
-    //Comvars
-    CloseableRegistry<ComVarType<?>>        COMVAR_TYPES        = createCloseable("comvar_types");
+    //Vars
+    CloseableRegistry<VarType<?>>           VAR_TYPES           = createCloseable("var_types");
 
     //Dungeons
     CloseableRegistry<KeyedBoss>            DUNGEON_BOSSES      = createCloseable("dungeon_bosses");
+    CloseableRegistry<SpawnRequirement.Type>SPAWN_REQUIREMENTS  = createCloseable("boss_spawn_tests");
+    Registry<DungeonLevel>                  DUNGEON_LEVELS      = create("dungeon_levels");
 
     //Battle pass
-    CloseableRegistry<GoalBookChallenge>    GOAL_BOOK           = createCloseable("battle_pass_challenges");
+    CloseableRegistry<BattlePassChallenge>  GOAL_BOOK           = createCloseable("battle_pass_challenges");
     CloseableRegistry<Reward>               REWARDS             = createCloseable("battle_pass_rewards");
 
     /**

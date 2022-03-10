@@ -7,41 +7,43 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
+import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.grenadier.types.selectors.EntitySelector;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserCache;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class UserArgument implements ArgumentType<UserParseResult> {
-    private static final UserArgument USER = new UserArgument(false, true);
-    private static final UserArgument USERS = new UserArgument(true, true);
-    private static final UserArgument ONLINE_USER = new UserArgument(false, false);
+    private static final UserArgument
+            USER        = new UserArgument(false, true),
+            USERS       = new UserArgument(true, true),
+            ONLINE_USER = new UserArgument(false, false);
 
-    public static final TranslatableExceptionType UNKNOWN_USER = new TranslatableExceptionType("user.parse.unknown");
-    public static final TranslatableExceptionType NO_USERS_FOUND = new TranslatableExceptionType("user.parse.nonFound");
-    public static final TranslatableExceptionType USER_NOT_ONLINE = new TranslatableExceptionType("user.parse.notOnline");
+    public static final TranslatableExceptionType
+            UNKNOWN_USER    = new TranslatableExceptionType("user.parse.unknown"),
+            NO_USERS_FOUND  = new TranslatableExceptionType("user.parse.nonFound"),
+            USER_NOT_ONLINE = new TranslatableExceptionType("user.parse.notOnline");
 
-    public static UserArgument user(){
+    public static UserArgument user() {
         return USER;
     }
 
-    public static UserArgument onlineUser(){
+    public static UserArgument onlineUser() {
         return ONLINE_USER;
     }
 
-    public static UserArgument users(){
+    public static UserArgument users() {
         return USERS;
     }
 
@@ -71,11 +73,11 @@ public class UserArgument implements ArgumentType<UserParseResult> {
 
         int cursor = reader.getCursor();
         String name = reader.readUnquotedString();
-        UUID id = FtcUtils.uuidFromName(name);
+        UserCache.CacheEntry entry = Crown.getUserManager().getCache().get(name);
 
-        if(id == null) throw UNKNOWN_USER.createWithContext(GrenadierUtils.correctReader(reader, cursor), Component.text(name));
+        if(entry == null) throw UNKNOWN_USER.createWithContext(GrenadierUtils.correctReader(reader, cursor), Component.text(name));
 
-        CrownUser result = UserManager.getUser(id);
+        CrownUser result = UserManager.getUser(entry.getUniqueId());
         if(!result.isOnline() && !allowOffline) {
             result.unload();
             throw USER_NOT_ONLINE.create(result.nickDisplayName());
@@ -106,12 +108,15 @@ public class UserArgument implements ArgumentType<UserParseResult> {
     }
 
     public ArgumentType<?> getHandle(){
-        if(!allowOffline){
-            if(allowMultiple) return net.minecraft.commands.arguments.EntityArgument.players();
-            else return net.minecraft.commands.arguments.EntityArgument.player();
+        if (allowMultiple) return ScoreHolderArgument.scoreHolders();
+        return ScoreHolderArgument.scoreHolder();
+
+        /*if (allowOffline) {
+            if (allowMultiple) return ScoreHolderArgument.scoreHolders();
+            return ScoreHolderArgument.scoreHolder();
         }
 
-        if(allowMultiple) return ScoreHolderArgument.scoreHolders();
-        else return ScoreHolderArgument.scoreHolder();
+        if (allowMultiple) return net.minecraft.commands.arguments.EntityArgument.players();
+        return net.minecraft.commands.arguments.EntityArgument.player();*/
     }
 }

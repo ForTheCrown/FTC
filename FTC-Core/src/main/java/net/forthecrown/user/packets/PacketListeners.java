@@ -8,7 +8,7 @@ import net.forthecrown.utils.ListUtils;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public final class PacketListeners {
     }
 
     public static boolean call(Packet packet, Player player) {
-        PacketContext context = new PacketContext(packet, UserManager.getUser(player));
+        PacketContext context = new PacketContext(packet, UserManager.getLoadedUser(player.getUniqueId()));
 
         List<PacketListener> listeners = LISTENERS.get(packet.getClass());
         if(ListUtils.isNullOrEmpty(listeners)) return false;

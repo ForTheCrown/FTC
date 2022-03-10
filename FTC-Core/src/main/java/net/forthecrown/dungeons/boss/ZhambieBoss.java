@@ -96,7 +96,7 @@ public class ZhambieBoss extends SimpleBoss {
 
     @Override
     protected Mob onSpawn(BossContext context) {
-        Husk zhambie = spawnLocation.getWorld().spawn(spawnLocation, Husk.class, husk -> {
+        Husk zhambie = getWorld().spawn(getSpawn(), Husk.class, husk -> {
             husk.setAdult();
             husk.customName(Component.text("Zhambie").color(NamedTextColor.YELLOW));
             husk.setCustomNameVisible(true);

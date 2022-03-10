@@ -17,10 +17,13 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.core.*;
+import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.registry.Registries;
+import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.text.Component;
 import net.minecraft.world.level.Level;
 import org.bukkit.NamespacedKey;
@@ -62,6 +65,17 @@ public class CommandResourceWorld extends FtcCommand {
                             c.getSource().sendAdmin("Starting resource world regen");
                             rw.resetAndLoad();
 
+                            return 0;
+                        })
+                )
+
+                .then(literal("next_reset")
+                        .executes(c -> {
+                            ResourceWorld rw = rw();
+                            long next = rw.getLastReset() + FtcVars.resourceWorldResetInterval.get();
+                            long dif = TimeUtil.timeUntil(next);
+
+                            c.getSource().sendMessage(ChatUtils.format("Next RW reset in {}", new TimePrinter(dif).printString()));
                             return 0;
                         })
                 )

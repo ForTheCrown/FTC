@@ -1,11 +1,11 @@
 package net.forthecrown.economy.houses;
 
 import com.google.gson.JsonElement;
-import net.forthecrown.core.ComVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.utils.math.MathUtil;
+import net.minecraft.util.Mth;
 import org.bukkit.Material;
 
 public class HouseMaterialData implements JsonSerializable {
@@ -41,7 +41,7 @@ public class HouseMaterialData implements JsonSerializable {
     }
 
     public void setDemand(float demand) {
-        this.demand = (float) MathUtil.clamp(demand, -1F, 1F);
+        this.demand = Mth.clamp(demand, -1F, 1F);
     }
 
     public int getSupply() {
@@ -77,8 +77,8 @@ public class HouseMaterialData implements JsonSerializable {
     }
 
     public void reset() {
-        this.demand = ComVars.getHousesStartingDemand();
-        this.supply = ComVars.getHousesStartingSupply();
+        this.demand = FtcVars.houses_startingDemand.get();
+        this.supply = FtcVars.houses_startingSupply.get();
 
         recalculate();
     }
