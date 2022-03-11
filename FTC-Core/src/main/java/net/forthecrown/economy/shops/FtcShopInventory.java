@@ -1,5 +1,6 @@
 package net.forthecrown.economy.shops;
 
+import net.forthecrown.core.Crown;
 import net.forthecrown.inventory.ItemStacks;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
@@ -56,6 +57,10 @@ public class FtcShopInventory extends CraftInventoryCustom implements ShopInvent
 
     @Override
     public ItemStack getExampleItem() {
+        if(exampleItem == null) {
+            Crown.logger().warn("Found null example item in shop {}", getHolder().getName());
+        }
+
         return exampleItem == null ? null : exampleItem.clone();
     }
 
@@ -65,10 +70,22 @@ public class FtcShopInventory extends CraftInventoryCustom implements ShopInvent
     }
 
     @Override
-    public void checkStock(){
-        if(getExampleItem() == null) return;
-        if(isFull() && !owningShop.getType().isBuyType()) getHolder().setOutOfStock(true);
-        getHolder().setOutOfStock(containsAtLeast(getExampleItem(), getExampleItem().getAmount()));
+    public boolean inStock() {
+        // Null example item shops are always out of stock
+        if(getExampleItem() == null) return false;
+
+        // If it's full and a sell shop, then it's considered
+        // out of stock due to the fact it cannot operate
+        if(isFull() && !owningShop.getType().isBuyType()) {
+            return false;
+        }
+
+        // Admin shops are never out of stock
+        if(getHolder().getType().isAdmin()) {
+            return true;
+        }
+
+        return containsAtLeast(getExampleItem(), getExampleItem().getAmount());
     }
 
     @Nonnull

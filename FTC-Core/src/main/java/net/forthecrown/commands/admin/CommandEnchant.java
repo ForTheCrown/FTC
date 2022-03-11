@@ -85,7 +85,7 @@ public class CommandEnchant extends FtcCommand {
                                         List<String> strings = new ArrayList<>();
 
                                         for (int i = 0; i < max; i++) {
-                                            strings.add(i + "");
+                                            strings.add((i + 1) + "");
                                         }
 
                                         return CompletionProvider.suggestMatching(b, strings);

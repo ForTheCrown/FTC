@@ -72,8 +72,9 @@ public interface ShopInventory extends FtcInventory {
     /**
      * Checks if the shop has enough stock
      * And changes the ingame sign accordingly
+     * @return True, if the inventory is 'in stock', false otherwise
      */
-    void checkStock();
+    boolean inStock();
 
     @Override
     boolean equals(Object o);

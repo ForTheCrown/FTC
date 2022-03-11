@@ -3,6 +3,7 @@ package net.forthecrown.dungeons.boss.evoker;
 import com.sk89q.worldedit.math.Vector3;
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.forthecrown.core.Crown;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.Bosses;
@@ -28,6 +29,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.Validate;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.util.ObjectArrayIterator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -50,6 +52,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
+    private static final Logger LOGGER = Crown.logger();
     public static final int NO_TRANSITION = -1;
 
     private Evoker evoker;
@@ -368,10 +371,15 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
     public void onEntitySpawn(EntitySpawnEvent event) {
         Entity e = event.getEntity();
         if(attackingAllowed) return;
-        if(!getRoom().contains(e)) return;
-        EntityType type = e.getType();
 
-        event.setCancelled(type == EntityType.EVOKER_FANGS || type == EntityType.VEX);
+        if(e instanceof EvokerFangs fangs && fangs.getOwner().equals(getBossEntity())) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if(e instanceof Vex vex && vex.getSummoner().equals(getBossEntity())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)

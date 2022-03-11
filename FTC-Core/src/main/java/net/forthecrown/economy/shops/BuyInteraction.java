@@ -15,13 +15,7 @@ public class BuyInteraction implements ShopInteraction {
         ShopType.ADMIN_BUY.getInteraction().test(session, economy); //Check they pass the basic stuff
 
         //Shop stock check
-        if(session.getShop().isOutOfStock()) throw FtcExceptionProvider.shopOutOfStock();
-
-        ItemStack example = session.getExampleItem();
-
-        //Shop stock check, but better
-        if(!session.getShopInventory().containsAtLeast(example, example.getAmount())) {
-            session.getShop().setOutOfStock(true);
+        if(!session.getShopInventory().inStock()) {
             throw FtcExceptionProvider.shopOutOfStock();
         }
     }
@@ -41,8 +35,7 @@ public class BuyInteraction implements ShopInteraction {
         session.getShopInventory().removeItem(example.clone());
 
         //Check stock
-        if(!session.getShopInventory().containsAtLeast(example, example.getAmount())) {
-            session.getShop().setOutOfStock(true);
+        if(!session.getShopInventory().inStock()) {
             ShopManager.informOfStockIssue(owner, session.getShop());
         }
 

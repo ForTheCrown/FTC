@@ -2,8 +2,8 @@ package net.forthecrown.economy.shops;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
@@ -117,17 +117,18 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
         //If the session has expiry code to execute, run it
         if(session.getOnSessionExpire() != null) session.getOnSessionExpire().run();
 
-        // Record session in history
+        // Record session in history and possibly log,
         // Amount will be 0 for sessions that didn't pass the
         // interaction test
         if(session.getAmount() > 0) {
             session.getShop().getHistory().addEntry(session);
-        }
 
-        //Log interaction data if needed
-        if(session.getType().isAdmin()) {
-            if(FtcVars.logAdminShop.get()) Crown.logger().info(logInfo(session));
-        } else if(FtcVars.logNormalShop.get()) Crown.logger().info(logInfo(session));
+            if((session.getType().isAdmin() && FtcVars.logAdminShop.get())
+                    || (!session.getType().isAdmin() && FtcVars.logNormalShop.get())
+            ) {
+                Crown.logger().info(logInfo(session));
+            }
+        }
     }
 
     @Override

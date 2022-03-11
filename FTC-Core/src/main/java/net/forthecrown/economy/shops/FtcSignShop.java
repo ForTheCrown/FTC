@@ -27,7 +27,6 @@ public class FtcSignShop implements SignShop {
 
     private ShopType type;
     private int price;
-    private boolean outOfStock;
 
     //used by getSignShop
     public FtcSignShop(WorldVec3i loc) throws IllegalArgumentException {
@@ -56,9 +55,6 @@ public class FtcSignShop implements SignShop {
         ownership.setOwner(shopOwner);
 
         history = new ShopHistory(this);
-
-        if(type != ShopType.ADMIN_BUY && type != ShopType.ADMIN_SELL) this.outOfStock = true;
-
         this.inventory = new FtcShopInventory(this);
 
         save();
@@ -72,8 +68,6 @@ public class FtcSignShop implements SignShop {
     @Override
     public void reload() {
         Crown.getShopManager().getSerializer().deserialize(this);
-
-        inventory.checkStock();
         update();
     }
 
@@ -146,19 +140,6 @@ public class FtcSignShop implements SignShop {
     }
 
     @Override
-    public boolean isOutOfStock() {
-        return outOfStock;
-    }
-
-    @Override
-    public void setOutOfStock(boolean outOfStock) {
-        if(getType().equals(ShopType.ADMIN_SELL)) return;
-
-        this.outOfStock = outOfStock;
-        update();
-    }
-
-    @Override
     public boolean wasDeleted(){
         return Crown.getShopManager().getSerializer().wasDeleted(this);
     }
@@ -193,7 +174,7 @@ public class FtcSignShop implements SignShop {
     public void update(){
         Sign s = getSign();
 
-        s.line(0, isOutOfStock() ? getType().outOfStockLabel() : getType().inStockLabel());
+        s.line(0, !getInventory().inStock() ? getType().outOfStockLabel() : getType().inStockLabel());
         s.line(3, Crown.getShopManager().getPriceLine(price));
 
         Bukkit.getScheduler().runTask(Crown.inst(), () -> s.update(true));

@@ -189,7 +189,7 @@ public class ShopCreateListener implements Listener {
                             .build()
             );
 
-            shop.setOutOfStock(false);
+            shop.update();
             shop.save();
         }
     }

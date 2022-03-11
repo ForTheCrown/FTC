@@ -75,9 +75,7 @@ public class ShopInteractionListener implements Listener {
                 shopInv.addItem(item);
             }
 
-            //Check the stock to see if the shop
-            //Should be in stock or out of stock
-            shopInv.checkStock();
+            shop.update();
         }
     }
 }

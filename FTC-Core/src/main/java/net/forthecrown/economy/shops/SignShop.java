@@ -100,18 +100,6 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable, De
     void setPrice(int price, boolean updateSign);
 
     /**
-     * Gets if the shop is out of stock or not
-     * @return Whether the shop is out of stock or not... duh
-     */
-    boolean isOutOfStock();
-
-    /**
-     * Sets if the shop is out of stock
-     * @param outOfStock Whether the shop is out of stock
-     */
-    void setOutOfStock(boolean outOfStock);
-
-    /**
      * Gets if the file was deleted
      * <p>Deleted in this context means that the sign the shop is based on has been broken by a player... I don't wanna know what happens when a non player breaks a sign</p>
      * <p>This is used basically only in the save method to stop it from saving the file when it's supposed to have been deleted</p>

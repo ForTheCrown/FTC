@@ -34,13 +34,14 @@ public class InvalidUserDataFilter {
 
     private static boolean shouldRemove(UUID uuid) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        if(player == null || player.getName() == null) {
-            LOGGER.info("{} had no name, removing", uuid);
+
+        if(!player.hasPlayedBefore()) {
+            LOGGER.info("{} or '{}' has not played before, removing", uuid, player.getName());
             return true;
         }
 
-        if(!player.hasPlayedBefore()) {
-            LOGGER.info("{} has not played before, removing", uuid);
+        if(player == null || player.getName() == null) {
+            LOGGER.info("{} had no name, removing", uuid);
             return true;
         }
 
