@@ -3,7 +3,6 @@ package net.forthecrown.user;
 import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.sk89q.worldedit.math.BlockVector2;
-import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.forthecrown.core.AfkKicker;
 import net.forthecrown.core.Crown;
@@ -102,13 +101,6 @@ public interface CrownUser extends
     OfflinePlayer getOfflinePlayer();
 
     /**
-     * Gets a list of all pets belonging to the user
-     * <p>The strings are arbitrary, don't try to guess them :(</p>
-     * @return The list of pets belonging to the user
-     */
-    ObjectList<Pet> getPets();
-
-    /**
      * NOT API, Executes required code when a user joins
      * @return Whether the user's name has changed since they last joined
      */
@@ -153,25 +145,6 @@ public interface CrownUser extends
      * @return last online name
      */
     String getLastOnlineName();
-
-    /**
-     * Checks if the user has the specified pet
-     * @param pet The pet to look for
-     * @return It says above lol
-     */
-    boolean hasPet(Pet pet);
-
-    /**
-     * Adds a pet
-     * @param pet Pet
-     */
-    void addPet(Pet pet);
-
-    /**
-     * Removes a pet
-     * @param pet Pet
-     */
-    void removePet(Pet pet);
 
     /**
      * Checks whether the user has the given property
@@ -289,49 +262,113 @@ public interface CrownUser extends
      */
     void setMatData(SoldMaterialData data);
 
+    /**
+     * Gets the user's rank tier
+     * @return User's rank tier, {@link RankTier#NONE}, if the user has no tier
+     */
     RankTier getRankTier();
 
+    /**
+     * Sets this user's rank tier
+     * @param tier The tier to set
+     * @param givePermission Whether to reconfigure permissions
+     */
     void setRankTier(RankTier tier, boolean givePermission);
 
+    /**
+     * Sets the rank tier, this is the same as 'setRankTier(tier, true)'
+     * @param tier The tier to set
+     */
     default void setRankTier(RankTier tier) {
         setRankTier(tier, true);
     }
 
+    /**
+     * Checks if the user's tier is equal or greater than the current tier
+     * @param tier The tier to check
+     * @return Whether the user's tier is greater or equal to the given tier
+     */
     default boolean hasTier(RankTier tier) {
         return getRankTier().ordinal() > tier.ordinal();
     }
 
+    /**
+     * Sets the rank tier, only if the current tier is less than
+     * the given tier
+     * @param tier The tier to add
+     */
     default void addTier(RankTier tier) {
         if(hasTier(tier)) return;
         setRankTier(tier);
     }
 
+    /**
+     * Gets the user's current title
+     * @return The user's title, {@link RankTitle#DEFAULT}, if no title selected
+     */
     RankTitle getTitle();
 
+    /**
+     * Sets the user's currently active title
+     * @param title The new active title
+     */
     void setTitle(RankTitle title);
 
+    /**
+     * Gets all the user can select
+     * @return All available titles
+     */
     ObjectSet<RankTitle> getAvailableTitles();
 
+    /**
+     * Gives the given title to the user
+     * @param title The title to give
+     *
+     * @param givePermissions Whether to recalculate permissions if the given title is from
+     *                        a tier greater than the current tier
+     *
+     * @param setTier Whether to change the user's tier if the given title is from a
+     *                tier greater than the current one
+     */
     void addTitle(RankTitle title, boolean givePermissions, boolean setTier);
 
+    /**
+     * Adds the given title, same as calling 'addTitle(title, givePermission, true)'
+     * @param title The title to give
+     * @param givePermission Whether to recalculate permissions if the given title is from
+     *                       a tier greater than the current tier
+     */
     default void addTitle(RankTitle title, boolean givePermission) {
         addTitle(title, givePermission, true);
     }
 
+    /**
+     * Adds the given title to the user, same as calling 'addTitle(title, true, true)'
+     * @param title The title to add
+     */
     default void addTitle(RankTitle title) {
         addTitle(title, true);
     }
 
-    void removeTitle(RankTitle title, boolean removePermission);
+    /**
+     * Removes the given title
+     * @param title The title to remove
+     */
+    void removeTitle(RankTitle title);
 
-    default void removeTitle(RankTitle title) {
-        removeTitle(title, false);
-    }
-
+    /**
+     * Checks if the user has the given title
+     * @param title The title to check for
+     * @return True if they have it, false if they don't
+     */
     default boolean hasTitle(RankTitle title) {
         return getAvailableTitles().contains(title);
     }
 
+    /**
+     * Gets the sellshop item filter this user uses
+     * @return Sellshop item filter
+     */
     ItemFilter getSellShopFilter();
 
     /**

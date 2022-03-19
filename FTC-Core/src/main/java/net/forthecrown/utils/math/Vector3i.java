@@ -8,8 +8,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.ChunkPos;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -127,6 +129,11 @@ public class Vector3i extends AbstractVector3i<Vector3i> {
 
     public WorldVec3i toWorldVector(World world) {
         return new WorldVec3i(world, x, y, z);
+    }
+
+    public Chunk getChunk(World world) {
+        ChunkPos pos = getChunkPos();
+        return world.getChunkAt(pos.x, pos.z);
     }
 
     @Override

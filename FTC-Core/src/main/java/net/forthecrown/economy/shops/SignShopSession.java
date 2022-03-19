@@ -97,8 +97,8 @@ public class SignShopSession {
      * Gets whether the shop has space for more items.
      * @return Whether the shop has inventory room.
      */
-    public boolean shopHasSpace() {
-        return !getShopInventory().isFull();
+    public boolean shopIsFull() {
+        return getShopInventory().isFull();
     }
 
     /**

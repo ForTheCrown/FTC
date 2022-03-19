@@ -1,6 +1,7 @@
-package net.forthecrown.core.battlepass;
+package net.forthecrown.core.battlepass.challenges;
 
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.battlepass.BattlePass;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.text.Component;
 
@@ -10,7 +11,7 @@ public final class Challenges {
     // -----------------------------------
     //          Daily Challenges
     // -----------------------------------
-    public static BattlePassChallenge
+    public static SimpleChallenge
             LOG_IN = register(
                     "Log in", BattlePass.Category.DAILY, 1, 100,
                     Component.text("Log in to FTC :D")
@@ -37,7 +38,14 @@ public final class Challenges {
     // -----------------------------------
     //         Weekly Challenges
     // -----------------------------------
-    public static BattlePassChallenge
+    public static final DungeonBossChallenge BEAT_4_DUNGEON_BOSSES = register(
+            new DungeonBossChallenge(
+                    "Kill all the Dungeon Bosses", BattlePass.Category.WEEKLY, 4, 1000,
+                    Component.text("Kill 4 dungeon bosses :D")
+            )
+    );
+
+    public static SimpleChallenge
             SPEND_100K_RHINES = register(
                     "Spend 100,000 Rhines", BattlePass.Category.WEEKLY, 100000, 1000,
                     Component.text("Spend 100,000 Rhines on anything")
@@ -47,11 +55,6 @@ public final class Challenges {
                     "Purchase from 20 Sign Shops", BattlePass.Category.WEEKLY, 20, 650,
                     Component.text("Use 20 player-owner Sign Shops"),
                     Component.text("Your own shops don't count")
-            ),
-
-            BEAT_4_DUNGEON_BOSSES = register(
-                    "Kill all the Dungeon Bosses", BattlePass.Category.WEEKLY, 4, 1000,
-                    Component.text("Kill all the dungeon bosses :D")
             ),
 
             RANK_SWORD_UP = register(
@@ -69,16 +72,18 @@ public final class Challenges {
         Crown.logger().info("GoalBook Challenges initialized");
     }
 
-    private static BattlePassChallenge register(BattlePassChallenge c) {
-        return Registries.GOAL_BOOK.register(c.key(), c);
+    private static <T extends BattlePassChallenge> T register(T c) {
+        return (T) Registries.GOAL_BOOK.register(c.key(), c);
     }
 
-    private static BattlePassChallenge register(String name, BattlePass.Category category, int target, int exp, Component... desc) {
-        return new BattlePassChallenge(name, category, target, exp, desc) {
-            @Override
-            protected void onTrigger(BattlePass.Progress progress, int amount) {
-                progress.increment(this, amount);
-            }
-        };
+    private static SimpleChallenge register(String name, BattlePass.Category category, int target, int exp, Component... desc) {
+        return register(
+                new SimpleChallenge(name, category, target, exp, desc) {
+                    @Override
+                    protected void onTrigger(BattlePass.Progress progress, int amount) {
+                        progress.increment(this, amount);
+                    }
+                }
+        );
     }
 }

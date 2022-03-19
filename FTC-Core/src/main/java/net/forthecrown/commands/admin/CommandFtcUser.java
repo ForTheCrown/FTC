@@ -686,7 +686,7 @@ public class CommandFtcUser extends FtcCommand {
 
             @Override
             public void remove(RankTitle val, CrownUser user) {
-                user.removeTitle(val, false);
+                user.removeTitle(val);
             }
 
             @Override

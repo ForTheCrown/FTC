@@ -36,7 +36,7 @@ public interface FtcSuggestionProvider {
 
             Message message = new LiteralMessage(user.getUniqueId().toString());
 
-            builder.suggest(user.getName(), message);
+            builder.suggest(user.getNickOrName(), message);
         }
 
         return builder.buildFuture();

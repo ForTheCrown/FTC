@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 public class FtcAnnouncer extends AbstractJsonSerializer implements Announcer {
 
     private final List<Component> announcements = new ArrayList<>();
-    private final Var<Short> delay = VarRegistry.getSafe("broadcastDelay", VarTypes.SHORT, (short) 12000);
+    private final Var<Short> delay = VarRegistry.def("broadcastDelay", VarTypes.SHORT, (short) 12000);
     private BukkitRunnable broadcaster;
 
     public FtcAnnouncer(){

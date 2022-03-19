@@ -10,7 +10,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
 public class TargetUpdateComponent implements BossComponent<SingleEntityBoss> {
-    public static final Var<Integer> CHECK_INTERVAL = VarRegistry.getSafe("bossTargetUpdateInterval", VarTypes.INT, 40);
+    public static final Var<Integer> CHECK_INTERVAL = VarRegistry.def("bossTargetUpdateInterval", VarTypes.INT, 40);
 
     private TargetUpdateComponent() {}
 

@@ -22,7 +22,6 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
     private final Map<String, PopulationRegion> byName = new Object2ObjectOpenHashMap<>();
     private final Map<RegionPos, PopulationRegion> byCords = new Object2ObjectOpenHashMap<>();
 
-
     public FtcRegionManager(World world) {
         super("regions_" + world.getName());
 

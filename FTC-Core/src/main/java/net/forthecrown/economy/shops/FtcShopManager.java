@@ -56,7 +56,7 @@ public class FtcShopManager implements ShopManager {
 
     @Override
     public Component getPriceLine(int amount) {
-        return PRICE_LINE
+        return ShopConstants.PRICE_LINE
                 .append(Component.text("$" + amount)
                         .color(NamedTextColor.BLACK)
                 );

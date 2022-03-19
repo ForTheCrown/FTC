@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.battlepass.challenges.Challenges;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.events.ShopInteractionListener;
@@ -54,6 +55,10 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
         }
 
         interaction.interact(session, economy);
+
+        if(customer instanceof CrownUser user) {
+            Challenges.USE_20_SIGN_SHOPS.trigger(customer.getUniqueId());
+        }
     }
 
     @Override

@@ -98,6 +98,7 @@ public interface Crown extends Plugin, Namespaced {
         Main.markets.save();
         Main.guild.save();
         Main.config.save();
+        Main.battlePass.save();
 
         Main.userManager.saveCache();
 

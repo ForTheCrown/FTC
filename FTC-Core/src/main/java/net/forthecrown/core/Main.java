@@ -1,16 +1,12 @@
 package net.forthecrown.core;
 
 import net.forthecrown.commands.CommandArkBox;
-import net.forthecrown.core.transformers.CacheConverter;
-import net.forthecrown.core.transformers.InvalidUserDataFilter;
-import net.forthecrown.serializer.UserJsonSerializer;
-import net.forthecrown.vars.VarRegistry;
-import net.forthecrown.vars.types.VarTypes;
 import net.forthecrown.core.admin.FtcJailManager;
 import net.forthecrown.core.admin.FtcPunishments;
 import net.forthecrown.core.admin.ServerRules;
-import net.forthecrown.core.chat.*;
 import net.forthecrown.core.battlepass.BattlePassImpl;
+import net.forthecrown.core.chat.*;
+import net.forthecrown.core.transformers.InvalidUserDataFilter;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
@@ -21,6 +17,7 @@ import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.regions.FtcRegionManager;
+import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.structure.FtcStructureManager;
 import net.forthecrown.structure.tree.test.TestNodes;
 import net.forthecrown.useables.FtcUsablesManager;
@@ -29,6 +26,8 @@ import net.forthecrown.useables.warps.FtcWarpManager;
 import net.forthecrown.user.FtcUserManager;
 import net.forthecrown.user.packets.PacketListeners;
 import net.forthecrown.utils.world.WorldLoader;
+import net.forthecrown.vars.VarRegistry;
+import net.forthecrown.vars.types.VarTypes;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.apache.logging.log4j.Logger;
@@ -88,7 +87,7 @@ public final class Main extends JavaPlugin implements Crown {
     public void onEnable() {
         luckPerms = LuckPermsProvider.get();
 
-        BootStrap.enableBootStrap();
+        BootStrap.enablePhase();
 
         announcer.doBroadcasts();
         dayChange.schedule();
@@ -119,16 +118,13 @@ public final class Main extends JavaPlugin implements Crown {
         // Set up Vars
         VarTypes.init();
         VarRegistry.load();
-        FtcVars.inDebugMode = VarRegistry.set("debugMode", VarTypes.BOOL, config.getJson().getBool("debug_mode", false));
+        FtcVars.inDebugMode = VarRegistry.set("debugMode", VarTypes.BOOL, config.getJson().getBool("debug_mode", false))
+                .setTransient(true);
 
         saveResource("banned_words.json", true);
 
         RoyalCommandException.ENABLE_HOVER_STACK_TRACE = Crown.inDebugMode();
-        BootStrap.loadBootStrap();
-
-        if(CacheConverter.shouldRun()) {
-            CacheConverter.run();
-        }
+        BootStrap.loadPhase();
 
         userManager.loadCache();
 

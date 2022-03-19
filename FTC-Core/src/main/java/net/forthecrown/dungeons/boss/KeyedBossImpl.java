@@ -2,6 +2,7 @@ package net.forthecrown.dungeons.boss;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
+import net.forthecrown.core.battlepass.challenges.Challenges;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserDataContainer;
@@ -36,6 +37,10 @@ public abstract class KeyedBossImpl extends AbstractBoss implements KeyedBoss {
             if(Crown.getUserManager().isAltForAny(p.getUniqueId(), context.players())) continue;
 
             CrownUser user = UserManager.getUser(p);
+
+            // This trigger must be ran before as it uses the data
+            // accessor to check for the bosses
+            Challenges.BEAT_4_DUNGEON_BOSSES.trigger(user, this);
 
             // I forgot why this exists, but it does lol
             UserDataContainer container = user.getDataContainer();

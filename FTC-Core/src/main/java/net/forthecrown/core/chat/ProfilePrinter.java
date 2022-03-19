@@ -192,7 +192,7 @@ public class ProfilePrinter implements ComponentPrinter {
         line(" Separated", separated);
 
         line(" OwnedShop",
-                user.marketOwnership.currentlyOwnsShop() ?
+                user.marketData.currentlyOwnsShop() ?
                         MarketDisplay.displayName(Crown.getMarkets().get(user.getUniqueId())) :
                         null
         );

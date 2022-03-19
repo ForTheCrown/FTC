@@ -26,6 +26,10 @@ public class DungeonUserDataAccessor implements BooleanDataAccessor<KeyedBoss> {
         set(c, array);
     }
 
+    public void clear(UserDataContainer container) {
+        set(container, null);
+    }
+
     private JsonArray get(UserDataContainer c) {
         return c.getOrDefault(this, new JsonArray()).getAsJsonArray();
     }

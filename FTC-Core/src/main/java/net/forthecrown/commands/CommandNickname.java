@@ -37,7 +37,7 @@ public class CommandNickname extends FtcCommand {
         UserCache.CacheEntry entry = cache.get(nick);
 
         if(entry != null) {
-            throw FtcExceptionProvider.create("Nickname cannot be the name of another player");
+            throw FtcExceptionProvider.create("That nickname is currently unavailable");
         }
     }
 

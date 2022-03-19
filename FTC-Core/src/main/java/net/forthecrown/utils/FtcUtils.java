@@ -184,32 +184,8 @@ public final class FtcUtils {
         // CoreProtect
         CoreProtectAPI api = CoreProtect.getInstance().getAPI();
         List<String[]> lookup = api.blockLookup(b, 0);
-        if(ListUtils.isNullOrEmpty(lookup)) return true;
 
-        CoreProtectAPI.ParseResult firstResult = api.parseResult(lookup.get(0));
-
-        // Why doesn't CoreProtect have something like this themselves, I get saving it
-        // as an int, but no wrapper for that int to make the API more understandable???
-        CoreProtectAction action = CoreProtectAction.values()[Math.min(firstResult.getActionId(), CoreProtectAction.values().length - 1)];
-
-        // I need to learn to use less words to explain myself
-        //
-        // If we reset a world, CoreProtect won't erase the
-        // world from its database, so we gotta check if the
-        // last thing done at the block's location was a block
-        // being broken, cuz if it was broken, and now there's
-        // something being mined here, then it's gotta be
-        // natural, right? Totally not a piston which pushed
-        // a block here
-        return action == CoreProtectAction.BROKE;
-    }
-
-    public enum CoreProtectAction {
-        BROKE,
-        PLACED,
-        CLICK,
-        KILL,
-        UNKNOWN;
+        return ListUtils.isNullOrEmpty(lookup);
     }
 
     public static Region getSelectionSafe(com.sk89q.worldedit.entity.Player wePlayer) throws CommandSyntaxException {

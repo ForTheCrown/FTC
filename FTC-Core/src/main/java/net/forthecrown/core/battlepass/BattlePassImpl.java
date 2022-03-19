@@ -2,10 +2,13 @@ package net.forthecrown.core.battlepass;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.*;
-import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Keys;
+import net.forthecrown.core.battlepass.challenges.BattlePassChallenge;
+import net.forthecrown.core.battlepass.challenges.Challenges;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.AbstractJsonSerializer;
@@ -13,6 +16,7 @@ import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.MapUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,6 +27,7 @@ import java.util.*;
 public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass {
     private final Map<UUID, Progress> progressMap = new Object2ObjectOpenHashMap<>();
     private final Map<Category, CurrentChallenges> challengeMap = new Object2ObjectOpenHashMap<>();
+    private final Long2ObjectMap<RewardInstance> currentRewards = new Long2ObjectOpenHashMap<>();
 
     public BattlePassImpl() {
         super("battle_pass");
@@ -58,6 +63,8 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
 
     @Override
     public void resetCategory(Category category) {
+        challengeMap.get(category).onReset();
+
         clearCategory(category);
         populateCategory(category);
     }
@@ -86,7 +93,9 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
 
     @Override
     public void clearChallenges() {
-        for (Category c: Category.values()) {
+        Set<Category> categories = new ObjectOpenHashSet<>(challengeMap.keySet());
+
+        for (Category c: categories) {
             clearCategory(c);
         }
     }
@@ -133,7 +142,18 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
     }
 
     @Override
+    public Collection<RewardInstance> getCurrentRewards() {
+        return currentRewards.values();
+    }
+
+    @Override
+    public RewardInstance getReward(long id) {
+        return currentRewards.get(id);
+    }
+
+    @Override
     protected void save(JsonWrapper json) {
+        // Challenges
         if(!challengeMap.isEmpty()) {
             JsonWrapper challenges = JsonWrapper.empty();
 
@@ -144,6 +164,17 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
             json.add("current_challenges", challenges);
         }
 
+        // Rewards
+        if(!MapUtils.isNullOrEmpty(currentRewards)) {
+            JsonArray arr = new JsonArray();
+
+            for (RewardInstance r: currentRewards.values()) {
+                if(r == null) continue;
+                arr.add(r.serialize());
+            }
+        }
+
+        // Progress
         if(!progressMap.isEmpty()) {
             json.addList("progress", progressMap.values());
         }
@@ -151,9 +182,8 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
 
     @Override
     protected void reload(JsonWrapper json) {
+        // Challenges
         clearChallenges();
-        progressMap.clear();
-
         if(json.has("current_challenges")) {
             JsonWrapper challenges = json.getWrapped("current_challenges");
 
@@ -166,6 +196,19 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
             }
         }
 
+        // Rewards
+        currentRewards.clear();
+        if(json.has("rewards")) {
+            JsonArray rewardArray = json.getArray("rewards");
+
+            for (JsonElement e: rewardArray) {
+                RewardInstance instance = RewardInstance.read(e);
+                currentRewards.put(instance.id(), instance);
+            }
+        }
+
+        // Progress
+        progressMap.clear();
         if(json.has("progress")) {
             JsonArray array = json.getArray("progress");
 
@@ -183,7 +226,20 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
             populateCategory(c);
         }
 
+        currentRewards.clear();
+        currentRewards.putAll(createTemplateRewards());
+
         save(json);
+    }
+
+    private Long2ObjectMap<RewardInstance> createTemplateRewards() {
+        Long2ObjectMap<RewardInstance> result = new Long2ObjectOpenHashMap<>();
+
+        for (int i = 0; i <= MAX_LEVEL.get(); i += 10) {
+
+        }
+
+        return result;
     }
 
     public static class ProgressImpl implements Progress {
@@ -217,17 +273,17 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
 
         @Override
         public void incrementLevel() {
-            if(level == MAX_LEVEL.get()) return;
+            if(level >= MAX_LEVEL.get()) return;
             level++;
 
             CrownUser user = UserManager.getUser(holder());
             if(user.isOnline()) {
                 user.sendMessage(
-                        Component.translatable("goalBook.levelUp", NamedTextColor.YELLOW)
+                        Component.translatable("battlePass.levelUp", NamedTextColor.YELLOW)
                                 .append(Component.newline())
                                 .append(
                                         Component.translatable(
-                                                "goalBook.levelUp.now",
+                                                "battlePass.levelUp.now",
                                                 NamedTextColor.GRAY,
                                                 Component.text(FtcUtils.arabicToRoman(level))
                                         )
@@ -236,9 +292,9 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
 
                 if(level == MAX_LEVEL.get()) {
                     user.sendMessage(
-                            Component.translatable("goalBook.levelLimitReached", NamedTextColor.YELLOW, Component.text(MAX_LEVEL.get()).color(NamedTextColor.GOLD))
+                            Component.translatable("battlePass.levelLimitReached", NamedTextColor.YELLOW, Component.text(MAX_LEVEL.get()).color(NamedTextColor.GOLD))
                                     .append(Component.newline())
-                                    .append(Component.translatable("goalBook.levelLimitReached.rhines").color(NamedTextColor.GRAY))
+                                    .append(Component.translatable("battlePass.levelLimitReached.rhines").color(NamedTextColor.GRAY))
                     );
                 }
             }
@@ -254,53 +310,51 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
             this.exp = Mth.clamp(amount, 0, EXP_PER_LEVEL.get());
         }
 
+        private void giveExpRhines(int amount) {
+            if(!FtcVars.bp_extraExpGivesRhines.get()) return;
+            CrownUser user = holderUser();
+            user.addBalance(amount);
+
+            if(user.isOnline()) {
+                user.sendMessage(
+                        Component.translatable(
+                                "battlePass.extraExpRhines",
+                                NamedTextColor.YELLOW,
+                                FtcFormatter.rhines(amount)
+                                        .color(NamedTextColor.GOLD)
+                        )
+                );
+            }
+        }
+
         @Override
         public void addExp(int amount) {
-            int total = exp + amount;
-
-            // If the total EXP we're at is above
-            // the max exp one can have
-            if(total >= EXP_PER_LEVEL.get()) {
-                // Bring the amount down by one level's worth
-                amount = total - EXP_PER_LEVEL.get();
-
-                // If we're at or above the level limit
-                if(level >= MAX_LEVEL.get()) {
-
-                    // If we're allowed to reward money for any extra exp earned
-                    // reward rhines
-                    if(FtcVars.gb_extraExpGivesRhines.get()) {
-                        Crown.getEconomy().add(holder(), amount);
-
-                        CrownUser user = UserManager.getUser(holder());
-
-                        if(user.isOnline()) {
-                            user.sendMessage(
-                                    Component.translatable("goalBook.extraExpRhines",
-                                            NamedTextColor.YELLOW,
-                                            FtcFormatter.rhines(amount)
-                                                    .color(NamedTextColor.GOLD)
-                                    )
-                            );
-                        }
-                    }
-
-                    // Stop executing, because we're over limit
-                    return;
-                }
-
-                incrementLevel();
-            } else {
-                // We're not over limit, make exp = total
-                // and stop
-                this.exp = total;
+            if(level >= MAX_LEVEL.get()) {
+                giveExpRhines(amount);
                 return;
             }
 
-            // Recursively call this method
-            // until the given amount is finally
-            // below the level limit
-            addExp(amount);
+            int newTotalExp = exp() + amount;
+            int newExp = newTotalExp % EXP_PER_LEVEL.get();
+            int levelAdd = newTotalExp / EXP_PER_LEVEL.get();
+
+            if((level() + levelAdd) >= MAX_LEVEL.get()) {
+                int currentLevel = level();
+
+                level(MAX_LEVEL.get());
+                exp(0);
+
+                int rhineAmount = ((MAX_LEVEL.get() - currentLevel) * EXP_PER_LEVEL.get()) + newExp;
+
+                giveExpRhines(rhineAmount);
+                return;
+            }
+
+            for (int i = 0; i < levelAdd; i++) {
+                incrementLevel();
+            }
+
+            exp(newExp);
         }
 
         @Override
@@ -337,7 +391,7 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
 
         @Override
         public JsonWrapper extraData() {
-            return extraData;
+            return extraData == null ? extraData = JsonWrapper.empty() : extraData;
         }
 
         @Override
@@ -361,7 +415,7 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
                 json.add("progress", progJson);
             }
 
-            if(!extraData.isEmpty()) {
+            if(extraData != null && !extraData.isEmpty()) {
                 json.add("extra_data", extraData);
             }
 

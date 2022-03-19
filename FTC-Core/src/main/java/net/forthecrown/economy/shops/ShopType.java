@@ -9,20 +9,20 @@ import org.jetbrains.annotations.NotNull;
  */
 public enum ShopType {
 
-    SELL(ShopManager.SELL_LABEL, ShopManager.NORMAL_STYLE, false, new SellInteraction()),
-    ADMIN_SELL(ShopManager.SELL_LABEL, ShopManager.ADMIN_STYLE, true, new AdminSellInteraction()),
+    SELL(ShopConstants.SELL_LABEL, ShopConstants.NORMAL_STYLE, false, new SellInteraction()),
+    ADMIN_SELL(ShopConstants.SELL_LABEL, ShopConstants.ADMIN_STYLE, true, new AdminSellInteraction()),
 
-    BUY(ShopManager.BUY_LABEL, ShopManager.NORMAL_STYLE, false, new BuyInteraction()),
-    ADMIN_BUY(ShopManager.BUY_LABEL, ShopManager.ADMIN_STYLE, true, new AdminBuyInteraction());
+    BUY(ShopConstants.BUY_LABEL, ShopConstants.NORMAL_STYLE, false, new BuyInteraction()),
+    ADMIN_BUY(ShopConstants.BUY_LABEL, ShopConstants.ADMIN_STYLE, true, new AdminBuyInteraction());
 
     private final Component inStock, outStock;
     private final boolean isAdmin, buyType;
     private final ShopInteraction interaction;
 
     ShopType(@NotNull String label, @NotNull Style style, boolean isAdmin, ShopInteraction interaction){
-        this.buyType = label.contains(ShopManager.BUY_LABEL);
+        this.buyType = label.contains(ShopConstants.BUY_LABEL);
         this.inStock = Component.text(label).style(style);
-        this.outStock = Component.text(label).style(ShopManager.OUT_OF_STOCK_STYLE);
+        this.outStock = Component.text(label).style(ShopConstants.OUT_OF_STOCK_STYLE);
 
         this.interaction = interaction;
         this.isAdmin = isAdmin;

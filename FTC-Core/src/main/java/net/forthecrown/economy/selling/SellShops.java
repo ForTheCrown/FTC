@@ -3,15 +3,15 @@ package net.forthecrown.economy.selling;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
+import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.inventory.builder.BuiltInventory;
 import net.forthecrown.inventory.builder.InventoryBuilder;
 import net.forthecrown.inventory.builder.options.InventoryBorder;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.inventory.builder.options.SimpleCordedOption;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.SoldMaterialData;
 import net.forthecrown.user.SellAmount;
-import net.forthecrown.inventory.ItemStackBuilder;
+import net.forthecrown.user.SoldMaterialData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -216,10 +216,13 @@ public class SellShops {
 
         int totalEarned = (int) (result.getAmount() * data.getPrice() * priceScalar);
 
-        // Give money and track their total earned
+        // Give money, if it's more than 0, and
+        // track their total earned, has to be
+        // checked otherwise exception
         // Why do we track earnings again? Taxes?
-        economy.add(user.getUniqueId(), totalEarned);
-        user.addTotalEarnings(totalEarned);
+        if (totalEarned > 0) {
+            economy.add(user.getUniqueId(), totalEarned);
+        }
 
         // Inform this good person that they've made
         // quite a bit of mulaa
@@ -231,6 +234,7 @@ public class SellShops {
                         FtcFormatter.rhines(totalEarned).color(NamedTextColor.GOLD)
                 )
         );
+
 
         // Tell console they sold stuff
         Crown.logger().info("{} sold {} {} for {}",

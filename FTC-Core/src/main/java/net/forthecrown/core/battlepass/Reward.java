@@ -38,18 +38,25 @@ public abstract class Reward implements Keyed, JsonSerializable {
         return progress.availableRewards().contains(instance);
     }
 
-    public final void award(CrownUser user, RewardInstance instance) {
+    public final boolean award(CrownUser user, RewardInstance instance) {
         BattlePass.Progress progress = Crown.getBattlePass().getProgress(user.getUniqueId());
+
+        if(!onClaim(user, instance)) {
+            user.sendMessage(
+                    Component.translatable("battlePass.reward.cannotClaim")
+                            .color(NamedTextColor.RED)
+            );
+            return false;
+        }
+
         progress.claimedRewards().add(instance);
-
-        onClaim(user, instance);
-
         user.sendMessage(
-                Component.translatable("goalBook.reward.got", NamedTextColor.YELLOW,
+                Component.translatable("battlePass.reward.got", NamedTextColor.YELLOW,
                         display(instance).color(NamedTextColor.GOLD)
                 )
         );
+        return true;
     }
 
-    protected abstract void onClaim(CrownUser user, RewardInstance instance);
+    protected abstract boolean onClaim(CrownUser user, RewardInstance instance);
 }

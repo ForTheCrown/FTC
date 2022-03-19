@@ -19,9 +19,9 @@ import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.EntityPlacer;
 import net.forthecrown.structure.StructurePlaceContext;
 import net.forthecrown.useables.warps.Warp;
-import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.TimeUtil;
+import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.math.Vector3i;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.forthecrown.utils.world.WorldLoader;
@@ -292,6 +292,10 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
 
             setGatesOpen(true);
 
+            // Purge the CoreProtect database
+            long dif = System.currentTimeMillis() - lastReset;
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "co purge r:#" + Worlds.RESOURCE_NAME + "t:" + dif / TimeUtil.DAY_IN_MILLIS + "d");
+
             lastReset = System.currentTimeMillis();
             LOGGER.info("RW reset finished");
         });
@@ -342,8 +346,6 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
 
         if(WorldLoader.isLoading(Worlds.end())) {
             LOGGER.warn("End is already regenerating, moving RW reset ahead by one day");
-
-            lastReset += TimeUtil.DAY_IN_MILLIS;
             return;
         }
 

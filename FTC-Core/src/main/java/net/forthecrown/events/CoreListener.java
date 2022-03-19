@@ -290,31 +290,16 @@ public class CoreListener implements Listener {
         }
     }
 
-    /*public static final int
-            CART_TABLE_SLOT_RESULT = 2,
-            CART_TABLE_SLOT_TOP_INPUT = 0;
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        if(!(event.getView().getTopInventory() instanceof CartographyInventory cart)) return;
-
-        ItemStack item = cart.getItem(CART_TABLE_SLOT_TOP_INPUT);
-
-        if(ItemStacks.isEmpty(item)) {
-            item = event.getCursor();
-            if(ItemStacks.isEmpty(item)) return;
-        }
-
-        if(ItemStacks.hasTagElement(item.getItemMeta(), "no_copies")) {
-            setNull(cart, CART_TABLE_SLOT_RESULT);
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+        if(ItemStacks.isSpecial(event.getItemDrop().getItemStack())) {
+            event.getPlayer().sendActionBar(
+                    Component.text("Cannot drop special item")
+                            .color(NamedTextColor.RED)
+            );
+            event.setCancelled(true);
         }
     }
-
-    private void setNull(Inventory inventory, int slot) {
-        Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
-            inventory.setItem(slot, null);
-        }, 1);
-    }*/
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {

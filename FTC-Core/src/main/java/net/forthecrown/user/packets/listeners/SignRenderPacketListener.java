@@ -2,7 +2,7 @@ package net.forthecrown.user.packets.listeners;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.economy.shops.ShopManager;
+import net.forthecrown.economy.shops.ShopConstants;
 import net.forthecrown.economy.shops.SignShop;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.packets.PacketContext;
@@ -68,6 +68,6 @@ public class SignRenderPacketListener implements PacketListener<ClientboundBlock
         if(tag == null || !tag.contains("PublicBukkitValues", Tag.TAG_COMPOUND) || !tag.contains("GlowingText")) return false;
         CompoundTag publicBukkit = tag.getCompound("PublicBukkitValues");
 
-        return publicBukkit.contains(ShopManager.SHOP_KEY.asString());
+        return publicBukkit.contains(ShopConstants.SHOP_KEY.asString());
     }
 }

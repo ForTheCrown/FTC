@@ -5,6 +5,7 @@ import net.forthecrown.commands.manager.FtcCommands;
 import net.forthecrown.core.admin.FtcJailManager;
 import net.forthecrown.core.admin.FtcPunishments;
 import net.forthecrown.core.admin.ServerRules;
+import net.forthecrown.core.battlepass.BattlePassImpl;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
@@ -35,7 +36,7 @@ import net.forthecrown.vars.types.VarTypes;
 
 import static net.forthecrown.core.Main.*;
 import static net.forthecrown.utils.FtcUtils.safeRunnable;
-import static net.forthecrown.vars.VarRegistry.getSafe;
+import static net.forthecrown.vars.VarRegistry.def;
 
 /**
  * A class which loads and creates everything the FTC plugin does and needs.
@@ -44,7 +45,7 @@ import static net.forthecrown.vars.VarRegistry.getSafe;
 final class BootStrap {
     private BootStrap() {}
 
-    static void loadBootStrap() {
+    static void loadPhase() {
         announcer   = new FtcAnnouncer();
         messages    = new FtcMessages();
         emotes      = new ChatEmotes();
@@ -58,8 +59,8 @@ final class BootStrap {
         FtcFlags.init();
     }
 
-    static void enableBootStrap() {
-        FtcVars.regionWorld = getSafe("regionWorld", VarTypes.WORLD, Worlds.OVERWORLD);
+    static void enablePhase() {
+        FtcVars.regionWorld = def("regionWorld", VarTypes.WORLD, Worlds.OVERWORLD);
 
         // Initialize config sections
         joinInfo        = new JoinInfo();
@@ -93,9 +94,10 @@ final class BootStrap {
         usablesManager      = new FtcUsablesManager();
         structureManager    = new FtcStructureManager();
 
-        markets = new FtcMarkets();
-        saver   = new PeriodicalSaver();
-        guild   = new TradeGuild();
+        markets     = new FtcMarkets();
+        saver       = new PeriodicalSaver();
+        guild       = new TradeGuild();
+        battlePass  = new BattlePassImpl();
 
         //Initialize modules
         safeRunnable(CorePacketListeners::init);

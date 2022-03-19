@@ -3,6 +3,7 @@ package net.forthecrown.core.battlepass;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.forthecrown.core.battlepass.challenges.BattlePassChallenge;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonSerializable;
 
@@ -19,6 +20,10 @@ public class CurrentChallenges extends ObjectArrayList<BattlePassChallenge> impl
 
     public void setListening(boolean listenersEnabled) {
         forEach(challenge -> challenge.setEnabled(listenersEnabled));
+    }
+
+    public void onReset() {
+        forEach(BattlePassChallenge::onReset);
     }
 
     @Override

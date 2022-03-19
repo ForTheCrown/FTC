@@ -15,10 +15,12 @@ public class SellInteraction implements ShopInteraction {
         ShopType.ADMIN_SELL.getInteraction().test(session, economy); //Check basic stuff
 
         //Check the shop's owner can afford the shop
-        if(!economy.has(session.getOwnership().getOwner(), session.getPrice())) throw FtcExceptionProvider.shopOwnerCannotAfford(session.getPrice());
+        if(!economy.has(session.getOwnership().getOwner(), session.getPrice())) {
+            throw FtcExceptionProvider.shopOwnerCannotAfford(session.getPrice());
+        }
 
         //Check shop has space for any more items
-        if(!session.shopHasSpace()) throw FtcExceptionProvider.noShopSpace();
+        if(session.shopIsFull()) throw FtcExceptionProvider.noShopSpace();
     }
 
     @Override

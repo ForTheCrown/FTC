@@ -23,15 +23,6 @@ public interface UserManager extends CrownSerializer {
     /**
      * Gets a user for a player
      * @param base The player to get the user of
-     * @return The user :|
-     */
-    static CrownUser getUser(Player base){
-        return getUser(base.getUniqueId());
-    }
-
-    /**
-     * Gets a user for a player
-     * @param base The player to get the user of
      * @return obvious innit
      */
     static CrownUser getUser(OfflinePlayer base){

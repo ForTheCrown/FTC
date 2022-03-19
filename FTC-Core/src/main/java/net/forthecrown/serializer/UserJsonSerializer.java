@@ -61,7 +61,6 @@ public class UserJsonSerializer implements UserSerializer {
         if (!FtcUtils.isNullOrBlank(user.ip)) json.add("ipAddress", user.ip);
         if (user.totalEarnings > 0) json.add("totalEarnings", user.totalEarnings);
         if (user.getGems() != 0) json.add("gems", user.getGems());
-        if (!user.pets.isEmpty()) json.addList("pets", user.pets);
         if (user.currentPrefix != null) json.add("currentPrefix", ChatUtils.toJson(user.currentPrefix));
         if (user.hulkSmashing) json.add("hulkSmashing", true);
 
@@ -110,7 +109,7 @@ public class UserJsonSerializer implements UserSerializer {
         saveAttach(json, user.homes);
         saveAttach(json, user.interactions);
         saveAttach(json, user.dataContainer);
-        saveAttach(json, user.marketOwnership);
+        saveAttach(json, user.marketData);
         saveAttach(json, user.mail);
 
         writeJson(json, user.getUniqueId());
@@ -163,12 +162,6 @@ public class UserJsonSerializer implements UserSerializer {
             user.previousNames.addAll(json.getList("previousNames", JsonElement::getAsString));
         }
 
-        //Pets
-        user.pets.clear();
-        if(json.has("pets")) {
-            user.pets.addAll(json.getList("pets", e -> JsonUtils.readEnum(Pet.class, e)));
-        }
-
         //Properties
         user.prefs.clear();
         if(json.has("properties")) {
@@ -198,7 +191,7 @@ public class UserJsonSerializer implements UserSerializer {
         loadAttach(json, user.homes);
         loadAttach(json, user.interactions);
         loadAttach(json, user.dataContainer);
-        loadAttach(json, user.marketOwnership);
+        loadAttach(json, user.marketData);
         loadAttach(json, user.mail);
 
         //Material data

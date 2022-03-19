@@ -1,11 +1,5 @@
 package net.forthecrown.economy;
 
-import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.UserManager;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.function.IntSupplier;
@@ -80,25 +74,6 @@ public class SortedBalanceMap implements BalanceMap {
     public Balance getEntry(int index) {
         validateIndex(index);
         return entries[index];
-    }
-
-    @Override
-    public Component getPrettyDisplay(int index) {
-        validateIndex(index);
-
-        Balance entry = getEntry(index);
-        if (!UserManager.isPlayerID(entry.getUniqueId())) return null;
-
-        CrownUser user = UserManager.getUser(entry.getUniqueId());
-        Component displayName = user.nickDisplayName();
-
-        user.unloadIfOffline();
-
-        return Component.text()
-                .append(displayName)
-                .append(Component.text(" - "))
-                .append(FtcFormatter.rhines(entry.getValue()).color(NamedTextColor.YELLOW))
-                .build();
     }
 
     @Override
@@ -211,8 +186,7 @@ public class SortedBalanceMap implements BalanceMap {
     }
 
     private boolean isInList(int index) {
-        if (index < 0) return false;
-        return index <= size - 1;
+        return index >= 0 && index < size;
     }
 
     @Override

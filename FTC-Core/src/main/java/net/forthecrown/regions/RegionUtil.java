@@ -107,8 +107,16 @@ public final class RegionUtil {
         }
     }
 
-    static IntArrayTag writeColumn(BlockVector2 pos) {
+    public static IntArrayTag writeColumn(BlockVector2 pos) {
         return new IntArrayTag(new int[] {pos.getX(), pos.getZ()});
+    }
+
+    public static BlockVector2 readColumn(IntArrayTag arrayTag) {
+        return readColumn(arrayTag.getAsIntArray());
+    }
+
+    public static BlockVector2 readColumn(int[] arr) {
+        return BlockVector2.at(arr[0], arr[1]);
     }
 
     // Serialize properties as a boolean array with each bit corresponding to the

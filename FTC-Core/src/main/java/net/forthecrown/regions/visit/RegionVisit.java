@@ -4,6 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcVars;
+import net.forthecrown.core.battlepass.challenges.Challenges;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.events.dynamic.RegionVisitListener;
 import net.forthecrown.regions.PopulationRegion;
@@ -220,6 +221,8 @@ public class RegionVisit implements Runnable {
     }
 
     void runTpHandlers() {
+        Challenges.TRAVEL_TO_5_REGIONS.trigger(getUser().getUniqueId());
+
         runHandlers(h -> h.onTeleport(this));
     }
 

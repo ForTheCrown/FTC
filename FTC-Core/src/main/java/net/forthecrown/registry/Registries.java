@@ -2,8 +2,8 @@ package net.forthecrown.registry;
 
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.animation.BlockAnimation;
-import net.forthecrown.core.battlepass.BattlePassChallenge;
 import net.forthecrown.core.battlepass.Reward;
+import net.forthecrown.core.battlepass.challenges.BattlePassChallenge;
 import net.forthecrown.core.npc.InteractableNPC;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;

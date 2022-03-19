@@ -38,12 +38,6 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
     @Override
     protected boolean shouldResetEarnings() { return System.currentTimeMillis() > getMain().getNextResetTime(); }
     @Override
-    public boolean hasPet(Pet pet) { return getMain().hasPet(pet); }
-    @Override
-    public void addPet(Pet pet) { getMain().addPet(pet); }
-    @Override
-    public void removePet(Pet pet) { getMain().removePet(pet); }
-    @Override
     public long getTotalEarnings() { return getMain().getTotalEarnings(); }
     @Override
     public void setTotalEarnings(long amount) { getMain().setTotalEarnings(amount); }
@@ -80,7 +74,7 @@ public class FtcUserAlt extends FtcUser implements CrownUserAlt {
     @Override
     public void addTitle(RankTitle title, boolean givePermissions, boolean setTierIfHigher) { getMain().addTitle(title, givePermissions, setTierIfHigher); }
     @Override
-    public void removeTitle(RankTitle title, boolean removePermission) { getMain().removeTitle(title, removePermission); }
+    public void removeTitle(RankTitle title) { getMain().removeTitle(title); }
     @Override
     public RankTier getRankTier() { return getMain().getRankTier(); }
     @Override

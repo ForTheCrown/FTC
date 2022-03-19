@@ -1,6 +1,5 @@
 package net.forthecrown.economy;
 
-import net.kyori.adventure.text.Component;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -68,15 +67,6 @@ public interface BalanceMap {
      * @throws ArrayIndexOutOfBoundsException If the index is outside of the balances list
      */
     Balance getEntry(int index) throws ArrayIndexOutOfBoundsException;
-
-    /**
-     * Gets a pretty display component for the given index.
-     * <p>Only used by the balance top command</p>
-     * @param index The index to get the display for
-     * @return The given index's display component
-     * @throws ArrayIndexOutOfBoundsException If the given index is outside of the balances list
-     */
-    Component getPrettyDisplay(int index) throws ArrayIndexOutOfBoundsException;
 
     /**
      * Gets an index of a UUID

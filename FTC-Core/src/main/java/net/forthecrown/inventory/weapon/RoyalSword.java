@@ -6,6 +6,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.Main;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.battlepass.challenges.Challenges;
 import net.forthecrown.inventory.RankedItem;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
 import net.forthecrown.inventory.weapon.click.ClickHistory;
@@ -281,6 +282,10 @@ public class RoyalSword extends RankedItem {
 
         this.waitingUpdate = nextUpgrades;
         nextUpgrades = RoyalWeapons.getUpgrades(rank + 1);
+
+        if(hasPlayerOwner()) {
+            Challenges.RANK_SWORD_UP.trigger(getOwner());
+        }
 
         if(waitingUpdate != null && waitingUpdate.hasFluff()) lastFluffChange = rank;
 

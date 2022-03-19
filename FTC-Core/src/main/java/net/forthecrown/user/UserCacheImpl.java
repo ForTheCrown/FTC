@@ -9,10 +9,10 @@ import java.util.stream.Stream;
 public class UserCacheImpl implements UserCache {
     public static final int EXPECTED_SIZE = 1300;
 
-    private final Map<UUID, CacheEntryImpl> identified = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
-    private final Map<String, CacheEntryImpl> named = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
-    private final Map<String, CacheEntryImpl> oldNamed = new Object2ObjectOpenHashMap<>(30);
-    private final Map<String, CacheEntryImpl> nicknamed = new Object2ObjectOpenHashMap<>(20);
+    private final Map<UUID,   CacheEntryImpl> identified = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
+    private final Map<String, CacheEntryImpl> named      = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
+    private final Map<String, CacheEntryImpl> oldNamed   = new Object2ObjectOpenHashMap<>(30);
+    private final Map<String, CacheEntryImpl> nicknamed  = new Object2ObjectOpenHashMap<>(20);
 
     @Override
     public synchronized CacheEntryImpl getNamed(String name) {
@@ -173,9 +173,17 @@ public class UserCacheImpl implements UserCache {
             return lastName;
         }
 
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
+        }
+
         @Override
         public long getLastNameChange() {
             return lastNameChange;
+        }
+
+        public void setLastNameChange(long lastNameChange) {
+            this.lastNameChange = lastNameChange;
         }
 
         @Override

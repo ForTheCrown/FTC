@@ -11,10 +11,7 @@ import net.forthecrown.core.FtcFlags;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.economy.shops.ShopInventory;
-import net.forthecrown.economy.shops.ShopManager;
-import net.forthecrown.economy.shops.ShopType;
-import net.forthecrown.economy.shops.SignShop;
+import net.forthecrown.economy.shops.*;
 import net.forthecrown.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -150,7 +147,7 @@ public class ShopCreateListener implements Listener {
             Inventory inv = event.getInventory();
             ShopInventory shopInv = shop.getInventory();
 
-            ItemStack item = inv.getContents()[2];
+            ItemStack item = inv.getContents()[ShopConstants.EXAMPLE_ITEM_SLOT];
             if(ItemStacks.isEmpty(item)){ //If example item was not found: destroy shop and tell them why they failed
                 shop.destroy(false);
 
@@ -169,8 +166,7 @@ public class ShopCreateListener implements Listener {
             shopInv.addItem(item.clone());
 
             //Update the sign's persitent data to make sign shop detection easy
-            sign.getPersistentDataContainer().set(ShopManager.SHOP_KEY, PersistentDataType.BYTE, (byte) 1);
-            sign.update();
+            sign.getPersistentDataContainer().set(ShopConstants.SHOP_KEY, PersistentDataType.BYTE, (byte) 1);
 
             //Send the info message
             player.sendMessage(

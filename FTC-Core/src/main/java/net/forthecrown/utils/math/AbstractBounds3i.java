@@ -125,6 +125,16 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
         );
     }
 
+    public T combine(ImmutableBounds3i... others) {
+        T result = clone();
+
+        for (ImmutableBounds3i o: others) {
+            result = result.combine(o);
+        }
+
+        return result;
+    }
+
     public T combine(ImmutableBounds3i o) {
         return combine(o.minX(), o.minY(), o.minZ(), o.maxX(), o.maxY(), o.maxZ());
     }
@@ -170,6 +180,20 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
                 Math.min(this.maxY, maxY),
                 Math.min(this.maxZ, maxZ)
         );
+    }
+
+    public BoundsFace[] getFaces() {
+        Vector3i min = min();
+        Vector3i max = max();
+
+        return new BoundsFace[]{
+                new BoundsFace(min, max.setY(minY), Direction.DOWN),
+                new BoundsFace(min.setY(maxY), max, Direction.UP),
+                new BoundsFace(min, max.setZ(minZ), Direction.NORTH),
+                new BoundsFace(min.setY(maxZ), max, Direction.SOUTH),
+                new BoundsFace(min, max.setX(minX), Direction.WEST),
+                new BoundsFace(min.setX(maxX), max, Direction.EAST)
+        };
     }
 
     public T move(Direction dir) {
@@ -346,5 +370,10 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
     @Override
     public String toString() {
         return min().toString() + ", " + max().toString();
+    }
+
+    @Override
+    public T clone() {
+        return cloneAt(minX, minY, minZ, maxX, maxY, maxZ, immutable);
     }
 }

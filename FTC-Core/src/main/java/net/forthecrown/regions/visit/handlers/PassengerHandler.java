@@ -15,10 +15,7 @@ import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Boat;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.*;
@@ -111,7 +108,7 @@ public class PassengerHandler implements VisitHandler {
 
         private Entity moveEntity(Entity entity, Location dest) {
             //handle boats and minecarts differently
-            if(entity instanceof Boat || entity instanceof Minecart) {
+            if(entity instanceof Vehicle) {
                 return moveVehicle(entity, dest);
             }
 

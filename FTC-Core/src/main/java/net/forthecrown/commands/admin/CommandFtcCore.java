@@ -381,6 +381,7 @@ public class CommandFtcCore extends FtcCommand {
         SHOPS ("Signshops",                     getShopManager()::save,         getShopManager()::reload),
         CONFIG ("Main Config",                  config()::save,                 config()::reload),
         DUNGEON_LEVELS ("Dungeon Levels",       LevelSerializer::save,          LevelSerializer::load),
+        BATTLEPASS ("BattlePass",               getBattlePass()::save,          getBattlePass()::reload),
         USER_MANAGER("User Manager",            getUserManager()::save,         getUserManager()::reload),
         USER_CACHE("User Cache",                getUserManager()::saveCache,    getUserManager()::loadCache);
 

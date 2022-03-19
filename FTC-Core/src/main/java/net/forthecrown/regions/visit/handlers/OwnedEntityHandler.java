@@ -102,7 +102,6 @@ public class OwnedEntityHandler implements VisitHandler {
     // go missing.
     // Kinda similar to what happened to the Wither farm me and
     // Robin tried to make.
-    // God this is dumb lol
     static void tpDelayed(List<Entity> entities, Location location) {
         if(location == null || ListUtils.isNullOrEmpty(entities)) return;
 

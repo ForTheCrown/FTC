@@ -7,6 +7,7 @@ import net.forthecrown.core.admin.PunishmentEntry;
 import net.forthecrown.core.admin.PunishmentRecord;
 import net.forthecrown.core.admin.PunishmentType;
 import net.forthecrown.core.admin.Punishments;
+import net.forthecrown.core.battlepass.challenges.Challenges;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.economy.selling.ItemFilter;
 import net.forthecrown.events.dynamic.AfkListener;
@@ -73,7 +74,7 @@ public class FtcUser implements CrownUser {
     public Component currentPrefix;
 
     //Attachments
-    public final FtcUserMarketData marketOwnership;
+    public final FtcUserMarketData marketData;
     public final FtcUserDataContainer dataContainer;
     public final FtcUserInteractions interactions;
     public final FtcUserCosmeticData cosmeticData;
@@ -85,7 +86,6 @@ public class FtcUser implements CrownUser {
     public RankTitle currentTitle = RankTitle.DEFAULT;
     public ObjectSet<RankTitle> titles = new ObjectOpenHashSet<>();
 
-    public final ObjectList<Pet> pets = new ObjectArrayList<>();
     public final ObjectSet<UserPref> prefs = new ObjectOpenHashSet<>();
 
     //Primitive variables, idk
@@ -129,7 +129,7 @@ public class FtcUser implements CrownUser {
     public FtcUser(@NotNull UUID uniqueId){
         this.uniqueId = uniqueId;
 
-        marketOwnership = new FtcUserMarketData(this);
+        marketData = new FtcUserMarketData(this);
         dataContainer = new FtcUserDataContainer(this);
         interactions = new FtcUserInteractions(this);
         cosmeticData = new FtcUserCosmeticData(this);
@@ -229,7 +229,7 @@ public class FtcUser implements CrownUser {
 
     @Override
     public UserMarketData getMarketData() {
-        return marketOwnership;
+        return marketData;
     }
 
     @Override
@@ -240,11 +240,6 @@ public class FtcUser implements CrownUser {
     @Override
     public UserDataContainer getDataContainer() {
         return dataContainer;
-    }
-
-    @Override
-    public ObjectList<Pet> getPets() {
-        return pets;
     }
 
     @Override
@@ -331,7 +326,7 @@ public class FtcUser implements CrownUser {
 
     private void removeDefaults(RankTier tier) {
         for (RankTitle t: tier.getApplicableDefaults()) {
-            removeTitle(t, false);
+            removeTitle(t);
         }
     }
 
@@ -362,15 +357,8 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public void removeTitle(RankTitle title, boolean removePermission) {
+    public void removeTitle(RankTitle title) {
         titles.remove(title);
-
-        if(removePermission) {
-            Bukkit.dispatchCommand(
-                    Bukkit.getConsoleSender(),
-                    "lp user " + getName() + " parent remove " + title.getTier().luckPermsGroup
-            );
-        }
     }
 
     @Override
@@ -650,7 +638,7 @@ public class FtcUser implements CrownUser {
         interactions.clearIncoming();
         interactions.clearOutgoing();
         interactions.clearInvites();
-        marketOwnership.clearIncoming();
+        marketData.clearIncoming();
 
         if(lastTeleport != null) lastTeleport.interrupt(false);
 
@@ -670,6 +658,9 @@ public class FtcUser implements CrownUser {
             RegionVisitListener listener = new RegionVisitListener(this, cosmeticData.getActiveTravel());
             listener.beginListening();
         }
+
+        // Trigger BattlePass
+        Challenges.LOG_IN.trigger(getUniqueId());
 
         sendPlayerListHeader(Crown.getTabList().format());
 
@@ -777,21 +768,6 @@ public class FtcUser implements CrownUser {
     @Override
     public String getLastOnlineName() {
         return lastOnlineName;
-    }
-
-    @Override
-    public boolean hasPet(Pet pet) {
-        return pets.contains(pet);
-    }
-
-    @Override
-    public void addPet(Pet pet) {
-        pets.add(pet);
-    }
-
-    @Override
-    public void removePet(Pet pet) {
-        pets.remove(pet);
     }
 
     @Override

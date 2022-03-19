@@ -30,6 +30,12 @@ public interface UserCache {
      * @return The entry, null if no name exists
      */
     CacheEntry getByLastName(String oldName);
+
+    /**
+     * Gets an entry by the given UUID
+     * @param uuid The UUID to get the entry of
+     * @return The UUID entry, null, if no player with the given UUID has joined the server
+     */
     CacheEntry getEntry(UUID uuid);
 
     /**
@@ -163,7 +169,7 @@ public interface UserCache {
          * gets the last UNIX timestamp of when the user
          * changed their name
          * @return The last name change timestamp,
-         *         {@link UserCache#NO_NAME_CHANGE}, if name was neverchanged
+         *         {@link UserCache#NO_NAME_CHANGE}, if name was never changed
          */
         long getLastNameChange();
     }

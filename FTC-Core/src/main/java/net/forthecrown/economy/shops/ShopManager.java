@@ -1,7 +1,5 @@
 package net.forthecrown.economy.shops;
 
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.Main;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.serializer.ShopSerializer;
 import net.forthecrown.user.CrownUser;
@@ -9,10 +7,7 @@ import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.inventory.Inventory;
@@ -30,18 +25,6 @@ import java.util.concurrent.CompletableFuture;
  * Implementation: {@link FtcShopManager}
  */
 public interface ShopManager {
-    NamespacedKey LEGACY_SHOP_KEY = new NamespacedKey(Main.OLD_NAMESPACE, "signshop");
-    NamespacedKey SHOP_KEY = new NamespacedKey(Crown.inst(), "signshop");
-
-    String BUY_LABEL = "=[Buy]=";
-    String SELL_LABEL = "=[Sell]=";
-
-    Style OUT_OF_STOCK_STYLE = Style.style(NamedTextColor.RED, TextDecoration.BOLD);
-    Style NORMAL_STYLE = Style.style(NamedTextColor.GREEN, TextDecoration.BOLD);
-    Style ADMIN_STYLE = Style.style(NamedTextColor.AQUA, TextDecoration.BOLD);
-
-    Component PRICE_LINE = Component.text("Price: ")
-            .color(NamedTextColor.DARK_GRAY);
 
     /**
      * Checks whether a block is a preexisting signshop.
@@ -55,16 +38,16 @@ public interface ShopManager {
         if (block.getState() instanceof Sign sign) {
             PersistentDataContainer container = sign.getPersistentDataContainer();
 
-            boolean hasLegacy = container.has(LEGACY_SHOP_KEY, PersistentDataType.BYTE);
+            boolean hasLegacy = container.has(ShopConstants.LEGACY_SHOP_KEY, PersistentDataType.BYTE);
             if(hasLegacy && fixLegacy) {
-                container.remove(LEGACY_SHOP_KEY);
-                container.set(SHOP_KEY, PersistentDataType.BYTE, (byte) 1);
+                container.remove(ShopConstants.LEGACY_SHOP_KEY);
+                container.set(ShopConstants.SHOP_KEY, PersistentDataType.BYTE, (byte) 1);
                 sign.update();
 
                 return true;
             }
 
-            return hasLegacy || container.has(SHOP_KEY, PersistentDataType.BYTE);
+            return hasLegacy || container.has(ShopConstants.SHOP_KEY, PersistentDataType.BYTE);
         } else {
             return false;
         }

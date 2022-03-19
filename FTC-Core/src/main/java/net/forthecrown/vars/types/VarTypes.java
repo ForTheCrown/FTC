@@ -28,5 +28,6 @@ public interface VarTypes {
     VarType<Component>  COMPONENT   = new ComponentVarType();
     VarType<Long>       TIME        = new TimeIntervalVarType();
 
+    // Empty initializer method
     static void init() {}
 }

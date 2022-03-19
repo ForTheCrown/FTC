@@ -1,6 +1,5 @@
 package net.forthecrown.vars;
 
-import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectCollection;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.regex.Pattern;
 
 /**
- * The CommandVariables class, manages and handles the CommandVariables
+ * Stores and manages Vars
  */
 public class VarRegistry {
     private static final Logger LOGGER = Crown.logger();
@@ -22,8 +21,16 @@ public class VarRegistry {
     public static final Pattern ALLOWED_NAME = Pattern.compile("^[a-z_]\\w*$");
     private static final Object2ObjectMap<String, Var> COM_VARS = new Object2ObjectOpenHashMap<>();
 
-    static final Var<Boolean> SERIALIZE_UNSUSED = getSafe("vars_saveUnused", VarTypes.BOOL, false);
+    static final Var<Boolean> SERIALIZE_UNSUSED = def("vars_saveUnused", VarTypes.BOOL, false);
 
+    /**
+     * Defines a variable. If this var is already defined, it sets the value of the var to the given one
+     * @param name The name of the variable
+     * @param type The variable's type
+     * @param value The variable's value
+     * @param <T> The variable's type
+     * @return The created var
+     */
     public static <T> Var<T> set(@NotNull String name, @NotNull VarType<T> type, T value) {
         validate(name, type);
 
@@ -41,56 +48,64 @@ public class VarRegistry {
         return entry;
     }
 
-    public static <T> Var<T> set(@NotNull String name, @NotNull VarType<T> type, JsonElement e) {
-        return set(name, type, type.deserialize(e));
-    }
-
-    public static <T> T get(@NotNull String name, @NotNull VarType<T> type) {
-        validate(name, type);
-        Var<T> var = COM_VARS.get(name);
-        if(var == null) return null;
-
-        Validate.isTrue(var.getType() == type, "Given type '%s' for %s did not match existing type: '%s'",
-                type.key(),
-                name,
-                var.getType().key()
-        );
-
-        return var.get();
-    }
-
+    /**
+     * Gets a plain var by the given name
+     * @param name The name of the var
+     * @return The gotten var, null, if no var by the given name was found
+     */
     public static Var getVar(String name) {
         return COM_VARS.get(name);
     }
 
-    public static VarType getType(@NotNull String name) {
-        Validate.notNull(name, "Name was null");
-        validateName(name);
-        return COM_VARS.get(name).getType();
-    }
-
+    /**
+     * Gets the amount of variables
+     * @return The variable count
+     */
     public static int size() {
         return COM_VARS.size();
     }
 
+    /**
+     * Checks if a variable with the given name exists
+     * @param name The var's name
+     * @return If the var exists, false otherwise
+     */
     public static boolean contains(String name) {
         return COM_VARS.containsKey(name);
     }
 
+    /**
+     * Removes The var with the given name
+     * @param name The name of the var to remove
+     */
     public static void remove(@NotNull String name) {
         Validate.notNull(name, "Name was null");
         COM_VARS.remove(name);
     }
 
+    /**
+     * Saves all variables
+     */
     public static void save() {
         VarSerializer.save(COM_VARS.values());
     }
 
+    /**
+     * Loads all variables
+     */
     public static void load() {
         VarSerializer.load(COM_VARS);
     }
 
-    public static <T> Var<T> getSafe(String name, VarType<T> type, T defValue) {
+    /**
+     * Defines a variable, will just return an already existing var if
+     * @param name The name of the var
+     * @param type The type of the var
+     * @param defValue The default value of the var
+     * @param <T> The var's type
+     * @return The defined var
+     */
+    public static <T> Var<T> def(String name, VarType<T> type, T defValue) {
         validate(name, type);
 
         Var<T> var = COM_VARS.get(name);
@@ -106,7 +121,7 @@ public class VarRegistry {
         }
 
         var.used = true;
-        LOGGER.info("getSafe called: name: '{}', type: '{}', defVal: {}", name, type.key().asString(), type.asParsableString(defValue));
+        LOGGER.info("Defined var '{}', type: '{}', defVal: {}", name, type.key().asString(), type.asParsableString(defValue));
         return var;
     }
 

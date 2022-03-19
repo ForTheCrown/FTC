@@ -10,6 +10,7 @@ public final class RegionConstants {
      * The full width of a region
      */
     public static final int REGION_SIZE = 400;
+
     /**
      * Half of a region's width
      */

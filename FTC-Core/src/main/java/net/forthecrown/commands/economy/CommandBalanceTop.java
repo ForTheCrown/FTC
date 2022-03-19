@@ -6,12 +6,15 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.BalanceMap;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nonnegative;
@@ -78,7 +81,7 @@ public class CommandBalanceTop extends FtcCommand {
             if(firstIndex + i >= balMap.size()) break;
             int index = firstIndex + i;
 
-            Component entryText = balMap.getPrettyDisplay(index);
+            Component entryText = getPrettyDisplay(balMap, index);
             if(entryText == null) continue;
 
             text
@@ -111,5 +114,23 @@ public class CommandBalanceTop extends FtcCommand {
 
         sender.sendMessage(text.build());
         return 0;
+    }
+
+    public static Component getPrettyDisplay(BalanceMap balMap, int index) {
+        Validate.isTrue(index >= 0 && index < balMap.size(), "Invalid index: " + index + " from size " + balMap.size());
+
+        BalanceMap.Balance entry = balMap.getEntry(index);
+        if (!UserManager.isPlayerID(entry.getUniqueId())) return null;
+
+        CrownUser user = UserManager.getUser(entry.getUniqueId());
+        Component displayName = user.nickDisplayName();
+
+        user.unloadIfOffline();
+
+        return Component.text()
+                .append(displayName)
+                .append(Component.text(" - "))
+                .append(FtcFormatter.rhines(entry.getValue()).color(NamedTextColor.YELLOW))
+                .build();
     }
 }

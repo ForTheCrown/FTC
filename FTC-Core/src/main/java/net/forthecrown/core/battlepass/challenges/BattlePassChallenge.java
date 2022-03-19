@@ -1,17 +1,17 @@
-package net.forthecrown.core.battlepass;
+package net.forthecrown.core.battlepass.challenges;
 
 import com.google.gson.JsonElement;
-import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
+import net.forthecrown.core.battlepass.BattlePass;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.Nameable;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 public abstract class BattlePassChallenge implements Keyed, Nameable, JsonSerializable {
     private final String name;
@@ -32,7 +32,11 @@ public abstract class BattlePassChallenge implements Keyed, Nameable, JsonSerial
         this.description = desc;
         this.target = target;
         this.exp = exp;
-        this.key = Keys.forthecrown(name.toLowerCase().replaceAll(" ", "_"));
+        this.key = Keys.forthecrown(
+                name.toLowerCase()
+                        .replaceAll(" ", "_")
+                        .replaceAll(",", "_")
+        );
     }
 
     public void setEnabled(boolean enabled) {
@@ -42,18 +46,6 @@ public abstract class BattlePassChallenge implements Keyed, Nameable, JsonSerial
     public boolean isEnabled() {
         return enabled;
     }
-
-    public final void trigger(UUID uuid, int amount) {
-        if(!isEnabled()) return;
-
-        onTrigger(Crown.getBattlePass().getProgress(uuid), amount);
-    }
-
-    public final void trigger(UUID uuid) {
-        trigger(uuid, 1);
-    }
-
-    protected abstract void onTrigger(BattlePass.Progress progress, int amount);
 
     public int getTarget() {
         return target;
@@ -66,6 +58,19 @@ public abstract class BattlePassChallenge implements Keyed, Nameable, JsonSerial
     @Override
     public String getName() {
         return name;
+    }
+
+    public Component displayName() {
+        TextComponent.Builder builder = Component.text()
+                .append(name().color(NamedTextColor.GOLD));
+
+        for (Component c: getDescription()) {
+            builder
+                    .append(Component.newline())
+                    .append(c);
+        }
+
+        return name().hoverEvent(builder.build());
     }
 
     public BattlePass.Category getCategory() {
@@ -85,4 +90,6 @@ public abstract class BattlePassChallenge implements Keyed, Nameable, JsonSerial
     public JsonElement serialize() {
         return JsonUtils.writeKey(key);
     }
+
+    public void onReset() {}
 }

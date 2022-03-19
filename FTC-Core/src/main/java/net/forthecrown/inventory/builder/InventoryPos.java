@@ -12,8 +12,8 @@ public class InventoryPos {
     private final byte column;
 
     public InventoryPos(int column, int row) {
-        Validate.isTrue(MathUtil.inRange(column, 0, 8), "Column cannot be more than 8, found: " + column);
-        Validate.isTrue(MathUtil.inRange(row, 0, 5), "Row cannot be more than 5, found: " + row);
+        Validate.isTrue(MathUtil.inRange(column, 0, 8), "Column cannot be more than 8 and less than 0, found: " + column);
+        Validate.isTrue(MathUtil.inRange(row, 0, 5), "Row cannot be more than 5 and less than 0, found: " + row);
 
         this.row = (byte) row;
         this.column = (byte) column;
