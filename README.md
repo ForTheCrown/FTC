@@ -5,7 +5,8 @@ The ForTheCrown GitHub repository.
 - **Core**: contains most of the code and features FTC has
 - **Enchantments**: Holds and manages FTC's custom enchantments
 ### Event projects
-The Events directory has the code for most of the Crown Events prior to March 2022. 
+The Events directory has the code for most of the Crown Events prior to March 2022.  
+Future events will be hosted at [FTC-Events](https://github.com/BotulToxin/FTC-Events)
 - **AprilEvent**: April 2021 Easter egg hunt event
 - **AugustEvent**: August 2021 Pinata event
 - **BigAssCrownEvent**: December 2020 christmas event
