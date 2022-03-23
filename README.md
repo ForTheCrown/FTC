@@ -46,11 +46,6 @@ This holds classes for copy pasting regions and the now depracated ``FtcBounding
 This holds 2 classes:
 - The ``WorldLoader``: a class which loads a world, it uses the world's WorldBorder to determine how much to load. The chunk loading is done async. The WorldLoader is used by the End resetter and RW resetter.
 - The ``WorldReCreator``: which takes a world, deletes the original, and then recreates it with similar world properties
-### [usables](FTC-Core/src/main/java/net/forthecrown/usables)
-Usables are objects which hold both ``UsageAction``s and ``UsageCheck``s.  
-The types of usable objects are UsableEntity's, UsableBlock's, Kits and Warps. The first two hold both UsageActions and UsageChecks, while the last 2 only hold checks.  
-  
-All UsageChecks and UsageActions, which I'll combine into UsageObjects for the sake of being brief, must specify a way to serialize an instance of the UsageObject and a way to parse command input into an instance of the UsageObject.
 ### [utils](FTC-Core/src/main/java/net/forthecrown/utils)
 There's honestly too much diverse stuff in here to talk about in a single section here. I'll try to summarize the most important classes:
 - ``FtcUtils``: Holds a lot of generic utility functions for stuff.
@@ -59,6 +54,13 @@ There's honestly too much diverse stuff in here to talk about in a single sectio
 - ``TickSequence``: Allows for the creation of a sequence of events executed after a tick delay, the tick delay of each execution node is relative to the last node in the sequence.
   
 A word of warning, the loot package is worthless and I don't know why I haven't deleted it lol, it's implementation is a thousand times more limited than vanilla's
+
+### [usables](FTC-Core/src/main/java/net/forthecrown/useables)
+Usables are objects which hold both ``UsageAction``s and ``UsageCheck``s.  
+The types of usable objects are UsableEntity's, UsableBlock's, Kits and Warps. The first two hold both UsageActions and UsageChecks, while the last 2 only hold checks.  
+  
+All UsageChecks and UsageActions, which I'll combine into UsageObjects for the sake of being brief, must specify a way to serialize an instance of the UsageObject and a way to parse command input into an instance of the UsageObject.
+
 ### [user](FTC-Core/src/main/java/net/forthecrown/user)
 Holds **everything** about the ``CrownUser`` class used by FTC for data and functions on the players that play on here.  
 You can get a user by simply doing: 
