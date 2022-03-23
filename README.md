@@ -24,7 +24,7 @@ Future events will be hosted at [FTC-Events](https://github.com/BotulToxin/FTC-E
 All the core's package start with ``net.forthecrown`` so to find any of these packages just add the package name given here onto the end of the FTC package lol  
   
 **I apologise for any errors in this documentation, I wrote this in like an hour while high on a coffee rush**
-### vars
+### [vars](FTC-Core/src/main/java/net/forthecrown/vars)
 This package contains classes and functions relating to Var's, a type of global variable that is automatically serialized and deserialized, all Vars can also be changed via the ``/var`` command.  
 You can create var's easily:
 ````java
@@ -36,22 +36,22 @@ Var<Integer> integerVar = Var.def("variable_name", VarTypes.INT, 4);
 You can disable var serialization with a simple ``Var.setTransient(boolean);``. If you need to listen to the var's value being changed you can use ``Var.setUpdateListener(Consumer<T>)``. Finally, to get the value of a var, call ``Var.get()``, this will return either the value of the var, or the default value if the actual value is null, if you want it to return a different def value, call ``Var.getValue(T def)``, if you want to manually update the value of the variable you can use ``Var.update(T)`` or ``Var.set(T)`` if you don't want the update listener to be called.  
   
 Each var requires a ``VarType<T>``, these are stored as constants in the ``VarTypes`` class. Var types should only be used as static final constants as they need to be registered in the ``Registries.VAR_TYPES``
-### utils.math
+### [utils.math](FTC-Core/src/main/java/net/forthecrown/utils/math)
 The math util package contains the block vectors that FTC uses. There's 2 vector classes used by FTC, the difference between them is that one is a simple vector implementation with an x, y and z components. While the other also hold a ``World`` component, meaning it's world-bound. These 2 vector's are ``Vector3i`` and ``WorldVec3i``  
   
 The package also holds 2 similarly structured bounding box classes, they again have the same difference. ``Bounds3i`` is a normal bounding class while ``WorldBounds3i`` is world-bound, but this allows the bounds to have a lot more functionality which includes a ``BlockIterator`` for iterating through each block within the bounding box, while the regular Bounds3i only has a ``VectorIterator``. Not to mention the world-bound bounding box has functions for easily getting entities that are inside the bounding box.
-### util.transformation
+### [utils.transformation](FTC-Core/src/main/java/net/forthecrown/utils/transformation)
 This holds classes for copy pasting regions and the now depracated ``FtcBoundingBox`` class. The ``RegionCopyPaste`` can essentially be seen as a beta version of the ``net.forthecrown.structure.BlockStructure`` class lol
-### util.world
+### [utils.world](FTC-Core/src/main/java/net/forthecrown/utils/world)
 This holds 2 classes:
 - The ``WorldLoader``: a class which loads a world, it uses the world's WorldBorder to determine how much to load. The chunk loading is done async. The WorldLoader is used by the End resetter and RW resetter.
 - The ``WorldReCreator``: which takes a world, deletes the original, and then recreates it with similar world properties
-### usables
+### [usables](FTC-Core/src/main/java/net/forthecrown/usables)
 Usables are objects which hold both ``UsageAction``s and ``UsageCheck``s.  
 The types of usable objects are UsableEntity's, UsableBlock's, Kits and Warps. The first two hold both UsageActions and UsageChecks, while the last 2 only hold checks.  
   
 All UsageChecks and UsageActions, which I'll combine into UsageObjects for the sake of being brief, must specify a way to serialize an instance of the UsageObject and a way to parse command input into an instance of the UsageObject.
-### utils
+### [utils](FTC-Core/src/main/java/net/forthecrown/utils)
 There's honestly too much diverse stuff in here to talk about in a single section here. I'll try to summarize the most important classes:
 - ``FtcUtils``: Holds a lot of generic utility functions for stuff.
 - ``Cooldown``: allows for placing ``CommandSender`` objects in cooldown in specific categories or in a general category.
@@ -59,7 +59,7 @@ There's honestly too much diverse stuff in here to talk about in a single sectio
 - ``TickSequence``: Allows for the creation of a sequence of events executed after a tick delay, the tick delay of each execution node is relative to the last node in the sequence.
   
 A word of warning, the loot package is worthless and I don't know why I haven't deleted it lol, it's implementation is a thousand times more limited than vanilla's
-### user
+### [user](FTC-Core/src/main/java/net/forthecrown/user)
 Holds **everything** about the ``CrownUser`` class used by FTC for data and functions on the players that play on here.  
 You can get a user by simply doing: 
 ````java
@@ -74,7 +74,7 @@ For a second, I'll talk about how user caching works. We have a class called ``U
 The serializer is a simple class that is meant to serialize a user's instance while the action handler is a class that exists because I didn't know where else to handle the data of a user's actions like sending/reading mail, sending a normal or marriage DM or even handling marriage actions like getting married or divorced (lmao). When I wrote this class I also had a worry that in the future I may need to call on these actions and have them handled without recreating the code that runs the action so the action handler interface seemed logical.  
   
 Allow me to quickly state that ``FtcUser`` and ``CrownUser`` are 2 different classes, FtcUser is the implementation of the CrownUser interface, that's the difference.
-### structure
+### [structure](FTC-Core/src/main/java/net/forthecrown/structure)
 Holds classes that allow for the creation and placement of structures into a world. A structure's placement into the world can be modified and transformed with ``BlockProcessor``s and ``EnityProcessor``s.  
 **Placing** a structure can be done so:
 ````java
@@ -106,25 +106,25 @@ The entity processor is very similar to the block processor, so I'll skip it lol
 Structure's can be scanned in from a world, however that's best done with the ``/ftcstruct`` command.  
   
 All structure's are stored in ``Registries.STRUCTURES`` from which they are serialized and deserialized.  
-### registry
+### [registry](FTC-Core/src/main/java/net/forthecrown/registry)
 Registries are constants that hold some kind of object with a ``NamespacedKey`` as a key, we use registries to make the job of serializing and deserializing objects easier, because if we have a common key type that we can write as a string that links to a certain registry's entry, we won't have to serialize an entire object, just a key to that object.  
   
 There are 2 types of registries, normal and closeable registries. Closeable registries can be closed, or frozen, so they can't be modified after being frozen. This is required for registries like the cosmetic registries as modification after initialization might cause issues with the inventory GUIs linked to them.
   
 Registry instances are stored as constants in the Registries class.
-### regions
+### [regions](FTC-Core/src/main/java/net/forthecrown/regions)
 This package just holds the classes and functions that manage ``PopulationRegion``s. Each region has a ``RegionPos`` that lets the ``RegionManager`` know where the region is located.  
   
 PopulationRegion itself extends an abstract class called ``RegionData`` which has 2 implementations: ``PopulationRegion`` and ``RegionData.Empty``. These 2 implementations are used by the ``RegionPoleGenerator`` for the signs which display neighbouring regions. 
-### inventory
+### [inventory](FTC-Core/src/main/java/net/forthecrown/inventory)
 This package contains 2 classes I love a lot. ``ItemStackBuilder`` because of how easy this makes the creation of ItemStack objects of any type with any type of data.  
   
 And ``ItemStacks`` which holds utility methods for ItemStack objects, it also has the life saving ``ItemStacks.isEmpty(ItemStack)`` method, because I can never understand what the heck is going with item stacks in bukkit, sometimes they're null, other times they're just items with 0 amount or ``Material.AIR`` as their type, it's weird, that utility method checks for all of that.
-### inventory.weapon
+### [inventory.weapon](FTC-Core/src/main/java/net/forthecrown/inventory/weapon)
 This package is home to the classes and functions of the ``RoyalSword``, its goals, upgrades and abilities. ``RoyalWeapons`` is the general utility class for creating and checking for royal swords.
-### inventory.crown
+### [inventory.crown](FTC-Core/src/main/java/net/forthecrown/inventory/crown)
 The lesser brother to ``net.forthecrown.inventory.weapon``, this holds classes and functions for the Royal Crown.
-### inventory.builder
+### [inventory.builder](FTC-Core/src/main/java/net/forthecrown/inventory/builder)
 This holds the ``InventoryBuilder`` object to make creating inventories easy. You can create an inventory like so:
 ````java
 BuiltInventory inv = new InventoryBuilder(54)
@@ -166,14 +166,14 @@ void setCancelEvent(boolean)
 // refresh the GUI with potentially new data, 'false' by default
 void setReloadInventory(boolean)
 ````
-### economy
+### [economy](FTC-Core/src/main/java/net/forthecrown/economy)
 Oh boy, this is going to be the most painful part...
 ``Economy`` and ``FtcEconomy`` are the same class, the second is just the implementation of the first. They are what allow us to modify and get the balances of users on the server. They use a backing ``BalanceMap`` to store the balances.  
   
 We currently make use of the ``SortedBalanceMap`` implementation to store the balance, this map is constantly kept sorted by the balance's value. While balance lookup and modification performance suffers slightly as a result, this means that ``/baltop`` loads in an instant.  
   
 Say you wanted to get the **price of an item**, for that you would use the `ItemPriceMap` which you can easily access with `Crown.getPriceMap()`.
-### economy.shops
+### [economy.shops](FTC-Core/src/main/java/net/forthecrown/economy/shops)
 This is the package that contains everything related to `SignShop`s. So... let's talk about the organized mess that are SignShops :(  
   
 First of all, SignShop's are an interface, their implementation is ``FtcSignShop``. Each shop holds a ``ShopInventory`` instance, this is obviously where the shop stores its stock. Now, the entire shop system is based around an `exampleItem`, an item which a shop holds as an example to do business by. The action of trading items in a sign shop is actually a ruse, the items are removed from the inventory yes, but they aren't then given to the customer, rather, the customer is given a clone of the example item, or vice versa, in the case of sell shops.  
@@ -209,7 +209,7 @@ if (shop == null) return;
 // Run the interaction
 manager.getInteractionHandler().handleInteraction(shop, customer, Crown.getEconomy());
 ```
-### economy.selling
+### [economy.selling](FTC-Core/src/main/java/net/forthecrown/economy/selling)
 SellShop classes and functions. It uses the `SellResult` class to handle most of it.
 ### economy.market
 This package holds the classes and functions (God damn I've used that exact same description for like every package here) for the markets in Hazelguard. For clarification, a market is the shop a player can purchase and own and place sign shops inside, while a shop, is the SignShop itself.  
@@ -217,16 +217,16 @@ This package holds the classes and functions (God damn I've used that exact same
 It should be noted that I was stoned out of mind... or something... when I wrote this, because the Market system lacks any trace of object oriented programming. The `MarketShop` interface is a pure data holding class any functionality is found within the `Markets` class which you can access with `Crown.getMarkets()`. I think I was just larping as `C` or something lol  
   
 Anyway, i hate the Market system but I also see no reason to rewrite it.
-### economy.houses and economy.guilds
+### [economy.houses](FTC-Core/src/main/java/net/forthecrown/economy/houses) and [economy.guilds](FTC-Core/src/main/java/net/forthecrown/economy/guilds)
 Neither of these packages are implemented within the server, guilds is finished, but untested. Houses aren't even finished.
-### dungeons
+### [dungeons](FTC-Core/src/main/java/net/forthecrown/dungeons)
 Fuck no, too much work to describe the mess that the Dungeons system is
-### cosmetics
+### [cosmetics](FTC-Core/src/main/java/net/forthecrown/cosmetics)
 Contains everything relating to the cosmetic stuff on FTC. Not much to really add here, Wout wrote the travel effects and it shows, cuz it's better than 98% of what I've written lol.
-### core
+### [core](FTC-Core/src/main/java/net/forthecrown/core)
 The core of FTC. I'll just quickly list and describes what each class here does. Note: Will skip any classes that are simply implementations of API interfaces.
 
-- `AfkKicker`: Tracks each player and kick them after they've been afk for longer than the `afkKickDelay` var specifies
+- `AfkKicker`: Tracks each player and kicks them after they've been afk for longer than the `afkKickDelay` var specifies
 - `BootStrap`: Initializes the FTC plugin
 - `Crown`: The center and main class for FTC, pretty much any part of FTC can be accessed with the static getter methods in this class, for example: `Crown.getEconomy()` lets you use the economy.
 - `DayChange`: Listens to the change of the day and then calls all it's registered listeners
@@ -239,10 +239,10 @@ The core of FTC. I'll just quickly list and describes what each class here does.
 - `Keys`: A couple utility methods relating to `NamespacedKey`s
 - `Kingship`: Tracks the current king and their title, is serialized into the FTC config
 - `Permissions`: Holds constants for permissions used in FTC
-- `ResourceWorld`: Holds data for the RW's regeneration and such.
+- `ResourceWorld`: Holds data for the RW's regeneration and manages the regeneration of the RW.
 - `Worlds`: Holds constants and easy getter functions the worlds you'll find on FTC
 Every other package in the core directory is pretty much useless ngl except for:
-### core.chat
+### [core.chat](FTC-Core/src/main/java/net/forthecrown/core/chat)
 Chat holds a lot of required utility functions and classes when it comes to dealing with MC Chat's and Kyori's Adventure API.  
   
 The two classes I've used the most often here are `FtcFormatter` which provides a lot of utility functions for formatting strings and components and providing display functions for stuff, like the very useful `FtcFormatter.itemDisplayName(ItemStack)` which returns an chat component that can be easily displayed to a human, I love this method if you can't tell.  
@@ -250,9 +250,9 @@ The two classes I've used the most often here are `FtcFormatter` which provides 
 The other class I've found myself using a weird amount of times is `TimePrinter` this is a `ComponentPrinter` class that prints a time interval, eg: `4 days, 2 hours, 3 minutes and 4 seconds`.  
   
 If you find yourself having to scan a user's input for banned words or anything you can use `BannedWords.checkAndWarn(CommandSender, Component/String)`, it will check if the input contains any banned words and warn the sender of the input and return true if it does.
-### commands
+### [commands](FTC-Core/src/main/java/net/forthecrown/commands)
 Commands contains, well, commands. I've started using the class naming formula of `Command{command_name}` . Other than that, there's nothing to note here, but in:
-### commands.manager
+### [commands.manager](FTC-Core/src/main/java/net/forthecrown/commands/manager)
 This class contains most notably the `FtcCommands` class which is used to initialize FTC's custom argument types and load all of FTC's commands. If you add any new custom argument types or commands, load and register them here.  
   
 As well, classes like `FtcExceptionProvider` provide a very easy way to create `CommandSyntaxExceptions`. And `FtcSuggestionProvider` Also helps with suggestions.
