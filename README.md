@@ -1,5 +1,7 @@
+
 # FTC 
-The ForTheCrown GitHub repository.
+The ForTheCrown GitHub repository.  
+**DO NOT SHOW THE CONTENTS OF THIS REPOSITORY OR ANY JARS PRODUCED FROM ANY PROJECTS HERE TO ANYONE WITHOUT THE EXPRESS PERMISSION OF ALL STAFF MEMBERS**
 
 ### Projects
 - **Core**: contains most of the code and features FTC has
@@ -25,31 +27,30 @@ All the core's package start with ``net.forthecrown`` so to find any of these pa
   
 **I apologise for any errors in this documentation, I wrote this in like an hour while high on a coffee rush**
 ### [vars](FTC-Core/src/main/java/net/forthecrown/vars)
-This package contains classes and functions relating to Var's, a type of global variable that is automatically serialized and deserialized, all Vars can also be changed via the ``/var`` command.  
+This package contains classes and functions relating to Var's, a type of global variable that is automatically serialized and deserialized, all Vars can also be changed via the `/var` command.  
 You can create var's easily:
 ````java
-// The last argument is a default value, if the variable does not yet exist
-// then the default value becomes the value, if it does exist, it will simply
-// be the value returned if the actual value of the variable is null
+// The last argument will be the default value of the Var, if the var
+// isn't defined, it also becomes the actual value of the var
 Var<Integer> integerVar = Var.def("variable_name", VarTypes.INT, 4);
 ````
-You can disable var serialization with a simple ``Var.setTransient(boolean);``. If you need to listen to the var's value being changed you can use ``Var.setUpdateListener(Consumer<T>)``. Finally, to get the value of a var, call ``Var.get()``, this will return either the value of the var, or the default value if the actual value is null, if you want it to return a different def value, call ``Var.getValue(T def)``, if you want to manually update the value of the variable you can use ``Var.update(T)`` or ``Var.set(T)`` if you don't want the update listener to be called.  
+You can disable var serialization with a simple `Var.setTransient(boolean)`. If you need to listen to the var's value being changed you can use ``Var.setUpdateListener(Consumer<T>)``. Finally, to get the value of a var, call ``Var.get()``, this will return either the value of the var, or the default value if the actual value is null, if you want it to return a different def value, call ``Var.getValue(T def)``, if you want to manually update the value of the variable you can use ``Var.update(T)`` or ``Var.set(T)`` if you don't want the update listener to be called.  
   
-Each var requires a ``VarType<T>``, these are stored as constants in the ``VarTypes`` class. Var types should only be used as static final constants as they need to be registered in the ``Registries.VAR_TYPES``
+Each var requires a ``VarType<T>``, these are stored as constants in the ``VarTypes`` class. Var types should only be used as static final constants as they need to be registered in the ``Registries.VAR_TYPES`` and when the system needs to compare then it just uses a simple `==` to do so.
 ### [utils.math](FTC-Core/src/main/java/net/forthecrown/utils/math)
 The math util package contains the block vectors that FTC uses. There's 2 vector classes used by FTC, the difference between them is that one is a simple vector implementation with an x, y and z components. While the other also hold a ``World`` component, meaning it's world-bound. These 2 vector's are ``Vector3i`` and ``WorldVec3i``  
   
-The package also holds 2 similarly structured bounding box classes, they again have the same difference. ``Bounds3i`` is a normal bounding class while ``WorldBounds3i`` is world-bound, but this allows the bounds to have a lot more functionality which includes a ``BlockIterator`` for iterating through each block within the bounding box, while the regular Bounds3i only has a ``VectorIterator``. Not to mention the world-bound bounding box has functions for easily getting entities that are inside the bounding box.
+The package also holds 2 similarly structured bounding box classes, they again have the same difference. ``Bounds3i`` is a normal bounding class while ``WorldBounds3i`` is world-bound, but this allows the bounds to have a lot more functionality which includes a ``BlockIterator`` for iterating through each block within the bounding box, while the regular Bounds3i only has a ``VectorIterator``. Not to mention the world-bound bounding box has functions for easily getting entities that are inside the bounding box with functions like `getEntities()`, `getEnitiesByType(Class<Entity>)`
 ### [utils.transformation](FTC-Core/src/main/java/net/forthecrown/utils/transformation)
 This holds classes for copy pasting regions and the now depracated ``FtcBoundingBox`` class. The ``RegionCopyPaste`` can essentially be seen as a beta version of the ``net.forthecrown.structure.BlockStructure`` class lol
 ### [utils.world](FTC-Core/src/main/java/net/forthecrown/utils/world)
 This holds 2 classes:
-- The ``WorldLoader``: a class which loads a world, it uses the world's WorldBorder to determine how much to load. The chunk loading is done async. The WorldLoader is used by the End resetter and RW resetter.
+- The ``WorldLoader``: A class which generates an entire world, using it's WorldBorder to know how much to generate and load. All loading and generation is done async. This class uses a system of `LoadSection`s, an area of 50x50 chunks, it divides the world into these sections and gives each section its own thread to load the world.
 - The ``WorldReCreator``: which takes a world, deletes the original, and then recreates it with similar world properties
 ### [utils](FTC-Core/src/main/java/net/forthecrown/utils)
 There's honestly too much diverse stuff in here to talk about in a single section here. I'll try to summarize the most important classes:
 - ``FtcUtils``: Holds a lot of generic utility functions for stuff.
-- ``Cooldown``: allows for placing ``CommandSender`` objects in cooldown in specific categories or in a general category.
+- ``Cooldown``: allows for placing ``CommandSender`` objects in cooldown in specific categories or in a general category. Use `Cooldown.containsOrAdd(CommandSender, int, String)`, which will automatically place the the given sender into the given cooldown category and return true, if they were already on cooldown
 - ``VanillaAccess``: Allows for access to the vanilla versions of Bukkit objects, honestly this just exists because typing ``VanillaAccess.getEntity(Entity)`` is easier to type than ``((CraftEntity) entity).getHandle()``
 - ``TickSequence``: Allows for the creation of a sequence of events executed after a tick delay, the tick delay of each execution node is relative to the last node in the sequence.
   
@@ -59,7 +60,7 @@ A word of warning, the loot package is worthless and I don't know why I haven't 
 Usables are objects which hold both ``UsageAction``s and ``UsageCheck``s.  
 The types of usable objects are UsableEntity's, UsableBlock's, Kits and Warps. The first two hold both UsageActions and UsageChecks, while the last 2 only hold checks.  
   
-All UsageChecks and UsageActions, which I'll combine into UsageObjects for the sake of being brief, must specify a way to serialize an instance of the UsageObject and a way to parse command input into an instance of the UsageObject.
+All UsageChecks and UsageActions, which I'll combine into UsageTypes for the sake of being brief, must specify a way to serialize an instance of the UsageTypes and a way to parse command input into an instance of the UsageTypes. Both checks and actions are stored in registries. 
 
 ### [user](FTC-Core/src/main/java/net/forthecrown/user)
 Holds **everything** about the ``CrownUser`` class used by FTC for data and functions on the players that play on here.  
@@ -139,7 +140,9 @@ CrownUser user = /* Get a user somehow */;
 inv.open(user);
 ````
 The rest is handled for you!  
+  
 This inventory system uses ``InventoryOption``s to allow for the user to interact with the inventory's buttons, everything in the inventory is technically an option, the border around the edge? An option! The single item that a player can click on? An option!  
+  
 There's 2 ways to use the option interface, one being the normal implementation of the ``InventoryOption`` interface which requires you to specify a ``int`` as an inventory slot. The other implementation is the ``CordedInventoryOption``, more words, I know. But this uses a ``InventoryPos`` instead of a simple int slot. It makes it more understandable and creation easier and more understandable for others.  
   
 The options require you to also specify an item creation function and an interaction option that is called when the player clicks in the slot or position specified by the option.  
@@ -157,7 +160,7 @@ While the ``ClickContext`` holds data relating to the inventory click it also al
 void setShouldClose(boolean);
 
 // Allows you to specify the amount of ticks the user
-// will be stopped from clicking on the the option
+// will be stopped from clicking on the the option, 0 for no cooldown
 void setCooldownTime(int)
 
 // Allows you to cancel the click event
@@ -168,13 +171,20 @@ void setCancelEvent(boolean)
 // refresh the GUI with potentially new data, 'false' by default
 void setReloadInventory(boolean)
 ````
+I'll also note that despite some of my attempts, this system is limited by the factor that none of the options can be moved around, nor can items be taken from or placed into the inventory. There is some slight functionality to counter this and provide an option for a more dynamic and open inventory, but this implementation is very limited and untested.
 ### [economy](FTC-Core/src/main/java/net/forthecrown/economy)
-Oh boy, this is going to be the most painful part...
-``Economy`` and ``FtcEconomy`` are the same class, the second is just the implementation of the first. They are what allow us to modify and get the balances of users on the server. They use a backing ``BalanceMap`` to store the balances.  
+``Economy`` and ``FtcEconomy`` are the same thing, the second is just the implementation of the first. They are what allow us to modify and get the balances of users on the server. They use a backing ``BalanceMap`` to store the balances.  
   
 We currently make use of the ``SortedBalanceMap`` implementation to store the balance, this map is constantly kept sorted by the balance's value. While balance lookup and modification performance suffers slightly as a result, this means that ``/baltop`` loads in an instant.  
   
-Say you wanted to get the **price of an item**, for that you would use the `ItemPriceMap` which you can easily access with `Crown.getPriceMap()`.
+Say you wanted to get the **price of an item**, for that you would use the `ItemPriceMap` which you can easily access with `Crown.getPriceMap()`.  
+  
+This package also contains several interfaces ment to be implemented in the future for functionality, these interfaces are: 
+- `PriceModifier`: A functional interface meant to modify something's price with a `PriceModificationContext`. Currently there's no use of this interface
+- `Taxable`: This small interface was made mostly for the `MarketShop` and `TradeGuild` system, where the guild imposes taxes on a market, however, as the `TradeGuild` system is on pause (cancelled), this interface is currently unused.
+- `BalanceHolder`: this is actually implemented by the `CrownUser` interface. This was meant to be used in the `ShopCustomer` interface for the most part, so that we could interface with the customer's balance... obviously, me.  
+  
+There's one more class, a basically abandoned re-write of the SellShop system, `ServerSellShop`, for a system that was devised for 1.18. This was to feature an inventory you'd place things into and it would sell everything it could for you, It was never finished due to the limitations of the `InventoryBuilder` system and because more important concerns took over.
 ### [economy.shops](FTC-Core/src/main/java/net/forthecrown/economy/shops)
 This is the package that contains everything related to `SignShop`s. So... let's talk about the organized mess that are SignShops :(  
   
@@ -190,7 +200,7 @@ SignShop creation and management is handled by the `ShopManager` class, which is
   
 Each shop holds a `LocationFilename` as an identifier for it, this is the `world_156_67_894` file name representation  
   
-**`Shop ownership`** is the class that defines who owns a shop, currently its implementation is very basic. The class itself allows for a `House` or a `UUID` player to own a shop with co owners. But in practice, only the single `UUID` player ownership is implemented.
+**`ShopOwnership`** is the class that defines who owns a shop, currently its implementation is very basic. The class itself allows for a `House` or a `UUID` player to own a shop with co owners. But in practice, only the single `UUID` player ownership is implemented.
   
 **Manually using shops**. If you wanna use a shop with a custom shop customer implementation you can do so with the following code:
 ```java
@@ -211,9 +221,16 @@ if (shop == null) return;
 // Run the interaction
 manager.getInteractionHandler().handleInteraction(shop, customer, Crown.getEconomy());
 ```
+The way a shop's block, aka its handle into the world, functions is by assigning a created sign shop a tag using Bukkit's `PersistentDataContainer`. We can then check to see if this block has the tag required with the `ShopManager.isShop(Block, boolean)` function. The second parameter there is whether the check should also fix the legacy tag. This is because the tag the blocks use changed and now there's actually 2 tags that get checked. Mostly this was caused by the plugin's name being changed from `FTCCore` to `ForTheCrown` because the tags are both `NamespacedKey`s
 ### [economy.selling](FTC-Core/src/main/java/net/forthecrown/economy/selling)
-SellShop classes and functions. It uses the `SellResult` class to handle most of it.
-### economy.market
+SellShop classes and functions. It uses the `SellResult` class to handle most of it.  
+  
+If you'd need to access the SellShop menu then that can be done by using the menu constants in `SellShops`. And if you need to make a user sell a particular material, then you can do so by using `SellShops.sell(CrownUser, Material, float, SoldMaterialData)`.  
+This method returns an integer that shows how many items were sold, 0 means nothing was sold.  
+Parameters (the first 2 are obvious):
+- float: The price scalar to apply to the price. Added to make the craftable_blocks easier to implement, as currently a BlockSellOption uses the sold material data of the underlying material, it just scales the price as needed and changes the displayed item to the block variant.
+- SoldMaterialData: the material earnings data to increment and recalculate if the sell result is successful
+### [economy.market](FTC-Core/src/main/java/net/forthecrown/economy/market)
 This package holds the classes and functions (God damn I've used that exact same description for like every package here) for the markets in Hazelguard. For clarification, a market is the shop a player can purchase and own and place sign shops inside, while a shop, is the SignShop itself.  
   
 It should be noted that I was stoned out of mind... or something... when I wrote this, because the Market system lacks any trace of object oriented programming. The `MarketShop` interface is a pure data holding class any functionality is found within the `Markets` class which you can access with `Crown.getMarkets()`. I think I was just larping as `C` or something lol  
@@ -222,7 +239,27 @@ Anyway, i hate the Market system but I also see no reason to rewrite it.
 ### [economy.houses](FTC-Core/src/main/java/net/forthecrown/economy/houses) and [economy.guilds](FTC-Core/src/main/java/net/forthecrown/economy/guilds)
 Neither of these packages are implemented within the server, guilds is finished, but untested. Houses aren't even finished.
 ### [dungeons](FTC-Core/src/main/java/net/forthecrown/dungeons)
-Fuck no, too much work to describe the mess that the Dungeons system is
+The Dungeons is the.... dungeons. A place where players go to fight through mobs and bosses. This class, by itself, contains only small items:
+- `BossItems`: Simply holds the reward items for each boss. This could be replaced with a class for itemstack constants
+- `BossLootBox`: I believed the current system of just giving you the loot was too limited so created this, the implementation is not finished. This was meant to provide functionality for limiting the amount of boss loot you could claim in a single time frame, similar to Genshin Impact's Resin system.
+- `Bosses`: The class that initializes and registers the bosses and holds them as static final constants.
+- `DungeonAreas`: Holds specific areas of the dungeons as constants
+- `DungeonUserDataAccessor`: First, some context, Whether you've beaten a boss is stored as a boolean value in the user's `UserDataContainer`. This was mostly going to be used by the BattlePass system for tracking boss defeats, but currently remains implemented but unused.
+### [dungeons.boss](FTC-Core/src/main/java/net/forthecrown/dungeons/boss)
+This holds most of the classes that make up the `DungeonBoss` inheritance hierarchy. This is a mistake, bosses should be re-written (for like the 4th time) to use a more modular component based system, aka an ECS (Entity Component System). with something like a `BossType` that defines the components. This would make boss serialization easier for contexts in which the boss is not a constant, like in the randomly generated levels.  
+  
+Bosses use a `SpawnRequirement` interface to test if a player can spawn a boss. Currently there's 2 implementations of this, a `LevelCleared` and a `Items` implementation. You can guess what they check for lol. These both hold a `SpawnRequirement.Type` for serializing and deserializing the requirements.  
+  
+There also exists a badly set up `BossContext` that's meant to provide a single dynamic `float` modifier for scaling a boss's health, damage and whatever else in accordance with the 'strength' of the party fighting the boss. I cannot do difficulty scaling, so this is badly implemented at best and makes the boss completely unbeatable at worst.
+### [dungeons.boss.components](FTC-Core/src/main/java/net/forthecrown/dungeons/boss/components)
+Contains the very basic boss components that are meant to be components applied to any boss. THIS IS WHAT THE ENTIRE BOSS SYSTEM SHOULD BE MADE OF, COMPONENTS. Inheritance is dumb for entities like this.  
+Speaking of components, if you, the one reading this, would like to re write the boss system, please take insipration from the Unity Engine's implementation or [this](https://github.com/divotkey/ecs/tree/master/Entity%20Component%20System/src/at/fhooe/mtd/ecs).
+### [dungeons.boss.evoker](FTC-Core/src/main/java/net/forthecrown/dungeons/boss/evoker)
+Where do I even begin, this is currently the largest boss with the most stuff attached to it. This could've been easier with a component implementation. Why did I love OOP inheritance so much ;-;
+### [dungeons.level](FTC-Core/src/main/java/net/forthecrown/dungeons/level)
+Holds classes relating to `DungeonLevel`s. These were meant to be used for the randomly generated dungeons. Currently the code inside them has been written, but has not been tested at all.
+
+
 ### [cosmetics](FTC-Core/src/main/java/net/forthecrown/cosmetics)
 Contains everything relating to the cosmetic stuff on FTC. Not much to really add here, Wout wrote the travel effects and it shows, cuz it's better than 98% of what I've written lol.
 ### [core](FTC-Core/src/main/java/net/forthecrown/core)
