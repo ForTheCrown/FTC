@@ -281,6 +281,76 @@ The core of FTC. I'll just quickly list and describes what each class here does.
 - `ResourceWorld`: Holds data for the RW's regeneration and manages the regeneration of the RW.
 - `Worlds`: Holds constants and easy getter functions the worlds you'll find on FTC
 Every other package in the core directory is pretty much useless ngl except for:
+### [core.admin](FTC-Core/src/main/java/net/forthecrown/core/admin)
+Classes and packages relating to admin activities such as muting/kicking/banning or jailing users.  
+  
+Most of the time you'll be using the general utility class `Punishments` for stuff. I'll go over that in a moment, before that, some structural info. This system uses a list of `PunishEntry`s that are tied to a UUID and have current and past punishments. Current punishments are the ones that are still in effect, if their expiry date isn't `INDEFINITE_EXPIRY` aka `-1` then they'll have a `BukkitTask` that'll be executed when the punishment expires.  You can manually check if they've been punished with something by calling `PunishEntry.isPunished(PunishType)` . `PunishType` is an enum which tells us what kinds of punishments we can bestow upon people,  
+  
+#### Punishments class
+I'll quickly go over the methods this class has, note: every method is `static` and all methods here accept both a `CrownUser` and `Player` as inputs:
+```java
+// A punishment length that will never end, just like hell :)
+final long INDEFINITE_EXPIRY = -1
+
+// Checks if the given UUID is soft muted
+boolean isSoftMuted(UUID);
+
+// Checks the mute status of the user or player you give it
+// result will either be NONE, SOFT or HARD.
+// NOTE: It will tell the user to stfu if their result == HARD
+MuteStatus checkMute(CommandSender);
+
+// Does the same as the above method, except it will not
+// inform the sender they are muted if the result is HARD
+MuteStatus muteStatus(CommandSender);
+
+// Gets a currently in-effect punishment of the given type
+// from the given user or player
+// Will be null if the given sender hasn't been punished with
+// the given type, or if the sender isn't a player or user
+Punishment current(CommandSender, PunishType);
+
+// Gets the sender's punishment entry,
+// Will be null if the sender is not a player or user
+PunishEntry entry(CommandSender)
+
+// Checks if the given string input contains any banned words, if it does
+// It tells the sender: 'pls don't say bad words UwU'
+boolean checkBannedWords(CommandSender, String);
+
+// Same as the above method, except it takes in a component input
+boolean checkBannedWords(CommandSender, Component);
+
+// Not normally a method you'd use, but can be used to punish a user.
+// Params:
+// CrownUser - The user being punished, cannot be null
+// CommandSource - The source punishing, cannot be null
+// String - the punishment reason, can be null
+// long - The length of the punishment, INDEFINITE_EXPIRY or -1 for an eternal punishment
+// PunishType - The type of punishment being given
+// String - Extra data, if the type == JAIL, this extra data will be key of the jail cell the 
+//          punished user will be in
+Punishment handlePunish(CrownUser, CommandSource, String, long, PunishType, String);
+
+// hehehe, puts the user in jail
+void placeInGayBabyJail(JailCell, CrownUser);
+
+// Removes the user from jail lmao
+void removeFromGayBabyJail(CrownUser);
+
+// A lot of the same parameters as the handlePunish method, last string is punishmentReason
+void announce(CommandSource, CrownUser, PunishType, long, String);
+
+// Announces the pardoning of the given user from the given punishment type by the given
+// command source
+void announcePardon(CommandSource, CrownUser, PunishType);
+```
+Additionally, with this system we have notes that are attached to players, these are stored in a `EntryNote` class that you can get by doing the following:
+```java
+PunishEntry entry = /* get an entry */
+List<EntryNote> notes = entry.notes();
+```
+If you wanna print them out, then copy my lazy ass and look at how I did it in `net.forthecrown.commands.punish.CommandNotes`, because the `EntryNote.printDisplay(ComponentWriter)` is meant for printing the info in a debug way, not an easily readable way.
 ### [core.chat](FTC-Core/src/main/java/net/forthecrown/core/chat)
 Chat holds a lot of required utility functions and classes when it comes to dealing with MC Chat's and Kyori's Adventure API.  
   
