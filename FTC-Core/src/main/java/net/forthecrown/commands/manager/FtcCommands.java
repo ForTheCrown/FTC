@@ -10,7 +10,7 @@ import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.help.*;
 import net.forthecrown.commands.markets.*;
 import net.forthecrown.commands.marriage.*;
-import net.forthecrown.commands.punishments.*;
+import net.forthecrown.commands.punish.*;
 import net.forthecrown.commands.regions.*;
 import net.forthecrown.core.Crown;
 import net.forthecrown.grenadier.RoyalArguments;
@@ -111,15 +111,11 @@ public final class FtcCommands {
         //Policing commands
         new CommandEavesDrop();
         new CommandVanish();
-        new CommandMute();
-        new CommandSoftMute();
-        new CommandJail();
-        new CommandJails();
-        new CommandPardon();
-        new CommandTempBan();
+        new CommandPunish();
         new CommandSeparate();
         new CommandSmite();
-        CommandPunishment.init();
+        new CommandNotes();
+        PunishmentCommand.init();
 
         //utility / misc commands
         new CommandGems();

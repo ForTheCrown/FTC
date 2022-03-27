@@ -7,7 +7,7 @@ import net.forthecrown.inventory.crown.Crowns;
 import net.forthecrown.inventory.crown.RoyalCrown;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.minecraft.util.Mth;
 import org.apache.commons.lang.Validate;
 import org.bukkit.GameMode;
@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 public record BossContext(float modifier, List<Player> players) {
-    public static BossContext create(FtcBoundingBox room) {
+    public static BossContext create(WorldBounds3i room) {
         // A lot of this stuff is arbitrary and should be changed
         //
         // It should dynamically change the boss difficulty based on

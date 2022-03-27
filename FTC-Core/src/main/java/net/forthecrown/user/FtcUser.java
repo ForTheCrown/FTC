@@ -3,10 +3,6 @@ package net.forthecrown.user;
 import io.papermc.paper.adventure.AdventureComponent;
 import it.unimi.dsi.fastutil.objects.*;
 import net.forthecrown.core.*;
-import net.forthecrown.core.admin.PunishmentEntry;
-import net.forthecrown.core.admin.PunishmentRecord;
-import net.forthecrown.core.admin.PunishmentType;
-import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.battlepass.challenges.Challenges;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.economy.selling.ItemFilter;
@@ -22,7 +18,6 @@ import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.inventory.Book;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
@@ -642,10 +637,6 @@ public class FtcUser implements CrownUser {
 
         if(lastTeleport != null) lastTeleport.interrupt(false);
 
-        if(Crown.getPunishments().checkJailed(getPlayer())){
-            Crown.getJailManager().getListener(getPlayer()).unreg();
-        }
-
         lastLoad = System.currentTimeMillis();
         unload();
     }
@@ -699,23 +690,11 @@ public class FtcUser implements CrownUser {
         }
 
         mail.informOfUnread();
-
-        Punishments manager = Crown.getPunishments();
-        PunishmentEntry entry = manager.getEntry(getUniqueId());
-        if(entry != null){
-            PunishmentRecord record = entry.getCurrent(PunishmentType.JAIL);
-            if(record == null) return;
-
-            try {
-                Key key = Keys.parse(record.extra);
-                manager.jail(key, getPlayer());
-            } catch (Exception ignored) {}
-        }
     }
 
     @Override
     public @NonNull HoverEvent<Component> asHoverEvent(@NonNull UnaryOperator<Component> op) {
-        ProfilePrinter printer = new ProfilePrinter(this, false, false);
+        ProfilePrinter printer = new ProfilePrinter(this, false, false, ComponentWriter.normal());
         return HoverEvent.showText(op.apply(printer.printForHover()));
     }
 
@@ -1063,6 +1042,11 @@ public class FtcUser implements CrownUser {
     @Override
     public long getLastGuildPassDonation() {
         return lastGuildPassDonation;
+    }
+
+    @Override
+    public String getIp() {
+        return ip;
     }
 
     @Override

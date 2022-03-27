@@ -1,16 +1,15 @@
 package net.forthecrown.commands.admin;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.commands.arguments.UserArgument;
+import net.forthecrown.commands.arguments.UserParseResult;
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.commands.arguments.UserParseResult;
-import net.forthecrown.commands.arguments.UserArgument;
-import net.forthecrown.user.CrownUser;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 
 public class CommandVanish extends FtcCommand {
@@ -43,7 +42,7 @@ public class CommandVanish extends FtcCommand {
                 );
     }
 
-    private int vanish(CommandSource source, CrownUser user, boolean joinLeaveMsg) throws CommandSyntaxException {
+    private int vanish(CommandSource source, CrownUser user, boolean joinLeaveMsg) {
         boolean vanished = user.isVanished();
 
         if(joinLeaveMsg){

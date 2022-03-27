@@ -105,7 +105,7 @@ public final class Rewards {
     public static void init() {
         Registries.REWARDS.close();
 
-        Crown.logger().info("GoalBook Rewards initialized");
+        Crown.logger().info("BattlePass Rewards initialized");
     }
 
     private static Reward register(Reward r) {

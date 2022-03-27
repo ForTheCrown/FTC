@@ -3,6 +3,9 @@ package net.forthecrown.utils.math;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -42,6 +45,13 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
                 vec2.getY(),
                 vec2.getZ()
         );
+    }
+
+    public static WorldBounds3i of(CompoundTag tag) {
+        int[] cords = tag.getIntArray("cords");
+        World world = Bukkit.getWorld(tag.getString("world"));
+
+        return new WorldBounds3i(world, cords[0], cords[1], cords[2], cords[3], cords[3], cords[5]);
     }
 
     public World getWorld() {
@@ -151,5 +161,14 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
 
     public Collection<Player> getPlayers() {
         return getEntitiesByType(Player.class);
+    }
+
+    @Override
+    public Tag save() {
+        CompoundTag tag = new CompoundTag();
+        tag.putString("world", world.getName());
+        tag.put("cords", super.save());
+
+        return tag;
     }
 }

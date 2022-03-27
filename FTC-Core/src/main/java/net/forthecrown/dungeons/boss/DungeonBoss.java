@@ -2,7 +2,7 @@ package net.forthecrown.dungeons.boss;
 
 import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.utils.Nameable;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
+import net.forthecrown.utils.math.WorldBounds3i;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -87,7 +87,7 @@ public interface DungeonBoss extends Nameable, Listener {
      * the boss is in
      * @return The boss' room's bounds
      */
-    FtcBoundingBox getRoom();
+    WorldBounds3i getRoom();
 
     /**
      * Gets the location the boss is meant to spawn

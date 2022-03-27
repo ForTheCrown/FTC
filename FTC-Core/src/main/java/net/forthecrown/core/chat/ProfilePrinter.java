@@ -4,8 +4,6 @@ import net.forthecrown.book.builder.TextInfo;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.admin.PunishmentEntry;
-import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.economy.market.MarketDisplay;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.*;
@@ -13,7 +11,6 @@ import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -28,8 +25,8 @@ public class ProfilePrinter implements ComponentPrinter {
     private final boolean self;
     private final boolean adminViewer;
     private final boolean profilePublic;
+    private final ComponentWriter writer;
 
-    private final TextComponent.Builder builder;
     private int headerLength;
 
     private static final Style BORDER_STYLE = Style.style(NamedTextColor.GOLD, TextDecoration.STRIKETHROUGH);
@@ -39,17 +36,17 @@ public class ProfilePrinter implements ComponentPrinter {
         this(
                 user,
                 source.textName().equalsIgnoreCase(user.getName()),
-                source.hasPermission(Permissions.PROFILE_BYPASS)
+                source.hasPermission(Permissions.PROFILE_BYPASS),
+                ComponentWriter.normal()
         );
     }
 
-    public ProfilePrinter(CrownUser user, boolean self, boolean adminViewer) {
+    public ProfilePrinter(CrownUser user, boolean self, boolean adminViewer, ComponentWriter writer) {
         this.user = (FtcUser) user;
         this.self = self;
         this.adminViewer = adminViewer;
         this.profilePublic = user.isProfilePublic();
-
-        builder = Component.text();
+        this.writer = writer;
     }
 
     public boolean isViewingAllowed() {
@@ -163,11 +160,8 @@ public class ProfilePrinter implements ComponentPrinter {
     }
 
     public ProfilePrinter adminInfo() {
-        Punishments list = Crown.getPunishments();
-        PunishmentEntry entry = list.getEntry(user.getUniqueId());
 
         Component locMessage = user.getLocation() == null ? null : FtcFormatter.clickableLocationMessage(user.getLocation(), true);
-        Component punishmentDisplay = entry == null ? null : Component.newline().append(entry.display(false));
 
         Component ignored = user.interactions.blocked.isEmpty() ?
                 null :
@@ -177,10 +171,13 @@ public class ProfilePrinter implements ComponentPrinter {
                 null :
                 Component.text(ListUtils.join(user.interactions.separated, id -> UserManager.getUser(id).getName()));
 
-        append(Component.text("\n\n"));
+        newLine();
+        newLine();
+
         append("&eAdmin Info:");
 
-        line(" Titles", ListUtils.join(user.getAvailableTitles(), r -> r.name().toLowerCase()));
+        // Made the /punish GUI's player head info unreadable
+        // line(" Titles", ListUtils.join(user.getAvailableTitles(), r -> r.name().toLowerCase()));
 
         newLine();
         onlineTimeThing();
@@ -200,16 +197,16 @@ public class ProfilePrinter implements ComponentPrinter {
         line(" MarriageCooldown", marriageCooldown());
         line(" Location", locMessage);
 
-        append(punishmentDisplay);
         return this;
     }
 
     public ProfilePrinter newLine() {
-        return append(Component.newline());
+        writer.newLine();
+        return this;
     }
 
     public ProfilePrinter append(Component text) {
-        if(text != null) builder.append(text);
+        if(text != null) writer.write(text);
         return this;
     }
 
@@ -290,7 +287,7 @@ public class ProfilePrinter implements ComponentPrinter {
     }
 
     public Component printCurrent() {
-        return builder.build();
+        return writer.get();
     }
 
     public boolean isAdminViewer() {

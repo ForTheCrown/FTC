@@ -3,6 +3,8 @@ package net.forthecrown.economy;
 import net.forthecrown.serializer.CrownSerializer;
 import org.bukkit.Material;
 
+import java.util.Set;
+
 /**
  * A map of item prices with the prices stored as shorts
  * <p></p>
@@ -40,4 +42,10 @@ public interface ItemPriceMap extends CrownSerializer {
      * @return Whether the map contains the material
      */
     boolean contains(Material mat);
+
+    /**
+     * Gets all the materials held by this price map
+     * @return The price map's material key set
+     */
+    Set<Material> getMaterials();
 }

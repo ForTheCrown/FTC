@@ -34,6 +34,7 @@ public class EavesDropper {
         UserManager.getOnlineUsers().forEach(u -> {
             if(toSkip != null && toSkip.test(u)) return;
             if(!u.isEavesDropping() || !u.hasPermission(permission)) return;
+
             u.sendMessage(formatted);
         });
         if(log) Bukkit.getConsoleSender().sendMessage(formatted);
@@ -42,17 +43,18 @@ public class EavesDropper {
     public static void reportMuted(Component text, Player player, MuteStatus status){
         CrownUser user = UserManager.getUser(player);
 
-        send(Component.text()
-                .append(
-                        Component.text()
-                                .color(NamedTextColor.YELLOW)
-                                .append(Component.text(status.edPrefix))
-                                .append(user.displayName())
-                                .append(Component.text(" > ").decorate(TextDecoration.BOLD))
-                                .build()
-                )
-                .append(text)
-                .build(),
+        send(
+                Component.text()
+                        .append(
+                                Component.text()
+                                        .color(NamedTextColor.YELLOW)
+                                        .append(Component.text(status.edPrefix))
+                                        .append(user.displayName())
+                                        .append(Component.text(" > ").decorate(TextDecoration.BOLD))
+                                        .build()
+                        )
+                        .append(text)
+                        .build(),
                 Permissions.EAVESDROP_MUTED,
                 u -> u.getName().equalsIgnoreCase(player.getName()),
                 true

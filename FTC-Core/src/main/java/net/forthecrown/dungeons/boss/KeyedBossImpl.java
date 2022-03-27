@@ -7,7 +7,7 @@ import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserDataContainer;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class KeyedBossImpl extends AbstractBoss implements KeyedBoss {
     private final Key key;
 
-    public KeyedBossImpl(String name, Location spawn, FtcBoundingBox room, SpawnRequirement requirement) {
+    public KeyedBossImpl(String name, Location spawn, WorldBounds3i room, SpawnRequirement requirement) {
         super(name, spawn, room, requirement);
 
         this.key = Keys.forthecrown(name.toLowerCase().replaceAll(" ", "_"));

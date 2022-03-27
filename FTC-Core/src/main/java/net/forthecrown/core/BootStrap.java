@@ -2,9 +2,7 @@ package net.forthecrown.core;
 
 import net.forthecrown.commands.CommandArkBox;
 import net.forthecrown.commands.manager.FtcCommands;
-import net.forthecrown.core.admin.FtcJailManager;
-import net.forthecrown.core.admin.FtcPunishments;
-import net.forthecrown.core.admin.ServerRules;
+import net.forthecrown.core.admin.FtcPunisher;
 import net.forthecrown.core.battlepass.BattlePassImpl;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.cosmetics.Cosmetics;
@@ -89,11 +87,10 @@ final class BootStrap {
 
         shopManager         = new FtcShopManager();
         regionManager       = new FtcRegionManager(FtcVars.getRegionWorld());
-        punishmentManager   = new FtcPunishments();
-        jailManager         = new FtcJailManager();
         usablesManager      = new FtcUsablesManager();
         structureManager    = new FtcStructureManager();
 
+        punisher    = new FtcPunisher();
         markets     = new FtcMarkets();
         saver       = new PeriodicalSaver();
         guild       = new TradeGuild();

@@ -5,6 +5,7 @@ import com.sk89q.worldedit.math.Vector3;
 import net.forthecrown.core.Crown;
 import net.forthecrown.cosmetics.travel.TravelUtil;
 import net.forthecrown.utils.math.Vector3i;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
@@ -111,17 +112,17 @@ public final class EvokerEffects {
         }
     }
 
-    public static void shieldLoseEffect(World world, Vector3 vec, FtcBoundingBox room) {
+    public static void shieldLoseEffect(World world, Vector3 vec, WorldBounds3i room) {
         playSoundInRoom(org.bukkit.Sound.BLOCK_CONDUIT_DEACTIVATE, 1f, 1f, room);
         world.spawnParticle(Particle.EXPLOSION_LARGE, vec.getX(), vec.getY(), vec.getZ(), 2);
     }
 
-    public static void shieldGainEffect(World world, Vector3 vec, FtcBoundingBox room) {
+    public static void shieldGainEffect(World world, Vector3 vec, WorldBounds3i room) {
         impactEffect(world, vec);
         playSoundInRoom(org.bukkit.Sound.BLOCK_CONDUIT_ACTIVATE, 1f, 1f, room);
     }
 
-    static void playSoundInRoom(org.bukkit.Sound s, float vol, float pitch, FtcBoundingBox room) {
+    static void playSoundInRoom(org.bukkit.Sound s, float vol, float pitch, WorldBounds3i room) {
         Sound sound = Sound.sound(s, Sound.Source.MASTER, vol, pitch);
 
         for (Player p: room.getPlayers()) {

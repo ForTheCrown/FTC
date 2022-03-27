@@ -1,12 +1,9 @@
 package net.forthecrown.core;
 
-import net.forthecrown.dungeons.level.LevelSerializer;
-import net.forthecrown.vars.VarRegistry;
-import net.forthecrown.core.admin.JailManager;
-import net.forthecrown.core.admin.Punishments;
-import net.forthecrown.core.admin.ServerRules;
-import net.forthecrown.core.chat.*;
+import net.forthecrown.core.admin.Punisher;
 import net.forthecrown.core.battlepass.BattlePass;
+import net.forthecrown.core.chat.*;
+import net.forthecrown.dungeons.level.LevelSerializer;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.economy.ItemPriceMap;
 import net.forthecrown.economy.guilds.TradeGuild;
@@ -20,6 +17,7 @@ import net.forthecrown.useables.UsablesManager;
 import net.forthecrown.useables.kits.KitManager;
 import net.forthecrown.useables.warps.WarpManager;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.vars.VarRegistry;
 import net.kyori.adventure.key.Namespaced;
 import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPerms;
@@ -41,14 +39,13 @@ public interface Crown extends Plugin, Namespaced {
     // Feels like I'm violating syntax by aligning the methods like this
     static UsablesManager       getUsables()            { return Main.usablesManager; }
     static RegionManager        getRegionManager()      { return Main.regionManager; }
-    static JailManager          getJailManager()        { return Main.jailManager; }
     static ShopManager          getShopManager()        { return Main.shopManager; }
     static UserManager          getUserManager()        { return Main.userManager; }
     static WarpManager          getWarpManager()        { return Main.warpRegistry; }
     static KitManager           getKitManager()         { return Main.kitRegistry; }
     static FtcStructureManager  getStructureManager()   { return Main.structureManager; }
 
-    static Punishments          getPunishments()        { return Main.punishmentManager; }
+    static Punisher             getPunisher()           { return Main.punisher; }
     static Markets              getMarkets()            { return Main.markets; }
     static LuckPerms            getLuckPerms()          { return Main.luckPerms; }
     static Announcer            getAnnouncer()          { return Main.announcer; }
@@ -84,8 +81,7 @@ public interface Crown extends Plugin, Namespaced {
         Main.warpRegistry.save();
         Main.kitRegistry.save();
 
-        Main.punishmentManager.save();
-        Main.jailManager.save();
+        Main.punisher.save();
 
         Main.shopManager.save();
         Main.usablesManager.saveAll();

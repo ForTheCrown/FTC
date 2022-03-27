@@ -5,7 +5,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements ImmutableBounds3i {
@@ -245,6 +247,14 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
 
     public boolean contains(Vector vec) {
         return contains(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ());
+    }
+
+    public boolean contains(Entity entity) {
+        return contains(entity.getLocation());
+    }
+
+    public boolean contains(Block block) {
+        return contains(block.getX(), block.getY(), block.getZ());
     }
 
     public boolean contains(Location vec) {

@@ -6,7 +6,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
-import net.forthecrown.core.chat.BannedWords;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.PagedDisplay;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -32,7 +32,7 @@ public class FtcUserActionHandler implements UserActionHandler {
     @Override
     public void handleDirectMessage(DirectMessage message) {
         //Validate they didn't just use a slur or something lol
-        if(BannedWords.checkAndWarn(message.getSender().asBukkit(), message.getFormattedText())) {
+        if(Punishments.checkBannedWords(message.getSender().asBukkit(), message.getFormattedText())) {
             message.setMuteStatus(MuteStatus.HARD);
         }
 
@@ -94,7 +94,7 @@ public class FtcUserActionHandler implements UserActionHandler {
         Component formatted = MarriageMessage.format(message.getSender().nickDisplayName(), message.getFormatted());
 
         //Validate they didn't just use a slur or something lol
-        if(BannedWords.checkAndWarn(message.getSender(), formatted)) {
+        if(Punishments.checkBannedWords(message.getSender(), formatted)) {
             message.setStatus(MuteStatus.HARD);
         }
 
@@ -273,9 +273,9 @@ public class FtcUserActionHandler implements UserActionHandler {
                 throw FtcExceptionProvider.blockedPlayer(user);
             }
 
-            MuteStatus status = senderUser.getInteractions().muteStatus();
+            MuteStatus status = Punishments.muteStatus(senderUser);
 
-            if(BannedWords.checkAndWarn(senderUser, text)) {
+            if(Punishments.checkBannedWords(senderUser, text)) {
                 status = MuteStatus.HARD;
             }
 

@@ -10,6 +10,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.core.Keys;
+import net.forthecrown.core.admin.JailCell;
 import net.forthecrown.core.animation.BlockAnimation;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
@@ -48,6 +49,8 @@ public class RegistryArguments<T> implements ArgumentType<T> {
 
     private static final RegistryArguments<WeaponGoal> WEAPON_GOAL = new RegistryArguments<>(Registries.WEAPON_GOALS, "Weapon goal");
     private static final RegistryArguments<WeaponAbility.Type> WEAPON_ABILITY = new RegistryArguments<>(Registries.WEAPON_ABILITIES, "Weapon ability");
+
+    private static final RegistryArguments<JailCell> JAIL_CELL = new RegistryArguments<>(Registries.JAILS, "Jail Cell");
 
     public static RegistryArguments<BlockAnimation> animation() {
         return ANIMATION;
@@ -103,6 +106,10 @@ public class RegistryArguments<T> implements ArgumentType<T> {
 
     public static RegistryArguments<DungeonLevel> dungeonLevel() {
         return DUNGEON_LEVEL;
+    }
+
+    public static RegistryArguments<JailCell> jailCell() {
+        return JAIL_CELL;
     }
 
     private final Registry<T> registry;

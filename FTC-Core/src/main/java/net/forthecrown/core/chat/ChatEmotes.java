@@ -17,10 +17,9 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class ChatEmotes implements SuggestionProvider<CommandSource> {
-
     private final Object2ObjectMap<String, String> emoteMap = new Object2ObjectOpenHashMap<>();
 
-    public void registerEmotes(){
+    public void registerEmotes() {
         register("shrug", "¯\\\\_(ツ)_/¯");
         register("ughcry", "(ಥ﹏ಥ)");
         register("hug", "༼ つ ◕_◕ ༽つ");
@@ -46,8 +45,8 @@ public class ChatEmotes implements SuggestionProvider<CommandSource> {
         emoteMap.put(':' + key + ':', emote);
     }
 
-    public String format(String input, @Nullable CommandSender source, boolean ignorePerms){
-        if(ignorePerms || source == null || source.hasPermission(Permissions.DONATOR_3)){
+    public String format(String input, @Nullable CommandSender source, boolean ignorePerms) {
+        if(ignorePerms || source == null || source.hasPermission(Permissions.DONATOR_3)) {
             for (Map.Entry<String, String> e: emoteMap.entrySet()) {
                 input = input.replaceAll(e.getKey(), e.getValue());
             }
@@ -62,10 +61,10 @@ public class ChatEmotes implements SuggestionProvider<CommandSource> {
     }
 
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder, boolean ignorePerms) {
-        if(context.getSource().hasPermission(Permissions.DONATOR_3) || ignorePerms){
+        if(context.getSource().hasPermission(Permissions.DONATOR_3) || ignorePerms) {
             String token = builder.getRemainingLowerCase();
 
-            for (Map.Entry<String, String> e: emoteMap.entrySet()){
+            for (Map.Entry<String, String> e: emoteMap.entrySet()) {
                 if(!e.getKey().startsWith(token)) continue;
                 builder.suggest(e.getKey(), new LiteralMessage(e.getValue()));
             }

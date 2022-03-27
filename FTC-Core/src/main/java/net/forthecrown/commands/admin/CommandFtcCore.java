@@ -7,24 +7,26 @@ import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.dungeons.level.LevelSerializer;
-import net.forthecrown.vars.VarRegistry;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcConfig;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.dungeons.level.LevelSerializer;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
+import net.forthecrown.grenadier.types.ShortArgument;
 import net.forthecrown.grenadier.types.WorldArgument;
 import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserTeleport;
 import net.forthecrown.utils.ListUtils;
+import net.forthecrown.vars.VarRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -75,6 +77,34 @@ public class CommandFtcCore extends FtcCommand {
                                     c.getSource().sendAdmin("Set max player limit to " + max);
                                     return 0;
                                 })
+                        )
+                )
+
+                .then(literal("item_price")
+                        .then(argument("mat", EnumArgument.of(Material.class))
+                                .executes(c -> {
+                                    Material m = c.getArgument("mat", Material.class);
+                                    int price = Crown.getPriceMap().getOrDefault(m, (short) -1);
+
+                                    if (price == -1) {
+                                        throw FtcExceptionProvider.create(m + " does not have a set price");
+                                    }
+
+                                    c.getSource().sendMessage("Price of " + m.key().asString() + ": " + FtcFormatter.getRhines(price));
+                                    return 0;
+                                })
+
+                                .then(argument("price", ShortArgument.shortArg((short) 1))
+                                        .executes(c -> {
+                                            Material m = c.getArgument("mat", Material.class);
+                                            short newPrice = c.getArgument("price", Short.class);
+
+                                            Crown.getPriceMap().set(m, newPrice);
+
+                                            c.getSource().sendAdmin("Set price of " + m.key().asString() + " to " + FtcFormatter.getRhines(newPrice));
+                                            return 0;
+                                        })
+                                )
                         )
                 )
 
@@ -371,7 +401,7 @@ public class CommandFtcCore extends FtcCommand {
         ITEM_PRICES ("Item Prices",             getPriceMap()::save,            getPriceMap()::reload),
         MARKETS("Markets",                      getMarkets()::save,             getMarkets()::reload),
         MESSAGES ("Messages",                   () -> {},                       getMessages()::reload),
-        PUNISHMENTS("Punishments",              getPunishments()::save,         getPunishments()::reload),
+        PUNISHMENTS("Punishments",              getPunisher()::save,            getPunisher()::reload),
         KITS("Kits",                            getKitManager()::save,          getKitManager()::reload),
         WARPS("Warps",                          getWarpManager()::save,         getWarpManager()::reload),
         INTERACTABLES("Interactable Manager",   getUsables()::saveAll,          getUsables()::reloadAll),

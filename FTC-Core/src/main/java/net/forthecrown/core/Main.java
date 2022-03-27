@@ -1,9 +1,7 @@
 package net.forthecrown.core;
 
 import net.forthecrown.commands.CommandArkBox;
-import net.forthecrown.core.admin.FtcJailManager;
-import net.forthecrown.core.admin.FtcPunishments;
-import net.forthecrown.core.admin.ServerRules;
+import net.forthecrown.core.admin.FtcPunisher;
 import net.forthecrown.core.battlepass.BattlePassImpl;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.core.transformers.InvalidUserDataFilter;
@@ -63,8 +61,7 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcRegionManager         regionManager;
     static FtcUsablesManager        usablesManager;
     static FtcShopManager           shopManager;
-    static FtcPunishments           punishmentManager;
-    static FtcJailManager           jailManager;
+    static FtcPunisher              punisher;
     static FtcWarpManager           warpRegistry;
     static FtcKitManager            kitRegistry;
     static FtcStructureManager      structureManager;

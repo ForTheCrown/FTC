@@ -6,10 +6,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
@@ -96,7 +97,7 @@ public class CommandPay extends FtcCommand {
             if(target.getInteractions().isBlockedPlayer(user.getUniqueId())) throw FtcExceptionProvider.cannotPayBlocked();
         }
 
-        MuteStatus status = user.getInteractions().muteStatusSilent();
+        MuteStatus status = Punishments.muteStatus(user);
         Component messageActual = message == null || !status.maySpeak || BannedWords.contains(message) ?
                 Component.text(".").color(NamedTextColor.GRAY) :
                 Component.text(": ").append(message.color(NamedTextColor.WHITE));

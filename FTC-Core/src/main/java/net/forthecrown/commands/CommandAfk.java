@@ -6,6 +6,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
@@ -63,7 +64,7 @@ public class CommandAfk extends FtcCommand {
                     //.clickEvent(ChatFormatter.unAfkClickEvent())
                     .color(NamedTextColor.GRAY);
         } else {
-            MuteStatus status = Crown.getPunishments().checkMuteSilent(user.getUniqueId());
+            MuteStatus status = Punishments.muteStatus(user);
 
             userMsg = Component.translatable("afk.self",
                     (hasMessage ? Component.text(": " + message) : Component.empty())

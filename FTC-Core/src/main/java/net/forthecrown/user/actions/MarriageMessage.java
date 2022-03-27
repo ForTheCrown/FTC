@@ -1,7 +1,7 @@
 package net.forthecrown.user.actions;
 
-import net.forthecrown.core.Crown;
 import net.forthecrown.core.admin.MuteStatus;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.Struct;
@@ -37,7 +37,7 @@ public class MarriageMessage implements UserAction, Struct {
         this.target = target;
         this.input = input;
         this.formatted = FtcFormatter.formatIfAllowed(input, sender.getPlayer());
-        status = Crown.getPunishments().checkMute(sender.getPlayer());
+        status = Punishments.checkMute(sender.getPlayer());
     }
 
     public static Component format(Component displayName, Component message){

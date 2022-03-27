@@ -115,6 +115,8 @@ public class TimePrinter implements ComponentPrinter {
         int nonZeroCount = 0;
 
         for (int i = start; inList(i); i += dir) {
+            if(!inList(i)) continue;
+
             UnitEntry entry = entries[i];
 
             if(entry.unit == TimerUnit.MILLISECOND && time >= TimerUnit.SECOND.inMillis) {
@@ -128,7 +130,7 @@ public class TimePrinter implements ComponentPrinter {
     }
 
     private boolean inList(int i) {
-        return i >= 0 && i <= entries.length;
+        return i >= 0 && i < entries.length;
     }
 
     private TimePrinter buildBiggest() {

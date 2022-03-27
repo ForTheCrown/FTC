@@ -33,7 +33,7 @@ public class SellInteraction implements ShopInteraction {
         //Add item to shop, give user mulaa
         session.getShopInventory().addItem(example.clone());
 
-        if(!session.customerIsOwner()) {
+        if(!session.customerIsOwner() && session.getPrice() > 0) {
             economy.remove(owner.getUniqueId(), session.getPrice());
         }
 

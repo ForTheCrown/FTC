@@ -9,6 +9,7 @@ import net.forthecrown.serializer.JsonWrapper;
 import org.bukkit.Material;
 
 import java.util.Map;
+import java.util.Set;
 
 import static org.bukkit.Material.*;
 
@@ -36,6 +37,11 @@ public class ServerItemPriceMap extends AbstractJsonSerializer implements ItemPr
     @Override
     public boolean contains(Material mat) {
         return itemPrices.containsKey(mat);
+    }
+
+    @Override
+    public Set<Material> getMaterials() {
+        return itemPrices.keySet();
     }
 
     @Override

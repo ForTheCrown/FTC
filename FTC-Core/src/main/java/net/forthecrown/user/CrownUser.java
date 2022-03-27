@@ -942,6 +942,12 @@ public interface CrownUser extends
 
     long getLastGuildPassDonation();
 
+    /**
+     * Gets the IP address of this user
+     * @return The user's IP address
+     */
+    String getIp();
+
     @Override
     boolean equals(Object o);
 

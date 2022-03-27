@@ -5,7 +5,7 @@ import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.dungeons.boss.components.EmptyRoomComponent;
 import net.forthecrown.dungeons.boss.components.InsideRoomComponent;
 import net.forthecrown.dungeons.boss.components.TargetUpdateComponent;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.minecraft.util.Mth;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -27,7 +27,7 @@ import java.util.Set;
 public abstract class SimpleBoss extends KeyedBossImpl implements SingleEntityBoss {
     protected Mob entity;
 
-    public SimpleBoss(String name, Location location, FtcBoundingBox room, ItemStack... items) {
+    public SimpleBoss(String name, Location location, WorldBounds3i room, ItemStack... items) {
         super(name, location, room, SpawnRequirement.items(items));
     }
 

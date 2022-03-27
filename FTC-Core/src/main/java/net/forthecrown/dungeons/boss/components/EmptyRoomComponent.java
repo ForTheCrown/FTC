@@ -4,7 +4,7 @@ import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.DungeonBoss;
 import net.forthecrown.utils.TimeUtil;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.vars.Var;
 import net.forthecrown.vars.types.VarTypes;
 import net.kyori.adventure.text.Component;
@@ -53,7 +53,7 @@ public class EmptyRoomComponent implements BossComponent {
         }
     }
 
-    boolean isEmpty(FtcBoundingBox box) {
+    boolean isEmpty(WorldBounds3i box) {
         for (Player p: box.getPlayers()) {
             if(p.getGameMode() != GameMode.SPECTATOR) return false;
         }

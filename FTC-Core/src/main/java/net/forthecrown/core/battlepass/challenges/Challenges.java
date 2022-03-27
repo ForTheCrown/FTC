@@ -69,7 +69,7 @@ public final class Challenges {
     public static void init() {
         Registries.GOAL_BOOK.close();
 
-        Crown.logger().info("GoalBook Challenges initialized");
+        Crown.logger().info("BattlePass Challenges initialized");
     }
 
     private static <T extends BattlePassChallenge> T register(T c) {

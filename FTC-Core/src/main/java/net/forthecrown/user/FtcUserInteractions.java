@@ -4,8 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.forthecrown.core.FtcVars;
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.actions.TeleportRequest;
 import net.forthecrown.utils.JsonUtils;
@@ -39,16 +37,6 @@ public class FtcUserInteractions extends AbstractUserAttachment implements UserI
     }
 
     @Override
-    public MuteStatus muteStatusSilent() {
-        return Crown.getPunishments().checkMuteSilent(user.getUniqueId());
-    }
-
-    @Override
-    public MuteStatus muteStatus() {
-        return Crown.getPunishments().checkMute(getUser());
-    }
-
-    @Override
     public Set<UUID> getBlockedUsers() {
         return blocked;
     }
@@ -66,11 +54,6 @@ public class FtcUserInteractions extends AbstractUserAttachment implements UserI
     @Override
     public boolean isOnlyBlocked(UUID uuid) {
         return blocked.contains(uuid);
-    }
-
-    @Override
-    public boolean chatAllowed() {
-        return muteStatusSilent().maySpeak;
     }
 
     @Override

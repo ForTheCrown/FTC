@@ -28,7 +28,7 @@ public final class StaffChat {
     public static final Set<Player> ignoring = new HashSet<>();
     public static final Component
             PREFIX = Component.text("[Staff] ").color(NamedTextColor.DARK_GRAY),
-            VANISH_PREFIX = Component.text("[V] ").color(NamedTextColor.WHITE);
+            VANISH_PREFIX = Component.text("[VANISH] ").color(NamedTextColor.WHITE);
 
     /**
      * Sends a staff chat message
@@ -65,15 +65,15 @@ public final class StaffChat {
     }
 
     static Component vanishPrefix(CommandSource source) {
-        boolean vanished = source.isPlayer() && UserManager.getUser(source.asOrNull(Player.class)).isVanished();
-        return vanished ? VANISH_PREFIX : Component.empty();
+        return isVanished(source) ? VANISH_PREFIX : Component.empty();
+    }
+
+    public static boolean isVanished(CommandSource source) {
+        return source.isPlayer() && UserManager.getUser(source.asOrNull(Player.class)).isVanished();
     }
 
     public static void send(Component text, boolean log){
-        Component message = Component.text()
-                .append(PREFIX)
-                .append(text)
-                .build();
+        Component message = format(text);
 
         for (Player p : Bukkit.getOnlinePlayers()){
             if(ignoring.contains(p)) continue;
@@ -81,5 +81,12 @@ public final class StaffChat {
         }
 
         if(log) Bukkit.getConsoleSender().sendMessage(message);
+    }
+
+    public static Component format(Component text) {
+        return Component.text()
+                .append(PREFIX)
+                .append(text)
+                .build();
     }
 }

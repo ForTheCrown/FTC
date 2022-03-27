@@ -1,15 +1,16 @@
 package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
-import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.chat.BannedWords;
-import net.forthecrown.user.UserManager;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 
@@ -47,7 +48,7 @@ public class CommandMe extends FtcCommand {
                             boolean mayBroadcast = true;
 
                             if(source.isPlayer()){
-                                MuteStatus status = Crown.getPunishments().checkMute(source.asBukkit());
+                                MuteStatus status = Punishments.checkMute(source.asBukkit());
 
                                 if(status == MuteStatus.HARD) return 0;
                                 if(status == MuteStatus.SOFT) mayBroadcast = false;

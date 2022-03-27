@@ -17,10 +17,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.emotes.EmoteSmooch;
 import net.forthecrown.core.*;
-import net.forthecrown.core.admin.EavesDropper;
-import net.forthecrown.core.admin.MuteStatus;
-import net.forthecrown.core.admin.Punishments;
-import net.forthecrown.core.admin.StaffChat;
+import net.forthecrown.core.admin.*;
 import net.forthecrown.core.chat.BannedWords;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
@@ -208,15 +205,15 @@ public class CoreListener implements Listener {
             return;
         }
 
-        Punishments punishments = Crown.getPunishments();
-        MuteStatus status = punishments.checkMute(player);
+        Punisher punishments = Crown.getPunisher();
+        MuteStatus status = Punishments.checkMute(player);
 
         if(status != MuteStatus.NONE){
             event.viewers().removeIf(a -> {
                 Player p = fromAudience(a);
                 if(p == null) return false;
 
-                return !punishments.isSoftmuted(p.getUniqueId());
+                return !Punishments.isSoftMuted(p.getUniqueId());
             });
             EavesDropper.reportMuted(event.message(), player, status);
 

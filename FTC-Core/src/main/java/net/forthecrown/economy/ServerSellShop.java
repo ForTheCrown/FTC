@@ -24,6 +24,9 @@ import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 public final class ServerSellShop {
     private ServerSellShop() {}
 
+    public static final InventoryPos SELL_ALL_POS = new InventoryPos(8, 0);
+    public static final InventoryPos INFO_POS = new InventoryPos(8, 1);
+
     public static final BuiltInventory SERVER_SELL_SHOP = new InventoryBuilder(54)
             .title(Component.text("Server sell shop"))
 
@@ -34,9 +37,6 @@ public final class ServerSellShop {
             .onClose(new SellShopCloseListener())
 
             .build();
-
-    public static final InventoryPos SELL_ALL_POS = new InventoryPos(8, 0);
-    public static final InventoryPos INFO_POS = new InventoryPos(8, 1);
 
     static boolean isLegalSlot(int slot) {
         return slot != SELL_ALL_POS.getSlot() && slot != INFO_POS.getSlot();

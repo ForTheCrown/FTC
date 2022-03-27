@@ -25,7 +25,7 @@ public class AdminSellInteraction implements ShopInteraction {
         ShopCustomer customer = session.getCustomer();
 
         //Add money and remove item
-        if(!session.customerIsOwner()) {
+        if(!session.customerIsOwner() && session.getPrice() > 0) {
             customer.addBalance(session.getPrice());
         }
         session.getCustomerInventory().removeItemAnySlot(example.clone());

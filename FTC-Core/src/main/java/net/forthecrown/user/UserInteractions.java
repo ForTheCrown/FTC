@@ -1,6 +1,5 @@
 package net.forthecrown.user;
 
-import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.user.actions.TeleportRequest;
 
 import java.util.List;
@@ -11,15 +10,6 @@ import java.util.UUID;
  * Class representing actions a user can have with another user
  */
 public interface UserInteractions extends UserAttachment {
-
-    /**
-     * Gets the mute status of this user
-     * @return The mute status of this user
-     */
-    MuteStatus muteStatusSilent();
-
-    MuteStatus muteStatus();
-
     /**
      * Gets all the blocked users of this user
      * @return The user's blocked users
@@ -44,8 +34,6 @@ public interface UserInteractions extends UserAttachment {
      * @return If the given ID is only blocked by the player
      */
     boolean isOnlyBlocked(UUID uuid);
-
-    boolean chatAllowed();
 
     boolean isBlockedPlayer(UUID uuid);
 

@@ -2,7 +2,7 @@ package net.forthecrown.dungeons;
 
 import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.squire.Squire;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -38,7 +38,7 @@ public final class DungeonUtils {
                 .build();
     }
 
-    public static @Nullable Player getNearestVisiblePlayer(LivingEntity origin, FtcBoundingBox inBox){
+    public static @Nullable Player getNearestVisiblePlayer(LivingEntity origin, WorldBounds3i inBox){
         Location location = origin.getEyeLocation();
         double lastDistance = Double.MAX_VALUE;
         Player result = null;
@@ -57,7 +57,7 @@ public final class DungeonUtils {
         return result;
     }
 
-    public static @Nullable Player getOptimalTarget(LivingEntity e, FtcBoundingBox inBox){
+    public static @Nullable Player getOptimalTarget(LivingEntity e, WorldBounds3i inBox){
         Player result = getNearestVisiblePlayer(e, inBox);
 
         if(e.getLastDamageCause() == null) return result;

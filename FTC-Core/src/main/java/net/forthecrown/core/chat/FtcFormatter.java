@@ -2,8 +2,6 @@ package net.forthecrown.core.chat;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.admin.PunishmentRecord;
-import net.forthecrown.core.admin.PunishmentType;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUser;
@@ -180,29 +178,6 @@ public interface FtcFormatter {
                 NamedTextColor.YELLOW,
                 user.nickDisplayName().color(getJoinColor(user))
         );
-    }
-
-    static TextComponent banMessage(PunishmentRecord record){
-        Validate.isTrue(record.type == PunishmentType.BAN, "Given record was not a ban record");
-
-        TextComponent.Builder builder = Component.text()
-                .append(Component.text("You are banned").color(NamedTextColor.DARK_RED))
-
-                .append(Component.newline())
-                .append(Component.text("Banned by: " + record.punisher))
-
-                .append(Component.newline())
-                .append(Component.text("Reason: "))
-                .append(record.hasReason() ? ChatUtils.convertString(record.reason) : Component.text("This server is not for you"));
-
-        if(!record.isPermanent()){
-            builder
-                    .append(Component.newline())
-                    .append(Component.text("Ban expires in: "))
-                    .append(Component.text(timeFromMillisMinusTime(record.expiresAt)));
-        }
-
-        return builder.build();
     }
 
     /**

@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.forthecrown.core.Crown;
 import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.utils.ListUtils;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -30,7 +31,7 @@ public abstract class AbstractBoss implements DungeonBoss {
     private final String name;
     private final SpawnRequirement requirement;
     private final Set<BossComponent> components;
-    private final FtcBoundingBox room;
+    private final WorldBounds3i room;
     private final Location spawn;
 
     // Variables used when boss is alive
@@ -39,7 +40,7 @@ public abstract class AbstractBoss implements DungeonBoss {
     protected BukkitTask tickTask;
     protected BossContext currentContext;
 
-    public AbstractBoss(String name, Location spawn, FtcBoundingBox room, SpawnRequirement requirement) {
+    public AbstractBoss(String name, Location spawn, WorldBounds3i room, SpawnRequirement requirement) {
         this.name = name;
         this.room = room;
         this.spawn = spawn.clone();
@@ -158,7 +159,7 @@ public abstract class AbstractBoss implements DungeonBoss {
     }
 
     @Override
-    public FtcBoundingBox getRoom() {
+    public WorldBounds3i getRoom() {
         return room;
     }
 
