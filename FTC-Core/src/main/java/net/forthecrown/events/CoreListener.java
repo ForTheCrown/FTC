@@ -18,7 +18,7 @@ import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.emotes.EmoteSmooch;
 import net.forthecrown.core.*;
 import net.forthecrown.core.admin.*;
-import net.forthecrown.core.chat.BannedWords;
+import net.forthecrown.core.admin.BannedWords;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.npc.NpcDirectory;
@@ -67,7 +67,6 @@ import java.util.Iterator;
 import java.util.Objects;
 
 import static net.forthecrown.core.chat.FtcFormatter.checkUppercase;
-import static net.forthecrown.core.chat.FtcFormatter.formatColorCodes;
 
 public class CoreListener implements Listener {
 
@@ -380,10 +379,12 @@ public class CoreListener implements Listener {
             boolean staffChat = StaffChat.toggledPlayers.contains(source);
 
             if(source.hasPermission(Permissions.DONATOR_3) || staffChat) strMessage = Crown.getEmotes().format(strMessage, source, true);
-            if(source.hasPermission(Permissions.DONATOR_2) || staffChat) strMessage = formatColorCodes(strMessage);
 
             strMessage = checkUppercase(source, strMessage);
-            message = ChatUtils.convertString(strMessage, false);
+
+            message = ChatUtils.convertString(strMessage,
+                    source.hasPermission(Permissions.DONATOR_2) || staffChat
+            );
 
             TextColor playerColor = staffChat ? NamedTextColor.GRAY : TextColor.color(230, 230, 230);
 

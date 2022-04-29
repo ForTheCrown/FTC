@@ -9,7 +9,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerEvent;
 
 public final class Events {
     private Events() {}
@@ -51,10 +50,6 @@ public final class Events {
 
     public static void unregister(Listener listener) {
         HandlerList.unregisterAll(listener);
-    }
-
-    public static <E extends PlayerEvent> void handlePlayer(E event, ExceptionedListener<E> executor) {
-        handle(event.getPlayer(), event, executor);
     }
 
     public static <E extends Event> void handle(CommandSender sender, E event, ExceptionedListener<E> executor) {

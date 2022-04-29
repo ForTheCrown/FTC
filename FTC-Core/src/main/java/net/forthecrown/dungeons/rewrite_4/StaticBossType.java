@@ -1,8 +1,8 @@
-package net.forthecrown.dungeons.rewrite_4.type;
+package net.forthecrown.dungeons.rewrite_4;
 
 import net.forthecrown.dungeons.boss.SpawnRequirement;
-import net.forthecrown.dungeons.rewrite_4.BossIdentifier;
-import net.forthecrown.dungeons.rewrite_4.DungeonBoss;
+import net.forthecrown.dungeons.rewrite_4.component.InsideRoomCheck;
+import net.forthecrown.dungeons.rewrite_4.component.TargetUpdater;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
@@ -18,6 +18,8 @@ public abstract class StaticBossType extends BossType {
         defineBoss(boss);
 
         boss.setRequirement(createRequirement());
+
+        BossTypes.ID_LOOKUP.put(getIdentifier(), getBoss());
     }
 
     protected abstract void _defineBoss(DungeonBoss boss);
@@ -36,6 +38,8 @@ public abstract class StaticBossType extends BossType {
 
         _defineBoss(boss);
 
+        boss.addComponent(new TargetUpdater());
+        boss.addComponent(new InsideRoomCheck());
     }
 
     public DungeonBoss getBoss() {

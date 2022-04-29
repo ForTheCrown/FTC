@@ -1,9 +1,9 @@
-package net.forthecrown.dungeons.rewrite_4.type;
+package net.forthecrown.dungeons.rewrite_4;
 
 import net.forthecrown.dungeons.BossItems;
+import net.forthecrown.dungeons.DungeonConstants;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.boss.BossContext;
-import net.forthecrown.dungeons.rewrite_4.DungeonBoss;
 import net.forthecrown.dungeons.rewrite_4.component.BossEntity;
 import net.forthecrown.dungeons.rewrite_4.component.BossRewards;
 import net.forthecrown.dungeons.rewrite_4.component.MinionSpawner;
@@ -26,9 +26,9 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class ZhambieBossType extends StaticBossType {
-    ZhambieBossType() {
-        super("Zhambie", BossTypes.ID_ZHAMBIE);
+public class ZhambieType extends StaticBossType {
+    ZhambieType() {
+        super("Zhambie", DungeonConstants.ID_ZHAMBIE);
     }
 
     public static ItemStack mummyIngot() {
@@ -47,6 +47,9 @@ public class ZhambieBossType extends StaticBossType {
 
     @Override
     protected void _defineBoss(DungeonBoss boss) {
+        boss.setRoom(DungeonConstants.ZHAMBIE_ROOM);
+        boss.setSpawnLocation(DungeonConstants.ZHAMBIE_SPAWN);
+
         boss.addComponent(new ZhambieEntity());
         boss.addComponent(new BossRewards.BossItemsReward(BossItems.ZHAMBIE));
 
@@ -83,9 +86,11 @@ public class ZhambieBossType extends StaticBossType {
         MinionSpawner.SpawnPosList list = new MinionSpawner.SpawnPosList();
         list.addRaw(
                 new double[][] {
-                        {-185.5, 78, 166.5}, {-197.5, 78, 165.2}, {-196.5, 78, 149.5},
-                        {-184.5, 78, 149.5}, {-183.5, 78, 154.4}, {-202.5, 78, 158.5},
-                        {-191.5, 79, 160.5}, {-190.5, 79, 154.5}, {-202.5, 78, 157.5}
+                        { -185.5, 78, 166.5 }, { -197.5, 78, 165.2 },
+                        { -196.5, 78, 149.5 }, { -184.5, 78, 149.5 },
+                        { -183.5, 78, 154.4 }, { -202.5, 78, 158.5 },
+                        { -191.5, 79, 160.5 }, { -190.5, 79, 154.5 },
+                        { -202.5, 78, 157.5 }
                 }
         );
 

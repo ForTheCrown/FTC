@@ -1,10 +1,16 @@
 package net.forthecrown.economy.shops;
 
+import lombok.Setter;
 import net.forthecrown.core.Crown;
 import net.forthecrown.inventory.ItemStacks;
+import net.forthecrown.utils.TagUtil;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -12,9 +18,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-public class FtcShopInventory extends CraftInventoryCustom implements ShopInventory {
+public class FtcShopInventory extends CraftInventoryCustom implements ShopInventory, ShopComponent {
 
     private final FtcSignShop owningShop;
+
+    @Setter
     private ItemStack exampleItem;
 
     public FtcShopInventory(FtcSignShop signShop){
@@ -57,16 +65,12 @@ public class FtcShopInventory extends CraftInventoryCustom implements ShopInvent
 
     @Override
     public ItemStack getExampleItem() {
-        if(exampleItem == null) {
+        if(ItemStacks.isEmpty(exampleItem)) {
             Crown.logger().warn("Found null example item in shop {}", getHolder().getName());
+            return null;
         }
 
-        return exampleItem == null ? null : exampleItem.clone();
-    }
-
-    @Override
-    public void setExampleItem(ItemStack exampleItem) {
-        this.exampleItem = exampleItem;
+        return exampleItem.clone();
     }
 
     @Override
@@ -98,5 +102,39 @@ public class FtcShopInventory extends CraftInventoryCustom implements ShopInvent
     @Override
     public SignShop getHolder(boolean useSnapshot) {
         return owningShop;
+    }
+
+    @Override
+    public String getSerialKey() {
+        return "inventory";
+    }
+
+    @Nullable
+    @Override
+    public Tag save() {
+        CompoundTag invTag = new CompoundTag();
+        invTag.put("exampleItem", TagUtil.writeItem(getExampleItem()));
+
+        if (!isEmpty()) {
+            ListTag items = new ListTag();
+
+            for (ItemStack i: getShopContents()) {
+                items.add(TagUtil.writeItem(i));
+            }
+
+            invTag.put("items", items);
+        }
+
+        return invTag;
+    }
+
+    @Override
+    public void load(@Nullable Tag t) {
+        CompoundTag tag = (CompoundTag) t;
+        exampleItem = TagUtil.readItem(tag.get("exampleItem"));
+
+        if(tag.contains("items", Tag.TAG_LIST)) {
+            setShopContents(TagUtil.readList(tag.getList("items", Tag.TAG_COMPOUND), TagUtil::readItem));
+        }
     }
 }

@@ -13,7 +13,9 @@ import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.core.chat.ComponentTagVisitor;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.economy.shops.FtcSignShop;
 import net.forthecrown.economy.shops.ShopType;
 import net.forthecrown.economy.shops.SignShop;
 import net.forthecrown.grenadier.CommandSource;
@@ -23,6 +25,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -88,6 +91,22 @@ public class CommandEditShop extends FtcCommand {
                     c.getSource().sendMessage(usageMessage);
                     return 0;
                 })
+
+                .then(literal("data")
+                        .executes(c -> {
+                            Player player = getPlayerSender(c);
+                            FtcSignShop shop = (FtcSignShop) getShop(player);
+
+                            ComponentTagVisitor visitor = new ComponentTagVisitor(true);
+                            CompoundTag tag = new CompoundTag();
+                            shop.save(tag);
+
+                            Component display = visitor.visit(tag, Component.text(shop.getFileName() + " data: "));
+
+                            c.getSource().sendMessage(display);
+                            return 0;
+                        })
+                )
 
                 .then(literal("buy").executes(c -> setType(c, false)))
                 .then(literal("sell").executes(c -> setType(c, true)))

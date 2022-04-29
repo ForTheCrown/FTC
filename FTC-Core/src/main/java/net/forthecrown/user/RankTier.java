@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * Represents a rank's tier
  */
-public enum RankTier implements Comparable<RankTier>, JsonSerializable {
+public enum RankTier implements JsonSerializable {
 
     NONE (1, NamedTextColor.DARK_GRAY, "default"),
     FREE (2, NamedTextColor.GRAY, "free-rank"),
@@ -36,7 +36,7 @@ public enum RankTier implements Comparable<RankTier>, JsonSerializable {
      * Returns whether the tier should use colors
      * @return ^^^^
      */
-    public boolean shouldUseColor(){
+    public boolean shouldUseColor() {
         return this == TIER_2;
     }
 

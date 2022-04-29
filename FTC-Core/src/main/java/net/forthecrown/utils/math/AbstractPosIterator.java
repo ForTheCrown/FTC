@@ -6,8 +6,8 @@ public abstract class AbstractPosIterator<T extends AbstractVector3i<T>, E> impl
     protected final T min;
     protected final T max;
     protected final long maxIteration;
-    protected long iteration;
 
+    protected long iteration;
     protected int x, y, z;
 
     public AbstractPosIterator(T min, T max, long maxIteration) {

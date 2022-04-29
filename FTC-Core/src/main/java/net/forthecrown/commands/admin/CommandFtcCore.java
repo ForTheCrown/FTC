@@ -423,12 +423,12 @@ public class CommandFtcCore extends FtcCommand {
             this.loadFunc = load;
         }
 
-        public String reloadMessage() {
-            return FtcFormatter.formatColorCodes("&7" + msg + " reloaded.");
+        public Component reloadMessage() {
+            return Component.text(msg + " reloaded.", NamedTextColor.GRAY);
         }
 
-        public String saveMessage() {
-            return FtcFormatter.formatColorCodes("&7" + msg + " saved.");
+        public Component saveMessage() {
+            return Component.text(msg + " saved.", NamedTextColor.GRAY);
         }
     }
 }

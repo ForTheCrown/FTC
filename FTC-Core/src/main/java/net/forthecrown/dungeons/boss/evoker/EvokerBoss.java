@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.dungeons.Bosses;
-import net.forthecrown.dungeons.DungeonAreas;
+import net.forthecrown.dungeons.DungeonConstants;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.KeyedBossImpl;
@@ -69,7 +69,7 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
     public EvokerBoss() {
         super("Emo",
                 new Location(Worlds.voidWorld(), -277.5, 37, 44.5),
-                DungeonAreas.EVOKER_ROOM,
+                DungeonConstants.EVOKER_ROOM,
                 SpawnRequirement.items()
         );
 

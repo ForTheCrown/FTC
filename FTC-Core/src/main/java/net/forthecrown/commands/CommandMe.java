@@ -6,7 +6,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.admin.Punishments;
-import net.forthecrown.core.chat.BannedWords;
+import net.forthecrown.core.admin.BannedWords;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;

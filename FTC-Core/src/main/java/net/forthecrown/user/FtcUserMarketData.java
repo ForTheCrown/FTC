@@ -4,62 +4,29 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.serializer.JsonWrapper;
 
 import java.util.UUID;
 
 public class FtcUserMarketData extends AbstractUserAttachment implements UserMarketData {
-    public long ownershipBegan;
-    public long lastAction;
-    public long joinDate;
-    public long kickDate;
+    @Getter @Setter
     public String ownedName;
 
-    private final ObjectList<UUID> incoming = new ObjectArrayList<>();
+    @Getter @Setter
     private UUID outgoing;
+
+    @Getter @Setter
+    public long ownershipBegan, lastStatusChange;
+
+    public long joinDate;
+    public long kickDate;
+
+    private final ObjectList<UUID> incoming = new ObjectArrayList<>();
 
     public FtcUserMarketData(FtcUser user) {
         super(user, "marketOwnership");
-    }
-
-    @Override
-    public long getOwnershipBegan() {
-        return ownershipBegan;
-    }
-
-    @Override
-    public void setOwnershipBegan(long ownershipBegan) {
-        this.ownershipBegan = ownershipBegan;
-    }
-
-    @Override
-    public long getLastStatusChange() {
-        return lastAction;
-    }
-
-    @Override
-    public void setLastStatusChange(long statusChange) {
-        lastAction = statusChange;
-    }
-
-    @Override
-    public String getOwnedName() {
-        return ownedName;
-    }
-
-    @Override
-    public void setOwnedName(String ownedName) {
-        this.ownedName = ownedName;
-    }
-
-    @Override
-    public UUID getOutgoing() {
-        return outgoing;
-    }
-
-    @Override
-    public void setOutgoing(UUID id) {
-        this.outgoing = id;
     }
 
     @Override
@@ -113,14 +80,14 @@ public class FtcUserMarketData extends AbstractUserAttachment implements UserMar
     public void deserialize(JsonElement element) {
         ownershipBegan = 0L;
         joinDate = 0L;
-        lastAction = 0L;
+        lastStatusChange = 0L;
         kickDate = 0L;
         ownedName = null;
 
         if(element == null) return;
         JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
-        lastAction = json.getLong("lastAction");
+        lastStatusChange = json.getLong("lastAction");
         ownershipBegan = json.getLong("ownershipBegan");
         ownedName = json.getString("ownedName");
         this.joinDate = json.getLong("guildJoinDate");
@@ -130,7 +97,7 @@ public class FtcUserMarketData extends AbstractUserAttachment implements UserMar
     public JsonObject serialize() {
         JsonWrapper json = JsonWrapper.empty();
 
-        if(lastAction != 0L) json.add("lastAction", lastAction);
+        if(lastStatusChange != 0L) json.add("lastAction", lastStatusChange);
         if(ownershipBegan != 0L) json.add("ownershipBegan", ownershipBegan);
         if(currentlyOwnsShop()) json.add("ownedName", ownedName);
         if(hasJoinedGuild()) json.add("guildJoinDate", joinDate);

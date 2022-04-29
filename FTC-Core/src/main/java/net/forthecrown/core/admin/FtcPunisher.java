@@ -9,10 +9,16 @@ import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.kyori.adventure.key.Key;
+import org.bukkit.BanList;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * Implementation of {@link Punisher}
+ */
 public class FtcPunisher extends AbstractJsonSerializer implements Punisher {
     private final Map<UUID, EntryImpl> entryMap = new Object2ObjectOpenHashMap<>();
     private final Map<UUID, JailCell> jailed = new Object2ObjectOpenHashMap<>();
@@ -30,6 +36,12 @@ public class FtcPunisher extends AbstractJsonSerializer implements Punisher {
     @Override
     public PunishEntry getEntry(UUID uuid) {
         return entryMap.computeIfAbsent(uuid, EntryImpl::new);
+    }
+
+    @Nullable
+    @Override
+    public PunishEntry getNullable(UUID uuid) {
+        return entryMap.get(uuid);
     }
 
     @NotNull
@@ -94,6 +106,9 @@ public class FtcPunisher extends AbstractJsonSerializer implements Punisher {
         }
     }
 
+    /**
+     * Implementation of {@link PunishEntry}
+     */
     public static class EntryImpl implements PunishEntry {
         private final UUID holder;
 
@@ -133,6 +148,14 @@ public class FtcPunisher extends AbstractJsonSerializer implements Punisher {
 
         @Override
         public boolean isPunished(PunishType type) {
+            if(type == PunishType.BAN) {
+                return Bukkit.getBanList(BanList.Type.NAME).isBanned(entryUser().getName());
+            }
+
+            if(type == PunishType.IP_BAN) {
+                return Bukkit.getBanList(BanList.Type.IP).isBanned(entryUser().getIp());
+            }
+
             return current.get(type) != null;
         }
 
@@ -144,11 +167,14 @@ public class FtcPunisher extends AbstractJsonSerializer implements Punisher {
 
         @Override
         public void revokePunishment(PunishType type) {
-            Punishment punishment = current.remove(type);
-            if(punishment == null) return;
+            if(!isPunished(type)) return;
 
-            punishment.cancelTask();
-            past.add(punishment);
+            Punishment punishment = current.remove(type);
+
+            if (punishment != null) {
+                punishment.cancelTask();
+                past.add(0, punishment);
+            }
 
             type.onPunishmentEnd(entryUser());
         }

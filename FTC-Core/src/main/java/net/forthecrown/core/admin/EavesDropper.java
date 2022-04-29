@@ -18,6 +18,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
+/**
+ * The staff tool to spy on users >:)
+ * <p></p>
+ * Why does Essentials call this SocialSpy, why do you
+ * wanna be the SS bro???
+ */
 public class EavesDropper {
 
     public static Component PREFIX = Component.text("[")

@@ -8,7 +8,6 @@ import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonWrapper;
-import net.forthecrown.utils.JsonUtils;
 
 import java.util.Set;
 
@@ -127,23 +126,23 @@ public class FtcUserCosmeticData extends AbstractUserAttachment implements Cosme
         death = null;
         travel = null;
 
-        if(element == null) return;
+        if (element == null) return;
         JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
-        if(json.has("arrow")) arrow = Registries.ARROW_EFFECTS.get(json.getKey("arrow"));
-        if(json.has("death")) death = Registries.DEATH_EFFECTS.get(json.getKey("death"));
-        if(json.has("travel")) travel = Registries.TRAVEL_EFFECTS.get(json.getKey("travel"));
+        if (json.has("arrow")) arrow = Registries.ARROW_EFFECTS.get(json.getKey("arrow"));
+        if (json.has("death")) death = Registries.DEATH_EFFECTS.get(json.getKey("death"));
+        if (json.has("travel")) travel = Registries.TRAVEL_EFFECTS.get(json.getKey("travel"));
 
-        if(json.has("arrowEffects")) {
-            arrowEffects.addAll(json.getList("arrowEffects", e -> Registries.ARROW_EFFECTS.get(JsonUtils.readKey(e))));
+        if (json.has("arrowEffects")) {
+            arrowEffects.addAll(json.getList("arrowEffects", Registries.ARROW_EFFECTS::read));
         }
 
-        if(json.has("deathEffects")) {
-            deathEffects.addAll(json.getList("deathEffects", e -> Registries.DEATH_EFFECTS.get(JsonUtils.readKey(e))));
+        if (json.has("deathEffects")) {
+            deathEffects.addAll(json.getList("deathEffects", Registries.DEATH_EFFECTS::read));
         }
 
-        if(json.has("travelEffects")) {
-            travelEffects.addAll(json.getList("travelEffects", e -> Registries.TRAVEL_EFFECTS.get(JsonUtils.readKey(e))));
+        if (json.has("travelEffects")) {
+            travelEffects.addAll(json.getList("travelEffects", Registries.TRAVEL_EFFECTS::read));
         }
     }
 
@@ -152,13 +151,13 @@ public class FtcUserCosmeticData extends AbstractUserAttachment implements Cosme
         JsonWrapper json = JsonWrapper.empty();
 
         //Arrow and death effects are serialized by their keys
-        if(hasActiveArrow()) json.add("arrow", arrow);
-        if(hasActiveDeath()) json.add("death", death);
-        if(hasActiveTravel()) json.add("travel", travel);
+        if (hasActiveArrow()) json.add("arrow", arrow);
+        if (hasActiveDeath()) json.add("death", death);
+        if (hasActiveTravel()) json.add("travel", travel);
 
-        if(!arrowEffects.isEmpty()) json.addList("arrowEffects", arrowEffects);
-        if(!deathEffects.isEmpty()) json.addList("deathEffects", deathEffects);
-        if(!travelEffects.isEmpty()) json.addList("travelEffects", travelEffects);
+        if (!arrowEffects.isEmpty()) json.addList("arrowEffects", arrowEffects);
+        if (!deathEffects.isEmpty()) json.addList("deathEffects", deathEffects);
+        if (!travelEffects.isEmpty()) json.addList("travelEffects", travelEffects);
 
         return json.nullIfEmpty();
     }

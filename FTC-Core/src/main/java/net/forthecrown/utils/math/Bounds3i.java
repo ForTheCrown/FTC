@@ -70,4 +70,9 @@ public class Bounds3i extends AbstractBounds3i<Bounds3i> implements Iterable<Vec
     public VectorIterator<Vector3i> iterator() {
         return new VectorIterator<>(min(), max(), volume());
     }
+
+    @Override
+    public String toString() {
+        return "(" + super.toString() + ")";
+    }
 }

@@ -1,13 +1,14 @@
 package net.forthecrown.user;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import lombok.Data;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 public class UserCacheImpl implements UserCache {
-    public static final int EXPECTED_SIZE = 1300;
+    public static final int EXPECTED_SIZE = 1100;
 
     private final Map<UUID,   CacheEntryImpl> identified = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
     private final Map<String, CacheEntryImpl> named      = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
@@ -25,7 +26,7 @@ public class UserCacheImpl implements UserCache {
     }
 
     @Override
-    public CacheEntry getByLastName(String oldName) {
+    public synchronized CacheEntry getByLastName(String oldName) {
         return oldNamed.get(oldName.toLowerCase());
     }
 
@@ -132,63 +133,22 @@ public class UserCacheImpl implements UserCache {
         }
     }
 
+    @Data
     public static class CacheEntryImpl implements CacheEntry {
-        private final UUID uuid;
+        private final UUID uniqueId;
         String name;
         String nickname;
         String lastName;
         long lastNameChange = NO_NAME_CHANGE;
 
-        public CacheEntryImpl(UUID uuid) {
-            this.uuid = uuid;
-        }
-
-        @Override
-        public UUID getUniqueId() {
-            return uuid;
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public void setNickname(String nickname) {
-            this.nickname = nickname;
-        }
-
-        @org.jetbrains.annotations.Nullable
-        @Override
-        public String getNickname() {
-            return nickname;
-        }
-
-        @org.jetbrains.annotations.Nullable
-        @Override
-        public String getLastName() {
-            return lastName;
-        }
-
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
-
-        @Override
-        public long getLastNameChange() {
-            return lastNameChange;
-        }
-
-        public void setLastNameChange(long lastNameChange) {
-            this.lastNameChange = lastNameChange;
-        }
-
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "{" + "id: " + uuid + ", name: " + name + (getNickname() == null ? "" : ", nick: " + nickname) + "}";
+            return getClass().getSimpleName() + "{" +
+                    "id: " + uniqueId +
+                    ", name: " + name +
+                    (getNickname() == null ? "" : ", nick: " + nickname) +
+                    (getLastName() == null ? "" : ", lastname: " + lastName) +
+                    "}";
         }
     }
 }

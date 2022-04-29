@@ -115,7 +115,7 @@ public class CommandTestCore extends FtcCommand {
 
                                     c.getSource().sendAdmin(
                                             ChatUtils.format("Completed test for region {}, volume: {}, size: {}, world: {}",
-                                                    bounds3i, bounds3i.volume(), bounds3i.span(), bounds3i.getWorld().getName()
+                                                    bounds3i, bounds3i.volume(), bounds3i.size(), bounds3i.getWorld().getName()
                                             )
                                     );
                                     return 0;

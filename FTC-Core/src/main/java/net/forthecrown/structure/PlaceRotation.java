@@ -1,5 +1,7 @@
 package net.forthecrown.structure;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.utils.math.Vector3i;
 import net.minecraft.world.level.block.Rotation;
 import org.dynmap.utils.Matrix3D;
@@ -9,21 +11,15 @@ import org.dynmap.utils.Vector3D;
  * The rotation of a build,
  * used when placing the build
  */
+@RequiredArgsConstructor
 public enum PlaceRotation implements Transformer {
     D_0 (0),
     D_90 (90),
     D_180 (180),
     D_270 (270);
 
+    @Getter
     final int degrees;
-
-    PlaceRotation(int d) {
-        this.degrees = d;
-    }
-
-    public int getDegrees() {
-        return degrees;
-    }
 
     public PlaceRotation add(PlaceRotation other) {
         return add0(other.ordinal());
@@ -36,17 +32,7 @@ public enum PlaceRotation implements Transformer {
     private PlaceRotation add0(int add) {
         int newOrdinal = ordinal() + add;
         PlaceRotation[] values = values();
-
-        // If added ordinals are within value bounds
-        // return given value
-        if(newOrdinal >= 0 && newOrdinal < values.length) {
-            return values[newOrdinal];
-        }
-
-        // If not within bounds check which side it goes over
-        // and return corresponding value
-        if(newOrdinal < 0) return values[newOrdinal + values.length];
-        else return values[newOrdinal - values.length];
+        return values[newOrdinal % values.length];
     }
 
     public Rotation toVanilla() {

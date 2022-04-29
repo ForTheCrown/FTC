@@ -3,13 +3,16 @@ package net.forthecrown.useables.checks;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import lombok.Getter;
 import net.forthecrown.core.Keys;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -54,14 +57,11 @@ public class CheckHasAllItems implements UsageCheck<CheckHasAllItems.CheckInstan
 
     public static class CheckInstance implements UsageCheckInstance {
 
+        @Getter
         private final Collection<ItemStack> items;
 
         CheckInstance(Collection<ItemStack> items) {
             this.items = items;
-        }
-
-        public Collection<ItemStack> getItems() {
-            return items;
         }
 
         @Override
@@ -71,7 +71,25 @@ public class CheckHasAllItems implements UsageCheck<CheckHasAllItems.CheckInstan
 
         @Override
         public Component failMessage(Player player) {
-            return Component.text("You don't have all the items needed").color(NamedTextColor.GRAY);
+            final TextComponent.Builder builder = Component.text()
+                    .color(NamedTextColor.YELLOW)
+                    .content("You don't have the following items: ");
+
+            for (ItemStack i: items) {
+                boolean has = player.getInventory().containsAtLeast(i, i.getAmount());
+
+                builder
+                        .append(Component.newline())
+                        .append(
+                                Component.text()
+                                        .color(has ? NamedTextColor.GRAY : NamedTextColor.GOLD)
+                                        .append(Component.text("- "))
+                                        .append(FtcFormatter.itemDisplayName(i))
+                                        .build()
+                        );
+            }
+
+            return builder.build();
         }
 
         @Override

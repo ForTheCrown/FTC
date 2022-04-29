@@ -1,7 +1,7 @@
 package net.forthecrown.events;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.dungeons.DungeonAreas;
+import net.forthecrown.dungeons.DungeonConstants;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.boss.SkalatanBoss;
 import net.forthecrown.inventory.ItemStackBuilder;
@@ -60,7 +60,7 @@ public class DungeonListeners implements Listener {
         // Josh, the dude that drops wither goo
         // I don't wanna know where he gets the goo from
         if(FtcUtils.isNullOrBlank(event.getEntity().getCustomName())) return;
-        if(event.getEntity() instanceof WitherSkeleton && event.getEntity().getCustomName().contains("Josh") && DungeonAreas.DUNGEON_AREA.contains(event.getEntity())){
+        if(event.getEntity() instanceof WitherSkeleton && event.getEntity().getCustomName().contains("Josh") && DungeonConstants.DUNGEON_AREA.contains(event.getEntity())){
             if(random.nextInt(4) > 0) return;
 
             WitherSkeleton skeleton = (WitherSkeleton) event.getEntity();
@@ -80,9 +80,8 @@ public class DungeonListeners implements Listener {
         }
 
         void hit(double damage) {
-            Component name = Component.text("Damage: " + String.format("%.1f",damage)).color(NamedTextColor.RED);
+            Component name = Component.text("Damage: " + String.format("%.2f",damage)).color(NamedTextColor.RED);
             dummy.customName(name);
-            dummy.setHealth(200);
 
             taskLogic();
         }
@@ -93,6 +92,7 @@ public class DungeonListeners implements Listener {
             }
 
             task = Bukkit.getScheduler().runTaskLater(Crown.inst(), () -> {
+                dummy.setHealth(dummy.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
                 dummy.customName(Component.text("Hit Me!").color(NamedTextColor.GOLD));
             }, 100);
         }

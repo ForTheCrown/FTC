@@ -21,7 +21,8 @@ public final class FtcVars {
 
     public static final Var<String>
             spawnRegion                 = def("spawnRegion",            VarTypes.STRING,     RegionConstants.DEFAULT_SPAWN_NAME),
-            discordLink                 = def("discordLink",            VarTypes.STRING,     "https://discord.gg/wXjHNdp");
+            discordLink                 = def("discordLink",            VarTypes.STRING,     "https://discord.gg/wXjHNdp"),
+            defaultBanReason            = def("defaultBanReason",       VarTypes.STRING,      "This server is not for you");
 
     public static final Var<Byte>
             maxNickLength               = def("maxNickLength",          VarTypes.BYTE,       (byte) 16),
@@ -41,7 +42,7 @@ public final class FtcVars {
             marriageCooldown            = def("marriageCooldown",       VarTypes.TIME,       DAY_IN_MILLIS * 3),
             userDataResetInterval       = def("userDataResetInterval",  VarTypes.TIME,       MONTH_IN_MILLIS * 2),
             autoSaveIntervalMins        = def("autoSaveIntervalMins",   VarTypes.LONG,       60L),
-            marketOwnershipSafeTime     = def("marketOwnershipSafeTime", VarTypes.TIME,       WEEK_IN_MILLIS * 2),
+            marketOwnershipSafeTime     = def("marketOwnershipSafeTime",VarTypes.TIME,       WEEK_IN_MILLIS * 2),
             evictionCleanupTime         = def("evictionCleanupTime",    VarTypes.TIME,       DAY_IN_MILLIS * 3),
             voteTime                    = def("voteTime",               VarTypes.TIME,       WEEK_IN_MILLIS),
             voteInterval                = def("voteInterval",           VarTypes.TIME,       WEEK_IN_MILLIS),
@@ -61,7 +62,8 @@ public final class FtcVars {
             crownEventIsTimed           = def("crownEventIsTimed",      VarTypes.BOOL,       false),
             hulkSmashPoles              = def("hulkSmashPoles",         VarTypes.BOOL,       true),
             allowNonOwnerSwords         = def("allowNonOwnerSwords",    VarTypes.BOOL,       false),
-            bp_extraExpGivesRhines      = def("bp_extraExpGivesRhines", VarTypes.BOOL,       true);
+            bp_extraExpGivesRhines      = def("bp_extraExpGivesRhines", VarTypes.BOOL,       true),
+            useAsyncTpForPlayers        = def("useAsyncTpForPlayers",   VarTypes.BOOL,       false);
 
     public static final Var<Integer>
             effectCost_arrow            = def("effectCost_arrow",       VarTypes.INT,        1000),

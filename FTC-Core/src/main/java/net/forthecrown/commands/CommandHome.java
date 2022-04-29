@@ -40,7 +40,7 @@ public class CommandHome extends FtcCommand {
 
                     //Check if they have home pole, and if they're in the correct world
                     if(homes.getHomeRegion() != null && user.getWorld().equals(FtcVars.getRegionWorld())) {
-                        RegionData local = Crown.getRegionManager().getData(user.getRegionCords());
+                        RegionData local = Crown.getRegionManager().getData(user.getRegionPos());
                         PopulationRegion region = Crown.getRegionManager().get(homes.getHomeRegion());
 
                         //If they're close to pole, tp them to home pole

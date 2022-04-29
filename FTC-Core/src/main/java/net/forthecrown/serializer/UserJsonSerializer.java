@@ -10,7 +10,6 @@ import net.forthecrown.user.*;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
-import net.forthecrown.utils.MapUtils;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -90,7 +89,7 @@ public class UserJsonSerializer implements UserSerializer {
         if(entLoc != null) json.addLocation("location", entLoc);
 
         //Sold materials
-        if(!MapUtils.isNullOrEmpty(user.matData)){
+        if(!FtcUtils.isNullOrEmpty(user.matData)){
             JsonObject sold = new JsonObject();
 
             for (SoldMaterialData d: user.matData.values()){

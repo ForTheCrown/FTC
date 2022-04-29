@@ -113,7 +113,7 @@ public class CommandShopHistory extends FtcCommand {
 
     private SignShop get(Player player) throws CommandSyntaxException {
         Block block = player.getTargetBlock(5);
-        if(!ShopManager.isShop(block, true)) throw FtcExceptionProvider.translatable("commands.lookingAtShop");
+        if(!ShopManager.isShop(block)) throw FtcExceptionProvider.translatable("commands.lookingAtShop");
 
         SignShop shop = Crown.getShopManager().getShop(WorldVec3i.of(block));
         ShopOwnership ownership = shop.getOwnership();

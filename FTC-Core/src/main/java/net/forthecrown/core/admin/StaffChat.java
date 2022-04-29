@@ -26,6 +26,7 @@ public final class StaffChat {
 
     public static final Set<Player> toggledPlayers = new HashSet<>();
     public static final Set<Player> ignoring = new HashSet<>();
+
     public static final Component
             PREFIX = Component.text("[Staff] ").color(NamedTextColor.DARK_GRAY),
             VANISH_PREFIX = Component.text("[VANISH] ").color(NamedTextColor.WHITE);
@@ -51,6 +52,12 @@ public final class StaffChat {
         send(text, !cmd);
     }
 
+    /**
+     * Sends a message to the staff chat in a command format,
+     * example: '[Staff] source_name: message'
+     * @param source The source sending the message
+     * @param msg The message to send
+     */
     public static void sendCommand(CommandSource source, Component msg) {
         send(
                 Component.text()
@@ -72,6 +79,11 @@ public final class StaffChat {
         return source.isPlayer() && UserManager.getUser(source.asOrNull(Player.class)).isVanished();
     }
 
+    /**
+     * Sends a message to the staff chat
+     * @param text The message to send
+     * @param log True, to log the message in console
+     */
     public static void send(Component text, boolean log){
         Component message = format(text);
 

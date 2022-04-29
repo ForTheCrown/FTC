@@ -1,4 +1,4 @@
-package net.forthecrown.core.chat;
+package net.forthecrown.core.admin;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -8,13 +8,14 @@ import com.google.gson.JsonParser;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.io.File;
@@ -24,6 +25,10 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * Checks and manages banned words in user
+ * messages and inputs.
+ */
 public final class BannedWords {
     private BannedWords() {}
 
@@ -61,7 +66,7 @@ public final class BannedWords {
     }
 
     public static boolean contains(String unfiltered) {
-        return containsBannedWords(ChatColor.stripColor(FtcFormatter.formatColorCodes(unfiltered)));
+        return contains(ChatUtils.convertString(unfiltered));
     }
 
     public static boolean contains(Component component) {
@@ -69,10 +74,11 @@ public final class BannedWords {
     }
 
     private static boolean containsBannedWords(String input) {
-        String inputLowerCase = input.toLowerCase();
+        String filteredInput = input.toLowerCase();
+        filteredInput = StringUtils.replaceChars(filteredInput, "АВЕЅZІКМНОРСТХШѴУ", "ABESZIKMHOPCTXWVY");
 
         for (String s: BANNED_WORDS) {
-            if(inputLowerCase.contains(s)) return true;
+            if(filteredInput.contains(s)) return true;
         }
 
         return false;

@@ -35,11 +35,11 @@ public class ResourceWorldListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBlockBreakEvent(BlockBreakEvent event) {
-        if(!testWorld(event.getBlock().getWorld())) return;
-        if(event.getBlock().getState() instanceof Container) return;
-        if(FtcVars.rwDoubleDropRate.get() < RANDOM.nextFloat(1f)) return;
-        if(!FtcUtils.isNaturallyPlaced(event.getBlock())) return;
-        if(event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
+        if (!testWorld(event.getBlock().getWorld())) return;
+        if (event.getBlock().getState() instanceof Container) return;
+        if (FtcVars.rwDoubleDropRate.get() < RANDOM.nextFloat(1f)) return;
+        if (!FtcUtils.isNaturallyPlaced(event.getBlock())) return;
+        if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
 
         // Since we can't modify the drops directly in the
         // event, we cancel all drops
@@ -70,9 +70,9 @@ public class ResourceWorldListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
-        if(ILLEGAL_ENTITIES.contains(event.getEntityType())) return;
-        if(!testWorld(event.getEntity().getWorld())) return;
-        if(FtcVars.rwDoubleDropRate.get() < RANDOM.nextFloat(1f)) return;
+        if (ILLEGAL_ENTITIES.contains(event.getEntityType())) return;
+        if (!testWorld(event.getEntity().getWorld())) return;
+        if (FtcVars.rwDoubleDropRate.get() < RANDOM.nextFloat(1f)) return;
 
         List<ItemStack> drops = processDrops(event.getDrops());
 
@@ -82,7 +82,7 @@ public class ResourceWorldListener implements Listener {
 
     private List<ItemStack> processDrops(Collection<ItemStack> drops) {
         List<ItemStack> toDrop = new ObjectArrayList<>();
-        if(ListUtils.isNullOrEmpty(drops)) return toDrop;
+        if (ListUtils.isNullOrEmpty(drops)) return toDrop;
 
         // Process drops
         for (ItemStack i: drops) {

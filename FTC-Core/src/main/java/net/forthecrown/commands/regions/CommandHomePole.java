@@ -48,7 +48,7 @@ public class CommandHomePole extends FtcCommand {
                     RegionPos cords = user.getHomes().getHomeRegion();
                     if(cords == null) throw FtcExceptionProvider.translatable("regions.noHome");
 
-                    RegionPos local = user.getRegionCords();
+                    RegionPos local = user.getRegionPos();
                     RegionData localRegion = Crown.getRegionManager().get(local);
                     RegionUtil.validateDistance(localRegion.getPolePosition(), user);
 

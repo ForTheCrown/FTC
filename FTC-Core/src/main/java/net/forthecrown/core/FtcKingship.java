@@ -1,6 +1,8 @@
 package net.forthecrown.core;
 
 import com.google.gson.JsonElement;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
@@ -11,6 +13,8 @@ import java.util.UUID;
 class FtcKingship extends FtcConfig.ConfigSection implements Kingship {
 
     private UUID id;
+
+    @Getter @Setter
     private boolean female;
 
     FtcKingship(){
@@ -32,16 +36,6 @@ class FtcKingship extends FtcConfig.ConfigSection implements Kingship {
     @Override
     public void set(@Nullable UUID uuid) {
         this.id = uuid;
-    }
-
-    @Override
-    public boolean isFemale() {
-        return female;
-    }
-
-    @Override
-    public void setFemale(boolean female) {
-        this.female = female;
     }
 
     @Override

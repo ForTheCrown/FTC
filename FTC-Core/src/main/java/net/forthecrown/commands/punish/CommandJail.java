@@ -7,11 +7,13 @@ import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.*;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.TimeArgument;
+import net.forthecrown.registry.Registries;
 import net.forthecrown.user.CrownUser;
 
 import javax.annotation.Nullable;
@@ -45,6 +47,10 @@ public class CommandJail extends FtcCommand {
         command
                 .then(argument("user", UserArgument.user())
                         .then(argument("jail", RegistryArguments.jailCell())
+                                .suggests((context, builder) ->
+                                        FtcSuggestionProvider.suggestKeysNoNamespace(builder, Registries.JAILS.keySet())
+                                )
+
                                 .executes(c -> punish(c, null, INDEFINITE_EXPIRY))
 
                                 .then(argument("time", TimeArgument.time())
@@ -65,6 +71,11 @@ public class CommandJail extends FtcCommand {
     private int punish(CommandContext<CommandSource> c, @Nullable String reason, long length) throws CommandSyntaxException {
         CommandSource source = c.getSource();
         CrownUser user = UserArgument.getUser(c, "user");
+
+        if (!Punishments.canPunish(source, user)) {
+            throw FtcExceptionProvider.create("Cannot punish " + user.getName());
+        }
+
         JailCell cell = c.getArgument("jail", JailCell.class);
 
         PunishEntry entry = Punishments.entry(user);

@@ -65,18 +65,11 @@ public class SortedBalanceMap implements BalanceMap {
     }
 
     @Override
-    public int get(int index) {
-        validateIndex(index);
-        return entries[index].getValue();
-    }
-
-    @Override
     public Balance getEntry(int index) {
         validateIndex(index);
         return entries[index];
     }
 
-    @Override
     public int getIndex(UUID id) {
         // Slow, but IDK how better to do it.
         // Go through list, checking each end of the list

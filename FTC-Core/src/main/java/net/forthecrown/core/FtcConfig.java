@@ -1,5 +1,7 @@
 package net.forthecrown.core;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
@@ -97,11 +99,9 @@ public interface FtcConfig extends CrownSerializer {
      * FtcConfig. It must provide a serializationKey, aka just a key for the json object so
      * the config can find it.
      */
+    @RequiredArgsConstructor
     abstract class ConfigSection implements JsonSerializable, JsonDeserializable {
-        public final String serializationKey;
-
-        public ConfigSection(String serializationKey) {
-            this.serializationKey = serializationKey;
-        }
+        @Getter
+        private final String serializationKey;
     }
 }

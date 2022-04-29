@@ -43,11 +43,11 @@ class FtcConfigImpl implements FtcConfig {
 
             // Don't serialize nulls
             if(e == null) {
-                json.remove(a.serializationKey);
+                json.remove(a.getSerializationKey());
                 continue;
             }
 
-            json.add(a.serializationKey, e);
+            json.add(a.getSerializationKey(), e);
         }
 
         write();
@@ -81,6 +81,7 @@ class FtcConfigImpl implements FtcConfig {
             for (JsonElement e: array) {
                 String name = e.getAsString();
                 World w = Bukkit.getWorld(name);
+
                 if(w == null) {
                     Crown.logger().warn("Found unknown world in illegal_worlds in config: " + name + ", ignoring");
                     continue;
@@ -92,7 +93,7 @@ class FtcConfigImpl implements FtcConfig {
 
         // Section loading
         for (ConfigSection a: sections) {
-            a.deserialize(json.get(a.serializationKey));
+            a.deserialize(json.get(a.getSerializationKey()));
         }
     }
 

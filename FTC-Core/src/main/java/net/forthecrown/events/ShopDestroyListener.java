@@ -17,7 +17,7 @@ public class ShopDestroyListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onSignDestroy(BlockBreakEvent event) {
-        if(!ShopManager.isShop(event.getBlock(), true)) return;
+        if(!ShopManager.isShop(event.getBlock())) return;
 
         SignShop shop = Crown.getShopManager().getShop(event.getBlock().getLocation());
         if(shop == null) return;
@@ -39,7 +39,7 @@ public class ShopDestroyListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockDestroy(BlockDestroyEvent event) {
         //Don't allow the block to be broken if it's a shop
-        if(ShopManager.isShop(event.getBlock(), false)) event.setCancelled(true);
+        if(ShopManager.isShop(event.getBlock())) event.setCancelled(true);
     }
 
 }

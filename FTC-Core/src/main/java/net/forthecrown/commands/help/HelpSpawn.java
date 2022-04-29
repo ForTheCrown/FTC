@@ -78,7 +78,7 @@ public class HelpSpawn extends FtcCommand {
 
             PopulationRegion region = Crown.getRegionManager().get(FtcVars.spawnRegion.get());
             if (region != null) {
-                BlockVector2 pole = Crown.getRegionManager().getData(sender.getRegionCords()).getPolePosition();
+                BlockVector2 pole = Crown.getRegionManager().getData(sender.getRegionPos()).getPolePosition();
 
                 if(RegionUtil.isCloseToPole(pole, sender)) {
                     ActionFactory.visitRegion(sender, region);

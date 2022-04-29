@@ -2,10 +2,10 @@ package net.forthecrown.economy.shops;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import lombok.Getter;
 import net.forthecrown.core.Crown;
 import net.forthecrown.inventory.ItemStackBuilder;
-import net.forthecrown.serializer.ShopJsonSerializer;
-import net.forthecrown.serializer.ShopSerializer;
 import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
@@ -16,40 +16,42 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.File;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class FtcShopManager implements ShopManager {
+    public static final String FILE_HEADER = "This file contains the name of every shop on FTC, DO NOT MODIFY, the shop manager requires this";
+
     private static final ItemStack EXAMPLE_BARRIER = new ItemStackBuilder(Material.BARRIER, 1)
             .setName(Component.text(""))
             .build();
 
+    @Getter
+    public final Set<LocationFileName> allShopNames = new ObjectOpenHashSet<>();
     public final Map<WorldVec3i, SignShop> loadedShops = new Object2ObjectOpenHashMap<>();
+
     public final FtcShopInteractionHandler handler = new FtcShopInteractionHandler();
-    public final ShopJsonSerializer serializer = new ShopJsonSerializer();
 
     @Override
     public SignShop getShop(WorldVec3i vec) {
         SignShop result = loadedShops.get(vec);
-        if (result != null) return result;
+        if(result != null) return result;
 
-        try {
-            FtcSignShop shop = new FtcSignShop(vec);
-            addShop(shop);
+        LocationFileName name = LocationFileName.of(vec);
+        if(!allShopNames.contains(name)) return null;
 
-            return shop;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        FtcSignShop shop = new FtcSignShop(vec);
+        loadedShops.put(vec, shop);
 
-        return null;
+        return shop;
     }
 
     @Override
     public SignShop createSignShop(WorldVec3i vec, ShopType type, int price, UUID owner) {
         FtcSignShop shop = new FtcSignShop(vec, type, price, owner);
-        addShop(shop);
+        loadedShops.put(vec, shop);
+        allShopNames.add(shop.getFileName());
 
         return shop;
     }
@@ -74,45 +76,75 @@ public class FtcShopManager implements ShopManager {
     }
 
     @Override
+    public File shopListFile() {
+        return new File(Crown.dataFolder(), "shopList.txt");
+    }
+
+    @Override
     public void save() {
-        for (SignShop shop : loadedShops.values()) {
-            try {
-                shop.save();
-            } catch (Exception e) {
-                e.printStackTrace();
+        loadedShops.values().forEach(SignShop::update);
+
+        File f = shopListFile();
+
+        try {
+            if(!f.exists()) f.createNewFile();
+
+            FileWriter fWriter = new FileWriter(f);
+            BufferedWriter writer = new BufferedWriter(fWriter);
+
+            writer.write(FILE_HEADER);
+
+            for (LocationFileName n: allShopNames) {
+                writer.newLine();
+                writer.write(n.toString());
             }
+
+            writer.close();
+            fWriter.close();
+        } catch (IOException e) {
+            Crown.logger().error("Couldn't save shop list", e);
         }
     }
 
     @Override
     public void reload() {
-        for (SignShop shop : loadedShops.values()) {
-            try {
-                shop.reload();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        loadedShops.values().forEach(SignShop::load);
+
+        File f = shopListFile();
+
+        if (!f.exists()) {
+            allShopNames.clear();
+            clearLoaded();
+
+            return;
+        }
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(f));
+
+            reader.lines()
+                    .forEach(s -> {
+                        if(s.equalsIgnoreCase(FILE_HEADER)) {
+                            return;
+                        }
+
+                        LocationFileName n = LocationFileName.parse(s);
+                        allShopNames.add(n);
+                    });
+        } catch (IOException e) {
+            Crown.logger().error("Couldn't read shop list file", e);
         }
     }
 
     @Override
-    public void addShop(SignShop shop) {
-        loadedShops.put(shop.getPosition(), shop);
-    }
-
-    @Override
-    public void removeShop(SignShop shop) {
-        loadedShops.remove(shop.getPosition());
-    }
-
-    @Override
-    public void clearShops() {
+    public void clearLoaded() {
         loadedShops.clear();
     }
 
     @Override
-    public Collection<SignShop> getShops() {
-        return new ArrayList<>(loadedShops.values());
+    public void onShopDestroy(SignShop shop) {
+        allShopNames.remove(shop.getFileName());
+        loadedShops.remove(shop.getPosition());
     }
 
     @Override
@@ -121,25 +153,23 @@ public class FtcShopManager implements ShopManager {
     }
 
     @Override
-    public ShopSerializer getSerializer() {
-        return serializer;
+    public Collection<SignShop> getLoadedShops() {
+        return loadedShops.values();
     }
 
     @Override
     public CompletableFuture<List<SignShop>> getAllShops() {
         return CompletableFuture.supplyAsync(() -> {
-            File dir = ShopJsonSerializer.SHOP_DIR;
             List<SignShop> shops = new ObjectArrayList<>();
 
-            for (File f: dir.listFiles()) {
+            for (LocationFileName f: allShopNames) {
                 try {
-                    LocationFileName name = LocationFileName.parse(f.getName());
-                    SignShop shop = getShop(name);
+                    SignShop shop = getShop(f);
 
                     if(shop == null) continue;
                     shops.add(shop);
                 } catch (Exception e) {
-                    Crown.logger().error("Error while loading shop file" + f.getName(), e);
+                    Crown.logger().error("Error while loading shop " + f, e);
                 }
             }
 

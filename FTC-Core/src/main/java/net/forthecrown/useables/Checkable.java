@@ -1,7 +1,6 @@
 package net.forthecrown.useables;
 
 import net.forthecrown.useables.checks.UsageCheckInstance;
-import net.forthecrown.utils.ListUtils;
 import net.kyori.adventure.key.Key;
 
 import java.util.List;
@@ -44,14 +43,6 @@ public interface Checkable extends UsableObject {
      * @return The check keys
      */
     Set<Key> getCheckTypes();
-
-    /**
-     * Gets the check keys as strings
-     * @return The check keys
-     */
-    default Set<String> getStringCheckTypes(){
-        return ListUtils.convertToSet(getCheckTypes(), Key::asString);
-    }
 
     /**
      * Gets a check with the given key and casts it to the given class

@@ -203,8 +203,8 @@ public class FtcUserActionHandler implements UserActionHandler {
                                             Component.text(" [", m.read ? NamedTextColor.GRAY : NamedTextColor.YELLOW)
                                                     .append(
                                                             Component.translatable(m.read ? "mail.read" : "mail.unread")
-                                                                    .clickEvent(ClickEvent.runCommand("/mail mark_" + (m.read ? "un" : "") + "read " + index))
-                                                                    .hoverEvent(Component.translatable(!m.read ? "mail.read.hover" : "mail.unread.hover"))
+                                                                    .clickEvent(self ? ClickEvent.runCommand("/mail mark_" + (m.read ? "un" : "") + "read " + index) : null)
+                                                                    .hoverEvent(self ? Component.translatable(!m.read ? "mail.read.hover" : "mail.unread.hover") : null)
                                                     )
                                                     .append(Component.text("] "))
                                     )

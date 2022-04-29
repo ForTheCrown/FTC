@@ -69,7 +69,7 @@ public class CommandGotoRegion extends FtcCommand {
         RegionPos cords;
         if(absolute) cords = RegionPos.of(l);
         else {
-            RegionPos temp = user.getRegionCords();
+            RegionPos temp = user.getRegionPos();
 
             cords = new RegionPos(
                     pos.isXRelative() ? temp.getX() + pos.getX() : pos.getX(),

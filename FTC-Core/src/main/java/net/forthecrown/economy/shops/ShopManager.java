@@ -1,7 +1,6 @@
 package net.forthecrown.economy.shops;
 
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.serializer.ShopSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.math.WorldVec3i;
@@ -14,6 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -33,21 +33,12 @@ public interface ShopManager {
      * @return Whether the block is a shop or not
      */
 
-    static boolean isShop(Block block, boolean fixLegacy){
+    static boolean isShop(Block block) {
         if(block == null) return false;
+
         if (block.getState() instanceof Sign sign) {
             PersistentDataContainer container = sign.getPersistentDataContainer();
-
-            boolean hasLegacy = container.has(ShopConstants.LEGACY_SHOP_KEY, PersistentDataType.BYTE);
-            if(hasLegacy && fixLegacy) {
-                container.remove(ShopConstants.LEGACY_SHOP_KEY);
-                container.set(ShopConstants.SHOP_KEY, PersistentDataType.BYTE, (byte) 1);
-                sign.update();
-
-                return true;
-            }
-
-            return hasLegacy || container.has(ShopConstants.SHOP_KEY, PersistentDataType.BYTE);
+            return container.has(ShopConstants.SHOP_KEY, PersistentDataType.TAG_CONTAINER);
         } else {
             return false;
         }
@@ -152,39 +143,24 @@ public interface ShopManager {
      */
     Inventory getExampleInventory();
 
+    File shopListFile();
+
     /**
-     * Saves all shops
+     * Saves all shops and the shop list
      */
     void save();
 
     /**
-     * Reloads all shops
+     * Reloads all shops and the shop list
      */
     void reload();
 
     /**
-     * Adds a shop to the loaded shop list
-     * @param shop The shop to add to the list
-     */
-    void addShop(SignShop shop);
-
-    /**
-     * Removes a sign from the loaded shop list
-     * @param shop The shop to remove
-     */
-    void removeShop(SignShop shop);
-
-    /**
      * Clears all loaded shops
      */
-    void clearShops();
+    void clearLoaded();
 
-    /**
-     * Gets all currently loaded shops
-     * <p>Note: This doesn't include all signshops that exist</p>
-     * @return All currently loaded shop
-     */
-    Collection<SignShop> getShops();
+    void onShopDestroy(SignShop shop);
 
     /**
      * Gets the interaction handler for shops
@@ -192,11 +168,7 @@ public interface ShopManager {
      */
     ShopInteractionHandler getInteractionHandler();
 
-    /**
-     * Gets the serializer incharge of serializing and deserializing shops
-     * @return The shop serializer
-     */
-    ShopSerializer getSerializer();
+    Collection<SignShop> getLoadedShops();
 
     /**
      * Loads all sign shops async

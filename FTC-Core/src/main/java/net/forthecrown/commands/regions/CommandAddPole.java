@@ -43,7 +43,7 @@ public class CommandAddPole extends FtcCommand {
                     RegionUtil.validateWorld(user.getWorld());
 
                     RegionManager manager = Crown.getRegionManager();
-                    PopulationRegion region = manager.get(user.getRegionCords());
+                    PopulationRegion region = manager.get(user.getRegionPos());
                     manager.getGenerator().generate(region);
 
                     c.getSource().sendAdmin("Placed region pole at " + region.nameOrPos());

@@ -51,7 +51,7 @@ public class GlobalVarArgument implements ArgumentType<Var<?>> {
         String token = builder.getRemainingLowerCase();
 
         for (Var v: VarRegistry.getValues()) {
-            if(!v.getName().toLowerCase().startsWith(token)) continue;
+            if(!v.getName().toLowerCase().contains(token)) continue;
 
             Message tooltip = GrenadierUtils.componentToMessage(v.asComponent());
             builder.suggest(v.getName(), tooltip);

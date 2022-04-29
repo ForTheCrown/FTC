@@ -7,25 +7,23 @@ import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.utils.BitUtil;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.MathUtil;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.math.WorldVec3i;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.HeightMap;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import static net.forthecrown.regions.RegionConstants.DISTANCE_TO_POLE;
+import static net.forthecrown.regions.RegionPoleGenerator.TOP_SIGN_KEY;
 
 public final class RegionUtil {
     private RegionUtil() {}
@@ -35,10 +33,10 @@ public final class RegionUtil {
      * @param region The region to find the bounding box for
      * @return The bounding box
      */
-    public static BoundingBox poleBoundingBox(PopulationRegion region) {
+    public static Bounds3i poleBoundingBox(PopulationRegion region) {
         WorldVec3i p = bottomOfPole(region.getWorld(), region.getPolePosition());
 
-        return new BoundingBox(p.getX() - 2, p.getY(), p.getZ()-2, p.getX() + 2, p.getY() + 5, p.getZ() + 2);
+        return new Bounds3i(p.getX() - 2, p.getY(), p.getZ()-2, p.getX() + 2, p.getY() + 5, p.getZ() + 2);
     }
 
     private static WorldVec3i findBottom(WorldVec3i p) {
@@ -49,7 +47,11 @@ public final class RegionUtil {
         if(b.getType() != Material.OAK_SIGN) return findBottom(p.below());
         Sign sign = (Sign) b.getState();
 
-        if(sign.getPersistentDataContainer().has(RegionPoleGenerator.TOP_SIGN_KEY, PersistentDataType.BYTE)) {
+        PersistentDataContainer container = sign.getPersistentDataContainer();
+
+        if(container.has(TOP_SIGN_KEY, PersistentDataType.BYTE)
+                || container.has(TOP_SIGN_KEY, RegionPos.DATA_TYPE)
+        ) {
             return p.below(4);
         }
 
@@ -78,10 +80,10 @@ public final class RegionUtil {
     }
 
     public static boolean isValidPolePosition(PopulationRegion region, BlockVector2 vec) {
-        FtcBoundingBox valid = region.getBB().shrink(5);
+        WorldBounds3i valid = region.getBB().contract(5);
 
-        return MathUtil.inRange(vec.getX(), valid.getMinX(), valid.getMaxX()) &&
-                MathUtil.inRange(vec.getZ(), valid.getMinZ(), valid.getMaxZ());
+        return MathUtil.inRange(vec.getX(), valid.minX(), valid.maxX()) &&
+                MathUtil.inRange(vec.getZ(), valid.minZ(), valid.maxZ());
     }
 
     public static void validateWorld(World world) throws CommandSyntaxException {
@@ -117,28 +119,6 @@ public final class RegionUtil {
 
     public static BlockVector2 readColumn(int[] arr) {
         return BlockVector2.at(arr[0], arr[1]);
-    }
-
-    // Serialize properties as a boolean array with each bit corresponding to the
-    // ordinal of the enum
-    static byte writeProperties(Set<RegionProperty> properties) {
-        byte val = 0;
-
-        for (RegionProperty p: properties) {
-            val = (byte) BitUtil.setBit(val, (short) p.ordinal(), true);
-        }
-
-        return val;
-    }
-
-    static Set<RegionProperty> readProperties(byte val) {
-        Set<RegionProperty> properties = new HashSet<>();
-
-        for (RegionProperty p: RegionProperty.values()) {
-            if(BitUtil.readBit(val, p.ordinal())) properties.add(p);
-        }
-
-        return properties;
     }
 
     public static int getPoleTop(RegionData data) {

@@ -6,8 +6,8 @@ import com.sk89q.worldedit.bukkit.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.*;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.CrownUser;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.ListUtils;
-import net.forthecrown.utils.MapUtils;
 import net.forthecrown.utils.math.MathUtil;
 import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
@@ -311,19 +311,19 @@ public class ItemStackBuilder implements Cloneable {
         if(name != null) meta.displayName(name);
         if(!ListUtils.isNullOrEmpty(lores)) meta.lore(lores);
 
-        if(!MapUtils.isNullOrEmpty(enchants)){
+        if(!FtcUtils.isNullOrEmpty(enchants)){
             for (Enchantment e: enchants.keySet()){
                 meta.addEnchant(e, enchants.getInt(e), ignoreEnchantRestrictions);
             }
         }
 
-        if(!MapUtils.isNullOrEmpty(modifiers)){
+        if(!FtcUtils.isNullOrEmpty(modifiers)){
             for (Map.Entry<Attribute, AttributeModifier> entry: modifiers.entrySet()){
                 meta.addAttributeModifier(entry.getKey(), entry.getValue());
             }
         }
 
-        if(!MapUtils.isNullOrEmpty(persistentData)){
+        if(!FtcUtils.isNullOrEmpty(persistentData)){
             for (Map.Entry<NamespacedKey, Byte> entry: persistentData.entrySet()){
                 meta.getPersistentDataContainer().set(entry.getKey(), PersistentDataType.BYTE, entry.getValue());
             }

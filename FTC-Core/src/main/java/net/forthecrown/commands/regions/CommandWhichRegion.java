@@ -42,7 +42,7 @@ public class CommandWhichRegion extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command.executes(c -> {
             CrownUser user = getUserSender(c);
-            RegionPos cords = user.getRegionCords();
+            RegionPos cords = user.getRegionPos();
             PopulationRegion region = Crown.getRegionManager().get(cords);
 
             if(region.hasName()) {

@@ -18,7 +18,7 @@ import org.bukkit.Material;
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 record NoteOption(EntryNote note, InventoryPos pos) implements CordedInventoryOption {
-    static final int MAX_CHARS_PER_LINE = 32;
+    static final int MAX_CHARS_PER_LINE = 20;
 
     @Override
     public InventoryPos getPos() {

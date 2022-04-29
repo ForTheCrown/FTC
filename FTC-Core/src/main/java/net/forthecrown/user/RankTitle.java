@@ -1,6 +1,7 @@
 package net.forthecrown.user;
 
 import com.google.gson.JsonElement;
+import lombok.Getter;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
@@ -40,8 +41,10 @@ public enum RankTitle implements JsonSerializable {
     JARL            (false,     TIER_3,    "[&#FBFF0FJarl&f]"),
     LEGEND          (false,     TIER_3,    "&#dfdfdf[&#fff147Legend&#dfdfdf]");
 
-    private final boolean defaultTitle;
-    private final RankTier tier;
+
+    @Getter private final boolean defaultTitle;
+    @Getter private final RankTier tier;
+
     private final Component prefix, noEndSpacePrefix;
 
     RankTitle(boolean defaultTitle, RankTier tier, String prefix) {
@@ -54,14 +57,6 @@ public enum RankTitle implements JsonSerializable {
 
     private Component fromString(String prefix) {
         return prefix == null ? null : LegacyComponentSerializer.legacyAmpersand().deserialize(prefix);
-    }
-
-    public RankTier getTier() {
-        return tier;
-    }
-
-    public boolean isDefaultTitle() {
-        return defaultTitle;
     }
 
     public Component prefix() {

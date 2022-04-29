@@ -4,7 +4,9 @@ import net.forthecrown.commands.CommandArkBox;
 import net.forthecrown.core.admin.FtcPunisher;
 import net.forthecrown.core.battlepass.BattlePassImpl;
 import net.forthecrown.core.chat.*;
-import net.forthecrown.core.transformers.InvalidUserDataFilter;
+import net.forthecrown.core.transformers.RegionResidencyTransformer;
+import net.forthecrown.core.transformers.ShopJsonToTag;
+import net.forthecrown.core.transformers.Transformers;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.economy.FtcEconomy;
@@ -15,7 +17,6 @@ import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.regions.FtcRegionManager;
-import net.forthecrown.serializer.UserJsonSerializer;
 import net.forthecrown.structure.FtcStructureManager;
 import net.forthecrown.structure.tree.test.TestNodes;
 import net.forthecrown.useables.FtcUsablesManager;
@@ -88,12 +89,22 @@ public final class Main extends JavaPlugin implements Crown {
 
         announcer.doBroadcasts();
         dayChange.schedule();
+        shopManager.reload();
 
         saverLogic();
 
         if(Crown.inDebugMode()) {
             TestNodes.init();
         }
+
+        if(ShopJsonToTag.shouldRun()) {
+            ShopJsonToTag.run(shopManager);
+        }
+
+        if(RegionResidencyTransformer.shouldRun()) {
+            RegionResidencyTransformer.run();
+        }
+
 
         logger.info("FTC startup completed");
     }
@@ -125,8 +136,10 @@ public final class Main extends JavaPlugin implements Crown {
 
         userManager.loadCache();
 
+        Transformers.load(getDataFolder());
+
         // Remove any potentially invalid user datas
-        InvalidUserDataFilter.run(UserJsonSerializer.USER_DIR, userManager);
+        //InvalidUserDataFilter.run(UserJsonSerializer.USER_DIR, userManager);
 
         logger.info("onLoad finished");
     }
@@ -157,11 +170,8 @@ public final class Main extends JavaPlugin implements Crown {
     void saverLogic() {
         boolean savePeriodically = config.getJson().getBool("save_periodically");
 
-        if(savePeriodically) {
-            saver.start();
-        } else {
-            saver.cancel();
-        }
+        if(savePeriodically) saver.start();
+        else saver.cancel();
     }
 
     @Override

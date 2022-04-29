@@ -8,10 +8,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Keys;
-import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.TimeArgument;
 import net.forthecrown.serializer.JsonWrapper;
+import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -93,7 +94,10 @@ public class CheckCooldown implements UsageCheck<CheckCooldown.CheckInstance> {
         public Component failMessage(Player player) {
             return duration > (2400*50) ? Component.text("You cannot use this for ")
                     .color(NamedTextColor.GRAY)
-                    .append(Component.text(FtcFormatter.convertMillisIntoTime(onCooldown.get(player.getUniqueId()) - System.currentTimeMillis())).color(NamedTextColor.GOLD))
+                    .append(new TimePrinter(TimeUtil.timeUntil(onCooldown.get(player.getUniqueId())))
+                            .print()
+                            .color(NamedTextColor.GOLD)
+                    )
                     : null;
         }
 

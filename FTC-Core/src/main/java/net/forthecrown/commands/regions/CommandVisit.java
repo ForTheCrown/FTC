@@ -51,7 +51,7 @@ public class CommandVisit extends FtcCommand {
                             }
 
                             PopulationRegion region = RegionArgument.getRegion(c, "region", true);
-                            PopulationRegion closest = Crown.getRegionManager().get(user.getRegionCords());
+                            PopulationRegion closest = Crown.getRegionManager().get(user.getRegionPos());
 
                             RegionUtil.validateWorld(user.getWorld());
                             RegionUtil.validateDistance(closest.getPolePosition(), user);

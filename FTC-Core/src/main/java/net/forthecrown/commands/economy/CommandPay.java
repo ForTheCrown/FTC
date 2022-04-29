@@ -11,7 +11,7 @@ import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.admin.Punishments;
-import net.forthecrown.core.chat.BannedWords;
+import net.forthecrown.core.admin.BannedWords;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.grenadier.command.BrigadierCommand;

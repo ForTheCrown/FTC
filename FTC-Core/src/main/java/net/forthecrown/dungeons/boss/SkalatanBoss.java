@@ -2,7 +2,7 @@ package net.forthecrown.dungeons.boss;
 
 import net.forthecrown.core.Worlds;
 import net.forthecrown.dungeons.BossItems;
-import net.forthecrown.dungeons.DungeonAreas;
+import net.forthecrown.dungeons.DungeonConstants;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -26,7 +26,7 @@ public class SkalatanBoss extends SimpleBoss {
     private int tick = STATE_SWITCH_INTERVAL;
 
     public SkalatanBoss() {
-        super("Skalatan", new Location(Worlds.voidWorld(), -103.5, 67, 184.5), DungeonAreas.SKALATAN_ROOM,
+        super("Skalatan", new Location(Worlds.voidWorld(), -103.5, 67, 184.5), DungeonConstants.SKALATAN_ROOM,
                 WITHER_GOO,
                 DungeonUtils.makeDungeonItem(Material.BONE, 30, "Floaty Bones"),
                 DungeonUtils.makeDungeonItem(Material.BONE, 30, "Horse Bones"),

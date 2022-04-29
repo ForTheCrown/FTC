@@ -52,13 +52,13 @@ public interface BalanceMap {
      */
     int get(UUID id);
 
-    /**
+    /*/**
      * Gets a balance by a list index in the balances list
      * @param index The index to get the balance of
      * @return The balance at the index
      * @throws ArrayIndexOutOfBoundsException If the index is less than 0 or is outside of the list's size
-     */
-    int get(int index) throws ArrayIndexOutOfBoundsException;
+     /
+    int get(int index) throws ArrayIndexOutOfBoundsException;*/
 
     /**
      * Gets an entry at the index
@@ -68,12 +68,13 @@ public interface BalanceMap {
      */
     Balance getEntry(int index) throws ArrayIndexOutOfBoundsException;
 
+    /*
     /**
      * Gets an index of a UUID
      * @param id The ID to get the index of
      * @return The index of the id, or -1, if the ID isn't in the map
-     */
-    int getIndex(UUID id);
+     /
+    int getIndex(UUID id);*/
 
     /**
      * Gets the size of the map

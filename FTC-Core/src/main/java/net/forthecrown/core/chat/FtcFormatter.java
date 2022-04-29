@@ -393,22 +393,6 @@ public interface FtcFormatter {
         return itemAndAmount(item, item.getAmount());
     }
 
-    static String timeFromMillisMinusTime(long millis){
-        return convertMillisIntoTime(millis - System.currentTimeMillis());
-    }
-
-    static String convertTicksIntoTime(long ticks){
-        return convertMillisIntoTime(ticks * 50);
-    }
-
-    static String convertMillisIntoTime(long millis){
-        return new TimePrinter(millis).printString();
-    }
-
-    static Component millisIntoTime(long millis){
-        return new TimePrinter(millis).print();
-    }
-
     static Component displayName(Entity entity){
         Component name = entity.customName() == null ? translatableEntityName(entity.getType()) : entity.customName();
         assert name != null;

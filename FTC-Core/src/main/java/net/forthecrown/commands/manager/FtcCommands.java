@@ -221,6 +221,7 @@ public final class FtcCommands {
         new CommandRegionData();
         new CommandWhichRegion();
         new CommandRegionProperties();
+        new CommandRegionResidents();
 
         //emote, other emotes are initialized by cosmetics in CosmeticEmotes.init()
         new EmotePog();

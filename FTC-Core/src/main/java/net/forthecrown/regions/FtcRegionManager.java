@@ -38,10 +38,12 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
         //Save all regions
         for (Map.Entry<RegionPos, PopulationRegion> e: byCords.entrySet()) {
             String key = e.getKey().toString();
-            Tag serialized = e.getValue().save();
+            CompoundTag t = new CompoundTag();
+            e.getValue().save(t);
 
             //If region should be serialized, serialize
-            if(serialized != null) tag.put(key, serialized);
+            if(t.isEmpty()) continue;
+            tag.put(key, t);
         }
 
         //Remove all unimportant regions

@@ -1,5 +1,7 @@
 package net.forthecrown.economy.selling;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.FtcInventory;
@@ -15,15 +17,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+@RequiredArgsConstructor
 public class ItemSellOption implements CordedInventoryOption {
 
-    private final InventoryPos cords;
-    private final Material material;
-
-    private ItemSellOption(InventoryPos slot, Material material) {
-        this.cords = slot;
-        this.material = material;
-    }
+    @Getter private final InventoryPos pos;
+    @Getter private final Material material;
 
     static ItemSellOption itemSell(int slot, Material material) {
         return new ItemSellOption(InventoryPos.fromSlot(slot), material);
@@ -31,15 +29,6 @@ public class ItemSellOption implements CordedInventoryOption {
 
     static ItemSellOption itemSell(int column, int row, Material material){
         return new ItemSellOption(new InventoryPos(column, row), material);
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
-
-    @Override
-    public InventoryPos getPos() {
-        return cords;
     }
 
     @Override

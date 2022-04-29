@@ -1,9 +1,9 @@
 package net.forthecrown.commands.admin;
 
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.FtcUserManager;
 import net.kyori.adventure.text.Component;
@@ -35,7 +35,10 @@ public class CommandMemory extends FtcCommand {
                     TextComponent.Builder builder = Component.text()
                             .color(yelo)
                             .append(Component.text("Uptime: "))
-                            .append(FtcFormatter.millisIntoTime(ManagementFactory.getRuntimeMXBean().getUptime()).color(gold))
+                            .append(new TimePrinter(ManagementFactory.getRuntimeMXBean().getUptime())
+                                    .print()
+                                    .color(gold)
+                            )
                             .append(Component.newline())
 
                             .append(Component.text("Current TPS: "))
@@ -51,7 +54,7 @@ public class CommandMemory extends FtcCommand {
                             .append(Component.newline())
 
                             .append(Component.text("Loaded shops: "))
-                            .append(Component.text(Crown.getShopManager().getShops().size()).color(gold))
+                            .append(Component.text(Crown.getShopManager().getLoadedShops().size()).color(gold))
                             .append(Component.newline())
 
                             .append(Component.text("Loaded users: "))

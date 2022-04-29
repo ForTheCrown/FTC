@@ -11,6 +11,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.serializer.JsonWrapper;
@@ -80,6 +82,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
 
     // Required biome types any potential seed must have within its world borders
     public static final EnumSet<Biome.BiomeCategory> REQUIRED_CATEGORIES = EnumSet.of(
+            Biome.BiomeCategory.DESERT,
             Biome.BiomeCategory.FOREST,
             Biome.BiomeCategory.MESA,
             Biome.BiomeCategory.TAIGA,
@@ -95,14 +98,20 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
     // An accessor that ChunkGenerator needs for a height check call
     public static final LevelHeightAccessor HEIGHT_ACCESSOR = LevelHeightAccessor.create(FtcUtils.MIN_Y, FtcUtils.Y_SIZE);
 
+    @Getter
     private final LongList legalSeeds = new LongArrayList();
 
+    @Getter @Setter
     private String toHazGate, toResGate, worldGuardSpawn;
+    @Getter @Setter
     private Component resetStart, resetEnd;
+    @Getter @Setter
     private long lastReset, lastSeed;
+    @Getter
     private int size;
+    @Getter @Setter
     private boolean autoResetEnabled;
-    private Key spawnStructure;
+    @Getter @Setter private Key spawnStructure;
 
     ResourceWorld() {
         super("resource_world");
@@ -478,7 +487,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
     private boolean isAreaGood(int x, int z, ChunkGenerator gen, int baseY) {
         // Biome's use their own positioning,
         // which is 1/4 the size of a chunk
-        Holder<Biome> b = gen.getNoiseBiome(x, QuartPos.fromBlock(64), z);
+        Holder<Biome> b = gen.getNoiseBiome(x, QuartPos.fromBlock(baseY), z);
         Biome.BiomeCategory category = Biome.getBiomeCategory(b);
 
         int blockX = x * 4;
@@ -526,82 +535,10 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         return result;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    //                                              Getters and setters
-    // -----------------------------------------------------------------------------------------------------------------
-
-    public Component getResetStart() {
-        return resetStart;
-    }
-
-    public void setResetStart(Component resetStart) {
-        this.resetStart = resetStart;
-    }
-
-    public Component getResetEnd() {
-        return resetEnd;
-    }
-
-    public void setResetEnd(Component resetEnd) {
-        this.resetEnd = resetEnd;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
     public void setSize(int size) {
         this.size = size;
 
         World w = Worlds.resource();
         w.getWorldBorder().setSize(size);
-    }
-
-    public boolean isAutoResetEnabled() {
-        return autoResetEnabled;
-    }
-
-    public void setAutoResetEnabled(boolean autoResetEnabled) {
-        this.autoResetEnabled = autoResetEnabled;
-    }
-
-    public long getLastReset() {
-        return lastReset;
-    }
-
-    public LongList getLegalSeeds() {
-        return legalSeeds;
-    }
-
-    public String getToHazGate() {
-        return toHazGate;
-    }
-
-    public void setToHazGate(String toHazGate) {
-        this.toHazGate = toHazGate;
-    }
-
-    public String getToResGate() {
-        return toResGate;
-    }
-
-    public void setToResGate(String toResGate) {
-        this.toResGate = toResGate;
-    }
-
-    public Key getSpawnStructure() {
-        return spawnStructure;
-    }
-
-    public void setSpawnStructure(Key spawnStructure) {
-        this.spawnStructure = spawnStructure;
-    }
-
-    public String getWorldGuardSpawn() {
-        return worldGuardSpawn;
-    }
-
-    public void setWorldGuardSpawn(String wgSpawnName) {
-        this.worldGuardSpawn = wgSpawnName;
     }
 }

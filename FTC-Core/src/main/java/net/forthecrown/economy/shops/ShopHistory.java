@@ -1,22 +1,22 @@
 package net.forthecrown.economy.shops;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.chat.PagedDisplay;
-import net.forthecrown.serializer.JsonDeserializable;
-import net.forthecrown.serializer.JsonSerializable;
+import net.forthecrown.utils.TagUtil;
 import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
 
-public class ShopHistory implements JsonSerializable, JsonDeserializable {
+public class ShopHistory implements ShopComponent {
     private static final Component BORDER = Component.text("                        ")
             .color(NamedTextColor.GRAY)
             .decorate(TextDecoration.STRIKETHROUGH);
@@ -130,36 +130,30 @@ public class ShopHistory implements JsonSerializable, JsonDeserializable {
         return TimeUtil.hasCooldownEnded(FtcVars.dataRetentionTime.get(), entry.date());
     }
 
-    @Override
-    public void deserialize(JsonElement element) {
-        entries.clear();
-        if(element == null || !element.isJsonArray()) return;
-
-        JsonArray array = element.getAsJsonArray();
-
-        for (JsonElement e: array) {
-            HistoryEntry entry = HistoryEntry.of(e);
-
-            if(isTooOld(entry)) continue;
-            if(entry.amount() < 1) continue;
-
-            entries.add(entry);
-        }
+    private void clearOld() {
+        entries.removeIf(this::isTooOld);
     }
 
     @Override
-    public JsonElement serialize() {
-        if(entries.isEmpty()) return null;
+    public String getSerialKey() {
+        return "history";
+    }
 
-        JsonArray array = new JsonArray();
+    @Nullable
+    @Override
+    public Tag save() {
+        if(isEmpty()) return null;
 
-        for (HistoryEntry e: entries) {
-            if(isTooOld(e)) continue;
-            if(e.amount() < 1) continue;
+        clearOld();
+        return TagUtil.writeList(entries, HistoryEntry::save);
+    }
 
-            array.add(e.serialize());
-        }
+    @Override
+    public void load(@Nullable Tag tag) {
+        entries.clear();
+        if(tag == null) return;
 
-        return array.isEmpty() ? null : array;
+        entries.addAll(TagUtil.readList((ListTag) tag, HistoryEntry::of));
+        clearOld();
     }
 }

@@ -4,16 +4,14 @@ import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 
 public final class ListUtils {
     private ListUtils() {}
-
-    public static <F, T> Set<T> convertToSet(@NotNull Collection<F> from, @NotNull Function<F, T> converter){
-        return new HashSet<>(convert(from, converter));
-    }
 
     public static <F, T> List<T> convert(@NotNull Collection<F> from, @NotNull Function<F, T> converter){
         Validate.notNull(from, "collection was null");
@@ -25,20 +23,6 @@ public final class ListUtils {
             convert.add(converter.apply(o));
         }
         return convert;
-    }
-
-    public static <F, T> List<T> arrayToList(@NotNull F[] from, @NotNull Function<F, T> converter){
-        return convert(Arrays.asList(from), converter);
-    }
-
-    public static <F, T> T[] convertArray(F[] from, IntFunction<T[]> arrayCreator, Function<F, T> function){
-        T[] result = arrayCreator.apply(from.length);
-
-        for (int i = 0; i < from.length; i++){
-            if(from[i] == null) continue;
-            result[i] = function.apply(from[i]);
-        }
-        return result;
     }
 
     public static <F, T> List<T> fromIterable(Iterable<F> from, Function<F, T> converter){

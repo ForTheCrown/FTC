@@ -16,7 +16,6 @@ import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.MapUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -165,7 +164,7 @@ public class BattlePassImpl extends AbstractJsonSerializer implements BattlePass
         }
 
         // Rewards
-        if(!MapUtils.isNullOrEmpty(currentRewards)) {
+        if(!FtcUtils.isNullOrEmpty(currentRewards)) {
             JsonArray arr = new JsonArray();
 
             for (RewardInstance r: currentRewards.values()) {

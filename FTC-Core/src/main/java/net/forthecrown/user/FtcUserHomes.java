@@ -14,30 +14,33 @@ import java.util.Map;
 import java.util.Set;
 
 public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
-
     // They shouldn't be able to input this in a command
     // Hacky solution, but it'll work, and it also won't require me to transform the way
     // homes are stored
     public static final String HOME_REGION_JSON_NAME = "user:home:region";
+    public static boolean DISABLE_LIMIT_CHECK = false;
 
     public Map<String, Location> homes = new HashMap<>();
     public RegionPos homeRegion;
 
-    public FtcUserHomes(FtcUser user){
+    public FtcUserHomes(FtcUser user) {
         super(user, "homes");
 
         checkOverLimit();
     }
 
-    public void checkOverLimit(){ //Remove homes until under limit
-        if(user.isOp()) return;
+    public void checkOverLimit() { //Remove homes until under limit
+        if (user.isOp()) return;
+        if (DISABLE_LIMIT_CHECK) return;
 
-        homes.entrySet().removeIf(e -> check());
+        while (check()) {
+            remove(homes.keySet().iterator().next());
+        }
     }
 
-    private boolean check(){
-        if(!getUser().isOnline()) return false;
-        if(getUser().hasPermission(Permissions.ADMIN)) return false;
+    private boolean check() {
+        if (!getUser().isOnline()) return false;
+        if (getUser().hasPermission(Permissions.ADMIN)) return false;
 
         int max = user.getRankTier().maxHomes;
         int current = size();
@@ -51,18 +54,18 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
     }
 
     @Override
-    public int size(){
+    public int size() {
         return homes.size();
     }
 
     @Override
-    public boolean contains(String name){
+    public boolean contains(String name) {
         return homes.containsKey(name);
     }
 
     @Override
-    public boolean canMakeMore(){
-        if(user.isOp()) return true;
+    public boolean canMakeMore() {
+        if (user.isOp()) return true;
 
         int currentHomes = size();
         int maxHomes = user.getRankTier().maxHomes;
@@ -83,29 +86,33 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
     }
 
     @Override
-    public Set<String> getHomeNames(){
+    public Set<String> getHomeNames() {
         checkOverLimit();
         return homes.keySet();
     }
 
     @Override
-    public Collection<Location> getHomeLocations(){
+    public Collection<Location> getHomeLocations() {
         checkOverLimit();
         return homes.values();
     }
 
     @Override
-    public void set(String name, Location location){
-        homes.put(name, location);
+    public void set(String name, Location location) {
+        Location old = homes.put(name, location);
+
+        UserUtil.reassignHome(getUser().getUniqueId(), name, location, old);
     }
 
     @Override
-    public void remove(String name){
-        homes.remove(name);
+    public void remove(String name) {
+        Location old = homes.remove(name);
+
+        UserUtil.reassignHome(getUser().getUniqueId(), name, old, null);
     }
 
     @Override
-    public Location get(String name){
+    public Location get(String name) {
         return homes.get(name);
     }
 
@@ -116,17 +123,20 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
 
     @Override
     public void setHomeRegion(RegionPos cords) {
+        RegionPos old = this.homeRegion;
         this.homeRegion = cords;
+
+        UserUtil.reassignRegionHome(getUser().getUniqueId(), old, cords);
     }
 
     @Override
     public JsonObject serialize() {
-        if(homes.isEmpty()) return null;
+        if (homes.isEmpty()) return null;
 
         JsonWrapper json = JsonWrapper.empty();
-        if(hasHomeRegion()) json.add(HOME_REGION_JSON_NAME, homeRegion.toString());
+        if (hasHomeRegion()) json.add(HOME_REGION_JSON_NAME, homeRegion.toString());
 
-        for (Map.Entry<String, Location> e: homes.entrySet()){
+        for (Map.Entry<String, Location> e : homes.entrySet()) {
             json.addLocation(e.getKey(), e.getValue());
         }
 
@@ -138,15 +148,15 @@ public class FtcUserHomes extends AbstractUserAttachment implements UserHomes {
         homes.clear();
         homeRegion = null;
 
-        if(element == null) return;
+        if (element == null) return;
         JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
-        if(json.has(HOME_REGION_JSON_NAME)) {
+        if (json.has(HOME_REGION_JSON_NAME)) {
             this.homeRegion = RegionPos.fromString(json.getString(HOME_REGION_JSON_NAME));
             json.remove(HOME_REGION_JSON_NAME);
         }
 
-        for (Map.Entry<String, JsonElement> e: json.entrySet()) {
+        for (Map.Entry<String, JsonElement> e : json.entrySet()) {
             homes.put(e.getKey(), JsonUtils.readLocation(e.getValue().getAsJsonObject()));
         }
     }

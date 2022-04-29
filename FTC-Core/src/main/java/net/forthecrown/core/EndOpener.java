@@ -1,6 +1,8 @@
 package net.forthecrown.core;
 
 import com.google.gson.JsonElement;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.FtcUtils;
@@ -42,10 +44,15 @@ import java.util.concurrent.CompletableFuture;
 public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListener {
     private static final Logger LOGGER = Crown.logger();
 
+    @Getter @Setter
     private Component openMessage, closeMessage;
+    @Getter @Setter
     private WorldVec3i leverPos;
+    @Getter
     private boolean open;
+    @Getter @Setter
     private boolean enabled;
+    @Getter
     private int endSize;
 
     public EndOpener() {
@@ -190,46 +197,6 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
             case FLOOR -> Direction.UP;
             default -> state.getValue(LeverBlock.FACING);
         };
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public boolean isOpen() {
-        return open;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public Component getCloseMessage() {
-        return closeMessage;
-    }
-
-    public void setCloseMessage(Component closeMessage) {
-        this.closeMessage = closeMessage;
-    }
-
-    public Component getOpenMessage() {
-        return openMessage;
-    }
-
-    public void setOpenMessage(Component openMessage) {
-        this.openMessage = openMessage;
-    }
-
-    public void setLeverPos(WorldVec3i leverPos) {
-        this.leverPos = leverPos;
-    }
-
-    public WorldVec3i getLeverPos() {
-        return leverPos;
-    }
-
-    public int getEndSize() {
-        return endSize;
     }
 
     public void setEndSize(int endSize) {

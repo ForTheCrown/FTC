@@ -1,17 +1,17 @@
 package net.forthecrown.commands;
 
+import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 
-import java.util.Collection;
+import java.util.Set;
 
 public class CommandList extends FtcCommand {
     public CommandList(){
@@ -26,7 +26,13 @@ public class CommandList extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> {
-                    Collection<CrownUser> users = UserManager.getOnlineUsers();
+                    Set<CrownUser> users = UserManager.getOnlineUsers();
+
+                    // If we should hide vanished
+                    if(!c.getSource().hasPermission(Permissions.VANISH_SEE)) {
+                        users.removeIf(CrownUser::isVanished);
+                    }
+
                     TextComponent.Builder builder = Component.text()
                             .color(NamedTextColor.YELLOW)
 
@@ -40,7 +46,7 @@ public class CommandList extends FtcCommand {
                             .append(Component.text("Players: "));
 
                     boolean firstIter = true;
-                    for (CrownUser u: users){
+                    for (CrownUser u: users) {
                         builder
                                 .append(firstIter ? Component.empty() : Component.text(", "))
                                 .append(u.nickDisplayName().color(NamedTextColor.WHITE))

@@ -44,16 +44,23 @@ public class CommandMarry extends FtcCommand {
                             CrownUser user = getUserSender(c);
                             CrownUser target = UserArgument.getUser(c, "user");
 
-                            if(target.equals(user)) throw FtcExceptionProvider.translatable("marriage.marrySelf");
+                            // Not self lol
+                            if (target.equals(user)) throw FtcExceptionProvider.translatable("marriage.marrySelf");
 
                             UserInteractions uInter = user.getInteractions();
                             UserInteractions tInter = target.getInteractions();
 
-                            if(uInter.getSpouse() != null) throw FtcExceptionProvider.senderAlreadyMarried();
-                            if(tInter.getSpouse() != null) throw FtcExceptionProvider.targetAlreadyMarried(target);
+                            // Both are unmarried
+                            if (uInter.getSpouse() != null) throw FtcExceptionProvider.senderAlreadyMarried();
+                            if (tInter.getSpouse() != null) throw FtcExceptionProvider.targetAlreadyMarried(target);
 
-                            if(!uInter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
-                            if(!tInter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(target);
+                            // Both can change marriage status
+                            if (!uInter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatus();
+                            if (!tInter.canChangeMarriageStatus()) throw FtcExceptionProvider.cannotChangeMarriageStatusTarget(target);
+
+                            // Both accepting proposals
+                            if (!tInter.acceptingProposals()) throw FtcExceptionProvider.translatable("marriage.disabled.target", target.nickDisplayName());
+                            if (!uInter.acceptingProposals()) throw FtcExceptionProvider.translatable("marriage.disabled.sender");
 
                             tInter.setLastProposal(user.getUniqueId());
 

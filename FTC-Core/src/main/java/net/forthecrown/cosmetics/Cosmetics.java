@@ -1,5 +1,6 @@
 package net.forthecrown.cosmetics;
 
+import lombok.Getter;
 import net.forthecrown.core.Crown;
 import net.forthecrown.cosmetics.arrows.ArrowEffects;
 import net.forthecrown.cosmetics.deaths.DeathEffects;
@@ -9,6 +10,7 @@ import net.forthecrown.cosmetics.travel.TravelEffects;
 public final class Cosmetics {
     private Cosmetics() {}
 
+    @Getter
     private static PlayerRidingManager rideManager;
 
     public static void init() {
@@ -24,9 +26,5 @@ public final class Cosmetics {
 
     public static void shutDown() {
         rideManager.stopAllRiding();
-    }
-
-    public static PlayerRidingManager getRideManager() {
-        return rideManager;
     }
 }

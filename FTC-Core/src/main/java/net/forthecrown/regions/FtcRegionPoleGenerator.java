@@ -1,7 +1,11 @@
 package net.forthecrown.regions;
 
+import net.forthecrown.core.Crown;
+import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.user.CrownUser;
+import net.forthecrown.user.UserManager;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.math.WorldVec3i;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -9,7 +13,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.WallSign;
-import org.bukkit.persistence.PersistentDataType;
+
+import java.util.UUID;
 
 public class FtcRegionPoleGenerator implements RegionPoleGenerator {
     private final FtcRegionManager manager;
@@ -26,8 +31,7 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
         WorldVec3i pos = region.getPoleBottom().mutable();
 
         //bounding box for the region pole
-        FtcBoundingBox box = FtcBoundingBox.of(region.getWorld(), region.getPoleBoundingBox());
-        box.expand(BlockFace.SOUTH_EAST, 1);
+        WorldBounds3i box = region.getPoleBoundingBox().toWorldBounds(region.getWorld());
 
         //Clear area
         box.forEach(b -> b.setType(Material.AIR, false));
@@ -39,6 +43,12 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
         //Place the help signs on the side
         generateSideText(pos.clone().inDirection(BlockFace.WEST), BlockFace.WEST);
         generateSideText(pos.clone().inDirection(BlockFace.EAST), BlockFace.EAST);
+
+        // Place the residency sign
+        RegionResidency residency = region.getResidency();
+        if(!region.hasProperty(RegionProperty.HIDE_RESIDENTS) && !residency.isEmpty()) {
+            generateResidency(pos.clone().inDirection(BlockFace.NORTH), BlockFace.NORTH, residency);
+        }
 
         //Place region name
         pos.above();
@@ -78,6 +88,9 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
         pos.add(4, 0, 0).getBlock().setType(Material.CHISELED_STONE_BRICKS, false);
         pos.subtract(0, 0, 4).getBlock().setType(Material.CHISELED_STONE_BRICKS, false);
 
+        // Update potential water block under the pole
+        // It looks awkward without this, idk why,
+        // we never change that block
         pos.subtract(1, 1, 1).getBlock().getState().update(false, false);
     }
 
@@ -94,11 +107,12 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
         Sign sign = (Sign) block.getState();
 
         //Set lines
-        sign.line(0, Component.empty());
+        sign.line(0, Component.text(Crown.inDebugMode() ? region.getPos().toString() : ""));
         sign.line(1, Component.text(region.hasName() ? region.getName() : "Wilderness"));
         sign.line(2, Component.text("Region"));
         sign.line(3, Component.empty());
-        sign.getPersistentDataContainer().set(TOP_SIGN_KEY, PersistentDataType.BYTE, (byte) 1);
+
+        sign.getPersistentDataContainer().set(TOP_SIGN_KEY, RegionPos.DATA_TYPE, region.getPos());
 
         sign.update();
     }
@@ -123,6 +137,44 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
         sign.line(2, Component.text("Region"));
         sign.line(3, pointer);
 
+        sign.update();
+    }
+
+    @Override
+    public void generateResidency(WorldVec3i pos, BlockFace direction, RegionResidency residency) {
+        Block b = pos.getBlock();
+
+        WallSign data = (WallSign) Material.OAK_WALL_SIGN.createBlockData();
+        data.setFacing(direction);
+        b.setBlockData(data, false);
+
+        Sign sign = (Sign) b.getState();
+
+        Component
+                line1 = null,
+                line2 = null;
+
+        if (residency.size() == 1) {
+            var v = residency.getEntries().entrySet().iterator().next();
+            UUID id = v.getKey();
+            RegionResidency.ResEntry entry = v.getValue();
+
+            CrownUser user = UserManager.getUser(id);
+            Component nick = user.nickOrName();
+
+            if (ChatUtils.plainText(nick).length() <= 16 && entry.isDirectResident()) {
+                line1 = Component.text("Resident:");
+                line2 = nick;
+            }
+        }
+
+        if(line1 == null || line2 == null) {
+            line1 = Component.text("Residents:");
+            line2 = Component.text(residency.isEmpty() ? "None" : "" + residency.size());
+        }
+
+        sign.line(1, line1);
+        sign.line(2, line2);
         sign.update();
     }
 

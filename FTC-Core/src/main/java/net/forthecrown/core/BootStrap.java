@@ -2,6 +2,7 @@ package net.forthecrown.core;
 
 import net.forthecrown.commands.CommandArkBox;
 import net.forthecrown.commands.manager.FtcCommands;
+import net.forthecrown.core.admin.BannedWords;
 import net.forthecrown.core.admin.FtcPunisher;
 import net.forthecrown.core.battlepass.BattlePassImpl;
 import net.forthecrown.core.chat.*;

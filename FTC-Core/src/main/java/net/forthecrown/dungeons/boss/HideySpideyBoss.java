@@ -3,7 +3,7 @@ package net.forthecrown.dungeons.boss;
 import com.destroystokyo.paper.entity.Pathfinder;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.dungeons.BossItems;
-import net.forthecrown.dungeons.DungeonAreas;
+import net.forthecrown.dungeons.DungeonConstants;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.dungeons.boss.components.MinionSpawnerComponent;
@@ -36,7 +36,7 @@ public class HideySpideyBoss extends SimpleBoss {
     public static Vec3 SPAWN_VEC = new Vec3(-78.5, 55, 284.5);
 
     public HideySpideyBoss() {
-        super("Hidey Spidey", new Location(Worlds.voidWorld(), SPAWN_VEC.x, SPAWN_VEC.y, SPAWN_VEC.z), DungeonAreas.SPIDEY_ROOM,
+        super("Hidey Spidey", new Location(Worlds.voidWorld(), SPAWN_VEC.x, SPAWN_VEC.y, SPAWN_VEC.z), DungeonConstants.SPIDEY_ROOM,
 
                 DungeonUtils.makeDungeonItem(Material.SPIDER_EYE, 45, (Component) null),
                 DungeonUtils.makeDungeonItem(Material.FERMENTED_SPIDER_EYE, 20, (Component) null),

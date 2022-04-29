@@ -63,6 +63,7 @@ public class FtcUsablesManager implements UsablesManager {
 
         if (state instanceof TileState tile) {
             PersistentDataContainer c = tile.getPersistentDataContainer();
+
             if(c.has(LEGACY_KEY, PersistentDataType.BYTE)) {
                 c.remove(LEGACY_KEY);
                 c.set(USABLE_KEY, PersistentDataType.BYTE, (byte) 1);

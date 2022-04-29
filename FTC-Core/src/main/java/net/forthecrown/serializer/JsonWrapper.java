@@ -4,17 +4,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.chat.ChatUtils;
+import net.forthecrown.serializer.wrapper.SerialWrapper;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.math.Vector3i;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +27,7 @@ import static net.forthecrown.utils.JsonUtils.*;
 /**
  * A JSON wrapper because this shit is too verbose on its own
  */
-public class JsonWrapper {
+public class JsonWrapper implements SerialWrapper<JsonObject> {
 
     //The source and handle of the wrapper
     private final JsonObject json;
@@ -62,58 +59,62 @@ public class JsonWrapper {
         json.add(name, serializable.serialize());
     }
 
+    @Override
     public <E extends Enum<E>> void addEnum(String name, E anum) {
         json.add(name, writeEnum(anum));
     }
 
+    @Override
     public <E extends Enum<E>> E getEnum(String name, Class<E> clazz) {
         return getEnum(name, clazz, null);
     }
 
+    @Override
     public <E extends Enum<E>> E getEnum(String name, Class<E> clazz, E def) {
         if (missingOrNull(name)) return def;
         return readEnum(clazz, json.get(name));
     }
 
+    @Override
     public void addLocation(String name, Location location) {
         json.add(name, writeLocation(location));
     }
 
+    @Override
     public Location getLocation(String name) {
         return get(name, e -> readLocation(e.getAsJsonObject()));
     }
 
+    @Override
     public void addUUID(String name, UUID id) {
         add(name, writeUUID(id));
     }
 
+    @Override
     public UUID getUUID(String name) {
         if (missingOrNull(name)) return null;
         return readUUID(get(name));
     }
 
+    @Override
     public void addKey(String name, Key key) {
         json.add(name, writeKey(key));
     }
 
+    @Override
     public NamespacedKey getKey(String name) {
         return get(name, JsonUtils::readKey);
     }
 
-    public void addRegion(String name, FtcBoundingBox box) {
-        json.add(name, box.serialize());
-    }
-
-    public FtcBoundingBox getRegion(String name) {
-        return FtcBoundingBox.of(get(name));
-    }
-
+    @Override
     public void addItem(String name, ItemStack item) {
         json.add(name, writeItem(item));
     }
 
+    @Override
     public ItemStack getItem(String name) {return getItem(name, null);}
 
+    @Override
     public ItemStack getItem(String name, ItemStack def) {
         if (missingOrNull(name)) return def;
         return readItem(get(name));
@@ -153,36 +154,46 @@ public class JsonWrapper {
         return get(name, Vector3i::of);
     }
 
+    @Override
     public String getString(String name) {return getString(name, null);}
 
+    @Override
     public String getString(String name, String def) {
         if (missingOrNull(name)) return def;
         return json.get(name).getAsString();
     }
 
+    @Override
     public boolean getBool(String name) {return getBool(name, false);}
 
+    @Override
     public boolean getBool(String name, boolean def) {
         if (missingOrNull(name)) return def;
         return get(name).getAsBoolean();
     }
 
+    @Override
     public long getLong(String name) {return getLong(name, 0L);}
 
+    @Override
     public long getLong(String name, long def) {
         if (missingOrNull(name)) return def;
         return get(name).getAsLong();
     }
 
+    @Override
     public double getDouble(String name) {return getDouble(name, 0D);}
 
+    @Override
     public double getDouble(String name, double def) {
         if (missingOrNull(name)) return def;
         return get(name).getAsDouble();
     }
 
+    @Override
     public float getFloat(String name) {return getFloat(name, 0f);}
 
+    @Override
     public float getFloat(String name, float def) {
         if (missingOrNull(name)) return def;
         return get(name).getAsFloat();
@@ -202,22 +213,28 @@ public class JsonWrapper {
         return get(name).getAsBigInteger();
     }
 
+    @Override
     public int getInt(String name) {return getInt(name, 0);}
 
+    @Override
     public int getInt(String name, int def) {
         if (missingOrNull(name)) return def;
         return json.get(name).getAsInt();
     }
 
+    @Override
     public short getShort(String name) {return getShort(name, (short) 0);}
 
+    @Override
     public short getShort(String name, short def) {
         if (missingOrNull(name)) return def;
         return json.get(name).getAsShort();
     }
 
+    @Override
     public byte getByte(String name) {return getByte(name, (byte) 0);}
 
+    @Override
     public byte getByte(String name, byte def) {
         if (missingOrNull(name)) return def;
         return get(name).getAsByte();
@@ -226,6 +243,14 @@ public class JsonWrapper {
     public JsonWrapper getWrapped(String name) {
         if (missingOrNull(name)) return null;
         return of(getObject(name));
+    }
+
+    @Override
+    public JsonWrapper createWrapped(String name) {
+        JsonWrapper empty = SerialWrapper.emptyJson();
+
+        add(name, empty);
+        return empty;
     }
 
     public JsonWrapper getWrappedNonNull(String name) {
@@ -237,6 +262,7 @@ public class JsonWrapper {
         json.add(name, buf.json);
     }
 
+    @Override
     public boolean isEmpty() {
         return size() < 1;
     }
@@ -304,27 +330,6 @@ public class JsonWrapper {
         return map;
     }
 
-    public void addNBT(String name, CompoundTag tag) {
-        add(name, tag.toString());
-    }
-
-    public CompoundTag getNBT(String name) {return getNBT(name, null);}
-
-    public CompoundTag getNBT(String name, CompoundTag def) {
-        if (missingOrNull(name)) return def;
-
-        try {
-            return TagParser.parseTag(getString(name));
-        } catch (CommandSyntaxException exception) {
-            exception.printStackTrace();
-            return def;
-        }
-    }
-
-    public void addArray(String name, JsonSerializable[] arr) {
-        addArray(name, arr, JsonSerializable::serialize);
-    }
-
     public <T> void addArray(String name, T[] arr, Function<T, JsonElement> converter) {
         JsonArray array = new JsonArray();
 
@@ -351,20 +356,25 @@ public class JsonWrapper {
         return JsonUtils.readIntArray(array);
     }
 
+    @Override
     public void addDate(String name, Date date) {
         add(name, JsonUtils.writeDate(date));
     }
 
+    @Override
     public Date getDate(String name) {return getDate(name, null);}
 
+    @Override
     public Date getDate(String name, Date def) {
         return get(name, JsonUtils::readDate, def);
     }
 
+    @Override
     public Component getComponent(String name) {
         return missingOrNull(name) ? null : ChatUtils.fromJson(get(name));
     }
 
+    @Override
     public void addComponent(String name, Component component) {
         add(name, ChatUtils.toJson(component));
     }
@@ -375,23 +385,53 @@ public class JsonWrapper {
         json.add(property, value);
     }
 
-    public JsonElement remove(String property) {
-        return json.remove(property);
+    @Override
+    public void remove(String property) {
+        json.remove(property);
     }
 
+    @Override
     public void add(String property, String value) {
         json.addProperty(property, value);
     }
 
-    public void add(String property, Number value) {
+    @Override
+    public void add(String property, byte value) {
         json.addProperty(property, value);
     }
 
-    public void add(String property, Boolean value) {
+    @Override
+    public void add(String property, short value) {
         json.addProperty(property, value);
     }
 
-    public void add(String property, Character value) {
+    @Override
+    public void add(String property, int value) {
+        json.addProperty(property, value);
+    }
+
+    @Override
+    public void add(String property, float value) {
+        json.addProperty(property, value);
+    }
+
+    @Override
+    public void add(String property, double value) {
+        json.addProperty(property, value);
+    }
+
+    @Override
+    public void add(String property, long value) {
+        json.addProperty(property, value);
+    }
+
+    @Override
+    public void add(String property, boolean value) {
+        json.addProperty(property, value);
+    }
+
+    @Override
+    public void add(String property, char value) {
         json.addProperty(property, value);
     }
 
@@ -399,10 +439,12 @@ public class JsonWrapper {
         return json.entrySet();
     }
 
+    @Override
     public int size() {
         return json.size();
     }
 
+    @Override
     public boolean has(String memberName) {
         return json.has(memberName);
     }

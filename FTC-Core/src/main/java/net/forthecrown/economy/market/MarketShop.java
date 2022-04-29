@@ -2,6 +2,7 @@ package net.forthecrown.economy.market;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.forthecrown.economy.Taxable;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
@@ -19,7 +20,7 @@ import java.util.UUID;
 /**
  * A data class which carries data for a single shop
  */
-public interface MarketShop extends JsonSerializable, Nameable, Struct {
+public interface MarketShop extends JsonSerializable, Nameable, Struct, Taxable {
     /**
      * Gets the worldguard region linked to this shop
      * @return The shop's worldguard region

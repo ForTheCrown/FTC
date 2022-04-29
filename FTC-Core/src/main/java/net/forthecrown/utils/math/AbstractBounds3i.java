@@ -2,6 +2,7 @@ package net.forthecrown.utils.math;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
@@ -188,7 +189,7 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
         Vector3i min = min();
         Vector3i max = max();
 
-        return new BoundsFace[]{
+        return new BoundsFace[] {
                 new BoundsFace(min, max.setY(minY), Direction.DOWN),
                 new BoundsFace(min.setY(maxY), max, Direction.UP),
                 new BoundsFace(min, max.setZ(minZ), Direction.NORTH),
@@ -247,6 +248,10 @@ public abstract class AbstractBounds3i<T extends AbstractBounds3i<T>> implements
 
     public boolean contains(Vector vec) {
         return contains(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ());
+    }
+
+    public boolean contains(Vec3i vec) {
+        return contains(vec.getX(), vec.getY(), vec.getZ());
     }
 
     public boolean contains(Entity entity) {

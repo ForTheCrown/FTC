@@ -25,7 +25,7 @@ public class CommandRoyalSword extends FtcCommand {
     public CommandRoyalSword() {
         super("RoyalSword");
 
-        setPermission(Permissions.ADMIN);
+        setPermission(Permissions.ROYAL_SWORD);
         register();
     }
 
@@ -82,6 +82,8 @@ public class CommandRoyalSword extends FtcCommand {
                 )
 
                 .then(literal("ability")
+                        .requires(source -> source.hasPermission(Permissions.ADMIN))
+
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
                             RoyalSword sword = getSword(user);
@@ -93,7 +95,7 @@ public class CommandRoyalSword extends FtcCommand {
                             return 0;
                         })
 
-                        .then(literal("unset")
+                        .then(literal("-unset")
                                 .executes(c -> {
                                     CrownUser user = getUserSender(c);
                                     RoyalSword sword = getSword(user);
@@ -134,6 +136,8 @@ public class CommandRoyalSword extends FtcCommand {
                 )
 
                 .then(literal("upgrade")
+                        .requires(source -> source.hasPermission(Permissions.ADMIN))
+
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
                             RoyalSword sword = getSword(user);

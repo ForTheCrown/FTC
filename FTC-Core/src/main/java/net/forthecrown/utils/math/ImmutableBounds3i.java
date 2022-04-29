@@ -16,40 +16,40 @@ public interface ImmutableBounds3i extends JsonSerializable, NbtSerializable {
     int maxY();
     int maxZ();
 
-    default int spanX() {
-        return maxX() - minX();
+    default int sizeX() {
+        return (maxX() - minX()) + 1;
     }
 
-    default int spanY() {
-        return maxY() - minY();
+    default int sizeY() {
+        return (maxY() - minY()) + 1;
     }
 
-    default int spanZ() {
-        return maxZ() - minZ();
+    default int sizeZ() {
+        return (maxZ() - minZ()) + 1;
     }
 
     default int centerX() {
-        return minX() + (spanX() / 2);
+        return minX() + (sizeX() / 2);
     }
 
     default int centerY() {
-        return minY() + (spanY() / 2);
+        return minY() + (sizeY() / 2);
     }
 
     default int centerZ() {
-        return minZ() + (spanZ() / 2);
+        return minZ() + (sizeZ() / 2);
     }
 
     default long volume() {
-        return (long) spanX() * spanZ() * spanZ();
+        return (long) sizeX() * sizeY() * sizeZ();
     }
 
     default Vector3i center() {
         return new Vector3i(centerX(), centerY(), centerZ());
     }
 
-    default Vector3i span() {
-        return new Vector3i(spanX(), spanY(), spanZ());
+    default Vector3i size() {
+        return new Vector3i(sizeX(), sizeY(), sizeZ());
     }
 
     default Vector3i min() {
@@ -66,6 +66,19 @@ public interface ImmutableBounds3i extends JsonSerializable, NbtSerializable {
 
     default int[] toIntArray() {
         return new int[] { minX(), minY(), minZ(), maxX(), maxY(), maxZ() };
+    }
+
+    default Vector3i[] corners() {
+        return new Vector3i[] {
+                new Vector3i(minX(), minY(), minZ()),
+                new Vector3i(minX(), minY(), maxZ()),
+                new Vector3i(minX(), maxY(), minZ()),
+                new Vector3i(maxX(), minY(), minZ()),
+                new Vector3i(minX(), maxY(), maxZ()),
+                new Vector3i(maxX(), maxY(), minZ()),
+                new Vector3i(maxX(), minY(), maxZ()),
+                new Vector3i(maxX(), maxY(), maxZ())
+        };
     }
 
     @Override

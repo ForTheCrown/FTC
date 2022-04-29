@@ -13,7 +13,7 @@ import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.dungeons.boss.SpawnRequirement;
 import net.forthecrown.dungeons.level.DungeonLevel;
-import net.forthecrown.dungeons.rewrite_4.type.BossType;
+import net.forthecrown.dungeons.rewrite_4.BossType;
 import net.forthecrown.economy.guilds.topics.VoteTopic;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;

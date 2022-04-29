@@ -69,28 +69,11 @@ public class CommandArkBox extends FtcCommand {
         command
                 .executes(c -> {
                     CrownUser user = getUserSender(c);
-                    ArkBoxInfo info = ID_2_DATA.get(user.getUniqueId());
 
+                    ArkBoxInfo info = ID_2_DATA.remove(user.getUniqueId());
                     if(info == null) throw FtcExceptionProvider.create("No ark box");
 
-                    if(!ItemStacks.isEmpty(info.item)) {
-                        user.getInventory().addItem(info.item.clone());
-                    }
-
-                    if(info.tier != null) {
-                        user.setRankTier(info.tier, true);
-                        List<RankTitle> titleList = info.tier.getTitlesForAndBelow();
-
-                        for (RankTitle t: titleList) {
-                            if(t.name().contains("LEGACY")) user.addTitle(t);
-                        }
-                    }
-
-                    ID_2_DATA.remove(user.getUniqueId());
-
-                    user.sendMessage(
-                            Component.text("Got ark box :D", NamedTextColor.YELLOW)
-                    );
+                    giveBox(user, info);
                     return 0;
                 })
 
@@ -195,6 +178,25 @@ public class CommandArkBox extends FtcCommand {
                                 )
                         )
                 );
+    }
+
+    public static void giveBox(CrownUser user, ArkBoxInfo info) {
+        if(!ItemStacks.isEmpty(info.item)) {
+            user.getInventory().addItem(info.item.clone());
+        }
+
+        if(info.tier != null) {
+            user.setRankTier(info.tier, true);
+            List<RankTitle> titleList = info.tier.getTitlesForAndBelow();
+
+            for (RankTitle t: titleList) {
+                if(t.name().contains("LEGACY")) user.addTitle(t);
+            }
+        }
+
+        user.sendMessage(
+                Component.text("Got ark box :D", NamedTextColor.YELLOW)
+        );
     }
 
     public static void save() {

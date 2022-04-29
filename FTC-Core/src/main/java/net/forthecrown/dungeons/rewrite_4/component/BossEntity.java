@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons.rewrite_4.component;
 
+import lombok.Getter;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.rewrite_4.BossComponent;
@@ -14,16 +15,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 
 public abstract class BossEntity extends BossComponent
         implements BossStatusListener, Listener, BossHealthListener
 {
+    @Getter
     protected Entity entity;
-    protected BossHealth health;
 
-    public Entity getEntity() {
-        return entity;
-    }
+    protected BossHealth health;
 
     protected abstract Entity summon(BossContext context, World w, Location l);
 
@@ -64,7 +64,13 @@ public abstract class BossEntity extends BossComponent
         Entity damager = (event instanceof EntityDamageByEntityEvent e) ? e.getDamager() : null;
         BossHealth.Damage dmg = health.damage(event.getFinalDamage(), damager, event.getCause());
 
-        event.setDamage(dmg.damage);
-        event.setCancelled(dmg.cancelled);
+        event.setDamage(dmg.getDamage());
+        event.setCancelled(dmg.isCancelled());
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityDeath(EntityDeathEvent event) {
+        if(!event.getEntity().equals(getEntity())) return;
+        getBoss().kill(false);
     }
 }

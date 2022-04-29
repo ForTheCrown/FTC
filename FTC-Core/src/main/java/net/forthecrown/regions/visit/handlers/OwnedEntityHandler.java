@@ -8,7 +8,7 @@ import net.forthecrown.regions.visit.RegionVisit;
 import net.forthecrown.regions.visit.VisitHandler;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.ListUtils;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
+import net.forthecrown.utils.math.WorldBounds3i;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -37,7 +37,7 @@ public class OwnedEntityHandler implements VisitHandler {
         // that's a no no
         entityTpLocation = visit.getTeleportLocation();
 
-        FtcBoundingBox box = FtcBoundingBox.of(visit.getDestWorld(), visit.getLocalRegion().getPoleBoundingBox());
+        WorldBounds3i box = visit.getLocalRegion().getPoleBoundingBox().toWorldBounds(visit.getDestWorld());
         box.expand(1);
 
         CrownUser user = visit.getUser();

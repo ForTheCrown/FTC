@@ -6,7 +6,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.PunishEntry;
 import net.forthecrown.core.admin.PunishType;
 import net.forthecrown.core.admin.Punishments;
@@ -18,7 +17,6 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.permissions.Permission;
 
 import javax.annotation.Nullable;
 
@@ -27,12 +25,12 @@ import static net.forthecrown.core.admin.Punishments.INDEFINITE_EXPIRY;
 public class PunishmentCommand extends FtcCommand {
     private final PunishType type;
 
-    PunishmentCommand(String name, PunishType type, Permission permission, String... aliases) {
+    PunishmentCommand(String name, PunishType type, String... aliases) {
         super(name);
 
         this.type = type;
         setAliases(aliases);
-        setPermission(permission);
+        setPermission(type.getPermission());
 
         register();
     }
@@ -63,10 +61,14 @@ public class PunishmentCommand extends FtcCommand {
     }
 
     int punish(CrownUser user, CommandSource source, @Nullable String reason, long length) throws RoyalCommandException {
+        if (!Punishments.canPunish(source, user)) {
+            throw FtcExceptionProvider.create("Cannot punish " + user.getName());
+        }
+
         PunishEntry entry = Punishments.entry(user);
 
         if (entry.isPunished(type)) {
-            throw FtcExceptionProvider.create(user.getNickOrName() + " has already been punished with a " + type.presentableName());
+            throw FtcExceptionProvider.create(user.getNickOrName() + " has already been " + type.nameEndingED());
         }
 
         Punishments.handlePunish(user, source, reason, length, type, null);
@@ -74,31 +76,31 @@ public class PunishmentCommand extends FtcCommand {
     }
 
     public static void init() {
-        new PunishmentCommand( "softmute",  PunishType.SOFT_MUTE,   Permissions.HELPER                                   );
-        new PunishmentCommand( "mute",      PunishType.MUTE,        Permissions.HELPER                                   );
-        new CommandKick(       "kick",      PunishType.KICK,        Permissions.HELPER, "fkick", "kickplayer"            );
-        new PunishmentCommand( "ban",       PunishType.BAN,         Permissions.POLICE, "fban",  "banish",      "fbanish");
-        new PunishmentCommand( "ipban",     PunishType.IP_BAN,      Permissions.POLICE, "banip", "fbanip",      "fipban" );
+        new PunishmentCommand( "softmute",  PunishType.SOFT_MUTE                                  );
+        new PunishmentCommand( "mute",      PunishType.MUTE                                       );
+        new CommandKick(       "kick",      PunishType.KICK,     "fkick", "kickplayer"            );
+        new PunishmentCommand( "ban",       PunishType.BAN,      "fban",  "banish",      "fbanish");
+        new PunishmentCommand( "ipban",     PunishType.IP_BAN,   "banip", "fbanip",      "fipban" );
 
         new CommandJails();
         new CommandJail();
 
-        new PardonCommand("unsoftmute", PunishType.SOFT_MUTE, Permissions.HELPER, "pardonsoftmute");
-        new PardonCommand("unmute", PunishType.MUTE, Permissions.HELPER, "pardonmute");
-        new PardonCommand("unjail", PunishType.JAIL, Permissions.HELPER, "pardonjail");
+        new PardonCommand("unsoftmute", PunishType.SOFT_MUTE,   "pardonsoftmute");
+        new PardonCommand("unmute",     PunishType.MUTE,        "pardonmute");
+        new PardonCommand("unjail",     PunishType.JAIL,        "pardonjail");
 
-        new PardonCommand("unban", PunishType.BAN, Permissions.POLICE, "pardon", "pardonban");
-        new PardonCommand("unbanip", PunishType.IP_BAN, Permissions.POLICE, "pardonip", "ippardon", "pardonipban");
+        new PardonCommand("unban",      PunishType.BAN,         "pardon", "pardonban");
+        new PardonCommand("unbanip",    PunishType.IP_BAN,      "pardonip", "ippardon", "pardonipban");
     }
 
     static class CommandKick extends PunishmentCommand {
-        CommandKick(String name, PunishType type, Permission permission, String... aliases) {
-            super(name, type, permission, aliases);
+        CommandKick(String name, PunishType type, String... aliases) {
+            super(name, type, aliases);
         }
 
         @Override
         int punish(CrownUser user, CommandSource source, @Nullable String reason, long length) throws RoyalCommandException {
-            if (user.isOnline()) {
+            if (!user.isOnline()) {
                 throw FtcExceptionProvider.create("Cannot kick offline user");
             }
 

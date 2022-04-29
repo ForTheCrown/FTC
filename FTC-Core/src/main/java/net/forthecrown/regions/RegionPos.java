@@ -5,6 +5,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldedit.math.BlockVector2;
 import net.forthecrown.utils.math.Vector3i;
 import org.bukkit.Location;
+import org.bukkit.persistence.PersistentDataAdapterContext;
+import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -15,9 +18,9 @@ import static net.forthecrown.regions.RegionConstants.REGION_SIZE;
  * Represents the position of a region in a 2 dimensional X Z grid.
  */
 public class RegionPos {
+    public static final PersistentDataType<int[], RegionPos> DATA_TYPE = new RegionPosDataType();
 
-    private final int x;
-    private final int z;
+    private final int x, z;
 
     public RegionPos(int x, int z) {
         this.x = x;
@@ -236,5 +239,28 @@ public class RegionPos {
     @Override
     public String toString() {
         return x + " " + z;
+    }
+
+    private static class RegionPosDataType implements PersistentDataType<int[], RegionPos> {
+
+        @Override
+        public @NotNull Class<int[]> getPrimitiveType() {
+            return int[].class;
+        }
+
+        @Override
+        public @NotNull Class<RegionPos> getComplexType() {
+            return RegionPos.class;
+        }
+
+        @Override
+        public int @NotNull [] toPrimitive(@NotNull RegionPos complex, @NotNull PersistentDataAdapterContext context) {
+            return new int[] { complex.getX(), complex.getZ() };
+        }
+
+        @Override
+        public @NotNull RegionPos fromPrimitive(int @NotNull [] primitive, @NotNull PersistentDataAdapterContext context) {
+             return new RegionPos(primitive[0], primitive[1]);
+        }
     }
 }

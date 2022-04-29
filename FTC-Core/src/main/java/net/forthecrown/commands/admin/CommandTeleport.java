@@ -3,6 +3,7 @@ package net.forthecrown.commands.admin;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.sk89q.worldedit.math.Vector3;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
@@ -15,6 +16,9 @@ import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.UserTeleport;
+import net.forthecrown.utils.math.MathUtil;
+import net.forthecrown.vars.Var;
+import net.forthecrown.vars.types.VarTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -52,12 +56,27 @@ public class CommandTeleport extends FtcCommand {
                         )
 
                         .then(argument("location_to", PositionArgument.position())
-                                .executes(c -> {
-                                    Location location = PositionArgument.getLocation(c, "location_to");
-                                    Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
+                                .executes(c -> entityTeleport(c, false, false))
 
-                                    return teleport(entities, location, FtcFormatter.clickableLocationMessage(location, false), c.getSource());
-                                })
+                                .then(argument("yaw", FloatArgumentType.floatArg(-180f, 180f))
+                                        .executes(c -> entityTeleport(c, true, false))
+
+                                        .then(argument("pitch", FloatArgumentType.floatArg(-90f, 90f))
+                                                .executes(c -> entityTeleport(c, true, true))
+                                        )
+                                )
+
+                                .then(literal("facing")
+                                        .then(argument("facing_pos", PositionArgument.position())
+                                                .executes(c -> teleportFacing(c, PositionArgument.getLocation(c, "facing_pos")))
+                                        )
+
+                                        .then(literal("facingEntity")
+                                                .then(argument("facing_entity", EntityArgument.entity())
+                                                        .executes(c -> teleportFacing(c, EntityArgument.getEntity(c, "facing_entity").getLocation()))
+                                                )
+                                        )
+                                )
                         )
                 )
 
@@ -71,6 +90,7 @@ public class CommandTeleport extends FtcCommand {
                             if(user.isTeleporting()) throw FtcExceptionProvider.create("You are already teleporting");
 
                             user.createTeleport(entity::getLocation, false, true, UserTeleport.Type.TELEPORT)
+                                    .setAsync(false)
                                     .start(false);
 
                             c.getSource().sendAdmin(
@@ -96,15 +116,40 @@ public class CommandTeleport extends FtcCommand {
                 );
     }
 
+    private int teleportFacing(CommandContext<CommandSource> c, Location facing) throws CommandSyntaxException {
+        Location location = PositionArgument.getLocation(c, "location_to");
+
+        Vector3 dif = MathUtil.toWorldEdit(location.clone().subtract(facing));
+
+        location.setYaw((float) dif.toYaw());
+        location.setPitch((float) dif.toPitch());
+
+        Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
+
+        return teleport(entities, location, FtcFormatter.clickableLocationMessage(location, false), c.getSource());
+    }
+
+    private int entityTeleport(CommandContext<CommandSource> c, boolean yaw, boolean pitch) throws CommandSyntaxException {
+        Location location = PositionArgument.getLocation(c, "location_to");
+        Collection<Entity> entities = EntityArgument.getEntities(c, "entity");
+
+        if(yaw) location.setYaw(c.getArgument("yaw", Float.class));
+        if(pitch) location.setPitch(c.getArgument("pitch", Float.class));
+
+        return teleport(entities, location, FtcFormatter.clickableLocationMessage(location, false), c.getSource());
+    }
+
     private int teleport(CommandContext<CommandSource> c, boolean yawGiven, boolean pitchGiven) throws CommandSyntaxException {
         CrownUser user = getUserSender(c);
         Location loc = PositionArgument.getLocation(c, "location");
+
         if(yawGiven) loc.setYaw(c.getArgument("yaw", Float.class));
         if(pitchGiven) loc.setPitch(c.getArgument("pitch", Float.class));
 
         if(user.isTeleporting()) throw FtcExceptionProvider.create("You are already teleporting");
 
         user.createTeleport(() -> loc, false, true, UserTeleport.Type.TELEPORT)
+                .setAsync(false)
                 .start(false);
 
         c.getSource().sendAdmin(
@@ -115,6 +160,8 @@ public class CommandTeleport extends FtcCommand {
         );
         return 0;
     }
+
+    private static final Var<Boolean> TP_SET_RETURN = Var.def("cmd_tp_tpSetsReturnLocation", VarTypes.BOOL, false);
 
     private int teleport(Collection<Entity> entities, Location location, Component destDisplayName, CommandSource source) throws CommandSyntaxException {
         if(entities.isEmpty()) throw FtcExceptionProvider.create("Found no one to teleport");
@@ -131,6 +178,7 @@ public class CommandTeleport extends FtcCommand {
             if(user.isTeleporting()) continue;
 
             user.createTeleport(() -> location, false, true, UserTeleport.Type.TELEPORT)
+                    .setSetReturn(TP_SET_RETURN.get())
                     .start(false);
             amount++;
         }

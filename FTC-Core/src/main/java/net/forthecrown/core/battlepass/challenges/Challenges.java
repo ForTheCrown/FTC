@@ -11,7 +11,7 @@ public final class Challenges {
     // -----------------------------------
     //          Daily Challenges
     // -----------------------------------
-    public static SimpleChallenge
+    public static final SimpleChallenge
             LOG_IN = register(
                     "Log in", BattlePass.Category.DAILY, 1, 100,
                     Component.text("Log in to FTC :D")
@@ -45,7 +45,7 @@ public final class Challenges {
             )
     );
 
-    public static SimpleChallenge
+    public static final SimpleChallenge
             SPEND_100K_RHINES = register(
                     "Spend 100,000 Rhines", BattlePass.Category.WEEKLY, 100000, 1000,
                     Component.text("Spend 100,000 Rhines on anything")

@@ -79,7 +79,9 @@ public class CommandNotes extends FtcCommand {
                                                         Component.text("Source: ")
                                                                 .append(Component.text(n.source()).color(NamedTextColor.WHITE))
                                                                 .color(NamedTextColor.GRAY)
+
                                                                 .append(Component.newline())
+
                                                                 .append(Component.text("Created: "))
                                                                 .append(FtcFormatter.formatDate(n.issued()).color(NamedTextColor.WHITE))
                                                 )
@@ -120,10 +122,9 @@ public class CommandNotes extends FtcCommand {
                                             }
 
                                             int index = c.getArgument("index", Integer.class);
-                                            index--;
 
                                             try {
-                                                entry.notes().remove(index);
+                                                entry.notes().remove(index - 1);
                                             } catch (IndexOutOfBoundsException e) {
                                                 throw FtcExceptionProvider.create("Invalid index: " + index);
                                             }

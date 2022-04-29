@@ -2,7 +2,7 @@ package net.forthecrown.dungeons.boss;
 
 import net.forthecrown.core.Worlds;
 import net.forthecrown.dungeons.BossItems;
-import net.forthecrown.dungeons.DungeonAreas;
+import net.forthecrown.dungeons.DungeonConstants;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.dungeons.boss.components.MinionSpawnerComponent;
@@ -30,7 +30,7 @@ import java.util.Set;
 
 public class ZhambieBoss extends SimpleBoss {
     public ZhambieBoss() {
-        super("Zhambie", new Location(Worlds.voidWorld(), -191.5, 80, 157.5), DungeonAreas.ZHAMBIE_ROOM,
+        super("Zhambie", new Location(Worlds.voidWorld(), -191.5, 80, 157.5), DungeonConstants.ZHAMBIE_ROOM,
                 DungeonUtils.makeDungeonItem(Material.DRIED_KELP, 45,  (Component) null),
                 DungeonUtils.makeDungeonItem(Material.GOLD_NUGGET, 30, (Component) null),
                 DungeonUtils.makeDungeonItem(Material.ROTTEN_FLESH, 15, "Knight's Flesh"),

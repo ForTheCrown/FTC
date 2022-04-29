@@ -1,8 +1,7 @@
 package net.forthecrown.utils.world;
 
-import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.FtcUtils;
-import net.minecraft.server.MinecraftServer;
+import net.forthecrown.utils.VanillaAccess;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.border.WorldBorder;
@@ -136,7 +135,7 @@ public class WorldReCreator {
         }
 
         if(preserveGameRules) {
-            level.getGameRules().assignFrom(rules, MinecraftServer.getServer());
+            level.getGameRules().assignFrom(rules, level);
         }
 
         return world;

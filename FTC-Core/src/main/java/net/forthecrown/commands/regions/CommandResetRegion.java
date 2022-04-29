@@ -40,7 +40,7 @@ public class CommandResetRegion extends FtcCommand {
 
                     RegionManager manager = Crown.getRegionManager();
 
-                    PopulationRegion region = manager.get(user.getRegionCords());
+                    PopulationRegion region = manager.get(user.getRegionPos());
                     String name = region.nameOrPos();
 
                     manager.reset(region);

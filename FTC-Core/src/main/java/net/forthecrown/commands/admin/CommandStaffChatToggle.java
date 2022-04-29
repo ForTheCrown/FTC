@@ -64,10 +64,10 @@ public class CommandStaffChatToggle extends FtcCommand {
 
                             if(set.contains(player)){
                                 set.remove(player);
-                                player.sendMessage(Component.text("You will no longer see StaffChat").color(NamedTextColor.GRAY));
+                                player.sendMessage(Component.text("You will now see StaffChat").color(NamedTextColor.GRAY));
                             } else {
                                 set.add(player);
-                                player.sendMessage(Component.text("You will now see StaffChat").color(NamedTextColor.GRAY));
+                                player.sendMessage(Component.text("You will no longer see StaffChat").color(NamedTextColor.GRAY));
                             }
 
                             return 0;

@@ -22,6 +22,12 @@ public final class ChatUtils {
     private ChatUtils() {}
 
     public static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
+            .character('&')
+            .extractUrls()
+            .hexColors()
+            .build();
+
+    public static final LegacyComponentSerializer SECTION_LEGACY = LegacyComponentSerializer.builder()
             .extractUrls()
             .hexColors()
             .build();
@@ -30,7 +36,14 @@ public final class ChatUtils {
     public static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     public static TextComponent convertString(String text, boolean translateColors){
-        return LEGACY.deserialize(translateColors ? FtcFormatter.formatColorCodes(text) : text);
+        return translateColors ? translateCodes(text) : Component.text(text);
+    }
+
+    private static TextComponent translateCodes(String input) {
+        TextComponent initial = LEGACY.deserialize(input);
+        String sectioned = LegacyComponentSerializer.legacySection().serialize(initial);
+
+        return SECTION_LEGACY.deserialize(sectioned);
     }
 
     public static TextComponent convertString(String text){

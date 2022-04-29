@@ -43,7 +43,7 @@ public class CommandSetHomeRegion extends FtcCommand {
                     CrownUser user = getUserSender(c);
                     RegionUtil.validateWorld(user.getWorld());
 
-                    RegionPos cords = user.getRegionCords();
+                    RegionPos cords = user.getRegionPos();
 
                     user.getHomes().setHomeRegion(cords);
 

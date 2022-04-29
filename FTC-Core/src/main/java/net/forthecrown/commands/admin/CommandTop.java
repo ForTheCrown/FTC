@@ -9,6 +9,8 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 
+// Top me :point_right::point_left: :pleading_face:
+// I'll see myself out... sorry
 public class CommandTop extends FtcCommand {
     public CommandTop(){
         super("top", Crown.inst());

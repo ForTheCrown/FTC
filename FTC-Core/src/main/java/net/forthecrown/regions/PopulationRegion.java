@@ -3,31 +3,37 @@ package net.forthecrown.regions;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.Message;
 import com.sk89q.worldedit.math.BlockVector2;
-import net.forthecrown.core.FtcVars;
+import lombok.Getter;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcDynmap;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
-import net.forthecrown.serializer.NbtSerializable;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.math.Bounds3i;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.math.WorldVec3i;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.dynmap.markers.Marker;
 import org.jetbrains.annotations.Nullable;
 
-public class PopulationRegion extends RegionData implements NbtSerializable {
-    private final FtcBoundingBox region;
+public class PopulationRegion extends RegionData {
+    private final WorldBounds3i region;
 
-    private BoundingBox poleBoundingBox;
+    private Bounds3i poleBoundingBox;
+
+    @Getter
+    private final RegionResidency residency;
 
     PopulationRegion(RegionPos pos, World world) {
         super(pos);
+
         this.region = makeRegion(world);
+        this.residency = new RegionResidency(this);
     }
 
     public PopulationRegion(RegionPos pos, World world, Tag tag) {
@@ -39,21 +45,35 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
     }
 
     //Makes a bounding box for the region, from -65 to 312
-    private FtcBoundingBox makeRegion(World world) {
+    private WorldBounds3i makeRegion(World world) {
         int minX = pos.getCenterX() - RegionConstants.HALF_REGION_SIZE;
         int minZ = pos.getCenterZ() - RegionConstants.HALF_REGION_SIZE;
 
         int maxX = pos.getCenterX() + RegionConstants.HALF_REGION_SIZE;
         int maxZ = pos.getCenterZ() + RegionConstants.HALF_REGION_SIZE;
 
-        return new FtcBoundingBox(world, minX, FtcUtils.MIN_Y, minZ, maxX, FtcUtils.MAX_Y, maxZ);
+        return new WorldBounds3i(world, minX, FtcUtils.MIN_Y, minZ, maxX, FtcUtils.MAX_Y, maxZ);
+    }
+
+    @Override
+    protected void saveExtraData(CompoundTag tag) {
+        if(!residency.isEmpty()) {
+            tag.put("residency", residency.save());
+        }
+    }
+
+    @Override
+    protected void loadExtraData(CompoundTag tag) {
+        if(tag.contains("residency", Tag.TAG_LIST)) {
+            residency.load(tag.getList("residency", Tag.TAG_COMPOUND));
+        }
     }
 
     /**
      * Gets the bounding box of this region
      * @return The region's bounding box
      */
-    public FtcBoundingBox getBB() {
+    public WorldBounds3i getBB() {
         return region;
     }
 
@@ -61,7 +81,7 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
      * Gets the bounding box of the pole
      * @return The region pole's bounding box
      */
-    public BoundingBox getPoleBoundingBox() {
+    public Bounds3i getPoleBoundingBox() {
         return poleBoundingBox;
     }
 
@@ -79,7 +99,7 @@ public class PopulationRegion extends RegionData implements NbtSerializable {
      */
     public void setPolePosition(@Nullable BlockVector2 polePosition) {
         //prev must be created before polePosition0 is called
-        FtcBoundingBox prev = FtcBoundingBox.of(getWorld(), poleBoundingBox);
+        WorldBounds3i prev = poleBoundingBox.toWorldBounds(getWorld());
 
         // Actually sets the pole's position and updates the
         // pole's bounding box

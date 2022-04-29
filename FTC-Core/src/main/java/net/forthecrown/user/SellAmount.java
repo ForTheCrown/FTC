@@ -1,11 +1,11 @@
 package net.forthecrown.user;
 
 import com.google.gson.JsonElement;
+import lombok.Getter;
 import net.forthecrown.economy.selling.SellAmountItem;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a player's sell amount in the {@link net.forthecrown.economy.selling.SellShops}
@@ -18,8 +18,11 @@ public enum SellAmount implements JsonSerializable {
     PER_64  (64, "Sell per stack",  35),
     ALL     (-1, "Sell all",        44);
 
+    @Getter
     private final byte value;
+    @Getter
     private final String text;
+    @Getter
     private final SellAmountItem invOption;
 
     SellAmount(int i, String text, int slot) {
@@ -29,36 +32,8 @@ public enum SellAmount implements JsonSerializable {
         invOption = new SellAmountItem(this, slot);
     }
 
-    /**
-     * Gets the sell amount from a byte
-     *
-     * @param i The byte to get from
-     * @return The sell amount of the corresponding byte, or null if one wasn't found
-     */
-    public static @Nullable SellAmount fromInt(byte i) {
-        return switch (i) {
-            case 64 -> PER_64;
-            case 16 -> PER_16;
-            case 1 -> PER_1;
-            case -1 -> ALL;
-            default -> null;
-        };
-    }
-
     public byte getItemAmount() {
         return (byte) Math.max(1, value);
-    }
-
-    public byte getValue() {
-        return value;
-    }
-
-    public SellAmountItem getInvOption() {
-        return invOption;
-    }
-
-    public String getText() {
-        return text;
     }
 
     public Component loreThing() {

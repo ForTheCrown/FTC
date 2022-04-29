@@ -4,6 +4,9 @@ import com.google.gson.JsonElement;
 import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 
+/**
+ * A single staff note
+ */
 public record EntryNote(String info, long issued, String source) implements JsonSerializable {
     @Override
     public JsonElement serialize() {

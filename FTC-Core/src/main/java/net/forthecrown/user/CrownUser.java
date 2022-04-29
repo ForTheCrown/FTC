@@ -833,7 +833,7 @@ public interface CrownUser extends
      * Gets the region pos of the user
      * @return The user's region pos
      */
-    default RegionPos getRegionCords() {
+    default RegionPos getRegionPos() {
         return RegionPos.of(getLocation());
     }
 
@@ -988,6 +988,10 @@ public interface CrownUser extends
     }
 
     long getLastOnline();
+
+    default UserCache.CacheEntry getCacheEntry() {
+        return Crown.getUserManager().getCache().getEntry(getUniqueId());
+    }
 
     default long getLastSeen() {
         if(isOnline()) return System.currentTimeMillis();

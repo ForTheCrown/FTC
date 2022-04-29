@@ -6,7 +6,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.Keys;
+import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.InteractionUtils;
 import net.forthecrown.utils.JsonUtils;
@@ -52,16 +55,10 @@ public class CheckHasitem implements UsageCheck<CheckHasitem.CheckInstance> {
         return false;
     }
 
+    @RequiredArgsConstructor
     public static class CheckInstance implements UsageCheckInstance {
+        @Getter
         private final ItemStack item;
-
-        CheckInstance(ItemStack item) {
-            this.item = item;
-        }
-
-        public ItemStack getItem() {
-            return item.clone();
-        }
 
         @Override
         public String asString() {
@@ -70,7 +67,8 @@ public class CheckHasitem implements UsageCheck<CheckHasitem.CheckInstance> {
 
         @Override
         public Component failMessage(Player player) {
-            return Component.text("You don't have the required item")
+            return Component.text("You don't have the required item: ")
+                    .append(FtcFormatter.itemDisplayName(item))
                     .color(NamedTextColor.GRAY);
         }
 

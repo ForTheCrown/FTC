@@ -1,6 +1,5 @@
 package net.forthecrown.commands.admin;
 
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.arguments.UserParseResult;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -17,13 +16,33 @@ public class CommandVanish extends FtcCommand {
         super("vanish", Crown.inst());
 
         setPermission(Permissions.VANISH);
+        setAliases("v");
         register();
     }
+
+    /*
+     * ----------------------------------------
+     * 			Command description:
+     * ----------------------------------------
+     * Allows you to disappear
+     *
+     * Valid usages of command:
+     * - /vanish
+     * - /vanish -joinLeaveMessage
+     * - /vanish <user>
+     * - /vanish <user> -joinLeaveMessage
+     *
+     * Author: Julie
+     */
 
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> vanish(c.getSource(), getUserSender(c), false))
+
+                .then(literal("-joinLeaveMessage")
+                        .executes(c -> vanish(c.getSource(), getUserSender(c), true))
+                )
 
                 .then(argument("user", UserArgument.user())
                         .executes(c -> vanish(
@@ -32,11 +51,11 @@ public class CommandVanish extends FtcCommand {
                                         false
                         ))
 
-                        .then(argument("message", BoolArgumentType.bool())
+                        .then(literal("-joinLeaveMessage")
                                 .executes(c -> vanish(
                                         c.getSource(),
                                         c.getArgument("user", UserParseResult.class).getUser(c.getSource(), false),
-                                        c.getArgument("message", Boolean.class)
+                                        true
                                 ))
                         )
                 );

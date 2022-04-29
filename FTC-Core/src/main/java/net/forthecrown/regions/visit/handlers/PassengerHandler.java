@@ -126,7 +126,7 @@ public class PassengerHandler implements VisitHandler {
             CompoundTag saved = new CompoundTag();
             nms.saveWithoutId(saved);
 
-            saved.putString("id", nms.getMinecraftKeyString());
+            saved.putString("id", nms.getEncodeId());
             saved.put("Pos", newDoubleList(dest.getX(), dest.getY(), dest.getZ()));
 
             nms.discard();

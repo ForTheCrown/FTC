@@ -12,6 +12,7 @@ import net.kyori.adventure.key.Keyed;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -31,8 +32,8 @@ import java.util.Map;
 public class BlockStructure implements NbtSerializable, Keyed {
     public static final String
             PALETTE_TAG = "palettes",
-            ENTITY_TAG = "entities",
-            HEADER_TAG = "header";
+            ENTITY_TAG  = "entities",
+            HEADER_TAG  = "header";
 
     private final Key key;
     private final Map<BlockState, BlockPalette> palettes = new Object2ObjectOpenHashMap<>();
@@ -83,7 +84,7 @@ public class BlockStructure implements NbtSerializable, Keyed {
 
                 net.minecraft.world.entity.Entity entity = VanillaAccess.getEntity(e);
                 CompoundTag data = new CompoundTag();
-                data.putString("id", entity.getMinecraftKeyString());
+                data.putString("id", EntityType.getKey(entity.getType()).toString());
                 data = entity.saveWithoutId(data);
 
                 entityInfos.add(new StructureEntityInfo(offset, data));
@@ -148,6 +149,7 @@ public class BlockStructure implements NbtSerializable, Keyed {
     public void clear() {
         entityInfos.clear();
         palettes.clear();
+        size = null;
     }
 
     public CompoundTag getHeader() {

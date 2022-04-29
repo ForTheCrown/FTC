@@ -46,11 +46,6 @@ public interface Kingship extends Nameable {
     void set(@Nullable UUID uuid);
 
     boolean isFemale();
-
-    /**
-     * 
-     * @param female
-     */
     void setFemale(boolean female);
 
     /**

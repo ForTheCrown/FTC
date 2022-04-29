@@ -1,7 +1,5 @@
 package net.forthecrown.economy.shops;
 
-import net.forthecrown.serializer.CrownSerializer;
-import net.forthecrown.serializer.Deletable;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.Nameable;
@@ -17,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * <p></p>
  * Implementation: {@link FtcSignShop}
  */
-public interface SignShop extends CrownSerializer, InventoryHolder, Nameable, Deletable {
+public interface SignShop extends InventoryHolder, Nameable {
 
     /**
      * Gets the file name of the shop
@@ -31,15 +29,12 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable, De
         return getFileName().toString();
     }
 
+    void load();
+
     /**
      * Destroys the shop lol
      */
     void destroy(boolean removeBlock);
-
-    /**
-     * Unloads the shop
-     */
-    void unload();
 
     /**
      * Gets the shop's location
@@ -98,14 +93,6 @@ public interface SignShop extends CrownSerializer, InventoryHolder, Nameable, De
      * @param updateSign whether the shop's sign should be updated
      */
     void setPrice(int price, boolean updateSign);
-
-    /**
-     * Gets if the file was deleted
-     * <p>Deleted in this context means that the sign the shop is based on has been broken by a player... I don't wanna know what happens when a non player breaks a sign</p>
-     * <p>This is used basically only in the save method to stop it from saving the file when it's supposed to have been deleted</p>
-     * @return Whether the shop has been deleted or not
-     */
-    boolean wasDeleted();
 
     /**
      * Gets the sign on which the shop is located

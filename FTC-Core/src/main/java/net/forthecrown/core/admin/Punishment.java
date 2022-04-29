@@ -19,6 +19,9 @@ import java.util.Objects;
 
 import static net.forthecrown.core.admin.Punishments.INDEFINITE_EXPIRY;
 
+/**
+ * A punishment
+ */
 public final class Punishment implements JsonSerializable {
     private final String source;
     private final String reason;
@@ -45,6 +48,11 @@ public final class Punishment implements JsonSerializable {
         this.expires = expires;
     }
 
+    /**
+     * Starts the punishment expiry task, will not do
+     * anything if {@code expires == {@link Punishments#INDEFINITE_EXPIRY}}
+     * @param callback The callback to call once the punishment expires
+     */
     public void startTask(Runnable callback) {
         if(expires == INDEFINITE_EXPIRY) return;
         cancelTask();
@@ -55,40 +63,71 @@ public final class Punishment implements JsonSerializable {
         Bukkit.getScheduler().runTaskLater(Crown.inst(), callback, until);
     }
 
+    /**
+     * Stops the expiry task
+     */
     public void cancelTask() {
         if(task == null || task.isCancelled()) return;
         task.cancel();
         task = null;
     }
 
-    public boolean willExpire() {
-        return expires != INDEFINITE_EXPIRY;
-    }
-
+    /**
+     * Gets the name of the punishment's source
+     * @return Punisher's name
+     */
     public String source() {
         return source;
     }
 
+    /**
+     * Gets the reason of the punishment, may be null
+     * @return The reason for this punishment
+     */
     public String reason() {
         return reason;
     }
 
+    /**
+     * Gets the punishment type
+     * @return The punishment type
+     */
     public PunishType type() {
         return type;
     }
 
+    /**
+     * Gets the extra data this holds
+     * @return The extra data, may be null
+     */
     public String extra() {
         return extra;
     }
 
+    /**
+     * Gets the UNIX timestamp of when
+     * the punishment began
+     * @return The punishment beginning
+     */
     public long began() {
         return began;
     }
 
+    /**
+     * Gets the UNIX timestamp of when
+     * the punishment will end
+     * @return The punishment end, or {@link Punishments#INDEFINITE_EXPIRY}
+     *         if it'll never end
+     */
     public long expires() {
         return expires;
     }
 
+    /**
+     * Writes info about this punishment
+     * into the given writer
+     * @param writer The writer to write to
+     */
     public void writeDisplay(ComponentWriter writer) {
         writeField(writer, "Source", source);
         writeField(writer, "Began", FtcFormatter.formatDate(began));
@@ -126,7 +165,7 @@ public final class Punishment implements JsonSerializable {
             json.add("reason", reason);
         }
 
-        if (FtcUtils.isNullOrBlank(extra)) {
+        if (!FtcUtils.isNullOrBlank(extra)) {
             json.add("extra", extra);
         }
 
@@ -169,7 +208,7 @@ public final class Punishment implements JsonSerializable {
 
     @Override
     public String toString() {
-        return "Punishment[" +
+        return getClass().getSimpleName() + "[" +
                 "source=" + source + ", " +
                 "reason=" + reason + ", " +
                 "type=" + type + ", " +

@@ -2,7 +2,10 @@ package net.forthecrown.useables.actions;
 
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.WorldArgument;
@@ -17,6 +20,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.CompletableFuture;
 
 public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance> {
     public static final NamespacedKey KEY = Keys.forthecrown("teleport_user");
@@ -70,6 +75,11 @@ public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance
     @Override
     public boolean requiresInput() {
         return false;
+    }
+
+    @Override
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        return PositionArgument.position().listSuggestions(context, builder);
     }
 
     public static class ActionInstance implements UsageActionInstance {

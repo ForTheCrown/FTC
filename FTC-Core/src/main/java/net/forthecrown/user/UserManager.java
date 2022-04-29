@@ -85,14 +85,6 @@ public interface UserManager extends CrownSerializer {
     }
 
     /**
-     * Gets all currently loaded users
-     * @return The currently loaded users
-     */
-    static Collection<CrownUser> getLoadedUsers() {
-        return new ArrayList<>(FtcUserManager.LOADED_USERS.values());
-    }
-
-    /**
      * Gets all currently online players as users
      * @return All online users
      */

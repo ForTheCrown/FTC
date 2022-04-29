@@ -8,17 +8,16 @@ import net.forthecrown.core.admin.PunishType;
 import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.CrownUser;
-import org.bukkit.permissions.Permission;
 
 public class PardonCommand extends FtcCommand {
     private final PunishType type;
 
-    PardonCommand(String name, PunishType type, Permission permission, String... aliases) {
+    PardonCommand(String name, PunishType type, String... aliases) {
         super(name);
         this.type = type;
 
         setAliases(aliases);
-        setPermission(permission);
+        setPermission(type.getPermission());
 
         register();
     }
@@ -31,7 +30,11 @@ public class PardonCommand extends FtcCommand {
                     PunishEntry entry = Punishments.entry(user);
 
                     if (!entry.isPunished(type)) {
-                       throw FtcExceptionProvider.create(user.getNickOrName() + " is not " + type.presentableName());
+                       throw FtcExceptionProvider.create(user.getNickOrName() + " is not " + type.nameEndingED());
+                    }
+
+                    if (!c.getSource().hasPermission(type.getPermission())) {
+                       throw FtcExceptionProvider.create("You do not have enough permissions to pardon a " + type.presentableName());
                     }
 
                     entry.revokePunishment(type);

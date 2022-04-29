@@ -9,6 +9,9 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Worlds;
@@ -25,33 +28,31 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Date;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class FtcMarketShop implements MarketShop {
+    @Getter
     private final ProtectedRegion worldGuard;
 
-    private final ObjectList<ShopEntrance> entrances = new ObjectArrayList<>();
-    private final ObjectList<String> connected = new ObjectArrayList<>();
-
+    @Getter @Setter
     private UUID owner;
+
+    @Getter @Setter
     private Date dateOfPurchase;
-    private EvictionData evictionData;
+
+    @Getter
     private final ObjectList<UUID> coOwners = new ObjectArrayList<>();
 
+    @Getter @Setter
+    private boolean taxed;
+
+    @Getter
+    private final ObjectList<ShopEntrance> entrances = new ObjectArrayList<>();
+
+    private final ObjectList<String> connected = new ObjectArrayList<>();
+
+    private EvictionData evictionData;
     private int price = -1;
     private String mergedName;
-
-    public FtcMarketShop(ProtectedRegion worldGuard) {
-        this.worldGuard = worldGuard;
-    }
-
-    @Override
-    public ProtectedRegion getWorldGuard() {
-        return worldGuard;
-    }
-
-    @Override
-    public ObjectList<ShopEntrance> getEntrances() {
-        return entrances;
-    }
 
     @Override
     public int getPrice() {
@@ -61,16 +62,6 @@ public class FtcMarketShop implements MarketShop {
     @Override
     public void setPrice(int price) {
         this.price = Mth.clamp(price, -1, FtcVars.maxMoneyAmount.get());
-    }
-
-    @Override
-    public Date getDateOfPurchase() {
-        return dateOfPurchase;
-    }
-
-    @Override
-    public void setDateOfPurchase(Date dateOfPurchase) {
-        this.dateOfPurchase = dateOfPurchase;
     }
 
     @Override
@@ -87,21 +78,6 @@ public class FtcMarketShop implements MarketShop {
     @Override
     public void setMerged(MarketShop shop) {
         mergedName = shop == null ? null : shop.getName();
-    }
-
-    @Override
-    public UUID getOwner() {
-        return owner;
-    }
-
-    @Override
-    public void setOwner(UUID uuid) {
-        this.owner = uuid;
-    }
-
-    @Override
-    public ObjectList<UUID> getCoOwners() {
-        return coOwners;
     }
 
     @Override

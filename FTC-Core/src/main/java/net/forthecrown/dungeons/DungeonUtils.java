@@ -20,6 +20,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
+import org.spigotmc.SpigotConfig;
 
 public final class DungeonUtils {
     private DungeonUtils() {}
@@ -76,7 +77,9 @@ public final class DungeonUtils {
             zomzom.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
             zomzom.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
 
-            zomzom.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(200);
+            zomzom.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(SpigotConfig.maxHealth);
+            zomzom.setHealth(SpigotConfig.maxHealth);
+
             zomzom.setAI(false);
             zomzom.stopSound(SoundStop.all());
             zomzom.setGravity(false);

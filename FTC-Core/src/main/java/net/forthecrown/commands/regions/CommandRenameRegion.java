@@ -58,7 +58,7 @@ public class CommandRenameRegion extends FtcCommand {
         String name = c.getArgument("name", String.class);
 
         RegionManager manager = Crown.getRegionManager();
-        PopulationRegion region = manager.get(user.getRegionCords());
+        PopulationRegion region = manager.get(user.getRegionPos());
 
         if(name.equals("-clear")) {
             manager.rename(region, null, false);

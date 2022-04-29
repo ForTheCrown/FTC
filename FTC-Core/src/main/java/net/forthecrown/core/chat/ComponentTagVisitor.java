@@ -2,6 +2,7 @@ package net.forthecrown.core.chat;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.nbt.*;
 
@@ -38,7 +39,9 @@ public class ComponentTagVisitor implements TagVisitor {
         if(prefix != null) builder.append(prefix);
 
         tag.accept(this);
-        return builder.build();
+        return builder
+                .clickEvent(ClickEvent.copyToClipboard(new StringTagVisitor().visit(tag)))
+                .build();
     }
 
     private void newLine() {

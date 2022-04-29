@@ -2,7 +2,7 @@ package net.forthecrown.regions;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.forthecrown.serializer.NbtSerializable;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.Nameable;
 import net.kyori.adventure.text.Component;
@@ -13,7 +13,6 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
-public abstract class RegionData implements Nameable, HoverEventSource<Component>, NbtSerializable {
+public abstract class RegionData implements Nameable, HoverEventSource<Component> {
     private static final GsonComponentSerializer SERIALIZER = GsonComponentSerializer.gson();
 
     protected final RegionPos pos;
@@ -36,34 +35,22 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
         this.pos = pos;
     }
 
-    @Override
-    public Tag save() {
-        boolean noPos = polePosition == null;
-        boolean noName = FtcUtils.isNullOrBlank(name);
+    public void save(CompoundTag tag) {
 
-        //Shouldn't serialize
-        if(noPos && noName) return null;
+        if (polePosition != null) tag.put("polePosition", RegionUtil.writeColumn(polePosition));
 
-        //If it only has a name
-        if(noPos && description == null && nameColor == null && !hasProperties()) {
-            return StringTag.valueOf(name);
+        if (!FtcUtils.isNullOrBlank(name)) {
+            tag.putString("name", name);
+
+            if (nameColor != null) tag.putInt("color", nameColor.value());
+            if (description != null) tag.putString("description", ChatUtils.GSON.serialize(description));
         }
 
-        //If it only has a position
-        if(!noPos && noName) {
-            return RegionUtil.writeColumn(polePosition);
+        if (!properties.isEmpty()) {
+           tag.putInt("properties", RegionProperty.pack(properties));
         }
 
-        //It has a both a name and a custom position.
-        CompoundTag tag = new CompoundTag();
-        tag.putString("name", name);
-
-        if(hasProperties()) tag.putByte("properties", RegionUtil.writeProperties(properties));
-        if(polePosition != null) tag.put("polePosition", RegionUtil.writeColumn(polePosition));
-        if(description != null) tag.putString("description", SERIALIZER.serialize(description));
-        if(nameColor != null) tag.putString("color", nameColor.asHexString());
-
-        return tag;
+        saveExtraData(tag);
     }
 
     protected void readTag(Tag tag) {
@@ -95,15 +82,20 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
         // Properties must be deserialized before name
         if(tags.contains("properties")) {
             properties.clear();
-            properties.addAll(RegionUtil.readProperties(tags.getByte("properties")));
+            properties.addAll(RegionProperty.unpack(tags.getInt("properties")));
         }
 
         this.name = tags.getString("name");
 
         //If has description, set it
         if(tags.contains("description")) this.description = SERIALIZER.deserialize(tags.getString("description"));
-        if(tags.contains("color")) this.nameColor = TextColor.fromHexString(tags.getString("color"));
+        if(tags.contains("color")) this.nameColor = TextColor.color(tags.getInt("color"));
+
+        loadExtraData(tags);
     }
+
+    protected void saveExtraData(CompoundTag tag) {}
+    protected void loadExtraData(CompoundTag tag) {}
 
     // sets the pole position without generating a new pole or removing the old one
     protected void setPolePosition0(@Nullable BlockVector2 polePosition) {
@@ -125,15 +117,15 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
     public void addProperty(RegionProperty property) {
         if(hasProperty(property)) return;
 
-        property.onAdd(this);
         properties.add(property);
+        property.onAdd(this);
     }
 
     public void removeProperty(RegionProperty property) {
         if(!hasProperty(property)) return;
 
-        property.onRemove(this);
         properties.remove(property);
+        property.onRemove(this);
     }
 
     public boolean hasProperties() {
@@ -178,13 +170,15 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
 
     @Override
     public @NotNull HoverEvent<Component> asHoverEvent(@NotNull UnaryOperator<Component> op) {
+        BlockVector2 vec2 = getPolePosition();
+
         return HoverEvent.showText(
                 op.apply(
                         Component.text()
                                 .append(descOrEmpty())
-                                .append(Component.text("x: " + getPos().getCenterX()))
+                                .append(Component.text("x: " + vec2.getX()))
                                 .append(Component.newline())
-                                .append(Component.text("z: " + getPos().getCenterZ()))
+                                .append(Component.text("z: " + vec2.getZ()))
                                 .build()
                 )
         );
@@ -199,7 +193,12 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
      * @return The region's name, or it's position.
      */
     public String nameOrPos() {
-        return hasName() ? getName() : getPos().toString();
+        if (hasName()) {
+            return getName();
+        }
+
+        BlockVector2 polePos = getPolePosition();
+        return polePos.getX() + " " + polePos.getZ();
     }
 
     /**
@@ -224,11 +223,6 @@ public abstract class RegionData implements Nameable, HoverEventSource<Component
     public static class Empty extends RegionData {
         public Empty(RegionPos pos) {
             super(pos);
-        }
-
-        @Override
-        protected void setPolePosition0(BlockVector2 vector2) {
-            this.polePosition = vector2;
         }
 
         @Override

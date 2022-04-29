@@ -2,12 +2,13 @@ package net.forthecrown.user;
 
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcVars;
-import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.events.dynamic.AsyncTeleportListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -24,7 +25,10 @@ public class UserTeleport {
     private final Supplier<Location> destination;
     private final boolean noCooldown;
     private final Type type;
+
     private AsyncTeleportListener listener;
+    private boolean async = true;
+    private boolean setReturn = true;
 
     private Component startMessage;
     private Component completeMessage;
@@ -47,7 +51,10 @@ public class UserTeleport {
                 user.sendMessage(Objects.requireNonNullElseGet(startMessage, () ->
                         Component.text(type.action + " in ")
                                 .color(NamedTextColor.GRAY)
-                                .append(Component.text(FtcFormatter.convertTicksIntoTime(FtcVars.tpTickDelay.get())).color(NamedTextColor.GOLD))
+                                .append(new TimePrinter(FtcVars.tpTickDelay.get() * 50)
+                                        .print()
+                                        .color(NamedTextColor.GOLD)
+                                )
                                 .append(Component.newline())
                                 .append(Component.text("Don't move!"))));
             }
@@ -91,8 +98,13 @@ public class UserTeleport {
         user.onTpComplete();
 
         try { //It'll probably throw an exception when the player logs out and the supplier can't get the loc
-            user.getPlayer().teleportAsync(destination.get());
-            user.setLastLocation(location);
+            Location dest = destination.get();
+            Player player = user.getPlayer();
+
+            if(FtcVars.useAsyncTpForPlayers.get() && async) player.teleportAsync(dest);
+            else player.teleport(dest);
+
+            if(setReturn) user.setLastLocation(location);
         } catch (NullPointerException ignored){ }
 
         stop();
@@ -134,6 +146,24 @@ public class UserTeleport {
 
     public UserTeleport setInterruptMessage(Component interruptMessage) {
         this.interruptMessage = interruptMessage;
+        return this;
+    }
+
+    public boolean isAsync() {
+        return async;
+    }
+
+    public UserTeleport setAsync(boolean async) {
+        this.async = async;
+        return this;
+    }
+
+    public boolean setReturn() {
+        return setReturn;
+    }
+
+    public UserTeleport setSetReturn(boolean setReturn) {
+        this.setReturn = setReturn;
         return this;
     }
 

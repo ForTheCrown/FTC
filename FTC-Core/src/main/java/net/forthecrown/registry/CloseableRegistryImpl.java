@@ -13,7 +13,7 @@ public class CloseableRegistryImpl<T> extends RegistryImpl<T> implements Closeab
     }
 
     @Override
-    public void close(){
+    public void close() {
         open = false;
     }
 
@@ -40,5 +40,5 @@ public class CloseableRegistryImpl<T> extends RegistryImpl<T> implements Closeab
         super.clear();
     }
 
-    private void validateOpen(){ Validate.isTrue(open, "Registry is closed"); }
+    private void validateOpen() { Validate.isTrue(open, "Registry is closed"); }
 }

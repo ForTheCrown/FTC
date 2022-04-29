@@ -2,18 +2,20 @@ package net.forthecrown.economy.shops;
 
 import com.google.gson.JsonElement;
 import net.forthecrown.core.chat.FtcFormatter;
-import net.forthecrown.serializer.JsonSerializable;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.nbt.LongArrayTag;
+import net.minecraft.nbt.Tag;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
 import java.util.UUID;
 
-public record HistoryEntry(long date, UUID customer, int amount, int earned, boolean wasBuy) implements JsonSerializable {
+public record HistoryEntry(long date, UUID customer, int amount, int earned, boolean wasBuy) {
     public HistoryEntry(long date, UUID customer, int amount, int earned, Type type) {
         this(date, customer, amount, earned, type == Type.BUY);
     }
@@ -44,7 +46,7 @@ public record HistoryEntry(long date, UUID customer, int amount, int earned, boo
         return FtcFormatter.displayName(entity);
     }
 
-    public static HistoryEntry of(JsonElement element) {
+    public static HistoryEntry ofLegacyJson(JsonElement element) {
         JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
 
         return new HistoryEntry(
@@ -56,20 +58,36 @@ public record HistoryEntry(long date, UUID customer, int amount, int earned, boo
         );
     }
 
-    @Override
-    public JsonElement serialize() {
-        JsonWrapper json = JsonWrapper.empty();
 
-        json.add("date", date);
-        json.addUUID("customer", customer);
-        json.add("amount", amount);
-        json.add("earned", earned);
+    public static HistoryEntry of(Tag t) {
+        return of(((LongArrayTag) t).getAsLongArray());
+    }
 
-        if(!wasBuy) {
-            json.addEnum("type", type());
-        }
+    public static HistoryEntry of(long[] data) {
+        Validate.isTrue(data.length >= 6, "Invalid data size");
 
-        return json.getSource();
+        return new HistoryEntry(
+                data[0],
+                new UUID(data[1], data[2]),
+                (int) data[3],
+                (int) data[4],
+                Type.values()[(int) data[5]]
+        );
+    }
+
+    public long[] toArray() {
+        return new long[] {
+                date,
+                customer.getMostSignificantBits(),
+                customer.getLeastSignificantBits(),
+                amount,
+                earned,
+                type().ordinal()
+        };
+    }
+
+    public LongArrayTag save() {
+        return new LongArrayTag(toArray());
     }
 
     public enum Type {

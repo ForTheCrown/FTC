@@ -66,8 +66,7 @@ public final class FtcUtils {
     }
 
     public static String addAnS(long amount){
-        if(amount == 1) return "";
-        return "s";
+        return amount == 1 ? "" : "s";
     }
 
     public static InputStream getFileOrResource(String path)  {
@@ -270,6 +269,10 @@ public final class FtcUtils {
 
     public static NamespacedKey ensureBukkit(Key key) {
         return key instanceof NamespacedKey ? (NamespacedKey) key : new NamespacedKey(key.namespace(), key.value());
+    }
+
+    public static boolean isNullOrEmpty(@Nullable Map<?, ?> map) {
+        return map == null || map.isEmpty();
     }
 
     public enum RomanNumeral {

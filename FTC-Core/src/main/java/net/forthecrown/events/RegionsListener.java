@@ -6,9 +6,7 @@ import net.forthecrown.core.Worlds;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionManager;
 import net.forthecrown.regions.RegionPos;
-import net.minecraft.core.BlockPos;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
@@ -47,9 +45,8 @@ public class RegionsListener implements Listener {
         while (iterator.hasNext()) {
             Block b = iterator.next();
             PopulationRegion region = manager.get(RegionPos.of(b.getX(), b.getZ()));
-            BlockPos pos = ((CraftBlock) b).getPosition();
 
-            if(region.getPoleBoundingBox().isInside(pos)) {
+            if(region.getPoleBoundingBox().contains(b)) {
                 iterator.remove();
             }
         }
@@ -58,9 +55,8 @@ public class RegionsListener implements Listener {
     private void piston(BlockPistonEvent event, List<Block> blocks) {
         for (Block b: blocks) {
             PopulationRegion region = manager.get(RegionPos.of(b.getX(), b.getZ()));
-            BlockPos pos = ((CraftBlock) b).getPosition();
 
-            if(region.getPoleBoundingBox().isInside(pos)) {
+            if(region.getPoleBoundingBox().contains(b)) {
                 event.setCancelled(true);
             }
         }
@@ -74,7 +70,7 @@ public class RegionsListener implements Listener {
 
         PopulationRegion region = manager.get(RegionPos.of(block.getX(), block.getZ()));
 
-        if(region.getPoleBoundingBox().isInside(new BlockPos(block.getX(), block.getY(), block.getZ()))) {
+        if(region.getPoleBoundingBox().contains(block)) {
             event.setCancelled(true);
         }
     }

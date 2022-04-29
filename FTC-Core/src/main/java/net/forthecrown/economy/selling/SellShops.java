@@ -222,6 +222,7 @@ public class SellShops {
         // Why do we track earnings again? Taxes?
         if (totalEarned > 0) {
             economy.add(user.getUniqueId(), totalEarned);
+            user.addTotalEarnings(totalEarned);
         }
 
         // Inform this good person that they've made

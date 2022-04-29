@@ -14,24 +14,27 @@ public final class Permissions {
 
     public static final Permission
             EAVESDROP               = register("ftc.eavesdrop"),
-            EAVESDROP_DM            = register("ftc.eavesdrop.dm"),
-            EAVESDROP_SIGNS         = register("ftc.eavesdrop.signs"),
-            EAVESDROP_ADMIN         = register("ftc.eavesdrop.admin"),
-            EAVESDROP_MUTED         = register("ftc.eavesdrop.muted"),
-            EAVESDROP_MARRIAGE      = register("ftc.eavesdrop.marriage"),
+            EAVESDROP_DM            = register(EAVESDROP.getName() + ".dm"),
+            EAVESDROP_SIGNS         = register(EAVESDROP.getName() + ".signs"),
+            EAVESDROP_ADMIN         = register(EAVESDROP.getName() + ".admin"),
+            EAVESDROP_MUTED         = register(EAVESDROP.getName() + ".muted"),
+            EAVESDROP_MARRIAGE      = register(EAVESDROP.getName() + ".marriage"),
+
+            VANISH                  = register("ftc.vanish"),
+            VANISH_SEE              = register(VANISH.getName() + ".see"),
 
             HELPER                  = register("ftc.helper"),
             POLICE                  = register("ftc.police"),
-            VANISH                  = register("ftc.vanish"),
-            VANISH_SEE              = register("ftc.vanish.see"),
+            ADMIN                   = register("ftc.admin"),
 
             STAFF_CHAT              = register("ftc.staffchat"),
-            ADMIN                   = register("ftc.admin"),
+            ROYAL_SWORD             = register("ftc.royalsword"),
             GAMEMODES               = register("ftc.gamemodes"),
             KING_MAKER              = register("ftc.kingmaker"),
+            BROADCAST               = register("ftc.broadcast"),
+
             IGNORE_CHAT_CASE        = register("ftc.chatcaseignore"),
             IGNORE_SWEARS           = register("ftc.ignorebannedwords"),
-            BROADCAST               = register("ftc.broadcast"),
 
             DONATOR_1               = register("ftc.donator1"),
             DONATOR_2               = register("ftc.donator2"),
@@ -42,15 +45,16 @@ public final class Permissions {
 
             MARRY                   = register("ftc.marry"),
 
-            EMOTE_IGNORE            = register("ftc.emotes.cooldown.ignore"),
             EMOTES                  = register("ftc.emotes"),
-            EMOTE_JINGLE            = register("ftc.emotes.jingle"),
-            EMOTE_POG               = register("ftc.emotes.pog"),
-            EMOTE_SCARE             = register("ftc.emotes.scare"),
-            EMOTE_HUG               = register("ftc.emotes.hug"),
+            EMOTE_IGNORE            = register(EMOTES.getName() + ".cooldown.ignore"),
+            EMOTE_JINGLE            = register(EMOTES.getName() + ".jingle"),
+            EMOTE_POG               = register(EMOTES.getName() + ".pog"),
+            EMOTE_SCARE             = register(EMOTES.getName() + ".scare"),
+            EMOTE_HUG               = register(EMOTES.getName() + ".hug"),
 
             MAIL                    = register("ftc.mail"),
-            MAIL_OTHERS             = register("ftc.mail.others"),
+            MAIL_OTHERS             = register(MAIL.getName() + ".others"),
+            MAIL_ALL                = register(MAIL.getName() + ".all"),
 
             GUILD                   = register("ftc.guilds"),
             GUILD_ADMIN             = register(GUILD.getName() + ".admin"),
@@ -119,7 +123,7 @@ public final class Permissions {
             IGNORE_AC               = register(COMMAND_PREFIX + "ignoreac"),
 
             REGIONS                 = register("ftc.regions"),
-            REGIONS_ADMIN           = register("ftc.regions.admin"),
+            REGIONS_ADMIN           = register(REGIONS.getName() + ".admin"),
 
             MARKETS                 = register("ftc.markets"),
 

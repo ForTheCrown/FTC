@@ -2,11 +2,12 @@ package net.forthecrown.dungeons.rewrite_4;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.SpawnRequirement;
 import net.forthecrown.dungeons.rewrite_4.component.BossStatusListener;
 import net.forthecrown.dungeons.rewrite_4.component.SpawnHandler;
-import net.forthecrown.dungeons.rewrite_4.type.BossType;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.utils.Locations;
 import net.forthecrown.utils.Nameable;
@@ -24,15 +25,18 @@ public class DungeonBoss implements Nameable {
     protected final Set<BossComponent> components = new ObjectOpenHashSet<>();
     protected final Set<CompTracker> compTrackers = new ObjectOpenHashSet<>();
 
-    private final BossType type;
-    private final BossIdentifier identifier;
+    @Getter private final BossType type;
+    @Getter private final BossIdentifier identifier;
 
-    private BossContext currentContext;
-    private Location spawnLocation;
+    @Getter private BossContext currentContext;
+    @Setter private Location spawnLocation;
+    @Getter private boolean alive;
+
+    @Getter @Setter
     private WorldBounds3i room;
-    private SpawnRequirement requirement;
 
-    private boolean alive;
+    @Getter @Setter
+    private SpawnRequirement requirement;
 
     public DungeonBoss(BossType type) {
         this.type = type;
@@ -45,8 +49,11 @@ public class DungeonBoss implements Nameable {
     }
 
     public boolean attemptSpawn(Player player) {
-        if (!requirement.test(player)) return false;
-        if(alive) return false;
+        if(isAlive()) return false;
+
+        if(requirement != null && !requirement.test(player)) {
+            return false;
+        }
 
         spawn();
         return true;
@@ -79,8 +86,11 @@ public class DungeonBoss implements Nameable {
         CompoundTag baseData = new CompoundTag();
         baseData.put("room", room.save());
 
-        baseData.putString("requirement_type", Registries.SPAWN_REQUIREMENTS.getKey(requirement.getType()).asString());
-        baseData.put("requirement_data", requirement.save());
+        if(requirement != null) {
+            baseData.putString("requirement_type", Registries.SPAWN_REQUIREMENTS.getKey(requirement.getType()).asString());
+            baseData.put("requirement_data", requirement.save());
+        }
+
         baseData.put("spawn_location", Locations.save(spawnLocation));
 
         tag.put("base_data", tag);
@@ -95,16 +105,16 @@ public class DungeonBoss implements Nameable {
         room = WorldBounds3i.of(baseData.getCompound("room"));
         spawnLocation = Locations.load(baseData.get("spawn_location"));
 
-        SpawnRequirement.Type type = Registries.SPAWN_REQUIREMENTS.read(tag.get("requirement_type"));
-        requirement = type.load(tag.get("requirement_data"));
+        if(baseData.contains("requirement_type")) {
+            SpawnRequirement.Type type = Registries.SPAWN_REQUIREMENTS.read(tag.get("requirement_type"));
+            requirement = type.load(tag.get("requirement_data"));
+        } else {
+            requirement = null;
+        }
 
         for (BossComponent c: components) {
             c.load(tag);
         }
-    }
-
-    public BossType getType() {
-        return type;
     }
 
     public void addComponent(BossComponent component) {
@@ -164,44 +174,12 @@ public class DungeonBoss implements Nameable {
         return result;
     }
 
-    public boolean isAlive() {
-        return alive;
-    }
-
-    public BossContext getCurrentContext() {
-        return currentContext;
-    }
-
     public Location getSpawnLocation() {
         return spawnLocation == null ? null : spawnLocation.clone();
     }
 
     public World getWorld() {
         return spawnLocation.getWorld();
-    }
-
-    public void setSpawnLocation(Location spawnLocation) {
-        this.spawnLocation = spawnLocation;
-    }
-
-    public WorldBounds3i getRoom() {
-        return room;
-    }
-
-    public void setRoom(WorldBounds3i room) {
-        this.room = room;
-    }
-
-    public SpawnRequirement getRequirement() {
-        return requirement;
-    }
-
-    public void setRequirement(SpawnRequirement requirement) {
-        this.requirement = requirement;
-    }
-
-    public BossIdentifier getIdentifier() {
-        return identifier;
     }
 
     @Override

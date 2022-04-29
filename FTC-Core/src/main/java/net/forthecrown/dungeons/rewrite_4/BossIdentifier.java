@@ -1,7 +1,6 @@
 package net.forthecrown.dungeons.rewrite_4;
 
 import net.forthecrown.core.Keys;
-import net.forthecrown.dungeons.rewrite_4.type.BossType;
 import net.forthecrown.registry.Registries;
 import net.kyori.adventure.key.Key;
 import org.apache.commons.lang3.Validate;

@@ -32,7 +32,7 @@ record PunishmentOption(Punishment punish,
     @Override
     public void place(FtcInventory inventory, CrownUser user) {
         ItemStackBuilder builder = new ItemStackBuilder(typeToMaterial(punish.type()))
-                .setName(Component.text((active ? "Active" : "Past") + " punishment").style(nonItalic(NamedTextColor.WHITE)));
+                .setName(Component.text((active ? "Active" : "Past") + " " + punish.type().presentableName()).style(nonItalic(NamedTextColor.WHITE)));
 
         ItemLoreBuilder loreBuilder = new ItemLoreBuilder();
         ComponentWriter writer = ComponentWriter.loreWriter(loreBuilder);
@@ -54,7 +54,7 @@ record PunishmentOption(Punishment punish,
         return switch (type) {
             case BAN -> Material.IRON_AXE;
             case JAIL -> Material.IRON_BARS;
-            case MUTE -> Material.BARREL;
+            case MUTE -> Material.BARRIER;
             case SOFT_MUTE -> Material.STRUCTURE_VOID;
             case IP_BAN -> Material.DIAMOND_AXE;
             case KICK -> Material.NETHERITE_BOOTS;

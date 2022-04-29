@@ -61,15 +61,15 @@ public class CommandMail extends FtcCommand {
                 )
 
                 .then(literal("read_other")
-                        .requires(source -> source.hasPermission(Permissions.POLICE))
+                        .requires(source -> source.hasPermission(Permissions.MAIL_OTHERS))
 
                         .then(argument("user", UserArgument.user())
-                                .requires(source -> source.hasPermission(Permissions.POLICE))
+                                .requires(source -> source.hasPermission(Permissions.MAIL_OTHERS))
 
                                 .executes(c -> readMailOther(c, 0))
 
                                 .then(argument("page", IntegerArgumentType.integer(1))
-                                        .requires(source -> source.hasPermission(Permissions.POLICE))
+                                        .requires(source -> source.hasPermission(Permissions.MAIL_OTHERS))
 
                                         .executes(c -> {
                                             int page = c.getArgument("page", Integer.class) - 1;
@@ -142,8 +142,8 @@ public class CommandMail extends FtcCommand {
                 )
 
                 .then(literal("send")
-                        .then(literal("all")
-                                .requires(source -> source.hasPermission(Permissions.ADMIN))
+                        .then(literal("-all")
+                                .requires(source -> source.hasPermission(Permissions.MAIL_ALL))
 
                                 .then(argument("message", ChatArgument.chat())
                                         .executes(c -> {

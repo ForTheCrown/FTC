@@ -1,6 +1,6 @@
 package net.forthecrown.economy;
 
 public interface Taxable {
-    boolean hasBeenTaxed();
+    boolean isTaxed();
     void setTaxed(boolean taxed);
 }

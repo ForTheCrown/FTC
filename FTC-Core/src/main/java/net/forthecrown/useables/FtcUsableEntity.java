@@ -3,6 +3,7 @@ package net.forthecrown.useables;
 import com.google.gson.JsonPrimitive;
 import net.forthecrown.core.Crown;
 import net.forthecrown.serializer.JsonWrapper;
+import net.forthecrown.utils.EntityIdentifier;
 import org.bukkit.entity.Entity;
 
 import java.util.UUID;
@@ -25,6 +26,8 @@ public class FtcUsableEntity extends AbstractUsable implements UsableEntity {
     @Override
     protected void save(JsonWrapper json) {
         json.add("uuid", new JsonPrimitive(id.toString()));
+        json.add("entityIdentifier", EntityIdentifier.of(entity).toString());
+
         saveInto(json);
     }
 

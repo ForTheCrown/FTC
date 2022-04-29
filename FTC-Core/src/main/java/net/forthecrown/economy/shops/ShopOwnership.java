@@ -1,25 +1,29 @@
 package net.forthecrown.economy.shops;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.serializer.JsonDeserializable;
-import net.forthecrown.serializer.JsonSerializable;
-import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
-import net.forthecrown.utils.JsonUtils;
+import net.forthecrown.utils.TagUtil;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.UUID;
 
-public class ShopOwnership implements JsonSerializable, JsonDeserializable {
+public class ShopOwnership implements ShopComponent {
+    @Getter @Setter
     private UUID owner;
+    @Getter @Setter
     private House owningHouse;
+
+    @Getter
     private final Set<UUID> coOwners = new ObjectOpenHashSet<>();
 
     public boolean hasOwner() {
@@ -34,24 +38,8 @@ public class ShopOwnership implements JsonSerializable, JsonDeserializable {
         return !coOwners.isEmpty();
     }
 
-    public UUID getOwner() {
-        return owner;
-    }
-
     public CrownUser ownerUser() {
         return getOwner() == null ? null : UserManager.getUser(getOwner());
-    }
-
-    public void setOwner(UUID owner) {
-        this.owner = owner;
-    }
-
-    public House getOwningHouse() {
-        return owningHouse;
-    }
-
-    public void setOwningHouse(House owningHouse) {
-        this.owningHouse = owningHouse;
     }
 
     public boolean isCoOwner(UUID uuid) {
@@ -68,54 +56,6 @@ public class ShopOwnership implements JsonSerializable, JsonDeserializable {
 
     public void clearCoOwners() {
         coOwners.clear();
-    }
-
-    public Set<UUID> getCoOwners() {
-        return coOwners;
-    }
-
-    @Override
-    public void deserialize(JsonElement element) {
-        setOwner(null);
-        setOwningHouse(null);
-        clearCoOwners();
-
-        if(element == null) return;
-
-        if(element.isJsonPrimitive()) {
-            JsonPrimitive primitive = element.getAsJsonPrimitive();
-
-            if(primitive.isNumber()) {
-                setOwner(JsonUtils.readUUID(element));
-            } else setOwningHouse(Registries.HOUSES.get(JsonUtils.readKey(element)));
-
-            return;
-        }
-
-        JsonWrapper json = JsonWrapper.of(element.getAsJsonObject());
-
-        if(json.has("owner")) setOwner(json.getUUID("owner"));
-
-        if(json.has("owningHouse")) {
-            setOwningHouse(Registries.HOUSES.get(json.getKey("owningHouse")));
-        }
-
-        if(json.has("coOwners")) {
-            coOwners.addAll(json.getList("coOwners", JsonUtils::readUUID));
-        }
-    }
-
-    @Override
-    public JsonElement serialize() {
-        if(hasOwner() && !hasCoOwners() && !hasOwningHouse()) return JsonUtils.writeUUID(getOwner());
-        if(hasOwningHouse() && !hasOwner()) return JsonUtils.writeKey(owningHouse);
-
-        JsonWrapper json = JsonWrapper.empty();
-        if(hasOwner()) json.addUUID("owner", getOwner());
-        if(hasOwningHouse()) json.add("owningHouse", owningHouse);
-        if(hasCoOwners()) json.addList("coOwners", coOwners, JsonUtils::writeUUID);
-
-        return json.getSource();
     }
 
     @Override
@@ -149,5 +89,57 @@ public class ShopOwnership implements JsonSerializable, JsonDeserializable {
 
     public boolean mayEditShop(UUID uuid) {
         return isOwner(uuid) || isCoOwner(uuid);
+    }
+
+    @Nullable
+    @Override
+    public Tag save() {
+        if(hasOwner() && !hasCoOwners() && !hasOwningHouse()) return TagUtil.writeUUID(getOwner());
+        if(hasOwningHouse() && !hasOwner()) return TagUtil.writeKey(owningHouse);
+
+        CompoundTag tag = new CompoundTag();
+        if(hasOwner()) tag.putUUID("owner", getOwner());
+        if(hasOwningHouse()) tag.put("owningHouse", TagUtil.writeKey(owningHouse));
+        if(hasCoOwners()) tag.put("coOwners", TagUtil.writeList(coOwners, TagUtil::writeUUID));
+
+        return tag;
+    }
+
+    @Override
+    public void load(@Nullable Tag t) {
+        setOwner(null);
+        setOwningHouse(null);
+        clearCoOwners();
+
+        if(t == null) return;
+
+        if(t.getId() == Tag.TAG_STRING) {
+            setOwningHouse(Registries.HOUSES.read(t));
+            return;
+        }
+
+        if(t.getId() == Tag.TAG_INT_ARRAY) {
+            setOwner(TagUtil.readUUID(t));
+            return;
+        }
+
+        CompoundTag tag = (CompoundTag) t;
+
+        if(tag.contains("owner")) {
+            setOwner(tag.getUUID("owner"));
+        }
+
+        if(tag.contains("owningHouse")) {
+            setOwningHouse(Registries.HOUSES.read(tag.get("owningHouse")));
+        }
+
+        if(tag.contains("coOwners")) {
+            coOwners.addAll(TagUtil.readList(tag.getList("coOwners", Tag.TAG_INT_ARRAY), TagUtil::readUUID));
+        }
+    }
+
+    @Override
+    public String getSerialKey() {
+        return "owner";
     }
 }

@@ -1,7 +1,7 @@
 package net.forthecrown.core.admin;
 
 import net.forthecrown.core.Crown;
-import net.forthecrown.core.chat.BannedWords;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.grenadier.CommandSource;
@@ -22,6 +22,10 @@ import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
+/**
+ * A general utility class for easisly accessing
+ * methods for the punishment and pardoning of users
+ */
 public final class Punishments {
     private Punishments() {}
 
@@ -30,11 +34,24 @@ public final class Punishments {
 
     static Punisher punisher;
 
+    /**
+     * Checks if the given UUID is softmuted
+     * @param uuid The UUID to check
+     * @return True, if softmuted, false otherwise
+     */
     public static boolean isSoftMuted(UUID uuid) {
-        PunishEntry entry = punisher.getEntry(uuid);
+        PunishEntry entry = punisher.getNullable(uuid);
+        if(entry == null) return false;
+
         return entry.isPunished(PunishType.SOFT_MUTE);
     }
 
+    /**
+     * Checks if the user is muted, will tell the user 'You are muted!'
+     * if the result is {@link MuteStatus#HARD}
+     * @param sender The sender to check, can be player or user
+     * @return The sender's mute status
+     */
     public static MuteStatus checkMute(CommandSender sender) {
         MuteStatus status = muteStatus(sender);
 
@@ -47,14 +64,29 @@ public final class Punishments {
         return status;
     }
 
+    /**
+     * Checks given sender's mute status
+     * @param sender The sender to check
+     * @return The sender's mute status
+     */
     public static MuteStatus muteStatus(CommandSender sender) {
-        Punishment p = current(sender, PunishType.SOFT_MUTE);
+        PunishEntry entry = entry(sender);
+        if(entry == null) return MuteStatus.SOFT;
+
+        Punishment p = entry.getCurrent(PunishType.SOFT_MUTE);
         if(p != null) return MuteStatus.SOFT;
 
-        p = current(sender, PunishType.MUTE);
+        p = entry.getCurrent(PunishType.MUTE);
         return p == null ? MuteStatus.NONE : MuteStatus.HARD;
     }
 
+    /**
+     * Gets a current punishment via type for the given sender
+     * @param sender The sender
+     * @param type The type of punishment to get the entry of
+     * @return The currently effective punishment, null, if the sender is not
+     *         punished with the given punishment type
+     */
     public static Punishment current(CommandSender sender, PunishType type) {
         PunishEntry entry = entry(sender);
         if(entry == null) return null;
@@ -62,6 +94,11 @@ public final class Punishments {
         return entry.getCurrent(type);
     }
 
+    /**
+     * Gets the punishment entry for the given sender
+     * @param sender The sender to get the entry of
+     * @return The sender's entry, null, if the sender is not a player or a user
+     */
     public static PunishEntry entry(CommandSender sender) {
         UUID uuid = null;
 
@@ -76,18 +113,33 @@ public final class Punishments {
         return punisher.getEntry(uuid);
     }
 
-    public static boolean checkBannedWords(CommandSender sender, String input) {
-        return BannedWords.checkAndWarn(sender, input);
-    }
-
+    /**
+     * Delegate method for {@link BannedWords#checkAndWarn(CommandSender, String)}
+     * @param sender The sender of the input
+     * @param input The input
+     * @return True, if it contains banned words, false otherwise
+     */
     public static boolean checkBannedWords(CommandSender sender, Component input) {
         return BannedWords.checkAndWarn(sender, input);
     }
 
-    public static Punishment handlePunish(CrownUser target, CommandSource source, @Nullable String reason, long length, PunishType type, @Nullable String extra) {
+    /**
+     * Punishes a user and handles all the formalities of doing so
+     * @param target The target of the punishment
+     * @param source The source doing the punishing
+     * @param reason The reason of the punishment, can be null
+     * @param length The length of the punishment,
+     *               {@link Punishments#INDEFINITE_EXPIRY} for eternal punishment
+     * @param type The type of the punishment
+     * @param extra Any extra data for the punishment, only used to
+     *              jail the user, the extra is the jail cell they're in
+     *
+     */
+    public static void handlePunish(CrownUser target, CommandSource source, @Nullable String reason, long length, PunishType type, @Nullable String extra) {
         Punishment punishment = new Punishment(
                 source.textName(),
-                reason, extra, type,
+                reason == null || reason.isEmpty() ? type.defaultReason() : reason,
+                extra, type,
                 System.currentTimeMillis(),
                 length == INDEFINITE_EXPIRY ? INDEFINITE_EXPIRY : System.currentTimeMillis() + length
         );
@@ -105,10 +157,13 @@ public final class Punishments {
                 reason,
                 length == INDEFINITE_EXPIRY ? "Eternal" : new TimePrinter(length).printString()
         );
-
-        return punishment;
     }
 
+    /**
+     * lol
+     * @param cell The cell to place the user in
+     * @param user The user to place in jail
+     */
     public static void placeInGayBabyJail(JailCell cell, CrownUser user) {
         Location l = Locations.of(cell.getWorld(), cell.getPos());
         user.getPlayer().teleport(l);
@@ -116,6 +171,10 @@ public final class Punishments {
         punisher.setJailed(user.getUniqueId(), cell);
     }
 
+    /**
+     * hehe
+     * @param user The user to remove from jail
+     */
     public static void removeFromGayBabyJail(CrownUser user) {
         if(user.isOnline()) {
             user.getPlayer().teleport(FtcUtils.findHazelLocation());
@@ -124,6 +183,14 @@ public final class Punishments {
         punisher.removeJailed(user.getUniqueId());
     }
 
+    /**
+     * Announces the punishment
+     * @param source The source giving out the punishment
+     * @param target The target of the punishment
+     * @param type The punishment's type
+     * @param length The punishment's length
+     * @param reason The reason
+     */
     public static void announce(CommandSource source, CrownUser target, PunishType type, long length, String reason) {
         TextComponent.Builder builder = Component.text()
                 .append(Component.text(type.nameEndingED() + " "))
@@ -143,6 +210,12 @@ public final class Punishments {
         _announce(source, target, builder.build());
     }
 
+    /**
+     * Announces the pardoning of a user
+     * @param source The source to pardon
+     * @param target The target
+     * @param type The type they were pardoned from
+     */
     public static void announcePardon(CommandSource source, CrownUser target, PunishType type) {
         _announce(
                 source, target,
@@ -175,5 +248,27 @@ public final class Punishments {
         }
 
         StaffChat.sendCommand(source, text);
+    }
+
+    /**
+     * Checks if the given user has any staff notes
+     * @param user The user to check
+     * @return True, if they have notes, false otherwise
+     */
+    public static boolean hasNotes(CrownUser user) {
+        PunishEntry entry = punisher.getNullable(user.getUniqueId());
+        return entry != null && !entry.notes().isEmpty();
+    }
+
+    /**
+     * Checks if the source can punish the given user
+     * @param source The source attempting to punish
+     * @param user The user to punish
+     * @return True, if the source is either OP or has {@link Permissions#ADMIN} permissions OR
+     *         the target does not have those permissions
+     */
+    public static boolean canPunish(CommandSource source, CrownUser user) {
+        if(source.isOp() || source.hasPermission(Permissions.ADMIN)) return true;
+        return !user.isOp() && !user.hasPermission(Permissions.ADMIN);
     }
 }

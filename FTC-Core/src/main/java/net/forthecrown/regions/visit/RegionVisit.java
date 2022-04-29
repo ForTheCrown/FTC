@@ -45,7 +45,7 @@ public class RegionVisit implements Runnable {
 
         this.region = region;
         this.manager = manager;
-        this.localRegion = manager.get(user.getRegionCords());
+        this.localRegion = manager.get(user.getRegionPos());
 
         findInitialTeleport();
 

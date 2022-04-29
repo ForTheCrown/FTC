@@ -124,7 +124,7 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
 
     @NotNull
     @Override
-    public Iterator<Block> iterator() {
+    public BlockIterator iterator() {
         return new BlockIterator(getWorld(), min(), max(), volume());
     }
 
@@ -134,6 +134,10 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
 
     public Collection<Entity> getEntities() {
         return getWorld().getNearbyEntities(toBukkit());
+    }
+
+    public Collection<Entity> getEntities(Predicate<Entity> predicate) {
+        return getWorld().getNearbyEntities(toBukkit(), predicate);
     }
 
     public <T extends Entity> Collection<T> getEntitiesByType(Class<T> clazz) {
@@ -170,5 +174,10 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
         tag.put("cords", super.save());
 
         return tag;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + getWorld().getName() + ", " + super.toString() + ")";
     }
 }

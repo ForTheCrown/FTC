@@ -4,7 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.FtcVars;
-import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserMarketData;
@@ -208,7 +208,7 @@ public interface Markets extends CrownSerializer {
         long nextAllowed = ownership.getLastStatusChange() + FtcVars.marketStatusCooldown.get();
         long remaining = nextAllowed - System.currentTimeMillis();
 
-        throw FtcExceptionProvider.translatable(transKey, FtcFormatter.millisIntoTime(remaining));
+        throw FtcExceptionProvider.translatable(transKey, new TimePrinter(remaining).print());
     }
 
     Book getPurchaseBook(MarketShop shop, CrownUser user, ClickableTextNode node);

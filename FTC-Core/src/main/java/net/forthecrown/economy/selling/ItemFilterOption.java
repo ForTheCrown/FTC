@@ -1,6 +1,8 @@
 package net.forthecrown.economy.selling;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.ItemStackBuilder;
 import net.forthecrown.inventory.builder.ClickContext;
@@ -12,6 +14,7 @@ import org.bukkit.Material;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+@RequiredArgsConstructor
 public class ItemFilterOption implements CordedInventoryOption {
     public static ItemFilterOption
             NAME_OPTION = new ItemFilterOption(
@@ -30,23 +33,11 @@ public class ItemFilterOption implements CordedInventoryOption {
                     "Accepting items with lore"
             );
 
+    @Getter
     private final InventoryPos pos;
     private final Function<ItemFilter, Boolean> getter;
     private final BiConsumer<Boolean, ItemFilter> setter;
     private final String trueName, falseName;
-
-    private ItemFilterOption(InventoryPos pos, Function<ItemFilter, Boolean> getter, BiConsumer<Boolean, ItemFilter> setter, String trueName, String falseName) {
-        this.pos = pos;
-        this.getter = getter;
-        this.setter = setter;
-        this.trueName = trueName;
-        this.falseName = falseName;
-    }
-
-    @Override
-    public InventoryPos getPos() {
-        return pos;
-    }
 
     @Override
     public void place(FtcInventory inventory, CrownUser user) {

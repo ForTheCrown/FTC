@@ -1,5 +1,7 @@
 package net.forthecrown.economy.selling;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.inventory.FtcInventory;
@@ -14,24 +16,13 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 
+@RequiredArgsConstructor
 public class SellAmountItem implements InventoryOption {
 
     private final SellAmount sellAmount;
+
+    @Getter
     private final int slot;
-
-    public SellAmountItem(SellAmount sellAmount, int slot) {
-        this.sellAmount = sellAmount;
-        this.slot = slot;
-    }
-
-    public SellAmount getSellAmount() {
-        return sellAmount;
-    }
-
-    @Override
-    public int getSlot() {
-        return slot;
-    }
 
     @Override
     public void place(FtcInventory inventory, CrownUser user) {

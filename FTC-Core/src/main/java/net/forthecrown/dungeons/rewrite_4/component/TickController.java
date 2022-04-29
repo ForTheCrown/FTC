@@ -34,10 +34,10 @@ public class TickController extends BossComponent implements BossStatusListener,
 
     @Override
     public void run() {
-        bossTick++;
-
         for (TickComponent c: tickComponents) {
             c.tick(bossTick);
         }
+
+        bossTick++;
     }
 }

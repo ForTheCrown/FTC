@@ -4,14 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import lombok.Getter;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcVars;
 import net.forthecrown.serializer.AbstractJsonSerializer;
-import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.serializer.UserJsonSerializer;
-import net.forthecrown.serializer.UserSerializer;
+import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.actions.FtcUserActionHandler;
-import net.forthecrown.user.actions.UserActionHandler;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.TimeUtil;
 import org.bukkit.entity.Player;
@@ -21,13 +20,15 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+import static net.forthecrown.user.UserCache.NO_NAME_CHANGE;
+
 public final class FtcUserManager extends AbstractJsonSerializer implements UserManager {
     public static final Map<UUID, FtcUser> LOADED_USERS = new Object2ObjectOpenHashMap<>();
     public static final Map<UUID, FtcUserAlt> LOADED_ALTS = new Object2ObjectOpenHashMap<>();
 
-    private final UserCacheImpl cache = new UserCacheImpl();
-    private final FtcUserActionHandler actionHandler = new FtcUserActionHandler();
-    private final UserJsonSerializer serializer = new UserJsonSerializer();
+    @Getter private final UserCacheImpl cache = new UserCacheImpl();
+    @Getter private final FtcUserActionHandler actionHandler = new FtcUserActionHandler();
+    @Getter private final UserJsonSerializer serializer = new UserJsonSerializer();
 
     // Alt 2 Main
     private final Map<UUID, UUID> alts = new Object2ObjectOpenHashMap<>();
@@ -152,40 +153,15 @@ public final class FtcUserManager extends AbstractJsonSerializer implements User
     @Override
     public CompletableFuture<List<CrownUser>> getAllUsers() {
         return CompletableFuture.supplyAsync(() -> {
-            File userDir = UserJsonSerializer.USER_DIR;
             List<CrownUser> users = new ObjectArrayList<>();
 
-            for (File f: userDir.listFiles()) {
-                String fName = f.getName();
-                UUID id = UUID.fromString(fName.substring(0, fName.indexOf('.')));
-
-                try {
-                    users.add(UserManager.getUser(id));
-                } catch (Exception e) {
-                    // It appears some user files were created wrongly,
-                    // Like there's a 'Wou' user file, IDK how that exists,
-                    // but it does lol, so gotta check for them
-                    LOGGER.error("Couldn't load data of user " + id + ". Corrupted or invalid data?", e);
-                }
-            }
+            getCache().readerStream()
+                    .forEach(entry -> {
+                        users.add(UserManager.getUser(entry));
+                    });
 
             return users;
         });
-    }
-
-    @Override
-    public UserActionHandler getActionHandler() {
-        return actionHandler;
-    }
-
-    @Override
-    public UserSerializer getSerializer() {
-        return serializer;
-    }
-
-    @Override
-    public UserCacheImpl getCache() {
-        return cache;
     }
 
     @Override
@@ -266,13 +242,13 @@ public final class FtcUserManager extends AbstractJsonSerializer implements User
             entry.name = json.getString("name");
             entry.nickname = json.getString("nick", null);
             entry.lastName = json.getString("lastName", null);
-            entry.lastNameChange = json.getLong("lastNameChange", -1L);
+            entry.lastNameChange = json.getLong("lastNameChange", NO_NAME_CHANGE);
 
-            if(entry.lastNameChange != UserCache.NO_NAME_CHANGE
+            if(entry.lastNameChange != NO_NAME_CHANGE
                     && TimeUtil.hasCooldownEnded(FtcVars.dataRetentionTime.get(), entry.lastNameChange)
             ) {
                 entry.lastName = null;
-                entry.lastNameChange = UserCache.NO_NAME_CHANGE;
+                entry.lastNameChange = NO_NAME_CHANGE;
             }
 
             entries.add(entry);

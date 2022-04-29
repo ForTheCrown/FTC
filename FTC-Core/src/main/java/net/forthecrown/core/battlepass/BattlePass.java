@@ -262,14 +262,14 @@ public interface BattlePass extends DayChangeListener, CrownSerializer {
 
             // If we beat the challenge
             if(newAmount >= c.getTarget()) {
-                addExp(c.getExp());
-
                 holderUser().sendMessage(
                         Component.translatable("battlePass.beatChallenge",
                                 NamedTextColor.GRAY,
                                 c.displayName().color(NamedTextColor.YELLOW)
                         )
                 );
+
+                addExp(c.getExp());
             }
 
             progress(c, Mth.clamp(newAmount, 0, c.getTarget()));

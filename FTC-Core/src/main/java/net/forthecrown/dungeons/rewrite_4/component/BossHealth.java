@@ -1,5 +1,8 @@
 package net.forthecrown.dungeons.rewrite_4.component;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import lombok.Data;
+import lombok.Getter;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.rewrite_4.BossComponent;
 import net.forthecrown.dungeons.rewrite_4.CompTracker;
@@ -12,14 +15,19 @@ import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 import javax.annotation.Nullable;
+import java.util.Set;
 
 public class BossHealth extends BossComponent implements BossStatusListener {
     private CompTracker<BossHealthListener> healthListeners;
-    private double baseHealth, maxHealth, health;
-    private BossBar bar;
+
+    @Getter private double baseHealth, maxHealth, health;
+    @Getter private final Set<Player> damageDealers = new ObjectOpenHashSet<>();
+    @Getter private BossBar bar;
 
     public BossHealth(double baseHealth) {
         this.baseHealth = baseHealth;
@@ -40,6 +48,8 @@ public class BossHealth extends BossComponent implements BossStatusListener {
         maxHealth = 0.0D;
         health = 0.0D;
 
+        damageDealers.clear();
+
         bar.setVisible(false);
         bar.removeAll();
         bar = null;
@@ -49,6 +59,8 @@ public class BossHealth extends BossComponent implements BossStatusListener {
     public void onBossSummon(BossContext context) {
         maxHealth = context.health(baseHealth);
         health = maxHealth;
+
+        damageDealers.clear();
 
         bar = Bukkit.createBossBar(getBoss().getName(), BarColor.RED, BarStyle.SOLID, BarFlag.DARKEN_SKY, BarFlag.CREATE_FOG, BarFlag.CREATE_FOG);
         updateProgress();
@@ -86,6 +98,16 @@ public class BossHealth extends BossComponent implements BossStatusListener {
         healthListeners.forEach(listener -> listener.onDamage(this, damage));
 
         if(damage.damage > 0.0D && !damage.cancelled && apply) {
+            if(damage.damager instanceof Player player) {
+                damageDealers.add(player);
+            }
+
+            if(damage.getDamager() instanceof Projectile arrow
+                    && arrow.getShooter() instanceof Player player
+            ) {
+                damageDealers.add(player);
+            }
+
             health = Mth.clamp(health - damage.damage, 0, maxHealth);
             updateProgress();
         }
@@ -102,18 +124,6 @@ public class BossHealth extends BossComponent implements BossStatusListener {
         updateProgress();
     }
 
-    public double getBaseHealth() {
-        return baseHealth;
-    }
-
-    public double getMaxHealth() {
-        return maxHealth;
-    }
-
-    public double getHealth() {
-        return health;
-    }
-
     public void updateProgress() {
         if(!isAlive()) return;
         bar.setProgress(health / maxHealth);
@@ -126,10 +136,6 @@ public class BossHealth extends BossComponent implements BossStatusListener {
         getBoss().getRoom().getPlayers().forEach(bar::addPlayer);
     }
 
-    public BossBar getBar() {
-        return bar;
-    }
-
     @Override
     public void save(CompoundTag tag) {
         tag.putDouble("baseHealth", baseHealth);
@@ -140,20 +146,20 @@ public class BossHealth extends BossComponent implements BossStatusListener {
         baseHealth = tag.getDouble("baseHealth");
     }
 
+    @Data
     public static class Damage {
-        public final double initialDamage;
-        public final @Nullable Entity damager;
-        public final EntityDamageEvent.DamageCause cause;
+        private final double initialDamage;
+        private final @Nullable Entity damager;
+        private final EntityDamageEvent.DamageCause cause;
 
-        public double damage;
-        public boolean cancelled;
+        private double damage;
+        private boolean cancelled;
 
         public Damage(double initialDamage, @Nullable Entity damager, EntityDamageEvent.DamageCause cause) {
             this.initialDamage = initialDamage;
             this.damager = damager;
             this.cause = cause;
 
-            this.cancelled = false;
             this.damage = initialDamage;
         }
     }

@@ -1,14 +1,18 @@
 package net.forthecrown.core.chat;
 
 import com.google.gson.JsonElement;
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.core.FtcConfig;
 import net.forthecrown.serializer.JsonWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
 public class JoinInfo extends FtcConfig.ConfigSection {
-    private Component info;
-    private Component endInfo;
+    @Getter @Setter
+    private Component info, endInfo;
+
+    @Setter
     private boolean shouldShow, shouldShowEnd;
 
     public JoinInfo(){
@@ -34,32 +38,8 @@ public class JoinInfo extends FtcConfig.ConfigSection {
         return builder.build();
     }
 
-    public Component getEndInfo() {
-        return endInfo;
-    }
-
-    public Component getInfo() {
-        return info;
-    }
-
-    public void setEndInfo(Component endInfo) {
-        this.endInfo = endInfo;
-    }
-
-    public void setInfo(Component info) {
-        this.info = info;
-    }
-
     public boolean shouldShow() {
         return shouldShow;
-    }
-
-    public void setShouldShow(boolean shouldShow) {
-        this.shouldShow = shouldShow;
-    }
-
-    public void setShouldShowEnd(boolean shouldShowEnd) {
-        this.shouldShowEnd = shouldShowEnd;
     }
 
     public boolean shouldShowEnd() {

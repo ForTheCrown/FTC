@@ -3,6 +3,7 @@ package net.forthecrown.core.admin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.sk89q.worldedit.math.Vector3;
+import lombok.Data;
 import net.forthecrown.core.chat.ComponentWriter;
 import net.forthecrown.serializer.JsonDeserializable;
 import net.forthecrown.serializer.JsonSerializable;
@@ -15,6 +16,23 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Represents a single jail cell
+ * <p></p>
+ * Since this class uses lombok and I can't
+ * add javadoc to that, I'll explain the variables
+ * here.
+ *
+ * <p></p>
+ * {@code world} - The world the cell is in
+ * <p>
+ * {@code pos} - The position anyone placed in this cell will be placed at
+ * <p>
+ * {@code cell} - The bounds of the cell, if a prisoner leaves it, they will
+ *                teleported back in
+ * </p></p>
+ */
+@Data
 public class JailCell implements Keyed, JsonSerializable, JsonDeserializable {
     private final Key key;
 
@@ -22,39 +40,15 @@ public class JailCell implements Keyed, JsonSerializable, JsonDeserializable {
     private Vector3 pos;
     private Bounds3i cell;
 
-    public JailCell(Key key) {
-        this.key = key;
-    }
-
-    public World getWorld() {
-        return world;
-    }
-
-    public void setWorld(World world) {
-        this.world = world;
-    }
-
-    public Vector3 getPos() {
-        return pos;
-    }
-
-    public void setPos(Vector3 pos) {
-        this.pos = pos;
-    }
-
-    public Bounds3i getCell() {
-        return cell;
-    }
-
-    public void setCell(Bounds3i cell) {
-        this.cell = cell;
-    }
-
     @Override
     public @NotNull Key key() {
         return key;
     }
 
+    /**
+     * Writes the cell's info to the given writer.
+     * @param writer The writer to write to
+     */
     public void writeDisplay(ComponentWriter writer) {
         writer.write(Component.text("Pos: " + pos));
         writer.newLine();

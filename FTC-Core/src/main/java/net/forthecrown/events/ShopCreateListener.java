@@ -1,13 +1,10 @@
 package net.forthecrown.events;
 
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcFlags;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
@@ -30,7 +27,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 
 public class ShopCreateListener implements Listener {
 
@@ -47,7 +43,7 @@ public class ShopCreateListener implements Listener {
             String line3 = ChatUtils.plainText(event.line(3));
 
             ShopType shopType;
-            switch (line0.toLowerCase()){
+            switch (line0.toLowerCase()) {
                 default: return; //switch statement to set the shop's type, basically that's it
 
                 case "-[buy]-":
@@ -79,19 +75,24 @@ public class ShopCreateListener implements Listener {
             int price;
             try {
                 price = Integer.parseInt(lastLine);
-            } catch (Exception e){ throw FtcExceptionProvider.translatable("shops.created.failed.noPrice"); }
+            } catch (Exception e) {
+                throw FtcExceptionProvider.translatable("shops.created.failed.noPrice");
+            }
 
             //Make sure they don't exceed the max shop price
-            if(price > FtcVars.maxSignShopPrice.get()) throw FtcExceptionProvider.maxShopPriceExceeded();
+            if(price > FtcVars.maxSignShopPrice.get()) {
+                throw FtcExceptionProvider.maxShopPriceExceeded();
+            }
 
             //They must give at least one line of info about the shop
-            if(line2.isBlank() && line1.isBlank()) throw FtcExceptionProvider.translatable("shops.created.failed.noDesc");
+            if(line2.isBlank() && line1.isBlank()) {
+                throw FtcExceptionProvider.translatable("shops.created.failed.noDesc");
+            }
 
             //WorldGuard flag check
-            LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-            ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(wgPlayer.getLocation());
-            if(!set.testState(wgPlayer, FtcFlags.SHOP_CREATION) && !player.hasPermission("ftc.admin")) {
+            StateFlag.State state = FtcFlags.query(player.getLocation(), FtcFlags.SHOP_CREATION);
 
+            if(state == StateFlag.State.DENY && !player.hasPermission("ftc.admin")) {
                 player.sendMessage(
                         Component.text()
                                 .append(Component.text("Hey! ")
@@ -165,9 +166,6 @@ public class ShopCreateListener implements Listener {
             shopInv.setExampleItem(item);
             shopInv.addItem(item.clone());
 
-            //Update the sign's persitent data to make sign shop detection easy
-            sign.getPersistentDataContainer().set(ShopConstants.SHOP_KEY, PersistentDataType.BYTE, (byte) 1);
-
             //Send the info message
             player.sendMessage(
                     Component.text()
@@ -186,7 +184,6 @@ public class ShopCreateListener implements Listener {
             );
 
             shop.update();
-            shop.save();
         }
     }
 }

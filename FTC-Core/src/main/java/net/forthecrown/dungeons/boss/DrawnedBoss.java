@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.dungeons.BossItems;
-import net.forthecrown.dungeons.DungeonAreas;
+import net.forthecrown.dungeons.DungeonConstants;
 import net.forthecrown.dungeons.DungeonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -26,7 +26,7 @@ public class DrawnedBoss extends SimpleBoss {
     private final Set<Guardian> guardians = new ObjectOpenHashSet<>();
 
     public DrawnedBoss() {
-        super("Drawned", new Location(Worlds.voidWorld(), -123.5, 25.5, 38.5), DungeonAreas.DRAWNED_ROOM,
+        super("Drawned", new Location(Worlds.voidWorld(), -123.5, 25.5, 38.5), DungeonConstants.DRAWNED_ROOM,
                 Artifacts.ELDER.item(),
                 Artifacts.HIDDEN.item(),
                 Artifacts.IRON.item(),

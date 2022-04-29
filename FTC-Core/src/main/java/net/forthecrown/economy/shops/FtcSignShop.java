@@ -1,110 +1,94 @@
 package net.forthecrown.economy.shops;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.forthecrown.core.Crown;
-import net.forthecrown.serializer.ShopSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.LocationFileName;
+import net.forthecrown.utils.TagUtil;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import org.apache.commons.lang3.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.UUID;
 
 public class FtcSignShop implements SignShop {
 
-    private final LocationFileName fileName;
-    private final WorldVec3i loc;
-    private final FtcShopInventory inventory;
-    private final ShopOwnership ownership;
-    private final ShopHistory history;
+    @Getter private final WorldVec3i position;
 
-    private ShopType type;
-    private int price;
+    @Getter private final FtcShopInventory inventory;
+    @Getter private final ShopOwnership ownership;
+    @Getter private final ShopHistory history;
+
+    @Getter @Setter
+    public ShopType type;
+
+    @Getter
+    public int price;
 
     //used by getSignShop
-    public FtcSignShop(WorldVec3i loc) throws IllegalArgumentException {
-        this.fileName = LocationFileName.of(loc);
-
-        ShopSerializer serializer = Crown.getShopManager().getSerializer();
-        Validate.isTrue(serializer.fileExists(this), getFileName() + " has no file");
-
-        this.loc = loc;
-
-        ownership = new ShopOwnership();
-        inventory = new FtcShopInventory(this);
-        history = new ShopHistory(this);
-
-        reload();
+    public FtcSignShop(WorldVec3i position) throws IllegalArgumentException {
+        this(position, false);
     }
 
     //used by createSignShop
-    public FtcSignShop(WorldVec3i loc, ShopType shopType, int price, UUID shopOwner) {
-        this.fileName = LocationFileName.of(loc);
-        this.loc = loc;
+    public FtcSignShop(WorldVec3i position, ShopType shopType, int price, UUID shopOwner) {
+        this(position, true);
+
         this.price = price;
         this.type = shopType;
+        ownership.setOwner(shopOwner);
+    }
+
+    public FtcSignShop(WorldVec3i pos, boolean newShop) {
+        this.position = pos;
 
         this.ownership = new ShopOwnership();
-        ownership.setOwner(shopOwner);
-
-        history = new ShopHistory(this);
+        this.history = new ShopHistory(this);
         this.inventory = new FtcShopInventory(this);
 
-        save();
+        if(!newShop) {
+            Validate.isTrue(
+                    getSign().getPersistentDataContainer().has(ShopConstants.SHOP_KEY),
+                    getFileName() + " has no shop data"
+            );
+
+            load();
+        }
     }
 
     @Override
-    public void save() {
-        Crown.getShopManager().getSerializer().serialize(this);
-    }
-
-    @Override
-    public void reload() {
-        Crown.getShopManager().getSerializer().deserialize(this);
-        update();
+    public void load() {
+        load(getSign());
     }
 
     @Override
     public void destroy(boolean removeBlock) {
-        Crown.getShopManager().removeShop(this);
+        Crown.getShopManager().onShopDestroy(this);
+
         if(inventory != null && !inventory.getShopContents().isEmpty()) {
             for (ItemStack stack : inventory.getShopContents()){
-                loc.getWorld().dropItemNaturally(loc.toLocation(), stack);
+                position.getWorld().dropItemNaturally(position.toLocation(), stack);
             }
         }
 
-        loc.getWorld().spawnParticle(Particle.CLOUD, loc.toLocation().add(0.5, 0.5, 0.5), 5, 0.1D, 0.1D, 0.1D, 0.05D);
+        position.getWorld().spawnParticle(Particle.CLOUD, position.toLocation().add(0.5, 0.5, 0.5), 5, 0.1D, 0.1D, 0.1D, 0.05D);
 
         if(removeBlock) getBlock().breakNaturally();
-        delete();
-    }
-
-    @Override
-    public void delete() {
-        Crown.getShopManager().getSerializer().delete(this);
-    }
-
-    @Override
-    public void unload(){
-        Crown.getShopManager().removeShop(this);
-        save();
-    }
-
-    @Override
-    public WorldVec3i getPosition() {
-        return loc;
     }
 
     @Override
     public LocationFileName getFileName() {
-        return fileName;
+        return LocationFileName.of(getPosition());
     }
 
     @Override
@@ -113,41 +97,10 @@ public class FtcSignShop implements SignShop {
     }
 
     @Override
-    public ShopOwnership getOwnership() {
-        return ownership;
-    }
-
-    @Override
-    public ShopType getType() {
-        return type;
-    }
-
-    @Override
-    public void setType(ShopType shopType) {
-        this.type = shopType;
-    }
-
-    @Override
-    public int getPrice() {
-        return price;
-    }
-
-    @Override
     public void setPrice(int price, boolean updateSign) {
         this.price = price;
 
         if(updateSign) update();
-    }
-
-    @Override
-    public boolean wasDeleted(){
-        return Crown.getShopManager().getSerializer().wasDeleted(this);
-    }
-
-    @Nonnull
-    @Override
-    public FtcShopInventory getInventory() {
-        return inventory;
     }
 
     @Override
@@ -161,23 +114,77 @@ public class FtcSignShop implements SignShop {
     }
 
     @Override
-    public ShopHistory getHistory() {
-        return history;
-    }
-
-    @Override
     public Sign getSign(){
         return (Sign) getBlock().getState();
     }
 
     @Override
-    public void update(){
+    public void update() {
         Sign s = getSign();
 
         s.line(0, !getInventory().inStock() ? getType().outOfStockLabel() : getType().inStockLabel());
         s.line(3, Crown.getShopManager().getPriceLine(price));
 
-        Bukkit.getScheduler().runTask(Crown.inst(), () -> s.update(true));
+        save(s);
+
+        s.update(true);
+    }
+
+    public void save(Sign sign) {
+        PersistentDataContainer container = sign.getPersistentDataContainer().getOrDefault(
+                ShopConstants.SHOP_KEY,
+                PersistentDataType.TAG_CONTAINER,
+                TagUtil.newContainer()
+        );
+
+        CompoundTag tag = TagUtil.ofContainer(container);
+        save(tag);
+
+        sign.getPersistentDataContainer().set(
+                ShopConstants.SHOP_KEY,
+                PersistentDataType.TAG_CONTAINER,
+                TagUtil.ofCompound(tag)
+        );
+    }
+
+    private void load(Sign sign) {
+        PersistentDataContainer container = sign.getPersistentDataContainer().getOrDefault(
+                ShopConstants.SHOP_KEY,
+                PersistentDataType.TAG_CONTAINER,
+                TagUtil.newContainer()
+        );
+
+        CompoundTag tag = TagUtil.ofContainer(container);
+        load(tag);
+    }
+
+    public void save(CompoundTag tag) {
+        tag.putInt("price", price);
+        tag.put("type", TagUtil.writeEnum(type));
+
+        writeComponent(ownership, tag);
+        writeComponent(inventory, tag);
+        writeComponent(history, tag);
+    }
+
+    public void load(CompoundTag tag) {
+        price = tag.getInt("price");
+        type = TagUtil.readEnum(tag.get("type"), ShopType.class);
+
+        readComponent(ownership, tag);
+        readComponent(inventory, tag);
+        readComponent(history, tag);
+    }
+
+    private void writeComponent(ShopComponent c, CompoundTag tag) {
+        Tag t = c.save();
+        if(t == null) return;
+
+        tag.put(c.getSerialKey(), t);
+    }
+
+    private void readComponent(ShopComponent c, CompoundTag tag) {
+        c.load(tag.get(c.getSerialKey()));
     }
 
     @Override

@@ -1,17 +1,15 @@
-package net.forthecrown.dungeons.rewrite_4.type;
+package net.forthecrown.dungeons.rewrite_4;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.registry.Registries;
+
+import java.util.Map;
 
 public final class BossTypes {
     private BossTypes() {}
 
-    public static long
-        ID_ZHAMBIE = 1L,
-        ID_SKALATAN = 2L,
-        ID_SPIDEY = 3L,
-        ID_DRAWNED = 4L,
-        ID_EMO = 5L;
+    static final Map<BossIdentifier, DungeonBoss> ID_LOOKUP = new Object2ObjectOpenHashMap<>();
 
     public static void init() {
 

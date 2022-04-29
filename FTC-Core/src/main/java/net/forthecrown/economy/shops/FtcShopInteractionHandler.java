@@ -147,6 +147,8 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
                 (session.getType().isBuyType() ? "bought" : "sold") + " " +
                 session.getAmount() + " " +
                 FtcFormatter.normalEnum(session.getMaterial()) +
-                " at a" + (session.getType().isAdmin() ? "n admin" : "") + " shop, location: " + session.getShop().getName();
+                " at a" + (session.getType().isAdmin() ? "n admin" : "") + " shop, location: " + session.getShop().getName()
+                + " for " + FtcFormatter.decimalizeNumber(session.getTotalEarned()) +
+                ", shop price: " + FtcFormatter.decimalizeNumber(session.getPrice());
     }
 }

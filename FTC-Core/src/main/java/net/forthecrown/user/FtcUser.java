@@ -2,7 +2,10 @@ package net.forthecrown.user;
 
 import io.papermc.paper.adventure.AdventureComponent;
 import it.unimi.dsi.fastutil.objects.*;
+import net.forthecrown.commands.CommandArkBox;
 import net.forthecrown.core.*;
+import net.forthecrown.core.admin.Punishments;
+import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.core.battlepass.challenges.Challenges;
 import net.forthecrown.core.chat.*;
 import net.forthecrown.economy.selling.ItemFilter;
@@ -21,6 +24,7 @@ import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.Util;
@@ -436,7 +440,7 @@ public class FtcUser implements CrownUser {
     @Override
     public void sendMessage(UUID sender, @Nonnull String message) {
         if(!isOnline()) return;
-        getOnlineHandle().sendMessage(sender, FtcFormatter.formatColorCodes(message));
+        sendMessage(sender, ChatUtils.stringToVanilla(message, true));
     }
 
     @Override
@@ -669,7 +673,7 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
-    public void onJoinLater(){
+    public void onJoinLater() {
         JoinInfo news = Crown.getJoinInfo();
         if(news.shouldShow()) sendMessage(news.display());
 
@@ -690,6 +694,28 @@ public class FtcUser implements CrownUser {
         }
 
         mail.informOfUnread();
+
+        // Tell admin if this user has notes
+        if(Punishments.hasNotes(this)) {
+            StaffChat.send(
+                    Component.text()
+                            .color(NamedTextColor.GRAY)
+
+                            .append(nickDisplayName().color(NamedTextColor.GOLD))
+                            .append(Component.text(" has staff notes,"))
+                            .append(Component.text(" [click to read]", NamedTextColor.YELLOW)
+                                    .hoverEvent(Component.text("Click me :D"))
+                                    .clickEvent(ClickEvent.runCommand("/notes " + getName()))
+                            )
+
+                            .build(),
+                    false
+            );
+        }
+
+        // Give the ark box if they've got one
+        CommandArkBox.ArkBoxInfo info = CommandArkBox.ID_2_DATA.remove(getUniqueId());
+        if(info != null) CommandArkBox.giveBox(this, info);
     }
 
     @Override
@@ -796,7 +822,10 @@ public class FtcUser implements CrownUser {
             sendMessage(
                     Component.text("You can teleport again in ")
                             .color(NamedTextColor.GRAY)
-                            .append(Component.text(FtcFormatter.convertMillisIntoTime(TimeUtil.timeUntil(nextAllowedTeleport))).color(NamedTextColor.GOLD))
+                            .append(new TimePrinter(TimeUtil.timeUntil(nextAllowedTeleport))
+                                    .print()
+                                    .color(NamedTextColor.GOLD)
+                            )
             );
             return false;
         }

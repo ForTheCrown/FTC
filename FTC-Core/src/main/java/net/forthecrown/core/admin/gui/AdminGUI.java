@@ -114,9 +114,9 @@ public class AdminGUI {
         return builder.build();
     }
 
-    static BuiltInventory createTimeSelection(PunishEntry entry, PunishType type, String extra) {
-        InventoryBuilder builder = createBase(27, entry.entryUser())
-                .add(new ReturnOption(entry.entryUser()));
+    static BuiltInventory createTimeSelection(PunishBuilder builder, int multiplier) {
+        InventoryBuilder invBuilder = createBase(27, builder.entry.entryUser())
+                .add(new ReturnOption(builder.entry.entryUser()));
         InventoryPos start = new InventoryPos(2, 1);
 
         TimeSelectionOption.TimeAmount[] values = TimeSelectionOption.TimeAmount.values();
@@ -125,27 +125,27 @@ public class AdminGUI {
             InventoryPos pos = start.add(i, 0);
             TimeSelectionOption.TimeAmount amount = values[i];
 
-            TimeSelectionOption option = new TimeSelectionOption(entry, type, extra, amount, pos);
-            builder.add(option);
+            TimeSelectionOption option = new TimeSelectionOption(builder, amount, multiplier, pos);
+            invBuilder.add(option);
         }
 
-        return builder.build();
+        return invBuilder.build();
     }
 
-    static BuiltInventory createJailSelector(PunishEntry entry) {
-        InventoryBuilder builder = createBase(27, entry.entryUser())
-                .add(new ReturnOption(entry.entryUser()));
+    static BuiltInventory createJailSelector(PunishBuilder builder) {
+        InventoryBuilder invBuilder = createBase(27, builder.entry.entryUser())
+                .add(new ReturnOption(builder.entry.entryUser()));
 
         int i = 0;
         for (JailCell c: Registries.JAILS) {
             InventoryPos pos = new InventoryPos(i + 2, 1);
             i++;
 
-            JailOption option = new JailOption(entry, c, pos);
-            builder.add(option);
+            JailOption option = new JailOption(builder, c, pos);
+            invBuilder.add(option);
         }
 
-        return builder.build();
+        return invBuilder.build();
     }
 
     private static InventoryBuilder createBase(int size, CrownUser punished) {

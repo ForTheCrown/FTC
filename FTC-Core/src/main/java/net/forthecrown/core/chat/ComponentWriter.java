@@ -85,6 +85,7 @@ public interface ComponentWriter extends Supplier<Component> {
         private ItemLoreBuilder builder;
         private TextComponent.Builder allText = Component.text();
         private TextComponent.Builder currentLine = Component.text();
+        private boolean lineAdded;
 
         public LoreWriter(ItemLoreBuilder builder) {
             this.builder = builder;
@@ -106,6 +107,7 @@ public interface ComponentWriter extends Supplier<Component> {
 
             currentLine.append(text);
             allText.append(text);
+            lineAdded = false;
         }
 
         @Override
@@ -114,6 +116,7 @@ public interface ComponentWriter extends Supplier<Component> {
             allText.append(Component.newline());
 
             currentLine = Component.text();
+            lineAdded = true;
         }
 
         @Override
@@ -121,10 +124,15 @@ public interface ComponentWriter extends Supplier<Component> {
             builder = new ItemLoreBuilder();
             allText = Component.text();
             currentLine = Component.text();
+            lineAdded = true;
         }
 
         @Override
         public Component get() {
+            if(!lineAdded) {
+                newLine();
+            }
+
             return allText.build();
         }
 

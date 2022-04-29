@@ -1,5 +1,7 @@
 package net.forthecrown.core.chat;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.text.Component;
@@ -205,6 +207,7 @@ public class TimePrinter implements ComponentPrinter {
         }
     }
 
+    @RequiredArgsConstructor
     public enum TimerUnit {
         MILLISECOND (1L),
         SECOND      (TimeUtil.SECOND_IN_MILLIS),
@@ -222,13 +225,7 @@ public class TimePrinter implements ComponentPrinter {
             return values;
         });
 
+        @Getter
         final long inMillis;
-        TimerUnit(long l) {
-            this.inMillis = l;
-        }
-
-        public long getInMillis() {
-            return inMillis;
-        }
     }
 }
