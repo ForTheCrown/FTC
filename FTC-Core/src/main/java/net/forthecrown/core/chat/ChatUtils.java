@@ -2,9 +2,9 @@ package net.forthecrown.core.chat;
 
 import com.google.gson.JsonElement;
 import io.papermc.paper.adventure.AdventureComponent;
-import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -40,8 +40,7 @@ public final class ChatUtils {
     }
 
     private static TextComponent translateCodes(String input) {
-        TextComponent initial = LEGACY.deserialize(input);
-        String sectioned = LegacyComponentSerializer.legacySection().serialize(initial);
+        String sectioned = FtcFormatter.formatColorCodes(input);
 
         return SECTION_LEGACY.deserialize(sectioned);
     }
@@ -67,7 +66,7 @@ public final class ChatUtils {
     }
 
     public static String getString(Component tex) {
-        return PaperAdventure.LEGACY_SECTION_UXRC.serialize(tex);
+        return SECTION_LEGACY.serialize(tex);
     }
 
     public static String plainText(Component text){
@@ -96,14 +95,19 @@ public final class ChatUtils {
 
     public static Component stringToNonItalic(String str) { return stringToNonItalic(str, true); }
     public static Component stringToNonItalic(String str, boolean translateColors) {
-        return Component.text()
-                .append(convertString(str, translateColors))
-                .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
-                .build();
+        return wrapForItems(convertString(str, translateColors));
     }
 
     public static Component renderToSimple(Component component) {
-        return GlobalTranslator.render(component, Locale.ENGLISH);
+        return GlobalTranslator.renderer().render(component, Locale.ENGLISH);
+    }
+
+    public static Component wrapForItems(Component text) {
+        return Component.text()
+                .decoration(TextDecoration.ITALIC, false)
+                .color(NamedTextColor.WHITE)
+                .append(text)
+                .build();
     }
 
     /**

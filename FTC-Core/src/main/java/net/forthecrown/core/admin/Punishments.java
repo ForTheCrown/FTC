@@ -1,6 +1,7 @@
 package net.forthecrown.core.admin;
 
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.TimePrinter;
@@ -8,7 +9,6 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
-import net.forthecrown.utils.Locations;
 import net.forthecrown.vars.Var;
 import net.forthecrown.vars.types.VarTypes;
 import net.kyori.adventure.text.Component;
@@ -157,6 +157,15 @@ public final class Punishments {
                 reason,
                 length == INDEFINITE_EXPIRY ? "Eternal" : new TimePrinter(length).printString()
         );
+
+        // Log punishment on Staff log
+        FtcDiscord.staffLog("Punishments", "**{} {} {}**, reason: ``{}``, length: **{}**",
+                source.textName(),
+                type.nameEndingED(),
+                target.getNickOrName(),
+                reason == null ? "None" : reason,
+                length == INDEFINITE_EXPIRY ? "Eternal" : new TimePrinter(length).printString()
+        );
     }
 
     /**
@@ -165,7 +174,7 @@ public final class Punishments {
      * @param user The user to place in jail
      */
     public static void placeInGayBabyJail(JailCell cell, CrownUser user) {
-        Location l = Locations.of(cell.getWorld(), cell.getPos());
+        Location l = FtcUtils.vecToLocation(cell.getWorld(), cell.getPos());
         user.getPlayer().teleport(l);
 
         punisher.setJailed(user.getUniqueId(), cell);
@@ -223,6 +232,8 @@ public final class Punishments {
                         .color(NamedTextColor.YELLOW)
                         .append(target.nickDisplayName().color(NamedTextColor.YELLOW))
         );
+
+        FtcDiscord.staffLog("Punishments", "{} Un{} {}", source.textName(), type.nameEndingED().toLowerCase(), target.getNickOrName());
     }
 
     private static void _announce(CommandSource source, CrownUser target, Component text) {

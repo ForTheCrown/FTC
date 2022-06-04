@@ -44,7 +44,10 @@ public interface FtcSuggestionProvider {
 
     static CompletableFuture<Suggestions> suggestPlayerNamesAndEmotes(CommandContext<CommandSource> c, SuggestionsBuilder builder, boolean ignorePerms) {
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ')+1);
+        return __suggestPlayerNamesAndEmotes(c, builder, ignorePerms);
+    }
 
+    static CompletableFuture<Suggestions> __suggestPlayerNamesAndEmotes(CommandContext<CommandSource> c, SuggestionsBuilder builder, boolean ignorePerms) {
         suggestPlayerNames(c.getSource(), builder);
         if(c.getSource().hasPermission(Permissions.DONATOR_3) || ignorePerms){
             return Crown.getEmotes().getSuggestions(c, builder, ignorePerms);

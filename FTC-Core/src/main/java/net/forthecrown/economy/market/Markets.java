@@ -8,7 +8,10 @@ import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.serializer.CrownSerializer;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserMarketData;
+import net.forthecrown.utils.math.WorldBounds3i;
+import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.inventory.Book;
+import net.kyori.adventure.text.Component;
 import org.bukkit.World;
 
 import java.util.Collection;
@@ -33,6 +36,8 @@ public interface Markets extends CrownSerializer {
      * @return The shop by that name
      */
     MarketShop get(String claimName);
+
+    MarketShop get(WorldVec3i pos);
 
     /**
      * Gets the world the markets are in
@@ -87,6 +92,8 @@ public interface Markets extends CrownSerializer {
      * @param uuid The uuid to trust
      */
     void trust(MarketShop shop, UUID uuid);
+
+    WorldBounds3i getBounds(MarketShop shop);
 
     /**
      * Untrusts a user in the given shop
@@ -150,6 +157,10 @@ public interface Markets extends CrownSerializer {
     void remove(MarketShop shop);
 
     void resetFromBackup(MarketShop shop);
+
+    void beginEviction(MarketShop shop, long evictTime, boolean automatic, Component reason);
+
+    void stopEviction(MarketShop shop);
 
     /**
      * Clears all the shops from this manager

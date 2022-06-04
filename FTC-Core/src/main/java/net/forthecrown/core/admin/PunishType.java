@@ -117,7 +117,7 @@ public enum PunishType {
                     punishment.source()
             );
 
-            if(user.isOnline()) {
+            if (user.isOnline()) {
                 user.getPlayer().kick(Component.text(punishment.reason()), PlayerKickEvent.Cause.IP_BANNED);
             }
         }

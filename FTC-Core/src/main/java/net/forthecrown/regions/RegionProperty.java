@@ -1,6 +1,5 @@
 package net.forthecrown.regions;
 
-import lombok.Getter;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcDynmap;
 import org.dynmap.markers.Marker;
@@ -12,7 +11,7 @@ import java.util.List;
 public enum RegionProperty {
      PAID_REGION {
         @Override
-        public void onAdd(RegionData region) {
+        public void onAdd(PopulationRegion region) {
             if(region.hasName() && !region.hasProperty(FORBIDS_MARKER)) {
                 Marker marker =  FtcDynmap.getMarker(region);
                 marker.setMarkerIcon(FtcDynmap.getSpecialIcon());
@@ -20,7 +19,7 @@ public enum RegionProperty {
         }
 
         @Override
-        public void onRemove(RegionData region) {
+        public void onRemove(PopulationRegion region) {
             if(region.hasName() && !region.hasProperty(FORBIDS_MARKER)) {
                 Marker marker =  FtcDynmap.getMarker(region);
                 marker.setMarkerIcon(FtcDynmap.getNormalIcon());
@@ -30,13 +29,13 @@ public enum RegionProperty {
 
     FORBIDS_MARKER {
         @Override
-        public void onAdd(RegionData region) {
+        public void onAdd(PopulationRegion region) {
             if(!region.hasName()) return;
             FtcDynmap.getMarker(region).deleteMarker();
         }
 
         @Override
-        public void onRemove(RegionData region) {
+        public void onRemove(PopulationRegion region) {
             if(!region.hasName()) return;
             FtcDynmap.createMarker(region);
         }
@@ -44,37 +43,28 @@ public enum RegionProperty {
 
     HIDE_RESIDENTS {
         @Override
-        public void onAdd(RegionData region) {
+        public void onAdd(PopulationRegion region) {
             regen(region);
         }
 
         @Override
-        public void onRemove(RegionData region) {
+        public void onRemove(PopulationRegion region) {
             regen(region);
         }
 
-        void regen(RegionData data) {
-            if (data instanceof PopulationRegion r) {
-                Crown.getRegionManager().getGenerator().generate(r);
-            }
+        void regen(PopulationRegion data) {
+            Crown.getRegionManager().getGenerator().generate(data);
         }
     };
 
-    public abstract void onAdd(RegionData region);
-    public abstract void onRemove(RegionData region);
-
-    @Getter
-    private final int bitFlag;
-
-    RegionProperty() {
-        bitFlag = 1 << ordinal();
-    }
+    public abstract void onAdd(PopulationRegion region);
+    public abstract void onRemove(PopulationRegion region);
 
     public static int pack(Collection<RegionProperty> properties) {
         int result = 0;
 
         for (var v: properties) {
-            result = result | v.getBitFlag();
+            result |= (1 << v.ordinal());
         }
 
         return result;
@@ -84,7 +74,7 @@ public enum RegionProperty {
         List<RegionProperty> properties = new ArrayList<>();
 
         for (var p: values()) {
-            if ((p.getBitFlag() & flags) == 0) continue;
+            if (((1 << p.ordinal()) & flags) == 0) continue;
             properties.add(p);
         }
 

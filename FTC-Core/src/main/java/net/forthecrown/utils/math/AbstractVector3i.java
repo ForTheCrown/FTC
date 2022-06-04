@@ -6,6 +6,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.ChunkPos;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -210,6 +211,30 @@ public abstract class AbstractVector3i<T extends AbstractVector3i<T>> implements
                 o.applyAsInt(other.getX(), x),
                 o.applyAsInt(other.getY(), y),
                 o.applyAsInt(other.getZ(), z)
+        );
+    }
+
+    public T clampX(int min, int max) {
+        return set(
+                Mth.clamp(x, min, max),
+                y,
+                z
+        );
+    }
+
+    public T clampY(int min, int max) {
+        return set(
+                x,
+                Mth.clamp(y, min, max),
+                z
+        );
+    }
+
+    public T clampZ(int min, int max) {
+        return set(
+                x,
+                y,
+                Mth.clamp(z, min, max)
         );
     }
 

@@ -15,8 +15,17 @@ import java.util.function.IntFunction;
 
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
+/**
+ * This is a mess lol
+ */
 public class AdminGUI {
-    public static final int ENTRIES_PER_PAGE = 14;
+    public static final int
+            ENTRIES_PER_PAGE = 14,
+            DIR_FORWARD = 1,
+            DIR_BACKWARD = -1;
+
+    static final int[] MULTIPLIERS = { 1, 2, 5, 10, 20 };
+
     private static final InventoryPos ONE = new InventoryPos(1, 1);
 
     public static BuiltInventory createOveriew(CrownUser punished) {
@@ -68,17 +77,18 @@ public class AdminGUI {
         return viewPageBased(list.size(), page, builder, value -> createPunishmentsView(entry, past, value));
     }
 
+    // Buggy buggy, worku, but weirdly lol
     private static BuiltInventory viewPageBased(int size, int page, InventoryBuilder builder, IntFunction<BuiltInventory> pageCreator) {
         int maxPage = (int) Math.ceil((double) size / (double) ENTRIES_PER_PAGE);
         boolean lastPage = page >= maxPage;
         boolean firstPage = page <= 0;
 
         if (!lastPage) {
-            builder.add(new PageSwitchOption(page, 1, pageCreator, new InventoryPos(8, 3)));
+            builder.add(new PageSwitchOption(page, DIR_FORWARD, pageCreator, new InventoryPos(8, 3)));
         }
 
         if (!firstPage) {
-            builder.add(new PageSwitchOption(page, -1, pageCreator, new InventoryPos(0, 3)));
+            builder.add(new PageSwitchOption(page, DIR_BACKWARD, pageCreator, new InventoryPos(0, 3)));
         }
 
         return builder.build();
@@ -121,12 +131,22 @@ public class AdminGUI {
 
         TimeSelectionOption.TimeAmount[] values = TimeSelectionOption.TimeAmount.values();
 
+        // Add time selection options
         for (int i = 0; i < values.length; i++) {
             InventoryPos pos = start.add(i, 0);
             TimeSelectionOption.TimeAmount amount = values[i];
 
             TimeSelectionOption option = new TimeSelectionOption(builder, amount, multiplier, pos);
             invBuilder.add(option);
+        }
+
+        // Add time multiplier options
+        for (int i = 0; i < MULTIPLIERS.length; i++) {
+            int val = MULTIPLIERS[i];
+
+            invBuilder.add(
+                    new TimeMultiplierOption(builder, val, multiplier == val, new InventoryPos(2 + i, 2))
+            );
         }
 
         return invBuilder.build();

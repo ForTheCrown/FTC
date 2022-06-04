@@ -2,7 +2,9 @@ package net.forthecrown.events;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.events.dynamic.JailCellListener;
+import net.forthecrown.user.packet.Packets;
 import net.forthecrown.utils.FtcUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -40,6 +42,15 @@ public final class Events {
 
         register(new ResourceWorldListener());
         register(new WeaponListener());
+
+        if (FtcDiscord.isActive()) {
+            Crown.logger().info("Discord listener registered");
+            FtcDiscord.getHandle().getJda().addEventListener(
+                    new DiscordListener()
+            );
+        }
+
+        Packets.register(new PlayerPacketListener());
 
         Crown.logger().info("Events registered");
     }

@@ -20,10 +20,10 @@ import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.TimeUtil;
+import net.kyori.adventure.text.Component;
 import net.minecraft.util.Mth;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.UUID;
@@ -50,7 +50,15 @@ public class FtcMarketShop implements MarketShop {
 
     private final ObjectList<String> connected = new ObjectArrayList<>();
 
-    private EvictionData evictionData;
+    @Getter
+    private final ObjectList<MarketScan> scans = new ObjectArrayList<>();
+
+    @Getter @Setter
+    private boolean memberEditingAllowed = true;
+
+    @Getter
+    private MarketEviction eviction;
+
     private int price = -1;
     private String mergedName;
 
@@ -86,22 +94,16 @@ public class FtcMarketShop implements MarketShop {
     }
 
     @Override
-    public void setEvictionDate(@Nullable Date date) {
-        if(evictionData != null) {
-            evictionData.cancel();
+    public void setEviction(MarketEviction eviction) {
+        if (this.eviction != null) {
+            this.eviction.cancel();
         }
 
-        if(date != null) {
-            this.evictionData = new EvictionData(this, date);
-            evictionData.start();
-        } else {
-            evictionData = null;
-        }
-    }
+        this.eviction = eviction;
 
-    @Override
-    public Date getEvictionDate() {
-        return evictionData == null ? null : evictionData.getDate();
+        if (eviction != null) {
+            eviction.start();
+        }
     }
 
     @Override
@@ -126,7 +128,11 @@ public class FtcMarketShop implements MarketShop {
             if(getDateOfPurchase() != null) ownership.addDate("dateOfPurchase", getDateOfPurchase());
 
             if(markedForEviction()) {
-                ownership.addDate("evictionDate", evictionData.getDate());
+                ownership.add("eviction", eviction);
+            }
+
+            if (!scans.isEmpty()) {
+                ownership.addList("scans", scans);
             }
 
             if(mergedName != null) {
@@ -135,6 +141,10 @@ public class FtcMarketShop implements MarketShop {
 
             if(!ListUtils.isNullOrEmpty(getCoOwners())) {
                 ownership.addList("coOwners", getCoOwners(), JsonUtils::writeUUID);
+            }
+
+            if (!memberEditingAllowed) {
+                ownership.add("membersCanEditShops", false);
             }
 
             json.add("ownershipData", ownership);
@@ -175,7 +185,19 @@ public class FtcMarketShop implements MarketShop {
             market.dateOfPurchase = ownership.getDate("dateOfPurchase");
 
             if(ownership.has("evictionDate")) {
-                market.setEvictionDate(ownership.getDate("evictionDate"));
+                MarketEviction data = new MarketEviction(
+                        market.getName(),
+                        MarketEviction.CAUSE_COMMAND,
+                        ownership.getDate("evictionData").getTime(),
+                        Component.text("Admin")
+                );
+                market.setEviction(data);
+            } else if (ownership.has("eviction")) {
+                market.setEviction(MarketEviction.deserialize(ownership.getArray("eviction"), market));
+            }
+
+            if (ownership.has("scans")) {
+                market.scans.addAll(ownership.getList("scans", MarketScan::deserialize));
             }
 
             if(ownership.has("coOwners")) {
@@ -185,6 +207,8 @@ public class FtcMarketShop implements MarketShop {
             if(ownership.has("merged")) {
                 market.mergedName = ownership.getString("merged");
             }
+
+            market.memberEditingAllowed = ownership.getBool("membersCanEditShops", true);
         }
 
         return market;

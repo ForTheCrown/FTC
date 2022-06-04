@@ -413,7 +413,7 @@ public class FtcUser implements CrownUser {
     @Nonnull
     @Override
     public String getName(){
-        if(FtcUtils.isNullOrBlank(name)) name = getOfflinePlayer().getName();
+        if(FtcUtils.isNullOrBlank(name)) return name = getOfflinePlayer().getName();
 
         return name;
     }

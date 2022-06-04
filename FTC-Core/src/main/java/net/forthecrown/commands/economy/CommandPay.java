@@ -77,25 +77,25 @@ public class CommandPay extends FtcCommand {
                 );
     }
 
-    private int pay(CrownUser user, List<CrownUser> targets, int amount, Component message) throws CommandSyntaxException {
-        if(!user.allowsPaying()) throw FtcExceptionProvider.senderPayDisabled();
+    int pay(CrownUser user, List<CrownUser> targets, int amount, Component message) throws CommandSyntaxException {
+        if (!user.allowsPaying()) throw FtcExceptionProvider.senderPayDisabled();
 
         UUID id = user.getUniqueId();
-        if(!bals.has(id, amount)) throw FtcExceptionProvider.cannotAfford(amount);
+        if (!bals.has(id, amount)) throw FtcExceptionProvider.cannotAfford(amount);
 
         targets.removeIf(u -> !u.allowsPaying());
 
-        if(targets.remove(user) && targets.isEmpty()) throw FtcExceptionProvider.cannotPaySelf();
-        if(targets.isEmpty()) throw EntityArgumentImpl.NO_ENTITIES_FOUND.create();
-        if(!bals.has(user.getUniqueId(), amount * targets.size())) throw FtcExceptionProvider.cannotAfford();
+        if (targets.remove(user) && targets.isEmpty()) throw FtcExceptionProvider.cannotPaySelf();
+        if (targets.isEmpty()) throw EntityArgumentImpl.NO_ENTITIES_FOUND.create();
+        if (!bals.has(user.getUniqueId(), amount * targets.size())) throw FtcExceptionProvider.cannotAfford();
+
+        if (targets.size() == 1) {
+            CrownUser target = targets.get(0);
+            if (!target.allowsPaying()) throw FtcExceptionProvider.targetPayDisabled(target);
+            if (target.getInteractions().isBlockedPlayer(user.getUniqueId())) throw FtcExceptionProvider.cannotPayBlocked();
+        }
 
         byte paidAmount = 0;
-
-        if(targets.size() == 1){
-            CrownUser target = targets.get(0);
-            if(!target.allowsPaying()) throw FtcExceptionProvider.targetPayDisabled(target);
-            if(target.getInteractions().isBlockedPlayer(user.getUniqueId())) throw FtcExceptionProvider.cannotPayBlocked();
-        }
 
         MuteStatus status = Punishments.muteStatus(user);
         Component messageActual = message == null || !status.maySpeak || BannedWords.contains(message) ?
@@ -105,7 +105,7 @@ public class CommandPay extends FtcCommand {
         Component formattedAmount = FtcFormatter.rhines(amount).color(NamedTextColor.GOLD);
 
         for (CrownUser target: targets) {
-            if(target.getInteractions().isBlockedPlayer(user.getUniqueId())) continue;
+            if (target.getInteractions().isBlockedPlayer(user.getUniqueId())) continue;
 
             bals.add(target.getUniqueId(), amount);
             bals.remove(id, amount);
@@ -132,9 +132,9 @@ public class CommandPay extends FtcCommand {
             target.unloadIfOffline();
         }
 
-        if(paidAmount == 0) throw UserArgument.NO_USERS_FOUND.create();
+        if (paidAmount == 0) throw UserArgument.NO_USERS_FOUND.create();
 
-        if(paidAmount > 1) {
+        if (paidAmount > 1) {
             user.sendMessage(
                     Component.translatable("economy.pay.result",
                             NamedTextColor.GRAY,

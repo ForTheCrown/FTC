@@ -39,17 +39,18 @@ public class CommandBalance extends FtcCommand {
     protected void createCommand(BrigadierCommand command) {
         command
                 .executes(c -> showBal(c.getSource(), getUserSender(c)))
+
                 .then(argument("player", UserArgument.user()) //Player is checking someone else's balance
                         .executes(c -> showBal(c.getSource(), UserArgument.getUser(c, "player")))
                 );
     }
 
-    private int showBal(CommandSource sender, CrownUser user){
+    private int showBal(CommandSource sender, CrownUser user) {
         Economy economy = Crown.getEconomy();
-        boolean senderIsUser = user.getName().equals(sender.textName());
+        boolean self = user.getName().equals(sender.textName());
         Component formatted = FtcFormatter.rhines(economy.get(user.getUniqueId())).color(NamedTextColor.GOLD);
 
-        Component text = senderIsUser ?
+        Component text = self ?
                 Component.translatable("user.valueQuery.self", formatted) :
                 Component.translatable("user.valueQuery.other", user.nickDisplayName().color(NamedTextColor.YELLOW), formatted);
 

@@ -3,7 +3,7 @@ package net.forthecrown.events.dynamic;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.admin.JailCell;
 import net.forthecrown.core.admin.Punisher;
-import net.forthecrown.utils.Locations;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -27,7 +27,7 @@ public class JailCellListener implements Listener {
         Player player = event.getPlayer();
 
         if(!cell.getCell().contains(player)) {
-            player.teleport(Locations.of(cell.getWorld(), cell.getPos()));
+            player.teleport(FtcUtils.vecToLocation(cell.getWorld(), cell.getPos()));
         }
     }
 

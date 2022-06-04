@@ -28,7 +28,11 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
         if(customer instanceof CrownUser) {
             Player user = ((CrownUser) customer).getPlayer();
 
-            if(user.isSneaking() && (shop.getOwnership().mayEditShop(user.getUniqueId()) || user.hasPermission(Permissions.SHOP_ADMIN))) {
+            if (user.isSneaking() &&
+                    (ShopManager.mayEdit(shop, user.getUniqueId())
+                            || user.hasPermission(Permissions.SHOP_ADMIN)
+                    )
+            ) {
                 user.openInventory(shop.getInventory());
                 Bukkit.getPluginManager().registerEvents(new ShopInteractionListener.ShopRestockListener(user, shop), Crown.inst());
                 return;

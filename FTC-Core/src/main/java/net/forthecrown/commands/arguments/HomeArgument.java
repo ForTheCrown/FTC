@@ -2,6 +2,7 @@ package net.forthecrown.commands.arguments;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -10,6 +11,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
+import net.forthecrown.royalgrenadier.VanillaMappedArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
@@ -23,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static net.forthecrown.royalgrenadier.GrenadierUtils.correctReader;
 
-public class HomeArgument implements ArgumentType<HomeParseResult> {
+public class HomeArgument implements ArgumentType<HomeParseResult>, VanillaMappedArgument {
     private static final HomeArgument HOME = new HomeArgument();
     protected HomeArgument() {}
 
@@ -91,5 +93,10 @@ public class HomeArgument implements ArgumentType<HomeParseResult> {
     @Override
     public Collection<String> getExamples() {
         return Arrays.asList("home", "BotulToxin:home", "Robinoh:nether", "base", "farm");
+    }
+
+    @Override
+    public ArgumentType<?> getVanillaArgumentType() {
+        return StringArgumentType.string();
     }
 }

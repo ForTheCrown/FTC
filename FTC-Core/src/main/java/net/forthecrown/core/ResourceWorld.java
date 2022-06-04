@@ -141,6 +141,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         findSeed().whenComplete((seed, throwable) -> {
             if (throwable != null) {
                 StaffChat.send(Component.text("Error while attempting to find RW seed"), false);
+                FtcDiscord.staffLog("RW", "Error while attempting to find RW seed");
                 LOGGER.error("Error while attempting to find seed, cannot open RW", throwable);
 
                 return;
@@ -168,6 +169,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         if (throwable != null) {
             StaffChat.send(Component.text("Error while resetting RW, cannot finish"), false);
             LOGGER.error("Could not regen Resource World", throwable);
+            FtcDiscord.staffLog("RW", "Error while resetting Resource World!");
             return;
         }
 
@@ -240,7 +242,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
 
             // Move RW -> Haz gate destination
             if (toRes == null) {
-                LOGGER.warn("Could not re-position rw -> haz gate, could not find gate with id {}", toResGate);
+                LOGGER.warn("Could not re-position haz -> rw gate, could not find gate with id {}", toResGate);
             } else {
                 // Same deal with the 2 method calls as above
                 toRes.addTo(null);
@@ -307,6 +309,8 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
 
             lastReset = System.currentTimeMillis();
             LOGGER.info("RW reset finished");
+
+            FtcDiscord.staffLog("RW", "Resource World reset finished!");
         });
     }
 

@@ -162,7 +162,12 @@ public class FtcPunisher extends AbstractJsonSerializer implements Punisher {
         @Override
         public void punish(Punishment punishment) {
             punishment.startTask(() -> revokePunishment(punishment.type()));
-            current.put(punishment.type(), punishment);
+            Punishment removed = current.put(punishment.type(), punishment);
+
+            if (removed != null) {
+                removed.cancelTask();
+                past.add(0, removed);
+            }
         }
 
         @Override

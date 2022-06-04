@@ -63,6 +63,7 @@ public interface Crown extends Plugin, Namespaced {
     static ServerRules          getRules()              { return Main.rules; }
     static EndOpener            getEndOpener()          { return Main.endOpener; }
     static ResourceWorld        getResourceWorld()      { return Main.resourceWorld; }
+    static ServerHolidays       getHolidays()           { return Main.holidays; }
 
     static FtcConfig            config()                { return Main.config; }
     static Logger               logger()                { return Main.logger; }
@@ -97,6 +98,8 @@ public interface Crown extends Plugin, Namespaced {
         Main.battlePass.save();
 
         Main.userManager.saveCache();
+
+        Main.holidays.save();
 
         if(Houses.ENABLED) {
             HouseSerializer.serialize();

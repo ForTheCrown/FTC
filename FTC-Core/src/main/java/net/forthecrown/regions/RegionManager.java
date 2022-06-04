@@ -32,7 +32,13 @@ public interface RegionManager extends CrownSerializer, NbtCompoundSavable {
      */
     PopulationRegion get(String name);
 
-    RegionData getData(RegionPos pos);
+    /**
+     * Gets a snapshot of a region
+     * @param pos The region position to get the snapshot of
+     * @return The region's snapshot, will be {@link PopulationRegion} if
+     *         the region is important, {@link RegionAccess.Empty} otherwise
+     */
+    RegionAccess getSnapshot(RegionPos pos);
 
     /**
      * Renames a given region to the given name.
@@ -77,7 +83,7 @@ public interface RegionManager extends CrownSerializer, NbtCompoundSavable {
     /**
      * Removes all 'unimportant' regions from the manager's tracking.
      * <p></p>
-     * Note: unimportant refers to the return result of {@link PopulationRegion#shouldSerialize()},
+     * Note: unimportant refers to the return result of {@link PopulationRegion#isImportant()},
      * If that returns false, the region is considered 'unimportant'
      */
     void dropUnimportantRegions();

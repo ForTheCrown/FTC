@@ -24,14 +24,16 @@ import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.registry.Registries;
 import net.forthecrown.registry.Registry;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.royalgrenadier.VanillaMappedArgument;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.useables.actions.UsageAction;
 import net.forthecrown.useables.checks.UsageCheck;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import org.bukkit.NamespacedKey;
 
 import java.util.concurrent.CompletableFuture;
 
-public class RegistryArguments<T> implements ArgumentType<T> {
+public class RegistryArguments<T> implements ArgumentType<T>, VanillaMappedArgument {
     private static final RegistryArguments<BlockAnimation> ANIMATION =     new RegistryArguments<>(Registries.ANIMATIONS, "Animation");
     private static final RegistryArguments<BlockStructure> STRUCTURE = new RegistryArguments<>(Registries.STRUCTURES, "Structure");
 
@@ -141,5 +143,10 @@ public class RegistryArguments<T> implements ArgumentType<T> {
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         return FtcSuggestionProvider.suggestRegistry(builder, registry);
+    }
+
+    @Override
+    public ArgumentType<?> getVanillaArgumentType() {
+        return ResourceLocationArgument.id();
     }
 }

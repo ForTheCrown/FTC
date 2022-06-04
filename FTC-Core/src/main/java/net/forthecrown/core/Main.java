@@ -4,8 +4,6 @@ import net.forthecrown.commands.CommandArkBox;
 import net.forthecrown.core.admin.FtcPunisher;
 import net.forthecrown.core.battlepass.BattlePassImpl;
 import net.forthecrown.core.chat.*;
-import net.forthecrown.core.transformers.RegionResidencyTransformer;
-import net.forthecrown.core.transformers.ShopJsonToTag;
 import net.forthecrown.core.transformers.Transformers;
 import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.dungeons.Bosses;
@@ -23,7 +21,7 @@ import net.forthecrown.useables.FtcUsablesManager;
 import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
 import net.forthecrown.user.FtcUserManager;
-import net.forthecrown.user.packets.PacketListeners;
+import net.forthecrown.user.packet.Packets;
 import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.vars.VarRegistry;
 import net.forthecrown.vars.types.VarTypes;
@@ -78,6 +76,7 @@ public final class Main extends JavaPlugin implements Crown {
     static TradeGuild               guild;
     static PeriodicalSaver          saver;
     static EndOpener                endOpener;
+    static ServerHolidays           holidays;
 
     static LuckPerms                luckPerms;
 
@@ -97,14 +96,13 @@ public final class Main extends JavaPlugin implements Crown {
             TestNodes.init();
         }
 
-        if(ShopJsonToTag.shouldRun()) {
-            ShopJsonToTag.run(shopManager);
-        }
+        ServerIcons.loadIcons();
+        Transformers.runCurrent();
 
-        if(RegionResidencyTransformer.shouldRun()) {
-            RegionResidencyTransformer.run();
-        }
-
+        FtcDiscord.staffLog("Server", "FTC started, plugin version: {}, paper version: {}",
+                getDescription().getVersion(),
+                Bukkit.getVersion()
+        );
 
         logger.info("FTC startup completed");
     }
@@ -135,11 +133,9 @@ public final class Main extends JavaPlugin implements Crown {
         BootStrap.loadPhase();
 
         userManager.loadCache();
+        logger.info("User cache loaded");
 
         Transformers.load(getDataFolder());
-
-        // Remove any potentially invalid user datas
-        //InvalidUserDataFilter.run(UserJsonSerializer.USER_DIR, userManager);
 
         logger.info("onLoad finished");
     }
@@ -157,12 +153,14 @@ public final class Main extends JavaPlugin implements Crown {
 
         safeRunnable(Bosses::shutDown);
         safeRunnable(Cosmetics::shutDown);
-        safeRunnable(PacketListeners::removeAll);
+        safeRunnable(Packets::removeAll);
         safeRunnable(CommandArkBox::save);
         safeRunnable(WorldLoader::shutdown);
 
         FtcUserManager.LOADED_USERS.clear();
         FtcUserManager.LOADED_ALTS.clear();
+
+        FtcDiscord.staffLog("Server", "FTC shutting down");
     }
 
     // IDK why this method has logic in the name, when there's

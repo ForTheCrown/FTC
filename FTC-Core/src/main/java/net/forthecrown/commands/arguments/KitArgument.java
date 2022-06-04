@@ -12,12 +12,14 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.royalgrenadier.VanillaMappedArgument;
 import net.forthecrown.useables.kits.Kit;
 import net.kyori.adventure.key.Key;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 
 import java.util.concurrent.CompletableFuture;
 
-public class KitArgument implements ArgumentType<Key> {
+public class KitArgument implements ArgumentType<Key>, VanillaMappedArgument {
     public static final KitArgument KIT = new KitArgument();
     private KitArgument() {}
 
@@ -53,5 +55,10 @@ public class KitArgument implements ArgumentType<Key> {
             return Crown.getKitManager().getSuggestions((CommandContext<CommandSource>) context, builder);
         } catch (CommandSyntaxException ignored) {}
         return Suggestions.empty();
+    }
+
+    @Override
+    public ArgumentType<?> getVanillaArgumentType() {
+        return ResourceLocationArgument.id();
     }
 }

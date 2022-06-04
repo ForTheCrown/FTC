@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import lombok.Getter;
 import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.scoreboard.ObjectiveArgument;
@@ -21,9 +22,11 @@ import java.util.concurrent.CompletableFuture;
 
 public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionInstance> {
     public static final NamespacedKey
-            ADD_KEY     = Keys.forthecrown("add_score"),
-            REMOVE_KEY  = Keys.forthecrown("remove_score"),
-            SET_KEY     = Keys.forthecrown("set_score");
+            ADD_KEY = Keys.forthecrown("add_score"),
+            REM_KEY = Keys.forthecrown("remove_score"),
+            SET_KEY = Keys.forthecrown("set_score"),
+            DIV_KEY = Keys.forthecrown("divide_score"),
+            MUL_KEY = Keys.forthecrown("multiply_score");
 
     private final Action action;
 
@@ -36,7 +39,7 @@ public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionIn
         Objective objective = ObjectiveArgument.objective().parse(reader);
         reader.expect(' ');
 
-        int amount = reader.readInt();
+        float amount = reader.readFloat();
 
         return new ActionInstance(action, objective, amount);
     }
@@ -63,11 +66,7 @@ public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionIn
 
     @Override
     public @NotNull Key key() {
-        return switch (action) {
-            case DECREMENT -> REMOVE_KEY;
-            case SET -> SET_KEY;
-            case INCREMENT -> ADD_KEY;
-        };
+        return keyFromAction(action);
     }
 
     @Override
@@ -75,28 +74,26 @@ public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionIn
         return ObjectiveArgument.objective().listSuggestions(context, builder);
     }
 
+    private static Key keyFromAction(Action action) {
+        return switch (action) {
+            case DECREMENT  -> REM_KEY;
+            case SET        -> SET_KEY;
+            case INCREMENT  -> ADD_KEY;
+            case DIVIDE     -> DIV_KEY;
+            case MULTIPLY   -> MUL_KEY;
+        };
+    }
+
     public static class ActionInstance implements UsageActionInstance {
 
-        private final Action action;
-        private final Objective objective;
-        private final int amount;
+        @Getter private final Action action;
+        @Getter private final Objective objective;
+        @Getter private final float amount;
 
-        public ActionInstance(Action action, Objective objective, int amount) {
+        public ActionInstance(Action action, Objective objective, float amount) {
             this.action = action;
             this.objective = objective;
             this.amount = amount;
-        }
-
-        public int getAmount() {
-            return amount;
-        }
-
-        public Objective getObjective() {
-            return objective;
-        }
-
-        public Action getAction() {
-            return action;
         }
 
         @Override
@@ -111,35 +108,33 @@ public class ActionChangeScore implements UsageAction<ActionChangeScore.ActionIn
 
         @Override
         public String asString() {
-            return typeKey().asString() + '{' + "obj=" + objective.getName() + ", amount=" + amount + '}';
+            return typeKey().asString() + '{' + "obj=" + objective.getName() + ", amount=" + String.format("%.02f", amount) + '}';
         }
 
         @Override
         public @NotNull Key typeKey() {
-            return switch (action) {
-                case DECREMENT -> REMOVE_KEY;
-                case SET -> SET_KEY;
-                case INCREMENT -> ADD_KEY;
-            };
+            return keyFromAction(action);
         }
     }
 
-    public interface IntBiOperator {
-        int apply(int score, int amount);
+    public interface ScoreOperator {
+        int apply(int score, float amount);
     }
 
     public enum Action {
-        INCREMENT (Integer::sum),
-        DECREMENT ((score, amount) -> score - amount),
-        SET ((score, amount) -> amount);
+        INCREMENT ((score, amount) -> (int) (score + amount)),
+        DECREMENT ((score, amount) -> (int) (score - amount)),
+        DIVIDE ((score, amount) ->    (int) (score / amount)),
+        MULTIPLY (((score, amount) -> (int) (score * amount))),
+        SET ((score, amount) ->       (int) amount);
 
-        public final IntBiOperator operator;
+        public final ScoreOperator operator;
 
-        Action(IntBiOperator operator){
+        Action(ScoreOperator operator){
             this.operator = operator;
         }
 
-        public int apply(int score, int amount){
+        public int apply(int score, float amount) {
             return operator.apply(score, amount);
         }
     }

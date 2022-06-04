@@ -2,7 +2,6 @@ package net.forthecrown.core.admin.gui;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.ItemStackBuilder;
@@ -16,6 +15,7 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.util.Mth;
 import org.bukkit.Material;
 
+import static net.forthecrown.core.admin.Punishments.INDEFINITE_EXPIRY;
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
 record TimeSelectionOption(PunishBuilder builder,
@@ -30,7 +30,7 @@ record TimeSelectionOption(PunishBuilder builder,
 
     @Override
     public void place(FtcInventory inventory, CrownUser user) {
-        ItemStackBuilder builder = new ItemStackBuilder(timeAmount.displayMaterial, 1)
+        ItemStackBuilder builder = new ItemStackBuilder(timeAmount.displayMaterial, multiplier)
                 .setName(Component.text(timeAmount.getDisplay(multiplier)).style(nonItalic()));
 
         inventory.setItem(getPos(), builder);
@@ -38,7 +38,7 @@ record TimeSelectionOption(PunishBuilder builder,
 
     @Override
     public void onClick(CrownUser user, ClickContext context) throws CommandSyntaxException {
-        builder.setLength(timeAmount.time * multiplier);
+        builder.setLength(timeAmount.time == INDEFINITE_EXPIRY ? INDEFINITE_EXPIRY : timeAmount.time * multiplier);
 
         builder.handle(user.getCommandSource());
         context.setShouldClose(true);
@@ -51,7 +51,7 @@ record TimeSelectionOption(PunishBuilder builder,
         WEEK ("{} Week{}", TimeUtil.WEEK_IN_MILLIS, Material.ORANGE_WOOL),
         MONTH ("{} Month{}", TimeUtil.MONTH_IN_MILLIS, Material.RED_WOOL),
 
-        INDEFINITE ("Forever", Punishments.INDEFINITE_EXPIRY, Material.BLACK_WOOL);
+        INDEFINITE ("Forever", INDEFINITE_EXPIRY, Material.BLACK_WOOL);
 
         private final String display;
         private final long time;

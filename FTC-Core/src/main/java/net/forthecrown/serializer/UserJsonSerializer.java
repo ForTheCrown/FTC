@@ -3,8 +3,8 @@ package net.forthecrown.serializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.user.*;
 import net.forthecrown.utils.FtcUtils;
@@ -38,6 +38,14 @@ public class UserJsonSerializer implements UserSerializer {
 
     @Override
     public void serialize(FtcUser user) {
+        try {
+            __serialize(user);
+        } catch (Throwable t) {
+            LOGGER.error("Could not serialize user: " + user, t);
+        }
+    }
+
+    private void __serialize(FtcUser user) {
         if(deletedFiles.contains(user.getUniqueId())) return;
 
         JsonWrapper json = JsonWrapper.empty();
@@ -121,6 +129,14 @@ public class UserJsonSerializer implements UserSerializer {
 
     @Override
     public void deserialize(FtcUser user) {
+        try {
+            __deserialize(user);
+        } catch (Throwable t) {
+            LOGGER.error("Could not deserialize: " + user, t);
+        }
+    }
+
+    private void __deserialize(FtcUser user) {
         if(deletedFiles.contains(user.getUniqueId())) return;
 
         JsonWrapper json = readJson(user);

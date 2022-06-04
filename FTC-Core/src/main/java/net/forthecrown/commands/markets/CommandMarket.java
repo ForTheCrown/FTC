@@ -26,6 +26,7 @@ import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.Vector3i;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -59,6 +60,40 @@ public class CommandMarket extends FtcCommand {
 
     @Override
     protected void createCommand(BrigadierCommand command) {
+        if (Crown.inDebugMode()) {
+            command
+                    .then(literal("run_day_change")
+                            .executes(c -> {
+                                c.getSource().sendAdmin("Running day update");
+                                ((FtcMarkets) Crown.getMarkets()).onDayChange();
+
+                                return 0;
+                            })
+                    )
+
+                    .then(literal("run_4_scans")
+                            .executes(c -> {
+                                CrownUser user = getUserSender(c);
+
+                                Markets markets = Crown.getMarkets();
+                                MarketShop shop = markets.get(user.getUniqueId());
+
+                                WorldBounds3i bounds3i = WorldBounds3i.of(
+                                        markets.getWorld(),
+                                        shop.getWorldGuard().getMinimumPoint(),
+                                        shop.getWorldGuard().getMaximumPoint()
+                                );
+
+                                for (int i = 0; i < 4; i++) {
+                                    shop.getScans().add(0, MarketScan.scanArea(bounds3i));
+                                }
+
+                                c.getSource().sendAdmin("Ran 4 scans");
+                                return 0;
+                            })
+                    );
+        }
+
         command
                 .then(literal("save")
                         .executes(c -> {
@@ -155,6 +190,16 @@ public class CommandMarket extends FtcCommand {
                                     );
 
                                     actor.print(builder.call());
+                                    return 0;
+                                })
+                        )
+
+                        .then(literal("clear_scans")
+                                .executes(c -> {
+                                    MarketShop shop = get(c);
+                                    shop.getScans().clear();
+
+                                    c.getSource().sendAdmin("Cleared scans");
                                     return 0;
                                 })
                         )

@@ -1,6 +1,8 @@
 package net.forthecrown.economy.shops;
 
+import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.math.WorldVec3i;
@@ -42,6 +44,24 @@ public interface ShopManager {
         } else {
             return false;
         }
+    }
+
+    static boolean mayEdit(SignShop shop, UUID uuid) {
+        if (shop == null) return false;
+        if (shop.getOwnership().mayEditShop(uuid)) return true;
+
+        WorldVec3i vec = shop.getPosition();
+        MarketShop s = Crown.getMarkets().get(vec);
+
+        if (s == null || !s.hasOwner()) {
+            return false;
+        }
+
+        if (!s.isMemberEditingAllowed()) {
+            return false;
+        }
+
+        return s.getCoOwners().contains(uuid);
     }
 
     /**

@@ -11,6 +11,8 @@ public final class UsageActions {
         register(new ActionChangeScore(ActionChangeScore.Action.DECREMENT));
         register(new ActionChangeScore(ActionChangeScore.Action.INCREMENT));
         register(new ActionChangeScore(ActionChangeScore.Action.SET));
+        register(new ActionChangeScore(ActionChangeScore.Action.MULTIPLY));
+        register(new ActionChangeScore(ActionChangeScore.Action.DIVIDE));
 
         register(new ActionRemoveNumber(false));
         register(new ActionRemoveNumber(true));
@@ -28,6 +30,7 @@ public final class UsageActions {
         register(new ActionShowText());
         register(new ActionTeleport());
         register(new ActionVisitRegion());
+        register(new ActionGiveHolidayItem());
 
         USAGE_ACTIONS.close();
         Crown.logger().info("Default actions registered");

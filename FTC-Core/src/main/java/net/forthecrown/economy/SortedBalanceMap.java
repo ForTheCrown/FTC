@@ -81,7 +81,9 @@ public class SortedBalanceMap implements BalanceMap {
         int divCorrection = size - (half + half);
 
         // Use divCorrection to account for odd sized lists
-        for (int i = 0; i < half + divCorrection; i++) {
+        int iterations = half + divCorrection;
+
+        for (int i = 0; i < iterations; i++) {
             //Check front half
             Balance entry = getEntry(i);
             if (entry != null && entry.getUniqueId().equals(id)) return i;

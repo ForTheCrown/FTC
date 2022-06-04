@@ -33,6 +33,12 @@ public interface RegionPoleGenerator {
      */
     void generateNextRegion(WorldVec3i pos, BlockFace signFace, BlockFace direction, RegionPos origin);
 
+    /**
+     * Generates a region residency sign
+     * @param pos The position to place the sign at
+     * @param direction the sign's direction
+     * @param residency The residency to generate for
+     */
     void generateResidency(WorldVec3i pos, BlockFace direction, RegionResidency residency);
 
     /**

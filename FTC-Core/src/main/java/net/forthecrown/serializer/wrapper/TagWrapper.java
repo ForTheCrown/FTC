@@ -1,7 +1,6 @@
 package net.forthecrown.serializer.wrapper;
 
 import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.utils.Locations;
 import net.forthecrown.utils.TagUtil;
 import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
@@ -32,12 +31,12 @@ public class TagWrapper implements SerialWrapper<CompoundTag> {
 
     @Override
     public void addLocation(String name, Location location) {
-        source.put(name, Locations.save(location));
+        source.put(name, TagUtil.writeLocation(location));
     }
 
     @Override
     public Location getLocation(String name) {
-        return source.contains(name) ? Locations.load(source.get(name)) : null;
+        return source.contains(name) ? TagUtil.readLocation(source.get(name)) : null;
     }
 
     @Override

@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class FtcEconomy extends AbstractJsonSerializer implements Economy {
 
-    private BalanceMap balanceMap = new SortedBalanceMap(100, FtcVars.startRhines::get);
+    private BalanceMap balanceMap = new SortedBalanceMap(200, FtcVars.startRhines::get);
 
     public FtcEconomy() {
         super("balances");

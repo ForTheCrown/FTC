@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class FtcShopManager implements ShopManager {
-    public static final String FILE_HEADER = "This file contains the name of every shop on FTC, DO NOT MODIFY, the shop manager requires this";
+    public static final String FILE_HEADER = "!!! This file contains the name of every shop on FTC, DO NOT MODIFY, the shop manager requires this !!!";
 
     private static final ItemStack EXAMPLE_BARRIER = new ItemStackBuilder(Material.BARRIER, 1)
             .setName(Component.text(""))
@@ -39,7 +39,10 @@ public class FtcShopManager implements ShopManager {
         if(result != null) return result;
 
         LocationFileName name = LocationFileName.of(vec);
-        if(!allShopNames.contains(name)) return null;
+        if(!allShopNames.contains(name)) {
+            if (ShopManager.isShop(vec.getBlock())) allShopNames.add(name);
+            else return null;
+        }
 
         FtcSignShop shop = new FtcSignShop(vec);
         loadedShops.put(vec, shop);
@@ -124,7 +127,7 @@ public class FtcShopManager implements ShopManager {
 
             reader.lines()
                     .forEach(s -> {
-                        if(s.equalsIgnoreCase(FILE_HEADER)) {
+                        if(FILE_HEADER.toLowerCase().contains(s.toLowerCase())) {
                             return;
                         }
 

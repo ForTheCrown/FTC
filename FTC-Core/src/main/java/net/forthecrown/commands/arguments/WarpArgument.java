@@ -12,12 +12,14 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.royalgrenadier.VanillaMappedArgument;
 import net.forthecrown.useables.warps.Warp;
 import net.kyori.adventure.key.Key;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 
 import java.util.concurrent.CompletableFuture;
 
-public class WarpArgument implements ArgumentType<Key> {
+public class WarpArgument implements ArgumentType<Key>, VanillaMappedArgument {
     public static final WarpArgument WARP = new WarpArgument();
     private WarpArgument() {}
 
@@ -54,5 +56,10 @@ public class WarpArgument implements ArgumentType<Key> {
         } catch (CommandSyntaxException e) {
             return Suggestions.empty();
         }
+    }
+
+    @Override
+    public ArgumentType<?> getVanillaArgumentType() {
+        return ResourceLocationArgument.id();
     }
 }

@@ -1,7 +1,5 @@
 package net.forthecrown.user.actions;
 
-import net.forthecrown.core.admin.MuteStatus;
-import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.utils.Struct;
@@ -19,7 +17,6 @@ public class DirectMessage implements UserAction, Struct {
 
     private final Component formattedText;
     private final boolean responding;
-    private MuteStatus muteStatus;
     private final String input;
 
     public DirectMessage(CommandSource sender, CommandSource target, boolean responding, String input) {
@@ -29,7 +26,6 @@ public class DirectMessage implements UserAction, Struct {
         this.input = input;
 
         formattedText = FtcFormatter.formatIfAllowed(input, sender.asBukkit());
-        muteStatus = Punishments.checkMute(sender.asBukkit());
     }
 
     public CommandSource getSender() {
@@ -66,14 +62,6 @@ public class DirectMessage implements UserAction, Struct {
                 .append(Component.text(" -> "))
                 .append(second)
                 .append(Component.text("]"));
-    }
-
-    public MuteStatus getMuteStatus(){
-        return muteStatus;
-    }
-
-    public void setMuteStatus(MuteStatus muteStatus) {
-        this.muteStatus = muteStatus;
     }
 
     public Component getFormattedText() {

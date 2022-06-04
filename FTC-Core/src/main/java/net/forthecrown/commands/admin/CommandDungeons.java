@@ -3,7 +3,6 @@ package net.forthecrown.commands.admin;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.RegistryArguments;
-import net.forthecrown.commands.arguments.RoyalEnchantArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Permissions;
@@ -109,26 +108,6 @@ public class CommandDungeons extends FtcCommand {
                                     c.getSource().sendAdmin( "item updated");
                                     return 0;
                                 })
-                        )
-                )
-
-                .then(literal("enchant")
-                        .then(literal("legacy")
-                                .then(argument("enchantment", RoyalEnchantArgument.ENCHANT)
-                                        .executes(c -> enchantItemInHand(c,
-                                                c.getArgument("enchantment", RoyalEnchant.class),
-                                                true
-                                        ))
-                                )
-                        )
-                        
-                        .then(literal("new")
-                                .then(argument("enchantment", RoyalEnchantArgument.ENCHANT)
-                                        .executes(c -> enchantItemInHand(c,
-                                                c.getArgument("enchantment", RoyalEnchant.class),
-                                                false
-                                        ))
-                                )
                         )
                 )
 

@@ -13,6 +13,7 @@ import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.forthecrown.grenadier.types.selectors.EntitySelector;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.royalgrenadier.VanillaMappedArgument;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserCache;
 import net.forthecrown.user.UserManager;
@@ -24,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class UserArgument implements ArgumentType<UserParseResult> {
+public class UserArgument implements ArgumentType<UserParseResult>, VanillaMappedArgument {
     private static final UserArgument
             USER        = new UserArgument(false, true),
             USERS       = new UserArgument(true, true),
@@ -107,16 +108,16 @@ public class UserArgument implements ArgumentType<UserParseResult> {
         return EntityArgument.players().getExamples();
     }
 
-    public ArgumentType<?> getHandle(){
-        if (allowMultiple) return ScoreHolderArgument.scoreHolders();
-        return ScoreHolderArgument.scoreHolder();
+    public ArgumentType<?> getVanillaArgumentType() {
+        /*if (allowMultiple) return ScoreHolderArgument.scoreHolders();
+        return ScoreHolderArgument.scoreHolder();*/
 
-        /*if (allowOffline) {
+        if (allowOffline) {
             if (allowMultiple) return ScoreHolderArgument.scoreHolders();
             return ScoreHolderArgument.scoreHolder();
         }
 
         if (allowMultiple) return net.minecraft.commands.arguments.EntityArgument.players();
-        return net.minecraft.commands.arguments.EntityArgument.player();*/
+        return net.minecraft.commands.arguments.EntityArgument.player();
     }
 }

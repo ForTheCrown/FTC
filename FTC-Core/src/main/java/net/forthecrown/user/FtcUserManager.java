@@ -13,12 +13,15 @@ import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.actions.FtcUserActionHandler;
 import net.forthecrown.utils.JsonUtils;
 import net.forthecrown.utils.TimeUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static net.forthecrown.user.UserCache.NO_NAME_CHANGE;
 
@@ -154,11 +157,25 @@ public final class FtcUserManager extends AbstractJsonSerializer implements User
     public CompletableFuture<List<CrownUser>> getAllUsers() {
         return CompletableFuture.supplyAsync(() -> {
             List<CrownUser> users = new ObjectArrayList<>();
+            AtomicBoolean shouldRunValidationLoop = new AtomicBoolean(false);
 
             getCache().readerStream()
                     .forEach(entry -> {
+                        OfflinePlayer p = Bukkit.getOfflinePlayer(entry.getUniqueId());
+
+                        if (!p.hasPlayedBefore()) {
+                            LOGGER.info("Found invalid player: {} or {}, while running getAllUsers", p.getUniqueId(), p.getName());
+
+                            shouldRunValidationLoop.set(true);
+                            return;
+                        }
+
                         users.add(UserManager.getUser(entry));
                     });
+
+            if (shouldRunValidationLoop.get()) {
+                cache.clearInvalid();
+            }
 
             return users;
         });
@@ -251,6 +268,15 @@ public final class FtcUserManager extends AbstractJsonSerializer implements User
                 entry.lastNameChange = NO_NAME_CHANGE;
             }
 
+            // Check if entry is valid
+            OfflinePlayer player = Bukkit.getOfflinePlayer(entry.getUniqueId());
+            if (!player.hasPlayedBefore()) {
+                LOGGER.warn("Found player that has not played before, ID: {}, name: {}, deleting", player.getUniqueId(), player.getName());
+                getSerializer().delete(player.getUniqueId());
+
+                continue;
+            }
+
             entries.add(entry);
         }
 
@@ -264,7 +290,7 @@ public final class FtcUserManager extends AbstractJsonSerializer implements User
 
         while (iterator.hasNext()) {
             FtcUser u = iterator.next().getValue();
-            u.save();
+            getSerializer().serialize(u);
 
             if(!u.isOnline()) iterator.remove();
         }

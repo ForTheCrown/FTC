@@ -156,6 +156,8 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
 
         Component message = open ? openMessage : closeMessage;
         Crown.getAnnouncer().announce(message);
+
+        FtcDiscord.staffLog("End", "End is now " + (open ? "open" : "closed"));
     }
 
     // Lever on = closed, lever off = open. AKA, flip the input

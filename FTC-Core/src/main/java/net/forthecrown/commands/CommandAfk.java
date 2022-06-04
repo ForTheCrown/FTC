@@ -57,7 +57,7 @@ public class CommandAfk extends FtcCommand {
         Component userMsg;
         Component broadcastMsg;
 
-        if(alreadyAFK){
+        if (alreadyAFK) {
             userMsg = Component.translatable("unafk.self").color(NamedTextColor.GRAY);
             broadcastMsg = Component.translatable("unafk.others", user.nickDisplayName())
                     .hoverEvent(Component.text("Click to welcome them back!"))

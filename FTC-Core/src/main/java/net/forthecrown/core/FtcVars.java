@@ -52,7 +52,8 @@ public final class FtcVars {
             afkKickDelay                = def("afkKickDelay",           VarTypes.TIME,       HOUR_IN_MILLIS * 3),
             dataRetentionTime           = def("dataRetentionTime",      VarTypes.TIME,       WEEK_IN_MILLIS * 2),
             guildJoinTime               = def("guildJoinTime",          VarTypes.TIME,       WEEK_IN_MILLIS * 2),
-            gb_donorTimeLength          = def("gb_donorTimeLength",     VarTypes.TIME,       MONTH_IN_MILLIS);
+            gb_donorTimeLength          = def("gb_donorTimeLength",     VarTypes.TIME,       MONTH_IN_MILLIS),
+            marketAutoKickCooldown      = def("marketAutoKickCooldown", VarTypes.TIME,       WEEK_IN_MILLIS);
 
     public static final Var<Boolean>
             taxesEnabled                = def("taxesEnabled",           VarTypes.BOOL,       false),
@@ -63,7 +64,8 @@ public final class FtcVars {
             hulkSmashPoles              = def("hulkSmashPoles",         VarTypes.BOOL,       true),
             allowNonOwnerSwords         = def("allowNonOwnerSwords",    VarTypes.BOOL,       false),
             bp_extraExpGivesRhines      = def("bp_extraExpGivesRhines", VarTypes.BOOL,       true),
-            useAsyncTpForPlayers        = def("useAsyncTpForPlayers",   VarTypes.BOOL,       false);
+            useAsyncTpForPlayers        = def("useAsyncTpForPlayers",   VarTypes.BOOL,       false),
+            staffLogEnabled             = def("staffLogEnabled",        VarTypes.BOOL,       false);
 
     public static final Var<Integer>
             effectCost_arrow            = def("effectCost_arrow",       VarTypes.INT,        1000),

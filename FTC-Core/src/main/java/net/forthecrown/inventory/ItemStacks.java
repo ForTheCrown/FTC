@@ -15,6 +15,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -196,6 +197,15 @@ public final class ItemStacks {
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Couldn't find class for item meta??????", e);
         }
+    }
+
+    public static CompoundTag save(ItemStack item) {
+        CompoundTag tag = new CompoundTag();
+        return CraftItemStack.asNMSCopy(item).save(tag);
+    }
+
+    public static ItemStack load(CompoundTag tag) {
+        return CraftItemStack.asCraftMirror(net.minecraft.world.item.ItemStack.of(tag));
     }
 
     /**

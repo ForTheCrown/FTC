@@ -32,6 +32,8 @@ import java.util.UUID;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class RegionResidency {
+    public static final long UNKNOWN_MOVEIN = -1;
+
     public static final long CUT_OFF_TIMESTAMP = Util.make(() -> {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(0L);
@@ -76,6 +78,8 @@ public class RegionResidency {
     }
 
     public void load(ListTag t) {
+        clear();
+
         for (Tag listT: t) {
             CompoundTag tag = (CompoundTag) listT;
 
@@ -204,7 +208,7 @@ public class RegionResidency {
 
         public long timeSinceMoveIn() {
             long firstMoveIn = firstMoveIn();
-            return firstMoveIn < CUT_OFF_TIMESTAMP ? -1 : TimeUtil.timeSince(firstMoveIn);
+            return firstMoveIn < CUT_OFF_TIMESTAMP ? UNKNOWN_MOVEIN : TimeUtil.timeSince(firstMoveIn);
         }
 
         public long firstMoveIn() {
@@ -213,17 +217,22 @@ public class RegionResidency {
             }
 
             if(!hasHomes()) {
-                return -1;
+                return UNKNOWN_MOVEIN;
             }
 
             return homes.values()
                     .longStream()
                     .min()
-                    .orElse(-1);
+                    .orElse(UNKNOWN_MOVEIN);
         }
 
         public boolean hasHomes() {
             return homes != null && !homes.isEmpty();
+        }
+
+        public boolean hasHome(String homeName) {
+            if (homes == null || homes.isEmpty()) return false;
+            return homes.containsKey(homeName);
         }
 
         private Object2LongMap<String> homesSafe() {

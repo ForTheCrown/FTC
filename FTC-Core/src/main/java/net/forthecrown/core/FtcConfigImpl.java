@@ -111,7 +111,7 @@ class FtcConfigImpl implements FtcConfig {
         File f = fileOrCreate();
 
         try {
-            this.json =  JsonWrapper.of(JsonUtils.readFileObject(f));
+            this.json = JsonWrapper.of(JsonUtils.readFileObject(f));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

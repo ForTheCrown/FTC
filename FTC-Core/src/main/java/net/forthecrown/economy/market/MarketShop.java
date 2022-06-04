@@ -8,11 +8,11 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Nameable;
 import net.forthecrown.utils.Struct;
+import net.forthecrown.utils.TimeUtil;
 import net.forthecrown.utils.math.Vector3i;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.UUID;
@@ -146,11 +146,27 @@ public interface MarketShop extends JsonSerializable, Nameable, Struct, Taxable 
      */
     ObjectList<String> getConnectedNames();
 
-    void setEvictionDate(@Nullable Date date);
-    Date getEvictionDate();
+    ObjectList<MarketScan> getScans();
+
+    default boolean shouldRunScan() {
+        if (getScans().isEmpty()) {
+            long since = TimeUtil.timeSince(getDateOfPurchase().getTime());
+            return since >= MarketScan.SCAN_INTERVAL.get();
+        }
+
+        MarketScan s = getScans().get(0);
+
+        return TimeUtil.hasCooldownEnded(MarketScan.SCAN_INTERVAL.get(), s.getScanTime());
+    }
+
+    void setEviction(MarketEviction data);
+    MarketEviction getEviction();
+
+    void setMemberEditingAllowed(boolean b);
+    boolean isMemberEditingAllowed();
 
     default boolean markedForEviction() {
-        return getEvictionDate() != null;
+        return getEviction() != null;
     }
 
     default Vector3i getBackupPos() {

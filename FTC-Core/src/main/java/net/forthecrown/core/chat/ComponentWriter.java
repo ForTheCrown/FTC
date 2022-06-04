@@ -2,13 +2,15 @@ package net.forthecrown.core.chat;
 
 import net.forthecrown.utils.ItemLoreBuilder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
-public interface ComponentWriter extends Supplier<Component> {
+public interface ComponentWriter extends Supplier<Component>, ComponentLike {
     void write(Component text);
     void clear();
 
@@ -24,11 +26,21 @@ public interface ComponentWriter extends Supplier<Component> {
         write(Component.empty());
     }
 
+    default void write(String s) {
+        write(Component.text(s));
+    }
+
     @Override
     Component get();
 
     default String getString() {
         return ChatUtils.getString(get());
+    }
+
+    @Override
+    @NotNull
+    default Component asComponent() {
+        return get();
     }
 
     default ComponentWriter prefixedWriter(Component prefix) {

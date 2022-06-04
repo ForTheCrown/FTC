@@ -11,12 +11,14 @@ public final class MathUtil {
     private MathUtil() {}
 
     public static boolean inRange(long val, long min, long max) {
-        if (val > max || val < min) return false;
+        if (val < min) return false;
+        if (val > max) return false;
         return true;
     }
 
-    public static boolean inRange(double check, double min, double max) {
-        if (check > max || check < min) return false;
+    public static boolean inRange(double val, double min, double max) {
+        if (val < min) return false;
+        if (val > max) return false;
         return true;
     }
 

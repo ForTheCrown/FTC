@@ -5,6 +5,7 @@ import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionManager;
 import net.forthecrown.regions.RegionPoleGenerator;
 import net.forthecrown.regions.RegionPos;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -14,13 +15,19 @@ import java.util.UUID;
 final class UserUtil {
     private UserUtil() {}
 
+    private static final Logger LOGGER = Crown.logger();
+
     static void reassignHome(UUID uuid, String name, @Nullable Location old, @Nullable Location newHome) {
+        if (old == null && newHome == null) {
+            return;
+        }
+
         RegionManager manager = Crown.getRegionManager();
         RegionPoleGenerator generator = manager.getGenerator();
 
-        if (inSameRegion(old, newHome, manager)) {
+        /*if (inSameRegion(old, newHome, manager)) {
             return;
-        }
+        }*/
 
         if (old != null && old.getWorld().equals(manager.getWorld())) {
             RegionPos pos = RegionPos.of(old);
@@ -65,10 +72,6 @@ final class UserUtil {
     static void reassignRegionHome(UUID uuid, @Nullable RegionPos old, @Nullable RegionPos newPos) {
         RegionManager manager = Crown.getRegionManager();
 
-        if (old != null && old.equals(newPos)) {
-            return;
-        }
-
         if (old != null) {
             PopulationRegion region = manager.get(old);
 
@@ -86,6 +89,7 @@ final class UserUtil {
                     .getEntry(uuid)
                     .setDirectMoveIn(System.currentTimeMillis());
 
+            LOGGER.info("Set new region home: {} for user '{}'", region.nameOrPos(), uuid);
             manager.getGenerator().generate(region);
         }
     }

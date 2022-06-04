@@ -1,16 +1,15 @@
 package net.forthecrown.commands.economy;
 
-import net.forthecrown.core.Crown;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
+import net.forthecrown.core.Crown;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.Economy;
-import net.forthecrown.core.chat.ChatUtils;
-import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -52,7 +51,7 @@ public class CommandDeposit extends FtcCommand {
             int amount;
             try {
                 Component component = mainItem.getItemMeta().lore().get(0);
-                String lore = ChatColor.stripColor(ChatUtils.getString(component)).replaceAll("[\\D]", "").trim();
+                String lore = ChatUtils.plainText(component).replaceAll("[\\D]", "").trim();
                 amount = Integer.parseInt(lore);
             } catch (NumberFormatException e) { throw FtcExceptionProvider.holdingCoins(); }
 

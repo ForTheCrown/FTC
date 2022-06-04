@@ -12,6 +12,7 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.inventory.ItemStacks;
+import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +29,24 @@ public class CommandItemName extends FtcCommand {
     @Override
     protected void createCommand(BrigadierCommand command) {
         command
+                .then(literal("-clear")
+                        .executes(c -> {
+                            CrownUser user = getUserSender(c);
+                            ItemStack held = user.getInventory().getItemInMainHand();
+
+                            if (ItemStacks.isEmpty(held)) {
+                                throw FtcExceptionProvider.mustHoldItem();
+                            }
+
+                            ItemMeta meta = held.getItemMeta();
+                            meta.displayName(null);
+                            held.setItemMeta(meta);
+
+                            c.getSource().sendAdmin("Removed item name");
+                            return 0;
+                        })
+                )
+
                 .then(argument("name", ChatArgument.chat())
                         .suggests((context, builder) -> {
                             CommandSource source = context.getSource();
@@ -40,7 +59,7 @@ public class CommandItemName extends FtcCommand {
 
                             Component display = FtcFormatter.itemDisplayName(held);
 
-                            return CompletionProvider.suggestMatching(builder, ChatUtils.LEGACY.serialize(display));
+                            return CompletionProvider.suggestMatching(builder, ChatUtils.LEGACY.serialize(ChatUtils.renderToSimple(display)));
                         })
 
                         .executes(c -> rename(c.getSource(), c.getArgument("name", Component.class)))
@@ -52,7 +71,7 @@ public class CommandItemName extends FtcCommand {
         if(ItemStacks.isEmpty(item)) throw FtcExceptionProvider.mustHoldItem();
 
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(name);
+        meta.displayName(ChatUtils.wrapForItems(name));
 
         item.setItemMeta(meta);
 

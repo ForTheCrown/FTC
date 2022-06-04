@@ -21,6 +21,8 @@ public record RewardInstance(Reward reward, JsonElement data, int level, boolean
         Reward reward = Rewards.read(json.get("reward"));
         long id = json.has("id") ? json.getLong("id") : ID_GENERATOR.getAndIncrement();
 
+        ID_GENERATOR.set(Math.max(id + 1, ID_GENERATOR.get()));
+
         return new RewardInstance(reward,
                 json.get("data"),
                 json.getInt("level"),

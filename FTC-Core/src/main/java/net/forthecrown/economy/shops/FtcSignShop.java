@@ -29,6 +29,9 @@ public class FtcSignShop implements SignShop {
     @Getter private final ShopOwnership ownership;
     @Getter private final ShopHistory history;
 
+    @Getter
+    public long lastStockEdit = -1L;
+
     @Getter @Setter
     public ShopType type;
 
@@ -114,6 +117,11 @@ public class FtcSignShop implements SignShop {
     }
 
     @Override
+    public void updateLastEdit() {
+        lastStockEdit = System.currentTimeMillis();
+    }
+
+    @Override
     public Sign getSign(){
         return (Sign) getBlock().getState();
     }
@@ -131,13 +139,7 @@ public class FtcSignShop implements SignShop {
     }
 
     public void save(Sign sign) {
-        PersistentDataContainer container = sign.getPersistentDataContainer().getOrDefault(
-                ShopConstants.SHOP_KEY,
-                PersistentDataType.TAG_CONTAINER,
-                TagUtil.newContainer()
-        );
-
-        CompoundTag tag = TagUtil.ofContainer(container);
+        CompoundTag tag = new CompoundTag();
         save(tag);
 
         sign.getPersistentDataContainer().set(
@@ -162,6 +164,10 @@ public class FtcSignShop implements SignShop {
         tag.putInt("price", price);
         tag.put("type", TagUtil.writeEnum(type));
 
+        if (lastStockEdit != -1L) {
+            tag.putLong("lastStockEdit", lastStockEdit);
+        }
+
         writeComponent(ownership, tag);
         writeComponent(inventory, tag);
         writeComponent(history, tag);
@@ -170,6 +176,9 @@ public class FtcSignShop implements SignShop {
     public void load(CompoundTag tag) {
         price = tag.getInt("price");
         type = TagUtil.readEnum(tag.get("type"), ShopType.class);
+
+        if (tag.contains("lastStockEdit")) lastStockEdit = tag.getLong("lastStockEdit");
+        else lastStockEdit = -1L;
 
         readComponent(ownership, tag);
         readComponent(inventory, tag);

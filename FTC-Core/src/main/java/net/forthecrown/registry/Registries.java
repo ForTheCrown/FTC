@@ -13,7 +13,6 @@ import net.forthecrown.cosmetics.travel.TravelEffect;
 import net.forthecrown.dungeons.boss.KeyedBoss;
 import net.forthecrown.dungeons.boss.SpawnRequirement;
 import net.forthecrown.dungeons.level.DungeonLevel;
-import net.forthecrown.dungeons.rewrite_4.BossType;
 import net.forthecrown.economy.guilds.topics.VoteTopic;
 import net.forthecrown.economy.houses.House;
 import net.forthecrown.inventory.weapon.abilities.WeaponAbility;
@@ -66,7 +65,6 @@ public interface Registries {
     //Dungeons
     CloseableRegistry<KeyedBoss>            DUNGEON_BOSSES      = createCloseable("dungeon_bosses");
     CloseableRegistry<SpawnRequirement.Type>SPAWN_REQUIREMENTS  = createCloseable("boss_spawn_tests");
-    CloseableRegistry<BossType>             BOSS_TYPES          = createCloseable("boss_types");
     Registry<DungeonLevel>                  DUNGEON_LEVELS      = create("dungeon_levels");
 
     //Battle pass

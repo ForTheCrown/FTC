@@ -14,9 +14,10 @@ import org.bukkit.Location;
 public final class FtcFlags {
     private FtcFlags() {}
 
-    public static final StateFlag SHOP_CREATION = new StateFlag("shop-creation", true);
-    public static final StateFlag TRAPDOOR_USE = new StateFlag("trapdoor-use", true);
-    public static final StateFlag RIDING_ALLOWED = new StateFlag("player-riding", true);
+    public static final StateFlag
+            SHOP_CREATION   = new StateFlag("shop-creation", true),
+            TRAPDOOR_USE    = new StateFlag("trapdoor-use", true),
+            RIDING_ALLOWED  = new StateFlag("player-riding", true);
 
     static void init() {
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();

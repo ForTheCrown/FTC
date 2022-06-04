@@ -3,6 +3,7 @@ package net.forthecrown.useables.actions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
@@ -15,6 +16,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionRemoveNumber implements UsageAction<ActionRemoveNumber.ActionInstance> {
+    static final IntegerArgumentType INT_ARG = IntegerArgumentType.integer(1);
+
     public static final NamespacedKey
             BAL_KEY = Keys.forthecrown("remove_balance"),
             GEM_KEY = Keys.forthecrown("remove_gems");
@@ -27,7 +30,8 @@ public class ActionRemoveNumber implements UsageAction<ActionRemoveNumber.Action
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
-        return new ActionInstance(fromBal, reader.readInt());
+        int val = INT_ARG.parse(reader);
+        return new ActionInstance(fromBal, val);
     }
 
     @Override

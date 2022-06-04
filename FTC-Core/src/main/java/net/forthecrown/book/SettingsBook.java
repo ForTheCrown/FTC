@@ -84,7 +84,7 @@ public final class SettingsBook {
     private static Component getFiller(int amount) {
         int half = amount >> 1;
 
-        // All hail the single pixel dot              \/ this piece of shit is because it gets offset by a SINGLE pixel if the value is less than 12
+        // All hail the single pixel dot        \/ this piece of shit is because it gets offset by a SINGLE pixel if the value is less than 12
         return Component.text(".".repeat(half - 7)).color(NamedTextColor.WHITE);
     }
 

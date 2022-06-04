@@ -2,8 +2,11 @@ package net.forthecrown.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import lombok.Getter;
 import net.forthecrown.commands.arguments.ChatArgument;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -12,20 +15,32 @@ import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.economy.shops.ShopConstants;
+import net.forthecrown.events.Events;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.inventory.FtcInventory;
+import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserMail;
-import net.forthecrown.user.UserManager;
 import net.forthecrown.user.actions.ActionFactory;
+import net.forthecrown.user.actions.MailAddAction;
 import net.forthecrown.user.actions.MailQuery;
 import net.forthecrown.user.actions.UserActionHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.UUID;
 
 public class CommandMail extends FtcCommand {
-    public static final int ENTRIES_PER_PAGE = 5;
-
     public CommandMail() {
         super("mail");
 
@@ -132,7 +147,7 @@ public class CommandMail extends FtcCommand {
                 .then(literal("clear")
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
-                            user.getMail().clear();
+                            user.getMail().clearPartial();
 
                             user.sendMessage(
                                     Component.translatable("mail.cleared", NamedTextColor.YELLOW)
@@ -141,59 +156,141 @@ public class CommandMail extends FtcCommand {
                         })
                 )
 
-                .then(literal("send")
-                        .then(literal("-all")
-                                .requires(source -> source.hasPermission(Permissions.MAIL_ALL))
+                // Claiming items embedded in messages
+                .then(literal("claim")
+                        .then(argument("index", IntegerArgumentType.integer(1))
+                                .executes(c -> {
+                                    CrownUser user = getUserSender(c);
+                                    UserMail mail = user.getMail();
 
-                                .then(argument("message", ChatArgument.chat())
-                                        .executes(c -> {
-                                            Component message = c.getArgument("message", Component.class);
+                                    int index = c.getArgument("index", Integer.class);
 
-                                            c.getSource().sendAdmin(
-                                                    Component.text("Sending all users mail: ")
-                                                            .append(message)
-                                            );
+                                    if (!mail.isValidIndex(index)) {
+                                        throw FtcExceptionProvider.translatable("mail.invalidIndex", Component.text(index));
+                                    }
 
-                                            UserManager m = Crown.getUserManager();
-                                            m.getAllUsers()
-                                                    .whenComplete((users, throwable) -> {
-                                                        if(throwable != null) {
-                                                            c.getSource().sendAdmin("Error sending mail to all users, check console");
-                                                            Crown.logger().error(throwable);
+                                    UserMail.MailMessage message = mail.get(index - 1);
 
-                                                            return;
-                                                        }
+                                    if (!UserMail.hasAttachment(message)) {
+                                        throw FtcExceptionProvider.translatable("mail.noItem");
+                                    }
 
-                                                        users.forEach(user -> {
-                                                            user.sendAndMail(message, null);
-                                                        });
+                                    if (message.attachmentClaimed) {
+                                        throw FtcExceptionProvider.translatable("mail.alreadyClaimed");
+                                    }
 
-                                                        m.unloadOffline();
-                                                        c.getSource().sendAdmin("Sent all users mail");
-                                                    });
+                                    message.attachment.testClaimable(user);
 
-                                            return 0;
-                                        })
-                                )
+                                    message.read = true;
+                                    message.attachmentClaimed = true;
+                                    message.attachment.claim(user);
+
+                                    user.sendMessage(message.attachment.claimText());
+                                    return 0;
+                                })
                         )
+                )
 
-                        .then(argument("target", UserArgument.user())
-                                .then(argument("message", StringArgumentType.greedyString())
-                                        .suggests((context, builder) -> FtcSuggestionProvider.suggestPlayerNamesAndEmotes(context, builder, false))
+                .then(sendArgs(true))
+                .then(sendArgs(false));
+    }
 
-                                        .executes(c -> {
-                                            CrownUser user = getUserSender(c);
-                                            CrownUser target = UserArgument.getUser(c, "target");
+    private LiteralArgumentBuilder<CommandSource> sendArgs(boolean item) {
+        return literal("send" + (item ? "_item" : ""))
+                .requires(item ? (source -> source.hasPermission(Permissions.MAIL_ITEMS)) : ArgumentBuilder.defaultRequirement())
 
-                                            String rawMessage = c.getArgument("message", String.class);
-                                            Component message = FtcFormatter.formatIfAllowed(rawMessage, user);
+                .then(literal("-all")
+                        .requires(source -> source.hasPermission(Permissions.MAIL_ALL))
 
-                                            ActionFactory.addMail(target, message, user.getUniqueId());
-                                            return 0;
-                                        })
-                                )
+                        .then(argument("message", ChatArgument.chat())
+                                .suggests((context, builder) -> FtcSuggestionProvider.suggestPlayerNamesAndEmotes(context, builder, false))
+
+                                .executes(c -> sendAll(c, item))
+                        )
+                )
+
+                .then(argument("target", UserArgument.user())
+                        .then(argument("message", StringArgumentType.greedyString())
+                                .suggests((context, builder) -> FtcSuggestionProvider.suggestPlayerNamesAndEmotes(context, builder, false))
+
+                                .executes(c -> send(c, item))
                         )
                 );
+    }
+
+    private int send(CommandContext<CommandSource> c, boolean item) throws CommandSyntaxException {
+        CrownUser user = getUserSender(c);
+        CrownUser target = UserArgument.getUser(c, "target");
+
+        String rawMessage = c.getArgument("message", String.class);
+        Component cMessage = FtcFormatter.formatIfAllowed(rawMessage, user);
+
+        if (item) {
+            ItemSender sender = (message, item1) -> {
+                MailAddAction action = new MailAddAction(message, target, user.getUniqueId());
+                action.setAttachment(UserMail.MailAttachment.item(item1));
+
+                UserActionHandler.handleAction(action);
+            };
+
+            return handleItem(user, sender, cMessage);
+        }
+
+        ActionFactory.addMail(target, cMessage, user.getUniqueId());
+        return 0;
+    }
+
+    private int sendAll(CommandContext<CommandSource> c, boolean item) throws CommandSyntaxException {
+        Component message = c.getArgument("message", Component.class);
+
+        if (item) {
+            CrownUser user = getUserSender(c);
+            ItemSender sender = (message1, item1) -> sendAll_(c.getSource(), message1, item1);
+
+            return handleItem(user, sender, message);
+        }
+
+        return sendAll_(c.getSource(), message, null);
+    }
+
+    private int handleItem(CrownUser user, ItemSender sender, Component message) {
+        MailItemSender mailItemSender = new MailItemSender(user, sender, message);
+        Events.register(mailItemSender);
+
+        user.getPlayer().openInventory(mailItemSender.getInventory());
+        return 0;
+    }
+
+    private int sendAll_(CommandSource source, Component text, ItemStack item) {
+        UUID uuid = null;
+
+        Crown.getUserManager().getAllUsers()
+                .whenComplete((users, throwable) -> {
+                    if(throwable != null) {
+                        source.sendAdmin("Error sending mail to all users, check console");
+                        Crown.logger().error(throwable);
+
+                        return;
+                    }
+
+                    users.forEach(user -> {
+                        MailAddAction action = new MailAddAction(text, user, uuid);
+
+                        if(item != null) {
+                            action.setAttachment(UserMail.MailAttachment.item(item.clone()));
+                        }
+
+                        action.setValidateSender(false);
+                        action.setInformSender(false);
+
+                        UserActionHandler.handleAction(action);
+                    });
+
+                    source.sendAdmin("Finished sending everyone mail");
+                    Crown.getUserManager().unloadOffline();
+                });
+
+        return 0;
     }
 
     private int readMailOther(CommandContext<CommandSource> c, int page) throws CommandSyntaxException {
@@ -209,5 +306,57 @@ public class CommandMail extends FtcCommand {
         MailQuery query = new MailQuery(c.getSource(), getUserSender(c), page);
         UserActionHandler.handleAction(query);
         return 1;
+    }
+
+    private interface ItemSender {
+        void send(Component message, ItemStack item);
+    }
+
+    private static class MailItemSender implements Listener, InventoryHolder {
+        @Getter
+        private final FtcInventory inventory;
+        private final CrownUser sender;
+        private final Component msgInput;
+        private final ItemSender itemSender;
+
+        public MailItemSender(CrownUser sender, ItemSender itemSender, Component msgInput) {
+            this.sender = sender;
+            this.itemSender = itemSender;
+            this.msgInput = msgInput;
+
+            this.inventory = FtcInventory.of(this, InventoryType.HOPPER, Component.text("Mail an item"));
+
+            ItemStack barrier = new ItemStack(Material.BARRIER, 1);
+
+            inventory.setItem(0, barrier);
+            inventory.setItem(1, barrier);
+            inventory.setItem(3, barrier);
+            inventory.setItem(4, barrier);
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onInventoryClick(InventoryClickEvent event) {
+            if (event.getClickedInventory() == null) return;
+            if (!event.getClickedInventory().equals(inventory)) return;
+            if (event.getSlot() == ShopConstants.EXAMPLE_ITEM_SLOT) return;
+
+            event.setCancelled(true);
+        }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onInventoryClose(InventoryCloseEvent event) {
+            if (!event.getInventory().equals(inventory)) return;
+
+            Events.handle(sender, event, e -> {
+                ItemStack item = e.getInventory().getItem(ShopConstants.EXAMPLE_ITEM_SLOT);
+
+                if (ItemStacks.isEmpty(item)) {
+                    throw FtcExceptionProvider.translatable("mail.noItemGiven");
+                }
+
+                Events.unregister(this);
+                itemSender.send(msgInput, item.clone());
+            });
+        }
     }
 }

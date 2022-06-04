@@ -93,6 +93,7 @@ public interface FtcInventory extends Inventory, JsonSerializable, JsonDeseriali
             setItem(index, item);
         }
     }
+
     default JsonObject serializeContents() {
         JsonWrapper json = JsonWrapper.empty();
 
@@ -111,7 +112,10 @@ public interface FtcInventory extends Inventory, JsonSerializable, JsonDeseriali
         JsonWrapper json = JsonWrapper.empty();
 
         json.add("size", getSize());
-        json.add("contents", serializeContents());
+
+        if(!isEmpty()) {
+            json.add("contents", serializeContents());
+        }
 
         return json.getSource();
     }

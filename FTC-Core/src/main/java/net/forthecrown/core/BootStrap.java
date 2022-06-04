@@ -30,7 +30,6 @@ import net.forthecrown.useables.checks.UsageChecks;
 import net.forthecrown.useables.kits.FtcKitManager;
 import net.forthecrown.useables.warps.FtcWarpManager;
 import net.forthecrown.user.FtcUserManager;
-import net.forthecrown.user.packets.listeners.CorePacketListeners;
 import net.forthecrown.vars.types.VarTypes;
 
 import static net.forthecrown.core.Main.*;
@@ -63,7 +62,6 @@ final class BootStrap {
 
         // Initialize config sections
         joinInfo        = new JoinInfo();
-        dayChange       = new DayChange();
         kingship        = new FtcKingship();
         rules           = new ServerRules();
         endOpener       = new EndOpener();
@@ -77,7 +75,11 @@ final class BootStrap {
         config.addSection(rules);
         config.addSection(tabList);
 
+        holidays  = new ServerHolidays();
+
         // Register day change listeners
+        dayChange = new DayChange();
+        dayChange.addListener(holidays);
         dayChange.addListener(endOpener);
         dayChange.addListener(resourceWorld);
 
@@ -97,8 +99,9 @@ final class BootStrap {
         guild       = new TradeGuild();
         battlePass  = new BattlePassImpl();
 
+        dayChange.addListener(markets);
+
         //Initialize modules
-        safeRunnable(CorePacketListeners::init);
         safeRunnable(Properties::init);
         safeRunnable(Houses::init);
         safeRunnable(EvokerVars::init);

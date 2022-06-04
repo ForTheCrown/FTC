@@ -21,10 +21,6 @@ public class ShopJsonToTag {
     private static final File SHOP_DIR = new File(Crown.dataFolder().getPath() + File.separator + "shops");
     private static final Logger LOGGER = Crown.logger();
 
-    public static boolean shouldRun() {
-        return Transformers.shouldRun(ShopJsonToTag.class);
-    }
-
     public static void run(FtcShopManager manager) {
         LOGGER.info("Starting shop data transformer");
 

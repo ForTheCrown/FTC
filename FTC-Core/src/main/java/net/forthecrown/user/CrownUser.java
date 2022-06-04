@@ -540,7 +540,11 @@ public interface CrownUser extends
      * @return The user's click event
      */
     default ClickEvent asClickEvent() {
-        return ClickEvent.suggestCommand("/" + (isOnline() ? "tell " + getName() + " " : "profile " + getName()));
+        return asClickEvent(isOnline());
+    }
+
+    default ClickEvent asClickEvent(boolean online) {
+        return ClickEvent.suggestCommand("/" + (online ? "tell " + getName() + " " : "profile " + getName()));
     }
 
     /**
@@ -548,7 +552,7 @@ public interface CrownUser extends
      * @return The user's display name
      */
     default Component displayName() {
-        return makeDisplayName(this, getName());
+        return makeDisplayName(this, getName(), isOnline());
     }
 
     /**
@@ -556,14 +560,18 @@ public interface CrownUser extends
      * @return The user's display name, possibly with a nickname
      */
     default Component nickDisplayName(){
-        return makeDisplayName(this, getNickOrName());
+        return nickDisplayName(isOnline());
     }
 
-    private static Component makeDisplayName(CrownUser user, String text) {
+    default Component nickDisplayName(boolean online) {
+        return makeDisplayName(this, getNickOrName(), online);
+    }
+
+    private static Component makeDisplayName(CrownUser user, String text, boolean online) {
         return Component.text(text)
                 .hoverEvent(user)
                 .insertion(user.getUniqueId().toString())
-                .clickEvent(user.asClickEvent());
+                .clickEvent(user.asClickEvent(online));
     }
 
     /**
@@ -903,11 +911,14 @@ public interface CrownUser extends
     }
 
     default void sendAndMail(Component message, @Nullable UUID sender) {
+        UserMail.MailMessage m = new UserMail.MailMessage(message, sender, System.currentTimeMillis());
+
         if(isOnline()) {
             sendBlockableMessage(sender, message);
+            m.read = true;
         }
 
-        getMail().add(message, sender);
+        getMail().add(m);
     }
 
     default void sendAndMail(Component message) {

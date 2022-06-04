@@ -113,15 +113,11 @@ public final class RegionUtil {
         return new IntArrayTag(new int[] {pos.getX(), pos.getZ()});
     }
 
-    public static BlockVector2 readColumn(IntArrayTag arrayTag) {
-        return readColumn(arrayTag.getAsIntArray());
-    }
-
     public static BlockVector2 readColumn(int[] arr) {
         return BlockVector2.at(arr[0], arr[1]);
     }
 
-    public static int getPoleTop(RegionData data) {
-        return data instanceof PopulationRegion ? ((PopulationRegion) data).getPoleBoundingBox().maxY() : FtcUtils.MAX_Y;
+    public static int getPoleTop(PopulationRegion data) {
+        return data != null ? ((PopulationRegion) data).getPoleBoundingBox().maxY() : FtcUtils.MAX_Y;
     }
 }

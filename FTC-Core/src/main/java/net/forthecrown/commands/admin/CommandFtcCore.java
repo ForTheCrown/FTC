@@ -413,7 +413,8 @@ public class CommandFtcCore extends FtcCommand {
         DUNGEON_LEVELS ("Dungeon Levels",       LevelSerializer::save,          LevelSerializer::load),
         BATTLEPASS ("BattlePass",               getBattlePass()::save,          getBattlePass()::reload),
         USER_MANAGER("User Manager",            getUserManager()::save,         getUserManager()::reload),
-        USER_CACHE("User Cache",                getUserManager()::saveCache,    getUserManager()::loadCache);
+        USER_CACHE("User Cache",                getUserManager()::saveCache,    getUserManager()::loadCache),
+        HOLIDAYS("Holidays",                    getHolidays()::save,            getHolidays()::reload);
 
         private final String msg;
         private final Runnable saveFunc, loadFunc;

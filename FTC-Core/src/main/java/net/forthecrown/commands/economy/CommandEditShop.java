@@ -9,13 +9,14 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Crown;
+import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.ComponentTagVisitor;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.economy.shops.FtcSignShop;
+import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.economy.shops.ShopType;
 import net.forthecrown.economy.shops.SignShop;
 import net.forthecrown.grenadier.CommandSource;
@@ -40,7 +41,7 @@ public class CommandEditShop extends FtcCommand {
 
         usageMessage = makeUsageMessage();
 
-        setDescription("Allows you edit a shop");
+        setDescription("Allows you to edit a shop");
         setAliases("shopedit", "signshop");
         setPermission(Permissions.SHOP_EDIT);
 
@@ -252,9 +253,9 @@ public class CommandEditShop extends FtcCommand {
         if(block == null || !(block.getState() instanceof Sign)) throw FtcExceptionProvider.translatable("commands.lookingAtShop");
 
         SignShop result = Crown.getShopManager().getShop(block.getLocation());
-        if(result == null
-                || !result.getOwnership().isOwner(player.getUniqueId())
-                && !player.hasPermission("ftc.admin")
+
+        if(result == null || !ShopManager.mayEdit(result, player.getUniqueId())
+                && !player.hasPermission(Permissions.ADMIN)
         ) {
             throw FtcExceptionProvider.translatable("commands.lookingAtShop");
         }
@@ -265,6 +266,7 @@ public class CommandEditShop extends FtcCommand {
         new BukkitRunnable() {
             @Override
             public void run() {
+                shop.updateLastEdit();
                 shop.update();
             }
         }.runTaskLater(Crown.inst(), 1);

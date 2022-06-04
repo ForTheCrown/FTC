@@ -55,6 +55,7 @@ public final class Permissions {
             MAIL                    = register("ftc.mail"),
             MAIL_OTHERS             = register(MAIL.getName() + ".others"),
             MAIL_ALL                = register(MAIL.getName() + ".all"),
+            MAIL_ITEMS              = register(MAIL.getName() + ".items"),
 
             GUILD                   = register("ftc.guilds"),
             GUILD_ADMIN             = register(GUILD.getName() + ".admin"),

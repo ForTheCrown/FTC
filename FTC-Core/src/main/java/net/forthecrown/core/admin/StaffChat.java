@@ -1,6 +1,8 @@
 package net.forthecrown.core.admin;
 
+import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.UserManager;
@@ -49,6 +51,7 @@ public final class StaffChat {
                 .append(message)
                 .build();
 
+        FtcDiscord.staffLog("Staff", "{} **>** {}", ChatUtils.plainText(senderText), ChatUtils.LEGACY.serialize(message));
         send(text, !cmd);
     }
 

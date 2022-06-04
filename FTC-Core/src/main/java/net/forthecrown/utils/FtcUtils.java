@@ -4,6 +4,7 @@ import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
@@ -273,6 +274,10 @@ public final class FtcUtils {
 
     public static boolean isNullOrEmpty(@Nullable Map<?, ?> map) {
         return map == null || map.isEmpty();
+    }
+
+    public static Location vecToLocation(World world, Vector3 pos) {
+        return new Location(world, pos.getX(), pos.getY(), pos.getZ());
     }
 
     public enum RomanNumeral {

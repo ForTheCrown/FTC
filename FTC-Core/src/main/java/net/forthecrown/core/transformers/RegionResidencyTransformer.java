@@ -8,18 +8,17 @@ import net.forthecrown.regions.RegionResidency;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.FtcUserHomes;
 import net.forthecrown.user.UserHomes;
+import net.forthecrown.user.UserManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.util.Collection;
 
+import static net.forthecrown.regions.RegionResidency.UNKNOWN_MOVEIN;
+
 public class RegionResidencyTransformer {
     private static final Logger LOGGER = Crown.logger();
-
-    public static boolean shouldRun() {
-        return Transformers.shouldRun(RegionResidencyTransformer.class);
-    }
 
     public static void run() {
         LOGGER.info("Running region residency transformer");
@@ -57,18 +56,23 @@ public class RegionResidencyTransformer {
                         continue;
                     }
 
-                    manager.get(RegionPos.of(l))
+                    RegionResidency.ResEntry entry = manager.get(RegionPos.of(l))
                             .getResidency()
-                            .getEntry(user.getUniqueId())
-                            .addHome(name, -1);
+                            .getEntry(user.getUniqueId());
+
+                    if (!entry.hasHome(name)) {
+                        entry.addHome(name, UNKNOWN_MOVEIN);
+                    }
                 }
 
                 if (homes.hasHomeRegion()) {
                     PopulationRegion region = manager.get(homes.getHomeRegion());
                     RegionResidency.ResEntry entry = region.getResidency().getEntry(user.getUniqueId());
 
-                    entry.setDirectMoveIn(-1);
-                    manager.getGenerator().generate(region);
+                     if (!entry.isDirectResident()) {
+                         entry.setDirectMoveIn(UNKNOWN_MOVEIN);
+                         manager.getGenerator().generate(region);
+                     }
                 }
             } catch (Throwable e) {
                 LOGGER.error("Error converting data", e);
@@ -78,7 +82,11 @@ public class RegionResidencyTransformer {
             LOGGER.info("Completed transformer on {}", user.getName());
         }
 
-        Crown.getUserManager().unloadOffline();
+        UserManager um = Crown.getUserManager();
+        um.unloadOffline();
+        um.saveCache();
+        um.loadCache();
+
         FtcUserHomes.DISABLE_LIMIT_CHECK = false;
 
         Transformers.complete(RegionResidencyTransformer.class);

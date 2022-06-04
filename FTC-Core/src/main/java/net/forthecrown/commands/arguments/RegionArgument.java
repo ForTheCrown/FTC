@@ -2,6 +2,7 @@ package net.forthecrown.commands.arguments;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -12,11 +13,12 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.exceptions.TranslatableExceptionType;
 import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
+import net.forthecrown.royalgrenadier.VanillaMappedArgument;
 import net.kyori.adventure.text.Component;
 
 import java.util.concurrent.CompletableFuture;
 
-public class RegionArgument implements ArgumentType<RegionParseResult> {
+public class RegionArgument implements ArgumentType<RegionParseResult>, VanillaMappedArgument {
     private static final RegionArgument INSTANCE = new RegionArgument();
     private RegionArgument() {}
 
@@ -53,7 +55,8 @@ public class RegionArgument implements ArgumentType<RegionParseResult> {
             //User parse failed, it is an unknown region
             throw UNKNOWN_REGION.createWithContext(
                     GrenadierUtils.correctReader(reader, cursor),
-                    Component.text(reader.getString().substring(cursor, reader.getCursor()))
+                    Component.text(reader.getString().substring(cursor, reader.getCursor())),
+                    Component.text("/listregions")
             );
         }
     }
@@ -88,5 +91,10 @@ public class RegionArgument implements ArgumentType<RegionParseResult> {
         }
 
         return builder.buildFuture();
+    }
+
+    @Override
+    public ArgumentType<?> getVanillaArgumentType() {
+        return StringArgumentType.string();
     }
 }

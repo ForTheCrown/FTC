@@ -34,7 +34,7 @@ public class ActionTeleport implements UsageAction<ActionTeleport.ActionInstance
         float yaw = location.getYaw();
         float pitch = location.getPitch();
 
-        if(reader.canRead() && reader.peek() == ' '){
+        if(reader.canRead() && reader.peek() == ' ') {
             reader.skipWhitespace();
 
             World world = WorldArgument.world().parse(reader);

@@ -28,6 +28,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -176,7 +177,7 @@ public interface FtcFormatter {
     static TranslatableComponent leaveMessage(CrownUser user){
         return Component.translatable("multiplayer.player.left",
                 NamedTextColor.YELLOW,
-                user.nickDisplayName().color(getJoinColor(user))
+                user.nickDisplayName(false).color(getJoinColor(user))
         );
     }
 
@@ -389,7 +390,6 @@ public interface FtcFormatter {
      * @return The formatted message with the item's amount.
      */
     static TextComponent itemAndAmount(ItemStack item) {
-        Validate.notNull(item);
         return itemAndAmount(item, item.getAmount());
     }
 
@@ -434,7 +434,7 @@ public interface FtcFormatter {
     }
 
     static Component sourceDisplayName(CommandSource source){
-        if(source.isPlayer()) return UserManager.getUser(source.textName()).nickDisplayName();
+        if(source.isPlayer()) return UserManager.getUser(source.asOrNull(Player.class)).nickDisplayName();
         return source.displayName();
     }
 

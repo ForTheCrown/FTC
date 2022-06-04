@@ -119,7 +119,7 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
 
     @Override
     public void generateNextRegion(WorldVec3i pos, BlockFace signFace, BlockFace direction, RegionPos origin) {
-        RegionData region = manager.getData(origin.add(direction.getModX(), direction.getModZ()));
+        RegionAccess region = manager.getSnapshot(origin.add(direction.getModX(), direction.getModZ()));
 
         Block block = pos.getBlock();
 

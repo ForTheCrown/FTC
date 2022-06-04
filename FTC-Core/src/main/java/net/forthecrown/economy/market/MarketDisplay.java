@@ -71,9 +71,20 @@ public interface MarketDisplay {
                     .append(Component.text("dateOfPurchase: ").append(FtcFormatter.formatDate(shop.getDateOfPurchase())));
 
             if(shop.markedForEviction()) {
-                builder
+                MarketEviction evict = shop.getEviction();
+
+                builder.append(Component.newline())
+                        .append(Component.text("Eviction: {"))
+
                         .append(Component.newline())
-                        .append(Component.text("evictionDate: ").append(FtcFormatter.formatDate(shop.getEvictionDate())));
+                        .append(Component.text("  Date: ").append(FtcFormatter.formatDate(evict.getEvictionTime())))
+
+                        .append(Component.newline())
+                        .append(Component.text("  Reason: ").append(evict.getReason()))
+
+                        .append(Component.newline())
+                        .append(Component.text("}"));
+
             }
 
             if(!shop.getCoOwners().isEmpty()) {

@@ -1,5 +1,7 @@
 package net.forthecrown.user;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.chat.TimePrinter;
@@ -167,6 +169,7 @@ public class UserTeleport {
         return this;
     }
 
+    @RequiredArgsConstructor
     public enum Type {
         WARP ("Warping"),
         TELEPORT ("Teleporting"),
@@ -175,9 +178,7 @@ public class UserTeleport {
         HOME ("Teleporting"),
         OTHER ("Teleporting");
 
+        @Getter
         private final String action;
-        Type(String teleporting) {
-            this.action = teleporting;
-        }
     }
 }

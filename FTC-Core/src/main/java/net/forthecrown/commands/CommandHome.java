@@ -7,7 +7,7 @@ import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.*;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.regions.PopulationRegion;
-import net.forthecrown.regions.RegionData;
+import net.forthecrown.regions.RegionAccess;
 import net.forthecrown.regions.RegionUtil;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserHomes;
@@ -22,7 +22,7 @@ public class CommandHome extends FtcCommand {
     public static final String DEFAULT = "home";
 
     public CommandHome(){
-        super("home");
+        super(DEFAULT);
 
         setPermission(Permissions.HOME);
         setDescription("Takes you to one of your homes");
@@ -40,7 +40,7 @@ public class CommandHome extends FtcCommand {
 
                     //Check if they have home pole, and if they're in the correct world
                     if(homes.getHomeRegion() != null && user.getWorld().equals(FtcVars.getRegionWorld())) {
-                        RegionData local = Crown.getRegionManager().getData(user.getRegionPos());
+                        RegionAccess local = Crown.getRegionManager().getSnapshot(user.getRegionPos());
                         PopulationRegion region = Crown.getRegionManager().get(homes.getHomeRegion());
 
                         //If they're close to pole, tp them to home pole
@@ -84,8 +84,14 @@ public class CommandHome extends FtcCommand {
                             Location l = result.getHome(c.getSource(), false);
 
                             //Check if the home's world is invalid
-                            if(!user.hasPermission(Permissions.WORLD_BYPASS) && CommandTpask.isInvalidWorld(l.getWorld())){
-                                throw FtcExceptionProvider.badWorldHome(result.getName());
+                            if(!user.hasPermission(Permissions.WORLD_BYPASS)) {
+                                if(CommandTpask.isInvalidWorld(l.getWorld())) throw FtcExceptionProvider.badWorldHome(result.getName());
+
+                                //Don't allow visiting end homes if end closed
+                                EndOpener opener = Crown.getEndOpener();
+                                if(l.getWorld().equals(Worlds.end()) && opener.isEnabled() && !opener.isOpen()) {
+                                    throw FtcExceptionProvider.create("The End is currently closed");
+                                }
                             }
 
                             //Teleport them to home

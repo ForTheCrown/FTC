@@ -2,6 +2,10 @@ package net.forthecrown.user;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Data;
+import net.forthecrown.core.Crown;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 import java.util.Map;
 import java.util.UUID;
@@ -117,6 +121,36 @@ public class UserCacheImpl implements UserCache {
     @Override
     public Stream<CacheEntry> readerStream() {
         return (Stream) identified.values().stream();
+    }
+
+    private static final Logger LOGGER = Crown.logger();
+
+    void clearInvalid() {
+        LOGGER.info("clearInvalid called");
+        var iterator = identified.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            var e = iterator.next();
+            CacheEntry cache = e.getValue();
+            OfflinePlayer p = Bukkit.getOfflinePlayer(cache.getUniqueId());
+
+            if (!p.hasPlayedBefore()) {
+                LOGGER.info("{} or {} has not played before, removing entry", p.getUniqueId(), p.getName());
+
+                iterator.remove();
+                named.remove(cache.getName());
+
+                if(cache.getNickname() != null) {
+                    nicknamed.remove(cache.getNickname());
+                }
+
+                if(cache.getLastName() != null) {
+                    oldNamed.remove(cache.getLastName());
+                }
+
+                Crown.getUserManager().getSerializer().delete(p.getUniqueId());
+            }
+        }
     }
 
     @Override

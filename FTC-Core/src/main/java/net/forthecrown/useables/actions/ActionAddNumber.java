@@ -13,6 +13,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static net.forthecrown.useables.actions.ActionRemoveNumber.INT_ARG;
+
 public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstance> {
     public static final NamespacedKey
             GEM_KEY = Keys.forthecrown("add_gems"),
@@ -26,7 +28,7 @@ public class ActionAddNumber implements UsageAction<ActionAddNumber.ActionInstan
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
-        int amount = reader.readInt();
+        int amount = INT_ARG.parse(reader);
 
         return new ActionInstance(toBal, amount);
     }

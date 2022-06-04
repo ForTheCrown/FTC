@@ -7,6 +7,7 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.core.admin.EavesDropper;
 import net.forthecrown.core.admin.MuteStatus;
 import net.forthecrown.core.admin.Punishments;
+import net.forthecrown.core.chat.ComponentWriter;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.PagedDisplay;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
@@ -31,18 +32,20 @@ import java.util.UUID;
 public class FtcUserActionHandler implements UserActionHandler {
     @Override
     public void handleDirectMessage(DirectMessage message) {
+        MuteStatus mute = Punishments.checkMute(message.getSender().asBukkit());
+
         //Validate they didn't just use a slur or something lol
         if(Punishments.checkBannedWords(message.getSender().asBukkit(), message.getFormattedText())) {
-            message.setMuteStatus(MuteStatus.HARD);
+            mute = MuteStatus.HARD;
         }
 
-        EavesDropper.reportDM(message);
+        EavesDropper.reportDM(message, mute);
 
         UUID senderID = null;
         UUID receiverID = null;
 
-        //If no mute what so ever
-        if(message.getMuteStatus().maySpeak) {
+        //If no mute whatsoever
+        if(mute.maySpeak) {
             if(message.getTarget().isPlayer()){
                 CrownUser user = UserManager.getUser(message.getTarget().asOrNull(Player.class));
                 user.setLastMessage(message.getSender());
@@ -75,7 +78,7 @@ public class FtcUserActionHandler implements UserActionHandler {
         }
 
         //If soft or no mute, send to sender
-        if(message.getMuteStatus().senderMaySee){
+        if(mute.senderMaySee){
             Component senderMessage = Component.text()
                     .append(message.getSenderHeader())
                     .append(Component.text(" "))
@@ -84,9 +87,6 @@ public class FtcUserActionHandler implements UserActionHandler {
 
             message.getSender().sendMessage(senderMessage, receiverID);
         }
-
-        //Remove from command source tracker
-        message.getTarget().onCommandComplete(null, message.getMuteStatus().maySpeak, 0);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class FtcUserActionHandler implements UserActionHandler {
         List<UserMail.MailMessage> messages = query.getMail().getMail();
 
         if(messages.isEmpty()) {
-            throw FtcExceptionProvider.translatable("mail.none." + selfTranslationKey);
+            throw FtcExceptionProvider.translatable("mail.none." + selfTranslationKey, query.getUser().nickDisplayName());
         }
 
         final Component border = Component.text("               ", NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH);
@@ -187,7 +187,36 @@ public class FtcUserActionHandler implements UserActionHandler {
                                     Component.newline()
                                             .append(Component.translatable("mail.metadata.sender", UserManager.getUser(m.sender).nickDisplayName()));
 
+                            Component itemClaim = Component.empty();
+
+                            if (UserMail.hasAttachment(m)) {
+                                ComponentWriter writer = ComponentWriter.normal();
+                                m.attachment.writeHover(writer);
+
+                                if (!self) {
+                                    itemClaim = Component.text("[Attachment] ")
+                                            .color(m.attachmentClaimed ? NamedTextColor.GRAY : NamedTextColor.AQUA)
+                                            .hoverEvent(
+                                                    Component.text(m.attachmentClaimed ? "Claimed" : "Not claimed")
+                                                            .append(Component.newline())
+                                                            .append(writer.get())
+                                            );
+                                } else {
+                                    itemClaim = Component.translatable("mail.claimItem",
+                                                    m.attachmentClaimed ? NamedTextColor.GRAY : NamedTextColor.AQUA
+                                            )
+                                            .hoverEvent(
+                                                    Component.translatable("mail.claimItem.hover." + (m.attachmentClaimed ? "unavailable" : "available"))
+                                                            .append(Component.newline())
+                                                            .append(writer.get())
+                                            )
+                                            .clickEvent(ClickEvent.runCommand("/mail claim " + index))
+                                            .append(Component.space());
+                                }
+                            }
+
                             return Component.text()
+                                    // user-friendly mail index
                                     .append(
                                             Component.text("" + index + ")", NamedTextColor.GOLD)
                                                     .hoverEvent(
@@ -199,16 +228,21 @@ public class FtcUserActionHandler implements UserActionHandler {
                                                     )
                                     )
 
+                                    // [Read] | [Unread] Messages
                                     .append(
                                             Component.text(" [", m.read ? NamedTextColor.GRAY : NamedTextColor.YELLOW)
                                                     .append(
-                                                            Component.translatable(m.read ? "mail.read" : "mail.unread")
+                                                            Component.translatable(!m.read ? "mail.read" : "mail.unread")
                                                                     .clickEvent(self ? ClickEvent.runCommand("/mail mark_" + (m.read ? "un" : "") + "read " + index) : null)
                                                                     .hoverEvent(self ? Component.translatable(!m.read ? "mail.read.hover" : "mail.unread.hover") : null)
                                                     )
                                                     .append(Component.text("] "))
                                     )
 
+                                    // [Claim Item] part
+                                    .append(itemClaim)
+
+                                    // The actual message
                                     .append(m.message)
                                     .build();
                         },
@@ -264,22 +298,21 @@ public class FtcUserActionHandler implements UserActionHandler {
         Component text = action.getText();
         Component senderDisplay = null;
 
-        if(action.hasSender() && action.shouldValidateSender()) {
+        if (action.hasSender()) {
             UUID sender = action.getSender();
             CrownUser senderUser = UserManager.getUser(sender);
             senderDisplay = senderUser.nickDisplayName().color(NamedTextColor.YELLOW);
+            MuteStatus status = MuteStatus.NONE;
 
-            if(user.getInteractions().isBlockedPlayer(sender)) {
-                throw FtcExceptionProvider.blockedPlayer(user);
+            if (action.shouldValidateSender()) {
+                status = Punishments.muteStatus(senderUser);
+
+                if(Punishments.checkBannedWords(senderUser, text)) {
+                    status = MuteStatus.HARD;
+                }
             }
 
-            MuteStatus status = Punishments.muteStatus(senderUser);
-
-            if(Punishments.checkBannedWords(senderUser, text)) {
-                status = MuteStatus.HARD;
-            }
-
-            if(status.senderMaySee) {
+            if(status.senderMaySee && action.informSender()) {
                 senderUser.sendMessage(
                         Component.translatable("mail.sent",
                                 NamedTextColor.YELLOW,
@@ -293,7 +326,16 @@ public class FtcUserActionHandler implements UserActionHandler {
             if(!status.maySpeak) return;
         }
 
-        mail.add(action.getText(), action.getSender());
+        UserMail.MailMessage message = new UserMail.MailMessage(
+                action.getText(), action.getSender(), System.currentTimeMillis()
+        );
+
+        if (!UserMail.isEmpty(action.getAttachment())) {
+            message.attachment = action.getAttachment();
+            message.attachmentClaimed = false;
+        }
+
+        mail.add(message);
 
         if(online) {
             if(action.hasSender()) {

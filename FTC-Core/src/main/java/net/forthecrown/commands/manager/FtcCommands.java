@@ -13,13 +13,8 @@ import net.forthecrown.commands.marriage.*;
 import net.forthecrown.commands.punish.*;
 import net.forthecrown.commands.regions.*;
 import net.forthecrown.core.Crown;
-import net.forthecrown.grenadier.RoyalArguments;
-import net.forthecrown.grenadier.VanillaArgumentType;
 import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.royalgrenadier.arguments.RoyalArgumentsImpl;
 import net.forthecrown.user.RankTitle;
-import net.minecraft.commands.arguments.ResourceLocationArgument;
-import net.minecraft.commands.arguments.TimeArgument;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,24 +26,8 @@ public final class FtcCommands {
 
     private FtcCommands(){}
 
-    public static void init(){
-        //ArgumentType registration
-        VanillaArgumentType key = VanillaArgumentType.custom(ResourceLocationArgument::id);
-
-        RoyalArgumentsImpl.register(UserArgument.class, UserArgument::getHandle, false);
-        RoyalArgumentsImpl.register(TimeArgument.class, t -> t, true);
-
-        RoyalArguments.register(BaltopArgument.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, BaltopArgument.MAX)));
-        RoyalArguments.register(ChatArgument.class, VanillaArgumentType.GREEDY_STRING);
-        RoyalArguments.register(GlobalVarArgument.class, VanillaArgumentType.WORD);
-
-        RoyalArguments.register(RegistryArguments.class, key);
-
-        RoyalArguments.register(WarpArgument.class, key);
-        RoyalArguments.register(KitArgument.class, key);
-
-        //Command loading
-
+    //Command loading
+    public static void init() {
         //Debug command
         if(Crown.inDebugMode()) {
             new CommandTestCore();
@@ -62,6 +41,8 @@ public final class FtcCommands {
         new CommandTransferShop();
         new CommandUnclaimShop();
         new CommandMarketWarning();
+        new CommandMarketAppeal();
+        new CommandMarketEditing();
 
         //admin commands
         new CommandKingMaker();
@@ -79,9 +60,7 @@ public final class FtcCommands {
         new CommandDungeons();
         new CommandFtcUser();
         new CommandPlayerTime();
-
-        //Admin utility
-
+        new CommandHolidays();
         new CommandEndOpener();
         new CommandFtcUser();
         new CommandSpeed();
@@ -227,7 +206,7 @@ public final class FtcCommands {
         new EmotePog();
 
         HelpPageArgument.MAX = Math.round(((float) FtcCommands.BY_NAME.size())/10);
-        RoyalArguments.register(HelpPageArgument.class, VanillaArgumentType.custom(() -> IntegerArgumentType.integer(1, HelpPageArgument.MAX)));
+        HelpPageArgument.intArg = IntegerArgumentType.integer(1, HelpPageArgument.MAX);
 
         new HelpHelp();
 

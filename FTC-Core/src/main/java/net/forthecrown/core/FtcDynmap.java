@@ -1,7 +1,7 @@
 package net.forthecrown.core;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import net.forthecrown.regions.RegionData;
+import net.forthecrown.regions.PopulationRegion;
 import net.forthecrown.regions.RegionProperty;
 import net.forthecrown.regions.RegionUtil;
 import org.dynmap.DynmapCommonAPI;
@@ -64,15 +64,23 @@ public class FtcDynmap extends DynmapCommonAPIListener {
     }
 
     public static MarkerSet getRegionPoleSet() {
+        MarkerSet set = _getRegionPoleSet();
+
+        set.setMarkerSetLabel(SET_LABEL);
+
+        return set;
+    }
+
+    private static MarkerSet _getRegionPoleSet() {
         MarkerSet set = getMarkerAPI().getMarkerSet(SET_NAME);
         return set == null ? getMarkerAPI().createMarkerSet(SET_NAME, SET_LABEL, null, true) : set;
     }
 
-    public static Marker getMarker(RegionData data) {
+    public static Marker getMarker(PopulationRegion data) {
         return getRegionPoleSet().findMarker(data.getMarkerID());
     }
 
-    public static Marker createMarker(RegionData data) {
+    public static Marker createMarker(PopulationRegion data) {
         BlockVector2 vec2 = data.getPolePosition();
 
         return getRegionPoleSet().createMarker(

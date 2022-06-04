@@ -7,37 +7,41 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.commands.click.ClickableTextNode;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
-import net.forthecrown.core.Crown;
-import net.forthecrown.core.Worlds;
+import net.forthecrown.core.*;
+import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
+import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.economy.Economy;
 import net.forthecrown.serializer.AbstractJsonSerializer;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.user.CrownUser;
-import net.forthecrown.user.UserMarketData;
+import net.forthecrown.user.UserMail;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.user.UserMarketData;
 import net.forthecrown.utils.FtcUtils;
+import net.forthecrown.utils.TimeUtil;
 import net.forthecrown.utils.math.Vector3i;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.forthecrown.utils.transformation.RegionCopyPaste;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static net.forthecrown.utils.transformation.BoundingBoxes.createPaste;
 import static net.forthecrown.utils.transformation.BoundingBoxes.wgToNms;
 
-public class FtcMarkets extends AbstractJsonSerializer implements Markets {
+public class FtcMarkets extends AbstractJsonSerializer implements Markets, DayChangeListener {
+    public static final int REQUIRED_SCANS = 2;
+
     //2 maps for tracking shops, byName stores all saved shops
     private final Object2ObjectMap<UUID, MarketShop> byOwner = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectMap<String, MarketShop> byName = new Object2ObjectOpenHashMap<>();
@@ -59,6 +63,19 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
     }
 
     @Override
+    public MarketShop get(WorldVec3i pos) {
+        if (!pos.getWorld().equals(getWorld())) return null;
+
+        for (var s: getAllShops()) {
+            if (s.getWorldGuard().contains(pos.getX(), pos.getY(), pos.getZ())) {
+                return s;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public World getWorld() {
         //Return the OVERWORLD constant in Worlds
         return Worlds.OVERWORLD;
@@ -68,6 +85,53 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
     public void add(MarketShop claim) {
         if(claim.hasOwner()) byOwner.put(claim.getOwner(), claim);
         byName.put(claim.getName(), claim);
+    }
+
+    @Override
+    public void onDayChange() {
+        outer: for (var s: byName.values()) {
+            if (!s.hasOwner()) continue;
+
+            LOGGER.info("Running auto eviction check on '{}'", s.getName());
+
+            List<MarketScan> scans = s.getScans();
+
+            if (s.shouldRunScan()) {
+                LOGGER.info("Running market scan on '{}'", s.getName());
+                MarketScan scan = runScan(s);
+
+                scans.add(0, scan);
+            }
+
+            if (scans.size() <= REQUIRED_SCANS) {
+                continue;
+            }
+
+            if (!s.markedForEviction()) {
+                for (int i = 0; i < REQUIRED_SCANS; i++) {
+                    if (scans.get(i).scanPasses()) continue outer;
+                }
+
+                LOGGER.info("Starting eviction of '{}'", s.getName());
+                beginEviction(s,
+                        System.currentTimeMillis() + FtcVars.marketAutoKickCooldown.get(),
+                        true,
+                        MarketScan.REASONS[scans.get(0).getResult()]
+                );
+
+            } else {
+                MarketScan scan = runScan(s);
+
+                if (scan.scanPasses()) {
+                    LOGGER.info("Stopping eviction of shop '{}'", s.getName());
+                    stopEviction(s);
+                }
+            }
+        }
+    }
+
+    MarketScan runScan(MarketShop s) {
+        return MarketScan.scanArea(getBounds(s));
     }
 
     @Override
@@ -145,10 +209,12 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         shop.setDateOfPurchase(null);
         shop.setMerged(null);
         shop.setOwner(null);
-        shop.setEvictionDate(null);
+        shop.setEviction(null);
 
         shop.getWorldGuard().getMembers().clear();
         shop.getCoOwners().clear();
+
+        shop.getScans().clear();
 
         Crown.getGuild().checkVoteShouldContinue();
 
@@ -215,6 +281,14 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
             MarketShop merged = shop.getMerged();
             merged.getWorldGuard().getMembers().addPlayer(uuid);
         }
+    }
+
+    @Override
+    public WorldBounds3i getBounds(MarketShop shop) {
+        return WorldBounds3i.of(getWorld(),
+                shop.getWorldGuard().getMinimumPoint(),
+                shop.getWorldGuard().getMaximumPoint()
+        );
     }
 
     @Override
@@ -299,6 +373,8 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
 
         CrownUser user = UserManager.getUser(target);
 
+        byOwner.remove(shop.getOwner());
+
         shop.setOwner(target);
         shop.getCoOwners().clear();
 
@@ -311,6 +387,17 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         }
 
         user.unloadIfOffline();
+
+        UserMarketData data = user.getMarketData();
+        data.setOwnedName(shop.getName());
+
+        if (data.hasOwnedBefore()) {
+            data.setOwnershipBegan(System.currentTimeMillis());
+            data.setLastStatusChange();
+        }
+
+        byOwner.put(target, shop);
+
         Crown.getGuild().checkVoteShouldContinue();
     }
 
@@ -347,9 +434,85 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
     }
 
     @Override
+    public void beginEviction(MarketShop shop, long evictTime, boolean automatic, Component reason) {
+        Validate.isTrue(shop.hasOwner(), "Cannot evict shop with no owner");
+        Validate.isTrue(!shop.markedForEviction(), "Shop '%s' is already marked for eviction", shop.getName());
+
+        MarketEviction data = new MarketEviction(
+                shop.getName(),
+                automatic ? MarketEviction.CAUSE_AUTOMATED : MarketEviction.CAUSE_COMMAND,
+                evictTime, reason
+        );
+
+        shop.setEviction(data);
+
+        TimePrinter printer = new TimePrinter(TimeUtil.timeUntil(evictTime)).build(3);
+        Component date = FtcFormatter.formatDate(evictTime)
+                        .color(NamedTextColor.YELLOW);
+        Component button = Component.translatable("market.evict.appeal.button", NamedTextColor.AQUA)
+                .clickEvent(ClickEvent.runCommand("/marketappeal"))
+                .hoverEvent(Component.text("Click me!"));
+
+        CrownUser user = shop.ownerUser();
+
+
+        UserMail.MailMessage m = new UserMail.MailMessage(
+                Component.translatable("market.evict.notice.mail",
+                        NamedTextColor.GRAY,
+                        Component.text()
+                                .color(NamedTextColor.YELLOW)
+                                .append(reason)
+                                .build(),
+                        date
+                )
+                        .append(Component.space())
+                        .append(button),
+                null, System.currentTimeMillis()
+        );
+
+        if (user.isOnline()) {
+            user.sendMessage(
+                    Component.translatable("market.evict.notice", NamedTextColor.GRAY,
+                            Component.text()
+                                    .color(NamedTextColor.YELLOW)
+                                    .append(reason)
+                                    .build(),
+                            date, printer.printCurrent()
+                    )
+                            .append(Component.space())
+                            .append(button)
+            );
+
+            m.read = true;
+        }
+
+        FtcDiscord.staffLog("Markets", "{}, owner '{}', has been marked for eviction, reason: '{}'",
+                shop.getName(), user.getNickOrName(), ChatUtils.plainText(reason)
+        );
+
+        user.getMail().add(m);
+    }
+
+    @Override
+    public void stopEviction(MarketShop shop) {
+        Validate.isTrue(shop.hasOwner(), "Shop has no owner");
+        Validate.isTrue(shop.markedForEviction(), "Shop '%s' is not marked for eviction", shop.getName());
+
+        shop.setEviction(null);
+
+        CrownUser user = shop.ownerUser();
+
+        user.sendAndMail(
+                Component.translatable("market.evict.cancelled", NamedTextColor.YELLOW)
+        );
+
+        FtcDiscord.staffLog("Markets", "{}, owner '{}', eviction cancelled", shop.getName(), user.getNickOrName());
+    }
+
+    @Override
     public void clear() {
         for (MarketShop m: getAllShops()) {
-            m.setEvictionDate(null);
+            m.setEviction(null);
         }
 
         byName.clear();
@@ -403,7 +566,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets {
         );
         
         Vector3i size = shop.getSize();
-        String dimensions = size.getX() + "x" + size.getY() + "x" + size.getY() + " blocks";
+        String dimensions = size.getX() + "x" + size.getY() + "x" + size.getZ() + " blocks";
 
         textBuilder
                 .append(newLine)

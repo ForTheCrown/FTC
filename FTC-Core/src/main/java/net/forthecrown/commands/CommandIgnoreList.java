@@ -25,9 +25,8 @@ public class CommandIgnoreList extends FtcCommand {
         setDescription("Displays all the ignored players");
         setAliases(
                 "blocked", "blockedplayers", "blockedlist",
-                "ignoring", "ignored",
+                "ignoring", "ignored", "ignores",
                 "ignoredlist", "ignoredplayers",
-                "ignorelist", "ignores",
                 "listignores", "listignored"
         );
 

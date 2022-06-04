@@ -78,8 +78,8 @@ public class CommandBalanceTop extends FtcCommand {
 
         int firstIndex = ENTRIES_PER_PAGE * page;
         for(int i = 0 ; i < ENTRIES_PER_PAGE ; i++) {
-            if(firstIndex + i >= balMap.size()) break;
             int index = firstIndex + i;
+            if(index >= balMap.size()) break;
 
             Component entryText = getPrettyDisplay(balMap, index);
             if(entryText == null) continue;
@@ -113,6 +113,7 @@ public class CommandBalanceTop extends FtcCommand {
                 .append(border);
 
         sender.sendMessage(text.build());
+
         return 0;
     }
 

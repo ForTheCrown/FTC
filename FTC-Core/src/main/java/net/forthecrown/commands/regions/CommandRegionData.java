@@ -6,7 +6,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.chat.ComponentTagVisitor;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.regions.RegionData;
+import net.forthecrown.regions.RegionAccess;
 import net.forthecrown.regions.RegionManager;
 import net.forthecrown.regions.RegionPos;
 import net.forthecrown.user.CrownUser;
@@ -56,19 +56,23 @@ public class CommandRegionData extends FtcCommand {
                             RegionPos pos = user.getRegionPos();
 
                             RegionManager manager = Crown.getRegionManager();
-                            RegionData data = manager.getData(pos);
-
-                            if(data instanceof RegionData.Empty) {
-                                throw FtcExceptionProvider.create("Region has no data");
-                            }
+                            RegionAccess data = manager.getSnapshot(pos);
 
                             CompoundTag tag = new CompoundTag();
                             data.save(tag);
 
+                            if (tag.isEmpty()) {
+                                throw FtcExceptionProvider.create("Region has no data");
+                            }
+
                             ComponentTagVisitor visitor = new ComponentTagVisitor(true);
 
                             user.sendMessage(
-                                    visitor.visit(tag, Component.text("Data for ").append(data.displayName()))
+                                    visitor.visit(tag,
+                                            Component.text("Data for ")
+                                                    .append(data.displayName())
+                                                    .append(Component.space())
+                                    )
                             );
 
                             return 0;

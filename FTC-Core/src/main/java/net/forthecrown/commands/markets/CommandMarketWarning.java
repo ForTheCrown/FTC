@@ -21,10 +21,8 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.TimeArgument;
 import net.forthecrown.user.CrownUser;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 public class CommandMarketWarning extends FtcCommand {
@@ -81,21 +79,17 @@ public class CommandMarketWarning extends FtcCommand {
 
                                         .executes(c -> {
                                             MarketShop shop = g.get(c, ARG_NAME);
+
+                                            if (shop.markedForEviction()) {
+                                                throw FtcExceptionProvider.create("That shop is already marked for eviction");
+                                            }
+
                                             String reason = StringArgumentType.getString(c, "reason");
                                             Component cReason = FtcFormatter.formatString(reason);
                                             long delay = TimeArgument.getMillis(c, "time");
                                             long evictionTime = System.currentTimeMillis() + delay;
-                                            Date evictTime = new Date(evictionTime);
 
-                                            shop.setEvictionDate(evictTime);
-
-                                            CrownUser user = shop.ownerUser();
-                                            user.sendAndMail(
-                                                    Component.translatable("market.evictNotice", cReason.color(NamedTextColor.GOLD))
-                                                            .color(NamedTextColor.YELLOW)
-                                                            .append(Component.newline())
-                                                            .append(Component.translatable("market.evictNotice2", FtcFormatter.formatDate(evictTime).color(NamedTextColor.GOLD)))
-                                            );
+                                            Crown.getMarkets().beginEviction(shop, evictionTime, false, cReason);
 
                                             c.getSource().sendAdmin(
                                                     Component.text("Issued eviction notice to ")
@@ -103,7 +97,7 @@ public class CommandMarketWarning extends FtcCommand {
                                                             .append(Component.text(". Will be evicted in "))
                                                             .append(new TimePrinter(delay))
                                                             .append(Component.text(" or on "))
-                                                            .append(FtcFormatter.formatDate(evictTime))
+                                                            .append(FtcFormatter.formatDate(evictionTime))
                                                             .append(Component.text(". Reason: "))
                                                             .append(cReason)
                                             );
@@ -120,10 +114,7 @@ public class CommandMarketWarning extends FtcCommand {
                                         throw FtcExceptionProvider.create(shop.getName() + " is not marked for eviction");
                                     }
 
-                                    shop.setEvictionDate(null);
-
-                                    CrownUser user = shop.ownerUser();
-                                    user.sendAndMail(Component.translatable("market.evictNotice.cancelled").color(NamedTextColor.YELLOW));
+                                    Crown.getMarkets().stopEviction(shop);
 
                                     c.getSource().sendAdmin(
                                             Component.text()

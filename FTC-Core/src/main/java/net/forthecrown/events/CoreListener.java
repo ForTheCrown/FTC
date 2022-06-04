@@ -18,7 +18,6 @@ import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.emotes.EmoteSmooch;
 import net.forthecrown.core.*;
 import net.forthecrown.core.admin.*;
-import net.forthecrown.core.admin.BannedWords;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.npc.NpcDirectory;
@@ -31,7 +30,7 @@ import net.forthecrown.user.UserInteractions;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.actions.MarriageMessage;
 import net.forthecrown.user.actions.UserActionHandler;
-import net.forthecrown.user.packets.PacketListeners;
+import net.forthecrown.user.packet.Packets;
 import net.forthecrown.utils.FtcUtils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -79,7 +78,7 @@ public class CoreListener implements Listener {
         CrownUser user = UserManager.getUser(event.getPlayer());
         boolean nameChanged = user.onJoin();
 
-        PacketListeners.inject(event.getPlayer());
+        Packets.inject(event.getPlayer());
 
         if(!event.getPlayer().hasPlayedBefore()) {
             event.getPlayer().teleport(Crown.config().getServerSpawn());
@@ -112,7 +111,7 @@ public class CoreListener implements Listener {
         CrownUser user = UserManager.getUser(event.getPlayer());
         user.onLeave();
 
-        PacketListeners.remove(event.getPlayer());
+        Packets.uninject(event.getPlayer());
         AfkKicker.remove(user.getUniqueId());
 
         if(user.isVanished()) event.quitMessage(null);
@@ -325,6 +324,7 @@ public class CoreListener implements Listener {
         event.setMaxPlayers(newMax);
 
         event.motd(motd());
+        event.setServerIcon(ServerIcons.getCurrent());
 
         Iterator<Player> iterator = event.iterator();
         while (iterator.hasNext()) {

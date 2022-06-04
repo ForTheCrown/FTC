@@ -18,7 +18,7 @@ public class CommandInvite extends FtcCommand {
         super("invite");
 
         setPermission(Permissions.REGIONS);
-        setDescription("Invites a player to your region");
+        setDescription("Invites players to your region");
 
         register();
     }
@@ -44,6 +44,7 @@ public class CommandInvite extends FtcCommand {
                         .executes(c -> {
                             CrownUser user = getUserSender(c);
                             Collection<CrownUser> users = UserArgument.getUsers(c, "users");
+                            users.removeIf(user1 -> !user1.isOnline());
 
                             boolean selfRemoved = users.remove(user);
                             if(users.isEmpty()) {

@@ -9,8 +9,6 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.serializer.JsonWrapper;
 import net.forthecrown.utils.ListUtils;
 import net.forthecrown.utils.TimeUtil;
-import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -24,11 +22,6 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
     @Override
     public boolean canSee(UUID id) {
         return getUser().getUniqueId().equals(id);
-    }
-    
-    @Override
-    public void add(Component message, @Nullable UUID sender) {
-        mail.add(0, new MailMessage(message, sender, System.currentTimeMillis()));
     }
 
     @Override
@@ -44,7 +37,12 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
     }
 
     @Override
-    public void clear() {
+    public void clearPartial() {
+        mail.removeIf(message -> !UserMail.hasAttachment(message) || message.attachmentClaimed);
+    }
+
+    @Override
+    public void clearTotal() {
         mail.clear();
     }
 
@@ -81,14 +79,20 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
     }
 
     @Override
+    public void add(MailMessage message) {
+        mail.add(0, message);
+    }
+
+    @Override
     public void deserialize(JsonElement element) {
-        mail.clear();
+        clearTotal();
         if(element == null) return;
 
         JsonArray array = element.getAsJsonArray();
 
         for (JsonElement e: array) {
             JsonWrapper json = JsonWrapper.of(e.getAsJsonObject());
+
             MailMessage message = new MailMessage(
                     ChatUtils.fromJson(json.get("msg")),
                     json.getUUID("sender"),
@@ -96,12 +100,21 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
                     json.has("read")
             );
 
-            if(!messageTooOld(message)) mail.add(message);
+            if(json.has("attachment")) {
+                message.attachmentClaimed = json.getBool("attachment_claimed");
+                message.attachment = MailAttachment.load(json.get("attachment"));
+            }
+
+            if(shouldRetainMessage(message)) mail.add(message);
         }
     }
 
-    boolean messageTooOld(MailMessage message) {
-        return TimeUtil.hasCooldownEnded(FtcVars.dataRetentionTime.get(), message.sent);
+    boolean shouldRetainMessage(MailMessage message) {
+        if (UserMail.hasAttachment(message)) {
+            return true;
+        }
+
+        return !TimeUtil.hasCooldownEnded(FtcVars.dataRetentionTime.get(), message.sent);
     }
 
     @Override
@@ -111,7 +124,7 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
         JsonArray array = new JsonArray();
 
         for (MailMessage m: getMail()) {
-            if(messageTooOld(m)) continue;
+            if(!shouldRetainMessage(m)) continue;
 
             JsonWrapper json = JsonWrapper.empty();
 
@@ -120,6 +133,11 @@ public class FtcUserMail extends AbstractUserAttachment implements UserMail {
 
             if(m.read) json.add("read", true);
             if(m.sender != null) json.addUUID("sender", m.sender);
+
+            if (UserMail.hasAttachment(m)) {
+                json.add("attachment_claimed", m.attachmentClaimed);
+                json.add("attachment", m.attachment.serialize());
+            }
 
             array.add(json.getSource());
         }

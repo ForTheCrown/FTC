@@ -10,7 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Supplier;
 
 public record SimpleAction<T extends UsageActionInstance>(NamespacedKey key,
-                                                          Supplier<T> supplier) implements UsageAction<T> {
+                                                          Supplier<T> supplier
+) implements UsageAction<T> {
 
     @Override
     public T parse(StringReader reader, CommandSource source) throws CommandSyntaxException {

@@ -67,9 +67,9 @@ public class EavesDropper {
         );
     }
 
-    public static void reportDM(DirectMessage message){
+    public static void reportDM(DirectMessage message, MuteStatus status){
         send(Component.text()
-                .append(Component.text(message.getMuteStatus().edPrefix))
+                .append(Component.text(status.edPrefix))
                 .append(DirectMessage.getHeader(
                         message.senderDisplayName(),
                         message.receiverDisplayName(),

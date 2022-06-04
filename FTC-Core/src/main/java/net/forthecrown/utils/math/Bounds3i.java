@@ -2,13 +2,20 @@ package net.forthecrown.utils.math;
 
 import com.google.gson.JsonElement;
 import com.sk89q.worldedit.regions.Region;
+import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.Level;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 public class Bounds3i extends AbstractBounds3i<Bounds3i> implements Iterable<Vector3i> {
+    public static Bounds3i WORLD = new Bounds3i(
+            -Level.MAX_LEVEL_SIZE, FtcUtils.MIN_Y, -Level.MAX_LEVEL_SIZE,
+             Level.MAX_LEVEL_SIZE, FtcUtils.MAX_Y,  Level.MAX_LEVEL_SIZE
+    );
+
     public Bounds3i(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         super(minX, minY, minZ, maxX, maxY, maxZ, true);
     }

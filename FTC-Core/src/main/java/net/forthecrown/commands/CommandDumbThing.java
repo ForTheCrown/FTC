@@ -44,7 +44,7 @@ public class CommandDumbThing extends FtcCommand {
                 Permissions.DONATOR_3,
                 "Shoots a bee :D",
                 player -> {
-                    Location l = player.getLocation();
+                    Location l = player.getEyeLocation();
 
                     Bee bee = l.getWorld().spawn(l, Bee.class);
                     bee.setVelocity(player.getEyeLocation().getDirection().multiply(2));
@@ -62,7 +62,7 @@ public class CommandDumbThing extends FtcCommand {
                 Permissions.DONATOR_3,
                 "Shoots a kitten at people",
                 player -> {
-                    Location l = player.getLocation();
+                    Location l = player.getEyeLocation();
 
                     Cat cat = l.getWorld().spawn(l, Cat.class);
                     cat.setBaby();

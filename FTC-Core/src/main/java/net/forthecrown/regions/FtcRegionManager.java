@@ -61,7 +61,7 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
             RegionPos pos = RegionPos.fromString(e.getKey());
 
             //Deserialize region
-            PopulationRegion region = new PopulationRegion(pos, world, e.getValue());
+            PopulationRegion region = new PopulationRegion(pos, world, (CompoundTag) e.getValue());
 
             //Add the region
             add(region);
@@ -90,11 +90,11 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
     }
 
     @Override
-    public RegionData getData(RegionPos pos) {
+    public RegionAccess getSnapshot(RegionPos pos) {
         PopulationRegion region = byCords.get(pos);
         if(region != null) return region;
 
-        return new RegionData.Empty(pos);
+        return new RegionAccess.Empty(pos);
     }
 
     @Override
@@ -116,18 +116,13 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
             }
         }
 
-        if(!hasName && !nullNew) {
-            FtcDynmap.createMarker(region);
-        }
 
         //Set the name and add it with the new name to the tracker
-        if(!nullNew) {
+        if (!nullNew) {
             byName.put(newName.toLowerCase(), region);
 
             if(!region.hasProperty(RegionProperty.FORBIDS_MARKER)) {
-                Marker marker = FtcDynmap.getMarker(region);
-                if(marker == null) marker = FtcDynmap.createMarker(region);
-
+                Marker marker = FtcDynmap.createMarker(region);
                 marker.setLabel(newName);
             }
         }
@@ -182,7 +177,7 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
 
     @Override
     public void dropUnimportantRegions() {
-        byCords.entrySet().removeIf(e -> !e.getValue().shouldSerialize());
+        byCords.entrySet().removeIf(e -> !e.getValue().isImportant());
     }
 
     @Override

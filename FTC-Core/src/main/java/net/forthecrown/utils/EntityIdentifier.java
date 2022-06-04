@@ -4,6 +4,8 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Data;
 import net.forthecrown.grenadier.types.UUIDArgument;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.ChunkPos;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -47,6 +49,16 @@ public class EntityIdentifier {
         return new EntityIdentifier(e.getUniqueId(), l.getWorld().getName(), chunkPos);
     }
 
+    public static EntityIdentifier load(Tag t) {
+        CompoundTag tag = (CompoundTag) t;
+
+        return of(
+                tag.getUUID("uuid"),
+                tag.getString("world_name"),
+                new ChunkPos(tag.getLong("chunk"))
+        );
+    }
+
     public static EntityIdentifier parse(String input) {
         try {
             StringReader reader = new StringReader(input);
@@ -73,5 +85,15 @@ public class EntityIdentifier {
     @Override
     public String toString() {
         return worldName + FIELD_SEPARATOR + chunk.x + FIELD_SEPARATOR + chunk.z + FIELD_SEPARATOR + uniqueId;
+    }
+
+    public Tag save() {
+        CompoundTag tag = new CompoundTag();
+
+        tag.putUUID("uuid", uniqueId);
+        tag.putString("world_name", worldName);
+        tag.putLong("chunk", chunk.longKey);
+
+        return tag;
     }
 }

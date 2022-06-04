@@ -25,7 +25,7 @@ public class ActionItem implements UsageAction<ActionItem.ActionInstance> {
 
     private final boolean add;
 
-    public ActionItem(boolean add){
+    public ActionItem(boolean add) {
         this.add = add;
     }
 
