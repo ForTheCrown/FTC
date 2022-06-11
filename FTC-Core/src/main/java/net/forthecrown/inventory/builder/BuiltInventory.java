@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.inventory.builder.options.InventoryOption;
 import net.forthecrown.inventory.builder.options.InventoryRunnable;
@@ -19,6 +18,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Comparator;
 
 public class BuiltInventory implements InventoryHolder {
 
@@ -36,7 +37,8 @@ public class BuiltInventory implements InventoryHolder {
                           int size,
                           boolean inventory, InventoryCloseAction onClose,
                           InventoryAction onOpen,
-                          InventoryRunnable click) {
+                          InventoryRunnable click
+    ) {
         this.options = new Int2ObjectOpenHashMap<>(options);
         this.title = title;
         this.size = size;
@@ -76,7 +78,7 @@ public class BuiltInventory implements InventoryHolder {
 
             option.onClick(user, context);
 
-            if(context.shouldCooldown()) Cooldown.add(player, getClass().getSimpleName(), 5);
+            if(context.shouldCooldown()) Cooldown.add(player, getClass().getSimpleName(), context.getCooldownTime());
             if(context.shouldReload()) open(player);
 
             event.setCancelled(context.shouldCancelEvent());
@@ -101,17 +103,10 @@ public class BuiltInventory implements InventoryHolder {
     public FtcInventory createInventory(CrownUser user){
         FtcInventory inv = FtcInventory.of(this, size, title);
 
-        ObjectList<InventoryOption> lows = new ObjectArrayList<>();
-        ObjectList<InventoryOption> mids = new ObjectArrayList<>();
-        ObjectList<InventoryOption> highs = new ObjectArrayList<>();
-
-        for (InventoryOption o: options.values()){
-            o.getPriority().pick(lows, mids, highs).add(o);
-        }
-
-        lows.forEach(o -> o.place(inv, user));
-        mids.forEach(o -> o.place(inv, user));
-        highs.forEach(o -> o.place(inv, user));
+        new ObjectArrayList<>(this.options.values())
+                .stream()
+                .sorted(Comparator.comparingInt(value -> value.getPriority().ordinal()))
+                .forEachOrdered(option -> option.place(inv, user));
 
         return inv;
     }

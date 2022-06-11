@@ -39,13 +39,16 @@ public interface Registries {
 
     Registry<JailCell>                      JAILS               = create("jails");
 
+    // Structure stuff
     Registry<BlockStructure>                STRUCTURES          = create("structures");
     Registry<StructureType>                 STRUCTURE_TYPES     = create("structure_types");
     Registry<StructureNodeType>             STRUCTURE_NODE_TYPES= create("structure_node_types");
 
+    // Guilds and Houses
     CloseableRegistry<VoteTopic>            VOTE_TOPICS         = createCloseable("vote_topics");
     CloseableRegistry<House>                HOUSES              = createCloseable("houses");
 
+    // Weapons
     CloseableRegistry<WeaponGoal>           WEAPON_GOALS        = createCloseable("weapon_goals");
     CloseableRegistry<WeaponAbility.Type>   WEAPON_ABILITIES    = createCloseable("weapon_abilities");
 

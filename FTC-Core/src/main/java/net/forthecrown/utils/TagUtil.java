@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 
+/**
+ * A utility class to do some tedious tasks
+ * that involve NBT serialization.
+ */
 public final class TagUtil {
     private static final CraftPersistentDataTypeRegistry REGISTRY = new CraftPersistentDataTypeRegistry();
 

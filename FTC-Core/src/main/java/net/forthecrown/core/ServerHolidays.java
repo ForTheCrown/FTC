@@ -157,6 +157,7 @@ public class ServerHolidays extends AbstractNbtSerializer implements DayChangeLi
             LOGGER.info("Removing all {} unclaimed mail from users", holiday.getName());
             String tag = holiday.getAttachmentTag(true);
 
+            // Remove mails with holiday tag
             users.forEach(user -> {
                 UserMail mail = user.getMail();
 

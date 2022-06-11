@@ -16,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+import static net.forthecrown.core.FtcDiscord.C_PUNISH;
+
 public class DiscordListener implements EventListener {
     private static final Logger LOGGER = Crown.logger();
 
@@ -30,7 +32,7 @@ public class DiscordListener implements EventListener {
             return;
         }
 
-        FtcDiscord.staffLog("Punishments", "Automated ban:");
+        FtcDiscord.staffLog(C_PUNISH, "Automated ban:");
         Punishments.handlePunish(
                 UserManager.getUser(id),
                 GrenadierUtils.wrap(Bukkit.getConsoleSender(), null),

@@ -38,8 +38,8 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
         json.add("sendFail", sendFail);
         json.add("cancelVanilla", cancelVanilla);
 
-        InteractionUtils.saveChecks(this, json.getSource());
-        InteractionUtils.saveActions(this, json.getSource());
+        UsablesUtils.saveChecks(this, json.getSource());
+        UsablesUtils.saveActions(this, json.getSource());
     }
 
     protected void reloadFrom(JsonWrapper json) {
@@ -47,12 +47,12 @@ public abstract class AbstractUsable extends AbstractJsonSerializer implements U
         cancelVanilla = json.getBool("cancelVanilla");
 
         try {
-            InteractionUtils.loadChecks(this, json.getSource());
+            UsablesUtils.loadChecks(this, json.getSource());
         } catch (CommandSyntaxException e) {
             e.printStackTrace();
         }
 
-        InteractionUtils.loadActions(this, json.getSource());
+        UsablesUtils.loadActions(this, json.getSource());
     }
 
     @Override

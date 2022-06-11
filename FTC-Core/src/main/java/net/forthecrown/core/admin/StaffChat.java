@@ -19,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
+import static net.forthecrown.core.FtcDiscord.C_STAFF;
+
 /**
  * Class representing the staff chat
  * <p>Exists because I was cleaning up the ChatEvents class lol</p>
@@ -51,7 +53,7 @@ public final class StaffChat {
                 .append(message)
                 .build();
 
-        FtcDiscord.staffLog("Staff", "{} **>** {}", ChatUtils.plainText(senderText), ChatUtils.LEGACY.serialize(message));
+        FtcDiscord.staffLog(C_STAFF, "{} **>** {}", ChatUtils.plainText(senderText), ChatUtils.LEGACY.serialize(message));
         send(text, !cmd);
     }
 

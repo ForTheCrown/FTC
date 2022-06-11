@@ -157,7 +157,7 @@ public class FtcRegionPoleGenerator implements RegionPoleGenerator {
         if (residency.size() == 1) {
             var v = residency.getEntries().entrySet().iterator().next();
             UUID id = v.getKey();
-            RegionResidency.ResEntry entry = v.getValue();
+            RegionResidency.Resident entry = v.getValue();
 
             CrownUser user = UserManager.getUser(id);
             Component nick = user.nickOrName();

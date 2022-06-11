@@ -130,6 +130,7 @@ public class FtcShopInteractionHandler implements ShopInteractionHandler {
         // Amount will be 0 for sessions that didn't pass the
         // interaction test
         if(session.getAmount() > 0) {
+            session.getShop().updateLastUse();
             session.getShop().getHistory().addEntry(session);
 
             if((session.getType().isAdmin() && FtcVars.logAdminShop.get())

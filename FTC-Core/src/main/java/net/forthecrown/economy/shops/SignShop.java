@@ -133,8 +133,8 @@ public interface SignShop extends InventoryHolder, Nameable {
      */
     ShopHistory getHistory();
 
-    long getLastStockEdit();
-    void updateLastEdit();
+    long getLastUse();
+    void updateLastUse();
 
     @Override
     boolean equals(Object o);

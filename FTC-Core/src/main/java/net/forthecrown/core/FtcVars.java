@@ -9,6 +9,9 @@ import org.bukkit.World;
 import static net.forthecrown.vars.VarRegistry.def;
 import static net.forthecrown.utils.TimeUtil.*;
 
+/**
+ * The Vars FTC uses stored as constants for easy access
+ */
 public final class FtcVars {
     static Var<Boolean>
             inDebugMode;

@@ -38,7 +38,6 @@ public abstract class ActionableBase extends CheckableBase implements Actionable
         key = FtcUtils.ensureBukkit(key);
         for (UsageActionInstance a: actions){
             if(!a.typeKey().equals(key)) continue;
-            if(!clazz.isAssignableFrom(a.getClass())) continue;
             return (T) a;
         }
 

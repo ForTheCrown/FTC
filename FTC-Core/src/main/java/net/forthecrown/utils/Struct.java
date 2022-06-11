@@ -6,6 +6,9 @@ package net.forthecrown.utils;
  * <p></p>
  * Child classes of Struct's should implement the interface as well, or not, depending on if they
  * intend to add functionality to the parent class.
+ *
+ * @deprecated Dumb lol
  */
+@Deprecated
 public interface Struct {
 }

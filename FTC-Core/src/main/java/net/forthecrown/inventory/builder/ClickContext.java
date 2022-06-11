@@ -25,9 +25,7 @@ public class ClickContext {
     private final ItemStack cursorItem;
     private final ClickType clickType;
 
-    private boolean shouldReload;
-    private boolean shouldCancelEvent;
-    private boolean shouldClose;
+    private boolean shouldReload, shouldCancelEvent, shouldClose;
     private int cooldownTime;
 
     public ClickContext(FtcInventory inventory, Player player, int slot, ItemStack cursorItem, ClickType type) {

@@ -576,17 +576,17 @@ public class CommandHolidays extends FtcCommand {
         FieldedWriter writer = FieldedWriter.wrap(w);
         writer.write(holiday.getFilteredName() + ": ");
 
-        writer.writeField("Name", holiday.getName());
+        writer.writeField("Name", holiday.getName(), true);
 
         if (!holiday.getRhines().isNone()) {
-            writer.writeField("Rhine reward", holiday.getRhines());
+            writer.writeField("Rhine reward", holiday.getRhines(), false);
         }
 
         if (!holiday.getGems().isNone()) {
-            writer.writeField("Gem reward", holiday.getGems());
+            writer.writeField("Gem reward", holiday.getGems(), false);
         }
 
-        writer.writeField("Period", holiday.getPeriod());
+        writer.writeField("Period", holiday.getPeriod(), false);
 
         if (!holiday.getMails().isEmpty()) {
             writer.newLine();
@@ -603,8 +603,8 @@ public class CommandHolidays extends FtcCommand {
 
         RewardContainer container = holiday.getContainer();
         FieldedWriter cWriter = FieldedWriter.wrap(writer.prefixedWriter(Component.text("  ")));
-        cWriter.writeField("Type", container.isChest() ? "Chest" : "Shulker");
-        cWriter.writeField("name", container.getName());
+        cWriter.writeField("Type", container.isChest() ? "Chest" : "Shulker", false);
+        cWriter.writeField("name", container.getName(), false);
 
         if (!container.getLore().isEmpty()) {
             cWriter.newLine();

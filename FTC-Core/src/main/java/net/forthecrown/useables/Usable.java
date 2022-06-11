@@ -32,7 +32,16 @@ public interface Usable extends Predicate<Player>, CrownSerializer, Deletable, C
      */
     void setSendFail(boolean send);
 
+    /**
+     * Sets if the usable should cancel the vanilla event
+     * @param cancelVanilla True, if the vanilla event should be cancelled, false otherwise
+     */
     void setCancelVanilla(boolean cancelVanilla);
 
+    /**
+     * Checks if this usable should cancel the vanilla interaction
+     * when this usable is used
+     * @return True, if the vanilla event should be cancelled, false otherwise
+     */
     boolean cancelVanillaInteraction();
 }

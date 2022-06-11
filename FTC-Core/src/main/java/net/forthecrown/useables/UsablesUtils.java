@@ -29,10 +29,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-//DO NOT EDIT THIS CLASS, IF YOU DO, THE CODE WONT COMPILE
-//?????????????????????????
-public final class InteractionUtils {
-    private InteractionUtils() {}
+public final class UsablesUtils {
+    private UsablesUtils() {}
 
     private static boolean isUsingHeldItem(StringReader reader) {
         return !reader.canRead() || reader.peek() == '-';

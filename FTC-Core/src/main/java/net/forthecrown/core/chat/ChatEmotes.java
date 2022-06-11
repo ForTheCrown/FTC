@@ -16,9 +16,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Stores, formats and provides suggestions for emotes
+ */
 public class ChatEmotes implements SuggestionProvider<CommandSource> {
     private final Object2ObjectMap<String, String> emoteMap = new Object2ObjectOpenHashMap<>();
 
+    /**
+     * Registers all emotes
+     */
     public void registerEmotes() {
         register("shrug", "¯\\\\_(ツ)_/¯");
         register("ughcry", "(ಥ﹏ಥ)");
@@ -45,6 +51,14 @@ public class ChatEmotes implements SuggestionProvider<CommandSource> {
         emoteMap.put(':' + key + ':', emote);
     }
 
+    /**
+     * Formats the given string's emotes if the source has
+     * the required permissions or if <code>ignorePerms == true</code>
+     * @param input The input to format
+     * @param source The source doing the formatting
+     * @param ignorePerms Whether to ignore the source's permissions
+     * @return The formatted input.
+     */
     public String format(String input, @Nullable CommandSender source, boolean ignorePerms) {
         if(ignorePerms || source == null || source.hasPermission(Permissions.DONATOR_3)) {
             for (Map.Entry<String, String> e: emoteMap.entrySet()) {

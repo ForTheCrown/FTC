@@ -9,7 +9,11 @@ import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
 
 import java.util.Objects;
 
+/**
+ * Class for world constants
+ */
 public interface Worlds {
+    // World names
     String
             OVERWORLD_NAME  = "world",
             END_NAME        = "world_the_end",
@@ -17,6 +21,7 @@ public interface Worlds {
             VOID_NAME       = "world_void",
             RESOURCE_NAME   = "world_resource";
 
+    // World keys
     NamespacedKey
             OVERWORLD_KEY   = ofLevelKey(Level.OVERWORLD),
             END_KEY         = ofLevelKey(Level.END),
@@ -24,6 +29,7 @@ public interface Worlds {
             VOID_KEY        = Keys.minecraft(VOID_NAME),
             RW_KEY          = Keys.minecraft(RESOURCE_NAME);
 
+    // Overworld Constant
     World   OVERWORLD       = nonNull(OVERWORLD_KEY);
 
     private static World nonNull(NamespacedKey key) {
@@ -34,18 +40,34 @@ public interface Worlds {
         return CraftNamespacedKey.fromMinecraft(key.location());
     }
 
+    /**
+     * Gets the void world
+     * @return The Void World
+     */
     static World voidWorld() {
         return nonNull(VOID_KEY);
     }
 
+    /**
+     * Gets the end
+     * @return The End World
+     */
     static World end() {
         return nonNull(END_KEY);
     }
 
+    /**
+     * Gets the resource world
+     * @return The Resource World
+     */
     static World resource() {
         return nonNull(RW_KEY);
     }
 
+    /**
+     * Gets the nether world
+     * @return The Nether world
+     */
     static World nether() {
         return nonNull(NETHER_KEY);
     }

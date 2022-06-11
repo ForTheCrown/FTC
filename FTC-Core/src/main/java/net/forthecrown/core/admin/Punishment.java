@@ -20,7 +20,9 @@ import java.util.Objects;
 import static net.forthecrown.core.admin.Punishments.INDEFINITE_EXPIRY;
 
 /**
- * A punishment
+ * A single punishment instance bestowed upon a player.
+ * <p>
+ * Bestowed is perhaps too generous of a word lol
  */
 public final class Punishment implements JsonSerializable {
     private final String source;

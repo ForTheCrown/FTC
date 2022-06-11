@@ -10,14 +10,12 @@ import lombok.Setter;
 import net.forthecrown.commands.CommandHome;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.ComponentWriter;
-import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.TimePrinter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.TimeUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
@@ -30,10 +28,20 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Stores data about users that live within a region
+ */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class RegionResidency {
+    /**
+     * Unknown move in time stamp, -1
+     */
     public static final long UNKNOWN_MOVEIN = -1;
 
+    /**
+     * All move in time stamps before this time stamp are considered
+     * invalid. Love having to compensate for my bad coding :D
+     */
     public static final long CUT_OFF_TIMESTAMP = Util.make(() -> {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(0L);
@@ -45,10 +53,15 @@ public class RegionResidency {
     @Getter private final PopulationRegion region;
 
     @Getter
-    private final Map<UUID, ResEntry> entries = new Object2ObjectOpenHashMap<>();
+    private final Map<UUID, Resident> entries = new Object2ObjectOpenHashMap<>();
 
-    public ResEntry getEntry(UUID uuid) {
-        return entries.computeIfAbsent(uuid, uuid1 -> new ResEntry());
+    /**
+     * Gets a residency entry for the given UUID
+     * @param uuid the UUID to get the entry of
+     * @return The gotten or created entry
+     */
+    public Resident getEntry(UUID uuid) {
+        return entries.computeIfAbsent(uuid, uuid1 -> new Resident());
     }
 
     public Tag save() {
@@ -58,7 +71,7 @@ public class RegionResidency {
             CompoundTag tag = new CompoundTag();
             tag.putUUID("resident", e.getKey());
 
-            ResEntry entry = e.getValue();
+            Resident entry = e.getValue();
 
             if (entry.isDirectResident()) {
                 tag.putLong("directMoveIn", entry.directMoveIn);
@@ -84,7 +97,7 @@ public class RegionResidency {
             CompoundTag tag = (CompoundTag) listT;
 
             UUID resident = tag.getUUID("resident");
-            ResEntry entry = new ResEntry();
+            Resident entry = new Resident();
 
             entry.directMoveIn = tag.getLong("directMoveIn");
 
@@ -102,7 +115,7 @@ public class RegionResidency {
 
     private void clearEmpty() {
         entries.entrySet().removeIf(entry -> {
-            ResEntry e = entry.getValue();
+            Resident e = entry.getValue();
             boolean notDirect = !e.isDirectResident();
             boolean noHomes = !e.hasHomes();
 
@@ -125,6 +138,10 @@ public class RegionResidency {
 
     private static final Logger LOGGER = Crown.logger();
 
+    /**
+     * Writes info about the region residency
+     * @param writer The writer to write the display info to
+     */
     public void write(ComponentWriter writer) {
         if(isEmpty()) return;
 
@@ -144,7 +161,7 @@ public class RegionResidency {
             index++;
 
             CrownUser user = UserManager.getUser(v.getKey());
-            ResEntry entry = v.getValue();
+            Resident entry = v.getValue();
             String transKey = "regions.reside.format.";
 
             if (entry.isDirectResident() || (entry.homes != null && entry.homes.containsKey(CommandHome.DEFAULT))) {
@@ -152,21 +169,7 @@ public class RegionResidency {
             }
 
             transKey += (user.isProfilePublic() ? "public" : "private");
-
             long time = entry.timeSinceMoveIn();
-
-            if(Crown.inDebugMode()) {
-                LOGGER.info("time: {}", time);
-                LOGGER.info("directMoveIn: {}, homes: {}", entry.directMoveIn, entry.homes);
-            }
-
-            HoverEvent hover = null;
-
-            if(Crown.inDebugMode()) {
-                hover = Component.text("TimeStamp: " + time + ", formatted: ")
-                        .append(FtcFormatter.formatDate(time))
-                        .asHoverEvent();
-            }
 
             writer.newLine();
             writer.write(Component.text(index + ") ", NamedTextColor.GOLD));
@@ -179,14 +182,13 @@ public class RegionResidency {
                                     Component.translatable("regions.reside.unknownTime")
                                     : new TimePrinter(time).printBiggest()
                             )
-                                    .hoverEvent(hover)
                                     .color(NamedTextColor.YELLOW)
                     )
             );
         }
     }
 
-    public static class ResEntry {
+    public static class Resident {
         @Setter @Getter
         private long directMoveIn;
 

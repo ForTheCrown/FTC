@@ -7,10 +7,23 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+/**
+ * A quick thing that {@link net.forthecrown.economy.shops.SignShop} used to
+ * use for its filenames. Currently only used by the {@link net.forthecrown.useables.UsableBlock}.
+ * <p>
+ * This class denotes a location saved as an underscore-separated string.
+ * Example: 'world_void_156_41_1265'
+ */
 public record LocationFileName(String world,
                                int x, int y, int z)
 {
 
+    /**
+     * Parses a location file name from the given string
+     * @param fName The string to parse
+     * @return The parsed result
+     * @throws IllegalStateException If the parsing failed
+     */
     public static LocationFileName parse(String fName) {
         try {
             // lastIndex meaning the index before the file type, so we don't read the .json at the end

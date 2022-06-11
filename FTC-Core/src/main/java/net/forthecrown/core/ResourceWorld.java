@@ -25,7 +25,7 @@ import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.TimeUtil;
 import net.forthecrown.utils.VanillaAccess;
 import net.forthecrown.utils.math.Vector3i;
-import net.forthecrown.utils.transformation.FtcBoundingBox;
+import net.forthecrown.utils.math.WorldBounds3i;
 import net.forthecrown.utils.world.WorldLoader;
 import net.forthecrown.utils.world.WorldReCreator;
 import net.kyori.adventure.key.Key;
@@ -51,36 +51,52 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
+import static net.forthecrown.core.FtcDiscord.C_RW;
+
 public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeListener {
     private static final Logger LOGGER = Crown.logger();
 
+    /**
+     * The distance a biome and flatness check should go,
+     * in QuartPos distance aka bit shifted twice to the right
+     */
     public static final int
-            // The distance a biome and flatness check should go,
-            // in QuartPos distance aka bit shifted twice to the right
             SPAWN_CHECK_QUART   = 5,
 
-            // The maximum Y a spawn can generate at, if we're above it,
-            // then we're most likely in a hilly area that is unfit to
-            // for a spawn
+            /**
+             * The maximum Y a spawn can generate at, if we're above it,
+             * then we're most likely in a hilly area that is unfit to
+             * for a spawn
+             */
             MAX_Y               = 75,
 
-            // The amount of WG region is bigger than the spawn
+            /**
+             * The amount of WG region is bigger than the spawn
+             */
             WG_OVERREACH        = 5,
 
-            // The amount the WG region is bigger than the spawn,
-            // on the Y axis, goes from MAX_Y to spawn_y_pos - WG_SIZE_Y
+            /**
+             * The amount the WG region is bigger than the spawn,
+             * on the Y axis, goes from MAX_Y to spawn_y_pos - WG_SIZE_Y
+             */
             WG_SIZE_Y           = 20,
 
-            // The max Y difference a potential spawn position can have
+            /**
+             * The max Y difference a potential spawn position can have
+             */
             MAX_Y_DIF           = 2;
 
-    // All legal biome categories that spawn can be in
+    /**
+     * All legal biome categories that spawn can be in
+     */
     public static final EnumSet<Biome.BiomeCategory> LEGAL_CATEGORIES = EnumSet.of(
             Biome.BiomeCategory.PLAINS,
             Biome.BiomeCategory.DESERT
     );
 
-    // Required biome types any potential seed must have within its world borders
+    /**
+     * Required biome types any potential seed must have within its world borders
+     */
     public static final EnumSet<Biome.BiomeCategory> REQUIRED_CATEGORIES = EnumSet.of(
             Biome.BiomeCategory.DESERT,
             Biome.BiomeCategory.FOREST,
@@ -95,7 +111,9 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
     public static final Heightmap.Types HEIGHT_MAP_TYPE = Heightmap.Types.OCEAN_FLOOR_WG;
     public static final HeightMap BUKKIT_HEIGHT_MAP = CraftHeightMap.fromNMS(HEIGHT_MAP_TYPE);
 
-    // An accessor that ChunkGenerator needs for a height check call
+    /**
+     * An accessor that ChunkGenerator needs for a height check call
+     */
     public static final LevelHeightAccessor HEIGHT_ACCESSOR = LevelHeightAccessor.create(FtcUtils.MIN_Y, FtcUtils.Y_SIZE);
 
     @Getter
@@ -141,7 +159,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         findSeed().whenComplete((seed, throwable) -> {
             if (throwable != null) {
                 StaffChat.send(Component.text("Error while attempting to find RW seed"), false);
-                FtcDiscord.staffLog("RW", "Error while attempting to find RW seed");
+                FtcDiscord.staffLog(C_RW, "Error while attempting to find RW seed");
                 LOGGER.error("Error while attempting to find seed, cannot open RW", throwable);
 
                 return;
@@ -169,7 +187,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         if (throwable != null) {
             StaffChat.send(Component.text("Error while resetting RW, cannot finish"), false);
             LOGGER.error("Could not regen Resource World", throwable);
-            FtcDiscord.staffLog("RW", "Error while resetting Resource World!");
+            FtcDiscord.staffLog(C_RW, "Error while resetting Resource World!");
             return;
         }
 
@@ -206,7 +224,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
 
             // Make sure there are no air blocks under
             // the spawn
-            FtcBoundingBox underArea = FtcBoundingBox.of(world, minUnder, maxUnder);
+            WorldBounds3i underArea = WorldBounds3i.of(world, minUnder, maxUnder);
             Orientable data = (Orientable) Material.STRIPPED_DARK_OAK_WOOD.createBlockData();
             data.setAxis(Axis.X);
 
@@ -310,7 +328,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
             lastReset = System.currentTimeMillis();
             LOGGER.info("RW reset finished");
 
-            FtcDiscord.staffLog("RW", "Resource World reset finished!");
+            FtcDiscord.staffLog(C_RW, "Resource World reset finished!");
         });
     }
 

@@ -21,32 +21,7 @@ public class VarRegistry {
     public static final Pattern ALLOWED_NAME = Pattern.compile("^[a-z_]\\w*$");
     private static final Object2ObjectMap<String, Var> COM_VARS = new Object2ObjectOpenHashMap<>();
 
-    static final Var<Boolean> SERIALIZE_UNSUSED = def("vars_saveUnused", VarTypes.BOOL, false);
-
-    /**
-     * Defines a variable. If this var is already defined, it sets the value of the var to the given one
-     * @param name The name of the variable
-     * @param type The variable's type
-     * @param value The variable's value
-     * @param <T> The variable's type
-     * @return The created var
-     */
-    public static <T> Var<T> set(@NotNull String name, @NotNull VarType<T> type, T value) {
-        validate(name, type);
-
-        Var<T> entry = COM_VARS.get(name);
-        boolean alreadyExists = entry != null;
-
-        if(alreadyExists && entry.getType() != type) {
-            throw new IllegalArgumentException("Mismatch between provided var type and already existing var type for " + name);
-        }
-
-        entry = alreadyExists ? entry.update(value) : type.createVar(name, value);
-        entry.used = true;
-        COM_VARS.put(name, entry);
-
-        return entry;
-    }
+    static final Var<Boolean> SERIALIZE_UNUSED = def("vars_saveUnused", VarTypes.BOOL, false);
 
     /**
      * Gets a plain var by the given name
@@ -110,6 +85,8 @@ public class VarRegistry {
 
         Var<T> var = COM_VARS.get(name);
 
+        // If var null -> it doesn't exist, if it does exist,
+        // check given type against var type
         if(var != null) {
             Validate.isTrue(var.getType() == type, "Existing type and given type did not match for comvar '" + name + "'");
             var.setDefaultValue(defValue);

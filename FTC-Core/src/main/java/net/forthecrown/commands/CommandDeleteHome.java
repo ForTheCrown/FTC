@@ -45,9 +45,13 @@ public class CommandDeleteHome extends FtcCommand {
                             UserHomes homes = user.getHomes();
                             HomeParseResult result = c.getArgument("home", HomeParseResult.class);
                             String name = result.getName();
+
+                            // Because of how the HomeParseResult works, we need to actually
+                            // get the home location for it to check permissions, because you
+                            // might've 'JulieWoolie:home' or something
                             Location l = result.getHome(c.getSource(), false);
 
-                            if(!homes.contains(name)) throw HomeArgument.UNKNOWN_HOME.create(Component.text("name"));
+                            if(!homes.contains(name)) throw HomeArgument.UNKNOWN_HOME.create(Component.text(name));
 
                             homes.remove(name);
                             user.sendMessage(Component.translatable("homes.deleted", Component.text(name).color(NamedTextColor.GOLD)).color(NamedTextColor.YELLOW));

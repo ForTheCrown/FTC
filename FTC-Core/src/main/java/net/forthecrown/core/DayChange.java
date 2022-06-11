@@ -12,6 +12,11 @@ import java.util.TimeZone;
 
 /**
  * DayUpdate listens to a change in the day.
+ * <p>
+ * <b>Word of warning</b>: Don't use the {@link Calendar} in the future,
+ * use {@link java.time.ZonedDateTime}, it's more up to date and
+ * easier to use and understand
+ * </p>
  */
 public class DayChange {
     private final List<DayChangeListener> listeners = new ArrayList<>();

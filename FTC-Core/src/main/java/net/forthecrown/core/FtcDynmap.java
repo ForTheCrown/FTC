@@ -11,6 +11,9 @@ import org.dynmap.markers.MarkerAPI;
 import org.dynmap.markers.MarkerIcon;
 import org.dynmap.markers.MarkerSet;
 
+/**
+ * A class for interacting with Dynmap easily
+ */
 public class FtcDynmap extends DynmapCommonAPIListener {
     private static DynmapCommonAPI api;
 
@@ -37,32 +40,61 @@ public class FtcDynmap extends DynmapCommonAPIListener {
         FtcDynmap.api = null;
     }
 
+    /**
+     * Gets or creates an icon with the given ID
+     * @param id The ID to use
+     * @return The gotten or created icon
+     */
     static MarkerIcon getOrCreate(String id) {
         MarkerIcon result = getMarkerAPI().getMarkerIcon(id);
 
         return result != null ? result : getMarkerAPI().createMarkerIcon(id, id, Crown.resource(id + ".png"));
     }
 
+    /**
+     * Gets the Dynmap API
+     * @return The Dynmap API
+     */
     public static DynmapCommonAPI getDynmap() {
         return api;
     }
 
+    /**
+     * Gets the Marker API
+     * @return The Marker API
+     */
     public static MarkerAPI getMarkerAPI() {
         return getDynmap().getMarkerAPI();
     }
 
+    /**
+     * Gets the normal pole icon
+     * @return The Normal pole icon
+     */
     public static MarkerIcon getNormalIcon() {
         return getOrCreate(NORMAL_LABEL);
     }
 
+    /**
+     * Gets the special pole icon
+     * @return The special pole icon
+     */
     public static MarkerIcon getSpecialIcon() {
         return getOrCreate(SPECIAL_LABEL);
     }
 
+    /**
+     * Checks if Dynmap is currently enabled
+     * @return True, if dynmap is enabled, false otherwise
+     */
     public static boolean isEnabled() {
         return enabled;
     }
 
+    /**
+     * Gets the region pole marker set
+     * @return The region pole marker set
+     */
     public static MarkerSet getRegionPoleSet() {
         MarkerSet set = _getRegionPoleSet();
 
@@ -76,10 +108,20 @@ public class FtcDynmap extends DynmapCommonAPIListener {
         return set == null ? getMarkerAPI().createMarkerSet(SET_NAME, SET_LABEL, null, true) : set;
     }
 
+    /**
+     * Gets the given region's Marker
+     * @param data The region to get the marker of
+     * @return The gotten marker, null, if the region has no marker
+     */
     public static Marker getMarker(PopulationRegion data) {
         return getRegionPoleSet().findMarker(data.getMarkerID());
     }
 
+    /**
+     * Creates a marker for the given region
+     * @param data The region to create a marker for
+     * @return The created marker
+     */
     public static Marker createMarker(PopulationRegion data) {
         BlockVector2 vec2 = data.getPolePosition();
 

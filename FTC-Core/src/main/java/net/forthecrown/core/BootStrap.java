@@ -23,7 +23,7 @@ import net.forthecrown.inventory.crown.Crowns;
 import net.forthecrown.inventory.weapon.RoyalWeapons;
 import net.forthecrown.regions.FtcRegionManager;
 import net.forthecrown.registry.Registries;
-import net.forthecrown.structure.FtcStructureManager;
+import net.forthecrown.structure.FtcStructSerializer;
 import net.forthecrown.useables.FtcUsablesManager;
 import net.forthecrown.useables.actions.UsageActions;
 import net.forthecrown.useables.checks.UsageChecks;
@@ -91,7 +91,7 @@ final class BootStrap {
         shopManager         = new FtcShopManager();
         regionManager       = new FtcRegionManager(FtcVars.getRegionWorld());
         usablesManager      = new FtcUsablesManager();
-        structureManager    = new FtcStructureManager();
+        structSerializer    = new FtcStructSerializer();
 
         punisher    = new FtcPunisher();
         markets     = new FtcMarkets();

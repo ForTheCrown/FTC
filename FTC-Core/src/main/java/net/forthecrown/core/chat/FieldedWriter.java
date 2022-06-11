@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
 
+import java.util.Objects;
+
 public interface FieldedWriter extends ComponentWriter {
     default void writeField(String field, Component value) {
         newLine();
@@ -14,9 +16,9 @@ public interface FieldedWriter extends ComponentWriter {
         write(value);
     }
 
-    default void writeField(String field, Object value) {
+    default void writeField(String field, Object value, boolean formatColors) {
         if(value == null) return;
-        writeField(field, ChatUtils.convertString(value.toString(), false));
+        writeField(field, ChatUtils.convertString(Objects.toString(value.toString()), formatColors));
     }
 
 

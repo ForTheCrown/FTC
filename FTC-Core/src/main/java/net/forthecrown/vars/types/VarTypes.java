@@ -9,7 +9,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.World;
 
 /**
- * Class which stores ComVarType constants for easy access.
+ * Class which stores {@link VarType} constants for easy access.
  */
 public interface VarTypes {
     VarType<Short>      SHORT       = new PrimitiveVarType<>(Short.class, r -> (short) r.readInt(),       JsonPrimitive::new,     JsonElement::getAsShort);
@@ -29,5 +29,9 @@ public interface VarTypes {
     VarType<Long>       TIME        = new TimeIntervalVarType();
 
     // Empty initializer method
+    //
+    // Called before anything else
+    // to initialize the constants
+    // in the class
     static void init() {}
 }

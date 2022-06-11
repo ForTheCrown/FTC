@@ -1,6 +1,7 @@
 package net.forthecrown.inventory;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import lombok.Getter;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.ItemLoreBuilder;
@@ -15,8 +16,13 @@ import java.util.UUID;
 
 public abstract class RoyalItem {
     private final String tagKey;
+
+    @Getter
     private UUID owner;
+
+    @Getter
     protected final ItemStack item;
+
     private int loreStart;
     private int loreEnd;
 
@@ -44,10 +50,6 @@ public abstract class RoyalItem {
         this.loreEnd = tag.getInt("lore_end");
 
         readNBT(tag);
-    }
-
-    public UUID getOwner() {
-        return owner;
     }
 
     public void update() {
@@ -97,10 +99,6 @@ public abstract class RoyalItem {
 
     public boolean hasPlayerOwner() {
         return owner != null && owner != Util.NIL_UUID;
-    }
-
-    public ItemStack getItem() {
-        return item;
     }
 
     public CompoundTag getData() {

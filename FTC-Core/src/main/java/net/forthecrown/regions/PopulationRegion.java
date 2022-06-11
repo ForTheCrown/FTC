@@ -308,6 +308,10 @@ public class PopulationRegion implements RegionAccess {
         this.name = name;
     }
 
+    /**
+     * Sets the name's color
+     * @param nameColor The new name color
+     */
     public void setNameColor(TextColor nameColor) {
         this.nameColor = nameColor;
     }
@@ -343,6 +347,10 @@ public class PopulationRegion implements RegionAccess {
         return !residency.isEmpty() || !FtcUtils.isNullOrBlank(name) || polePosition != null;
     }
 
+    /**
+     * Gets the pole's bottom position
+     * @return The pole's bottom position
+     */
     public WorldVec3i getPoleBottom() {
         BlockVector2 vec2 = getPolePosition();
 

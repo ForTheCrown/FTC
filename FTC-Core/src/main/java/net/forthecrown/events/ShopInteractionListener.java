@@ -75,7 +75,7 @@ public class ShopInteractionListener implements Listener {
                 shopInv.addItem(item);
             }
 
-            shop.updateLastEdit();
+            shop.updateLastUse();
             shop.update();
         }
     }

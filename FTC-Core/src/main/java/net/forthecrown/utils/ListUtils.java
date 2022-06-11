@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
+/**
+ * Utilities relating to lists and collections, mostly involving either
+ * converting lists from one type to another or joining lists together
+ * into strings
+ */
 public final class ListUtils {
     private ListUtils() {}
 

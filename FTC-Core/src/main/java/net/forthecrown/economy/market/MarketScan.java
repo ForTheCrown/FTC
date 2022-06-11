@@ -21,6 +21,9 @@ import org.bukkit.block.Block;
 
 import java.util.List;
 
+/**
+ * A scan of a market
+ */
 @RequiredArgsConstructor
 public class MarketScan implements JsonSerializable {
     public static final Var<Byte> REQUIRED_RATIO = Var.def("markets_requiredStockPercent", VarTypes.BYTE, (byte) 20);
@@ -34,6 +37,9 @@ public class MarketScan implements JsonSerializable {
         RES_NOT_ENOUGH_SHOPS = 2,
         RES_INACTIVE         = 3;
 
+    /**
+     * Scan failure reasons, index corresponds to {@link #getResult()} return value
+     */
     public static final Component[] REASONS = {
             Component.text("Shops are not stocked"),
             null,
@@ -49,6 +55,7 @@ public class MarketScan implements JsonSerializable {
     }
 
     public int getResult() {
+        // Less than enough shops
         if (shopScans.size() < MIN_SHOP_AMOUNT.get()) {
             return RES_NOT_ENOUGH_SHOPS;
         }
@@ -60,10 +67,12 @@ public class MarketScan implements JsonSerializable {
         float fillPercent = (float) avg.occupied / avg.totalSpace;
         float requiredPercent = (float) avg.required / avg.totalSpace;
 
+        // Not enough stocked shops
         if (requiredPercent > fillPercent) {
             return RES_NOT_STOCKED;
         }
 
+        // Shops are used/stocked frequently enough
         if (combined.lastEdit != -1 && TimeUtil.timeSince(combined.lastEdit) > INACTIVITY_TIME.get()) {
             return RES_INACTIVE;
         }
@@ -85,6 +94,11 @@ public class MarketScan implements JsonSerializable {
         return result;
     }
 
+    /**
+     * Scans a given area
+     * @param area The area to scan
+     * @return The scan result
+     */
     public static MarketScan scanArea(WorldBounds3i area) {
         ObjectList<SingleShopScan> scans = new ObjectArrayList<>();
         long time = System.currentTimeMillis();
@@ -105,7 +119,7 @@ public class MarketScan implements JsonSerializable {
                 occupiedSpace += i.getAmount();
             }
 
-            scans.add(new SingleShopScan(totalSpace, required, occupiedSpace, shop.getLastStockEdit()));
+            scans.add(new SingleShopScan(totalSpace, required, occupiedSpace, shop.getLastUse()));
         }
 
         return new MarketScan(scans, time);

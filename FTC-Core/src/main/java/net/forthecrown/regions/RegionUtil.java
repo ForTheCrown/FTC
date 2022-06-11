@@ -5,7 +5,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.FtcVars;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.Bounds3i;
@@ -71,6 +70,12 @@ public final class RegionUtil {
         };
     }
 
+    /**
+     * Gets the bottom position of a pole
+     * @param world The world the pole is in
+     * @param vec2 The position of the pole
+     * @return The pole's position
+     */
     public static WorldVec3i bottomOfPole(World world, BlockVector2 vec2) {
         int y = world.getHighestBlockYAt(vec2.getX(), vec2.getZ(), HeightMap.WORLD_SURFACE);
         WorldVec3i vec3i = new WorldVec3i(world, vec2.getX(), y, vec2.getZ());
@@ -79,6 +84,12 @@ public final class RegionUtil {
         return result == null ? findBottomLazy(vec3i) : result;
     }
 
+    /**
+     * Checks if the given 2D position is a valid place for a region post
+     * @param region The region the pole is for
+     * @param vec The place to put the pole
+     * @return True, if the pole is not outside the region and is more than 5 blocks away from the edge
+     */
     public static boolean isValidPolePosition(PopulationRegion region, BlockVector2 vec) {
         WorldBounds3i valid = region.getBB().contract(5);
 
@@ -86,22 +97,47 @@ public final class RegionUtil {
                 MathUtil.inRange(vec.getZ(), valid.minZ(), valid.maxZ());
     }
 
+    /**
+     * Validates that the given world is the region world
+     * @param world The world to check
+     * @throws CommandSyntaxException If the world is not the region world
+     */
     public static void validateWorld(World world) throws CommandSyntaxException {
         if(!world.equals(FtcVars.getRegionWorld())) throw FtcExceptionProvider.regionsWrongWorld();
     }
 
+    /**
+     * Checks if the given user is in a valid distance to the pole
+     * @param pole The pole's position
+     * @param user The user
+     * @return True, if the user has the {@link Permissions#REGIONS_ADMIN} permission or is close to the pole
+     */
     public static boolean isCloseToPoleOrOp(BlockVector2 pole, CrownUser user) {
-        if(user.hasPermission(Permissions.REGIONS_ADMIN)) return true;
-
-        return isCloseToPole(pole, user);
+        return isCloseToPole(pole, user) || user.hasPermission(Permissions.REGIONS_ADMIN);
     }
 
+    /**
+     * Checks if the given user is within a valid distance to the
+     * given pole position
+     *
+     * @param pole The pole's position
+     * @param user The user
+     * @return True, if the user is closer than {@link RegionConstants#DISTANCE_TO_POLE} to the pole.
+     */
     public static boolean isCloseToPole(BlockVector2 pole, CrownUser user) {
         BlockVector2 vec2 = user.get2DLocation();
         return vec2.distance(pole) <= DISTANCE_TO_POLE;
     }
 
-    public static void validateDistance(BlockVector2 pole, CrownUser user) throws RoyalCommandException {
+    /**
+     * Checks if the user has the required permission or is close enough
+     * to the given pole
+     *
+     * @param pole The pole's position
+     * @param user The user
+     * @throws CommandSyntaxException If user either doesn't have the permission or isn't close enough
+     */
+    public static void validateDistance(BlockVector2 pole, CrownUser user) throws CommandSyntaxException {
         if(!isCloseToPoleOrOp(pole, user)) {
             throw FtcExceptionProvider.translatable("regions.tooFar",
                     Component.text("x = " + pole.getX() + " z = " + pole.getZ())
@@ -118,6 +154,6 @@ public final class RegionUtil {
     }
 
     public static int getPoleTop(PopulationRegion data) {
-        return data != null ? ((PopulationRegion) data).getPoleBoundingBox().maxY() : FtcUtils.MAX_Y;
+        return data != null ? data.getPoleBoundingBox().maxY() : FtcUtils.MAX_Y;
     }
 }

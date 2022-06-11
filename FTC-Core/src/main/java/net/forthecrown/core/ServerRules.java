@@ -2,6 +2,7 @@ package net.forthecrown.core;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import lombok.Getter;
 import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -12,7 +13,11 @@ import net.kyori.adventure.text.format.TextDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Holds the server's rules and displays them
+ */
 public class ServerRules extends FtcConfig.ConfigSection {
+    @Getter
     private final List<Component> rules = new ArrayList<>();
 
     public ServerRules(){
@@ -22,7 +27,7 @@ public class ServerRules extends FtcConfig.ConfigSection {
     }
 
     //Displays the rules
-    public Component display(){
+    public Component display() {
         Component border = Component.text("          ").style(Style.style(NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
         TextComponent.Builder builder = Component.text()
                 .append(border)

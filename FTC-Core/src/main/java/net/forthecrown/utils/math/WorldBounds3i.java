@@ -47,6 +47,17 @@ public class WorldBounds3i extends AbstractBounds3i<WorldBounds3i> implements It
         );
     }
 
+    public static WorldBounds3i of(World world, ImmutableVector3i vec1, ImmutableVector3i vec2) {
+        return new WorldBounds3i(world,
+                vec1.getX(),
+                vec1.getY(),
+                vec1.getZ(),
+                vec2.getX(),
+                vec2.getY(),
+                vec2.getZ()
+        );
+    }
+
     public static WorldBounds3i of(CompoundTag tag) {
         int[] cords = tag.getIntArray("cords");
         World world = Bukkit.getWorld(tag.getString("world"));

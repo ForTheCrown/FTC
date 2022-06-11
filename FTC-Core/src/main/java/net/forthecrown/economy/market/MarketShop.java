@@ -146,8 +146,16 @@ public interface MarketShop extends JsonSerializable, Nameable, Struct, Taxable 
      */
     ObjectList<String> getConnectedNames();
 
+    /**
+     * Gets the past scans of this market
+     * @return Previous market scans
+     */
     ObjectList<MarketScan> getScans();
 
+    /**
+     * Checks if this market should run a scan
+     * @return True, if a new scan should be run on this market
+     */
     default boolean shouldRunScan() {
         if (getScans().isEmpty()) {
             long since = TimeUtil.timeSince(getDateOfPurchase().getTime());
@@ -159,12 +167,35 @@ public interface MarketShop extends JsonSerializable, Nameable, Struct, Taxable 
         return TimeUtil.hasCooldownEnded(MarketScan.SCAN_INTERVAL.get(), s.getScanTime());
     }
 
+    /**
+     * Sets the eviction data
+     * @param data The new eviction data, null, to cancel eviction
+     */
     void setEviction(MarketEviction data);
+
+    /**
+     * Gets the current eviction data
+     * @return Current eviction data, null, if the shop isn't being evicted
+     */
     MarketEviction getEviction();
 
+    /**
+     * Sets if members are allowed to edit shops
+     * @param b If member editing is allowed
+     */
     void setMemberEditingAllowed(boolean b);
+
+    /**
+     * Gets if co-owners of this shop are allowed to edit
+     * each other's shops
+     * @return If sign shops' editing by co-owners is allowed
+     */
     boolean isMemberEditingAllowed();
 
+    /**
+     * Checks if this market is marked for eviction
+     * @return True, if the market is marked for eviction
+     */
     default boolean markedForEviction() {
         return getEviction() != null;
     }

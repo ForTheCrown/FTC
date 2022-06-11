@@ -36,10 +36,20 @@ public interface Registry<T> extends BaseRegistry<T, T>, Iterable<T>, Keyed {
       */
     Key getKey(T val);
 
+     /**
+      * Reads a registry key from the given JSON element
+      * @param element the JSON element to read
+      * @return The found entry
+      */
     default T read(JsonElement element) {
         return get(JsonUtils.readKey(element));
     }
 
+     /**
+      * Reads a registry key from the given NBT tag
+      * @param tag The NBT tag to read
+      * @return The found entry
+      */
     default T read(Tag tag) {
         return get(Keys.parse(tag.getAsString()));
     }

@@ -1,8 +1,13 @@
 package net.forthecrown.utils;
 
+/**
+ * A class with utility functions and constants
+ * relating to time.
+ */
 public final class TimeUtil {
     private TimeUtil() {}
 
+    // Time constants
     public static final long
             TICKS_IN_MILLIS     = 50,
             SECOND_IN_MILLIS    = 1000,
@@ -10,7 +15,7 @@ public final class TimeUtil {
             HOUR_IN_MILLIS      = MINUTE_IN_MILLIS * 60,
             DAY_IN_MILLIS       = HOUR_IN_MILLIS * 24,
             WEEK_IN_MILLIS      = DAY_IN_MILLIS * 7,
-            MONTH_IN_MILLIS     = WEEK_IN_MILLIS * 4,
+            MONTH_IN_MILLIS     = WEEK_IN_MILLIS * 4,  // This one is not 100% accurate as months change length
             YEAR_IN_MILLIS      = DAY_IN_MILLIS * 365;
 
     public static long millisToTicks(long millis) {

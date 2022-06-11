@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.core.Crown;
 import net.forthecrown.useables.CheckableBase;
-import net.forthecrown.useables.InteractionUtils;
+import net.forthecrown.useables.UsablesUtils;
 import net.forthecrown.useables.checks.UsageCheckInstance;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
@@ -31,7 +31,7 @@ public class FtcWarp extends CheckableBase implements Warp {
 
         this.key = key;
         this.location = JsonUtils.readLocation(json.getAsJsonObject("location"));
-        InteractionUtils.loadChecks(this, json);
+        UsablesUtils.loadChecks(this, json);
     }
 
     public FtcWarp(Key name, Location location){
@@ -90,7 +90,7 @@ public class FtcWarp extends CheckableBase implements Warp {
 
         result.add("location", JsonUtils.writeLocation(location));
 
-        InteractionUtils.saveChecks(this, result);
+        UsablesUtils.saveChecks(this, result);
         return result;
     }
 

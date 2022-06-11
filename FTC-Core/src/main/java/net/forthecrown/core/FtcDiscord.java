@@ -4,7 +4,6 @@ import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.util.DiscordUtil;
 import net.forthecrown.core.chat.ChatUtils;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 
 /**
@@ -14,13 +13,20 @@ import org.bukkit.Bukkit;
 public final class FtcDiscord {
     private FtcDiscord() {}
 
-    private static final Logger LOGGER = Crown.logger();
-
     public static final String
+            // Channel names
             UPDATE_CHANNEL  = "updates",
             GENERAL_CHANNEL = "chat",
             STAFF_CHAT      = "cool-club",
-            STAFF_LOG       = "staff-log";
+            STAFF_LOG       = "staff-log",
+
+            // Staff Log categories
+            C_STAFF         = "Staff",
+            C_PUNISH        = "Punishments",
+            C_END           = "End",
+            C_RW            = "RW",
+            C_SERVER        = "Server",
+            C_MARKETS       = "Markets";
 
     public static DiscordSRV getHandle() {
         return DiscordSRV.getPlugin();
@@ -47,6 +53,12 @@ public final class FtcDiscord {
         return getTextChannel(STAFF_CHAT);
     }
 
+    /**
+     * Sends a message to the staff log
+     * @param cat The category of the message
+     * @param msg The message itself. Keep in mind the argument format is the same used by Log4J
+     * @param args The message arguments
+     */
     public static void staffLog(String cat, String msg, Object... args) {
         if (!Bukkit.getPluginManager().isPluginEnabled("DiscordSRV")) return;
         if (!FtcVars.staffLogEnabled.get()) return;

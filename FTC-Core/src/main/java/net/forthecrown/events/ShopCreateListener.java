@@ -183,7 +183,7 @@ public class ShopCreateListener implements Listener {
                             .build()
             );
 
-            shop.updateLastEdit();
+            shop.updateLastUse();
             shop.update();
         }
     }

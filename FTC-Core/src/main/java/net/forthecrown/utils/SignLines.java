@@ -4,6 +4,10 @@ import net.forthecrown.core.chat.ChatUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.block.Sign;
 
+/**
+ * A small data class to store the data written on a
+ * sign or data which can be applied to a sign
+ */
 public record SignLines(Component line0, Component line1, Component line2, Component line3) {
     public static final SignLines EMPTY = new SignLines(Component.empty(), Component.empty(), Component.empty(), Component.empty());
 
@@ -20,6 +24,10 @@ public record SignLines(Component line0, Component line1, Component line2, Compo
         );
     }
 
+    /**
+     * Sets the given sign's lines this instance's lines
+     * @param sign The sign to edit
+     */
     public void apply(Sign sign) {
         sign.line(0, emptyIfNull(line0));
         sign.line(1, emptyIfNull(line1));

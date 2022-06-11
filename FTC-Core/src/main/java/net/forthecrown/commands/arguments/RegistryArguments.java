@@ -11,7 +11,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.commands.manager.FtcSuggestionProvider;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.admin.JailCell;
-import net.forthecrown.core.animation.BlockAnimation;
 import net.forthecrown.cosmetics.arrows.ArrowEffect;
 import net.forthecrown.cosmetics.deaths.DeathEffect;
 import net.forthecrown.cosmetics.travel.TravelEffect;
@@ -34,7 +33,6 @@ import org.bukkit.NamespacedKey;
 import java.util.concurrent.CompletableFuture;
 
 public class RegistryArguments<T> implements ArgumentType<T>, VanillaMappedArgument {
-    private static final RegistryArguments<BlockAnimation> ANIMATION =     new RegistryArguments<>(Registries.ANIMATIONS, "Animation");
     private static final RegistryArguments<BlockStructure> STRUCTURE = new RegistryArguments<>(Registries.STRUCTURES, "Structure");
 
     private static final RegistryArguments<ArrowEffect> ARROW_EFFECT =  new RegistryArguments<>(Registries.ARROW_EFFECTS, "Arrow Effect");
@@ -53,10 +51,6 @@ public class RegistryArguments<T> implements ArgumentType<T>, VanillaMappedArgum
     private static final RegistryArguments<WeaponAbility.Type> WEAPON_ABILITY = new RegistryArguments<>(Registries.WEAPON_ABILITIES, "Weapon ability");
 
     private static final RegistryArguments<JailCell> JAIL_CELL = new RegistryArguments<>(Registries.JAILS, "Jail Cell");
-
-    public static RegistryArguments<BlockAnimation> animation() {
-        return ANIMATION;
-    }
 
     public static RegistryArguments<ArrowEffect> arrowEffect() {
         return ARROW_EFFECT;

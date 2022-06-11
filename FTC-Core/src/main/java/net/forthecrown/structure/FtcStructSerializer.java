@@ -10,8 +10,8 @@ import net.minecraft.nbt.Tag;
 
 import java.util.Map;
 
-public class FtcStructureManager extends AbstractNbtSerializer {
-    public FtcStructureManager() {
+public class FtcStructSerializer extends AbstractNbtSerializer {
+    public FtcStructSerializer() {
         super("structures");
 
         reload();

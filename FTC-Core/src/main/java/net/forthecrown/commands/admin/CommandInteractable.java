@@ -100,7 +100,7 @@ public class CommandInteractable extends FtcCommand {
                 );
     }
 
-    private LiteralArgumentBuilder<CommandSource> editArg(InteractionUtils.BrigadierFunction<Usable> supplier){
+    private LiteralArgumentBuilder<CommandSource> editArg(UsablesUtils.BrigadierFunction<Usable> supplier){
         return literal("edit")
                 .then(actionsArgument(supplier::apply))
                 .then(checksArgument(supplier::apply))
@@ -133,7 +133,7 @@ public class CommandInteractable extends FtcCommand {
                         )
                 );
     }
-    private LiteralArgumentBuilder<CommandSource> removeArg(InteractionUtils.BrigadierFunction<Usable> supplier){
+    private LiteralArgumentBuilder<CommandSource> removeArg(UsablesUtils.BrigadierFunction<Usable> supplier){
         return literal("remove")
                 .executes(c -> {
                     Usable interactable = supplier.apply(c);
@@ -159,7 +159,7 @@ public class CommandInteractable extends FtcCommand {
         return Crown.getUsables().getBlock(b.getLocation());
     }
 
-    public LiteralArgumentBuilder<CommandSource> checksArgument(InteractionUtils.BrigadierFunction<Checkable> p) {
+    public LiteralArgumentBuilder<CommandSource> checksArgument(UsablesUtils.BrigadierFunction<Checkable> p) {
         LiteralArgumentBuilder<CommandSource> result = literal("checks");
         addArguments(result, p, UsableAccessor.CHECKABLE);
 
@@ -178,7 +178,7 @@ public class CommandInteractable extends FtcCommand {
                         )
                 );
     }
-    public LiteralArgumentBuilder<CommandSource> actionsArgument(InteractionUtils.BrigadierFunction<Actionable> p) {
+    public LiteralArgumentBuilder<CommandSource> actionsArgument(UsablesUtils.BrigadierFunction<Actionable> p) {
         LiteralArgumentBuilder<CommandSource> result = literal("actions");
         addArguments(result, p, UsableAccessor.ACTIONABLE);
 
@@ -199,7 +199,7 @@ public class CommandInteractable extends FtcCommand {
     }
 
     private <T extends UsageType, V extends UsableObject> void addArguments(LiteralArgumentBuilder<CommandSource> args,
-                                                                            InteractionUtils.BrigadierFunction<V> p,
+                                                                            UsablesUtils.BrigadierFunction<V> p,
                                                                             UsableAccessor<T ,V> acc
     ) {
         args

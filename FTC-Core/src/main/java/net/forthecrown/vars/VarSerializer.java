@@ -16,6 +16,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * A class that serializes all non-transient, used variables.
+ *
+ * The current implementation of the serializer uses a format
+ * in which everything is placed into a JSON object where each
+ * entry is a type's key and its value a JSON object. The entries
+ * in that object are variables and their serialized values
+ */
 public class VarSerializer {
     private static final Logger LOGGER = Crown.logger();
 
@@ -46,8 +54,13 @@ public class VarSerializer {
         return JsonWrapper.of(JsonUtils.readFileObject(f));
     }
 
+    /**
+     * Loads all variables into the given variable map
+     * @param comvarMap The map to load into
+     */
     static void load(Map<String, Var> comvarMap) {
         JsonWrapper json;
+
         try {
             json = read();
         } catch (IOException e) {
@@ -55,6 +68,7 @@ public class VarSerializer {
             return;
         }
 
+        // Initial JSON object, keys = types
         for (Map.Entry<String, JsonElement> e: json.entrySet()) {
             JsonObject values = e.getValue().getAsJsonObject();
             Key typeKey = Keys.parse(e.getKey());
@@ -65,28 +79,38 @@ public class VarSerializer {
                 continue;
             }
 
+            // Sub JSON object, entries = variables
             for (Map.Entry<String, JsonElement> val: values.entrySet()) {
                 String key = val.getKey();
 
                 if(!VarRegistry.isValidName(key)) {
-                    LOGGER.warn("Found illegally named comvar in JSON, ignoring. name: '{}', section: '{}'", key, typeKey.asString());
+                    LOGGER.warn("Found illegally named var in JSON, ignoring. name: '{}', section: '{}'", key, typeKey.asString());
                     continue;
                 }
 
-                Object deserialized = type.deserialize(val.getValue());
+                try {
+                    Object deserialized = type.deserialize(val.getValue());
 
-                Var v = comvarMap.computeIfAbsent(val.getKey(), s -> new Var(type, s, deserialized));
-                v.update(deserialized);
+                    Var v = comvarMap.computeIfAbsent(val.getKey(), s -> new Var(type, s, deserialized));
+                    v.update(deserialized);
+                } catch (Exception exc) {
+                    LOGGER.error("Couldn't load variable named: " + key + ", type: " + typeKey, exc);
+                }
             }
         }
     }
 
+    /**
+     * Save all variables in the given variable collection
+     * @param values The values to save
+     */
     static void save(Collection<Var> values) {
         JsonWrapper json = JsonWrapper.empty();
 
         for (Var v: values) {
+            // If the var is transient or its not used then skip it
             if(v.isTransient()) continue;
-            if (!v.used && !VarRegistry.SERIALIZE_UNSUSED.get()) continue;
+            if (!v.used && !VarRegistry.SERIALIZE_UNUSED.get()) continue;
 
             VarType t = v.getType();
             JsonWrapper section = json.getWrappedNonNull(t.key().asString());
@@ -99,7 +123,7 @@ public class VarSerializer {
         try {
             JsonUtils.writeFile(json.getSource(), f);
         } catch (IOException e) {
-            LOGGER.error("Couldn't write Comvar file", e);
+            LOGGER.error("Couldn't write Var file", e);
         }
     }
 }

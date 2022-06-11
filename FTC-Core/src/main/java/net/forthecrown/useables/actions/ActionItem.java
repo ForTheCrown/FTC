@@ -8,7 +8,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.forthecrown.core.Keys;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.InteractionUtils;
+import net.forthecrown.useables.UsablesUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import org.bukkit.NamespacedKey;
@@ -31,7 +31,7 @@ public class ActionItem implements UsageAction<ActionItem.ActionInstance> {
 
     @Override
     public ActionInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
-        return new ActionInstance(InteractionUtils.parseGivenItem(source, reader), add);
+        return new ActionInstance(UsablesUtils.parseGivenItem(source, reader), add);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ActionItem implements UsageAction<ActionItem.ActionInstance> {
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return InteractionUtils.listItems(context, builder);
+        return UsablesUtils.listItems(context, builder);
     }
 
     public static class ActionInstance implements UsageActionInstance {

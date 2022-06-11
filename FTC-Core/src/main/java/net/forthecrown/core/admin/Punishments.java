@@ -22,6 +22,8 @@ import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
+import static net.forthecrown.core.FtcDiscord.C_PUNISH;
+
 /**
  * A general utility class for easisly accessing
  * methods for the punishment and pardoning of users
@@ -159,7 +161,7 @@ public final class Punishments {
         );
 
         // Log punishment on Staff log
-        FtcDiscord.staffLog("Punishments", "**{} {} {}**, reason: ``{}``, length: **{}**",
+        FtcDiscord.staffLog(C_PUNISH, "**{} {} {}**, reason: ``{}``, length: **{}**",
                 source.textName(),
                 type.nameEndingED(),
                 target.getNickOrName(),
@@ -233,7 +235,7 @@ public final class Punishments {
                         .append(target.nickDisplayName().color(NamedTextColor.YELLOW))
         );
 
-        FtcDiscord.staffLog("Punishments", "{} Un{} {}", source.textName(), type.nameEndingED().toLowerCase(), target.getNickOrName());
+        FtcDiscord.staffLog(C_PUNISH, "{} Un{} {}", source.textName(), type.nameEndingED().toLowerCase(), target.getNickOrName());
     }
 
     private static void _announce(CommandSource source, CrownUser target, Component text) {

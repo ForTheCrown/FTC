@@ -7,6 +7,9 @@ import org.apache.commons.lang3.Validate;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ *
+ */
 public interface PriceModifier {
     void changePrice(PriceModificationContext context);
 

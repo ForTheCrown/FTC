@@ -16,6 +16,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
+import static net.forthecrown.core.FtcDiscord.C_MARKETS;
+
 @RequiredArgsConstructor
 public class MarketEviction implements JsonSerializable {
     public static final byte
@@ -88,7 +90,7 @@ public class MarketEviction implements JsonSerializable {
                 )
         );
 
-        FtcDiscord.staffLog("Markets", "{}, owner '{}', evicted", market.getName(), owner.getNickOrName());
+        FtcDiscord.staffLog(C_MARKETS, "{}, owner '{}', evicted", market.getName(), owner.getNickOrName());
 
         markets.unclaim(market, true);
     }

@@ -81,7 +81,6 @@ public final class FtcCommands {
         new CommandTime();
         new CommandNPC();
         new CommandLaunch();
-        new CommandAnimation();
         new CommandFtcStruct();
         new CommandGetOffset();
         new CommandItemStacks();

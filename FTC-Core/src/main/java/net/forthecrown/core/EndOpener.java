@@ -36,6 +36,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static net.forthecrown.core.FtcDiscord.C_END;
+
 /**
  * The end opener should automatically close and open the end portal in
  * Hazelguard.
@@ -157,7 +159,7 @@ public class EndOpener extends FtcConfig.ConfigSection implements DayChangeListe
         Component message = open ? openMessage : closeMessage;
         Crown.getAnnouncer().announce(message);
 
-        FtcDiscord.staffLog("End", "End is now " + (open ? "open" : "closed"));
+        FtcDiscord.staffLog(C_END, "End is now " + (open ? "open" : "closed"));
     }
 
     // Lever on = closed, lever off = open. AKA, flip the input

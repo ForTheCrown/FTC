@@ -22,7 +22,7 @@ import java.util.function.Predicate;
  * The staff tool to spy on users >:)
  * <p></p>
  * Why does Essentials call this SocialSpy, why do you
- * wanna be the SS bro???
+ * wanna be the SS bro??? Bit sus
  */
 public class EavesDropper {
 

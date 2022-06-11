@@ -9,6 +9,11 @@ import net.forthecrown.serializer.JsonWrapper;
 import java.io.*;
 import java.util.Map;
 
+/**
+ * A class for ensuring a file has what it's meant to have
+ * by default
+ * @param <T> The
+ */
 public interface FileDefaults<T> {
     FileDefaults<JsonWrapper> JSON = new FileDefaults<>() {
         @Override

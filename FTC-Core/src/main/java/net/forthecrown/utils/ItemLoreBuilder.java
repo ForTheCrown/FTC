@@ -8,6 +8,10 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.List;
 
+/**
+ * A small and quick utility class to help to add lore
+ * to an item.
+ */
 public class ItemLoreBuilder {
     private final List<Component> lore;
 

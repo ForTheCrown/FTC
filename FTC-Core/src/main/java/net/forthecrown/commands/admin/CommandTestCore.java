@@ -11,8 +11,6 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.manager.FtcExceptionProvider;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.animation.AnimationBuilder;
-import net.forthecrown.core.animation.BlockAnimation;
 import net.forthecrown.core.chat.ChatUtils;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.core.chat.TimePrinter;
@@ -35,14 +33,11 @@ import net.forthecrown.user.CrownUser;
 import net.forthecrown.utils.CrownRandom;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.math.Vector3i;
-import net.forthecrown.utils.math.Vector3iOffset;
 import net.forthecrown.utils.math.WorldBounds3i;
-import net.forthecrown.utils.transformation.BoundingBoxes;
 import net.forthecrown.utils.transformation.FtcBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec2;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.*;
@@ -58,16 +53,6 @@ import java.util.UUID;
 
 public class CommandTestCore extends FtcCommand {
     private static final Logger LOGGER = Crown.logger();
-
-    static final BlockAnimation TEST_ANIM = new AnimationBuilder("test_animation")
-            .setTicksPerFrame(10)
-            .addFrames(BoundingBoxes.createArray(
-                    new Vector3i(273, 4, 219),
-                    new Vector3iOffset(5, 5, 5),
-                    Direction.EAST,
-                    1, 12
-            ))
-            .buildAndRegister();
 
     public CommandTestCore(){
         super("coretest", Crown.inst());

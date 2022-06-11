@@ -23,7 +23,7 @@ public final class Var<T> implements JsonSerializable, Supplier<T>, ComponentLik
     private T defaultValue;
     private Consumer<T> updateListener;
 
-    boolean used, _transient;
+    boolean used, _transient; // Needs underscore because it's a java keyword lol
 
     public Var(VarType<T> type, String name, T value) {
         this.value = value;

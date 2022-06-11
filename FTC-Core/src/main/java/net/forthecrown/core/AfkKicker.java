@@ -13,6 +13,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Class that automatically kicks people for AFKing
+ */
 public class AfkKicker {
     private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(0, r -> {
         Thread t = new Thread(r);

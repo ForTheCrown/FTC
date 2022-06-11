@@ -242,7 +242,6 @@ public class RegionPos {
     }
 
     private static class RegionPosDataType implements PersistentDataType<int[], RegionPos> {
-
         @Override
         public @NotNull Class<int[]> getPrimitiveType() {
             return int[].class;

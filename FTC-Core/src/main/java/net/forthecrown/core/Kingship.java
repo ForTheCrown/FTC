@@ -29,6 +29,11 @@ public interface Kingship extends Nameable {
                 .decorate(TextDecoration.BOLD);
     }
 
+    /**
+     * Gets text to display on coins about who the
+     * current monarch is
+     * @return Coin ruler display text
+     */
     static Component coinDisplay() {
         Kingship kingship = Crown.getKingship();
         if(!kingship.hasKing()) return Component.text("During the Interregnum")

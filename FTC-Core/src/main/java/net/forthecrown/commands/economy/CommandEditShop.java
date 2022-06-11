@@ -266,7 +266,7 @@ public class CommandEditShop extends FtcCommand {
         new BukkitRunnable() {
             @Override
             public void run() {
-                shop.updateLastEdit();
+                shop.updateLastUse();
                 shop.update();
             }
         }.runTaskLater(Crown.inst(), 1);

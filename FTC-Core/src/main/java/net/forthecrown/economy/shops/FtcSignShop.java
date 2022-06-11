@@ -30,7 +30,7 @@ public class FtcSignShop implements SignShop {
     @Getter private final ShopHistory history;
 
     @Getter
-    public long lastStockEdit = -1L;
+    public long lastUse = -1L;
 
     @Getter @Setter
     public ShopType type;
@@ -117,8 +117,8 @@ public class FtcSignShop implements SignShop {
     }
 
     @Override
-    public void updateLastEdit() {
-        lastStockEdit = System.currentTimeMillis();
+    public void updateLastUse() {
+        lastUse = System.currentTimeMillis();
     }
 
     @Override
@@ -164,8 +164,8 @@ public class FtcSignShop implements SignShop {
         tag.putInt("price", price);
         tag.put("type", TagUtil.writeEnum(type));
 
-        if (lastStockEdit != -1L) {
-            tag.putLong("lastStockEdit", lastStockEdit);
+        if (lastUse != -1L) {
+            tag.putLong("lastStockEdit", lastUse);
         }
 
         writeComponent(ownership, tag);
@@ -177,8 +177,8 @@ public class FtcSignShop implements SignShop {
         price = tag.getInt("price");
         type = TagUtil.readEnum(tag.get("type"), ShopType.class);
 
-        if (tag.contains("lastStockEdit")) lastStockEdit = tag.getLong("lastStockEdit");
-        else lastStockEdit = -1L;
+        if (tag.contains("lastStockEdit")) lastUse = tag.getLong("lastStockEdit");
+        else lastUse = -1L;
 
         readComponent(ownership, tag);
         readComponent(inventory, tag);

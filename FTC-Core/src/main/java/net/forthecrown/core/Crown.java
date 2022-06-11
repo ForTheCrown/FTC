@@ -12,7 +12,7 @@ import net.forthecrown.economy.houses.Houses;
 import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.regions.RegionManager;
-import net.forthecrown.structure.FtcStructureManager;
+import net.forthecrown.structure.FtcStructSerializer;
 import net.forthecrown.useables.UsablesManager;
 import net.forthecrown.useables.kits.KitManager;
 import net.forthecrown.useables.warps.WarpManager;
@@ -37,14 +37,16 @@ public interface Crown extends Plugin, Namespaced {
     static Crown                inst()                  { return Main.inst; }
 
     // Feels like I'm violating syntax by aligning the methods like this
+
+    // Managers
     static UsablesManager       getUsables()            { return Main.usablesManager; }
     static RegionManager        getRegionManager()      { return Main.regionManager; }
     static ShopManager          getShopManager()        { return Main.shopManager; }
     static UserManager          getUserManager()        { return Main.userManager; }
     static WarpManager          getWarpManager()        { return Main.warpRegistry; }
     static KitManager           getKitManager()         { return Main.kitRegistry; }
-    static FtcStructureManager  getStructureManager()   { return Main.structureManager; }
 
+    // Classes that are interfaces for some reason
     static Punisher             getPunisher()           { return Main.punisher; }
     static Markets              getMarkets()            { return Main.markets; }
     static LuckPerms            getLuckPerms()          { return Main.luckPerms; }
@@ -55,6 +57,7 @@ public interface Crown extends Plugin, Namespaced {
     static TabList              getTabList()            { return Main.tabList; }
     static BattlePass           getBattlePass()         { return Main.battlePass; }
 
+    // Classes that aren't interfaces
     static FtcMessages          getMessages()           { return Main.messages; }
     static DayChange            getDayChange()          { return Main.dayChange; }
     static JoinInfo             getJoinInfo()           { return Main.joinInfo; }
@@ -64,7 +67,9 @@ public interface Crown extends Plugin, Namespaced {
     static EndOpener            getEndOpener()          { return Main.endOpener; }
     static ResourceWorld        getResourceWorld()      { return Main.resourceWorld; }
     static ServerHolidays       getHolidays()           { return Main.holidays; }
+    static FtcStructSerializer  getStructureManager()   { return Main.structSerializer; }
 
+    // Bukkit stuff
     static FtcConfig            config()                { return Main.config; }
     static Logger               logger()                { return Main.logger; }
     static File                 dataFolder()            { return inst().getDataFolder(); }
@@ -90,7 +95,7 @@ public interface Crown extends Plugin, Namespaced {
         Main.prices.save();
 
         Main.regionManager.save();
-        Main.structureManager.save();
+        Main.structSerializer.save();
 
         Main.markets.save();
         Main.guild.save();

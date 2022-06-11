@@ -9,7 +9,7 @@ import net.forthecrown.core.Crown;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.inventory.ItemStacks;
 import net.forthecrown.useables.CheckableBase;
-import net.forthecrown.useables.InteractionUtils;
+import net.forthecrown.useables.UsablesUtils;
 import net.forthecrown.useables.checks.UsageCheckInstance;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
@@ -45,7 +45,7 @@ public class FtcKit extends CheckableBase implements Kit {
             items.add(JsonUtils.readItem(e));
         }
 
-        InteractionUtils.loadChecks(this, json);
+        UsablesUtils.loadChecks(this, json);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class FtcKit extends CheckableBase implements Kit {
         }
 
         json.add("items", itemArray);
-        InteractionUtils.saveChecks(this, json);
+        UsablesUtils.saveChecks(this, json);
         return json;
     }
 

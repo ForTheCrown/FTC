@@ -15,7 +15,7 @@ import net.forthecrown.economy.shops.FtcShopManager;
 import net.forthecrown.events.MobHealthBar;
 import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.regions.FtcRegionManager;
-import net.forthecrown.structure.FtcStructureManager;
+import net.forthecrown.structure.FtcStructSerializer;
 import net.forthecrown.structure.tree.test.TestNodes;
 import net.forthecrown.useables.FtcUsablesManager;
 import net.forthecrown.useables.kits.FtcKitManager;
@@ -23,6 +23,7 @@ import net.forthecrown.useables.warps.FtcWarpManager;
 import net.forthecrown.user.FtcUserManager;
 import net.forthecrown.user.packet.Packets;
 import net.forthecrown.utils.world.WorldLoader;
+import net.forthecrown.vars.Var;
 import net.forthecrown.vars.VarRegistry;
 import net.forthecrown.vars.types.VarTypes;
 import net.luckperms.api.LuckPerms;
@@ -35,6 +36,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.dynmap.DynmapCommonAPIListener;
 
+import static net.forthecrown.core.FtcDiscord.C_SERVER;
 import static net.forthecrown.utils.FtcUtils.safeRunnable;
 
 /**
@@ -63,7 +65,7 @@ public final class Main extends JavaPlugin implements Crown {
     static FtcPunisher              punisher;
     static FtcWarpManager           warpRegistry;
     static FtcKitManager            kitRegistry;
-    static FtcStructureManager      structureManager;
+    static FtcStructSerializer      structSerializer;
 
     static ResourceWorld            resourceWorld;
     static BattlePassImpl           battlePass;
@@ -99,7 +101,7 @@ public final class Main extends JavaPlugin implements Crown {
         ServerIcons.loadIcons();
         Transformers.runCurrent();
 
-        FtcDiscord.staffLog("Server", "FTC started, plugin version: {}, paper version: {}",
+        FtcDiscord.staffLog(C_SERVER, "FTC started, plugin version: {}, paper version: {}",
                 getDescription().getVersion(),
                 Bukkit.getVersion()
         );
@@ -124,7 +126,7 @@ public final class Main extends JavaPlugin implements Crown {
         // Set up Vars
         VarTypes.init();
         VarRegistry.load();
-        FtcVars.inDebugMode = VarRegistry.set("debugMode", VarTypes.BOOL, config.getJson().getBool("debug_mode", false))
+        FtcVars.inDebugMode = Var.def("debugMode", VarTypes.BOOL, config.getJson().getBool("debug_mode", false))
                 .setTransient(true);
 
         saveResource("banned_words.json", true);
@@ -160,7 +162,7 @@ public final class Main extends JavaPlugin implements Crown {
         FtcUserManager.LOADED_USERS.clear();
         FtcUserManager.LOADED_ALTS.clear();
 
-        FtcDiscord.staffLog("Server", "FTC shutting down");
+        FtcDiscord.staffLog(C_SERVER, "FTC shutting down");
     }
 
     // IDK why this method has logic in the name, when there's

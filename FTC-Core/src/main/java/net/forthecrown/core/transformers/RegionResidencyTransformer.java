@@ -56,7 +56,7 @@ public class RegionResidencyTransformer {
                         continue;
                     }
 
-                    RegionResidency.ResEntry entry = manager.get(RegionPos.of(l))
+                    RegionResidency.Resident entry = manager.get(RegionPos.of(l))
                             .getResidency()
                             .getEntry(user.getUniqueId());
 
@@ -67,7 +67,7 @@ public class RegionResidencyTransformer {
 
                 if (homes.hasHomeRegion()) {
                     PopulationRegion region = manager.get(homes.getHomeRegion());
-                    RegionResidency.ResEntry entry = region.getResidency().getEntry(user.getUniqueId());
+                    RegionResidency.Resident entry = region.getResidency().getEntry(user.getUniqueId());
 
                      if (!entry.isDirectResident()) {
                          entry.setDirectMoveIn(UNKNOWN_MOVEIN);

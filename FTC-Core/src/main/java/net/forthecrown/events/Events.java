@@ -11,7 +11,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * A class for some general utility methods
+ * relating to event listeners
+ */
 public final class Events {
     private Events() {}
 
@@ -55,15 +60,30 @@ public final class Events {
         Crown.logger().info("Events registered");
     }
 
+    /**
+     * Registers the given listener
+     * @param listener The listener to register
+     */
     public static void register(Listener listener) {
         Bukkit.getPluginManager().registerEvents(listener, Crown.inst());
     }
 
+    /**
+     * Unregisters the given listener
+     * @param listener The listener to unregister
+     */
     public static void unregister(Listener listener) {
         HandlerList.unregisterAll(listener);
     }
 
-    public static <E extends Event> void handle(CommandSender sender, E event, ExceptionedListener<E> executor) {
+    /**
+     * Handles an event which may throw a {@link CommandSyntaxException}
+     * @param sender The sender involved in the event, may be null
+     * @param event The event to handle
+     * @param executor The executor which may throw an exception
+     * @param <E> The event type
+     */
+    public static <E extends Event> void handle(@Nullable CommandSender sender, E event, ExceptionedListener<E> executor) {
         try {
             executor.execute(event);
         } catch (CommandSyntaxException e) {

@@ -36,6 +36,7 @@ import org.bukkit.entity.EntityType;
 
 import java.util.*;
 
+import static net.forthecrown.core.FtcDiscord.C_MARKETS;
 import static net.forthecrown.utils.transformation.BoundingBoxes.createPaste;
 import static net.forthecrown.utils.transformation.BoundingBoxes.wgToNms;
 
@@ -486,7 +487,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets, DayCh
             m.read = true;
         }
 
-        FtcDiscord.staffLog("Markets", "{}, owner '{}', has been marked for eviction, reason: '{}'",
+        FtcDiscord.staffLog(C_MARKETS, "{}, owner '{}', has been marked for eviction, reason: '{}'",
                 shop.getName(), user.getNickOrName(), ChatUtils.plainText(reason)
         );
 
@@ -506,7 +507,7 @@ public class FtcMarkets extends AbstractJsonSerializer implements Markets, DayCh
                 Component.translatable("market.evict.cancelled", NamedTextColor.YELLOW)
         );
 
-        FtcDiscord.staffLog("Markets", "{}, owner '{}', eviction cancelled", shop.getName(), user.getNickOrName());
+        FtcDiscord.staffLog(C_MARKETS, "{}, owner '{}', eviction cancelled", shop.getName(), user.getNickOrName());
     }
 
     @Override

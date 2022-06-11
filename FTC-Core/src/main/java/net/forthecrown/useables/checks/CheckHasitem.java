@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.chat.FtcFormatter;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.InteractionUtils;
+import net.forthecrown.useables.UsablesUtils;
 import net.forthecrown.utils.JsonUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -27,7 +27,7 @@ public class CheckHasitem implements UsageCheck<CheckHasitem.CheckInstance> {
 
     @Override
     public CheckInstance parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
-        return new CheckInstance(InteractionUtils.parseGivenItem(source, reader));
+        return new CheckInstance(UsablesUtils.parseGivenItem(source, reader));
     }
 
     @Override
@@ -47,7 +47,7 @@ public class CheckHasitem implements UsageCheck<CheckHasitem.CheckInstance> {
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return InteractionUtils.listItems(context, builder);
+        return UsablesUtils.listItems(context, builder);
     }
 
     @Override

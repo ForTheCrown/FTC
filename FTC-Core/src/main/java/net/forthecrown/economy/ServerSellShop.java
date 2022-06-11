@@ -20,7 +20,13 @@ import org.bukkit.inventory.PlayerInventory;
 
 import static net.forthecrown.core.chat.FtcFormatter.nonItalic;
 
-//Mmmm yes, internal classes
+/**
+ * This was meant to be the planned version of the sellshop where
+ * you could just fill up a random empty inventory and sell whatever
+ * was inside. Not finished though.
+ * @deprecated Not finished
+ */
+@Deprecated
 public final class ServerSellShop {
     private ServerSellShop() {}
 

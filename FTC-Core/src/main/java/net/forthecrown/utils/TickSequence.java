@@ -10,6 +10,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A class to perform a series of actions
+ * in delayed sequences.
+ * <p>
+ * The delay each node holds is relative
+ * to the last one. The first node's delay
+ * is the delay before anything is executed.
+ * <p>
+ * Use {@link #start()} to start the sequence
+ * execution and {@link #stop()} to stop it lol
+ */
 public class TickSequence {
     protected final List<SequenceNode> nodes;
     protected int nodeIndex = 0;
