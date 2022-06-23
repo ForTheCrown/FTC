@@ -478,6 +478,13 @@ public class FtcUser implements CrownUser {
     }
 
     @Override
+    public void sendMessage(UUID sender, @NonNull Component message) {
+        if(!isOnline()) return;
+        Component coolComponent = GlobalTranslator.render(message, getPlayer().locale());
+        sendMessage(sender, new AdventureComponent(coolComponent));
+    }
+
+    @Override
     public void sendMessage(UUID sender, net.minecraft.network.chat.Component message) {
         sendMessage(sender, message, ChatType.SYSTEM);
     }
@@ -907,7 +914,7 @@ public class FtcUser implements CrownUser {
     @Override
     public void sendOrMail(Component message, @Nullable UUID sender) {
         if(isOnline()) {
-            sendMessage(/*sender, */new AdventureComponent(message));
+            sendMessage(sender, new AdventureComponent(message));
             return;
         }
 

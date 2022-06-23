@@ -436,6 +436,8 @@ public interface CrownUser extends
 
     void sendMessage(Component message);
 
+    void sendMessage(UUID sender, @NonNull Component message);
+
     /**
      * No clue, appears to work the same as sendMessage(IChatBaseComponent message);
      * @param id ??????
