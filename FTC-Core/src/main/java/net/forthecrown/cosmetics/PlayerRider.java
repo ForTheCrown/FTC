@@ -3,7 +3,7 @@ package net.forthecrown.cosmetics;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.Keys;
 import net.forthecrown.utils.FtcUtils;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -11,7 +11,7 @@ import net.minecraft.world.entity.monster.Slime;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -56,7 +56,7 @@ public class PlayerRider implements Listener {
 
         nms.setInvulnerable(true);
         nms.setNoGravity(true);
-        nms.setCustomName(new TextComponent(rider.getName() + '_' + ridden.getName()));
+        nms.setCustomName(Component.literal(rider.getName() + '_' + ridden.getName()));
         nms.setCustomNameVisible(false);
 
         slime.setSize(0, false);

@@ -2,7 +2,6 @@ package net.forthecrown.registry;
 
 import net.forthecrown.core.Keys;
 import net.forthecrown.core.admin.JailCell;
-import net.forthecrown.core.animation.BlockAnimation;
 import net.forthecrown.core.battlepass.Reward;
 import net.forthecrown.core.battlepass.challenges.BattlePassChallenge;
 import net.forthecrown.core.npc.InteractableNPC;
@@ -35,7 +34,7 @@ public interface Registries {
     Registry<Registry<?>>                   MASTER_REGISTRY     = new RegistryImpl<>(Keys.forthecrown("master_registry"));
 
     Registry<InteractableNPC>               NPCS                = create("npcs");
-    Registry<BlockAnimation>                ANIMATIONS          = create("animations");
+    // Registry<BlockAnimation>                ANIMATIONS          = create("animations");
 
     Registry<JailCell>                      JAILS               = create("jails");
 

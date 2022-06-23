@@ -7,7 +7,7 @@ import net.forthecrown.utils.TagUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryCustom;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;

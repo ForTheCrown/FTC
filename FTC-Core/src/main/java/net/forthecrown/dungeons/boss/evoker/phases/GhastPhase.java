@@ -9,7 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftGhast;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftGhast;
 import org.bukkit.entity.Ghast;
 
 public class GhastPhase implements AttackPhase {

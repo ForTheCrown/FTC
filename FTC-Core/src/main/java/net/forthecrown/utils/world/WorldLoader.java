@@ -12,7 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;

@@ -32,8 +32,10 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -42,13 +44,12 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Orientable;
-import org.bukkit.craftbukkit.v1_18_R2.CraftHeightMap;
+import org.bukkit.craftbukkit.v1_19_R1.CraftHeightMap;
 import org.bukkit.entity.Player;
 import org.mcteam.ancientgates.Gate;
 import org.mcteam.ancientgates.Gates;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static net.forthecrown.core.FtcDiscord.C_RW;
@@ -87,25 +88,27 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
             MAX_Y_DIF           = 2;
 
     /**
-     * All legal biome categories that spawn can be in
+     * All legal biomes that spawn can be in
      */
-    public static final EnumSet<Biome.BiomeCategory> LEGAL_CATEGORIES = EnumSet.of(
-            Biome.BiomeCategory.PLAINS,
-            Biome.BiomeCategory.DESERT
-    );
+    public static final Set<BiomeCategory> LEGAL_CATEGORIES = new HashSet<>(Arrays.asList(
+            BiomeCategory.PLAINS,
+            BiomeCategory.DESERT
+    ));
 
     /**
      * Required biome types any potential seed must have within its world borders
      */
-    public static final EnumSet<Biome.BiomeCategory> REQUIRED_CATEGORIES = EnumSet.of(
-            Biome.BiomeCategory.DESERT,
-            Biome.BiomeCategory.FOREST,
-            Biome.BiomeCategory.MESA,
-            Biome.BiomeCategory.TAIGA,
-            Biome.BiomeCategory.JUNGLE,
-            Biome.BiomeCategory.SAVANNA,
-            Biome.BiomeCategory.MOUNTAIN
-    );
+    public static final Set<BiomeCategory> REQUIRED_CATEGORIES = new HashSet<>(Arrays.asList(
+            BiomeCategory.PLAINS,
+            BiomeCategory.FOREST,
+            BiomeCategory.DESERT,
+            BiomeCategory.MESA,
+            BiomeCategory.TAIGA,
+            BiomeCategory.JUNGLE,
+            BiomeCategory.SAVANNA,
+            BiomeCategory.MOUNTAIN,
+            BiomeCategory.CAVES
+    ));
 
     // The height maps for NMS and Bukkit that are used for height calculation... shocking ik
     public static final Heightmap.Types HEIGHT_MAP_TYPE = Heightmap.Types.OCEAN_FLOOR_WG;
@@ -480,6 +483,8 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
     private boolean isAcceptableSeed(long seed) {
         if (seed == lastSeed) return false;
 
+        /* ez fix B)
+
         // Create chunk generator for given seed
         ChunkGenerator gen = WorldGenSettings.makeDefaultOverworld(VanillaAccess.getServer().registryAccess(), seed);
 
@@ -502,11 +507,11 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
                 if (!isAreaGood(x, z, gen, baseY)) return false;
             }
         }
-
+        */
         return true;
     }
 
-    private boolean isAreaGood(int x, int z, ChunkGenerator gen, int baseY) {
+    /*private boolean isAreaGood(int x, int z, ChunkGenerator gen, int baseY) {
         // Biome's use their own positioning,
         // which is 1/4 the size of a chunk
         Holder<Biome> b = gen.getNoiseBiome(x, QuartPos.fromBlock(baseY), z);
@@ -555,7 +560,7 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         }
 
         return result;
-    }
+    }*/
 
     public void setSize(int size) {
         this.size = size;

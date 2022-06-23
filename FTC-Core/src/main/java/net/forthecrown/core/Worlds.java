@@ -5,7 +5,7 @@ import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftNamespacedKey;
 
 import java.util.Objects;
 
@@ -17,7 +17,7 @@ public interface Worlds {
     String
             OVERWORLD_NAME  = "world",
             END_NAME        = "world_the_end",
-            NETHER_NAME     = "world_the_nether",
+            NETHER_NAME     = "world_nether",
             VOID_NAME       = "world_void",
             RESOURCE_NAME   = "world_resource";
 

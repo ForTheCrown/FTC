@@ -85,6 +85,7 @@ final class BootStrap {
 
         // Only load here, cuz we've already read the JSON
         config.load();
+        logger.info("after config load");
 
         economy = new FtcEconomy();
 

@@ -6,7 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Date;

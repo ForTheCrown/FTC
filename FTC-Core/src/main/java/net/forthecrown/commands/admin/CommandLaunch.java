@@ -11,7 +11,7 @@ import net.forthecrown.grenadier.types.pos.Position;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
 import net.minecraft.world.phys.Vec3;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;

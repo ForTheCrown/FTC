@@ -3,10 +3,12 @@ package net.forthecrown.regions;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forthecrown.core.Crown;
 import net.forthecrown.core.FtcDynmap;
+import net.forthecrown.core.Main;
 import net.forthecrown.serializer.AbstractNbtSerializer;
 import net.forthecrown.utils.FtcUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.dynmap.markers.Marker;
@@ -24,7 +26,6 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
 
     public FtcRegionManager(World world) {
         super("regions_" + world.getName());
-
         this.world = world;
 
         generator = new FtcRegionPoleGenerator(this);
@@ -55,6 +56,8 @@ public class FtcRegionManager extends AbstractNbtSerializer implements RegionMan
         //Clear em all
         byCords.clear();
         byName.clear();
+
+        Bukkit.getLogger().info("- Start");
 
         for (Map.Entry<String, Tag> e: tag.tags.entrySet()) {
             //Get region pos

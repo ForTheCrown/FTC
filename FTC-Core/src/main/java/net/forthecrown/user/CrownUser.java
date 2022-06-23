@@ -31,6 +31,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -433,6 +434,8 @@ public interface CrownUser extends
      */
     void sendMessage(net.minecraft.network.chat.Component message);
 
+    void sendMessage(Component message);
+
     /**
      * No clue, appears to work the same as sendMessage(IChatBaseComponent message);
      * @param id ??????
@@ -461,7 +464,7 @@ public interface CrownUser extends
      * @param id The UUID of the sender
      * @param message the message
      */
-    void sendBlockableMessage(UUID id, Component message);
+    // void sendBlockableMessage(UUID id, Component message);
 
     /**
      * Gets if the user is online
@@ -914,7 +917,8 @@ public interface CrownUser extends
         UserMail.MailMessage m = new UserMail.MailMessage(message, sender, System.currentTimeMillis());
 
         if(isOnline()) {
-            sendBlockableMessage(sender, message);
+            //sendBlockableMessage(sender, message);
+            sendMessage(message);
             m.read = true;
         }
 

@@ -132,7 +132,7 @@ public class PlayerPacketListener implements PacketListener {
                 ClientboundPlayerInfoPacket.PlayerUpdate u = iterator.next();
                 if(u.getGameMode() != GameType.SPECTATOR || u.getProfile().getId().equals(target)) continue;
 
-                iterator.set(new ClientboundPlayerInfoPacket.PlayerUpdate(u.getProfile(), u.getLatency(), GameType.SURVIVAL, u.getDisplayName()));
+                iterator.set(new ClientboundPlayerInfoPacket.PlayerUpdate(u.getProfile(), u.getLatency(), GameType.SURVIVAL, u.getDisplayName(), u.getProfilePublicKey()));
             }
         }
     }

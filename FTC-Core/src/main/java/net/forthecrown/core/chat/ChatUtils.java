@@ -11,7 +11,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.apache.logging.log4j.message.ParameterizedMessage;
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage;
 
 import java.util.Locale;
 

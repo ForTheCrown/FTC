@@ -18,7 +18,7 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftVector;
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftVector;
 import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;

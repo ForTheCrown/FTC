@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,7 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -174,7 +174,7 @@ public class DungeonLevelImpl implements DungeonLevel {
             s.setNoGravity(true);
             s.setPos(vecPos);
             s.setCustomNameVisible(true);
-            s.setCustomName(new TextComponent(vecPos.x + " " + vecPos.y + " " + vecPos.z));
+            s.setCustomName(Component.literal(vecPos.x + " " + vecPos.y + " " + vecPos.z));
 
             slimes[i] = s;
             sPlayer.networkManager.send(s.getAddEntityPacket());

@@ -1,6 +1,7 @@
 package net.forthecrown.user;
 
 import io.papermc.paper.adventure.AdventureComponent;
+import io.papermc.paper.adventure.PaperAdventure;
 import it.unimi.dsi.fastutil.objects.*;
 import net.forthecrown.commands.CommandArkBox;
 import net.forthecrown.core.*;
@@ -17,6 +18,7 @@ import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.FtcUtils;
 import net.forthecrown.utils.TimeUtil;
+import net.forthecrown.utils.VanillaAccess;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
@@ -27,21 +29,26 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Registry;
 import net.minecraft.network.Connection;
+import net.minecraft.network.chat.ChatSender;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundChatPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerChatPacket;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_18_R2.CraftOfflinePlayer;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R1.CraftOfflinePlayer;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.Permission;
@@ -55,6 +62,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -426,57 +434,74 @@ public class FtcUser implements CrownUser {
 
     @Override
     public void sendMessage(@Nonnull String... messages){
-        for (String s: messages){
-            sendMessage(s);
-        }
+        for (String s: messages) sendMessage(s);
     }
 
     @Override
     public void sendMessage(@NonNull Component message) {
         if(!isOnline()) return;
-        sendMessage(new AdventureComponent(message));
+        Component coolComponent = GlobalTranslator.render(message, getPlayer().locale());
+        sendMessage(new AdventureComponent(coolComponent));
     }
 
     @Override
-    public void sendMessage(UUID sender, @Nonnull String message) {
+    public void sendMessage(net.minecraft.network.chat.Component message) {
         if(!isOnline()) return;
-        sendMessage(sender, ChatUtils.stringToVanilla(message, true));
-    }
-
-    @Override
-    public void sendMessage(UUID sender, String[] messages) {
-        for (String s: messages){
-            sendMessage(sender, s);
-        }
-    }
-
-    @Override
-        public void sendMessage(net.minecraft.network.chat.Component message){
         sendMessage(message, ChatType.SYSTEM);
     }
 
     @Override
-    public void sendMessage(UUID id, net.minecraft.network.chat.Component message){
-        sendMessage(id, message, ChatType.SYSTEM);
+    public void sendMessage(net.minecraft.network.chat.Component message, ChatType type) {
+        if(!isOnline()) return;
+        sendMessage(message, type);
+    }
+
+    public void sendMessage(net.minecraft.network.chat.Component message, ResourceKey<ChatType> type) {
+        if(!isOnline()) return;
+        int id = convert(type); // ChatType -> int
+        sendPacket(new ClientboundSystemChatPacket(message, id));
     }
 
     @Override
-    public void sendMessage(net.minecraft.network.chat.Component message, ChatType type){
-        if(!isOnline()) return;
-        sendMessage(Util.NIL_UUID, message, type);
+    public void sendMessage(@Nullable UUID sender, @NotNull String message) {
+        if (!isOnline()) return;
+        if (sender == null) sendMessage(ChatUtils.stringToVanilla(message));
+        else sendMessage(sender, ChatUtils.stringToVanilla(message));
     }
 
     @Override
-    public void sendMessage(UUID id, net.minecraft.network.chat.Component message, ChatType type){
-        if(!isOnline()) return;
-        sendPacket(new ClientboundChatPacket(message, type, id));
+    public void sendMessage(@Nullable UUID sender, @NotNull String... messages) {
+        if (sender == null)
+            sendMessage(messages);
+        else
+            for (String s: messages) sendMessage(sender, s);
     }
 
     @Override
-    public void sendBlockableMessage(UUID id, Component message){
-        if(!isOnline()) return;
-        sendMessage(id, new AdventureComponent(message), ChatType.CHAT);
+    public void sendMessage(UUID sender, net.minecraft.network.chat.Component message) {
+        sendMessage(sender, message, ChatType.SYSTEM);
     }
+
+    @Override
+    public void sendMessage(UUID sender, net.minecraft.network.chat.Component message, ChatType type) {
+        sendMessage(sender, message, type);
+    }
+
+    public void sendMessage(UUID sender, net.minecraft.network.chat.Component message, ResourceKey<ChatType> type) {
+        if(!isOnline()) return;
+        int id = convert(type); // ChatType -> int
+        sendPacket(new ClientboundPlayerChatPacket(PaperAdventure.asAdventure(message), id, new ChatSender(sender, ChatUtils.stringToVanilla(getName())), Instant.now()));
+    }
+
+
+
+    private int convert(ResourceKey<ChatType> type) {
+        net.minecraft.core.Registry<ChatType> reg = VanillaAccess.getServer().registryHolder.registryOrThrow(Registry.CHAT_TYPE_REGISTRY);
+        return reg.getId(reg.get(type));
+    }
+
+
+
 
     @Nonnull
     @Override
@@ -882,7 +907,7 @@ public class FtcUser implements CrownUser {
     @Override
     public void sendOrMail(Component message, @Nullable UUID sender) {
         if(isOnline()) {
-            sendMessage(sender, new AdventureComponent(message));
+            sendMessage(/*sender, */new AdventureComponent(message));
             return;
         }
 

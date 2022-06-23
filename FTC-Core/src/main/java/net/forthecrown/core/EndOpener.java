@@ -26,7 +26,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Switch;
-import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
