@@ -193,7 +193,7 @@ public final class ItemStacks {
         try {
             // This will have to be updated with each MC update,
             // because the package name will change
-            return Class.forName("org.bukkit.craftbukkit.v1_18_R2.inventory.CraftMetaItem");
+            return Class.forName("org.bukkit.craftbukkit.v1_19_R1.inventory.CraftMetaItem");
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Couldn't find class for item meta??????", e);
         }
