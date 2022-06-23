@@ -32,14 +32,16 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
+import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -49,7 +51,8 @@ import org.bukkit.entity.Player;
 import org.mcteam.ancientgates.Gate;
 import org.mcteam.ancientgates.Gates;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
 import static net.forthecrown.core.FtcDiscord.C_RW;
@@ -87,18 +90,22 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
              */
             MAX_Y_DIF           = 2;
 
+
+    // Note to Wout:
+    // Please remember EnumSets exist, you don't have to
+    // new HashSet(Arrays.asList()); everything lmao
     /**
      * All legal biomes that spawn can be in
      */
-    public static final Set<BiomeCategory> LEGAL_CATEGORIES = new HashSet<>(Arrays.asList(
+    public static final EnumSet<BiomeCategory> LEGAL_CATEGORIES = EnumSet.of(
             BiomeCategory.PLAINS,
             BiomeCategory.DESERT
-    ));
+    );
 
     /**
      * Required biome types any potential seed must have within its world borders
      */
-    public static final Set<BiomeCategory> REQUIRED_CATEGORIES = new HashSet<>(Arrays.asList(
+    public static final EnumSet<BiomeCategory> REQUIRED_CATEGORIES = EnumSet.of(
             BiomeCategory.PLAINS,
             BiomeCategory.FOREST,
             BiomeCategory.DESERT,
@@ -106,9 +113,8 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
             BiomeCategory.TAIGA,
             BiomeCategory.JUNGLE,
             BiomeCategory.SAVANNA,
-            BiomeCategory.MOUNTAIN,
-            BiomeCategory.CAVES
-    ));
+            BiomeCategory.MOUNTAIN
+    );
 
     // The height maps for NMS and Bukkit that are used for height calculation... shocking ik
     public static final Heightmap.Types HEIGHT_MAP_TYPE = Heightmap.Types.OCEAN_FLOOR_WG;
@@ -483,17 +489,17 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
     private boolean isAcceptableSeed(long seed) {
         if (seed == lastSeed) return false;
 
-        /* ez fix B)
-
         // Create chunk generator for given seed
-        ChunkGenerator gen = WorldGenSettings.makeDefaultOverworld(VanillaAccess.getServer().registryAccess(), seed);
+        WorldGenSettings settings = WorldPresets.createNormalWorldFromPreset(DedicatedServer.getServer().registryHolder, seed);
+        NoiseBasedChunkGenerator gen = (NoiseBasedChunkGenerator) settings.overworld();
+        RandomState randomState = RandomState.create(gen.settings.value(), gen.noises, seed);
 
         // Ensure the seed has all required biomes
         // As far as I can see, this is also the most intense part
         // of the seed testing in terms of power needed to run it
-        if (!hasBiomes(gen)) return false;
+        if (!hasBiomes(gen, randomState)) return false;
 
-        int baseY = gen.getBaseHeight(0, 0, HEIGHT_MAP_TYPE, HEIGHT_ACCESSOR);
+        int baseY = gen.getBaseHeight(0, 0, HEIGHT_MAP_TYPE, HEIGHT_ACCESSOR, randomState);
 
         // In most cases, if we're above 75, we're in a hilly area
         // Hilly areas are a no no
@@ -504,25 +510,25 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         // generally flat enough
         for (int x = 0; x < SPAWN_CHECK_QUART; x++) {
             for (int z = 0; z < SPAWN_CHECK_QUART; z++) {
-                if (!isAreaGood(x, z, gen, baseY)) return false;
+                if (!isAreaGood(x, z, gen, baseY, randomState)) return false;
             }
         }
-        */
+
         return true;
     }
 
-    /*private boolean isAreaGood(int x, int z, ChunkGenerator gen, int baseY) {
+    private boolean isAreaGood(int x, int z, NoiseBasedChunkGenerator gen, int baseY, RandomState randomState) {
         // Biome's use their own positioning,
         // which is 1/4 the size of a chunk
-        Holder<Biome> b = gen.getNoiseBiome(x, QuartPos.fromBlock(baseY), z);
-        Biome.BiomeCategory category = Biome.getBiomeCategory(b);
+        Holder<Biome> b = gen.getBiomeSource().getNoiseBiome(x, QuartPos.fromBlock(baseY), z, randomState.sampler());
+        BiomeCategory category = BiomeCategory.get(b);
 
         int blockX = x * 4;
         int blockZ = z * 4;
 
         // Get the difference between this area's
         // Y level and the base Y
-        int y = gen.getBaseHeight(blockX, blockZ, HEIGHT_MAP_TYPE, HEIGHT_ACCESSOR);
+        int y = gen.getBaseHeight(blockX, blockZ, HEIGHT_MAP_TYPE, HEIGHT_ACCESSOR, randomState);
         int dif = baseY - y;
 
         // For this to return true, the biome must be from
@@ -533,19 +539,19 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
                 && dif > -MAX_Y_DIF;
     }
 
-    private boolean hasBiomes(ChunkGenerator gen) {
+    private boolean hasBiomes(NoiseBasedChunkGenerator gen, RandomState randomState) {
         int halfSize = size >> 1; // All my homies hate dividing by 2, bit shifting to the right is where it's at
 
-        EnumSet<Biome.BiomeCategory> biomes = findBiomes(gen, halfSize, QuartPos.fromBlock(64));
+        EnumSet<BiomeCategory> biomes = findBiomes(gen, halfSize, QuartPos.fromBlock(64), randomState);
 
         return biomes.containsAll(REQUIRED_CATEGORIES);
     }
 
-    private EnumSet<Biome.BiomeCategory> findBiomes(ChunkGenerator gen, int halfSize, int y) {
+    private EnumSet<BiomeCategory> findBiomes(ChunkGenerator gen, int halfSize, int y, RandomState randomState) {
         int max = QuartPos.fromBlock(halfSize);
         int min = QuartPos.fromBlock(-halfSize);
 
-        EnumSet<Biome.BiomeCategory> result = EnumSet.noneOf(Biome.BiomeCategory.class);
+        EnumSet<BiomeCategory> result = EnumSet.noneOf(BiomeCategory.class);
 
         // Go through the world area and find the biome at every
         // cord. For the sake of speed, it only gets every 8th biome.
@@ -555,12 +561,12 @@ public class ResourceWorld extends FtcConfig.ConfigSection implements DayChangeL
         // every 8 chunks
         for (int x = min; x < max; x += 8) {
             for (int z = min; z < max; z += 8) {
-                result.add(Biome.getBiomeCategory(gen.getNoiseBiome(x, y, z)));
+                result.add(BiomeCategory.get(gen.getBiomeSource().getNoiseBiome(x, y, z, randomState.sampler())));
             }
         }
 
         return result;
-    }*/
+    }
 
     public void setSize(int size) {
         this.size = size;
