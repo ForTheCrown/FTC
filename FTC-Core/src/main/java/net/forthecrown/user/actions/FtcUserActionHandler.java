@@ -119,8 +119,8 @@ public class FtcUserActionHandler implements UserActionHandler {
         //If not muted at all, send to target
         // if(status.senderMaySee) message.getSender().sendBlockableMessage(message.getTarget().getUniqueId(), formatted);
         // if(status.maySpeak) message.getTarget().sendBlockableMessage(message.getSender().getUniqueId(), formatted);
-        if(status.senderMaySee) message.getSender().sendMessage(message.getSender().getUniqueId(), formatted);
-        if(status.maySpeak) message.getTarget().sendMessage(message.getSender().getUniqueId(), formatted);
+        if(status.senderMaySee) message.getSender().sendMessage(message.getTarget().getUniqueId(), formatted);
+        if(status.maySpeak) message.getTarget().sendMessage(message.getTarget().getUniqueId(), formatted);
     }
 
     @Override
