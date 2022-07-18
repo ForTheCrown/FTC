@@ -24,7 +24,7 @@ public interface Squire extends Plugin {
 
     static void unfreezeRegistry(MappedRegistry registry) {
         try {
-            Field frozen = registry.getClass().getDeclaredField("bL");
+            Field frozen = registry.getClass().getDeclaredField("ca");
             frozen.setAccessible(true);
 
             frozen.set(registry, false);
