@@ -129,6 +129,9 @@ public class PassengerHandler implements VisitHandler {
             saved.putString("id", nms.getEncodeId());
             saved.put("Pos", newDoubleList(dest.getX(), dest.getY(), dest.getZ()));
 
+            if (entity.getType() == org.bukkit.entity.EntityType.CHEST_BOAT) {
+                ((ChestBoat) entity).getInventory().clear();
+            }
             nms.discard();
 
             Optional<net.minecraft.world.entity.Entity> e = EntityType.create(saved, level);
