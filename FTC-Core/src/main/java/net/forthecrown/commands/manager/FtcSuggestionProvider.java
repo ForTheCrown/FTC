@@ -32,7 +32,7 @@ public interface FtcSuggestionProvider {
 
         for (CrownUser user: UserManager.getOnlineUsers()) {
             if(user.isVanished() && !seeVanished) continue;
-            if(!user.getName().toLowerCase().startsWith(token)) continue;
+            if(!user.getNickOrName().toLowerCase().startsWith(token)) continue;
 
             Message message = new LiteralMessage(user.getUniqueId().toString());
 
