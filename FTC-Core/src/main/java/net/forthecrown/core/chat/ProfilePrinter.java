@@ -127,7 +127,7 @@ public class ProfilePrinter implements ComponentPrinter {
         }
 
         line("Gems", FtcFormatter.gemsNonTrans(user.getGems()), user.getGems() > 0);
-        line("Rhines", FtcFormatter.rhines(Crown.getEconomy().get(user.getUniqueId())));
+        line("Rhines", FtcFormatter.rhinesNonTrans(user.getBalance()));
 
         return this;
     }
