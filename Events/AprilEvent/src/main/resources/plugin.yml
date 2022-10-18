@@ -1,6 +1,0 @@
-name: EasterEggHunt
-version: @version@
-main: net.forthecrown.easteregghunt.EasterMain
-api-version: 1.16
-depend: [ FTCCore ]
-authors: [ BotulToxin ]

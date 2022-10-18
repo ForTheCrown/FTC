@@ -1,7 +1,0 @@
-name: MarchEvent
-version: ${project.version}
-main: net.forthecrown.marchevent.EventMain
-api-version: 1.16
-depend:
-  - FTCCore
-  - Multiverse-Core

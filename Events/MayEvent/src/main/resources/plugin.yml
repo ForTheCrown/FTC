@@ -1,7 +1,0 @@
-name: MayEvent
-version: @version@
-main: net.forthecrown.mayevent.MayMain
-api-version: 1.16
-depend:
-  - FTCCore
-  - WorldEdit

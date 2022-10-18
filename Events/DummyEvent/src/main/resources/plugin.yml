@@ -1,8 +1,0 @@
-name: DummyEvent
-version: @version@
-main: net.forthecrown.dummyevent.SprintMain
-api-version: 1.16
-
-depend:
-  - FTCCore
-  - Multiverse-Core

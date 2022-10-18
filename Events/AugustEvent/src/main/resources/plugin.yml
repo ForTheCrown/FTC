@@ -1,9 +1,0 @@
-name: AugustEvent
-main: net.forthecrown.august.AugustPlugin
-version: 1.0.0-SNAPSHOT
-api-version: 1.17
-authors:
-  - Wout
-  - BotulToxin
-depend:
-  - FTCCore

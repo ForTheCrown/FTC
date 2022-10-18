@@ -1,5 +1,0 @@
-name: Valentines
-version: '${version}'
-main: net.forthecrown.valentines.Valentines
-api-version: 1.18
-depend: [ ForTheCrown ]

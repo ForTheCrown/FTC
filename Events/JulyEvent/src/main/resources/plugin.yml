@@ -1,8 +1,0 @@
-name: JulyEvent
-version: @version@
-main: net.forthecrown.july.JulyMain
-api-version: 1.16
-authors: [ Ants ]
-depend:
-  - FTCCore
-  - RoyalGrenadier
