@@ -1,0 +1,19 @@
+{
+  "item_head": {
+    "description": [
+      "Willhelm perished in an attack on Questmoor.",
+      "However, the business of selling heads is",
+      "still alive and well"
+    ],
+    "reward": {
+      "rhines": 100
+    },
+    "slot": 20
+  },
+  "item_item": {
+    "slot": 22
+  },
+  "item_potion": {
+    "slot": 24
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "drops": {
+    "title": "Mob Drops Shop",
+    "shop_contents_file": "drops.shop",
+    "main_page_slot": { "row": 2, "column": 2 },
+    "header_item": {
+      "material": "rotten_flesh",
+      "name": "Mob Drops",
+      "lore": [ "Common items dropped by mobs." ]
+    }
+  },
+  "minerals": {
+    "title": "Minerals Shop",
+    "shop_contents_file": "minerals.shop",
+    "main_page_slot": { "row": 2, "column": 3 },
+    "header_item": {
+      "material": "amethyst_shard",
+      "name": "Minerals",
+      "lore": [ "Ores and minerals found from the ground." ]
+    }
+  },
+  "mining": {
+    "title": "Mining Shop",
+    "shop_contents_file": "mining.shop",
+    "main_page_slot": { "row": 2, "column": 5 },
+    "header_item": {
+      "material": "iron_pickaxe",
+      "name": "Mining",
+      "lore": [ "Blocks attained by mining." ]
+    }
+  },
+  "farming": {
+    "title": "Farming Shop",
+    "shop_contents_file": "crops.shop",
+    "main_page_slot": { "row": 2, "column": 6 },
+    "header_item": {
+      "material": "wheat",
+      "name": "Farming",
+      "lore": [ "Crops and other farm-able items." ]
+    }
+  }
+}

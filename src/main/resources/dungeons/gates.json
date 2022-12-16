@@ -1,0 +1,20 @@
+{
+  "default": {
+    "structure": "dungeons/gates/default",
+    "palettes": {
+      "closed": "closed",
+      "open": "default"
+    },
+    "variants": {}
+  },
+  "collapsed": {
+    "structure": "dungeons/gates/collapsed",
+    "palettes": { "closed": "default" },
+    "variants": {}
+  },
+  "decorated": {
+    "structure": "dungeons/gates/decorated",
+    "palettes": { "closed": "default" },
+    "variants": {}
+  }
+}

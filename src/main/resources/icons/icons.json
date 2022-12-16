@@ -1,0 +1,26 @@
+{
+  "default": "default.png",
+  "debug_mode": "debug_mode.png",
+  "maintenance": "maintenance.png",
+  "pride_month": {
+    "period": [ "01.06", "30.06" ],
+    "icons": [
+      "pride/asexual.png",
+      "pride/bisexual.png",
+      "pride/homosexual.png",
+      "pride/lesbian.png",
+      "pride/lgbt.png",
+      "pride/non_binary.png",
+      "pride/pansexual.png",
+      "pride/trans.png"
+    ]
+  },
+  "seasonal/winter": {
+    "period": [ "01.12", "31.01" ],
+    "icons": "seasonal/winter.png"
+  },
+  "april_fools": {
+    "period": "01.04",
+    "icons": "seasonal/april_fools.png"
+  }
+}
