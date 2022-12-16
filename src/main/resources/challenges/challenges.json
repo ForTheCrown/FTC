@@ -95,11 +95,7 @@
   "weekly/wither": {
     "displayName": "Wither",
     "eventClass": "org.bukkit.event.entity.EntityDeathEvent",
-<<<<<<< HEAD
     "script": "challenges/on_kill_wither.js",
-=======
-    "script": "challenges/on_wither_kill.js",
->>>>>>> 3231eee08d622e57f8b8746bb510f7048ca5de84
     "type": "weekly",
     "goal": 5,
     "description": [
@@ -112,11 +108,7 @@
   "weekly/warden": {
     "displayName": "Warden",
     "eventClass": "org.bukkit.event.entity.EntityDeathEvent",
-<<<<<<< HEAD
     "script": "challenges/on_kill_warden.js",
-=======
-    "script": "challenges/on_warden_kill.js",
->>>>>>> 3231eee08d622e57f8b8746bb510f7048ca5de84
     "type": "weekly",
     "description": [
       "Kill a warden"
@@ -173,7 +165,6 @@
       "guildExp": 25
     }
   },
-<<<<<<< HEAD
   "daily/grow_oaks": {
     "displayName": "Oak Trees",
     "eventClass": "org.bukkit.event.world.StructureGrowEvent",
@@ -402,23 +393,16 @@
       "guildExp": 10
     }
   },
-=======
->>>>>>> 3231eee08d622e57f8b8746bb510f7048ca5de84
   "daily/shop_challenge": {
     "displayName": "Item Challenge",
     "eventClass": "custom",
     "goal": 2,
     "description": [
-<<<<<<< HEAD
       "Complete %goal of the daily challenges in /shop."
-=======
-      "Complete %goal of the daily challenges in /shop"
->>>>>>> 3231eee08d622e57f8b8746bb510f7048ca5de84
     ],
     "reward": {
       "guildExp": 40
     }
-<<<<<<< HEAD
   },
   "weekly/break_blocks": {
     "displayName": "Block Breaker",
@@ -494,7 +478,5 @@
     "reward": {
       "guildExp": 25
     }
-=======
->>>>>>> 3231eee08d622e57f8b8746bb510f7048ca5de84
   }
 }
