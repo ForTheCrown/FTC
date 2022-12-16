@@ -1,0 +1,33 @@
+name: ForTheCrown
+version: '${version}'
+main: net.forthecrown.core.Main
+api-version: 1.19
+authors: [ Julie, Wout ]
+prefix: 'FTC'
+
+loadbefore: [
+  OpenInv,
+  GriefPrevention
+]
+
+depend: [
+  RoyalGrenadier,
+  WorldGuard,
+  LuckPerms,
+  AncientGates,
+  GSit
+]
+
+softdepend: [
+  VotingPlugin,
+  dynmap,
+  DiscordSRV
+]
+
+libraries: [
+  '${nashorn}'
+]
+
+buildTime: '${buildDate}'
+buildID: '${buildID}'
+debug_build: ${debug_build}

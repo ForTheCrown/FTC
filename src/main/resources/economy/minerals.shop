@@ -1,0 +1,14 @@
+#---------------------------------------------------------------------------------------#
+# Material        | Price | Max Earnings | Compact Material | Compact Multiplier | Slot #
+#---------------------------------------------------------------------------------------#
+| coal            | 10    |              | coal_block       | 9                  | 2, 2 |
+| emerald         | 7     |              | emerald_block    | 9                  | 3, 2 |
+| diamond         | 400   |              | diamond_block    | 9                  | 4, 2 |
+| lapis_lazuli    | 10    |              | lapis_block      | 9                  | 5, 2 |
+| redstone        | 10    |              | redstone_block   | 9                  | 6, 2 |
+| quartz          | 8     |              | quartz_block     | 4                  | 2, 3 |
+| copper_ingot    | 8     |              | copper_block     | 9                  | 3, 3 |
+| iron_ingot      | 5     |              | iron_block       | 9                  | 4, 3 |
+| gold_ingot      | 7     |              | gold_block       | 9                  | 5, 3 |
+| netherite_ingot | 8000  |              | netherite_block  | 9                  | 6, 3 |
+| amethyst_shard  | 8     |              | amethyst_block   | 4                  | 4, 4 |

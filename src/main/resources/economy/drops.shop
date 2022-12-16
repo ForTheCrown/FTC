@@ -1,0 +1,15 @@
+#------------------------------------------------------------------------------------#
+# Material     | Price | Max Earnings | Compact Material | Compact Multiplier | Slot #
+#------------------------------------------------------------------------------------#
+| rotten_flesh | 2     |              |                  |                    | 2, 2 |
+| bone         | 2     |              |                  |                    | 3, 2 |
+| arrow        | 5     |              |                  |                    | 4, 2 |
+| string       | 2     |              | white_wool       | 4                  | 5, 2 |
+| spider_eye   | 5     |              |                  |                    | 6, 2 |
+| leather      | 10    |              |                  |                    | 2, 3 |
+| gunpowder    | 5     |              |                  |                    | 3, 3 |
+| blaze_rod    | 5     |              |                  |                    | 4, 3 |
+| slime_ball   | 4     |              | slime_block      | 9                  | 5, 3 |
+| cod          | 3     |              |                  |                    | 6, 3 |
+| ink_sac      | 5     |              |                  |                    | 3, 4 |
+| glow_ink_sac | 10    |              |                  |                    | 5, 4 |
