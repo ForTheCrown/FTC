@@ -3,6 +3,5 @@ function canComplete(user) {
 }
 
 function onEvent(event, handle) {
-    // PlayerAdvancementDoneEvent
-    handle.givePoint(event.getPlayer());
+    handle.givePoints(event.getPlayer(), event.getAmount());
 }

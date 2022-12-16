@@ -17,7 +17,3 @@ function onEvent(event, handle) {
         }
     }
 }
-
-function onComplete(user) {
-    logger.warn("Lightning challenge completed by: {}", user.getName())
-}

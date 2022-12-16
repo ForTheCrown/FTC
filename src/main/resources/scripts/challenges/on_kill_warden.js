@@ -6,11 +6,7 @@ function onEvent(event, handle) {
     // EntityDeathEvent
     var player = event.getEntity().getKiller();
 
-    if (player != null && event.getEntity().getType() == EntityType.WITHER) {
+    if (player != null && event.getEntity().getType() == EntityType.WARDEN) {
         handle.givePoint(player);
     }
-}
-
-function onComplete(user) {
-    logger.warn("Wither challenge completed by: {}", user.getName())
 }

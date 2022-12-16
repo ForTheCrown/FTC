@@ -8,7 +8,3 @@ function onEvent(player, handle) {
     // Input should directly be a Player object
     handle.givePoint(player);
 }
-
-function onComplete(user) {
-    logger.warn("Buy challenge completed by: {}", user.getName())
-}

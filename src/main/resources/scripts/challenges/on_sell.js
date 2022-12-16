@@ -7,7 +7,3 @@ function onEvent(event, handle) {
     // (points = Rhines earned)
     handle.givePoints(event.getPlayer(), event.getEarned());
 }
-
-function onComplete(user) {
-    logger.warn("Sell challenge completed by: {}", user.getName())
-}
