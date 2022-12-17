@@ -1,5 +1,9 @@
 package net.forthecrown.guilds.menu;
 
+import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
+
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import net.forthecrown.commands.guild.GuildInviteNode;
 import net.forthecrown.user.User;
@@ -22,213 +26,210 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
-
 @Getter
 public class StatisticsMenu extends MenuPage {
-    private final MembersMenu members;
 
-    public static final int
-            SLOT_GENERAL = 20,
-            SLOT_MEMBERS = 21,
-            SLOT_EXP = 22,
-            SLOT_EFFECTS = 23,
-            SLOT_BANNER = 24;
+  private final MembersMenu members;
 
-    private static final Slot
-            SLOT_JOIN = Slot.of(4, 4);
+  public static final int
+      SLOT_GENERAL = 20,
+      SLOT_MEMBERS = 21,
+      SLOT_EXP = 22,
+      SLOT_EFFECTS = 23,
+      SLOT_BANNER = 24;
 
-    public StatisticsMenu(MenuPage parent) {
-        super(parent);
+  private static final Slot
+      SLOT_JOIN = Slot.of(4, 4);
 
-        members = new MembersMenu(this);
+  public StatisticsMenu(MenuPage parent) {
+    super(parent);
 
-        initMenu(Menus.builder(45, "Guild statistics"), true);
-    }
+    members = new MembersMenu(this);
 
-    @Override
-    protected void createMenu(MenuBuilder builder) {
-        builder.add(SLOT_MEMBERS, members);
+    initMenu(Menus.builder(45, "Guild statistics"), true);
+  }
 
-        // Join button that's only available when the guild is public and
-        // when the viewer doesn't already have a guild
-        builder.add(SLOT_JOIN,
-                MenuNode.builder()
-                        .setItem((user, context) -> {
-                            var guild = context.getOrThrow(GUILD);
+  @Override
+  protected void createMenu(MenuBuilder builder) {
+    builder.add(SLOT_MEMBERS, members);
 
-                            if (!guild.getSettings().isPublic()
-                                    || user.getGuild() != null
-                            ) {
-                                return null;
-                            }
+    // Join button that's only available when the guild is public and
+    // when the viewer doesn't already have a guild
+    builder.add(SLOT_JOIN,
+        MenuNode.builder()
+            .setItem((user, context) -> {
+              var guild = context.getOrThrow(GUILD);
 
-                            var i = ItemStacks.builder(Material.WRITABLE_BOOK)
-                                    .setName(
-                                            Text.format(
-                                                    "Click to join {0}",
-                                                    guild.displayName()
-                                            )
-                                    );
+              if (!guild.getSettings().isPublic()
+                  || user.getGuild() != null
+              ) {
+                return null;
+              }
 
-                            if (guild.isFull()) {
-                                i.addLore("This guild is full and cannot be joined :(")
-                                        .addEnchant(Enchantment.BINDING_CURSE, 1)
-                                        .addFlags(ItemFlag.HIDE_ENCHANTS);
-                            } else {
-                                i.addLore(
-                                        "This guild is public and can be " +
-                                                "joined without invitation"
-                                );
-                            }
+              var i = ItemStacks.builder(Material.WRITABLE_BOOK)
+                  .setName(
+                      Text.format(
+                          "Click to join {0}",
+                          guild.displayName()
+                      )
+                  );
 
-                            return i.build();
-                        })
+              if (guild.isFull()) {
+                i.addLore("This guild is full and cannot be joined :(")
+                    .addEnchant(Enchantment.BINDING_CURSE, 1)
+                    .addFlags(ItemFlag.HIDE_ENCHANTS);
+              } else {
+                i.addLore(
+                    "This guild is public and can be " +
+                        "joined without invitation"
+                );
+              }
 
-                        .setRunnable((user, context, click) -> {
-                            var guild = context.getOrThrow(GUILD);
+              return i.build();
+            })
 
-                            if (!guild.getSettings().isPublic()
-                                    || user.getGuild() != null
-                            ) {
-                                return;
-                            }
+            .setRunnable((user, context, click) -> {
+              var guild = context.getOrThrow(GUILD);
 
-                            GuildInviteNode.ensureJoinable(user, guild);
-                            guild.join(user);
-                            click.shouldReloadMenu(true);
-                        })
+              if (!guild.getSettings().isPublic()
+                  || user.getGuild() != null
+              ) {
+                return;
+              }
 
-                        .build()
-        );
+              GuildInviteNode.ensureJoinable(user, guild);
+              guild.join(user);
+              click.shouldReloadMenu(true);
+            })
 
-        builder.add(SLOT_BANNER,
-                MenuNode.builder()
-                        .setItem((user, context) -> {
-                            var item = context.getOrThrow(GUILD)
-                                    .getSettings()
-                                    .getBanner()
-                                    .clone();
+            .build()
+    );
 
-                            ItemMeta meta = item.getItemMeta();
-                            meta.displayName(Component.text("Guild Banner", NamedTextColor.YELLOW)
-                                    .decoration(TextDecoration.ITALIC, false));
-                            item.setItemMeta(meta);
+    builder.add(SLOT_BANNER,
+        MenuNode.builder()
+            .setItem((user, context) -> {
+              var item = context.getOrThrow(GUILD)
+                  .getSettings()
+                  .getBanner()
+                  .clone();
 
-                            return item;
-                        })
+              ItemMeta meta = item.getItemMeta();
+              meta.displayName(Component.text("Guild Banner", NamedTextColor.YELLOW)
+                  .decoration(TextDecoration.ITALIC, false));
+              item.setItemMeta(meta);
 
-                        .build()
-        );
+              return item;
+            })
 
-        builder.add(SLOT_GENERAL,
-                MenuNode.builder()
-                        .setItem((user, context) -> {
-                            var guild = context.getOrThrow(GUILD);
+            .build()
+    );
 
-                            return ItemStacks.builder(Material.GOLDEN_HELMET)
-                                    .setName("&eGeneral")
-                                    .setLore(
-                                            List.of(
-                                                    Component.text("Guild Leader: ", NamedTextColor.GOLD)
-                                                            .append(guild.getLeader().getUser().displayName()
-                                                                    .color(NamedTextColor.WHITE)),
-                                                    Component.text("Guild created on: ", NamedTextColor.GOLD)
-                                                            .append(guild.getFormattedCreationDate()))
-                                    )
+    builder.add(SLOT_GENERAL,
+        MenuNode.builder()
+            .setItem((user, context) -> {
+              var guild = context.getOrThrow(GUILD);
 
-                                    .addLore(
-                                            Component.text(guild.getSettings().allowsVisit() ?
-                                                            "Has a public /visit location." :
-                                                            "Does not have a public /visit location.")
-                                                    .color(NamedTextColor.WHITE)
-                                                    .decoration(TextDecoration.ITALIC, false)
-                                    )
+              return ItemStacks.builder(Material.GOLDEN_HELMET)
+                  .setName("&eGeneral")
+                  .setLore(
+                      List.of(
+                          Component.text("Guild Leader: ", NamedTextColor.GOLD)
+                              .append(guild.getLeader().getUser().displayName()
+                                  .color(NamedTextColor.WHITE)),
+                          Component.text("Guild created on: ", NamedTextColor.GOLD)
+                              .append(guild.getFormattedCreationDate()))
+                  )
 
-                                    .build();
-                        })
+                  .addLore(
+                      Component.text(guild.getSettings().allowsVisit() ?
+                              "Has a public /visit location." :
+                              "Does not have a public /visit location.")
+                          .color(NamedTextColor.WHITE)
+                          .decoration(TextDecoration.ITALIC, false)
+                  )
 
-                        .build()
-        );
+                  .build();
+            })
 
-        builder.add(SLOT_EXP,
-                MenuNode.builder()
-                        .setItem((user, context) -> {
-                            var guild = context.getOrThrow(GUILD);
+            .build()
+    );
 
-                            return ItemStacks.builder(Material.EXPERIENCE_BOTTLE)
-                                    .setName("&eGuild Experience")
-                                    .setFlags(ItemFlag.HIDE_ATTRIBUTES)
+    builder.add(SLOT_EXP,
+        MenuNode.builder()
+            .setItem((user, context) -> {
+              var guild = context.getOrThrow(GUILD);
 
-                                    // Garbled mess, use Text#format()
-                                    .addLoreRaw(Component.text("Total EXP earned: ", NamedTextColor.GOLD)
-                                            .decoration(TextDecoration.ITALIC, false)
-                                            .append(Component.text(guild.getTotalExp())
-                                                    .color(NamedTextColor.WHITE))
-                                    )
-                                    .addLoreRaw(Component.text("EXP earned today: ", NamedTextColor.GOLD)
-                                            .decoration(TextDecoration.ITALIC, false)
-                                            .append(Component.text(guild.getTotalTodayExp())
-                                                    .color(NamedTextColor.WHITE))
-                                    )
-                                    .addLoreRaw(Component.text("Top EXP contributor: ", NamedTextColor.GOLD)
-                                            .decoration(TextDecoration.ITALIC, false)
-                                            .append(guild.getTopContributor().displayName())
-                                                    .color(NamedTextColor.WHITE)
-                                    )
+              return ItemStacks.builder(Material.EXPERIENCE_BOTTLE)
+                  .setName("&eGuild Experience")
+                  .setFlags(ItemFlag.HIDE_ATTRIBUTES)
 
-                                    .build();
-                        })
+                  // Garbled mess, use Text#format()
+                  .addLoreRaw(Component.text("Total EXP earned: ", NamedTextColor.GOLD)
+                      .decoration(TextDecoration.ITALIC, false)
+                      .append(Component.text(guild.getTotalExp())
+                          .color(NamedTextColor.WHITE))
+                  )
+                  .addLoreRaw(Component.text("EXP earned today: ", NamedTextColor.GOLD)
+                      .decoration(TextDecoration.ITALIC, false)
+                      .append(Component.text(guild.getTotalTodayExp())
+                          .color(NamedTextColor.WHITE))
+                  )
+                  .addLoreRaw(Component.text("Top EXP contributor: ", NamedTextColor.GOLD)
+                      .decoration(TextDecoration.ITALIC, false)
+                      .append(guild.getTopContributor().displayName())
+                      .color(NamedTextColor.WHITE)
+                  )
 
-                        .build()
-        );
+                  .build();
+            })
 
-        builder.add(SLOT_EFFECTS,
-                MenuNode.builder()
-                        .setItem((user, context) -> {
-                            var guild = context.getOrThrow(GUILD);
+            .build()
+    );
 
-                            var item = ItemStacks.builder(Material.GLASS)
-                                    .setName("&eGuild Chunks")
-                                    .setFlags(ItemFlag.HIDE_ATTRIBUTES)
-                                    .build();
+    builder.add(SLOT_EFFECTS,
+        MenuNode.builder()
+            .setItem((user, context) -> {
+              var guild = context.getOrThrow(GUILD);
 
-                            ItemMeta meta = item.getItemMeta();
-                            List<Component> lore = new ArrayList<>();
+              var item = ItemStacks.builder(Material.GLASS)
+                  .setName("&eGuild Chunks")
+                  .setFlags(ItemFlag.HIDE_ATTRIBUTES)
+                  .build();
 
-                            lore.add(Component.text(guild.activeEffectCount() > 0 ? "Active Effects: " : "No active effects.")
-                                    .color(NamedTextColor.GOLD)
-                                    .decoration(TextDecoration.ITALIC, false));
+              ItemMeta meta = item.getItemMeta();
+              List<Component> lore = new ArrayList<>();
 
-                            guild.getActiveEffects().forEach(e -> {
-                                lore.add(Component.text("- ", NamedTextColor.WHITE)
-                                        .decoration(TextDecoration.ITALIC, false)
-                                        .append(e.getName().color(NamedTextColor.WHITE)));
-                            });
+              lore.add(Component.text(
+                      guild.activeEffectCount() > 0 ? "Active Effects: " : "No active effects.")
+                  .color(NamedTextColor.GOLD)
+                  .decoration(TextDecoration.ITALIC, false));
 
-                            meta.lore(lore);
-                            item.setItemMeta(meta);
-                            return item;
-                        })
+              guild.getActiveEffects().forEach(e -> {
+                lore.add(Component.text("- ", NamedTextColor.WHITE)
+                    .decoration(TextDecoration.ITALIC, false)
+                    .append(e.getName().color(NamedTextColor.WHITE)));
+              });
 
-                        .build()
-        );
-    }
+              meta.lore(lore);
+              item.setItemMeta(meta);
+              return item;
+            })
 
-    @Override
-    public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
-        return ItemStacks.builder(Material.NAME_TAG)
-                .setName(Component.text("Statistics", NamedTextColor.YELLOW)
-                        .decoration(TextDecoration.ITALIC, false))
-                .addLore(Component.text("Information about the guild.", NamedTextColor.GRAY))
-                .build();
-    }
+            .build()
+    );
+  }
 
-    @Override
-    protected MenuNode createHeader() {
-        return this;
-    }
+  @Override
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+    return ItemStacks.builder(Material.NAME_TAG)
+        .setName(Component.text("Statistics", NamedTextColor.YELLOW)
+            .decoration(TextDecoration.ITALIC, false))
+        .addLore(Component.text("Information about the guild.", NamedTextColor.GRAY))
+        .build();
+  }
+
+  @Override
+  protected MenuNode createHeader() {
+    return this;
+  }
 }

@@ -12,68 +12,68 @@ import net.forthecrown.user.property.Properties;
 
 public class CommandMarry extends FtcCommand {
 
-    public CommandMarry() {
-        super("marry");
+  public CommandMarry() {
+    super("marry");
 
-        setDescription("Marry a person");
-        setPermission(Permissions.MARRY);
-        register();
-    }
+    setDescription("Marry a person");
+    setPermission(Permissions.MARRY);
+    register();
+  }
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     *
-     * Valid usages of command:
-     * /marry
-     *
-     * Permissions used:
-     * ftc.marry
-     *
-     * Main Author: Julie
-     */
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   *
+   * Valid usages of command:
+   * /marry
+   *
+   * Permissions used:
+   * ftc.marry
+   *
+   * Main Author: Julie
+   */
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("user", Arguments.ONLINE_USER)
-                        .executes(c -> {
-                            User user = getUserSender(c);
-                            User target = Arguments.getUser(c, "user");
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .then(argument("user", Arguments.ONLINE_USER)
+            .executes(c -> {
+              User user = getUserSender(c);
+              User target = Arguments.getUser(c, "user");
 
-                            UserInteractions userSocials = user.getInteractions();
-                            UserInteractions targetSocials = target.getInteractions();
+              UserInteractions userSocials = user.getInteractions();
+              UserInteractions targetSocials = target.getInteractions();
 
-                            // Not self lol
-                            if (target.equals(user)) {
-                                throw Exceptions.MARRY_SELF;
-                            }
+              // Not self lol
+              if (target.equals(user)) {
+                throw Exceptions.MARRY_SELF;
+              }
 
-                            // Both are unmarried
-                            if (userSocials.isMarried()) {
-                                throw Exceptions.ALREADY_MARRIED;
-                            }
+              // Both are unmarried
+              if (userSocials.isMarried()) {
+                throw Exceptions.ALREADY_MARRIED;
+              }
 
-                            if (targetSocials.isMarried()) {
-                                throw Exceptions.targetAlreadyMarried(target);
-                            }
+              if (targetSocials.isMarried()) {
+                throw Exceptions.targetAlreadyMarried(target);
+              }
 
-                            // Both accepting proposals
-                            if (!user.get(Properties.ACCEPTING_PROPOSALS)) {
-                                throw Exceptions.MARRY_DISABLED_SENDER;
-                            }
+              // Both accepting proposals
+              if (!user.get(Properties.ACCEPTING_PROPOSALS)) {
+                throw Exceptions.MARRY_DISABLED_SENDER;
+              }
 
-                            if (!target.get(Properties.ACCEPTING_PROPOSALS)) {
-                                throw Exceptions.marriageDisabledTarget(target);
-                            }
+              if (!target.get(Properties.ACCEPTING_PROPOSALS)) {
+                throw Exceptions.marriageDisabledTarget(target);
+              }
 
-                            targetSocials.setLastProposal(user.getUniqueId());
+              targetSocials.setLastProposal(user.getUniqueId());
 
-                            user.sendMessage(Messages.proposeSender(target));
-                            target.sendMessage(Messages.proposeTarget(user));
-                            return 0;
-                        })
-                );
-    }
+              user.sendMessage(Messages.proposeSender(target));
+              target.sendMessage(Messages.proposeTarget(user));
+              return 0;
+            })
+        );
+  }
 }

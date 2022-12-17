@@ -1,46 +1,46 @@
 package net.forthecrown.waypoint;
 
+import java.util.Objects;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.forthecrown.utils.io.types.SerializerParser;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class WaypointProperty<T> {
-    @EqualsAndHashCode.Include
-    private final String name;
 
-    @EqualsAndHashCode.Include
-    private final int id;
+  @EqualsAndHashCode.Include
+  private final String name;
 
-    private final SerializerParser<T> serializer;
-    private final T defaultValue;
+  @EqualsAndHashCode.Include
+  private final int id;
 
-    public WaypointProperty(String name,
-                            SerializerParser<T> serializer,
-                            T defaultValue
-    ) {
-        this.serializer = Objects.requireNonNull(serializer);
-        this.defaultValue = defaultValue;
+  private final SerializerParser<T> serializer;
+  private final T defaultValue;
 
-        Objects.requireNonNull(name, "Name cannot be null");
+  public WaypointProperty(String name,
+                          SerializerParser<T> serializer,
+                          T defaultValue
+  ) {
+    this.serializer = Objects.requireNonNull(serializer);
+    this.defaultValue = defaultValue;
 
-        var holder = WaypointProperties.REGISTRY
-                .register(name, this);
+    Objects.requireNonNull(name, "Name cannot be null");
 
-        this.id = holder.getId();
-        this.name = holder.getKey();
-    }
+    var holder = WaypointProperties.REGISTRY
+        .register(name, this);
 
-    public void onValueUpdate(Waypoint waypoint,
-                              @Nullable T oldValue,
-                              @Nullable T value
-    ) {
-        // This method is overriden by several instances of this class,
-        // but this was the most used function call I made in it lol
-        Waypoints.updateDynmap(waypoint);
-    }
+    this.id = holder.getId();
+    this.name = holder.getKey();
+  }
+
+  public void onValueUpdate(Waypoint waypoint,
+                            @Nullable T oldValue,
+                            @Nullable T value
+  ) {
+    // This method is overriden by several instances of this class,
+    // but this was the most used function call I made in it lol
+    Waypoints.updateDynmap(waypoint);
+  }
 }

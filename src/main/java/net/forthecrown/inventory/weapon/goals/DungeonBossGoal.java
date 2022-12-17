@@ -13,31 +13,32 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor
 @Getter
 public class DungeonBossGoal implements WeaponKillGoal {
-    private final KeyedBoss boss;
-    private final int goal = 1;
 
-    @Override
-    public Component loreDisplay() {
-        return Component.text("Defeat " + boss.getName());
+  private final KeyedBoss boss;
+  private final int goal = 1;
+
+  @Override
+  public Component loreDisplay() {
+    return Component.text("Defeat " + boss.getName());
+  }
+
+  @Override
+  public boolean test(User user, Entity entity) {
+    // onDeath in DungeonBoss gets called before the weapon listener, getBossEntity() returns null
+    if (!entity.getPersistentDataContainer()
+        .has(Bosses.BOSS_TAG, PersistentDataType.STRING)
+    ) {
+      return false;
     }
 
-    @Override
-    public boolean test(User user, Entity entity) {
-        // onDeath in DungeonBoss gets called before the weapon listener, getBossEntity() returns null
-        if (!entity.getPersistentDataContainer()
-                .has(Bosses.BOSS_TAG, PersistentDataType.STRING)
-        ) {
-            return false;
-        }
+    var bossKey = entity.getPersistentDataContainer()
+        .get(Bosses.BOSS_TAG, PersistentDataType.STRING);
 
-        var bossKey = entity.getPersistentDataContainer()
-                .get(Bosses.BOSS_TAG, PersistentDataType.STRING);
+    return boss.getKey().equals(bossKey);
+  }
 
-        return boss.getKey().equals(bossKey);
-    }
-
-    @Override
-    public @NotNull String getName() {
-        return "boss/" + boss.getKey();
-    }
+  @Override
+  public @NotNull String getName() {
+    return "boss/" + boss.getKey();
+  }
 }

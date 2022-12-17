@@ -6,5 +6,6 @@ import org.bukkit.entity.Player;
 
 @FunctionalInterface
 public interface SimpleNpc {
-    boolean run(Player player, Entity entity) throws CommandSyntaxException;
+
+  boolean run(Player player, Entity entity) throws CommandSyntaxException;
 }

@@ -9,61 +9,63 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 /**
- * A usable which is saved into a {@link PersistentDataContainer}
- * and typically exists within the MC world itself.
+ * A usable which is saved into a {@link PersistentDataContainer} and typically exists within the MC
+ * world itself.
  */
 public abstract class BukkitSavedUsable extends AbstractUsable {
-    /**
-     * Determines if the vanilla interaction that occurs
-     * when you interact with the underlying MC entity
-     * should be cancelled
-     */
-    @Getter @Setter
-    protected boolean cancelVanilla;
 
-    public abstract PersistentDataContainer getDataContainer();
-    protected abstract NamespacedKey getDataKey();
+  /**
+   * Determines if the vanilla interaction that occurs when you interact with the underlying MC
+   * entity should be cancelled
+   */
+  @Getter
+  @Setter
+  protected boolean cancelVanilla;
 
-    public void save() {
-        var container = getDataContainer();
-        save(container);
-    }
+  public abstract PersistentDataContainer getDataContainer();
 
-    public void save(PersistentDataContainer container) {
-        CompoundTag tag = new CompoundTag();
-        save(tag);
+  protected abstract NamespacedKey getDataKey();
 
-        container.set(
-                getDataKey(),
-                PersistentDataType.TAG_CONTAINER,
-                TagUtil.ofCompound(tag)
-        );
-    }
+  public void save() {
+    var container = getDataContainer();
+    save(container);
+  }
 
-    @Override
-    public void save(CompoundTag tag) {
-        tag.putBoolean("cancelVanilla", cancelVanilla);
-        super.save(tag);
-    }
+  public void save(PersistentDataContainer container) {
+    CompoundTag tag = new CompoundTag();
+    save(tag);
 
-    public void load() {
-        var container = getDataContainer();
-        load(container);
-    }
+    container.set(
+        getDataKey(),
+        PersistentDataType.TAG_CONTAINER,
+        TagUtil.ofCompound(tag)
+    );
+  }
 
-    public void load(PersistentDataContainer container) {
-        var tag = container.getOrDefault(
-                getDataKey(),
-                PersistentDataType.TAG_CONTAINER,
-                TagUtil.newContainer()
-        );
+  @Override
+  public void save(CompoundTag tag) {
+    tag.putBoolean("cancelVanilla", cancelVanilla);
+    super.save(tag);
+  }
 
-        load(TagUtil.ofContainer(tag));
-    }
+  public void load() {
+    var container = getDataContainer();
+    load(container);
+  }
 
-    @Override
-    public void load(CompoundTag tag) {
-        setCancelVanilla(tag.getBoolean("cancelVanilla"));
-        super.load(tag);
-    }
+  public void load(PersistentDataContainer container) {
+    var tag = container.getOrDefault(
+        getDataKey(),
+        PersistentDataType.TAG_CONTAINER,
+        TagUtil.newContainer()
+    );
+
+    load(TagUtil.ofContainer(tag));
+  }
+
+  @Override
+  public void load(CompoundTag tag) {
+    setCancelVanilla(tag.getBoolean("cancelVanilla"));
+    super.load(tag);
+  }
 }

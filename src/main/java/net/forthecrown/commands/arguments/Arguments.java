@@ -2,6 +2,7 @@ package net.forthecrown.commands.arguments;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.List;
 import net.forthecrown.commands.arguments.chat.ChatArgument;
 import net.forthecrown.commands.arguments.chat.MessageArgument;
 import net.forthecrown.grenadier.CommandSource;
@@ -12,68 +13,71 @@ import net.forthecrown.user.User;
 import net.forthecrown.waypoint.Waypoint;
 import net.kyori.adventure.text.Component;
 
-import java.util.List;
-
 public interface Arguments {
-    ChatArgument CHAT = new ChatArgument();
 
-    HolidayArgument HOLIDAY = new HolidayArgument();
+  ChatArgument CHAT = new ChatArgument();
 
-    HomeArgument HOME = new HomeArgument();
+  HolidayArgument HOLIDAY = new HolidayArgument();
 
-    MarketArgument MARKET = new MarketArgument();
+  HomeArgument HOME = new HomeArgument();
 
-    RewardRangeArgument REWARD_RANGE = new RewardRangeArgument();
+  MarketArgument MARKET = new MarketArgument();
 
-    TriggerArgument TRIGGER = new TriggerArgument();
+  RewardRangeArgument REWARD_RANGE = new RewardRangeArgument();
 
-    UseCmdArgument<Warp> WARPS = new UseCmdArgument<>(
-            () -> Usables.getInstance().getWarps(), Warp.class
-    );
-    UseCmdArgument<Kit> KITS = new UseCmdArgument<>(
-            () -> Usables.getInstance().getKits(), Kit.class
-    );
+  TriggerArgument TRIGGER = new TriggerArgument();
 
-    UserArgument USER         = new UserArgument(false, true);
-    UserArgument USERS        = new UserArgument(true, true);
-    UserArgument ONLINE_USERS = new UserArgument(true, false);
-    UserArgument ONLINE_USER  = new UserArgument(false, false);
+  UseCmdArgument<Warp> WARPS = new UseCmdArgument<>(
+      () -> Usables.getInstance().getWarps(), Warp.class
+  );
+  UseCmdArgument<Kit> KITS = new UseCmdArgument<>(
+      () -> Usables.getInstance().getKits(), Kit.class
+  );
 
-    MessageArgument MESSAGE = new MessageArgument();
+  UserArgument USER = new UserArgument(false, true);
+  UserArgument USERS = new UserArgument(true, true);
+  UserArgument ONLINE_USERS = new UserArgument(true, false);
+  UserArgument ONLINE_USER = new UserArgument(false, false);
 
-    SellMaterialArgument SELL_MATERIAL = new SellMaterialArgument();
+  MessageArgument MESSAGE = new MessageArgument();
 
-    FtcKeyArgument FTC_KEY = new FtcKeyArgument();
+  SellMaterialArgument SELL_MATERIAL = new SellMaterialArgument();
 
-    GuildArgument GUILD = new GuildArgument();
+  FtcKeyArgument FTC_KEY = new FtcKeyArgument();
 
-    WaypointArgument WAYPOINT = new WaypointArgument();
+  GuildArgument GUILD = new GuildArgument();
 
-    ScriptArgument SCRIPT = new ScriptArgument();
+  WaypointArgument WAYPOINT = new WaypointArgument();
 
-    static List<User> getUsers(CommandContext<CommandSource> c, String argument) throws CommandSyntaxException {
-        UserParseResult result = c.getArgument(argument, UserParseResult.class);
-        return result.getUsers(c.getSource(), true);
-    }
+  ScriptArgument SCRIPT = new ScriptArgument();
 
-    static User getUser(CommandContext<CommandSource> c, String argument) throws CommandSyntaxException {
-        UserParseResult result = c.getArgument(argument, UserParseResult.class);
-        return result.get(c.getSource(), true);
-    }
+  static List<User> getUsers(CommandContext<CommandSource> c, String argument)
+      throws CommandSyntaxException {
+    UserParseResult result = c.getArgument(argument, UserParseResult.class);
+    return result.getUsers(c.getSource(), true);
+  }
 
-    static Waypoint getWaypoint(CommandContext<CommandSource> c, String argument) throws CommandSyntaxException {
-        ParseResult<Waypoint> result = c.getArgument(argument, ParseResult.class);
-        return result.get(c.getSource(), true);
-    }
+  static User getUser(CommandContext<CommandSource> c, String argument)
+      throws CommandSyntaxException {
+    UserParseResult result = c.getArgument(argument, UserParseResult.class);
+    return result.get(c.getSource(), true);
+  }
 
-    static Waypoint getWaypointNoChecks(CommandContext<CommandSource> c, String argument) throws CommandSyntaxException {
-        ParseResult<Waypoint> result = c.getArgument(argument, ParseResult.class);
-        return result.get(c.getSource(), false);
-    }
+  static Waypoint getWaypoint(CommandContext<CommandSource> c, String argument)
+      throws CommandSyntaxException {
+    ParseResult<Waypoint> result = c.getArgument(argument, ParseResult.class);
+    return result.get(c.getSource(), true);
+  }
 
-    static Component getMessage(CommandContext<CommandSource> c, String arg) {
-        var source = c.getSource();
-        return c.getArgument(arg, MessageArgument.Result.class)
-                .format(source.asBukkit());
-    }
+  static Waypoint getWaypointNoChecks(CommandContext<CommandSource> c, String argument)
+      throws CommandSyntaxException {
+    ParseResult<Waypoint> result = c.getArgument(argument, ParseResult.class);
+    return result.get(c.getSource(), false);
+  }
+
+  static Component getMessage(CommandContext<CommandSource> c, String arg) {
+    var source = c.getSource();
+    return c.getArgument(arg, MessageArgument.Result.class)
+        .format(source.asBukkit());
+  }
 }

@@ -10,41 +10,41 @@ import net.forthecrown.waypoint.visit.WaypointVisit;
 
 public class CommandHomeWaypoint extends FtcCommand {
 
-    public CommandHomeWaypoint() {
-        super("HomeWaypoint");
+  public CommandHomeWaypoint() {
+    super("HomeWaypoint");
 
-        setPermission(Permissions.WAYPOINTS);
-        setAliases("homepole", "homepost");
+    setPermission(Permissions.WAYPOINTS);
+    setAliases("homepole", "homepost");
 
-        register();
-    }
+    register();
+  }
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     *
-     * Valid usages of command:
-     * /HomeWaypoint
-     *
-     * Permissions used:
-     *
-     * Main Author:
-     */
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   *
+   * Valid usages of command:
+   * /HomeWaypoint
+   *
+   * Permissions used:
+   *
+   * Main Author:
+   */
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> {
-                    User user = getUserSender(c);
-                    Waypoint home = user.getHomes().getHomeTeleport();
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> {
+          User user = getUserSender(c);
+          Waypoint home = user.getHomes().getHomeTeleport();
 
-                    if (home == null) {
-                        throw Exceptions.NO_HOME_REGION;
-                    }
+          if (home == null) {
+            throw Exceptions.NO_HOME_REGION;
+          }
 
-                    WaypointVisit.visit(user, home);
-                    return 0;
-                });
-    }
+          WaypointVisit.visit(user, home);
+          return 0;
+        });
+  }
 }

@@ -10,41 +10,42 @@ import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildCreateNode extends GuildCommandNode {
-    public GuildCreateNode() {
-        super("guildcreate", "create");
-        setAliases("createguild");
-    }
 
-    @Override
-    protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-        writer.field("create", "Creates a new guild");
-    }
+  public GuildCreateNode() {
+    super("guildcreate", "create");
+    setAliases("createguild");
+  }
 
-    @Override
-    protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command) {
-        command
-                .then(argument("string", StringArgumentType.word())
-                        .executes(c -> {
-                            var user = getUserSender(c);
+  @Override
+  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
+    writer.field("create", "Creates a new guild");
+  }
 
-                            if (user.getGuild() != null) {
-                                throw Exceptions.ALREADY_IN_GUILD;
-                            }
+  @Override
+  protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command) {
+    command
+        .then(argument("string", StringArgumentType.word())
+            .executes(c -> {
+              var user = getUserSender(c);
 
-                            var name = c.getArgument("string", String.class);
-                            Guilds.validateName(name);
+              if (user.getGuild() != null) {
+                throw Exceptions.ALREADY_IN_GUILD;
+              }
 
-                            GuildManager.get()
-                                    .createGuild(user, name);
+              var name = c.getArgument("string", String.class);
+              Guilds.validateName(name);
 
-                            user.sendMessage(
-                                    Text.renderString(
-                                            "&eGuild created!&6" +
-                                            "\nDo, &e/guild help&6 to get info on how guilds work."
-                                    )
-                            );
-                            return 0;
-                        })
-                );
-    }
+              GuildManager.get()
+                  .createGuild(user, name);
+
+              user.sendMessage(
+                  Text.renderString(
+                      "&eGuild created!&6" +
+                          "\nDo, &e/guild help&6 to get info on how guilds work."
+                  )
+              );
+              return 0;
+            })
+        );
+  }
 }

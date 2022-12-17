@@ -1,6 +1,7 @@
 package net.forthecrown.dungeons.level.generator;
 
 import com.google.gson.JsonElement;
+import java.util.Random;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -8,191 +9,198 @@ import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.math.Vectors;
 import org.spongepowered.math.vector.Vector3i;
 
-import java.util.Random;
-
 @Getter
 public class TreeGeneratorConfig {
-    private static final String
-            KEY_MAX_DEPTH = "maxDepth",
-            KEY_MIN_DEPTH = "minDepth",
 
-            KEY_MIN_ROOM_DEPTH = "minRoomDepth",
-            KEY_MAX_ROOM_DEPTH = "maxRoomDepth",
+  private static final String
+      KEY_MAX_DEPTH = "maxDepth",
+      KEY_MIN_DEPTH = "minDepth",
 
-            KEY_MIN_CONNECTOR_DEPTH = "minConnectorDepth",
-            KEY_MAX_CONNECTOR_DEPTH = "maxConnectorDepth",
+  KEY_MIN_ROOM_DEPTH = "minRoomDepth",
+      KEY_MAX_ROOM_DEPTH = "maxRoomDepth",
 
-            KEY_MAX_CONNECTOR_EXITS = "maxConnectorExits",
-            KEY_MAX_ROOM_EXITS = "maxRoomExits",
+  KEY_MIN_CONNECTOR_DEPTH = "minConnectorDepth",
+      KEY_MAX_CONNECTOR_DEPTH = "maxConnectorDepth",
 
-            KEY_OPEN_CHANCE = "openRoomChance",
-            KEY_REQUIRED_ROOMS = "requiredRoomCount",
+  KEY_MAX_CONNECTOR_EXITS = "maxConnectorExits",
+      KEY_MAX_ROOM_EXITS = "maxRoomExits",
 
-            KEY_POTENTIAL_LEVELS = "potentialLevels",
-            KEY_LOCATION = "location",
-            KEY_CHEST_CHANCE = "chestChance",
-            KEY_SEED = "seed";
+  KEY_OPEN_CHANCE = "openRoomChance",
+      KEY_REQUIRED_ROOMS = "requiredRoomCount",
 
-    /** Max depth, to avoid infinite growth */
-    private final int maxDepth;
-    private final int minDepth;
+  KEY_POTENTIAL_LEVELS = "potentialLevels",
+      KEY_LOCATION = "location",
+      KEY_CHEST_CHANCE = "chestChance",
+      KEY_SEED = "seed";
 
-    private final int minRoomDepth;
-    private final int maxRoomDepth;
+  /**
+   * Max depth, to avoid infinite growth
+   */
+  private final int maxDepth;
+  private final int minDepth;
 
-    private final int minConnectorDepth;
-    private final int maxConnectorDepth;
+  private final int minRoomDepth;
+  private final int maxRoomDepth;
 
-    private final int maxConnectorExits;
-    private final int maxRoomExits;
+  private final int minConnectorDepth;
+  private final int maxConnectorDepth;
 
-    /**
-     * The amount of 'potential' levels made by the generator,
-     * from which the best level is selected
-     */
-    private final int potentialLevels;
+  private final int maxConnectorExits;
+  private final int maxRoomExits;
 
-    /** Required amount of non-connector rooms */
-    private final int requiredRooms;
+  /**
+   * The amount of 'potential' levels made by the generator, from which the best level is selected
+   */
+  private final int potentialLevels;
 
-    /**
-     * Chance for a room to have open gates and thus
-     * allow for further nodes to be developed from it
-     */
-    private final float roomOpenChance;
+  /**
+   * Required amount of non-connector rooms
+   */
+  private final int requiredRooms;
 
-    private final float decorateGateRate;
+  /**
+   * Chance for a room to have open gates and thus allow for further nodes to be developed from it
+   */
+  private final float roomOpenChance;
 
-    /** Tree generation location */
-    private final Vector3i location;
+  private final float decorateGateRate;
 
-    /** 0.0 to 1.0 chance a chest location will result in a chest */
-    private final float chestRate;
+  /**
+   * Tree generation location
+   */
+  private final Vector3i location;
 
-    private final Random random;
+  /**
+   * 0.0 to 1.0 chance a chest location will result in a chest
+   */
+  private final float chestRate;
 
-    public TreeGeneratorConfig(Builder builder) {
-        this.maxDepth = builder.maxDepth;
-        this.minDepth = builder.minDepth;
+  private final Random random;
 
-        this.minRoomDepth = builder.minRoomDepth;
-        this.maxRoomDepth = builder.maxRoomDepth;
+  public TreeGeneratorConfig(Builder builder) {
+    this.maxDepth = builder.maxDepth;
+    this.minDepth = builder.minDepth;
 
-        this.minConnectorDepth = builder.minConnectorDepth;
-        this.maxConnectorDepth = builder.maxConnectorDepth;
+    this.minRoomDepth = builder.minRoomDepth;
+    this.maxRoomDepth = builder.maxRoomDepth;
 
-        this.maxConnectorExits = builder.maxConnectorExits;
-        this.maxRoomExits = builder.maxRoomExits;
+    this.minConnectorDepth = builder.minConnectorDepth;
+    this.maxConnectorDepth = builder.maxConnectorDepth;
 
-        this.roomOpenChance = builder.roomOpenChance;
-        this.requiredRooms = builder.requiredRooms;
-        this.decorateGateRate = builder.decorateGateRate;
+    this.maxConnectorExits = builder.maxConnectorExits;
+    this.maxRoomExits = builder.maxRoomExits;
 
-        this.location = builder.location;
-        this.chestRate = builder.chestRate;
-        this.random = builder.random;
+    this.roomOpenChance = builder.roomOpenChance;
+    this.requiredRooms = builder.requiredRooms;
+    this.decorateGateRate = builder.decorateGateRate;
 
-        this.potentialLevels = builder.potentialLevels;
+    this.location = builder.location;
+    this.chestRate = builder.chestRate;
+    this.random = builder.random;
+
+    this.potentialLevels = builder.potentialLevels;
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static TreeGeneratorConfig defaultConfig() {
+    return builder().build();
+  }
+
+  public static TreeGeneratorConfig deserialize(JsonElement element) {
+    JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
+    var builder = builder();
+
+    if (json.has(KEY_MAX_DEPTH)) {
+      builder.maxDepth(json.getInt(KEY_MAX_DEPTH));
     }
 
-    public static Builder builder() {
-        return new Builder();
+    if (json.has(KEY_MIN_DEPTH)) {
+      builder.minDepth(json.getInt(KEY_MIN_DEPTH));
     }
 
-    public static TreeGeneratorConfig defaultConfig() {
-        return builder().build();
+    if (json.has(KEY_MIN_CONNECTOR_DEPTH)) {
+      builder.minConnectorDepth(json.getInt(KEY_MIN_CONNECTOR_DEPTH));
     }
 
-    public static TreeGeneratorConfig deserialize(JsonElement element) {
-        JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());
-        var builder = builder();
-
-        if (json.has(KEY_MAX_DEPTH)) {
-            builder.maxDepth(json.getInt(KEY_MAX_DEPTH));
-        }
-
-        if (json.has(KEY_MIN_DEPTH)) {
-            builder.minDepth(json.getInt(KEY_MIN_DEPTH));
-        }
-
-        if (json.has(KEY_MIN_CONNECTOR_DEPTH)) {
-            builder.minConnectorDepth(json.getInt(KEY_MIN_CONNECTOR_DEPTH));
-        }
-
-        if (json.has(KEY_MAX_CONNECTOR_DEPTH)) {
-            builder.maxConnectorDepth(json.getInt(KEY_MAX_CONNECTOR_DEPTH));
-        }
-
-        if (json.has(KEY_MAX_CONNECTOR_EXITS)) {
-            builder.maxConnectorExits(json.getInt(KEY_MAX_CONNECTOR_EXITS));
-        }
-
-        if (json.has(KEY_MAX_ROOM_EXITS)) {
-            builder.maxRoomExits(json.getInt(KEY_MAX_ROOM_EXITS));
-        }
-
-        if (json.has(KEY_POTENTIAL_LEVELS)) {
-            builder.potentialLevels(json.getInt(KEY_POTENTIAL_LEVELS));
-        }
-
-        if (json.has(KEY_LOCATION)) {
-            builder.location(Vectors.read3i(json.get(KEY_LOCATION)));
-        }
-
-        if (json.has(KEY_CHEST_CHANCE)) {
-            builder.chestRate(json.getFloat(KEY_CHEST_CHANCE));
-        }
-
-        if (json.has(KEY_SEED)) {
-            builder.random(new Random(json.getLong(KEY_SEED)));
-        }
-
-        if (json.has(KEY_MIN_ROOM_DEPTH)) {
-            builder.minRoomDepth(json.getInt(KEY_MIN_ROOM_DEPTH));
-        }
-
-        if (json.has(KEY_MAX_ROOM_DEPTH)) {
-            builder.maxRoomDepth(json.getInt(KEY_MAX_ROOM_DEPTH));
-        }
-
-        if (json.has(KEY_OPEN_CHANCE)) {
-            builder.roomOpenChance(json.getInt(KEY_OPEN_CHANCE));
-        }
-
-        if (json.has(KEY_REQUIRED_ROOMS)) {
-            builder.requiredRooms(json.getInt(KEY_REQUIRED_ROOMS));
-        }
-
-        return builder.build();
+    if (json.has(KEY_MAX_CONNECTOR_DEPTH)) {
+      builder.maxConnectorDepth(json.getInt(KEY_MAX_CONNECTOR_DEPTH));
     }
 
-    @Getter @Setter
-    @Accessors(chain = true, fluent = true)
-    public static class Builder {
-        private int maxDepth = 10;
-        private int minDepth = 5;
-
-        private int minRoomDepth = 1;
-        private int maxRoomDepth = 1;
-
-        private int minConnectorDepth = 1;
-        private int maxConnectorDepth = 2;
-
-        private int maxConnectorExits = 3;
-        private int maxRoomExits = 3;
-
-        private float roomOpenChance = 0.1F;
-        private float decorateGateRate = 0.5F;
-
-        private int requiredRooms = 3;
-
-        private int potentialLevels = 35;
-        private Vector3i location = Vector3i.ZERO;
-        private float chestRate = 0.3f;
-        private Random random = new Random();
-
-        public TreeGeneratorConfig build() {
-            return new TreeGeneratorConfig(this);
-        }
+    if (json.has(KEY_MAX_CONNECTOR_EXITS)) {
+      builder.maxConnectorExits(json.getInt(KEY_MAX_CONNECTOR_EXITS));
     }
+
+    if (json.has(KEY_MAX_ROOM_EXITS)) {
+      builder.maxRoomExits(json.getInt(KEY_MAX_ROOM_EXITS));
+    }
+
+    if (json.has(KEY_POTENTIAL_LEVELS)) {
+      builder.potentialLevels(json.getInt(KEY_POTENTIAL_LEVELS));
+    }
+
+    if (json.has(KEY_LOCATION)) {
+      builder.location(Vectors.read3i(json.get(KEY_LOCATION)));
+    }
+
+    if (json.has(KEY_CHEST_CHANCE)) {
+      builder.chestRate(json.getFloat(KEY_CHEST_CHANCE));
+    }
+
+    if (json.has(KEY_SEED)) {
+      builder.random(new Random(json.getLong(KEY_SEED)));
+    }
+
+    if (json.has(KEY_MIN_ROOM_DEPTH)) {
+      builder.minRoomDepth(json.getInt(KEY_MIN_ROOM_DEPTH));
+    }
+
+    if (json.has(KEY_MAX_ROOM_DEPTH)) {
+      builder.maxRoomDepth(json.getInt(KEY_MAX_ROOM_DEPTH));
+    }
+
+    if (json.has(KEY_OPEN_CHANCE)) {
+      builder.roomOpenChance(json.getInt(KEY_OPEN_CHANCE));
+    }
+
+    if (json.has(KEY_REQUIRED_ROOMS)) {
+      builder.requiredRooms(json.getInt(KEY_REQUIRED_ROOMS));
+    }
+
+    return builder.build();
+  }
+
+  @Getter
+  @Setter
+  @Accessors(chain = true, fluent = true)
+  public static class Builder {
+
+    private int maxDepth = 10;
+    private int minDepth = 5;
+
+    private int minRoomDepth = 1;
+    private int maxRoomDepth = 1;
+
+    private int minConnectorDepth = 1;
+    private int maxConnectorDepth = 2;
+
+    private int maxConnectorExits = 3;
+    private int maxRoomExits = 3;
+
+    private float roomOpenChance = 0.1F;
+    private float decorateGateRate = 0.5F;
+
+    private int requiredRooms = 3;
+
+    private int potentialLevels = 35;
+    private Vector3i location = Vector3i.ZERO;
+    private float chestRate = 0.3f;
+    private Random random = new Random();
+
+    public TreeGeneratorConfig build() {
+      return new TreeGeneratorConfig(this);
+    }
+  }
 }

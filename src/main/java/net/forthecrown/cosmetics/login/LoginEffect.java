@@ -17,78 +17,79 @@ import org.bukkit.inventory.ItemFlag;
 
 @Getter
 public class LoginEffect extends Cosmetic {
-    private final RankTier tier;
-    private final Component prefix, suffix;
 
-    public LoginEffect(String name, Slot slot, RankTier tier, Component prefix, Component suffix) {
-        super(name, Cosmetics.LOGIN, slot);
-        this.tier = tier;
-        this.prefix = prefix;
-        this.suffix = suffix;
-    }
+  private final RankTier tier;
+  private final Component prefix, suffix;
 
-    @Override
-    public MenuNode createNode() {
-        return MenuNode.builder()
-                .setItem((user, context) -> {
-                    var builder = ItemStacks.builder(
-                            displayData.getMaterial(user.getTitles().hasTier(tier))
-                    )
-                            .setName(displayData.getItemDisplayName())
-                            .addLore("&7Join/Leave decoration")
-                            .addLore("&7Example:")
-                            .addLore(
-                                    Messages.joinMessage(
-                                            LoginEffects.createDisplayName(
-                                                    user, user, this
-                                            )
-                                    )
-                            );
+  public LoginEffect(String name, Slot slot, RankTier tier, Component prefix, Component suffix) {
+    super(name, Cosmetics.LOGIN, slot);
+    this.tier = tier;
+    this.prefix = prefix;
+    this.suffix = suffix;
+  }
 
-                    boolean active = equals(
-                            user.getCosmeticData()
-                                    .get(Cosmetics.LOGIN)
-                    );
+  @Override
+  public MenuNode createNode() {
+    return MenuNode.builder()
+        .setItem((user, context) -> {
+          var builder = ItemStacks.builder(
+                  displayData.getMaterial(user.getTitles().hasTier(tier))
+              )
+              .setName(displayData.getItemDisplayName())
+              .addLore("&7Join/Leave decoration")
+              .addLore("&7Example:")
+              .addLore(
+                  Messages.joinMessage(
+                      LoginEffects.createDisplayName(
+                          user, user, this
+                      )
+                  )
+              );
 
-                    if (active) {
-                        builder
-                                .setFlags(ItemFlag.HIDE_ENCHANTS)
-                                .addEnchant(Enchantment.BINDING_CURSE, 1);
-                    }
+          boolean active = equals(
+              user.getCosmeticData()
+                  .get(Cosmetics.LOGIN)
+          );
 
-                    if (!user.getTitles().hasTier(tier)) {
-                        builder.addLore(
-                                Component.text("Requires " + Text.prettyEnumName(tier),
-                                        NamedTextColor.RED
-                                )
-                        );
-                    }
+          if (active) {
+            builder
+                .setFlags(ItemFlag.HIDE_ENCHANTS)
+                .addEnchant(Enchantment.BINDING_CURSE, 1);
+          }
 
-                    return builder.build();
-                })
+          if (!user.getTitles().hasTier(tier)) {
+            builder.addLore(
+                Component.text("Requires " + Text.prettyEnumName(tier),
+                    NamedTextColor.RED
+                )
+            );
+          }
 
-                .setRunnable((user, context) -> {
-                    if (!user.getTitles().hasTier(tier)) {
-                        throw Exceptions.DONT_HAVE_TIER;
-                    }
+          return builder.build();
+        })
 
-                    var cosmetics = user.getCosmeticData();
-                    boolean active = equals(
-                            cosmetics.get(Cosmetics.LOGIN)
-                    );
+        .setRunnable((user, context) -> {
+          if (!user.getTitles().hasTier(tier)) {
+            throw Exceptions.DONT_HAVE_TIER;
+          }
 
-                    if (active) {
-                        throw Exceptions.alreadySetCosmetic(
-                                displayName(),
-                                type.getDisplayName()
-                        );
-                    }
+          var cosmetics = user.getCosmeticData();
+          boolean active = equals(
+              cosmetics.get(Cosmetics.LOGIN)
+          );
 
-                    user.sendMessage(Messages.setCosmetic(this));
-                    cosmetics.set(type, this);
-                    context.shouldReloadMenu(true);
-                })
+          if (active) {
+            throw Exceptions.alreadySetCosmetic(
+                displayName(),
+                type.getDisplayName()
+            );
+          }
 
-                .build();
-    }
+          user.sendMessage(Messages.setCosmetic(this));
+          cosmetics.set(type, this);
+          context.shouldReloadMenu(true);
+        })
+
+        .build();
+  }
 }

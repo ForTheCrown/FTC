@@ -6,5 +6,6 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.useables.UsageTypeHolder;
 
 public interface UsageHolderProvider<T extends UsageTypeHolder> {
-    T get(CommandContext<CommandSource> context) throws CommandSyntaxException;
+
+  T get(CommandContext<CommandSource> context) throws CommandSyntaxException;
 }

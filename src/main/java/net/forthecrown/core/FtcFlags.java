@@ -12,27 +12,29 @@ import org.bukkit.Location;
  * Creates and registers flags for this plugin
  */
 public final class FtcFlags {
-    private FtcFlags() {}
 
-    public static final StateFlag
-            SHOP_CREATION   = new StateFlag("shop-creation", true),
-            TRAPDOOR_USE    = new StateFlag("trapdoor-use", true);
+  private FtcFlags() {
+  }
 
-    static void init() {
-        FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+  public static final StateFlag
+      SHOP_CREATION = new StateFlag("shop-creation", true),
+      TRAPDOOR_USE = new StateFlag("trapdoor-use", true);
 
-        try {
-            registry.register(SHOP_CREATION);
-            registry.register(TRAPDOOR_USE);
-        } catch (FlagConflictException e){
-            e.printStackTrace();
-        }
+  static void init() {
+    FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+
+    try {
+      registry.register(SHOP_CREATION);
+      registry.register(TRAPDOOR_USE);
+    } catch (FlagConflictException e) {
+      e.printStackTrace();
     }
+  }
 
-    public static <T> T query(Location pos, Flag<T> flag) {
-        return WorldGuard.getInstance()
-                .getPlatform()
-                .getRegionContainer().createQuery()
-                .queryValue(BukkitAdapter.adapt(pos), null, flag);
-    }
+  public static <T> T query(Location pos, Flag<T> flag) {
+    return WorldGuard.getInstance()
+        .getPlatform()
+        .getRegionContainer().createQuery()
+        .queryValue(BukkitAdapter.adapt(pos), null, flag);
+  }
 }

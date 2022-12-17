@@ -12,52 +12,53 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 /**
- * Listener for detecting if AFK players should be
- * un-AFK-ed or for pushing back the {@link AfkKicker}
+ * Listener for detecting if AFK players should be un-AFK-ed or for pushing back the
+ * {@link AfkKicker}
  */
 public class AfkListener implements Listener {
-    public static void checkUnafk(PlayerEvent event){
-        checkUnafk(event.getPlayer());
+
+  public static void checkUnafk(PlayerEvent event) {
+    checkUnafk(event.getPlayer());
+  }
+
+  public static void checkUnafk(Player plr) {
+    var user = Users.getLoadedUser(plr.getUniqueId());
+
+    if (user == null || !user.isAfk()) {
+      return;
     }
 
-    public static void checkUnafk(Player plr){
-        var user = Users.getLoadedUser(plr.getUniqueId());
+    user.unafk();
+  }
 
-        if (user == null || !user.isAfk()) {
-            return;
-        }
-
-        user.unafk();
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerMove(PlayerMoveEvent event) {
+    if (!event.hasChangedBlock()) {
+      return;
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerMove(PlayerMoveEvent event) {
-        if (!event.hasChangedBlock()) {
-            return;
-        }
+    checkUnafk(event);
+    AfkKicker.addOrDelay(event.getPlayer().getUniqueId());
+  }
 
-        checkUnafk(event);
-        AfkKicker.addOrDelay(event.getPlayer().getUniqueId());
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+    AfkKicker.addOrDelay(event.getPlayer().getUniqueId());
+
+    if (!event.getMessage().startsWith("/afk")
+        && !event.getMessage().startsWith("afk")
+    ) {
+      checkUnafk(event);
     }
+  }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-        AfkKicker.addOrDelay(event.getPlayer().getUniqueId());
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerInteract(PlayerInteractEvent event) {
+    checkUnafk(event);
+  }
 
-        if (!event.getMessage().startsWith("/afk")
-                && !event.getMessage().startsWith("afk")
-        ) {
-            checkUnafk(event);
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        checkUnafk(event);
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        checkUnafk(event.getEntity());
-    }
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerDeath(PlayerDeathEvent event) {
+    checkUnafk(event.getEntity());
+  }
 }

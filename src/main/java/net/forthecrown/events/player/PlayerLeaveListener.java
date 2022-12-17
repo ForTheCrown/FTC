@@ -13,20 +13,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerLeaveListener implements Listener {
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerLeave(PlayerQuitEvent event){
-        User user = Users.get(event.getPlayer());
-        user.onLeave();
 
-        PacketListeners.uninject(event.getPlayer());
-        AfkKicker.remove(user.getUniqueId());
-        event.quitMessage(null);
+  @EventHandler(priority = EventPriority.LOWEST)
+  public void onPlayerLeave(PlayerQuitEvent event) {
+    User user = Users.get(event.getPlayer());
+    user.onLeave();
 
-        if (!user.get(Properties.VANISHED)) {
-            PlayerJoinListener.sendLogoutMessage(user);
-        }
+    PacketListeners.uninject(event.getPlayer());
+    AfkKicker.remove(user.getUniqueId());
+    event.quitMessage(null);
 
-        UserManager.get().unload(user);
-        TabList.update();
+    if (!user.get(Properties.VANISHED)) {
+      PlayerJoinListener.sendLogoutMessage(user);
     }
+
+    UserManager.get().unload(user);
+    TabList.update();
+  }
 }

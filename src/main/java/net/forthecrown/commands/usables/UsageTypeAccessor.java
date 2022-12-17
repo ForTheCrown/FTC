@@ -1,51 +1,58 @@
 package net.forthecrown.commands.usables;
 
 import net.forthecrown.commands.arguments.RegistryArguments;
-import net.forthecrown.useables.*;
+import net.forthecrown.useables.ActionHolder;
+import net.forthecrown.useables.CheckHolder;
+import net.forthecrown.useables.UsageAction;
+import net.forthecrown.useables.UsageInstance;
+import net.forthecrown.useables.UsageTest;
+import net.forthecrown.useables.UsageType;
+import net.forthecrown.useables.UsageTypeHolder;
+import net.forthecrown.useables.UsageTypeList;
 
 // Accessor which provides a common way of accessing a usage type holder
 // this is so I wouldn't have to rewrite the arguments for action holders
 // and check holders both.
-interface UsageTypeAccessor<T extends  UsageInstance, H extends UsageTypeHolder> {
+interface UsageTypeAccessor<T extends UsageInstance, H extends UsageTypeHolder> {
 
-    UsageTypeAccessor<UsageTest, CheckHolder> CHECKS = new UsageTypeAccessor<>() {
-        @Override
-        public UsageTypeList getList(CheckHolder holder) {
-            return holder.getChecks();
-        }
+  UsageTypeAccessor<UsageTest, CheckHolder> CHECKS = new UsageTypeAccessor<>() {
+    @Override
+    public UsageTypeList getList(CheckHolder holder) {
+      return holder.getChecks();
+    }
 
-        @Override
-        public String getName() {
-            return "Test";
-        }
+    @Override
+    public String getName() {
+      return "Test";
+    }
 
-        @Override
-        public RegistryArguments<UsageType<UsageTest>> getArgumentType() {
-            return RegistryArguments.USAGE_CHECK;
-        }
-    };
+    @Override
+    public RegistryArguments<UsageType<UsageTest>> getArgumentType() {
+      return RegistryArguments.USAGE_CHECK;
+    }
+  };
 
 
-    UsageTypeAccessor<UsageAction, ActionHolder> ACTIONS = new UsageTypeAccessor<>() {
-        @Override
-        public UsageTypeList getList(ActionHolder holder) {
-            return holder.getActions();
-        }
+  UsageTypeAccessor<UsageAction, ActionHolder> ACTIONS = new UsageTypeAccessor<>() {
+    @Override
+    public UsageTypeList getList(ActionHolder holder) {
+      return holder.getActions();
+    }
 
-        @Override
-        public String getName() {
-            return "Action";
-        }
+    @Override
+    public String getName() {
+      return "Action";
+    }
 
-        @Override
-        public RegistryArguments<UsageType<UsageAction>> getArgumentType() {
-            return RegistryArguments.USAGE_ACTION;
-        }
-    };
+    @Override
+    public RegistryArguments<UsageType<UsageAction>> getArgumentType() {
+      return RegistryArguments.USAGE_ACTION;
+    }
+  };
 
-    UsageTypeList<T> getList(H holder);
+  UsageTypeList<T> getList(H holder);
 
-    String getName();
+  String getName();
 
-    RegistryArguments<UsageType<T>> getArgumentType();
+  RegistryArguments<UsageType<T>> getArgumentType();
 }

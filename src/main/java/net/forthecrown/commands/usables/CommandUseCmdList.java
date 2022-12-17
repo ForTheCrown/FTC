@@ -3,58 +3,59 @@ package net.forthecrown.commands.usables;
 import net.forthecrown.commands.arguments.UseCmdArgument;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.utils.text.Text;
-import net.forthecrown.utils.text.TextJoiner;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.useables.command.CommandUsable;
+import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.TextJoiner;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandUseCmdList<T extends CommandUsable> extends FtcCommand {
-    private final UseCmdArgument<T> argument;
 
-    public CommandUseCmdList(String name, UseCmdArgument<T> argument) {
-        super(name + "s");
+  private final UseCmdArgument<T> argument;
 
-        setAliases(name + "list");
-        this.argument = argument;
+  public CommandUseCmdList(String name, UseCmdArgument<T> argument) {
+    super(name + "s");
 
-        register();
-    }
+    setAliases(name + "list");
+    this.argument = argument;
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     *
-     * Valid usages of command:
-     * /UseCmdList
-     *
-     * Permissions used:
-     *
-     * Main Author:
-     */
+    register();
+  }
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> {
-                    var user = getUserSender(c);
-                    var list = argument.getManager().getUsable(user.getPlayer());
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   *
+   * Valid usages of command:
+   * /UseCmdList
+   *
+   * Permissions used:
+   *
+   * Main Author:
+   */
 
-                    if (list.isEmpty()) {
-                        throw Exceptions.NOTHING_TO_LIST;
-                    }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> {
+          var user = getUserSender(c);
+          var list = argument.getManager().getUsable(user.getPlayer());
 
-                    user.sendMessage(
-                            Text.format("{0, class}s: &e{1}",
-                                    NamedTextColor.GRAY,
+          if (list.isEmpty()) {
+            throw Exceptions.NOTHING_TO_LIST;
+          }
 
-                                    argument.getTypeClass(),
-                                    TextJoiner.onComma()
-                                            .add(list.stream().map(CommandUsable::displayName))
-                            )
-                    );
-                    return 0;
-                });
-    }
+          user.sendMessage(
+              Text.format("{0, class}s: &e{1}",
+                  NamedTextColor.GRAY,
+
+                  argument.getTypeClass(),
+                  TextJoiner.onComma()
+                      .add(list.stream().map(CommandUsable::displayName))
+              )
+          );
+          return 0;
+        });
+  }
 }

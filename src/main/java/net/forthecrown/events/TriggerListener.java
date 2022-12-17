@@ -8,16 +8,17 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 @RequiredArgsConstructor
 public class TriggerListener implements Listener {
-    private final TriggerManager manager;
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerMove(PlayerMoveEvent event) {
-        // We only care about block changes, since
-        // triggers are based on blocks
-        if (!event.hasChangedPosition()) {
-            return;
-        }
+  private final TriggerManager manager;
 
-        manager.run(event.getPlayer(), event.getFrom(), event.getTo());
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerMove(PlayerMoveEvent event) {
+    // We only care about block changes, since
+    // triggers are based on blocks
+    if (!event.hasChangedPosition()) {
+      return;
     }
+
+    manager.run(event.getPlayer(), event.getFrom(), event.getTo());
+  }
 }

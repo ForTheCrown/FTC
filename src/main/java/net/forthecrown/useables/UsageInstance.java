@@ -1,33 +1,33 @@
 package net.forthecrown.useables;
 
+import java.util.Objects;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.Tag;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
 public abstract class UsageInstance {
-    @Getter
-    private final UsageType type;
 
-    public UsageInstance(UsageType type) {
-        this.type = Objects.requireNonNull(type);
+  @Getter
+  private final UsageType type;
 
-        // Only this class' type is allowed to initialize
-        // this class
-        Validate.isTrue(
-                type.getTypeClass() == getClass(),
+  public UsageInstance(UsageType type) {
+    this.type = Objects.requireNonNull(type);
 
-                "Invalid type used to initialize %s",
-                getClass().getName()
-        );
-    }
+    // Only this class' type is allowed to initialize
+    // this class
+    Validate.isTrue(
+        type.getTypeClass() == getClass(),
 
-    @Nullable
-    public abstract Component displayInfo();
+        "Invalid type used to initialize %s",
+        getClass().getName()
+    );
+  }
 
-    @Nullable
-    public abstract Tag save();
+  @Nullable
+  public abstract Component displayInfo();
+
+  @Nullable
+  public abstract Tag save();
 }

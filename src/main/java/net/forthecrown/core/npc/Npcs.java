@@ -13,30 +13,32 @@ import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 
 public final class Npcs {
-    private Npcs() {}
 
-    public static final NamespacedKey KEY = Keys.forthecrown("interactable_npc");
+  private Npcs() {
+  }
 
-    public static boolean interact(String id, Entity entity, Player player, boolean cancelled) {
-        var npc = Registries.NPCS.get(id);
+  public static final NamespacedKey KEY = Keys.forthecrown("interactable_npc");
 
-        if (npc.isEmpty()) {
-            FTC.getLogger().warn("Unknown NPC key: " + id);
-            return cancelled;
-        }
+  public static boolean interact(String id, Entity entity, Player player, boolean cancelled) {
+    var npc = Registries.NPCS.get(id);
 
-        try {
-            return npc.get().run(player, entity);
-        } catch (CommandSyntaxException e) {
-            Exceptions.handleSyntaxException(player, e);
-            return cancelled;
-        }
+    if (npc.isEmpty()) {
+      FTC.getLogger().warn("Unknown NPC key: " + id);
+      return cancelled;
     }
 
-    public static void make(String key, Entity entity) throws IllegalArgumentException {
-        Validate.isTrue(entity.getType() != EntityType.PLAYER, "Entity cannot be player");
-
-        entity.getPersistentDataContainer()
-                .set(KEY, PersistentDataType.STRING, key);
+    try {
+      return npc.get().run(player, entity);
+    } catch (CommandSyntaxException e) {
+      Exceptions.handleSyntaxException(player, e);
+      return cancelled;
     }
+  }
+
+  public static void make(String key, Entity entity) throws IllegalArgumentException {
+    Validate.isTrue(entity.getType() != EntityType.PLAYER, "Entity cannot be player");
+
+    entity.getPersistentDataContainer()
+        .set(KEY, PersistentDataType.STRING, key);
+  }
 }

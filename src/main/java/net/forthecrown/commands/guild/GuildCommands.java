@@ -8,93 +8,95 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.guilds.menu.GuildMenus;
 
 public class GuildCommands {
-    static final GuildCommandNode[] NODES = {
-            new GuildHelpNode(),
-            new GuildInfoNode(),
-            new GuildListNode(),
 
-            new GuildSetNode(),
-            new GuildPermNode(),
+  static final GuildCommandNode[] NODES = {
+      new GuildHelpNode(),
+      new GuildInfoNode(),
+      new GuildListNode(),
 
-            new GuildInviteNode(),
-            new GuildKickNode(),
-            new GuildJoinNode(),
-            new GuildLeaveNode(),
+      new GuildSetNode(),
+      new GuildPermNode(),
 
-            new GuildChunkNode(),
+      new GuildInviteNode(),
+      new GuildKickNode(),
+      new GuildJoinNode(),
+      new GuildLeaveNode(),
 
-            new GuildChatNode(),
+      new GuildChunkNode(),
 
-            new GuildCreateNode(),
-            new GuildDeleteNode(),
+      new GuildChatNode(),
 
-            new GuildDiscoveryNode(),
+      new GuildCreateNode(),
+      new GuildDeleteNode(),
 
-            new GuildChangeRankNode("guildpromote", "promote", true),
-            new GuildChangeRankNode("guilddemote", "demote", false),
-    };
+      new GuildDiscoveryNode(),
 
-    public static void createCommands() {
-        new CommandGuild();
+      new GuildChangeRankNode("guildpromote", "promote", true),
+      new GuildChangeRankNode("guilddemote", "demote", false),
+  };
+
+  public static void createCommands() {
+    new CommandGuild();
+  }
+
+  static class CommandGuild extends FtcCommand {
+
+    public CommandGuild() {
+      super("guild");
+
+      setPermission(Permissions.GUILD);
+      setDescription("Guild command");
+      setAliases("g");
+
+      register();
     }
 
-    static class CommandGuild extends FtcCommand {
-        public CommandGuild() {
-            super("guild");
-
-            setPermission(Permissions.GUILD);
-            setDescription("Guild command");
-            setAliases("g");
-
-            register();
+    @Override
+    protected void createCommand(BrigadierCommand command) {
+      for (var n : NODES) {
+        // The help command shouldn't be created
+        if (!n.getName().contains("help")) {
+          n.register();
         }
 
-        @Override
-        protected void createCommand(BrigadierCommand command) {
-            for (var n: NODES) {
-                // The help command shouldn't be created
-                if (!n.getName().contains("help")) {
-                    n.register();
-                }
+        for (var name : n.getArgumentName()) {
+          var literal = literal(name)
+              .executes(c -> {
+                StringReader reader = new StringReader(c.getInput());
+                reader.setCursor(reader.getTotalLength());
 
-                for (var name: n.getArgumentName()) {
-                    var literal = literal(name)
-                            .executes(c -> {
-                                StringReader reader = new StringReader(c.getInput());
-                                reader.setCursor(reader.getTotalLength());
+                throw CommandSyntaxException.BUILT_IN_EXCEPTIONS
+                    .dispatcherUnknownArgument()
+                    .createWithContext(reader);
+              })
 
-                                throw CommandSyntaxException.BUILT_IN_EXCEPTIONS
-                                        .dispatcherUnknownArgument()
-                                        .createWithContext(reader);
-                            })
+              .requires(n);
 
-                            .requires(n);
+          n.create(literal);
+          command.then(literal);
+        }
+      }
 
-                    n.create(literal);
-                    command.then(literal);
-                }
+      command
+          .executes(context -> {
+            var user = getUserSender(context);
+
+            if (user.getGuild() == null) {
+              GuildMenus.open(
+                  GuildMenus.DISCOVERY_MENU,
+                  user,
+                  null
+              );
+              return 0;
             }
 
-            command
-                    .executes(context -> {
-                        var user = getUserSender(context);
-
-                        if (user.getGuild() == null) {
-                            GuildMenus.open(
-                                    GuildMenus.DISCOVERY_MENU,
-                                    user,
-                                    null
-                            );
-                            return 0;
-                        }
-
-                        GuildMenus.open(
-                                GuildMenus.MAIN_MENU,
-                                user,
-                                user.getGuild()
-                        );
-                        return 0;
-                    });
-        }
+            GuildMenus.open(
+                GuildMenus.MAIN_MENU,
+                user,
+                user.getGuild()
+            );
+            return 0;
+          });
     }
+  }
 }

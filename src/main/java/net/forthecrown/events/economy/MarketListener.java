@@ -7,10 +7,10 @@ import net.forthecrown.economy.market.MarketManager;
 import net.forthecrown.economy.market.MarketShop;
 import net.forthecrown.economy.market.Markets;
 import net.forthecrown.economy.market.ShopEntrance;
-import net.forthecrown.utils.text.format.UnitFormat;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Util;
+import net.forthecrown.utils.text.format.UnitFormat;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -26,96 +26,98 @@ import org.bukkit.persistence.PersistentDataType;
 import org.spongepowered.math.vector.Vector3i;
 
 public class MarketListener implements Listener {
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEntityEvent event) {
-        bookLogic(event.getRightClicked(), Users.get(event.getPlayer()));
+
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerInteract(PlayerInteractEntityEvent event) {
+    bookLogic(event.getRightClicked(), Users.get(event.getPlayer()));
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerInteract(PlayerInteractEvent event) {
+    BlockState state = event.getClickedBlock().getState();
+
+    if (!(state instanceof PersistentDataHolder)) {
+      return;
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        BlockState state = event.getClickedBlock().getState();
+    bookLogic(((PersistentDataHolder) state), Users.get(event.getPlayer()));
+  }
 
-        if (!(state instanceof PersistentDataHolder)) {
-            return;
-        }
+  private void bookLogic(PersistentDataHolder holder, User user) {
+    PersistentDataContainer container = holder.getPersistentDataContainer();
 
-        bookLogic(((PersistentDataHolder) state), Users.get(event.getPlayer()));
+    if (!container.has(ShopEntrance.NOTICE_KEY, PersistentDataType.STRING)) {
+      return;
     }
 
-    private void bookLogic(PersistentDataHolder holder, User user) {
-        PersistentDataContainer container = holder.getPersistentDataContainer();
+    String shopName = container.get(ShopEntrance.NOTICE_KEY, PersistentDataType.STRING);
+    MarketManager markets = Economy.get().getMarkets();
+    MarketShop shop = markets.get(shopName);
 
-        if (!container.has(ShopEntrance.NOTICE_KEY, PersistentDataType.STRING)) {
-            return;
-        }
+    openPurchaseBook(shop, user);
+  }
 
-        String shopName = container.get(ShopEntrance.NOTICE_KEY, PersistentDataType.STRING);
-        MarketManager markets = Economy.get().getMarkets();
-        MarketShop shop = markets.get(shopName);
+  private void openPurchaseBook(MarketShop shop, User user) {
+    String name = "purchase_" + shop.getName();
+    ClickableTextNode node = new ClickableTextNode(name)
+        .setExecutor(u -> {
+          ClickableTexts.unregister(name);
+          shop.attemptPurchase(u);
+        })
+        .setPrompt(u -> {
+          Component purchase = Component.text("[Purchase]")
+              .color(NamedTextColor.GREEN);
 
-        openPurchaseBook(markets, shop, user);
-    }
+          if (!u.hasBalance(shop.getPrice())) {
+            purchase = purchase.color(NamedTextColor.GRAY)
+                .hoverEvent(
+                    Component.text("Cannot afford ").append(UnitFormat.rhines(shop.getPrice())));
+          }
 
-    private void openPurchaseBook(MarketManager markets, MarketShop shop, User user) {
-        String name = "purchase_" + shop.getName();
-        ClickableTextNode node = new ClickableTextNode(name)
-                .setExecutor(u -> {
-                    ClickableTexts.unregister(name);
-                    shop.attemptPurchase(u);
-                })
-                .setPrompt(u -> {
-                    Component purchase = Component.text("[Purchase]")
-                            .color(NamedTextColor.GREEN);
+          if (!Markets.canChangeStatus(u)) {
+            purchase = purchase.color(NamedTextColor.GOLD)
+                .hoverEvent(Component.text("Cannot currently purchase shop"));
+          }
 
-                    if (!u.hasBalance(shop.getPrice())) {
-                        purchase = purchase.color(NamedTextColor.GRAY)
-                                .hoverEvent(Component.text("Cannot afford ").append(UnitFormat.rhines(shop.getPrice())));
-                    }
+          return purchase;
+        });
 
-                    if (!Markets.canChangeStatus(u)) {
-                        purchase = purchase.color(NamedTextColor.GOLD)
-                                .hoverEvent(Component.text("Cannot currently purchase shop"));
-                    }
+    ClickableTexts.register(node);
+    Book.Builder builder = Book.builder()
+        .title(Component.text("Purchase shop?"));
 
-                    return purchase;
-                });
+    Component newLine = Component.newline();
+    Component tripleNew = Component.text("\n\n\n");
 
-        ClickableTexts.register(node);
-        Book.Builder builder = Book.builder()
-                .title(Component.text("Purchase shop?"));
+    TextComponent.Builder textBuilder = Component.text()
+        .content("Purchase shop?")
 
-        Component newLine = Component.newline();
-        Component tripleNew = Component.text("\n\n\n");
+        .append(tripleNew)
+        .append(Component.text("Price: ").append(UnitFormat.rhines(shop.getPrice())))
+        .append(tripleNew);
 
-        TextComponent.Builder textBuilder = Component.text()
-                .content("Purchase shop?")
+    int entranceAmount = shop.getEntrances().size();
 
-                .append(tripleNew)
-                .append(Component.text("Price: ").append(UnitFormat.rhines(shop.getPrice())))
-                .append(tripleNew);
+    textBuilder.append(
+        Component.text(entranceAmount + " entrance" + Util.conditionalPlural(entranceAmount))
+    );
 
-        int entranceAmount = shop.getEntrances().size();
+    Vector3i size = shop.getReset().getSize();
+    String dimensions = size.x() + "x" + size.y() + "x" + size.z() + " blocks";
 
-        textBuilder.append(
-                Component.text(entranceAmount + " entrance" + Util.conditionalPlural(entranceAmount))
-        );
+    textBuilder
+        .append(newLine)
+        .append(Component.text(dimensions));
 
-        Vector3i size = shop.getReset().getSize();
-        String dimensions = size.x() + "x" + size.y() + "x" + size.z() + " blocks";
+    textBuilder
+        .append(tripleNew)
+        .append(newLine)
+        .append(newLine);
 
-        textBuilder
-                .append(newLine)
-                .append(Component.text(dimensions));
+    textBuilder.append(node.prompt(user));
 
-        textBuilder
-                .append(tripleNew)
-                .append(newLine)
-                .append(newLine);
+    builder.addPage(textBuilder.build());
 
-        textBuilder.append(node.prompt(user));
-
-        builder.addPage(textBuilder.build());
-
-        user.openBook(builder.build());
-    }
+    user.openBook(builder.build());
+  }
 }

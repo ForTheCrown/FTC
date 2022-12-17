@@ -10,33 +10,37 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface WeaponGoal {
 
-    /**
-     * Gets the amount of kills needed to beat this goal
-     * @return The goal's required kill amount
-     */
-    int getGoal();
+  /**
+   * Gets the amount of kills needed to beat this goal
+   *
+   * @return The goal's required kill amount
+   */
+  int getGoal();
 
-    /**
-     * Tests if the killed entity fits this goal
-     * @param event The entity
-     * @return Whether the entity is a legal kill for this goal or not
-     */
-    boolean test(EntityDamageByEntityEvent event);
+  /**
+   * Tests if the killed entity fits this goal
+   *
+   * @param event The entity
+   * @return Whether the entity is a legal kill for this goal or not
+   */
+  boolean test(EntityDamageByEntityEvent event);
 
-    /**
-     * Gets the amount to increment the goal
-     * @param event The context of the weapon's usage
-     * @return The amount to increase
-     */
-    default int getIncrementAmount(EntityDamageByEntityEvent event) {
-        return GeneralConfig.swordGoalGainPerKill;
-    }
+  /**
+   * Gets the amount to increment the goal
+   *
+   * @param event The context of the weapon's usage
+   * @return The amount to increase
+   */
+  default int getIncrementAmount(EntityDamageByEntityEvent event) {
+    return GeneralConfig.swordGoalGainPerKill;
+  }
 
-    /**
-     * The component to display in an item's lore to represent this goal
-     * @return The goal's chat representation
-     */
-    Component loreDisplay();
+  /**
+   * The component to display in an item's lore to represent this goal
+   *
+   * @return The goal's chat representation
+   */
+  Component loreDisplay();
 
-    @NotNull String getName();
+  @NotNull String getName();
 }

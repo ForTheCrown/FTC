@@ -4,7 +4,11 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.*;
+import net.forthecrown.useables.CheckHolder;
+import net.forthecrown.useables.ConstructType;
+import net.forthecrown.useables.UsableConstructor;
+import net.forthecrown.useables.UsageTest;
+import net.forthecrown.useables.UsageType;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.utils.io.TagUtil;
@@ -15,43 +19,46 @@ import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 
 public class TestRank extends UsageTest {
-    public static final UsageType<TestRank> TYPE = UsageType.of(TestRank.class);
 
-    private final RankTitle title;
-    public TestRank(RankTitle title) {
-        super(TYPE);
-        this.title = title;
-    }
+  public static final UsageType<TestRank> TYPE = UsageType.of(TestRank.class);
 
-    @Override
-    public Component displayInfo() {
-        return title.asComponent();
-    }
+  private final RankTitle title;
 
-    @Override
-    public Tag save() {
-        return TagUtil.writeEnum(title);
-    }
+  public TestRank(RankTitle title) {
+    super(TYPE);
+    this.title = title;
+  }
 
-    @Override
-    public boolean test(Player player, CheckHolder holder) {
-        return Users.get(player).getTitles().hasTitle(title);
-    }
+  @Override
+  public Component displayInfo() {
+    return title.asComponent();
+  }
 
-    @Override
-    public Component getFailMessage(Player player, CheckHolder holder) {
-        return Text.format("You need the &f{0}&r rank", NamedTextColor.GRAY, title);
-    }
+  @Override
+  public Tag save() {
+    return TagUtil.writeEnum(title);
+  }
 
-    // --- TYPE CONSTRUCTORS ---
+  @Override
+  public boolean test(Player player, CheckHolder holder) {
+    return Users.get(player).getTitles().hasTitle(title);
+  }
 
-    @UsableConstructor
-    public static TestRank parse(StringReader reader, CommandSource source) throws CommandSyntaxException {
-        return new TestRank(Commands.RANK.parse(reader));
-    }
+  @Override
+  public Component getFailMessage(Player player, CheckHolder holder) {
+    return Text.format("You need the &f{0}&r rank", NamedTextColor.GRAY, title);
+  }
 
-    @UsableConstructor(ConstructType.TAG)
-    public static TestRank load(Tag tag) {
-        return new TestRank(TagUtil.readEnum(RankTitle.class, tag));
-    }
+  // --- TYPE CONSTRUCTORS ---
+
+  @UsableConstructor
+  public static TestRank parse(StringReader reader, CommandSource source)
+      throws CommandSyntaxException {
+    return new TestRank(Commands.RANK.parse(reader));
+  }
+
+  @UsableConstructor(ConstructType.TAG)
+  public static TestRank load(Tag tag) {
+    return new TestRank(TagUtil.readEnum(RankTitle.class, tag));
+  }
 }

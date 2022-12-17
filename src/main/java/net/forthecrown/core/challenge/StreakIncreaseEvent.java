@@ -10,16 +10,17 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @RequiredArgsConstructor
 public class StreakIncreaseEvent extends Event {
-    @Getter
-    private static final HandlerList handlerList = new HandlerList();
 
-    private final User user;
-    private final StreakCategory category;
-    private final int streak;
-    private final ChallengeEntry entry;
+  @Getter
+  private static final HandlerList handlerList = new HandlerList();
 
-    @Override
-    public @NotNull HandlerList getHandlers() {
-        return handlerList;
-    }
+  private final User user;
+  private final StreakCategory category;
+  private final int streak;
+  private final ChallengeEntry entry;
+
+  @Override
+  public @NotNull HandlerList getHandlers() {
+    return handlerList;
+  }
 }

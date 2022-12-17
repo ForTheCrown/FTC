@@ -9,36 +9,37 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.PlayerInventory;
 
 public class InventoryMenuListener implements Listener {
-    @EventHandler(ignoreCancelled = true)
-    public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getView().getTopInventory().getHolder() instanceof Menu menu)) {
-            return;
-        }
 
-        if (event.getClickedInventory() == null
-                || event.getClickedInventory() instanceof PlayerInventory
-        ) {
-            return;
-        }
-
-        menu.onMenuClick(event);
+  @EventHandler(ignoreCancelled = true)
+  public void onInventoryClick(InventoryClickEvent event) {
+    if (!(event.getView().getTopInventory().getHolder() instanceof Menu menu)) {
+      return;
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onInventoryClose(InventoryCloseEvent event) {
-        if (!(event.getView().getTopInventory().getHolder() instanceof Menu menu)) {
-            return;
-        }
-
-        menu.onMenuClose(event);
+    if (event.getClickedInventory() == null
+        || event.getClickedInventory() instanceof PlayerInventory
+    ) {
+      return;
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onInventoryDrag(InventoryDragEvent event) {
-        if (!(event.getView().getTopInventory().getHolder() instanceof Menu menu)) {
-            return;
-        }
+    menu.onMenuClick(event);
+  }
 
-        event.setCancelled(!menu.isItemMovingAllowed());
+  @EventHandler(ignoreCancelled = true)
+  public void onInventoryClose(InventoryCloseEvent event) {
+    if (!(event.getView().getTopInventory().getHolder() instanceof Menu menu)) {
+      return;
     }
+
+    menu.onMenuClose(event);
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onInventoryDrag(InventoryDragEvent event) {
+    if (!(event.getView().getTopInventory().getHolder() instanceof Menu menu)) {
+      return;
+    }
+
+    event.setCancelled(!menu.isItemMovingAllowed());
+  }
 }

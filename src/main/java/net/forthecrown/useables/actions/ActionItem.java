@@ -5,7 +5,11 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import net.forthecrown.grenadier.CommandSource;
-import net.forthecrown.useables.*;
+import net.forthecrown.useables.ActionHolder;
+import net.forthecrown.useables.ConstructType;
+import net.forthecrown.useables.UsableConstructor;
+import net.forthecrown.useables.UsageAction;
+import net.forthecrown.useables.UsageType;
 import net.forthecrown.useables.util.UsageUtil;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.inventory.ItemStacks;
@@ -19,73 +23,75 @@ import org.jetbrains.annotations.Nullable;
 
 @Getter
 public class ActionItem extends UsageAction {
-    // --- TYPE ---
-    public static final UsageType<ActionItem> TYPE_REM = UsageType.of(ActionItem.class)
-            .setSuggests(UsageUtil::suggestItems)
-            .requiresInput(false);
 
-    public static final UsageType<ActionItem> TYPE_ADD = UsageType.of(ActionItem.class)
-            .setSuggests(UsageUtil::suggestItems)
-            .requiresInput(false);
+  // --- TYPE ---
+  public static final UsageType<ActionItem> TYPE_REM = UsageType.of(ActionItem.class)
+      .setSuggests(UsageUtil::suggestItems)
+      .requiresInput(false);
 
-    private final boolean add;
-    private final ImmutableList<ItemStack> items;
+  public static final UsageType<ActionItem> TYPE_ADD = UsageType.of(ActionItem.class)
+      .setSuggests(UsageUtil::suggestItems)
+      .requiresInput(false);
 
-    public ActionItem(UsageType<ActionItem> type, ImmutableList<ItemStack> items) {
-        super(type);
+  private final boolean add;
+  private final ImmutableList<ItemStack> items;
 
-        this.items = items;
-        this.add = type == TYPE_ADD;
+  public ActionItem(UsageType<ActionItem> type, ImmutableList<ItemStack> items) {
+    super(type);
+
+    this.items = items;
+    this.add = type == TYPE_ADD;
+  }
+
+  @Override
+  public void onUse(Player player, ActionHolder holder) {
+    var inventory = player.getInventory();
+
+    for (var i : items) {
+      if (ItemStacks.isEmpty(i)) {
+        continue;
+      }
+
+      ItemStack item = i.clone();
+
+      if (add) {
+        Util.giveOrDropItem(inventory, player.getLocation(), item);
+      } else {
+        inventory.removeItemAnySlot(item);
+      }
     }
+  }
 
-    @Override
-    public void onUse(Player player, ActionHolder holder) {
-        var inventory = player.getInventory();
+  @Override
+  public @Nullable Component displayInfo() {
+    return Text.format("items={0}",
+        TextJoiner.onComma()
+            .add(items.stream()
+                .map(Text::itemAndAmount)
+            )
+    );
+  }
 
-        for (var i: items) {
-            if (ItemStacks.isEmpty(i)) {
-                continue;
-            }
+  @Override
+  public @Nullable Tag save() {
+    return UsageUtil.saveItems(items);
+  }
 
-            ItemStack item = i.clone();
+  // --- TYPE CONSTRUCTORS ---
 
-            if (add) {
-                Util.giveOrDropItem(inventory, player.getLocation(), item);
-            } else {
-                inventory.removeItemAnySlot(item);
-            }
-        }
-    }
+  @UsableConstructor(ConstructType.PARSE)
+  public static ActionItem parse(UsageType<ActionItem> type, StringReader reader,
+                                 CommandSource source
+  )
+      throws CommandSyntaxException {
+    return new ActionItem(
+        type,
+        UsageUtil.parseItems(reader, source)
+    );
+  }
 
-    @Override
-    public @Nullable Component displayInfo() {
-        return Text.format("items={0}",
-                TextJoiner.onComma()
-                        .add(items.stream()
-                                .map(Text::itemAndAmount)
-                        )
-        );
-    }
-
-    @Override
-    public @Nullable Tag save() {
-        return UsageUtil.saveItems(items);
-    }
-
-    // --- TYPE CONSTRUCTORS ---
-
-    @UsableConstructor(ConstructType.PARSE)
-    public static ActionItem parse(UsageType<ActionItem> type, StringReader reader, CommandSource source)
-            throws CommandSyntaxException
-    {
-        return new ActionItem(
-                type,
-                UsageUtil.parseItems(reader, source)
-        );
-    }
-
-    @UsableConstructor(ConstructType.TAG)
-    public static ActionItem load(UsageType<ActionItem> type, Tag tag) {
-        return new ActionItem(type, UsageUtil.loadItems(tag));
-    }
+  @UsableConstructor(ConstructType.TAG)
+  public static ActionItem load(UsageType<ActionItem> type, Tag tag) {
+    return new ActionItem(type, UsageUtil.loadItems(tag));
+  }
 }

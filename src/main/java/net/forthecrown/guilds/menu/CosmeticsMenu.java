@@ -18,43 +18,44 @@ import org.jetbrains.annotations.Nullable;
 
 @Getter
 public class CosmeticsMenu extends MenuPage {
-    private final GuildColorMenu primaryColor;
-    private final GuildColorMenu secondaryColor;
-    private final NameFormatMenu nameFormat;
 
-    public static final int
-            SLOT_PRIMARY_COLOR = 20,
-            SLOT_SECONDARY_COLOR = 22,
-            SLOT_NAME_FORMAT = 24;
+  private final GuildColorMenu primaryColor;
+  private final GuildColorMenu secondaryColor;
+  private final NameFormatMenu nameFormat;
 
-    public CosmeticsMenu(MenuPage parent) {
-        super(parent);
+  public static final int
+      SLOT_PRIMARY_COLOR = 20,
+      SLOT_SECONDARY_COLOR = 22,
+      SLOT_NAME_FORMAT = 24;
 
-        primaryColor = new GuildColorMenu(this, "Primary Color");
-        secondaryColor = new GuildColorMenu(this, "Secondary Color");
-        nameFormat = new NameFormatMenu(this);
+  public CosmeticsMenu(MenuPage parent) {
+    super(parent);
 
-        initMenu(Menus.builder(45, "Guild cosmetics"), true);
-    }
+    primaryColor = new GuildColorMenu(this, "Primary Color");
+    secondaryColor = new GuildColorMenu(this, "Secondary Color");
+    nameFormat = new NameFormatMenu(this);
 
-    @Override
-    protected void createMenu(MenuBuilder builder) {
-        builder.add(SLOT_PRIMARY_COLOR, primaryColor);
-        builder.add(SLOT_SECONDARY_COLOR, secondaryColor);
-        builder.add(SLOT_NAME_FORMAT, nameFormat);
-    }
+    initMenu(Menus.builder(45, "Guild cosmetics"), true);
+  }
 
-    @Override
-    public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
-        return ItemStacks.builder(Material.LOOM)
-                .setName(Component.text("Cosmetics", NamedTextColor.YELLOW)
-                        .decoration(TextDecoration.ITALIC, false))
-                .addLore(Component.text("Customization for the guild.", NamedTextColor.GRAY))
-                .build();
-    }
+  @Override
+  protected void createMenu(MenuBuilder builder) {
+    builder.add(SLOT_PRIMARY_COLOR, primaryColor);
+    builder.add(SLOT_SECONDARY_COLOR, secondaryColor);
+    builder.add(SLOT_NAME_FORMAT, nameFormat);
+  }
 
-    @Override
-    protected MenuNode createHeader() {
-        return this;
-    }
+  @Override
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+    return ItemStacks.builder(Material.LOOM)
+        .setName(Component.text("Cosmetics", NamedTextColor.YELLOW)
+            .decoration(TextDecoration.ITALIC, false))
+        .addLore(Component.text("Customization for the guild.", NamedTextColor.GRAY))
+        .build();
+  }
+
+  @Override
+  protected MenuNode createHeader() {
+    return this;
+  }
 }

@@ -1,5 +1,7 @@
 package net.forthecrown.user.packet;
 
+import static net.forthecrown.user.packet.PacketListeners.call;
+
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -8,61 +10,62 @@ import net.minecraft.network.protocol.Packet;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import static net.forthecrown.user.packet.PacketListeners.call;
-
 @RequiredArgsConstructor
 public class PacketListenerChannelHandler extends ChannelDuplexHandler {
-    private final Player player;
 
-    // Server bound packets
-    @Override
-    public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
-        // Call packet listeners, if call() returns true
-        // packet shouldn't be read
-        if (msg instanceof Packet<?> packet) {
-            var call = call(packet, player);
+  private final Player player;
 
-            if (call == null) {
-                super.channelRead(ctx, msg);
-                return;
-            }
+  // Server bound packets
+  @Override
+  public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg)
+      throws Exception {
+    // Call packet listeners, if call() returns true
+    // packet shouldn't be read
+    if (msg instanceof Packet<?> packet) {
+      var call = call(packet, player);
 
-            if (call.isCancelled()) {
-                return;
-            }
-
-            if (call.getReplacementPacket() != null) {
-                super.channelRead(ctx, call.getReplacementPacket());
-                return;
-            }
-        }
-
+      if (call == null) {
         super.channelRead(ctx, msg);
+        return;
+      }
+
+      if (call.isCancelled()) {
+        return;
+      }
+
+      if (call.getReplacementPacket() != null) {
+        super.channelRead(ctx, call.getReplacementPacket());
+        return;
+      }
     }
 
-    // Client bound packets
-    @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        // Call packet listeners, if call() returns true
-        // packet shouldn't be written
-        if (msg instanceof Packet<?> packet) {
-            var call = call(packet, player);
+    super.channelRead(ctx, msg);
+  }
 
-            if (call == null) {
-                super.write(ctx, msg, promise);
-                return;
-            }
+  // Client bound packets
+  @Override
+  public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise)
+      throws Exception {
+    // Call packet listeners, if call() returns true
+    // packet shouldn't be written
+    if (msg instanceof Packet<?> packet) {
+      var call = call(packet, player);
 
-            if (call.isCancelled()) {
-                return;
-            }
-
-            if (call.getReplacementPacket() != null) {
-                super.write(ctx, call.getReplacementPacket(), promise);
-                return;
-            }
-        }
-
+      if (call == null) {
         super.write(ctx, msg, promise);
+        return;
+      }
+
+      if (call.isCancelled()) {
+        return;
+      }
+
+      if (call.getReplacementPacket() != null) {
+        super.write(ctx, call.getReplacementPacket(), promise);
+        return;
+      }
     }
+
+    super.write(ctx, msg, promise);
+  }
 }

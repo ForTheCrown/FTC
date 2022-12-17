@@ -1,5 +1,7 @@
 package net.forthecrown.commands;
 
+import static org.bukkit.Bukkit.getServer;
+
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
@@ -15,78 +17,83 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import static org.bukkit.Bukkit.getServer;
-
 public class CommandLeaderboard extends FtcCommand {
 
-    private final String objectiveName;
-    private CommandLeaderboard(String objectiveName) {
-        super(objectiveName + "top");
-        this.objectiveName = objectiveName;
+  private final String objectiveName;
 
-        setPermission(Permissions.DEFAULT);
-        register();
-    }
+  private CommandLeaderboard(String objectiveName) {
+    super(objectiveName + "top");
+    this.objectiveName = objectiveName;
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     *
-     * Valid usages of command:
-     * /Leaderboard
-     *
-     * Permissions used:
-     *
-     * Main Author:
-     */
+    setPermission(Permissions.DEFAULT);
+    register();
+  }
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> {
-                    Player player = c.getSource().asPlayer();
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   *
+   * Valid usages of command:
+   * /Leaderboard
+   *
+   * Permissions used:
+   *
+   * Main Author:
+   */
 
-                    Scoreboard mainScoreboard = getServer().getScoreboardManager().getMainScoreboard();
-                    Objective objective = mainScoreboard.getObjective(objectiveName);
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> {
+          Player player = c.getSource().asPlayer();
 
-                    TextComponent displayName = Component.text()
-                            .color(NamedTextColor.GOLD)
-                            .append(Component.text("---"))
-                            .append(Component.text("Leaderboard").color(NamedTextColor.YELLOW))
-                            .append(Component.text("---"))
-                            .build();
+          Scoreboard mainScoreboard = getServer().getScoreboardManager().getMainScoreboard();
+          Objective objective = mainScoreboard.getObjective(objectiveName);
 
-                    Scoreboard scoreboard = getServer().getScoreboardManager().getNewScoreboard();
-                    Objective newObj = scoreboard.registerNewObjective(player.getName(), "dummy", displayName);
+          TextComponent displayName = Component.text()
+              .color(NamedTextColor.GOLD)
+              .append(Component.text("---"))
+              .append(Component.text("Leaderboard").color(NamedTextColor.YELLOW))
+              .append(Component.text("---"))
+              .build();
 
-                    for(String name : objective.getScoreboard().getEntries()) {
-                        //If you don't have a set score, or your score is 0, dont' show it
-                        if(!objective.getScore(name).isScoreSet() || objective.getScore(name).getScore() == 0) continue;
+          Scoreboard scoreboard = getServer().getScoreboardManager().getNewScoreboard();
+          Objective newObj = scoreboard.registerNewObjective(player.getName(), "dummy",
+              displayName);
 
-                        newObj.getScore(name).setScore(objective.getScore(name).getScore());
-                    }
-
-                    newObj.setDisplaySlot(DisplaySlot.SIDEBAR);
-                    player.setScoreboard(scoreboard);
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(FTC.getPlugin(), () -> player.setScoreboard(mainScoreboard), 15 * 20);
-
-                    return 0;
-                });
-    }
-
-    public static void createCommands() {
-        new CommandLeaderboard("Death");
-
-        new CommandLeaderboard("crown") {
-            @Override
-            public boolean test(CommandSource source) {
-                if(!GeneralConfig.crownEventActive) {
-                    return false;
-                }
-
-                return super.test(source);
+          for (String name : objective.getScoreboard().getEntries()) {
+            //If you don't have a set score, or your score is 0, dont' show it
+            if (!objective.getScore(name).isScoreSet()
+                || objective.getScore(name).getScore() == 0) {
+              continue;
             }
-        };
-    }
+
+            newObj.getScore(name).setScore(objective.getScore(name).getScore());
+          }
+
+          newObj.setDisplaySlot(DisplaySlot.SIDEBAR);
+          player.setScoreboard(scoreboard);
+          Bukkit.getScheduler()
+              .scheduleSyncDelayedTask(FTC.getPlugin(), () -> player.setScoreboard(mainScoreboard),
+                  15 * 20);
+
+          return 0;
+        });
+  }
+
+  public static void createCommands() {
+    new CommandLeaderboard("Death");
+
+    new CommandLeaderboard("crown") {
+      @Override
+      public boolean test(CommandSource source) {
+        if (!GeneralConfig.crownEventActive) {
+          return false;
+        }
+
+        return super.test(source);
+      }
+    };
+  }
 }

@@ -14,65 +14,66 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Ghast;
 
 public class GhastPhase implements AttackPhase {
-    public static final double[][] SPAWNS = {
-            { -277.5, 37, 38.5 },
-            { -277.5, 37, 50.5 }
-    };
 
-    static final BossMessage START = BossMessage.simple("phase_ghast_start");
+  public static final double[][] SPAWNS = {
+      {-277.5, 37, 38.5},
+      {-277.5, 37, 50.5}
+  };
 
-    private int tick;
+  static final BossMessage START = BossMessage.simple("phase_ghast_start");
 
-    @Override
-    public void onStart(EvokerBoss boss, BossContext context) {
-        tick = 0;
-        boss.getPhaseBar().setVisible(true);
-        boss.getPhaseBar().setTitle("Ghasts, deflect their attacks!");
+  private int tick;
 
-        boss.broadcast(false, START);
+  @Override
+  public void onStart(EvokerBoss boss, BossContext context) {
+    tick = 0;
+    boss.getPhaseBar().setVisible(true);
+    boss.getPhaseBar().setTitle("Ghasts, deflect their attacks!");
 
-        for (double[] pos: SPAWNS) {
-            Location l = new Location(boss.getWorld(), pos[0], pos[1], pos[2]);
+    boss.broadcast(false, START);
 
-            boss.getWorld().spawn(l, Ghast.class, ghast -> {
-                Entity nms = VanillaAccess.getEntity(ghast);
+    for (double[] pos : SPAWNS) {
+      Location l = new Location(boss.getWorld(), pos[0], pos[1], pos[2]);
 
-                // explosionPower cannot be changed by setters, Bukkit doesn't
-                // change this, so instead of using reflection, I just save
-                // the ghast into NBT, modify the NBT, and then load the ghast
-                // from that same NBT
-                CompoundTag saved = new CompoundTag();
-                nms.save(saved);
+      boss.getWorld().spawn(l, Ghast.class, ghast -> {
+        Entity nms = VanillaAccess.getEntity(ghast);
 
-                saved.putByte("ExplosionPower", (byte) 3);
-                nms.load(saved);
+        // explosionPower cannot be changed by setters, Bukkit doesn't
+        // change this, so instead of using reflection, I just save
+        // the ghast into NBT, modify the NBT, and then load the ghast
+        // from that same NBT
+        CompoundTag saved = new CompoundTag();
+        nms.save(saved);
 
-                AttackPhases.clearAllDrops(ghast);
+        saved.putByte("ExplosionPower", (byte) 3);
+        nms.load(saved);
 
-                double health = EvokerConfig.ghast_health;
-                AttributeInstance maxHealth = ghast.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-                Util.clearModifiers(maxHealth);
+        AttackPhases.clearAllDrops(ghast);
 
-                maxHealth.setBaseValue(health);
-                ghast.setHealth(health);
-            });
-        }
+        double health = EvokerConfig.ghast_health;
+        AttributeInstance maxHealth = ghast.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        Util.clearModifiers(maxHealth);
+
+        maxHealth.setBaseValue(health);
+        ghast.setHealth(health);
+      });
     }
+  }
 
-    @Override
-    public void onEnd(EvokerBoss boss, BossContext context) {
+  @Override
+  public void onEnd(EvokerBoss boss, BossContext context) {
 
+  }
+
+  @Override
+  public void onTick(EvokerBoss boss, BossContext context) {
+    tick++;
+
+    if (tick >= EvokerConfig.ghast_length) {
+      boss.nextPhase(false);
+    } else {
+      double progress = (double) tick / (double) EvokerConfig.ghast_length;
+      boss.getPhaseBar().setProgress(progress);
     }
-
-    @Override
-    public void onTick(EvokerBoss boss, BossContext context) {
-        tick++;
-
-        if(tick >= EvokerConfig.ghast_length) {
-            boss.nextPhase(false);
-        } else {
-            double progress = (double) tick / (double) EvokerConfig.ghast_length;
-            boss.getPhaseBar().setProgress(progress);
-        }
-    }
+  }
 }

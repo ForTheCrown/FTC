@@ -23,177 +23,191 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class Menu implements InventoryHolder, MenuCloseConsumer {
-    /** The cooldown category menus use */
-    public static final String COOLDOWN_CATEGORY = Menu.class.getName();
 
-    /* ----------------------------- INSTANCE FIELDS ------------------------------ */
+  /**
+   * The cooldown category menus use
+   */
+  public static final String COOLDOWN_CATEGORY = Menu.class.getName();
 
-    /** The menu's title */
-    private final Component title;
+  /* ----------------------------- INSTANCE FIELDS ------------------------------ */
 
-    /** The menu's size */
-    private final int size;
+  /**
+   * The menu's title
+   */
+  private final Component title;
 
-    /** True, if items can be removed from the inventory and added it to it by users */
-    private final boolean itemMovingAllowed;
+  /**
+   * The menu's size
+   */
+  private final int size;
 
-    /** Inventory index 2 menu node map. Immutable */
-    private final Int2ObjectMap<MenuNode> nodes;
+  /**
+   * True, if items can be removed from the inventory and added it to it by users
+   */
+  private final boolean itemMovingAllowed;
 
-    /**
-     * Callback for when this menu is opened, called before
-     * the inventory options are placed into the inventory
-     */
-    private final MenuOpenConsumer openCallback;
+  /**
+   * Inventory index 2 menu node map. Immutable
+   */
+  private final Int2ObjectMap<MenuNode> nodes;
 
-    /** Callback for when this menu is closed */
-    private final MenuCloseConsumer closeCallback;
+  /**
+   * Callback for when this menu is opened, called before the inventory options are placed into the
+   * inventory
+   */
+  private final MenuOpenConsumer openCallback;
 
-    /** Border node placed on all empty border slots */
-    private final MenuNode border;
+  /**
+   * Callback for when this menu is closed
+   */
+  private final MenuCloseConsumer closeCallback;
 
-    /* ----------------------------- CONSTRUCTOR ------------------------------ */
+  /**
+   * Border node placed on all empty border slots
+   */
+  private final MenuNode border;
 
-    Menu(MenuBuilder builder) {
-        this.title = builder.title;
-        this.size = builder.size;
+  /* ----------------------------- CONSTRUCTOR ------------------------------ */
 
-        this.itemMovingAllowed = builder.itemMovingAllowed;
+  Menu(MenuBuilder builder) {
+    this.title = builder.title;
+    this.size = builder.size;
 
-        this.nodes = Int2ObjectMaps.unmodifiable(builder.nodes);
+    this.itemMovingAllowed = builder.itemMovingAllowed;
 
-        this.openCallback = builder.openCallback;
-        this.closeCallback = builder.closeCallback;
-        this.border = builder.border;
+    this.nodes = Int2ObjectMaps.unmodifiable(builder.nodes);
+
+    this.openCallback = builder.openCallback;
+    this.closeCallback = builder.closeCallback;
+    this.border = builder.border;
+  }
+
+  /* ----------------------------- FUNCTIONS ------------------------------ */
+
+  public void open(User user) {
+    open(user, InventoryContext.EMPTY);
+  }
+
+  public void open(User user, InventoryContext context) {
+    if (openCallback != null) {
+      openCallback.onOpen(user, context);
     }
 
-    /* ----------------------------- FUNCTIONS ------------------------------ */
+    var inventory = createInventory(user, context);
+    user.getPlayer().openInventory(inventory);
+  }
 
-    public void open(User user) {
-        open(user, InventoryContext.EMPTY);
+  public MenuInventory createInventory(User user, InventoryContext context) {
+    var inv = new MenuInventory(this, size, title, context);
+
+    nodes.int2ObjectEntrySet()
+        .forEach(entry -> {
+          Slot slot = Slot.of(entry.getIntKey());
+
+          if (slot.getIndex() >= inv.getSize()) {
+            throw new IllegalStateException(
+                "Slot " + slot + " is too big for inventory size: " +
+                    inv.getSize()
+            );
+          }
+
+          var item = entry.getValue().createItem(user, context);
+
+          if (ItemStacks.isEmpty(item)) {
+            return;
+          }
+
+          inv.setItem(slot, item);
+        });
+
+    if (border != null) {
+      var item = border.createItem(user, context);
+
+      if (ItemStacks.notEmpty(item)) {
+        Menus.placeBorder(inv, item);
+      }
     }
 
-    public void open(User user, InventoryContext context) {
-        if (openCallback != null) {
-            openCallback.onOpen(user, context);
-        }
+    return inv;
+  }
 
-        var inventory = createInventory(user, context);
-        user.getPlayer().openInventory(inventory);
+  public void onMenuClick(InventoryClickEvent event) {
+    ClickContext click = new ClickContext(
+        (MenuInventory) event.getClickedInventory(),
+        (Player) event.getWhoClicked(),
+        event.getSlot(),
+        event.getCursor(),
+        event.getClick()
+    );
+
+    InventoryContext context = click.getInventory().getContext();
+    User user = Users.get(click.getPlayer());
+
+    if (itemMovingAllowed) {
+      event.setCancelled(false);
+      click.cancelEvent(false);
+    } else {
+      event.setCancelled(true);
+      click.cancelEvent(true);
     }
 
-    public MenuInventory createInventory(User user, InventoryContext context) {
-        var inv = new MenuInventory(this, size, title, context);
-
-        nodes.int2ObjectEntrySet()
-                .forEach(entry -> {
-                    Slot slot = Slot.of(entry.getIntKey());
-
-                    if (slot.getIndex() >= inv.getSize()) {
-                        throw new IllegalStateException(
-                                "Slot " + slot + " is too big for inventory size: " +
-                                inv.getSize()
-                        );
-                    }
-
-                    var item = entry.getValue().createItem(user, context);
-
-                    if (ItemStacks.isEmpty(item)) {
-                        return;
-                    }
-
-                    inv.setItem(slot, item);
-                });
-
-        if (border != null) {
-            var item = border.createItem(user, context);
-
-            if (ItemStacks.notEmpty(item)) {
-                Menus.placeBorder(inv, item);
-            }
-        }
-
-        return inv;
+    if (Cooldown.contains(user, COOLDOWN_CATEGORY)) {
+      return;
     }
 
-    public void onMenuClick(InventoryClickEvent event) {
-        ClickContext click = new ClickContext(
-                (MenuInventory) event.getClickedInventory(),
-                (Player) event.getWhoClicked(),
-                event.getSlot(),
-                event.getCursor(),
-                event.getClick()
-        );
+    try {
+      var node = nodes.get(click.getSlot());
 
-        InventoryContext context = click.getInventory().getContext();
-        User user = Users.get(click.getPlayer());
-
-        if (itemMovingAllowed) {
-            event.setCancelled(false);
-            click.cancelEvent(false);
+      if (node == null) {
+        if (border != null
+            && Menus.isBorderSlot(Slot.of(click.getSlot()), size)
+        ) {
+          node = border;
         } else {
-            event.setCancelled(true);
-            click.cancelEvent(true);
+          return;
         }
+      }
 
-        if (Cooldown.contains(user, COOLDOWN_CATEGORY)) {
-            return;
-        }
+      node.onClick(user, context, click);
 
-        try {
-            var node = nodes.get(click.getSlot());
+      if (click.shouldCooldown()) {
+        Cooldown.add(user, COOLDOWN_CATEGORY, click.getCooldownTime());
+      }
 
-            if (node == null) {
-                if (border != null
-                        && Menus.isBorderSlot(Slot.of(click.getSlot()), size)
-                ) {
-                    node = border;
-                } else {
-                    return;
-                }
-            }
+      if (click.cancelEvent()) {
+        event.setCancelled(true);
+      }
 
-            node.onClick(user, context, click);
+      if (click.shouldClose()) {
+        click.getPlayer().closeInventory();
+      } else if (click.shouldReloadMenu()) {
+        open(user, context);
+      }
+    } catch (CommandSyntaxException exc) {
+      Exceptions.handleSyntaxException(user, exc);
+    } catch (Throwable t) {
+      FTC.getLogger().error("Error running menu click!", t);
+    }
+  }
 
-            if (click.shouldCooldown()) {
-                Cooldown.add(user, COOLDOWN_CATEGORY, click.getCooldownTime());
-            }
+  public void onMenuClose(InventoryCloseEvent event) {
+    MenuInventory inv = (MenuInventory) event.getInventory();
+    onClose(inv, Users.get(event.getPlayer().getUniqueId()), event.getReason());
+  }
 
-            if (click.cancelEvent()) {
-                event.setCancelled(true);
-            }
+  /* ----------------------------- OVERRIDDEN METHODS ------------------------------ */
 
-            if (click.shouldClose()) {
-                click.getPlayer().closeInventory();
-            }
-            else if (click.shouldReloadMenu()) {
-                open(user, context);
-            }
-        } catch (CommandSyntaxException exc) {
-            Exceptions.handleSyntaxException(user, exc);
-        } catch (Throwable t) {
-            FTC.getLogger().error("Error running menu click!", t);
-        }
+  @Override
+  public void onClose(FtcInventory inventory, User user, InventoryCloseEvent.Reason reason) {
+    if (closeCallback == null) {
+      return;
     }
 
-    public void onMenuClose(InventoryCloseEvent event) {
-        MenuInventory inv = (MenuInventory) event.getInventory();
-        onClose(inv, Users.get(event.getPlayer().getUniqueId()), event.getReason());
-    }
+    closeCallback.onClose(inventory, user, reason);
+  }
 
-    /* ----------------------------- OVERRIDDEN METHODS ------------------------------ */
-
-    @Override
-    public void onClose(FtcInventory inventory, User user, InventoryCloseEvent.Reason reason) {
-        if (closeCallback == null) {
-            return;
-        }
-
-        closeCallback.onClose(inventory, user, reason);
-    }
-
-    @Override
-    public @NotNull Inventory getInventory() {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public @NotNull Inventory getInventory() {
+    throw new UnsupportedOperationException();
+  }
 }

@@ -1,5 +1,7 @@
 package net.forthecrown.economy;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import lombok.Getter;
 import net.forthecrown.core.config.ConfigManager;
 import net.forthecrown.core.module.OnEnable;
@@ -11,57 +13,55 @@ import net.forthecrown.economy.sell.SellShop;
 import net.forthecrown.economy.shops.ShopManager;
 import net.forthecrown.utils.io.PathUtil;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 public class Economy {
-    private static final Economy INSTANCE = new Economy();
 
-    @Getter
-    private final SellShop sellShop;
+  private static final Economy INSTANCE = new Economy();
 
-    @Getter
-    private final ShopManager shops;
+  @Getter
+  private final SellShop sellShop;
 
-    @Getter
-    private final MarketManager markets;
+  @Getter
+  private final ShopManager shops;
 
-    @Getter
-    private final Path directory;
+  @Getter
+  private final MarketManager markets;
 
-    private Economy() {
-        this.directory = PathUtil.getPluginDirectory("economy");
+  @Getter
+  private final Path directory;
 
-        this.sellShop = new SellShop(directory);
-        this.markets = new MarketManager(directory);
+  private Economy() {
+    this.directory = PathUtil.getPluginDirectory("economy");
 
-        this.shops = new ShopManager();
+    this.sellShop = new SellShop(directory);
+    this.markets = new MarketManager(directory);
 
-        ConfigManager.get()
-                .registerConfig(MarketConfig.class);
+    this.shops = new ShopManager();
+
+    ConfigManager.get()
+        .registerConfig(MarketConfig.class);
+  }
+
+  public static Economy get() {
+    return INSTANCE;
+  }
+
+  @OnEnable
+  static void init() {
+    if (!Files.exists(get().getSellShop().getPath())) {
+      get().getSellShop().createDefaults();
     }
+  }
 
-    public static Economy get() {
-        return INSTANCE;
-    }
+  @OnSave
+  public void save() {
+    shops.save();
+    markets.save();
+  }
 
-    @OnEnable
-    static void init() {
-        if (!Files.exists(get().getSellShop().getPath())) {
-            get().getSellShop().createDefaults();
-        }
-    }
-
-    @OnSave
-    public void save() {
-        shops.save();
-        markets.save();
-    }
-
-    @OnLoad
-    public void reload() {
-        shops.reload();
-        markets.load();
-        sellShop.load();
-    }
+  @OnLoad
+  public void reload() {
+    shops.reload();
+    markets.load();
+    sellShop.load();
+  }
 }

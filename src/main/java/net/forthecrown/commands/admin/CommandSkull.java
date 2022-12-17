@@ -1,5 +1,6 @@
 package net.forthecrown.commands.admin;
 
+import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -11,39 +12,38 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.concurrent.CompletableFuture;
-
 public class CommandSkull extends FtcCommand {
-    public CommandSkull() {
-        super("skull");
 
-        register();
-    }
+  public CommandSkull() {
+    super("skull");
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("profile", Arguments.USER)
-                        .executes(c -> {
-                            Player player = c.getSource().asPlayer();
+    register();
+  }
 
-                            if (player.getInventory().firstEmpty() == -1) {
-                                throw Exceptions.INVENTORY_FULL;
-                            }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .then(argument("profile", Arguments.USER)
+            .executes(c -> {
+              Player player = c.getSource().asPlayer();
 
-                            User user = Arguments.getUser(c, "profile");
+              if (player.getInventory().firstEmpty() == -1) {
+                throw Exceptions.INVENTORY_FULL;
+              }
 
-                            CompletableFuture.runAsync(() -> {
-                                ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
-                                SkullMeta meta = (SkullMeta) item.getItemMeta();
+              User user = Arguments.getUser(c, "profile");
 
-                                meta.setOwningPlayer(user.getOfflinePlayer());
-                                item.setItemMeta(meta);
+              CompletableFuture.runAsync(() -> {
+                ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
+                SkullMeta meta = (SkullMeta) item.getItemMeta();
 
-                                Tasks.runSync(() -> player.getInventory().addItem(item));
-                            });
-                            return 0;
-                        })
-                );
-    }
+                meta.setOwningPlayer(user.getOfflinePlayer());
+                item.setItemMeta(meta);
+
+                Tasks.runSync(() -> player.getInventory().addItem(item));
+              });
+              return 0;
+            })
+        );
+  }
 }

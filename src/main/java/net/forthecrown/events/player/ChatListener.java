@@ -7,7 +7,11 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.forthecrown.core.AfkKicker;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.admin.*;
+import net.forthecrown.core.admin.BannedWords;
+import net.forthecrown.core.admin.EavesDropper;
+import net.forthecrown.core.admin.Mute;
+import net.forthecrown.core.admin.Punishments;
+import net.forthecrown.core.admin.StaffChat;
 import net.forthecrown.user.MarriageMessage;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
@@ -26,184 +30,182 @@ import org.jetbrains.annotations.Nullable;
 
 public class ChatListener implements Listener {
 
-    @EventHandler(ignoreCancelled = true)
-    public void onAsyncChatDecorate(AsyncChatDecorateEvent event) {
-        event.result(
-                Text.renderString(
-                        event.player(), Text.toString(event.originalMessage())
-                )
-        );
+  @EventHandler(ignoreCancelled = true)
+  public void onAsyncChatDecorate(AsyncChatDecorateEvent event) {
+    event.result(
+        Text.renderString(
+            event.player(), Text.toString(event.originalMessage())
+        )
+    );
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onAsyncChatCommandDecorate(AsyncChatCommandDecorateEvent event) {
+    onAsyncChatDecorate(event);
+  }
+
+  @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+  public void onHandleChat(AsyncChatEvent event) {
+    // Cancel event so no signed chat messages are sent
+    // to anyone
+    event.setCancelled(true);
+
+    // Manually send chat message to all viewers still
+    // left in the viewer list
+    event.viewers().forEach(audience -> {
+      var message = event.renderer()
+          .render(
+              event.getPlayer(),
+              event.getPlayer().displayName(),
+              event.message(),
+              audience
+          );
+
+      audience.sendMessage(event.getPlayer(), message);
+    });
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onPlayerChat(AsyncChatEvent event) {
+    Player player = event.getPlayer();
+    User user = Users.get(player);
+
+    event.renderer(FtcChatRenderer.INSTANCE);
+    var rendered = event.renderer().render(player, user.displayName(), event.message(), player);
+    var mute = Punishments.checkMute(player);
+
+    // If said banned word, set mute to hard, else keep mute as is
+    // then if mute == hard, report to eaves dropper and cancel event
+    mute = BannedWords.checkAndWarn(player, rendered) ? Mute.HARD : mute;
+
+    if (mute != Mute.NONE) {
+      EavesDropper.reportChat(rendered, mute);
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onAsyncChatCommandDecorate(AsyncChatCommandDecorateEvent event) {
-        onAsyncChatDecorate(event);
+    if (!mute.isVisibleToOthers()) {
+      event.setCancelled(true);
+      return;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onHandleChat(AsyncChatEvent event) {
-        // Cancel event so no signed chat messages are sent
-        // to anyone
-        event.setCancelled(true);
+    // If staff chat toggle is enabled for this player
+    // then don't send message to chat, just to staff
+    if (StaffChat.toggledPlayers.contains(player.getUniqueId())) {
+      StaffChat.send(user.getCommandSource(null), event.message(), false);
 
-        // Manually send chat message to all viewers still
-        // left in the viewer list
-        event.viewers().forEach(audience -> {
-            var message = event.renderer()
-                    .render(
-                            event.getPlayer(),
-                            event.getPlayer().displayName(),
-                            event.message(),
-                            audience
-                    );
-
-            audience.sendMessage(event.getPlayer(), message);
-        });
+      event.setCancelled(true);
+      return;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerChat(AsyncChatEvent event) {
-        Player player = event.getPlayer();
-        User user = Users.get(player);
+    // If vanished, don't say nuthin
+    if (user.get(Properties.VANISHED)) {
+      user.sendMessage(Messages.CHAT_NO_SPEAK_VANISH);
 
-        event.renderer(FtcChatRenderer.INSTANCE);
-        var rendered = event.renderer().render(player, user.displayName(), event.message(), player);
-        var mute = Punishments.checkMute(player);
-
-        // If said banned word, set mute to hard, else keep mute as is
-        // then if mute == hard, report to eaves dropper and cancel event
-        mute = BannedWords.checkAndWarn(player, rendered) ? Mute.HARD : mute;
-
-        if (mute != Mute.NONE) {
-            EavesDropper.reportChat(rendered, mute);
-        }
-
-        if (!mute.isVisibleToOthers()) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // If staff chat toggle is enabled for this player
-        // then don't send message to chat, just to staff
-        if (StaffChat.toggledPlayers.contains(player.getUniqueId())) {
-            StaffChat.send(user.getCommandSource(null), event.message(), false);
-
-            event.setCancelled(true);
-            return;
-        }
-
-        // If vanished, don't say nuthin
-        if (user.get(Properties.VANISHED)) {
-            user.sendMessage(Messages.CHAT_NO_SPEAK_VANISH);
-
-            event.setCancelled(true);
-            return;
-        }
-
-        // If marriage chat enabled
-        if (user.get(Properties.MARRIAGE_CHAT)) {
-            event.setCancelled(true);
-            var spouse = user.getInteractions().spouseUser();
-
-            // Ensure spouse exists and is online
-            if (spouse == null || !spouse.isOnline()) {
-                user.flip(Properties.MARRIAGE_CHAT);
-                user.sendMessage(Messages.CANNOT_SEND_MCHAT);
-
-                return;
-            }
-
-            MarriageMessage.send(
-                    user, spouse,
-                    Text.toString(event.originalMessage()),
-                    true
-            );
-
-            return;
-        }
-
-        final Mute finalMute = mute;
-
-        // Filter out all that shouldn't see the message
-        event.viewers().removeIf(audience -> {
-            if (!(audience instanceof Player playerViewer)) {
-                return false;
-            }
-
-            var viewer = Users.get(playerViewer);
-
-            if (Users.areBlocked(user, viewer)) {
-                return true;
-            }
-
-            // If the message sender is soft-muted, then only other
-            // soft muted players may see the message
-            return finalMute == Mute.SOFT && Punishments.muteStatus(viewer) != Mute.SOFT;
-        });
-
-        AfkKicker.addOrDelay(event.getPlayer().getUniqueId());
-        AfkListener.checkUnafk(event);
+      event.setCancelled(true);
+      return;
     }
 
-    /**
-     * Tests if the given input <code>s</code> is more than half uppercase,
-     * if it is, then it warns the source and tells them not to send all
-     * upper case messages.
-     * <p>
-     * If the <code>s</code> input is less than 8 characters long, if the
-     * sender is null or has the {@link Permissions#CHAT_IGNORE_CASE} permission,
-     * then this method won't check the string
-     *
-     * @param source The sender of the message
-     * @param s The input to test
-     */
-    public static void warnCase(@Nullable CommandSender source, String s) {
-        if (s.length() <= 8
-                || source == null
-                || source.hasPermission(Permissions.CHAT_IGNORE_CASE)
-        ) {
-            return;
-        }
+    // If marriage chat enabled
+    if (user.get(Properties.MARRIAGE_CHAT)) {
+      event.setCancelled(true);
+      var spouse = user.getInteractions().spouseUser();
 
-        int upperCaseCount = 0;
-        int half = s.length() / 2;
+      // Ensure spouse exists and is online
+      if (spouse == null || !spouse.isOnline()) {
+        user.flip(Properties.MARRIAGE_CHAT);
+        user.sendMessage(Messages.CANNOT_SEND_MCHAT);
 
-        for (int i = 0; i < s.length(); i++) {
-            if (Character.isUpperCase(s.charAt(i))) {
-                upperCaseCount++;
-            }
+        return;
+      }
 
-            if (upperCaseCount > half) {
-                //1 and a half minute cooldown
-                if (!Cooldown.containsOrAdd(source, "uppercase_warning", (60 + 30) * 20)) {
-                    source.sendMessage(Messages.ALL_CAPS);
-                }
+      MarriageMessage.send(
+          user, spouse,
+          Text.toString(event.originalMessage()),
+          true
+      );
 
-                return;
-            }
-        }
+      return;
     }
 
-    private enum FtcChatRenderer implements ChatRenderer {
-        INSTANCE;
+    final Mute finalMute = mute;
 
-        @Override
-        public @NotNull Component render(@NotNull Player source,
-                                         @NotNull Component displayName,
-                                         @NotNull Component message,
-                                         @NotNull Audience viewer
-        ) {
-            return format(source, message, viewer);
-        }
+    // Filter out all that shouldn't see the message
+    event.viewers().removeIf(audience -> {
+      if (!(audience instanceof Player playerViewer)) {
+        return false;
+      }
 
-        private Component format(Player source, Component message, Audience viewer) {
-            var plain = Text.plain(message);
-            warnCase(source, plain);
+      var viewer = Users.get(playerViewer);
 
-            User user = Users.get(source);
-            boolean prependRank = Users.allowsRankedChat(viewer);
+      if (Users.areBlocked(user, viewer)) {
+        return true;
+      }
 
-            return Messages.chatMessage(user, message, prependRank);
-        }
+      // If the message sender is soft-muted, then only other
+      // soft muted players may see the message
+      return finalMute == Mute.SOFT && Punishments.muteStatus(viewer) != Mute.SOFT;
+    });
+
+    AfkKicker.addOrDelay(event.getPlayer().getUniqueId());
+    AfkListener.checkUnafk(event);
+  }
+
+  /**
+   * Tests if the given input <code>s</code> is more than half uppercase, if it is, then it warns
+   * the source and tells them not to send all upper case messages.
+   * <p>
+   * If the <code>s</code> input is less than 8 characters long, if the sender is null or has the
+   * {@link Permissions#CHAT_IGNORE_CASE} permission, then this method won't check the string
+   *
+   * @param source The sender of the message
+   * @param s      The input to test
+   */
+  public static void warnCase(@Nullable CommandSender source, String s) {
+    if (s.length() <= 8
+        || source == null
+        || source.hasPermission(Permissions.CHAT_IGNORE_CASE)
+    ) {
+      return;
     }
+
+    int upperCaseCount = 0;
+    int half = s.length() / 2;
+
+    for (int i = 0; i < s.length(); i++) {
+      if (Character.isUpperCase(s.charAt(i))) {
+        upperCaseCount++;
+      }
+
+      if (upperCaseCount > half) {
+        //1 and a half minute cooldown
+        if (!Cooldown.containsOrAdd(source, "uppercase_warning", (60 + 30) * 20)) {
+          source.sendMessage(Messages.ALL_CAPS);
+        }
+
+        return;
+      }
+    }
+  }
+
+  private enum FtcChatRenderer implements ChatRenderer {
+    INSTANCE;
+
+    @Override
+    public @NotNull Component render(@NotNull Player source,
+                                     @NotNull Component displayName,
+                                     @NotNull Component message,
+                                     @NotNull Audience viewer
+    ) {
+      return format(source, message, viewer);
+    }
+
+    private Component format(Player source, Component message, Audience viewer) {
+      var plain = Text.plain(message);
+      warnCase(source, plain);
+
+      User user = Users.get(source);
+      boolean prependRank = Users.allowsRankedChat(viewer);
+
+      return Messages.chatMessage(user, message, prependRank);
+    }
+  }
 }

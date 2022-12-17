@@ -11,58 +11,58 @@ import net.forthecrown.user.data.UserInteractions;
 
 public class CommandDivorce extends FtcCommand {
 
-    public CommandDivorce() {
-        super("divorce");
+  public CommandDivorce() {
+    super("divorce");
 
-        setPermission(Permissions.MARRY);
-        setDescription("Divorce your spouse");
-        register();
+    setPermission(Permissions.MARRY);
+    setDescription("Divorce your spouse");
+    register();
+  }
+
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   *
+   * Valid usages of command:
+   * /divorce
+   *
+   * Permissions used:
+   * ftc.marry
+   *
+   * Main Author: Julie
+   */
+
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> {
+          User user = getUserSender(c);
+          UserInteractions inter = user.getInteractions();
+
+          testCanDivorce(user);
+
+          user.sendMessage(Messages.confirmDivorce(inter.spouseUser()));
+          return 0;
+        })
+
+        .then(literal("confirm")
+            .executes(c -> {
+              User user = getUserSender(c);
+
+              testCanDivorce(user);
+
+              user.getInteractions().divorce();
+              return 0;
+            })
+        );
+  }
+
+  public static void testCanDivorce(User user) throws CommandSyntaxException {
+    UserInteractions inter = user.getInteractions();
+
+    if (inter.getSpouse() == null) {
+      throw Exceptions.NOT_MARRIED;
     }
-
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     *
-     * Valid usages of command:
-     * /divorce
-     *
-     * Permissions used:
-     * ftc.marry
-     *
-     * Main Author: Julie
-     */
-
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> {
-                    User user = getUserSender(c);
-                    UserInteractions inter = user.getInteractions();
-
-                    testCanDivorce(user);
-
-                    user.sendMessage(Messages.confirmDivorce(inter.spouseUser()));
-                    return 0;
-                })
-
-                .then(literal("confirm")
-                        .executes(c -> {
-                            User user = getUserSender(c);
-
-                            testCanDivorce(user);
-
-                            user.getInteractions().divorce();
-                            return 0;
-                        })
-                );
-    }
-
-    public static void testCanDivorce(User user) throws CommandSyntaxException {
-        UserInteractions inter = user.getInteractions();
-
-        if (inter.getSpouse() == null) {
-            throw Exceptions.NOT_MARRIED;
-        }
-    }
+  }
 }

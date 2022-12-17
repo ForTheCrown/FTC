@@ -12,31 +12,32 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class TestEmptyInventory extends UsageTest {
-    // --- TYPE ---
-    public static final UsageType<TestEmptyInventory> TYPE = UsageType.of(TestEmptyInventory.class);
 
-    @UsableConstructor(ConstructType.EMPTY)
-    public TestEmptyInventory() {
-        super(TYPE);
-    }
+  // --- TYPE ---
+  public static final UsageType<TestEmptyInventory> TYPE = UsageType.of(TestEmptyInventory.class);
 
-    @Override
-    public @Nullable Component displayInfo() {
-        return null;
-    }
+  @UsableConstructor(ConstructType.EMPTY)
+  public TestEmptyInventory() {
+    super(TYPE);
+  }
 
-    @Override
-    public @Nullable Tag save() {
-        return null;
-    }
+  @Override
+  public @Nullable Component displayInfo() {
+    return null;
+  }
 
-    @Override
-    public boolean test(Player player, CheckHolder holder) {
-        return player.getInventory().isEmpty();
-    }
+  @Override
+  public @Nullable Tag save() {
+    return null;
+  }
 
-    @Override
-    public @Nullable Component getFailMessage(Player player, CheckHolder holder) {
-        return Component.text("Your inventory must be empty", NamedTextColor.GRAY);
-    }
+  @Override
+  public boolean test(Player player, CheckHolder holder) {
+    return player.getInventory().isEmpty();
+  }
+
+  @Override
+  public @Nullable Component getFailMessage(Player player, CheckHolder holder) {
+    return Component.text("Your inventory must be empty", NamedTextColor.GRAY);
+  }
 }

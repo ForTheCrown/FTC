@@ -1,57 +1,57 @@
 package net.forthecrown.user.packet;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Comparator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.network.protocol.Packet;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Comparator;
-import java.util.List;
-
 @RequiredArgsConstructor
 public class PacketHandlerList<T extends Packet> {
-    final Class<T> packetClass;
-    final List<PacketExecutor<T>> executors = new ObjectArrayList<>();
 
-    public void addExecutor(PacketExecutor<T> executor) {
-        executors.add(executor);
-        executors.sort(Comparator.comparingInt(PacketExecutor::getPrio));
-    }
+  final Class<T> packetClass;
+  final List<PacketExecutor<T>> executors = new ObjectArrayList<>();
 
-    public void removeAll(Class c) {
-        executors.removeIf(executor -> c == executor.getExecutorClass());
-    }
+  public void addExecutor(PacketExecutor<T> executor) {
+    executors.add(executor);
+    executors.sort(Comparator.comparingInt(PacketExecutor::getPrio));
+  }
 
-    public PacketCall run(T packet, Player player) {
-        PacketCall call = new PacketCall(player);
+  public void removeAll(Class c) {
+    executors.removeIf(executor -> c == executor.getExecutorClass());
+  }
 
-        for (var v : executors) {
-            if (call.isCancelled() && v.isIgnoreCancelled()) {
-                continue;
-            }
+  public PacketCall run(T packet, Player player) {
+    PacketCall call = new PacketCall(player);
 
-            try {
-                v.run(packet, call);
-            } catch (Throwable t) {
-                Throwable throwable = t;
+    for (var v : executors) {
+      if (call.isCancelled() && v.isIgnoreCancelled()) {
+        continue;
+      }
 
-                if (throwable instanceof InvocationTargetException exc) {
-                    throwable = exc.getCause();
-                }
+      try {
+        v.run(packet, call);
+      } catch (Throwable t) {
+        Throwable throwable = t;
 
-                PacketListeners.LOGGER.error(
-                        "Error running packet listener executor '{}'",
-                        v.getExecutorClass().getSimpleName(),
-                        throwable
-                );
-            }
+        if (throwable instanceof InvocationTargetException exc) {
+          throwable = exc.getCause();
         }
 
-        return call;
+        PacketListeners.LOGGER.error(
+            "Error running packet listener executor '{}'",
+            v.getExecutorClass().getSimpleName(),
+            throwable
+        );
+      }
     }
 
-    public boolean isEmpty() {
-        return executors.isEmpty();
-    }
+    return call;
+  }
+
+  public boolean isEmpty() {
+    return executors.isEmpty();
+  }
 }

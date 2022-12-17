@@ -9,44 +9,44 @@ import net.kyori.adventure.text.Component;
 
 public class CommandStaffChat extends FtcCommand {
 
-    public CommandStaffChat(){
-        super("sc");
+  public CommandStaffChat() {
+    super("sc");
 
-        setPermission(Permissions.STAFF_CHAT);
-        setAliases("staffchat");
-        setDescription("Sends a message to the staff chat");
+    setPermission(Permissions.STAFF_CHAT);
+    setAliases("staffchat");
+    setDescription("Sends a message to the staff chat");
 
-        register();
-    }
+    register();
+  }
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     * Sends a message to the staff chat
-     *
-     *
-     * Valid usages of command:
-     * - /staffchat
-     * - /sc
-     *
-     * Permissions used:
-     * - ftc.staffchat
-     *
-     * Author: Julie
-     */
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   * Sends a message to the staff chat
+   *
+   *
+   * Valid usages of command:
+   * - /staffchat
+   * - /sc
+   *
+   * Permissions used:
+   * - ftc.staffchat
+   *
+   * Author: Julie
+   */
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command.then(argument("message", Arguments.CHAT)
-                .executes(c -> {
-                    StaffChat.send(
-                            c.getSource(),
-                            c.getArgument("message", Component.class),
-                            true
-                    );
-                    return 0;
-                })
-        );
-    }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command.then(argument("message", Arguments.CHAT)
+        .executes(c -> {
+          StaffChat.send(
+              c.getSource(),
+              c.getArgument("message", Component.class),
+              true
+          );
+          return 0;
+        })
+    );
+  }
 }

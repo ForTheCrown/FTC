@@ -12,68 +12,71 @@ import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.jetbrains.annotations.NotNull;
 
 class EnchantHandle extends Enchantment {
-    private final FtcEnchant wrapper;
 
-    protected EnchantHandle(FtcEnchant wrapper, EnchantmentCategory type, EquipmentSlot... slotTypes) {
-        super(Rarity.VERY_RARE, type, slotTypes);
-        this.wrapper = wrapper;
-    }
+  private final FtcEnchant wrapper;
 
-    @Override
-    public Component getFullname(int level) {
-        return PaperAdventure.asVanilla(wrapper.displayName(level));
-    }
+  protected EnchantHandle(FtcEnchant wrapper, EnchantmentCategory type,
+                          EquipmentSlot... slotTypes
+  ) {
+    super(Rarity.VERY_RARE, type, slotTypes);
+    this.wrapper = wrapper;
+  }
 
-    @Override
-    public int getMinLevel() {
-        return wrapper.getStartLevel();
-    }
+  @Override
+  public Component getFullname(int level) {
+    return PaperAdventure.asVanilla(wrapper.displayName(level));
+  }
 
-    @Override
-    public int getMaxLevel() {
-        return wrapper.getMaxLevel();
-    }
+  @Override
+  public int getMinLevel() {
+    return wrapper.getStartLevel();
+  }
 
-    @Override
-    public boolean isTreasureOnly() {
-        return wrapper.isTreasure();
-    }
+  @Override
+  public int getMaxLevel() {
+    return wrapper.getMaxLevel();
+  }
 
-    @Override
-    public boolean isTradeable() {
-        return wrapper.isTradeable();
-    }
+  @Override
+  public boolean isTreasureOnly() {
+    return wrapper.isTreasure();
+  }
 
-    @Override
-    public boolean isDiscoverable() {
-        return wrapper.isDiscoverable();
-    }
+  @Override
+  public boolean isTradeable() {
+    return wrapper.isTradeable();
+  }
 
-    @Override
-    public boolean isCurse() {
-        return wrapper.isCursed();
-    }
+  @Override
+  public boolean isDiscoverable() {
+    return wrapper.isDiscoverable();
+  }
 
-    @Override
-    public boolean canEnchant(@NotNull ItemStack itemstack) {
-        return wrapper.canEnchantItem(CraftItemStack.asBukkitCopy(itemstack));
-    }
+  @Override
+  public boolean isCurse() {
+    return wrapper.isCursed();
+  }
 
-    @Override
-    public void doPostAttack(LivingEntity user, Entity target, int level) {
-        wrapper.onAttack(
-                user.getBukkitLivingEntity(),
-                target.getBukkitEntity(),
-                level
-        );
-    }
+  @Override
+  public boolean canEnchant(@NotNull ItemStack itemstack) {
+    return wrapper.canEnchantItem(CraftItemStack.asBukkitCopy(itemstack));
+  }
 
-    @Override
-    public void doPostHurt(LivingEntity user, Entity attacker, int level) {
-        wrapper.onHurt(
-                user.getBukkitLivingEntity(),
-                attacker.getBukkitEntity(),
-                level
-        );
-    }
+  @Override
+  public void doPostAttack(LivingEntity user, Entity target, int level) {
+    wrapper.onAttack(
+        user.getBukkitLivingEntity(),
+        target.getBukkitEntity(),
+        level
+    );
+  }
+
+  @Override
+  public void doPostHurt(LivingEntity user, Entity attacker, int level) {
+    wrapper.onHurt(
+        user.getBukkitLivingEntity(),
+        attacker.getBukkitEntity(),
+        level
+    );
+  }
 }

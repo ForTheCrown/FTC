@@ -9,43 +9,44 @@ import net.forthecrown.user.TeleportRequest;
 import net.forthecrown.user.User;
 
 public class CommandTpaCancel extends FtcCommand {
-    public CommandTpaCancel(){
-        super("tpacancel");
 
-        setPermission(Permissions.TPA);
-        setDescription("Cancels a tpa request");
+  public CommandTpaCancel() {
+    super("tpacancel");
 
-        register();
-    }
+    setPermission(Permissions.TPA);
+    setDescription("Cancels a tpa request");
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("user", Arguments.ONLINE_USER)
-                        .executes(c -> {
-                            User user = getUserSender(c);
-                            User target = Arguments.getUser(c, "user");
+    register();
+  }
 
-                            TeleportRequest r = user.getInteractions().getOutgoing(target);
-                            if (r == null) {
-                                throw Exceptions.noOutgoing(target);
-                            }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .then(argument("user", Arguments.ONLINE_USER)
+            .executes(c -> {
+              User user = getUserSender(c);
+              User target = Arguments.getUser(c, "user");
 
-                            r.cancel();
-                            return 0;
-                        })
-                )
+              TeleportRequest r = user.getInteractions().getOutgoing(target);
+              if (r == null) {
+                throw Exceptions.noOutgoing(target);
+              }
 
-                .executes(c -> {
-                    User user = getUserSender(c);
-                    TeleportRequest r = user.getInteractions().latestOutgoing();
+              r.cancel();
+              return 0;
+            })
+        )
 
-                    if(r == null) {
-                        throw Exceptions.NO_TP_REQUESTS;
-                    }
+        .executes(c -> {
+          User user = getUserSender(c);
+          TeleportRequest r = user.getInteractions().latestOutgoing();
 
-                    r.cancel();
-                    return 0;
-                });
-    }
+          if (r == null) {
+            throw Exceptions.NO_TP_REQUESTS;
+          }
+
+          r.cancel();
+          return 0;
+        });
+  }
 }

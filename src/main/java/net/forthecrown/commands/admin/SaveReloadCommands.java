@@ -26,205 +26,207 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 public class SaveReloadCommands extends FtcCommand {
-    private static final EnumArgument<Section> SECTION_ARGUMENT = EnumArgument.of(Section.class);
 
-    private final boolean save;
+  private static final EnumArgument<Section> SECTION_ARGUMENT = EnumArgument.of(Section.class);
 
-    public SaveReloadCommands(@NotNull String name, boolean save) {
-        super(name);
+  private final boolean save;
 
-        this.save = save;
+  public SaveReloadCommands(@NotNull String name, boolean save) {
+    super(name);
 
-        setPermission(Permissions.ADMIN);
-        register();
-    }
+    this.save = save;
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> {
-                    if (save) {
-                        ModuleServices.SAVE.run();
-                    } else {
-                        ModuleServices.RELOAD.run();
-                    }
+    setPermission(Permissions.ADMIN);
+    register();
+  }
 
-                    c.getSource().sendAdmin(format(save, "FTC-Plugin"));
-                    return 0;
-                })
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> {
+          if (save) {
+            ModuleServices.SAVE.run();
+          } else {
+            ModuleServices.RELOAD.run();
+          }
 
-                .then(argument("section", SECTION_ARGUMENT)
-                        .executes(c -> {
-                            var section = c.getArgument("section", Section.class);
+          c.getSource().sendAdmin(format(save, "FTC-Plugin"));
+          return 0;
+        })
 
-                            if (save) {
-                                if (section.onSave == null) {
-                                    throw Exceptions.format(
-                                            "{0} cannot be saved!",
-                                            section
-                                    );
-                                }
-                            } else if (section.onLoad == null) {
-                                throw Exceptions.format(
-                                        "{0} cannot be loaded!",
-                                        section
-                                );
-                            }
+        .then(argument("section", SECTION_ARGUMENT)
+            .executes(c -> {
+              var section = c.getArgument("section", Section.class);
 
-                            section.run(save);
-
-                            c.getSource().sendAdmin(format(save, section.getViewerName()));
-                            return 0;
-                        })
+              if (save) {
+                if (section.onSave == null) {
+                  throw Exceptions.format(
+                      "{0} cannot be saved!",
+                      section
+                  );
+                }
+              } else if (section.onLoad == null) {
+                throw Exceptions.format(
+                    "{0} cannot be loaded!",
+                    section
                 );
-    }
+              }
 
-    public static void createCommands() {
-        new SaveReloadCommands("ftcsave", true);
-        new SaveReloadCommands("ftcreload", false);
-    }
+              section.run(save);
 
-    private static Component format(boolean save, String section) {
-        return Text.format("{0} {1}",
-                save ? "Saved" : "Reloaded",
-                section
+              c.getSource().sendAdmin(format(save, section.getViewerName()));
+              return 0;
+            })
         );
+  }
+
+  public static void createCommands() {
+    new SaveReloadCommands("ftcsave", true);
+    new SaveReloadCommands("ftcreload", false);
+  }
+
+  private static Component format(boolean save, String section) {
+    return Text.format("{0} {1}",
+        save ? "Saved" : "Reloaded",
+        section
+    );
+  }
+
+  @RequiredArgsConstructor
+  public enum Section {
+    USER_CACHE(
+        UserManager.get().getUserLookup()::save,
+        UserManager.get().getUserLookup()::reload
+    ),
+
+    USER_ALTS(
+        UserManager.get().getAlts()::save,
+        UserManager.get().getAlts()::reload
+    ),
+
+    USER_BALANCES(
+        UserManager.get().getBalances()::save,
+        UserManager.get().getBalances()::reload
+    ),
+
+    USER_VOTES(
+        UserManager.get().getVotes()::save,
+        UserManager.get().getVotes()::reload
+    ),
+
+    USER_GEMS(
+        UserManager.get().getGems()::save,
+        UserManager.get().getGems()::reload
+    ),
+
+    USER_PLAYTIME(
+        UserManager.get().getPlayTime()::save,
+        UserManager.get().getPlayTime()::reload
+    ),
+
+    USERS(
+        UserManager.get()::save,
+        UserManager.get()::reload
+    ),
+
+    KITS(
+        Usables.getInstance().getKits()::save,
+        Usables.getInstance().getKits()::reload
+    ),
+
+    WARPS(
+        Usables.getInstance().getWarps()::save,
+        Usables.getInstance().getWarps()::reload
+    ),
+
+    USABLES(
+        Usables.getInstance()::save,
+        Usables.getInstance()::reload
+    ),
+
+    WAYPOINTS(
+        WaypointManager.getInstance()::save,
+        WaypointManager.getInstance()::reload
+    ),
+
+    GUILDS(
+        GuildManager.get()::save,
+        GuildManager.get()::load
+    ),
+
+    SHOPS(
+        Economy.get().getShops()::save,
+        Economy.get().getShops()::reload
+    ),
+
+    PUNISHMENTS(
+        Punishments.get()::save,
+        Punishments.get()::reload
+    ),
+
+    MARKETS(
+        Economy.get().getMarkets()::save,
+        Economy.get().getMarkets()::load
+    ),
+
+    SELL_SHOP(
+        () -> {
+        },
+        Economy.get().getSellShop()::load
+    ),
+
+    ANNOUNCER(
+        Announcer.get()::save,
+        Announcer.get()::reload
+    ),
+
+    HOLIDAYS(
+        ServerHolidays.get()::save,
+        ServerHolidays.get()::reload
+    ),
+
+    STRUCTURES(
+        Structures.get()::save,
+        Structures.get()::load
+    ),
+
+    RW_TRACKER(
+        ResourceWorldTracker.get()::save,
+        ResourceWorldTracker.get()::reload
+    ),
+
+    CHALLENGES(
+        ChallengeManager.getInstance()::save,
+        ChallengeManager.getInstance()::load
+    ),
+
+    DATA_LOG(
+        LogManager.getInstance()::save,
+        LogManager.getInstance()::load
+    ),
+
+    SCRIPTS(
+        null,
+        ScriptManager.getInstance()::load
+    ),
+
+    CONFIG(
+        ConfigManager.get()::save,
+        ConfigManager.get()::load
+    );
+
+    private final Runnable onSave, onLoad;
+
+    public String getViewerName() {
+      return Text.prettyEnumName(this);
     }
 
-    @RequiredArgsConstructor
-    public enum Section {
-        USER_CACHE (
-                UserManager.get().getUserLookup()::save,
-                UserManager.get().getUserLookup()::reload
-        ),
-
-        USER_ALTS (
-                UserManager.get().getAlts()::save,
-                UserManager.get().getAlts()::reload
-        ),
-
-        USER_BALANCES (
-                UserManager.get().getBalances()::save,
-                UserManager.get().getBalances()::reload
-        ),
-
-        USER_VOTES (
-                UserManager.get().getVotes()::save,
-                UserManager.get().getVotes()::reload
-        ),
-
-        USER_GEMS (
-                UserManager.get().getGems()::save,
-                UserManager.get().getGems()::reload
-        ),
-
-        USER_PLAYTIME (
-                UserManager.get().getPlayTime()::save,
-                UserManager.get().getPlayTime()::reload
-        ),
-
-        USERS (
-                UserManager.get()::save,
-                UserManager.get()::reload
-        ),
-
-        KITS (
-                Usables.getInstance().getKits()::save,
-                Usables.getInstance().getKits()::reload
-        ),
-
-        WARPS (
-                Usables.getInstance().getWarps()::save,
-                Usables.getInstance().getWarps()::reload
-        ),
-
-        USABLES (
-                Usables.getInstance()::save,
-                Usables.getInstance()::reload
-        ),
-
-        WAYPOINTS (
-                WaypointManager.getInstance()::save,
-                WaypointManager.getInstance()::reload
-        ),
-
-        GUILDS (
-                GuildManager.get()::save,
-                GuildManager.get()::load
-        ),
-
-        SHOPS (
-                Economy.get().getShops()::save,
-                Economy.get().getShops()::reload
-        ),
-
-        PUNISHMENTS (
-                Punishments.get()::save,
-                Punishments.get()::reload
-        ),
-
-        MARKETS (
-                Economy.get().getMarkets()::save,
-                Economy.get().getMarkets()::load
-        ),
-
-        SELL_SHOP (
-                () -> {},
-                Economy.get().getSellShop()::load
-        ),
-
-        ANNOUNCER (
-                Announcer.get()::save,
-                Announcer.get()::reload
-        ),
-
-        HOLIDAYS (
-                ServerHolidays.get()::save,
-                ServerHolidays.get()::reload
-        ),
-
-        STRUCTURES (
-                Structures.get()::save,
-                Structures.get()::load
-        ),
-
-        RW_TRACKER (
-                ResourceWorldTracker.get()::save,
-                ResourceWorldTracker.get()::reload
-        ),
-
-        CHALLENGES (
-                ChallengeManager.getInstance()::save,
-                ChallengeManager.getInstance()::load
-        ),
-
-        DATA_LOG (
-                LogManager.getInstance()::save,
-                LogManager.getInstance()::load
-        ),
-
-        SCRIPTS (
-                null,
-                ScriptManager.getInstance()::load
-        ),
-
-        CONFIG (
-                ConfigManager.get()::save,
-                ConfigManager.get()::load
-        );
-
-        private final Runnable onSave, onLoad;
-
-        public String getViewerName() {
-            return Text.prettyEnumName(this);
-        }
-
-        public void run(boolean save) {
-            if (save) {
-                onSave.run();
-            } else {
-                onLoad.run();
-            }
-        }
+    public void run(boolean save) {
+      if (save) {
+        onSave.run();
+      } else {
+        onLoad.run();
+      }
     }
+  }
 }

@@ -9,44 +9,45 @@ import net.forthecrown.user.TeleportRequest;
 import net.forthecrown.user.User;
 
 public class CommandTpDeny extends FtcCommand {
-    public CommandTpDeny(){
-        super("tpdeny");
 
-        setPermission(Permissions.TPA);
-        setDescription("Denies a tpa request");
-        setAliases("tpadeny");
+  public CommandTpDeny() {
+    super("tpdeny");
 
-        register();
-    }
+    setPermission(Permissions.TPA);
+    setDescription("Denies a tpa request");
+    setAliases("tpadeny");
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("user", Arguments.ONLINE_USER)
-                        .executes(c -> {
-                            User user = getUserSender(c);
-                            User target = Arguments.getUser(c, "user");
-                            TeleportRequest request = user.getInteractions().getIncoming(target);
+    register();
+  }
 
-                            if (request == null) {
-                                throw Exceptions.noIncoming(target);
-                            }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .then(argument("user", Arguments.ONLINE_USER)
+            .executes(c -> {
+              User user = getUserSender(c);
+              User target = Arguments.getUser(c, "user");
+              TeleportRequest request = user.getInteractions().getIncoming(target);
 
-                            request.deny();
-                            return 0;
-                        })
-                )
+              if (request == null) {
+                throw Exceptions.noIncoming(target);
+              }
 
-                .executes(c -> {
-                    User user = getUserSender(c);
-                    TeleportRequest first = user.getInteractions().latestIncoming();
+              request.deny();
+              return 0;
+            })
+        )
 
-                    if (first == null) {
-                        throw Exceptions.NO_TP_REQUESTS;
-                    }
+        .executes(c -> {
+          User user = getUserSender(c);
+          TeleportRequest first = user.getInteractions().latestIncoming();
 
-                    first.deny();
-                    return 0;
-                });
-    }
+          if (first == null) {
+            throw Exceptions.NO_TP_REQUESTS;
+          }
+
+          first.deny();
+          return 0;
+        });
+  }
 }

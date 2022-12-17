@@ -8,21 +8,22 @@ import net.forthecrown.royalgrenadier.VanillaMappedArgument;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 
 public class FtcKeyArgument implements ArgumentType<String>, VanillaMappedArgument {
-    @Override
-    public String parse(StringReader reader) throws CommandSyntaxException {
-        int start = reader.getCursor();
 
-        while (reader.canRead() && Keys.isValidKeyChar(reader.peek())) {
-            reader.skip();
-        }
+  @Override
+  public String parse(StringReader reader) throws CommandSyntaxException {
+    int start = reader.getCursor();
 
-        int end = reader.getCursor();
-
-        return reader.getString().substring(start, end);
+    while (reader.canRead() && Keys.isValidKeyChar(reader.peek())) {
+      reader.skip();
     }
 
-    @Override
-    public ArgumentType<?> getVanillaArgumentType() {
-        return ScoreHolderArgument.scoreHolder();
-    }
+    int end = reader.getCursor();
+
+    return reader.getString().substring(start, end);
+  }
+
+  @Override
+  public ArgumentType<?> getVanillaArgumentType() {
+    return ScoreHolderArgument.scoreHolder();
+  }
 }

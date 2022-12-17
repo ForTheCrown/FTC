@@ -10,43 +10,45 @@ import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 
 @Getter
-public abstract class CommandUsable extends AbstractCheckable implements CheckHolder, HoverEventSource<Component> {
-    private final String name;
+public abstract class CommandUsable extends AbstractCheckable implements CheckHolder,
+    HoverEventSource<Component> {
 
-    public CommandUsable(String name) {
-        this.name = name;
+  private final String name;
+
+  public CommandUsable(String name) {
+    this.name = name;
+  }
+
+  public CommandUsable(String name, CompoundTag tag) throws CommandSyntaxException {
+    this(name);
+    loadChecks(tag);
+  }
+
+  protected abstract void save(CompoundTag tag);
+
+  public Component name() {
+    return Component.text(getName());
+  }
+
+  public Component displayName() {
+    return name().hoverEvent(this);
+  }
+
+  public CompoundTag save() {
+    var tag = new CompoundTag();
+    saveChecks(tag);
+    save(tag);
+
+    return tag;
+  }
+
+  public boolean interact(Player player) {
+    if (!testInteraction(player)) {
+      return false;
     }
 
-    public CommandUsable(String name, CompoundTag tag) throws CommandSyntaxException {
-        this(name);
-        loadChecks(tag);
-    }
+    return onInteract(player);
+  }
 
-    protected abstract void save(CompoundTag tag);
-
-    public Component name() {
-        return Component.text(getName());
-    }
-
-    public Component displayName() {
-        return name().hoverEvent(this);
-    }
-
-    public CompoundTag save() {
-        var tag = new CompoundTag();
-        saveChecks(tag);
-        save(tag);
-
-        return tag;
-    }
-
-    public boolean interact(Player player) {
-        if (!testInteraction(player)) {
-            return false;
-        }
-
-        return onInteract(player);
-    }
-
-    public abstract boolean onInteract(Player player);
+  public abstract boolean onInteract(Player player);
 }

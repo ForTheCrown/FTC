@@ -15,43 +15,45 @@ import org.spongepowered.math.vector.Vector3i;
 @Getter
 @RequiredArgsConstructor
 public class DungeonSpawner {
-    public static final String
-            TAG_SPAWNER = "spawner",
-            TAG_POSITION = "position";
 
-    private final SpawnerImpl spawner;
-    private final Vector3i position;
+  public static final String
+      TAG_SPAWNER = "spawner",
+      TAG_POSITION = "position";
 
-    public void onTick(World world) {
-        spawner.serverTick(
-                VanillaAccess.getLevel(world),
-                Vectors.toMinecraft(position)
-        );
+  private final SpawnerImpl spawner;
+  private final Vector3i position;
+
+  public void onTick(World world) {
+    spawner.serverTick(
+        VanillaAccess.getLevel(world),
+        Vectors.toMinecraft(position)
+    );
+  }
+
+  public CompoundTag save() {
+    CompoundTag tag = new CompoundTag();
+    tag.put(TAG_SPAWNER, spawner.save(new CompoundTag()));
+    tag.put(TAG_POSITION, Vectors.writeTag(position));
+    return tag;
+  }
+
+  public static DungeonSpawner load(Tag t) {
+    if (!(t instanceof CompoundTag tag)) {
+      return null;
     }
 
-    public CompoundTag save() {
-        CompoundTag tag = new CompoundTag();
-        tag.put(TAG_SPAWNER, spawner.save(new CompoundTag()));
-        tag.put(TAG_POSITION, Vectors.writeTag(position));
-        return tag;
+    SpawnerImpl spawner = new SpawnerImpl();
+    spawner.load(null, null, tag.getCompound(TAG_SPAWNER));
+
+    Vector3i pos = Vectors.read3i(tag.get(TAG_POSITION));
+
+    return new DungeonSpawner(spawner, pos);
+  }
+
+  public static class SpawnerImpl extends BaseSpawner {
+
+    @Override
+    public void broadcastEvent(Level world, BlockPos pos, int status) {
     }
-
-    public static DungeonSpawner load(Tag t) {
-        if (!(t instanceof CompoundTag tag)) {
-            return null;
-        }
-
-        SpawnerImpl spawner = new SpawnerImpl();
-        spawner.load(null, null, tag.getCompound(TAG_SPAWNER));
-
-        Vector3i pos = Vectors.read3i(tag.get(TAG_POSITION));
-
-        return new DungeonSpawner(spawner, pos);
-    }
-
-    public static class SpawnerImpl extends BaseSpawner {
-        @Override
-        public void broadcastEvent(Level world, BlockPos pos, int status) {
-        }
-    }
+  }
 }

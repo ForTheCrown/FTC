@@ -1,5 +1,6 @@
 package net.forthecrown.dungeons.boss;
 
+import java.util.Set;
 import net.forthecrown.dungeons.Bosses;
 import net.forthecrown.dungeons.boss.components.BossComponent;
 import net.forthecrown.dungeons.boss.components.EmptyRoomComponent;
@@ -19,119 +20,126 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.GenericMath;
 
-import java.util.Set;
-
 /**
  * A simple dungeon boss used by the first 4 dungeon bosses
  */
 public abstract class SimpleBoss extends KeyedBossImpl implements SingleEntityBoss {
-    protected Mob entity;
 
-    public SimpleBoss(String name, Location location, WorldBounds3i room, ItemStack... items) {
-        super(name, location, room, SpawnTest.items(items));
+  protected Mob entity;
+
+  public SimpleBoss(String name, Location location, WorldBounds3i room, ItemStack... items) {
+    super(name, location, room, SpawnTest.items(items));
+  }
+
+  @Override
+  protected void createComponents(Set<BossComponent> c) {
+    c.add(TargetUpdateComponent.create());
+    c.add(InsideRoomComponent.create());
+    c.add(EmptyRoomComponent.create(this));
+  }
+
+  // Methods subclasses must or should implement
+  // The only required one is the one which creates
+  // the boss entity
+  protected abstract Mob onSpawn(BossContext context);
+
+  protected void onDeath(BossContext context) {
+  }
+
+  protected void onHit(BossContext context, EntityDamageEvent event) {
+  }
+
+  @Override
+  public void spawn() {
+    // Don't spawn more than 1 boss
+    if (isAlive()) {
+      return;
     }
 
-    @Override
-    protected void createComponents(Set<BossComponent> c) {
-        c.add(TargetUpdateComponent.create());
-        c.add(InsideRoomComponent.create());
-        c.add(EmptyRoomComponent.create(this));
+    // Create context and entity
+    currentContext = BossContext.create(getRoom());
+    entity = onSpawn(currentContext);
+
+    createBossBar(currentContext);
+
+    // Get everything that's needed started
+    registerEvents();
+    startTickTask();
+
+    logSpawn(currentContext);
+
+    // Give boss the boss tag and an empty loottable
+    entity.getPersistentDataContainer()
+        .set(Bosses.BOSS_TAG, PersistentDataType.STRING, getKey());
+
+    entity.setLootTable(LootTables.EMPTY.getLootTable());
+
+    runComponents(component -> component.onSpawn(this, currentContext));
+
+    alive = true;
+  }
+
+  @Override
+  public void kill(boolean force) {
+    if (!isAlive()) {
+      return;
     }
 
-    // Methods subclasses must or should implement
-    // The only required one is the one which creates
-    // the boss entity
-    protected abstract Mob onSpawn(BossContext context);
-    protected void onDeath(BossContext context) {}
-    protected void onHit(BossContext context, EntityDamageEvent event) {}
+    // Destroy the basic things first
+    unregisterEvents();
+    stopTickTask();
+    destroyBossBar();
 
-    @Override
-    public void spawn() {
-        // Don't spawn more than 1 boss
-        if (isAlive()) {
-            return;
-        }
+    // Play some death effects
+    getWorld().createExplosion(entity.getLocation().add(0, 1, 0), 2.0f, false, false, entity);
+    getWorld().playSound(entity.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1.0f, 1.0f);
 
-        // Create context and entity
-        currentContext = BossContext.create(getRoom());
-        entity = onSpawn(currentContext);
-
-        createBossBar(currentContext);
-
-        // Get everything that's needed started
-        registerEvents();
-        startTickTask();
-
-        logSpawn(currentContext);
-
-        // Give boss the boss tag and an empty loottable
-        entity.getPersistentDataContainer()
-                .set(Bosses.BOSS_TAG, PersistentDataType.STRING, getKey());
-
-        entity.setLootTable(LootTables.EMPTY.getLootTable());
-
-        runComponents(component -> component.onSpawn(this, currentContext));
-
-        alive = true;
+    // If we're not being forced, run the onDeath functions
+    // as well as giving away the awards for this boss
+    if (!force) {
+      onDeath(currentContext);
+      finalizeKill(currentContext);
     }
 
-    @Override
-    public void kill(boolean force) {
-        if (!isAlive()) {
-            return;
-        }
+    runComponents(component -> component.onDeath(this, currentContext, force));
 
-        // Destroy the basic things first
-        unregisterEvents();
-        stopTickTask();
-        destroyBossBar();
+    // Nullify everything
+    entity.remove();
+    entity = null;
+    alive = false;
+    currentContext = null;
+  }
 
-        // Play some death effects
-        getWorld().createExplosion(entity.getLocation().add(0, 1, 0), 2.0f, false, false, entity);
-        getWorld().playSound(entity.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1.0f, 1.0f);
+  @Override
+  public @Nullable Mob getBossEntity() {
+    return entity;
+  }
 
-        // If we're not being forced, run the onDeath functions
-        // as well as giving away the awards for this boss
-        if(!force) {
-            onDeath(currentContext);
-            finalizeKill(currentContext);
-        }
-
-        runComponents(component -> component.onDeath(this, currentContext, force));
-
-        // Nullify everything
-        entity.remove();
-        entity = null;
-        alive = false;
-        currentContext = null;
+  @EventHandler(ignoreCancelled = true)
+  public void onEntityDamage(EntityDamageEvent event) {
+    if (!event.getEntity().equals(entity)) {
+      return;
     }
+    onHit(currentContext, event);
 
-    @Override
-    public @Nullable Mob getBossEntity() {
-        return entity;
+    double newHealth = entity.getHealth() - event.getFinalDamage();
+    // Update boss bar
+    bossBar.setProgress(
+        GenericMath.clamp(
+            newHealth / entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)
+                .getValue(),
+            0, 1
+        )
+    );
+
+    runComponents(component -> component.onHit(this, currentContext, event));
+  }
+
+  @EventHandler
+  public void onBossDeath(EntityDeathEvent event) {
+    if (!event.getEntity().equals(entity)) {
+      return;
     }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onEntityDamage(EntityDamageEvent event) {
-        if (!event.getEntity().equals(entity)) return;
-        onHit(currentContext, event);
-
-        double newHealth = entity.getHealth() - event.getFinalDamage();
-        // Update boss bar
-        bossBar.setProgress(
-                GenericMath.clamp(
-                        newHealth / entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)
-                                .getValue(),
-                        0, 1
-                )
-        );
-
-        runComponents(component -> component.onHit(this, currentContext, event));
-    }
-
-    @EventHandler
-    public void onBossDeath(EntityDeathEvent event) {
-        if (!event.getEntity().equals(entity)) return;
-        kill();
-    }
+    kill();
+  }
 }

@@ -1,5 +1,6 @@
 package net.forthecrown.guilds.menu;
 
+import java.util.Arrays;
 import lombok.Getter;
 import net.forthecrown.guilds.unlockables.Unlockable;
 import net.forthecrown.guilds.unlockables.UnlockableSetting;
@@ -16,48 +17,48 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
 @Getter
 public class UpgradesMenu extends MenuPage {
-    private final GuildRanksMenu ranksMenu;
-    private final ChunkUpgradesMenu chunkMenu;
-    private final CosmeticsMenu cosmeticsMenu;
 
-    public UpgradesMenu(MenuPage parent) {
-        super(parent);
+  private final GuildRanksMenu ranksMenu;
+  private final ChunkUpgradesMenu chunkMenu;
+  private final CosmeticsMenu cosmeticsMenu;
 
-        ranksMenu = new GuildRanksMenu(this);
-        chunkMenu = new ChunkUpgradesMenu(this);
-        this.cosmeticsMenu = new CosmeticsMenu(this);
+  public UpgradesMenu(MenuPage parent) {
+    super(parent);
 
-        initMenu(Menus.builder(Menus.MAX_INV_SIZE, "Guild Upgrades"), true);
-    }
+    ranksMenu = new GuildRanksMenu(this);
+    chunkMenu = new ChunkUpgradesMenu(this);
+    this.cosmeticsMenu = new CosmeticsMenu(this);
 
-    @Override
-    protected void createMenu(MenuBuilder builder) {
-        builder.add(22, ranksMenu);
-        builder.add(29, chunkMenu);
-        builder.add(24, cosmeticsMenu);
+    initMenu(Menus.builder(Menus.MAX_INV_SIZE, "Guild Upgrades"), true);
+  }
 
-        addAll(UnlockableSetting.values(), builder);
-        addAll(Upgradable.values(), builder);
-    }
+  @Override
+  protected void createMenu(MenuBuilder builder) {
+    builder.add(22, ranksMenu);
+    builder.add(29, chunkMenu);
+    builder.add(24, cosmeticsMenu);
 
-    static void addAll(Unlockable[] values, MenuBuilder builder) {
-        Arrays.stream(values).forEach(unlockable -> builder.add(unlockable.getSlot(), unlockable.toInvOption()));
-    }
+    addAll(UnlockableSetting.values(), builder);
+    addAll(Upgradable.values(), builder);
+  }
 
-    @Override
-    protected MenuNode createHeader() {
-        return this;
-    }
+  static void addAll(Unlockable[] values, MenuBuilder builder) {
+    Arrays.stream(values)
+        .forEach(unlockable -> builder.add(unlockable.getSlot(), unlockable.toInvOption()));
+  }
 
-    @Override
-    public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
-        return ItemStacks.builder(Material.GOLDEN_APPLE)
-                .setName("&eGuild upgrades")
-                .addLore("&7Upgrades that can be unlocked with Guild Exp.")
-                .build();
-    }
+  @Override
+  protected MenuNode createHeader() {
+    return this;
+  }
+
+  @Override
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+    return ItemStacks.builder(Material.GOLDEN_APPLE)
+        .setName("&eGuild upgrades")
+        .addLore("&7Upgrades that can be unlocked with Guild Exp.")
+        .build();
+  }
 }

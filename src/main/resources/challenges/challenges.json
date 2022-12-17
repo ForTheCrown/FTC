@@ -213,7 +213,7 @@
   },
   "daily/fish": {
     "displayName": "Fishing",
-    "eventClass": "org.bukkit.event.entity.PlayerFishEvent",
+    "eventClass": "org.bukkit.event.player.PlayerFishEvent",
     "script": "challenges/generic.js",
     "goal": 10,
     "description": [

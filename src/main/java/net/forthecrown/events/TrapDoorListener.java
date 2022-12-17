@@ -22,42 +22,46 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class TrapDoorListener implements Listener {
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        Block block = event.getClickedBlock();
-        BlockData data = event.getClickedBlock().getBlockData();
 
-        if (!(data instanceof TrapDoor)) {
-            return;
-        }
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerInteract(PlayerInteractEvent event) {
+    Block block = event.getClickedBlock();
+    BlockData data = event.getClickedBlock().getBlockData();
 
-        com.sk89q.worldedit.util.Location weLoc = BukkitAdapter.adapt(block.getLocation());
-        LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
-
-        WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
-        RegionQuery query = platform.getRegionContainer().createQuery();
-        boolean canBypass = platform.getSessionManager().hasBypass(wgPlayer, BukkitAdapter.adapt(block.getWorld()));
-
-        if (!query.testState(weLoc, wgPlayer, FtcFlags.TRAPDOOR_USE)
-                && !canBypass
-        ) {
-            ApplicableRegionSet set = platform.getRegionContainer()
-                    .get(BukkitAdapter.adapt(block.getWorld()))
-                    .getApplicableRegions(BlockVector3.at(weLoc.getBlockX(), weLoc.getBlockY(), weLoc.getBlockZ()));
-
-            for (ProtectedRegion region: set) {
-                if (region.isMember(wgPlayer)) {
-                    return;
-                }
-            }
-
-            event.setCancelled(true);
-            event.getPlayer().sendMessage(
-                    Component.text()
-                            .append(Component.text("Hey!").style(Style.style(NamedTextColor.RED, TextDecoration.BOLD)))
-                            .append(Component.text(" You can't do that here!").color(NamedTextColor.GRAY))
-                            .build()
-            );
-        }
+    if (!(data instanceof TrapDoor)) {
+      return;
     }
+
+    com.sk89q.worldedit.util.Location weLoc = BukkitAdapter.adapt(block.getLocation());
+    LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
+
+    WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
+    RegionQuery query = platform.getRegionContainer().createQuery();
+    boolean canBypass = platform.getSessionManager()
+        .hasBypass(wgPlayer, BukkitAdapter.adapt(block.getWorld()));
+
+    if (!query.testState(weLoc, wgPlayer, FtcFlags.TRAPDOOR_USE)
+        && !canBypass
+    ) {
+      ApplicableRegionSet set = platform.getRegionContainer()
+          .get(BukkitAdapter.adapt(block.getWorld()))
+          .getApplicableRegions(
+              BlockVector3.at(weLoc.getBlockX(), weLoc.getBlockY(), weLoc.getBlockZ()));
+
+      for (ProtectedRegion region : set) {
+        if (region.isMember(wgPlayer)) {
+          return;
+        }
+      }
+
+      event.setCancelled(true);
+      event.getPlayer().sendMessage(
+          Component.text()
+              .append(Component.text("Hey!")
+                  .style(Style.style(NamedTextColor.RED, TextDecoration.BOLD)))
+              .append(Component.text(" You can't do that here!").color(NamedTextColor.GRAY))
+              .build()
+      );
+    }
+  }
 }

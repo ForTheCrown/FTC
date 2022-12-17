@@ -1,5 +1,7 @@
 package net.forthecrown.structure;
 
+import static net.forthecrown.commands.admin.CommandStructFunction.COMMAND_NAME;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
@@ -25,151 +27,159 @@ import org.bukkit.block.data.Directional;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
-import static net.forthecrown.commands.admin.CommandStructFunction.COMMAND_NAME;
-
 @Getter
 @RequiredArgsConstructor
 public class FunctionInfo {
-    private static final Logger LOGGER = FTC.getLogger();
 
-    /* ----------------------------- CONSTANTS ------------------------------ */
+  private static final Logger LOGGER = FTC.getLogger();
 
-    public static final String
-            FUNCTION_CMD_PREFIX = "function_build";
+  /* ----------------------------- CONSTANTS ------------------------------ */
 
-    private static final Argument<String> FUNC_ARG = Argument.builder(FUNCTION_CMD_PREFIX, Arguments.FTC_KEY)
-            .build();
+  public static final String
+      FUNCTION_CMD_PREFIX = "function_build";
 
-    private static final Argument<CompoundTag> TAG_ARG = Argument.builder("data", CompoundTagArgument.compoundTag())
-            .build();
+  private static final Argument<String> FUNC_ARG = Argument.builder(FUNCTION_CMD_PREFIX,
+          Arguments.FTC_KEY)
+      .build();
 
-    private static final Argument<ParsedBlock> TURNS_INTO_ARG = Argument.builder("turns_into", BlockArgument.block())
-            .build();
+  private static final Argument<CompoundTag> TAG_ARG = Argument.builder("data",
+          CompoundTagArgument.compoundTag())
+      .build();
 
-    public static final ArgsArgument PARSER = ArgsArgument.builder()
-            .addRequired(FUNC_ARG)
-            .addOptional(TAG_ARG)
-            .addOptional(TURNS_INTO_ARG)
-            .build();
+  private static final Argument<ParsedBlock> TURNS_INTO_ARG = Argument.builder("turns_into",
+          BlockArgument.block())
+      .build();
 
-    private static final String
-            TAG_FUNCTION = "function",
-            TAG_FACING = "direction",
-            TAG_POSITION = "position",
-            TAG_TURNS_INTO = "turns_into",
-            TAG_INFO = "value";
+  public static final ArgsArgument PARSER = ArgsArgument.builder()
+      .addRequired(FUNC_ARG)
+      .addOptional(TAG_ARG)
+      .addOptional(TURNS_INTO_ARG)
+      .build();
 
-    /* ----------------------------- INSTANCE FIELDS ------------------------------ */
+  private static final String
+      TAG_FUNCTION = "function",
+      TAG_FACING = "direction",
+      TAG_POSITION = "position",
+      TAG_TURNS_INTO = "turns_into",
+      TAG_INFO = "value";
 
-    /** An arbitrary function key defined by staff/systems which use structures */
-    private final String functionKey;
+  /* ----------------------------- INSTANCE FIELDS ------------------------------ */
 
-    /** The direction the command block this function was scanned from was facing */
-    private final Direction facing;
+  /**
+   * An arbitrary function key defined by staff/systems which use structures
+   */
+  private final String functionKey;
 
-    /**
-     * The block data this function's block will turn into when a
-     * structure is being placed, may be null.
-     * <p>
-     * Note: If a {@link StructurePlaceConfig} has a defined {@link FunctionProcessor}
-     * for functions with the same names as this one, this block data will not be
-     * placed into the world unless a processor calls the {@link #place(StructurePlaceConfig)}
-     * method manually
-     */
-    private final BlockData turnsInto;
+  /**
+   * The direction the command block this function was scanned from was facing
+   */
+  private final Direction facing;
 
-    /** This function's block position relative to the structure */
-    private final Vector3i offset;
+  /**
+   * The block data this function's block will turn into when a structure is being placed, may be
+   * null.
+   * <p>
+   * Note: If a {@link StructurePlaceConfig} has a defined {@link FunctionProcessor} for functions
+   * with the same names as this one, this block data will not be placed into the world unless a
+   * processor calls the {@link #place(StructurePlaceConfig)} method manually
+   */
+  private final BlockData turnsInto;
 
-    /**
-     * Optional data given to the function
-     * <p>
-     * Note: will not be applied to block
-     */
-    private final CompoundTag tag;
+  /**
+   * This function's block position relative to the structure
+   */
+  private final Vector3i offset;
 
-    /* ----------------------------- METHODS ------------------------------ */
+  /**
+   * Optional data given to the function
+   * <p>
+   * Note: will not be applied to block
+   */
+  private final CompoundTag tag;
 
-    public void place(StructurePlaceConfig config) {
-        if (turnsInto == null) {
-            return;
-        }
+  /* ----------------------------- METHODS ------------------------------ */
 
-        Vector3i pos = config.getTransform().apply(offset);
-        BlockData data = turnsInto.clone();
-        data = VanillaAccess.rotate(data, config.getTransform().getRotation());
-
-        Vectors.getBlock(pos, config.getWorld())
-                .setBlockData(data);
+  public void place(StructurePlaceConfig config) {
+    if (turnsInto == null) {
+      return;
     }
 
-    /* ----------------------------- PARSE ------------------------------ */
+    Vector3i pos = config.getTransform().apply(offset);
+    BlockData data = turnsInto.clone();
+    data = VanillaAccess.rotate(data, config.getTransform().getRotation());
 
-    public static FunctionInfo parse(Vector3d origin, CommandBlock cmd) throws CommandSyntaxException {
-        String command = cmd.getCommand();
-        StringReader reader = new StringReader(command);
+    Vectors.getBlock(pos, config.getWorld())
+        .setBlockData(data);
+  }
 
-        if (reader.peek() == '/') {
-            reader.skip();
-        }
+  /* ----------------------------- PARSE ------------------------------ */
 
-        // If the input does not start with the command name,
-        // this will do nothing, as there's nothing to skip over
-        Readers.skip(reader, COMMAND_NAME);
-        reader.skipWhitespace();
+  public static FunctionInfo parse(Vector3d origin, CommandBlock cmd)
+      throws CommandSyntaxException {
+    String command = cmd.getCommand();
+    StringReader reader = new StringReader(command);
 
-        ParsedArgs args = PARSER.parse(reader);
-        var direction = Direction.fromBukkit(
-                ((Directional) cmd.getBlockData()).getFacing()
-        );
-
-        return new FunctionInfo(
-                args.get(FUNC_ARG),
-                direction,
-
-                args.has(TURNS_INTO_ARG) ? args.get(TURNS_INTO_ARG).getData() : null,
-                Vectors.from(cmd.getBlock()).sub(origin.toInt()),
-                args.get(TAG_ARG)
-        );
+    if (reader.peek() == '/') {
+      reader.skip();
     }
 
-    /* ----------------------------- SERIALIZATION ------------------------------ */
+    // If the input does not start with the command name,
+    // this will do nothing, as there's nothing to skip over
+    Readers.skip(reader, COMMAND_NAME);
+    reader.skipWhitespace();
 
-    public Tag save() {
-        CompoundTag tag = new CompoundTag();
+    ParsedArgs args = PARSER.parse(reader);
+    var direction = Direction.fromBukkit(
+        ((Directional) cmd.getBlockData()).getFacing()
+    );
 
-        tag.putString(TAG_FUNCTION, functionKey);
-        tag.put(TAG_FACING, TagUtil.writeEnum(facing));
-        tag.put(TAG_POSITION, Vectors.writeTag(offset));
+    return new FunctionInfo(
+        args.get(FUNC_ARG),
+        direction,
 
-        if (turnsInto != null) {
-            tag.put(
-                    TAG_TURNS_INTO,
-                    TagUtil.writeBlockData(turnsInto)
-            );
-        }
+        args.has(TURNS_INTO_ARG) ? args.get(TURNS_INTO_ARG).getData() : null,
+        Vectors.from(cmd.getBlock()).sub(origin.toInt()),
+        args.get(TAG_ARG)
+    );
+  }
 
-        if (this.tag != null && !this.tag.isEmpty()) {
-            tag.put(TAG_INFO, this.tag);
-        }
+  /* ----------------------------- SERIALIZATION ------------------------------ */
 
-        return tag;
+  public Tag save() {
+    CompoundTag tag = new CompoundTag();
+
+    tag.putString(TAG_FUNCTION, functionKey);
+    tag.put(TAG_FACING, TagUtil.writeEnum(facing));
+    tag.put(TAG_POSITION, Vectors.writeTag(offset));
+
+    if (turnsInto != null) {
+      tag.put(
+          TAG_TURNS_INTO,
+          TagUtil.writeBlockData(turnsInto)
+      );
     }
 
-    public static FunctionInfo load(Tag t) {
-        CompoundTag tag = (CompoundTag) t;
-        BlockData data = null;
-
-        if (tag.contains(TAG_TURNS_INTO)) {
-            data = TagUtil.readBlockData(tag.get(TAG_TURNS_INTO));
-        }
-
-        return new FunctionInfo(
-                tag.getString(TAG_FUNCTION),
-                TagUtil.readEnum(Direction.class, tag.get(TAG_FACING)),
-                data,
-                Vectors.read3i(tag.get(TAG_POSITION)),
-                tag.contains(TAG_INFO) ? tag.getCompound(TAG_INFO) : null
-        );
+    if (this.tag != null && !this.tag.isEmpty()) {
+      tag.put(TAG_INFO, this.tag);
     }
+
+    return tag;
+  }
+
+  public static FunctionInfo load(Tag t) {
+    CompoundTag tag = (CompoundTag) t;
+    BlockData data = null;
+
+    if (tag.contains(TAG_TURNS_INTO)) {
+      data = TagUtil.readBlockData(tag.get(TAG_TURNS_INTO));
+    }
+
+    return new FunctionInfo(
+        tag.getString(TAG_FUNCTION),
+        TagUtil.readEnum(Direction.class, tag.get(TAG_FACING)),
+        data,
+        Vectors.read3i(tag.get(TAG_POSITION)),
+        tag.contains(TAG_INFO) ? tag.getCompound(TAG_INFO) : null
+    );
+  }
 }

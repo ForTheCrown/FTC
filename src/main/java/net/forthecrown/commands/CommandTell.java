@@ -12,52 +12,55 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 
 public class CommandTell extends FtcCommand {
-    public CommandTell(){
-        super("ftell");
 
-        setAliases("emsg", "tell", "whisper", "w", "msg", "etell", "ewhisper", "pm", "dm", "t", "message");
-        setPermission(Permissions.MESSAGE);
-        setDescription("Sends a message to a player");
-        setHelpListName("msg");
+  public CommandTell() {
+    super("ftell");
 
-        register();
-    }
+    setAliases("emsg", "tell", "whisper", "w", "msg", "etell", "ewhisper", "pm", "dm", "t",
+        "message");
+    setPermission(Permissions.MESSAGE);
+    setDescription("Sends a message to a player");
+    setHelpListName("msg");
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                // /tell <user>
-                .then(argument("user", Arguments.ONLINE_USER)
+    register();
+  }
 
-                        // /tell <user> <message>
-                        .then(argument("message", Arguments.MESSAGE)
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        // /tell <user>
+        .then(argument("user", Arguments.ONLINE_USER)
 
-                                .executes(c -> {
-                                    CommandSource source = c.getSource();
-                                    User user = Arguments.getUser(c, "user");
-                                    var text = c.getArgument("message", MessageArgument.Result.class);
+            // /tell <user> <message>
+            .then(argument("message", Arguments.MESSAGE)
 
-                                    return sendMsg(source, user, text);
-                                })
-                        )
-                );
-    }
+                .executes(c -> {
+                  CommandSource source = c.getSource();
+                  User user = Arguments.getUser(c, "user");
+                  var text = c.getArgument("message", MessageArgument.Result.class);
 
-    public int sendMsg(CommandSource sender, User target, MessageArgument.Result message) throws CommandSyntaxException {
-        CommandSource receiver = target.getCommandSource(this);
+                  return sendMsg(source, user, text);
+                })
+            )
+        );
+  }
 
-        if (sender.isPlayer()) {
-            User user = Users.get(sender.asPlayer());
+  public int sendMsg(CommandSource sender, User target, MessageArgument.Result message)
+      throws CommandSyntaxException {
+    CommandSource receiver = target.getCommandSource(this);
 
-            if(!user.equals(target)) {
-                user.setLastMessage(receiver);
-                target.setLastMessage(sender);
-            }
-        }
+    if (sender.isPlayer()) {
+      User user = Users.get(sender.asPlayer());
 
+      if (!user.equals(target)) {
+        user.setLastMessage(receiver);
         target.setLastMessage(sender);
-
-        DirectMessage.run(sender, receiver, false, message.getText());
-        return 0;
+      }
     }
+
+    target.setLastMessage(sender);
+
+    DirectMessage.run(sender, receiver, false, message.getText());
+    return 0;
+  }
 }

@@ -1,6 +1,8 @@
 package net.forthecrown.core;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectAVLTreeMap;
+import java.util.Comparator;
+import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -10,112 +12,116 @@ import org.apache.commons.lang3.Validate;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 
-import java.util.Comparator;
-import java.util.function.Predicate;
-
 public class TieredPermission {
-    /** The prefix used for permissions */
-    @Getter
-    private final String prefix;
 
-    /** The range of supported integer values for tiers */
-    @Getter
-    private final Range<Integer> range;
+  /**
+   * The prefix used for permissions
+   */
+  @Getter
+  private final String prefix;
 
-    private final Int2ObjectAVLTreeMap<Permission> permissions;
+  /**
+   * The range of supported integer values for tiers
+   */
+  @Getter
+  private final Range<Integer> range;
 
-    @Getter
-    private final Permission unlimitedPermission;
+  private final Int2ObjectAVLTreeMap<Permission> permissions;
 
-    public TieredPermission(String prefix, Range<Integer> range, Permission unlimitedPermission) {
-        this.prefix = prefix;
-        this.range = range;
+  @Getter
+  private final Permission unlimitedPermission;
 
-        // Creates a sorted map that's sorted from largest to smallest
-        // this is for iteration in the getTier method, which requires
-        // us to scan from greatest tier to smallest to return an accurate
-        // result
-        permissions = new Int2ObjectAVLTreeMap<>(Comparator.reverseOrder());
+  public TieredPermission(String prefix, Range<Integer> range, Permission unlimitedPermission) {
+    this.prefix = prefix;
+    this.range = range;
 
-        // Register all permissions
-        for (int tier = range.getMinimum(); tier <= range.getMaximum(); tier++) {
-            permissions.put(tier, Permissions.register(prefix + tier));
-        }
+    // Creates a sorted map that's sorted from largest to smallest
+    // this is for iteration in the getTier method, which requires
+    // us to scan from greatest tier to smallest to return an accurate
+    // result
+    permissions = new Int2ObjectAVLTreeMap<>(Comparator.reverseOrder());
 
-        this.unlimitedPermission = unlimitedPermission;
+    // Register all permissions
+    for (int tier = range.getMinimum(); tier <= range.getMaximum(); tier++) {
+      permissions.put(tier, Permissions.register(prefix + tier));
     }
 
-    public static Builder builder() {
-        return new Builder();
+    this.unlimitedPermission = unlimitedPermission;
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public int getTier(User user) {
+    return _getTier(user::hasPermission);
+  }
+
+  public int getTier(Permissible permissible) {
+    return _getTier(permissible::hasPermission);
+  }
+
+  public boolean hasUnlimited(Permissible permissible) {
+    return permissible.hasPermission(getUnlimitedPermission());
+  }
+
+  public boolean hasUnlimited(User user) {
+    return user.hasPermission(getUnlimitedPermission());
+  }
+
+  private int _getTier(Predicate<Permission> validate) {
+    if (validate.test(getUnlimitedPermission())) {
+      return Integer.MAX_VALUE;
     }
 
-    public int getTier(User user) {
-        return _getTier(user::hasPermission);
+    for (var v : permissions.int2ObjectEntrySet()) {
+      if (validate.test(v.getValue())) {
+        return v.getIntKey();
+      }
     }
 
-    public int getTier(Permissible permissible) {
-        return _getTier(permissible::hasPermission);
+    return -1;
+  }
+
+  public boolean contains(int tier) {
+    return permissions.containsKey(tier);
+  }
+
+  public Permission getPermission(int tier) {
+    return permissions.get(tier);
+  }
+
+  @Getter
+  @Setter
+  @Accessors(chain = true, fluent = true)
+  static class Builder {
+
+    private String prefix;
+    private Permission unlimitedPermission;
+    private Range<Integer> range = Range.between(1, 5);
+
+    public Builder tiersFrom1To(int end) {
+      return range(Range.between(1, end));
     }
 
-    public boolean hasUnlimited(Permissible permissible) {
-        return permissible.hasPermission(getUnlimitedPermission());
+    public Builder tiersFrom0To(int end) {
+      return range(Range.between(0, end));
     }
 
-    public boolean hasUnlimited(User user) {
-        return user.hasPermission(getUnlimitedPermission());
+    public Builder unlimitedPerm(String perm) {
+      return unlimitedPermission(Permissions.register(perm));
     }
 
-    private int _getTier(Predicate<Permission> validate) {
-        if (validate.test(getUnlimitedPermission())) {
-            return Integer.MAX_VALUE;
-        }
-
-        for (var v: permissions.int2ObjectEntrySet()) {
-            if (validate.test(v.getValue())) {
-                return v.getIntKey();
-            }
-        }
-
-        return -1;
+    public Builder allowUnlimited() {
+      return unlimitedPerm(prefix + (prefix.endsWith(".") ? "" : ".") + "unlimited");
     }
 
-    public boolean contains(int tier) {
-        return permissions.containsKey(tier);
+    public TieredPermission build() {
+      return new TieredPermission(
+          Validate.notBlank(prefix),
+          range,
+          unlimitedPermission
+      );
     }
-
-    public Permission getPermission(int tier) {
-        return permissions.get(tier);
-    }
-
-    @Getter @Setter
-    @Accessors(chain = true, fluent = true)
-    static class Builder {
-        private String prefix;
-        private Permission unlimitedPermission;
-        private Range<Integer> range = Range.between(1, 5);
-
-        public Builder tiersFrom1To(int end) {
-            return range(Range.between(1, end));
-        }
-
-        public Builder tiersFrom0To(int end) {
-            return range(Range.between(0, end));
-        }
-
-        public Builder unlimitedPerm(String perm) {
-            return unlimitedPermission(Permissions.register(perm));
-        }
-
-        public Builder allowUnlimited() {
-            return unlimitedPerm(prefix + (prefix.endsWith(".") ? "" : ".") + "unlimited");
-        }
-
-        public TieredPermission build() {
-            return new TieredPermission(
-                    Validate.notBlank(prefix),
-                    range,
-                    unlimitedPermission
-            );
-        }
-    }
+  }
 }

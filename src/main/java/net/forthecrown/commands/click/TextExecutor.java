@@ -5,5 +5,6 @@ import net.forthecrown.user.User;
 
 @FunctionalInterface
 public interface TextExecutor {
-    void execute(User user) throws CommandSyntaxException;
+
+  void execute(User user) throws CommandSyntaxException;
 }

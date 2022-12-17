@@ -7,39 +7,41 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.permissions.Permission;
 
 public class ItemModCommands extends CmdUtil {
-    static final Permission PERMISSION = Permissions.ADMIN;
 
-    private static final ItemModifierNode[] NODES = {
-            new EnchantmentNode(),
-            new ItemLoreNode(),
-            new ItemNameNode(),
-            new ItemDataNode(),
-            new ItemAttributeNode()
-    };
+  static final Permission PERMISSION = Permissions.ADMIN;
 
-    public static void createCommands() {
-        new ItemStacksCommand().register();
+  private static final ItemModifierNode[] NODES = {
+      new EnchantmentNode(),
+      new ItemLoreNode(),
+      new ItemNameNode(),
+      new ItemDataNode(),
+      new ItemAttributeNode()
+  };
+
+  public static void createCommands() {
+    new ItemStacksCommand().register();
+  }
+
+  public static class ItemStacksCommand extends FtcCommand {
+
+    public ItemStacksCommand() {
+      super("items");
+
+      setAliases("itemstacks", "itemstack", "item");
+      setPermission(PERMISSION);
     }
 
-    public static class ItemStacksCommand extends FtcCommand {
-        public ItemStacksCommand() {
-            super("items");
+    @Override
+    protected void createCommand(BrigadierCommand command) {
+      for (var node : NODES) {
+        var literal = literal(node.getArgumentName());
 
-            setAliases("itemstacks", "itemstack", "item");
-            setPermission(PERMISSION);
-        }
+        node.create(literal);
+        node.register();
 
-        @Override
-        protected void createCommand(BrigadierCommand command) {
-            for (var node: NODES) {
-                var literal = literal(node.getArgumentName());
-
-                node.create(literal);
-                node.register();
-
-                command.then(literal);
-            }
-        }
+        command.then(literal);
+      }
     }
+  }
 
 }

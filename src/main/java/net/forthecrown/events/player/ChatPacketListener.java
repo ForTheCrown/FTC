@@ -1,6 +1,7 @@
 package net.forthecrown.events.player;
 
 import io.papermc.paper.adventure.ChatDecorationProcessor;
+import java.util.Objects;
 import net.forthecrown.core.FTC;
 import net.forthecrown.user.packet.PacketCall;
 import net.forthecrown.user.packet.PacketHandler;
@@ -14,86 +15,87 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.event.player.PlayerKickEvent;
 
-import java.util.Objects;
-
 public class ChatPacketListener implements PacketListener {
-    private static final Logger LOGGER = FTC.getLogger();
 
-    @PacketHandler
-    public void onChat(ServerboundChatPacket packet, PacketCall call) {
-        call.setCancelled(true);
+  private static final Logger LOGGER = FTC.getLogger();
 
-        if (containsIllegalCharacters(packet.message(), call)) {
-            return;
-        }
+  @PacketHandler
+  public void onChat(ServerboundChatPacket packet, PacketCall call) {
+    call.setCancelled(true);
 
-        // Handle player conversing
-        if (call.getPlayer().isConversing()) {
-            call.getExecutor().execute(() -> {
-                call.getPlayer().acceptConversationInput(packet.message());
-            });
-            return;
-        }
+    if (containsIllegalCharacters(packet.message(), call)) {
+      return;
+    }
 
-        var decoProcessor = new ChatDecorationProcessor(
-                VanillaAccess.getServer(),
-                VanillaAccess.getPlayer(call.getPlayer()),
-                null,
-                net.minecraft.network.chat.Component.literal(packet.message())
+    // Handle player conversing
+    if (call.getPlayer().isConversing()) {
+      call.getExecutor().execute(() -> {
+        call.getPlayer().acceptConversationInput(packet.message());
+      });
+      return;
+    }
+
+    var decoProcessor = new ChatDecorationProcessor(
+        VanillaAccess.getServer(),
+        VanillaAccess.getPlayer(call.getPlayer()),
+        null,
+        net.minecraft.network.chat.Component.literal(packet.message())
+    );
+
+    decoProcessor.process().whenComplete((result, throwable) -> {
+      if (throwable != null) {
+        LOGGER.error("Chat decoration error!", throwable);
+        return;
+      }
+
+      try {
+        call.getPacketListener().chat(
+            packet.message(),
+            PlayerChatMessage.system(packet.message())
+                .withResult(Objects.requireNonNull(result)),
+            true
         );
+      } catch (Throwable t) {
+        LOGGER.error("Couldn't process chat!", t);
+      }
+    });
+  }
 
-        decoProcessor.process().whenComplete((result, throwable) -> {
-            if (throwable != null) {
-                LOGGER.error("Chat decoration error!", throwable);
-                return;
-            }
+  @PacketHandler
+  public void onChatCommand(ServerboundChatCommandPacket packet, PacketCall call) {
+    call.setCancelled(true);
 
-            try {
-                call.getPacketListener().chat(
-                        packet.message(),
-                        PlayerChatMessage.system(packet.message())
-                                .withResult(Objects.requireNonNull(result)),
-                        true
-                );
-            } catch (Throwable t) {
-                LOGGER.error("Couldn't process chat!", t);
-            }
-        });
+    if (containsIllegalCharacters(packet.command(), call)) {
+      return;
     }
 
-    @PacketHandler
-    public void onChatCommand(ServerboundChatCommandPacket packet, PacketCall call) {
-        call.setCancelled(true);
+    // Switch to main thread to execute command logic
+    call.getExecutor().execute(() -> {
+      // Prepend this onto it, or it won't find the command lol
+      String command = "/" + packet.command();
 
-        if (containsIllegalCharacters(packet.command(), call)) {
-            return;
-        }
+      call.getPacketListener()
+          .handleCommand(command);
+    });
+  }
 
-        // Switch to main thread to execute command logic
-        call.getExecutor().execute(() -> {
-            // Prepend this onto it, or it won't find the command lol
-            String command = "/" + packet.command();
+  /**
+   * Copies vanilla behaviour in regard to illegal character handling
+   */
+  private static boolean containsIllegalCharacters(String s, PacketCall call) {
+    var player = call.getPlayer();
 
-            call.getPacketListener()
-                    .handleCommand(command);
-        });
+    if (ServerGamePacketListenerImpl.isChatMessageIllegal(s)) {
+      call.getExecutor().execute(() -> {
+        player.kick(
+            Component.translatable("multiplayer.disconnect.illegal_characters"),
+            PlayerKickEvent.Cause.ILLEGAL_CHARACTERS
+        );
+      });
+
+      return true;
     }
 
-    /** Copies vanilla behaviour in regard to illegal character handling */
-    private static boolean containsIllegalCharacters(String s, PacketCall call) {
-        var player = call.getPlayer();
-
-        if (ServerGamePacketListenerImpl.isChatMessageIllegal(s)) {
-            call.getExecutor().execute(() -> {
-                player.kick(
-                        Component.translatable("multiplayer.disconnect.illegal_characters"),
-                        PlayerKickEvent.Cause.ILLEGAL_CHARACTERS
-                );
-            });
-
-            return true;
-        }
-
-        return false;
-    }
+    return false;
+  }
 }

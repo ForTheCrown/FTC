@@ -8,5 +8,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UsableConstructor {
-    ConstructType value() default ConstructType.PARSE;
+
+  ConstructType value() default ConstructType.PARSE;
 }

@@ -7,40 +7,41 @@ import net.kyori.adventure.text.format.TextColor;
 import org.jetbrains.annotations.NotNull;
 
 public class DefaultTextWriter extends TextWriter {
-    private TextComponent.Builder builder;
 
-    public DefaultTextWriter(TextComponent.Builder builder) {
-        this.builder = builder;
-    }
+  private TextComponent.Builder builder;
 
-    @Override
-    protected void onNewLine() {
-        builder.append(Component.newline());
-    }
+  public DefaultTextWriter(TextComponent.Builder builder) {
+    this.builder = builder;
+  }
 
-    @Override
-    protected void onClear() {
-        var style = builder.build().style();
+  @Override
+  protected void onNewLine() {
+    builder.append(Component.newline());
+  }
 
-        builder = Component.text()
-                .style(style);
-    }
+  @Override
+  protected void onClear() {
+    var style = builder.build().style();
 
-    @Override
-    protected void onWrite(Component text) {
-        builder.append(text);
-    }
+    builder = Component.text()
+        .style(style);
+  }
 
-    @Override
-    public @NotNull Component asComponent() {
-        return builder.build();
-    }
+  @Override
+  protected void onWrite(Component text) {
+    builder.append(text);
+  }
 
-    public void setStyle(Style style) {
-        builder.style(style);
-    }
+  @Override
+  public @NotNull Component asComponent() {
+    return builder.build();
+  }
 
-    public void setColor(TextColor color) {
-        builder.color(color);
-    }
+  public void setStyle(Style style) {
+    builder.style(style);
+  }
+
+  public void setColor(TextColor color) {
+    builder.color(color);
+  }
 }

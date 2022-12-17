@@ -28,111 +28,113 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataType;
 
 public class CoreListener implements Listener {
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockPlace(BlockPlaceEvent event) {
-        if (event.getBlock().getType() != Material.HOPPER
-                || GeneralConfig.hoppersInOneChunk == -1
-        ) {
-            return;
-        }
 
-        int hopperAmount = event.getBlock()
-                .getChunk()
-                .getTileEntities(block -> block.getType() == Material.HOPPER, true)
-                .size();
-
-        if (hopperAmount <= GeneralConfig.hoppersInOneChunk) {
-            return;
-        }
-
-        event.setCancelled(true);
-        event.getPlayer().sendMessage(Messages.tooManyHoppers());
+  @EventHandler(ignoreCancelled = true)
+  public void onBlockPlace(BlockPlaceEvent event) {
+    if (event.getBlock().getType() != Material.HOPPER
+        || GeneralConfig.hoppersInOneChunk == -1
+    ) {
+      return;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onSignChange(SignChangeEvent event) {
-        Player player = event.getPlayer();
+    int hopperAmount = event.getBlock()
+        .getChunk()
+        .getTileEntities(block -> block.getType() == Material.HOPPER, true)
+        .size();
 
-        // Disable case checking on signs
-        ChatParser parser = ChatParser.of(player)
-                .addFlags(ChatParser.FLAG_IGNORE_CASE);
-
-        for (int i = 0; i < 4; i++) {
-            event.line(i, parser.render(event.getLine(i)));
-        }
+    if (hopperAmount <= GeneralConfig.hoppersInOneChunk) {
+      return;
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerDropItem(PlayerDropItemEvent event) {
-        if (ExtendedItems.isSpecial(event.getItemDrop().getItemStack())) {
-            event.getPlayer().sendActionBar(
-                    Messages.CANNOT_DROP_SPECIAL
-            );
+    event.setCancelled(true);
+    event.getPlayer().sendMessage(Messages.tooManyHoppers());
+  }
 
-            event.setCancelled(true);
-        }
+  @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+  public void onSignChange(SignChangeEvent event) {
+    Player player = event.getPlayer();
+
+    // Disable case checking on signs
+    ChatParser parser = ChatParser.of(player)
+        .addFlags(ChatParser.FLAG_IGNORE_CASE);
+
+    for (int i = 0; i < 4; i++) {
+      event.line(i, parser.render(event.getLine(i)));
+    }
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerDropItem(PlayerDropItemEvent event) {
+    if (ExtendedItems.isSpecial(event.getItemDrop().getItemStack())) {
+      event.getPlayer().sendActionBar(
+          Messages.CANNOT_DROP_SPECIAL
+      );
+
+      event.setCancelled(true);
+    }
+  }
+
+  @EventHandler
+  public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+    if (!event.getRightClicked()
+        .getPersistentDataContainer()
+        .has(Npcs.KEY, PersistentDataType.STRING)
+    ) {
+      return;
     }
 
-    @EventHandler
-    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        if (!event.getRightClicked()
-                .getPersistentDataContainer()
-                .has(Npcs.KEY, PersistentDataType.STRING)
-        ) {
-            return;
-        }
+    event.setCancelled(true);
+    event.setCancelled(
+        Npcs.interact(
+            event.getRightClicked().getPersistentDataContainer()
+                .get(Npcs.KEY, PersistentDataType.STRING),
+            event.getRightClicked(),
+            event.getPlayer(),
+            event.isCancelled()
+        )
+    );
+  }
 
-        event.setCancelled(true);
-        event.setCancelled(
-                Npcs.interact(
-                        event.getRightClicked().getPersistentDataContainer().get(Npcs.KEY, PersistentDataType.STRING),
-                        event.getRightClicked(),
-                        event.getPlayer(),
-                        event.isCancelled()
-                )
-        );
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerDeath(PlayerDeathEvent event) {
+    if (event.getKeepInventory()) {
+      return;
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        if (event.getKeepInventory()) {
-            return;
-        }
+    User user = Users.get(event.getEntity());
+    Location loc = user.getLocation();
 
-        User user = Users.get(event.getEntity());
-        Location loc = user.getLocation();
+    user.setReturnLocation(loc);
 
-        user.setReturnLocation(loc);
-
-        if (!loc.getWorld().equals(Worlds.voidWorld())) {
-            user.sendMessage(Messages.diedAt(loc));
-        }
-
-        FTC.getLogger().info("! {} died at x={} y={} z={} world='{}'",
-                user.getName(),
-                loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(),
-                loc.getWorld().getName()
-        );
-
-        PlayerInventory inventory = event.getEntity().getInventory();
-        Int2ObjectMap<ItemStack> items = new Int2ObjectOpenHashMap<>();
-
-        for (int i = 0; i < inventory.getSize(); i++) {
-            ItemStack item = inventory.getItem(i);
-
-            if (ExtendedItems.shouldRemainInInventory(item)) {
-                items.put(i, item);
-            }
-        }
-
-        event.getDrops().removeAll(items.values());
-
-        Tasks.runLater(() -> {
-            PlayerInventory inv = user.getPlayer().getInventory();
-
-            for (var e: items.int2ObjectEntrySet()) {
-                inv.setItem(e.getIntKey(), e.getValue());
-            }
-        }, 1);
+    if (!loc.getWorld().equals(Worlds.voidWorld())) {
+      user.sendMessage(Messages.diedAt(loc));
     }
+
+    FTC.getLogger().info("! {} died at x={} y={} z={} world='{}'",
+        user.getName(),
+        loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(),
+        loc.getWorld().getName()
+    );
+
+    PlayerInventory inventory = event.getEntity().getInventory();
+    Int2ObjectMap<ItemStack> items = new Int2ObjectOpenHashMap<>();
+
+    for (int i = 0; i < inventory.getSize(); i++) {
+      ItemStack item = inventory.getItem(i);
+
+      if (ExtendedItems.shouldRemainInInventory(item)) {
+        items.put(i, item);
+      }
+    }
+
+    event.getDrops().removeAll(items.values());
+
+    Tasks.runLater(() -> {
+      PlayerInventory inv = user.getPlayer().getInventory();
+
+      for (var e : items.int2ObjectEntrySet()) {
+        inv.setItem(e.getIntKey(), e.getValue());
+      }
+    }, 1);
+  }
 }

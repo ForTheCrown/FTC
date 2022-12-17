@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.admin.JailCell;
 import net.forthecrown.core.challenge.Challenge;
@@ -30,71 +31,71 @@ import net.forthecrown.user.data.UserTimeTracker;
 import net.forthecrown.waypoint.WaypointProperties;
 import net.forthecrown.waypoint.WaypointProperty;
 
-import java.util.concurrent.CompletableFuture;
-
 public class RegistryArguments<T> implements ArgumentType<Holder<T>>, VanillaMappedArgument {
 
-    public static final RegistryArguments<BlockStructure>
-            STRUCTURE = new RegistryArguments<>(Structures.get().getRegistry(), "Structure");
+  public static final RegistryArguments<BlockStructure>
+      STRUCTURE = new RegistryArguments<>(Structures.get().getRegistry(), "Structure");
 
-    public static final RegistryArguments<KeyedBoss>
-            DUNGEON_BOSS =  new RegistryArguments<>(Registries.DUNGEON_BOSSES, "Dungeon boss");
+  public static final RegistryArguments<KeyedBoss>
+      DUNGEON_BOSS = new RegistryArguments<>(Registries.DUNGEON_BOSSES, "Dungeon boss");
 
-    public static final RegistryArguments<JailCell>
-            JAIL_CELL = new RegistryArguments<>(Registries.JAILS, "Jail Cell");
+  public static final RegistryArguments<JailCell>
+      JAIL_CELL = new RegistryArguments<>(Registries.JAILS, "Jail Cell");
 
-    public static final RegistryArguments<SimpleNpc>
-            NPC = new RegistryArguments<>(Registries.NPCS, "NPC");
+  public static final RegistryArguments<SimpleNpc>
+      NPC = new RegistryArguments<>(Registries.NPCS, "NPC");
 
-    public static final RegistryArguments<SellShopMenu>
-            SELLS_SHOP = new RegistryArguments<>(Economy.get().getSellShop().getMenus(), "Menu");
+  public static final RegistryArguments<SellShopMenu>
+      SELLS_SHOP = new RegistryArguments<>(Economy.get().getSellShop().getMenus(), "Menu");
 
-    public static final RegistryArguments<TimeField>
-            TIME_FIELDS = new RegistryArguments<>(UserTimeTracker.TIME_FIELDS, "TimeStamp");
+  public static final RegistryArguments<TimeField>
+      TIME_FIELDS = new RegistryArguments<>(UserTimeTracker.TIME_FIELDS, "TimeStamp");
 
-    public static final RegistryArguments<WaypointProperty>
-            WAYPOINT_PROPERTY = new RegistryArguments<>(WaypointProperties.REGISTRY, "Waypoint property");
+  public static final RegistryArguments<WaypointProperty>
+      WAYPOINT_PROPERTY = new RegistryArguments<>(WaypointProperties.REGISTRY, "Waypoint property");
 
-    public static final RegistryArguments<Challenge> CHALLENGE = new RegistryArguments<>(
-            ChallengeManager.getInstance().getChallengeRegistry(),
-            "Challenge"
-    );
+  public static final RegistryArguments<Challenge> CHALLENGE = new RegistryArguments<>(
+      ChallengeManager.getInstance().getChallengeRegistry(),
+      "Challenge"
+  );
 
-    public static final RegistryArguments<UsageType<UsageAction>> USAGE_ACTION =  new RegistryArguments<>(
-            ((Registry) Registries.USAGE_ACTIONS), "Usage action"
-    );
-    public static final RegistryArguments<UsageType<UsageTest>>   USAGE_CHECK  =   new RegistryArguments<>(
-            ((Registry) Registries.USAGE_CHECKS), "Usage check"
-    );
+  public static final RegistryArguments<UsageType<UsageAction>> USAGE_ACTION = new RegistryArguments<>(
+      ((Registry) Registries.USAGE_ACTIONS), "Usage action"
+  );
+  public static final RegistryArguments<UsageType<UsageTest>> USAGE_CHECK = new RegistryArguments<>(
+      ((Registry) Registries.USAGE_CHECKS), "Usage check"
+  );
 
-    private final Registry<T> registry;
-    private final String unknown;
+  private final Registry<T> registry;
+  private final String unknown;
 
-    public RegistryArguments(Registry<T> registry, String unknownMessage) {
-        this.registry = registry;
-        this.unknown = unknownMessage;
-    }
+  public RegistryArguments(Registry<T> registry, String unknownMessage) {
+    this.registry = registry;
+    this.unknown = unknownMessage;
+  }
 
-    @Override
-    public Holder<T> parse(StringReader reader) throws CommandSyntaxException {
-        int cursor = reader.getCursor();
-        String key = Arguments.FTC_KEY.parse(reader);
+  @Override
+  public Holder<T> parse(StringReader reader) throws CommandSyntaxException {
+    int cursor = reader.getCursor();
+    String key = Arguments.FTC_KEY.parse(reader);
 
-        return registry.getHolder(key).orElseThrow(() -> {
-            return Exceptions.unknown(unknown,
-                    GrenadierUtils.correctReader(reader, cursor),
-                    key
-            );
-        });
-    }
+    return registry.getHolder(key).orElseThrow(() -> {
+      return Exceptions.unknown(unknown,
+          GrenadierUtils.correctReader(reader, cursor),
+          key
+      );
+    });
+  }
 
-    @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CompletionProvider.suggestMatching(builder, registry.keys());
-    }
+  @Override
+  public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+                                                            SuggestionsBuilder builder
+  ) {
+    return CompletionProvider.suggestMatching(builder, registry.keys());
+  }
 
-    @Override
-    public ArgumentType<?> getVanillaArgumentType() {
-        return Arguments.FTC_KEY.getVanillaArgumentType();
-    }
+  @Override
+  public ArgumentType<?> getVanillaArgumentType() {
+    return Arguments.FTC_KEY.getVanillaArgumentType();
+  }
 }

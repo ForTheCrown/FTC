@@ -16,50 +16,51 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 
 public class DurabilityListener implements Listener {
-    static final Sound BREAK_SOUND = Sound.sound(
-            org.bukkit.Sound.ENTITY_ITEM_BREAK,
-            Sound.Source.MASTER,
-            1f, 1f
-    );
 
-    @EventHandler(ignoreCancelled = true)
-    public void onEntityDamageItem(PlayerItemDamageEvent event) {
-        User user = Users.get(event.getPlayer());
+  static final Sound BREAK_SOUND = Sound.sound(
+      org.bukkit.Sound.ENTITY_ITEM_BREAK,
+      Sound.Source.MASTER,
+      1f, 1f
+  );
 
-        if (!user.get(Properties.DURABILITY_ALERTS)) {
-            return;
-        }
+  @EventHandler(ignoreCancelled = true)
+  public void onEntityDamageItem(PlayerItemDamageEvent event) {
+    User user = Users.get(event.getPlayer());
 
-        ItemStack item = event.getItem();
-        Damageable damageable = (Damageable) item.getItemMeta();
-
-        float damage = damageable.getDamage();
-        float maxDurability = item.getType().getMaxDurability();
-        float remaining = maxDurability - damage - 1;
-
-        // If durability is above threshold or player is on cooldown, do not show alert
-        if (remaining >= (maxDurability * GeneralConfig.durabilityWarnThreshold)
-                || remaining <= 0
-                || Cooldown.containsOrAdd(user, Properties.DURABILITY_ALERTS.getKey(), 20 * 10)
-        ) {
-            return;
-        }
-
-        user.playSound(BREAK_SOUND);
-        user.showTitle(
-                Title.title(
-                        // Title
-                        Text.format("Your {0, item, -!amount} is about to break!",
-                                NamedTextColor.RED,
-                                item
-                        ),
-
-                        // Subtitle
-                        Text.format("{0, number} / {1, number} durability left",
-                                NamedTextColor.GOLD,
-                                remaining, maxDurability
-                        )
-                )
-        );
+    if (!user.get(Properties.DURABILITY_ALERTS)) {
+      return;
     }
+
+    ItemStack item = event.getItem();
+    Damageable damageable = (Damageable) item.getItemMeta();
+
+    float damage = damageable.getDamage();
+    float maxDurability = item.getType().getMaxDurability();
+    float remaining = maxDurability - damage - 1;
+
+    // If durability is above threshold or player is on cooldown, do not show alert
+    if (remaining >= (maxDurability * GeneralConfig.durabilityWarnThreshold)
+        || remaining <= 0
+        || Cooldown.containsOrAdd(user, Properties.DURABILITY_ALERTS.getKey(), 20 * 10)
+    ) {
+      return;
+    }
+
+    user.playSound(BREAK_SOUND);
+    user.showTitle(
+        Title.title(
+            // Title
+            Text.format("Your {0, item, -!amount} is about to break!",
+                NamedTextColor.RED,
+                item
+            ),
+
+            // Subtitle
+            Text.format("{0, number} / {1, number} durability left",
+                NamedTextColor.GOLD,
+                remaining, maxDurability
+            )
+        )
+    );
+  }
 }

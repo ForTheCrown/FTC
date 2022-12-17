@@ -1,27 +1,29 @@
 package net.forthecrown.guilds;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.book.BookBuilder;
 
-import static net.kyori.adventure.text.Component.text;
-
 public class GuildPermissionsBook {
-    private GuildPermissionsBook() {}
 
-    private static final ObjectList<GuildPermissionsBookOption> PERMISSIONS = new ObjectArrayList<>();
+  private GuildPermissionsBook() {
+  }
 
-    static void addPermission(GuildPermissionsBookOption perm) {
-        PERMISSIONS.add(perm);
-    }
+  private static final ObjectList<GuildPermissionsBookOption> PERMISSIONS = new ObjectArrayList<>();
 
-    public static void open(User user, Guild guild, GuildRank rank) {
-        Pair<Guild, GuildRank> pair = Pair.of(guild, rank);
+  static void addPermission(GuildPermissionsBookOption perm) {
+    PERMISSIONS.add(perm);
+  }
 
-        user.openBook(
-                BookBuilder.createSettings(pair, text("Rank Settings"), PERMISSIONS)
-        );
-    }
+  public static void open(User user, Guild guild, GuildRank rank) {
+    Pair<Guild, GuildRank> pair = Pair.of(guild, rank);
+
+    user.openBook(
+        BookBuilder.createSettings(pair, text("Rank Settings"), PERMISSIONS)
+    );
+  }
 }

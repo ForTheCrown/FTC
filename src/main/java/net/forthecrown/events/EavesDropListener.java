@@ -7,9 +7,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
 public class EavesDropListener implements Listener {
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onSignChange(SignChangeEvent event) {
-        var player = event.getPlayer();
-        EavesDropper.reportSign(player, event.getBlock(), event.lines());
-    }
+
+  @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+  public void onSignChange(SignChangeEvent event) {
+    var player = event.getPlayer();
+    EavesDropper.reportSign(player, event.getBlock(), event.lines());
+  }
 }

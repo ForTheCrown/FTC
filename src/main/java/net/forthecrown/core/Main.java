@@ -12,64 +12,65 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class Main extends JavaPlugin implements Namespaced {
-    public static final String
-            NAME            = "ForTheCrown",
-            NAMESPACE       = NAME.toLowerCase(),
-            OLD_NAMESPACE   = "ftccore";
 
-    boolean debugMode;
-    FtcLogger logger;
+  public static final String
+      NAME = "ForTheCrown",
+      NAMESPACE = NAME.toLowerCase(),
+      OLD_NAMESPACE = "ftccore";
 
-    @Override
-    public void onEnable() {
-        // Register dynmap hook connection thing
-        DynmapUtil.registerListener();
+  boolean debugMode;
+  FtcLogger logger;
 
-        setDebugMode();
-        ensureLoggerExists();
+  @Override
+  public void onEnable() {
+    // Register dynmap hook connection thing
+    DynmapUtil.registerListener();
 
-        BootStrap.init();
+    setDebugMode();
+    ensureLoggerExists();
 
-        FTC.getLogger().info("FTC started");
+    BootStrap.init();
+
+    FTC.getLogger().info("FTC started");
+  }
+
+  @Override
+  public void onLoad() {
+    setDebugMode();
+    ensureLoggerExists();
+
+    FtcFlags.init();
+  }
+
+  @Override
+  public void onDisable() {
+    Bukkit.getScheduler()
+        .cancelTasks(this);
+
+    ModuleServices.run(OnSave.class);
+    ModuleServices.run(OnDisable.class);
+  }
+
+  private void ensureLoggerExists() {
+    if (logger != null) {
+      return;
     }
 
-    @Override
-    public void onLoad() {
-        setDebugMode();
-        ensureLoggerExists();
+    logger = new FtcLogger(
+        (ExtendedLogger) LogManager.getLogger(getLogger().getName())
+    );
+  }
 
-        FtcFlags.init();
-    }
+  private void setDebugMode() {
+    YamlConfiguration config = YamlConfiguration.loadConfiguration(
+        getTextResource("plugin.yml")
+    );
 
-    @Override
-    public void onDisable() {
-        Bukkit.getScheduler()
-                .cancelTasks(this);
+    debugMode = config.getBoolean("debug_build");
+  }
 
-        ModuleServices.run(OnSave.class);
-        ModuleServices.run(OnDisable.class);
-    }
-
-    private void ensureLoggerExists() {
-        if (logger != null) {
-            return;
-        }
-
-        logger = new FtcLogger(
-                (ExtendedLogger) LogManager.getLogger(getLogger().getName())
-        );
-    }
-
-    private void setDebugMode() {
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(
-                getTextResource("plugin.yml")
-        );
-
-        debugMode = config.getBoolean("debug_build");
-    }
-
-    @Override
-    public @NonNull String namespace() {
-        return NAMESPACE;
-    }
+  @Override
+  public @NonNull String namespace() {
+    return NAMESPACE;
+  }
 }

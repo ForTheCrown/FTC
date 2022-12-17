@@ -1,5 +1,7 @@
 package net.forthecrown.commands.guild;
 
+import static net.forthecrown.guilds.GuildRank.ID_LEADER;
+
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
@@ -12,62 +14,61 @@ import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.writer.TextWriter;
 
-import static net.forthecrown.guilds.GuildRank.ID_LEADER;
-
 class GuildKickNode extends GuildCommandNode {
-    GuildKickNode() {
-        super("guildkick", "kick");
+
+  GuildKickNode() {
+    super("guildkick", "kick");
+  }
+
+  @Override
+  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
+    writer.field("kick <user>", "Kicks a user out of your guild");
+
+    if (source.hasPermission(Permissions.GUILD_ADMIN)) {
+      writer.field("kick <user> <guild>", "Kicks a user out of a guild");
     }
+  }
 
-    @Override
-    protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-        writer.field("kick <user>", "Kicks a user out of your guild");
+  @Override
+  protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command) {
+    var arg = argument("user", Arguments.USER);
 
-        if (source.hasPermission(Permissions.GUILD_ADMIN)) {
-            writer.field("kick <user> <guild>", "Kicks a user out of a guild");
-        }
-    }
+    addGuildCommand(arg, (c, provider) -> {
+      Guild guild = provider.get(c);
+      User user = getUserSender(c);
+      User target = Arguments.getUser(c, "user");
 
-    @Override
-    protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command) {
-        var arg = argument("user", Arguments.USER);
+      testPermission(
+          user,
+          guild,
+          GuildPermission.CAN_KICK,
+          Exceptions.NO_PERMISSION
+      );
 
-        addGuildCommand(arg, (c, provider) -> {
-            Guild guild = provider.get(c);
-            User user = getUserSender(c);
-            User target = Arguments.getUser(c, "user");
+      if (user.equals(target)) {
+        throw Exceptions.KICK_SELF;
+      }
 
-            testPermission(
-                    user,
-                    guild,
-                    GuildPermission.CAN_KICK,
-                    Exceptions.NO_PERMISSION
-            );
+      GuildMember member = guild.getMember(target.getUniqueId());
 
-            if (user.equals(target)) {
-                throw Exceptions.KICK_SELF;
-            }
+      if (member == null) {
+        throw Exceptions.notGuildMember(target, guild);
+      } else if (member.getRankId() == ID_LEADER) {
+        throw Exceptions.CANNOT_KICK_LEADER;
+      }
 
-            GuildMember member = guild.getMember(target.getUniqueId());
+      guild.removeMember(target.getUniqueId());
 
-            if (member == null) {
-                throw Exceptions.notGuildMember(target, guild);
-            } else if (member.getRankId() == ID_LEADER) {
-                throw Exceptions.CANNOT_KICK_LEADER;
-            }
+      target.sendOrMail(Messages.guildKickedTarget(guild, user));
+      guild.sendMessage(Messages.guildKickAnnouncement(user, target));
 
-            guild.removeMember(target.getUniqueId());
+      if (!guild.isMember(user.getUniqueId())) {
+        user.sendMessage(Messages.guildKickedSender(guild, target));
+      }
 
-            target.sendOrMail(Messages.guildKickedTarget(guild, user));
-            guild.sendMessage(Messages.guildKickAnnouncement(user, target));
+      return 0;
+    });
 
-            if (!guild.isMember(user.getUniqueId())) {
-                user.sendMessage(Messages.guildKickedSender(guild, target));
-            }
-
-            return 0;
-        });
-
-        command.then(arg);
-    }
+    command.then(arg);
+  }
 }

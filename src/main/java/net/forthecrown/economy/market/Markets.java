@@ -11,65 +11,71 @@ import net.forthecrown.user.data.UserMarketData;
 import net.forthecrown.utils.Time;
 import org.bukkit.World;
 
-/** Utility class for market related matters */
+/**
+ * Utility class for market related matters
+ */
 public @UtilityClass class Markets {
-    /**
-     * Checks if the given ownership can change status and throws an exception
-     * if they can't
-     * @param ownership The market ownership to check
-     * @throws CommandSyntaxException If the given owner can't change status
-     */
-    public static void checkStatusChange(UserMarketData ownership) throws CommandSyntaxException {
-        checkStatusChange(
-                ownership,
-                "You cannot currently do this, next allowed: {0, time, -timestamp}."
-        );
+
+  /**
+   * Checks if the given ownership can change status and throws an exception if they can't
+   *
+   * @param ownership The market ownership to check
+   * @throws CommandSyntaxException If the given owner can't change status
+   */
+  public static void checkStatusChange(UserMarketData ownership) throws CommandSyntaxException {
+    checkStatusChange(
+        ownership,
+        "You cannot currently do this, next allowed: {0, time, -timestamp}."
+    );
+  }
+
+  public static void checkCanPurchase(UserMarketData ownership) throws CommandSyntaxException {
+    checkStatusChange(
+        ownership,
+        "Cannot purchase shop right now, allowed in: {0, time, -timestamp}."
+    );
+  }
+
+  public static void checkStatusChange(UserMarketData ownership, String transKey)
+      throws CommandSyntaxException {
+    if (canChangeStatus(ownership.getUser())) {
+      return;
     }
 
-    public static void checkCanPurchase(UserMarketData ownership) throws CommandSyntaxException {
-        checkStatusChange(
-                ownership,
-                "Cannot purchase shop right now, allowed in: {0, time, -timestamp}."
-        );
-    }
+    long nextAllowed = ownership.getUser()
+        .getTime(TimeField.MARKET_LAST_ACTION) + MarketConfig.statusCooldown;
 
-    public static void checkStatusChange(UserMarketData ownership, String transKey) throws CommandSyntaxException {
-        if (canChangeStatus(ownership.getUser())) {
-            return;
-        }
+    throw Exceptions.format(transKey, nextAllowed);
+  }
 
-        long nextAllowed = ownership.getUser()
-                .getTime(TimeField.MARKET_LAST_ACTION) + MarketConfig.statusCooldown;
+  /**
+   * Tests if this user currently owns a shop
+   *
+   * @param user The user to test
+   * @return True if the user directly owns a market shop
+   */
+  public static boolean ownsShop(User user) {
+    return Economy.get().getMarkets().get(user.getUniqueId()) != null;
+  }
 
-        throw Exceptions.format(transKey, nextAllowed);
-    }
+  /**
+   * Tests if this user's {@link MarketConfig#statusCooldown} has ended or not
+   *
+   * @param user The user to test
+   * @return True, if the market cooldown has ended for this user
+   */
+  public static boolean canChangeStatus(User user) {
+    return Time.isPast(
+        MarketConfig.statusCooldown + user.getTime(TimeField.MARKET_LAST_ACTION)
+    );
+  }
 
-    /**
-     * Tests if this user currently owns a shop
-     * @param user The user to test
-     * @return True if the user directly owns a market shop
-     */
-    public static boolean ownsShop(User user) {
-        return Economy.get().getMarkets().get(user.getUniqueId()) != null;
-    }
-
-    /**
-     * Tests if this user's {@link MarketConfig#statusCooldown} has
-     * ended or not
-     * @param user The user to test
-     * @return True, if the market cooldown has ended for this user
-     */
-    public static boolean canChangeStatus(User user) {
-        return Time.isPast(
-                MarketConfig.statusCooldown + user.getTime(TimeField.MARKET_LAST_ACTION)
-        );
-    }
-
-    /**
-     * Gets the world the markets are located in
-     * @return The market world
-     */
-    public static World getWorld() {
-        return Worlds.overworld();
-    }
+  /**
+   * Gets the world the markets are located in
+   *
+   * @return The market world
+   */
+  public static World getWorld() {
+    return Worlds.overworld();
+  }
 }

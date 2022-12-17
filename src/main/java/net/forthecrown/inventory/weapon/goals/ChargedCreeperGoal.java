@@ -12,25 +12,26 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @RequiredArgsConstructor
 public class ChargedCreeperGoal implements WeaponKillGoal {
-    private final int goal;
 
-    @Override
-    public boolean test(User user, Entity killed) {
-        if (killed.getType() != EntityType.CREEPER) {
-            return false;
-        }
+  private final int goal;
 
-        Creeper creeper = (Creeper) killed;
-        return creeper.isPowered();
+  @Override
+  public boolean test(User user, Entity killed) {
+    if (killed.getType() != EntityType.CREEPER) {
+      return false;
     }
 
-    @Override
-    public Component loreDisplay() {
-        return Component.text("Charged Creeper");
-    }
+    Creeper creeper = (Creeper) killed;
+    return creeper.isPowered();
+  }
 
-    @Override
-    public @NotNull String getName() {
-        return "charged_creeper";
-    }
+  @Override
+  public Component loreDisplay() {
+    return Component.text("Charged Creeper");
+  }
+
+  @Override
+  public @NotNull String getName() {
+    return "charged_creeper";
+  }
 }

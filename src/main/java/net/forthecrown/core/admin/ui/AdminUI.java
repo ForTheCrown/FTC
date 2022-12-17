@@ -7,21 +7,22 @@ import net.forthecrown.utils.inventory.menu.context.ContextOption;
 import net.forthecrown.utils.inventory.menu.context.ContextSet;
 
 public class AdminUI {
-    static final ContextSet SET = ContextSet.create();
 
-    static final ContextOption<PunishEntry>     ENTRY           = SET.newOption();
-    static final ContextOption<PunishBuilder>   PUNISHMENT      = SET.newOption();
-    static final ContextOption<Integer>         PAGE            = SET.newOption(0);
-    static final ContextOption<Integer>         TIME_MULTIPLIER = SET.newOption(1);
+  static final ContextSet SET = ContextSet.create();
 
-    static final MainPage MAIN = new MainPage();
+  static final ContextOption<PunishEntry> ENTRY = SET.newOption();
+  static final ContextOption<PunishBuilder> PUNISHMENT = SET.newOption();
+  static final ContextOption<Integer> PAGE = SET.newOption(0);
+  static final ContextOption<Integer> TIME_MULTIPLIER = SET.newOption(1);
 
-    public static void open(User viewer, User entry) {
-        var pEntry = Punishments.get().getEntry(entry.getUniqueId());
+  static final MainPage MAIN = new MainPage();
 
-        var context = SET.createContext();
-        context.set(ENTRY, pEntry);
+  public static void open(User viewer, User entry) {
+    var pEntry = Punishments.get().getEntry(entry.getUniqueId());
 
-        MAIN.getInventory().open(viewer, context);
-    }
+    var context = SET.createContext();
+    context.set(ENTRY, pEntry);
+
+    MAIN.getInventory().open(viewer, context);
+  }
 }

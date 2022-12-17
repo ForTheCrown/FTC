@@ -1,5 +1,7 @@
 package net.forthecrown.economy.sell;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.challenge.ChallengeManager;
@@ -13,81 +15,84 @@ import net.forthecrown.utils.io.FtcJar;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.SerializationHelper;
 
-import java.io.IOException;
-import java.nio.file.Path;
-
 @RequiredArgsConstructor
 public class SellShop {
-    /** Registry of sell shop menus */
-    @Getter
-    private final Registry<SellShopMenu> menus = Registries.newRegistry();
 
-    /**
-     * Directory the sellshops are in, this directory
-     * must include the <code>shops.json</code> file
-     * from which the shop data is read
-     */
-    private final Path directory;
+  /**
+   * Registry of sell shop menus
+   */
+  @Getter
+  private final Registry<SellShopMenu> menus = Registries.newRegistry();
 
-    /** Main sellshop menu */
-    @Getter
-    private Menu mainMenu;
+  /**
+   * Directory the sellshops are in, this directory must include the <code>shops.json</code> file
+   * from which the shop data is read
+   */
+  private final Path directory;
 
-    /** Global item price map */
-    @Getter
-    private final ItemPriceMap priceMap = new ItemPriceMap();
+  /**
+   * Main sellshop menu
+   */
+  @Getter
+  private Menu mainMenu;
 
-    public void load() {
-        createDefaults();
-        SerializationHelper.readJsonFile(getPath(), this::load);
+  /**
+   * Global item price map
+   */
+  @Getter
+  private final ItemPriceMap priceMap = new ItemPriceMap();
+
+  public void load() {
+    createDefaults();
+    SerializationHelper.readJsonFile(getPath(), this::load);
+  }
+
+  private void load(JsonWrapper json) {
+    this.menus.clear();
+    this.priceMap.clear();
+
+    var builder = Menus.builder(Menus.sizeFromRows(4), "FTC Shop")
+        .addBorder()
+        .add(4, 1, SellShopNodes.WEBSTORE);
+
+    for (var e : json.entrySet()) {
+      var name = e.getKey();
+      var element = e.getValue();
+      var menuJson = JsonWrapper.wrap(element.getAsJsonObject());
+
+      var reader = new MenuReader(directory, menuJson);
+      var menu = reader.read(this);
+
+      priceMap.addAll(menu.getPriceMap());
+      builder.add(reader.getSlot(), Menus.createOpenNode(menu.getInventory(), menu.getButton()));
+
+      menus.register(name, menu);
     }
 
-    private void load(JsonWrapper json) {
-        this.menus.clear();
-        this.priceMap.clear();
+    var challengeMenu = ChallengeManager.getInstance()
+        .getItemChallengeMenu();
 
-        var builder = Menus.builder(Menus.sizeFromRows(4), "FTC Shop")
-                .addBorder()
-                .add(4, 1, SellShopNodes.WEBSTORE);
-
-        for (var e: json.entrySet()) {
-            var name = e.getKey();
-            var element = e.getValue();
-            var menuJson = JsonWrapper.wrap(element.getAsJsonObject());
-
-            var reader = new MenuReader(directory, menuJson);
-            var menu = reader.read(this);
-
-            priceMap.addAll(menu.getPriceMap());
-            builder.add(reader.getSlot(), Menus.createOpenNode(menu.getInventory(), menu.getButton()));
-
-            menus.register(name, menu);
-        }
-
-        var challengeMenu = ChallengeManager.getInstance()
-                .getItemChallengeMenu();
-
-        if (challengeMenu != null) {
-            builder.add(Slot.of(4, 2),
-                    Menus.createOpenNode(
-                            challengeMenu,
-                            Challenges.createMenuHeader()
-                    )
-            );
-        }
-
-        this.mainMenu = builder.build();
+    if (challengeMenu != null) {
+      builder.add(Slot.of(4, 2),
+          Menus.createOpenNode(
+              challengeMenu,
+              Challenges.createMenuHeader()
+          )
+      );
     }
 
-    public Path getPath() {
-        return directory.resolve("shops.json");
-    }
+    this.mainMenu = builder.build();
+  }
 
-    public void createDefaults() {
-        try {
-            FtcJar.saveResources("economy");
-        } catch (IOException exc) {
-            throw new IllegalArgumentException(exc);
-        }
+  public Path getPath() {
+    return directory.resolve("shops.json");
+  }
+
+  public void createDefaults() {
+    try {
+      FtcJar.saveResources("economy");
+    } catch (IOException exc) {
+      throw new IllegalArgumentException(exc);
     }
+  }
 }

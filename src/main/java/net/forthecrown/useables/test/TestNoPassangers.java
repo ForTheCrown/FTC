@@ -11,31 +11,32 @@ import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 
 public class TestNoPassangers extends UsageTest {
-    // --- TYPE ---
-    public static final UsageType<TestNoPassangers> TYPE = UsageType.of(TestNoPassangers.class);
 
-    @UsableConstructor(ConstructType.EMPTY)
-    public TestNoPassangers() {
-        super(TYPE);
-    }
+  // --- TYPE ---
+  public static final UsageType<TestNoPassangers> TYPE = UsageType.of(TestNoPassangers.class);
 
-    @Override
-    public Component displayInfo() {
-        return null;
-    }
+  @UsableConstructor(ConstructType.EMPTY)
+  public TestNoPassangers() {
+    super(TYPE);
+  }
 
-    @Override
-    public Tag save() {
-        return null;
-    }
+  @Override
+  public Component displayInfo() {
+    return null;
+  }
 
-    @Override
-    public boolean test(Player player, CheckHolder holder) {
-        return player.getPassengers().isEmpty();
-    }
+  @Override
+  public Tag save() {
+    return null;
+  }
 
-    @Override
-    public Component getFailMessage(Player player, CheckHolder holder) {
-        return Component.text("Cannot have anyone riding you", NamedTextColor.GRAY);
-    }
+  @Override
+  public boolean test(Player player, CheckHolder holder) {
+    return player.getPassengers().isEmpty();
+  }
+
+  @Override
+  public Component getFailMessage(Player player, CheckHolder holder) {
+    return Component.text("Cannot have anyone riding you", NamedTextColor.GRAY);
+  }
 }

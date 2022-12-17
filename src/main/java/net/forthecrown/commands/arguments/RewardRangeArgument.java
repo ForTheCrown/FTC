@@ -10,22 +10,23 @@ import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.commands.arguments.RangeArgument;
 
 public class RewardRangeArgument implements ArgumentType<RewardRange>, VanillaMappedArgument {
-    @Override
-    public RewardRange parse(StringReader reader) throws CommandSyntaxException {
-        MinMaxBounds.Ints ints = RangeArgument.intRange().parse(reader);
 
-        int min = ints.getMin() == null ? 0 : ints.getMin();
-        int max = ints.getMax() == null ? Integer.MAX_VALUE : ints.getMax();
+  @Override
+  public RewardRange parse(StringReader reader) throws CommandSyntaxException {
+    MinMaxBounds.Ints ints = RangeArgument.intRange().parse(reader);
 
-        if (min < 100 || max < 100) {
-            throw Exceptions.INVALID_REWARD_RANGE;
-        }
+    int min = ints.getMin() == null ? 0 : ints.getMin();
+    int max = ints.getMax() == null ? Integer.MAX_VALUE : ints.getMax();
 
-        return RewardRange.between(min, max);
+    if (min < 100 || max < 100) {
+      throw Exceptions.INVALID_REWARD_RANGE;
     }
 
-    @Override
-    public ArgumentType<?> getVanillaArgumentType() {
-        return RangeArgument.intRange();
-    }
+    return RewardRange.between(min, max);
+  }
+
+  @Override
+  public ArgumentType<?> getVanillaArgumentType() {
+    return RangeArgument.intRange();
+  }
 }

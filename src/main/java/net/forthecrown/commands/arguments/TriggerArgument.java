@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.royalgrenadier.VanillaMappedArgument;
@@ -13,29 +14,31 @@ import net.forthecrown.useables.UsableTrigger;
 import net.forthecrown.useables.Usables;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 
-import java.util.concurrent.CompletableFuture;
-
 public class TriggerArgument implements ArgumentType<UsableTrigger>, VanillaMappedArgument {
-    @Override
-    public UsableTrigger parse(StringReader reader) throws CommandSyntaxException {
-        int cursor = reader.getCursor();
-        String name = Arguments.FTC_KEY.parse(reader);
-        var trigger = Usables.getInstance().getTriggers().getNamed(name);
 
-        if (trigger == null) {
-            throw Exceptions.unknownTrigger(reader, cursor, name);
-        }
+  @Override
+  public UsableTrigger parse(StringReader reader) throws CommandSyntaxException {
+    int cursor = reader.getCursor();
+    String name = Arguments.FTC_KEY.parse(reader);
+    var trigger = Usables.getInstance().getTriggers().getNamed(name);
 
-        return trigger;
+    if (trigger == null) {
+      throw Exceptions.unknownTrigger(reader, cursor, name);
     }
 
-    @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CompletionProvider.suggestMatching(builder, Usables.getInstance().getTriggers().getNames());
-    }
+    return trigger;
+  }
 
-    @Override
-    public ArgumentType<?> getVanillaArgumentType() {
-        return ScoreHolderArgument.scoreHolder();
-    }
+  @Override
+  public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+                                                            SuggestionsBuilder builder
+  ) {
+    return CompletionProvider.suggestMatching(builder,
+        Usables.getInstance().getTriggers().getNames());
+  }
+
+  @Override
+  public ArgumentType<?> getVanillaArgumentType() {
+    return ScoreHolderArgument.scoreHolder();
+  }
 }

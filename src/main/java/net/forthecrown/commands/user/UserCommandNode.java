@@ -8,22 +8,25 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.jetbrains.annotations.NotNull;
 
 abstract class UserCommandNode extends FtcCommand {
-    final String argumentName;
 
-    public UserCommandNode(@NotNull String name, String argumentName) {
-        super(name);
-        this.argumentName = argumentName;
+  final String argumentName;
 
-        setPermission(UserCommands.PERMISSION);
-    }
+  public UserCommandNode(@NotNull String name, String argumentName) {
+    super(name);
+    this.argumentName = argumentName;
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        var argument = argument(UserCommands.USER_ARG_NAME, Arguments.USER);
-        create(argument, c -> Arguments.getUser(c, UserCommands.USER_ARG_NAME));
+    setPermission(UserCommands.PERMISSION);
+  }
 
-        command.then(argument);
-    }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    var argument = argument(UserCommands.USER_ARG_NAME, Arguments.USER);
+    create(argument, c -> Arguments.getUser(c, UserCommands.USER_ARG_NAME));
 
-    protected abstract <T extends ArgumentBuilder<CommandSource, T>> void create(T command, UserProvider provider);
+    command.then(argument);
+  }
+
+  protected abstract <T extends ArgumentBuilder<CommandSource, T>> void create(T command,
+                                                                               UserProvider provider
+  );
 }

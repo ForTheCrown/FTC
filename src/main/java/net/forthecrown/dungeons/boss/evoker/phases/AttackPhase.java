@@ -11,36 +11,41 @@ import org.bukkit.event.Listener;
  * Represents a single phase of the Evoker's attack pattern thingy
  */
 public interface AttackPhase extends Listener {
-    /**
-     * Starts the phase
-     * @param boss The boss
-     */
-    default void start(EvokerBoss boss) {
-        // Update phase progress bar
-        boss.updatePhaseBarViewers();
-        BossBar bar = boss.getPhaseBar();
-        bar.setProgress(0d);
-        // Other phases might change name, ensure it's the default
-        bar.setTitle("Phase progress");
 
-        // Register events and call onStart
-        Events.register(this);
-        onStart(boss, boss.currentContext());
-    }
+  /**
+   * Starts the phase
+   *
+   * @param boss The boss
+   */
+  default void start(EvokerBoss boss) {
+    // Update phase progress bar
+    boss.updatePhaseBarViewers();
+    BossBar bar = boss.getPhaseBar();
+    bar.setProgress(0d);
+    // Other phases might change name, ensure it's the default
+    bar.setTitle("Phase progress");
 
-    /**
-     * Ends the phase
-     * @param boss The boss
-     */
-    default void end(EvokerBoss boss) {
-        // Make bar invis and unregister event handlers
-        boss.getPhaseBar().setVisible(false);
-        HandlerList.unregisterAll(this);
-        onEnd(boss, boss.currentContext());
-    }
+    // Register events and call onStart
+    Events.register(this);
+    onStart(boss, boss.currentContext());
+  }
 
-    void onStart(EvokerBoss boss, BossContext context);
-    void onEnd(EvokerBoss boss, BossContext context);
+  /**
+   * Ends the phase
+   *
+   * @param boss The boss
+   */
+  default void end(EvokerBoss boss) {
+    // Make bar invis and unregister event handlers
+    boss.getPhaseBar().setVisible(false);
+    HandlerList.unregisterAll(this);
+    onEnd(boss, boss.currentContext());
+  }
 
-    default void onTick(EvokerBoss boss, BossContext context) {}
+  void onStart(EvokerBoss boss, BossContext context);
+
+  void onEnd(EvokerBoss boss, BossContext context);
+
+  default void onTick(EvokerBoss boss, BossContext context) {
+  }
 }

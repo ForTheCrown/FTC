@@ -2,23 +2,19 @@ package net.forthecrown.economy.sell;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.forthecrown.utils.inventory.menu.Slot;
-import org.bukkit.Material;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import net.forthecrown.utils.inventory.menu.Slot;
+import org.bukkit.Material;
 
 /**
- * Parses a {@link ItemPriceMap} from a .shop
- * file.
+ * Parses a {@link ItemPriceMap} from a .shop file.
  * <p>
- * Parsing is done by reading the file line by line
- * and using the {@link #SEPARATOR} char as a column
- * separator, The file requires each row to have 6 columns
- * which contain the following data:
+ * Parsing is done by reading the file line by line and using the {@link #SEPARATOR} char as a
+ * column separator, The file requires each row to have 6 columns which contain the following data:
  * <pre>
  * Column 1: Contains the name of the primary material
  *           that row's data will be for, eg: 'stone'.
@@ -48,196 +44,194 @@ import java.nio.file.Path;
  * </pre>
  * Each row must begin and end with a {@link #SEPARATOR} character
  * <p>
- * If a line starts with '#' then it's marked as a comment line and
- * ignored by this parser. Spaces do also not matter in the context
- * of this parser, all whitespaces are simply skipped over
+ * If a line starts with '#' then it's marked as a comment line and ignored by this parser. Spaces
+ * do also not matter in the context of this parser, all whitespaces are simply skipped over
  * <p>
- * I should add a 'blank line' is any line which is left empty or
- * is given '-' as a value. Basically an empty column is implicitly
- * empty, but a column with '-' as the value is explicitly empty
+ * I should add a 'blank line' is any line which is left empty or is given '-' as a value. Basically
+ * an empty column is implicitly empty, but a column with '-' as the value is explicitly empty
  */
 public class PriceMapReader {
-    /**
-     * Column separator character: '|'
-     */
-    static final char SEPARATOR = '|';
 
-    /**
-     * Explicitly empty column value
-     */
-    static final char EMPTY_VAL = '-';
+  /**
+   * Column separator character: '|'
+   */
+  static final char SEPARATOR = '|';
 
-    static final int DEF_MAX_EARNINGS = 500_000;
+  /**
+   * Explicitly empty column value
+   */
+  static final char EMPTY_VAL = '-';
 
-    static ItemPriceMap readFile(Path path) {
-        var map = new ItemPriceMap();
+  static final int DEF_MAX_EARNINGS = 500_000;
 
-        try (var reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-            read(map, reader);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+  static ItemPriceMap readFile(Path path) {
+    var map = new ItemPriceMap();
 
-        return map;
+    try (var reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+      read(map, reader);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
     }
 
-    private static void read(ItemPriceMap map, BufferedReader reader) throws IOException {
-        var lines = reader.lines().toList();
-        int line = 0;
+    return map;
+  }
 
-        for (var s: lines) {
-            line++;
+  private static void read(ItemPriceMap map, BufferedReader reader) throws IOException {
+    var lines = reader.lines().toList();
+    int line = 0;
 
-            // Trim it, so we don't have any
-            // leading spaces or anything
-            var trimmed = s.trim();
+    for (var s : lines) {
+      line++;
 
-            // Test if it's a comment line or not,
-            // if it is, skip it
-            if (trimmed.startsWith("#")) {
-                continue;
-            }
+      // Trim it, so we don't have any
+      // leading spaces or anything
+      var trimmed = s.trim();
 
-            try {
-                map.add(parseLine(new StringReader(trimmed)));
-            } catch (CommandSyntaxException e) {
-                throw new IOException(
-                        String.format("Error on line %s: '%s'", line, e.getMessage()),
-                        e
-                );
-            }
-        }
+      // Test if it's a comment line or not,
+      // if it is, skip it
+      if (trimmed.startsWith("#")) {
+        continue;
+      }
+
+      try {
+        map.add(parseLine(new StringReader(trimmed)));
+      } catch (CommandSyntaxException e) {
+        throw new IOException(
+            String.format("Error on line %s: '%s'", line, e.getMessage()),
+            e
+        );
+      }
+    }
+  }
+
+  private static ItemSellData parseLine(StringReader reader)
+      throws CommandSyntaxException, IOException {
+    var builder = ItemSellData.builder();
+
+    // --- Base data ---
+
+    skipSeparator(reader);
+    builder.material(parseMaterial(reader, false));
+
+    skipSeparator(reader);
+    builder.price(parseInt(reader, null));
+
+    // --- Max earnings ---
+
+    skipSeparator(reader);
+    builder.maxEarnings(parseInt(reader, DEF_MAX_EARNINGS));
+
+    // --- Compact data parsing ---
+
+    skipSeparator(reader);
+    var compactMat = parseMaterial(reader, true);
+    builder.compactMaterial(compactMat);
+
+    skipSeparator(reader);
+    var multiplier = parseInt(reader, 0);
+    builder.compactMultiplier(multiplier);
+
+    // Ensure that both the multiplier and compact
+    // material were given and not just 1 of them
+    if ((multiplier == 0 && compactMat != null)
+        || (multiplier != 0 && compactMat == null)
+    ) {
+      throw new IOException(
+          "Either multiplier or compact material was given," +
+              "but not both. Both most be given!"
+      );
     }
 
-    private static ItemSellData parseLine(StringReader reader) throws CommandSyntaxException, IOException {
-        var builder = ItemSellData.builder();
+    // --- Slot parsing ---
 
-        // --- Base data ---
+    skipSeparator(reader);
+    var slot = parseInt(reader, null);
 
-        skipSeparator(reader);
-        builder.material(parseMaterial(reader, false));
+    reader.skipWhitespace();
 
-        skipSeparator(reader);
-        builder.price(parseInt(reader, null));
+    // Check if we were given an inventory position instead
+    // of a raw inventory slot
+    if (reader.peek() == ',') {
+      reader.skip();
+      reader.skipWhitespace();
 
-        // --- Max earnings ---
+      var column = slot;
+      var row = parseInt(reader, null);
 
-        skipSeparator(reader);
-        builder.maxEarnings(parseInt(reader, DEF_MAX_EARNINGS));
-
-        // --- Compact data parsing ---
-
-        skipSeparator(reader);
-        var compactMat = parseMaterial(reader, true);
-        builder.compactMaterial(compactMat);
-
-        skipSeparator(reader);
-        var multiplier = parseInt(reader, 0);
-        builder.compactMultiplier(multiplier);
-
-        // Ensure that both the multiplier and compact
-        // material were given and not just 1 of them
-        if ((multiplier == 0 && compactMat != null)
-                || (multiplier != 0 && compactMat == null)
-        ) {
-            throw new IOException(
-                    "Either multiplier or compact material was given," +
-                            "but not both. Both most be given!"
-            );
-        }
-
-        // --- Slot parsing ---
-
-        skipSeparator(reader);
-        var slot = parseInt(reader, null);
-
-        reader.skipWhitespace();
-
-        // Check if we were given an inventory position instead
-        // of a raw inventory slot
-        if (reader.peek() == ',') {
-            reader.skip();
-            reader.skipWhitespace();
-
-            var column = slot;
-            var row = parseInt(reader, null);
-
-            builder.inventoryIndex(Slot.toIndex(column, row));
-        } else {
-            builder.inventoryIndex(slot);
-        }
-
-        skipSeparator(reader);
-        return builder.build();
+      builder.inventoryIndex(Slot.toIndex(column, row));
+    } else {
+      builder.inventoryIndex(slot);
     }
 
-    static void skipSeparator(StringReader reader) throws CommandSyntaxException {
-        reader.skipWhitespace();
-        reader.expect(SEPARATOR);
-        reader.skipWhitespace();
+    skipSeparator(reader);
+    return builder.build();
+  }
+
+  static void skipSeparator(StringReader reader) throws CommandSyntaxException {
+    reader.skipWhitespace();
+    reader.expect(SEPARATOR);
+    reader.skipWhitespace();
+  }
+
+  /**
+   * Parses a material from the given reader
+   *
+   * @param reader     The reader to parse from
+   * @param allowEmpty Whether to allow null return values
+   * @return The parsed material, or null, if allowEmpty is set to true
+   * @throws IOException If allowEmpty was false and an empty value was found, or if read material
+   *                     was an invalid material
+   */
+  static Material parseMaterial(StringReader reader, boolean allowEmpty) throws IOException {
+    if (testEmpty(allowEmpty, reader)) {
+      return null;
     }
 
-    /**
-     * Parses a material from the given reader
-     * @param reader The reader to parse from
-     * @param allowEmpty Whether to allow null return values
-     * @return The parsed material, or null, if allowEmpty is set to true
-     * @throws IOException If allowEmpty was false and an empty value was found, or if
-     *                     read material was an invalid material
-     */
-    static Material parseMaterial(StringReader reader, boolean allowEmpty) throws IOException {
-        if (testEmpty(allowEmpty, reader)) {
-            return null;
-        }
+    var label = reader.readUnquotedString();
+    var material = Material.getMaterial(label.toUpperCase());
 
-        var label = reader.readUnquotedString();
-        var material = Material.getMaterial(label.toUpperCase());
-
-        if (material == null) {
-            throw new IOException("Unknown Material: '" + label + "'");
-        }
-
-        return material;
+    if (material == null) {
+      throw new IOException("Unknown Material: '" + label + "'");
     }
 
-    /**
-     * Parses an integer from the given reader
-     * @param reader The reader
-     * @param def The value to return if the next value
-     *            is empty, if this is null, empty values
-     *            will not be allowed
-     * @return The read integer
-     * @throws IOException If there was empty value when it was
-     *                     not allowed
-     * @throws CommandSyntaxException If the input couldn't be
-     *                                parsed as an integer
-     */
-    static int parseInt(StringReader reader, Integer def) throws IOException, CommandSyntaxException {
-        if (testEmpty(def != null, reader)) {
-            return def;
-        }
+    return material;
+  }
 
-        return reader.readInt();
+  /**
+   * Parses an integer from the given reader
+   *
+   * @param reader The reader
+   * @param def    The value to return if the next value is empty, if this is null, empty values
+   *               will not be allowed
+   * @return The read integer
+   * @throws IOException            If there was empty value when it was not allowed
+   * @throws CommandSyntaxException If the input couldn't be parsed as an integer
+   */
+  static int parseInt(StringReader reader, Integer def) throws IOException, CommandSyntaxException {
+    if (testEmpty(def != null, reader)) {
+      return def;
     }
 
-    /**
-     * Tests that the given reader does not have
-     * an implicitly or explicitly empty value
-     * @param allowed Whether to allow empty values or not
-     * @param reader The reader to test
-     * @return True, if the value was empty, false otherwise
-     * @throws IOException If the the allowed argument was false and
-     *                     next value was empty
-     */
-    static boolean testEmpty(boolean allowed, StringReader reader) throws IOException {
-        if (reader.peek() == EMPTY_VAL || reader.peek() == SEPARATOR) {
-            if (!allowed) {
-                throw new IOException("Empty value where not allowed");
-            } else {
-                return true;
-            }
-        }
+    return reader.readInt();
+  }
 
-        return false;
+  /**
+   * Tests that the given reader does not have an implicitly or explicitly empty value
+   *
+   * @param allowed Whether to allow empty values or not
+   * @param reader  The reader to test
+   * @return True, if the value was empty, false otherwise
+   * @throws IOException If the the allowed argument was false and next value was empty
+   */
+  static boolean testEmpty(boolean allowed, StringReader reader) throws IOException {
+    if (reader.peek() == EMPTY_VAL || reader.peek() == SEPARATOR) {
+      if (!allowed) {
+        throw new IOException("Empty value where not allowed");
+      } else {
+        return true;
+      }
     }
+
+    return false;
+  }
 }

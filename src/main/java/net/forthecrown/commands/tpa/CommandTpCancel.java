@@ -7,26 +7,27 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.User;
 
 public class CommandTpCancel extends FtcCommand {
-    public CommandTpCancel(){
-        super("tpcancel");
 
-        setPermission(Permissions.TPA);
-        setDescription("Cancels a teleport");
+  public CommandTpCancel() {
+    super("tpcancel");
 
-        register();
-    }
+    setPermission(Permissions.TPA);
+    setDescription("Cancels a teleport");
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command.executes(c -> {
-            User user = getUserSender(c);
+    register();
+  }
 
-            if(user.isTeleporting()) {
-                throw Exceptions.NOT_CURRENTLY_TELEPORTING;
-            }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command.executes(c -> {
+      User user = getUserSender(c);
 
-            user.getLastTeleport().interrupt();
-            return 0;
-        });
-    }
+      if (user.isTeleporting()) {
+        throw Exceptions.NOT_CURRENTLY_TELEPORTING;
+      }
+
+      user.getLastTeleport().interrupt();
+      return 0;
+    });
+  }
 }

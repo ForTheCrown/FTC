@@ -1,6 +1,9 @@
 package net.forthecrown.useables.command;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.UnaryOperator;
 import lombok.Getter;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.io.TagUtil;
@@ -15,99 +18,96 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.UnaryOperator;
-
 public class Kit extends CommandUsable {
-    @Getter
-    private final List<ItemStack> items = new ArrayList<>();
 
-    public Kit(String name, List<ItemStack> items) {
-        super(name);
+  @Getter
+  private final List<ItemStack> items = new ArrayList<>();
 
-        items.forEach(itemStack -> {
-            if (ItemStacks.isEmpty(itemStack)) {
-                return;
-            }
+  public Kit(String name, List<ItemStack> items) {
+    super(name);
 
-            items.add(itemStack.clone());
-        });
+    items.forEach(itemStack -> {
+      if (ItemStacks.isEmpty(itemStack)) {
+        return;
+      }
+
+      items.add(itemStack.clone());
+    });
+  }
+
+  public Kit(String name, CompoundTag tag) throws CommandSyntaxException {
+    super(name, tag);
+
+    var itemArray = tag.getList("items", Tag.TAG_COMPOUND);
+    for (var e : itemArray) {
+      items.add(TagUtil.readItem(e));
+    }
+  }
+
+  @Override
+  protected void save(CompoundTag tag) {
+    var list = new ListTag();
+
+    for (var i : items) {
+      list.add(TagUtil.writeItem(i));
     }
 
-    public Kit(String name, CompoundTag tag) throws CommandSyntaxException {
-        super(name, tag);
+    tag.put("items", list);
+  }
 
-        var itemArray = tag.getList("items", Tag.TAG_COMPOUND);
-        for (var e: itemArray) {
-            items.add(TagUtil.readItem(e));
-        }
+  @Override
+  public boolean onInteract(Player player) {
+    if (!testSpace(player)) {
+      return false;
     }
 
-    @Override
-    protected void save(CompoundTag tag) {
-        var list = new ListTag();
+    PlayerInventory inv = player.getInventory();
 
-        for (var i: items) {
-            list.add(TagUtil.writeItem(i));
-        }
+    for (ItemStack i : items) {
+      inv.addItem(i.clone());
+    }
+    return true;
+  }
 
-        tag.put("items", list);
+  public boolean testSpace(Player player) {
+    if (!hasSpace(player.getInventory())) {
+      if (!silent) {
+        player.sendMessage(Component.text("No room in inventory"));
+      }
+
+      return false;
     }
 
-    @Override
-    public boolean onInteract(Player player) {
-        if (!testSpace(player)) {
-            return false;
-        }
+    return true;
+  }
 
-        PlayerInventory inv = player.getInventory();
+  public boolean hasSpace(PlayerInventory inventory) {
+    int freeSlots = 0;
 
-        for (ItemStack i: items) {
-            inv.addItem(i.clone());
-        }
-        return true;
+    for (ItemStack i : inventory) {
+      if (ItemStacks.isEmpty(i)) {
+        freeSlots++;
+      }
     }
 
-    public boolean testSpace(Player player) {
-        if (!hasSpace(player.getInventory())) {
-            if (!silent) {
-                player.sendMessage(Component.text("No room in inventory"));
-            }
+    return freeSlots >= items.size();
+  }
 
-            return false;
-        }
+  @Override
+  public @NotNull HoverEvent<Component> asHoverEvent(@NotNull UnaryOperator<Component> op) {
+    var builder = Component.text()
+        .append(Component.text("Items: "));
 
-        return true;
+    for (ItemStack i : items) {
+      Component name = Text.itemAndAmount(i);
+
+      builder
+          .append(Component.newline())
+          .append(name);
     }
 
-    public boolean hasSpace(PlayerInventory inventory) {
-        int freeSlots = 0;
-
-        for (ItemStack i: inventory) {
-            if (ItemStacks.isEmpty(i)) {
-                freeSlots++;
-            }
-        }
-
-        return freeSlots >= items.size();
-    }
-
-    @Override
-    public @NotNull HoverEvent<Component> asHoverEvent(@NotNull UnaryOperator<Component> op) {
-        var builder = Component.text()
-                .append(Component.text("Items: "));
-
-        for (ItemStack i: items){
-            Component name = Text.itemAndAmount(i);
-
-            builder
-                    .append(Component.newline())
-                    .append(name);
-        }
-
-        return builder
-                .build()
-                .asHoverEvent(op);
-    }
+    return builder
+        .build()
+        .asHoverEvent(op);
+  }
 }

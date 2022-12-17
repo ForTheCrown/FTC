@@ -23,61 +23,63 @@ import org.bukkit.entity.Player;
 @Getter
 @RequiredArgsConstructor
 public class GuildSignPacketListener implements PacketListener {
-    private static final Logger LOGGER = FTC.getLogger();
 
-    // Literally copied and pasted from the packet listener class
-    private static final int MAX_SIGN_LINE_LENGTH = Integer.getInteger("Paper.maxSignLength", 80); // Paper
+  private static final Logger LOGGER = FTC.getLogger();
 
-    private final User user;
-    private final Guild guild;
-    private final Material material;
+  // Literally copied and pasted from the packet listener class
+  private static final int MAX_SIGN_LINE_LENGTH = Integer.getInteger("Paper.maxSignLength",
+      80); // Paper
 
-    @PacketHandler(ignoreCancelled = true)
-    public void onSignPacket(ServerboundSignUpdatePacket packet, PacketCall call) {
-        if (!call.getUser().equals(user)) {
-            return;
-        }
+  private final User user;
+  private final Guild guild;
+  private final Material material;
 
-        call.setCancelled(true);
-
-        Component[] lines = capLength(packet.getLines(), call.getPlayer());
-        var pos = packet.getPos();
-        var loc = new Location(user.getWorld(), pos.getX(), pos.getY(), pos.getZ());
-
-        user.getPlayer().sendBlockChange(loc, Material.AIR.createBlockData());
-
-        guild.addMsgBoardPost(
-                new GuildMessage(
-                        material,
-                        user.getUniqueId(),
-                        System.currentTimeMillis(),
-                        lines
-                )
-        );
-
-        Tasks.runLater(() -> {
-            GuildMenus.open(
-                    GuildMenus.MAIN_MENU.getMessageBoard(),
-                    user, guild
-            );
-
-            PacketListeners.unregister(this);
-        }, 1);
+  @PacketHandler(ignoreCancelled = true)
+  public void onSignPacket(ServerboundSignUpdatePacket packet, PacketCall call) {
+    if (!call.getUser().equals(user)) {
+      return;
     }
 
-    private Component[] capLength(String[] lines, Player player) {
-        Component[] result = new Component[4];
+    call.setCancelled(true);
 
-        for (int i = 0; i < result.length; i++) {
-            String line = lines[i];
+    Component[] lines = capLength(packet.getLines(), call.getPlayer());
+    var pos = packet.getPos();
+    var loc = new Location(user.getWorld(), pos.getX(), pos.getY(), pos.getZ());
 
-            if (line.length() > MAX_SIGN_LINE_LENGTH) {
-                line = line.substring(0, MAX_SIGN_LINE_LENGTH);
-            }
+    user.getPlayer().sendBlockChange(loc, Material.AIR.createBlockData());
 
-            result[i] = Text.renderString(player, line);
-        }
+    guild.addMsgBoardPost(
+        new GuildMessage(
+            material,
+            user.getUniqueId(),
+            System.currentTimeMillis(),
+            lines
+        )
+    );
 
-        return result;
+    Tasks.runLater(() -> {
+      GuildMenus.open(
+          GuildMenus.MAIN_MENU.getMessageBoard(),
+          user, guild
+      );
+
+      PacketListeners.unregister(this);
+    }, 1);
+  }
+
+  private Component[] capLength(String[] lines, Player player) {
+    Component[] result = new Component[4];
+
+    for (int i = 0; i < result.length; i++) {
+      String line = lines[i];
+
+      if (line.length() > MAX_SIGN_LINE_LENGTH) {
+        line = line.substring(0, MAX_SIGN_LINE_LENGTH);
+      }
+
+      result[i] = Text.renderString(player, line);
     }
+
+    return result;
+  }
 }

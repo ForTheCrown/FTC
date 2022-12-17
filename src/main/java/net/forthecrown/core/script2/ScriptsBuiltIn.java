@@ -1,7 +1,6 @@
 package net.forthecrown.core.script2;
 
 import jdk.dynalink.beans.StaticClass;
-import lombok.experimental.UtilityClass;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.FtcLogger;
 import net.forthecrown.core.Messages;
@@ -31,34 +30,33 @@ import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
-@UtilityClass
-class ScriptsBuiltIn {
-    private final Class[] DEFAULT_CLASSES = {
-            Util.class,             FTC.class,
-            Vector3i.class,         Vector3d.class,
-            Vector2i.class,         Vector2d.class,
-            WorldBounds3i.class,    Bounds3i.class,
-            WorldVec3i.class,       Cooldown.class,
-            Bukkit.class,           Material.class,
-            EntityType.class,       Vectors.class,
-            Location.class,         Component.class,
-            Text.class,             NamedTextColor.class,
-            Messages.class,         Style.class,
-            Users.class,            HoverEvent.class,
-            TextDecoration.class,   ClickEvent.class,
-            TextColor.class
-    };
+public final class ScriptsBuiltIn {
 
-    void populate(String name, NashornScriptEngine engine) {
-        for (var c: DEFAULT_CLASSES) {
-            engine.put(c.getSimpleName(), StaticClass.forClass(c));
-        }
+  private ScriptsBuiltIn() {
+  }
 
-        FtcLogger logger = new FtcLogger(
-                LogManager.getContext()
-                        .getLogger(name)
-        );
+  private static final Class[] DEFAULT_CLASSES = {
+      Util.class, FTC.class,
+      Vector3i.class, Vector3d.class,
+      Vector2i.class, Vector2d.class,
+      WorldBounds3i.class, Bounds3i.class,
+      WorldVec3i.class, Cooldown.class,
+      Bukkit.class, Material.class,
+      EntityType.class, Vectors.class,
+      Location.class, Component.class,
+      Text.class, NamedTextColor.class,
+      Messages.class, Style.class,
+      Users.class, HoverEvent.class,
+      TextDecoration.class, ClickEvent.class,
+      TextColor.class
+  };
 
-        engine.put("logger", logger);
+  public static void populate(String name, NashornScriptEngine engine) {
+    for (var c : DEFAULT_CLASSES) {
+      engine.put(c.getSimpleName(), StaticClass.forClass(c));
     }
+
+    FtcLogger logger = new FtcLogger(LogManager.getContext().getLogger(name));
+    engine.put("logger", logger);
+  }
 }

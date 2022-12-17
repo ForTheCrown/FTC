@@ -6,36 +6,38 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import java.util.concurrent.CompletableFuture;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
 
-import java.util.concurrent.CompletableFuture;
-
 public class GuildArgument implements ArgumentType<Guild> {
-    @Override
-    public Guild parse(StringReader reader) throws CommandSyntaxException {
-        int start = reader.getCursor();
 
-        var name = reader.readUnquotedString();
-        var guild = GuildManager.get()
-                .getGuild(name);
+  @Override
+  public Guild parse(StringReader reader) throws CommandSyntaxException {
+    int start = reader.getCursor();
 
-        if (guild == null) {
-            reader.setCursor(start);
-            throw Exceptions.unknown("Guild", reader, name);
-        }
+    var name = reader.readUnquotedString();
+    var guild = GuildManager.get()
+        .getGuild(name);
 
-        return guild;
+    if (guild == null) {
+      reader.setCursor(start);
+      throw Exceptions.unknown("Guild", reader, name);
     }
 
-    @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CompletionProvider.suggestMatching(builder,
-                GuildManager.get().getGuilds()
-                        .stream()
-                        .map(Guild::getName)
-        );
-    }
+    return guild;
+  }
+
+  @Override
+  public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+                                                            SuggestionsBuilder builder
+  ) {
+    return CompletionProvider.suggestMatching(builder,
+        GuildManager.get().getGuilds()
+            .stream()
+            .map(Guild::getName)
+    );
+  }
 }

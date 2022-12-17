@@ -8,36 +8,36 @@ import net.forthecrown.user.User;
 
 public class CommandPunish extends FtcCommand {
 
-    public CommandPunish() {
-        super("Punish");
+  public CommandPunish() {
+    super("Punish");
 
-        register();
-    }
+    register();
+  }
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     *
-     * Valid usages of command:
-     * /Punish
-     *
-     * Permissions used:
-     *
-     * Main Author:
-     */
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   *
+   * Valid usages of command:
+   * /Punish
+   *
+   * Permissions used:
+   *
+   * Main Author:
+   */
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("user", Arguments.USER)
-                        .executes(c -> {
-                            User user = getUserSender(c);
-                            User target = Arguments.getUser(c, "user");
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .then(argument("user", Arguments.USER)
+            .executes(c -> {
+              User user = getUserSender(c);
+              User target = Arguments.getUser(c, "user");
 
-                            AdminUI.open(user, target);
-                            return 0;
-                        })
-                );
-    }
+              AdminUI.open(user, target);
+              return 0;
+            })
+        );
+  }
 }

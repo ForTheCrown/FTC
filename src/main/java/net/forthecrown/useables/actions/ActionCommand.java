@@ -7,7 +7,11 @@ import lombok.Getter;
 import net.forthecrown.commands.manager.FtcSuggestions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.Suggester;
-import net.forthecrown.useables.*;
+import net.forthecrown.useables.ActionHolder;
+import net.forthecrown.useables.ConstructType;
+import net.forthecrown.useables.UsableConstructor;
+import net.forthecrown.useables.UsageAction;
+import net.forthecrown.useables.UsageType;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.StringTag;
@@ -18,76 +22,79 @@ import org.jetbrains.annotations.Nullable;
 
 @Getter
 public class ActionCommand extends UsageAction {
-    private static final Suggester<CommandSource> COMMAND_SUGGESTIONS = (context, builder) -> {
-        String filteredInput = builder.getInput()
-                .replaceAll("%p", "ap")
-                .replaceAll("%plr", "aplr")
-                .replaceAll("%player", "aplayer");
 
-        builder = new SuggestionsBuilder(
-                filteredInput,
-                builder.getStart()
-        );
+  private static final Suggester<CommandSource> COMMAND_SUGGESTIONS = (context, builder) -> {
+    String filteredInput = builder.getInput()
+        .replaceAll("%p", "ap")
+        .replaceAll("%plr", "aplr")
+        .replaceAll("%player", "aplayer");
 
-        return FtcSuggestions.COMMAND_SUGGESTIONS.getSuggestions(context, builder);
-    };
+    builder = new SuggestionsBuilder(
+        filteredInput,
+        builder.getStart()
+    );
 
-    // --- TYPE ---
-    public static final UsageType<ActionCommand> TYPE_PLAYER = UsageType.of(ActionCommand.class)
-            .setSuggests(COMMAND_SUGGESTIONS);
+    return FtcSuggestions.COMMAND_SUGGESTIONS.getSuggestions(context, builder);
+  };
 
-    public static final UsageType<ActionCommand> TYPE_SERVER = UsageType.of(ActionCommand.class)
-            .setSuggests(COMMAND_SUGGESTIONS);
+  // --- TYPE ---
+  public static final UsageType<ActionCommand> TYPE_PLAYER = UsageType.of(ActionCommand.class)
+      .setSuggests(COMMAND_SUGGESTIONS);
 
-    private final boolean server;
-    private final String command;
+  public static final UsageType<ActionCommand> TYPE_SERVER = UsageType.of(ActionCommand.class)
+      .setSuggests(COMMAND_SUGGESTIONS);
 
-    public ActionCommand(UsageType<ActionCommand> type, String command) {
-        super(type);
-        this.command = command;
+  private final boolean server;
+  private final String command;
 
-        this.server = type == TYPE_SERVER;
-    }
+  public ActionCommand(UsageType<ActionCommand> type, String command) {
+    super(type);
+    this.command = command;
 
-    @Override
-    public void onUse(Player player, ActionHolder holder) {
-        String command = replaceSelectors(player.getName(), this.command);
+    this.server = type == TYPE_SERVER;
+  }
 
-        Bukkit.dispatchCommand(
-                server ? Bukkit.getConsoleSender() : player,
-                command
-        );
-    }
+  @Override
+  public void onUse(Player player, ActionHolder holder) {
+    String command = replaceSelectors(player.getName(), this.command);
 
-    public static String replaceSelectors(String name, String command) {
-        return command
-                .replaceAll("%plr", name)
-                .replaceAll("%player", name)
-                .replaceAll("%p", name);
-    }
+    Bukkit.dispatchCommand(
+        server ? Bukkit.getConsoleSender() : player,
+        command
+    );
+  }
 
-    @Override
-    public @Nullable Component displayInfo() {
-        return Text.format("cmd='{0}'", command);
-    }
+  public static String replaceSelectors(String name, String command) {
+    return command
+        .replaceAll("%plr", name)
+        .replaceAll("%player", name)
+        .replaceAll("%p", name);
+  }
 
-    @Override
-    public @Nullable Tag save() {
-        return StringTag.valueOf(command);
-    }
+  @Override
+  public @Nullable Component displayInfo() {
+    return Text.format("cmd='{0}'", command);
+  }
 
-    // --- TYPE CONSTRUCTORS ---
+  @Override
+  public @Nullable Tag save() {
+    return StringTag.valueOf(command);
+  }
 
-    @UsableConstructor(ConstructType.PARSE)
-    public static ActionCommand parse(UsageType<ActionCommand> type, StringReader reader, CommandSource source) throws CommandSyntaxException {
-        String result = reader.getRemaining();
-        reader.setCursor(reader.getTotalLength());
+  // --- TYPE CONSTRUCTORS ---
 
-        return new ActionCommand(type, result);
-    }
+  @UsableConstructor(ConstructType.PARSE)
+  public static ActionCommand parse(UsageType<ActionCommand> type, StringReader reader,
+                                    CommandSource source
+  ) throws CommandSyntaxException {
+    String result = reader.getRemaining();
+    reader.setCursor(reader.getTotalLength());
 
-    @UsableConstructor(ConstructType.TAG)
-    public static ActionCommand load(UsageType<ActionCommand> type, Tag tag) {
-        return new ActionCommand(type, tag.getAsString());
-    }
+    return new ActionCommand(type, result);
+  }
+
+  @UsableConstructor(ConstructType.TAG)
+  public static ActionCommand load(UsageType<ActionCommand> type, Tag tag) {
+    return new ActionCommand(type, tag.getAsString());
+  }
 }

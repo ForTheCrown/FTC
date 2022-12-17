@@ -1,5 +1,6 @@
 package net.forthecrown.commands.emotes;
 
+import javax.annotation.Nonnegative;
 import lombok.Getter;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
@@ -12,72 +13,75 @@ import net.forthecrown.utils.Cooldown;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnegative;
-
 /**
  * The class to make the handling of emotes easier
- * <p>Here the return value actually matters. If the returned value is below 0, they don't get added to the cooldown</p>
+ * <p>Here the return value actually matters. If the returned value is below 0, they don't get
+ * added
+ * to the cooldown</p>
  */
 public abstract class CommandEmote extends FtcCommand {
 
-    @Getter
-    protected final int cooldownTime;
-    protected final Component cooldownMessage;
-    protected final String cooldownCategory;
+  @Getter
+  protected final int cooldownTime;
+  protected final Component cooldownMessage;
+  protected final String cooldownCategory;
 
-    protected CommandEmote(@NotNull String name, @Nonnegative int cooldownTime, @NotNull Component cooldownMessage) {
-        super(name);
+  protected CommandEmote(@NotNull String name, @Nonnegative int cooldownTime,
+                         @NotNull Component cooldownMessage
+  ) {
+    super(name);
 
-        setPermission(Permissions.EMOTES);
+    setPermission(Permissions.EMOTES);
 
-        this.cooldownCategory = "command_emote_" + name;
-        this.cooldownMessage = cooldownMessage;
-        this.cooldownTime = cooldownTime;
-    }
+    this.cooldownCategory = "command_emote_" + name;
+    this.cooldownMessage = cooldownMessage;
+    this.cooldownTime = cooldownTime;
+  }
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> executeSelf(getUserSender(c)))
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> executeSelf(getUserSender(c)))
 
-                .then(argument("player", Arguments.ONLINE_USER)
-                        .executes(c -> {
-                            User sender = getUserSender(c);
+        .then(argument("player", Arguments.ONLINE_USER)
+            .executes(c -> {
+              User sender = getUserSender(c);
 
-                            if (Cooldown.contains(sender, cooldownCategory)) {
-                                sender.sendMessage(cooldownMessage);
-                                return 0;
-                            }
+              if (Cooldown.contains(sender, cooldownCategory)) {
+                sender.sendMessage(cooldownMessage);
+                return 0;
+              }
 
-                            User target = Arguments.getUser(c, "player");
+              User target = Arguments.getUser(c, "player");
 
-                            if (target.equals(sender)) {
-                                //Make sure to execute on self, not on others
-                                return executeSelf(sender);
-                            }
+              if (target.equals(sender)) {
+                //Make sure to execute on self, not on others
+                return executeSelf(sender);
+              }
 
-                            //If either doesn't allow emotes, stop
-                            if (!sender.get(Properties.EMOTES)) {
-                                throw Exceptions.EMOTE_DISABLE_SELF;
-                            }
+              //If either doesn't allow emotes, stop
+              if (!sender.get(Properties.EMOTES)) {
+                throw Exceptions.EMOTE_DISABLE_SELF;
+              }
 
-                            if (!target.get(Properties.EMOTES)) {
-                                throw Exceptions.emoteDisabledTarget(target);
-                            }
+              if (!target.get(Properties.EMOTES)) {
+                throw Exceptions.emoteDisabledTarget(target);
+              }
 
-                            //If return value is more than or equal to 0, add to cooldown
-                            if (execute(sender, target) >= 0
-                                    && !sender.hasPermission(Permissions.EMOTE_IGNORE)
-                                    && getCooldownTime() > 0
-                            ) {
-                                Cooldown.add(sender, cooldownCategory, getCooldownTime());
-                            }
+              //If return value is more than or equal to 0, add to cooldown
+              if (execute(sender, target) >= 0
+                  && !sender.hasPermission(Permissions.EMOTE_IGNORE)
+                  && getCooldownTime() > 0
+              ) {
+                Cooldown.add(sender, cooldownCategory, getCooldownTime());
+              }
 
-                            return 0;
-                        })
-                );
-    }
+              return 0;
+            })
+        );
+  }
 
-    public abstract int execute(User sender, User target);
-    public abstract int executeSelf(User user);
+  public abstract int execute(User sender, User target);
+
+  public abstract int executeSelf(User user);
 }

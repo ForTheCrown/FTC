@@ -14,35 +14,35 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class ShopInteractionListener implements Listener {
 
-    @EventHandler
-    public void onSignShopUser(PlayerInteractEvent event){
-        // Not clicking block, not worth our time
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
-            return;
-        }
-
-        // Interacted block is not a shop, stop
-        if (!SignShops.isShop(event.getClickedBlock())) {
-            return;
-        }
-
-        var player = event.getPlayer();
-
-        //Can't use in spectator lol
-        if(player.getGameMode() == GameMode.SPECTATOR) {
-            return;
-        }
-
-        // Test player being on a little cooldown
-        if (Cooldown.containsOrAdd(player, 6)) {
-            return;
-        }
-
-        ShopManager manager = Economy.get().getShops();
-        SignShop shop = manager.getShop(event.getClickedBlock());
-
-        //Handle interaction between player and shop
-        manager.handleInteraction(Users.get(player), shop);
+  @EventHandler
+  public void onSignShopUser(PlayerInteractEvent event) {
+    // Not clicking block, not worth our time
+    if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+      return;
     }
+
+    // Interacted block is not a shop, stop
+    if (!SignShops.isShop(event.getClickedBlock())) {
+      return;
+    }
+
+    var player = event.getPlayer();
+
+    //Can't use in spectator lol
+    if (player.getGameMode() == GameMode.SPECTATOR) {
+      return;
+    }
+
+    // Test player being on a little cooldown
+    if (Cooldown.containsOrAdd(player, 6)) {
+      return;
+    }
+
+    ShopManager manager = Economy.get().getShops();
+    SignShop shop = manager.getShop(event.getClickedBlock());
+
+    //Handle interaction between player and shop
+    manager.handleInteraction(Users.get(player), shop);
+  }
 
 }

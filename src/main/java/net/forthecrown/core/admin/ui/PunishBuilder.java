@@ -12,14 +12,15 @@ import net.forthecrown.grenadier.CommandSource;
 @Accessors(chain = true)
 @RequiredArgsConstructor
 public class PunishBuilder {
-    final PunishEntry entry;
-    final PunishType type;
 
-    String reason;
-    String extra;
-    long length;
+  final PunishEntry entry;
+  final PunishType type;
 
-    public void punish(CommandSource source) {
-        Punishments.handlePunish(entry.getUser(), source, reason, length, type, extra);
-    }
+  String reason;
+  String extra;
+  long length;
+
+  public void punish(CommandSource source) {
+    Punishments.handlePunish(entry.getUser(), source, reason, length, type, extra);
+  }
 }

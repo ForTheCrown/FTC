@@ -9,38 +9,39 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.UserTeleport;
 
 public class CommandBack extends FtcCommand {
-    public CommandBack(){
-        super("back");
 
-        setPermission(Permissions.BACK);
-        setAliases("return");
-        setDescription("Teleports you to your previous location");
+  public CommandBack() {
+    super("back");
 
-        register();
-    }
+    setPermission(Permissions.BACK);
+    setAliases("return");
+    setDescription("Teleports you to your previous location");
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> {
-                    User user = getUserSender(c);
-                    if (!user.checkTeleporting()) {
-                        return 0;
-                    }
+    register();
+  }
 
-                    if(user.getReturnLocation() == null) {
-                        throw Exceptions.NO_RETURN;
-                    }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> {
+          User user = getUserSender(c);
+          if (!user.checkTeleporting()) {
+            return 0;
+          }
 
-                    if(!user.hasPermission(Permissions.WORLD_BYPASS)
-                            && CommandTpask.isInvalidWorld(user.getReturnLocation().getWorld())
-                    ) {
-                        throw Exceptions.CANNOT_RETURN;
-                    }
+          if (user.getReturnLocation() == null) {
+            throw Exceptions.NO_RETURN;
+          }
 
-                    user.createTeleport(user::getReturnLocation, UserTeleport.Type.BACK)
-                            .start();
-                    return 0;
-                });
-    }
+          if (!user.hasPermission(Permissions.WORLD_BYPASS)
+              && CommandTpask.isInvalidWorld(user.getReturnLocation().getWorld())
+          ) {
+            throw Exceptions.CANNOT_RETURN;
+          }
+
+          user.createTeleport(user::getReturnLocation, UserTeleport.Type.BACK)
+              .start();
+          return 0;
+        });
+  }
 }

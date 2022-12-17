@@ -8,44 +8,46 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import org.bukkit.permissions.Permission;
 
 public class UserCommands extends CmdUtil {
-    static final Permission PERMISSION = Permissions.ADMIN;
-    static final String USER_ARG_NAME = "user";
 
-    static final UserCommandNode[] NODES = {
-            new UserTimeNode(),
-            new UserTitlesNode(),
-            new UserCosmeticsNode(),
-            new UserEarningsNode(),
-            new UserTabNode()
-    };
+  static final Permission PERMISSION = Permissions.ADMIN;
+  static final String USER_ARG_NAME = "user";
 
-    public static void createCommands() {
-        new UserCommand().register();
+  static final UserCommandNode[] NODES = {
+      new UserTimeNode(),
+      new UserTitlesNode(),
+      new UserCosmeticsNode(),
+      new UserEarningsNode(),
+      new UserTabNode()
+  };
+
+  public static void createCommands() {
+    new UserCommand().register();
+  }
+
+  static class UserCommand extends FtcCommand {
+
+    public UserCommand() {
+      super("ftcuser");
+
+      setAliases("users", "user");
+      setPermission(PERMISSION);
     }
 
-    static class UserCommand extends FtcCommand {
-        public UserCommand() {
-            super("ftcuser");
+    @Override
+    protected void createCommand(BrigadierCommand command) {
+      var argument = argument(USER_ARG_NAME, Arguments.USER);
+      UserProvider provider = c -> Arguments.getUser(c, USER_ARG_NAME);
 
-            setAliases("users", "user");
-            setPermission(PERMISSION);
-        }
+      for (var n : NODES) {
+        n.register();
 
-        @Override
-        protected void createCommand(BrigadierCommand command) {
-            var argument = argument(USER_ARG_NAME, Arguments.USER);
-            UserProvider provider = c -> Arguments.getUser(c, USER_ARG_NAME);
+        var literal = literal(n.argumentName);
+        n.create(literal, provider);
 
-            for (var n: NODES) {
-                n.register();
+        argument.then(literal);
+      }
 
-                var literal = literal(n.argumentName);
-                n.create(literal, provider);
-
-                argument.then(literal);
-            }
-
-            command.then(argument);
-        }
+      command.then(argument);
     }
+  }
 }

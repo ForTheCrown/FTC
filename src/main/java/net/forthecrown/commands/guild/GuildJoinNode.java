@@ -7,32 +7,33 @@ import net.forthecrown.user.User;
 import net.forthecrown.utils.text.writer.TextWriter;
 
 class GuildJoinNode extends GuildCommandNode {
-    GuildJoinNode() {
-        super("guildjoin", "join");
-    }
 
-    @Override
-    protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-        writer.field("join <guild>", "Joins a guild");
-    }
+  GuildJoinNode() {
+    super("guildjoin", "join");
+  }
 
-    @Override
-    protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command) {
-        command
-                .then(guildArgument()
-                        .executes(c -> {
-                            User user = getUserSender(c);
-                            Guild guild = providerForArgument().get(c);
+  @Override
+  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
+    writer.field("join <guild>", "Joins a guild");
+  }
 
-                            GuildInviteNode.ensureJoinable(user, guild);
+  @Override
+  protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command) {
+    command
+        .then(guildArgument()
+            .executes(c -> {
+              User user = getUserSender(c);
+              Guild guild = providerForArgument().get(c);
 
-                            if (!guild.getSettings().isPublic()) {
-                                return GuildInviteNode.acceptInvite(c);
-                            }
+              GuildInviteNode.ensureJoinable(user, guild);
 
-                            guild.join(user);
-                            return 0;
-                        })
-                );
-    }
+              if (!guild.getSettings().isPublic()) {
+                return GuildInviteNode.acceptInvite(c);
+              }
+
+              guild.join(user);
+              return 0;
+            })
+        );
+  }
 }

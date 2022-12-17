@@ -4,6 +4,8 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -18,164 +20,164 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 
-import java.util.Map;
-import java.util.UUID;
-
 public class CommandSign extends FtcCommand {
-    public CommandSign(){
-        super("sign");
 
-        setAliases("editsign");
-        register();
-    }
+  public CommandSign() {
+    super("sign");
 
-    private final Map<UUID, SignLines> copies = new Object2ObjectOpenHashMap<>();
+    setAliases("editsign");
+    register();
+  }
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("pos", PositionArgument.blockPos())
-                        .then(literal("clear")
-                                .executes(c -> {
-                                    Sign sign = get(c);
+  private final Map<UUID, SignLines> copies = new Object2ObjectOpenHashMap<>();
 
-                                    SignLines.EMPTY.apply(sign);
-                                    sign.update();
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .then(argument("pos", PositionArgument.blockPos())
+            .then(literal("clear")
+                .executes(c -> {
+                  Sign sign = get(c);
 
-                                    c.getSource().sendAdmin("Cleared sign");
-                                    return 0;
-                                })
-                        )
+                  SignLines.EMPTY.apply(sign);
+                  sign.update();
 
-                        .then(literal("copy")
-                                .executes(c -> {
-                                    User user = getUserSender(c);
-                                    Sign sign = get(c);
+                  c.getSource().sendAdmin("Cleared sign");
+                  return 0;
+                })
+            )
 
-                                    SignLines lines = new SignLines(sign);
-                                    copies.put(user.getUniqueId(), lines);
+            .then(literal("copy")
+                .executes(c -> {
+                  User user = getUserSender(c);
+                  Sign sign = get(c);
 
-                                    user.sendMessage(
-                                            Component.text("Copied sign")
-                                    );
+                  SignLines lines = new SignLines(sign);
+                  copies.put(user.getUniqueId(), lines);
 
-                                    return 0;
-                                })
-                        )
+                  user.sendMessage(
+                      Component.text("Copied sign")
+                  );
 
-                        .then(literal("paste")
-                                .executes(c -> {
-                                    User user = getUserSender(c);
-                                    Sign sign = get(c);
+                  return 0;
+                })
+            )
 
-                                    SignLines lines = copies.get(user.getUniqueId());
-                                    if (lines == null) {
-                                        throw Exceptions.NO_SIGN_COPY;
-                                    }
+            .then(literal("paste")
+                .executes(c -> {
+                  User user = getUserSender(c);
+                  Sign sign = get(c);
 
-                                    lines.apply(sign);
-                                    sign.update();
+                  SignLines lines = copies.get(user.getUniqueId());
+                  if (lines == null) {
+                    throw Exceptions.NO_SIGN_COPY;
+                  }
 
-                                    user.sendMessage(
-                                            Component.text("Pasted sign")
-                                    );
+                  lines.apply(sign);
+                  sign.update();
 
-                                    return 0;
-                                })
-                        )
+                  user.sendMessage(
+                      Component.text("Pasted sign")
+                  );
 
-                        .then(argument("index", IntegerArgumentType.integer(1, 4))
-                                .suggests(suggestMatching("1", "2", "3", "4"))
+                  return 0;
+                })
+            )
 
-                                .then(literal("set")
-                                        .then(argument("line", Arguments.CHAT)
-                                                .suggests((c, b) -> {
-                                                    Sign sign = get(c);
-                                                    int line = c.getArgument("index", Integer.class);
-                                                    var token = b.getRemainingLowerCase();
+            .then(argument("index", IntegerArgumentType.integer(1, 4))
+                .suggests(suggestMatching("1", "2", "3", "4"))
 
-                                                    var lineComponent = sign.line(line - 1);
+                .then(literal("set")
+                    .then(argument("line", Arguments.CHAT)
+                        .suggests((c, b) -> {
+                          Sign sign = get(c);
+                          int line = c.getArgument("index", Integer.class);
+                          var token = b.getRemainingLowerCase();
 
-                                                    String lineText = LegacyComponentSerializer
-                                                            .legacyAmpersand()
-                                                            .serialize(lineComponent);
+                          var lineComponent = sign.line(line - 1);
 
-                                                    if (CompletionProvider.startsWith(token, lineText)) {
-                                                        b.suggest(lineText, toTooltip(lineComponent));
-                                                        return b.buildFuture();
-                                                    }
+                          String lineText = LegacyComponentSerializer
+                              .legacyAmpersand()
+                              .serialize(lineComponent);
 
-                                                    return Arguments.CHAT.listSuggestions(c, b);
-                                                })
+                          if (CompletionProvider.startsWith(token, lineText)) {
+                            b.suggest(lineText, toTooltip(lineComponent));
+                            return b.buildFuture();
+                          }
 
-                                                .executes(c -> set(c, c.getArgument("line", Component.class)))
-                                        )
-                                )
+                          return Arguments.CHAT.listSuggestions(c, b);
+                        })
 
-                                .then(literal("clear")
-                                        .executes(c -> set(c, Component.empty()))
-                                )
-                        )
-                );
-    }
+                        .executes(c -> set(c, c.getArgument("line", Component.class)))
+                    )
+                )
 
-    private int set(CommandContext<CommandSource> c, Component text) throws CommandSyntaxException {
-        int index = c.getArgument("index", Integer.class);
-        Sign sign = get(c);
-
-        sign.line(index-1, text);
-        sign.update();
-
-        c.getSource().sendAdmin(
-                Component.text("Set line " + index + " to: ")
-                        .append(text)
+                .then(literal("clear")
+                    .executes(c -> set(c, Component.empty()))
+                )
+            )
         );
-        return 0;
+  }
+
+  private int set(CommandContext<CommandSource> c, Component text) throws CommandSyntaxException {
+    int index = c.getArgument("index", Integer.class);
+    Sign sign = get(c);
+
+    sign.line(index - 1, text);
+    sign.update();
+
+    c.getSource().sendAdmin(
+        Component.text("Set line " + index + " to: ")
+            .append(text)
+    );
+    return 0;
+  }
+
+  private Sign get(CommandContext<CommandSource> c) throws CommandSyntaxException {
+    Location l = c.getArgument("pos", Position.class).getLocation(c.getSource());
+
+    if (!(l.getBlock().getState() instanceof Sign)) {
+      throw Exceptions.notSign(l);
     }
 
-    private Sign get(CommandContext<CommandSource> c) throws CommandSyntaxException {
-        Location l = c.getArgument("pos", Position.class).getLocation(c.getSource());
+    return (Sign) l.getBlock().getState();
+  }
 
-        if (!(l.getBlock().getState() instanceof Sign)) {
-            throw Exceptions.notSign(l);
-        }
+  /**
+   * A small data class to store the data written on a sign or data which can be applied to a sign
+   */
+  record SignLines(Component line0,
+                   Component line1,
+                   Component line2,
+                   Component line3
+  ) {
 
-        return (Sign) l.getBlock().getState();
+    public static final SignLines EMPTY = new SignLines(Component.empty(), Component.empty(),
+        Component.empty(), Component.empty());
+
+    public SignLines(Sign sign) {
+      this(
+          sign.line(0),
+          sign.line(1),
+          sign.line(2),
+          sign.line(3)
+      );
     }
 
     /**
-     * A small data class to store the data written on a
-     * sign or data which can be applied to a sign
+     * Sets the given sign's lines this instance's lines
+     *
+     * @param sign The sign to edit
      */
-    record SignLines(Component line0,
-                     Component line1,
-                     Component line2,
-                     Component line3
-    ) {
-        public static final SignLines EMPTY = new SignLines(Component.empty(), Component.empty(), Component.empty(), Component.empty());
-
-        public SignLines(Sign sign) {
-            this(
-                    sign.line(0),
-                    sign.line(1),
-                    sign.line(2),
-                    sign.line(3)
-            );
-        }
-
-        /**
-         * Sets the given sign's lines this instance's lines
-         * @param sign The sign to edit
-         */
-        public void apply(Sign sign) {
-            sign.line(0, emptyIfNull(line0));
-            sign.line(1, emptyIfNull(line1));
-            sign.line(2, emptyIfNull(line2));
-            sign.line(3, emptyIfNull(line3));
-        }
-
-        private static Component emptyIfNull(Component component) {
-            return component == null ? Component.empty() : component;
-        }
+    public void apply(Sign sign) {
+      sign.line(0, emptyIfNull(line0));
+      sign.line(1, emptyIfNull(line1));
+      sign.line(2, emptyIfNull(line2));
+      sign.line(3, emptyIfNull(line3));
     }
+
+    private static Component emptyIfNull(Component component) {
+      return component == null ? Component.empty() : component;
+    }
+  }
 }

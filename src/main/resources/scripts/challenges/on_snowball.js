@@ -1,3 +1,6 @@
+const Player = Java.type("org.bukkit.entity.Player");
+const Snowball = Java.type("org.bukkit.entity.Snowball");
+
 function canComplete(user) {
     return user.getGuild() != null;
 }
@@ -5,10 +8,11 @@ function canComplete(user) {
 function onEvent(event, handle) {
     // ProjectileHitEvent
     var projectile = event.getEntity();
-    if (projectile instanceof Snowball && projectile.getShooter() instanceof Player player) {
+    if (projectile instanceof Snowball && projectile.getShooter() instanceof Player) {
+        let player = projectile.getShooter();
 
         var hit = event.getHitEntity;
-        if (hit != null && hit.getType() == EntityType.Player && hit != player) {
+        if (hit != null && hit.getType() == EntityType.PLAYER && hit != player) {
             handle.givePoint(player);
         }
     }

@@ -8,32 +8,32 @@ import net.forthecrown.user.User;
 
 public class CommandCosmetics extends FtcCommand {
 
-    public CommandCosmetics(){
-        super("cosmetics");
+  public CommandCosmetics() {
+    super("cosmetics");
 
-        setPermission(Permissions.DEFAULT);
-        register();
-    }
+    setPermission(Permissions.DEFAULT);
+    register();
+  }
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     * Opens the Cosmetics menu
-     *
-     *
-     * Valid usages of command:
-     * - /cosmetics
-     *
-     * Author: Wout
-     */
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   * Opens the Cosmetics menu
+   *
+   *
+   * Valid usages of command:
+   * - /cosmetics
+   *
+   * Author: Wout
+   */
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command.executes(c -> {
-           User u = getUserSender(c);
-           CosmeticMenus.MAIN.open(u);
-           return 0;
-        });
-    }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command.executes(c -> {
+      User u = getUserSender(c);
+      CosmeticMenus.MAIN.open(u);
+      return 0;
+    });
+  }
 }

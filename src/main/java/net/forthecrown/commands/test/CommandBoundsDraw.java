@@ -2,6 +2,7 @@ package net.forthecrown.commands.test;
 
 import com.mojang.brigadier.context.CommandContext;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.List;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Worlds;
@@ -18,127 +19,126 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 import org.spongepowered.math.vector.Vector3d;
 
-import java.util.List;
-
 public class CommandBoundsDraw extends FtcCommand {
-    private static final Logger LOGGER = FTC.getLogger();
 
-    public static final List<BoundingBox> BOXES = new ObjectArrayList<>();
+  private static final Logger LOGGER = FTC.getLogger();
 
-    private static BukkitTask task;
+  public static final List<BoundingBox> BOXES = new ObjectArrayList<>();
 
-    public static final Color[] COLORS = {
-            Color.RED,
-            Color.GREEN,
-            Color.BLACK,
-            Color.BLUE,
-            Color.PURPLE,
-            Color.ORANGE,
-            Color.SILVER,
-            Color.WHITE,
-            Color.YELLOW,
-    };
+  private static BukkitTask task;
 
-    public CommandBoundsDraw() {
-        super("BoundsDraw");
+  public static final Color[] COLORS = {
+      Color.RED,
+      Color.GREEN,
+      Color.BLACK,
+      Color.BLUE,
+      Color.PURPLE,
+      Color.ORANGE,
+      Color.SILVER,
+      Color.WHITE,
+      Color.YELLOW,
+  };
 
-        register();
-    }
+  public CommandBoundsDraw() {
+    super("BoundsDraw");
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     *
-     * Valid usages of command:
-     * /BoundsDraw
-     *
-     * Permissions used:
-     *
-     * Main Author:
-     */
+    register();
+  }
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> {
-                    if (task == null) {
-                        task = Tasks.runTimer(() -> {
-                            for (int i = 0; i < BOXES.size(); i++) {
-                                BoundingBox b = BOXES.get(i);
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   *
+   * Valid usages of command:
+   * /BoundsDraw
+   *
+   * Permissions used:
+   *
+   * Main Author:
+   */
 
-                                try {
-                                    Vector3d min =
-                                            Vectors.doubleFrom(b.getMin());
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> {
+          if (task == null) {
+            task = Tasks.runTimer(() -> {
+              for (int i = 0; i < BOXES.size(); i++) {
+                BoundingBox b = BOXES.get(i);
 
-                                    Vector3d max =
-                                            Vectors.doubleFrom(b.getMax());
+                try {
+                  Vector3d min =
+                      Vectors.doubleFrom(b.getMin());
 
-                                    Color color = COLORS[i % BOXES.size()];
+                  Vector3d max =
+                      Vectors.doubleFrom(b.getMax());
 
-                                    Particles.drawBounds(
-                                            min, max, Worlds.overworld(),
-                                            color
-                                    );
-                                } catch (Throwable t) {
-                                    LOGGER.error("Couldn't draw bounds {}",
-                                            b, t
-                                    );
-                                }
-                            }
+                  Color color = COLORS[i % BOXES.size()];
 
-                        }, 15, 15);
+                  Particles.drawBounds(
+                      min, max, Worlds.overworld(),
+                      color
+                  );
+                } catch (Throwable t) {
+                  LOGGER.error("Couldn't draw bounds {}",
+                      b, t
+                  );
+                }
+              }
 
-                        c.getSource().sendMessage("Now drawing");
-                        return 0;
-                    }
+            }, 15, 15);
 
-                    Tasks.cancel(task);
+            c.getSource().sendMessage("Now drawing");
+            return 0;
+          }
 
-                    c.getSource().sendMessage("No longer drawing");
-                    return 0;
-                })
+          Tasks.cancel(task);
 
-                .then(literal("clear")
-                        .executes(c -> {
-                            BOXES.clear();
+          c.getSource().sendMessage("No longer drawing");
+          return 0;
+        })
 
-                            c.getSource().sendMessage("Cleared");
-                            return 0;
-                        })
+        .then(literal("clear")
+            .executes(c -> {
+              BOXES.clear();
+
+              c.getSource().sendMessage("Cleared");
+              return 0;
+            })
+        )
+
+        .then(literal("remove")
+            .executes(c -> {
+              if (BOXES.isEmpty()) {
+                c.getSource().sendMessage("EMPTY");
+                return 0;
+              }
+
+              BOXES.remove(BOXES.size() - 1);
+
+              c.getSource().sendMessage("Removed last");
+              return 0;
+            })
+        )
+
+        .then(literal("add")
+            .then(argument("min", PositionArgument.position())
+                .then(argument("max", PositionArgument.position())
+                    .executes(this::add)
                 )
+            )
+        );
+  }
 
-                .then(literal("remove")
-                        .executes(c -> {
-                            if (BOXES.isEmpty()) {
-                                c.getSource().sendMessage("EMPTY");
-                                return 0;
-                            }
+  private int add(CommandContext<CommandSource> c) {
+    Location min = PositionArgument.getLocation(c, "min");
+    Location max = PositionArgument.getLocation(c, "max");
 
-                            BOXES.remove(BOXES.size() - 1);
+    BoundingBox box = BoundingBox.of(min, max);
+    BOXES.add(box);
 
-                            c.getSource().sendMessage("Removed last");
-                            return 0;
-                        })
-                )
-
-                .then(literal("add")
-                        .then(argument("min", PositionArgument.position())
-                                .then(argument("max", PositionArgument.position())
-                                        .executes(this::add)
-                                )
-                        )
-                );
-    }
-
-    private int add(CommandContext<CommandSource> c) {
-        Location min = PositionArgument.getLocation(c, "min");
-        Location max = PositionArgument.getLocation(c, "max");
-
-        BoundingBox box = BoundingBox.of(min, max);
-        BOXES.add(box);
-
-        c.getSource().sendMessage("Created box");
-        return 0;
-    }
+    c.getSource().sendMessage("Created box");
+    return 0;
+  }
 }

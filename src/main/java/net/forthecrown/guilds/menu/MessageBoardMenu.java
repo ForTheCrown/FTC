@@ -1,6 +1,10 @@
 package net.forthecrown.guilds.menu;
 
+import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
+import static net.forthecrown.guilds.menu.GuildMenus.PAGE;
+
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.List;
 import lombok.Getter;
 import net.forthecrown.guilds.GuildMessage;
 import net.forthecrown.user.User;
@@ -17,61 +21,60 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
-import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
-import static net.forthecrown.guilds.menu.GuildMenus.PAGE;
-
 @Getter
 public class MessageBoardMenu extends ListPage<GuildMessage> {
-    private final MessageCreationMenu messageCreation;
 
-    public MessageBoardMenu(MenuPage parent) {
-        super(parent, PAGE);
+  private final MessageCreationMenu messageCreation;
 
-        messageCreation = new MessageCreationMenu(this);
+  public MessageBoardMenu(MenuPage parent) {
+    super(parent, PAGE);
 
-        initMenu(Menus.builder(Menus.MAX_INV_SIZE, "Guild Messages"), true);
-    }
+    messageCreation = new MessageCreationMenu(this);
 
-    @Override
-    protected void createMenu(MenuBuilder builder) {
-        super.createMenu(builder);
-        builder.add(8, messageCreation);
-    }
+    initMenu(Menus.builder(Menus.MAX_INV_SIZE, "Guild Messages"), true);
+  }
 
-    @Override
-    protected void onClick(User user, GuildMessage entry, InventoryContext context, ClickContext click) throws CommandSyntaxException {
-        entry.toMenuNode().onClick(user, context, click);
-    }
+  @Override
+  protected void createMenu(MenuBuilder builder) {
+    super.createMenu(builder);
+    builder.add(8, messageCreation);
+  }
 
-    @Override
-    protected List<GuildMessage> getList(User user, InventoryContext context) {
-        return context.getOrThrow(GUILD)
-                .getMsgBoardPosts();
-    }
+  @Override
+  protected void onClick(User user, GuildMessage entry, InventoryContext context,
+                         ClickContext click
+  ) throws CommandSyntaxException {
+    entry.toMenuNode().onClick(user, context, click);
+  }
 
-    @Override
-    protected ItemStack getItem(User user, GuildMessage entry, InventoryContext context) {
-        return entry.toMenuNode().createItem(user, context);
-    }
+  @Override
+  protected List<GuildMessage> getList(User user, InventoryContext context) {
+    return context.getOrThrow(GUILD)
+        .getMsgBoardPosts();
+  }
 
-    @Override
-    public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
-        return ItemStacks.builder(Material.OAK_SIGN)
-                .setName("&eMessage Board")
-                .addLore("&7A place to post messages for the guild.")
-                .build();
-    }
+  @Override
+  protected ItemStack getItem(User user, GuildMessage entry, InventoryContext context) {
+    return entry.toMenuNode().createItem(user, context);
+  }
 
-    @Override
-    protected MenuNode createHeader() {
-        return this;
-    }
+  @Override
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+    return ItemStacks.builder(Material.OAK_SIGN)
+        .setName("&eMessage Board")
+        .addLore("&7A place to post messages for the guild.")
+        .build();
+  }
 
-    @Override
-    public void onClick(User user, InventoryContext context, ClickContext click) throws CommandSyntaxException {
-        setPage(0, context);
-        getMenu().open(user, context);
-    }
+  @Override
+  protected MenuNode createHeader() {
+    return this;
+  }
+
+  @Override
+  public void onClick(User user, InventoryContext context, ClickContext click)
+      throws CommandSyntaxException {
+    setPage(0, context);
+    getMenu().open(user, context);
+  }
 }

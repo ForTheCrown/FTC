@@ -2,108 +2,119 @@ package net.forthecrown.useables.command;
 
 import com.google.common.collect.Iterators;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import net.forthecrown.utils.io.SerializableObject;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Path;
-import java.util.*;
+public class CmdUsables<T extends CommandUsable> extends SerializableObject.NbtDat implements
+    Iterable<T> {
 
-public class CmdUsables<T extends CommandUsable> extends SerializableObject.NbtDat implements Iterable<T> {
-    /** Entry factory to deserialize entries */
-    @Getter
-    private final EntryFactory<T> factory;
+  /**
+   * Entry factory to deserialize entries
+   */
+  @Getter
+  private final EntryFactory<T> factory;
 
-    private final Map<String, T> entries = new HashMap<>();
+  private final Map<String, T> entries = new HashMap<>();
 
-    public CmdUsables(Path file, EntryFactory<T> factory) {
-        super(file);
-        this.factory = factory;
+  public CmdUsables(Path file, EntryFactory<T> factory) {
+    super(file);
+    this.factory = factory;
+  }
+
+  @Override
+  public void save(CompoundTag tag) {
+    for (var e : entries.entrySet()) {
+      tag.put(e.getKey(), e.getValue().save());
+    }
+  }
+
+  @Override
+  public void load(CompoundTag tag) {
+    clear();
+
+    for (var e : tag.tags.entrySet()) {
+      var name = e.getKey();
+      var entryTag = (CompoundTag) e.getValue();
+
+      try {
+        var t = factory.create(name, entryTag);
+        add(t);
+      } catch (CommandSyntaxException exc) {
+        exc.printStackTrace();
+      }
+    }
+  }
+
+  public Collection<T> getUsable(Player player) {
+    List<T> result = new ArrayList<>();
+
+    for (var e : entries.values()) {
+      if (!e.test(player)) {
+        continue;
+      }
+
+      result.add(e);
     }
 
-    @Override
-    public void save(CompoundTag tag) {
-        for (var e: entries.entrySet()) {
-            tag.put(e.getKey(), e.getValue().save());
-        }
-    }
+    return result;
+  }
 
-    @Override
-    public void load(CompoundTag tag) {
-        clear();
+  public void clear() {
+    entries.clear();
+  }
 
-        for (var e: tag.tags.entrySet()) {
-            var name = e.getKey();
-            var entryTag = (CompoundTag) e.getValue();
+  public int size() {
+    return entries.size();
+  }
 
-            try {
-                var t = factory.create(name, entryTag);
-                add(t);
-            } catch (CommandSyntaxException exc) {
-                exc.printStackTrace();
-            }
-        }
-    }
+  public boolean isEmpty() {
+    return size() == 0;
+  }
 
-    public Collection<T> getUsable(Player player) {
-        List<T> result = new ArrayList<>();
+  public T get(String name) {
+    return entries.get(name);
+  }
 
-        for (var e: entries.values()) {
-            if (!e.test(player)) {
-                continue;
-            }
+  public void add(T t) {
+    entries.put(t.getName(), t);
+  }
 
-            result.add(e);
-        }
+  public boolean contains(String name) {
+    return entries.containsKey(name);
+  }
 
-        return result;
-    }
+  public void remove(T t) {
+    entries.remove(t.getName());
+  }
 
-    public void clear() {
-        entries.clear();
-    }
+  public Set<String> keySet() {
+    return Collections.unmodifiableSet(entries.keySet());
+  }
 
-    public int size() {
-        return entries.size();
-    }
+  public Collection<T> values() {
+    return Collections.unmodifiableCollection(entries.values());
+  }
 
-    public boolean isEmpty() {
-        return size() == 0;
-    }
+  @NotNull
+  @Override
+  public Iterator<T> iterator() {
+    return Iterators.unmodifiableIterator(entries.values().iterator());
+  }
 
-    public T get(String name) {
-        return entries.get(name);
-    }
+  public interface EntryFactory<E> {
 
-    public void add(T t) {
-        entries.put(t.getName(), t);
-    }
-
-    public boolean contains(String name) {
-        return entries.containsKey(name);
-    }
-
-    public void remove(T t) {
-        entries.remove(t.getName());
-    }
-
-    public Set<String> keySet() {
-        return Collections.unmodifiableSet(entries.keySet());
-    }
-
-    public Collection<T> values() {
-        return Collections.unmodifiableCollection(entries.values());
-    }
-
-    @NotNull
-    @Override
-    public Iterator<T> iterator() {
-        return Iterators.unmodifiableIterator(entries.values().iterator());
-    }
-
-    public interface EntryFactory<E> {
-        E create(String name, CompoundTag tag) throws CommandSyntaxException;
-    }
+    E create(String name, CompoundTag tag) throws CommandSyntaxException;
+  }
 }

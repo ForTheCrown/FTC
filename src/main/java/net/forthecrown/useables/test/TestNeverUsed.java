@@ -1,6 +1,10 @@
 package net.forthecrown.useables.test;
 
-import net.forthecrown.useables.*;
+import net.forthecrown.useables.CheckHolder;
+import net.forthecrown.useables.ConstructType;
+import net.forthecrown.useables.UsableConstructor;
+import net.forthecrown.useables.UsageTest;
+import net.forthecrown.useables.UsageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.nbt.ByteTag;
@@ -8,50 +12,51 @@ import net.minecraft.nbt.Tag;
 import org.bukkit.entity.Player;
 
 public class TestNeverUsed extends UsageTest {
-    // --- TYPE ---
-    public static final UsageType<TestNeverUsed> TYPE = UsageType.of(TestNeverUsed.class);
 
-    private boolean used;
+  // --- TYPE ---
+  public static final UsageType<TestNeverUsed> TYPE = UsageType.of(TestNeverUsed.class);
 
-    public TestNeverUsed(boolean used) {
-        super(TYPE);
-        this.used = used;
-    }
+  private boolean used;
 
-    @Override
-    public Component displayInfo() {
-        return Component.text("used=" + used);
-    }
+  public TestNeverUsed(boolean used) {
+    super(TYPE);
+    this.used = used;
+  }
 
-    @Override
-    public Tag save() {
-        return ByteTag.valueOf(used);
-    }
+  @Override
+  public Component displayInfo() {
+    return Component.text("used=" + used);
+  }
 
-    @Override
-    public boolean test(Player player, CheckHolder holder) {
-        return !used;
-    }
+  @Override
+  public Tag save() {
+    return ByteTag.valueOf(used);
+  }
 
-    @Override
-    public void postTests(Player player, CheckHolder holder) {
-        used = true;
-    }
+  @Override
+  public boolean test(Player player, CheckHolder holder) {
+    return !used;
+  }
 
-    @Override
-    public Component getFailMessage(Player player, CheckHolder holder) {
-        return Component.text("Only 1 person may ever use this", NamedTextColor.GRAY);
-    }
+  @Override
+  public void postTests(Player player, CheckHolder holder) {
+    used = true;
+  }
 
-    // --- TYPE CONSTRUCTORS ---
+  @Override
+  public Component getFailMessage(Player player, CheckHolder holder) {
+    return Component.text("Only 1 person may ever use this", NamedTextColor.GRAY);
+  }
 
-    @UsableConstructor(ConstructType.EMPTY)
-    public static TestNeverUsed create() {
-        return new TestNeverUsed(false);
-    }
+  // --- TYPE CONSTRUCTORS ---
 
-    @UsableConstructor(ConstructType.TAG)
-    public static TestNeverUsed load(Tag tag) {
-        return new TestNeverUsed(((ByteTag) tag).getAsByte() != 0);
-    }
+  @UsableConstructor(ConstructType.EMPTY)
+  public static TestNeverUsed create() {
+    return new TestNeverUsed(false);
+  }
+
+  @UsableConstructor(ConstructType.TAG)
+  public static TestNeverUsed load(Tag tag) {
+    return new TestNeverUsed(((ByteTag) tag).getAsByte() != 0);
+  }
 }

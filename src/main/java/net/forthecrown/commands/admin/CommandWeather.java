@@ -9,28 +9,29 @@ import org.bukkit.WeatherType;
 import org.bukkit.World;
 
 public class CommandWeather extends FtcCommand {
-    public CommandWeather(){
-        super("weather");
 
-        register();
-    }
+  public CommandWeather() {
+    super("weather");
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("weather", EnumArgument.of(WeatherType.class))
-                        .executes(c -> {
-                            CommandSource source = c.getSource();
-                            World world = source.getWorld();
-                            WeatherType weatherType = c.getArgument("weather", WeatherType.class);
+    register();
+  }
 
-                            world.setStorm(weatherType == WeatherType.DOWNFALL);
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .then(argument("weather", EnumArgument.of(WeatherType.class))
+            .executes(c -> {
+              CommandSource source = c.getSource();
+              World world = source.getWorld();
+              WeatherType weatherType = c.getArgument("weather", WeatherType.class);
 
-                            source.sendAdmin(
-                                    Component.text("Set weather to " + weatherType.name().toLowerCase())
-                            );
-                            return 0;
-                        })
-                );
-    }
+              world.setStorm(weatherType == WeatherType.DOWNFALL);
+
+              source.sendAdmin(
+                  Component.text("Set weather to " + weatherType.name().toLowerCase())
+              );
+              return 0;
+            })
+        );
+  }
 }

@@ -4,5 +4,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.grenadier.CommandSource;
 
 public interface ParseResult<R> {
-    R get(CommandSource source, boolean validate) throws CommandSyntaxException;
+
+  R get(CommandSource source, boolean validate) throws CommandSyntaxException;
 }

@@ -1,116 +1,121 @@
 package net.forthecrown.core.admin;
 
+import static net.forthecrown.core.Messages.edChat;
+import static net.forthecrown.core.Messages.edDirectMessage;
+import static net.forthecrown.core.Messages.edGuildChat;
+import static net.forthecrown.core.Messages.edMarriageChat;
+import static net.forthecrown.core.Messages.edOreMining;
+import static net.forthecrown.core.Messages.edPrependPrefix;
+import static net.forthecrown.core.Messages.edSign;
+
+import java.util.List;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.guilds.Guild;
-import net.forthecrown.user.User;
-import net.forthecrown.utils.text.Text;
 import net.forthecrown.user.DirectMessage;
 import net.forthecrown.user.MarriageMessage;
+import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.property.BoolProperty;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.utils.math.WorldVec3i;
+import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-
-import static net.forthecrown.core.Messages.*;
-
 /**
  *
  */
 public class EavesDropper {
-    private static final Logger LOGGER = FTC.getLogger();
 
-    public static void send(Component message, BoolProperty property, boolean log) {
-        var formatted = edPrependPrefix(message);
+  private static final Logger LOGGER = FTC.getLogger();
 
-        Users.getOnline()
-                .forEach(user -> {
-                    if (!user.hasPermission(Permissions.EAVESDROP)) {
-                        return;
-                    }
+  public static void send(Component message, BoolProperty property, boolean log) {
+    var formatted = edPrependPrefix(message);
 
-                    if (!user.get(property)) {
-                        return;
-                    }
-
-                    user.sendMessage(formatted);
-                });
-
-
-        if (log) {
-            LOGGER.info(Text.plain(message));
-        }
-    }
-
-    public static void reportDirectMessage(DirectMessage message, Mute status) {
-        if (message.getSender().hasPermission(Permissions.EAVESDROP_ADMIN)
-                || message.getTarget().hasPermission(Permissions.EAVESDROP_ADMIN)
-        ) {
+    Users.getOnline()
+        .forEach(user -> {
+          if (!user.hasPermission(Permissions.EAVESDROP)) {
             return;
-        }
+          }
 
-        send(edDirectMessage(message, status), Properties.EAVES_DROP_DM, false);
-    }
-
-    public static void reportMarriageChat(MarriageMessage message, Mute mute) {
-        if (message.getTarget().hasPermission(Permissions.EAVESDROP_ADMIN)
-                || message.getSender().hasPermission(Permissions.EAVESDROP_ADMIN)
-        ) {
+          if (!user.get(property)) {
             return;
-        }
+          }
 
-        send(edMarriageChat(message, mute), Properties.EAVES_DROP_MCHAT, message.isChat());
+          user.sendMessage(formatted);
+        });
+
+    if (log) {
+      LOGGER.info(Text.plain(message));
+    }
+  }
+
+  public static void reportDirectMessage(DirectMessage message, Mute status) {
+    if (message.getSender().hasPermission(Permissions.EAVESDROP_ADMIN)
+        || message.getTarget().hasPermission(Permissions.EAVESDROP_ADMIN)
+    ) {
+      return;
     }
 
-    public static void reportSign(Player placer, Block sign, List<Component> lines) {
-        if (lines.isEmpty()
-                || isEmpty(lines)
-                || placer.hasPermission(Permissions.EAVESDROP_ADMIN)
-        ) {
-            return;
-        }
+    send(edDirectMessage(message, status), Properties.EAVES_DROP_DM, false);
+  }
 
-        var pos = WorldVec3i.of(sign);
-        send(edSign(placer, pos, lines), Properties.EAVES_DROP_SIGN, false);
+  public static void reportMarriageChat(MarriageMessage message, Mute mute) {
+    if (message.getTarget().hasPermission(Permissions.EAVESDROP_ADMIN)
+        || message.getSender().hasPermission(Permissions.EAVESDROP_ADMIN)
+    ) {
+      return;
     }
 
-    private static boolean isEmpty(List<Component> lines) {
-        for (var c: lines) {
-            if (!Text.plain(c).isBlank()) {
-                return false;
-            }
-        }
+    send(edMarriageChat(message, mute), Properties.EAVES_DROP_MCHAT, message.isChat());
+  }
 
-        return true;
+  public static void reportSign(Player placer, Block sign, List<Component> lines) {
+    if (lines.isEmpty()
+        || isEmpty(lines)
+        || placer.hasPermission(Permissions.EAVESDROP_ADMIN)
+    ) {
+      return;
     }
 
-    public static void reportChat(Component chatMessage, Mute mute) {
-        send(edChat(chatMessage, mute), Properties.EAVES_DROP_MUTED, true);
+    var pos = WorldVec3i.of(sign);
+    send(edSign(placer, pos, lines), Properties.EAVES_DROP_SIGN, false);
+  }
+
+  private static boolean isEmpty(List<Component> lines) {
+    for (var c : lines) {
+      if (!Text.plain(c).isBlank()) {
+        return false;
+      }
     }
 
-    public static void reportOreMining(Block block, int count, Player player) {
-        if (player.hasPermission(Permissions.EAVESDROP_ADMIN)) {
-            return;
-        }
+    return true;
+  }
 
-        send(edOreMining(player, block, count), Properties.EAVES_DROP_MINING, true);
+  public static void reportChat(Component chatMessage, Mute mute) {
+    send(edChat(chatMessage, mute), Properties.EAVES_DROP_MUTED, true);
+  }
+
+  public static void reportOreMining(Block block, int count, Player player) {
+    if (player.hasPermission(Permissions.EAVESDROP_ADMIN)) {
+      return;
     }
 
-    public static void reportGuildChat(User sender, Mute mute, Guild guild, Component message) {
-        if (sender.hasPermission(Permissions.EAVESDROP_ADMIN)) {
-            return;
-        }
+    send(edOreMining(player, block, count), Properties.EAVES_DROP_MINING, true);
+  }
 
-        send(
-                edGuildChat(sender, guild, mute, message),
-                Properties.EAVES_DROP_GUILD_CHAT,
-                false
-        );
+  public static void reportGuildChat(User sender, Mute mute, Guild guild, Component message) {
+    if (sender.hasPermission(Permissions.EAVESDROP_ADMIN)) {
+      return;
     }
+
+    send(
+        edGuildChat(sender, guild, mute, message),
+        Properties.EAVES_DROP_GUILD_CHAT,
+        false
+    );
+  }
 }

@@ -12,42 +12,42 @@ import org.bukkit.entity.Player;
 
 public class CommandGetOffset extends FtcCommand {
 
-    public CommandGetOffset() {
-        super("GetOffset");
+  public CommandGetOffset() {
+    super("GetOffset");
 
-        setPermission(Permissions.ADMIN);
-        register();
-    }
+    setPermission(Permissions.ADMIN);
+    register();
+  }
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     *
-     * Valid usages of command:
-     * /GetOffset
-     *
-     * Permissions used:
-     *
-     * Main Author:
-     */
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   *
+   * Valid usages of command:
+   * /GetOffset
+   *
+   * Permissions used:
+   *
+   * Main Author:
+   */
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> {
-                    Player player = c.getSource().asPlayer();
-                    BukkitPlayer wePlayer = BukkitAdapter.adapt(player);
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> {
+          Player player = c.getSource().asPlayer();
+          BukkitPlayer wePlayer = BukkitAdapter.adapt(player);
 
-                    Region region = Util.getSelectionSafe(wePlayer);
+          Region region = Util.getSelectionSafe(wePlayer);
 
-                    BlockVector3 dif = region.getMaximumPoint().subtract(region.getMinimumPoint());
-                    BlockVector3 dimensions = region.getDimensions();
+          BlockVector3 dif = region.getMaximumPoint().subtract(region.getMinimumPoint());
+          BlockVector3 dimensions = region.getDimensions();
 
-                    player.sendMessage("dimensions: " + dimensions);
-                    player.sendMessage("dif: " + dif);
-                    player.sendMessage("distance: " + dif.length());
-                    return 0;
-                });
-    }
+          player.sendMessage("dimensions: " + dimensions);
+          player.sendMessage("dif: " + dif);
+          player.sendMessage("distance: " + dif.length());
+          return 0;
+        });
+  }
 }

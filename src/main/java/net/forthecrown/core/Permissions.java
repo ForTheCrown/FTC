@@ -8,172 +8,175 @@ import org.bukkit.plugin.PluginManager;
  * Class to store permission constants
  */
 public final class Permissions {
-    private Permissions() {}
 
-    public static final String COMMAND_PREFIX = "ftc.commands.";
-    public static final String PUNISH_PREFIX = "ftc.punish.";
+  private Permissions() {
+  }
 
-    public static final Permission
-            EAVESDROP               = register("ftc.eavesdrop"),
-            EAVESDROP_ADMIN         = register(EAVESDROP.getName() + ".admin"),
+  public static final String COMMAND_PREFIX = "ftc.commands.";
+  public static final String PUNISH_PREFIX = "ftc.punish.";
 
-            VANISH                  = register("ftc.vanish"),
-            VANISH_SEE              = register(VANISH.getName() + ".see"),
+  public static final Permission
+      EAVESDROP = register("ftc.eavesdrop"),
+      EAVESDROP_ADMIN = register(EAVESDROP.getName() + ".admin"),
 
-            ADMIN                   = register("ftc.admin"),
+  VANISH = register("ftc.vanish"),
+      VANISH_SEE = register(VANISH.getName() + ".see"),
 
-            PUNISH_MUTE             = register(PUNISH_PREFIX + "mute"),
-            PUNISH_SOFTMUTE         = register(PUNISH_PREFIX + "softmute"),
-            PUNISH_JAIL             = register(PUNISH_PREFIX + "jail"),
-            PUNISH_KICK             = register(PUNISH_PREFIX + "kick"),
-            PUNISH_BAN              = register(PUNISH_PREFIX + "ban"),
-            PUNISH_BANIP            = register(PUNISH_PREFIX + "banip"),
-            PUNISH_NOTES            = register(PUNISH_PREFIX + "notes"),
-            PUNISH_SEPARATE         = register(PUNISH_PREFIX + "separate"),
+  ADMIN = register("ftc.admin"),
 
-            STAFF_CHAT              = register("ftc.staffchat"),
-            ROYAL_SWORD             = register("ftc.royalsword"),
-            BROADCAST               = register("ftc.broadcast"),
-            USABLES                 = register("ftc.usables"),
+  PUNISH_MUTE = register(PUNISH_PREFIX + "mute"),
+      PUNISH_SOFTMUTE = register(PUNISH_PREFIX + "softmute"),
+      PUNISH_JAIL = register(PUNISH_PREFIX + "jail"),
+      PUNISH_KICK = register(PUNISH_PREFIX + "kick"),
+      PUNISH_BAN = register(PUNISH_PREFIX + "ban"),
+      PUNISH_BANIP = register(PUNISH_PREFIX + "banip"),
+      PUNISH_NOTES = register(PUNISH_PREFIX + "notes"),
+      PUNISH_SEPARATE = register(PUNISH_PREFIX + "separate"),
 
-            CHAT_IGNORE_CASE        = register("ftc.chat.caseignore"),
-            IGNORE_SWEARS           = register("ftc.chat.ignorebanned"),
-            CHAT_EMOTES             = register("ftc.chat.emotes"),
-            CHAT_COLORS             = register("ftc.chat.color"),
-            CHAT_LINKS              = register("ftc.chat.links"),
-            CHAT_CLEAN_LINKS        = registerPrefixed(CHAT_LINKS, "clean"),
-            CHAT_GRADIENTS          = register("ftc.chat.gradients"),
+  STAFF_CHAT = register("ftc.staffchat"),
+      ROYAL_SWORD = register("ftc.royalsword"),
+      BROADCAST = register("ftc.broadcast"),
+      USABLES = register("ftc.usables"),
 
-            AUTO_SELL               = register("ftc.sellshop.auto"),
+  CHAT_IGNORE_CASE = register("ftc.chat.caseignore"),
+      IGNORE_SWEARS = register("ftc.chat.ignorebanned"),
+      CHAT_EMOTES = register("ftc.chat.emotes"),
+      CHAT_COLORS = register("ftc.chat.color"),
+      CHAT_LINKS = register("ftc.chat.links"),
+      CHAT_CLEAN_LINKS = registerPrefixed(CHAT_LINKS, "clean"),
+      CHAT_GRADIENTS = register("ftc.chat.gradients"),
 
-            TP_BYPASS               = register("ftc.teleports.bypass"),
-            WORLD_BYPASS            = register("ftc.teleports.worldbypass"),
+  AUTO_SELL = register("ftc.sellshop.auto"),
 
-            MARRY                   = register("ftc.marry"),
+  TP_BYPASS = register("ftc.teleports.bypass"),
+      WORLD_BYPASS = register("ftc.teleports.worldbypass"),
 
-            EMOTES                  = register("ftc.emotes"),
-            EMOTE_IGNORE            = registerPrefixed(EMOTES, "cooldown.ignore"),
-            EMOTE_JINGLE            = registerPrefixed(EMOTES, "jingle"),
-            EMOTE_POG               = registerPrefixed(EMOTES, "pog"),
-            EMOTE_SCARE             = registerPrefixed(EMOTES, "scare"),
-            EMOTE_HUG               = registerPrefixed(EMOTES, "hug"),
+  MARRY = register("ftc.marry"),
 
-            MAIL                    = register("ftc.mail"),
-            MAIL_OTHERS             = registerPrefixed(MAIL, "others"),
-            MAIL_ALL                = registerPrefixed(MAIL, "all"),
-            MAIL_ITEMS              = registerPrefixed(MAIL, "items"),
+  EMOTES = register("ftc.emotes"),
+      EMOTE_IGNORE = registerPrefixed(EMOTES, "cooldown.ignore"),
+      EMOTE_JINGLE = registerPrefixed(EMOTES, "jingle"),
+      EMOTE_POG = registerPrefixed(EMOTES, "pog"),
+      EMOTE_SCARE = registerPrefixed(EMOTES, "scare"),
+      EMOTE_HUG = registerPrefixed(EMOTES, "hug"),
 
-            SHOP_ADMIN              = register("ftc.shops.admin"),
-            SHOP_EDIT               = register(COMMAND_PREFIX + "shopedit"),
-            SHOP_HISTORY            = register(COMMAND_PREFIX + "shophistory"),
+  MAIL = register("ftc.mail"),
+      MAIL_OTHERS = registerPrefixed(MAIL, "others"),
+      MAIL_ALL = registerPrefixed(MAIL, "all"),
+      MAIL_ITEMS = registerPrefixed(MAIL, "items"),
 
-            NEARBY                  = register(COMMAND_PREFIX + "near"),
-            NEARBY_IGNORE           = registerPrefixed(NEARBY, "ignore"),
-            NEARBY_ADMIN            = registerPrefixed(NEARBY, "admin"),
+  SHOP_ADMIN = register("ftc.shops.admin"),
+      SHOP_EDIT = register(COMMAND_PREFIX + "shopedit"),
+      SHOP_HISTORY = register(COMMAND_PREFIX + "shophistory"),
 
-            WARP                    = register(COMMAND_PREFIX + "warp"),
-            KIT                     = register(COMMAND_PREFIX + "kit"),
-            WARP_ADMIN              = registerPrefixed(WARP, "admin"),
-            KIT_ADMIN               = registerPrefixed(KIT,  "admin"),
+  NEARBY = register(COMMAND_PREFIX + "near"),
+      NEARBY_IGNORE = registerPrefixed(NEARBY, "ignore"),
+      NEARBY_ADMIN = registerPrefixed(NEARBY, "admin"),
 
-            PROFILE                 = register(COMMAND_PREFIX + "profile"),
-            PROFILE_BYPASS          = registerPrefixed(PROFILE, "bypass"),
+  WARP = register(COMMAND_PREFIX + "warp"),
+      KIT = register(COMMAND_PREFIX + "kit"),
+      WARP_ADMIN = registerPrefixed(WARP, "admin"),
+      KIT_ADMIN = registerPrefixed(KIT, "admin"),
 
-            BACK                    = register(COMMAND_PREFIX + "back"),
+  PROFILE = register(COMMAND_PREFIX + "profile"),
+      PROFILE_BYPASS = registerPrefixed(PROFILE, "bypass"),
 
-            TPA                     = register(COMMAND_PREFIX + "tpa"),
-            TPA_HERE                = register(COMMAND_PREFIX + "tpahere"),
+  BACK = register(COMMAND_PREFIX + "back"),
 
-            HELP                    = register(COMMAND_PREFIX + "help"),
+  TPA = register(COMMAND_PREFIX + "tpa"),
+      TPA_HERE = register(COMMAND_PREFIX + "tpahere"),
 
-            PAY                     = register(COMMAND_PREFIX + "pay"),
-            PAY_TOGGLE              = registerPrefixed(PAY, "toggle"),
+  HELP = register(COMMAND_PREFIX + "help"),
 
-            MESSAGE                 = register(COMMAND_PREFIX + "message"),
+  PAY = register(COMMAND_PREFIX + "pay"),
+      PAY_TOGGLE = registerPrefixed(PAY, "toggle"),
 
-            WORKBENCH               = register(COMMAND_PREFIX + "workbench"),
-            ENDER_CHEST             = register(COMMAND_PREFIX + "enderchest"),
-            STONE_CUTTER            = register(COMMAND_PREFIX + "stonecutter"),
-            GRINDSTONE              = register(COMMAND_PREFIX + "grindstone"),
-            SMITHING                = register(COMMAND_PREFIX + "smithingtable"),
-            CARTOGRAPHY             = register(COMMAND_PREFIX + "cartography"),
-            LOOM                    = register(COMMAND_PREFIX + "loom"),
+  MESSAGE = register(COMMAND_PREFIX + "message"),
 
-            REPAIR                  = register(COMMAND_PREFIX + "repair"),
+  WORKBENCH = register(COMMAND_PREFIX + "workbench"),
+      ENDER_CHEST = register(COMMAND_PREFIX + "enderchest"),
+      STONE_CUTTER = register(COMMAND_PREFIX + "stonecutter"),
+      GRINDSTONE = register(COMMAND_PREFIX + "grindstone"),
+      SMITHING = register(COMMAND_PREFIX + "smithingtable"),
+      CARTOGRAPHY = register(COMMAND_PREFIX + "cartography"),
+      LOOM = register(COMMAND_PREFIX + "loom"),
 
-            DISPOSAL                = register(COMMAND_PREFIX + "disposal"),
-            FEED                    = register(COMMAND_PREFIX + "feed"),
-            HEAL                    = register(COMMAND_PREFIX + "heal"),
-            CMD_DUNGEONS            = register(COMMAND_PREFIX + "dungeons"),
+  REPAIR = register(COMMAND_PREFIX + "repair"),
 
-            HOME                    = register(COMMAND_PREFIX + "home"),
-            HOME_OTHERS             = registerPrefixed(HOME, "others"),
+  DISPOSAL = register(COMMAND_PREFIX + "disposal"),
+      FEED = register(COMMAND_PREFIX + "feed"),
+      HEAL = register(COMMAND_PREFIX + "heal"),
+      CMD_DUNGEONS = register(COMMAND_PREFIX + "dungeons"),
 
-            BECOME_BARON            = register(COMMAND_PREFIX + "becomebaron"),
+  HOME = register(COMMAND_PREFIX + "home"),
+      HOME_OTHERS = registerPrefixed(HOME, "others"),
 
-            IGNORE                  = register(COMMAND_PREFIX + "ignore"),
-            IGNORELIST_OTHERS       = register(COMMAND_PREFIX + "ignorelist.others"),
-            IGNORE_AC               = register(COMMAND_PREFIX + "ignoreac"),
+  BECOME_BARON = register(COMMAND_PREFIX + "becomebaron"),
 
-            CMD_BEEZOOKA            = register(COMMAND_PREFIX + "beezooka"),
-            CMD_KITTY_CANNON        = register(COMMAND_PREFIX + "kittycannon"),
-            CMD_NICKNAME            = register(COMMAND_PREFIX + "nickname"),
-            CMD_SUICIDE             = register(COMMAND_PREFIX + "suicide"),
+  IGNORE = register(COMMAND_PREFIX + "ignore"),
+      IGNORELIST_OTHERS = register(COMMAND_PREFIX + "ignorelist.others"),
+      IGNORE_AC = register(COMMAND_PREFIX + "ignoreac"),
 
-            HAT                     = register(COMMAND_PREFIX + "hat"),
+  CMD_BEEZOOKA = register(COMMAND_PREFIX + "beezooka"),
+      CMD_KITTY_CANNON = register(COMMAND_PREFIX + "kittycannon"),
+      CMD_NICKNAME = register(COMMAND_PREFIX + "nickname"),
+      CMD_SUICIDE = register(COMMAND_PREFIX + "suicide"),
 
-            GUILD                   = register("ftc.guild"),
-            GUILD_ADMIN             = registerPrefixed(GUILD, "admin"),
+  HAT = register(COMMAND_PREFIX + "hat"),
 
-            CMD_GAMEMODE            = register(COMMAND_PREFIX + "gamemode"),
-            CMD_GAMEMODE_OTHERS     = registerPrefixed(CMD_GAMEMODE, "others"),
-            CMD_GAMEMODE_CREATIVE   = registerPrefixed(CMD_GAMEMODE, "creative"),
-            CMD_GAMEMODE_SPECTATOR  = registerPrefixed(CMD_GAMEMODE, "spectator"),
-            CMD_GAMEMODE_ADVENTURE  = registerPrefixed(CMD_GAMEMODE, "adventure"),
+  GUILD = register("ftc.guild"),
+      GUILD_ADMIN = registerPrefixed(GUILD, "admin"),
 
-            CMD_GET_POS             = register(COMMAND_PREFIX + "getpos"),
-            CMD_MEMORY              = register(COMMAND_PREFIX + "memory"),
+  CMD_GAMEMODE = register(COMMAND_PREFIX + "gamemode"),
+      CMD_GAMEMODE_OTHERS = registerPrefixed(CMD_GAMEMODE, "others"),
+      CMD_GAMEMODE_CREATIVE = registerPrefixed(CMD_GAMEMODE, "creative"),
+      CMD_GAMEMODE_SPECTATOR = registerPrefixed(CMD_GAMEMODE, "spectator"),
+      CMD_GAMEMODE_ADVENTURE = registerPrefixed(CMD_GAMEMODE, "adventure"),
 
-            CMD_TELEPORT            = register(COMMAND_PREFIX + "teleport"),
-            CMD_LIST                = register(COMMAND_PREFIX + "list"),
+  CMD_GET_POS = register(COMMAND_PREFIX + "getpos"),
+      CMD_MEMORY = register(COMMAND_PREFIX + "memory"),
 
-            WAYPOINTS               = register("ftc.waypoints"),
-            WAYPOINTS_ADMIN         = registerPrefixed(WAYPOINTS, "admin"),
-            WAYPOINTS_FLAGS         = registerPrefixed(WAYPOINTS, "flags"),
+  CMD_TELEPORT = register(COMMAND_PREFIX + "teleport"),
+      CMD_LIST = register(COMMAND_PREFIX + "list"),
 
-            CHALLENGES              = register("ftc.challenges"),
-            CHALLENGES_ADMIN        = registerPrefixed(CHALLENGES, "admin"),
+  WAYPOINTS = register("ftc.waypoints"),
+      WAYPOINTS_ADMIN = registerPrefixed(WAYPOINTS, "admin"),
+      WAYPOINTS_FLAGS = registerPrefixed(WAYPOINTS, "flags"),
 
-            MARKETS                 = register("ftc.markets"),
-            MARKET_WARNING          = registerPrefixed(MARKETS, "warning"),
+  CHALLENGES = register("ftc.challenges"),
+      CHALLENGES_ADMIN = registerPrefixed(CHALLENGES, "admin"),
 
-            DEFAULT                 = register("ftc.default");
+  MARKETS = register("ftc.markets"),
+      MARKET_WARNING = registerPrefixed(MARKETS, "warning"),
 
-    public static final TieredPermission MAX_HOMES = TieredPermission.builder()
-            .prefix("ftc.homes.")
-            .allowUnlimited()
-            .tiersFrom1To(5)
-            .build();
+  DEFAULT = register("ftc.default");
 
-    /**
-     * Registers a string permission
-     * @param permission The name of the permission
-     * @return The registered permission
-     */
-    public static Permission register(String permission) {
-        PluginManager manager = Bukkit.getPluginManager();
+  public static final TieredPermission MAX_HOMES = TieredPermission.builder()
+      .prefix("ftc.homes.")
+      .allowUnlimited()
+      .tiersFrom1To(5)
+      .build();
 
-        //Register the permission, or if it's already registered,
-        //return the registered permission
-        Permission perm = manager.getPermission(permission);
-        if (perm == null) {
-            manager.addPermission(perm = new Permission(permission));
-        }
+  /**
+   * Registers a string permission
+   *
+   * @param permission The name of the permission
+   * @return The registered permission
+   */
+  public static Permission register(String permission) {
+    PluginManager manager = Bukkit.getPluginManager();
 
-        return perm;
+    //Register the permission, or if it's already registered,
+    //return the registered permission
+    Permission perm = manager.getPermission(permission);
+    if (perm == null) {
+      manager.addPermission(perm = new Permission(permission));
     }
 
-    public static Permission registerPrefixed(Permission parent, String suffix) {
-        return register(parent.getName() + "." + suffix);
-    }
+    return perm;
+  }
+
+  public static Permission registerPrefixed(Permission parent, String suffix) {
+    return register(parent.getName() + "." + suffix);
+  }
 }

@@ -2,97 +2,104 @@ package net.forthecrown.core.admin.ui;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
-import net.forthecrown.utils.text.Text;
-import net.forthecrown.utils.text.writer.TextWriters;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserFormat;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.utils.inventory.menu.*;
+import net.forthecrown.utils.inventory.menu.Menu;
+import net.forthecrown.utils.inventory.menu.MenuBuilder;
+import net.forthecrown.utils.inventory.menu.MenuNode;
+import net.forthecrown.utils.inventory.menu.MenuNodeItem;
+import net.forthecrown.utils.inventory.menu.Menus;
+import net.forthecrown.utils.inventory.menu.Slot;
 import net.forthecrown.utils.inventory.menu.context.ClickContext;
 import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 abstract class AdminUiPage implements MenuNode {
-    static final Slot HEAD_SLOT = Slot.of(4);
 
-    @Getter
-    private final Menu inventory;
+  static final Slot HEAD_SLOT = Slot.of(4);
 
-    @Getter
-    private final AdminUiPage parent;
+  @Getter
+  private final Menu inventory;
 
-    MenuNodeItem item;
+  @Getter
+  private final AdminUiPage parent;
 
-    public AdminUiPage(Component title, int size, AdminUiPage parent) {
-        this.parent = parent;
+  MenuNodeItem item;
 
-        var builder = Menus.builder(size, title);
+  public AdminUiPage(Component title, int size, AdminUiPage parent) {
+    this.parent = parent;
 
-        this.item = MenuNodeItem.of(user -> {
-            return ItemStacks.builder(Material.PAPER)
-                    .setName("&e< Go back")
-                    .addLore("&7Go back to the previous page")
-                    .build();
-        });
+    var builder = Menus.builder(size, title);
 
-        if (hasBorder()) {
-            builder.addBorder(
-                    ItemStacks.builder(Material.GRAY_STAINED_GLASS_PANE)
-                            .setName(" ")
-                            .build()
-            );
-        }
+    this.item = MenuNodeItem.of(user -> {
+      return ItemStacks.builder(Material.PAPER)
+          .setName("&e< Go back")
+          .addLore("&7Go back to the previous page")
+          .build();
+    });
 
-        if (parent != null) {
-            builder.add(0, parent);
-        }
-
-        builder.add(HEAD_SLOT,
-                MenuNode.builder()
-                        .setItem((user, context) -> {
-                            var punished = context.get(AdminUI.ENTRY).getUser();
-
-                            var item = ItemStacks.headBuilder()
-                                    .setProfile(punished)
-                                    .setNameRaw(punished.displayName().style(Text.NON_ITALIC));
-
-                            var writer = TextWriters.loreWriter();
-                            UserFormat format = UserFormat.create(user)
-                                    .disableHover()
-                                    .with(UserFormat.ADMIN_VIEWER);
-
-                            UserFormat.applyProfileStyle(writer);
-                            format.format(writer);
-
-                            writer.newLine();
-                            item.addLoreRaw(writer.getLore());
-
-                            return item.build();
-                        })
-                        .build()
-        );
-
-        createMenu(builder);
-
-        this.inventory = builder.build();
+    if (hasBorder()) {
+      builder.addBorder(
+          ItemStacks.builder(Material.GRAY_STAINED_GLASS_PANE)
+              .setName(" ")
+              .build()
+      );
     }
 
-    protected abstract void createMenu(MenuBuilder builder);
-
-    protected boolean hasBorder() {
-        return true;
+    if (parent != null) {
+      builder.add(0, parent);
     }
 
-    @Override
-    public void onClick(User user, InventoryContext context, ClickContext click) throws CommandSyntaxException {
-        getInventory().open(user, context);
-    }
+    builder.add(HEAD_SLOT,
+        MenuNode.builder()
+            .setItem((user, context) -> {
+              var punished = context.get(AdminUI.ENTRY).getUser();
 
-    @Override
-    public ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
-        return item.createItem(user, context);
-    }
+              var item = ItemStacks.headBuilder()
+                  .setProfile(punished)
+                  .setNameRaw(punished.displayName().style(Text.NON_ITALIC));
+
+              var writer = TextWriters.loreWriter();
+              UserFormat format = UserFormat.create(user)
+                  .disableHover()
+                  .with(UserFormat.ADMIN_VIEWER);
+
+              UserFormat.applyProfileStyle(writer);
+              format.format(writer);
+
+              writer.newLine();
+              item.addLoreRaw(writer.getLore());
+
+              return item.build();
+            })
+            .build()
+    );
+
+    createMenu(builder);
+
+    this.inventory = builder.build();
+  }
+
+  protected abstract void createMenu(MenuBuilder builder);
+
+  protected boolean hasBorder() {
+    return true;
+  }
+
+  @Override
+  public void onClick(User user, InventoryContext context, ClickContext click)
+      throws CommandSyntaxException {
+    getInventory().open(user, context);
+  }
+
+  @Override
+  public ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+    return item.createItem(user, context);
+  }
 }

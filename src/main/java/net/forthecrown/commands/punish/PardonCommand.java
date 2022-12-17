@@ -10,38 +10,39 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.User;
 
 public class PardonCommand extends FtcCommand {
-    private final PunishType type;
 
-    PardonCommand(String name, PunishType type, String... aliases) {
-        super(name);
-        this.type = type;
+  private final PunishType type;
 
-        setAliases(aliases);
-        setPermission(type.getPermission());
+  PardonCommand(String name, PunishType type, String... aliases) {
+    super(name);
+    this.type = type;
 
-        register();
-    }
+    setAliases(aliases);
+    setPermission(type.getPermission());
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command.then(argument("user", Arguments.USER)
-                .executes(c -> {
-                    User user = Arguments.getUser(c, "user");
-                    PunishEntry entry = Punishments.entry(user);
+    register();
+  }
 
-                    if (!entry.isPunished(type)) {
-                       throw Exceptions.notPunished(user, type);
-                    }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command.then(argument("user", Arguments.USER)
+        .executes(c -> {
+          User user = Arguments.getUser(c, "user");
+          PunishEntry entry = Punishments.entry(user);
 
-                    if (!c.getSource().hasPermission(type.getPermission())) {
-                       throw Exceptions.cannotPardon(type);
-                    }
+          if (!entry.isPunished(type)) {
+            throw Exceptions.notPunished(user, type);
+          }
 
-                    entry.revokePunishment(type, c.getSource().textName());
-                    Punishments.announcePardon(c.getSource(), user, type);
+          if (!c.getSource().hasPermission(type.getPermission())) {
+            throw Exceptions.cannotPardon(type);
+          }
 
-                    return 0;
-                })
-        );
-    }
+          entry.revokePunishment(type, c.getSource().textName());
+          Punishments.announcePardon(c.getSource(), user, type);
+
+          return 0;
+        })
+    );
+  }
 }

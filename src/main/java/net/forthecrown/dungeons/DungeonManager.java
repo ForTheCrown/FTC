@@ -10,34 +10,35 @@ import net.forthecrown.utils.io.PathUtil;
 
 @Getter
 public class DungeonManager {
-    @Getter
-    private static final DungeonManager instance = new DungeonManager();
 
-    private final Registry<Registry<PieceType>>
-            typeRegistries = Registries.newRegistry();
+  @Getter
+  private static final DungeonManager instance = new DungeonManager();
 
-    private final Registry<RoomType>
-            roomTypes = createTypeRegistry("rooms");
+  private final Registry<Registry<PieceType>>
+      typeRegistries = Registries.newRegistry();
 
-    private final Registry<GateType>
-            gateTypes = createTypeRegistry("gates");
+  private final Registry<RoomType>
+      roomTypes = createTypeRegistry("rooms");
 
-    private final DungeonDataStorage storage;
+  private final Registry<GateType>
+      gateTypes = createTypeRegistry("gates");
 
-    public DungeonManager() {
-        this.storage = new DungeonDataStorage(
-                PathUtil.getPluginDirectory("dungeons")
-        );
-    }
+  private final DungeonDataStorage storage;
 
-    private void init() {
-        storage.loadGates(gateTypes);
-        storage.loadRooms(roomTypes);
-    }
+  public DungeonManager() {
+    this.storage = new DungeonDataStorage(
+        PathUtil.getPluginDirectory("dungeons")
+    );
+  }
 
-    private <T extends PieceType<?>> Registry<T> createTypeRegistry(String name) {
-        Registry registry = Registries.newRegistry();
-        typeRegistries.register(name, registry);
-        return registry;
-    }
+  private void init() {
+    storage.loadGates(gateTypes);
+    storage.loadRooms(roomTypes);
+  }
+
+  private <T extends PieceType<?>> Registry<T> createTypeRegistry(String name) {
+    Registry registry = Registries.newRegistry();
+    typeRegistries.register(name, registry);
+    return registry;
+  }
 }

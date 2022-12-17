@@ -12,73 +12,74 @@ import net.forthecrown.user.property.Properties;
 import net.kyori.adventure.text.Component;
 
 public class CommandVanish extends FtcCommand {
-    public CommandVanish() {
-        super("vanish");
 
-        setPermission(Permissions.VANISH);
-        setAliases("v");
+  public CommandVanish() {
+    super("vanish");
 
-        register();
-    }
+    setPermission(Permissions.VANISH);
+    setAliases("v");
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     * Allows you to disappear
-     *
-     * Valid usages of command:
-     * - /vanish
-     * - /vanish -joinLeaveMessage
-     * - /vanish <user>
-     * - /vanish <user> -joinLeaveMessage
-     *
-     * Author: Julie
-     */
+    register();
+  }
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> vanish(c.getSource(), getUserSender(c), false))
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   * Allows you to disappear
+   *
+   * Valid usages of command:
+   * - /vanish
+   * - /vanish -joinLeaveMessage
+   * - /vanish <user>
+   * - /vanish <user> -joinLeaveMessage
+   *
+   * Author: Julie
+   */
 
-                .then(literal("-joinLeaveMessage")
-                        .executes(c -> vanish(c.getSource(), getUserSender(c), true))
-                )
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> vanish(c.getSource(), getUserSender(c), false))
 
-                .then(argument("user", Arguments.USER)
-                        .executes(c -> vanish(
-                                        c.getSource(),
-                                        c.getArgument("user", UserParseResult.class).get(c.getSource(), false),
-                                        false
-                        ))
+        .then(literal("-joinLeaveMessage")
+            .executes(c -> vanish(c.getSource(), getUserSender(c), true))
+        )
 
-                        .then(literal("-joinLeaveMessage")
-                                .executes(c -> vanish(
-                                        c.getSource(),
-                                        c.getArgument("user", UserParseResult.class).get(c.getSource(), false),
-                                        true
-                                ))
-                        )
-                );
-    }
+        .then(argument("user", Arguments.USER)
+            .executes(c -> vanish(
+                c.getSource(),
+                c.getArgument("user", UserParseResult.class).get(c.getSource(), false),
+                false
+            ))
 
-    private int vanish(CommandSource source, User user, boolean joinLeaveMsg) {
-        boolean vanished = user.get(Properties.VANISHED);
-
-        if (joinLeaveMsg) {
-            if (vanished) {
-                PlayerJoinListener.sendLoginMessage(user);
-            } else {
-                PlayerJoinListener.sendLogoutMessage(user);
-            }
-        }
-
-        user.set(Properties.VANISHED, !vanished);
-
-        source.sendAdmin(
-                Component.text((vanished ? "Unv" : "V") + "anished ")
-                        .append(user.displayName())
+            .then(literal("-joinLeaveMessage")
+                .executes(c -> vanish(
+                    c.getSource(),
+                    c.getArgument("user", UserParseResult.class).get(c.getSource(), false),
+                    true
+                ))
+            )
         );
-        return 0;
+  }
+
+  private int vanish(CommandSource source, User user, boolean joinLeaveMsg) {
+    boolean vanished = user.get(Properties.VANISHED);
+
+    if (joinLeaveMsg) {
+      if (vanished) {
+        PlayerJoinListener.sendLoginMessage(user);
+      } else {
+        PlayerJoinListener.sendLogoutMessage(user);
+      }
     }
+
+    user.set(Properties.VANISHED, !vanished);
+
+    source.sendAdmin(
+        Component.text((vanished ? "Unv" : "V") + "anished ")
+            .append(user.displayName())
+    );
+    return 0;
+  }
 }

@@ -6,142 +6,142 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Class for storing shop interactions as
- * constants.
+ * Class for storing shop interactions as constants.
+ *
  * @see #SELL
  * @see #BUY
  * @see #ADMIN_BUY
  * @see #ADMIN_SELL
  */
 final class Interactions {
-    private Interactions() {}
 
-    /**
-     * Interaction type for admin buy shops
-     * <h2>Testing</h2>
-     * Tests if the customer's inventory is full and that
-     * the customer can afford the shop's price
-     * <h2>Interaction</h2>
-     * Subtracts the appropriate amount of rhines from customer
-     * and gives them the shop's item
-     */
-    public static final ShopInteraction ADMIN_BUY = new ShopInteraction() {
-        @Override
-        public void test(@NotNull SignShopSession session) throws CommandSyntaxException {
-            // Check that the customer has space for items
-            if (session.customerIsFull()) {
-                throw Exceptions.INVENTORY_FULL;
-            }
+  private Interactions() {
+  }
 
-            // Check that the user isn't poor :)
-            if (!session.getCustomer().hasBalance(session.getPrice())) {
-                throw Exceptions.cannotAfford(session.getPrice());
-            }
-        }
+  /**
+   * Interaction type for admin buy shops
+   * <h2>Testing</h2>
+   * Tests if the customer's inventory is full and that the customer can afford the shop's price
+   * <h2>Interaction</h2>
+   * Subtracts the appropriate amount of rhines from customer and gives them the shop's item
+   */
+  public static final ShopInteraction ADMIN_BUY = new ShopInteraction() {
+    @Override
+    public void test(@NotNull SignShopSession session) throws CommandSyntaxException {
+      // Check that the customer has space for items
+      if (session.customerIsFull()) {
+        throw Exceptions.INVENTORY_FULL;
+      }
 
-        @Override
-        public void interact(@NotNull SignShopSession session) {
-            ItemStack exampleItem = session.getExampleItem();
-            var customer = session.getCustomer();
+      // Check that the user isn't poor :)
+      if (!session.getCustomer().hasBalance(session.getPrice())) {
+        throw Exceptions.cannotAfford(session.getPrice());
+      }
+    }
 
-            //Remove money
-            if (session.getPrice() > 0) {
-                customer.removeBalance(session.getPrice());
-            }
+    @Override
+    public void interact(@NotNull SignShopSession session) {
+      ItemStack exampleItem = session.getExampleItem();
+      var customer = session.getCustomer();
 
-            //Give item
-            session.getCustomerInventory().addItem(exampleItem);
-        }
-    };
+      //Remove money
+      if (session.getPrice() > 0) {
+        customer.removeBalance(session.getPrice());
+      }
 
-    public static final ShopInteraction ADMIN_SELL = new ShopInteraction() {
-        @Override
-        public void test(@NotNull SignShopSession session) throws CommandSyntaxException {
-            ItemStack example = session.getExampleItem();
+      //Give item
+      session.getCustomerInventory().addItem(exampleItem);
+    }
+  };
 
-            //User does not have item to sell
-            if (!session.getCustomerInventory()
-                    .containsAtLeast(example, example.getAmount())
-            ) {
-                throw Exceptions.dontHaveItemForShop(example);
-            }
-        }
+  public static final ShopInteraction ADMIN_SELL = new ShopInteraction() {
+    @Override
+    public void test(@NotNull SignShopSession session) throws CommandSyntaxException {
+      ItemStack example = session.getExampleItem();
 
-        @Override
-        public void interact(@NotNull SignShopSession session) {
-            ItemStack example = session.getExampleItem();
-            var customer = session.getCustomer();
+      //User does not have item to sell
+      if (!session.getCustomerInventory()
+          .containsAtLeast(example, example.getAmount())
+      ) {
+        throw Exceptions.dontHaveItemForShop(example);
+      }
+    }
 
-            //Add money and remove item
-            if (session.getPrice() > 0) {
-                customer.addBalance(session.getPrice());
-            }
+    @Override
+    public void interact(@NotNull SignShopSession session) {
+      ItemStack example = session.getExampleItem();
+      var customer = session.getCustomer();
 
-            session.getCustomerInventory().removeItemAnySlot(example.clone());
-        }
-    };
+      //Add money and remove item
+      if (session.getPrice() > 0) {
+        customer.addBalance(session.getPrice());
+      }
 
-    public static final ShopInteraction SELL = new ShopInteraction() {
-        @Override
-        public void test(@NotNull SignShopSession session) throws CommandSyntaxException {
-            // Overlap with admin sell, run its checks first
-            ADMIN_SELL.test(session);
+      session.getCustomerInventory().removeItemAnySlot(example.clone());
+    }
+  };
 
-            //Check the shop's owner can afford the shop
-            if (!session.getOwnerUser().hasBalance(session.getPrice())) {
-                throw Exceptions.shopOwnerCannotAfford(session.getPrice());
-            }
+  public static final ShopInteraction SELL = new ShopInteraction() {
+    @Override
+    public void test(@NotNull SignShopSession session) throws CommandSyntaxException {
+      // Overlap with admin sell, run its checks first
+      ADMIN_SELL.test(session);
 
-            //Check shop has space for any more items
-            if (session.shopIsFull()) {
-                session.getShop().update();
-                throw Exceptions.SHOP_NO_SPACE;
-            }
-        }
+      //Check the shop's owner can afford the shop
+      if (!session.getOwnerUser().hasBalance(session.getPrice())) {
+        throw Exceptions.shopOwnerCannotAfford(session.getPrice());
+      }
 
-        @Override
-        public void interact(@NotNull SignShopSession session) {
-            ADMIN_SELL.interact(session);
+      //Check shop has space for any more items
+      if (session.shopIsFull()) {
+        session.getShop().update();
+        throw Exceptions.SHOP_NO_SPACE;
+      }
+    }
 
-            var owner = session.getOwnerUser();
-            ItemStack example = session.getExampleItem();
+    @Override
+    public void interact(@NotNull SignShopSession session) {
+      ADMIN_SELL.interact(session);
 
-            //Add item to shop, give user mulaa
-            session.getShopInventory().addItem(example.clone());
+      var owner = session.getOwnerUser();
+      ItemStack example = session.getExampleItem();
 
-            if (session.getPrice() > 0) {
-                owner.removeBalance(session.getPrice());
-            }
-        }
-    };
+      //Add item to shop, give user mulaa
+      session.getShopInventory().addItem(example.clone());
 
-    public static final ShopInteraction BUY = new ShopInteraction() {
-        @Override
-        public void test(@NotNull SignShopSession session) throws CommandSyntaxException {
-            // Overlap with admin function, call its test method
-            ADMIN_BUY.test(session);
+      if (session.getPrice() > 0) {
+        owner.removeBalance(session.getPrice());
+      }
+    }
+  };
 
-            //Shop stock check
-            if (!session.getShop().inStock()) {
-                session.getShop().update();
-                throw Exceptions.OUT_OF_STOCK;
-            }
-        }
+  public static final ShopInteraction BUY = new ShopInteraction() {
+    @Override
+    public void test(@NotNull SignShopSession session) throws CommandSyntaxException {
+      // Overlap with admin function, call its test method
+      ADMIN_BUY.test(session);
 
-        @Override
-        public void interact(@NotNull SignShopSession session) {
-            // Overlap with admin function, call its interact method
-            ADMIN_BUY.interact(session);
+      //Shop stock check
+      if (!session.getShop().inStock()) {
+        session.getShop().update();
+        throw Exceptions.OUT_OF_STOCK;
+      }
+    }
 
-            var owner = session.getOwnerUser();
+    @Override
+    public void interact(@NotNull SignShopSession session) {
+      // Overlap with admin function, call its interact method
+      ADMIN_BUY.interact(session);
 
-            //Add money to owner, remove item from shop
-            if (session.getPrice() > 0) {
-                owner.addBalance(session.getPrice());
-            }
+      var owner = session.getOwnerUser();
 
-            // Remove the item from the shop's inventory
-            session.getShopInventory().removeItem(session.getExampleItem());
-        }
-    };
+      //Add money to owner, remove item from shop
+      if (session.getPrice() > 0) {
+        owner.addBalance(session.getPrice());
+      }
+
+      // Remove the item from the shop's inventory
+      session.getShopInventory().removeItem(session.getExampleItem());
+    }
+  };
 }

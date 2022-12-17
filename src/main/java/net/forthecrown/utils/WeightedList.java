@@ -1,135 +1,142 @@
 package net.forthecrown.utils;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Random;
 import lombok.Getter;
 
-import java.util.*;
-
 public class WeightedList<T> {
-    private final List<Entry<T>> values = new ObjectArrayList<>();
 
-    @Getter
-    private int totalWeight = 0;
+  private final List<Entry<T>> values = new ObjectArrayList<>();
 
-    public void addAll(WeightedList<T> other) {
-        for (var e: other.values) {
-            add(e.weight, e.value);
-        }
+  @Getter
+  private int totalWeight = 0;
+
+  public void addAll(WeightedList<T> other) {
+    for (var e : other.values) {
+      add(e.weight, e.value);
+    }
+  }
+
+  public void add(int weight, T value) {
+    totalWeight += weight;
+    values.add(new Entry<>(value, weight));
+  }
+
+  private void remove(Entry<T> entry) {
+    int index = values.indexOf(entry);
+
+    if (index == -1) {
+      return;
     }
 
-    public void add(int weight, T value) {
-        totalWeight += weight;
-        values.add(new Entry<>(value, weight));
+    remove(index);
+  }
+
+  private void remove(int index) {
+    Objects.checkIndex(index, values.size());
+    var val = values.remove(index);
+    totalWeight -= val.weight;
+  }
+
+  public T get(Random random) {
+    Entry<T> value = findRandom(random);
+
+    if (value == null) {
+      return null;
     }
 
-    private void remove(Entry<T> entry) {
-        int index = values.indexOf(entry);
+    return value.value;
+  }
 
-        if (index == -1) {
-            return;
-        }
-
-        remove(index);
+  private Entry<T> findRandom(Random random) {
+    if (isEmpty()) {
+      return null;
     }
 
-    private void remove(int index) {
-        Objects.checkIndex(index, values.size());
-        var val = values.remove(index);
-        totalWeight -= val.weight;
+    int value = random.nextInt(0, totalWeight);
+
+    for (Entry<T> p : values) {
+      if ((value -= p.weight) <= 0) {
+        return p;
+      }
     }
 
-    public T get(Random random) {
-        Entry<T> value = findRandom(random);
+    return null;
+  }
 
-        if (value == null) {
-            return null;
-        }
+  public void clear() {
+    totalWeight = 0;
+    values.clear();
+  }
 
-        return value.value;
+  public boolean isEmpty() {
+    return values.isEmpty();
+  }
+
+  public int size() {
+    return values.size();
+  }
+
+  public Iterator<T> iterator(Random random) {
+    return new WeightedIterator(random);
+  }
+
+  /* ----------------------------- SUB CLASSES ------------------------------ */
+
+  private record Entry<T>(T value, int weight) {
+
+  }
+
+  private class WeightedIterator implements Iterator<T> {
+
+    private final Random random;
+    private final WeightedList<T> remaining;
+
+    private Entry<T> current;
+
+    public WeightedIterator(Random random) {
+      this.random = random;
+
+      remaining = new WeightedList<>();
+      remaining.addAll(WeightedList.this);
     }
 
-    private Entry<T> findRandom(Random random) {
-        if (isEmpty()) {
-            return null;
-        }
-
-        int value = random.nextInt(0, totalWeight);
-
-        for (Entry<T> p : values) {
-            if ((value -= p.weight) <= 0) {
-                return p;
-            }
-        }
-
-        return null;
+    @Override
+    public boolean hasNext() {
+      return !remaining.isEmpty();
     }
 
-    public void clear() {
-        totalWeight = 0;
-        values.clear();
+    @Override
+    public T next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+
+      if (remaining.values.size() == 1) {
+        current = remaining.values.get(0);
+        remaining.clear();
+
+        return current.value;
+      }
+
+      current = remaining.findRandom(random);
+      remaining.remove(current);
+
+      return current.value;
     }
 
-    public boolean isEmpty() {
-        return values.isEmpty();
+    @Override
+    public void remove() {
+      if (current == null) {
+        throw new IllegalStateException();
+      }
+
+      WeightedList.this.remove(current);
+      current = null;
     }
-
-    public int size() {
-        return values.size();
-    }
-
-    public Iterator<T> iterator(Random random) {
-        return new WeightedIterator(random);
-    }
-
-    /* ----------------------------- SUB CLASSES ------------------------------ */
-
-    private record Entry<T>(T value, int weight) {}
-
-    private class WeightedIterator implements Iterator<T> {
-        private final Random random;
-        private final WeightedList<T> remaining;
-
-        private Entry<T> current;
-
-        public WeightedIterator(Random random) {
-            this.random = random;
-
-            remaining = new WeightedList<>();
-            remaining.addAll(WeightedList.this);
-        }
-
-        @Override
-        public boolean hasNext() {
-            return !remaining.isEmpty();
-        }
-
-        @Override
-        public T next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-
-            if (remaining.values.size() == 1) {
-                current = remaining.values.get(0);
-                remaining.clear();
-
-                return current.value;
-            }
-
-            current = remaining.findRandom(random);
-            remaining.remove(current);
-
-            return current.value;
-        }
-
-        @Override
-        public void remove() {
-            if (current == null) {
-                throw new IllegalStateException();
-            }
-
-            WeightedList.this.remove(current);
-            current = null;
-        }
-    }
+  }
 }

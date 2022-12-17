@@ -7,32 +7,37 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ContextOption<T> {
-    /** The set this optional belongs to */
-    private final ContextSet parent;
 
-    /** The ID/index of this option */
-    private final int index;
+  /**
+   * The set this optional belongs to
+   */
+  private final ContextSet parent;
 
-    /** The option's default value */
-    private final T defaultValue;
+  /**
+   * The ID/index of this option
+   */
+  private final int index;
 
-    @Override
-    public int hashCode() {
-        return index;
+  /**
+   * The option's default value
+   */
+  private final T defaultValue;
+
+  @Override
+  public int hashCode() {
+    return index;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ContextOption<?> option)) {
+      return false;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ContextOption)) {
-            return false;
-        }
-
-        ContextOption<?> option = (ContextOption<?>) o;
-
-        return getIndex() == option.getIndex()
-                && getParent() == option.getParent();
-    }
+    return getIndex() == option.getIndex()
+        && getParent() == option.getParent();
+  }
 }

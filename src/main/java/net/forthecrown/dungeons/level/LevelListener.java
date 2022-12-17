@@ -17,87 +17,88 @@ import org.bukkit.event.player.PlayerMoveEvent;
 @Getter
 @RequiredArgsConstructor
 public class LevelListener implements Listener {
-    private final DungeonLevel level;
-    boolean registered;
 
-    boolean inLevel(Location loc) {
-        return loc.getWorld().equals(DungeonWorld.get())
-                && level.getChunkMap().getTotalArea().contains(loc);
+  private final DungeonLevel level;
+  boolean registered;
+
+  boolean inLevel(Location loc) {
+    return loc.getWorld().equals(DungeonWorld.get())
+        && level.getChunkMap().getTotalArea().contains(loc);
+  }
+
+  void register() {
+    if (registered) {
+      return;
     }
 
-    void register() {
-        if (registered) {
-            return;
-        }
+    Events.register(this);
+    registered = true;
+  }
 
-        Events.register(this);
-        registered = true;
+  void unregister() {
+    if (!registered) {
+      return;
     }
 
-    void unregister() {
-        if (!registered) {
-            return;
-        }
+    Events.unregister(this);
+    registered = false;
+  }
 
-        Events.unregister(this);
-        registered = false;
+  @EventHandler(ignoreCancelled = true)
+  public void onPlayerMove(PlayerMoveEvent event) {
+    if (!inLevel(event.getFrom())
+        || event.getPlayer().getGameMode() == GameMode.SPECTATOR
+    ) {
+      return;
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerMove(PlayerMoveEvent event) {
-        if (!inLevel(event.getFrom())
-                || event.getPlayer().getGameMode() == GameMode.SPECTATOR
-        ) {
-            return;
-        }
+    Bounds3i origin = TriggerManager.makePlayerBounds(event.getFrom());
+    Bounds3i destination = TriggerManager.makePlayerBounds(event.getTo());
+    Bounds3i totalArea = origin.combine(destination);
 
-        Bounds3i origin = TriggerManager.makePlayerBounds(event.getFrom());
-        Bounds3i destination = TriggerManager.makePlayerBounds(event.getTo());
-        Bounds3i totalArea = origin.combine(destination);
+    var pieces = level.getIntersecting(totalArea);
+    pieces.removeIf(piece -> piece instanceof DungeonGate);
 
-        var pieces = level.getIntersecting(totalArea);
-        pieces.removeIf(piece -> piece instanceof DungeonGate);
-
-        if (pieces.isEmpty()) {
-            return;
-        }
-
-        var user = Users.get(event.getPlayer());
-
-        for (var p: pieces) {
-            if (!p.isTicked()) {
-                continue;
-            }
-
-            var bounds = p.getBounds();
-
-            boolean originInside = bounds.overlaps(origin);
-            boolean destInside = bounds.overlaps(destination);
-
-            // If did not leave or enter the room
-            if (originInside == destInside) {
-                continue;
-            }
-
-            // If exiting
-            // Because of the above check, the two booleans
-            // must have an opposite state
-            if (originInside) {
-                p.getUsers().remove(user);
-
-                // If room is now empty
-                if (p.getUsers().isEmpty()) {
-                    level.getActivePieces().remove(p);
-                    level.getInactivePieces().add(p);
-                }
-
-                p.onExit(user, level);
-            } else {
-                level.getActivePieces().add(p);
-                level.getInactivePieces().remove(p);
-
-                p.onEnter(user, level);
-            }
-        }
+    if (pieces.isEmpty()) {
+      return;
     }
+
+    var user = Users.get(event.getPlayer());
+
+    for (var p : pieces) {
+      if (!p.isTicked()) {
+        continue;
+      }
+
+      var bounds = p.getBounds();
+
+      boolean originInside = bounds.overlaps(origin);
+      boolean destInside = bounds.overlaps(destination);
+
+      // If did not leave or enter the room
+      if (originInside == destInside) {
+        continue;
+      }
+
+      // If exiting
+      // Because of the above check, the two booleans
+      // must have an opposite state
+      if (originInside) {
+        p.getUsers().remove(user);
+
+        // If room is now empty
+        if (p.getUsers().isEmpty()) {
+          level.getActivePieces().remove(p);
+          level.getInactivePieces().add(p);
+        }
+
+        p.onExit(user, level);
+      } else {
+        level.getActivePieces().add(p);
+        level.getInactivePieces().remove(p);
+
+        p.onEnter(user, level);
+      }
+    }
+  }
 }

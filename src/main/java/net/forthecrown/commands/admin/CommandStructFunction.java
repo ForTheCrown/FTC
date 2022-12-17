@@ -5,30 +5,31 @@ import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.structure.FunctionInfo;
 
 public class CommandStructFunction extends FtcCommand {
-    public static final String COMMAND_NAME = "StructFunction";
 
-    public CommandStructFunction() {
-        super(COMMAND_NAME);
+  public static final String COMMAND_NAME = "StructFunction";
 
-        register();
-    }
+  public CommandStructFunction() {
+    super(COMMAND_NAME);
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     *
-     * Valid usages of command:
-     * /StructFunction
-     *
-     * Permissions used:
-     *
-     * Main Author:
-     */
+    register();
+  }
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("args", FunctionInfo.PARSER));
-    }
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   *
+   * Valid usages of command:
+   * /StructFunction
+   *
+   * Permissions used:
+   *
+   * Main Author:
+   */
+
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .then(argument("args", FunctionInfo.PARSER));
+  }
 }

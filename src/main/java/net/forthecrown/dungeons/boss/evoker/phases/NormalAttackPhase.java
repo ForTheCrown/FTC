@@ -8,45 +8,46 @@ import net.forthecrown.utils.Util;
 import org.bukkit.entity.Spellcaster;
 
 /**
- * The phase where he starts attacking with his own magic,
- * kinda weak ngl lol
+ * The phase where he starts attacking with his own magic, kinda weak ngl lol
  */
 public class NormalAttackPhase implements AttackPhase {
-    private int tick;
 
-    public static final BossMessage
-        START = BossMessage.random("phase_normal_start", 2),
-        END = BossMessage.partySize("phase_normal_end");
+  private int tick;
 
-    @Override
-    public void onStart(EvokerBoss boss, BossContext context) {
-        tick = 0;
-        boss.setAttackingAllowed(true);
-        boss.getPhaseBar().setVisible(true);
-        boss.getPhaseBar().setTitle("Magic attacks, look out!");
+  public static final BossMessage
+      START = BossMessage.random("phase_normal_start", 2),
+      END = BossMessage.partySize("phase_normal_end");
 
-        boss.broadcast(true, START);
+  @Override
+  public void onStart(EvokerBoss boss, BossContext context) {
+    tick = 0;
+    boss.setAttackingAllowed(true);
+    boss.getPhaseBar().setVisible(true);
+    boss.getPhaseBar().setTitle("Magic attacks, look out!");
+
+    boss.broadcast(true, START);
+  }
+
+  @Override
+  public void onEnd(EvokerBoss boss, BossContext context) {
+    boss.setAttackingAllowed(false);
+    boss.broadcast(true, END);
+  }
+
+  @Override
+  public void onTick(EvokerBoss boss, BossContext context) {
+    tick++;
+
+    if (boss.getBossEntity().getSpell() == Spellcaster.Spell.NONE) {
+      boss.getBossEntity().setSpell(
+          Util.RANDOM.nextBoolean() ? Spellcaster.Spell.FANGS : Spellcaster.Spell.SUMMON_VEX);
     }
 
-    @Override
-    public void onEnd(EvokerBoss boss, BossContext context) {
-        boss.setAttackingAllowed(false);
-        boss.broadcast(true, END);
+    if (tick >= EvokerConfig.normal_length) {
+      boss.nextPhase(true);
+    } else {
+      double progress = (double) tick / (double) EvokerConfig.normal_length;
+      boss.getPhaseBar().setProgress(progress);
     }
-
-    @Override
-    public void onTick(EvokerBoss boss, BossContext context) {
-        tick++;
-
-        if (boss.getBossEntity().getSpell() == Spellcaster.Spell.NONE) {
-            boss.getBossEntity().setSpell(Util.RANDOM.nextBoolean() ? Spellcaster.Spell.FANGS : Spellcaster.Spell.SUMMON_VEX);
-        }
-
-        if (tick >= EvokerConfig.normal_length) {
-            boss.nextPhase(true);
-        } else {
-            double progress = (double) tick / (double) EvokerConfig.normal_length;
-            boss.getPhaseBar().setProgress(progress);
-        }
-    }
+  }
 }

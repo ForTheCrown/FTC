@@ -5,5 +5,6 @@ import net.forthecrown.grenadier.CommandSource;
 
 @FunctionalInterface
 public interface SuggestionFunction {
-    void suggest(SuggestionsBuilder builder, CommandSource source);
+
+  void suggest(SuggestionsBuilder builder, CommandSource source);
 }

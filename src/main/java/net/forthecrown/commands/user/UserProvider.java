@@ -7,15 +7,16 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.User;
 
 interface UserProvider {
-    User get(CommandContext<CommandSource> c) throws CommandSyntaxException;
 
-    default User getOnline(CommandContext<CommandSource> c) throws CommandSyntaxException {
-        var result = get(c);
+  User get(CommandContext<CommandSource> c) throws CommandSyntaxException;
 
-        if (!result.isOnline()) {
-            throw Exceptions.notOnline(result);
-        }
+  default User getOnline(CommandContext<CommandSource> c) throws CommandSyntaxException {
+    var result = get(c);
 
-        return result;
+    if (!result.isOnline()) {
+      throw Exceptions.notOnline(result);
     }
+
+    return result;
+  }
 }

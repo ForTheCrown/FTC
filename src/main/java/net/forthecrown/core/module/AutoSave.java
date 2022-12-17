@@ -9,22 +9,23 @@ import org.bukkit.scheduler.BukkitTask;
  * Class which saves the FTC-Core in the interval given in the autoSaveIntervalMins comvar
  */
 public final class AutoSave extends ModuleService {
-    private BukkitTask task;
 
-    AutoSave() {
-        super(OnSave.class);
-    }
+  private BukkitTask task;
 
-    public void schedule() {
-        cancel();
+  AutoSave() {
+    super(OnSave.class);
+  }
 
-        long interval = GeneralConfig.autoSaveInterval;
-        interval = Time.millisToTicks(interval);
+  public void schedule() {
+    cancel();
 
-        task = Tasks.runTimer(this, interval, interval);
-    }
+    long interval = GeneralConfig.autoSaveInterval;
+    interval = Time.millisToTicks(interval);
 
-    public void cancel() {
-        task = Tasks.cancel(task);
-    }
+    task = Tasks.runTimer(this, interval, interval);
+  }
+
+  public void cancel() {
+    task = Tasks.cancel(task);
+  }
 }

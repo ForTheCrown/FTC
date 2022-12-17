@@ -1,68 +1,68 @@
 package net.forthecrown.core.script2;
 
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
 
-import java.util.Optional;
-
 @Builder(builderClassName = "Builder")
 @RequiredArgsConstructor(staticName = "of")
 public class ScriptResult {
-    @Getter
-    private final Script script;
 
-    @Getter
-    private final String method;
+  @Getter
+  private final Script script;
 
-    private final Object result;
+  @Getter
+  private final String method;
 
-    private final Throwable exception;
+  private final Object result;
 
-    public Optional<Object> result() {
-        return Optional.ofNullable(result);
-    }
+  private final Throwable exception;
 
-    public Optional<Throwable> error() {
-        return Optional.ofNullable(exception);
-    }
+  public Optional<Object> result() {
+    return Optional.ofNullable(result);
+  }
 
-    public ScriptResult logIfError() {
-        error().ifPresent(e -> {
-            FTC.getLogger().error(
-                    "Couldn't invoke method '{}' in '{}'",
-                    method, script.getName(),
-                    e
-            );
-        });
+  public Optional<Throwable> error() {
+    return Optional.ofNullable(exception);
+  }
 
-        return this;
-    }
+  public ScriptResult logIfError() {
+    error().ifPresent(e -> {
+      FTC.getLogger().error(
+          "Couldn't invoke method '{}' in '{}'",
+          method, script.getName(),
+          e
+      );
+    });
 
-    public void close() {
-        getScript().close();
-    }
+    return this;
+  }
 
-    public Optional<Boolean> asBoolean() {
-        return result().flatMap(o -> {
-            if (o instanceof Boolean b) {
-                return Optional.of(b);
-            }
+  public void close() {
+    getScript().close();
+  }
 
-            if (o instanceof Number number) {
-                return Optional.of(
-                        number.longValue() != 0
-                );
-            }
+  public Optional<Boolean> asBoolean() {
+    return result().flatMap(o -> {
+      if (o instanceof Boolean b) {
+        return Optional.of(b);
+      }
 
-            if (o instanceof String str) {
-                return Optional.of(
-                        Boolean.parseBoolean(str)
-                );
-            }
+      if (o instanceof Number number) {
+        return Optional.of(
+            number.longValue() != 0
+        );
+      }
 
-            return Optional.empty();
-        });
-    }
+      if (o instanceof String str) {
+        return Optional.of(
+            Boolean.parseBoolean(str)
+        );
+      }
+
+      return Optional.empty();
+    });
+  }
 }

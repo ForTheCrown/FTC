@@ -13,128 +13,135 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.pos.PositionArgument;
 import net.forthecrown.useables.TriggerType;
-import net.forthecrown.utils.text.Text;
 import net.forthecrown.useables.UsableTrigger;
 import net.forthecrown.useables.Usables;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.math.WorldBounds3i;
+import net.forthecrown.utils.text.Text;
 import org.bukkit.Location;
 
 class TriggerNode extends InteractableNode<UsableTrigger> {
-    protected TriggerNode() {
-        super("area_triggers");
-        this.argumentName = "triggers";
 
-        setAliases("usable_triggers", "triggers");
+  protected TriggerNode() {
+    super("area_triggers");
+    this.argumentName = "triggers";
+
+    setAliases("usable_triggers", "triggers");
+  }
+
+  @Override
+  protected void createNewUsableArguments(LiteralArgumentBuilder<CommandSource> command) {
+    command
+        .then(argument("name", Arguments.FTC_KEY)
+            // No area input given -> use WorldEdit region
+            .executes(c -> {
+              User user = getUserSender(c);
+              com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(user.getPlayer());
+
+              Region region = Util.getSelectionSafe(wePlayer);
+              WorldBounds3i bounds3i = WorldBounds3i.of(user.getWorld(), region);
+
+              return createTrigger(c, bounds3i);
+            })
+
+            // Area input given, use that lol
+            .then(argument("pos1", PositionArgument.blockPos())
+                .then(argument("pos2", PositionArgument.blockPos())
+                    .executes(c -> {
+                      getUserSender(c);
+
+                      Location p1 = PositionArgument.getLocation(c, "pos1");
+                      Location p2 = PositionArgument.getLocation(c, "pos2");
+
+                      WorldBounds3i bounds = WorldBounds3i.of(p1, p2);
+
+                      return createTrigger(c, bounds);
+                    })
+                )
+            )
+        );
+  }
+
+  private int createTrigger(CommandContext<CommandSource> c, WorldBounds3i area)
+      throws CommandSyntaxException {
+    String name = c.getArgument("name", String.class);
+    var triggers = Usables.getInstance().getTriggers();
+
+    if (triggers.contains(name)) {
+      throw Exceptions.alreadyExists("Trigger", name);
     }
 
-    @Override
-    protected void createNewUsableArguments(LiteralArgumentBuilder<CommandSource> command) {
-        command
-                .then(argument("name", Arguments.FTC_KEY)
-                        // No area input given -> use WorldEdit region
-                        .executes(c -> {
-                            User user = getUserSender(c);
-                            com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(user.getPlayer());
+    UsableTrigger trigger = new UsableTrigger(name, area);
+    triggers.add(trigger);
 
-                            Region region = Util.getSelectionSafe(wePlayer);
-                            WorldBounds3i bounds3i = WorldBounds3i.of(user.getWorld(), region);
+    c.getSource().sendAdmin("Created trigger called: " + name);
+    return 0;
+  }
 
-                            return createTrigger(c, bounds3i);
-                        })
+  @Override
+  protected void createRemoveArguments(LiteralArgumentBuilder<CommandSource> command,
+                                       UsageHolderProvider<UsableTrigger> provider
+  ) {
+    command
+        .executes(c -> {
+          var trigger = provider.get(c);
+          var triggers = Usables.getInstance().getTriggers();
 
-                        // Area input given, use that lol
-                        .then(argument("pos1", PositionArgument.blockPos())
-                                .then(argument("pos2", PositionArgument.blockPos())
-                                        .executes(c -> {
-                                            getUserSender(c);
+          triggers.remove(trigger);
 
-                                            Location p1 = PositionArgument.getLocation(c, "pos1");
-                                            Location p2 = PositionArgument.getLocation(c, "pos2");
+          c.getSource().sendAdmin(
+              Text.format("Removed trigger named '{0}'", trigger.getName())
+          );
+          return 0;
+        });
+  }
 
-                                            WorldBounds3i bounds = WorldBounds3i.of(p1, p2);
+  @Override
+  protected void addEditArguments(RequiredArgumentBuilder<CommandSource, ?> command,
+                                  UsageHolderProvider<UsableTrigger> provider
+  ) {
+    command
+        .then(literal("type")
+            .executes(c -> {
+              var trigger = provider.get(c);
 
-                                            return createTrigger(c, bounds);
-                                        })
-                                )
-                        )
-                );
-    }
+              c.getSource().sendMessage(
+                  Text.format("{0}'s type is '{1}'",
+                      trigger.getName(),
+                      trigger.getType().name().toLowerCase()
+                  )
+              );
+              return 0;
+            })
 
-    private int createTrigger(CommandContext<CommandSource> c, WorldBounds3i area) throws CommandSyntaxException {
-        String name = c.getArgument("name", String.class);
-        var triggers = Usables.getInstance().getTriggers();
-
-        if (triggers.contains(name)) {
-            throw Exceptions.alreadyExists("Trigger", name);
-        }
-
-        UsableTrigger trigger = new UsableTrigger(name, area);
-        triggers.add(trigger);
-
-        c.getSource().sendAdmin("Created trigger called: " + name);
-        return 0;
-    }
-
-    @Override
-    protected void createRemoveArguments(LiteralArgumentBuilder<CommandSource> command, UsageHolderProvider<UsableTrigger> provider) {
-        command
+            .then(argument("type", EnumArgument.of(TriggerType.class))
                 .executes(c -> {
-                    var trigger = provider.get(c);
-                    var triggers = Usables.getInstance().getTriggers();
+                  var trigger = provider.get(c);
+                  var type = c.getArgument("type", TriggerType.class);
 
-                    triggers.remove(trigger);
+                  trigger.setType(type);
 
-                    c.getSource().sendAdmin(
-                            Text.format("Removed trigger named '{0}'", trigger.getName())
-                    );
-                    return 0;
-                });
-    }
+                  c.getSource().sendAdmin(
+                      Text.format("Set {0}'s type to {1}",
+                          trigger.getName(),
+                          type.name().toLowerCase()
+                      )
+                  );
+                  return 0;
+                })
+            )
+        );
+  }
 
-    @Override
-    protected void addEditArguments(RequiredArgumentBuilder<CommandSource, ?> command, UsageHolderProvider<UsableTrigger> provider) {
-        command
-                .then(literal("type")
-                        .executes(c -> {
-                            var trigger = provider.get(c);
+  @Override
+  protected ArgumentType<?> getArgumentType() {
+    return Arguments.TRIGGER;
+  }
 
-                            c.getSource().sendMessage(
-                                    Text.format("{0}'s type is '{1}'",
-                                            trigger.getName(),
-                                            trigger.getType().name().toLowerCase()
-                                    )
-                            );
-                            return 0;
-                        })
-
-                        .then(argument("type", EnumArgument.of(TriggerType.class))
-                                .executes(c -> {
-                                    var trigger = provider.get(c);
-                                    var type = c.getArgument("type", TriggerType.class);
-
-                                    trigger.setType(type);
-
-                                    c.getSource().sendAdmin(
-                                            Text.format("Set {0}'s type to {1}",
-                                                    trigger.getName(),
-                                                    type.name().toLowerCase()
-                                            )
-                                    );
-                                    return 0;
-                                })
-                        )
-                );
-    }
-
-    @Override
-    protected ArgumentType<?> getArgumentType() {
-        return Arguments.TRIGGER;
-    }
-
-    @Override
-    protected UsableTrigger get(String argumentName, CommandContext<CommandSource> context) throws CommandSyntaxException {
-        return context.getArgument(argumentName, UsableTrigger.class);
-    }
+  @Override
+  protected UsableTrigger get(String argumentName, CommandContext<CommandSource> context)
+      throws CommandSyntaxException {
+    return context.getArgument(argumentName, UsableTrigger.class);
+  }
 }

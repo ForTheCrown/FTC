@@ -1,6 +1,7 @@
 package net.forthecrown.useables.command;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.function.UnaryOperator;
 import net.forthecrown.user.UserTeleport;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.TagUtil;
@@ -12,61 +13,60 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.UnaryOperator;
-
 public class Warp extends CommandUsable {
-    private Location destination;
 
-    public Warp(String name, Location destination) {
-        super(name);
-        this.destination = destination;
+  private Location destination;
+
+  public Warp(String name, Location destination) {
+    super(name);
+    this.destination = destination;
+  }
+
+  public Warp(String name, CompoundTag tag) throws CommandSyntaxException {
+    super(name, tag);
+    setDestination(TagUtil.readLocation(tag.get("location")));
+  }
+
+  @Override
+  protected void save(CompoundTag tag) {
+    tag.put("location", TagUtil.writeLocation(getDestination()));
+  }
+
+  @Override
+  public boolean onInteract(Player player) {
+    var user = Users.get(player);
+
+    if (!user.canTeleport()) {
+      player.sendMessage("Cannot teleport right now!");
+      return false;
     }
 
-    public Warp(String name, CompoundTag tag) throws CommandSyntaxException {
-        super(name, tag);
-        setDestination(TagUtil.readLocation(tag.get("location")));
-    }
+    user.createTeleport(this::getDestination, UserTeleport.Type.WARP)
+        .start();
+    return true;
+  }
 
-    @Override
-    protected void save(CompoundTag tag) {
-        tag.put("location", TagUtil.writeLocation(getDestination()));
-    }
+  @Override
+  public @NotNull HoverEvent<Component> asHoverEvent(@NotNull UnaryOperator<Component> op) {
+    return Component.text("Destination: ")
+        .append(Component.newline())
+        .append(Component.text("world: " + getDestination().getWorld().getName()))
 
-    @Override
-    public boolean onInteract(Player player) {
-        var user = Users.get(player);
+        .append(Component.newline())
+        .append(Component.text("x: " + getDestination().getBlockX()))
 
-        if (!user.canTeleport()) {
-            player.sendMessage("Cannot teleport right now!");
-            return false;
-        }
+        .append(Component.newline())
+        .append(Component.text("y: " + getDestination().getBlockY()))
 
-        user.createTeleport(this::getDestination, UserTeleport.Type.WARP)
-                .start();
-        return true;
-    }
+        .append(Component.newline())
+        .append(Component.text("z: " + getDestination().getBlockZ())).asHoverEvent();
+  }
 
-    @Override
-    public @NotNull HoverEvent<Component> asHoverEvent(@NotNull UnaryOperator<Component> op) {
-        return Component.text("Destination: ")
-                .append(Component.newline())
-                .append(Component.text("world: " + getDestination().getWorld().getName()))
+  public Location getDestination() {
+    return destination.clone();
+  }
 
-                .append(Component.newline())
-                .append(Component.text("x: " + getDestination().getBlockX()))
-
-                .append(Component.newline())
-                .append(Component.text("y: " + getDestination().getBlockY()))
-
-                .append(Component.newline())
-                .append(Component.text("z: " + getDestination().getBlockZ())).asHoverEvent();
-    }
-
-    public Location getDestination() {
-        return destination.clone();
-    }
-
-    public void setDestination(Location destination) {
-        this.destination = Validate.notNull(destination);
-    }
+  public void setDestination(Location destination) {
+    this.destination = Validate.notNull(destination);
+  }
 }

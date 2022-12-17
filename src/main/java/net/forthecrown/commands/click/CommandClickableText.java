@@ -6,38 +6,39 @@ import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 
 public class CommandClickableText extends FtcCommand {
-    public static final String NAME = "clickable_text";
 
-    public CommandClickableText() {
-        super(NAME);
+  public static final String NAME = "clickable_text";
 
-        setPermission(Permissions.DEFAULT);
-        register();
-    }
+  public CommandClickableText() {
+    super(NAME);
 
-    /*
-     * ----------------------------------------
-     * 			Command description:
-     * ----------------------------------------
-     *
-     * Valid usages of command:
-     * /clickable_text
-     *
-     * Permissions used:
-     *
-     * Main Author: Julie
-     */
+    setPermission(Permissions.DEFAULT);
+    register();
+  }
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("args", StringArgumentType.greedyString())
-                        .executes(c -> {
-                            String args = c.getArgument("args", String.class);
-                            ClickableTexts.execute(getUserSender(c), args);
+  /*
+   * ----------------------------------------
+   * 			Command description:
+   * ----------------------------------------
+   *
+   * Valid usages of command:
+   * /clickable_text
+   *
+   * Permissions used:
+   *
+   * Main Author: Julie
+   */
 
-                            return 0;
-                        })
-                );
-    }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .then(argument("args", StringArgumentType.greedyString())
+            .executes(c -> {
+              String args = c.getArgument("args", String.class);
+              ClickableTexts.execute(getUserSender(c), args);
+
+              return 0;
+            })
+        );
+  }
 }

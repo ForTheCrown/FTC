@@ -13,29 +13,31 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @RequiredArgsConstructor
 public class BuiltNode implements MenuNode {
-    private final MenuNodeItem item;
-    private final MenuClickConsumer runnable;
-    private final boolean playSound;
 
-    @Override
-    public void onClick(User user, InventoryContext context, ClickContext click) throws CommandSyntaxException {
-        if (runnable == null) {
-            return;
-        }
+  private final MenuNodeItem item;
+  private final MenuClickConsumer runnable;
+  private final boolean playSound;
 
-        if (playSound) {
-            user.playSound(Sound.UI_BUTTON_CLICK, 0.4f, 1);
-        }
-
-        runnable.onClick(user, context, click);
+  @Override
+  public void onClick(User user, InventoryContext context, ClickContext click)
+      throws CommandSyntaxException {
+    if (runnable == null) {
+      return;
     }
 
-    @Override
-    public ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
-        if (item == null) {
-            return null;
-        }
-
-        return this.item.createItem(user, context);
+    if (playSound) {
+      user.playSound(Sound.UI_BUTTON_CLICK, 0.4f, 1);
     }
+
+    runnable.onClick(user, context, click);
+  }
+
+  @Override
+  public ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+    if (item == null) {
+      return null;
+    }
+
+    return this.item.createItem(user, context);
+  }
 }

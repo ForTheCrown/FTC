@@ -21,68 +21,75 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 abstract class GuildCommandNode extends FtcCommand {
-    private final String[] argumentName;
 
-    protected GuildCommandNode(@NotNull String name, String... argumentName) {
-        super(name);
-        this.argumentName = Validate.notEmpty(argumentName);
+  private final String[] argumentName;
 
-        setPermission(Permissions.GUILD);
+  protected GuildCommandNode(@NotNull String name, String... argumentName) {
+    super(name);
+    this.argumentName = Validate.notEmpty(argumentName);
+
+    setPermission(Permissions.GUILD);
+  }
+
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    create(command);
+  }
+
+  protected abstract void writeHelpInfo(TextWriter writer, CommandSource source);
+
+  protected abstract <T extends ArgumentBuilder<CommandSource, T>> void create(T command);
+
+  protected static RequiredArgumentBuilder<CommandSource, Guild> guildArgument() {
+    return argument("guild", Arguments.GUILD);
+  }
+
+  protected static GuildProvider providerForArgument() {
+    return GuildProvider.argument("guild");
+  }
+
+  protected void testPermission(User user,
+                                Guild guild,
+                                GuildPermission permission,
+                                CommandSyntaxException exception
+  ) throws CommandSyntaxException {
+    var member = guild.getMember(user.getUniqueId());
+
+    if (member == null || member.hasLeft()) {
+      if (!user.hasPermission(Permissions.GUILD_ADMIN)) {
+        throw Exceptions.NOT_IN_GUILD;
+      }
+
+      return;
     }
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        create(command);
+    if (!member.hasPermission(permission)) {
+      throw exception;
     }
+  }
 
-    protected abstract void writeHelpInfo(TextWriter writer, CommandSource source);
-    protected abstract <T extends ArgumentBuilder<CommandSource, T>> void create(T command);
+  protected LiteralArgumentBuilder<CommandSource> createGuildCommand(String name,
+                                                                     GuildCommand cmd
+  ) {
+    var literal = literal(name);
+    addGuildCommand(literal, cmd);
+    return literal;
+  }
 
-    protected static RequiredArgumentBuilder<CommandSource, Guild> guildArgument() {
-        return argument("guild", Arguments.GUILD);
-    }
+  protected <T extends ArgumentBuilder<CommandSource, T>> void addGuildCommand(T command,
+                                                                               GuildCommand cmd
+  ) {
+    command
+        .executes(c -> cmd.run(c, GuildProvider.SENDERS_GUILD))
 
-    protected static GuildProvider providerForArgument() {
-        return GuildProvider.argument("guild");
-    }
+        .then(guildArgument()
+            .requires(source -> source.hasPermission(Permissions.GUILD_ADMIN))
+            .executes(c -> cmd.run(c, providerForArgument()))
+        );
+  }
 
-    protected void testPermission(User user,
-                                  Guild guild,
-                                  GuildPermission permission,
-                                  CommandSyntaxException exception
-    ) throws CommandSyntaxException {
-        var member = guild.getMember(user.getUniqueId());
+  protected interface GuildCommand {
 
-        if (member == null || member.hasLeft()) {
-            if (!user.hasPermission(Permissions.GUILD_ADMIN)) {
-                throw Exceptions.NOT_IN_GUILD;
-            }
-
-            return;
-        }
-
-        if (!member.hasPermission(permission)) {
-            throw exception;
-        }
-    }
-
-    protected LiteralArgumentBuilder<CommandSource> createGuildCommand(String name, GuildCommand cmd) {
-        var literal = literal(name);
-        addGuildCommand(literal, cmd);
-        return literal;
-    }
-
-    protected <T extends ArgumentBuilder<CommandSource, T>> void addGuildCommand(T command, GuildCommand cmd) {
-        command
-                .executes(c -> cmd.run(c, GuildProvider.SENDERS_GUILD))
-
-                .then(guildArgument()
-                        .requires(source -> source.hasPermission(Permissions.GUILD_ADMIN))
-                        .executes(c -> cmd.run(c, providerForArgument()))
-                );
-    }
-
-    protected static interface GuildCommand {
-        int run(CommandContext<CommandSource> c, GuildProvider provider) throws CommandSyntaxException;
-    }
+    int run(CommandContext<CommandSource> c, GuildProvider provider) throws CommandSyntaxException;
+  }
 }

@@ -1,38 +1,42 @@
 package net.forthecrown.core.config;
 
+import static net.kyori.adventure.text.Component.text;
+
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
+import java.util.concurrent.TimeUnit;
 import jdk.jfr.Timestamp;
-import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-import java.util.concurrent.TimeUnit;
-
-import static net.kyori.adventure.text.Component.text;
-
 @ConfigData(filePath = "resource_world.json")
-public @UtilityClass class ResourceWorldConfig {
-    public boolean enabled = true;
+public final class ResourceWorldConfig {
 
-    public LongList legalSeeds = new LongArrayList();
-    public String toHazGate = "res_to_haz";
-    public String toResGate = "haz_to_res";
-    public String worldGuardSpawn = "rw_spawn";
-    public String spawnStructure = "rw_spawn";
+  public static boolean enabled = true;
 
-    public long sectionRetentionTime = TimeUnit.MINUTES.toMillis(5);
-    public long resetInterval = TimeUnit.DAYS.toMillis(28 * 2);
+  public static LongList legalSeeds = new LongArrayList();
+  public static String toHazGate = "res_to_haz";
+  public static String toResGate = "haz_to_res";
+  public static String worldGuardSpawn = "rw_spawn";
+  public static String spawnStructure = "rw_spawn";
 
-    public float doubleDropRate = 0.5F;
+  public static long sectionRetentionTime = TimeUnit.MINUTES.toMillis(5);
+  public static long resetInterval = TimeUnit.DAYS.toMillis(28 * 2);
 
-    public Component resetStart = text("The resource world has began resetting!", NamedTextColor.YELLOW);
-    public Component resetEnd = text("The resource world has reset!", NamedTextColor.YELLOW);
+  public static float doubleDropRate = 0.5F;
 
-    @Timestamp
-    public long lastReset;
+  public static Component resetStart = text("The resource world has began resetting!",
+      NamedTextColor.YELLOW);
+  public static Component resetEnd = text("The resource world has reset!", NamedTextColor.YELLOW);
 
-    public long lastSeed;
+  @Timestamp
+  public static long lastReset;
 
-    public int nextSize = 3000;
+  public static long lastSeed;
+
+  public static int nextSize = 3000;
+
+  private ResourceWorldConfig() {
+    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+  }
 }

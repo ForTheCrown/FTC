@@ -11,40 +11,41 @@ import net.forthecrown.utils.io.Results;
 import net.kyori.adventure.text.Component;
 
 public class ItemChallengeParser {
-    public static final String
-            KEY_REWARD = "reward",
-            KEY_SLOT = "slot",
-            KEY_DESCRIPTION = "description",
-            KEY_TYPE = "type";
 
-    public static DataResult<ItemChallenge> parse(JsonObject element) {
-        JsonWrapper json = JsonWrapper.wrap(element);
+  public static final String
+      KEY_REWARD = "reward",
+      KEY_SLOT = "slot",
+      KEY_DESCRIPTION = "description",
+      KEY_TYPE = "type";
 
-        if (!json.has(KEY_SLOT)) {
-            return Results.errorResult("Missing %s value", KEY_SLOT);
-        }
+  public static DataResult<ItemChallenge> parse(JsonObject element) {
+    JsonWrapper json = JsonWrapper.wrap(element);
 
-        Slot slot = MenuReader.readSlot(json.get(KEY_SLOT));
-        Reward reward = Reward.EMPTY;
-
-        ResetInterval interval = json.getEnum(
-                KEY_TYPE,
-                ResetInterval.class,
-                ResetInterval.DAILY
-        );
-
-        ImmutableList.Builder<Component> desc = ImmutableList.builder();
-
-        for (var c: json.getList(KEY_DESCRIPTION, JsonUtils::readText)) {
-            desc.add(c);
-        }
-
-        if (json.has(KEY_REWARD)) {
-            reward = Reward.deserialize(json.get(KEY_REWARD));
-        }
-
-        return DataResult.success(
-                new ItemChallenge(slot, reward, desc.build(), interval)
-        );
+    if (!json.has(KEY_SLOT)) {
+      return Results.errorResult("Missing %s value", KEY_SLOT);
     }
+
+    Slot slot = MenuReader.readSlot(json.get(KEY_SLOT));
+    Reward reward = Reward.EMPTY;
+
+    ResetInterval interval = json.getEnum(
+        KEY_TYPE,
+        ResetInterval.class,
+        ResetInterval.DAILY
+    );
+
+    ImmutableList.Builder<Component> desc = ImmutableList.builder();
+
+    for (var c : json.getList(KEY_DESCRIPTION, JsonUtils::readText)) {
+      desc.add(c);
+    }
+
+    if (json.has(KEY_REWARD)) {
+      reward = Reward.deserialize(json.get(KEY_REWARD));
+    }
+
+    return DataResult.success(
+        new ItemChallenge(slot, reward, desc.build(), interval)
+    );
+  }
 }

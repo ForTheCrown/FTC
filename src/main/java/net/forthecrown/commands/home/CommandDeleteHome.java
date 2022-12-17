@@ -17,68 +17,69 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 
 public class CommandDeleteHome extends FtcCommand {
-    public CommandDeleteHome(){
-        super("deletehome");
 
-        setPermission(Permissions.HOME);
-        setDescription("Deletes a home");
-        setAliases("removehome", "remhome", "yeethome", "delhome");
+  public CommandDeleteHome() {
+    super("deletehome");
 
-        register();
+    setPermission(Permissions.HOME);
+    setDescription("Deletes a home");
+    setAliases("removehome", "remhome", "yeethome", "delhome");
+
+    register();
+  }
+
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        // /deletehome
+        .executes(c -> {
+          User user = getUserSender(c);
+          UserHomes homes = user.getHomes();
+
+          if (!homes.contains(UserHomes.DEFAULT)) {
+            throw Exceptions.NO_DEF_HOME;
+          }
+
+          return delHome(c.getSource(), HomeParseResult.DEFAULT);
+        })
+
+        // /deletehome <home>
+        .then(argument("home", Arguments.HOME)
+            .executes(c -> {
+              HomeParseResult result = c.getArgument("home", HomeParseResult.class);
+              return delHome(c.getSource(), result);
+            })
+        );
+  }
+
+  private int delHome(CommandSource source, HomeParseResult result) throws CommandSyntaxException {
+    // Because of how the HomeParseResult works, we need to actually
+    // get the home location for it to check permissions, because you
+    // might've inputted 'JulieWoolie:home' or something
+    Pair<String, Location> h = result.get(source, true);
+    var name = h.getFirst();
+
+    User user;
+
+    if (result.getUser() == null) {
+      user = Users.get(source.asPlayer());
+    } else {
+      user = Users.get(result.getUser());
     }
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                // /deletehome
-                .executes(c -> {
-                    User user = getUserSender(c);
-                    UserHomes homes = user.getHomes();
+    boolean self = source.textName().equals(user.getName());
+    var homes = user.getHomes();
 
-                    if(!homes.contains(UserHomes.DEFAULT)) {
-                        throw Exceptions.NO_DEF_HOME;
-                    }
+    homes.remove(name);
 
-                    return delHome(c.getSource(), HomeParseResult.DEFAULT);
-                })
-
-                // /deletehome <home>
-                .then(argument("home", Arguments.HOME)
-                        .executes(c -> {
-                            HomeParseResult result = c.getArgument("home", HomeParseResult.class);
-                            return delHome(c.getSource(), result);
-                        })
-                );
+    if (self) {
+      user.sendMessage(Messages.deletedHomeSelf(name));
+    } else {
+      source.sendAdmin(Messages.deletedHomeOther(user, name));
     }
 
-    private int delHome(CommandSource source, HomeParseResult result) throws CommandSyntaxException {
-        // Because of how the HomeParseResult works, we need to actually
-        // get the home location for it to check permissions, because you
-        // might've inputted 'JulieWoolie:home' or something
-        Pair<String, Location> h = result.get(source, true);
-        var name = h.getFirst();
+    user.playSound(Sound.UI_TOAST_IN, 2, 1.3f);
 
-        User user;
-
-        if (result.getUser() == null) {
-            user = Users.get(source.asPlayer());
-        } else {
-            user = Users.get(result.getUser());
-        }
-
-        boolean self = source.textName().equals(user.getName());
-        var homes = user.getHomes();
-
-        homes.remove(name);
-
-        if (self) {
-            user.sendMessage(Messages.deletedHomeSelf(name));
-        } else {
-            source.sendAdmin(Messages.deletedHomeOther(user, name));
-        }
-
-        user.playSound(Sound.UI_TOAST_IN, 2, 1.3f);
-
-        return 0;
-    }
+    return 0;
+  }
 }

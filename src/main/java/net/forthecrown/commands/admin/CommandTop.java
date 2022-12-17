@@ -9,25 +9,26 @@ import org.bukkit.HeightMap;
 import org.bukkit.Location;
 
 public class CommandTop extends FtcCommand {
-    public CommandTop(){
-        super("top");
 
-        setPermission(Permissions.ADMIN);
-        register();
-    }
+  public CommandTop() {
+    super("top");
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .executes(c -> {
-                    User user = getUserSender(c);
-                    Location top = user.getLocation().toHighestLocation(HeightMap.WORLD_SURFACE);
+    setPermission(Permissions.ADMIN);
+    register();
+  }
 
-                    user.createTeleport(() -> top, UserTeleport.Type.TELEPORT)
-                            .setDelayed(false)
-                            .setSetReturn(false)
-                            .start();
-                    return 0;
-                });
-    }
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .executes(c -> {
+          User user = getUserSender(c);
+          Location top = user.getLocation().toHighestLocation(HeightMap.WORLD_SURFACE);
+
+          user.createTeleport(() -> top, UserTeleport.Type.TELEPORT)
+              .setDelayed(false)
+              .setSetReturn(false)
+              .start();
+          return 0;
+        });
+  }
 }

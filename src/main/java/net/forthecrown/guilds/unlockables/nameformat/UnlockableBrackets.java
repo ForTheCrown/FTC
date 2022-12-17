@@ -1,5 +1,11 @@
 package net.forthecrown.guilds.unlockables.nameformat;
 
+import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
+import static net.forthecrown.utils.text.Text.nonItalic;
+import static net.kyori.adventure.text.Component.text;
+
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.guilds.Guild;
@@ -16,110 +22,103 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static net.forthecrown.guilds.menu.GuildMenus.GUILD;
-import static net.forthecrown.utils.text.Text.nonItalic;
-import static net.kyori.adventure.text.Component.text;
-
 @RequiredArgsConstructor
 @Getter
 public enum UnlockableBrackets implements Unlockable {
-    DEFAULT(11, 0, GuildNameFormat.Bracket.DEFAULT),
-    BRACKETS2(12, 500, GuildNameFormat.Bracket.ROUND),
-    BRACKETS3(13, 500, GuildNameFormat.Bracket.ANGLE),
-    BRACKETS4(14, 1000, GuildNameFormat.Bracket.SQUARE_SPECIAL1),
-    BRACKETS5(15, 1000, GuildNameFormat.Bracket.SQUARE_SPECIAL2),
-    ;
+  DEFAULT(11, 0, GuildNameFormat.Bracket.DEFAULT),
+  BRACKETS2(12, 500, GuildNameFormat.Bracket.ROUND),
+  BRACKETS3(13, 500, GuildNameFormat.Bracket.ANGLE),
+  BRACKETS4(14, 1000, GuildNameFormat.Bracket.SQUARE_SPECIAL1),
+  BRACKETS5(15, 1000, GuildNameFormat.Bracket.SQUARE_SPECIAL2),
+  ;
 
-    @Getter
-    private final int slot, expRequired;
-    private final GuildNameFormat.Bracket bracket;
+  @Getter
+  private final int slot, expRequired;
+  private final GuildNameFormat.Bracket bracket;
 
-    @Override
-    public GuildPermission getPerm() {
-        return GuildPermission.CAN_CHANGE_GUILD_COSMETICS;
-    }
+  @Override
+  public GuildPermission getPerm() {
+    return GuildPermission.CAN_CHANGE_GUILD_COSMETICS;
+  }
 
-    @Override
-    public String getKey() {
-        return name().toLowerCase();
-    }
+  @Override
+  public String getKey() {
+    return name().toLowerCase();
+  }
 
-    @Override
-    public Component getName() {
-        return text("Name format brackets");
-    }
+  @Override
+  public Component getName() {
+    return text("Name format brackets");
+  }
 
-    @Override
-    public MenuNode toInvOption() {
-        return MenuNode.builder()
-                .setItem((user, context) -> {
-                    Guild guild = context.getOrThrow(GUILD);
+  @Override
+  public MenuNode toInvOption() {
+    return MenuNode.builder()
+        .setItem((user, context) -> {
+          Guild guild = context.getOrThrow(GUILD);
 
-                    var item = ItemStacks.builder(Material.MOJANG_BANNER_PATTERN)
-                            .setName(bracket.getPreview(
-                                    guild.getName(),
-                                    guild.getSettings().getPrimaryColor().getTextColor(),
-                                    guild.getSettings().getSecondaryColor().getTextColor()))
-                            .setFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS)
-                            .build();
+          var item = ItemStacks.builder(Material.MOJANG_BANNER_PATTERN)
+              .setName(bracket.getPreview(
+                  guild.getName(),
+                  guild.getSettings().getPrimaryColor().getTextColor(),
+                  guild.getSettings().getSecondaryColor().getTextColor()))
+              .setFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS)
+              .build();
 
-                    ItemMeta meta = item.getItemMeta();
-                    List<Component> lore = meta.lore();
+          ItemMeta meta = item.getItemMeta();
+          List<Component> lore = meta.lore();
 
-                    if (lore == null) {
-                        lore = new ArrayList<>();
-                    }
+          if (lore == null) {
+            lore = new ArrayList<>();
+          }
 
-                    if (isUnlocked(guild)) {
-                        boolean active = guild.getSettings()
-                                .getNameFormat()
-                                .getBracket() == bracket;
+          if (isUnlocked(guild)) {
+            boolean active = guild.getSettings()
+                .getNameFormat()
+                .getBracket() == bracket;
 
-                        // Add click-to-active or is-active line
-                        lore.add(active
-                                ? text("Active")
-                                        .color(NamedTextColor.YELLOW)
-                                        .decoration(TextDecoration.ITALIC, false)
-                                : text("Click to activate")
-                                        .color(NamedTextColor.GRAY)
-                                        .decoration(TextDecoration.ITALIC, false)
-                        );
+            // Add click-to-active or is-active line
+            lore.add(active
+                ? text("Active")
+                .color(NamedTextColor.YELLOW)
+                .decoration(TextDecoration.ITALIC, false)
+                : text("Click to activate")
+                    .color(NamedTextColor.GRAY)
+                    .decoration(TextDecoration.ITALIC, false)
+            );
 
-                        if (active) {
-                            meta.addEnchant(
-                                    Enchantment.BINDING_CURSE,
-                                    1,
-                                    true
-                            );
-                        }
-                    } else {
-                        var style = nonItalic(NamedTextColor.GRAY);
+            if (active) {
+              meta.addEnchant(
+                  Enchantment.BINDING_CURSE,
+                  1,
+                  true
+              );
+            }
+          } else {
+            var style = nonItalic(NamedTextColor.GRAY);
 
-                        // Add progress lore lines
-                        lore.add(getProgressComponent(guild).style(style));
-                        lore.add(Component.empty());
-                        lore.add(getClickComponent().style(style));
-                        lore.add(getShiftClickComponent().style(style));
-                    }
+            // Add progress lore lines
+            lore.add(getProgressComponent(guild).style(style));
+            lore.add(Component.empty());
+            lore.add(getClickComponent().style(style));
+            lore.add(getShiftClickComponent().style(style));
+          }
 
-                    meta.lore(lore);
-                    item.setItemMeta(meta);
+          meta.lore(lore);
+          item.setItemMeta(meta);
 
-                    return item;
-                })
+          return item;
+        })
 
-                .setRunnable((user, context, c) -> onClick(user, c, context, () -> {
-                    Guild guild = context.getOrThrow(GUILD);
+        .setRunnable((user, context, c) -> onClick(user, c, context, () -> {
+          Guild guild = context.getOrThrow(GUILD);
 
-                    // If not active
-                    if (guild.getSettings().getNameFormat().getBracket() != bracket) {
-                            guild.getSettings().getNameFormat().setBracket(bracket);
-                    }
-                }))
+          // If not active
+          if (guild.getSettings().getNameFormat().getBracket() != bracket) {
+            guild.getSettings().getNameFormat().setBracket(bracket);
+          }
+        }))
 
-                .build();
-    }
+        .build();
+  }
 }

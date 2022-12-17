@@ -14,29 +14,33 @@ public record ReforgeUpgrade(Material type,
                              Component... fluff
 ) implements WeaponUpgrade {
 
-    public static WeaponUpgrade reforge(Material type, Component itemName, Component display, Component... fluff) {
-        return new ReforgeUpgrade(type, itemName, display, Validate.noNullElements(fluff));
+  public static WeaponUpgrade reforge(Material type, Component itemName, Component display,
+                                      Component... fluff
+  ) {
+    return new ReforgeUpgrade(type, itemName, display, Validate.noNullElements(fluff));
+  }
+
+  public static WeaponUpgrade reforge(Material type, Component itemName, Component display,
+                                      String... fluff
+  ) {
+    Validate.noNullElements(fluff);
+    Component[] arr = new Component[fluff.length];
+
+    for (int i = 0; i < fluff.length; i++) {
+      arr[i] = Text.renderString(fluff[i]);
     }
 
-    public static WeaponUpgrade reforge(Material type, Component itemName, Component display, String... fluff) {
-        Validate.noNullElements(fluff);
-        Component[] arr = new Component[fluff.length];
+    return reforge(type, itemName, display, arr);
+  }
 
-        for (int i = 0; i < fluff.length; i++) {
-            arr[i] = Text.renderString(fluff[i]);
-        }
+  @Override
+  public void apply(RoyalSword sword, ItemStack item, ItemMeta meta) {
+    item.setType(type);
+    meta.displayName(itemName);
+  }
 
-        return reforge(type, itemName, display, arr);
-    }
-
-    @Override
-    public void apply(RoyalSword sword, ItemStack item, ItemMeta meta) {
-        item.setType(type);
-        meta.displayName(itemName);
-    }
-
-    @Override
-    public Component[] getFlavorText() {
-        return fluff;
-    }
+  @Override
+  public Component[] getFlavorText() {
+    return fluff;
+  }
 }

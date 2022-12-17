@@ -7,92 +7,94 @@ import net.forthecrown.dungeons.level.DungeonRoom;
 import net.forthecrown.dungeons.level.PieceVisitor;
 import net.minecraft.nbt.CompoundTag;
 
-@Getter @Setter
+@Getter
+@Setter
 public class DungeonGate extends DungeonPiece {
-    private static final String
-            TAG_ORIGIN = "origin_gate",
-            TAG_TARGET = "target_gate",
-            TAG_PARENT_EXIT = "parent_exit_gate",
-            TAG_OPEN = "open";
 
-    boolean open = true;
+  private static final String
+      TAG_ORIGIN = "origin_gate",
+      TAG_TARGET = "target_gate",
+      TAG_PARENT_EXIT = "parent_exit_gate",
+      TAG_OPEN = "open";
 
-    private AbsoluteGateData parentExit;
-    private AbsoluteGateData originGate;
-    private AbsoluteGateData targetGate;
+  boolean open = true;
 
-    public DungeonGate(GateType type) {
-        super(type);
+  private AbsoluteGateData parentExit;
+  private AbsoluteGateData originGate;
+  private AbsoluteGateData targetGate;
+
+  public DungeonGate(GateType type) {
+    super(type);
+  }
+
+  public DungeonGate(GateType type, CompoundTag tag) {
+    super(type, tag);
+
+    if (tag.contains(TAG_OPEN) && type.isOpenable()) {
+      setOpen(!tag.getBoolean(TAG_OPEN));
     }
 
-    public DungeonGate(GateType type, CompoundTag tag) {
-        super(type, tag);
+    setOriginGate(AbsoluteGateData.load(tag.get(TAG_ORIGIN)));
+    setTargetGate(AbsoluteGateData.load(tag.get(TAG_TARGET)));
+    setParentExit(AbsoluteGateData.load(tag.get(TAG_PARENT_EXIT)));
+  }
 
-        if (tag.contains(TAG_OPEN) && type.isOpenable()) {
-            setOpen(!tag.getBoolean(TAG_OPEN));
-        }
+  @Override
+  public GateType getType() {
+    return (GateType) super.getType();
+  }
 
-        setOriginGate(AbsoluteGateData.load(tag.get(TAG_ORIGIN)));
-        setTargetGate(AbsoluteGateData.load(tag.get(TAG_TARGET)));
-        setParentExit(AbsoluteGateData.load(tag.get(TAG_PARENT_EXIT)));
+  public void setOpen(boolean open) {
+    if (!getType().isOpenable()) {
+      return;
     }
 
-    @Override
-    public GateType getType() {
-        return (GateType) super.getType();
+    this.open = open;
+  }
+
+  @Override
+  public String getPaletteName() {
+    if (!getType().isOpenable()) {
+      return getType().getClosedPalette();
     }
 
-    public void setOpen(boolean open) {
-        if (!getType().isOpenable()) {
-            return;
-        }
+    return isOpen()
+        ? getType().getOpenPalette()
+        : getType().getClosedPalette();
+  }
 
-        this.open = open;
+  public boolean isOpen() {
+    return open && getType().isOpenable();
+  }
+
+  @Override
+  protected void saveAdditional(CompoundTag tag) {
+    if (getType().isOpenable()) {
+      tag.putBoolean(TAG_OPEN, open);
     }
 
-    @Override
-    public String getPaletteName() {
-        if (!getType().isOpenable()) {
-            return getType().getClosedPalette();
-        }
-
-        return isOpen()
-                ? getType().getOpenPalette()
-                : getType().getClosedPalette();
+    if (originGate != null) {
+      tag.put(TAG_ORIGIN, originGate.save());
     }
 
-    public boolean isOpen() {
-        return open && getType().isOpenable();
+    if (targetGate != null) {
+      tag.put(TAG_TARGET, targetGate.save());
     }
 
-    @Override
-    protected void saveAdditional(CompoundTag tag) {
-        if (getType().isOpenable()) {
-            tag.putBoolean(TAG_OPEN, open);
-        }
-
-        if (originGate != null) {
-            tag.put(TAG_ORIGIN, originGate.save());
-        }
-
-        if (targetGate != null) {
-            tag.put(TAG_TARGET, targetGate.save());
-        }
-
-        if (parentExit != null) {
-            tag.put(TAG_PARENT_EXIT, parentExit.save());
-        }
+    if (parentExit != null) {
+      tag.put(TAG_PARENT_EXIT, parentExit.save());
     }
+  }
 
-    @Override
-    protected boolean canBeChild(DungeonPiece o) {
-        return o instanceof DungeonRoom
-                && this.isOpen()
-                && !hasChildren();
-    }
+  @Override
+  protected boolean canBeChild(DungeonPiece o) {
+    return o instanceof DungeonRoom
+        && this.isOpen()
+        && !hasChildren();
+  }
 
-    @Override
-    protected PieceVisitor.Result onVisit(PieceVisitor walker) {
-        return walker.onGate(this);
-    }
+  @Override
+  protected PieceVisitor.Result onVisit(PieceVisitor walker) {
+    return walker.onGate(this);
+  }
 }

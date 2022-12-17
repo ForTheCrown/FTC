@@ -1,5 +1,7 @@
 package net.forthecrown.commands.guild;
 
+import static net.kyori.adventure.text.Component.text;
+
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.forthecrown.grenadier.CommandSource;
@@ -10,49 +12,48 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 
-import static net.kyori.adventure.text.Component.text;
-
 class GuildHelpNode extends GuildCommandNode {
-    public GuildHelpNode() {
-        super("guildhelp", "help", "?");
-    }
 
-    @Override
-    protected void writeHelpInfo(TextWriter writer, CommandSource source) {
-        writer.field("?", "Shows help information");
-    }
+  public GuildHelpNode() {
+    super("guildhelp", "help", "?");
+  }
 
-    @Override
-    protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command) {
-        command.executes(c -> {
-            var writer = createHelpWriter(getLabel(c));
+  @Override
+  protected void writeHelpInfo(TextWriter writer, CommandSource source) {
+    writer.field("?", "Shows help information");
+  }
 
-            for (var n: GuildCommands.NODES) {
-                if (!writer.isLineEmpty()) {
-                    writer.newLine();
-                }
+  @Override
+  protected <T extends ArgumentBuilder<CommandSource, T>> void create(T command) {
+    command.executes(c -> {
+      var writer = createHelpWriter(getLabel(c));
 
-                n.writeHelpInfo(writer, c.getSource());
-            }
+      for (var n : GuildCommands.NODES) {
+        if (!writer.isLineEmpty()) {
+          writer.newLine();
+        }
 
-            c.getSource().sendMessage(writer);
-            return 0;
-        });
-    }
+        n.writeHelpInfo(writer, c.getSource());
+      }
 
-    private TextWriter createHelpWriter(String label) {
-        var writer = TextWriters.newWriter();
-        writer.setFieldSeparator(text(" - "));
-        writer.setFieldStyle(Style.style(NamedTextColor.GOLD));
-        writer.setFieldValueStyle(Style.empty());
+      c.getSource().sendMessage(writer);
+      return 0;
+    });
+  }
 
-        return writer.withPrefix(
-                Component.text(label + " ", writer.getFieldStyle())
-        );
-    }
+  private TextWriter createHelpWriter(String label) {
+    var writer = TextWriters.newWriter();
+    writer.setFieldSeparator(text(" - "));
+    writer.setFieldStyle(Style.style(NamedTextColor.GOLD));
+    writer.setFieldValueStyle(Style.empty());
 
-    private String getLabel(CommandContext<CommandSource> c) {
-        var filtered = GrenadierUtils.filterCommandInput(c.getInput());
-        return "/" + filtered.readUnquotedString();
-    }
+    return writer.withPrefix(
+        Component.text(label + " ", writer.getFieldStyle())
+    );
+  }
+
+  private String getLabel(CommandContext<CommandSource> c) {
+    var filtered = GrenadierUtils.filterCommandInput(c.getInput());
+    return "/" + filtered.readUnquotedString();
+  }
 }

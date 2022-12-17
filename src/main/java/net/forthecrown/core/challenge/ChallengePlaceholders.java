@@ -12,77 +12,79 @@ import net.kyori.adventure.text.TextReplacementConfig;
 @Getter
 @RequiredArgsConstructor(staticName = "of")
 public class ChallengePlaceholders {
-    private static final ImmutableMap<String, PlaceholderFormatter>
-            FORMATTERS = createFormatter();
 
-    private final Holder<Challenge> holder;
+  private static final ImmutableMap<String, PlaceholderFormatter>
+      FORMATTERS = createFormatter();
 
-    public static ChallengePlaceholders of(Challenge challenge) {
-        return of(
-                ChallengeManager.getInstance()
-                        .getChallengeRegistry()
-                        .getHolderByValue(challenge)
-                        .orElseThrow()
-        );
+  private final Holder<Challenge> holder;
+
+  public static ChallengePlaceholders of(Challenge challenge) {
+    return of(
+        ChallengeManager.getInstance()
+            .getChallengeRegistry()
+            .getHolderByValue(challenge)
+            .orElseThrow()
+    );
+  }
+
+  public Component format(Component text, User user) {
+    Component result = text;
+
+    for (var e : FORMATTERS.entrySet()) {
+      Component replaceValue = e.getValue()
+          .format(holder, user);
+
+      if (replaceValue == null) {
+        continue;
+      }
+
+      result = result.replaceText(
+          TextReplacementConfig.builder()
+              .matchLiteral("%" + e.getKey())
+              .replacement(replaceValue)
+              .build()
+      );
     }
 
-    public Component format(Component text, User user) {
-        Component result = text;
+    return result;
+  }
 
-        for (var e: FORMATTERS.entrySet()) {
-            Component replaceValue = e.getValue()
-                    .format(holder, user);
+  static ImmutableMap<String, PlaceholderFormatter> createFormatter() {
+    ImmutableMap.Builder<String, PlaceholderFormatter>
+        builder = ImmutableMap.builder();
 
-            if (replaceValue == null) {
-                continue;
-            }
+    builder.put("goal", (holder1, user) -> {
+      if (user == null) {
+        return null;
+      }
 
-            result = result.replaceText(
-                    TextReplacementConfig.builder()
-                            .matchLiteral("%" + e.getKey())
-                            .replacement(replaceValue)
-                            .build()
-            );
-        }
+      return Text.format(
+          "{0, number}",
+          holder1.getValue().getGoal(user)
+      );
+    });
 
-        return result;
-    }
+    builder.put("streak_category", (holder1, user) -> {
+      return Component.text(
+          holder1.getValue()
+              .getStreakCategory()
+              .getDisplayName()
+      );
+    });
 
-    static ImmutableMap<String, PlaceholderFormatter> createFormatter() {
-        ImmutableMap.Builder<String, PlaceholderFormatter>
-                builder = ImmutableMap.builder();
+    builder.put("type", (holder1, user) -> {
+      return Component.text(
+          holder1.getValue()
+              .getResetInterval()
+              .getDisplayName()
+      );
+    });
 
-        builder.put("goal", (holder1, user) -> {
-            if (user == null) {
-                return null;
-            }
+    return builder.build();
+  }
 
-            return Text.format(
-                    "{0, number}",
-                    holder1.getValue().getGoal(user)
-            );
-        });
+  private interface PlaceholderFormatter {
 
-        builder.put("streak_category", (holder1, user) -> {
-            return Component.text(
-                    holder1.getValue()
-                            .getStreakCategory()
-                            .getDisplayName()
-            );
-        });
-
-        builder.put("type", (holder1, user) -> {
-            return Component.text(
-                    holder1.getValue()
-                            .getResetInterval()
-                            .getDisplayName()
-            );
-        });
-
-        return builder.build();
-    }
-
-    private interface PlaceholderFormatter {
-        Component format(Holder<Challenge> holder, User user);
-    }
+    Component format(Holder<Challenge> holder, User user);
+  }
 }

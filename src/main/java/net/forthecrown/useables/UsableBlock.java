@@ -13,41 +13,42 @@ import org.spongepowered.math.vector.Vector3i;
 
 @RequiredArgsConstructor
 public class UsableBlock extends BukkitSavedUsable {
-    @Getter
-    private final World world;
-    @Getter
-    private final Vector3i position;
 
-    @Override
-    public void adminInfo(TextWriter writer) {
-        writer.field("Position", position);
-        writer.field("World", world.getName());
-        super.adminInfo(writer);
-    }
+  @Getter
+  private final World world;
+  @Getter
+  private final Vector3i position;
 
-    public Block getBlock() {
-        return Vectors.getBlock(position, world);
-    }
+  @Override
+  public void adminInfo(TextWriter writer) {
+    writer.field("Position", position);
+    writer.field("World", world.getName());
+    super.adminInfo(writer);
+  }
 
-    public TileState getTileEntity() {
-        return (TileState) getBlock().getState();
-    }
+  public Block getBlock() {
+    return Vectors.getBlock(position, world);
+  }
 
-    @Override
-    public void save() {
-        var tile = getTileEntity();
-        save(tile.getPersistentDataContainer());
+  public TileState getTileEntity() {
+    return (TileState) getBlock().getState();
+  }
 
-        tile.update();
-    }
+  @Override
+  public void save() {
+    var tile = getTileEntity();
+    save(tile.getPersistentDataContainer());
 
-    @Override
-    public PersistentDataContainer getDataContainer() {
-        return getTileEntity().getPersistentDataContainer();
-    }
+    tile.update();
+  }
 
-    @Override
-    protected NamespacedKey getDataKey() {
-        return Usables.BLOCK_KEY;
-    }
+  @Override
+  public PersistentDataContainer getDataContainer() {
+    return getTileEntity().getPersistentDataContainer();
+  }
+
+  @Override
+  protected NamespacedKey getDataKey() {
+    return Usables.BLOCK_KEY;
+  }
 }

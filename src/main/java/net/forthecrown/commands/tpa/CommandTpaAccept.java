@@ -9,44 +9,45 @@ import net.forthecrown.user.TeleportRequest;
 import net.forthecrown.user.User;
 
 public class CommandTpaAccept extends FtcCommand {
-    public CommandTpaAccept(){
-        super("tpaccept");
 
-        setPermission(Permissions.TPA);
-        setDescription("Accepts a tpa request");
+  public CommandTpaAccept() {
+    super("tpaccept");
 
-        register();
-    }
+    setPermission(Permissions.TPA);
+    setDescription("Accepts a tpa request");
 
-    @Override
-    protected void createCommand(BrigadierCommand command) {
-        command
-                .then(argument("user", Arguments.ONLINE_USER)
-                        .executes(c -> {
-                            User user = getUserSender(c);
-                            User target = Arguments.getUser(c, "user");
+    register();
+  }
 
-                            TeleportRequest r = user.getInteractions().getIncoming(target);
+  @Override
+  protected void createCommand(BrigadierCommand command) {
+    command
+        .then(argument("user", Arguments.ONLINE_USER)
+            .executes(c -> {
+              User user = getUserSender(c);
+              User target = Arguments.getUser(c, "user");
 
-                            if (r == null) {
-                                throw Exceptions.noIncoming(target);
-                            }
+              TeleportRequest r = user.getInteractions().getIncoming(target);
 
-                            r.accept();
-                            return 0;
-                        })
-                )
+              if (r == null) {
+                throw Exceptions.noIncoming(target);
+              }
 
-                .executes(c -> {
-                    User user = getUserSender(c);
-                    TeleportRequest r = user.getInteractions().latestIncoming();
+              r.accept();
+              return 0;
+            })
+        )
 
-                    if (r == null) {
-                        throw Exceptions.NO_TP_REQUESTS;
-                    }
+        .executes(c -> {
+          User user = getUserSender(c);
+          TeleportRequest r = user.getInteractions().latestIncoming();
 
-                    r.accept();
-                    return 0;
-                });
-    }
+          if (r == null) {
+            throw Exceptions.NO_TP_REQUESTS;
+          }
+
+          r.accept();
+          return 0;
+        });
+  }
 }

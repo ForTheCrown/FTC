@@ -9,25 +9,26 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @RequiredArgsConstructor
 public class DamageGoal implements WeaponGoal {
-    private final int goal;
 
-    @Override
-    public boolean test(EntityDamageByEntityEvent event) {
-        return true;
-    }
+  private final int goal;
 
-    @Override
-    public int getIncrementAmount(EntityDamageByEntityEvent event) {
-        return (int) event.getFinalDamage();
-    }
+  @Override
+  public boolean test(EntityDamageByEntityEvent event) {
+    return true;
+  }
 
-    @Override
-    public Component loreDisplay() {
-        return Component.text("Dealt damage");
-    }
+  @Override
+  public int getIncrementAmount(EntityDamageByEntityEvent event) {
+    return (int) event.getFinalDamage();
+  }
 
-    @Override
-    public @NotNull String getName() {
-        return "dealt_damage";
-    }
+  @Override
+  public Component loreDisplay() {
+    return Component.text("Dealt damage");
+  }
+
+  @Override
+  public @NotNull String getName() {
+    return "dealt_damage";
+  }
 }
