@@ -27,7 +27,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class SaveReloadCommands extends FtcCommand {
 
-  private static final EnumArgument<Section> SECTION_ARGUMENT = EnumArgument.of(Section.class);
+  private static final EnumArgument<Section> SECTION_ARGUMENT
+      = EnumArgument.of(Section.class);
 
   private final boolean save;
 

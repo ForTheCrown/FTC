@@ -87,6 +87,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.math.GenericMath;
 
 public class User implements ForwardingAudience.Single,
     HoverEventSource<Component>, Identity {
@@ -472,6 +473,15 @@ public class User implements ForwardingAudience.Single,
     }
 
     getTimeTracker().setCurrent(TimeField.LAST_LOGIN);
+
+    // Inform of guild Exp Multiplier
+    var modifier = GuildManager.get()
+        .getExpModifier()
+        .getModifier();
+
+    if (getGuild() != null && GenericMath.floor(modifier) > 1) {
+      sendMessage(Messages.guildMultiplierActive(modifier));
+    }
 
     // Tell admin if this user has notes
     if (Punishments.hasNotes(this)) {

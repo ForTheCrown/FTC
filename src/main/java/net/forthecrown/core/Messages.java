@@ -2807,7 +2807,10 @@ public interface Messages {
       NamedTextColor.GRAY
   );
 
-  TextComponent G_INVITE_CANCEL_TARGET = text("The guild cancelled their invite");
+  TextComponent WEEKEND_MULTIPLIER_INACTIVE = text(
+      "Weekend multiplier is no longer active :(",
+      NamedTextColor.YELLOW
+  );
 
   static Component leftGuild(Guild guild) {
     return format("You've left the &f{0}&r guild.",
@@ -2949,6 +2952,38 @@ public interface Messages {
             chatMessage(displayName, message)
         )
         .build();
+  }
+
+  static Component multiplierNowActive(float mod) {
+    return format(
+        "&6{0, number}x multiplier on all earned &6Guild Exp&r now active!",
+        NamedTextColor.YELLOW,
+        mod
+    );
+  }
+
+  static Component multiplierIncremented(float mod) {
+    return format(
+        "Guild Exp multiplier increased to &6{0, number}x&r!",
+        NamedTextColor.YELLOW,
+        mod
+    );
+  }
+
+  static Component weekendMultiplierActive(float mod) {
+    return format(
+        "Weekend Guild Exp multiplier is now active! &6({0, number}x)",
+        NamedTextColor.YELLOW,
+        mod
+    );
+  }
+
+  static Component guildMultiplierActive(float mod) {
+    return format(
+        "There's a &6{0, number}x multiplier&r on all earned Guild Exp!",
+        NamedTextColor.YELLOW,
+        mod
+    );
   }
 
   /* ---------------------------- CHALLENGES ----------------------------- */

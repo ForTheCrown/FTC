@@ -43,21 +43,21 @@ public @UtilityClass class BinaryJson {
       // Null
       TYPE_NULL = 0,
 
-  // Container types
-  TYPE_OBJECT = 1,
+      // Container types
+      TYPE_OBJECT = 1,
       TYPE_EMPTY_OBJECT = 2,
       TYPE_ARRAY = 3,
       TYPE_EMPTY_ARRAY = 4,
 
-  // String
-  TYPE_STRING = 5,
+      // String
+      TYPE_STRING = 5,
 
-  // Booleans
-  TYPE_FALSE = 6,
+      // Booleans
+      TYPE_FALSE = 6,
       TYPE_TRUE = 7,
 
-  // Numbers
-  TYPE_BYTE = 8,
+      // Numbers
+      TYPE_BYTE = 8,
       TYPE_SHORT = 9,
       TYPE_INT = 10,
       TYPE_LONG = 11,
@@ -65,7 +65,7 @@ public @UtilityClass class BinaryJson {
       TYPE_DOUBLE = 13,
 
   // Special numbers
-  TYPE_BIG_DECIMAL = 14,
+      TYPE_BIG_DECIMAL = 14,
       TYPE_BIG_INTEGER = 15;
 
   private static final JsonPrimitive

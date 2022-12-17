@@ -1,5 +1,16 @@
 package net.forthecrown.core.challenge;
 
+import static net.forthecrown.core.challenge.ChallengeLogs.ACTIVE;
+import static net.forthecrown.core.challenge.ChallengeLogs.A_CHALLENGE;
+import static net.forthecrown.core.challenge.ChallengeLogs.A_EXTRA;
+import static net.forthecrown.core.challenge.ChallengeLogs.A_TYPE;
+import static net.forthecrown.core.challenge.ChallengeLogs.COMPLETED;
+import static net.forthecrown.core.challenge.ChallengeLogs.C_CHALLENGE;
+import static net.forthecrown.core.challenge.ChallengeLogs.C_PLAYER;
+import static net.forthecrown.core.challenge.ChallengeLogs.STREAK_SCHEMA;
+import static net.forthecrown.core.challenge.ChallengeLogs.S_CATEGORY;
+import static net.forthecrown.core.challenge.ChallengeLogs.S_PLAYER;
+
 import com.google.common.base.Strings;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -49,23 +60,23 @@ public final class Challenges {
   }
 
   public static void logActivation(Holder<Challenge> challenge, String extra) {
-    LogEntry entry = LogEntry.of(ChallengeLogs.ACTIVE)
-        .set(ChallengeLogs.A_CHALLENGE, challenge.getKey())
-        .set(ChallengeLogs.A_TYPE, challenge.getValue().getResetInterval());
+    LogEntry entry = LogEntry.of(ACTIVE)
+        .set(A_CHALLENGE, challenge.getKey())
+        .set(A_TYPE, challenge.getValue().getResetInterval());
 
     if (!Strings.isNullOrEmpty(extra)) {
-      entry.set(ChallengeLogs.A_EXTRA, extra);
+      entry.set(A_EXTRA, extra);
     }
 
-    DataLogs.log(ChallengeLogs.ACTIVE, entry);
+    DataLogs.log(ACTIVE, entry);
   }
 
   public static void logCompletion(Holder<Challenge> challenge, UUID uuid) {
-    LogEntry entry = LogEntry.of(ChallengeLogs.COMPLETED)
-        .set(ChallengeLogs.C_PLAYER, uuid)
-        .set(ChallengeLogs.C_CHALLENGE, challenge.getKey());
+    LogEntry entry = LogEntry.of(COMPLETED)
+        .set(C_PLAYER, uuid)
+        .set(C_CHALLENGE, challenge.getKey());
 
-    DataLogs.log(ChallengeLogs.COMPLETED, entry);
+    DataLogs.log(COMPLETED, entry);
   }
 
   public static boolean hasCompleted(Challenge challenge, UUID uuid) {
@@ -88,14 +99,14 @@ public final class Challenges {
     };
 
     return !DataLogs.query(
-        LogQuery.builder(ChallengeLogs.COMPLETED)
+        LogQuery.builder(COMPLETED)
             .maxResults(1)
             .queryRange(Range.between(start, LocalDate.now()))
 
-            .field(ChallengeLogs.C_PLAYER)
+            .field(C_PLAYER)
             .add(uuid1 -> Objects.equals(uuid1, uuid))
 
-            .field(ChallengeLogs.C_CHALLENGE)
+            .field(C_CHALLENGE)
             .add(s -> Objects.equals(s, challenge.getKey()))
 
             .build()
@@ -260,11 +271,11 @@ public final class Challenges {
 
   public static void logStreak(StreakCategory category, UUID uuid) {
     DataLogs.log(
-        ChallengeLogs.STREAK_SCHEMA,
+        STREAK_SCHEMA,
 
-        LogEntry.of(ChallengeLogs.STREAK_SCHEMA)
-            .set(ChallengeLogs.S_CATEGORY, category)
-            .set(ChallengeLogs.S_PLAYER, uuid)
+        LogEntry.of(STREAK_SCHEMA)
+            .set(S_CATEGORY, category)
+            .set(S_PLAYER, uuid)
     );
   }
 
@@ -273,14 +284,14 @@ public final class Challenges {
                                    UUID uuid
   ) {
     var result = DataLogs.query(
-        LogQuery.builder(ChallengeLogs.STREAK_SCHEMA)
+        LogQuery.builder(STREAK_SCHEMA)
             .queryRange(dateRange)
             .maxResults(1)
 
-            .field(ChallengeLogs.S_PLAYER)
+            .field(S_PLAYER)
             .add(uuid1 -> Objects.equals(uuid1, uuid))
 
-            .field(ChallengeLogs.S_CATEGORY)
+            .field(S_CATEGORY)
             .add(category1 -> Objects.equals(category, category1))
 
             .build()

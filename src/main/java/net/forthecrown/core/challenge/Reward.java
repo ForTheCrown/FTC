@@ -8,13 +8,19 @@ import lombok.Data;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.script2.Script;
+import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.TextJoiner;
+import net.forthecrown.utils.text.format.UnitFormat;
 import net.forthecrown.utils.text.writer.TextWriter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
+import org.spongepowered.math.GenericMath;
 
 @Getter
 @Builder(builderClassName = "Builder")
@@ -119,18 +125,45 @@ public class Reward {
     int gemReward = gems.getInt(streak);
     int guildReward = guildExp.getInt(streak);
 
+    TextJoiner joiner = TextJoiner.newJoiner()
+        .setPrefix(Component.text("You got: ", NamedTextColor.YELLOW))
+        .setSuffix(Component.text(".", NamedTextColor.YELLOW))
+        .setDelimiter(Component.text(", ", NamedTextColor.YELLOW))
+        .setColor(NamedTextColor.GOLD);
+
     if (rhineReward > 0) {
       user.addBalance(rhineReward);
+      joiner.add(UnitFormat.rhines(rhineReward));
     }
 
     if (gemReward > 0) {
       user.addGems(0);
+      joiner.add(UnitFormat.gems(rhineReward));
     }
 
     var guild = user.getGuild();
     if (guildReward > 0 && guild != null) {
       var member = guild.getMember(user.getUniqueId());
-      member.addExpEarned(guildReward);
+
+      var modifier = GuildManager.get().getExpModifier();
+      float mod = modifier.getModifier();
+      int modified = modifier.applyAsInt(guildReward);
+
+      member.addExpEarned(modified);
+
+      // Floating point precision
+      if (GenericMath.floor(mod) > 1) {
+        joiner.add(
+            Text.format(
+                "{0, number} Guild Exp ({1, number}x multiplier)",
+                modified, mod
+            )
+        );
+      } else {
+        joiner.add(
+            Text.format("{0, number} Guild Exp", guildReward)
+        );
+      }
     }
 
     if (ItemStacks.notEmpty(item)) {
@@ -139,7 +172,11 @@ public class Reward {
           user.getLocation(),
           item.clone()
       );
+
+      joiner.add(Text.itemDisplayName(item));
     }
+
+    user.sendMessage(joiner);
 
     if (!Strings.isNullOrEmpty(claimScript)) {
       Script.run(claimScript, "onRewardClaim", user, streak);
@@ -169,7 +206,21 @@ public class Reward {
     }
 
     if (guildExp > 0) {
-      writer.field("Guild Exp", Text.NUMBER_FORMAT.format(guildExp));
+      var modifier = GuildManager.get().getExpModifier();
+      float mod = modifier.getModifier();
+
+      if (mod > 0) {
+        writer.field("Guild Exp",
+            Text.format(
+                "{0, number} ({1, number}x multiplier, {2, number} originally)",
+                modifier.applyAsInt(guildExp),
+                mod,
+                guildExp
+            )
+        );
+      } else {
+        writer.field("Guild Exp", Text.formatNumber(guildExp));
+      }
     }
 
     if (ItemStacks.notEmpty(item)) {

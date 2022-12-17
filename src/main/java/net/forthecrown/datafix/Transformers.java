@@ -15,21 +15,20 @@ import net.forthecrown.utils.io.PathUtil;
 import org.apache.logging.log4j.Logger;
 
 /**
- * A class to handle data transformers. A data transformer is anything which trudges through a
- * relatively large amount to data to reformat, fix or change it. Mostly I use these to update data
- * to a new format, like for updating users from YAML -> JSON
+ * A class to handle data transformers. A data transformer is anything which
+ * trudges through a relatively large amount to data to reformat, fix or change
+ * it. Mostly I use these to update data to a new format, like for updating
+ * users from YAML -> JSON
  * <p>
- * Data transformers need to have a specific implementation, Normally, each data transformer will be
- * checked if they've been ran before, if that passes, this class will look for a
- * <code>static boolean shouldRun()</code> method, if that's found
- * and returns true, then this class will attempt to call a
- * <code>static void run()</code> method to initiate the transformer
+ * Data transformers need to have a specific implementation, Normally, each data
+ * transformer will be checked if they've been ran before.
  */
 public class Transformers {
 
   private static final Logger LOGGER = FTC.getLogger();
 
   // A list of all current data transformers
+  // Add and remove entries from here as needed
   private static final DataUpdater[] CURRENT_TRANSFORMERS = {
   };
 

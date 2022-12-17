@@ -29,6 +29,10 @@ class GuildHelpNode extends GuildCommandNode {
       var writer = createHelpWriter(getLabel(c));
 
       for (var n : GuildCommands.NODES) {
+        if (!c.getSource().hasPermission(n.getPermission())) {
+          continue;
+        }
+
         if (!writer.isLineEmpty()) {
           writer.newLine();
         }

@@ -100,7 +100,7 @@ public @UtilityClass class Users {
     );
   }
 
-  /* ----------------------------- UTILITY ------------------------------ */
+  /* ------------------------------ UTILITY ------------------------------- */
 
   /**
    * Tests if the given UUID belongs to a player that has played on the server.

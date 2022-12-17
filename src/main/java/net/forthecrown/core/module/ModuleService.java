@@ -26,8 +26,7 @@ public class ModuleService implements Runnable {
   private final Class<? extends Annotation> annotationType;
 
   @Getter
-  private final List<Pair<Object, Method>>
-      callbacks = new ObjectArrayList<>();
+  private final List<Pair<Object, Method>> callbacks = new ObjectArrayList<>();
 
   public static ModuleService of(Class<? extends Annotation> annotationType) {
     return new ModuleService(annotationType);

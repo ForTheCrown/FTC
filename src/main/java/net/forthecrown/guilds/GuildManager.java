@@ -15,14 +15,19 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
+import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
+import net.forthecrown.core.Announcer;
 import net.forthecrown.core.DynmapUtil;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.Messages;
+import net.forthecrown.core.config.ConfigManager;
 import net.forthecrown.core.module.OnDayChange;
+import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.guilds.unlockables.UnlockableColor;
@@ -62,6 +67,9 @@ public class GuildManager {
   @Getter
   private transient final UUID2IntMap expTop = new UUID2IntMap(null);
 
+  @Getter
+  private final ExpModifiers expModifier = new ExpModifiers();
+
   private GuildManager() {
     storage = new GuildDataStorage(PathUtil.getPluginDirectory("guilds"));
   }
@@ -70,9 +78,25 @@ public class GuildManager {
     return inst;
   }
 
+  @OnEnable
+  private void onEnable() {
+    ConfigManager.get().registerConfig(GuildConfig.class);
+  }
+
   @OnDayChange
   void onDayChange(ZonedDateTime time) {
     resetDailyExpEarnedAmounts();
+
+    var announcer = Announcer.get();
+
+    // If start of weekend or end of weekend, announce multiplier state change
+    if (time.getDayOfWeek() == DayOfWeek.SATURDAY) {
+      announcer.announce(
+          Messages.weekendMultiplierActive(expModifier.getModifier())
+      );
+    } else if (time.getDayOfWeek() == DayOfWeek.MONDAY) {
+      announcer.announce(Messages.WEEKEND_MULTIPLIER_INACTIVE);
+    }
   }
 
   public void createGuild(User user, String guildName) {
@@ -264,12 +288,15 @@ public class GuildManager {
       storage.saveGuild(g);
       storage.saveChunks(g.getId(), getGuildChunks(g));
     }
+
+    storage.saveModifiers(getExpModifier());
   }
 
   @OnLoad
   public void load() {
     clear();
 
+    storage.loadModifiers(expModifier);
     storage.findExistingGuilds().forEach(uuid -> {
       Guild guild = storage.loadGuild(uuid);
 

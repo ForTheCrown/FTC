@@ -30,6 +30,7 @@ public class GuildCommands {
       new GuildDeleteNode(),
 
       new GuildDiscoveryNode(),
+      new GuildMultiplierNode(),
 
       new GuildChangeRankNode("guildpromote", "promote", true),
       new GuildChangeRankNode("guilddemote", "demote", false),

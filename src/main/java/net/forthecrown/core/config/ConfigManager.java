@@ -40,14 +40,15 @@ public class ConfigManager {
       throw new IllegalArgumentException("File path not set");
     }
 
+    String trimmed = data.filePath().trim();
     Path path;
 
-    if (data.filePath().trim().startsWith("ForTheCrown/")) {
-      path = PathUtil.pluginPath(data.filePath().trim());
-    } else if (data.filePath().trim().startsWith("plugins/")) {
-      path = Paths.get("plugins", data.filePath());
+    if (trimmed.startsWith("ForTheCrown/")) {
+      path = PathUtil.pluginPath(trimmed.replaceAll("ForTheCrown/", ""));
+    } else if (trimmed.startsWith("plugins/")) {
+      path = Paths.get(data.filePath());
     } else {
-      path = Configs.DIRECTORY.resolve(data.filePath());
+      path = Configs.DIRECTORY.resolve(trimmed);
     }
 
     configs.add(new ConfigFileData(path, file));

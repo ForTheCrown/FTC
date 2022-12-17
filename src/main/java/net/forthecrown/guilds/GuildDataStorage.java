@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @RequiredArgsConstructor
 public class GuildDataStorage {
+  public static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$");
 
   private static final Logger LOGGER = FTC.getLogger();
 
@@ -49,15 +51,18 @@ public class GuildDataStorage {
    */
   private final Path chunkFile;
 
+  private final Path modifiers;
+
   /* ---------------------------- CONSTRUCTOR ----------------------------- */
 
   GuildDataStorage(Path directory) {
     this.directory = directory;
     this.archiveDirectory = directory.resolve("archive");
     this.chunkFile = directory.resolve("chunks.json");
+    this.modifiers = directory.resolve("modifiers.json");
   }
 
-  /* ----------------------- GUILD SERIALIZATION ------------------------- */
+  /* ------------------------ GUILD SERIALIZATION ------------------------- */
 
   /**
    * Deletes the file belonging to the given guild
@@ -81,6 +86,8 @@ public class GuildDataStorage {
       for (var p : stream) {
         if (p.equals(getChunkFile())
             || p.equals(getArchiveDirectory())
+            || p.equals(getModifiers())
+            || p.toString().contains("config.json")
         ) {
           continue;
         }
@@ -262,5 +269,20 @@ public class GuildDataStorage {
               )
           );
         });
+  }
+
+  /* ----------------------------- MODIFIERS ------------------------------ */
+
+  public void loadModifiers(ExpModifiers modifiers) {
+    if (!Files.exists(this.modifiers)) {
+      modifiers.clear();
+      return;
+    }
+
+    SerializationHelper.readJsonFile(this.modifiers, modifiers::deserialize);
+  }
+
+  public void saveModifiers(ExpModifiers modifiers) {
+    SerializationHelper.writeJson(this.modifiers, modifiers.serialize());
   }
 }

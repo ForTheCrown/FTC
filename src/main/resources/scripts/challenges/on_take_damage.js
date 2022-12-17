@@ -3,8 +3,11 @@ function canComplete(user) {
 }
 
 function onEvent(event, handle) {
-    // EntityDamageEvent
-    var dmg = (float)(event.getFinalDamage() / 2);
+    if (event.getEntity().getType() != EntityType.PLAYER) {
+        return;
+    }
 
-    handle.givePoints(event.getPlayer(), dmg);
+    // EntityDamageEvent
+    var dmg = event.getFinalDamage() / 2;
+    handle.givePoints(event.getEntity(), dmg);
 }

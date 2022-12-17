@@ -2,6 +2,7 @@ package net.forthecrown.events.economy;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -49,92 +50,100 @@ public class ShopCreateListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onSignShopCreate(SignChangeEvent event1) {
-    Events.runSafe(event1.getPlayer(), event1, event -> {
-      if (Text.toString(event.line(0)).isBlank()) {
-        return;
-      }
+    Events.runSafe(event1.getPlayer(), event1, this::onShopCreateThrowing);
+  }
 
-      Player player = event.getPlayer();
+  private void onShopCreateThrowing(SignChangeEvent event)
+      throws CommandSyntaxException
+  {
+    if (Text.toString(event.line(0)).isBlank()) {
+      return;
+    }
 
-      String line0 = Text.plain(event.line(0)).trim();
-      String line1 = Text.plain(event.line(1));
-      String line2 = Text.plain(event.line(2));
-      String line3 = Text.plain(event.line(3));
+    Player player = event.getPlayer();
 
-      ShopType shopType;
+    String line0 = Text.plain(event.line(0)).trim();
+    String line1 = Text.plain(event.line(1));
+    String line2 = Text.plain(event.line(2));
+    String line3 = Text.plain(event.line(3));
 
-      if (SELL_PATTERN.matcher(line0).matches()) {
-        shopType = ShopType.SELL;
-      } else if (BUY_PATTERN.matcher(line0).matches()) {
-        shopType = ShopType.BUY;
-      } else {
-        // Top line matches neither of the type patterns, therefor
-        // the player is probably not even trying to make a shop sign
-        return;
-      }
+    ShopType shopType;
 
-      if (player.getGameMode() == GameMode.CREATIVE
-          && player.hasPermission(Permissions.SHOP_ADMIN)
-      ) {
-        shopType = shopType.toAdmin();
-      }
+    if (SELL_PATTERN.matcher(line0).matches()) {
+      shopType = ShopType.SELL;
+    } else if (BUY_PATTERN.matcher(line0).matches()) {
+      shopType = ShopType.BUY;
+    } else {
+      // Top line matches neither of the type patterns, therefor
+      // the player is probably not even trying to make a shop sign
+      return;
+    }
 
-      // No price given
-      if (line3.isBlank()) {
-        throw Exceptions.SHOP_NO_PRICE;
-      }
+    if (player.getGameMode() == GameMode.CREATIVE
+        && player.hasPermission(Permissions.SHOP_ADMIN)
+    ) {
+      shopType = shopType.toAdmin();
+    }
 
-      Sign sign = (Sign) event.getBlock().getState();
-      String lastLine = line3.toLowerCase()
-          .replaceAll("\\D", "")
-          .trim();
+    // No price given
+    if (line3.isBlank()) {
+      throw Exceptions.SHOP_NO_PRICE;
+    }
 
-      // Parse price
-      int price;
-      try {
-        price = Integer.parseInt(lastLine);
-      } catch (Exception e) {
-        throw Exceptions.SHOP_NO_PRICE;
-      }
+    Sign sign = (Sign) event.getBlock().getState();
+    String lastLine = line3.toLowerCase()
+        .replaceAll("\\D", "")
+        .trim();
 
-      // Make sure they don't exceed the max shop price
-      if (price > GeneralConfig.maxSignShopPrice) {
-        throw Exceptions.shopMaxPrice();
-      }
+    // Parse price
+    int price;
+    try {
+      price = Integer.parseInt(lastLine);
+    } catch (Exception e) {
+      throw Exceptions.SHOP_NO_PRICE;
+    }
 
-      // They must give at least one line of info about the shop
-      if (line2.isBlank() && line1.isBlank()) {
-        throw Exceptions.SHOP_NO_DESC;
-      }
+    // Make sure they don't exceed the max shop price
+    if (price > GeneralConfig.maxSignShopPrice) {
+      throw Exceptions.shopMaxPrice();
+    }
 
-      //WorldGuard flag check
-      StateFlag.State state = FtcFlags.query(player.getLocation(), FtcFlags.SHOP_CREATION);
+    // They must give at least one line of info about the shop
+    if (line2.isBlank() && line1.isBlank()) {
+      throw Exceptions.SHOP_NO_DESC;
+    }
 
-      if (state == StateFlag.State.DENY
-          && !player.hasPermission(Permissions.ADMIN)
-      ) {
-        player.sendMessage(Messages.WG_CANNOT_MAKE_SHOP);
-        return;
-      }
+    //WorldGuard flag check
+    StateFlag.State state = FtcFlags.query(player.getLocation(), FtcFlags.SHOP_CREATION);
 
-      ShopManager shopManager = Economy.get().getShops();
+    if (state == StateFlag.State.DENY
+        && !player.hasPermission(Permissions.ADMIN)
+    ) {
+      player.sendMessage(Messages.WG_CANNOT_MAKE_SHOP);
+      return;
+    }
 
-      //creates the signshop
-      SignShop shop = shopManager.createSignShop(sign.getLocation(), shopType, price,
-          player.getUniqueId());
+    ShopManager shopManager = Economy.get().getShops();
 
-      //Opens the example item selection screen
-      player.openInventory(SignShops.createExampleInventory());
-      Events.register(new ExampleItemSelectionListener(player, shop));
+    //creates the sign shop
+    SignShop shop = shopManager.createSignShop(
+        sign.getLocation(),
+        shopType,
+        price,
+        player.getUniqueId()
+    );
 
-      if (shopType == ShopType.BUY) {
-        event.line(0, shopType.getUnStockedLabel());
-      } else {
-        event.line(0, shopType.getStockedLabel());
-      }
+    //Opens the example item selection screen
+    player.openInventory(SignShops.createExampleInventory(shop));
+    Events.register(new ExampleItemSelectionListener(player, shop));
 
-      event.line(3, SignShops.priceLine(price));
-    });
+    if (shopType == ShopType.BUY) {
+      event.line(0, shopType.getUnStockedLabel());
+    } else {
+      event.line(0, shopType.getStockedLabel());
+    }
+
+    event.line(3, SignShops.priceLine(price));
   }
 
   @RequiredArgsConstructor

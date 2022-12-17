@@ -29,7 +29,9 @@ public class CommandSudo extends FtcCommand {
                 .suggests((c, b) -> {
                   String token = b.getRemaining().toLowerCase();
 
-                  if (token.isBlank() || token.startsWith(CHAT_PREFIX)) {
+                  if (token.isBlank()
+                      || CHAT_PREFIX.startsWith(token.toLowerCase())
+                  ) {
                     CompletionProvider.suggestMatching(b, CHAT_PREFIX);
                   }
 

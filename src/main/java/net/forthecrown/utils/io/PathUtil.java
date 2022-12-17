@@ -292,7 +292,11 @@ public final class PathUtil {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-      results.add(fileName(root.relativize(file).toString()));
+      String s = fileName(root.relativize(file).toString());
+
+      // I hate Windows' directory separators
+      results.add(s.replaceAll("\\\\", "/"));
+
       return FileVisitResult.CONTINUE;
     }
 

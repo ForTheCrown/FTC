@@ -34,8 +34,6 @@ import net.forthecrown.utils.inventory.menu.Menu;
 import net.forthecrown.utils.io.PathUtil;
 import org.apache.commons.lang3.Range;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.entity.EnderPearl;
-import org.openjdk.nashorn.internal.objects.NativeJavaImporter;
 
 public class ChallengeManager {
 
@@ -203,8 +201,10 @@ public class ChallengeManager {
   }
 
   public void activate(Holder<Challenge> holder, boolean resetting) {
-    var extra = holder.getValue().activate(resetting);
     activeChallenges.add(holder.getValue());
+
+    var extra = holder.getValue()
+        .activate(resetting);
 
     if (resetting) {
       Challenges.logActivation(holder, extra);
