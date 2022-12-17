@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.waypoint.Waypoint;
+import net.forthecrown.waypoint.WaypointConfig;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.math.vector.Vector3d;
@@ -79,5 +80,14 @@ public abstract class WaypointType {
 
   public boolean isDestroyed(Waypoint waypoint) {
     return false;
+  }
+
+  protected static Bounds3i boundsFromSize(Vector3i size) {
+    Vector3i halfSize = size.div(2, 1, 2);
+
+    return Bounds3i.of(
+        halfSize.negate().withY(0),
+        halfSize.sub(0, 1, 0)
+    );
   }
 }

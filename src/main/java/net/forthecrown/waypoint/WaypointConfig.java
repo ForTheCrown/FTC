@@ -14,19 +14,18 @@ public @UtilityClass class WaypointConfig {
    * The required X Y Z size of player-made waypoints
    */
   public Vector3i
-      playerWaypointSize = Vector3i.from(5);
+      playerWaypointSize = Vector3i.from(5),
+      adminWaypointSize = Vector3i.from(5);
 
   /**
    * Name of the spawn waypoint
    */
-  public String
-      spawnWaypoint = "Hazelguard";
+  public String spawnWaypoint = "Hazelguard";
 
   /**
    * Worlds players cannot move their waypoints to
    */
-  public String[]
-      disabledPlayerWorlds = {"world_void", "world_resource", "world_the_end"};
+  public String[] disabledPlayerWorlds = {"world_void", "world_resource", "world_the_end"};
 
   /**
    * Delay between a waypoint being marked for removal and when it's actually deleted
@@ -38,8 +37,7 @@ public @UtilityClass class WaypointConfig {
   /**
    * Determines whether /movein enforces a cooldown
    */
-  public boolean
-      moveInHasCooldown = false;
+  public boolean moveInHasCooldown = false;
 
   public boolean isDisabledWorld(World w) {
     return ArrayUtils.contains(disabledPlayerWorlds, w.getName());

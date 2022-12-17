@@ -46,13 +46,7 @@ public class RegionPoleType extends PlayerWaypointType {
 
   @Override
   public @NotNull Bounds3i createBounds() {
-    var halfSize = Waypoints.poleSize()
-        .div(2, 1, 2);
-
-    return Bounds3i.of(
-        halfSize.negate().withY(0),
-        halfSize
-    );
+    return boundsFromSize(Waypoints.poleSize());
   }
 
   @Override
