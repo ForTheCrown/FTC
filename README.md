@@ -22,7 +22,10 @@ changes and submit a pull request, we'll look over the pull request and then
 decide if we'll include it or not.  
   
 Even if we do not include your changes, we'll still be thankful you chose to 
-contribute to our codebase
+contribute to our codebase.  
+  
+As a general rule of thumb, we use [Google's Java style](https://google.github.io/styleguide/javaguide.html)
+with a column character limit of 80.
 
 ## Dependencies
 FTC mostly on the PaperMC and other open-source libraries that can be 
