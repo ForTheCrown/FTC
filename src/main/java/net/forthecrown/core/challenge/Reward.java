@@ -20,7 +20,6 @@ import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
-import org.spongepowered.math.GenericMath;
 
 @Getter
 @Builder(builderClassName = "Builder")
@@ -151,8 +150,7 @@ public class Reward {
 
       member.addExpEarned(modified);
 
-      // Floating point precision
-      if (GenericMath.floor(mod) > 1) {
+      if (mod > 1) {
         joiner.add(
             Text.format(
                 "{0, number} Guild Exp ({1, number}x multiplier)",
@@ -209,7 +207,7 @@ public class Reward {
       var modifier = GuildManager.get().getExpModifier();
       float mod = modifier.getModifier();
 
-      if (mod > 0) {
+      if (mod > 1) {
         writer.field("Guild Exp",
             Text.format(
                 "{0, number} ({1, number}x multiplier, {2, number} originally)",

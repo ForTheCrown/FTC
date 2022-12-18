@@ -105,4 +105,9 @@ public class WorldVec3i implements JsonSerializable {
         .append(getPos())
         .toHashCode();
   }
+
+  @Override
+  public String toString() {
+    return String.format("(world: %s, pos:%s)", getWorld(), getPos());
+  }
 }

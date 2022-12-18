@@ -53,7 +53,7 @@ public final class Challenges {
       METHOD_GET_PLAYER = "getPlayer",
       METHOD_ON_EVENT = "onEvent",
 
-  METHOD_STREAK_INCREASE = "onStreakIncrease";
+      METHOD_STREAK_INCREASE = "onStreakIncrease";
 
   private Challenges() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");

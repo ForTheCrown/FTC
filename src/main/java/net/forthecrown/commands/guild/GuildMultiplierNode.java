@@ -1,11 +1,12 @@
 package net.forthecrown.commands.guild;
 
 import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import java.time.Duration;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.arguments.UserParseResult;
-import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.commands.manager.Commands;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.TimeArgument;
@@ -55,18 +56,8 @@ public class GuildMultiplierNode extends GuildCommandNode {
     );
 
     writer.field(
-        "multiplier remove <player>",
-        "Removes all multipliers started by the given user"
-    );
-
-    writer.field(
-        "multiplier weekendActive",
-        "Shows if the weekend modifer is active"
-    );
-
-    writer.field(
-        "multiplier weekendActive <true | false>",
-        "Enables / Disables the weekend multiplier"
+        "multiplier remove <index>",
+        "Removes the multiplier at the given index"
     );
   }
 
@@ -151,27 +142,16 @@ public class GuildMultiplierNode extends GuildCommandNode {
         )
 
         .then(literal("remove")
-            .then(argument("user", Arguments.USER)
+            .then(argument("index", IntegerArgumentType.integer(1))
                 .executes(c -> {
                   var modifiers = GuildManager.get().getExpModifier();
-                  User user = Arguments.getUser(c, "user");
+                  int index = c.getArgument("index", Integer.class);
+                  var list = modifiers.getMultipliers();
 
-                  boolean removed = modifiers.getMultipliers()
-                      .removeIf(m -> m.getDonator().equals(user.getUniqueId()));
+                  Commands.ensureIndexValid(index, list.size());
 
-                  if (!removed) {
-                    throw Exceptions.format(
-                        "No multiplier with {0, user} as source",
-                        user
-                    );
-                  }
-
-                  c.getSource().sendAdmin(
-                      Text.format(
-                          "Removed all Multipliers started by {0, user}",
-                          user
-                      )
-                  );
+                  list.remove(index);
+                  c.getSource().sendAdmin("Removed multiplier");
                   return 0;
                 })
             )

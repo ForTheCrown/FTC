@@ -1,6 +1,7 @@
 package net.forthecrown.core.challenge;
 
 import com.google.common.collect.ImmutableList;
+import net.forthecrown.core.FTC;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
@@ -128,6 +129,14 @@ public interface Challenge {
     }
 
     getReward().give(user, streak);
+
+    // Find the challenge's entry and then use it's key to log the
+    // user completing this challenge
+    Challenges.apply(this, holder -> {
+      FTC.getLogger().info("{} completed the {} challenge",
+          user.getName(), holder.getKey()
+      );
+    });
   }
 
   /**

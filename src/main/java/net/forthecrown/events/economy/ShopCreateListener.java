@@ -134,7 +134,7 @@ public class ShopCreateListener implements Listener {
     );
 
     //Opens the example item selection screen
-    player.openInventory(SignShops.createExampleInventory(shop));
+    player.openInventory(SignShops.createExampleInventory());
     Events.register(new ExampleItemSelectionListener(player, shop));
 
     if (shopType == ShopType.BUY) {

@@ -214,7 +214,7 @@
   "daily/fish": {
     "displayName": "Fishing",
     "eventClass": "org.bukkit.event.player.PlayerFishEvent",
-    "script": "challenges/generic.js",
+    "script": "challenges/on_fish.js",
     "goal": 10,
     "description": [
       "Catch %goal items by fishing."
@@ -420,7 +420,8 @@
   "weekly/playtime": {
     "displayName": "Playtime",
     "goal": 300,
-    "eventClass": "custom",
+    "eventClass": "org.bukkit.event.player.PlayerJoinEvent",
+    "script": "challenges/playtime.js",
     "type": "weekly",
     "description": [
       "Play for %goal minutes."
@@ -431,11 +432,11 @@
   },
   "weekly/raid": {
     "displayName": "Raid",
-    "eventClass": "org.bukkit.event.raid.RaidTriggerEvent",
-    "script": "challenges/generic.js",
+    "eventClass": "org.bukkit.event.raid.RaidFinishEvent",
+    "script": "challenges/on_raid.js",
     "type": "weekly",
     "description": [
-      "Start a raid."
+      "Finish a raid."
     ],
     "reward": {
       "guildExp": 40

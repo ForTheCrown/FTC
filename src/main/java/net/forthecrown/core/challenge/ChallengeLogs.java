@@ -2,7 +2,6 @@ package net.forthecrown.core.challenge;
 
 import com.mojang.serialization.Codec;
 import java.util.UUID;
-import lombok.experimental.UtilityClass;
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.log.LogSchema;
@@ -10,13 +9,13 @@ import net.forthecrown.log.SchemaField;
 import net.forthecrown.utils.io.FtcCodecs;
 import net.minecraft.core.UUIDUtil;
 
-public @UtilityClass class ChallengeLogs {
+public final class ChallengeLogs {
   /* ---------------------------- COMPLETIONS ----------------------------- */
 
-  public final Holder<LogSchema> COMPLETED;
+  public static final Holder<LogSchema> COMPLETED;
 
-  public final SchemaField<UUID> C_PLAYER;
-  public final SchemaField<String> C_CHALLENGE;
+  public static final SchemaField<UUID> C_PLAYER;
+  public static final SchemaField<String> C_CHALLENGE;
 
   static {
     var builder = LogSchema.builder("challenges/completed");
@@ -29,11 +28,11 @@ public @UtilityClass class ChallengeLogs {
 
   /* ------------------------------ ACTIVES ------------------------------- */
 
-  public final Holder<LogSchema> ACTIVE;
+  public static final Holder<LogSchema> ACTIVE;
 
-  public final SchemaField<String> A_CHALLENGE;
-  public final SchemaField<ResetInterval> A_TYPE;
-  public final SchemaField<String> A_EXTRA;
+  public static final SchemaField<String> A_CHALLENGE;
+  public static final SchemaField<ResetInterval> A_TYPE;
+  public static final SchemaField<String> A_EXTRA;
 
   static {
     var builder = LogSchema.builder("challenges/active");
@@ -47,10 +46,10 @@ public @UtilityClass class ChallengeLogs {
 
   /* ------------------------------ STREAKS ------------------------------- */
 
-  public final Holder<LogSchema> STREAK_SCHEMA;
+  public static final Holder<LogSchema> STREAK_SCHEMA;
 
-  public final SchemaField<UUID> S_PLAYER;
-  public final SchemaField<StreakCategory> S_CATEGORY;
+  public static final SchemaField<UUID> S_PLAYER;
+  public static final SchemaField<StreakCategory> S_CATEGORY;
 
   static {
     var builder = LogSchema.builder("challenges/streaks");
@@ -62,6 +61,11 @@ public @UtilityClass class ChallengeLogs {
     );
 
     STREAK_SCHEMA = builder.register();
+  }
+
+  private ChallengeLogs() {
+    throw new UnsupportedOperationException(
+        "This is a utility class and cannot be instantiated");
   }
 
   @OnEnable

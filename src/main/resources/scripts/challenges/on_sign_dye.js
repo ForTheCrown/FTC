@@ -1,3 +1,5 @@
+const EquipmentSlot = Java.type("org.bukkit.inventory.EquipmentSlot");
+
 function canComplete(user) {
     return user.getGuild() != null;
 }

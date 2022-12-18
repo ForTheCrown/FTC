@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
@@ -31,8 +30,6 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @RequiredArgsConstructor
 public class GuildDataStorage {
-  public static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$");
-
   private static final Logger LOGGER = FTC.getLogger();
 
   /**
@@ -279,7 +276,11 @@ public class GuildDataStorage {
       return;
     }
 
-    SerializationHelper.readJsonFile(this.modifiers, modifiers::deserialize);
+    SerializationHelper.readFile(
+        this.modifiers,
+        file -> JsonUtils.readFile(file).getAsJsonArray(),
+        modifiers::deserialize
+    );
   }
 
   public void saveModifiers(ExpModifiers modifiers) {

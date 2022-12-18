@@ -21,7 +21,6 @@ import net.forthecrown.events.player.PlayerJoinListener;
 import net.forthecrown.events.player.PlayerLeaveListener;
 import net.forthecrown.events.player.PlayerPacketListener;
 import net.forthecrown.events.player.PlayerTeleportListener;
-import net.forthecrown.events.player.PlaytimeChallengeListener;
 import net.forthecrown.events.player.WeaponListener;
 import net.forthecrown.user.packet.PacketListeners;
 import net.forthecrown.utils.Util;
@@ -36,9 +35,7 @@ import org.jetbrains.annotations.Nullable;
  * A class for some general utility methods relating to event listeners
  */
 public final class Events {
-
-  private Events() {
-  }
+  private Events() {}
 
   /**
    * Initializes all FTC listeners
@@ -52,7 +49,6 @@ public final class Events {
     register(new MotdListener());
     register(new PlayerTeleportListener());
     register(new TrapDoorListener());
-    register(new PlaytimeChallengeListener());
 
     // Join / Quit listeners
     register(new PlayerJoinListener());

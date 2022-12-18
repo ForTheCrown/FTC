@@ -132,6 +132,12 @@ public class JsonChallenge implements Challenge {
     } else {
       listener.script = Script.read(script);
     }
+
+    listener.script.getMirror()
+        .put("_challengeHandle", listener.handle);
+
+    listener.script.getMirror()
+        .put("_challenge", this);
   }
 
   @Override

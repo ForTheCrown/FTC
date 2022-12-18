@@ -7,6 +7,7 @@ function onEvent(event, handle) {
     var block = event.getBlock();
 
     if (block != null && block.getType().name().contains("_ORE")) {
+        let player = event.getPlayer();
         handle.givePoint(player);
     }
 }

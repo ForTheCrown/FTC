@@ -11,7 +11,7 @@ function onEvent(event, handle) {
     if (projectile instanceof Snowball && projectile.getShooter() instanceof Player) {
         let player = projectile.getShooter();
 
-        var hit = event.getHitEntity;
+        var hit = event.getHitEntity();
         if (hit != null && hit.getType() == EntityType.PLAYER && hit != player) {
             handle.givePoint(player);
         }

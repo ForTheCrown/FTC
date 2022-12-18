@@ -11,7 +11,7 @@ function onEvent(event, handle) {
     if (projectile instanceof EnderPearl && projectile.getShooter() instanceof Player) {
         let player = projectile.getShooter();
 
-        var hit = event.getHitEntity;
+        var hit = event.getHitEntity();
         if (hit != null && hit.getType() == EntityType.ENDERMAN) {
             handle.givePoint(player);
         }

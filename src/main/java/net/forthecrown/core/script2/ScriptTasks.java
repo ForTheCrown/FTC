@@ -21,30 +21,19 @@ public class ScriptTasks {
     return add(wrapper);
   }
 
-  public TaskWrapper run(Runnable runnable) {
-    return run((task) -> runnable.run());
-  }
-
-  public TaskWrapper runLater(Consumer<TaskWrapper> consumer, long delayTicks) {
+  public TaskWrapper runLater(long delayTicks, Consumer<TaskWrapper> consumer) {
     TaskWrapper wrapper = new TaskWrapper(consumer, this);
     wrapper.task = Tasks.runLater(wrapper::run, delayTicks);
     return add(wrapper);
   }
 
-  public TaskWrapper runLater(Runnable runnable, long delayTicks) {
-    return runLater((task) -> runnable.run(), delayTicks);
-  }
-
-  public TaskWrapper runTimer(Consumer<TaskWrapper> consumer, long initialDelayMillis,
-                              long delayMillis
+  public TaskWrapper runTimer(long initialDelayMillis,
+                              long delayMillis,
+                              Consumer<TaskWrapper> consumer
   ) {
     TaskWrapper wrapper = new TaskWrapper(consumer, this);
     wrapper.task = Tasks.runTimer(wrapper::run, initialDelayMillis, delayMillis);
     return add(wrapper);
-  }
-
-  public TaskWrapper runTimer(Runnable runnable, long initialDelayMillis, long delayMillis) {
-    return runTimer((task) -> runnable.run(), initialDelayMillis, delayMillis);
   }
 
   private TaskWrapper add(TaskWrapper wrapper) {

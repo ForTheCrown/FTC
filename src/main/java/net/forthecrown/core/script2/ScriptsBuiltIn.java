@@ -31,9 +31,7 @@ import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
 public final class ScriptsBuiltIn {
-
-  private ScriptsBuiltIn() {
-  }
+  private ScriptsBuiltIn() {}
 
   private static final Class[] DEFAULT_CLASSES = {
       Util.class, FTC.class,

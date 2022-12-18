@@ -14,6 +14,7 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.kyori.adventure.text.Component;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 @Getter
 @RequiredArgsConstructor
@@ -51,13 +52,15 @@ public class ChallengeEntry {
 
   public void addProgress(Holder<Challenge> holder, float value) {
     var challenge = holder.getValue();
-    float current = progress.getFloat(challenge);
 
     if (Challenges.hasCompleted(holder, id)
         || !Challenges.isActive(challenge)
     ) {
       return;
     }
+
+    PlayerMoveEvent
+    float current = progress.getFloat(challenge);
 
     User user = getUser();
 

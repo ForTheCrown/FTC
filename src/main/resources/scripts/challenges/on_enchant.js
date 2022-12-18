@@ -5,6 +5,6 @@ function canComplete(user) {
 function onEvent(event, handle) {
     // EnchantItemEvent
     if (event.getExpLevelCost() >= 30) {
-        handle.givePoint(event.getPlayer());
+        handle.givePoint(event.getEnchanter());
     }
 }

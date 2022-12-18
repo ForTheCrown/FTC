@@ -198,10 +198,10 @@ public final class SignShops {
    *
    * @return the example inventory
    */
-  public static Inventory createExampleInventory(SignShop shop) {
+  public static Inventory createExampleInventory() {
     // Create example inventory
     Inventory inv = Bukkit.createInventory(
-        shop,
+        null,
         InventoryType.HOPPER,
         Component.text("Specify what and how much")
     );

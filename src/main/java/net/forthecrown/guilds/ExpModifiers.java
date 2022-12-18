@@ -1,5 +1,6 @@
 package net.forthecrown.guilds;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.time.DayOfWeek;
@@ -76,7 +77,7 @@ public class ExpModifiers implements IntUnaryOperator {
   public int applyAsInt(int operand) {
     float mod = getModifier();
 
-    if (GenericMath.floor(mod) <= 1) {
+    if (mod <= 1) {
       return operand;
     }
 
@@ -100,29 +101,20 @@ public class ExpModifiers implements IntUnaryOperator {
   public void clear() {
     multipliers.forEach(m -> Tasks.cancel(m.getTask()));
     multipliers.clear();
-
   }
 
-  public JsonElement serialize() {
-    JsonWrapper json = JsonWrapper.create();
-    if (!multipliers.isEmpty()) {
-      json.add(KEY_DONATOR_MODS,
-          JsonUtils.ofStream(
-              multipliers.stream().map(DonatorMultiplier::serialize)
-          )
-      );
-    }
-    return json.getSource();
+  public JsonArray serialize() {
+    return JsonUtils.ofStream(
+        multipliers.stream().map(DonatorMultiplier::serialize)
+    );
   }
 
-  public void deserialize(JsonWrapper wrapper) {
+  public void deserialize(JsonArray arr) {
     clear();
 
-    if (wrapper.has(KEY_DONATOR_MODS)) {
-      JsonUtils.stream(wrapper.getArray(KEY_DONATOR_MODS))
-          .map(DonatorMultiplier::deserialize)
-          .forEach(this::addMultiplier);
-    }
+    JsonUtils.stream(arr)
+        .map(DonatorMultiplier::deserialize)
+        .forEach(multipliers::add);
   }
 
   @Getter

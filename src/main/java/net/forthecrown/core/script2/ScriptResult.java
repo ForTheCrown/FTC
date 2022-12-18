@@ -10,9 +10,11 @@ import net.forthecrown.core.FTC;
 @RequiredArgsConstructor(staticName = "of")
 public class ScriptResult {
 
+  /** The script that executed the method */
   @Getter
   private final Script script;
 
+  /** The name of them method that was executed */
   @Getter
   private final String method;
 
@@ -28,6 +30,10 @@ public class ScriptResult {
     return Optional.ofNullable(exception);
   }
 
+  /**
+   * Logs the error message this result represents, if there is an error message
+   * @return This
+   */
   public ScriptResult logIfError() {
     error().ifPresent(e -> {
       FTC.getLogger().error(
@@ -40,6 +46,7 @@ public class ScriptResult {
     return this;
   }
 
+  /** Closes the underlying script this result came from */
   public void close() {
     getScript().close();
   }
