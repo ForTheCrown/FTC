@@ -1,5 +1,7 @@
 package net.forthecrown.dungeons.boss;
 
+import co.aikar.timings.Timing;
+import co.aikar.timings.Timings;
 import com.google.common.base.Joiner;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
@@ -23,6 +25,8 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractBoss implements DungeonBoss {
+  private static Timing BOSS_TICK_TIMING
+      = Timings.of(FTC.getPlugin(), "Boss Tick");
 
   protected static final Logger LOGGER = FTC.getLogger();
 
@@ -96,8 +100,10 @@ public abstract class AbstractBoss implements DungeonBoss {
     stopTickTask(); // Ensure there isn't already a tick task running
 
     tickTask = Bukkit.getScheduler().runTaskTimer(FTC.getPlugin(), () -> {
-      tick();
-      runComponents(component -> component.onTick(this, currentContext()));
+      try (var t = BOSS_TICK_TIMING.startTiming()) {
+        tick();
+        runComponents(component -> component.onTick(this, currentContext()));
+      }
     }, 1L, 1L);
   }
 

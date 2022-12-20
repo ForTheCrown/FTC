@@ -32,12 +32,10 @@ public @UtilityClass class EvokerConfig {
       swarm_vexSpawnDist = 2.25;
 
   public static int
-      normal_length = 400,
-
       swarm_vexAmount = 5,
       swarm_spawnRadial = 270,
-      swarm_summonInterval = 60,
-      swarm_endingDelay = 20 * 10,
+      swarm_summonInterval = 80,
+      swarm_endingDelay = 20 * 12,
 
       zombies_skeletonChance = 5,
       illager_ravagerChance = 1,

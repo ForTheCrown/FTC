@@ -18,14 +18,14 @@ import org.spongepowered.math.imaginary.Quaterniond;
 import org.spongepowered.math.vector.Vector3d;
 
 /**
- * The phase where he starts attacking with his own magic, kinda weak ngl lol
+ * The phase where the evoker spawns a swarm of weak vexes
  */
 public class SwarmPhase implements AttackPhase {
   EvokerBoss boss;
 
   int spawned = 0;
   int tick = -1;
-  int requiredSpawns = 0;
+  int requiredWaves = 0;
 
   private static final List<Vex> spawnedVexes = new ObjectArrayList<>();
 
@@ -38,8 +38,12 @@ public class SwarmPhase implements AttackPhase {
   public void onStart(EvokerBoss boss, BossContext context) {
     reset();
     this.boss = boss;
-    requiredSpawns = context.players().size() + 2;
-    boss.getPhaseBar().setTitle("Spawning vexes! (" + requiredSpawns + ")");
+
+    // Phase should spawn a minimum of 3 waves, with +1 extra
+    // wave per each player
+    requiredWaves = context.players().size() + 2;
+
+    boss.getPhaseBar().setTitle("Spawning vexes! (" + requiredWaves + ")");
     boss.getPhaseBar().setVisible(true);
   }
 
@@ -54,9 +58,11 @@ public class SwarmPhase implements AttackPhase {
     double progress;
     ++tick;
 
-    if (spawned < requiredSpawns) {
+    // If more waves should be spawned
+    if (spawned < requiredWaves) {
       progress = (double) tick / EvokerConfig.swarm_summonInterval;
 
+      // If should spawn
       if (tick >= EvokerConfig.swarm_summonInterval) {
         tick = 0;
         summon();
@@ -67,21 +73,23 @@ public class SwarmPhase implements AttackPhase {
 
     boss.getPhaseBar().setProgress(progress);
 
-    if (spawned < requiredSpawns
+    if (spawned < requiredWaves
         || tick < EvokerConfig.swarm_endingDelay
     ) {
       return;
     }
 
-    boss.nextPhase(true);
+    boss.nextPhase(false);
   }
 
+  /** Reset spawn and tick counters */
   void reset() {
     this.tick = -1;
     this.spawned = 0;
-    this.requiredSpawns = 0;
+    this.requiredWaves = 0;
   }
 
+  /** Make the boss summon a wave of vexes */
   void summon() {
     ++spawned;
     spawnVexes(
@@ -90,24 +98,32 @@ public class SwarmPhase implements AttackPhase {
         PotionPhase.findTarget(boss)
     );
 
-    if (spawned >= requiredSpawns) {
+    // Adjust boss bar to display how many more vex waves
+    // will be spawned, or to show "Defeat the vexes!"
+    if (spawned >= requiredWaves) {
       boss.getPhaseBar().setTitle("Defeat the vexes!");
     } else {
       boss.getPhaseBar().setTitle(
-          "Spawning vexes! (" + (requiredSpawns - spawned) + ")"
+          "Spawning vexes! (" + (requiredWaves - spawned) + ")"
       );
     }
 
+    // Cool lightning strike when summoning
     boss.getBossEntity()
         .getWorld()
         .strikeLightningEffect(boss.getBossEntity().getLocation());
   }
 
+  /** Spawns vexes in a circle around the boss */
   void spawnVexes(Evoker boss, BossContext context, Player target) {
     double dist = EvokerConfig.swarm_vexSpawnDist;
     int amount = EvokerConfig.swarm_vexAmount;
 
+    // The size of the circle in which the
+    // vexes spawn, in degrees
     double circleSize = EvokerConfig.swarm_spawnRadial;
+
+    // Radial interval between each vex's spawn position
     double degreeInterval = circleSize / amount;
     double radianInterval = Math.toRadians(degreeInterval);
 
@@ -115,12 +131,12 @@ public class SwarmPhase implements AttackPhase {
       boss.lookAt(target);
     }
 
-    // Center of the entity
+    // Get center of the entity
     Location loc = boss.getLocation();
     loc = boss.getBoundingBox().getCenter()
         .toLocation(loc.getWorld(), loc.getYaw(), loc.getPitch());
 
-    // Direction the boss is facing
+    // Direction the boss is facing, normalized to dist
     Vector3d dir = Vectors.doubleFrom(loc.getDirection())
         .normalize()
         .mul(dist)
@@ -130,12 +146,15 @@ public class SwarmPhase implements AttackPhase {
 
     Quaterniond initialRotation
         = Quaterniond.fromAxesAnglesDeg(-90, 0, degreeInterval);
-
-    Vector3d left = initialRotation.rotate(dir);
     Quaterniond rotation = Quaterniond.fromAxesAnglesRad(0, 0, -radianInterval);
 
+    Vector3d left = initialRotation.rotate(dir);
+
     for (int i = 0; i < amount; i++) {
+      // Rotate position
       left = rotation.rotate(left);
+
+      // Get spawn location
       Vector3d spawn = left.add(pos);
       Location l = new Location(
           boss.getWorld(),
@@ -143,6 +162,7 @@ public class SwarmPhase implements AttackPhase {
           loc.getYaw(), loc.getPitch()
       );
 
+      // Spawn vex
       l.getWorld().spawn(l, Vex.class, vex -> {
         AttributeInstance maxHealth
             = vex.getAttribute(Attribute.GENERIC_MAX_HEALTH);
