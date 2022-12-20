@@ -5,7 +5,6 @@ import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.core.module.OnSave;
 import net.kyori.adventure.key.Namespaced;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.spi.ExtendedLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -57,7 +56,8 @@ public final class Main extends JavaPlugin implements Namespaced {
     }
 
     logger = new FtcLogger(
-        (ExtendedLogger) LogManager.getLogger(getLogger().getName())
+        LogManager.getContext()
+            .getLogger(getLogger().getName())
     );
   }
 

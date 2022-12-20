@@ -56,7 +56,7 @@ public class Kit extends CommandUsable {
   }
 
   @Override
-  public boolean onInteract(Player player) {
+  public boolean onInteract(Player player, boolean adminInteraction) {
     if (!testSpace(player)) {
       return false;
     }

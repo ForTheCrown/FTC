@@ -55,7 +55,8 @@ public class ChunkedMap<T extends BoundsHolder> {
    * {@link #toChunkLong(Vector3i)}, and the entries are a quick implementation of the {@link List}
    * class
    */
-  protected final Long2ObjectMap<ChunkList<T>> chunkMap = new Long2ObjectOpenHashMap<>();
+  protected final Long2ObjectMap<ChunkList<T>> chunkMap
+      = new Long2ObjectOpenHashMap<>();
 
   /**
    * Entries registered within this map.
@@ -65,7 +66,8 @@ public class ChunkedMap<T extends BoundsHolder> {
    * underlying value don't alter the bounds of the entry. Because if that happened, this map
    * wouldn't know in which chunks an entry was stored.
    */
-  protected final Map<T, Entry<T>> entries = new Object2ObjectOpenHashMap<>();
+  protected final Map<T, Entry<T>> entries
+      = new Object2ObjectOpenHashMap<>();
 
   /**
    * The total area this map encompasses, may be null.

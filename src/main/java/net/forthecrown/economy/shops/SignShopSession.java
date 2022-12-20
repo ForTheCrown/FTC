@@ -18,7 +18,6 @@ import net.forthecrown.user.Users;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
-import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
@@ -34,12 +33,6 @@ public class SignShopSession {
    * is removed
    */
   public static final int SESSION_TIME_OUT = 2 * 20;
-
-  /**
-   * The material the session's shop sells
-   */
-  @Getter
-  private final Material material;
 
   /**
    * The session's shop
@@ -84,7 +77,6 @@ public class SignShopSession {
     this.shop = shop;
     this.customer = customer;
 
-    this.material = shop.getExampleItem().getType();
     this.type = shop.getType();
     this.shopInventory = shop.getInventory();
   }
@@ -219,7 +211,7 @@ public class SignShopSession {
           customer.getName(),
           (type.isBuyType() ? "bought" : "sold"),
           getAmount(),
-          Text.prettyEnumName(material),
+          Text.prettyEnumName(getExampleItem().getType()),
           (type.isAdmin() ? "n admin" : " "),
           shop.getName(),
           getTotalEarned(),
@@ -244,6 +236,7 @@ public class SignShopSession {
 
     if (!shop.inStock()) {
       owner.sendMessage(Messages.stockIssueMessage(type, shop.getPosition()));
+      shop.update();
     }
   }
 

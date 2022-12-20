@@ -4,9 +4,8 @@ import static net.forthecrown.user.data.UserTimeTracker.UNSET;
 
 import com.google.common.base.Strings;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Getter;
@@ -22,7 +21,7 @@ import net.forthecrown.utils.Time;
 import net.forthecrown.utils.WorldChunkMap;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializableObject;
-import net.forthecrown.waypoint.type.WaypointTypes;
+import net.forthecrown.waypoint.WaypointScan.Result;
 import net.minecraft.nbt.CompoundTag;
 import org.apache.logging.log4j.Logger;
 
@@ -69,41 +68,25 @@ public class WaypointManager extends SerializableObject.NbtDat {
 
   @OnDayChange
   void onDayChange() {
-    Set<Waypoint> toRemove = new ObjectArraySet<>();
+    Map<Waypoint, Result> toRemove = new HashMap<>();
 
     for (var w : byId.values()) {
-      // Admin waypoints and invulnerable waypoints can
-      // never be destroyed, so skip them
-      if (w.getType() == WaypointTypes.ADMIN
-          || w.get(WaypointProperties.INVULNERABLE)
+      Result result = WaypointScan.scan(w);
+
+      if (result == Result.SUCCESS
+          || result == Result.CANNOT_BE_DESTROYED
       ) {
         continue;
       }
 
-      // If no name nor any residents
-      if (Strings.isNullOrEmpty(w.get(WaypointProperties.NAME))
-          && w.getResidents().isEmpty()
-      ) {
-        toRemove.add(w);
+      if (result == Result.DESTROYED) {
+        toRemove.put(w, result);
         continue;
       }
 
-      // Destroyed poles are always definitely removed
-      if (w.getType().isDestroyed(w)) {
-        toRemove.add(w);
-        continue;
-      }
-
-      // Ensure the pole's area is valid
-      var result = w.getType().isValid(w);
-
-      if (result.isEmpty()) {
-        w.setLastValidTime(System.currentTimeMillis());
-        continue;
-      }
-
+      // Residents empty, no set name, no guild or pole was broken
       if (shouldRemove(w)) {
-        toRemove.add(w);
+        toRemove.put(w, result);
       }
     }
 
@@ -113,12 +96,13 @@ public class WaypointManager extends SerializableObject.NbtDat {
     }
 
     // Remove all invalid waypoints
-    toRemove.forEach(waypoint -> {
-      LOGGER.info("Auto-removing waypoint {} or '{}' at {}, world={}",
+    toRemove.forEach((waypoint, result) -> {
+      LOGGER.info("Auto-removing waypoint {} or '{}' at {}, world={}, reason={}",
           waypoint.getId(),
           waypoint.get(WaypointProperties.NAME),
           waypoint.getPosition(),
-          waypoint.getWorld()
+          waypoint.getWorld(),
+          result.getReason()
       );
 
       removeWaypoint(waypoint);

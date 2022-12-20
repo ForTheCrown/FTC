@@ -127,4 +127,12 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
         .setName("&eGuild Discovery Menu")
         .build();
   }
+
+  @Override
+  public void onClick(User user, InventoryContext context, ClickContext click)
+      throws CommandSyntaxException
+  {
+    setPage(0, context);
+    getMenu().open(user, context);
+  }
 }

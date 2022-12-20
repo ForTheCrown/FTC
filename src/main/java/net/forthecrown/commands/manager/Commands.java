@@ -77,6 +77,7 @@ import net.forthecrown.commands.economy.CommandPay;
 import net.forthecrown.commands.economy.CommandShop;
 import net.forthecrown.commands.economy.CommandShopHistory;
 import net.forthecrown.commands.economy.CommandWithdraw;
+import net.forthecrown.commands.emotes.EmotePet;
 import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.guild.GuildCommands;
 import net.forthecrown.commands.help.HelpCommand;
@@ -286,6 +287,7 @@ public final class Commands {
 
     //emote, other emotes are initialized by cosmetics in CosmeticEmotes.init()
     new EmotePog();
+    new EmotePet();
 
     //help commands
     HelpCommand.createCommands();

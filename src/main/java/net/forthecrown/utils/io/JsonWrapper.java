@@ -27,6 +27,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.utils.JsonSerializable;
 import net.forthecrown.utils.math.Vectors;
 import net.kyori.adventure.key.Key;
@@ -42,24 +44,12 @@ import org.spongepowered.math.vector.Vectorl;
 /**
  * A JSON wrapper because this shit is too verbose on its own
  */
+@Getter
+@RequiredArgsConstructor(staticName = "wrap")
 public final class JsonWrapper {
 
   //The source and handle of the wrapper
-  private final JsonObject json;
-
-  private JsonWrapper(JsonObject json) {
-    this.json = json;
-  }
-
-  /**
-   * Creates a wrapper for the given JSON
-   *
-   * @param json the json to create the wrapper for
-   * @return The wrapper for the given JSON object
-   */
-  public static JsonWrapper wrap(JsonObject json) {
-    return new JsonWrapper(json);
-  }
+  private final JsonObject source;
 
   /**
    * Creates an empty json buf
@@ -71,11 +61,11 @@ public final class JsonWrapper {
   }
 
   public void add(String name, JsonSerializable serializable) {
-    json.add(name, serializable.serialize());
+    source.add(name, serializable.serialize());
   }
 
   public <E extends Enum<E>> void addEnum(String name, E anum) {
-    json.add(name, writeEnum(anum));
+    source.add(name, writeEnum(anum));
   }
 
   public <E extends Enum<E>> E getEnum(String name, Class<E> clazz) {
@@ -86,11 +76,11 @@ public final class JsonWrapper {
     if (missingOrNull(name)) {
       return def;
     }
-    return readEnum(clazz, json.get(name));
+    return readEnum(clazz, source.get(name));
   }
 
   public void addLocation(String name, Location location) {
-    json.add(name, writeLocation(location));
+    source.add(name, writeLocation(location));
   }
 
   public Location getLocation(String name) {
@@ -109,7 +99,7 @@ public final class JsonWrapper {
   }
 
   public void addKey(String name, Key key) {
-    json.add(name, writeKey(key));
+    source.add(name, writeKey(key));
   }
 
   public NamespacedKey getKey(String name) {
@@ -117,7 +107,7 @@ public final class JsonWrapper {
   }
 
   public void addItem(String name, ItemStack item) {
-    json.add(name, writeItem(item));
+    source.add(name, writeItem(item));
   }
 
   public ItemStack getItem(String name) {
@@ -167,7 +157,7 @@ public final class JsonWrapper {
   public <T> void addList(String name, Iterable<T> iterable, Function<T, JsonElement> function) {
     JsonArray array = new JsonArray();
     iterable.forEach(e -> array.add(function.apply(e)));
-    json.add(name, array);
+    source.add(name, array);
   }
 
   public String getString(String name) {
@@ -178,7 +168,7 @@ public final class JsonWrapper {
     if (missingOrNull(name)) {
       return def;
     }
-    return json.get(name).getAsString();
+    return source.get(name).getAsString();
   }
 
   public boolean getBool(String name) {
@@ -255,7 +245,7 @@ public final class JsonWrapper {
     if (missingOrNull(name)) {
       return def;
     }
-    return json.get(name).getAsInt();
+    return source.get(name).getAsInt();
   }
 
   public short getShort(String name) {
@@ -266,7 +256,7 @@ public final class JsonWrapper {
     if (missingOrNull(name)) {
       return def;
     }
-    return json.get(name).getAsShort();
+    return source.get(name).getAsShort();
   }
 
   public byte getByte(String name) {
@@ -303,7 +293,7 @@ public final class JsonWrapper {
   }
 
   public void add(String name, JsonWrapper buf) {
-    json.add(name, buf.json);
+    source.add(name, buf.source);
   }
 
   public void addAll(JsonWrapper json) {
@@ -337,7 +327,7 @@ public final class JsonWrapper {
       jsonMap.add(keyFunc.apply(e.getKey()), valueFunc.apply(e.getValue()));
     }
 
-    json.add(name, jsonMap);
+    source.add(name, jsonMap);
   }
 
   public <K, V> Map<K, V> getMap(String name, Function<String, K> keyFunc,
@@ -400,7 +390,7 @@ public final class JsonWrapper {
       array.add(converter.apply(t));
     }
 
-    json.add(name, array);
+    source.add(name, array);
   }
 
   public <T> T[] getArray(String name, Function<JsonElement, T> parser,
@@ -483,94 +473,90 @@ public final class JsonWrapper {
   //------------------ Delegate Methods -----------------//
 
   public void add(String property, JsonElement value) {
-    json.add(property, value);
+    source.add(property, value);
   }
 
   public void remove(String property) {
-    json.remove(property);
+    source.remove(property);
   }
 
   public void add(String property, String value) {
-    json.addProperty(property, value);
+    source.addProperty(property, value);
   }
 
   public void add(String property, byte value) {
-    json.addProperty(property, value);
+    source.addProperty(property, value);
   }
 
   public void add(String property, short value) {
-    json.addProperty(property, value);
+    source.addProperty(property, value);
   }
 
   public void add(String property, int value) {
-    json.addProperty(property, value);
+    source.addProperty(property, value);
   }
 
   public void add(String property, float value) {
-    json.addProperty(property, value);
+    source.addProperty(property, value);
   }
 
   public void add(String property, double value) {
-    json.addProperty(property, value);
+    source.addProperty(property, value);
   }
 
   public void add(String property, long value) {
-    json.addProperty(property, value);
+    source.addProperty(property, value);
   }
 
   public void add(String property, boolean value) {
-    json.addProperty(property, value);
+    source.addProperty(property, value);
   }
 
   public void add(String property, char value) {
-    json.addProperty(property, value);
+    source.addProperty(property, value);
   }
 
   public Set<Map.Entry<String, JsonElement>> entrySet() {
-    return json.entrySet();
+    return source.entrySet();
   }
 
   public int size() {
-    return json.size();
+    return source.size();
   }
 
   public boolean has(String memberName) {
-    return json.has(memberName);
+    return source.has(memberName);
   }
 
   public JsonElement get(String memberName) {
-    return json.get(memberName);
+    return source.get(memberName);
   }
 
   public JsonPrimitive getPrimitive(String memberName) {
-    return json.getAsJsonPrimitive(memberName);
+    return source.getAsJsonPrimitive(memberName);
   }
 
   public JsonArray getArray(String memberName) {
-    return json.getAsJsonArray(memberName);
+    return source.getAsJsonArray(memberName);
   }
 
   public JsonObject getObject(String memberName) {
-    return json.getAsJsonObject(memberName);
-  }
-
-  public JsonObject getSource() {
-    return json;
+    return source.getAsJsonObject(memberName);
   }
 
   public JsonObject nullIfEmpty() {
-    return isEmpty() ? null : json;
+    return isEmpty() ? null : source;
   }
 
   public String toString() {
-    return json.toString();
+    return source.toString();
   }
 
   public boolean equals(Object o) {
-    return json.equals(o);
+    return source.equals(o);
   }
 
   public int hashCode() {
-    return json.hashCode();
+    return source.hashCode();
   }
 }

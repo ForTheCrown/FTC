@@ -11,7 +11,7 @@ public class CommandCreateWaypoint extends FtcCommand {
   public CommandCreateWaypoint() {
     super("CreateWaypoint");
 
-    setPermission(Permissions.WAYPOINTS);
+    setPermission(Permissions.WAYPOINTS_ADMIN);
     setDescription("Creates a new waypoint");
     setAliases("waypointcreate");
 
@@ -40,7 +40,6 @@ public class CommandCreateWaypoint extends FtcCommand {
         })
 
         .then(literal("-admin")
-            .requires(source -> source.hasPermission(Permissions.WAYPOINTS_ADMIN))
             .executes(c -> {
               Waypoints.makeWaypoint(
                   WaypointTypes.ADMIN,
@@ -52,8 +51,6 @@ public class CommandCreateWaypoint extends FtcCommand {
         )
 
         .then(literal("-region_pole")
-            .requires(source -> source.hasPermission(Permissions.WAYPOINTS_ADMIN))
-
             .executes(c -> {
               Waypoints.makeWaypoint(
                   WaypointTypes.REGION_POLE,

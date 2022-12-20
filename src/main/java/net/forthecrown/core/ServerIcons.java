@@ -1,5 +1,8 @@
 package net.forthecrown.core;
 
+import static net.forthecrown.utils.io.FtcJar.ALLOW_OVERWRITE;
+import static net.forthecrown.utils.io.FtcJar.OVERWRITE_IF_NEWER;
+
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.IOException;
@@ -54,7 +57,11 @@ public class ServerIcons {
 
   void saveDefaults() {
     try {
-      FtcJar.saveResources("icons", directory);
+      FtcJar.saveResources(
+          "icons",
+          directory,
+          ALLOW_OVERWRITE | OVERWRITE_IF_NEWER
+      );
       LOGGER.debug("Saved default server icon directory");
     } catch (IOException exc) {
       LOGGER.error("Couldn't save default icons!", exc);

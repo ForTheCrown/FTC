@@ -114,9 +114,12 @@ public class ShopCreateListener implements Listener {
     }
 
     //WorldGuard flag check
-    StateFlag.State state = FtcFlags.query(player.getLocation(), FtcFlags.SHOP_CREATION);
+    StateFlag.State flagState = FtcFlags.query(
+        event.getBlock().getLocation(),
+        FtcFlags.SHOP_CREATION
+    );
 
-    if (state == StateFlag.State.DENY
+    if (flagState == StateFlag.State.DENY
         && !player.hasPermission(Permissions.ADMIN)
     ) {
       player.sendMessage(Messages.WG_CANNOT_MAKE_SHOP);

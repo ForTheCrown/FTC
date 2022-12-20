@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.LocationFileName;
 import net.forthecrown.utils.Tasks;
+import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.io.SerializableObject;
 import net.forthecrown.utils.math.WorldVec3i;
 import org.bukkit.Location;
@@ -70,6 +72,10 @@ public class ShopManager implements SerializableObject {
     // are thrown, we passed the test and can
     // move on to interaction
     try {
+      if (ItemStacks.isEmpty(shop.getExampleItem())) {
+        throw Exceptions.create(Messages.SHOP_NO_EXAMPLE);
+      }
+
       shop.getType().getInteraction().test(session);
 
       session.delayExpiry();

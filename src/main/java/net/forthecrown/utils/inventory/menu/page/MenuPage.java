@@ -55,7 +55,8 @@ public abstract class MenuPage implements MenuNode {
 
   @Override
   public void onClick(User user, InventoryContext context, ClickContext click)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     if (menu == null) {
       return;
     }

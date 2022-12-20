@@ -87,7 +87,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.math.GenericMath;
 
 public class User implements ForwardingAudience.Single,
     HoverEventSource<Component>, Identity {
@@ -479,7 +478,7 @@ public class User implements ForwardingAudience.Single,
         .getExpModifier()
         .getModifier();
 
-    if (getGuild() != null && GenericMath.floor(modifier) > 1) {
+    if (getGuild() != null && modifier > 1) {
       sendMessage(Messages.guildMultiplierActive(modifier));
     }
 

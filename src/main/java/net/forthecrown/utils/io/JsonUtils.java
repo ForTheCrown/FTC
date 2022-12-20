@@ -48,12 +48,9 @@ import org.bukkit.inventory.ItemStack;
  * I love how verbose GSON is by itself
  */
 public final class JsonUtils {
+  private JsonUtils() {}
 
-  private JsonUtils() {
-  }
-
-  public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z",
-      Locale.ROOT);
+  public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.ROOT);
   private static final DateFormat LEGACY_FORMAT = DateFormat.getDateInstance();
 
   private static final BigInteger B = BigInteger.ONE.shiftLeft(64); // 2^64

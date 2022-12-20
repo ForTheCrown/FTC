@@ -98,8 +98,7 @@ public class Registry<V> implements Iterable<V> {
    *
    * @see #registryId
    */
-  private static final AtomicInteger nextRegistryId = new AtomicInteger(
-      0); // AtomicInteger for thread safety
+  private static final AtomicInteger nextRegistryId = new AtomicInteger(0);
 
   /* -------------------------- INSTANCE FIELDS --------------------------- */
 
@@ -112,14 +111,14 @@ public class Registry<V> implements Iterable<V> {
   /**
    * Key to entry lookup map
    */
-  private final Object2ObjectMap<String, Holder<V>>
-      byKey = new Object2ObjectOpenHashMap<>();
+  private final Object2ObjectMap<String, Holder<V>> byKey
+      = new Object2ObjectOpenHashMap<>();
 
   /**
    * Value to entry lookup map
    */
-  private final Object2ObjectMap<V, Holder<V>>
-      byValue = new Object2ObjectOpenHashMap<>();
+  private final Object2ObjectMap<V, Holder<V>> byValue
+      = new Object2ObjectOpenHashMap<>();
 
   /**
    * ID to entry lookup array

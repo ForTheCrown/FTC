@@ -1,6 +1,8 @@
 package net.forthecrown.events.economy;
 
+import net.forthecrown.core.Messages;
 import net.forthecrown.economy.shops.SignShop;
+import net.forthecrown.utils.Util;
 import net.forthecrown.utils.inventory.ItemStacks;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,6 +25,12 @@ public class ShopInventoryListener implements Listener {
     ItemStack[] contents = inv.getContents().clone();
 
     final ItemStack example = shop.getExampleItem();
+
+    if (ItemStacks.isEmpty(example)) {
+      player.sendMessage(Messages.SHOP_NO_EXAMPLE);
+      Util.giveOrDropItem(inv, player.getLocation(), contents);
+      return;
+    }
 
     //Clear the shop inventory because the contents are stored above
     shopInv.clear();

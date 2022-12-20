@@ -1,5 +1,6 @@
 package net.forthecrown.core.module;
 
+import co.aikar.timings.Timing;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.lang.annotation.Annotation;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
 import net.forthecrown.utils.Util;
 import org.apache.logging.log4j.Logger;
@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
-@RequiredArgsConstructor
 public class ModuleService implements Runnable {
 
   private static final Logger LOGGER = FTC.getLogger();
@@ -27,6 +26,13 @@ public class ModuleService implements Runnable {
 
   @Getter
   private final List<Pair<Object, Method>> callbacks = new ObjectArrayList<>();
+
+  private final Timing timing;
+
+  public ModuleService(Class<? extends Annotation> annotationType) {
+    this.annotationType = annotationType;
+    timing = FTC.timing(annotationType.getSimpleName());
+  }
 
   public static ModuleService of(Class<? extends Annotation> annotationType) {
     return new ModuleService(annotationType);
@@ -64,6 +70,7 @@ public class ModuleService implements Runnable {
     }
 
     int ran = 0;
+    timing.startTiming();
 
     for (var pair : getCallbacks()) {
       Method callback = pair.getSecond();
@@ -117,6 +124,7 @@ public class ModuleService implements Runnable {
         annotationType.getSimpleName(),
         ran
     );
+    timing.stopTiming();
   }
 
   public void invoke(@Nullable Object instance,

@@ -10,16 +10,16 @@ public class ModuleServices {
       SERVICES = Registries.newRegistry();
 
   public static final ModuleService
-      SAVE = ModuleService.of(OnSave.class),
-      RELOAD = ModuleService.of(OnLoad.class),
-      ON_ENABLE = ModuleService.of(OnEnable.class),
+      SAVE       = ModuleService.of(OnSave.class),
+      RELOAD     = ModuleService.of(OnLoad.class),
+      ON_ENABLE  = ModuleService.of(OnEnable.class),
       ON_DISABLE = ModuleService.of(OnDisable.class);
 
   public static final DayChange
       DAY_CHANGE = new DayChange();
 
   public static final AutoSave
-      AUTO_SAVE = new AutoSave();
+      AUTO_SAVE  = new AutoSave();
 
   static {
     SERVICES.register("save", SAVE);

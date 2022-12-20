@@ -256,7 +256,9 @@ public class SignShop implements InventoryHolder {
    * @see #exampleItem
    */
   public ItemStack getExampleItem() {
-    return exampleItem == null ? null : exampleItem.clone();
+    return ItemStacks.isEmpty(exampleItem)
+        ? null
+        : exampleItem.clone();
   }
 
   /**
@@ -274,7 +276,7 @@ public class SignShop implements InventoryHolder {
    * @return
    */
   public boolean inStock() {
-    if (getExampleItem() == null) {
+    if (ItemStacks.isEmpty(exampleItem)) {
       return false;
     }
 
@@ -291,7 +293,10 @@ public class SignShop implements InventoryHolder {
 
     // Check if inventory contains enough of the example item
     // to be considered 'in stock'
-    return getInventory().containsAtLeast(getExampleItem(), getExampleItem().getAmount());
+    return getInventory().containsAtLeast(
+        getExampleItem(),
+        getExampleItem().getAmount()
+    );
   }
 
   /**
@@ -407,7 +412,9 @@ public class SignShop implements InventoryHolder {
     // 1st: label, 4th: the shop price
     s.line(
         LINE_TYPE,
-        inStock() ? getType().getStockedLabel() : getType().getUnStockedLabel()
+        inStock()
+            ? getType().getStockedLabel()
+            : getType().getUnStockedLabel()
     );
     s.line(
         LINE_PRICE,
@@ -534,7 +541,8 @@ public class SignShop implements InventoryHolder {
       }
     } else {
       setExampleItem(TagUtil.readItem(tag.get(TAG_EXAMPLE_ITEM)));
-      this.inventory = SignShops.createInventory(this, tag.getInt(TAG_INVENTORY_SIZE));
+      getInventory().clear();
+      resizeInventory(tag.getInt(TAG_INVENTORY_SIZE));
 
       int itemCount = tag.getInt(TAG_ITEM_COUNT);
       int stackSize = exampleItem.getMaxStackSize();

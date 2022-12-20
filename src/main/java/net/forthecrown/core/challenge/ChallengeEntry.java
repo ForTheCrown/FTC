@@ -14,7 +14,6 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.kyori.adventure.text.Component;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.event.player.PlayerMoveEvent;
 
 @Getter
 @RequiredArgsConstructor
@@ -55,13 +54,12 @@ public class ChallengeEntry {
 
     if (Challenges.hasCompleted(holder, id)
         || !Challenges.isActive(challenge)
+        || ChallengeManager.getInstance().areChallengesLocked()
     ) {
       return;
     }
 
-    PlayerMoveEvent
     float current = progress.getFloat(challenge);
-
     User user = getUser();
 
     float newVal = Math.min(
@@ -70,6 +68,10 @@ public class ChallengeEntry {
     );
 
     if (newVal >= challenge.getGoal(user)) {
+      LOGGER.debug("Challenge {} is at/over goal for {}",
+          holder.getKey(), user
+      );
+
       if (!challenge.canComplete(user)) {
         return;
       }

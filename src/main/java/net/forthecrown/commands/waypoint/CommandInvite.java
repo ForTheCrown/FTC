@@ -53,7 +53,7 @@ public class CommandInvite extends FtcCommand {
                 throw Exceptions.NO_HOME_REGION;
               }
 
-              var targets = Arguments.getUsers(c, "user");
+              var targets = Arguments.getUsers(c, "users");
               if (targets.size() == 1) {
                 User target = targets.get(0);
 

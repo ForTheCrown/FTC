@@ -14,9 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * @see #ADMIN_SELL
  */
 final class Interactions {
-
-  private Interactions() {
-  }
+  private Interactions() {}
 
   /**
    * Interaction type for admin buy shops
@@ -93,7 +91,7 @@ final class Interactions {
       }
 
       //Check shop has space for any more items
-      if (session.shopIsFull()) {
+      if (session.getShop().inStock()) {
         session.getShop().update();
         throw Exceptions.SHOP_NO_SPACE;
       }

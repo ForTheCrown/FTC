@@ -47,8 +47,8 @@ public abstract class CommandUsable extends AbstractCheckable implements CheckHo
       return false;
     }
 
-    return onInteract(player);
+    return onInteract(player, false);
   }
 
-  public abstract boolean onInteract(Player player);
+  public abstract boolean onInteract(Player player, boolean adminInteraction);
 }

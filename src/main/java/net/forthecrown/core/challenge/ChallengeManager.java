@@ -89,6 +89,26 @@ public class ChallengeManager {
     return Collections.unmodifiableList(activeChallenges);
   }
 
+  /**
+   * Tests if challenge progress can be made.
+   * <p>
+   * Tests if challenges are currently locked, this is to prevent a bug with
+   * challenges that listen to very commonly triggered events, like the walk
+   * event.
+   * <p>
+   * If true, then no progress can be made during challenge completion. This can
+   * come about as a tick tasks are run near the end of a tick, so packets, move
+   * events and so forth can occur before the day change reset is triggered, but
+   * since it's a new day, the challenges allow themselves to be completed, over
+   * and over again.
+   *
+   * @return True, if challenge progress is locked, false otherwise
+   */
+  public boolean areChallengesLocked() {
+    LocalDate now = LocalDate.now();
+    return now.compareTo(date) != 0;
+  }
+
   @OnDayChange
   void onDayChange(ZonedDateTime time) {
     date = time.toLocalDate();

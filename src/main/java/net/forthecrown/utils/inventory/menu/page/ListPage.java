@@ -40,10 +40,6 @@ public abstract class ListPage<T> extends MenuPage {
     // fit onto the page
     Slot endSlot = Slot.of(builder.getSize() - 1);
 
-        /*if (builder.getSize() > (MIN_INV_SIZE * 2)) {
-            endSlot = endSlot.add(-1, -1);
-        }*/
-
     // Difference between start and end slots
     Slot size = endSlot.add(-startSlot.getColumn(), -startSlot.getRow());
 
@@ -114,7 +110,8 @@ public abstract class ListPage<T> extends MenuPage {
   protected abstract ItemStack getItem(User user, T entry, InventoryContext context);
 
   protected void onClick(User user, T entry, InventoryContext context, ClickContext click)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
 
   }
 

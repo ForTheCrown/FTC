@@ -33,7 +33,7 @@ public class Warp extends CommandUsable {
   }
 
   @Override
-  public boolean onInteract(Player player) {
+  public boolean onInteract(Player player, boolean adminInteraction) {
     var user = Users.get(player);
 
     if (!user.canTeleport()) {

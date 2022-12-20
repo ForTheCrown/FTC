@@ -2361,6 +2361,8 @@ public interface Messages {
   Component SHOP_CREATE_FAILED = text("Shop creation failed! ", NamedTextColor.DARK_RED)
       .append(text("No item in inventory!", NamedTextColor.RED));
 
+  Component SHOP_NO_EXAMPLE = text("This shop has no item set!", NamedTextColor.RED);
+
   static Component formatShopHistory(HistoryEntry entry, ItemStack exampleItem) {
     return format(
         "&e{0, user} &r{1} &6{2, number} {3, item, -!amount}&r for &6{4, rhines}&r, date: &e{5, date}",

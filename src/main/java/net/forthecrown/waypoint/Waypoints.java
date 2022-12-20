@@ -693,19 +693,7 @@ public @UtilityClass class Waypoints {
   }
 
   public void removeIfPossible(Waypoint waypoint) {
-    if (waypoint.getType().isDestroyed(waypoint)) {
-      WaypointManager.getInstance()
-          .removeWaypoint(waypoint);
-
-      return;
-    }
-
-    if (!waypoint.getResidents().isEmpty()
-        || waypoint.getType() == WaypointTypes.ADMIN
-        || waypoint.get(WaypointProperties.INVULNERABLE)
-        || waypoint.get(WaypointProperties.GUILD_OWNER) != null
-        || !Strings.isNullOrEmpty(waypoint.get(WaypointProperties.NAME))
-    ) {
+    if (!WaypointScan.canBeRemoved(waypoint)) {
       return;
     }
 

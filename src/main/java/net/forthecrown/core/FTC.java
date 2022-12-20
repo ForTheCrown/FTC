@@ -1,25 +1,31 @@
 package net.forthecrown.core;
 
-import lombok.experimental.UtilityClass;
+import co.aikar.timings.Timing;
+import co.aikar.timings.Timings;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public @UtilityClass class FTC {
+public final class FTC {
+  private FTC() {}
 
   /**
    * Gets the FTC plugin instance
    *
    * @return FTC plugin instance
    */
-  public Main getPlugin() {
+  public static Main getPlugin() {
     return JavaPlugin.getPlugin(Main.class);
   }
 
-  public Logger getLogger() {
+  public static Logger getLogger() {
     return getPlugin().logger;
   }
 
-  public boolean inDebugMode() {
+  public static boolean inDebugMode() {
     return getPlugin().debugMode;
+  }
+
+  public static Timing timing(String name) {
+    return Timings.of(getPlugin(), name);
   }
 }

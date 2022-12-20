@@ -103,7 +103,7 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
                   var t = argument.get(c, "usable");
                   var user = Arguments.getUser(c, "user");
 
-                  t.onInteract(user.getPlayer());
+                  t.onInteract(user.getPlayer(), true);
 
                   c.getSource().sendAdmin(
                       Text.format(otherUserFormat,

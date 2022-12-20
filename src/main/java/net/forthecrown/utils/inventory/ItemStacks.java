@@ -234,6 +234,13 @@ public final class ItemStacks {
     return CraftItemStack.asCraftMirror(net.minecraft.world.item.ItemStack.of(tag));
   }
 
+  /**
+   * Converts the given item to an NBT string representation of the item.
+   * @param item The item to convert to NBT
+   *
+   * @return The resulting NBT text, will be an empty string if
+   * {@link #isEmpty(ItemStack)} for the item returns true
+   */
   public static String toNbtString(ItemStack item) {
     if (isEmpty(item)) {
       return "";
@@ -242,8 +249,20 @@ public final class ItemStacks {
     return save(item).toString();
   }
 
-  public static ItemStack fromNbtString(String nbt) throws CommandSyntaxException {
-    return load(TagParser.parseTag(nbt));
+  /**
+   * Parses an item from a given NBT string.
+   * @param nbt The NBT string to parse
+   * @return The parsed item
+   * @throws IllegalStateException If the given string was not valid NBT.
+   */
+  public static ItemStack fromNbtString(String nbt)
+      throws IllegalStateException
+  {
+    try {
+      return load(TagParser.parseTag(nbt));
+    } catch (CommandSyntaxException s) {
+      throw new IllegalStateException(s);
+    }
   }
 
   /* ----------------------------- UTILITY ------------------------------ */

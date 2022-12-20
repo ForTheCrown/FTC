@@ -103,7 +103,8 @@ public class FtcJar {
   }
 
   public static void saveResources(String sourceDir, Path dest)
-      throws IOException {
+      throws IOException
+  {
     saveResources(sourceDir, dest, 0);
   }
 
@@ -204,13 +205,6 @@ public class FtcJar {
 
       var sLastModified = sourceAttr.lastModifiedTime().toInstant();
       var dLastModified = destAttr.lastModifiedTime().toInstant();
-
-      LOGGER.debug("sourceLastModified={}", sLastModified);
-      LOGGER.debug("  destLastModified={}", dLastModified);
-
-      LOGGER.debug("dif={}",
-          sLastModified.toEpochMilli() - dLastModified.toEpochMilli()
-      );
 
       return sLastModified.isAfter(dLastModified);
     }

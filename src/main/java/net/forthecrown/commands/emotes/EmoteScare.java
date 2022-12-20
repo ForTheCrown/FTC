@@ -4,7 +4,10 @@ import static net.forthecrown.core.Messages.EMOTE_SCARE_COOLDOWN;
 import static net.forthecrown.core.Messages.scareSender;
 import static net.forthecrown.core.Messages.scareTarget;
 
+import java.time.LocalDate;
+import java.time.Month;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.Tasks;
 import org.bukkit.Location;
@@ -27,9 +30,20 @@ public class EmoteScare extends CommandEmote {
   }
 
   @Override
+  public boolean test(CommandSource source) {
+    var month = LocalDate.now().getMonth();
+
+    if (month == Month.OCTOBER) {
+      return true;
+    }
+
+    return super.test(source);
+  }
+
+  @Override
   public int execute(User sender, User target) {
     sender.sendMessage(scareSender(target));
-    target.sendMessage(scareTarget(sender, target.hasPermission(getPermission())));
+    target.sendMessage(scareTarget(sender, test(sender.getCommandSource(this))));
 
     scare(target.getPlayer());
     return 0;

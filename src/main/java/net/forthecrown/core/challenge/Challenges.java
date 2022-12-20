@@ -11,6 +11,7 @@ import static net.forthecrown.core.challenge.ChallengeLogs.STREAK_SCHEMA;
 import static net.forthecrown.core.challenge.ChallengeLogs.S_CATEGORY;
 import static net.forthecrown.core.challenge.ChallengeLogs.S_PLAYER;
 
+import co.aikar.timings.Timing;
 import com.google.common.base.Strings;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.Consumer;
+import net.forthecrown.core.FTC;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.economy.sell.SellShop;
@@ -44,6 +46,7 @@ import org.bukkit.inventory.ItemFlag;
  * Utility class for challenge-related functions
  */
 public final class Challenges {
+  private Challenges() {}
 
   public static final String
       METHOD_ON_RESET = "onReset",
@@ -55,9 +58,8 @@ public final class Challenges {
 
       METHOD_STREAK_INCREASE = "onStreakIncrease";
 
-  private Challenges() {
-    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-  }
+  public static final Timing COMPLETION_QUERY = FTC.timing("Challenge Completion Query");
+  public static final Timing STREAK_QUERY = FTC.timing("Challenge Streak Query");
 
   public static void logActivation(Holder<Challenge> challenge, String extra) {
     LogEntry entry = LogEntry.of(ACTIVE)
@@ -98,7 +100,8 @@ public final class Challenges {
       case MANUAL -> LocalDate.MIN;
     };
 
-    return !DataLogs.query(
+    COMPLETION_QUERY.startTiming();
+    var result = !DataLogs.query(
         LogQuery.builder(COMPLETED)
             .maxResults(1)
             .queryRange(Range.between(start, LocalDate.now()))
@@ -111,6 +114,9 @@ public final class Challenges {
 
             .build()
     ).isEmpty();
+    COMPLETION_QUERY.stopTiming();
+
+    return result;
   }
 
   public static void trigger(String challengeName, Object input) {
@@ -236,6 +242,8 @@ public final class Challenges {
 
     int streak = 0;
 
+    STREAK_QUERY.startTiming();
+
     // Iterate backwards through date ranges
     // defined by the category
     while (streak < ChallengeConfig.maxStreak) {
@@ -263,6 +271,8 @@ public final class Challenges {
         break;
       }
     }
+
+    STREAK_QUERY.stopTiming();
 
     return streak == 0
         ? OptionalInt.empty()

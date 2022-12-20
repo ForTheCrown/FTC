@@ -26,9 +26,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>Exists because I was cleaning up the ChatEvents class lol</p>
  */
 public final class StaffChat {
-
-  private StaffChat() {
-  }
+  private StaffChat() {}
 
   public static final Set<UUID> toggledPlayers = new HashSet<>();
 

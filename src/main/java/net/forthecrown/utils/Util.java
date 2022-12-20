@@ -126,10 +126,12 @@ public final class Util {
 
   public static void giveOrDropItem(Inventory inv,
                                     Location loc,
-                                    ItemStack item
+                                    ItemStack... item
   ) {
     if (inv.firstEmpty() == -1) {
-      loc.getWorld().dropItem(loc, item);
+      for (var i: item) {
+        loc.getWorld().dropItem(loc, i);
+      }
     } else {
       inv.addItem(item);
     }
