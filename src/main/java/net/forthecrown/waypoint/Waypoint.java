@@ -240,6 +240,15 @@ public class Waypoint implements BoundsHolder {
     return "waypoint." + getId();
   }
 
+  public String identificationInfo() {
+    return String.format("(id=%s, name='%s', pos=%s, world=%s)",
+        getId(),
+        get(WaypointProperties.NAME),
+        getPosition(),
+        getWorld() == null ? null : getWorld().getName()
+    );
+  }
+
   /* ---------------------------- PROPERTIES ----------------------------- */
 
   public <T> T get(WaypointProperty<T> property) {

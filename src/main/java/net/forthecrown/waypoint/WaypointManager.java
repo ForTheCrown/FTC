@@ -97,11 +97,8 @@ public class WaypointManager extends SerializableObject.NbtDat {
 
     // Remove all invalid waypoints
     toRemove.forEach((waypoint, result) -> {
-      LOGGER.info("Auto-removing waypoint {} or '{}' at {}, world={}, reason={}",
-          waypoint.getId(),
-          waypoint.get(WaypointProperties.NAME),
-          waypoint.getPosition(),
-          waypoint.getWorld(),
+      LOGGER.info("Auto-removing waypoint {}, reason={}",
+          waypoint.identificationInfo(),
           result.getReason()
       );
 

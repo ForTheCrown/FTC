@@ -35,6 +35,7 @@ import net.forthecrown.utils.Time;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
+import net.forthecrown.waypoint.WaypointScan.Result;
 import net.forthecrown.waypoint.type.PlayerWaypointType;
 import net.forthecrown.waypoint.type.WaypointType;
 import net.forthecrown.waypoint.type.WaypointTypes;
@@ -693,9 +694,16 @@ public @UtilityClass class Waypoints {
   }
 
   public void removeIfPossible(Waypoint waypoint) {
-    if (!WaypointScan.canBeRemoved(waypoint)) {
+    Result scanResult = WaypointScan.scan(waypoint);
+
+    if (!scanResult.isRemovable()) {
       return;
     }
+
+    FTC.getLogger().info("Removing waypoint {}, reason: {}",
+        waypoint.identificationInfo(),
+        scanResult.getReason()
+    );
 
     WaypointManager.getInstance()
         .removeWaypoint(waypoint);
