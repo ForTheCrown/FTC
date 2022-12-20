@@ -34,14 +34,17 @@ public class EmoteBonk extends CommandEmote {
 
   @Override
   public int execute(User sender, User target) {
-    Location loc = target.getLocation();
-    loc.setPitch(loc.getPitch() + 20F);
-
     sender.sendMessage(bonkSender(target));
     target.sendMessage(bonkTarget(sender));
 
     if (target.getGameMode() != GameMode.SPECTATOR) {
-      target.getPlayer().teleport(loc);
+      Location loc = target.getLocation();
+
+      target.getPlayer().setRotation(
+          loc.getYaw(),
+          loc.getPitch() + 20.0F
+      );
+
       target.getWorld().playSound(loc, Sound.ENTITY_SHULKER_HURT_CLOSED, 2.0F, 0.8F);
 
       Particle.CRIT.builder()
