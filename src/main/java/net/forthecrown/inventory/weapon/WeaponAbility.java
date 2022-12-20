@@ -54,8 +54,9 @@ public class WeaponAbility {
   }
 
   public int getCooldownTicks() {
-    int time = getDuration();
-    return GenericMath.floor(time * GeneralConfig.swordAbilityCooldownScalar);
+    float level = getLevel();
+    float mod = GeneralConfig.swordAbilityCooldownScalar / level;
+    return GenericMath.floor(getDuration() * mod);
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */
