@@ -22,6 +22,7 @@ public interface AttackPhase extends Listener {
     boss.updatePhaseBarViewers();
     BossBar bar = boss.getPhaseBar();
     bar.setProgress(0d);
+
     // Other phases might change name, ensure it's the default
     bar.setTitle("Phase progress");
 

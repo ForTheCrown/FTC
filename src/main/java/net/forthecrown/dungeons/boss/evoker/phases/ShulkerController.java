@@ -3,6 +3,7 @@ package net.forthecrown.dungeons.boss.evoker.phases;
 import com.destroystokyo.paper.ParticleBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.evoker.EvokerBoss;
 import net.forthecrown.dungeons.boss.evoker.EvokerConfig;
@@ -21,6 +22,7 @@ import org.spongepowered.math.vector.Vector3d;
 
 // I'm something of a data-oriented programmer myself
 public class ShulkerController {
+  public static final int PARTICLES_PER_STEP = 5;
 
   final World world;
   final EvokerBoss boss;
@@ -55,11 +57,13 @@ public class ShulkerController {
           drawBeam(data);
 
           // If we should start firing the projectile
-          if (data.tick >= EvokerConfig.shulker_aimingTime) {
-            data.tick = 0;
-            data.phase = Phase.FIRING;
-            data.drawTick = EvokerConfig.shulker_drawInterval;
+          if (data.tick < EvokerConfig.shulker_aimingTime) {
+            continue;
           }
+
+          data.tick = 0;
+          data.phase = Phase.FIRING;
+          data.drawTick = EvokerConfig.shulker_drawInterval;
         }
 
         case FIRING -> {
@@ -67,18 +71,20 @@ public class ShulkerController {
 
           drawFiringBeam(data);
 
-          if (data.tick >= data.firingTicks) {
-            data.phase = Phase.NONE;
-            data.tick = 0;
-            data.drawTick = 0;
-
-            // Boom boom at target :D
-            Vector3d pos = data.target;
-            world.createExplosion(
-                pos.x(), pos.y(), pos.z(),
-                3.5f, false, false, data.shulker
-            );
+          if (!(data.tick >= data.firingTicks)) {
+            continue;
           }
+
+          data.phase = Phase.NONE;
+          data.tick = 0;
+          data.drawTick = 0;
+
+          // Boom boom at target :D
+          Vector3d pos = data.target;
+          world.createExplosion(
+              pos.x(), pos.y(), pos.z(),
+              3.5f, false, false, data.shulker
+          );
         }
 
         case TRAITOR -> {
@@ -92,31 +98,32 @@ public class ShulkerController {
           final double random = Util.RANDOM.nextDouble(interval);
           final int nextAimTick = (int) (interval + random);
 
-          if (data.tick >= nextAimTick) {
-            data.tick = 0;
-            data.phase = Phase.AIMING;
-            data.drawTick = EvokerConfig.shulker_drawInterval;
-            data.target = findTarget();
-
-            if (data.target == null) {
-              data.phase = Phase.NONE;
-            } else {
-              Vector3d dist = data.target.sub(data.beamOrigin);
-              data.firingTicks = dist.length() / EvokerConfig.shulker_firingSpeed;
-
-              // beamStep is the large step the beam will take every
-              // tick towards the player
-              data.step = dist.div(data.firingTicks);
-              data.currentStart = data.beamOrigin;
-              data.particleDist = data.step.div(PARTICLES_PER_STEP);
-            }
+          if (data.tick < nextAimTick) {
+            continue;
           }
+
+          data.tick = 0;
+          data.phase = Phase.AIMING;
+          data.drawTick = EvokerConfig.shulker_drawInterval;
+          data.target = findTarget();
+
+          if (data.target == null) {
+            data.phase = Phase.NONE;
+            continue;
+          }
+
+          Vector3d dist = data.target.sub(data.beamOrigin);
+          data.firingTicks = dist.length() / EvokerConfig.shulker_firingSpeed;
+
+          // beamStep is the large step the beam will take every
+          // tick towards the player
+          data.step = dist.div(data.firingTicks);
+          data.currentStart = data.beamOrigin;
+          data.particleDist = data.step.div(PARTICLES_PER_STEP);
         }
       }
     }
   }
-
-  public static final int PARTICLES_PER_STEP = 5;
 
   void drawFiringBeam(ShulkerData data) {
     Vector3d start = data.currentStart;
@@ -229,11 +236,9 @@ public class ShulkerController {
       return null;
     }
 
-    Vector3d pos = Vectors.doubleFrom(target.getLocation());
+    Vector3d pos = Vectors.doubleFrom(target.getBoundingBox().getCenter());
     Vector3d vel = Vectors.doubleFrom(target.getVelocity());
-
-    return pos.add(vel)
-        .add(0, target.getHeight() / 2, 0);
+    return pos.add(vel);
   }
 
   // Small data container for shulker stuff
@@ -250,12 +255,13 @@ public class ShulkerController {
 
     public ShulkerData(Shulker shulker) {
       this.shulker = shulker;
-      beamOrigin = Vectors.doubleFrom(shulker.getLocation()).add(0, shulker.getHeight() / 2, 0);
+      beamOrigin = Vectors.doubleFrom(shulker.getBoundingBox().getCenter());
       phase = Phase.NONE;
     }
   }
 
   // The phase a shulker is at
+  @RequiredArgsConstructor
   enum Phase {
     NONE(null, 0f),
     AIMING(Color.WHITE, 1f),
@@ -264,10 +270,5 @@ public class ShulkerController {
 
     final Color color;
     final float size;
-
-    Phase(Color color, float size) {
-      this.color = color;
-      this.size = size;
-    }
   }
 }

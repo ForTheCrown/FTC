@@ -9,6 +9,8 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.math.WorldBounds3i;
 import net.minecraft.util.Mth;
 import org.bukkit.GameMode;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -126,5 +128,11 @@ public record BossContext(float modifier, List<Player> players) {
   public double damage(double initial) {
     final double damage = (modifier() / 3) * initial;
     return Math.ceil(damage + modifier());
+  }
+
+  public AttributeModifier healthModifier() {
+    return new AttributeModifier(
+        "boss_context_modifier", modifier, Operation.MULTIPLY_SCALAR_1
+    );
   }
 }

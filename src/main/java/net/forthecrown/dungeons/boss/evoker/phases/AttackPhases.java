@@ -29,19 +29,18 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 public final class AttackPhases {
+  private AttackPhases() {}
 
-  private AttackPhases() {
-  }
-
-  // Copied from the zombie class in NMS... this has to be a rounding error during compilation lol
+  // Copied from the zombie class in NMS... this has to be a rounding
+  // error during compilation lol
   public static final double ZOMBIE_BASE_MOVE_SPEED = 0.23000000417232513D;
 
   public static final AttackPhase
-      SHIELD = new ShieldPhase(),
-      POTION = new PotionPhase(),
+      SHIELD  = new ShieldPhase(),
+      POTION  = new PotionPhase(),
       SHULKER = new ShulkerPhase(),
-      NORMAL_ATTACK = new NormalAttackPhase(),
-      GHAST = new GhastPhase();
+      SWARM   = new SwarmPhase(),
+      GHAST   = new GhastPhase();
 
   public static final AttackPhase ZOMBIES = new SummonPhase(
       (pos, world, context) -> {
@@ -109,7 +108,7 @@ public final class AttackPhases {
 
   // Phases that can be selected during round phase shuffle
   public static final AttackPhase[] SELECTABLE_PHASES = {
-      POTION, ZOMBIES, ILLAGERS, NORMAL_ATTACK, GHAST
+      POTION, ZOMBIES, ILLAGERS, SWARM, GHAST
   };
 
   // Phases that get appended onto the randomized phase order

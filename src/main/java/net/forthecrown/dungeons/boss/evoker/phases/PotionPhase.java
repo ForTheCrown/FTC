@@ -28,7 +28,8 @@ import org.spongepowered.math.vector.Vector3d;
 
 public class PotionPhase implements AttackPhase {
 
-  private static final List<QueuedPotion> QUEUED_POTIONS = new ObjectArrayList<>();
+  private static final List<QueuedPotion> QUEUED_POTIONS
+      = new ObjectArrayList<>();
 
   static final BossMessage
       START_MESSAGE = BossMessage.simple("phase_potion_start");
@@ -77,27 +78,32 @@ public class PotionPhase implements AttackPhase {
         QueuedPotion e = iterator.next();
         e.untilSpawn--;
 
-        if (e.untilSpawn <= 0) {
-          Vector2d next = e.pos;
-          Location l = new Location(boss.getWorld(), next.x(), EvokerConfig.potion_spawnY,
-              next.toVector3().z());
-          int duration = EvokerConfig.potion_length - tick;
-
-          l.getWorld().spawn(l, ThrownPotion.class, potion -> {
-            ItemStack item = ItemStacks.potionBuilder(Material.LINGERING_POTION, 1)
-                .addEffect(new PotionEffect(
-                    Util.RANDOM.nextBoolean() ? PotionEffectType.POISON : PotionEffectType.WITHER,
-                    duration,
-                    (context.modifier() >= (float) GeneralConfig.maxBossDifficulty / 2) ? 2 : 1,
-                    false, true, true
-                ))
-                .build();
-
-            potion.setItem(item);
-          });
-
-          iterator.remove();
+        if (e.untilSpawn > 0) {
+          continue;
         }
+
+        Vector2d next = e.pos;
+        Location l = new Location(
+            boss.getWorld(),
+            next.x(), EvokerConfig.potion_spawnY, next.y()
+        );
+
+        int duration = EvokerConfig.potion_length - tick;
+
+        l.getWorld().spawn(l, ThrownPotion.class, potion -> {
+          ItemStack item = ItemStacks.potionBuilder(Material.LINGERING_POTION, 1)
+              .addEffect(new PotionEffect(
+                  Util.RANDOM.nextBoolean() ? PotionEffectType.POISON : PotionEffectType.WITHER,
+                  duration,
+                  (context.modifier() >= (float) GeneralConfig.maxBossDifficulty / 2) ? 2 : 1,
+                  false, true, true
+              ))
+              .build();
+
+          potion.setItem(item);
+        });
+
+        iterator.remove();
       }
     }
 
@@ -106,7 +112,6 @@ public class PotionPhase implements AttackPhase {
     }
 
     potionTick = 0;
-
     Vector2d potionSpawn;
 
     if (Util.RANDOM.nextBoolean()) {
@@ -124,7 +129,11 @@ public class PotionPhase implements AttackPhase {
     }
 
     QUEUED_POTIONS.add(new QueuedPotion(potionSpawn));
-    Vector3d pos = potionSpawn.toVector3(EvokerConfig.potion_spawnY);
+    Vector3d pos = new Vector3d(
+        potionSpawn.x(),
+        EvokerConfig.potion_spawnY,
+        potionSpawn.y()
+    );
 
     EvokerEffects.summoningSound(boss.getWorld(), pos);
     EvokerEffects.drawImpact(boss.getWorld(), pos, 1);
@@ -158,7 +167,6 @@ public class PotionPhase implements AttackPhase {
 
   @RequiredArgsConstructor
   private static class QueuedPotion {
-
     private final Vector2d pos;
     private int untilSpawn = EvokerConfig.potion_spawnDelay;
   }

@@ -23,28 +23,35 @@ public @UtilityClass class EvokerConfig {
   public static double
       shulker_particleDistance = 0.2D,
 
-  potion_minDist = 4.0D,
+      potion_minDist = 4.0D,
       potion_maxDist = 15.0D,
       potion_spawnY = 40.5D,
 
-  shulker_firingSpeed = 0.75D;
+      shulker_firingSpeed = 0.75D,
+
+      swarm_vexSpawnDist = 2.25;
 
   public static int
       normal_length = 400,
 
-  zombies_skeletonChance = 5,
+      swarm_vexAmount = 5,
+      swarm_spawnRadial = 270,
+      swarm_summonInterval = 60,
+      swarm_endingDelay = 20 * 10,
+
+      zombies_skeletonChance = 5,
       illager_ravagerChance = 1,
       vulnerable_length = phaseTransition * 2,
 
-  shulker_drawInterval = 15,
+      shulker_drawInterval = 15,
       shulker_aimingTime = 15,
       shulker_aimInterval = 60,
 
-  potion_throwInterval = 20,
+      potion_throwInterval = 20,
       potion_length = 140,
       potion_spawnDelay = 5,
 
-  ghast_length = 400,
+      ghast_length = 400,
       ghast_health = 2000;
 
   public static short

@@ -16,8 +16,7 @@ public interface BossMessage {
       .put("summon_insult_single", text("A lone traveller? This will be easy!"))
       .put("summon_insult_party", text("What fools you are, this room will be your grave!"))
       .put("summon_shield", text("The ones before were weak, I know your tactics."))
-      .put("summon_shield_secondline",
-          text("I prepared a shield that no mortal weapon can pierce!"))
+      .put("summon_shield_secondline", text("I prepared a shield that no mortal weapon can pierce!"))
 
       // Zhombie summon phase
       .put("phase_zombie_start_0", text("Army of the undead, I summon thee!"))

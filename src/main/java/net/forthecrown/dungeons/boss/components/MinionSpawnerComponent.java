@@ -97,7 +97,7 @@ public class MinionSpawnerComponent implements BossComponent<DungeonBoss> {
   }
 
   public static void kill(Entity e) {
-    if (!(e instanceof LivingEntity living)) {
+    if (!(e instanceof LivingEntity living) || e.isDead()) {
       return;
     }
 

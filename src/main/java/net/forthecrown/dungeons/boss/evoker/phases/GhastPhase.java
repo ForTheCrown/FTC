@@ -14,6 +14,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Ghast;
 
 public class GhastPhase implements AttackPhase {
+  public static final byte EXPLOSION_POWER = 3;
 
   public static final double[][] SPAWNS = {
       {-277.5, 37, 38.5},
@@ -45,7 +46,7 @@ public class GhastPhase implements AttackPhase {
         CompoundTag saved = new CompoundTag();
         nms.save(saved);
 
-        saved.putByte("ExplosionPower", (byte) 3);
+        saved.putByte("ExplosionPower", EXPLOSION_POWER);
         nms.load(saved);
 
         AttackPhases.clearAllDrops(ghast);

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,7 @@ import net.forthecrown.dungeons.boss.components.TargetUpdateComponent;
 import net.forthecrown.dungeons.boss.evoker.phases.AttackPhase;
 import net.forthecrown.dungeons.boss.evoker.phases.AttackPhases;
 import net.forthecrown.dungeons.boss.evoker.phases.SummonPhase;
+import net.forthecrown.dungeons.boss.evoker.phases.SwarmPhase;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.TickSequence;
 import net.forthecrown.utils.Util;
@@ -67,14 +69,21 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
   public static final int NO_TRANSITION = -1;
 
   private Evoker evoker;
-  private final TickSequence spawnAnim, deathAnim;
+  private final TickSequence spawnAnim;
+  private final TickSequence deathAnim;
 
   AttackPhase[] attackOrder;
   int phaseIndex;
   int transitionTick;
+
   @Getter
   @Setter
-  boolean attackingAllowed, invulnerable;
+  boolean attackingAllowed;
+
+  @Getter
+  @Setter
+  boolean invulnerable;
+
   @Getter
   @Setter
   Spellcaster.Spell spell;
@@ -82,7 +91,9 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
   @Getter
   private BossBar phaseBar;
 
-  AttackPhase phase, lastPhase;
+  AttackPhase phase;
+  AttackPhase lastPhase;
+
   EvokerState state;
 
   public EvokerBoss() {
@@ -173,6 +184,7 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
     }
 
     SummonPhase.killAllSpawned();
+    SwarmPhase.killAllSpawned();
 
     runComponents(component -> component.onDeath(this, currentContext, force));
     setPhase(null);
@@ -296,8 +308,7 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
   }
 
   public void broadcast(boolean allowCancellation, BossMessage... msgs) {
-    Validate.noNullElements(msgs,
-        "Given messages were null or contained a null message, index: %d");
+    Validate.noNullElements(msgs, "Given messages were null or contained a null message, index: %d");
     Validate.notEmpty(msgs, "Messages were empty");
 
     if (Util.RANDOM.nextBoolean() && allowCancellation) {
@@ -388,14 +399,14 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
     }
 
     if (e instanceof EvokerFangs fangs
-        && fangs.getOwner().equals(getBossEntity())
+        && Objects.equals(evoker, fangs.getOwner())
     ) {
       event.setCancelled(true);
       return;
     }
 
     if (e instanceof Vex vex
-        && vex.getSummoner().equals(getBossEntity())
+        && Objects.equals(evoker, vex.getSummoner())
     ) {
       event.setCancelled(true);
     }

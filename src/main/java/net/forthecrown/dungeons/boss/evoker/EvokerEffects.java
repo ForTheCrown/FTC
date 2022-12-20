@@ -14,9 +14,7 @@ import org.bukkit.util.Vector;
 import org.spongepowered.math.vector.Vector3d;
 
 public final class EvokerEffects {
-
-  private EvokerEffects() {
-  }
+  private EvokerEffects() {}
 
   public static final ParticleBuilder IMPACT_PARTICLE = new ParticleBuilder(
       Particle.CAMPFIRE_SIGNAL_SMOKE)
