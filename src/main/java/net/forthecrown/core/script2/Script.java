@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
+import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -14,6 +16,7 @@ import net.forthecrown.core.FTC;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.io.PathUtil;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngine;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
@@ -266,6 +269,16 @@ public class Script implements Closeable {
   }
 
   /**
+   * Delegate for {@link #load(Consumer)} with a null consumer
+   * @return This
+   * @throws ScriptLoadException If the script couldn't be loaded
+   * @see #load(Consumer)
+   */
+  public Script load() throws ScriptLoadException {
+    return load(null);
+  }
+
+  /**
    * Loads this script from the script's file.
    * <p>
    * If this script has already been loaded, then {@link #close()} will be called before,
@@ -286,10 +299,15 @@ public class Script implements Closeable {
    * default java classes, specified in {@link ScriptsBuiltIn}, and adds the {@link #getTasks()} and
    * {@link #getEvents()} to the script.
    *
+   * @param loadCallback Callback for placing values into the script's
+   *                     bindings before evaluation
+   *
    * @return This
    * @throws ScriptLoadException If the script couldn't be loaded
    */
-  public Script load() throws ScriptLoadException {
+  public Script load(@Nullable Consumer<Bindings> loadCallback)
+      throws ScriptLoadException
+  {
     if (engine != null) {
       close();
     }
@@ -307,6 +325,10 @@ public class Script implements Closeable {
       this.engine = engine;
       this.mirror = (ScriptObjectMirror)
           engine.getBindings(ScriptContext.ENGINE_SCOPE);
+
+      if (loadCallback != null) {
+        loadCallback.accept(mirror);
+      }
 
       var ctx = engine.getContext();
       ctx.setAttribute(
