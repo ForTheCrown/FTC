@@ -5,12 +5,15 @@ import java.util.List;
 import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.core.FTC;
 import net.forthecrown.utils.Tasks;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.scheduler.BukkitTask;
 
 @Getter
 @RequiredArgsConstructor
 public class ScriptTasks {
+  private static final Logger LOGGER = FTC.getLogger();
 
   private final Script script;
   private final List<TaskWrapper> tasks = new ObjectArrayList<>();
@@ -49,14 +52,20 @@ public class ScriptTasks {
   @Getter
   @RequiredArgsConstructor
   public static class TaskWrapper {
-
     private final Consumer<TaskWrapper> callback;
     private final ScriptTasks tasks;
 
     private BukkitTask task;
 
     public void run() {
-      callback.accept(this);
+      try {
+        callback.accept(this);
+      } catch (Exception exc) {
+        LOGGER.error("Couldn't invoke task callback for script {}",
+            tasks.getScript().getName(),
+            exc
+        );
+      }
     }
 
     public int getTaskId() {

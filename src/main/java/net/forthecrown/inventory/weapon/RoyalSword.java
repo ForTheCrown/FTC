@@ -39,7 +39,8 @@ public class RoyalSword extends ExtendedItem {
       TAG_RANK = "rank",
       TAG_LAST_FLAVOR = "lastFlavorChange",
       TAG_EXTRA_DATA = "extraData",
-      TAG_GOALS = "goals";
+      TAG_GOALS = "goals",
+      TAG_ABILITY = "ability";
 
   public static final Component BORDER = Component.text("------------------------------",
       nonItalic(NamedTextColor.DARK_GRAY));
@@ -48,6 +49,9 @@ public class RoyalSword extends ExtendedItem {
   private SwordRank rank;
   @Setter
   private SwordRank lastFlavorChange;
+
+  @Setter
+  private WeaponAbility ability;
 
   private final Object2IntMap<String> progress = new Object2IntOpenHashMap<>();
 
@@ -190,7 +194,7 @@ public class RoyalSword extends ExtendedItem {
     return true;
   }
 
-  // --- LORE ---
+  /* ------------------------------- LORE --------------------------------- */
 
   @Override
   protected void writeLore(TextWriter writer) {
@@ -203,6 +207,12 @@ public class RoyalSword extends ExtendedItem {
       writer.line(BORDER);
       lastFlavorChange.writeFlavor(writer);
       writer.line(BORDER);
+    }
+
+    if (ability != null) {
+      ability.write(writer);
+      writer.newLine();
+      writer.newLine();
     }
 
     if (!rank.getGoals().isEmpty()) {
@@ -280,7 +290,7 @@ public class RoyalSword extends ExtendedItem {
     }
   }
 
-  // --- SERIALIZATION ---
+  /* --------------------------- SERIALIZATION ---------------------------- */
 
   private void load(CompoundTag tag) {
     if (tag.contains(TAG_LAST_FLAVOR)) {
@@ -293,6 +303,10 @@ public class RoyalSword extends ExtendedItem {
     }
 
     this.rank = SwordRanks.RANKS[tag.getInt(TAG_RANK)];
+
+    if (tag.contains(TAG_ABILITY)) {
+      setAbility(WeaponAbility.load(tag.get(TAG_ABILITY)));
+    }
 
     if (tag.contains(TAG_GOALS)) {
       for (var e : tag.getCompound(TAG_GOALS).tags.entrySet()) {
@@ -336,6 +350,10 @@ public class RoyalSword extends ExtendedItem {
 
     if (lastFlavorChange != null) {
       tag.putInt(TAG_LAST_FLAVOR, lastFlavorChange.getIndex());
+    }
+
+    if (ability != null) {
+      tag.put(TAG_ABILITY, ability.save());
     }
   }
 }

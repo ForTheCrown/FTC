@@ -8,7 +8,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import lombok.experimental.UtilityClass;
 import net.forthecrown.commands.arguments.WaypointArgument;
 import net.forthecrown.commands.guild.GuildProvider;
 import net.forthecrown.commands.manager.Exceptions;
@@ -53,13 +52,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.math.vector.Vector3i;
 
-public @UtilityClass class Waypoints {
+public final class Waypoints {
+  private Waypoints() {}
+
   /* ------------------------- COLUMN CONSTANTS --------------------------- */
 
   /**
    * The required center column for guild waypoints
    */
-  public final Material[] GUILD_COLUMN = {
+  public static final Material[] GUILD_COLUMN = {
       Material.STONE_BRICKS,
       Material.STONE_BRICKS,
       Material.LODESTONE,
@@ -68,7 +69,7 @@ public @UtilityClass class Waypoints {
   /**
    * The required center column for player waypoints
    */
-  public final Material[] PLAYER_COLUMN = {
+  public static final Material[] PLAYER_COLUMN = {
       Material.STONE_BRICKS,
       Material.STONE_BRICKS,
       Material.CHISELED_STONE_BRICKS,
@@ -77,7 +78,7 @@ public @UtilityClass class Waypoints {
   /**
    * The required center column for region poles
    */
-  public final Material[] REGION_POLE_COLUMN = {
+  public static final Material[] REGION_POLE_COLUMN = {
       Material.GLOWSTONE,
       Material.GLOWSTONE,
       Material.SEA_LANTERN
@@ -88,24 +89,24 @@ public @UtilityClass class Waypoints {
   /**
    * Name of the Region pole {@link net.forthecrown.structure.BlockStructure}
    */
-  public final String POLE_STRUCTURE = "region_pole";
+  public static final String POLE_STRUCTURE = "region_pole";
 
-  public final String FUNC_REGION_NAME = "region_name";
+  public static final String FUNC_REGION_NAME = "region_name";
 
-  public final String FUNC_RESIDENTS = "region_residents";
+  public static final String FUNC_RESIDENTS = "region_residents";
 
   /**
    * Default size of the pole (5, 5, 5)
    */
-  public Vector3i DEFAULT_POLE_SIZE = Vector3i.from(5);
+  public static Vector3i DEFAULT_POLE_SIZE = Vector3i.from(5);
 
-  public BlockStructure getRegionPole() {
+  public static BlockStructure getRegionPole() {
     return Structures.get()
         .getRegistry()
         .orNull(POLE_STRUCTURE);
   }
 
-  public Vector3i poleSize() {
+  public static Vector3i poleSize() {
     return Structures.get()
         .getRegistry()
         .get(POLE_STRUCTURE)
@@ -113,7 +114,7 @@ public @UtilityClass class Waypoints {
         .orElse(DEFAULT_POLE_SIZE);
   }
 
-  public void placePole(Waypoint region) {
+  public static void placePole(Waypoint region) {
     var structure = getRegionPole();
 
     if (structure == null) {
@@ -145,9 +146,9 @@ public @UtilityClass class Waypoints {
     structure.place(config);
   }
 
-  private void processTopSign(Waypoint region,
-                              FunctionInfo info,
-                              StructurePlaceConfig config
+  private static void processTopSign(Waypoint region,
+                                     FunctionInfo info,
+                                     StructurePlaceConfig config
   ) {
     var pos = config.getTransform().apply(info.getOffset());
     var world = config.getWorld();
@@ -207,7 +208,7 @@ public @UtilityClass class Waypoints {
     sign.update();
   }
 
-  private Component signName(Waypoint waypoint) {
+  private static Component signName(Waypoint waypoint) {
     var name = waypoint.get(WaypointProperties.NAME);
     return text(Strings.isNullOrEmpty(name) ? "Wilderness" : name);
   }
@@ -215,7 +216,7 @@ public @UtilityClass class Waypoints {
   /**
    * Gets all invulnerable waypoints within the given bounds in the given world
    */
-  public Set<Waypoint> getInvulnerable(Bounds3i bounds3i, World world) {
+  public static Set<Waypoint> getInvulnerable(Bounds3i bounds3i, World world) {
     return filterSet(
         WaypointManager.getInstance()
             .getChunkMap()
@@ -226,7 +227,7 @@ public @UtilityClass class Waypoints {
   /**
    * Gets all invulnerable waypoints at the given position in the given world
    */
-  public Set<Waypoint> getInvulnerable(Vector3i pos, World world) {
+  public static Set<Waypoint> getInvulnerable(Vector3i pos, World world) {
     return filterSet(
         WaypointManager.getInstance()
             .getChunkMap()
@@ -237,7 +238,7 @@ public @UtilityClass class Waypoints {
   /**
    * Removes non-invulnerable waypoints from the given set
    */
-  private Set<Waypoint> filterSet(Set<Waypoint> waypoints) {
+  private static Set<Waypoint> filterSet(Set<Waypoint> waypoints) {
     waypoints.removeIf(waypoint -> !waypoint.get(WaypointProperties.INVULNERABLE));
     return waypoints;
   }
@@ -248,7 +249,7 @@ public @UtilityClass class Waypoints {
    * @param player The player to find the colliding waypoints of
    * @return The waypoint the player is inside, null, if not inside any waypoints
    */
-  public Waypoint getColliding(Player player) {
+  public static Waypoint getColliding(Player player) {
     return WaypointManager.getInstance()
         .getChunkMap()
         .getOverlapping(
@@ -267,7 +268,7 @@ public @UtilityClass class Waypoints {
    * @return The nearest waypoint to the user, null, if there are no waypoints or the user is in a
    * world with no waypoints
    */
-  public Waypoint getNearest(User user) {
+  public static Waypoint getNearest(User user) {
     return WaypointManager.getInstance()
         .getChunkMap()
         .findNearest(user.getLocation())
@@ -283,7 +284,7 @@ public @UtilityClass class Waypoints {
    * @param name The name to test
    * @return True, if the name is valid, as specified in the above paragraph, false otherwise.
    */
-  public boolean isValidName(String name) {
+  public static boolean isValidName(String name) {
     return !BannedWords.contains(name)
         && !name.contains(" ")
         && !name.equalsIgnoreCase(WaypointArgument.FLAG_NEAREST)
@@ -320,10 +321,11 @@ public @UtilityClass class Waypoints {
    * @return An empty optional if the area is valid, an optional containing a corresponding error
    * message, if the area is invalid
    */
-  public Optional<CommandSyntaxException> isValidWaypointArea(Vector3i pos,
-                                                              PlayerWaypointType type,
-                                                              World w,
-                                                              boolean testOverlap
+  public static Optional<CommandSyntaxException> isValidWaypointArea(
+      Vector3i pos,
+      PlayerWaypointType type,
+      World w,
+      boolean testOverlap
   ) {
     var bounds = type.createBounds()
         .move(pos)
@@ -416,7 +418,7 @@ public @UtilityClass class Waypoints {
    * @param name     The name to set the sign to, if null, the sign is removed
    * @throws IllegalStateException If the given waypoint is not a {@link PlayerWaypointType}
    */
-  public void setNameSign(Waypoint waypoint, String name)
+  public static void setNameSign(Waypoint waypoint, String name)
       throws IllegalStateException {
     if (!(waypoint.getType() instanceof PlayerWaypointType type)) {
       throw new IllegalStateException(
@@ -451,7 +453,7 @@ public @UtilityClass class Waypoints {
    * @return True, if the block's type is either the top of {@link #GUILD_COLUMN} or
    * {@link #PLAYER_COLUMN}
    */
-  public boolean isTopOfWaypoint(Block block) {
+  public static boolean isTopOfWaypoint(Block block) {
     var t = block.getType();
 
     return t == GUILD_COLUMN[COLUMN_TOP]
@@ -469,8 +471,9 @@ public @UtilityClass class Waypoints {
    * @throws CommandSyntaxException If the pole couldn't be created
    * @see #tryCreate(CommandSource, GuildProvider.Simple)
    */
-  public Waypoint tryCreate(CommandSource source)
-      throws CommandSyntaxException {
+  public static Waypoint tryCreate(CommandSource source)
+      throws CommandSyntaxException
+  {
     return tryCreate(source, GuildProvider.SENDERS_GUILD);
   }
 
@@ -496,13 +499,13 @@ public @UtilityClass class Waypoints {
    * @return The created waypoint
    * @throws CommandSyntaxException If the waypoint creation fails at any stage
    */
-  public Waypoint tryCreate(CommandSource source, GuildProvider.Simple provider)
-      throws CommandSyntaxException {
+  public static Waypoint tryCreate(CommandSource source,
+                                   GuildProvider.Simple provider
+  )
+      throws CommandSyntaxException
+  {
     var player = source.asPlayer();
-
-    Block b = player.getTargetBlockExact(
-        5, FluidCollisionMode.NEVER
-    );
+    Block b = findTopBlock(player);
 
     if (b == null) {
       throw Exceptions.FACE_WAYPOINT_TOP;
@@ -534,8 +537,8 @@ public @UtilityClass class Waypoints {
         if (!source.hasPermission(Permissions.GUILD_ADMIN)) {
           throw Exceptions.NO_PERMISSION;
         }
-
-      } else if (!member.hasPermission(GuildPermission.CAN_RELOCATE)) {
+      }
+      else if (!member.hasPermission(GuildPermission.CAN_RELOCATE)) {
         throw Exceptions.G_NO_PERM_WAYPOINT;
       }
 
@@ -588,8 +591,7 @@ public @UtilityClass class Waypoints {
     if (type == WaypointTypes.GUILD) {
       var user = Users.get(player);
       var guild = provider.get(source);
-
-      setGuildWaypoint(guild, waypoint, user);
+      guild.moveWaypoint(waypoint, user);
     } else {
       if (waypoint.get(WaypointProperties.OWNER) == null) {
         waypoint.set(
@@ -609,6 +611,34 @@ public @UtilityClass class Waypoints {
   }
 
   /**
+   * Finds a potential waypoint's top block
+   * <p>
+   * This gets the given player's targeted block, at a max distance of 5, and
+   * checks if that block, or any block above it, qualifies as a waypoint's top
+   * block, the first valid block being the one that's chosen.
+   *
+   * @param player The player who's looking at a waypoint's block
+   * @return A waypoint's potential top block, null, if none found.
+   */
+  public static @Nullable Block findTopBlock(Player player) {
+    var block = player.getTargetBlockExact(5, FluidCollisionMode.NEVER);
+
+    if (block == null) {
+      return null;
+    }
+
+    for (int i = 0; i < COLUMN_TOP + 2; i++) {
+      Block b = block.getRelative(0, i, 0);
+
+      if (isTopOfWaypoint(b)) {
+        return b;
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Tests if the user can move their home waypoint.
    * <p>
    * If {@link WaypointConfig#moveInHasCooldown} is false, then this method will not throw an
@@ -619,8 +649,9 @@ public @UtilityClass class Waypoints {
    * @param user The user to test
    * @throws CommandSyntaxException If they cannot move their waypoint home
    */
-  public void validateMoveInCooldown(User user)
-      throws CommandSyntaxException {
+  public static void validateMoveInCooldown(User user)
+      throws CommandSyntaxException
+  {
     long lastMoveIn = user.getTime(TimeField.LAST_MOVEIN);
 
     // Unset cool downs mean they haven't
@@ -643,27 +674,9 @@ public @UtilityClass class Waypoints {
     }
   }
 
-  public void setGuildWaypoint(Guild guild, Waypoint waypoint, User user) {
-    var current = guild.getSettings().getWaypoint();
-
-    if (current != null) {
-      current.set(WaypointProperties.GUILD_OWNER, null);
-      removeIfPossible(current);
-    }
-
-    guild.sendMessage(
-        Messages.guildSetCenter(waypoint.getPosition(), user)
-    );
-
-    guild.getSettings()
-        .setWaypoint(waypoint.getId());
-
-    waypoint.set(WaypointProperties.GUILD_OWNER, guild.getId());
-  }
-
-  public Waypoint makeWaypoint(WaypointType type,
-                               @Nullable Vector3i pos,
-                               CommandSource source
+  public static Waypoint makeWaypoint(WaypointType type,
+                                      @Nullable Vector3i pos,
+                                      CommandSource source
   ) {
     Vector3i position;
 
@@ -693,7 +706,7 @@ public @UtilityClass class Waypoints {
     return waypoint;
   }
 
-  public void removeIfPossible(Waypoint waypoint) {
+  public static void removeIfPossible(Waypoint waypoint) {
     Result scanResult = WaypointScan.scan(waypoint);
 
     if (!scanResult.isRemovable()) {
@@ -719,7 +732,7 @@ public @UtilityClass class Waypoints {
    * @param waypoint The waypoint to get the name of
    * @return The gotten name, may be null
    */
-  public @Nullable String getEffectiveName(@NotNull Waypoint waypoint) {
+  public static @Nullable String getEffectiveName(@NotNull Waypoint waypoint) {
     if (!Strings.isNullOrEmpty(waypoint.get(WaypointProperties.NAME))) {
       return waypoint.get(WaypointProperties.NAME);
     }
@@ -744,7 +757,7 @@ public @UtilityClass class Waypoints {
    * @param waypoint The waypoint to update the marker of
    * @see WaypointDynmap#updateMarker(Waypoint)
    */
-  public void updateDynmap(Waypoint waypoint) {
+  public static void updateDynmap(Waypoint waypoint) {
     if (!DynmapUtil.isInstalled()) {
       return;
     }

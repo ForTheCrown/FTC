@@ -47,7 +47,7 @@ public class CommandMoveIn extends FtcCommand {
           if (waypoint == null
               || !waypoint.getBounds().contains(user.getPlayer())
           ) {
-            var target = user.getPlayer().getTargetBlockExact(5);
+            var target = Waypoints.findTopBlock(user.getPlayer());
 
             if (target != null && Waypoints.isTopOfWaypoint(target)) {
               Waypoints.tryCreate(c.getSource());

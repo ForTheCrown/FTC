@@ -1,6 +1,9 @@
 package net.forthecrown.commands.manager;
 
 import static net.forthecrown.commands.manager.OpenExceptionType.INSTANCE;
+import static net.forthecrown.waypoint.Waypoints.COLUMN_TOP;
+import static net.forthecrown.waypoint.Waypoints.GUILD_COLUMN;
+import static net.forthecrown.waypoint.Waypoints.PLAYER_COLUMN;
 
 import com.mojang.brigadier.ImmutableStringReader;
 import com.mojang.brigadier.StringReader;
@@ -24,7 +27,6 @@ import net.forthecrown.utils.text.Text;
 import net.forthecrown.waypoint.Waypoint;
 import net.forthecrown.waypoint.WaypointConfig;
 import net.forthecrown.waypoint.WaypointProperties;
-import net.forthecrown.waypoint.Waypoints;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -580,7 +582,7 @@ public interface Exceptions {
   );
 
   CommandSyntaxException FACE_WAYPOINT_TOP = create(
-      "You must be looking at the waypoint's top block"
+      "You must be looking at a waypoint's top block"
   );
 
   static CommandSyntaxException unknownRegion(StringReader reader, int cursor) {
@@ -629,12 +631,12 @@ public interface Exceptions {
   }
 
   static CommandSyntaxException invalidWaypointTop(Material m) {
-    return format("{0} is an invalid waypoint top! Must be either " +
+    return format("{0} is an invalid waypoint top block! Must be either " +
             "{1} (player waypoint) or {2} (guild waypoint)",
         m,
 
-        Waypoints.PLAYER_COLUMN[2],
-        Waypoints.GUILD_COLUMN[2]
+        PLAYER_COLUMN[COLUMN_TOP],
+        GUILD_COLUMN[COLUMN_TOP]
     );
   }
 

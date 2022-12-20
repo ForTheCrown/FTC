@@ -138,7 +138,8 @@ public class Script implements Closeable {
    * @throws IllegalArgumentException If the given file doesn't exist or isn't a file
    */
   public static Script read(String file)
-      throws ScriptLoadException, IllegalArgumentException {
+      throws ScriptLoadException, IllegalArgumentException
+  {
     return of(file).load();
   }
 
@@ -156,7 +157,8 @@ public class Script implements Closeable {
    * @throws IllegalArgumentException If the given file doesn't exist or isn't a file
    */
   public static Script read(Path file)
-      throws ScriptLoadException, IllegalArgumentException {
+      throws ScriptLoadException, IllegalArgumentException
+  {
     return of(file).load();
   }
 
@@ -171,7 +173,8 @@ public class Script implements Closeable {
    * @throws IllegalArgumentException If the given script file didn't exist or wasn't a file
    */
   public static void run(Path file, String method, Object... args)
-      throws ScriptLoadException, IllegalArgumentException {
+      throws ScriptLoadException, IllegalArgumentException
+  {
     read(file).invoke(method, args).close();
   }
 
@@ -186,7 +189,8 @@ public class Script implements Closeable {
    * @throws IllegalArgumentException If the given script file didn't exist or wasn't a file
    */
   public static void run(String f, String method, Object... args)
-      throws ScriptLoadException, IllegalArgumentException {
+      throws ScriptLoadException, IllegalArgumentException
+  {
     read(f).invoke(method, args).close();
   }
 
@@ -231,7 +235,7 @@ public class Script implements Closeable {
           .script(script)
           .method(method)
           .build();
-    } catch (ScriptException | NoSuchMethodException e) {
+    } catch (Exception e) {
       return ScriptResult.builder()
           .exception(e)
           .script(script)

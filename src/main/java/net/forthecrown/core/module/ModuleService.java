@@ -1,6 +1,7 @@
 package net.forthecrown.core.module;
 
 import co.aikar.timings.Timing;
+import co.aikar.timings.Timings;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.lang.annotation.Annotation;
@@ -92,11 +93,11 @@ public class ModuleService implements Runnable {
               name
           );
 
-          return;
+          continue;
         }
       }
 
-      try {
+      try (Timing t = Timings.ofStart(FTC.getPlugin(), name, timing)) {
         invoke(instance, callback);
         ++ran;
 

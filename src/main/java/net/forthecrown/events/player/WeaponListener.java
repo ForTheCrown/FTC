@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 public class WeaponListener implements Listener {
 
@@ -34,5 +35,27 @@ public class WeaponListener implements Listener {
     ) {
       sword.damage(damager, event, item);
     }
+  }
+
+  // Don't ignore cancelled, by default,
+  // interactions with air blocks will be cancelled
+  @EventHandler
+  public void onPlayerInteract(PlayerInteractEvent event) {
+    var player = event.getPlayer();
+    var item = player.getInventory().getItemInMainHand();
+    RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);
+
+    if (sword == null) {
+      return;
+    }
+
+    var ability = sword.getAbility();
+
+    if (ability == null || player.hasCooldown(item.getType())) {
+      return;
+    }
+
+    ability.apply(player);
+    player.setCooldown(item.getType(), ability.getCooldownTicks());
   }
 }

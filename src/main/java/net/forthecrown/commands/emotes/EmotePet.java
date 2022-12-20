@@ -15,7 +15,7 @@ import org.bukkit.Sound;
 public class EmotePet extends CommandEmote {
 
   public EmotePet() {
-    super("pet", 300, text("You pet too much"));
+    super("pet", 20 * 2, text("You pet too much"));
     register();
   }
 
@@ -35,13 +35,13 @@ public class EmotePet extends CommandEmote {
     var part = randomPart();
 
     sender.sendMessage(
-        Text.format("{0} Pet &e{1, user}&r's &e{2}&r {1}",
+        Text.format("{0} Pet &e{1, user}&r's &e{2}&r {0}",
             HEART, target, part
         )
     );
     target.sendMessage(
-        Text.format("{0} &e{1, user}&r pet your &e{1}&r {0}",
-            HEART, target, part
+        Text.format("{0} &e{1, user}&r pet your &e{2}&r {0}",
+            HEART, sender, part
         )
     );
 

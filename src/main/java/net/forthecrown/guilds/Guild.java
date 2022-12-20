@@ -29,6 +29,9 @@ import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.Text;
+import net.forthecrown.waypoint.Waypoint;
+import net.forthecrown.waypoint.WaypointProperties;
+import net.forthecrown.waypoint.Waypoints;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.audience.MessageType;
@@ -152,6 +155,22 @@ public class Guild implements ForwardingAudience, InventoryHolder {
         .map(UnlockableChunkUpgrade::getPotionEffectType)
         .filter(Objects::nonNull)
         .collect(ObjectOpenHashSet.toSet());
+  }
+
+  public void moveWaypoint(Waypoint waypoint, User user) {
+    var current = getSettings().getWaypoint();
+
+    if (current != null) {
+      current.set(WaypointProperties.GUILD_OWNER, null);
+      Waypoints.removeIfPossible(current);
+    }
+
+    sendMessage(
+        Messages.guildSetCenter(waypoint.getPosition(), user)
+    );
+
+    getSettings().setWaypoint(waypoint.getId());
+    waypoint.set(WaypointProperties.GUILD_OWNER, getId());
   }
 
   public String getName() {

@@ -48,15 +48,13 @@ function updateFromUserMap() {
 
 function onVote(/* PlayerPostVoteEvent */ event) {
     // Kill, and then respawn the leaderboard
-    scheduler.run(new Runnable() {
-        run: function() {
-            // Clear existing values in the map and then
-            // re add the values from the user map
-            leaderboard.getValues().clear();
-            updateFromUserMap();
+    scheduler.run(task => {
+        // Clear existing values in the map and then
+        // re add the values from the user map
+        leaderboard.getValues().clear();
+        updateFromUserMap();
 
-            leaderboard.spawn();
-        }
+        leaderboard.spawn();
     });
 }
 

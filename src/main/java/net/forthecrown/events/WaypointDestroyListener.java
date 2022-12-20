@@ -5,9 +5,7 @@ import java.util.Collections;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.waypoint.WaypointManager;
-import net.forthecrown.waypoint.WaypointProperties;
 import net.forthecrown.waypoint.Waypoints;
-import net.forthecrown.waypoint.type.WaypointTypes;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -56,11 +54,6 @@ public class WaypointDestroyListener implements Listener {
             blocks.iterator().next().getWorld(),
             Bounds3i.of(blocks)
         );
-
-    waypoints.removeIf(waypoint -> {
-      return waypoint.get(WaypointProperties.INVULNERABLE)
-          || waypoint.getType() == WaypointTypes.ADMIN;
-    });
 
     if (waypoints.isEmpty()) {
       return;

@@ -33,7 +33,8 @@ public @UtilityClass class GeneralConfig {
       broadcastDelay              = 12000;
 
   public static float
-      durabilityWarnThreshold     = 0.1F;
+      durabilityWarnThreshold     = 0.1F,
+      swordAbilityCooldownScalar  = 1.5f;
 
   public static boolean
       userCacheSuggestions        = true,

@@ -174,8 +174,18 @@ class GuildSetNode extends GuildCommandNode {
     if (nearest == null
         || !nearest.getBounds().contains(user.getPlayer())
     ) {
-      Waypoints.tryCreate(c.getSource(), provider.simplify(c));
-      return 0;
+      var top = Waypoints.findTopBlock(user.getPlayer());
+
+      if (top != null) {
+        Waypoints.tryCreate(c.getSource(), provider.simplify(c));
+        return 0;
+      }
+
+      if (nearest == null) {
+        throw Exceptions.FAR_FROM_WAYPOINT;
+      } else {
+        throw Exceptions.farFromWaypoint(nearest);
+      }
     }
 
     if (nearest.getType() != WaypointTypes.PLAYER
@@ -208,7 +218,7 @@ class GuildSetNode extends GuildCommandNode {
     }
 
     nearest.setType(WaypointTypes.GUILD);
-    Waypoints.setGuildWaypoint(guild, nearest, user);
+    guild.moveWaypoint(nearest, user);
     return 0;
   }
 }

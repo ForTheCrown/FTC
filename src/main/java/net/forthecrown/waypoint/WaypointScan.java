@@ -9,9 +9,14 @@ import static net.forthecrown.waypoint.WaypointScan.Result.SUCCESS;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.forthecrown.core.FTC;
 import net.forthecrown.waypoint.type.WaypointTypes;
+import org.apache.logging.log4j.Logger;
 
-public class WaypointScan {
+public final class WaypointScan {
+  private WaypointScan() {}
+
+  private static final Logger LOGGER = FTC.getLogger();
 
   @Getter
   @RequiredArgsConstructor
@@ -26,18 +31,16 @@ public class WaypointScan {
     final boolean removable;
   }
 
-  public static boolean canBeRemoved(Waypoint waypoint) {
-    return scan(waypoint).isRemovable();
-  }
-
   public static Result scan(Waypoint waypoint) {
     if (waypoint.getType() == WaypointTypes.ADMIN
         || waypoint.get(WaypointProperties.INVULNERABLE)
     ) {
+      LOGGER.debug("scan={} is invulnerable", waypoint);
       return CANNOT_BE_DESTROYED;
     }
 
     if (waypoint.getType().isDestroyed(waypoint)) {
+      LOGGER.debug("scan={} is destroyed", waypoint);
       return DESTROYED;
     }
 
@@ -45,13 +48,18 @@ public class WaypointScan {
         && waypoint.get(WaypointProperties.GUILD_OWNER) == null
         && Strings.isNullOrEmpty(waypoint.get(WaypointProperties.NAME))
     ) {
+      LOGGER.debug("scan={} has no residents/name/guild", waypoint);
       return NO_RESIDENTS_NAME_GUILD;
     }
 
     var test = waypoint.getType().isValid(waypoint);
 
-    return test.isPresent()
-        ? POLE_BROKEN
-        : SUCCESS;
+    if (test.isPresent()) {
+      LOGGER.debug("scan={} is broken", waypoint);
+      return POLE_BROKEN;
+    }
+
+    LOGGER.debug("scan={} is perfect", waypoint);
+    return SUCCESS;
   }
 }

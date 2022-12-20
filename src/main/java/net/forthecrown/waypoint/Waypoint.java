@@ -480,6 +480,11 @@ public class Waypoint implements BoundsHolder {
   /* ------------------------- OBJECT OVERRIDES -------------------------- */
 
   @Override
+  public String toString() {
+    return identificationInfo();
+  }
+
+  @Override
   public int hashCode() {
     return id.hashCode();
   }

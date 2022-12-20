@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.core.FTC;
 import net.forthecrown.utils.Util;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -23,6 +24,7 @@ import org.openjdk.nashorn.internal.runtime.Context;
 @Getter
 @RequiredArgsConstructor
 public class ScriptEvents {
+  private static final Logger LOGGER = FTC.getLogger();
 
   private final Script script;
   private final List<ExecutorWrapper> wrappers = new ObjectArrayList<>();
@@ -179,7 +181,15 @@ public class ScriptEvents {
         return;
       }
 
-      handle.invoke(events.getScript(), event);
+      try {
+        handle.invoke(events.getScript(), event);
+      } catch (Exception e) {
+        LOGGER.error("Couldn't invoke script handle for event: {}, script={}",
+            event.getEventName(),
+            events.getScript().getName(),
+            e
+        );
+      }
     }
   }
 
