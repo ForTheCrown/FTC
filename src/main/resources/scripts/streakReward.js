@@ -10,11 +10,11 @@ function onStreakIncrease(user, streak) {
 
     // Alternating high streaks
     if (streak > 30) {
-        giveRhines(user, 50000);
+        giveRhines(user, 15000);
         giveGuildExp(user, 100);
 
         if (streak % 2 == 0) {
-            giveGems(user, 500);
+            giveGems(user, 200);
         } else {
             giveCrateKey(user);
         }
@@ -28,16 +28,16 @@ function onStreakIncrease(user, streak) {
         rhines = 5000;
         guildExp = 40;
     } else if (streak <= 10) {
-        rhines = 10000;
+        rhines = 7500;
         guildExp = 50;
     } else if (streak <= 15) {
-        rhines = 20000;
+        rhines = 10000;
         guildExp = 60;
     } else if (streak <= 20) {
-        rhines = 25000;
+        rhines = 12500;
         guildExp = 75;
     } else if (streak <= 30) {
-        rhines = 50000;
+        rhines = 15000;
         guildExp = 100;
     }
     giveRhines(user, rhines);
@@ -46,14 +46,14 @@ function onStreakIncrease(user, streak) {
     // Gems
     let gems = 0;
     if (streak == 2) gems = 50;
-    else if (streak == 4) gems = 100;
-    else if (streak == 7) gems = 150;
-    else if (streak == 9) gems = 200;
-    else if (streak == 12) gems = 250;
+    else if (streak == 4) gems = 75;
+    else if (streak == 7) gems = 100;
+    else if (streak == 9) gems = 150;
+    else if (streak == 12) gems = 150;
     else if (streak == 14 || streak == 17 ||
              streak == 19 || streak == 22 ||
              streak == 24 || streak == 27 ||
-             streak == 29) gems = 500;
+             streak == 29) gems = 200;
     giveGems(user, gems);
 
     // Plushies
