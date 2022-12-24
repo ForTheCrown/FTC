@@ -9,55 +9,69 @@ public final class EvokerSequences {
   public static final BossMessage
       AWAKEN = BossMessage.simple("summon_awaken"),
       INSULT = BossMessage.partySize("summon_insult"),
-      END_MESSAGE = BossMessage.simple("summon_shield"),
-      END_MESSAGE_L2 = BossMessage.simple("summon_shield_secondline"),
+      SHIELD = BossMessage.simple("summon_shield"),
+      SHIELD_SECONDLINE = BossMessage.simple("summon_shield_secondline"),
+      LETS_BATTLE = BossMessage.simple("summon_lets_go"),
+
       DEATH_START = BossMessage.simple("death_start"),
       DEATH_MIDDLE = BossMessage.partySize("death_middle"),
       DEATH_END = BossMessage.simple("death_end");
 
-  public static final BossMessage[] SUMMON_AUTO_MSGS = {
-      AWAKEN, INSULT
-  };
+  public static final PotionEffect BLINDNESS
+      = new PotionEffect(PotionEffectType.BLINDNESS, 1000, 0);
 
   public static TickSequence createSummoning(EvokerBoss boss) {
     TickSequence result = new TickSequence();
-    final int messageInterval = 20;
-    final int messageTicks = (SUMMON_AUTO_MSGS.length * messageInterval) + messageInterval;
 
     result.addNode(() -> {
       boss.setInvulnerable(false);
       boss.getRoom().getPlayers().forEach(player -> {
-        player.addPotionEffect(
-            new PotionEffect(PotionEffectType.BLINDNESS, messageTicks, 1, false, true));
+        player.addPotionEffect(BLINDNESS);
       });
     }, 0);
 
-    for (BossMessage m : SUMMON_AUTO_MSGS) {
-      result.addNode(() -> boss.broadcast(false, m), messageInterval);
-    }
+    result.addNode(() -> boss.broadcast(false, AWAKEN), 40);
 
-    result.addNode(boss::onSummoningFinish, 15);
     result.addNode(() -> {
-      boss.broadcast(false, END_MESSAGE, END_MESSAGE_L2);
+      boss.broadcast(false, INSULT);
+      boss.onSummoningFinish();
+    }, 20);
+
+    result.addNode(() -> {
+      boss.getRoom().getPlayers().forEach(player -> {
+        player.removePotionEffect(BLINDNESS.getType());
+      });
+    }, 40);
+
+    result.addNode(() -> {
+      boss.broadcast(false, SHIELD);
+    }, 40);
+
+    result.addNode(() -> {
+      boss.broadcast(false, SHIELD_SECONDLINE);
       boss.getBossEntity().setGlowing(true);
       boss.setInvulnerable(true);
-    }, messageInterval);
-    result.addNode(() -> boss.nextPhase(false), messageInterval);
+    }, 20);
+
+    result.addNode(() -> {
+      boss.broadcast(false, LETS_BATTLE);
+      boss.nextPhase(false);
+    }, 40);
 
     return result;
   }
 
   public static TickSequence createDeath(EvokerBoss boss) {
     TickSequence result = new TickSequence();
-    final int interval = EvokerConfig.deathAnimLength / 2;
 
     result.addNode(() -> boss.broadcast(false, DEATH_START), 0);
-    result.addNode(() -> boss.broadcast(false, DEATH_MIDDLE), interval);
+    result.addNode(() -> boss.broadcast(false, DEATH_MIDDLE), 40);
+    result.addNode(() -> boss.broadcast(false, DEATH_END), 20);
 
     result.addNode(() -> {
-      boss.broadcast(false, DEATH_END);
+      EvokerEffects.lightning(boss);
       boss.kill(false);
-    }, interval);
+    }, 40);
 
     return result;
   }

@@ -1,6 +1,5 @@
 package net.forthecrown.economy;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import lombok.Getter;
 import net.forthecrown.core.config.ConfigManager;
@@ -47,9 +46,8 @@ public class Economy {
 
   @OnEnable
   static void init() {
-    if (!Files.exists(get().getSellShop().getPath())) {
-      get().getSellShop().createDefaults();
-    }
+    get().getSellShop()
+        .createDefaults();
   }
 
   @OnSave

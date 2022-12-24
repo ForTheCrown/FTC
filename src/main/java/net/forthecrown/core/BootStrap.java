@@ -46,9 +46,7 @@ import org.apache.logging.log4j.Logger;
  * starts the plugin
  */
 final class BootStrap {
-
-  private BootStrap() {
-  }
+  private BootStrap() {}
 
   private static final Logger LOGGER = FTC.getLogger();
 

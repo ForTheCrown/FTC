@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.dungeons.level.DungeonRoom;
+import net.forthecrown.dungeons.level.room.DungeonRoom;
 
 @Getter
 @RequiredArgsConstructor

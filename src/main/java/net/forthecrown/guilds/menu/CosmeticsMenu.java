@@ -6,7 +6,7 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.menu.page.MenuPage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -46,7 +46,7 @@ public class CosmeticsMenu extends MenuPage {
   }
 
   @Override
-  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context) {
     return ItemStacks.builder(Material.LOOM)
         .setName(Component.text("Cosmetics", NamedTextColor.YELLOW)
             .decoration(TextDecoration.ITALIC, false))

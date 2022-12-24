@@ -1,18 +1,18 @@
 package net.forthecrown.dungeons.level;
 
 import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.util.Pair;
 import java.util.Random;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.core.registry.RegistryKey;
 import net.forthecrown.dungeons.DungeonManager;
-import net.forthecrown.dungeons.level.gate.GateData;
 import net.forthecrown.dungeons.level.gate.GateType;
+import net.forthecrown.dungeons.level.room.RoomType;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 
 public final class Pieces {
+  private Pieces() {}
 
   public static final int
       FLAG_CONNECTOR = 0x1,
@@ -26,9 +26,6 @@ public final class Pieces {
       .put("mob_room", FLAG_MOB_ROOM)
       .put("root", FLAG_ROOT)
       .build();
-
-  private Pieces() {
-  }
 
   public static PieceType load(Tag t) {
     RegistryKey key = RegistryKey.load(t);
@@ -67,30 +64,6 @@ public final class Pieces {
     return null;
   }
 
-  public static Pair<Holder<GateType>, GateData> findGate(GateData.Opening opening,
-                                                          boolean open
-  ) {
-    final int requiredGates = open ? 2 : 1;
-    var registry = DungeonManager.getInstance()
-        .getGateTypes();
-
-    for (var h : registry.entries()) {
-      var gates = h.getValue().getGates();
-
-      if (gates.size() < requiredGates) {
-        continue;
-      }
-
-      for (var g : gates) {
-        if (g.opening().equals(opening)) {
-          return Pair.of(h, g);
-        }
-      }
-    }
-
-    return null;
-  }
-
   public static Holder<RoomType> getRoot() {
     var reg = DungeonManager.getInstance().getRoomTypes();
 
@@ -105,16 +78,13 @@ public final class Pieces {
 
   public static Holder<GateType> getClosed(Random random) {
     return DungeonManager.getInstance().getGateTypes()
-        .getRandom(random, holder -> {
-          return !holder.getValue()
-              .isOpenable();
-        })
+        .getRandom(random, holder -> !holder.getValue().isOpenable())
         .orElseThrow();
   }
 
   public static Holder<GateType> getDefaultGate() {
     return DungeonManager.getInstance().getGateTypes()
         .getHolder("default")
-        .orElseThrow();
+        .orElseThrow(() -> new IllegalStateException("No default gate!"));
   }
 }

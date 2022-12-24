@@ -1,4 +1,4 @@
-package net.forthecrown.utils.inventory.menu.context;
+package net.forthecrown.utils.context;
 
 import lombok.AccessLevel;
 import lombok.Getter;

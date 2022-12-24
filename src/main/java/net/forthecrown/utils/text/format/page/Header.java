@@ -4,6 +4,7 @@ import static net.kyori.adventure.text.Component.space;
 
 import net.forthecrown.core.Messages;
 import net.forthecrown.utils.ArrayIterator;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.ArrayUtils;
@@ -94,14 +95,14 @@ public class Header<T> implements PageElement<T> {
   // --- METHODS ---
 
   @Override
-  public void write(PageEntryIterator<T> it, TextWriter writer) {
-    write(elements[TYPE_PREPEND], writer, it, false);
-    write(elements[TYPE_REPEAT], writer, it, false);
+  public void write(PageEntryIterator<T> it, TextWriter writer, Context context) {
+    write(elements[TYPE_PREPEND], writer, it, context, false);
+    write( elements[TYPE_REPEAT], writer, it, context, false);
 
-    write(elements[TYPE_MIDDLE], writer, it, false);
+    write( elements[TYPE_MIDDLE], writer, it, context, false);
 
-    write(elements[TYPE_REPEAT], writer, it, true);
-    write(elements[TYPE_APPEND], writer, it, false);
+    write( elements[TYPE_REPEAT], writer, it, context, true);
+    write( elements[TYPE_APPEND], writer, it, context, false);
   }
 
   /**
@@ -112,8 +113,11 @@ public class Header<T> implements PageElement<T> {
    * @param it       The page being iterated through
    * @param reverse  Whether to reverse the given elements array
    */
-  private static <T> void write(PageElement<T>[] elements, TextWriter writer,
-                                PageEntryIterator<T> it, boolean reverse
+  private static <T> void write(PageElement<T>[] elements,
+                                TextWriter writer,
+                                PageEntryIterator<T> it,
+                                Context context,
+                                boolean reverse
   ) {
     if (elements == null || elements.length <= 0) {
       return;
@@ -126,7 +130,7 @@ public class Header<T> implements PageElement<T> {
 
     var iter = ArrayIterator.unmodifiable(elements);
     while (iter.hasNext()) {
-      iter.next().write(it, writer);
+      iter.next().write(it, writer, context);
     }
   }
 
@@ -138,7 +142,7 @@ public class Header<T> implements PageElement<T> {
    * @return This
    */
   private Header<T> addElement(int type, Component component) {
-    return addElement(type, (it, writer) -> writer.write(component));
+    return addElement(type, (it, writer, context) -> writer.write(component));
   }
 
   /**

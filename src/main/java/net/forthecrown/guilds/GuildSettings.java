@@ -32,6 +32,11 @@ public class GuildSettings {
       IS_PUBLIC_KEY = "isPublic",
       ALLOWS_VISIT_KEY = "allowsVisit";
 
+  public static final int UNLIMITED_MEMBERS = 0x1;
+  public static final int UNLIMITED_CHUNKS  = 0x2;
+
+  public static final long NO_ROLE = 0L;
+
   @Getter
   private final Guild guild;
 
@@ -63,9 +68,29 @@ public class GuildSettings {
   @Accessors(fluent = true)
   private boolean allowsVisit;
 
+  @Getter
+  @Setter
+  private int adminFlags;
+
   public GuildSettings(Guild guild) {
     this.guild = guild;
   }
+
+  /* ------------------------------- FLAGS -------------------------------- */
+
+  public boolean hasFlags(int flags) {
+    return (adminFlags & flags) == flags;
+  }
+
+  public void addFlags(int flags) {
+    adminFlags |= flags;
+  }
+
+  public void removeFlags(int flags) {
+    adminFlags &= ~flags;
+  }
+
+  /* ------------------------------ METHODS ------------------------------- */
 
   public Waypoint getWaypoint() {
     if (waypoint == null) {

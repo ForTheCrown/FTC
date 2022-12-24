@@ -282,7 +282,8 @@ public abstract class UseCmdCommand<T extends CommandUsable> extends FtcCommand 
 
     @Override
     protected Kit create(Player player, String name, CommandContext<CommandSource> context)
-        throws CommandSyntaxException {
+        throws CommandSyntaxException
+    {
       return new Kit(name, listInventory(player));
     }
 

@@ -12,7 +12,7 @@ import net.forthecrown.useables.ConstructType;
 import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageAction;
 import net.forthecrown.useables.UsageType;
-import net.forthecrown.user.UUID2IntMap;
+import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.Util;
 import net.kyori.adventure.text.Component;

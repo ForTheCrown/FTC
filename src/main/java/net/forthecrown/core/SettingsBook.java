@@ -52,7 +52,7 @@ public final class SettingsBook {
     });
 
     node.setPrompt(user -> {
-      boolean currentState = user.get(command.getProperty());
+      boolean currentState = command.getProperty().getState(user);
       return BookSetting.createButton(state, currentState, "", null);
     });
 

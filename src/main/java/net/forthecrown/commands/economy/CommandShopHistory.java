@@ -17,6 +17,9 @@ import net.forthecrown.grenadier.types.args.ArgsArgument;
 import net.forthecrown.grenadier.types.args.Argument;
 import net.forthecrown.grenadier.types.args.ParsedArgs;
 import net.forthecrown.utils.LocationFileName;
+import net.forthecrown.utils.Util;
+import net.forthecrown.utils.context.ContextOption;
+import net.forthecrown.utils.context.ContextSet;
 import net.forthecrown.utils.math.WorldVec3i;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.format.page.Footer;
@@ -49,18 +52,49 @@ public class CommandShopHistory extends FtcCommand {
    * Main Author: Julie
    */
 
-  public static final Argument<Integer> PAGE = Argument.of("page", IntegerArgumentType.integer(1),
-      1);
-  public static final Argument<Integer> PAGE_SIZE = Argument.of("page_size",
-      IntegerArgumentType.integer(5, 25), 10);
-  public static final Argument<LocationFileName> SHOP_NAME = Argument.of("shop_name",
-      LocationFileName::parse);
+  public static final Argument<Integer> PAGE
+      = Argument.of("page", IntegerArgumentType.integer(1), 1);
+
+  public static final Argument<Integer> PAGE_SIZE
+      = Argument.of("page_size", IntegerArgumentType.integer(5, 25), 10);
+
+  public static final Argument<LocationFileName> SHOP_NAME
+      = Argument.of("shop_name", LocationFileName::parse);
 
   public static final ArgsArgument ARGS = ArgsArgument.builder()
       .addRequired(PAGE)
       .addOptional(PAGE_SIZE)
       .addOptional(SHOP_NAME)
       .build();
+
+  public static final ContextSet SET = ContextSet.create();
+  public static final ContextOption<SignShop> SHOP = SET.newOption();
+
+  public final PageFormat<HistoryEntry> format = Util.make(() -> {
+    PageFormat<HistoryEntry> format = PageFormat.create();
+
+    format
+        .setHeader(Messages.SHOP_HISTORY_TITLE)
+        .setFooter(
+            Footer.create()
+                .setPageButton((viewerPage, pageSize1, context) -> {
+                  return Text.argJoiner(this)
+                      .add(SHOP_NAME, context.getOrThrow(SHOP).getName())
+                      .add(PAGE, viewerPage)
+                      .add(PAGE_SIZE, pageSize1)
+                      .joinClickable();
+                })
+        )
+
+        .setEntry((writer, entry, viewerIndex, context) -> {
+          writer.write(Messages.formatShopHistory(
+              entry,
+              context.getOrThrow(SHOP).getExampleItem()
+          ));
+        });
+
+    return format;
+  });
 
   public static final ParsedArgs EMPTY = new ParsedArgs() {
     @Override
@@ -125,32 +159,10 @@ public class CommandShopHistory extends FtcCommand {
     // Ensure the page is valid
     Commands.ensurePageValid(page, pageSize, history.size());
 
-    var joiner = Text.argJoiner(this)
-        .add(SHOP_NAME, shop.getName());
-
     var it = history.pageIterator(page, pageSize);
-    PageFormat<HistoryEntry> format = PageFormat.create();
+    var context = SET.createContext().set(SHOP, shop);
 
-    format
-        .setHeader(Messages.SHOP_HISTORY_TITLE)
-        .setFooter(
-            Footer.create()
-                .setPageButton((viewerPage, pageSize1) -> {
-                  return joiner
-                      .add(PAGE, viewerPage)
-                      .add(PAGE_SIZE, pageSize1)
-                      .joinClickable();
-                })
-        )
-
-        .setEntry((writer, entry, viewerIndex) -> {
-          writer.write(Messages.formatShopHistory(
-              entry,
-              shop.getExampleItem()
-          ));
-        });
-
-    source.sendMessage(format.format(it));
+    source.sendMessage(format.format(it, context));
     return 0;
   }
 

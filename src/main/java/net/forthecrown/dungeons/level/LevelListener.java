@@ -1,12 +1,12 @@
 package net.forthecrown.dungeons.level;
 
+import java.util.Set;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.dungeons.DungeonWorld;
-import net.forthecrown.dungeons.level.gate.DungeonGate;
+import net.forthecrown.dungeons.level.room.DungeonRoom;
 import net.forthecrown.events.Events;
 import net.forthecrown.useables.TriggerManager;
-import net.forthecrown.user.Users;
 import net.forthecrown.utils.math.Bounds3i;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -56,20 +56,17 @@ public class LevelListener implements Listener {
     Bounds3i destination = TriggerManager.makePlayerBounds(event.getTo());
     Bounds3i totalArea = origin.combine(destination);
 
-    var pieces = level.getIntersecting(totalArea);
-    pieces.removeIf(piece -> piece instanceof DungeonGate);
+    Set allPieces = level.getIntersecting(totalArea);
+    allPieces.removeIf(piece -> !(piece instanceof DungeonRoom));
+    var pieces = (Set<DungeonRoom>) allPieces;
 
     if (pieces.isEmpty()) {
       return;
     }
 
-    var user = Users.get(event.getPlayer());
+    var user = event.getPlayer();
 
     for (var p : pieces) {
-      if (!p.isTicked()) {
-        continue;
-      }
-
       var bounds = p.getBounds();
 
       boolean originInside = bounds.overlaps(origin);
@@ -84,10 +81,10 @@ public class LevelListener implements Listener {
       // Because of the above check, the two booleans
       // must have an opposite state
       if (originInside) {
-        p.getUsers().remove(user);
+        p.getPlayers().remove(user);
 
         // If room is now empty
-        if (p.getUsers().isEmpty()) {
+        if (p.getPlayers().isEmpty()) {
           level.getActivePieces().remove(p);
           level.getInactivePieces().add(p);
         }

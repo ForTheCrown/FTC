@@ -1,7 +1,9 @@
-package net.forthecrown.dungeons.level;
+package net.forthecrown.dungeons.level.room;
 
 import java.util.Map;
 import lombok.Getter;
+import net.forthecrown.dungeons.level.PieceStyle;
+import net.forthecrown.dungeons.level.PieceType;
 import net.minecraft.nbt.CompoundTag;
 
 @Getter

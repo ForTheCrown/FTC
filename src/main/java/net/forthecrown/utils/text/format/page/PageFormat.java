@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.Messages;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
@@ -58,9 +59,9 @@ public class PageFormat<T> {
    * @return The formatted message
    * @see #write(PageEntryIterator, TextWriter)
    */
-  public Component format(PageEntryIterator<T> it) {
+  public Component format(PageEntryIterator<T> it, Context context) {
     var writer = TextWriters.newWriter();
-    write(it, writer);
+    write(it, writer, context);
 
     return writer.asComponent();
   }
@@ -75,19 +76,19 @@ public class PageFormat<T> {
    * @param it     The iterator to write and format
    * @param writer The destination of the component writing
    */
-  public void write(PageEntryIterator<T> it, TextWriter writer) {
+  public void write(PageEntryIterator<T> it, TextWriter writer, Context context) {
     // Header might be null so also make sure
     // to not write the new line, otherwise you're gonna have
     // an empty line lol
     if (header != null) {
-      header.write(it, writer);
+      header.write(it, writer, context);
       writer.newLine();
     }
 
     while (it.hasNext()) {
       var t = it.next();
 
-      entry.write(it, t, writer);
+      entry.write(it, t, writer, context);
 
       if (it.hasNext()) {
         writer.newLine();
@@ -99,7 +100,7 @@ public class PageFormat<T> {
     // there'll be a blank line lol
     if (footer != null) {
       writer.newLine();
-      footer.write(it, writer);
+      footer.write(it, writer, context);
     }
   }
 

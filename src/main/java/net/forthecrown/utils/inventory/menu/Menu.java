@@ -11,8 +11,7 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.utils.inventory.menu.context.ClickContext;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -85,10 +84,10 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
   /* ----------------------------- FUNCTIONS ------------------------------ */
 
   public void open(User user) {
-    open(user, InventoryContext.EMPTY);
+    open(user, Context.EMPTY);
   }
 
-  public void open(User user, InventoryContext context) {
+  public void open(User user, Context context) {
     if (openCallback != null) {
       openCallback.onOpen(user, context);
     }
@@ -97,7 +96,7 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
     user.getPlayer().openInventory(inventory);
   }
 
-  public MenuInventory createInventory(User user, InventoryContext context) {
+  public MenuInventory createInventory(User user, Context context) {
     var inv = new MenuInventory(this, size, title, context);
 
     nodes.int2ObjectEntrySet()
@@ -140,7 +139,7 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
         event.getClick()
     );
 
-    InventoryContext context = click.getInventory().getContext();
+    Context context = click.getInventory().getContext();
     User user = Users.get(click.getPlayer());
 
     if (itemMovingAllowed) {

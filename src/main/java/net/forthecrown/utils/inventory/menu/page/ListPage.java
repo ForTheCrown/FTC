@@ -10,9 +10,9 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Slot;
-import net.forthecrown.utils.inventory.menu.context.ClickContext;
-import net.forthecrown.utils.inventory.menu.context.ContextOption;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.inventory.menu.ClickContext;
+import net.forthecrown.utils.context.ContextOption;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -105,25 +105,25 @@ public abstract class ListPage<T> extends MenuPage {
     }
   }
 
-  protected abstract List<T> getList(User user, InventoryContext context);
+  protected abstract List<T> getList(User user, Context context);
 
-  protected abstract ItemStack getItem(User user, T entry, InventoryContext context);
+  protected abstract ItemStack getItem(User user, T entry, Context context);
 
-  protected void onClick(User user, T entry, InventoryContext context, ClickContext click)
+  protected void onClick(User user, T entry, Context context, ClickContext click)
       throws CommandSyntaxException
   {
 
   }
 
-  protected int getPage(InventoryContext context) {
+  protected int getPage(Context context) {
     return context.getOrThrow(page);
   }
 
-  protected void setPage(int page, InventoryContext context) {
+  protected void setPage(int page, Context context) {
     context.set(this.page, page);
   }
 
-  protected int getMaxPage(User user, InventoryContext context, int pageSize) {
+  protected int getMaxPage(User user, Context context, int pageSize) {
     return PageEntryIterator.getMaxPage(pageSize, getList(user, context).size());
   }
 
@@ -173,7 +173,7 @@ public abstract class ListPage<T> extends MenuPage {
   }
 
   @Override
-  public void onClick(User user, InventoryContext context, ClickContext click)
+  public void onClick(User user, Context context, ClickContext click)
       throws CommandSyntaxException {
     var list = getList(user, context);
 

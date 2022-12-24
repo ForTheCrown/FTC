@@ -411,6 +411,15 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
   public UserLookupEntry get(String str) {
     UserLookupEntry entry;
 
+    // Attempt to parse String into UUID
+    try {
+      UUID uuid = UUID.fromString(str);
+      return getEntry(uuid);
+    } catch (IllegalArgumentException ignored) {
+      // If UUID parse fails, the string is
+      // most likely a user's name/nick
+    }
+
     if ((entry = getNamed(str)) != null) {
       return entry;
     }

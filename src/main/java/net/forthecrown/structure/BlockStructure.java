@@ -39,7 +39,8 @@ public class BlockStructure {
    * {@link #DEFAULT_PALETTE_NAME}.
    */
   @Getter
-  private final Map<String, BlockPalette> palettes = new Object2ObjectOpenHashMap<>();
+  private final Map<String, BlockPalette> palettes
+      = new Object2ObjectOpenHashMap<>();
 
   final List<FunctionInfo> functions = new ObjectArrayList<>();
 

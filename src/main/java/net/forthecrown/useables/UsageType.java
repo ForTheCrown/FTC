@@ -81,7 +81,8 @@ public class UsageType<T extends UsageInstance> {
   }
 
   private T orEmpty(ReflectionExecutable<T> executable, Object... params)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     if (executable == null) {
       return tryRun(this, emptyConstructor);
     } else {

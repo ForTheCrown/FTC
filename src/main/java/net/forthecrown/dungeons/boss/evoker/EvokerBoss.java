@@ -1,5 +1,7 @@
 package net.forthecrown.dungeons.boss.evoker;
 
+import static net.kyori.adventure.text.Component.text;
+
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Arrays;
@@ -30,6 +32,7 @@ import net.forthecrown.dungeons.boss.evoker.phases.SwarmPhase;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.TickSequence;
 import net.forthecrown.utils.Util;
+import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.sound.Sound;
@@ -100,7 +103,15 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
     super("Emo",
         new Location(Worlds.voidWorld(), -277.5, 37, 44.5),
         DungeonAreas.EVOKER_ROOM,
-        SpawnTest.items()
+
+        SpawnTest.items(
+            ItemStacks.fromNbtString(
+                "{Count:1b,dataVersion:3218,id:\"minecraft:glowstone_dust\",tag:{display:{Lore:['{\"text\":\"Some sparkles never hurt\",\"italic\":false}'],Name:'{\"text\":\"Magic Dust\",\"color\":\"gold\",\"italic\":false}'}}}"
+            ),
+            ItemStacks.fromNbtString(
+                "{Count:1b,dataVersion:3218,id:\"minecraft:gunpowder\",tag:{display:{Lore:['{\"text\":\"Kill some mobs in the dungeon.\",\"italic\":false}'],Name:'{\"text\":\"Evoker Dust\",\"color\":\"gray\",\"italic\":false}'}}}"
+            )
+        )
     );
 
     spawnAnim = EvokerSequences.createSummoning(this);
@@ -316,11 +327,12 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
     }
 
     // Format messages
-    TextComponent.Builder builder = Component.text();
+    TextComponent.Builder builder = text();
     Iterator<BossMessage> iterator = new ObjectArrayIterator<>(msgs);
     Component messagePrefix = name()
         .color(NamedTextColor.YELLOW)
-        .append(Component.text(" > ").style(Style.style(NamedTextColor.GRAY, TextDecoration.BOLD)));
+        .append(
+            text(" > ").style(Style.style(NamedTextColor.GRAY, TextDecoration.BOLD)));
 
     while (iterator.hasNext()) {
       BossMessage m = iterator.next();

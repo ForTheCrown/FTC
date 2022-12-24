@@ -10,7 +10,7 @@ import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.useables.util.UsageUtil;
-import net.forthecrown.user.UUID2IntMap;
+import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.format.UnitFormat;

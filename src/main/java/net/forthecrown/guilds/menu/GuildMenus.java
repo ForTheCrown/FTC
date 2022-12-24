@@ -2,8 +2,8 @@ package net.forthecrown.guilds.menu;
 
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.inventory.menu.context.ContextOption;
-import net.forthecrown.utils.inventory.menu.context.ContextSet;
+import net.forthecrown.utils.context.ContextOption;
+import net.forthecrown.utils.context.ContextSet;
 import net.forthecrown.utils.inventory.menu.page.MenuPage;
 
 public class GuildMenus {

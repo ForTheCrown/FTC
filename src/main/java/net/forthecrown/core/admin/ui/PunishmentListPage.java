@@ -12,8 +12,8 @@ import net.forthecrown.core.admin.Punishment;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNodeItem;
-import net.forthecrown.utils.inventory.menu.context.ClickContext;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.inventory.menu.ClickContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
@@ -97,7 +97,7 @@ class PunishmentListPage extends ListUiPage<Punishment> {
 
   // On entry click
   @Override
-  protected void onClick(Punishment entry, int index, User user, InventoryContext context) {
+  protected void onClick(Punishment entry, int index, User user, Context context) {
     if (!current) {
       return;
     }
@@ -108,7 +108,7 @@ class PunishmentListPage extends ListUiPage<Punishment> {
 
   // On page open
   @Override
-  public void onClick(User user, InventoryContext context, ClickContext click)
+  public void onClick(User user, Context context, ClickContext click)
       throws CommandSyntaxException {
     super.onClick(user, context, click);
 

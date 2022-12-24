@@ -21,6 +21,7 @@ public class FtcEnchants {
   public static final HealingBlock HEALING_BLOCK = new HealingBlock();
   public static final PoisonCrit POISON_CRIT = new PoisonCrit();
   public static final StrongAim STRONG_AIM = new StrongAim();
+  public static final SoulBond SOUL_BOND = new SoulBond();
 
   @OnEnable
   private static void init() {
@@ -38,6 +39,7 @@ public class FtcEnchants {
       register(HEALING_BLOCK);
       register(POISON_CRIT);
       register(STRONG_AIM);
+      register(SOUL_BOND);
 
       enchantRegistry.freeze();
       Enchantment.stopAcceptingRegistrations();
@@ -47,8 +49,11 @@ public class FtcEnchants {
   }
 
   private static <T extends FtcEnchant> T register(final T enchant) {
-    Registry.register(BuiltInRegistries.ENCHANTMENT, enchant.getKey().asString(),
-        enchant.getHandle());
+    Registry.register(
+        BuiltInRegistries.ENCHANTMENT,
+        enchant.getKey().asString(),
+        enchant.getHandle()
+    );
 
     if (Enchantment.getByKey(enchant.getKey()) == null) {
       Enchantment.registerEnchantment(enchant);

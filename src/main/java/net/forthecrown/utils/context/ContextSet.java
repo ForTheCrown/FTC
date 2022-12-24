@@ -1,4 +1,4 @@
-package net.forthecrown.utils.inventory.menu.context;
+package net.forthecrown.utils.context;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Set;
@@ -51,13 +51,13 @@ public class ContextSet {
    *
    * @return The created context
    */
-  public InventoryContext createContext() {
+  public Context createContext() {
     var values = new Object[options.size()];
 
     for (var f : options) {
       values[f.getIndex()] = f.getDefaultValue();
     }
 
-    return new InventoryContext(this, values);
+    return new Context(this, values);
   }
 }

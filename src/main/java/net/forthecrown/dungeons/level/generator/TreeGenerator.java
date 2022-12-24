@@ -22,10 +22,11 @@ import net.forthecrown.core.registry.Holder;
 import net.forthecrown.dungeons.DungeonManager;
 import net.forthecrown.dungeons.level.DungeonLevel;
 import net.forthecrown.dungeons.level.DungeonPiece;
-import net.forthecrown.dungeons.level.DungeonRoom;
+import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.Gates;
 import net.forthecrown.dungeons.level.PieceVisitor;
 import net.forthecrown.dungeons.level.Pieces;
-import net.forthecrown.dungeons.level.RoomType;
+import net.forthecrown.dungeons.level.room.RoomType;
 import net.forthecrown.dungeons.level.gate.DungeonGate;
 import net.forthecrown.dungeons.level.gate.GateType;
 import net.forthecrown.utils.math.Transform;
@@ -179,7 +180,12 @@ public class TreeGenerator {
     level = new DungeonLevel();
     level.addPiece(root);
 
-    var gates = PieceGenerator.createGates(root, root.getType().getGates());
+    var gates = Gates.createGates(
+        root,
+        root.getType().getGates(),
+        config.getRandom()
+    );
+
     genQueue.addAll(
         gates.stream()
             .map(gate -> new PieceGenerator(SectionType.CONNECTOR, this, gate, null))

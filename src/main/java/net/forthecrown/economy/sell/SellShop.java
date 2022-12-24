@@ -1,5 +1,8 @@
 package net.forthecrown.economy.sell;
 
+import static net.forthecrown.utils.io.FtcJar.ALLOW_OVERWRITE;
+import static net.forthecrown.utils.io.FtcJar.OVERWRITE_IF_NEWER;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import lombok.Getter;
@@ -90,7 +93,10 @@ public class SellShop {
 
   public void createDefaults() {
     try {
-      FtcJar.saveResources("economy");
+      FtcJar.saveResources(
+          "economy",
+          ALLOW_OVERWRITE | OVERWRITE_IF_NEWER
+      );
     } catch (IOException exc) {
       throw new IllegalArgumentException(exc);
     }

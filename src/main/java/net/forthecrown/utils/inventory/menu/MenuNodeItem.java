@@ -2,7 +2,7 @@ package net.forthecrown.utils.inventory.menu;
 
 import java.util.function.Function;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +20,7 @@ public interface MenuNodeItem {
    * @param context The context the menu is being opened with
    * @return The created item, can be null
    */
-  @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context);
+  @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context);
 
   /**
    * Creates a node item which simply returns the given item, without cloning it

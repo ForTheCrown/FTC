@@ -1611,6 +1611,10 @@ public interface Messages {
    */
   String TOGGLE_EAVESDROP_SIGN = "N{1} showing what people write on signs.";
 
+  String TOGGLE_DYNMAP_HIDE = "N{1} hidden on dynmap.";
+
+  String TOGGLE_PLAYER_RIDING = "Can n{1} ride players.";
+
   /**
    * Formats the message to tell users they have enabled/disabled a boolean {@link UserProperty}
    * <p>

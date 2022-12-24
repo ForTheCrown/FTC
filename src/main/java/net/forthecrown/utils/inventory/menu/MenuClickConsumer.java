@@ -2,8 +2,7 @@ package net.forthecrown.utils.inventory.menu;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.inventory.menu.context.ClickContext;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 
 /**
  * Menu callback called when a user clicks in a {@link Menu} menu
@@ -25,12 +24,12 @@ public interface MenuClickConsumer {
    * @throws CommandSyntaxException If something went wrong, the exception's failure message will be
    *                                shown to the user in chat
    */
-  void onClick(User user, InventoryContext context, ClickContext click)
+  void onClick(User user, Context context, ClickContext click)
       throws CommandSyntaxException;
 
   /**
    * A legacy implementation of {@link MenuClickConsumer} which doesn't accept
-   * {@link InventoryContext}
+   * {@link Context}
    */
   @FunctionalInterface
   interface Contextless extends MenuClickConsumer {
@@ -46,7 +45,7 @@ public interface MenuClickConsumer {
     void onClick(User user, ClickContext context) throws CommandSyntaxException;
 
     @Override
-    default void onClick(User user, InventoryContext context, ClickContext click)
+    default void onClick(User user, Context context, ClickContext click)
         throws CommandSyntaxException {
       onClick(user, click);
     }

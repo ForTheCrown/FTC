@@ -8,7 +8,7 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.menu.page.MenuPage;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +44,7 @@ public class GuildColorMenu extends MenuPage {
   }
 
   @Override
-  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context) {
     var guild = context.getOrThrow(GUILD);
     var color = primary
         ? guild.getSettings().getPrimaryColor()

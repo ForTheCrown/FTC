@@ -126,7 +126,9 @@ public class GuildInviteNode extends GuildCommandNode {
         );
   }
 
-  static int acceptInvite(CommandContext<CommandSource> c) throws CommandSyntaxException {
+  static int acceptInvite(CommandContext<CommandSource> c)
+      throws CommandSyntaxException
+  {
     return answerInvite(c, GuildInvite::onAccept);
   }
 
@@ -149,7 +151,8 @@ public class GuildInviteNode extends GuildCommandNode {
   }
 
   public static void ensureJoinable(User user, Guild guild)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     if (user.getGuild() != null) {
       throw Exceptions.ALREADY_IN_GUILD;
     }

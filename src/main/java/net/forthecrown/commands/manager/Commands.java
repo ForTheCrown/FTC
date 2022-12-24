@@ -66,7 +66,6 @@ import net.forthecrown.commands.admin.CommandTeleportExact;
 import net.forthecrown.commands.admin.CommandTime;
 import net.forthecrown.commands.admin.CommandTop;
 import net.forthecrown.commands.admin.CommandVanish;
-import net.forthecrown.commands.admin.CommandWeather;
 import net.forthecrown.commands.admin.CommandWorld;
 import net.forthecrown.commands.admin.SaveReloadCommands;
 import net.forthecrown.commands.click.CommandClickableText;
@@ -178,7 +177,6 @@ public final class Commands {
     new CommandRoyalSword();
     new CommandGameMode();
     new CommandWorld();
-    new CommandWeather();
     new CommandGetPos();
     new CommandTop();
     new CommandMemory();

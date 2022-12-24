@@ -15,7 +15,9 @@ import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.core.FTC;
 import net.forthecrown.dungeons.DungeonWorld;
+import net.forthecrown.dungeons.LevelManager.LevelCell;
 import net.forthecrown.dungeons.level.gate.DungeonGate;
+import net.forthecrown.dungeons.level.room.DungeonRoom;
 import net.forthecrown.utils.ChunkedMap;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.TagUtil;
@@ -42,17 +44,17 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
   /**
    * Piece ID to piece lookup map
    */
-  private final Map<UUID, DungeonPiece>
-      pieceLookup = new Object2ObjectOpenHashMap<>();
+  private final Map<UUID, DungeonPiece> pieceLookup
+      = new Object2ObjectOpenHashMap<>();
 
   @Getter
   private final ChunkedMap<DungeonPiece> chunkMap = new ChunkedMap<>();
 
   @Getter
-  private final Set<DungeonPiece> activePieces = new ObjectOpenHashSet<>();
+  private final Set<DungeonRoom> activePieces = new ObjectOpenHashSet<>();
 
   @Getter
-  private final Set<DungeonPiece> inactivePieces = new ObjectOpenHashSet<>();
+  private final Set<DungeonRoom> inactivePieces = new ObjectOpenHashSet<>();
 
   /**
    * The root room from which all other rooms have sprung
@@ -67,6 +69,9 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
   private BukkitTask tickTask;
 
   private final LevelListener listener = new LevelListener(this);
+
+  @Getter @Setter
+  private LevelCell cell;
 
   /* ------------------------------ METHODS ------------------------------- */
 
@@ -125,6 +130,8 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
 
   public void stopTicking() {
     tickTask = Tasks.cancel(tickTask);
+    inactivePieces.clear();
+    activePieces.clear();
   }
 
   void onActivate() {
@@ -134,7 +141,8 @@ public class DungeonLevel implements Iterable<DungeonPiece> {
     inactivePieces.addAll(
         pieceLookup.values()
             .stream()
-            .filter(DungeonPiece::isTicked)
+            .filter(dungeonPiece -> dungeonPiece instanceof DungeonRoom)
+            .map(dungeonPiece -> (DungeonRoom) dungeonPiece)
             .toList()
     );
   }

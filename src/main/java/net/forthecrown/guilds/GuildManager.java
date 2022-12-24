@@ -1,6 +1,7 @@
 package net.forthecrown.guilds;
 
 import static net.forthecrown.guilds.GuildRank.ID_LEADER;
+import static net.forthecrown.guilds.GuildSettings.UNLIMITED_CHUNKS;
 import static net.forthecrown.guilds.Guilds.NO_EXP;
 import static net.kyori.adventure.text.Component.text;
 
@@ -31,8 +32,9 @@ import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
 import net.forthecrown.guilds.unlockables.UnlockableColor;
-import net.forthecrown.user.UUID2IntMap;
+import net.forthecrown.guilds.unlockables.Upgradable;
 import net.forthecrown.user.User;
+import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.waypoint.Waypoints;
 import net.kyori.adventure.text.Component;
@@ -65,13 +67,21 @@ public class GuildManager {
    * Transient guild id 2 total exp map, used for displaying in /guildtop
    */
   @Getter
-  private transient final UUID2IntMap expTop = new UUID2IntMap(null);
+  private transient final UUID2IntMap expTop = new UUID2IntMap();
 
   @Getter
   private final ExpModifiers expModifier = new ExpModifiers();
 
   private GuildManager() {
     storage = new GuildDataStorage(PathUtil.getPluginDirectory("guilds"));
+
+    expTop.setValidator(uuid -> {
+      var guild = getGuild(uuid);
+
+      return guild == null
+          ? uuid + " doesn't belong to a guild!"
+          : null;
+    });
   }
 
   public static GuildManager get() {
@@ -144,6 +154,8 @@ public class GuildManager {
       byName.remove(guild.getName().toLowerCase());
     }
 
+    expTop.remove(id);
+
     // Un-render all guild chunks and
     // remove guild from chunk lookup map
     byChunk.long2ObjectEntrySet()
@@ -173,6 +185,7 @@ public class GuildManager {
     }
 
     packedChunks.forEach(value -> byChunk.put(value, guild));
+    expTop.set(guild.getId(), (int) guild.getTotalExp());
   }
 
   void onRename(String name, Guild guild) {
@@ -233,6 +246,15 @@ public class GuildManager {
             .filter(id -> id.equals(guild))
             .count()
     );
+  }
+
+  public boolean canClaimMore(Guild guild) {
+    if (guild.getSettings().hasFlags(UNLIMITED_CHUNKS)) {
+      return true;
+    }
+
+    return getGuildChunkAmount(guild)
+        < Upgradable.MAX_CHUNKS.currentLimit(guild);
   }
 
   // Get the chunks the given guild has claimed

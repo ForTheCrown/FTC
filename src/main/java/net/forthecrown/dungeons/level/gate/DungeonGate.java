@@ -3,8 +3,8 @@ package net.forthecrown.dungeons.level.gate;
 import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.dungeons.level.DungeonPiece;
-import net.forthecrown.dungeons.level.DungeonRoom;
 import net.forthecrown.dungeons.level.PieceVisitor;
+import net.forthecrown.dungeons.level.room.DungeonRoom;
 import net.minecraft.nbt.CompoundTag;
 
 @Getter

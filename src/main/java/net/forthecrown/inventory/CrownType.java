@@ -4,6 +4,8 @@ import static net.forthecrown.utils.text.Text.nonItalic;
 import static net.kyori.adventure.text.Component.text;
 
 import java.util.UUID;
+import net.forthecrown.core.registry.Keys;
+import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.utils.inventory.BaseItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
@@ -11,6 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Material;
+import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,9 +31,15 @@ public class CrownType implements ExtendedItemType<RoyalCrown> {
       .append(text("-"))
       .build();
 
+  @Pattern(Keys.VALID_KEY_REGEX)
   @Override
   public String getKey() {
     return "royal_crown";
+  }
+
+  @Override
+  public boolean shouldRemainInInventory() {
+    return false;
   }
 
   @Override
@@ -48,6 +57,7 @@ public class CrownType implements ExtendedItemType<RoyalCrown> {
     return ItemStacks.builder(Material.GOLDEN_HELMET)
         .setNameRaw(CROWN_TITLE)
         .setModelData(MODEL_DATA)
-        .setUnbreakable(true);
+        .setUnbreakable(true)
+        .addEnchant(FtcEnchants.SOUL_BOND, 1);
   }
 }

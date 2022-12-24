@@ -3,8 +3,8 @@ package net.forthecrown.core.admin.ui;
 import net.forthecrown.core.admin.PunishEntry;
 import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.inventory.menu.context.ContextOption;
-import net.forthecrown.utils.inventory.menu.context.ContextSet;
+import net.forthecrown.utils.context.ContextOption;
+import net.forthecrown.utils.context.ContextSet;
 
 public class AdminUI {
 

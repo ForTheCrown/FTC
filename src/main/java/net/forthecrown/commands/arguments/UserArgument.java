@@ -34,8 +34,8 @@ public class UserArgument implements ArgumentType<UserParseResult>, VanillaMappe
   @Override
   public UserParseResult parse(StringReader reader) throws CommandSyntaxException {
     if (reader.peek() == '@') {
-      EntitySelector selector = allowMultiple ?
-          EntityArgument.players().parse(reader, true)
+      EntitySelector selector = allowMultiple
+          ? EntityArgument.players().parse(reader, true)
           : EntityArgument.player().parse(reader, true);
 
       return new UserParseResult(selector, allowOffline);
@@ -64,24 +64,27 @@ public class UserArgument implements ArgumentType<UserParseResult>, VanillaMappe
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                             SuggestionsBuilder builder
   ) {
-    if (context.getSource() instanceof CommandSource) {
-      StringReader reader = new StringReader(builder.getInput());
-      reader.setCursor(builder.getStart());
-
-      EntitySelectorParser parser = new EntitySelectorParser(reader, true);
-
-      try {
-        parser.parse();
-      } catch (CommandSyntaxException ignored) {
-      }
-
-      return parser.fillSuggestions(builder, builder1 -> {
-        FtcSuggestions.suggestPlayerNames((CommandSource) context.getSource(), builder1,
-            allowOffline);
-      });
-    } else {
+    if (!(context.getSource() instanceof CommandSource)) {
       return Suggestions.empty();
     }
+
+    StringReader reader = new StringReader(builder.getInput());
+    reader.setCursor(builder.getStart());
+
+    EntitySelectorParser parser = new EntitySelectorParser(reader, true);
+
+    try {
+      parser.parse();
+    } catch (CommandSyntaxException ignored) {
+    }
+
+    return parser.fillSuggestions(builder, builder1 -> {
+      FtcSuggestions.suggestPlayerNames(
+          (CommandSource) context.getSource(),
+          builder1,
+          allowOffline
+      );
+    });
   }
 
   @Override

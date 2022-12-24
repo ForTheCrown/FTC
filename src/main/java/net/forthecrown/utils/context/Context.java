@@ -1,4 +1,4 @@
-package net.forthecrown.utils.inventory.menu.context;
+package net.forthecrown.utils.context;
 
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -9,12 +9,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class InventoryContext {
+public class Context {
 
   /**
    * A context that has no options
    */
-  public static final InventoryContext EMPTY = new InventoryContext(null, null) {
+  public static final Context EMPTY = new Context(null, null) {
     @Override
     public <T> boolean has(@NotNull ContextOption<T> option) {
       return false;
@@ -26,7 +26,8 @@ public class InventoryContext {
     }
 
     @Override
-    public <T> void set(@NotNull ContextOption<T> option, T value) {
+    public <T> Context set(@NotNull ContextOption<T> option, T value) {
+      return this;
     }
   };
 
@@ -57,9 +58,10 @@ public class InventoryContext {
     return Optional.ofNullable(get(option)).orElseThrow();
   }
 
-  public <T> void set(@NotNull ContextOption<T> option, @Nullable T value) {
+  public <T> Context set(@NotNull ContextOption<T> option, @Nullable T value) {
     validateOption(option);
     options[option.getIndex()] = value;
+    return this;
   }
 
   private void validateOption(ContextOption option) {

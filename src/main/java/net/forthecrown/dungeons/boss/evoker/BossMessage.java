@@ -15,6 +15,7 @@ public interface BossMessage {
       .put("summon_awaken", text("Who dares summon me!"))
       .put("summon_insult_single", text("A lone traveller? This will be easy!"))
       .put("summon_insult_party", text("What fools you are, this room will be your grave!"))
+      .put("summon_lets_go", text("Let's battle!"))
       .put("summon_shield", text("The ones before were weak, I know your tactics."))
       .put("summon_shield_secondline", text("I prepared a shield that no mortal weapon can pierce!"))
 
@@ -36,10 +37,8 @@ public interface BossMessage {
       .put("phase_shulker_betrayal", text("You traitors! Stop sabotaging my shield!"))
 
       // Normal attack phase
-      .put("phase_normal_start_0", text("Ugh, do I have to do everything myself!"))
-      .put("phase_normal_start_1", text("Must I destroy you with my own spells!"))
-      .put("phase_normal_end_single", text("My magic has been worn out by a single fool?"))
-      .put("phase_normal_end_multi", text("My magic has worn out :("))
+      .put("phase_swarm_begin", text("Go, my little minions!"))
+      .put("phase_swarm_end", text(":("))
 
       // Potion phase
       .put("phase_potion_start", text("My mom made these potions, hope you like them :>"))
@@ -54,8 +53,7 @@ public interface BossMessage {
       // Death
       .put("death_start", text("How!?!"))
       .put("death_middle_single", text("Beaten by a single fool, I'm a grand failure"))
-      .put("death_middle_party",
-          text("This wasn't supposed to happen, I was meant to be different!"))
+      .put("death_middle_party", text("This wasn't supposed to happen, I was meant to be different!"))
       .put("death_end", text("We will meet again"))
 
       .build();

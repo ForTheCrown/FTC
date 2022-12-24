@@ -4,7 +4,7 @@ import lombok.Getter;
 import net.forthecrown.core.registry.Registries;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.dungeons.level.PieceType;
-import net.forthecrown.dungeons.level.RoomType;
+import net.forthecrown.dungeons.level.room.RoomType;
 import net.forthecrown.dungeons.level.gate.GateType;
 import net.forthecrown.utils.io.PathUtil;
 

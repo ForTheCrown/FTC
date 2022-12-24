@@ -189,7 +189,9 @@ public final class Text {
     var visitor = new TextComponentTagVisitor(indent, 0);
     var text = visitor.visit(tag);
 
-    return PaperAdventure.asAdventure(text);
+    return PaperAdventure.asAdventure(text)
+        .clickEvent(ClickEvent.copyToClipboard(tag.getAsString()))
+        .hoverEvent(text("Click to copy raw NBT!"));
   }
 
   /**

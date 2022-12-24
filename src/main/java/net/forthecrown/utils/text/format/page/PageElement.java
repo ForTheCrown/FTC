@@ -1,5 +1,6 @@
 package net.forthecrown.utils.text.format.page;
 
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.writer.TextWriter;
 
 /**
@@ -16,5 +17,5 @@ public interface PageElement<T> {
    * @param it     The page being iterated through
    * @param writer The destination of the text
    */
-  void write(PageEntryIterator<T> it, TextWriter writer);
+  void write(PageEntryIterator<T> it, TextWriter writer, Context context);
 }

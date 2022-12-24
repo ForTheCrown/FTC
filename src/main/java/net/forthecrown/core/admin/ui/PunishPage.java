@@ -18,7 +18,7 @@ import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.MenuNodeItem;
 import net.forthecrown.utils.inventory.menu.Slot;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -149,7 +149,7 @@ class PunishPage extends AdminUiPage {
     }
 
     @Override
-    protected void onClick(JailCell entry, int index, User user, InventoryContext context) {
+    protected void onClick(JailCell entry, int index, User user, Context context) {
       context.get(PUNISHMENT).setExtra(
           Registries.JAILS.getKey(entry)
               .orElse("UNKNOWN")

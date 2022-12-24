@@ -15,7 +15,7 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.menu.page.ListPage;
 import net.forthecrown.utils.inventory.menu.page.MenuPage;
 import net.forthecrown.utils.text.Text;
@@ -53,14 +53,14 @@ public class MembersMenu extends ListPage<GuildMember> {
   }
 
   @Override
-  protected List<GuildMember> getList(User user, InventoryContext context) {
+  protected List<GuildMember> getList(User user, Context context) {
     var list = context.getOrThrow(GUILD).getMembersList();
     list.sort(user.get(Properties.MEMBER_SORT).getComparator());
     return list;
   }
 
   @Override
-  protected ItemStack getItem(User user, GuildMember member, InventoryContext context) {
+  protected ItemStack getItem(User user, GuildMember member, Context context) {
     var memberUser = member.getUser();
 
     var builder = ItemStacks.headBuilder()
@@ -97,7 +97,7 @@ public class MembersMenu extends ListPage<GuildMember> {
   }
 
   @Override
-  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context) {
     var builder = ItemStacks.builder(Material.PLAYER_HEAD)
         .setFlags(ItemFlag.HIDE_ATTRIBUTES)
         .setName("&eGuild Members");

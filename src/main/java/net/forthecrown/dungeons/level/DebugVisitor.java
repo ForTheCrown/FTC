@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.CharUtils.LF;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.dungeons.level.gate.DungeonGate;
+import net.forthecrown.dungeons.level.room.DungeonRoom;
 
 @Getter
 @RequiredArgsConstructor

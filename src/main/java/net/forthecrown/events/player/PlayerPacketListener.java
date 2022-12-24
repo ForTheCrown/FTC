@@ -62,16 +62,16 @@ public class PlayerPacketListener implements PacketListener {
       buf1.writeUUID(entry.profileId());
 
       for (var a : packet.actions()) {
-        ClientboundPlayerInfoUpdatePacket.Action.Writer
-            writer = ReflectionUtil.getField(a, WRITER_FIELD);
+        ClientboundPlayerInfoUpdatePacket.Action.Writer writer
+            = ReflectionUtil.getField(a, WRITER_FIELD);
 
         writer.write(buf1, entry);
       }
     });
 
     buf.readerIndex(0);
-    ClientboundPlayerInfoUpdatePacket
-        replacementPacket = new ClientboundPlayerInfoUpdatePacket(buf);
+    ClientboundPlayerInfoUpdatePacket replacementPacket
+        = new ClientboundPlayerInfoUpdatePacket(buf);
 
     call.setReplacementPacket(replacementPacket);
   }

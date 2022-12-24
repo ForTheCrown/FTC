@@ -10,7 +10,7 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.user.UUID2IntMap;
+import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.user.User;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.utils.text.format.UnitFormat;

@@ -19,6 +19,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 public class Kit extends CommandUsable {
+  public static final String TAG_ITEMS = "items";
 
   @Getter
   private final List<ItemStack> items = new ArrayList<>();
@@ -31,14 +32,14 @@ public class Kit extends CommandUsable {
         return;
       }
 
-      items.add(itemStack.clone());
+      this.items.add(itemStack.clone());
     });
   }
 
   public Kit(String name, CompoundTag tag) throws CommandSyntaxException {
     super(name, tag);
 
-    var itemArray = tag.getList("items", Tag.TAG_COMPOUND);
+    var itemArray = tag.getList(TAG_ITEMS, Tag.TAG_COMPOUND);
     for (var e : itemArray) {
       items.add(TagUtil.readItem(e));
     }
@@ -52,7 +53,7 @@ public class Kit extends CommandUsable {
       list.add(TagUtil.writeItem(i));
     }
 
-    tag.put("items", list);
+    tag.put(TAG_ITEMS, list);
   }
 
   @Override

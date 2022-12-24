@@ -3,6 +3,7 @@ package net.forthecrown.commands;
 import static net.forthecrown.core.Messages.TOGGLE_BROADCASTS;
 import static net.forthecrown.core.Messages.TOGGLE_CHAT_RANKS;
 import static net.forthecrown.core.Messages.TOGGLE_DURABILITY_WARN;
+import static net.forthecrown.core.Messages.TOGGLE_DYNMAP_HIDE;
 import static net.forthecrown.core.Messages.TOGGLE_EAVESDROP_DM;
 import static net.forthecrown.core.Messages.TOGGLE_EAVESDROP_GCHAT;
 import static net.forthecrown.core.Messages.TOGGLE_EAVESDROP_MCHAT;
@@ -16,6 +17,7 @@ import static net.forthecrown.core.Messages.TOGGLE_INVITE;
 import static net.forthecrown.core.Messages.TOGGLE_MARRIAGE;
 import static net.forthecrown.core.Messages.TOGGLE_MCHAT;
 import static net.forthecrown.core.Messages.TOGGLE_PAYING;
+import static net.forthecrown.core.Messages.TOGGLE_PLAYER_RIDING;
 import static net.forthecrown.core.Messages.TOGGLE_PROFILE_PRIVATE;
 import static net.forthecrown.core.Messages.TOGGLE_TPA;
 
@@ -24,6 +26,7 @@ import lombok.Getter;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
+import net.forthecrown.core.DynmapUtil;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.SettingsBook;
@@ -32,6 +35,8 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.data.UserInteractions;
 import net.forthecrown.user.property.BoolProperty;
 import net.forthecrown.user.property.Properties;
+import net.forthecrown.user.property.UserPreference;
+import net.forthecrown.utils.Util;
 import org.bukkit.permissions.Permission;
 
 /**
@@ -43,7 +48,7 @@ public class ToggleCommand extends FtcCommand {
   /**
    * The property this command flips
    */
-  private final BoolProperty property;
+  private final UserPreference property;
 
   /**
    * The message format to display when users toggle the property for themselves
@@ -58,7 +63,7 @@ public class ToggleCommand extends FtcCommand {
   public ToggleCommand(
       String name,
       String displayName,
-      BoolProperty property,
+      UserPreference property,
       String messageFormat,
       Permission permission,
       String description,
@@ -91,8 +96,7 @@ public class ToggleCommand extends FtcCommand {
   public void setState(User user, boolean state) throws CommandSyntaxException {
     test(user, state);
 
-    user.set(property, state);
-
+    property.setState(user, state);
     user.sendMessage(Messages.toggleMessage(messageFormat, state));
   }
 
@@ -129,7 +133,7 @@ public class ToggleCommand extends FtcCommand {
         // /<command>
         .executes(c -> {
           User user = getUserSender(c);
-          boolean state = !user.get(getProperty());
+          boolean state = !getProperty().getState(user);
 
           setState(user, state);
           return 0;
@@ -141,11 +145,11 @@ public class ToggleCommand extends FtcCommand {
 
             .executes(c -> {
               User user = Arguments.getUser(c, "user");
-              boolean state = !user.get(getProperty());
+              boolean state = !getProperty().getState(user);
 
               test(user, state);
 
-              user.set(property, state);
+              property.setState(user, state);
 
               c.getSource().sendAdmin(Messages.toggleOther(displayName, user, state));
               return 0;
@@ -163,6 +167,35 @@ public class ToggleCommand extends FtcCommand {
         "Toggles your profile being private or public",
         "profileprivate", "profilepublic"
     );
+
+    new ToggleCommand(
+        "dynmaptoggle",
+        "Dynmap Hide",
+        UserPreference.DYNMAP_HIDE,
+        TOGGLE_DYNMAP_HIDE,
+        Permissions.DEFAULT,
+        "Toggles others being able to see you on dynmap"
+    ) {
+      @Override
+      public boolean allowedInBook(User user) {
+        return DynmapUtil.isInstalled();
+      }
+    };
+
+    new ToggleCommand(
+        "playerridingtoggle",
+        "Player Riding",
+        UserPreference.PLAYER_RIDING,
+        TOGGLE_PLAYER_RIDING,
+        Permissions.DEFAULT,
+        "Toggles being able to ride other players",
+        "ridingtoggle", "playerriding"
+    ) {
+      @Override
+      public boolean allowedInBook(User user) {
+        return Util.isPluginEnabled("GSit");
+      }
+    };
 
     new ToggleCommand(
         "ignoreac",

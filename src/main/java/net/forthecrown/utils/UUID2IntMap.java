@@ -1,5 +1,6 @@
-package net.forthecrown.user;
+package net.forthecrown.utils;
 
+import com.google.common.base.Strings;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectIterators;
 import it.unimi.dsi.fastutil.objects.ObjectList;
@@ -9,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.UUID;
 import java.util.function.IntSupplier;
@@ -16,16 +18,23 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
+import net.forthecrown.core.FTC;
+import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.io.SerializableObject;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A sorted UUID 2 int value map
  */
 public class UUID2IntMap extends SerializableObject.Json
-    implements Iterable<UUID2IntMap.Entry> {
+    implements Iterable<UUID2IntMap.Entry>
+{
+  private static final Logger LOGGER = FTC.getLogger();
 
   /**
    * The minimum value that can be stored in user maps, the value is 0
@@ -60,8 +69,17 @@ public class UUID2IntMap extends SerializableObject.Json
   @Getter
   private boolean unsaved = true;
 
+  @Setter
+  @Getter
+  @Accessors(chain = true)
+  private KeyValidator validator;
+
   public UUID2IntMap(Path path) {
     this(path, () -> MINIMUM_VALUE);
+  }
+
+  public UUID2IntMap() {
+    this(null, () -> MINIMUM_VALUE);
   }
 
   public UUID2IntMap(Path filePath, IntSupplier defaultSupplier) {
@@ -72,12 +90,26 @@ public class UUID2IntMap extends SerializableObject.Json
   /**
    * Sets the uuid's value.
    * <p>
-   * This method will also ensure that the given amount is equal to or greater than 0.
+   * This method will also ensure that the given amount is equal to or greater
+   * than 0.
    *
    * @param uuid   The UUID to set the value of
    * @param amount the amount to set the uuid's value to
+   *
+   * @throws IllegalArgumentException If a {@link KeyValidator} is present, and
+   * the given UUID fails validation
    */
-  public void set(UUID uuid, int amount) {
+  public void set(UUID uuid, int amount) throws IllegalArgumentException {
+    Objects.requireNonNull(uuid);
+
+    if (validator != null) {
+      String reason = validator.test(uuid);
+
+      if (!Strings.isNullOrEmpty(reason)) {
+        throw new IllegalArgumentException(reason);
+      }
+    }
+
     amount = Math.max(MINIMUM_VALUE, amount);
 
     var entry = entries.get(uuid);
@@ -89,14 +121,13 @@ public class UUID2IntMap extends SerializableObject.Json
 
       entries.put(uuid, entry);
       insert(entry);
-
-      return;
+    } else {
+      // UUId stored in map, set entry's value
+      // and resort map
+      entry.setValue(amount);
+      sortedList.sort(COMPARATOR);
     }
 
-    // UUId stored in map, set entry's value
-    // and resort map
-    entry.setValue(amount);
-    sortedList.sort(COMPARATOR);
     unsaved = true;
   }
 
@@ -236,7 +267,7 @@ public class UUID2IntMap extends SerializableObject.Json
 
   @Override
   public void save() {
-    if (!isUnsaved()) {
+    if (!isUnsaved() || getFilePath() == null) {
       return;
     }
 
@@ -251,11 +282,26 @@ public class UUID2IntMap extends SerializableObject.Json
     unsaved = false;
   }
 
+  @Override
+  public void reload() {
+    if (getFilePath() == null) {
+      return;
+    }
+
+    super.reload();
+  }
+
   public void load(JsonWrapper json) {
     clear();
 
     for (var e : json.entrySet()) {
       var id = UUID.fromString(e.getKey());
+
+      if (validator != null && !Strings.isNullOrEmpty(validator.test(id))) {
+        LOGGER.warn("Invalid UUID: {}, found in {}", id, getFilePath());
+        continue;
+      }
+
       set(id, e.getValue().getAsInt());
     }
 
@@ -277,5 +323,23 @@ public class UUID2IntMap extends SerializableObject.Json
     public int compareTo(@NotNull UUID2IntMap.Entry o) {
       return Integer.compare(value, o.value);
     }
+  }
+
+  public interface KeyValidator {
+    KeyValidator IS_USER = uuid -> {
+      if (Users.isPlayerId(uuid)) {
+        return null;
+      }
+      return uuid + " doesn't belong to a player!";
+    };
+
+    /**
+     * Tests the given UUID
+     * @param uuid The UUID to test
+     *
+     * @return The reason for the UUID being denied, or null/empty if
+     *         the UUID is valid
+     */
+    @Nullable String test(UUID uuid);
   }
 }

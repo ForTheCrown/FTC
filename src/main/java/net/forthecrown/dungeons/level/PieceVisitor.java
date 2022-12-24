@@ -1,6 +1,7 @@
 package net.forthecrown.dungeons.level;
 
 import net.forthecrown.dungeons.level.gate.DungeonGate;
+import net.forthecrown.dungeons.level.room.DungeonRoom;
 
 public interface PieceVisitor {
 

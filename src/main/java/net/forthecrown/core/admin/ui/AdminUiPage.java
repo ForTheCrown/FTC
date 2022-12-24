@@ -11,8 +11,8 @@ import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.MenuNodeItem;
 import net.forthecrown.utils.inventory.menu.Menus;
 import net.forthecrown.utils.inventory.menu.Slot;
-import net.forthecrown.utils.inventory.menu.context.ClickContext;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.inventory.menu.ClickContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
@@ -93,13 +93,13 @@ abstract class AdminUiPage implements MenuNode {
   }
 
   @Override
-  public void onClick(User user, InventoryContext context, ClickContext click)
+  public void onClick(User user, Context context, ClickContext click)
       throws CommandSyntaxException {
     getInventory().open(user, context);
   }
 
   @Override
-  public ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+  public ItemStack createItem(@NotNull User user, @NotNull Context context) {
     return item.createItem(user, context);
   }
 }

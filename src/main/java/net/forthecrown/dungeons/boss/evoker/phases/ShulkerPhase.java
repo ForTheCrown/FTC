@@ -55,8 +55,13 @@ public class ShulkerPhase implements AttackPhase {
       Location l = new Location(boss.getWorld(), cord[0] + 0.5D, cord[1], cord[2] + 0.5D);
 
       Shulker s = boss.getWorld().spawn(l, Shulker.class, shulker -> {
-        AttackPhases.modifyHealth(shulker,
-            shulker.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue(), context);
+        AttackPhases.modifyHealth(
+            shulker,
+            shulker.getAttribute(Attribute.GENERIC_MAX_HEALTH)
+                .getBaseValue() + 10,
+            context
+        );
+
         shulker.setAware(false);
         shulker.customName(Component.text("Shulker Guardian", NamedTextColor.RED));
         shulker.setColor(DyeColor.RED);

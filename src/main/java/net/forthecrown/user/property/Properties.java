@@ -172,7 +172,13 @@ public class Properties {
   /**
    * Determines whether the user's guild discovery sorting option is inverted
    */
-  G_DISC_SORT_INVERTED = new BoolProperty("guildDiscoverySortInverted", false);
+  G_DISC_SORT_INVERTED = new BoolProperty("guildDiscoverySortInverted", false),
+
+  /**
+   * Determines whether only public guilds are shown in the guild
+   * discovery menu
+   */
+  G_DISC_PUBLIC_ONLY   = new BoolProperty("guildDiscovery_onlyPublic", true);
 
   /**
    * Determines a player's TAB prefix.

@@ -2,13 +2,16 @@ package net.forthecrown.commands.test;
 
 import static net.kyori.adventure.text.Component.text;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
 import net.forthecrown.commands.arguments.Arguments;
+import net.forthecrown.commands.docs.CommandDocs;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.FTC;
@@ -61,6 +64,22 @@ public class CommandFtcTest extends FtcCommand {
   @Override
   protected void createCommand(BrigadierCommand command) {
     command
+        .then(literal("generate_command_docs")
+            .then(argument("stubs", BoolArgumentType.bool())
+                .executes(c -> {
+                  Path dir = PathUtil.pluginPath("generated_docs");
+                  boolean stubs = c.getArgument("stubs", Boolean.class);
+
+                  var docs = new CommandDocs(stubs);
+                  docs.fill();
+                  docs.write(dir);
+
+                  c.getSource().sendMessage("Generated documentation");
+                  return 0;
+                })
+            )
+        )
+
         .then(literal("fire_streak_event")
             .then(argument("streak", IntegerArgumentType.integer(1))
                 .then(argument("user", Arguments.ONLINE_USER)

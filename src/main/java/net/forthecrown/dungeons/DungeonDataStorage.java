@@ -18,7 +18,7 @@ import net.forthecrown.core.registry.Keys;
 import net.forthecrown.core.registry.Registry;
 import net.forthecrown.dungeons.level.PieceStyle;
 import net.forthecrown.dungeons.level.Pieces;
-import net.forthecrown.dungeons.level.RoomType;
+import net.forthecrown.dungeons.level.room.RoomType;
 import net.forthecrown.dungeons.level.gate.GateType;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.utils.Util;

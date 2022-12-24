@@ -1,7 +1,7 @@
 package net.forthecrown.utils.inventory.menu;
 
 import net.forthecrown.user.User;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 
 /**
  * Menu callback called when a menu is opened.
@@ -17,5 +17,5 @@ public interface MenuOpenConsumer {
    * @param user    The user opening the inventory
    * @param context The context the inventory is being opened with
    */
-  void onOpen(User user, InventoryContext context);
+  void onOpen(User user, Context context);
 }

@@ -9,14 +9,18 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.IntSupplier;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
+import net.forthecrown.utils.UUID2IntMap;
+import net.forthecrown.utils.UUID2IntMap.KeyValidator;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializableObject;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 public final class UserManager implements SerializableObject {
@@ -94,10 +98,22 @@ public final class UserManager implements SerializableObject {
     userLookup = new UserLookup(directory.resolve("profiles.json"));
 
     // Create user data maps
-    balances = new UUID2IntMap(directory.resolve("balances.json"), () -> GeneralConfig.startRhines);
-    playTime = new UUID2IntMap(directory.resolve("playtime.json"));
-    votes = new UUID2IntMap(directory.resolve("votes.json"));
-    gems = new UUID2IntMap(directory.resolve("gems.json"));
+    balances  = createMap("balances.json", () -> GeneralConfig.startRhines);
+    playTime  = createMap("playtime.json", null);
+    votes     = createMap("votes.json", null);
+    gems      = createMap("gems.json", null);
+  }
+
+  private UUID2IntMap createMap(String file, @Nullable IntSupplier supplier) {
+    Path path = directory.resolve(file);
+
+    if (supplier == null) {
+      return new UUID2IntMap(path)
+          .setValidator(KeyValidator.IS_USER);
+    }
+
+    return new UUID2IntMap(path, supplier)
+        .setValidator(KeyValidator.IS_USER);
   }
 
   public static UserManager get() {
@@ -143,9 +159,9 @@ public final class UserManager implements SerializableObject {
   @Override
   @OnLoad
   public void reload() {
-    loadMaps();
     userLookup.reload();
     alts.reload();
+    loadMaps();
 
     reloadUsers();
   }

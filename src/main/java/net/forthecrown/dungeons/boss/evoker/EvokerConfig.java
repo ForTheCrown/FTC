@@ -13,7 +13,6 @@ public @UtilityClass class EvokerConfig {
       rhineReward = 25000,
       baseHealth = 400,
       ticksBetweenSpawns = 7,
-      deathAnimLength = 40,
       phaseTransition = 5 * 20;
 
   public static String
@@ -27,7 +26,9 @@ public @UtilityClass class EvokerConfig {
       potion_maxDist = 15.0D,
       potion_spawnY = 40.5D,
 
-      shulker_firingSpeed = 0.75D,
+      shulker_firingSpeed = 1.0D,
+      shulker_fastFireDist = 10.0D,
+      shulker_fastFireSpeed = 1.25D,
 
       swarm_vexSpawnDist = 2.25;
 

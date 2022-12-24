@@ -12,7 +12,7 @@ import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
 import net.forthecrown.utils.inventory.menu.Slot;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.menu.page.MenuPage;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
@@ -137,7 +137,7 @@ public class StatisticsMenu extends MenuPage {
                               .append(guild.getLeader().getUser().displayName()
                                   .color(NamedTextColor.WHITE)),
                           Component.text("Guild created on: ", NamedTextColor.GOLD)
-                              .append(guild.getFormattedCreationDate()))
+                              .append(Text.formatDate(guild.getCreationTimeStamp())))
                   )
 
                   .addLore(
@@ -220,7 +220,7 @@ public class StatisticsMenu extends MenuPage {
   }
 
   @Override
-  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context) {
     return ItemStacks.builder(Material.NAME_TAG)
         .setName(Component.text("Statistics", NamedTextColor.YELLOW)
             .decoration(TextDecoration.ITALIC, false))

@@ -125,6 +125,9 @@ public class Registry<V> implements Iterable<V> {
    */
   private Holder<V>[] byId = EMPTY_ARRAY;
 
+  @Getter
+  private RegistryIndex<V, ?> index;
+
   /**
    * True, if the registry has been frozen and was made immutable, false otherwise
    */
@@ -276,10 +279,14 @@ public class Registry<V> implements Iterable<V> {
 
     // Insert holder into registry lookup objects
     byId = ObjectArrays.ensureCapacity(byId, holder.getId() + 1);
-    byId[holder.getId()] = holder;
 
+    byId[holder.getId()] = holder;
     byKey.put(holder.getKey(), holder);
     var existing = byValue.put(holder.getValue(), holder);
+
+    if (index != null) {
+      index.onRegister(holder);
+    }
 
     if (existing != null) {
       FTC.getLogger().warn(
@@ -471,6 +478,38 @@ public class Registry<V> implements Iterable<V> {
   private void testFrozen() throws IllegalArgumentException {
     if (isFrozen() && isFreezingAllowed()) {
       throw Util.newException("This registry is frozen and cannot be modified");
+    }
+  }
+
+  /* ----------------------------- INDEXING ------------------------------- */
+
+  /**
+   * Sets the registry's indexer.
+   * <p>
+   * The indexer's job is to provide an additional mapping for entries
+   * registered into this registry.
+   * <p>
+   * A registry's indexer can only be set once, afterwards, any attempted
+   * changes to an indexer, will result in an exception being thrown
+   *
+   * @param index The indexer to set
+   * @param <T> The Indexer's type
+   * @throws IllegalArgumentException If an indexer is already set
+   */
+  public <T> void setIndex(RegistryIndex<V, T> index)
+      throws IllegalArgumentException
+  {
+    Objects.requireNonNull(index);
+
+    if (this.index != null) {
+      throw Util.newException("Registry indexer already set!");
+    }
+
+    this.index = index;
+
+    if (!isEmpty()) {
+      byKey.values()
+          .forEach(index::onRegister);
     }
   }
 

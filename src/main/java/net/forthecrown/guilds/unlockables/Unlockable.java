@@ -10,8 +10,8 @@ import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.ThrowingRunnable;
 import net.forthecrown.utils.inventory.menu.MenuNode;
-import net.forthecrown.utils.inventory.menu.context.ClickContext;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.inventory.menu.ClickContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -88,7 +88,7 @@ public interface Unlockable {
 
   default void onClick(User user,
                        ClickContext context,
-                       InventoryContext c,
+                       Context c,
                        ThrowingRunnable<CommandSyntaxException> r
   ) throws CommandSyntaxException {
     Guild guild = c.get(GUILD);

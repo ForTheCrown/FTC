@@ -1,9 +1,8 @@
-package net.forthecrown.utils.inventory.menu.context;
+package net.forthecrown.utils.inventory.menu;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.utils.inventory.menu.MenuInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;

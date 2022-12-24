@@ -9,7 +9,7 @@ import net.forthecrown.core.admin.PunishEntry;
 import net.forthecrown.user.User;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuNodeItem;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
@@ -84,6 +84,6 @@ class NotesPage extends ListUiPage<EntryNote> {
   }
 
   @Override
-  protected void onClick(EntryNote entry, int index, User user, InventoryContext context) {
+  protected void onClick(EntryNote entry, int index, User user, Context context) {
   }
 }

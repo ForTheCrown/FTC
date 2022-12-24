@@ -12,8 +12,8 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
-import net.forthecrown.utils.inventory.menu.context.ClickContext;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.inventory.menu.ClickContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.menu.page.ListPage;
 import net.forthecrown.utils.inventory.menu.page.MenuPage;
 import org.bukkit.Material;
@@ -41,25 +41,25 @@ public class MessageBoardMenu extends ListPage<GuildMessage> {
   }
 
   @Override
-  protected void onClick(User user, GuildMessage entry, InventoryContext context,
+  protected void onClick(User user, GuildMessage entry, Context context,
                          ClickContext click
   ) throws CommandSyntaxException {
     entry.toMenuNode().onClick(user, context, click);
   }
 
   @Override
-  protected List<GuildMessage> getList(User user, InventoryContext context) {
+  protected List<GuildMessage> getList(User user, Context context) {
     return context.getOrThrow(GUILD)
         .getMsgBoardPosts();
   }
 
   @Override
-  protected ItemStack getItem(User user, GuildMessage entry, InventoryContext context) {
+  protected ItemStack getItem(User user, GuildMessage entry, Context context) {
     return entry.toMenuNode().createItem(user, context);
   }
 
   @Override
-  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context) {
     return ItemStacks.builder(Material.OAK_SIGN)
         .setName("&eMessage Board")
         .addLore("&7A place to post messages for the guild.")
@@ -72,7 +72,7 @@ public class MessageBoardMenu extends ListPage<GuildMessage> {
   }
 
   @Override
-  public void onClick(User user, InventoryContext context, ClickContext click)
+  public void onClick(User user, Context context, ClickContext click)
       throws CommandSyntaxException {
     setPage(0, context);
     getMenu().open(user, context);

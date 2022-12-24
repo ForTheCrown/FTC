@@ -14,8 +14,8 @@ import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.MenuNodeItem;
 import net.forthecrown.utils.inventory.menu.Menus;
 import net.forthecrown.utils.inventory.menu.Slot;
-import net.forthecrown.utils.inventory.menu.context.ClickContext;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.inventory.menu.ClickContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -108,7 +108,7 @@ abstract class ListUiPage<T> extends AdminUiPage {
 
   protected abstract ItemStack getItem(T entry, PunishEntry punishEntry);
 
-  protected abstract void onClick(T entry, int index, User user, InventoryContext context);
+  protected abstract void onClick(T entry, int index, User user, Context context);
 
   protected int maxPage(int pageSize, PunishEntry entry) {
     return PageEntryIterator.getMaxPage(pageSize, getList(entry).size());
@@ -168,7 +168,7 @@ abstract class ListUiPage<T> extends AdminUiPage {
   }
 
   @Override
-  public void onClick(User user, InventoryContext context, ClickContext click)
+  public void onClick(User user, Context context, ClickContext click)
       throws CommandSyntaxException {
     if (getList(context.get(ENTRY)).isEmpty()) {
       throw Exceptions.NOTHING_TO_LIST;

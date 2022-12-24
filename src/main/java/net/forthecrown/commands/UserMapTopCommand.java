@@ -11,7 +11,7 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.guilds.GuildManager;
-import net.forthecrown.user.UUID2IntMap;
+import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.text.Text;
@@ -173,7 +173,7 @@ public class UserMapTopCommand extends FtcCommand {
               .getGuild(uuid)
               .displayName();
         },
-        "topguilds"
+        "topguilds", "gtop"
     );
   }
 }

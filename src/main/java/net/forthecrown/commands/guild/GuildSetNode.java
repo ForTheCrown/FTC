@@ -1,9 +1,13 @@
 package net.forthecrown.commands.guild;
 
 import static net.forthecrown.guilds.GuildRank.ID_LEADER;
+import static net.forthecrown.guilds.GuildSettings.UNLIMITED_CHUNKS;
+import static net.forthecrown.guilds.GuildSettings.UNLIMITED_MEMBERS;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Objects;
@@ -11,6 +15,7 @@ import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.CommandSource;
+import net.forthecrown.guilds.Guild;
 import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.guilds.GuildPermission;
 import net.forthecrown.guilds.Guilds;
@@ -41,6 +46,24 @@ class GuildSetNode extends GuildCommandNode {
       writer.field("set name <name> <guild>", "Sets a guild's name");
       writer.field("set leader <user> <guild>", "Sets a guild's leader");
       writer.field("set waypoint <guild>", "Sets the guild's waypoint");
+
+      writer.field(
+          "set unlimitedMembers <guild> <true | false>",
+          "Sets whether a guild can have unlimited members"
+      );
+      writer.field(
+          "set unlimitedMembers <guild>",
+          "Queries whether a guild has unlimited members or not"
+      );
+
+      writer.field(
+          "set unlimitedChunks <guild> <true | false>",
+          "Sets if a guild can claim unlimited amount of chunks"
+      );
+      writer.field(
+          "set unlimitedChunks <guild>",
+          "Queries whether a guild has unlimited chunks or not"
+      );
     }
   }
 
@@ -56,6 +79,9 @@ class GuildSetNode extends GuildCommandNode {
     addGuildCommand(waypointArg, this::waypoint);
 
     command
+        .then(flagArgument("unlimitedMembers", UNLIMITED_MEMBERS))
+        .then(flagArgument("unlimitedChunks", UNLIMITED_CHUNKS))
+
         .then(literal("name")
             .then(nameArg)
         )
@@ -65,6 +91,51 @@ class GuildSetNode extends GuildCommandNode {
         )
 
         .then(waypointArg);
+  }
+
+  private LiteralArgumentBuilder<CommandSource> flagArgument(String name,
+                                                             int flag
+  ) {
+    return literal(name)
+        .requires(source -> source.hasPermission(Permissions.GUILD_ADMIN))
+
+        .then(guildArgument()
+            .executes(c -> {
+              Guild guild = providerForArgument().get(c);
+              boolean set = guild.getSettings().hasFlags(flag);
+
+              c.getSource().sendMessage(
+                  Text.format("{0} set for {1}: {2}",
+                      name,
+                      guild.displayName(),
+                      set
+                  )
+              );
+              return 0;
+            })
+
+            .then(argument("state", BoolArgumentType.bool())
+                .executes(c -> {
+                  boolean state = c.getArgument("state", Boolean.class);
+                  Guild guild = providerForArgument().get(c);
+
+                  if (state) {
+                    guild.getSettings().addFlags(flag);
+                  } else {
+                    guild.getSettings().removeFlags(flag);
+                  }
+
+                  c.getSource().sendAdmin(
+                      Text.format("{0} now set for {1}: {2}",
+                          name,
+                          guild.displayName(),
+                          state
+                      )
+                  );
+                  return 0;
+                })
+            )
+        );
   }
 
   private int rename(CommandContext<CommandSource> c,

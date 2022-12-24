@@ -62,7 +62,8 @@ public class ShopHistory {
   }
 
   private boolean isTooOld(HistoryEntry entry) {
-    return Time.isPast(GeneralConfig.dataRetentionTime + entry.date());
+    long expiryDate = GeneralConfig.dataRetentionTime + entry.date();
+    return Time.isPast(expiryDate);
   }
 
   private void clearOld() {

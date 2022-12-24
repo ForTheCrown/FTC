@@ -4,6 +4,7 @@ import static net.forthecrown.utils.text.Text.nonItalic;
 
 import java.util.UUID;
 import net.forthecrown.core.registry.Keys;
+import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.inventory.ExtendedItemType;
 import net.forthecrown.utils.inventory.BaseItemBuilder;
 import net.forthecrown.utils.inventory.ItemStacks;
@@ -60,10 +61,16 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
   }
 
   @Override
+  public boolean shouldRemainInInventory() {
+    return false;
+  }
+
+  @Override
   public @NotNull BaseItemBuilder createBaseItem() {
     return ItemStacks.builder(Material.WOODEN_SWORD)
         .setNameRaw(RANK_1_NAME)
         .setUnbreakable(true)
-        .setFlags(ItemFlag.HIDE_ATTRIBUTES);
+        .setFlags(ItemFlag.HIDE_ATTRIBUTES)
+        .addEnchant(FtcEnchants.SOUL_BOND, 1);
   }
 }

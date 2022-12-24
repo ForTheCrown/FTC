@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.forthecrown.core.Messages;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
@@ -53,7 +54,7 @@ public class Footer implements PageElement {
   }
 
   @Override
-  public void write(PageEntryIterator it, TextWriter writer) {
+  public void write(PageEntryIterator it, TextWriter writer, Context context) {
     if (border != null) {
       writer.write(border);
     }
@@ -62,7 +63,7 @@ public class Footer implements PageElement {
     // if there is a previous page to go to
     if (pageButton != null && !it.isFirstPage()) {
       writer.write(
-          Messages.previousPage(pageButton.create(it.getPage(), it.getPageSize()))
+          Messages.previousPage(pageButton.create(it.getPage(), it.getPageSize(), context))
               .color(color)
       );
     } else if (border != null) {
@@ -82,7 +83,7 @@ public class Footer implements PageElement {
     // a next page to go to
     if (pageButton != null && !it.isLastPage()) {
       writer.write(
-          Messages.nextPage(pageButton.create(it.getPage() + 2, it.getPageSize()))
+          Messages.nextPage(pageButton.create(it.getPage() + 2, it.getPageSize(), context))
               .color(color)
       );
     } else if (border != null) {
@@ -133,7 +134,7 @@ public class Footer implements PageElement {
    */
   public Footer setPageButton(String format) {
     return setPageButton(
-        (viewerPage, pageSize) -> {
+        (viewerPage, pageSize, context) -> {
           return ClickEvent.runCommand(
               String.format(
                   format,
@@ -156,7 +157,6 @@ public class Footer implements PageElement {
   }
 
   public interface PageButtonProvider {
-
-    ClickEvent create(int viewerPage, int pageSize);
+    ClickEvent create(int viewerPage, int pageSize, Context context);
   }
 }

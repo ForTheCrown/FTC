@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import net.forthecrown.core.registry.Holder;
 import net.forthecrown.dungeons.DungeonManager;
 import net.forthecrown.dungeons.level.Pieces;
-import net.forthecrown.dungeons.level.RoomType;
+import net.forthecrown.dungeons.level.room.RoomType;
 import org.apache.commons.lang3.Range;
 
 public enum SectionType {

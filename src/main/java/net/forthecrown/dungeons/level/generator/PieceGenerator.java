@@ -4,25 +4,22 @@ import static net.forthecrown.dungeons.level.generator.StepResult.FAILED;
 import static net.forthecrown.dungeons.level.generator.StepResult.MAX_DEPTH;
 import static net.forthecrown.dungeons.level.generator.StepResult.MAX_SECTION_DEPTH;
 
-import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.forthecrown.core.registry.Holder;
 import net.forthecrown.dungeons.level.DungeonPiece;
-import net.forthecrown.dungeons.level.DungeonRoom;
+import net.forthecrown.dungeons.level.room.DungeonRoom;
+import net.forthecrown.dungeons.level.Gates;
 import net.forthecrown.dungeons.level.Pieces;
-import net.forthecrown.dungeons.level.RoomType;
+import net.forthecrown.dungeons.level.room.RoomType;
 import net.forthecrown.dungeons.level.gate.DungeonGate;
 import net.forthecrown.dungeons.level.gate.GateData;
-import net.forthecrown.dungeons.level.gate.GateType;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.WeightedList;
 import org.apache.commons.lang3.Range;
-import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
@@ -166,7 +163,9 @@ public class PieceGenerator {
           // Remove gate, as it's now the entrance
           gIt.remove();
 
-          List<DungeonGate> exits = createGates(room, gates);
+          List<DungeonGate> exits = Gates.createGates(
+              room, gates, config.getRandom()
+          );
 
           // Close random gates if we have more than
           // max amount of gates
@@ -249,67 +248,6 @@ public class PieceGenerator {
     data.roomCount--;
     data.successful.remove(failed);
     origin.clearChildren();
-  }
-
-  static List<DungeonGate> createGates(DungeonRoom piece, List<GateData> exits) {
-    return exits.stream()
-        .map(data1 -> data1.toAbsolute(piece))
-        .map(exit -> {
-          // Find a gate which matches the exit's size
-          Pair<Holder<GateType>, GateData>
-              pair = Pieces.findGate(exit.opening(), false);
-
-          Holder<GateType> gateType;
-          GateData entrance;
-          List<GateData> gates;
-
-          // If exit not found, resort to using the default gate
-          if (pair == null) {
-            gateType = Pieces.getDefaultGate();
-            gates = gateType.getValue().getGates();
-            entrance = gates.get(GATE_INDEX_ENTRANCE);
-          } else {
-            gateType = pair.getFirst();
-            entrance = pair.getSecond();
-            gates = gateType.getValue().getGates();
-          }
-
-          DungeonGate gate = gateType.getValue().create();
-          int entranceIndex = gates.indexOf(entrance);
-
-          Validate.isTrue(
-              !gates.isEmpty(),
-              "%s has no gates, cannot use!",
-              gate.getType().getStructureName()
-          );
-
-          NodeAlign.align(gate, exit, entrance);
-          piece.addChild(gate);
-
-          // No exit
-          if (gates.size() == 1) {
-            gate.setOpen(false);
-          } else {
-            int exitIndex = -1;
-
-            // Find exit gate, Lazy way of finding the opposite
-            // index of entranceIndex, since it probably only has 2
-            // entrances
-            while ((++exitIndex) == entranceIndex
-                && exitIndex < gates.size()
-            ) {
-
-            }
-
-            gate.setTargetGate(
-                gates.get(exitIndex)
-                    .toAbsolute(gate)
-            );
-          }
-
-          return gate;
-        })
-        .collect(ObjectArrayList.toList());
   }
 
   @Getter

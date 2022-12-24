@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.concurrent.CompletableFuture;
+import lombok.Getter;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.admin.JailCell;
 import net.forthecrown.core.challenge.Challenge;
@@ -31,6 +32,7 @@ import net.forthecrown.user.data.UserTimeTracker;
 import net.forthecrown.waypoint.WaypointProperties;
 import net.forthecrown.waypoint.WaypointProperty;
 
+@Getter
 public class RegistryArguments<T> implements ArgumentType<Holder<T>>, VanillaMappedArgument {
 
   public static final RegistryArguments<BlockStructure>

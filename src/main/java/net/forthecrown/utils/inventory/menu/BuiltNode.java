@@ -4,8 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.user.User;
-import net.forthecrown.utils.inventory.menu.context.ClickContext;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,7 @@ public class BuiltNode implements MenuNode {
   private final boolean playSound;
 
   @Override
-  public void onClick(User user, InventoryContext context, ClickContext click)
+  public void onClick(User user, Context context, ClickContext click)
       throws CommandSyntaxException {
     if (runnable == null) {
       return;
@@ -33,7 +32,7 @@ public class BuiltNode implements MenuNode {
   }
 
   @Override
-  public ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+  public ItemStack createItem(@NotNull User user, @NotNull Context context) {
     if (item == null) {
       return null;
     }

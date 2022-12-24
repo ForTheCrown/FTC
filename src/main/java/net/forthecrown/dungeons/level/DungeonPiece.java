@@ -3,9 +3,8 @@ package net.forthecrown.dungeons.level;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import net.forthecrown.dungeons.level.gate.DungeonGate;
@@ -14,13 +13,11 @@ import net.forthecrown.structure.BlockProcessors;
 import net.forthecrown.structure.BlockStructure;
 import net.forthecrown.structure.Rotation;
 import net.forthecrown.structure.StructurePlaceConfig;
-import net.forthecrown.user.User;
 import net.forthecrown.utils.BoundsHolder;
 import net.forthecrown.utils.io.TagUtil;
 import net.forthecrown.utils.math.Bounds3i;
 import net.forthecrown.utils.math.Transform;
 import net.minecraft.nbt.CompoundTag;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bukkit.World;
 import org.spongepowered.math.vector.Vector3i;
 
@@ -65,12 +62,6 @@ public abstract class DungeonPiece implements BoundsHolder {
 
   @Getter
   private Rotation rotation = Rotation.NONE;
-
-  /**
-   * List of users inside this room
-   */
-  @Getter
-  private final List<User> users = new ObjectArrayList<>();
 
   /**
    * The level this piece is apart of
@@ -254,34 +245,6 @@ public abstract class DungeonPiece implements BoundsHolder {
     return o instanceof DungeonGate;
   }
 
-  /* ----------------------------- CALLBACKS ------------------------------ */
-
-  /**
-   * Ticked whenever 1 or more players are inside the room
-   */
-  public void onTick(World world, DungeonLevel level) {
-
-  }
-
-  /**
-   * Ticked whenever the room is empty
-   */
-  public void onIdleTick(World world, DungeonLevel level) {
-
-  }
-
-  public boolean isTicked() {
-    return false;
-  }
-
-  public void onEnter(User user, DungeonLevel level) {
-
-  }
-
-  public void onExit(User user, DungeonLevel level) {
-
-  }
-
   /* ----------------------------- ITERATION ------------------------------ */
 
   public PieceVisitor.Result visit(PieceVisitor walker) {
@@ -315,6 +278,7 @@ public abstract class DungeonPiece implements BoundsHolder {
 
     for (var c : children.values()) {
       if (c.visit(walker) == PieceVisitor.Result.STOP) {
+        walker.onChildrenEnd(this);
         return PieceVisitor.Result.STOP;
       }
     }
@@ -337,26 +301,21 @@ public abstract class DungeonPiece implements BoundsHolder {
 
   protected abstract void saveAdditional(CompoundTag tag);
 
-  /* ----------------------------- OBJECT OVERRIDES ------------------------------ */
+  /* -------------------------- OBJECT OVERRIDES -------------------------- */
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-
-    if (!getClass().isInstance(o)) {
+    if (!(o instanceof DungeonPiece that)) {
       return false;
     }
-
-    DungeonPiece piece = (DungeonPiece) o;
-
-    return getId().equals(piece.getId());
+    return Objects.equals(getId(), that.getId());
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37)
-        .append(getId()).toHashCode();
+    return getId().hashCode();
   }
 }

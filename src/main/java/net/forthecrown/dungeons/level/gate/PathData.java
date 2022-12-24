@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.forthecrown.dungeons.level.DungeonRoom;
+import net.forthecrown.dungeons.level.room.DungeonRoom;
 
 @Getter
 @Setter

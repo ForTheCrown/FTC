@@ -22,9 +22,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
 public final class TabList {
-
-  private TabList() {
-  }
+  private TabList() {}
 
   public static final int MIN_BORDER_PIXELS =
       4 * 24; // Space character size times min amount of spaces in border

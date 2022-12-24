@@ -37,6 +37,7 @@ import net.forthecrown.user.Users;
 import net.forthecrown.user.data.MailAttachment;
 import net.forthecrown.user.data.MailMessage;
 import net.forthecrown.user.data.UserMail;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.format.page.Footer;
 import net.forthecrown.utils.text.format.page.PageEntry;
@@ -79,29 +80,27 @@ public class CommandMail extends FtcCommand {
    * Main Author: Julie
    */
 
-  private static final Argument<Component> MSG_ARG = Argument.builder("message", Arguments.CHAT)
-      .build();
+  private static final Argument<Component> MSG_ARG
+      = Argument.builder("message", Arguments.CHAT).build();
 
-  private static final Argument<Integer> RHINE_ARG = Argument.builder("rhines",
-          IntegerArgumentType.integer(0))
-      .setDefaultValue(0)
-      .build();
+  private static final Argument<Integer> RHINE_ARG
+      = Argument.builder("rhines", IntegerArgumentType.integer(0))
+          .setDefaultValue(0)
+          .build();
 
-  private static final Argument<Integer> GEM_ARG = Argument.builder("gems",
-          IntegerArgumentType.integer(0))
-      .setDefaultValue(0)
-      .build();
+  private static final Argument<Integer> GEM_ARG
+      = Argument.builder("gems", IntegerArgumentType.integer(0))
+          .setDefaultValue(0)
+          .build();
 
-  private static final Argument<ItemStack> ITEM_ARG = Argument.builder("item",
-          UsageUtil.ITEM_ARGUMENT)
-      .build();
+  private static final Argument<ItemStack> ITEM_ARG
+      = Argument.builder("item", UsageUtil.ITEM_ARGUMENT).build();
 
-  private static final Argument<String> TAG_ARG = Argument.builder("tag",
-          StringArgumentType.string())
-      .build();
+  private static final Argument<String> TAG_ARG
+      = Argument.builder("tag", StringArgumentType.string()).build();
 
-  private static final Argument<String> SCRIPT_ARG = Argument.builder("script", Arguments.SCRIPT)
-      .build();
+  private static final Argument<String> SCRIPT_ARG
+      = Argument.builder("script", Arguments.SCRIPT).build();
 
   private static final ArgsArgument ARGS = ArgsArgument.builder()
       .addRequired(MSG_ARG)
@@ -496,7 +495,7 @@ public class CommandMail extends FtcCommand {
 
         new PageEntry.EntryDisplay<MailMessage>() {
           @Override
-          public void write(TextWriter writer, MailMessage entry, int viewerIndex) {
+          public void write(TextWriter writer, MailMessage entry, int viewerIndex, Context context) {
             // create mark as read/unread click event
             var event = ClickEvent.runCommand(
                 String.format(
@@ -565,7 +564,8 @@ public class CommandMail extends FtcCommand {
             PageEntryIterator.of(
                 mail.getMail(),
                 page, pageSize
-            )
+            ),
+            Context.EMPTY
         )
     );
 

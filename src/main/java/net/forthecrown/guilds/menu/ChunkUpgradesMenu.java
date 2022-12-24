@@ -6,7 +6,7 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.menu.page.MenuPage;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -34,7 +34,7 @@ public class ChunkUpgradesMenu extends MenuPage {
   }
 
   @Override
-  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context) {
     return ItemStacks.builder(Material.BEACON)
         .setName("&eChunk upgrades")
         .addLore("&7Effects applied in guild chunks")

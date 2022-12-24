@@ -4,8 +4,10 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 import net.forthecrown.dungeons.boss.BossContext;
 import net.forthecrown.dungeons.boss.components.MinionSpawnerComponent;
+import net.forthecrown.dungeons.boss.evoker.BossMessage;
 import net.forthecrown.dungeons.boss.evoker.EvokerBoss;
 import net.forthecrown.dungeons.boss.evoker.EvokerConfig;
+import net.forthecrown.dungeons.boss.evoker.EvokerEffects;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.math.Vectors;
 import org.bukkit.Location;
@@ -21,6 +23,10 @@ import org.spongepowered.math.vector.Vector3d;
  * The phase where the evoker spawns a swarm of weak vexes
  */
 public class SwarmPhase implements AttackPhase {
+  public static final BossMessage
+      BEGIN = BossMessage.simple("phase_swarm_begin"),
+      END = BossMessage.simple("phase_swarm_end");
+
   EvokerBoss boss;
 
   int spawned = 0;
@@ -45,12 +51,15 @@ public class SwarmPhase implements AttackPhase {
 
     boss.getPhaseBar().setTitle("Spawning vexes! (" + requiredWaves + ")");
     boss.getPhaseBar().setVisible(true);
+
+    boss.broadcast(true, BEGIN);
   }
 
   @Override
   public void onEnd(EvokerBoss boss, BossContext context) {
     reset();
     this.boss = null;
+    boss.broadcast(true, END);
   }
 
   @Override
@@ -109,9 +118,7 @@ public class SwarmPhase implements AttackPhase {
     }
 
     // Cool lightning strike when summoning
-    boss.getBossEntity()
-        .getWorld()
-        .strikeLightningEffect(boss.getBossEntity().getLocation());
+    EvokerEffects.lightning(boss);
   }
 
   /** Spawns vexes in a circle around the boss */

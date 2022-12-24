@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
@@ -55,20 +56,23 @@ public class PageEntry<T> {
     return PageEntry.<T>create().setEntryDisplay(display);
   }
 
-  public void write(PageEntryIterator<T> it, T entry, TextWriter writer) {
+  public void write(PageEntryIterator<T> it, T entry,
+                    TextWriter writer,
+                    Context context
+  ) {
     writer.write(index.createIndex(it.getViewerIndex(), entry));
     writer.space();
 
     if (entryDisplay == null) {
       writer.write(Text.valueOf(entry));
     } else {
-      entryDisplay.write(writer, entry, it.getViewerIndex());
+      entryDisplay.write(writer, entry, it.getViewerIndex(), context);
     }
   }
 
   public interface EntryDisplay<T> {
 
-    void write(TextWriter writer, T entry, int viewerIndex);
+    void write(TextWriter writer, T entry, int viewerIndex, Context context);
   }
 
   public interface IndexFormatter<T> {

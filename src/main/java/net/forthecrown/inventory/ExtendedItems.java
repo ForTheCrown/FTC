@@ -2,6 +2,7 @@ package net.forthecrown.inventory;
 
 import net.forthecrown.core.module.OnEnable;
 import net.forthecrown.core.registry.Registries;
+import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.inventory.weapon.RoyalSword;
 import net.forthecrown.inventory.weapon.RoyalSwordType;
 import net.forthecrown.utils.inventory.ItemStacks;
@@ -53,6 +54,13 @@ public final class ExtendedItems {
         ExtendedItemFix.fixCrown(meta);
       }
     });
+
+    var type = getType(item);
+    if (type == ROYAL_SWORD || type == CROWN) {
+      item.addEnchantment(FtcEnchants.SOUL_BOND, 1);
+      var i = type.get(item);
+      i.update(item);
+    }
   }
 
   public static boolean shouldRemainInInventory(ItemStack itemStack) {

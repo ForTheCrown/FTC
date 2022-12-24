@@ -113,7 +113,13 @@ public class ShulkerController {
           }
 
           Vector3d dist = data.target.sub(data.beamOrigin);
-          data.firingTicks = dist.length() / EvokerConfig.shulker_firingSpeed;
+          double length = dist.length();
+
+          if (length > EvokerConfig.shulker_fastFireDist) {
+            data.firingTicks = length / EvokerConfig.shulker_fastFireSpeed;
+          } else {
+            data.firingTicks = length / EvokerConfig.shulker_firingSpeed;
+          }
 
           // beamStep is the large step the beam will take every
           // tick towards the player

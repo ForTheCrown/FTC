@@ -7,10 +7,12 @@ import net.forthecrown.core.Messages;
 import net.forthecrown.core.Worlds;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.npc.Npcs;
+import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Tasks;
+import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.ChatParser;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -122,7 +124,13 @@ public class CoreListener implements Listener {
     for (int i = 0; i < inventory.getSize(); i++) {
       ItemStack item = inventory.getItem(i);
 
-      if (ExtendedItems.shouldRemainInInventory(item)) {
+      if (ItemStacks.isEmpty(item)) {
+        continue;
+      }
+
+      if (ExtendedItems.shouldRemainInInventory(item)
+          || item.containsEnchantment(FtcEnchants.SOUL_BOND)
+      ) {
         items.put(i, item);
       }
     }
@@ -130,7 +138,7 @@ public class CoreListener implements Listener {
     event.getDrops().removeAll(items.values());
 
     Tasks.runLater(() -> {
-      PlayerInventory inv = user.getPlayer().getInventory();
+      PlayerInventory inv = user.getInventory();
 
       for (var e : items.int2ObjectEntrySet()) {
         inv.setItem(e.getIntKey(), e.getValue());

@@ -8,6 +8,7 @@ import net.forthecrown.utils.math.WorldBounds3i;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -16,9 +17,15 @@ import org.spongepowered.math.vector.Vector3d;
 public final class EvokerEffects {
   private EvokerEffects() {}
 
-  public static final ParticleBuilder IMPACT_PARTICLE = new ParticleBuilder(
-      Particle.CAMPFIRE_SIGNAL_SMOKE)
-      .count(5);
+  public static final ParticleBuilder IMPACT_PARTICLE
+      = new ParticleBuilder(Particle.CAMPFIRE_SIGNAL_SMOKE).count(5);
+
+  public static final Sound THUNDER = Sound.sound(
+      org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
+      SoundCategory.MASTER,
+      2.0F,
+      1.0F
+  );
 
   public static void impactEffect(World world, Vector3d pos) {
     for (int i = 0; i < EvokerConfig.impact_stepCount; i++) {
@@ -130,5 +137,15 @@ public final class EvokerEffects {
     for (Player p : room.getPlayers()) {
       p.playSound(sound);
     }
+  }
+
+  public static void lightning(EvokerBoss boss) {
+    var pos = boss.getBossEntity().getLocation();
+    boss.getRoom().getPlayers().forEach(player -> {
+      player.playSound(THUNDER, pos.x(), pos.y(), pos.z());
+    });
+
+    var world = boss.getSpawn().getWorld();
+    world.strikeLightningEffect(boss.getSpawn());
   }
 }

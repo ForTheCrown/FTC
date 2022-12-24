@@ -82,17 +82,14 @@ public class TestScript extends UsageTest {
   @Override
   public void postTests(Player player, CheckHolder holder) {
     try (var script = Script.read(this.script)) {
-      if (script.hasMethod("onTestsPassed")) {
-        script.invoke("onTestsPassed",
-            Users.get(player)
-        );
-      }
+      script.invokeIfExists("onTestsPassed", Users.get(player));
     }
   }
 
   @UsableConstructor(ConstructType.PARSE)
   public static TestScript parse(StringReader reader, CommandSource source)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     return new TestScript(Arguments.SCRIPT.parse(reader));
   }
 

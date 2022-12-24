@@ -26,14 +26,15 @@ public abstract class FtcCommand extends AbstractCommand {
     // don't need to know what kinds of commands we have
     permissionMessage(Messages.UNKNOWN_COMMAND);
 
-    setPermission(Permissions.COMMAND_PREFIX + getName());
+    setPermission(Permissions.registerCmd(name));
     setDescription("An FTC command");
 
     Commands.BY_NAME.put(getName(), this);
   }
 
   protected static User getUserSender(CommandContext<CommandSource> c)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     return Users.get(c.getSource().asPlayer());
   }
 }

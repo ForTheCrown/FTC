@@ -16,10 +16,10 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
-import net.forthecrown.utils.inventory.menu.context.ClickContext;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.inventory.menu.Slot;
+import net.forthecrown.utils.inventory.menu.ClickContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.menu.page.ListPage;
-import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class GuildDiscoveryMenu extends ListPage<Guild> {
+  public static final Slot PUBLIC_ONLY_SLOT = Slot.of(53);
 
   private final StatisticsMenu statisticsMenu;
 
@@ -52,14 +53,44 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
     for (var s : DiscoverySort.values()) {
       builder.add(s.getSlot(), s.toInvOption());
     }
+
+    builder.add(PUBLIC_ONLY_SLOT,
+        MenuNode.builder()
+            .setItem((user, context) -> {
+              boolean enabled = user.get(Properties.G_DISC_PUBLIC_ONLY);
+
+              var item = ItemStacks.builder(Material.KNOWLEDGE_BOOK)
+                  .setName("&eDisplay only public guilds")
+                  .addLore("&7Toggle whether private guilds should be shown");
+
+              if (enabled) {
+                item.addEnchant(Enchantment.BINDING_CURSE, 1)
+                    .addFlags(ItemFlag.HIDE_ENCHANTS);
+              }
+
+              return item.build();
+            })
+
+            .setRunnable((user, context, click) -> {
+              user.flip(Properties.G_DISC_PUBLIC_ONLY);
+              click.shouldReloadMenu(true);
+            })
+
+            .build()
+    );
   }
 
   @Override
-  protected List<Guild> getList(User user, InventoryContext context) {
+  protected List<Guild> getList(User user, Context context) {
     List<Guild> list = GuildManager.get().getGuilds();
 
     boolean invert = user.get(Properties.G_DISC_SORT_INVERTED);
     DiscoverySort sort = user.get(Properties.DISCOVERY_SORT);
+
+    if (user.get(Properties.G_DISC_PUBLIC_ONLY)) {
+      list.removeIf(guild -> !guild.getSettings().isPublic());
+    }
+
     list.sort(invert ? sort.reversed() : sort);
 
     return list;
@@ -68,7 +99,7 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
   @Override
   protected ItemStack getItem(User user,
                               Guild entry,
-                              InventoryContext context
+                              Context context
   ) {
     var builder = ItemStacks.toBuilder(
         entry.getSettings().getBanner().clone()
@@ -82,20 +113,14 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
 
     if (Objects.equals(entry, user.getGuild())) {
       builder.addEnchant(Enchantment.BINDING_CURSE, 1)
-          .addFlags(ItemFlag.HIDE_ENCHANTS)
-          .addLore("Your guild!");
+          .addFlags(ItemFlag.HIDE_ENCHANTS);
     }
-
-    var leader = entry.getLeader().getUser();
 
     var writer = TextWriters.loreWriter();
     writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
     writer.setFieldValueStyle(Style.style(NamedTextColor.WHITE));
 
-    writer.field("Leader", leader.displayName());
-    writer.field("Total Exp", Text.formatNumber(entry.getTotalExp()));
-    writer.field("Created", Text.formatDate(entry.getCreationTimeStamp()));
-    writer.field("Members", Text.formatNumber(entry.getMemberSize()));
+    entry.writeDiscoverInfo(writer, user);
 
     builder.addLore(writer.getLore());
     builder.addLore("")
@@ -107,7 +132,7 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
   @Override
   protected void onClick(User user,
                          Guild entry,
-                         InventoryContext context,
+                         Context context,
                          ClickContext click
   ) throws CommandSyntaxException {
     context.set(GUILD, entry);
@@ -121,7 +146,7 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
 
   @Override
   public @Nullable ItemStack createItem(@NotNull User user,
-                                        @NotNull InventoryContext context
+                                        @NotNull Context context
   ) {
     return ItemStacks.builder(Material.COMPASS)
         .setName("&eGuild Discovery Menu")
@@ -129,7 +154,7 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
   }
 
   @Override
-  public void onClick(User user, InventoryContext context, ClickContext click)
+  public void onClick(User user, Context context, ClickContext click)
       throws CommandSyntaxException
   {
     setPage(0, context);

@@ -10,7 +10,7 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
-import net.forthecrown.utils.inventory.menu.context.InventoryContext;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.menu.page.MenuPage;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -55,7 +55,7 @@ public class UpgradesMenu extends MenuPage {
   }
 
   @Override
-  public @Nullable ItemStack createItem(@NotNull User user, @NotNull InventoryContext context) {
+  public @Nullable ItemStack createItem(@NotNull User user, @NotNull Context context) {
     return ItemStacks.builder(Material.GOLDEN_APPLE)
         .setName("&eGuild upgrades")
         .addLore("&7Upgrades that can be unlocked with Guild Exp.")

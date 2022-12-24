@@ -1,6 +1,7 @@
 package net.forthecrown.guilds;
 
 import static net.forthecrown.guilds.GuildRank.ID_LEADER;
+import static net.forthecrown.guilds.GuildSettings.UNLIMITED_MEMBERS;
 import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.Component.text;
 
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import net.forthecrown.commands.guild.GuildInvite;
@@ -29,6 +31,8 @@ import net.forthecrown.user.Users;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.Text;
+import net.forthecrown.utils.text.writer.TextWriter;
+import net.forthecrown.utils.text.writer.TextWriters;
 import net.forthecrown.waypoint.Waypoint;
 import net.forthecrown.waypoint.WaypointProperties;
 import net.forthecrown.waypoint.Waypoints;
@@ -39,6 +43,10 @@ import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.event.HoverEventSource;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -46,7 +54,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
-public class Guild implements ForwardingAudience, InventoryHolder {
+public class Guild
+    implements ForwardingAudience,
+    InventoryHolder,
+    HoverEventSource<Component>
+{
 
   // Json keys
   static final String
@@ -106,9 +118,25 @@ public class Guild implements ForwardingAudience, InventoryHolder {
     refreshGuildChest();
   }
 
-  public Component getFormattedCreationDate() {
-    return Text.formatDate(creationTimeStamp);
+  /* ------------------------------ METHODS ------------------------------- */
+
+  public void moveWaypoint(Waypoint waypoint, User user) {
+    var current = getSettings().getWaypoint();
+
+    if (current != null) {
+      current.set(WaypointProperties.GUILD_OWNER, null);
+      Waypoints.removeIfPossible(current);
+    }
+
+    sendMessage(
+        Messages.guildSetCenter(waypoint.getPosition(), user)
+    );
+
+    getSettings().setWaypoint(waypoint.getId());
+    waypoint.set(WaypointProperties.GUILD_OWNER, getId());
   }
+
+  /* ------------------------------- CHEST -------------------------------- */
 
   public int getGuildChestSize() {
     return Upgradable.GUILD_CHEST_SIZE.currentLimit(this);
@@ -129,6 +157,8 @@ public class Guild implements ForwardingAudience, InventoryHolder {
       inventory.setContents(content);
     }
   }
+
+  /* ------------------------------ EFFECTS ------------------------------- */
 
   public boolean hasActiveEffect(UnlockableChunkUpgrade effect) {
     return activeEffects.contains(effect);
@@ -157,21 +187,7 @@ public class Guild implements ForwardingAudience, InventoryHolder {
         .collect(ObjectOpenHashSet.toSet());
   }
 
-  public void moveWaypoint(Waypoint waypoint, User user) {
-    var current = getSettings().getWaypoint();
-
-    if (current != null) {
-      current.set(WaypointProperties.GUILD_OWNER, null);
-      Waypoints.removeIfPossible(current);
-    }
-
-    sendMessage(
-        Messages.guildSetCenter(waypoint.getPosition(), user)
-    );
-
-    getSettings().setWaypoint(waypoint.getId());
-    waypoint.set(WaypointProperties.GUILD_OWNER, getId());
-  }
+  /* --------------------------- NAMING/DISPLAY --------------------------- */
 
   public String getName() {
     return this.settings.getName();
@@ -185,6 +201,7 @@ public class Guild implements ForwardingAudience, InventoryHolder {
         )
 
         .clickEvent(ClickEvent.runCommand("/g info " + getName()))
+        .hoverEvent(this)
         .build();
   }
 
@@ -193,9 +210,83 @@ public class Guild implements ForwardingAudience, InventoryHolder {
   }
 
   @Override
+  public void sendMessage(@NotNull Identified source, @NotNull Component message,
+                          @NotNull MessageType type
+  ) {
+    sendMessage(source.identity(), message, type);
+  }
+
+  @Override
+  public void sendMessage(@NotNull Identity source, @NotNull Component message,
+                          @NotNull MessageType type
+  ) {
+    // Prepend guild prefix
+    getOnlineMembers().forEach(user -> {
+      user.sendMessage(
+          source,
+          text().append(getPrefix(), message).build(),
+          type
+      );
+    });
+  }
+
+  @Override
+  public @NotNull HoverEvent<Component> asHoverEvent(
+      @NotNull UnaryOperator<Component> op
+  ) {
+    var writer = TextWriters.newWriter();
+    writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
+    writeHover(writer);
+
+    return writer.asComponent()
+        .asHoverEvent(op);
+  }
+
+  public void writeDiscoverInfo(TextWriter writer, User viewer) {
+    if (Objects.equals(viewer.getGuild(), this)) {
+      writer.line("Your guild!", NamedTextColor.YELLOW);
+    }
+
+    writer.line(
+        settings.isPublic()
+            ? text("Guild Public", NamedTextColor.GREEN)
+            : text("Guild Private", NamedTextColor.RED)
+    );
+    writer.newLine();
+    writer.newLine();
+
+    writeHover(writer);
+  }
+
+  public void writeHover(TextWriter writer) {
+    User leader = getLeader().getUser();
+
+    writer.field("Leader", leader.displayName());
+    writer.field("Total Exp", Text.formatNumber(getTotalExp()));
+    writer.field("Created", Text.formatDate(getCreationTimeStamp()));
+    writer.field("Members", Text.formatNumber(getMemberSize()));
+
+    if (!settings.hasFlags(UNLIMITED_MEMBERS)) {
+      writer.write(
+          "/" + Text.NUMBER_FORMAT.format(Upgradable.MAX_MEMBERS.currentLimit(this)),
+          writer.getFieldValueStyle()
+      );
+    }
+
+    var waypoint = getSettings().getWaypoint();
+    if (waypoint == null) {
+      writer.field("Waypoint", "Not set");
+    } else {
+      writer.field("Waypoint", "/vr " + getName());
+    }
+  }
+
+  @Override
   public @NotNull Iterable<? extends Audience> audiences() {
     return getOnlineMembers();
   }
+
+  /* ------------------------------ MEMBERS ------------------------------- */
 
   public long getTotalTodayExp() {
     return this.members.values()
@@ -299,7 +390,8 @@ public class Guild implements ForwardingAudience, InventoryHolder {
   }
 
   public boolean isFull() {
-    return getMemberSize() >= Upgradable.MAX_MEMBERS.currentLimit(this);
+    return !getSettings().hasFlags(UNLIMITED_MEMBERS)
+        && getMemberSize() >= Upgradable.MAX_MEMBERS.currentLimit(this);
   }
 
   public void rename(String name) {
@@ -364,27 +456,6 @@ public class Guild implements ForwardingAudience, InventoryHolder {
 
   public void removeMsgBoardPost(GuildMessage post) {
     this.msgBoardPosts.remove(post);
-  }
-
-  @Override
-  public void sendMessage(@NotNull Identified source, @NotNull Component message,
-                          @NotNull MessageType type
-  ) {
-    sendMessage(source.identity(), message, type);
-  }
-
-  @Override
-  public void sendMessage(@NotNull Identity source, @NotNull Component message,
-                          @NotNull MessageType type
-  ) {
-    // Prepend guild prefix
-    getOnlineMembers().forEach(user -> {
-      user.sendMessage(
-          source,
-          text().append(getPrefix(), message).build(),
-          type
-      );
-    });
   }
 
   /* --------------------------- SERIALIZATION ---------------------------- */
@@ -486,5 +557,4 @@ public class Guild implements ForwardingAudience, InventoryHolder {
 
     return id.equals(other.getId());
   }
-
 }

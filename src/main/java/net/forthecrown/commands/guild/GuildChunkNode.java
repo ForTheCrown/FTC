@@ -128,7 +128,8 @@ class GuildChunkNode extends GuildCommandNode {
   }
 
   private int claimChunk(CommandContext<CommandSource> c, GuildProvider provider)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     var guild = provider.get(c);
     var user = getUserSender(c);
 
@@ -138,7 +139,7 @@ class GuildChunkNode extends GuildCommandNode {
     int maxChunks = Upgradable.MAX_CHUNKS.currentLimit(guild);
     var manager = GuildManager.get();
 
-    if (manager.getGuildChunkAmount(guild) >= maxChunks) {
+    if (!manager.canClaimMore(guild)) {
       throw Exceptions.cannotClaimMoreChunks(guild, maxChunks);
     }
 
@@ -158,7 +159,8 @@ class GuildChunkNode extends GuildCommandNode {
   }
 
   private int unclaimChunk(CommandContext<CommandSource> c, GuildProvider provider)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     var guild = provider.get(c);
     var user = getUserSender(c);
 
