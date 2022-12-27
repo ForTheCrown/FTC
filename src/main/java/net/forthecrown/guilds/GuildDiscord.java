@@ -332,6 +332,8 @@ public class GuildDiscord {
 
       forEachDiscordMember(manager::removePermissionOverride);
 
+      webHookMessage(channel, CHANNEL_OPENING_MESSAGE, false);
+
       manager.submit();
       lastChannelUpdate = System.currentTimeMillis();
     });
