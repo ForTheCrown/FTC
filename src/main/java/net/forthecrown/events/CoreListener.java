@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 public class CoreListener implements Listener {
@@ -126,13 +127,7 @@ public class CoreListener implements Listener {
       int index = it.nextIndex();
       var item = it.next();
 
-      // IDK why, but item.containsEnchantment() doesn't work
-      // for this, I guess because custom enchantment or something
-      var enchants = item.getEnchantments();
-
-      if (ExtendedItems.shouldRemainInInventory(item)
-          || enchants.containsKey(FtcEnchants.SOUL_BOND)
-      ) {
+      if (shouldRemainAfterDeath(item)) {
         items.put(index, item);
       }
     }
@@ -150,5 +145,22 @@ public class CoreListener implements Listener {
         inv.setItem(e.getIntKey(), e.getValue());
       }
     }, 1);
+  }
+
+  private boolean shouldRemainAfterDeath(ItemStack item) {
+    // IDK why, but item.containsEnchantment() doesn't work
+    // for this, I guess because custom enchantment or something
+    var enchants = item.getEnchantments();
+
+    if (item.getItemMeta() instanceof EnchantmentStorageMeta storageMeta) {
+      var storedEnchants = storageMeta.getStoredEnchants();
+
+      if (storedEnchants.containsKey(FtcEnchants.SOUL_BOND)) {
+        return true;
+      }
+    }
+
+    return ExtendedItems.shouldRemainInInventory(item)
+        || enchants.containsKey(FtcEnchants.SOUL_BOND);
   }
 }

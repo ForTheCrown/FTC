@@ -13,6 +13,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class FtcEnchants {
@@ -70,18 +71,28 @@ public class FtcEnchants {
   }
 
   public static void addEnchant(ItemMeta meta, FtcEnchant enchant, int level) {
-    meta.addEnchant(enchant, level, true);
+    if (meta instanceof EnchantmentStorageMeta storageMeta) {
+      storageMeta.addStoredEnchant(enchant, level, true);
+    } else {
+      meta.addEnchant(enchant, level, true);
+    }
 
     List<Component> lore = new ArrayList<>();
 
-    lore.add(
-        enchant.displayName(level)
-            .color(NamedTextColor.GRAY)
-            .decoration(TextDecoration.ITALIC, false)
-    );
+    Component displayName = enchant.displayName(level)
+        .color(NamedTextColor.GRAY)
+        .decoration(TextDecoration.ITALIC, false);
 
-    if (meta.lore() != null) {
-      lore.addAll(meta.lore());
+    lore.add(displayName);
+
+    List<Component> existing = meta.lore();
+    if (existing != null && !existing.isEmpty()) {
+      existing.removeIf(component -> {
+        return component.contains(displayName)
+            || displayName.contains(component);
+      });
+
+      lore.addAll(existing);
     }
 
     meta.lore(lore);

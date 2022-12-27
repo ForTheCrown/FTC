@@ -1,18 +1,28 @@
 package net.forthecrown.events;
 
 import com.destroystokyo.paper.ParticleBuilder;
+import com.destroystokyo.paper.event.inventory.PrepareGrindstoneEvent;
+import it.unimi.dsi.fastutil.objects.ObjectIntPair;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import net.forthecrown.dungeons.enchantments.FtcEnchant;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.utils.Cooldown;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.utils.text.Text;
+import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
@@ -28,6 +38,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -51,34 +63,121 @@ public class EnchantListeners implements Listener {
       return;
     }
 
-    var enchants = first.getEnchantments();
+    var resMeta = result.getItemMeta();
+    Mutable<Boolean> pointer = new MutableBoolean();
+
+    addEnchants(resMeta, first, second, pointer);
+    //addEnchants(resMeta, second, first, pointer);
+
+    if (pointer.getValue()) {
+      event.setResult(null);
+      return;
+    }
+
+    result.setItemMeta(resMeta);
+    event.setResult(result);
+  }
+
+  private void addEnchants(ItemMeta resMeta, ItemStack first, ItemStack second, Mutable<Boolean> pointer) {
+    Map<Enchantment, Integer> enchants;
+    var meta = second.getItemMeta();
+
+    if (meta instanceof EnchantmentStorageMeta me) {
+      enchants = me.getStoredEnchants();
+    } else {
+      enchants = meta.getEnchants();
+    }
+
+    boolean combiningEnchants = first.getType() == second.getType();
+    boolean book = second.getType() == Material.ENCHANTED_BOOK;
 
     for (var e : enchants.entrySet()) {
       if (!(e.getKey() instanceof FtcEnchant enchant)) {
         continue;
       }
 
-      int level = e.getValue();
-
-      if (!enchant.canEnchantItem(second)) {
-        result.editMeta(meta -> {
-          if (!meta.hasLore()) {
+      if (combiningEnchants) {
+        if (!book && !enchant.canEnchantItem(first)) {
+          if (enchants.size() == 1) {
+            pointer.setValue(true);
             return;
           }
 
-          var lore = meta.lore();
-          lore.removeIf(c -> c.contains(enchant.displayName(level)));
-
-          meta.lore(lore);
-        });
+          continue;
+        }
+      } else if (!enchant.canEnchantItem(first)) {
+        if (enchants.size() == 1) {
+          pointer.setValue(true);
+          return;
+        }
 
         continue;
       }
 
-      result.addUnsafeEnchantment(enchant, level);
+      int level = e.getValue();
+      FtcEnchants.addEnchant(resMeta, enchant, level);
+    }
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onPrepareGrindstone(PrepareGrindstoneEvent event) {
+    if (ItemStacks.isEmpty(event.getResult())) {
+      return;
     }
 
+    List<ObjectIntPair<FtcEnchant>> removing = new ArrayList<>();
+
+    var lower = event.getInventory().getLowerItem();
+    var upper = event.getInventory().getUpperItem();
+
+    if (ItemStacks.notEmpty(lower)) {
+      count(removing, lower);
+    }
+
+    if (ItemStacks.notEmpty(upper)) {
+      count(removing, upper);
+    }
+
+    if (removing.isEmpty()) {
+      return;
+    }
+
+    var result = event.getResult();
+    var meta = result.getItemMeta();
+
+    var lore = meta.lore();
+
+    if (lore == null || lore.isEmpty()) {
+      return;
+    }
+
+    List<Component> finalLore = new ArrayList<>(lore);
+
+    removing.stream()
+        .map(pair -> pair.left().displayName(pair.rightInt()))
+        .map(Text::plain)
+        .forEach(plain -> {
+          finalLore.removeIf(component1 -> {
+            String lorePlain = Text.plain(component1);
+
+            return lorePlain.contains(plain)
+                || plain.contains(lorePlain);
+          });
+        });
+
+    meta.lore(finalLore);
+    result.setItemMeta(meta);
     event.setResult(result);
+  }
+
+  private void count(List<ObjectIntPair<FtcEnchant>> enchants, ItemStack item) {
+    for (var e: item.getEnchantments().entrySet()) {
+      if (!(e.getKey() instanceof FtcEnchant enc)) {
+        continue;
+      }
+
+      enchants.add(ObjectIntPair.of(enc, e.getValue()));
+    }
   }
 
   @EventHandler(ignoreCancelled = true)

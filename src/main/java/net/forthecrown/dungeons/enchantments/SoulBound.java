@@ -1,11 +1,11 @@
 package net.forthecrown.dungeons.enchantments;
 
-import java.util.EnumSet;
 import java.util.Set;
 import net.forthecrown.core.registry.Keys;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraft.world.item.enchantment.Enchantments;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class SoulBound extends FtcEnchant {
@@ -14,8 +14,8 @@ public class SoulBound extends FtcEnchant {
     super(
         Keys.forthecrown("soulbound"),
         "Soulbound",
-        EnchantmentCategory.VANISHABLE,
-        EquipmentSlot.values()
+        Enchantments.UNBREAKING.category,
+        Enchantments.UNBREAKING.slots
     );
   }
 
@@ -26,11 +26,16 @@ public class SoulBound extends FtcEnchant {
 
   @Override
   public @NotNull EnchantmentTarget getItemTarget() {
-    return EnchantmentTarget.ALL;
+    return Enchantment.DURABILITY.getItemTarget();
   }
 
   @Override
   public @NotNull Set<org.bukkit.inventory.EquipmentSlot> getActiveSlots() {
-    return EnumSet.allOf(org.bukkit.inventory.EquipmentSlot.class);
+    return Enchantment.DURABILITY.getActiveSlots();
+  }
+
+  @Override
+  public boolean canEnchantItem(@NotNull ItemStack stack) {
+    return Enchantment.DURABILITY.canEnchantItem(stack);
   }
 }

@@ -12,7 +12,9 @@ import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.CompletionProvider;
 import net.forthecrown.grenadier.types.EnchantArgument;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 public class EnchantmentNode extends ItemModifierNode {
 
@@ -97,16 +99,33 @@ public class EnchantmentNode extends ItemModifierNode {
     var item = getHeld(c.getSource());
     var enchantment = getEnchantment(c);
 
+    if (item.getType() == Material.BOOK) {
+      item.setType(Material.ENCHANTED_BOOK);
+    }
+
     if (item.getEnchantmentLevel(enchantment) >= level) {
       throw Exceptions.ENCH_MUST_BE_BETTER;
     }
 
-    if (enchantment instanceof FtcEnchant ftcEnchant) {
-      FtcEnchants.addEnchant(item, ftcEnchant, level);
+    var meta = item.getItemMeta();
+
+    if (meta instanceof EnchantmentStorageMeta storageMeta) {
+
+      if (enchantment instanceof FtcEnchant ftcEnchant) {
+        FtcEnchants.addEnchant(meta, ftcEnchant, level);
+      } else {
+        storageMeta.addStoredEnchant(enchantment, level, true);
+      }
+
     } else {
-      item.addUnsafeEnchantment(enchantment, level);
+      if (enchantment instanceof FtcEnchant ftcEnchant) {
+        FtcEnchants.addEnchant(meta, ftcEnchant, level);
+      } else {
+        meta.addEnchant(enchantment, level, true);
+      }
     }
 
+    item.setItemMeta(meta);
     c.getSource().sendAdmin(Messages.addedEnchant(enchantment, level));
     return 0;
   }

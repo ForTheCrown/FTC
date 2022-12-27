@@ -29,6 +29,7 @@ import net.forthecrown.dungeons.boss.evoker.phases.AttackPhase;
 import net.forthecrown.dungeons.boss.evoker.phases.AttackPhases;
 import net.forthecrown.dungeons.boss.evoker.phases.SummonPhase;
 import net.forthecrown.dungeons.boss.evoker.phases.SwarmPhase;
+import net.forthecrown.dungeons.enchantments.FtcEnchants;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.TickSequence;
 import net.forthecrown.utils.Util;
@@ -45,6 +46,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.core.util.ObjectArrayIterator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.boss.BarColor;
@@ -60,6 +62,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTables;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Scoreboard;
@@ -378,6 +381,15 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
           )
       );
     }
+
+    ItemStack enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
+    FtcEnchants.addEnchant(enchantedBook, FtcEnchants.SOUL_BOND, 1);
+
+    Util.giveOrDropItem(
+        player.getInventory(),
+        player.getLocation(),
+        enchantedBook
+    );
   }
 
   public EvokerState getState() {

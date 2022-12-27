@@ -12,13 +12,13 @@ import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
 public class PacketListenerChannelHandler extends ChannelDuplexHandler {
-
   private final Player player;
 
   // Server bound packets
   @Override
   public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg)
-      throws Exception {
+      throws Exception
+  {
     // Call packet listeners, if call() returns true
     // packet shouldn't be read
     if (msg instanceof Packet<?> packet) {
@@ -34,7 +34,7 @@ public class PacketListenerChannelHandler extends ChannelDuplexHandler {
       }
 
       if (call.getReplacementPacket() != null) {
-        super.channelRead(ctx, call.getReplacementPacket());
+        ctx.fireChannelRead(call.getReplacementPacket());
         return;
       }
     }
@@ -48,22 +48,25 @@ public class PacketListenerChannelHandler extends ChannelDuplexHandler {
       throws Exception {
     // Call packet listeners, if call() returns true
     // packet shouldn't be written
-    if (msg instanceof Packet<?> packet) {
-      var call = call(packet, player);
+    if (!(msg instanceof Packet<?> packet)) {
+      super.write(ctx, msg, promise);
+      return;
+    }
 
-      if (call == null) {
-        super.write(ctx, msg, promise);
-        return;
-      }
+    var call = call(packet, player);
 
-      if (call.isCancelled()) {
-        return;
-      }
+    if (call == null) {
+      super.write(ctx, msg, promise);
+      return;
+    }
 
-      if (call.getReplacementPacket() != null) {
-        super.write(ctx, call.getReplacementPacket(), promise);
-        return;
-      }
+    if (call.isCancelled()) {
+      return;
+    }
+
+    if (call.getReplacementPacket() != null) {
+      ctx.write(call.getReplacementPacket(), promise);
+      return;
     }
 
     super.write(ctx, msg, promise);
