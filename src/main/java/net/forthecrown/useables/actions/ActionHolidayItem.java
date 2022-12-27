@@ -47,7 +47,10 @@ public class ActionHolidayItem extends UsageAction {
       return;
     }
 
-    ItemStack item = holidays.getRewardItem(holiday, Users.get(player), ZonedDateTime.now());
+    ItemStack item = holiday.getRewardItem(
+        Users.get(player),
+        ZonedDateTime.now()
+    );
 
     if (ItemStacks.isEmpty(item)) {
       FTC.getLogger().warn("Cannot give rewards for '{}', reward item is empty", holidayName);

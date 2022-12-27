@@ -167,6 +167,15 @@ public @UtilityClass class Guilds {
     if (GuildManager.get().getGuild(name) != null) {
       throw Exceptions.format("Name '{0}' is already taken", name);
     }
+
+    // If the guild has a discord channel, then we test if it's been archived
+    // by testing if it has '-Archived' in the name, stupid ik
+    if (name.contains("-Archived")) {
+      throw Exceptions.format(
+          "Due to poor planning, '-Archived' may not be "
+              + "used in a guild's name"
+      );
+    }
   }
 
   /* ----------------------------- GRADIENT ------------------------------- */

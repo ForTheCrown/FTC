@@ -1,6 +1,8 @@
 package net.forthecrown.commands.guild;
 
 import static net.forthecrown.guilds.GuildRank.ID_LEADER;
+import static net.forthecrown.guilds.GuildSettings.GUILD_CHANNEL;
+import static net.forthecrown.guilds.GuildSettings.ROLE_COLOR;
 import static net.forthecrown.guilds.GuildSettings.UNLIMITED_CHUNKS;
 import static net.forthecrown.guilds.GuildSettings.UNLIMITED_MEMBERS;
 
@@ -31,6 +33,7 @@ class GuildSetNode extends GuildCommandNode {
 
   public GuildSetNode() {
     super("guildset", "set");
+    setAliases("gset");
   }
 
   @Override
@@ -40,6 +43,10 @@ class GuildSetNode extends GuildCommandNode {
 
     writer.field("set waypoint", "Sets your guilds waypoint to the one " +
         "you're looking at, or the one you're close to"
+    );
+
+    writer.field("set discordAnnouncements", "Set whether announcements"
+        + " are sent to the guild's discord channel"
     );
 
     if (source.hasPermission(Permissions.GUILD_ADMIN)) {
@@ -81,6 +88,16 @@ class GuildSetNode extends GuildCommandNode {
     command
         .then(flagArgument("unlimitedMembers", UNLIMITED_MEMBERS))
         .then(flagArgument("unlimitedChunks", UNLIMITED_CHUNKS))
+        .then(flagArgument("roleColorFlag", ROLE_COLOR))
+        .then(flagArgument("guildChannelFlag", GUILD_CHANNEL))
+
+        .then(donatorArg("roleColor", ROLE_COLOR))
+        .then(donatorArg("guildChannel", GUILD_CHANNEL))
+
+        .then(createGuildCommand(
+            "discordAnnouncements",
+            this::discordAnnouncements
+        ))
 
         .then(literal("name")
             .then(nameArg)
@@ -91,6 +108,25 @@ class GuildSetNode extends GuildCommandNode {
         )
 
         .then(waypointArg);
+  }
+
+  private LiteralArgumentBuilder<CommandSource> donatorArg(String name, int flag) {
+    return literal(name)
+        .requires(source -> source.hasPermission(Permissions.GUILD_ADMIN))
+
+        .then(argument("player", Arguments.USER)
+            .executes(c -> {
+              var player = Arguments.getUser(c, "player");
+              var guild = player.getGuild();
+
+              if (guild == null) {
+                throw Exceptions.NOT_IN_GUILD;
+              }
+
+              guild.getSettings().addFlags(flag);
+              return 0;
+            })
+        );
   }
 
   private LiteralArgumentBuilder<CommandSource> flagArgument(String name,
@@ -155,7 +191,7 @@ class GuildSetNode extends GuildCommandNode {
 
     guild.rename(name);
 
-    guild.sendMessage(
+    guild.announce(
         Text.format("&e{0, user}&r renamed the guild to '&6{1}&r'",
             NamedTextColor.GRAY,
             user, name
@@ -218,7 +254,7 @@ class GuildSetNode extends GuildCommandNode {
 
     targetMember.setRankId(ID_LEADER);
 
-    guild.sendMessage(
+    guild.announce(
         Text.format("&e{0, user}&r has given guild leadership to &6{1, user}&r.",
             NamedTextColor.GRAY,
             user, target
@@ -290,6 +326,31 @@ class GuildSetNode extends GuildCommandNode {
 
     nearest.setType(WaypointTypes.GUILD);
     guild.moveWaypoint(nearest, user);
+    return 0;
+  }
+
+  private int discordAnnouncements(CommandContext<CommandSource> c,
+                                   GuildProvider provider
+  ) throws CommandSyntaxException {
+    var guild = provider.get(c);
+    var user = getUserSender(c);
+
+    testPermission(user, guild,
+        GuildPermission.DISCORD,
+        Exceptions.NO_PERMISSION
+    );
+
+    boolean state = !guild.getDiscord().forwardAnnouncements();
+
+    guild.announce(
+        Text.format(
+            "&e{0, user}&r {1} message forwarding to discord.",
+            state ? NamedTextColor.GOLD : NamedTextColor.GRAY,
+            user, state ? "enabled" : "disabled"
+        )
+    );
+
+    guild.getDiscord().forwardAnnouncements(state);
     return 0;
   }
 }

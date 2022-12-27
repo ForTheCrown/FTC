@@ -14,6 +14,7 @@ import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.format.UnitFormat;
 import net.forthecrown.utils.text.format.page.Header;
@@ -60,7 +61,7 @@ public class UserMapTopCommand extends FtcCommand {
 
             // Write the server total if not
             // on first page
-            .append((it, writer) -> {
+            .append((it, writer, context) -> {
               if (!it.isFirstPage()) {
                 return;
               }
@@ -71,7 +72,7 @@ public class UserMapTopCommand extends FtcCommand {
             })
         )
 
-        .setEntry((writer, entry, viewerIndex) -> {
+        .setEntry((writer, entry, viewerIndex, context) -> {
           writer.formatted("{0} - &e{1}",
               display.apply(entry.getUniqueId()),
               unitMaker.apply(entry.getValue())
@@ -119,7 +120,10 @@ public class UserMapTopCommand extends FtcCommand {
 
     Commands.ensurePageValid(page, pageSize, map.size());
 
-    source.sendMessage(format.format(map.pageIterator(page, pageSize)));
+    source.sendMessage(format.format(
+        map.pageIterator(page, pageSize),
+        Context.EMPTY
+    ));
     return 0;
   }
 

@@ -3,9 +3,11 @@ package net.forthecrown.economy.sell;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import java.util.Arrays;
 import java.util.Iterator;
+import net.forthecrown.utils.AbstractListIterator;
 import net.forthecrown.utils.ArrayIterator;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A custom implementation of a simple map for storing item price data.
@@ -116,5 +118,50 @@ public class ItemPriceMap implements Iterable<ItemSellData> {
   @Override
   public Iterator<ItemSellData> iterator() {
     return ArrayIterator.unmodifiable(map);
+  }
+
+  public Iterator<String> keyIterator() {
+    return new AbstractListIterator<>() {
+      @Override
+      protected void add(int pos, String val) {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      protected @Nullable String get(int pos) {
+        var data = map[pos];
+
+        if (data == null) {
+          return null;
+        }
+
+        if (data.getCompactMaterial() == null
+            || data.getMaterial().ordinal() == pos
+        ) {
+          return data.getMaterial()
+              .name()
+              .toLowerCase();
+        }
+
+        return data.getCompactMaterial()
+            .name()
+            .toLowerCase();
+      }
+
+      @Override
+      protected void set(int pos, @Nullable String val) {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      protected void remove(int pos) {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      protected int size() {
+        return ItemPriceMap.this.map.length;
+      }
+    };
   }
 }

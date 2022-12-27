@@ -181,7 +181,7 @@ class GuildChunkNode extends GuildCommandNode {
       user.sendMessage(Messages.CHUNK_UNCLAIMED);
     }
 
-    guild.sendMessage(
+    guild.announce(
         Messages.guildUnclaimAnnouncement(
             Vector2i.from(pos.x << Vectors.CHUNK_BITS, pos.z << Vectors.CHUNK_BITS),
             user
@@ -197,7 +197,7 @@ class GuildChunkNode extends GuildCommandNode {
       if (wChunk.equals(pos)) {
         Guilds.yeetWaypoint(guild);
 
-        guild.sendMessage(
+        guild.announce(
             Messages.GUILD_WAYPOINT_LOST
         );
       }
@@ -220,7 +220,7 @@ class GuildChunkNode extends GuildCommandNode {
     LongSet allChunks = manager.getGuildChunks(guild);
     allChunks.forEach(value -> manager.removeChunkOwner(guild, value));
 
-    guild.sendMessage(Messages.guildUnclaimAllAnnouncement(user));
+    guild.announce(Messages.guildUnclaimAllAnnouncement(user));
     user.sendMessage(Messages.guildUnclaimAll(guild));
 
     return 0;

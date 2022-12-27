@@ -49,7 +49,7 @@ public class GuildInvite {
     var guild = getGuild();
     var user = getReceiver();
 
-    guild.sendMessage(Messages.REQUEST_CANCELLED);
+    guild.announce(Messages.REQUEST_CANCELLED);
     user.sendMessage(Messages.requestCancelled(guild.displayName()));
 
     delete();

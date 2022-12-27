@@ -525,6 +525,8 @@ public class SignShop implements InventoryHolder {
       readLegacyOwner(tag.get("ownership"));
     }
 
+    history.load(tag.get(TAG_HISTORY));
+
     // Load legacy inventory
     if (tag.contains("inventory")) {
       var inventory = tag.getCompound("inventory");

@@ -1,23 +1,13 @@
 package net.forthecrown.commands.guild;
 
-import static net.kyori.adventure.text.Component.space;
-import static net.kyori.adventure.text.Component.text;
-
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.forthecrown.commands.arguments.Arguments;
-import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
-import net.forthecrown.core.admin.BannedWords;
-import net.forthecrown.core.admin.EavesDropper;
-import net.forthecrown.core.admin.Mute;
-import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.user.User;
-import net.forthecrown.user.Users;
-import net.forthecrown.user.property.Properties;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 
@@ -60,59 +50,7 @@ class GuildChatNode extends GuildCommandNode {
     Guild guild = provider.get(c);
     Component message = Arguments.getMessage(c, "message");
 
-    var mute = Punishments.checkMute(user);
-
-    if (BannedWords.checkAndWarn(user.getPlayer(), message)) {
-      mute = Mute.HARD;
-    }
-
-    EavesDropper.reportGuildChat(user, mute, guild, message);
-
-    if (!mute.isVisibleToOthers()) {
-      return 0;
-    }
-
-    Mute finalMute = mute;
-    guild.getMembers()
-        .values()
-        .stream()
-        .filter(member -> {
-          if (finalMute == Mute.SOFT) {
-            return member.getId().equals(user.getUniqueId());
-          }
-
-          var viewer = member.getUser();
-
-          if (!viewer.isOnline()) {
-            viewer.unloadIfOffline();
-            return false;
-          }
-
-          return !Users.areBlocked(user, viewer);
-        })
-
-        .forEach(member -> {
-          var viewer = member.getUser();
-          boolean showRank = viewer.get(Properties.GUILD_RANKED_TAGS);
-          var rank = guild.getSettings().getRank(member.getRankId());
-
-          Component displayName = Users.createListName(
-              user,
-              text()
-                  .append(showRank ?
-                      rank.getFormattedName().append(space())
-                      : Component.empty()
-                  )
-                  .append(user.getTabName())
-                  .build(),
-              false
-          );
-
-          viewer.sendMessage(
-              Messages.guildChat(guild, displayName, message)
-          );
-        });
-
+    guild.chat(user, message);
     return 0;
   }
 }

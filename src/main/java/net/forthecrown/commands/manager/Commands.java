@@ -73,6 +73,7 @@ import net.forthecrown.commands.economy.CommandBecomeBaron;
 import net.forthecrown.commands.economy.CommandDeposit;
 import net.forthecrown.commands.economy.CommandEditShop;
 import net.forthecrown.commands.economy.CommandPay;
+import net.forthecrown.commands.economy.CommandSell;
 import net.forthecrown.commands.economy.CommandShop;
 import net.forthecrown.commands.economy.CommandShopHistory;
 import net.forthecrown.commands.economy.CommandWithdraw;
@@ -246,6 +247,7 @@ public final class Commands {
     new CommandEditShop();
     new CommandShopHistory();
     new CommandShop();
+    new CommandSell();
 
     //teleportation commands
     new CommandTpask();

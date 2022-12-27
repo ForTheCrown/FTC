@@ -158,7 +158,7 @@ public class ScriptManager {
       var script = s.script();
 
       if (s.shouldBeActive(date)) {
-        if (script.isLoaded()) {
+        if (script.isCompiled()) {
           // Invoke the day change callback, if it exists
           script.invokeIfExists("__onDayChange", time);
 
@@ -167,7 +167,7 @@ public class ScriptManager {
 
         LOGGER.debug("Loading script {}", script.getName());
         script.load();
-      } else if (script.isLoaded()) {
+      } else if (script.isCompiled()) {
         LOGGER.debug("Closing script {}", script.getName());
         script.close();
       }

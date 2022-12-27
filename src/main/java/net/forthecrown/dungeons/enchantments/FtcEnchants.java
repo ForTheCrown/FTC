@@ -21,7 +21,7 @@ public class FtcEnchants {
   public static final HealingBlock HEALING_BLOCK = new HealingBlock();
   public static final PoisonCrit POISON_CRIT = new PoisonCrit();
   public static final StrongAim STRONG_AIM = new StrongAim();
-  public static final SoulBond SOUL_BOND = new SoulBond();
+  public static final SoulBound SOUL_BOND = new SoulBound();
 
   @OnEnable
   private static void init() {

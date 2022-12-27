@@ -72,6 +72,7 @@ public class ModuleService implements Runnable {
 
     int ran = 0;
     timing.startTiming();
+    String timingPrefix = annotationType.getSimpleName() + "::";
 
     for (var pair : getCallbacks()) {
       Method callback = pair.getSecond();
@@ -97,7 +98,7 @@ public class ModuleService implements Runnable {
         }
       }
 
-      try (Timing t = Timings.ofStart(FTC.getPlugin(), name, timing)) {
+      try (Timing t = Timings.ofStart(FTC.getPlugin(), timingPrefix + name, timing)) {
         invoke(instance, callback);
         ++ran;
 

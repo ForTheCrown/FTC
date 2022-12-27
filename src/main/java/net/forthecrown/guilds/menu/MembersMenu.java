@@ -8,14 +8,13 @@ import java.util.Arrays;
 import java.util.List;
 import net.forthecrown.guilds.GuildMember;
 import net.forthecrown.guilds.MemberSort;
-import net.forthecrown.guilds.unlockables.Upgradable;
 import net.forthecrown.user.User;
 import net.forthecrown.user.property.Properties;
+import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
-import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.inventory.menu.page.ListPage;
 import net.forthecrown.utils.inventory.menu.page.MenuPage;
 import net.forthecrown.utils.text.Text;
@@ -111,8 +110,7 @@ public class MembersMenu extends ListPage<GuildMember> {
     // This looks like a garbled mess of characters
     lore.add(Component.text("Amount: ", NamedTextColor.GOLD)
         .decoration(TextDecoration.ITALIC, false)
-        .append(Component.text(guild.getMemberSize() + "/" +
-                Upgradable.MAX_MEMBERS.currentLimit(guild))
+        .append(Text.formatNumber(guild.getMemberSize())
             .color(NamedTextColor.WHITE)));
     lore.add(Component.text("Click to view members.")
         .color(NamedTextColor.GRAY)

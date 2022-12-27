@@ -17,7 +17,7 @@ class GuildDeleteNode extends GuildCommandNode {
 
   GuildDeleteNode() {
     super("deleteguild", "delete");
-    setAliases("guilddelete");
+    setAliases("guilddelete", "gdelete");
   }
 
   @Override
@@ -52,9 +52,8 @@ class GuildDeleteNode extends GuildCommandNode {
         reason = "Closed by owner";
       }
 
+      guild.announce(Messages.guildDeletedAnnouncement(user));
       Guilds.removeAndArchive(guild, user.getName(), reason);
-
-      guild.sendMessage(Messages.guildDeletedAnnouncement(user));
 
       if (!guild.isMember(user.getUniqueId())) {
         user.sendMessage(Messages.guildDeleted(guild));

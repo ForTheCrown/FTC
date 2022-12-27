@@ -69,7 +69,7 @@ public class GuildInviteNode extends GuildCommandNode {
 
               guild.addInvite(invite);
 
-              guild.sendMessage(
+              guild.announce(
                   Messages.requestSent(
                       target,
                       Messages.crossButton(

@@ -10,8 +10,8 @@ import net.forthecrown.inventory.FtcInventory;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Cooldown;
-import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.context.Context;
+import net.forthecrown.utils.inventory.ItemStacks;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -99,6 +99,14 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
   public MenuInventory createInventory(User user, Context context) {
     var inv = new MenuInventory(this, size, title, context);
 
+    if (border != null) {
+      var item = border.createItem(user, context);
+
+      if (ItemStacks.notEmpty(item)) {
+        Menus.placeBorder(inv, item);
+      }
+    }
+
     nodes.int2ObjectEntrySet()
         .forEach(entry -> {
           Slot slot = Slot.of(entry.getIntKey());
@@ -118,14 +126,6 @@ public class Menu implements InventoryHolder, MenuCloseConsumer {
 
           inv.setItem(slot, item);
         });
-
-    if (border != null) {
-      var item = border.createItem(user, context);
-
-      if (ItemStacks.notEmpty(item)) {
-        Menus.placeBorder(inv, item);
-      }
-    }
 
     return inv;
   }

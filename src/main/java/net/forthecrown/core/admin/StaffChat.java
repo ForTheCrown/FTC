@@ -54,8 +54,7 @@ public final class StaffChat {
         .append(message)
         .build();
 
-    FtcDiscord.staffLog(C_STAFF, "{} **>** {}", Text.plain(senderText),
-        Text.LEGACY.serialize(message));
+    FtcDiscord.staffLog(C_STAFF, "{} **>** {}", Text.plain(senderText), Text.LEGACY.serialize(message));
     send(text, !cmd);
   }
 

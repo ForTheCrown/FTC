@@ -104,6 +104,19 @@ public class ChatListener implements Listener {
       return;
     }
 
+    if (user.get(Properties.G_CHAT_TOGGLE)) {
+      var guild = user.getGuild();
+
+      if (guild == null) {
+        user.set(Properties.G_CHAT_TOGGLE, false);
+      } else {
+        guild.chat(user, event.message());
+
+        event.setCancelled(true);
+        return;
+      }
+    }
+
     // If marriage chat enabled
     if (user.get(Properties.MARRIAGE_CHAT)) {
       event.setCancelled(true);

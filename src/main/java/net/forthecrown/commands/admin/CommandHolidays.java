@@ -179,7 +179,7 @@ public class CommandHolidays extends FtcCommand {
                             throw Exceptions.HOLIDAY_NO_REWARDS;
                           }
 
-                          ServerHolidays.get().runHoliday(holiday);
+                          holiday.run();
 
                           c.getSource()
                               .sendAdmin("Giving all players " + holiday.getName() + " rewards");
@@ -196,7 +196,7 @@ public class CommandHolidays extends FtcCommand {
                             throw Exceptions.HOLIDAY_NO_REWARDS;
                           }
 
-                          ServerHolidays.get().giveRewards(user, holiday);
+                          holiday.giveRewards(user);
 
                           c.getSource().sendAdmin(
                               Component.text("Gave ")
@@ -215,8 +215,9 @@ public class CommandHolidays extends FtcCommand {
                           User user = Arguments.getUser(c, "user");
                           Holiday holiday = get(c);
 
-                          ItemStack item = ServerHolidays.get()
-                              .getRewardItem(holiday, user, ZonedDateTime.now());
+                          ItemStack item = holiday.getRewardItem(
+                              user, ZonedDateTime.now()
+                          );
 
                           if (ItemStacks.isEmpty(item)) {
                             throw Exceptions.holidayNoItem(holiday);

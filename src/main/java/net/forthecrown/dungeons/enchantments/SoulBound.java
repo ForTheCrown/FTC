@@ -8,12 +8,12 @@ import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.jetbrains.annotations.NotNull;
 
-public class SoulBond extends FtcEnchant {
+public class SoulBound extends FtcEnchant {
 
-  public SoulBond() {
+  public SoulBound() {
     super(
-        Keys.forthecrown("soulbond"),
-        "Soulbond",
+        Keys.forthecrown("soulbound"),
+        "Soulbound",
         EnchantmentCategory.VANISHABLE,
         EquipmentSlot.values()
     );

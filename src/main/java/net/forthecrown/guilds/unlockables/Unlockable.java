@@ -119,8 +119,12 @@ public interface Unlockable {
     int spentAmount;
 
     // Spend all available when shift clicking, else spend EXP_COST
-    spentAmount = member.spendExp(this, context.getClickType().isShiftClick()
-        ? member.getExpAvailable() : EXP_COST);
+    spentAmount = member.spendExp(
+        this,
+        context.getClickType().isShiftClick()
+            ? member.getExpAvailable()
+            : EXP_COST
+    );
 
     // Send user message
     if (spentAmount == 0) {
@@ -141,7 +145,7 @@ public interface Unlockable {
 
     // Check if unlocked now
     if (this.isUnlocked(guild)) {
-      user.getGuild().sendMessage(
+      user.getGuild().announce(
           Text.format("&6{0}&r has been unlocked by &6{1, user}&r!",
               NamedTextColor.YELLOW,
               getName(),

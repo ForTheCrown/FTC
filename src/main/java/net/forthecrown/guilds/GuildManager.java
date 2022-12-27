@@ -171,6 +171,10 @@ public class GuildManager {
 
     storage.delete(guild.getId());
     Guilds.yeetWaypoint(guild);
+
+    var discord = guild.getDiscord();
+    discord.deleteRole();
+    discord.archiveChannel("Guild-Deleted");
   }
 
   public void addGuild(Guild guild, LongSet packedChunks) {

@@ -71,7 +71,7 @@ public class EndOpener {
     // portal should be closed
     Range<Byte> closedRange = Range.between(first, openingDay);
 
-    // idk, if it's the middle of the month, reset the end
+    // If it's the middle of the month, reset the end
     // Preferably perform the resetting asynchronously.
     int rangeDif = closedRange.getMaximum() - closedRange.getMinimum();
     int resetDay = closedRange.getMinimum() + (rangeDif / 2);

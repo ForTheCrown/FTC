@@ -25,7 +25,7 @@ public class ChunkUpgradesMenu extends MenuPage {
 
   @Override
   protected void createMenu(MenuBuilder builder) {
-    UpgradesMenu.addAll(UnlockableChunkUpgrade.values(), builder);
+    UpgradesMenu.addAll(builder, UnlockableChunkUpgrade.values());
   }
 
   @Override

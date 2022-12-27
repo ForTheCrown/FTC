@@ -60,7 +60,7 @@ class GuildKickNode extends GuildCommandNode {
       guild.removeMember(target.getUniqueId());
 
       target.sendOrMail(Messages.guildKickedTarget(guild, user));
-      guild.sendMessage(Messages.guildKickAnnouncement(user, target));
+      guild.announce(Messages.guildKickAnnouncement(user, target));
 
       if (!guild.isMember(user.getUniqueId())) {
         user.sendMessage(Messages.guildKickedSender(guild, target));

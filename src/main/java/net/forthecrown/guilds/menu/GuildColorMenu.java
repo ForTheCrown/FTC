@@ -30,11 +30,10 @@ public class GuildColorMenu extends MenuPage {
   @Override
   protected void createMenu(MenuBuilder builder) {
     UpgradesMenu.addAll(
-        primary
+        builder, primary
             ? UnlockableColor.getPrimaries()
-            : UnlockableColor.getSecondaries(),
+            : UnlockableColor.getSecondaries()
 
-        builder
     );
   }
 

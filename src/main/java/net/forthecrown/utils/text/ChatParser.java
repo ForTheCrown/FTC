@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import lombok.Getter;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
+import net.forthecrown.user.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -187,6 +188,21 @@ public class ChatParser {
    * @return
    */
   public static ChatParser of(Permissible sender) {
+    if (sender == null) {
+      return TOTAL_RENDERER;
+    }
+
+    return of(
+        sender.hasPermission(Permissions.CHAT_COLORS),
+        sender.hasPermission(Permissions.CHAT_EMOTES),
+        sender.hasPermission(Permissions.CHAT_IGNORE_CASE),
+        sender.hasPermission(Permissions.CHAT_GRADIENTS),
+        sender.hasPermission(Permissions.CHAT_LINKS),
+        sender.hasPermission(Permissions.CHAT_CLEAN_LINKS)
+    );
+  }
+
+  public static ChatParser of(User sender) {
     if (sender == null) {
       return TOTAL_RENDERER;
     }

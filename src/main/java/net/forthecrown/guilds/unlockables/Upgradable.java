@@ -250,7 +250,7 @@ public enum Upgradable implements Unlockable {
 
     // Check limit changed
     if (currentLimit != currentLimit(guild)) {
-      guild.sendMessage(getName()
+      guild.announce(getName()
           .append(Component.text(" has been upgraded by "))
           .color(NamedTextColor.YELLOW)
           .append(user.displayName())

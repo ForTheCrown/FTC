@@ -151,7 +151,7 @@ public class SwordRanks {
         .register(ranks);
 
     ModifierFunction
-        speed = i -> (i / 10) + 0.8,   // Speed = (rank / 10) + 0.8
+        speed  = i -> (i / 10) + 0.8,   // Speed = (rank / 10) + 0.8
         attack = i -> (i / 5) + 2;      // attack = (rank / 5) + 2
 
     // --- RANK 10 ---

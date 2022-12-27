@@ -23,6 +23,7 @@ import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 
 class GuildListNode extends GuildCommandNode {
   public static final ContextSet SET = ContextSet.create();
@@ -47,6 +48,7 @@ class GuildListNode extends GuildCommandNode {
       User viewer = context.getOrThrow(VIEWER);
       Component display = entry.displayName();
       TextWriter hoverWriter = TextWriters.newWriter();
+      hoverWriter.setFieldStyle(Style.style(NamedTextColor.GRAY));
       entry.writeDiscoverInfo(hoverWriter, viewer);
 
       writer.formatted("{0} - {1, number} member{2}",
@@ -61,7 +63,7 @@ class GuildListNode extends GuildCommandNode {
 
   GuildListNode() {
     super("guilds", "l", "list");
-    setAliases("guildlist");
+    setAliases("guildlist", "glist");
   }
 
   @Override

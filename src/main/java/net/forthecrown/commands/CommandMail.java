@@ -11,6 +11,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Commands;
@@ -37,13 +38,16 @@ import net.forthecrown.user.Users;
 import net.forthecrown.user.data.MailAttachment;
 import net.forthecrown.user.data.MailMessage;
 import net.forthecrown.user.data.UserMail;
+import net.forthecrown.utils.Util;
 import net.forthecrown.utils.context.Context;
+import net.forthecrown.utils.context.ContextOption;
+import net.forthecrown.utils.context.ContextSet;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.format.page.Footer;
+import net.forthecrown.utils.text.format.page.Header;
 import net.forthecrown.utils.text.format.page.PageEntry;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
 import net.forthecrown.utils.text.format.page.PageFormat;
-import net.forthecrown.utils.text.writer.TextWriter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -110,6 +114,109 @@ public class CommandMail extends FtcCommand {
       .addOptional(TAG_ARG)
       .addOptional(SCRIPT_ARG)
       .build();
+
+  public static final ContextSet SET = ContextSet.create();
+
+  public static final ContextOption<User> MAIL_USER = SET.newOption();
+  public static final ContextOption<CommandSource> VIEWER = SET.newOption();
+  public static final ContextOption<Boolean> SELF = SET.newOption();
+
+  public static final PageFormat<MailMessage> FORMAT = Util.make(() -> {
+    final PageFormat<MailMessage> format = PageFormat.create();
+
+    format.setHeader(
+        Header.<MailMessage>create()
+            .title((it, writer, context) -> {
+              writer.write(context.getOrThrow(SELF)
+                  ? Messages.MAIL_HEADER_SELF
+                  : Messages.mailHeader(context.getOrThrow(MAIL_USER))
+              );
+            })
+    );
+
+    format.setEntry(PageEntry.of(
+        (viewerIndex, entry) -> {
+          // Format index to show meta info about the
+          // mail message
+          return Component.text(viewerIndex + ")")
+              .color(NamedTextColor.GOLD)
+              .hoverEvent(Messages.messageMetaInfo(entry));
+        },
+
+        (writer, entry, viewerIndex, context) -> {
+          boolean self = context.getOrThrow(SELF);
+          User user = context.getOrThrow(MAIL_USER);
+
+          // create mark as read/unread click event
+          var event = ClickEvent.runCommand(
+              String.format(
+                  "/mail mark_%sread %s%s",
+                  entry.isRead() ? "un" : "",
+                  viewerIndex,
+                  self ? "" : " " + user.getName()
+              )
+          );
+
+          // Write the [read] or [unread] buttons
+          if (entry.isRead()) {
+            writer.write(Messages.MAIL_UNREAD.clickEvent(event));
+          } else {
+            writer.write(Messages.MAIL_READ.clickEvent(event));
+          }
+
+          // If there's an attachment to show
+          if (!MailAttachment.isEmpty(entry.getAttachment())) {
+            var attach = entry.getAttachment();
+
+            writer.space();
+
+            // If we're reading self, show the button which
+            // would let you claim the attachment
+            if (self) {
+              var cmd = "/mail claim " + viewerIndex;
+
+              writer.write(
+                  Messages.CLAIM
+                      .color(attach.isClaimed() ?
+                          NamedTextColor.GRAY
+                          : NamedTextColor.AQUA
+                      )
+                      .clickEvent(ClickEvent.runCommand(cmd))
+              );
+            } else {
+              // Else just create a display button to tell
+              // staff what's in the attachment
+              writer.write(
+                  Messages.MAIL_ATTACHMENT.hoverEvent(attach)
+              );
+            }
+          }
+
+          // Write a space and then the actual content
+          // of the mail message itself
+          writer.space();
+          writer.write(entry.getMessage());
+        }
+    ));
+
+    format.setFooter(
+        Footer.create()
+            .setPageButton((viewerPage, pageSize, context) -> {
+              String cmdFormat;
+              boolean self = context.getOrThrow(SELF);
+              User user = context.getOrThrow(MAIL_USER);
+
+              if (self) {
+                cmdFormat = "/mail %s %s";
+              } else {
+                cmdFormat = "/mail read_other " + user.getName() + " %s %s";
+              }
+
+              return ClickEvent.runCommand(cmdFormat);
+            })
+    );
+    return format;
+  });
 
   @Override
   protected void createCommand(BrigadierCommand command) {
@@ -266,8 +373,8 @@ public class CommandMail extends FtcCommand {
               MailMessage message = list.get(index - 1);
               message.setRead(read);
 
-              user.sendMessage(read ?
-                  Messages.MARKED_READ
+              user.sendMessage(read
+                  ? Messages.MARKED_READ
                   : Messages.MARKED_UNREAD
               );
               return 0;
@@ -360,8 +467,10 @@ public class CommandMail extends FtcCommand {
 
   private LiteralArgumentBuilder<CommandSource> sendArgs(boolean item) {
     return literal("send" + (item ? "_item" : ""))
-        .requires(item ? (source -> source.hasPermission(Permissions.MAIL_ITEMS))
-            : ArgumentBuilder.defaultRequirement())
+        .requires(item
+            ? (source -> source.hasPermission(Permissions.MAIL_ITEMS))
+            : ArgumentBuilder.defaultRequirement()
+        )
 
         .then(literal("-all")
             .requires(source -> source.hasPermission(Permissions.MAIL_ALL))
@@ -381,6 +490,10 @@ public class CommandMail extends FtcCommand {
   private int send(CommandContext<CommandSource> c, boolean item) throws CommandSyntaxException {
     User user = getUserSender(c);
     User target = Arguments.getUser(c, "target");
+
+    if (Objects.equals(user, target)) {
+      throw Exceptions.MAIL_SELF;
+    }
 
     Component cMessage = Arguments.getMessage(c, "message");
 
@@ -453,119 +566,39 @@ public class CommandMail extends FtcCommand {
   }
 
   private int readMailOther(CommandContext<CommandSource> c, int page, int pageSize)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     User user = Arguments.getUser(c, "user");
     return readMail(c.getSource(), user, page, pageSize);
   }
 
   private static int readMail(CommandContext<CommandSource> c, int page, int pageSize)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     return readMail(c.getSource(), getUserSender(c), page, pageSize);
   }
 
   private static int readMail(CommandSource source, User user, int page, int pageSize)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     var mail = user.getMail();
     boolean self = source.textName().equals(user.getName());
     List<MailMessage> messages = mail.getMail();
 
-    if (messages.isEmpty()) {
-      throw Exceptions.NOTHING_TO_LIST;
-    }
-
     Commands.ensurePageValid(page, pageSize, messages.size());
 
-    final PageFormat<MailMessage> format = PageFormat.create();
-
-    format.setHeader(
-        self ? Messages.MAIL_HEADER_SELF : Messages.mailHeader(user)
-    );
-
-    format.setEntry(PageEntry.of(
-        new PageEntry.IndexFormatter<MailMessage>() {
-          @Override
-          public Component createIndex(int viewerIndex, MailMessage entry) {
-            // Format index to show meta info about the
-            // mail message
-            return Component.text(viewerIndex + ")")
-                .color(NamedTextColor.GOLD)
-                .hoverEvent(Messages.messageMetaInfo(entry));
-          }
-        },
-
-        new PageEntry.EntryDisplay<MailMessage>() {
-          @Override
-          public void write(TextWriter writer, MailMessage entry, int viewerIndex, Context context) {
-            // create mark as read/unread click event
-            var event = ClickEvent.runCommand(
-                String.format(
-                    "/mail mark_%sread %s%s",
-                    entry.isRead() ? "un" : "",
-                    viewerIndex,
-                    self ? "" : " " + user.getName()
-                )
-            );
-
-            // Write the [read] or [unread] buttons
-            if (entry.isRead()) {
-              writer.write(Messages.MAIL_UNREAD.clickEvent(event));
-            } else {
-              writer.write(Messages.MAIL_READ.clickEvent(event));
-            }
-
-            // If there's an attachment to show
-            if (!MailAttachment.isEmpty(entry.getAttachment())) {
-              var attach = entry.getAttachment();
-
-              writer.space();
-
-              // If we're reading self, show the button which
-              // would let you claim the attachment
-              if (self) {
-                var cmd = "/mail claim " + viewerIndex;
-
-                writer.write(
-                    Messages.CLAIM
-                        .color(attach.isClaimed() ?
-                            NamedTextColor.GRAY
-                            : NamedTextColor.AQUA
-                        )
-                        .clickEvent(ClickEvent.runCommand(cmd))
-                );
-              } else {
-                // Else just create a display button to tell
-                // staff what's in the attachment
-                writer.write(
-                    Messages.MAIL_ATTACHMENT.hoverEvent(attach)
-                );
-              }
-            }
-
-            // Write a space and then the actual content
-            // of the mail message itself
-            writer.space();
-            writer.write(entry.getMessage());
-          }
-        }
-    ));
-
-    String cmdFormat;
-
-    if (self) {
-      cmdFormat = "mail %s %s";
-    } else {
-      cmdFormat = "mail read_other " + user.getName() + " %s %s";
-    }
-
-    format.setFooter(Footer.ofButton(cmdFormat));
+    Context context = SET.createContext()
+        .set(MAIL_USER, user)
+        .set(VIEWER, source)
+        .set(SELF, self);
 
     source.sendMessage(
-        format.format(
+        FORMAT.format(
             PageEntryIterator.of(
                 mail.getMail(),
                 page, pageSize
             ),
-            Context.EMPTY
+            context
         )
     );
 
@@ -573,7 +606,6 @@ public class CommandMail extends FtcCommand {
   }
 
   private interface ItemSender {
-
     void send(Component message, ItemStack item);
   }
 

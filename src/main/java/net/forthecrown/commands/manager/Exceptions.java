@@ -719,7 +719,7 @@ public interface Exceptions {
 
   CommandSyntaxException MAIL_NO_ITEM_GIVEN = create("No item was given, cannot send item.");
 
-  CommandSyntaxException MAIL_PRIVATE = create("Cannot look at another user's mail.");
+  CommandSyntaxException MAIL_SELF = create("Cannot mail yourself a message");
 
   // ---------------------------
   // --- SECTION: CMD IGNORE ---

@@ -61,11 +61,6 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
   }
 
   @Override
-  public boolean shouldRemainInInventory() {
-    return false;
-  }
-
-  @Override
   public @NotNull BaseItemBuilder createBaseItem() {
     return ItemStacks.builder(Material.WOODEN_SWORD)
         .setNameRaw(RANK_1_NAME)

@@ -10,16 +10,19 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.DynmapUtil;
+import net.forthecrown.core.FTC;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.waypoint.Waypoint;
 import net.forthecrown.waypoint.WaypointManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 
 public class GuildSettings {
+  private static final Logger LOGGER = FTC.getLogger();
 
   public static final String
       NAME_KEY = "name",
@@ -30,12 +33,17 @@ public class GuildSettings {
       NAME_FORMAT_KEY = "nameFormat",
       BANNER_KEY = "banner",
       IS_PUBLIC_KEY = "isPublic",
-      ALLOWS_VISIT_KEY = "allowsVisit";
+      ALLOWS_VISIT_KEY = "allowsVisit",
+      FLAGS_KEY = "adminFlags";
 
   public static final int UNLIMITED_MEMBERS = 0x1;
   public static final int UNLIMITED_CHUNKS  = 0x2;
 
-  public static final long NO_ROLE = 0L;
+  /** Flag stating a guild has unlocked the role color feature */
+  public static final int ROLE_COLOR = 0x4;
+
+  /** Flag stating this guild has the guild channel as an unlocked feature */
+  public static final int GUILD_CHANNEL = 0x8;
 
   @Getter
   private final Guild guild;
@@ -147,6 +155,17 @@ public class GuildSettings {
     if (DynmapUtil.isInstalled()) {
       GuildDynmap.updateGuildChunks(getGuild());
     }
+
+    // Only change color for donators
+    if (!guild.getSettings().hasFlags(ROLE_COLOR)) {
+      return;
+    }
+
+    guild.getDiscord().getRole().ifPresent(role -> {
+      role.getManager()
+          .setColor(color.getTextColor().value())
+          .submit();
+    });
   }
 
   public void setSecondaryColor(GuildColor color) {
@@ -160,10 +179,6 @@ public class GuildSettings {
     if (DynmapUtil.isInstalled()) {
       GuildDynmap.updateGuildChunks(getGuild());
     }
-  }
-
-  private static void updateDynmap() {
-
   }
 
   public void setBanner(ItemStack item) {
@@ -198,6 +213,7 @@ public class GuildSettings {
     primaryColor = json.getEnum(PRIMARY_COLOR_KEY, GuildColor.class);
     secondaryColor = json.getEnum(SECONDARY_COLOR_KEY, GuildColor.class);
     banner = json.getItem(BANNER_KEY);
+    adminFlags = json.getInt(FLAGS_KEY);
     setWaypoint(json.getUUID(WAYPOINT_KEY));
 
     if (json.has(NAME_FORMAT_KEY)) {
@@ -231,6 +247,10 @@ public class GuildSettings {
     result.add(BANNER_KEY, JsonUtils.writeItem(this.banner));
     result.addProperty(IS_PUBLIC_KEY, this.isPublic);
     result.addProperty(ALLOWS_VISIT_KEY, this.allowsVisit);
+
+    if (adminFlags != 0) {
+      result.addProperty(FLAGS_KEY, adminFlags);
+    }
 
     if (!nameFormat.isDefault()) {
       result.add(NAME_FORMAT_KEY, nameFormat.serialize());

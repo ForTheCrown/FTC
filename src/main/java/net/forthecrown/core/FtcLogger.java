@@ -125,6 +125,11 @@ public class FtcLogger extends AbstractLogger {
       return;
     }
 
+    if (level.intLevel() <= Level.ERROR.intLevel()) {
+      DiscordErrorLogHandler.INSTANCE
+          .onLog(message.getFormattedMessage(), t, level.name());
+    }
+
     pluginLogger.logMessage(
         fqcn,
 

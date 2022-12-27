@@ -137,8 +137,10 @@ public class CommandScripts extends FtcCommand {
   }
 
   private int eval(CommandContext<CommandSource> c)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     String input = c.getArgument("input", String.class);
+    Object obj;
 
     try {
       var engine = ScriptManager.getInstance()
@@ -146,7 +148,7 @@ public class CommandScripts extends FtcCommand {
 
       ScriptsBuiltIn.populate("command-script", engine);
 
-      engine.eval(input);
+      obj = engine.eval(input);
     } catch (ScriptException exc) {
       throw Exceptions.format(
           "Error running script: {0}",
@@ -154,19 +156,26 @@ public class CommandScripts extends FtcCommand {
       );
     }
 
-    c.getSource()
-        .sendAdmin("Successfully ran script");
+    c.getSource().sendAdmin(
+        Text.format("Succesfully ran script! Result: {0}",
+            obj
+        )
+    );
 
     return 0;
   }
 
-  private int run(CommandContext<CommandSource> c, @Nullable String method, boolean closeAfter
+  private int run(CommandContext<CommandSource> c,
+                  @Nullable String method,
+                  boolean closeAfter
   ) throws CommandSyntaxException {
     String scriptName = c.getArgument("script", String.class);
     Script script;
+    ScriptResult result;
 
     try {
-      script = Script.read(scriptName);
+      script = Script.of(scriptName).compile();
+      result = script.eval();
     } catch (ScriptLoadException exc) {
       exc.printStackTrace();
 
@@ -177,7 +186,15 @@ public class CommandScripts extends FtcCommand {
       );
     }
 
-    Object result = script.getEvalResult();
+    if (result.error().isPresent()) {
+      var exc = result.error().get();
+
+      throw Exceptions.format(
+          "Couldn't evaluate script '{0}', reason: {1}",
+          script.getName(),
+          exc.getCause()
+      );
+    }
 
     if (method != null) {
       if (!script.hasMethod(method)) {
@@ -190,21 +207,17 @@ public class CommandScripts extends FtcCommand {
         );
       }
 
-      ScriptResult invoke = script.invoke(method);
+      result = script.invoke(method);
 
-      if (invoke.error().isPresent()) {
+      if (result.error().isPresent()) {
         script.close();
 
         throw Exceptions.format(
             "Couldn't run '{0}' in '{1}': {2}",
             method,
             scriptName,
-            invoke.error().get()
+            result.error().get()
         );
-      } else if (invoke.result().isPresent()) {
-        result = invoke.result().get();
-      } else {
-        result = null;
       }
     }
 
@@ -213,14 +226,14 @@ public class CommandScripts extends FtcCommand {
           Text.format("Successfully ran {0} in script {1}, result={2}",
               method,
               scriptName,
-              result
+              result.result().orElse(null)
           )
       );
     } else {
       c.getSource().sendAdmin(
           Text.format("Successfully ran script {0}, result={1}",
               scriptName,
-              result
+              result.result().orElse(null)
           )
       );
     }

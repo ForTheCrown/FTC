@@ -4,6 +4,7 @@ import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import net.forthecrown.core.FTC;
 
 @Builder(builderClassName = "Builder")
@@ -16,7 +17,8 @@ public class ScriptResult {
 
   /** The name of them method that was executed */
   @Getter
-  private final String method;
+  @Accessors(fluent = true)
+  private final Optional<String> method;
 
   private final Object result;
 
@@ -36,9 +38,19 @@ public class ScriptResult {
    */
   public ScriptResult logIfError() {
     error().ifPresent(e -> {
+      if (method.isEmpty()) {
+        FTC.getLogger().error(
+            "Couldn't evaluate script {}", script.getName(),
+            e
+        );
+
+        return;
+      }
+
       FTC.getLogger().error(
           "Couldn't invoke method '{}' in '{}'",
-          method, script.getName(),
+          method.get(),
+          script.getName(),
           e
       );
     });

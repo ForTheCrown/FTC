@@ -12,6 +12,7 @@ import net.forthecrown.user.Users;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.inventory.ItemStack;
@@ -51,7 +52,10 @@ public abstract class ExtendedItem {
         int level = e.getValue();
 
         if (enchant instanceof FtcEnchant ftcEnchant) {
-          loreWriter.line(ftcEnchant.displayName(level));
+          loreWriter.line(
+              ftcEnchant.displayName(level)
+                  .colorIfAbsent(NamedTextColor.GRAY)
+          );
         }
       }
     }

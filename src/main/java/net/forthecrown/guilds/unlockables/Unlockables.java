@@ -23,9 +23,14 @@ public @UtilityClass class Unlockables {
     registerAll(UnlockableBrackets.values());
     registerAll(UnlockableColorType.values());
     registerAll(UnlockableStyle.values());
+
+    // Role color doesn't have to be registered
+    // because it's not serialized
+    registerAll(UnlockableDiscordRole.ROLE);
+    registerAll(UnlockableTextChannel.CHANNEL);
   }
 
-  private static void registerAll(Unlockable[] unlockables) {
+  private static void registerAll(Unlockable... unlockables) {
     for (var u : unlockables) {
       String key;
 

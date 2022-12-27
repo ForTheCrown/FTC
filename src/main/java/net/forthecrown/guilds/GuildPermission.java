@@ -94,6 +94,14 @@ public enum GuildPermission {
       "Deny claiming and unclaiming chunks.",
       "Permission to claim and unclaim chunks."
   ),
+
+  DISCORD(
+      "able to create/delete the Discord role",
+      "Discord Role",
+      "Allow creating/deleting the Discord role",
+      "Deny creating/deleting the Discord role",
+      "Permission to create/delete the Discord role"
+  )
   ;
 
   @Getter

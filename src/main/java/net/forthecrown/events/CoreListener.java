@@ -121,18 +121,24 @@ public class CoreListener implements Listener {
     PlayerInventory inventory = event.getEntity().getInventory();
     Int2ObjectMap<ItemStack> items = new Int2ObjectOpenHashMap<>();
 
-    for (int i = 0; i < inventory.getSize(); i++) {
-      ItemStack item = inventory.getItem(i);
+    var it = ItemStacks.nonEmptyIterator(inventory);
+    while (it.hasNext()) {
+      int index = it.nextIndex();
+      var item = it.next();
 
-      if (ItemStacks.isEmpty(item)) {
-        continue;
-      }
+      // IDK why, but item.containsEnchantment() doesn't work
+      // for this, I guess because custom enchantment or something
+      var enchants = item.getEnchantments();
 
       if (ExtendedItems.shouldRemainInInventory(item)
-          || item.containsEnchantment(FtcEnchants.SOUL_BOND)
+          || enchants.containsKey(FtcEnchants.SOUL_BOND)
       ) {
-        items.put(i, item);
+        items.put(index, item);
       }
+    }
+
+    if (items.isEmpty()) {
+      return;
     }
 
     event.getDrops().removeAll(items.values());

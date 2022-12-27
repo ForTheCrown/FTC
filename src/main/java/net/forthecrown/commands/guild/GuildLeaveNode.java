@@ -25,8 +25,6 @@ class GuildLeaveNode extends GuildCommandNode {
           var user = getUserSender(c);
           var guild = GuildProvider.SENDERS_GUILD.get(c);
 
-          user.sendMessage(Messages.leftGuild(guild));
-
           if (guild.getMemberSize() == 1) {
             guild.removeMember(user.getUniqueId());
 
@@ -34,14 +32,16 @@ class GuildLeaveNode extends GuildCommandNode {
                 guild, user.getName(), "No members left"
             );
 
+            user.sendMessage(Messages.leftGuild(guild));
             user.sendMessage(Messages.GUILD_DELETED_EMPTY);
           } else {
             if (guild.isLeader(user)) {
               throw Exceptions.GLEADER_CANNOT_LEAVE;
             }
 
+            user.sendMessage(Messages.leftGuild(guild));
             guild.removeMember(user.getUniqueId());
-            guild.sendMessage(Messages.leftGuildAnnouncement(user));
+            guild.announce(Messages.leftGuildAnnouncement(user));
           }
 
           return 0;

@@ -1,5 +1,6 @@
 package net.forthecrown.user;
 
+import co.aikar.timings.Timing;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -18,7 +19,6 @@ import net.forthecrown.utils.Util;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.SerializableObject;
 import net.forthecrown.utils.io.SerializationHelper;
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.OfflinePlayer;
 
@@ -38,6 +38,8 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
 
   private static final Logger LOGGER = FTC.getLogger();
 
+  private static final Timing LOOKUP_TIMING = FTC.timing("User Lookup load");
+
   /**
    * Expected size of the 2 primary maps for tracking names and UUIDs
    */
@@ -50,13 +52,18 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
   public static final long NO_NAME_CHANGE = -1;
 
   // Primary lookup maps
-  private final Map<UUID, UserLookupEntry> identified = new Object2ObjectOpenHashMap<>(
-      EXPECTED_SIZE);
-  private final Map<String, UserLookupEntry> named = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
+  private final Map<UUID, UserLookupEntry> identified
+      = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
+
+  private final Map<String, UserLookupEntry> named
+      = new Object2ObjectOpenHashMap<>(EXPECTED_SIZE);
 
   // Secondary lookup maps
-  private final Map<String, UserLookupEntry> oldNamed = new Object2ObjectOpenHashMap<>(30);
-  private final Map<String, UserLookupEntry> nicknamed = new Object2ObjectOpenHashMap<>(20);
+  private final Map<String, UserLookupEntry> oldNamed
+      = new Object2ObjectOpenHashMap<>(30);
+
+  private final Map<String, UserLookupEntry> nicknamed
+      = new Object2ObjectOpenHashMap<>(20);
 
   /**
    * If the changes have been made to this map and the map has not been saved.
@@ -105,11 +112,7 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
   }
 
   protected void load(JsonArray array) {
-    if (FTC.inDebugMode()) {
-      LOGGER.info("Beginning profile map load");
-    }
-
-    StopWatch watch = StopWatch.createStarted();
+    LOOKUP_TIMING.startTiming();
     clear();
 
     for (JsonElement e : array) {
@@ -120,18 +123,15 @@ public class UserLookup extends SerializableObject.AbstractSerializer<JsonArray>
             entry.getUniqueId(), entry.getName()
         );
 
-        UserManager.get().getSerializer().delete(entry.getUniqueId());
+        UserManager.get().getSerializer()
+            .delete(entry.getUniqueId());
         continue;
       }
 
       addEntry(entry);
     }
 
-    watch.stop();
-    if (FTC.inDebugMode()) {
-      LOGGER.info("Loaded profile map, took {}ms", watch.getTime());
-    }
-
+    LOOKUP_TIMING.stopTiming();
     unsaved = false;
   }
 

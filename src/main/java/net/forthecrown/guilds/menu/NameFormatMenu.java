@@ -43,9 +43,9 @@ public class NameFormatMenu extends MenuPage {
     builder.add(SLOT_COLOR, getInfoPaper("Colors >"));
     builder.add(SLOT_STYLE, getInfoPaper("Styles >"));
 
-    UpgradesMenu.addAll(UnlockableBrackets.values(), builder);
-    UpgradesMenu.addAll(UnlockableColorType.values(), builder);
-    UpgradesMenu.addAll(UnlockableStyle.values(), builder);
+    UpgradesMenu.addAll(builder, UnlockableBrackets.values());
+    UpgradesMenu.addAll(builder, UnlockableColorType.values());
+    UpgradesMenu.addAll(builder, UnlockableStyle.values());
 
     builder.add(SLOT_RESULT, MenuNode.builder()
         .setItem((user, context) -> {

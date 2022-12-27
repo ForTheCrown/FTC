@@ -124,6 +124,8 @@ public final class Permissions {
 
       GUILD                   = register("ftc.guild"),
       GUILD_ADMIN             = registerPrefixed(GUILD, "admin"),
+      GUILD_ROLE_COLOR        = registerPrefixed(GUILD, "donator.rolecolor"),
+      GUILD_PRIVATE_CHAT      = registerPrefixed(GUILD, "donator.guildchat"),
 
       CMD_GAMEMODE            = registerCmd("gamemode"),
       CMD_GAMEMODE_OTHERS     = registerPrefixed(CMD_GAMEMODE, "others"),

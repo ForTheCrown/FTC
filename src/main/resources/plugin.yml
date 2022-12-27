@@ -15,13 +15,13 @@ depend: [
   WorldGuard,
   LuckPerms,
   AncientGates,
-  GSit
+  GSit,
+  DiscordSRV
 ]
 
 softdepend: [
   VotingPlugin,
   dynmap,
-  DiscordSRV
 ]
 
 libraries: [

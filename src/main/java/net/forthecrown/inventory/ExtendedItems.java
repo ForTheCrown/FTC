@@ -9,9 +9,7 @@ import net.forthecrown.utils.inventory.ItemStacks;
 import org.bukkit.inventory.ItemStack;
 
 public final class ExtendedItems {
-
-  private ExtendedItems() {
-  }
+  private ExtendedItems() {}
 
   public static final String TAG_CONTAINER = "special_item";
   public static final String TAG_TYPE = "type";
@@ -39,6 +37,7 @@ public final class ExtendedItems {
   public static ExtendedItemType getType(ItemStack itemStack) {
     for (var type : Registries.ITEM_TYPES) {
       if (type.get(itemStack) != null) {
+        fixInvRemain(type, itemStack);
         return type;
       }
     }
@@ -54,13 +53,14 @@ public final class ExtendedItems {
         ExtendedItemFix.fixCrown(meta);
       }
     });
+  }
 
-    var type = getType(item);
-    if (type == ROYAL_SWORD || type == CROWN) {
-      item.addEnchantment(FtcEnchants.SOUL_BOND, 1);
-      var i = type.get(item);
-      i.update(item);
+  public static void fixInvRemain(ExtendedItemType type, ItemStack item) {
+    if (type != ROYAL_SWORD && type != CROWN) {
+      return;
     }
+
+    item.addEnchantment(FtcEnchants.SOUL_BOND, 1);
   }
 
   public static boolean shouldRemainInInventory(ItemStack itemStack) {

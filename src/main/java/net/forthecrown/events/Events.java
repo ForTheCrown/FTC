@@ -1,6 +1,7 @@
 package net.forthecrown.events;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import github.scarsz.discordsrv.DiscordSRV;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.module.OnEnable;
@@ -96,6 +97,11 @@ public final class Events {
 
     PacketListeners.register(new PlayerPacketListener());
     PacketListeners.register(new ChatPacketListener());
+
+    var listener = new GuildDiscordListener();
+    var api = DiscordSRV.api;
+
+    api.subscribe(listener);
   }
 
   /**

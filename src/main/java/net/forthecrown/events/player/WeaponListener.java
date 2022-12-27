@@ -41,6 +41,10 @@ public class WeaponListener implements Listener {
   // interactions with air blocks will be cancelled
   @EventHandler
   public void onPlayerInteract(PlayerInteractEvent event) {
+    if (!event.getAction().isRightClick()) {
+      return;
+    }
+
     var player = event.getPlayer();
     var item = player.getInventory().getItemInMainHand();
     RoyalSword sword = ExtendedItems.ROYAL_SWORD.get(item);

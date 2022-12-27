@@ -20,7 +20,7 @@ import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-abstract class GuildCommandNode extends FtcCommand {
+public abstract class GuildCommandNode extends FtcCommand {
 
   private final String[] argumentName;
 
@@ -48,10 +48,10 @@ abstract class GuildCommandNode extends FtcCommand {
     return GuildProvider.argument("guild");
   }
 
-  protected void testPermission(User user,
-                                Guild guild,
-                                GuildPermission permission,
-                                CommandSyntaxException exception
+  public static void testPermission(User user,
+                                    Guild guild,
+                                    GuildPermission permission,
+                                    CommandSyntaxException exception
   ) throws CommandSyntaxException {
     var member = guild.getMember(user.getUniqueId());
 

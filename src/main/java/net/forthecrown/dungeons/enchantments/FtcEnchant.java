@@ -94,4 +94,14 @@ public abstract class FtcEnchant extends Enchantment {
 
   public void onAttack(LivingEntity user, Entity target, int level) {
   }
+
+  @Override
+  public String toString() {
+    return getKey().toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return getKey().hashCode();
+  }
 }

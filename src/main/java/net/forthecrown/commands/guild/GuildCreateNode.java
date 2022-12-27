@@ -13,7 +13,7 @@ class GuildCreateNode extends GuildCommandNode {
 
   public GuildCreateNode() {
     super("guildcreate", "create");
-    setAliases("createguild");
+    setAliases("createguild", "gcreate");
   }
 
   @Override

@@ -106,7 +106,7 @@ public class GuildRanksMenu extends MenuPage {
     builder.add(12, defaultOption)
         .add(14, leaderOption);
 
-    UpgradesMenu.addAll(UnlockableRankSlot.values(), builder);
+    UpgradesMenu.addAll(builder, UnlockableRankSlot.values());
   }
 
   @Override

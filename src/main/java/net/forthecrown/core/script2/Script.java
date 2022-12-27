@@ -8,8 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import javax.script.Bindings;
+import javax.script.CompiledScript;
 import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
@@ -53,15 +53,11 @@ public class Script implements Closeable {
    */
   private NashornScriptEngine engine;
 
-  /**
-   * Script's self instance
-   */
-  private ScriptObjectMirror mirror;
+  /** Compiled representation of this script */
+  private CompiledScript compiledScript;
 
-  /**
-   * Result of the initial script evaluation
-   */
-  private Object evalResult;
+  /** Script's self instance */
+  private ScriptObjectMirror mirror;
 
   /* ---------------------------- CONSTRUCTORS ---------------------------- */
 
@@ -215,7 +211,8 @@ public class Script implements Closeable {
    *                             either.
    */
   public ScriptResult invoke(String method, Object... args)
-      throws ScriptLoadException {
+      throws ScriptLoadException
+  {
     if (engine == null) {
       load();
     }
@@ -236,13 +233,13 @@ public class Script implements Closeable {
       return ScriptResult.builder()
           .result(result)
           .script(script)
-          .method(method)
+          .method(Optional.of(method))
           .build();
     } catch (Exception e) {
       return ScriptResult.builder()
           .exception(e)
           .script(script)
-          .method(method)
+          .method(Optional.of(method))
           .build()
           .logIfError();
     }
@@ -260,7 +257,8 @@ public class Script implements Closeable {
    *                             either.
    */
   public Optional<ScriptResult> invokeIfExists(String method, Object... args)
-      throws ScriptLoadException {
+      throws ScriptLoadException
+  {
     if (!hasMethod(method)) {
       return Optional.empty();
     }
@@ -274,6 +272,7 @@ public class Script implements Closeable {
    * @throws ScriptLoadException If the script couldn't be loaded
    * @see #load(Consumer)
    */
+  @Deprecated
   public Script load() throws ScriptLoadException {
     return load(null);
   }
@@ -281,33 +280,71 @@ public class Script implements Closeable {
   /**
    * Loads this script from the script's file.
    * <p>
-   * If this script has already been loaded, then {@link #close()} will be called before,
-   * effectively reloading the script.
+   * If this script has already been loaded, then {@link #close()} will be
+   * called before, effectively reloading the script.
    * <p>
    * A script load exception will be thrown in one of the following scenarios:
    * <pre>
    * 1. If the script file doesn't exist.
    * 2. If the script file couldn't be read.
-   * 3. If the script could not be 'compiled' aka evaluated
+   * 3. If the script could not be 'compiled' and then evaluated
    * </pre>
    * If an exception is thrown, then {@link #close()} will be called again.
    * <p>
-   * If the script is loaded and read correctly, then this script instance's fields are set and the
-   * script itself is loaded.
+   * If the script is loaded and read correctly, then this script instance's
+   * fields are set and the script itself is loaded.
    * <p>
-   * On-top of just loading the script, this method also populates the script's bindings with the
-   * default java classes, specified in {@link ScriptsBuiltIn}, and adds the {@link #getTasks()} and
-   * {@link #getEvents()} to the script.
+   * On-top of just loading the script, this method also populates the script's
+   * bindings with the default java classes, specified in {@link ScriptsBuiltIn},
+   * and adds the {@link #getTasks()} and {@link #getEvents()} to the script.
    *
    * @param loadCallback Callback for placing values into the script's
    *                     bindings before evaluation
    *
    * @return This
    * @throws ScriptLoadException If the script couldn't be loaded
+   *
+   * @deprecated This method performs 2 operations at once, compilation and
+   *             evaluation of a script, use {@link #compile()} to load and
+   *             compile a script, and then use {@link #eval()} to evaluate
    */
+  @Deprecated
   public Script load(@Nullable Consumer<Bindings> loadCallback)
       throws ScriptLoadException
   {
+    compile();
+
+    if (loadCallback != null) {
+      loadCallback.accept(mirror);
+    }
+
+    var result = eval();
+
+    if (result.error().isPresent()) {
+      throw new ScriptLoadException(this, result.error().get());
+    }
+
+    return this;
+  }
+
+  /**
+   * Loads, reads and compiles the script.
+   * <p>
+   * This will throw a script load exception in one of the following
+   * circumstances: <pre>
+   * 1. The file doesn't exist
+   * 2. The file has syntax errors or contains
+   *    tokens not supported by the Nashorn engine </pre>
+   * If an exception is thrown, then {@link #close()} will be called again
+   * <p>
+   * After compilation, users of this class are free to edit the script
+   * bindings however they deem fit. Script bindings can be accessed with
+   * {@link #getMirror()}
+   *
+   * @return This
+   * @throws ScriptLoadException If the script couldn't be loaded
+   */
+  public Script compile() throws ScriptLoadException {
     if (engine != null) {
       close();
     }
@@ -326,18 +363,7 @@ public class Script implements Closeable {
       this.mirror = (ScriptObjectMirror)
           engine.getBindings(ScriptContext.ENGINE_SCOPE);
 
-      if (loadCallback != null) {
-        loadCallback.accept(mirror);
-      }
-
-      var ctx = engine.getContext();
-      ctx.setAttribute(
-          ScriptEngine.FILENAME,
-          name,
-          ScriptContext.ENGINE_SCOPE
-      );
-
-      evalResult = engine.eval(reader);
+      compiledScript = engine.compile(reader);
     } catch (IOException | ScriptException exc) {
       close();
       throw new ScriptLoadException(this, exc);
@@ -347,14 +373,46 @@ public class Script implements Closeable {
   }
 
   /**
-   * Tests if this script has been loaded or not
+   * Evaluates this script. This requires the script to be compiled,
+   * with {@link #compile()}
+   * <p>
+   * Aka, runs the main scope of this script.
+   *
+   * @return A successful or failed result
+   *
+   * @throws NullPointerException If the script is not compiled
    */
-  public boolean isLoaded() {
-    return mirror != null;
+  public ScriptResult eval() throws NullPointerException {
+    ensureCompiled();
+
+    try {
+      var obj = compiledScript.eval(mirror);
+
+      return ScriptResult.builder()
+          .script(this)
+          .method(Optional.empty())
+          .result(obj)
+          .build();
+    } catch (Exception t) {
+      return ScriptResult.builder()
+          .script(this)
+          .method(Optional.empty())
+          .result(null)
+          .exception(t)
+          .build()
+          .logIfError();
+    }
   }
 
   /**
-   * Tests if this script has a method with the given name. If {@link #isLoaded()} is false, then
+   * Tests if this script has been loaded or not
+   */
+  public boolean isCompiled() {
+    return compiledScript != null;
+  }
+
+  /**
+   * Tests if this script has a method with the given name. If {@link #isCompiled()} is false, then
    * this returns false
    *
    * @param name The name of the method to look for
@@ -375,8 +433,36 @@ public class Script implements Closeable {
   }
 
   /**
-   * Unloads this script, cancels all event listeners created by this script, cancels all tasks
-   * registered by this script and calls the {@link #METHOD_ON_CLOSE} method, if it exists.
+   * Ensures this script has been compiled, if it hasn't throws a
+   * null pointer exception
+   */
+  private void ensureCompiled() throws NullPointerException {
+    Objects.requireNonNull(compiledScript, "Script not compiled");
+  }
+
+  /**
+   * Places an object into the script's bindings.
+   * <p>
+   * This allows you to use the given object within the script easily,
+   * for example, placing a {@link net.forthecrown.user.User} instance into a
+   * script with the key 'user' would allow you to use it like so:
+   * <pre>
+   * const afk = user.isAfk();
+   * print(afk);
+   * </pre>
+   * @param key The name of the binding
+   * @param o The binding's value
+   * @throws NullPointerException If this script wasn't compiled
+   */
+  public void put(String key, Object o) throws NullPointerException {
+    ensureCompiled();
+    mirror.put(key, o);
+  }
+
+  /**
+   * Unloads this script, cancels all event listeners created by this script,
+   * cancels all tasks registered by this script and calls the
+   * {@link #METHOD_ON_CLOSE} method, if it exists.
    */
   @Override
   public void close() {
@@ -391,7 +477,7 @@ public class Script implements Closeable {
 
     engine = null;
     mirror = null;
-    evalResult = null;
+    compiledScript = null;
   }
 
   /**
@@ -430,13 +516,12 @@ public class Script implements Closeable {
     if (!(o instanceof Script script)) {
       return false;
     }
-    return getFile().equals(script.getFile())
-        && Objects.equals(getEvalResult(), script.getEvalResult());
+    return getFile().equals(script.getFile());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getFile(), getEvalResult());
+    return Objects.hash(getFile(), getCompiledScript());
   }
 
   @Override

@@ -9,7 +9,7 @@ class GuildDiscoveryNode extends GuildCommandNode {
 
   protected GuildDiscoveryNode() {
     super("guilddiscover", "discover");
-    setAliases("discoverguilds", "guilddiscovery");
+    setAliases("discoverguilds", "guilddiscovery", "gdiscover");
   }
 
   @Override

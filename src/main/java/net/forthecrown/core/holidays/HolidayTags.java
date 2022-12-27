@@ -82,13 +82,17 @@ public class HolidayTags {
     return builder.build();
   }
 
-  public static Component replaceTags(String original, User user, Holiday holiday,
+  public static Component replaceTags(String original,
+                                      User user,
+                                      Holiday holiday,
                                       ZonedDateTime time
   ) {
     return replaceTags(Text.renderString(original), user, holiday, time);
   }
 
-  public static Component replaceTags(Component original, User user, Holiday holiday,
+  public static Component replaceTags(Component original,
+                                      User user,
+                                      Holiday holiday,
                                       ZonedDateTime time
   ) {
     var context = new TagContext(holiday, time, user, original);
@@ -125,7 +129,6 @@ public class HolidayTags {
   }
 
   interface TagReplace {
-
     static TagReplace of(Function<TagContext, String> function) {
       return context -> Text.renderString(function.apply(context));
     }

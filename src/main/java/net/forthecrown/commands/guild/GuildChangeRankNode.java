@@ -92,7 +92,7 @@ class GuildChangeRankNode extends GuildCommandNode {
       sender.sendMessage(Messages.changedRank(promotes, user, rank, guild));
     }
 
-    guild.sendMessage(
+    guild.announce(
         Messages.rankChangeAnnouncement(promotes, sender, user, rank)
     );
 

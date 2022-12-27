@@ -19,8 +19,8 @@ public final class FtcDiscord {
       // Channel names
       STAFF_LOG = "staff-log",
 
-  // Staff Log categories
-  C_STAFF = "Staff",
+      // Staff Log categories
+      C_STAFF = "Staff",
       C_PUNISH = "Punishments",
       C_END = "End",
       C_RW = "RW",

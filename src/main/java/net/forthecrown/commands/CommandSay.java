@@ -9,7 +9,9 @@ import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -55,7 +57,8 @@ public class CommandSay extends FtcCommand {
                     audiences,
                     ChatRenderer.defaultRenderer(),
                     message,
-                    message
+                    message,
+                    SignedMessage.system(Text.plain(message), message)
                 );
 
                 event.callEvent();

@@ -6,12 +6,15 @@ import com.destroystokyo.paper.profile.CraftPlayerProfile;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.common.base.Strings;
 import com.mojang.serialization.DataResult;
+import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrays;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +25,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.forthecrown.core.AfkKicker;
 import net.forthecrown.core.FTC;
+import net.forthecrown.core.FtcDiscord;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.core.TabList;
@@ -1424,7 +1428,8 @@ public class User implements ForwardingAudience.Single,
    * @throws UserOfflineException     If the user is not AFK
    */
   public void afk(@Nullable Component reason)
-      throws IllegalArgumentException, UserOfflineException {
+      throws IllegalArgumentException, UserOfflineException
+  {
     ensureOnline();
     Validate.isTrue(!afk, "User is already AFK");
 
@@ -1485,6 +1490,29 @@ public class User implements ForwardingAudience.Single,
     return getGuildId() == null ? null : GuildManager.get().getGuild(getGuildId());
   }
 
+  public String getDiscordId() {
+    if (!FtcDiscord.isActive()) {
+      return null;
+    }
+
+    return DiscordSRV.getPlugin()
+        .getAccountLinkManager()
+        .getDiscordId(getUniqueId());
+  }
+
+  public Optional<Member> getDiscordMember() {
+    var discId = getDiscordId();
+
+    if (Strings.isNullOrEmpty(discId)) {
+      return Optional.empty();
+    }
+
+    return Optional.ofNullable(
+        DiscordSRV.getPlugin()
+            .getMainGuild()
+            .getMemberById(discId)
+    );
+  }
 
   /* ----------------------------- OBJECT OVERRIDES ------------------------------ */
 

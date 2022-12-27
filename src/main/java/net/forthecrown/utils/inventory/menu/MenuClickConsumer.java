@@ -46,7 +46,8 @@ public interface MenuClickConsumer {
 
     @Override
     default void onClick(User user, Context context, ClickContext click)
-        throws CommandSyntaxException {
+        throws CommandSyntaxException
+    {
       onClick(user, click);
     }
   }

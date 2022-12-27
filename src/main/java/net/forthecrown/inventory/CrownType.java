@@ -38,11 +38,6 @@ public class CrownType implements ExtendedItemType<RoyalCrown> {
   }
 
   @Override
-  public boolean shouldRemainInInventory() {
-    return false;
-  }
-
-  @Override
   public @NotNull RoyalCrown create(@Nullable UUID owner) {
     return new RoyalCrown(this, owner);
   }

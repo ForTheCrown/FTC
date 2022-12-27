@@ -24,10 +24,15 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import net.forthecrown.commands.guild.GuildInvite;
 import net.forthecrown.core.Messages;
+import net.forthecrown.core.admin.BannedWords;
+import net.forthecrown.core.admin.EavesDropper;
+import net.forthecrown.core.admin.Mute;
+import net.forthecrown.core.admin.Punishments;
 import net.forthecrown.guilds.unlockables.UnlockableChunkUpgrade;
 import net.forthecrown.guilds.unlockables.Upgradable;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
+import net.forthecrown.user.property.Properties;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.Text;
@@ -39,6 +44,8 @@ import net.forthecrown.waypoint.Waypoints;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.chat.ChatType;
+import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -69,7 +76,8 @@ public class Guild
       MEMBERS_KEY = "members",
       POSTS_KEY = "boardPosts",
       ACTIVE_EFFECTS_KEY = "activeEffects",
-      CHEST_KEY = "chest";
+      CHEST_KEY = "chest",
+      DISCORD_KEY = "discord";
 
   public static final short
       MAX_NAME_SIZE = 12,
@@ -102,15 +110,20 @@ public class Guild
       activeEffects = new ObjectOpenHashSet<>();
 
   @Getter
-  private final ObjectList<GuildMessage>
-      msgBoardPosts = new ObjectArrayList<>();
+  private final ObjectList<GuildMessage> msgBoardPosts
+      = new ObjectArrayList<>();
 
-  private final ObjectList<GuildInvite>
-      outgoingInvites = new ObjectArrayList<>();
+  private final ObjectList<GuildInvite> outgoingInvites
+      = new ObjectArrayList<>();
+
+  @Getter
+  private final GuildDiscord discord;
 
   public Guild(UUID id, long totalExp, long creationTimeStamp) {
     this.id = id;
     this.settings = new GuildSettings(this);
+    this.discord = new GuildDiscord(this);
+
     this.totalExp = totalExp;
     this.creationTimeStamp = creationTimeStamp;
 
@@ -128,12 +141,76 @@ public class Guild
       Waypoints.removeIfPossible(current);
     }
 
-    sendMessage(
+    announce(
         Messages.guildSetCenter(waypoint.getPosition(), user)
     );
 
     getSettings().setWaypoint(waypoint.getId());
     waypoint.set(WaypointProperties.GUILD_OWNER, getId());
+  }
+
+  public void announce(Component message) {
+    sendMessage(message);
+    discord.forwardAnnouncement(message);
+  }
+
+  public void chat(User user, Component message) {
+    var mute = Punishments.checkMute(user);
+
+    if (BannedWords.checkAndWarn(user.getPlayer(), message)) {
+      mute = Mute.HARD;
+    }
+
+    EavesDropper.reportGuildChat(user, mute, this, message);
+
+    if (!mute.isVisibleToOthers()) {
+      return;
+    }
+
+    // Forward message to discord
+    getDiscord()
+        .forwardGuildChat(user, message);
+
+    Mute finalMute = mute;
+    getMembers()
+        .values()
+        .stream()
+        .filter(member -> {
+          if (finalMute == Mute.SOFT) {
+            return member.getId().equals(user.getUniqueId());
+          }
+
+          var viewer = member.getUser();
+
+          if (!viewer.isOnline()) {
+            viewer.unloadIfOffline();
+            return false;
+          }
+
+          return !Users.areBlocked(user, viewer);
+        })
+
+        .forEach(member -> {
+          var viewer = member.getUser();
+          boolean showRank = viewer.get(Properties.GUILD_RANKED_TAGS);
+          var rank = getSettings().getRank(member.getRankId());
+
+          Component displayName = Users.createListName(
+              user,
+              text()
+                  .append(showRank ?
+                      rank.getFormattedName().append(space())
+                      : Component.empty()
+                  )
+                  .append(user.getTabName())
+                  .build(),
+              false
+          );
+
+          viewer.sendMessage(
+              Messages.guildChat(this, displayName, message)
+          );
+        });
   }
 
   /* ------------------------------- CHEST -------------------------------- */
@@ -231,11 +308,33 @@ public class Guild
   }
 
   @Override
+  public void sendMessage(@NotNull SignedMessage signedMessage,
+                          @NotNull ChatType.Bound boundChatType
+  ) {
+    sendMessage(signedMessage.identity(), signedMessage.unsignedContent(), MessageType.CHAT);
+  }
+
+  @Override
+  public void sendMessage(@NotNull Component message,
+                          @NotNull ChatType.Bound boundChatType
+  ) {
+    sendMessage(Identity.nil(), message, MessageType.CHAT);
+  }
+
+  @Override
   public @NotNull HoverEvent<Component> asHoverEvent(
       @NotNull UnaryOperator<Component> op
   ) {
     var writer = TextWriters.newWriter();
     writer.setFieldStyle(Style.style(NamedTextColor.GRAY));
+    writer.write(
+        getSettings()
+            .getNameFormat().
+            apply(this)
+    );
+    writer.newLine();
+    writer.newLine();
+
     writeHover(writer);
 
     return writer.asComponent()
@@ -261,7 +360,7 @@ public class Guild
   public void writeHover(TextWriter writer) {
     User leader = getLeader().getUser();
 
-    writer.field("Leader", leader.displayName());
+    writer.field("Leader", leader.getTabName());
     writer.field("Total Exp", Text.formatNumber(getTotalExp()));
     writer.field("Created", Text.formatDate(getCreationTimeStamp()));
     writer.field("Members", Text.formatNumber(getMemberSize()));
@@ -397,6 +496,18 @@ public class Guild
   public void rename(String name) {
     GuildManager.get().onRename(name, this);
     settings.name = name;
+
+    discord.getRole().ifPresent(role -> {
+      role.getManager()
+          .setName("Guild: " + name)
+          .submit();
+    });
+
+    discord.channelIfNotArchived().ifPresent(channel -> {
+      channel.getManager()
+          .setName(name)
+          .submit();
+    });
   }
 
   public void addMember(User user) {
@@ -408,12 +519,33 @@ public class Guild
 
     member.hasLeft(false);
     user.setGuild(this);
+
+    var role = discord.getRole();
+    if (role.isEmpty()) {
+      return;
+    }
+
+    user.getDiscordMember().ifPresent(m -> {
+      discord.channelIfNotArchived().ifPresent(channel -> {
+        channel.getManager()
+            .putPermissionOverride(
+                m,
+                GuildDiscord.memberOverridePerms(),
+                null
+            )
+            .submit();
+      });
+
+      m.getGuild()
+          .addRoleToMember(m, role.get())
+          .submit();
+    });
   }
 
   public void join(User user) {
     addMember(user);
 
-    sendMessage(
+    announce(
         Messages.guildJoinAnnouncement(user)
     );
     user.sendMessage(
@@ -429,7 +561,25 @@ public class Guild
     }
 
     member.hasLeft(true);
-    Users.get(id).setGuild(null);
+    var user = Users.get(id);
+    user.setGuild(null);
+
+    var role = discord.getRole();
+    if (role.isEmpty()) {
+      return;
+    }
+
+    user.getDiscordMember().ifPresent(m -> {
+      m.getGuild()
+          .removeRoleFromMember(m, role.get())
+          .submit();
+
+      discord.channelIfNotArchived().ifPresent(channel -> {
+        channel.getManager()
+            .removePermissionOverride(m)
+            .submit();
+      });
+    });
   }
 
   public void addInvite(GuildInvite invite) {
@@ -498,6 +648,7 @@ public class Guild
     g.msgBoardPosts.addAll(msgBoardPosts);
 
     g.settings.deserialize(json.getObject(SETTINGS_KEY));
+    g.discord.deserialize(json.get(DISCORD_KEY));
 
     // Read inventory
     g.refreshGuildChest();
@@ -533,6 +684,11 @@ public class Guild
     JsonArray activeEffectsJson = new JsonArray();
     this.activeEffects.forEach(e -> activeEffectsJson.add(JsonUtils.writeEnum(e)));
     result.add(ACTIVE_EFFECTS_KEY, activeEffectsJson);
+
+    JsonElement discord = this.discord.serialize();
+    if (discord != null) {
+      result.add(DISCORD_KEY, discord);
+    }
 
     JsonArray chest = Guilds.writeInventory(inventory);
     if (!chest.isEmpty()) {

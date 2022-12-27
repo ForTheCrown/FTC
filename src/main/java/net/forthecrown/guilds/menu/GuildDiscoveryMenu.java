@@ -65,7 +65,10 @@ public class GuildDiscoveryMenu extends ListPage<Guild> {
 
               if (enabled) {
                 item.addEnchant(Enchantment.BINDING_CURSE, 1)
-                    .addFlags(ItemFlag.HIDE_ENCHANTS);
+                    .addFlags(ItemFlag.HIDE_ENCHANTS)
+                    .addLore("Click to show private guilds");
+              } else {
+                item.addLore("Click to only show public guilds");
               }
 
               return item.build();

@@ -267,6 +267,30 @@ public class ToggleCommand extends FtcCommand {
     };
 
     new ToggleCommand(
+        "toggleguildchat",
+        "GC Toggled",
+        Properties.G_CHAT_TOGGLE,
+        "All your messages will n{1} go to /gc",
+        Permissions.GUILD,
+        "Toggles all chat messages being sent to /gc",
+        "gct", "gctoggle"
+    ) {
+      @Override
+      public boolean allowedInBook(User user) {
+        return user.getGuild() != null;
+      }
+
+      @Override
+      public void test(User user, boolean newState)
+          throws CommandSyntaxException
+      {
+        if (user.getGuild() == null && newState) {
+          throw Exceptions.NOT_IN_GUILD;
+        }
+      }
+    };
+
+    new ToggleCommand(
         "toggleemotes",
         "Emotes",
         Properties.EMOTES,
