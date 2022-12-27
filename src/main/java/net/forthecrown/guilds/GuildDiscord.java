@@ -146,10 +146,14 @@ public class GuildDiscord {
     WebhookUtil.deliverMessage(
         channel,
         "Steven, the Guild Commissioner",
-        null,
 
+        // Avatar URL
+        getJDA().getSelfUser()
+            .getEffectiveAvatarUrl(),
+
+        // Dumb quick thing to quickly toggle between
+        // embedded messages and normal text messages
         asEmbeded ? null : message,
-
         !asEmbeded ? null : new EmbedBuilder()
             .setTitle(message)
             .setColor(

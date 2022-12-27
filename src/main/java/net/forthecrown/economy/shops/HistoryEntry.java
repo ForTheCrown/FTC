@@ -73,7 +73,7 @@ public record HistoryEntry(long date, UUID customer, int amount, int earned, boo
    * @see #toArray()
    */
   public static HistoryEntry of(long[] data) {
-    Validate.isTrue(data.length != DATA_LENGTH, "Invalid data size");
+    Validate.isTrue(data.length == DATA_LENGTH, "Invalid data size");
 
     return new HistoryEntry(
         data[INDEX_DATE],

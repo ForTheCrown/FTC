@@ -5,10 +5,12 @@ import net.forthecrown.core.module.OnDisable;
 import net.forthecrown.core.module.OnSave;
 import net.kyori.adventure.key.Namespaced;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public final class Main extends JavaPlugin implements Namespaced {
 
@@ -74,5 +76,11 @@ public final class Main extends JavaPlugin implements Namespaced {
   @Override
   public @NonNull String namespace() {
     return NAMESPACE;
+  }
+
+  @Override
+  public @NotNull Logger getLog4JLogger() {
+    ensureLoggerExists();
+    return logger;
   }
 }
