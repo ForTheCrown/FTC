@@ -9,6 +9,7 @@ import lombok.Getter;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.RankTier;
 import net.forthecrown.user.data.UserRank;
+import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.utils.context.Context;
 import net.forthecrown.utils.context.ContextOption;
 import net.forthecrown.utils.context.ContextSet;
@@ -70,14 +71,15 @@ public final class RankMenu {
   }
 
   public static List<UserRank> getExtraRanks(User user, RankTier tier) {
-    return user.getTitles().getAvailable()
+    return tier.getTitles()
         .stream()
         .filter(rank -> {
-          if (rank.isDefaultTitle() || rank.getMenuSlot() != null) {
+          if (rank.getMenuSlot() != null) {
             return false;
           }
 
-          return rank.getTier() == tier;
+          boolean has = user.getTitles().hasTitle(rank);
+          return has || !rank.isHidden();
         })
         .collect(Collectors.toList());
   }
@@ -130,6 +132,8 @@ public final class RankMenu {
 
               .build()
       );
+
+      builder.add(4, 5, UserRanks.DEFAULT.getMenuNode());
     }
 
     private void fillMenu(MenuBuilder builder, RankTier tier) {

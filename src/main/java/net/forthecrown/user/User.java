@@ -61,6 +61,8 @@ import net.forthecrown.user.property.UserProperty;
 import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
+import net.forthecrown.utils.Util;
+import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
 import net.kyori.adventure.audience.Audience;
@@ -1196,6 +1198,27 @@ public class User implements ForwardingAudience.Single,
 
     Component displayName = listDisplayName(true);
     getPlayer().playerListName(displayName);
+
+    // Mmm yes, let's put our API on an insecure HTTP protocol instead
+    // of an HTTPS protocol
+    Component prefix = getEffectivePrefix(true);
+    Component suffix = get(Properties.SUFFIX);
+
+    Util.consoleCommand("nte player %s clear", getName());
+
+    if (!prefix.equals(Component.empty())) {
+      Util.consoleCommand("nte player %s prefix '%s &r'",
+          getName(),
+          Text.LEGACY.serialize(prefix)
+      );
+    }
+
+    if (!suffix.equals(Component.empty())) {
+      Util.consoleCommand("nte player %s suffix ' %s'",
+          getName(),
+          Text.LEGACY.serialize(suffix)
+      );
+    }
 
     TabList.update();
   }

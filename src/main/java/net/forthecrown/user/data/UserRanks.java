@@ -28,6 +28,7 @@ public final class UserRanks {
   public static final UserRank DEFAULT = UserRank.builder()
       .slot(1, 1)
       .defaultTitle(true)
+      .prefix("No Title")
       .hidden(true)
       .tier(NONE)
       .registered("default");

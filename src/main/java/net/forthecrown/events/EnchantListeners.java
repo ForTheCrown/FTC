@@ -265,7 +265,8 @@ public class EnchantListeners implements Listener {
   @EventHandler
   public void onActivate(PlayerInteractEvent event) {
     if (event.getAction() != Action.LEFT_CLICK_AIR
-        && event.getAction() != Action.LEFT_CLICK_BLOCK) {
+        && event.getAction() != Action.LEFT_CLICK_BLOCK
+    ) {
       return;
     }
 
@@ -277,11 +278,13 @@ public class EnchantListeners implements Listener {
 
     var item = player.getInventory().getItemInMainHand();
 
-    if (item.getType() != Material.TRIDENT) {
+    if (ItemStacks.isEmpty(item)) {
       return;
     }
 
-    if (!item.containsEnchantment(FtcEnchants.DOLPHIN_SWIMMER)) {
+    var map = item.getEnchantments();
+
+    if (!map.containsKey(FtcEnchants.DOLPHIN_SWIMMER)) {
       return;
     }
 
