@@ -38,6 +38,8 @@ public final class UserRanks {
   public static final UserRank LEGACY_FREE = UserRank.builder()
       .tier(FREE)
       .prefix("&8[&7Veteran Knight&8]")
+      .addDesc("Given to players that earned")
+      .addDesc("the Knight rank before 1.18.")
       .registered("legacy_free");
 
   public static final UserRank KNIGHT = UserRank.builder()
@@ -45,7 +47,8 @@ public final class UserRanks {
       .asDefault()
       .slot(3, 1)
       .prefix("&8[&7Knight&8]")
-      .addDesc("Earned by defeating the first 3 Dungeon bosses")
+      .addDesc("Earned by defeating the first")
+      .addDesc("three bosses in the Dungeons.")
       .registered("knight");
 
   public static final UserRank BARON = UserRank.builder()
@@ -53,7 +56,7 @@ public final class UserRanks {
       .slot(5, 1)
       .genderEquivalentKey("baroness")
       .prefix("&8[&7Baron&8]")
-      .addDesc("Earned with /becomebaron")
+      .addDesc("Earned with /becomebaron.")
       .registered("baron");
 
   public static final UserRank BARONESS = UserRank.builder()
@@ -61,19 +64,21 @@ public final class UserRanks {
       .slot(5, 2)
       .genderEquivalentKey("baron")
       .prefix("&8[&7Baroness&8]")
-      .addDesc("Earned with /becomebaron")
+      .addDesc("Earned with /becomebaron.")
       .registered("baroness");
 
   public static final UserRank VIKING = UserRank.builder()
       .tier(FREE)
       .prefix("&8[&7Viking&8]")
       .hidden(true)
+      .addDesc("Unobtainable")
       .registered("viking");
 
   public static final UserRank BERSERKER = UserRank.builder()
       .tier(FREE)
       .prefix("&8[&7Berserker&8]")
       .hidden(true)
+      .addDesc("Unobtainable")
       .registered("berserker");
 
 
@@ -81,6 +86,8 @@ public final class UserRanks {
       .tier(TIER_1)
       .prefix("&#959595[&eVeteran Lord&#959595]")
       .genderEquivalentKey("legacy_tier_1_fem")
+      .addDesc("Given to players that had")
+      .addDesc("the Lord rank before 1.18.")
       .hidden(true)
       .registered("legacy_tier_1");
 
@@ -88,6 +95,8 @@ public final class UserRanks {
       .tier(TIER_1)
       .prefix("&#959595[&eVeteran Lady&#959595]")
       .genderEquivalentKey("legacy_tier_1")
+      .addDesc("Given to players that had")
+      .addDesc("the Lady rank before 1.18.")
       .hidden(true)
       .registered("legacy_tier_1_fem");
 
@@ -96,6 +105,7 @@ public final class UserRanks {
       .asDefault()
       .slot(3, 1)
       .genderEquivalentKey("lady")
+      .addDesc("Included in Tier-1 rank package.")
       .prefix("&#959595[&eLord&#959595]")
       .registered("lord");
 
@@ -104,18 +114,21 @@ public final class UserRanks {
       .asDefault()
       .slot(5, 1)
       .genderEquivalentKey("lord")
+      .addDesc("Included in Tier-1 rank package.")
       .prefix("&#959595[&eLady&#959595]")
       .registered("lady");
 
   public static final UserRank SAILOR = UserRank.builder()
       .tier(TIER_1)
       .prefix("&#959595[&eSailor&#959595]")
+      .addDesc("Unobtainable")
       .registered("sailor");
 
   public static final UserRank WARRIOR = UserRank.builder()
       .tier(TIER_1)
       .genderEquivalentKey("shield_maiden")
       .prefix("&#959595[&eWarrior&#959595]")
+      .addDesc("Unobtainable")
       .hidden(true)
       .registered("warrior");
 
@@ -123,6 +136,7 @@ public final class UserRanks {
       .tier(TIER_1)
       .genderEquivalentKey("warrior")
       .prefix("&#959595[&eShieldMaiden&#959595]")
+      .addDesc("Unobtainable")
       .hidden(true)
       .registered("shield_maiden");
 
@@ -131,6 +145,8 @@ public final class UserRanks {
       .tier(TIER_2)
       .prefix("&7[&6Veteran Duke&7]")
       .genderEquivalentKey("legacy_tier_2_fem")
+      .addDesc("Given to players that had")
+      .addDesc("the Duke rank before 1.18.")
       .hidden(true)
       .registered("legacy_tier_2");
 
@@ -138,6 +154,8 @@ public final class UserRanks {
       .tier(TIER_2)
       .prefix("&7[&6Veteran Duchess&7]")
       .genderEquivalentKey("legacy_tier_2")
+      .addDesc("Given to players that had")
+      .addDesc("the Duchess rank before 1.18.")
       .hidden(true)
       .registered("legacy_tier_2_fem");
 
@@ -146,6 +164,7 @@ public final class UserRanks {
       .asDefault()
       .slot(3, 1)
       .genderEquivalentKey("duchess")
+      .addDesc("Included in Tier-2 rank package.")
       .prefix("&7[&6Duke&7]")
       .registered("duke");
 
@@ -154,23 +173,27 @@ public final class UserRanks {
       .asDefault()
       .slot(5, 1)
       .genderEquivalentKey("duke")
+      .addDesc("Included in Tier-2 rank package.")
       .prefix("&7[&6Duchess&7]")
       .registered("duchess");
 
   public static final UserRank CAPTAIN = UserRank.builder()
       .tier(TIER_2)
       .prefix("&7[&6Captain&7]")
+      .addDesc("Was available in the webshop during 2022.")
       .hidden(true)
       .registered("captain");
 
   public static final UserRank ELITE = UserRank.builder()
       .tier(TIER_2)
       .prefix("&7[&6Elite&7]")
+      .addDesc("Was available in the webshop during 2022.")
       .registered("elite");
 
   public static final UserRank HERSIR = UserRank.builder()
       .tier(TIER_2)
       .prefix("&7[&6Hersir&7]")
+      .addDesc("Unobtainable")
       .hidden(true)
       .registered("hersir");
 
@@ -179,6 +202,8 @@ public final class UserRanks {
       .tier(TIER_3)
       .truncatedPrefix(getTier3Prefix("Veteran Prince"))
       .genderEquivalentKey("legacy_tier_3_fem")
+      .addDesc("Given to players that had")
+      .addDesc("the Prince rank before 1.18.")
       .hidden(true)
       .registered("legacy_tier_3");
 
@@ -186,6 +211,8 @@ public final class UserRanks {
       .tier(TIER_3)
       .truncatedPrefix(getTier3Prefix("Veteran Princess"))
       .genderEquivalentKey("legacy_tier_3")
+      .addDesc("Given to players that had")
+      .addDesc("the Princess rank before 1.18.")
       .hidden(true)
       .registered("legacy_tier_3_fem");
 
@@ -194,6 +221,7 @@ public final class UserRanks {
       .asDefault()
       .slot(3, 1)
       .genderEquivalentKey("princess")
+      .addDesc("Available in Tier-3 rank package.")
       .truncatedPrefix(getTier3Prefix("Prince"))
       .registered("prince");
 
@@ -202,30 +230,35 @@ public final class UserRanks {
       .asDefault()
       .slot(5, 1)
       .genderEquivalentKey("prince")
+      .addDesc("Available in Tier-3 rank package.")
       .truncatedPrefix(getTier3Prefix("Princess"))
       .registered("princess");
 
   public static final UserRank ADMIRAL = UserRank.builder()
       .tier(TIER_3)
       .prefix("&f[&#fbff0fAdmiral&f]")
+      .addDesc("Was available in the webshop during 2022.")
       .hidden(true)
       .registered("admiral");
 
   public static final UserRank ROYAL = UserRank.builder()
       .tier(TIER_3)
       .prefix("&f[&#fbff0fRoyal&f]")
+      .addDesc("Was available in the webshop during 2022.")
       .hidden(true)
       .registered("royal");
 
   public static final UserRank JARL = UserRank.builder()
       .tier(TIER_3)
       .prefix("&f[&#fbff0fJarl&f]")
+      .addDesc("Unobtainable")
       .hidden(true)
       .registered("jarl");
 
   public static final UserRank LEGEND = UserRank.builder()
       .tier(TIER_3)
       .prefix("&#dfdfdf[&#fff147Legend&#dfdfdf]")
+      .addDesc("Was available in the webshop during 2020.")
       .hidden(true)
       .registered("legend");
 
