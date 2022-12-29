@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import net.forthecrown.core.registry.Keys;
 import net.forthecrown.utils.inventory.ItemStacks;
+import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -207,11 +208,17 @@ public final class JsonUtils {
   }
 
   public static Component readText(JsonElement element) {
-    return GsonComponentSerializer.gson().deserializeFromTree(element);
+    if (element instanceof JsonPrimitive primitive && primitive.isString()) {
+      return Text.renderString(primitive.getAsString());
+    }
+
+    return GsonComponentSerializer.gson()
+        .deserializeFromTree(element);
   }
 
   public static JsonElement writeText(Component component) {
-    return GsonComponentSerializer.gson().serializeToTree(component);
+    return GsonComponentSerializer.gson()
+        .serializeToTree(component);
   }
 
   static final Gson gson = new GsonBuilder()

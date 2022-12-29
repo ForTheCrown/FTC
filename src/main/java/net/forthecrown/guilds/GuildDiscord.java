@@ -122,20 +122,28 @@ public class GuildDiscord {
 
   /* ----------------------------- FORWARDING ----------------------------- */
 
+  /**
+   * Forwards an announcement to the guild's discord server.
+   * <p>
+   * If {@link #forwardAnnouncements} is set to false, then this method
+   * will do nothing
+   *
+   * @param msg The message to forward
+   */
   public void forwardAnnouncement(Component msg) {
     if (!forwardAnnouncements()) {
       return;
     }
 
     getChannel().ifPresent(channel -> {
-      String text = Text.plain(msg);
+      String text = Text.toDiscord(msg);
       webHookMessage(channel, text, true);
     });
   }
 
   public void forwardGuildChat(User sender, Component message) {
     getChannel().ifPresent(channel -> {
-      String text = Text.plain(message);
+      String text = Text.toDiscord(message);
       String name = sender.getNickOrName();
 
       webHookMessage(channel, name + " **>** " + text, false);

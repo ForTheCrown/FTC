@@ -57,9 +57,7 @@ import org.jetbrains.annotations.Nullable;
  * Utility functions relating to Components, mostly string converters lol
  */
 public final class Text {
-
-  private Text() {
-  }
+  private Text() {}
 
   /* ----------------------------- CONSTANTS ------------------------------ */
 
@@ -113,6 +111,22 @@ public final class Text {
    */
   public static String plain(Component text) {
     return PlainTextComponentSerializer.plainText().serialize(text);
+  }
+
+  /**
+   * Translates a given text to a discord-formatted string.
+   * <p>
+   * Since discord doesn't support colored text, this will be an uncoloured
+   * text, all hover/click events will be ignored
+   *
+   * @param text The text to translate
+   * @return The flattened result
+   */
+  public static String toDiscord(Component text) {
+    Objects.requireNonNull(text);
+
+    return new DiscordRenderer()
+        .flatten(text);
   }
 
   /**

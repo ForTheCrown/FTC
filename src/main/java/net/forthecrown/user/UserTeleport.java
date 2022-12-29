@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.forthecrown.core.Messages;
+import net.forthecrown.core.Permissions;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.utils.Tasks;
 import net.kyori.adventure.text.Component;
@@ -107,7 +108,11 @@ public class UserTeleport {
    * If {@link #isDelayed()} == false, It will instantly skip to {@link #complete()}.
    */
   public void start() {
-    if (!delayed) {
+    int tpDelay = getTpDelay();
+
+    if (!delayed || tpDelay <= 0) {
+      delayed = false;
+
       complete();
       return;
     }
@@ -116,11 +121,22 @@ public class UserTeleport {
     if (!silent) {
       user.sendMessage(Objects.requireNonNullElse(
           startMessage,
-          Messages.teleportStart(GeneralConfig.tpTickDelay * 50L, type)
+          Messages.teleportStart(tpDelay * 50L, type)
       ));
     }
 
-    task = Tasks.runLater(this::complete, GeneralConfig.tpTickDelay);
+    task = Tasks.runLater(this::complete, tpDelay);
+  }
+
+  int getTpDelay() {
+    var perm = Permissions.TP_DELAY;
+
+    if (perm.hasUnlimited(getUser())) {
+      return 0;
+    }
+
+    return perm.getTier(false, getUser())
+        .orElse(perm.getRange().getMaximum());
   }
 
   /**

@@ -68,6 +68,7 @@ import net.forthecrown.commands.admin.CommandTop;
 import net.forthecrown.commands.admin.CommandVanish;
 import net.forthecrown.commands.admin.CommandWorld;
 import net.forthecrown.commands.admin.SaveReloadCommands;
+import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.click.CommandClickableText;
 import net.forthecrown.commands.economy.CommandBecomeBaron;
 import net.forthecrown.commands.economy.CommandDeposit;
@@ -124,8 +125,7 @@ import net.forthecrown.commands.waypoint.CommandVisit;
 import net.forthecrown.commands.waypoint.CommandWaypoints;
 import net.forthecrown.core.FTC;
 import net.forthecrown.core.module.OnEnable;
-import net.forthecrown.grenadier.types.EnumArgument;
-import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.data.UserRank;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.format.page.PageEntryIterator;
 import org.bukkit.entity.Player;
@@ -136,7 +136,8 @@ public final class Commands {
   public static final StringReader EMPTY_READER = new StringReader("");
 
   public static final Map<String, FtcCommand> BY_NAME = new HashMap<>();
-  public static final EnumArgument<RankTitle> RANK = EnumArgument.of(RankTitle.class);
+  public static final RegistryArguments<UserRank> RANK
+      = RegistryArguments.RANKS;
 
   private Commands() {
   }

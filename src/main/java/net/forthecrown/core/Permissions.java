@@ -46,8 +46,7 @@ public final class Permissions {
 
       AUTO_SELL               = register("ftc.sellshop.auto"),
 
-      TP_BYPASS               = register("ftc.teleports.bypass"),
-      WORLD_BYPASS            = register("ftc.teleports.worldbypass"),
+      WORLD_BYPASS            = register("ftc.teleport.worldbypass"),
 
       MARRY                   = register("ftc.marry"),
 
@@ -124,8 +123,6 @@ public final class Permissions {
 
       GUILD                   = register("ftc.guild"),
       GUILD_ADMIN             = registerPrefixed(GUILD, "admin"),
-      GUILD_ROLE_COLOR        = registerPrefixed(GUILD, "donator.rolecolor"),
-      GUILD_PRIVATE_CHAT      = registerPrefixed(GUILD, "donator.guildchat"),
 
       CMD_GAMEMODE            = registerCmd("gamemode"),
       CMD_GAMEMODE_OTHERS     = registerPrefixed(CMD_GAMEMODE, "others"),
@@ -153,6 +150,13 @@ public final class Permissions {
 
   public static final TieredPermission MAX_HOMES = TieredPermission.builder()
       .prefix("ftc.homes.")
+      .allowUnlimited()
+      .tiersFrom1To(5)
+      .build();
+
+  public static final TieredPermission TP_DELAY = TieredPermission.builder()
+      .prefix("ftc.teleport.delay.")
+      .unlimitedPerm("ftc.teleport.bypass")
       .allowUnlimited()
       .tiersFrom1To(5)
       .build();

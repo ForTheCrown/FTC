@@ -2,6 +2,7 @@ package net.forthecrown.core;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectAVLTreeMap;
 import java.util.Comparator;
+import java.util.OptionalInt;
 import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,12 +54,12 @@ public class TieredPermission {
     return new Builder();
   }
 
-  public int getTier(User user) {
-    return _getTier(user::hasPermission);
+  public OptionalInt getTier(boolean highest, User user) {
+    return _getTier(highest, user::hasPermission);
   }
 
-  public int getTier(Permissible permissible) {
-    return _getTier(permissible::hasPermission);
+  public OptionalInt getTier(boolean highest, Permissible permissible) {
+    return _getTier(highest, permissible::hasPermission);
   }
 
   public boolean hasUnlimited(Permissible permissible) {
@@ -69,18 +70,35 @@ public class TieredPermission {
     return user.hasPermission(getUnlimitedPermission());
   }
 
-  private int _getTier(Predicate<Permission> validate) {
+  private OptionalInt _getTier(boolean highest, Predicate<Permission> validate) {
     if (validate.test(getUnlimitedPermission())) {
-      return Integer.MAX_VALUE;
+      return OptionalInt.of(
+          highest ? Integer.MAX_VALUE : Integer.MIN_VALUE
+      );
     }
 
+    Integer result = null;
+
     for (var v : permissions.int2ObjectEntrySet()) {
-      if (validate.test(v.getValue())) {
-        return v.getIntKey();
+      if (!validate.test(v.getValue())) {
+        continue;
+      }
+
+      if (result == null) {
+        result = v.getIntKey();
+        continue;
+      }
+
+      if (highest) {
+        result = Math.max(result, v.getIntKey());
+      } else {
+        result = Math.min(result, v.getIntKey());
       }
     }
 
-    return -1;
+    return result == null
+        ? OptionalInt.empty()
+        : OptionalInt.of(result);
   }
 
   public boolean contains(int tier) {

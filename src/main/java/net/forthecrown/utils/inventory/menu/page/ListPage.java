@@ -174,7 +174,8 @@ public abstract class ListPage<T> extends MenuPage {
 
   @Override
   public void onClick(User user, Context context, ClickContext click)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     var list = getList(user, context);
 
     if (list == null || list.isEmpty()) {

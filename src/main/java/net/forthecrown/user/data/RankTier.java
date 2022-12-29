@@ -1,14 +1,15 @@
 package net.forthecrown.user.data;
 
 import com.google.gson.JsonElement;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
-import it.unimi.dsi.fastutil.objects.ObjectSets;
-import java.util.Set;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.forthecrown.utils.JsonSerializable;
 import net.forthecrown.utils.io.JsonUtils;
+import org.apache.commons.lang.WordUtils;
 
 /**
  * Represents a rank's tier.
@@ -19,7 +20,7 @@ import net.forthecrown.utils.io.JsonUtils;
  * synced to each other.
  *
  * @see UserTitles#ensureSynced()
- * @see RankTitle
+ * @see UserRank
  * @see UserTitles
  */
 @Getter
@@ -59,19 +60,23 @@ public enum RankTier implements JsonSerializable {
   /**
    * All titles that belong to this tier
    */
-  final ObjectSet<RankTitle> titles = new ObjectOpenHashSet<>();
+  final ObjectList<UserRank> titles = new ObjectArrayList<>();
 
   /**
    * Gets a cloned enum set of all the titles this tier holds
    *
    * @return Cloned enum set of this tier's titles
    */
-  public Set<RankTitle> getTitles() {
-    return ObjectSets.unmodifiable(titles);
+  public List<UserRank> getTitles() {
+    return ObjectLists.unmodifiable(titles);
   }
 
   @Override
   public JsonElement serialize() {
     return JsonUtils.writeEnum(this);
+  }
+
+  public String getDisplayName() {
+    return WordUtils.capitalizeFully(name().replaceAll("_", " "));
   }
 }

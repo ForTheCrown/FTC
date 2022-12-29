@@ -25,7 +25,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
-import org.dynmap.Log;
 
 public class PlayerJoinListener implements Listener {
 
@@ -79,7 +78,7 @@ public class PlayerJoinListener implements Listener {
             .get(user.getPreviousNames().size() - 1);
 
         sendLogMessage(audience -> {
-          Component name = LoginEffects.getDisplayName(user);
+          Component name = LoginEffects.getDisplayName(user, audience);
           return Messages.newNameJoinMessage(name, lastName);
         });
       } else {
@@ -90,7 +89,7 @@ public class PlayerJoinListener implements Listener {
 
   public static void sendLoginMessage(User user) {
     sendLogMessage(audience -> {
-      Component name = LoginEffects.getDisplayName(user);
+      Component name = LoginEffects.getDisplayName(user, audience);
       LoginEffect effect = user.getCosmeticData().get(Cosmetics.LOGIN);
       return Messages.joinMessage(name, effect);
     });
@@ -98,7 +97,7 @@ public class PlayerJoinListener implements Listener {
 
   public static void sendLogoutMessage(User user) {
     sendLogMessage(audience -> {
-      Component name = LoginEffects.getDisplayName(user);
+      Component name = LoginEffects.getDisplayName(user, audience);
       LoginEffect effect = user.getCosmeticData().get(Cosmetics.LOGIN);
       return Messages.leaveMessage(name, effect);
     });

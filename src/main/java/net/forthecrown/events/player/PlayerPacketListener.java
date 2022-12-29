@@ -5,7 +5,6 @@ import io.netty.buffer.ByteBufAllocator;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 import java.util.UUID;
-import net.forthecrown.core.FTC;
 import net.forthecrown.user.packet.PacketCall;
 import net.forthecrown.user.packet.PacketHandler;
 import net.forthecrown.user.packet.PacketListener;
@@ -13,11 +12,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Action;
 import net.minecraft.world.level.GameType;
-import org.apache.logging.log4j.Logger;
 
 public class PlayerPacketListener implements PacketListener {
-  private static final Logger LOGGER = FTC.getLogger();
-
   public static final String WRITER_FIELD = "h";
 
   @PacketHandler(ignoreCancelled = true)
@@ -32,15 +28,11 @@ public class PlayerPacketListener implements PacketListener {
       return;
     }
 
-    LOGGER.debug("actions={}", actions);
-
     UUID target = call.getPlayer().getUniqueId();
     List<ClientboundPlayerInfoUpdatePacket.Entry>
         entries = new ObjectArrayList<>(packet.entries());
 
     var it = entries.listIterator();
-
-    LOGGER.debug("Before loop");
 
     boolean changed = false;
 
@@ -48,16 +40,12 @@ public class PlayerPacketListener implements PacketListener {
       var n = it.next();
 
       if (n.profileId().equals(target)) {
-        LOGGER.debug("profileId == target: {}", target);
         continue;
       }
 
       if (n.gameMode() != GameType.SPECTATOR) {
-        LOGGER.debug("Not spectator");
         continue;
       }
-
-      LOGGER.debug("Setting entry");
 
       changed = true;
       it.set(
@@ -73,10 +61,7 @@ public class PlayerPacketListener implements PacketListener {
       );
     }
 
-    LOGGER.debug("After loop");
-
     if (!changed) {
-      LOGGER.debug("None changed");
       return;
     }
 
@@ -103,8 +88,6 @@ public class PlayerPacketListener implements PacketListener {
     ClientboundPlayerInfoUpdatePacket replacementPacket
         = new ClientboundPlayerInfoUpdatePacket(buf);
 
-    LOGGER.debug("Setting replacement packet: {}", replacementPacket);
     call.setReplacementPacket(replacementPacket);
-    LOGGER.debug("END");
   }
 }

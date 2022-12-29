@@ -13,9 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 
 public final class Npcs {
-
-  private Npcs() {
-  }
+  private Npcs() {}
 
   public static final NamespacedKey KEY = Keys.forthecrown("interactable_npc");
 

@@ -42,6 +42,7 @@ public class RoyalSwordType implements ExtendedItemType<RoyalSword> {
 
   public RoyalSwordType() {
     SwordRanks.init();
+    WeaponAbilities.init();
   }
 
   @Pattern(Keys.VALID_KEY_REGEX)

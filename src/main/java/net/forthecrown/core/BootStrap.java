@@ -31,6 +31,7 @@ import net.forthecrown.structure.Structures;
 import net.forthecrown.useables.Usables;
 import net.forthecrown.user.Components;
 import net.forthecrown.user.UserManager;
+import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.packet.PacketListeners;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.utils.text.ChatEmotes;
@@ -59,6 +60,7 @@ final class BootStrap {
 
     // Users
     init(UserManager::get);
+    init(UserRanks.class);
     init(Components.class);
     init(Properties.class);
 

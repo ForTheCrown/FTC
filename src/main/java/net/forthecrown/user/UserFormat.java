@@ -15,9 +15,9 @@ import net.forthecrown.economy.market.MarketDisplay;
 import net.forthecrown.economy.market.Markets;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.guilds.Guild;
-import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.user.data.TimeField;
 import net.forthecrown.user.data.UserInteractions;
+import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.data.UserTitles;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.utils.text.Text;
@@ -196,7 +196,7 @@ public class UserFormat {
       writer.field("Spouse", spouseDisplayName);
     }
 
-    if (titles.getTitle() != RankTitle.DEFAULT) {
+    if (titles.getTitle() != UserRanks.DEFAULT) {
       writer.field("Rank", titles.getTitle());
     }
 

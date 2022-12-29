@@ -1,7 +1,11 @@
 package net.forthecrown.user.data;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import java.util.EnumSet;
+import com.google.gson.JsonPrimitive;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.util.Set;
+import java.util.function.Consumer;
 import lombok.Getter;
 import net.forthecrown.core.FTC;
 import net.forthecrown.user.ComponentType;
@@ -9,26 +13,33 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.UserComponent;
 import net.forthecrown.user.UserOfflineException;
 import net.forthecrown.utils.Util;
-import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Data and functions relating to tiers and titles a user can have.
  *
- * @see RankTitle
+ * @see UserRank
  * @see RankTier
  * @see #ensureSynced()
  */
 public class UserTitles extends UserComponent {
+  private static final Logger LOGGER = FTC.getLogger();
+
+  public static final String
+      KEY_TITLE = "title",
+      KEY_AVAILABLE = "titles",
+      KEY_TIER = "tier";
+
   /* ----------------------------- INSTANCE FIELDS ------------------------------ */
   /**
    * The user's currently active title
    */
   @Getter
-  private RankTitle title = RankTitle.DEFAULT;
+  private UserRank title = UserRanks.DEFAULT;
 
   /**
    * The user's current tier
@@ -39,7 +50,7 @@ public class UserTitles extends UserComponent {
   /**
    * All non-default titles available to this user
    */
-  private final EnumSet<RankTitle> available = EnumSet.noneOf(RankTitle.class);
+  private final Set<UserRank> available = new ObjectOpenHashSet<>();
 
   /* ----------------------------- CONSTRUCTORS ------------------------------ */
 
@@ -54,8 +65,8 @@ public class UserTitles extends UserComponent {
    *
    * @return The user's non-default titles
    */
-  public EnumSet<RankTitle> getAvailable() {
-    return available.clone();
+  public Set<UserRank> getAvailable() {
+    return new ObjectOpenHashSet<>(available);
   }
 
   /* ----------------------------- TITLES ------------------------------ */
@@ -68,9 +79,9 @@ public class UserTitles extends UserComponent {
    *
    * @param title The title to test for
    * @return True, if the user has this title
-   * @see RankTitle#isDefaultTitle()
+   * @see UserRank#isDefaultTitle()
    */
-  public boolean hasTitle(RankTitle title) {
+  public boolean hasTitle(UserRank title) {
     if (title.isDefaultTitle()) {
       return hasTier(title.getTier());
     }
@@ -89,13 +100,13 @@ public class UserTitles extends UserComponent {
   /**
    * Adds the given title to this user.
    * <p>
-   * Delegate for: {@link #addTitle(RankTitle, boolean)} with the boolean parameter as true
+   * Delegate for: {@link #addTitle(UserRank, boolean)} with the boolean parameter as true
    *
    * @param title The title to add
-   * @see #addTitle(RankTitle, boolean)
-   * @see #addTitle(RankTitle, boolean, boolean)
+   * @see #addTitle(UserRank, boolean)
+   * @see #addTitle(UserRank, boolean, boolean)
    */
-  public void addTitle(RankTitle title) {
+  public void addTitle(UserRank title) {
     addTitle(title, true);
   }
 
@@ -103,16 +114,16 @@ public class UserTitles extends UserComponent {
    * Adds the given title to this user and potentially changes the user's tier and permissions group
    * if the given title's tier is higher than the current tier.
    * <p>
-   * Delegate method for {@link #addTitle(RankTitle, boolean, boolean)} with both boolean parameters
+   * Delegate method for {@link #addTitle(UserRank, boolean, boolean)} with both boolean parameters
    * set to the value of
    * <code>givePermissions</code>
    *
    * @param title           The title to add
    * @param givePermissions True, to change the user's permissions group and tier if the title's
    *                        tier is higher than the current user's tier
-   * @see #addTitle(RankTitle, boolean, boolean)
+   * @see #addTitle(UserRank, boolean, boolean)
    */
-  public void addTitle(RankTitle title, boolean givePermissions) {
+  public void addTitle(UserRank title, boolean givePermissions) {
     addTitle(title, givePermissions, givePermissions);
   }
 
@@ -131,7 +142,7 @@ public class UserTitles extends UserComponent {
    *                        tier is higher than the current user's tier
    * @param setTier         True, to test if the user's tier should be changed if it's higher
    */
-  public void addTitle(RankTitle title, boolean givePermissions, boolean setTier) {
+  public void addTitle(UserRank title, boolean givePermissions, boolean setTier) {
     if (!title.isDefaultTitle()) {
       available.add(title);
 
@@ -150,7 +161,7 @@ public class UserTitles extends UserComponent {
    *
    * @param title The title to remove
    */
-  public void removeTitle(RankTitle title) {
+  public void removeTitle(UserRank title) {
     if (title.isDefaultTitle()) {
       return;
     }
@@ -169,7 +180,7 @@ public class UserTitles extends UserComponent {
    *
    * @param title The title to set
    */
-  public void setTitle(RankTitle title) {
+  public void setTitle(UserRank title) {
     this.title = title;
 
     if (!getUser().isOnline()) {
@@ -255,12 +266,12 @@ public class UserTitles extends UserComponent {
   }
 
   /**
-   * Ensures the user's {@link RankTier} is synced to the user's permission group and that the
-   * user's permission group is synced to the user's tier.
+   * Ensures the user's {@link RankTier} is synced to the user's permission
+   * group and that the user's permission group is synced to the user's tier.
    * <p>
-   * If the user has a permission group of a higher tier than the one they currently have, then the
-   * user's tier is changed. If the user has a tier higher than their luck perms group, then their
-   * luck perms group is upgraded
+   * If the user has a permission group of a higher tier than the one they
+   * currently have, then the user's tier is changed. If the user has a tier
+   * higher than their luck perms group, then their luck perms group is upgraded
    *
    * @throws UserOfflineException If the user is offline
    */
@@ -294,12 +305,13 @@ public class UserTitles extends UserComponent {
   }
 
   /**
-   * Clears all available titles, sets the active title to {@link RankTitle#DEFAULT} and the current
+   * Clears all available titles, sets the active title to
+   * {@link UserRanks#DEFAULT} and the current
    * tier to {@link RankTier#NONE}
    */
   public void clear() {
     available.clear();
-    title = RankTitle.DEFAULT;
+    title = UserRanks.DEFAULT;
     tier = RankTier.NONE;
   }
 
@@ -315,28 +327,63 @@ public class UserTitles extends UserComponent {
 
     var json = JsonWrapper.wrap(element.getAsJsonObject());
 
-    this.title = json.getEnum("title", RankTitle.class, RankTitle.DEFAULT);
-    this.tier = json.getEnum("tier", RankTier.class, RankTier.NONE);
-    this.available.addAll(
-        json.getList("titles", element1 -> JsonUtils.readEnum(RankTitle.class, element1)));
+    tier = json.getEnum(KEY_TIER, RankTier.class, RankTier.NONE);
+
+    if (json.has(KEY_TITLE)) {
+      deserializeRank(json.get(KEY_TITLE), rank -> this.title = rank);
+    }
+
+    if (json.has(KEY_AVAILABLE)) {
+      JsonArray arr = json.getArray(KEY_AVAILABLE);
+
+      for (var e: arr) {
+        deserializeRank(e, available::add);
+      }
+    }
   }
 
   @Override
   public @Nullable JsonElement serialize() {
     var json = JsonWrapper.create();
 
-    if (title != RankTitle.DEFAULT) {
-      json.add("title", title);
+    if (tier != RankTier.NONE) {
+      json.addEnum(KEY_TIER, tier);
     }
 
-    if (tier != RankTier.NONE) {
-      json.add("tier", tier);
+    if (title != UserRanks.DEFAULT) {
+      serializeRank(title, primitive -> json.add(KEY_TITLE, primitive));
     }
 
     if (!available.isEmpty()) {
-      json.addList("titles", available);
+      JsonArray arr = new JsonArray();
+
+      for (var t: available) {
+        serializeRank(t, arr::add);
+      }
+
+      if (!arr.isEmpty()) {
+        json.add(KEY_AVAILABLE, arr);
+      }
     }
 
     return json.nullIfEmpty();
+  }
+
+  private void deserializeRank(JsonElement element,
+                               Consumer<UserRank> consumer
+  ) {
+    UserRanks.REGISTRY.readJson(element)
+        .ifPresentOrElse(consumer, () -> {
+          LOGGER.warn("Unknown user rank: {}", element);
+        });
+  }
+
+  private void serializeRank(UserRank rank,
+                             Consumer<JsonPrimitive> keyConsumer
+  ) {
+    UserRanks.REGISTRY.writeJson(rank)
+        .ifPresentOrElse(keyConsumer, () -> {
+          LOGGER.warn("Unregistered rank found {}, cannot serialize", rank);
+        });
   }
 }

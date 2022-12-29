@@ -58,6 +58,7 @@ public final class Main extends JavaPlugin implements Namespaced {
     }
 
     getLogger().addHandler(DiscordErrorLogHandler.INSTANCE);
+    Bukkit.getLogger().addHandler(DiscordErrorLogHandler.INSTANCE);
 
     logger = new FtcLogger(
         LogManager.getContext()

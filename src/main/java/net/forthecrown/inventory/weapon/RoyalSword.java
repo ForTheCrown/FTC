@@ -10,6 +10,7 @@ import lombok.Setter;
 import net.forthecrown.core.FTC;
 import net.forthecrown.inventory.ExtendedItem;
 import net.forthecrown.inventory.ExtendedItemType;
+import net.forthecrown.inventory.weapon.ability.WeaponAbility;
 import net.forthecrown.inventory.weapon.goals.WeaponGoal;
 import net.forthecrown.user.data.RankTier;
 import net.forthecrown.utils.Tasks;
@@ -19,6 +20,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -34,13 +36,15 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 @Getter
 public class RoyalSword extends ExtendedItem {
+  private static final Logger LOGGER = FTC.getLogger();
 
   public static final String
       TAG_RANK = "rank",
       TAG_LAST_FLAVOR = "lastFlavorChange",
       TAG_EXTRA_DATA = "extraData",
       TAG_GOALS = "goals",
-      TAG_ABILITY = "ability";
+      TAG_ABILITY = "ability",
+      TAG_ABILITY_TYPE = "abilityType";
 
   public static final Component BORDER = Component.text("------------------------------",
       nonItalic(NamedTextColor.DARK_GRAY));
@@ -304,8 +308,16 @@ public class RoyalSword extends ExtendedItem {
 
     this.rank = SwordRanks.RANKS[tag.getInt(TAG_RANK)];
 
-    if (tag.contains(TAG_ABILITY)) {
-      setAbility(WeaponAbility.load(tag.get(TAG_ABILITY)));
+    if (tag.contains(TAG_ABILITY_TYPE)) {
+      WeaponAbilities.REGISTRY.readTag(tag.get(TAG_ABILITY_TYPE))
+          .ifPresentOrElse(type -> {
+            CompoundTag abilityTag = tag.getCompound(TAG_ABILITY);
+            setAbility(type.load(abilityTag));
+          }, () -> {
+            LOGGER.warn("Unknown ability type {} found in {}'s sword",
+                tag.get(TAG_ABILITY_TYPE), getOwner()
+            );
+          });
     }
 
     if (tag.contains(TAG_GOALS)) {
@@ -353,7 +365,19 @@ public class RoyalSword extends ExtendedItem {
     }
 
     if (ability != null) {
-      tag.put(TAG_ABILITY, ability.save());
+      WeaponAbilities.REGISTRY.writeTag(ability.getType())
+          .ifPresentOrElse(keyTag -> {
+            CompoundTag abilityTag = new CompoundTag();
+            ability.save(abilityTag);
+
+            tag.put(TAG_ABILITY, abilityTag);
+            tag.put(TAG_ABILITY_TYPE, keyTag);
+          }, () -> {
+            LOGGER.warn(
+                "Unregistered weapon ability found in {} sword",
+                getOwner()
+            );
+          });
     }
   }
 }

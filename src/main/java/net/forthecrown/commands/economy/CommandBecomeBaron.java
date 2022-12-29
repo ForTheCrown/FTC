@@ -10,7 +10,7 @@ import net.forthecrown.economy.TransactionType;
 import net.forthecrown.economy.Transactions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.user.User;
-import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.data.UserRanks;
 import org.bukkit.Sound;
 
 public class CommandBecomeBaron extends FtcCommand {
@@ -69,7 +69,7 @@ public class CommandBecomeBaron extends FtcCommand {
               validate(user);
 
               user.removeBalance(GeneralConfig.baronPrice);
-              user.getTitles().addTitle(RankTitle.BARON);
+              user.getTitles().addTitle(UserRanks.BARON);
 
               Transactions.builder()
                   .type(TransactionType.BECOME_BARON)
@@ -88,7 +88,7 @@ public class CommandBecomeBaron extends FtcCommand {
   private static void validate(User user) throws CommandSyntaxException {
     var baronPrice = GeneralConfig.baronPrice;
 
-    if (user.getTitles().hasTitle(RankTitle.BARON)) {
+    if (user.getTitles().hasTitle(UserRanks.BARON)) {
       throw Exceptions.ALREADY_BARON;
     }
 

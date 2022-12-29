@@ -1,12 +1,8 @@
 package net.forthecrown.cosmetics.login;
 
 import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.Component.textOfChildren;
 
-import net.forthecrown.core.Messages;
-import net.forthecrown.cosmetics.Cosmetics;
 import net.forthecrown.user.User;
-import net.forthecrown.user.Users;
 import net.forthecrown.user.data.RankTier;
 import net.forthecrown.utils.inventory.menu.Slot;
 import net.kyori.adventure.audience.Audience;
@@ -38,7 +34,8 @@ public class LoginEffects {
     return new LoginEffect(name, slot, tier, prefix, suffix);
   }
 
-  public static Component getDisplayName(User user) {
-      return user.listDisplayName(true).color(NamedTextColor.YELLOW);
+  public static Component getDisplayName(User user, Audience viewer) {
+      return user.listDisplayName(true)
+          .color(NamedTextColor.YELLOW);
   }
 }

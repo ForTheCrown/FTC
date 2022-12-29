@@ -21,7 +21,7 @@ import net.forthecrown.grenadier.exceptions.RoyalCommandException;
 import net.forthecrown.guilds.Guild;
 import net.forthecrown.royalgrenadier.GrenadierUtils;
 import net.forthecrown.user.User;
-import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.data.UserRank;
 import net.forthecrown.utils.math.Vectors;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.waypoint.Waypoint;
@@ -164,6 +164,7 @@ public interface Exceptions {
   CommandSyntaxException NO_PERMISSION = INSTANCE.create(Messages.NO_PERMISSION);
 
   CommandSyntaxException DONT_HAVE_TITLE = create("You don't have this title.");
+
   CommandSyntaxException DONT_HAVE_TIER = create("You don't have the required tier.");
 
   CommandSyntaxException ALREADY_YOUR_TITLE = create("This is already your title");
@@ -529,7 +530,7 @@ public interface Exceptions {
 
   static CommandSyntaxException overHomeLimit(User user) {
     return format("Cannot create more homes (Over limit of {0, number}).",
-        Permissions.MAX_HOMES.getTier(user)
+        Permissions.MAX_HOMES.getTier(true, user).orElse(5)
     );
   }
 
@@ -862,7 +863,7 @@ public interface Exceptions {
     return format("{0, location, -c -w} is not a sign", l);
   }
 
-  static CommandSyntaxException defaultTitle(RankTitle title) {
+  static CommandSyntaxException defaultTitle(UserRank title) {
     return format("Cannot use default title: '{0}'", title);
   }
 

@@ -10,8 +10,8 @@ import net.forthecrown.useables.UsableConstructor;
 import net.forthecrown.useables.UsageTest;
 import net.forthecrown.useables.UsageType;
 import net.forthecrown.user.Users;
-import net.forthecrown.user.data.RankTitle;
-import net.forthecrown.utils.io.TagUtil;
+import net.forthecrown.user.data.UserRank;
+import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,9 +22,9 @@ public class TestRank extends UsageTest {
 
   public static final UsageType<TestRank> TYPE = UsageType.of(TestRank.class);
 
-  private final RankTitle title;
+  private final UserRank title;
 
-  public TestRank(RankTitle title) {
+  public TestRank(UserRank title) {
     super(TYPE);
     this.title = title;
   }
@@ -36,7 +36,8 @@ public class TestRank extends UsageTest {
 
   @Override
   public Tag save() {
-    return TagUtil.writeEnum(title);
+    return UserRanks.REGISTRY.writeTag(title)
+        .orElseThrow();
   }
 
   @Override
@@ -53,12 +54,15 @@ public class TestRank extends UsageTest {
 
   @UsableConstructor
   public static TestRank parse(StringReader reader, CommandSource source)
-      throws CommandSyntaxException {
-    return new TestRank(Commands.RANK.parse(reader));
+      throws CommandSyntaxException
+  {
+    return new TestRank(Commands.RANK.parse(reader).getValue());
   }
 
   @UsableConstructor(ConstructType.TAG)
   public static TestRank load(Tag tag) {
-    return new TestRank(TagUtil.readEnum(RankTitle.class, tag));
+    return new TestRank(
+        UserRanks.REGISTRY.readTagOrThrow(tag)
+    );
   }
 }

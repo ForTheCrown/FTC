@@ -4,13 +4,15 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
+import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.manager.Exceptions;
+import net.forthecrown.core.registry.Holder;
 import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.types.ArrayArgument;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.RankTier;
-import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.data.UserRank;
 import net.forthecrown.user.data.UserTitles;
 import net.forthecrown.utils.text.Text;
 import net.forthecrown.utils.text.TextJoiner;
@@ -20,13 +22,13 @@ import net.forthecrown.utils.text.writer.TextWriters;
 class UserTitlesNode extends UserCommandNode {
 
   private static final EnumArgument<RankTier> TIER_ARG = EnumArgument.of(RankTier.class);
-  private static final EnumArgument<RankTitle> TITLE_ARG = EnumArgument.of(RankTitle.class);
+  private static final RegistryArguments<UserRank> TITLE_ARG = RegistryArguments.RANKS;
 
-  private static final ArrayArgument<RankTitle> TITLE_ARRAY_ARG = ArrayArgument.of(TITLE_ARG);
+  private static final ArrayArgument<Holder<UserRank>> TITLE_ARRAY_ARG
+      = ArrayArgument.of(TITLE_ARG);
 
   public UserTitlesNode() {
     super("user_titles", "titles");
-
   }
 
   @Override
@@ -73,13 +75,13 @@ class UserTitlesNode extends UserCommandNode {
             .then(argument("title", TITLE_ARG)
                 .executes(c -> {
                   User user = provider.get(c);
-                  var title = c.getArgument("title", RankTitle.class);
+                  Holder<UserRank> title = c.getArgument("title", Holder.class);
 
-                  user.getTitles().setTitle(title);
+                  user.getTitles().setTitle(title.getValue());
 
                   c.getSource().sendAdmin(
                       Text.format("Set {0, user}'s title to {1}",
-                          user, title
+                          user, title.getValue()
                       )
                   );
                   return 0;
@@ -179,7 +181,12 @@ class UserTitlesNode extends UserCommandNode {
     var user = provider.get(c);
     UserTitles userTitles = user.getTitles();
 
-    Collection<RankTitle> titles = c.getArgument("titles", Collection.class);
+    Collection<Holder<UserRank>> rankHolders
+        = c.getArgument("titles", Collection.class);
+
+    var titles = rankHolders.stream()
+        .map(Holder::getValue)
+        .toList();
 
     for (var t : titles) {
       if (t.isDefaultTitle()) {

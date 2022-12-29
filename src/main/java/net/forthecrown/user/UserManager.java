@@ -2,6 +2,7 @@ package net.forthecrown.user;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -15,10 +16,13 @@ import net.forthecrown.core.FTC;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.core.module.OnLoad;
 import net.forthecrown.core.module.OnSave;
+import net.forthecrown.core.registry.Keys;
+import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.utils.UUID2IntMap;
 import net.forthecrown.utils.UUID2IntMap.KeyValidator;
 import net.forthecrown.utils.io.PathUtil;
 import net.forthecrown.utils.io.SerializableObject;
+import net.forthecrown.utils.io.SerializationHelper;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
@@ -102,6 +106,8 @@ public final class UserManager implements SerializableObject {
     playTime  = createMap("playtime.json", null);
     votes     = createMap("votes.json", null);
     gems      = createMap("gems.json", null);
+
+    readExtraRanks();
   }
 
   private UUID2IntMap createMap(String file, @Nullable IntSupplier supplier) {
@@ -114,6 +120,40 @@ public final class UserManager implements SerializableObject {
 
     return new UUID2IntMap(path, supplier)
         .setValidator(KeyValidator.IS_USER);
+  }
+
+  private void readExtraRanks() {
+    Path rankJson = directory.resolve("ranks.json");
+
+    if (!Files.exists(rankJson)) {
+      return;
+    }
+
+    SerializationHelper.readJsonFile(rankJson, wrapper -> {
+      for (var e: wrapper.entrySet()) {
+        if (!Keys.isValidKey(e.getKey())) {
+          LOGGER.warn("{} is an invalid registry key", e.getKey());
+          continue;
+        }
+
+        if (!(e.getValue().isJsonObject())) {
+          LOGGER.warn("Expected {} to be JSON object, was {}",
+              e.getKey(), e.getValue()
+          );
+          continue;
+        }
+
+        // IDK if it matters, but even though there's a init call in
+        // Bootstrap, this is at the moment, the first call to this class
+        // during startup, meaning this call loads the class
+        UserRanks.parse(e.getValue())
+            .resultOrPartial(s -> {
+              LOGGER.warn("Couldn't parse rank at {}: {}", e.getKey(), s);
+            })
+
+            .ifPresent(rank -> UserRanks.REGISTRY.register(e.getKey(), rank));
+      }
+    });
   }
 
   public static UserManager get() {

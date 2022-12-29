@@ -156,7 +156,7 @@
   "daily/playtime": {
     "displayName": "Playtime",
     "goal": 30,
-    "eventClass": "custom",
+    "eventClass": "org.bukkit.event.player.PlayerJoinEvent",
     "script": "challenges/playtime.js",
     "description": [
       "Play for %goal minutes"

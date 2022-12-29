@@ -11,7 +11,6 @@ import net.forthecrown.economy.market.MarketManager;
 import net.forthecrown.user.data.CosmeticData;
 import net.forthecrown.user.data.MailMessage;
 import net.forthecrown.user.data.RankTier;
-import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.user.data.UserHomes;
 import net.forthecrown.user.data.UserInteractions;
 import net.forthecrown.user.data.UserMail;

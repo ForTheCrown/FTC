@@ -6,12 +6,10 @@ import net.forthecrown.commands.click.ClickableTexts;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.npc.SimpleNpc;
-import net.forthecrown.core.registry.Keys;
 import net.forthecrown.dungeons.BossItems;
 import net.forthecrown.events.DungeonListeners;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
@@ -20,8 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public class DiegoNPC implements SimpleNpc {
-
-  public static final Key KEY = Keys.royals("diego");
 
   private static final ClickableTextNode TRIDENT_NODE = ClickableTexts.register(
       new ClickableTextNode("trident_fork")

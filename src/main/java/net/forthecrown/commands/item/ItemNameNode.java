@@ -16,6 +16,11 @@ public class ItemNameNode extends ItemModifierNode {
   }
 
   @Override
+  String getArgumentName() {
+    return "name";
+  }
+
+  @Override
   public void create(LiteralArgumentBuilder<CommandSource> command) {
     command
         .then(argument("name", Arguments.CHAT)

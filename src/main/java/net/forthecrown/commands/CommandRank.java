@@ -3,8 +3,6 @@ package net.forthecrown.commands;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.inventory.RankMenu;
-import net.forthecrown.user.Users;
-import org.bukkit.entity.Player;
 
 public class CommandRank extends FtcCommand {
 
@@ -34,8 +32,8 @@ public class CommandRank extends FtcCommand {
   @Override
   protected void createCommand(BrigadierCommand command) {
     command.executes(c -> {
-      Player player = c.getSource().asPlayer();
-      RankMenu.openInventory(Users.get(player));
+      RankMenu.getInstance().open(getUserSender(c));
+
       return 0;
     });
   }

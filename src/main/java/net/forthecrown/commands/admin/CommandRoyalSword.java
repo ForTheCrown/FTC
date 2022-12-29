@@ -1,6 +1,5 @@
 package net.forthecrown.commands.admin;
 
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.Pair;
 import net.forthecrown.commands.arguments.Arguments;
@@ -8,40 +7,17 @@ import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.core.Permissions;
 import net.forthecrown.grenadier.command.BrigadierCommand;
-import net.forthecrown.grenadier.types.RegistryArgument;
-import net.forthecrown.grenadier.types.args.ArgsArgument;
-import net.forthecrown.grenadier.types.args.Argument;
-import net.forthecrown.grenadier.types.args.ParsedArgs;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.inventory.weapon.RoyalSword;
-import net.forthecrown.inventory.weapon.WeaponAbility;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.inventory.ItemStacks;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
-import org.bukkit.Registry;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
 
 public class CommandRoyalSword extends FtcCommand {
-
-  public static final Argument<PotionEffectType> POT_TYPE
-      = Argument.builder("type", RegistryArgument.registry(Registry.POTION_EFFECT_TYPE))
-          .build();
-
-  public static final Argument<Integer> LEVEL
-      = Argument.builder("level", IntegerArgumentType.integer(1)).build();
-
-  public static final Argument<Integer> DURATION
-      = Argument.builder("duration", IntegerArgumentType.integer(1)).build();
-
-  public static final ArgsArgument ARGS = ArgsArgument.builder()
-      .addRequired(LEVEL)
-      .addRequired(POT_TYPE)
-      .addRequired(DURATION)
-      .build();
 
   public CommandRoyalSword() {
     super("RoyalSword");
@@ -80,33 +56,6 @@ public class CommandRoyalSword extends FtcCommand {
                       Component.text("Created royal sword for ")
                           .append(user.displayName())
                   );
-                  return 0;
-                })
-            )
-        )
-
-        .then(literal("ability")
-            .then(argument("args", ARGS)
-                .executes(c -> {
-                  User user = getUserSender(c);
-                  var pair = getSword(user);
-
-                  ItemStack item = pair.first();
-                  RoyalSword sword = pair.second();
-
-                  var args = c.getArgument("args", ParsedArgs.class);
-                  int level = args.get(LEVEL);
-                  int duration = args.get(DURATION);
-                  PotionEffectType type = args.get(POT_TYPE);
-
-                  WeaponAbility ability = new WeaponAbility(
-                      type, level, duration
-                  );
-
-                  sword.setAbility(ability);
-                  sword.update(item);
-
-                  c.getSource().sendAdmin("Applied ability to weapon");
                   return 0;
                 })
             )

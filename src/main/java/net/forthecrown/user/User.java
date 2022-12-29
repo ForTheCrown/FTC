@@ -45,12 +45,12 @@ import net.forthecrown.guilds.GuildManager;
 import net.forthecrown.user.data.CosmeticData;
 import net.forthecrown.user.data.MailAttachment;
 import net.forthecrown.user.data.MailMessage;
-import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.user.data.TimeField;
 import net.forthecrown.user.data.UserHomes;
 import net.forthecrown.user.data.UserInteractions;
 import net.forthecrown.user.data.UserMail;
 import net.forthecrown.user.data.UserMarketData;
+import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.data.UserShopData;
 import net.forthecrown.user.data.UserTimeTracker;
 import net.forthecrown.user.data.UserTitles;
@@ -1008,7 +1008,7 @@ public class User implements ForwardingAudience.Single,
 
     // Create teleport and return it
     return lastTeleport = new UserTeleport(this, destination, type)
-        .setDelayed(!hasPermission(Permissions.TP_BYPASS));
+        .setDelayed(!Permissions.TP_DELAY.hasUnlimited(this));
   }
 
   /**
@@ -1178,7 +1178,7 @@ public class User implements ForwardingAudience.Single,
 
     // If our title is anything other han default,
     // return it
-    if (allowRank && getTitles().getTitle() != RankTitle.DEFAULT) {
+    if (allowRank && getTitles().getTitle() != UserRanks.DEFAULT) {
       return getTitles().getTitle().getPrefix();
     }
 

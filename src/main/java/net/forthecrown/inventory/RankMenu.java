@@ -1,252 +1,322 @@
 package net.forthecrown.inventory;
 
-import static net.forthecrown.utils.text.Text.nonItalic;
+import static net.forthecrown.utils.inventory.menu.Menus.MAX_INV_SIZE;
 
-import net.forthecrown.commands.manager.Exceptions;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.Getter;
 import net.forthecrown.user.User;
 import net.forthecrown.user.data.RankTier;
-import net.forthecrown.user.data.RankTitle;
+import net.forthecrown.user.data.UserRank;
+import net.forthecrown.utils.context.Context;
+import net.forthecrown.utils.context.ContextOption;
+import net.forthecrown.utils.context.ContextSet;
 import net.forthecrown.utils.inventory.ItemStacks;
-import net.forthecrown.utils.inventory.menu.Menu;
+import net.forthecrown.utils.inventory.menu.ClickContext;
 import net.forthecrown.utils.inventory.menu.MenuBuilder;
 import net.forthecrown.utils.inventory.menu.MenuNode;
 import net.forthecrown.utils.inventory.menu.Menus;
+import net.forthecrown.utils.inventory.menu.Slot;
+import net.forthecrown.utils.inventory.menu.page.ListPage;
+import net.forthecrown.utils.inventory.menu.page.MenuPage;
 import net.forthecrown.utils.text.Text;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class RankMenu {
-
-  private RankMenu() {
-  }
-
-  private static final ItemStack
-      BORDER_ORANGE = Menus.createBorderItem(Material.ORANGE_STAINED_GLASS_PANE),
-      BORDER_YELLOW = Menus.createBorderItem(Material.YELLOW_STAINED_GLASS_PANE),
-      BORDER_BLACK = Menus.createBorderItem(Material.BLACK_STAINED_GLASS_PANE);
-
-  /**
-   * Option to switch back to default rank
-   */
-  private static final MenuNode DEFAULT_OPTION = MenuNode.builder()
-      .setItem((user, context) -> {
-        var item = ItemStacks.builder(Material.MAP)
-            .setNameRaw(Component.text("Default").style(nonItalic(NamedTextColor.WHITE)))
-            .addLoreRaw(
-                Component.text("This is the default title!").style(nonItalic(NamedTextColor.GRAY)));
-
-        if (user.getTitles().getTitle() == RankTitle.DEFAULT) {
-          item
-              .setFlags(ItemFlag.HIDE_ENCHANTS)
-              .addEnchant(Enchantment.BINDING_CURSE, 1);
-        }
-
-        return item.build();
-      })
-
-      .setRunnable((user, context) -> {
-        if (user.getTitles().getTitle() == RankTitle.DEFAULT) {
-          throw Exceptions.ALREADY_YOUR_TITLE;
-        }
-
-        setTitle(RankTitle.DEFAULT, user);
-        context.shouldReloadMenu(true);
-      })
-
-      .build();
-
-  private static final ItemStack FREE_HEADER = createHeaderItem(Material.STONE_SWORD,
-      "Free Titles",
-      "Titles that any player can unlock.",
-      null
-  );
-
-  private static final ItemStack[] HEADERS = {
-      FREE_HEADER, // NONE
-      FREE_HEADER, // FREE
-
-      // T 1
-      createHeaderItem(Material.IRON_SWORD,
-          "Tier 1 Titles",
-          "Titles that players with Tier 1 rank can unlock.",
-          null
-      ),
-
-      // T 2
-      createHeaderItem(Material.GOLDEN_SWORD,
-          "Tier 2 Titles",
-          "Titles that players with Tier 2 rank can unlock.",
-          null
-      ),
-
-      // T 3
-      createHeaderItem(Material.GOLDEN_SWORD,
-          "Tier 3 Titles",
-          "Titles that players with Tier 3 rank can unlock.",
-          Enchantment.DURABILITY
-      )
+  private static final Slot[] DECORATED_SLOTS = {
+      Slot.of(3, 0),
+      Slot.of(5, 0),
+      Slot.of(4, 5),
   };
 
-  public static final Menu GUI_FREE_RANKS = createBase(RankTier.FREE, Component.text("Free ranks"))
-      .add(2, 2, selectRank(RankTitle.KNIGHT))
-      .add(4, 2, selectRank(RankTitle.BARON))
-      .add(4, 3, selectRank(RankTitle.BARONESS))
-      .add(7, 4, selectRank(RankTitle.LEGACY_FREE))
-      .build();
+  private static final ContextSet SET = ContextSet.create();
+  private static final ContextOption<Integer> PAGE = SET.newOption(0);
 
-  public static final Menu GUI_TIER1 = createBase(RankTier.TIER_1, Component.text("Tier 1"))
-      // Border decorations
-      .add(3, BORDER_BLACK)
-      .add(5, BORDER_BLACK)
-      .add(49, BORDER_BLACK)
+  @Getter
+  private static final RankMenu instance = new RankMenu();
 
-      // Title options
-      .add(2, 2, selectRank(RankTitle.LORD))
-      .add(2, 3, selectRank(RankTitle.LADY))
-      .add(7, 4, selectRank(RankTitle.LEGACY_TIER_1))
-      .build();
+  private final RankPage[] menus = new RankPage[RankTier.values().length];
 
-  public static final Menu GUI_TIER2 = createBase(RankTier.TIER_2, Component.text("Tier 2"))
-      // Border decorations
-      .add(3, BORDER_ORANGE)
-      .add(5, BORDER_ORANGE)
-      .add(49, BORDER_ORANGE)
+  private RankMenu() {
+    for (int i = 0; i < menus.length; i++) {
+      if (i == RankTier.NONE.ordinal()) {
+        continue;
+      }
 
-      // Title options
-      .add(2, 2, selectRank(RankTitle.DUKE))
-      .add(2, 3, selectRank(RankTitle.DUCHESS))
-      .add(4, 2, selectRank(RankTitle.CAPTAIN))
-      .add(6, 2, selectRank(RankTitle.ELITE))
-      .add(7, 4, selectRank(RankTitle.LEGACY_TIER_2))
-      .build();
-
-  public static final Menu GUI_TIER3 = createBase(RankTier.TIER_3, Component.text("Tier 3"))
-      // Decorations
-      .add(3, BORDER_YELLOW)
-      .add(5, BORDER_YELLOW)
-      .add(49, BORDER_YELLOW)
-      .add(2, BORDER_ORANGE)
-      .add(6, BORDER_ORANGE)
-      .add(48, BORDER_ORANGE)
-      .add(50, BORDER_ORANGE)
-
-      // Title options
-      .add(2, 2, selectRank(RankTitle.PRINCE))
-      .add(2, 3, selectRank(RankTitle.PRINCESS))
-      .add(4, 2, selectRank(RankTitle.ADMIRAL))
-      .add(4, 3, selectRank(RankTitle.ROYAL))
-      .add(6, 2, selectRank(RankTitle.LEGEND))
-      .add(7, 4, selectRank(RankTitle.LEGACY_TIER_3))
-      .build();
-
-  private static MenuBuilder createBase(RankTier tier, TextComponent title) {
-    return Menus.builder(54, title)
-        .addBorder()
-        .add(8, 0, getNextPageOption(tier))
-        .add(4, HEADERS[tier.ordinal()])
-        .add(1, 1, DEFAULT_OPTION);
-  }
-
-  public static void openInventory(User user) {
-    switch (user.getTitles().getTier()) {
-      case TIER_1 -> GUI_TIER1.open(user);
-      case TIER_2 -> GUI_TIER2.open(user);
-      case TIER_3 -> GUI_TIER3.open(user);
-      default -> GUI_FREE_RANKS.open(user);
+      RankTier tier = RankTier.values()[i];
+      RankPage page = new RankPage(tier);
+      menus[i] = page;
     }
+
+    // NONE == FREE menu
+    menus[RankTier.NONE.ordinal()] = menus[RankTier.FREE.ordinal()];
   }
 
-  private static ItemStack createHeaderItem(Material mat, String itemName, String description,
-                                            @Nullable Enchantment enchantment
+  public void open(User user) {
+    var tier = user.getTitles().getTier().ordinal();
+    open(user, tier);
+  }
+
+  private void open(User user, int nextTier) {
+    var menu = menus[nextTier % RankTier.values().length];
+    menu.getMenu().open(user, SET.createContext());
+  }
+
+  public static List<UserRank> getExtraRanks(User user, RankTier tier) {
+    return user.getTitles().getAvailable()
+        .stream()
+        .filter(rank -> {
+          if (rank.isDefaultTitle() || rank.getMenuSlot() != null) {
+            return false;
+          }
+
+          return rank.getTier() == tier;
+        })
+        .collect(Collectors.toList());
+  }
+
+  private static void fillSlots(Slot[] slots,
+                         MenuBuilder builder,
+                         ItemStack itemStack
   ) {
-    var builder = ItemStacks.builder(mat)
-        .setNameRaw(Component.text(itemName).style(nonItalic(NamedTextColor.AQUA)))
-        .addLoreRaw(Component.empty())
-        .addLoreRaw(Component.text(description).style(nonItalic(NamedTextColor.GRAY)));
+    for (var s: slots) {
+      builder.add(s, itemStack);
+    }
+  }
 
-    if (enchantment != null) {
-      builder.addEnchant(enchantment, 1);
+  private class RankPage extends MenuPage {
+    private final RankTier tier;
+    private final ExtraRankListPage listPage;
+
+    public RankPage(RankTier tier) {
+      super(null);
+
+      this.tier = tier;
+      this.listPage = new ExtraRankListPage(this, tier);
+
+      initMenu(
+          Menus.builder(MAX_INV_SIZE)
+              .setTitle(tier.getDisplayName()),
+          true
+      );
     }
 
-    return builder.setFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS).build();
-  }
+    @Override
+    protected void createMenu(MenuBuilder builder) {
+      decorateMenu(builder);
+      fillMenu(builder, tier);
 
+      builder.add(8,
+          MenuNode.builder()
+              .setItem(
+                  ItemStacks.builder(Material.PAPER)
+                      .setName("&eNext page >")
+                      .build()
+              )
 
-  // Next Page
-  private static MenuNode getNextPageOption(RankTier tier) {
-    return MenuNode.builder()
-        .setItem(
-            ItemStacks.builder(Material.PAPER)
-                .setNameRaw(Component.text("Next page >").style(nonItalic(NamedTextColor.YELLOW)))
-                .setFlags(ItemFlag.HIDE_ATTRIBUTES)
+              .setRunnable((user, context, click) -> {
+                click.shouldClose(false);
+                click.shouldReloadMenu(false);
+
+                open(user, tier.ordinal() + 1);
+              })
+
+              .build()
+      );
+    }
+
+    private void fillMenu(MenuBuilder builder, RankTier tier) {
+      tier.getTitles()
+          .stream()
+          .filter(rank -> rank.getMenuSlot() != null)
+          .forEach(rank -> {
+            builder.add(rank.getMenuSlot(), rank.getMenuNode());
+          });
+
+      for (int i = 1; i < 8; i++) {
+        int finalI = i;
+
+        builder.add(i, 4,
+            MenuNode.builder()
+                .setItem((user, context) -> {
+                  var extra = getExtraRanks(user, tier);
+                  int index = finalI - 1;
+
+                  if (index >= extra.size()) {
+                    return null;
+                  }
+
+                  return extra.get(index)
+                      .getMenuNode()
+                      .createItem(user, context);
+                })
+
+                .setRunnable((user, context, click) -> {
+                  var extra = getExtraRanks(user, tier);
+                  int index = finalI - 1;
+
+                  if (index >= extra.size()) {
+                    return;
+                  }
+
+                  extra.get(index)
+                      .getMenuNode()
+                      .onClick(user, context, click);
+                })
+
                 .build()
-        )
-        .setRunnable((user, context) -> getNextInventory(tier).open(user))
-        .build();
+        );
+      }
+
+      builder.add(8, 3, listPage);
+    }
+
+    private void decorateMenu(MenuBuilder builder) {
+      builder.addBorder();
+
+      final ItemStack blackBorder
+          = Menus.createBorderItem(Material.BLACK_STAINED_GLASS_PANE);
+
+      final ItemStack goldBorder
+          = Menus.createBorderItem(Material.ORANGE_STAINED_GLASS_PANE);
+
+      final ItemStack yellowBorder
+          = Menus.createBorderItem(Material.YELLOW_STAINED_GLASS_PANE);
+
+      for (int i = 1; i < 8; i++) {
+        builder.add(i, 3, Menus.defaultBorderItem());
+      }
+
+      switch (tier) {
+        case TIER_3 -> {
+          Slot[] golds = {
+              Slot.of(2, 0),
+              Slot.of(6, 0),
+              Slot.of(3, 5),
+              Slot.of(5, 5),
+          };
+
+          fillSlots(DECORATED_SLOTS, builder, yellowBorder);
+          fillSlots(golds, builder, goldBorder);
+        }
+
+        case TIER_2 -> {
+          fillSlots(DECORATED_SLOTS, builder, yellowBorder);
+        }
+
+        case TIER_1 -> {
+          fillSlots(DECORATED_SLOTS, builder, blackBorder);
+        }
+      }
+    }
+
+    @Override
+    public @Nullable ItemStack createItem(@NotNull User user,
+                                          @NotNull Context context
+    ) {
+      return switch (tier) {
+        case TIER_3 -> ItemStacks.builder(Material.GOLDEN_SWORD)
+            .addEnchant(Enchantment.BINDING_CURSE, 1)
+            .addFlags(ItemFlag.HIDE_ENCHANTS)
+            .build();
+
+        case TIER_2 -> ItemStacks.builder(Material.GOLDEN_SWORD)
+            .build();
+
+        case TIER_1 -> ItemStacks.builder(Material.IRON_SWORD)
+            .build();
+
+        default -> ItemStacks.builder(Material.STONE)
+            .build();
+      };
+    }
+
+    @Override
+    protected MenuNode createHeader() {
+      return this;
+    }
   }
 
-  private static Menu getNextInventory(RankTier current) {
-    return switch (current) {
-      case TIER_1 -> GUI_TIER2;
-      case TIER_2 -> GUI_TIER3;
-      case TIER_3 -> GUI_FREE_RANKS;
-      default -> GUI_TIER1;
-    };
-  }
+  private static class ExtraRankListPage extends ListPage<UserRank> {
+    private final RankTier tier;
 
-  static void setTitle(RankTitle title, User user) {
-    user.getTitles().setTitle(title);
+    public ExtraRankListPage(MenuPage parent,
+                             RankTier tier
+    ) {
+      super(parent, PAGE);
+      this.tier = tier;
 
-    user.sendMessage(
-        Text.format("Your title is now {0}",
-            NamedTextColor.GRAY,
+      initMenu(
+          Menus.builder(
+              Menus.sizeFromRows(5),
+              "Extra %s Ranks".formatted(tier.getDisplayName())
+          ),
+          true
+      );
+    }
 
-            // Titles have unset main colors,
-            // so ensure the main color of the
-            // title is white
-            Component.text()
-                .color(NamedTextColor.WHITE)
-                .append(title.getTruncatedPrefix())
-                .build()
-        )
-    );
-  }
+    @Override
+    protected List<UserRank> getList(User user, Context context) {
+      return getExtraRanks(user, tier);
+    }
 
-  static MenuNode selectRank(RankTitle title) {
-    return MenuNode.builder()
-        .setItem((user, context) -> {
-          var item = ItemStacks.builder(
-                  user.getTitles().hasTitle(title) ? Material.GLOBE_BANNER_PATTERN : Material.PAPER)
-              .setNameRaw(title.getTruncatedPrefix().style(nonItalic(NamedTextColor.WHITE)));
+    @Override
+    protected ItemStack getItem(User user, UserRank entry, Context context) {
+      return entry.getMenuNode().createItem(user, context);
+    }
 
-          if (user.getTitles().getTitle() == title) {
-            item
-                .setFlags(ItemFlag.HIDE_ENCHANTS)
-                .addEnchant(Enchantment.BINDING_CURSE, 1);
-          }
+    @Override
+    protected void onClick(User user, UserRank entry, Context context,
+                           ClickContext click
+    ) throws CommandSyntaxException {
+      entry.getMenuNode().onClick(user, context, click);
+    }
 
-          return item.build();
-        })
+    @Override
+    public @Nullable ItemStack createItem(@NotNull User user,
+                                          @NotNull Context context
+    ) {
 
-        .setRunnable((user, context) -> {
-          if (!user.getTitles().hasTitle(title)) {
-            throw Exceptions.DONT_HAVE_TITLE;
-          }
+      var extra = getExtraRanks(user, tier);
 
-          if (user.getTitles().getTitle() == title) {
-            throw Exceptions.ALREADY_YOUR_TITLE;
-          }
+      if (extra.size() <= 7) {
+        return null;
+      }
 
-          setTitle(title, user);
-          context.shouldReloadMenu(true);
-        })
+      return ItemStacks.builder(Material.PAPER)
+          .setName("&eSee all extra ranks >")
+          .addLore(
+              Text.format("You have {0, number} non-default ranks",
+                  NamedTextColor.GRAY,
+                  extra.size()
+              )
+          )
+          .build();
+    }
 
-        .build();
+    @Override
+    public void onClick(User user, Context context, ClickContext click)
+        throws CommandSyntaxException
+    {
+      var extra = getExtraRanks(user, tier);
+
+      if (extra.size() <= 7) {
+        return;
+      }
+
+      super.onClick(user, context, click);
+    }
+
+    @Override
+    protected MenuNode createHeader() {
+      return this;
+    }
   }
 }

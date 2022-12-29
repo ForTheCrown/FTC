@@ -25,6 +25,10 @@ public class ChatArgument implements VanillaMappedArgument, ArgumentType<Compone
       return ChatEmotes.format(result);
     }
 
+    if (peek == '\\') {
+      reader.skip();
+    }
+
     var remaining = reader.getRemaining();
     reader.setCursor(reader.getTotalLength());
 

@@ -4,7 +4,9 @@ import static net.forthecrown.utils.text.Text.format;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.keybind;
 import static net.kyori.adventure.text.Component.newline;
+import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.event.ClickEvent.openUrl;
 import static net.kyori.adventure.text.event.ClickEvent.runCommand;
 
@@ -35,9 +37,8 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.UserTeleport;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.data.MailMessage;
-import net.forthecrown.user.data.RankTier;
-import net.forthecrown.user.data.RankTitle;
 import net.forthecrown.user.data.UserHomes;
+import net.forthecrown.user.data.UserRanks;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.user.property.UserProperty;
 import net.forthecrown.utils.Time;
@@ -141,13 +142,13 @@ public interface Messages {
    * Standard " < " previous page button with hover text, and bold and yellow styling
    */
   TextComponent PREVIOUS_PAGE = text(" < ", NamedTextColor.YELLOW, TextDecoration.BOLD)
-      .hoverEvent(Component.translatable("spectatorMenu.previous_page"));
+      .hoverEvent(translatable("spectatorMenu.previous_page"));
 
   /**
    * Standard " > " next page button with hover text, and bold and yellow styling
    */
   TextComponent NEXT_PAGE = text(" > ", NamedTextColor.YELLOW, TextDecoration.BOLD)
-      .hoverEvent(Component.translatable("spectatorMenu.next_page"));
+      .hoverEvent(translatable("spectatorMenu.next_page"));
 
   /**
    * A standard page border made up of spaces with a {@link TextDecoration#STRIKETHROUGH} style
@@ -491,15 +492,17 @@ public interface Messages {
    */
   static TextComponent joinMessage(Component displayName, LoginEffect effect) {
       return text()
-              .append(
-                      effect.getPrefix(),
-                      Component.space(),
-                      Component.translatable("multiplayer.player.joined",
-                              NamedTextColor.YELLOW,
-                              displayName),
-                      Component.space(),
-                      effect.getSuffix())
-              .build();
+          .append(
+              effect == null ? empty() : effect.getPrefix().append(space()),
+
+              translatable("multiplayer.player.joined",
+                      NamedTextColor.YELLOW,
+                      displayName
+              ),
+
+              effect == null ? empty() : space().append(effect.getSuffix())
+          )
+          .build();
   }
 
   /**
@@ -509,7 +512,7 @@ public interface Messages {
    * @return The formatted message
    */
   static TranslatableComponent newNameJoinMessage(Component displayName, String oldName) {
-    return Component.translatable("multiplayer.player.joined.renamed",
+    return translatable("multiplayer.player.joined.renamed",
         NamedTextColor.YELLOW,
         displayName,
         text(oldName)
@@ -525,15 +528,15 @@ public interface Messages {
    */
   static TextComponent leaveMessage(Component displayName, LoginEffect effect) {
     return text()
-            .append(
-                    effect.getPrefix(),
-                    Component.space(),
-                    Component.translatable("multiplayer.player.left",
-                            NamedTextColor.YELLOW,
-                            displayName),
-                    Component.space(),
-                    effect.getSuffix())
-            .build();
+        .append(
+            effect == null ? empty() : effect.getPrefix().append(space()),
+            translatable("multiplayer.player.left",
+                NamedTextColor.YELLOW,
+                displayName
+            ),
+            effect == null ? empty() : space().append(effect.getSuffix())
+        )
+        .build();
   }
 
   /**
@@ -2027,7 +2030,7 @@ public interface Messages {
     return format("Are you sure you wish to become a &e{0}&r?" +
             "It will cost &6{1, rhines}&r.\n{2}",
         NamedTextColor.GRAY,
-        RankTitle.BARON.getTruncatedPrefix(),
+        UserRanks.BARON.getTruncatedPrefix(),
         GeneralConfig.baronPrice,
         confirmButton(cmd)
     );
@@ -2036,7 +2039,7 @@ public interface Messages {
   static Component becomeBaron() {
     return format("Congratulations! &7You are now a {0}!",
         NamedTextColor.GOLD,
-        RankTitle.BARON.getTruncatedPrefix()
+        UserRanks.BARON.getTruncatedPrefix()
     );
   }
 
@@ -2086,7 +2089,7 @@ public interface Messages {
     return format("Set {0} gamemode to &e{1}&r.",
         NamedTextColor.GRAY,
         GAME_MODE_SELF,
-        Component.translatable(mode)
+        translatable(mode)
     );
   }
 
@@ -2094,7 +2097,7 @@ public interface Messages {
     return format("Set {0, user}'s gamemode to &e{1}&r.",
         NamedTextColor.GRAY,
         target,
-        Component.translatable(mode)
+        translatable(mode)
     );
   }
 
@@ -2102,7 +2105,7 @@ public interface Messages {
     return format("&6{0}&r changed your gamemode to &e{1}&r.",
         NamedTextColor.GRAY,
         Text.sourceDisplayName(changer),
-        Component.translatable(mode)
+        translatable(mode)
     );
   }
 
@@ -2781,7 +2784,7 @@ public interface Messages {
   static Component priceDropped(Material material, int before, int after) {
     return format("Your price for &e{0}&r dropped from &6{1, rhines}&r to &e{2, rhines}&r.",
         NamedTextColor.GRAY,
-        Component.translatable(material),
+        translatable(material),
         before, after
     );
   }
@@ -2801,7 +2804,7 @@ public interface Messages {
 
   Component DIEGO_TEXT = text("Hello, what can I do for ya?", NamedTextColor.YELLOW);
 
-  Component GOT_KNIGHT_RANK = format("Got {0} rank", NamedTextColor.GOLD, RankTitle.KNIGHT);
+  Component GOT_KNIGHT_RANK = format("Got {0} rank", NamedTextColor.GOLD, UserRanks.KNIGHT);
 
   Component DUNGEON_LORE = text("Dungeon Item");
 

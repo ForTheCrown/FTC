@@ -45,7 +45,7 @@ public class UserHomes extends UserComponent {
    */
   public static final String DEFAULT = "home";
 
-  /* ----------------------------- INSTANCE FIELDS ------------------------------ */
+  /* -------------------------- INSTANCE FIELDS --------------------------- */
 
   /**
    * The name 2 location map of all of this user's homes.
@@ -59,13 +59,13 @@ public class UserHomes extends UserComponent {
   @Getter
   private UUID homeWaypoint;
 
-  /* ----------------------------- CONSTRUCTOR ------------------------------ */
+  /* ---------------------------- CONSTRUCTOR ----------------------------- */
 
   public UserHomes(User user, ComponentType<UserHomes> type) {
     super(user, type);
   }
 
-  /* ----------------------------- STATIC UTILITY ------------------------------ */
+  /* --------------------------- STATIC UTILITY --------------------------- */
 
   static void reassignWaypointHome(UUID uuid,
                                    @Nullable UUID old,
@@ -95,7 +95,7 @@ public class UserHomes extends UserComponent {
     }
   }
 
-  /* ----------------------------- METHODS ------------------------------ */
+  /* ------------------------------ METHODS ------------------------------- */
 
   /**
    * Clears all the user's homes
@@ -131,7 +131,8 @@ public class UserHomes extends UserComponent {
    * @return Whether the user is allowed to create new homes
    */
   public boolean canMakeMore() {
-    return size() < Permissions.MAX_HOMES.getTier(user);
+    return size() < Permissions.MAX_HOMES.getTier(true, user)
+        .orElse(Permissions.MAX_HOMES.getRange().getMaximum());
   }
 
   /**
