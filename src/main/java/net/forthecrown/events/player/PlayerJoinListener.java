@@ -5,6 +5,8 @@ import net.forthecrown.core.AfkKicker;
 import net.forthecrown.core.Messages;
 import net.forthecrown.core.TabList;
 import net.forthecrown.core.config.GeneralConfig;
+import net.forthecrown.cosmetics.Cosmetics;
+import net.forthecrown.cosmetics.login.LoginEffect;
 import net.forthecrown.cosmetics.login.LoginEffects;
 import net.forthecrown.inventory.ExtendedItems;
 import net.forthecrown.useables.Usables;
@@ -15,6 +17,7 @@ import net.forthecrown.user.Users;
 import net.forthecrown.user.data.TimeField;
 import net.forthecrown.user.packet.PacketListeners;
 import net.forthecrown.user.property.Properties;
+import net.forthecrown.utils.Tasks;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -22,6 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+import org.dynmap.Log;
 
 public class PlayerJoinListener implements Listener {
 
@@ -51,7 +55,7 @@ public class PlayerJoinListener implements Listener {
       ItemStack sword = ExtendedItems.ROYAL_SWORD.createItem(user.getUniqueId());
       user.getInventory().addItem(sword);
 
-      //Give join kit
+      // Give join kit
       Kit kit = Usables.getInstance()
           .getKits()
           .get(GeneralConfig.onFirstJoinKit);
@@ -59,6 +63,9 @@ public class PlayerJoinListener implements Listener {
       if (kit != null) {
         kit.interact(user.getPlayer());
       }
+
+      // Display some info
+      Tasks.runLaterAsync(() -> user.sendMessage(Messages.RANK_CHAT_INFO), 200);
 
       return;
     }
@@ -72,7 +79,7 @@ public class PlayerJoinListener implements Listener {
             .get(user.getPreviousNames().size() - 1);
 
         sendLogMessage(audience -> {
-          Component name = LoginEffects.createDisplayName(user, audience);
+          Component name = LoginEffects.getDisplayName(user);
           return Messages.newNameJoinMessage(name, lastName);
         });
       } else {
@@ -83,15 +90,17 @@ public class PlayerJoinListener implements Listener {
 
   public static void sendLoginMessage(User user) {
     sendLogMessage(audience -> {
-      Component name = LoginEffects.createDisplayName(user, audience);
-      return Messages.joinMessage(name);
+      Component name = LoginEffects.getDisplayName(user);
+      LoginEffect effect = user.getCosmeticData().get(Cosmetics.LOGIN);
+      return Messages.joinMessage(name, effect);
     });
   }
 
   public static void sendLogoutMessage(User user) {
     sendLogMessage(audience -> {
-      Component name = LoginEffects.createDisplayName(user, audience);
-      return Messages.leaveMessage(name);
+      Component name = LoginEffects.getDisplayName(user);
+      LoginEffect effect = user.getCosmeticData().get(Cosmetics.LOGIN);
+      return Messages.leaveMessage(name, effect);
     });
   }
 

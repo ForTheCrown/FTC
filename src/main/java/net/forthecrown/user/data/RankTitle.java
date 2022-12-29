@@ -5,6 +5,7 @@ import static net.forthecrown.user.data.RankTier.NONE;
 import static net.forthecrown.user.data.RankTier.TIER_1;
 import static net.forthecrown.user.data.RankTier.TIER_2;
 import static net.forthecrown.user.data.RankTier.TIER_3;
+import static net.kyori.adventure.text.Component.text;
 
 import com.google.gson.JsonElement;
 import lombok.Getter;
@@ -13,6 +14,8 @@ import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -38,27 +41,38 @@ public enum RankTitle implements JsonSerializable, ComponentLike {
   VIKING(false, -1, FREE, "&8[&7Viking&8]"), // how earn?
   BERSERKER(false, -1, FREE, "&8[&7Berserker&8]"), // how earn?
 
-  LEGACY_TIER_1(false, -1, TIER_1, "&#959595[&6Veteran Lord&#959595]"),
-  LORD(true, 9, TIER_1, "&#959595[&6Lord&#959595]"),
-  LADY(true, 8, TIER_1, "&#959595[&6Lady&#959595]"),
-  SAILOR(false, -1, TIER_1, "&#959595[&6Sailor&#959595]"),
-  WARRIOR(false, 12, TIER_1, "&#959595[&6Warrior&#959595]"),
-  SHIELD_MAIDEN(false, 11, TIER_1, "&#959595[&6ShieldMaiden&#959595]"),
+  LEGACY_TIER_1(false, -1, TIER_1, "&#959595[&eVeteran Lord&#959595]"),
+  LORD(true, 9, TIER_1, "&#959595[&eLord&#959595]"),
+  LADY(true, 8, TIER_1, "&#959595[&eLady&#959595]"),
+  SAILOR(false, -1, TIER_1, "&#959595[&eSailor&#959595]"),
+  WARRIOR(false, 12, TIER_1, "&#959595[&eWarrior&#959595]"),
+  SHIELD_MAIDEN(false, 11, TIER_1, "&#959595[&eShieldMaiden&#959595]"),
 
-  LEGACY_TIER_2(false, -1, TIER_2, "&7[&#ffbf15Veteran Duke&7]"),
-  DUKE(true, 15, TIER_2, "&7[&#ffbf15Duke&7]"),
-  DUCHESS(true, 14, TIER_2, "&7[&#ffbf15Duchess&7]"),
-  CAPTAIN(false, -1, TIER_2, "&7[&#ffbf15Captain&7]"),
-  ELITE(false, -1, TIER_2, "&7[&#ffbf15Elite&7]"),
-  HERSIR(false, -1, TIER_2, "&7[&#ffbf15Hersir&7]"),
+  LEGACY_TIER_2(false, -1, TIER_2, "&7[&6Veteran Duke&7]"), // old duke color: #ffbf15
+  DUKE(true, 15, TIER_2, "&7[&6Duke&7]"),
+  DUCHESS(true, 14, TIER_2, "&7[&6Duchess&7]"),
+  CAPTAIN(false, -1, TIER_2, "&7[&6Captain&7]"),
+  ELITE(false, -1, TIER_2, "&7[&6Elite&7]"),
+  HERSIR(false, -1, TIER_2, "&7[&6Hersir&7]"),
 
-  LEGACY_TIER_3(false, -1, TIER_3, "&f[&#FBFF0FVeteran Prince&f]"),
-  PRINCE(true, 21, TIER_3, "&f[&#FBFF0FPrince&f]"),
-  PRINCESS(true, 20, TIER_3, "&f[&#FBFF0FPrincess&f]"),
+  LEGACY_TIER_3(false, -1, TIER_3, getTier3Prefix("Veteran Prince")),
+  PRINCE(true, 21, TIER_3, getTier3Prefix("Prince")),
+  PRINCESS(true, 20, TIER_3, getTier3Prefix("Princess")),
   ADMIRAL(false, -1, TIER_3, "&f[&#FBFF0FAdmiral&f]"),
   ROYAL(false, -1, TIER_3, "&f[&#FBFF0FRoyal&f]"),
   JARL(false, -1, TIER_3, "&f[&#FBFF0FJarl&f]"),
   LEGEND(false, -1, TIER_3, "&#dfdfdf[&#fff147Legend&#dfdfdf]");
+
+  private static Component getTier3Prefix(String s) {
+      return text()
+              .color(NamedTextColor.WHITE)
+              .append(
+                      text("["),
+                      Text.gradient(s, NamedTextColor.GOLD, TextColor.fromHexString("#fe771c")),
+                      text("]")
+              )
+              .build();
+  }
 
   /**
    * Determines if this title comes with the tier or whether the title must be attained separately
@@ -89,6 +103,17 @@ public enum RankTitle implements JsonSerializable, ComponentLike {
 
     this.truncatedPrefix = fromString(prefix);
     this.prefix = fromString(prefix == null ? null : prefix + ' ');
+
+    this.tier.titles.add(this);
+  }
+
+  RankTitle(boolean defaultTitle, int gendered, RankTier tier, Component prefix) {
+    this.defaultTitle = defaultTitle;
+    this.tier = tier;
+    this.genderEquivalent = gendered;
+
+    this.truncatedPrefix = prefix;
+    this.prefix = prefix.append(Component.space());
 
     this.tier.titles.add(this);
   }

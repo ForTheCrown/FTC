@@ -17,17 +17,20 @@ import net.kyori.adventure.text.format.TextColor;
 public class LoginEffects {
 
   private static final TextColor
+      FR_COLOR = NamedTextColor.GRAY,
       T1_COLOR = NamedTextColor.YELLOW,
-      T2_COLOR = TextColor.fromHexString("#ffd82e"),
-      T3_COLOR = NamedTextColor.GOLD;
+      T2_COLOR = NamedTextColor.GOLD,
+      T3_COLOR = TextColor.fromHexString("#fe771c");
 
   public static final LoginEffect
-      TIER_1 = create("Tier 1", Slot.of(3, 1), RankTier.TIER_1, text("<", T1_COLOR),
-      text(">", T1_COLOR)),
-      TIER_2 = create("Tier 2", Slot.of(4, 1), RankTier.TIER_2, text("<<", T2_COLOR),
-          text(">>", T2_COLOR)),
-      TIER_3 = create("Tier 3", Slot.of(5, 1), RankTier.TIER_3, text("<<<", T3_COLOR),
-          text(">>>", T3_COLOR));
+      FREE_RANK = create("Free rank", Slot.of(2, 1), RankTier.FREE, text(">", FR_COLOR),
+          text("<", FR_COLOR)),
+      TIER_1 = create("Tier 1", Slot.of(3, 1), RankTier.TIER_1, text(">", T1_COLOR),
+          text("<", T1_COLOR)),
+      TIER_2 = create("Tier 2", Slot.of(4, 1), RankTier.TIER_2, text(">", T2_COLOR),
+          text("<", T2_COLOR)),
+      TIER_3 = create("Tier 3", Slot.of(5, 1), RankTier.TIER_3, text(">", T3_COLOR),
+          text("<", T3_COLOR));
 
   private static LoginEffect create(String name, Slot slot, RankTier tier, Component prefix,
                                     Component suffix
@@ -35,30 +38,7 @@ public class LoginEffects {
     return new LoginEffect(name, slot, tier, prefix, suffix);
   }
 
-  public static Component createDisplayName(User user, Audience viewer) {
-    LoginEffect effect = user.getCosmeticData()
-        .get(Cosmetics.LOGIN);
-
-    return createDisplayName(user, viewer, effect);
-  }
-
-  public static Component createDisplayName(User user, Audience viewer, LoginEffect effect) {
-    boolean prependRank = Users.allowsRankedChat(viewer);
-
-    if (effect == null) {
-      return user.listDisplayName(prependRank)
-          .color(Messages.getJoinColor(user));
-    }
-
-    return Users.createListName(
-            user,
-            textOfChildren(
-                effect.getPrefix(),
-                user.getTabName(),
-                effect.getSuffix()
-            ),
-            prependRank
-        )
-        .color(Messages.getJoinColor(user));
+  public static Component getDisplayName(User user) {
+      return user.listDisplayName(true).color(NamedTextColor.YELLOW);
   }
 }

@@ -33,6 +33,7 @@ import net.forthecrown.guilds.unlockables.Upgradable;
 import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.property.Properties;
+import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.io.JsonUtils;
 import net.forthecrown.utils.io.JsonWrapper;
 import net.forthecrown.utils.text.Text;
@@ -551,6 +552,8 @@ public class Guild
     user.sendMessage(
         Messages.guildJoin(this)
     );
+
+    Tasks.runLaterAsync(() -> user.sendMessage(Messages.GUILD_JOINED_HELP), 60);
   }
 
   public void removeMember(UUID id) {

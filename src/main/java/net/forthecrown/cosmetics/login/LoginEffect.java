@@ -40,9 +40,8 @@ public class LoginEffect extends Cosmetic {
               .addLore("&7Example:")
               .addLore(
                   Messages.joinMessage(
-                      LoginEffects.createDisplayName(
-                          user, user, this
-                      )
+                          LoginEffects.getDisplayName(user),
+                          this
                   )
               );
 

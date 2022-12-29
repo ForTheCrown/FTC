@@ -59,6 +59,7 @@ import net.forthecrown.user.property.Properties;
 import net.forthecrown.user.property.PropertyMap;
 import net.forthecrown.user.property.UserProperty;
 import net.forthecrown.utils.ArrayIterator;
+import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.Time;
 import net.forthecrown.utils.text.writer.TextWriter;
 import net.forthecrown.utils.text.writer.TextWriters;
@@ -483,7 +484,7 @@ public class User implements ForwardingAudience.Single,
         .getModifier();
 
     if (getGuild() != null && modifier > 1) {
-      sendMessage(Messages.guildMultiplierActive(modifier));
+      Tasks.runLaterAsync(() -> sendMessage(Messages.guildMultiplierActive(modifier)), 60);
     }
 
     // Tell admin if this user has notes

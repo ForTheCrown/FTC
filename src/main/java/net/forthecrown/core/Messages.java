@@ -18,6 +18,7 @@ import net.forthecrown.core.challenge.ResetInterval;
 import net.forthecrown.core.challenge.StreakCategory;
 import net.forthecrown.core.config.GeneralConfig;
 import net.forthecrown.cosmetics.Cosmetic;
+import net.forthecrown.cosmetics.login.LoginEffect;
 import net.forthecrown.economy.market.MarketConfig;
 import net.forthecrown.economy.market.MarketEviction;
 import net.forthecrown.economy.sell.SellResult;
@@ -482,16 +483,23 @@ public interface Messages {
   TextComponent WELCOME_BACK = text("Welcome back!", NamedTextColor.GOLD);
 
   /**
-   * Formats a normal join message
+   * Formats a join message
    *
    * @param displayName The display name of the joining user
+   * @param effect The effect to apply to the message
    * @return The join message
    */
-  static TranslatableComponent joinMessage(Component displayName) {
-    return Component.translatable("multiplayer.player.joined",
-        NamedTextColor.YELLOW,
-        displayName
-    );
+  static TextComponent joinMessage(Component displayName, LoginEffect effect) {
+      return text()
+              .append(
+                      effect.getPrefix(),
+                      Component.space(),
+                      Component.translatable("multiplayer.player.joined",
+                              NamedTextColor.YELLOW,
+                              displayName),
+                      Component.space(),
+                      effect.getSuffix())
+              .build();
   }
 
   /**
@@ -509,32 +517,23 @@ public interface Messages {
   }
 
   /**
-   * Formats a simple leave message
+   * Formats a leave message
    *
    * @param displayName The leaving display name of the leaving user
+   * @param effect The effect to apply to the message
    * @return the formatted message
    */
-  static TranslatableComponent leaveMessage(Component displayName) {
-    return Component.translatable("multiplayer.player.left",
-        NamedTextColor.YELLOW,
-        displayName
-    );
-  }
-
-  /**
-   * Gets a color to use on the user's display name when they join
-   *
-   * @param user The user to get the color for
-   * @return The join color.
-   */
-  static TextColor getJoinColor(User user) {
-    RankTier r = user.getTitles().getTier();
-
-    if (r == RankTier.TIER_2) {
-      return NamedTextColor.GOLD;
-    }
-
-    return NamedTextColor.YELLOW;
+  static TextComponent leaveMessage(Component displayName, LoginEffect effect) {
+    return text()
+            .append(
+                    effect.getPrefix(),
+                    Component.space(),
+                    Component.translatable("multiplayer.player.left",
+                            NamedTextColor.YELLOW,
+                            displayName),
+                    Component.space(),
+                    effect.getSuffix())
+            .build();
   }
 
   /**
@@ -548,6 +547,24 @@ public interface Messages {
         NamedTextColor.YELLOW, user
     );
   }
+
+
+  /**
+   * The message shown to first-time joining players to inform them about the /rankchat toggle.
+   * <p>
+   * Used by {@link net.forthecrown.events.player.PlayerJoinListener}
+   */
+  TextComponent RANK_CHAT_INFO = text()
+          .color(TextColor.color(250, 239, 172))
+          .append(
+                  text("Toggle seeing rank-tags in chat with "),
+                  text("/rankchat", NamedTextColor.YELLOW)
+                          .clickEvent(ClickEvent.runCommand("/rankchat"))
+                          .hoverEvent(CLICK_ME),
+                  text(".")
+          )
+          .build();
+
 
   // ----------------------------------
   // --- SECTION: USER INTERACTIONS ---
@@ -2812,6 +2829,26 @@ public interface Messages {
   TextComponent GUILD_WAYPOINT_LOST = text("Waypoint was lost due to chunk unclaiming!",
       NamedTextColor.GRAY
   );
+
+  /**
+   * The message shown to first-time joining guild members to inform them about guild commands.
+   * <p>
+   * Used by {@link net.forthecrown.guilds.Guild}
+   */
+  TextComponent GUILD_JOINED_HELP = text()
+          .color(NamedTextColor.GRAY)
+          .append(
+                  text("Use "),
+                  text("/g", NamedTextColor.YELLOW)
+                          .clickEvent(ClickEvent.runCommand("/g"))
+                          .hoverEvent(CLICK_ME),
+                  text(" to get started.\n Use "),
+                  text("/g help", NamedTextColor.YELLOW)
+                          .clickEvent(ClickEvent.runCommand("/g help"))
+                          .hoverEvent(CLICK_ME),
+                  text(" to learn about guild commands.")
+          )
+          .build();
 
   TextComponent WEEKEND_MULTIPLIER_INACTIVE = text(
       "Weekend multiplier is no longer active :(",
