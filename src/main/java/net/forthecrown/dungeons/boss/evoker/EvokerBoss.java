@@ -27,6 +27,7 @@ import net.forthecrown.dungeons.boss.components.InsideRoomComponent;
 import net.forthecrown.dungeons.boss.components.TargetUpdateComponent;
 import net.forthecrown.dungeons.boss.evoker.phases.AttackPhase;
 import net.forthecrown.dungeons.boss.evoker.phases.AttackPhases;
+import net.forthecrown.dungeons.boss.evoker.phases.GhastPhase;
 import net.forthecrown.dungeons.boss.evoker.phases.SummonPhase;
 import net.forthecrown.dungeons.boss.evoker.phases.SwarmPhase;
 import net.forthecrown.dungeons.enchantments.FtcEnchants;
@@ -198,7 +199,8 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
     }
 
     SummonPhase.killAllSpawned();
-    SwarmPhase.killAllSpawned();
+    SwarmPhase .killAllSpawned();
+    GhastPhase .killAllSpawned();
 
     runComponents(component -> component.onDeath(this, currentContext, force));
     setPhase(null);
@@ -227,7 +229,9 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
   @Override
   protected void tick() {
     if (spell != null || !attackingAllowed) {
-      Spellcaster.Spell normalized = spell == null ? Spellcaster.Spell.NONE : spell;
+      Spellcaster.Spell normalized = spell == null
+          ? Spellcaster.Spell.NONE
+          : spell;
 
       if (evoker.getSpell() != normalized) {
         evoker.setSpell(normalized);
@@ -306,8 +310,9 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
       Util.clearModifiers(moveSpeed);
       moveSpeed.setBaseValue(0D);
 
-      AttributeInstance knockbackResistance = evoker.getAttribute(
-          Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+      AttributeInstance knockbackResistance
+          = evoker.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+
       Util.clearModifiers(knockbackResistance);
       knockbackResistance.setBaseValue(1D);
 
@@ -335,7 +340,9 @@ public class EvokerBoss extends KeyedBossImpl implements SingleEntityBoss {
     Component messagePrefix = name()
         .color(NamedTextColor.YELLOW)
         .append(
-            text(" > ").style(Style.style(NamedTextColor.GRAY, TextDecoration.BOLD)));
+            text(" > ")
+                .style(Style.style(NamedTextColor.GRAY, TextDecoration.BOLD))
+        );
 
     while (iterator.hasNext()) {
       BossMessage m = iterator.next();
