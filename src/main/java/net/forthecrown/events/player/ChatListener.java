@@ -17,6 +17,7 @@ import net.forthecrown.user.User;
 import net.forthecrown.user.Users;
 import net.forthecrown.user.property.Properties;
 import net.forthecrown.utils.Cooldown;
+import net.forthecrown.utils.Tasks;
 import net.forthecrown.utils.text.Text;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -69,6 +70,13 @@ public class ChatListener implements Listener {
   public void onPlayerChat(AsyncChatEvent event) {
     Player player = event.getPlayer();
     User user = Users.get(player);
+
+    // These have to be run in sync due to them updating the user's
+    // TAB menu and thus calling the NametagEdit plugin
+    Tasks.runSync(() -> {
+      AfkKicker.addOrDelay(event.getPlayer().getUniqueId());
+      AfkListener.checkUnafk(event);
+    });
 
     event.renderer(FtcChatRenderer.INSTANCE);
     var rendered = event.renderer().render(player, user.displayName(), event.message(), player);
@@ -157,9 +165,6 @@ public class ChatListener implements Listener {
       // soft muted players may see the message
       return finalMute == Mute.SOFT && Punishments.muteStatus(viewer) != Mute.SOFT;
     });
-
-    AfkKicker.addOrDelay(event.getPlayer().getUniqueId());
-    AfkListener.checkUnafk(event);
   }
 
   /**
