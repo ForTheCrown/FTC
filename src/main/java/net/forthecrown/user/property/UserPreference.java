@@ -40,7 +40,7 @@ public interface UserPreference {
 
     @Override
     public void setState(User user, boolean state) {
-      if (DynmapUtil.isInstalled())  {
+      if (!DynmapUtil.isInstalled())  {
         return;
       }
 

@@ -31,12 +31,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class RankMenu {
+  /** The decorated slots next to the header */
   private static final Slot[] DECORATED_SLOTS = {
       Slot.of(3, 0),
       Slot.of(5, 0),
       Slot.of(4, 5),
   };
 
+  // Context required to represent the 'extra ranks' menu's page
   private static final ContextSet SET = ContextSet.create();
   private static final ContextOption<Integer> PAGE = SET.newOption(0);
 
@@ -46,7 +48,9 @@ public final class RankMenu {
   private final RankPage[] menus = new RankPage[RankTier.values().length];
 
   private RankMenu() {
+    // Initialize menus
     for (int i = 0; i < menus.length; i++) {
+      // NONE tier doesn't get a menu lol
       if (i == RankTier.NONE.ordinal()) {
         continue;
       }

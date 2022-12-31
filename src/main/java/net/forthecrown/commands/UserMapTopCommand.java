@@ -72,7 +72,7 @@ public class UserMapTopCommand extends FtcCommand {
             })
         )
 
-        .setEntry((writer, entry, viewerIndex, context) -> {
+        .setEntry((writer, entry, viewerIndex, context, it) -> {
           writer.formatted("{0} - &e{1}",
               display.apply(entry.getUniqueId()),
               unitMaker.apply(entry.getValue())

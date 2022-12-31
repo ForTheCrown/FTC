@@ -1,9 +1,11 @@
 package net.forthecrown.commands.home;
 
+import static net.forthecrown.commands.home.CommandHome.HOME_KEYWORDS;
 import static net.forthecrown.commands.manager.Exceptions.CANNOT_SET_HOME;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Collection;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
 import net.forthecrown.commands.tpa.CommandTpask;
@@ -24,6 +26,20 @@ public class CommandSetHome extends FtcCommand {
     setDescription("Sets a home where you're standing");
 
     register();
+  }
+
+  @Override
+  public Collection<String> createKeywords() {
+    return HOME_KEYWORDS;
+  }
+
+  @Override
+  public void populateUsages(UsageFactory factory) {
+    factory.create("")
+        .addInfo("Sets your default home, named 'home'");
+
+    factory.create("<home name>")
+        .addInfo("Sets a home to where you're standing");
   }
 
   @Override

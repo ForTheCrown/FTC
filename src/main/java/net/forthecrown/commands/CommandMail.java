@@ -135,7 +135,7 @@ public class CommandMail extends FtcCommand {
     );
 
     format.setEntry(PageEntry.of(
-        (viewerIndex, entry) -> {
+        (viewerIndex, entry, it) -> {
           // Format index to show meta info about the
           // mail message
           return Component.text(viewerIndex + ")")
@@ -143,7 +143,7 @@ public class CommandMail extends FtcCommand {
               .hoverEvent(Messages.messageMetaInfo(entry));
         },
 
-        (writer, entry, viewerIndex, context) -> {
+        (writer, entry, viewerIndex, context, it) -> {
           boolean self = context.getOrThrow(SELF);
           User user = context.getOrThrow(MAIL_USER);
 

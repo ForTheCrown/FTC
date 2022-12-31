@@ -24,11 +24,11 @@ public final class Main extends JavaPlugin implements Namespaced {
 
   @Override
   public void onEnable() {
-    // Register dynmap hook connection thing
-    DynmapUtil.registerListener();
-
     setDebugMode();
     ensureLoggerExists();
+
+    // Register dynmap hook connection thing
+    DynmapUtil.registerListener();
 
     BootStrap.init();
 
@@ -38,8 +38,6 @@ public final class Main extends JavaPlugin implements Namespaced {
   @Override
   public void onLoad() {
     setDebugMode();
-    ensureLoggerExists();
-
     FtcFlags.init();
   }
 
@@ -57,8 +55,11 @@ public final class Main extends JavaPlugin implements Namespaced {
       return;
     }
 
-    getLogger().addHandler(DiscordErrorLogHandler.INSTANCE);
     Bukkit.getLogger().addHandler(DiscordErrorLogHandler.INSTANCE);
+
+    for (var p: Bukkit.getPluginManager().getPlugins()) {
+      p.getLogger().addHandler(DiscordErrorLogHandler.INSTANCE);
+    }
 
     logger = new FtcLogger(
         LogManager.getContext()

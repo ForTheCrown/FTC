@@ -1,6 +1,9 @@
 package net.forthecrown.commands.home;
 
+import static net.forthecrown.commands.home.CommandHome.HOME_KEYWORDS;
+
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Collection;
 import net.forthecrown.commands.arguments.Arguments;
 import net.forthecrown.commands.manager.Exceptions;
 import net.forthecrown.commands.manager.FtcCommand;
@@ -24,6 +27,11 @@ public class CommandHomeList extends FtcCommand {
     setDescription("Lists all your homes");
 
     register();
+  }
+
+  @Override
+  public Collection<String> createKeywords() {
+    return HOME_KEYWORDS;
   }
 
   @Override

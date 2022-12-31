@@ -20,9 +20,13 @@ public class CommandTell extends FtcCommand {
         "message");
     setPermission(Permissions.MESSAGE);
     setDescription("Sends a message to a player");
-    setHelpListName("msg");
 
     register();
+  }
+
+  @Override
+  public String getHelpListName() {
+    return "tell";
   }
 
   @Override

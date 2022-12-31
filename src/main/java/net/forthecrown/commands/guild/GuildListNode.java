@@ -42,7 +42,7 @@ class GuildListNode extends GuildCommandNode {
 
     result.setFooter(Footer.ofButton("/g list %s %s"));
 
-    result.setEntry((writer, entry, viewerIndex, context) -> {
+    result.setEntry((writer, entry, viewerIndex, context, it) -> {
       int members = entry.getMemberSize();
 
       User viewer = context.getOrThrow(VIEWER);

@@ -25,7 +25,8 @@ softdepend: [
 ]
 
 libraries: [
-  '${nashorn}'
+  '${nashorn}',
+  'org.apache.commons:commons-text:1.10.0'
 ]
 
 buildTime: '${buildDate}'

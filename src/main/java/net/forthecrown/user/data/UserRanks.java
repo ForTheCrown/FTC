@@ -284,7 +284,7 @@ public final class UserRanks {
 
   public static DataResult<UserRank> parse(JsonElement element) {
     if (element == null || !element.isJsonObject()) {
-      return null;
+      return DataResult.error("Invalid JSON: " + element);
     }
 
     JsonWrapper json = JsonWrapper.wrap(element.getAsJsonObject());

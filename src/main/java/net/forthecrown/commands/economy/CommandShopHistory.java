@@ -86,7 +86,7 @@ public class CommandShopHistory extends FtcCommand {
                 })
         )
 
-        .setEntry((writer, entry, viewerIndex, context) -> {
+        .setEntry((writer, entry, viewerIndex, context, it) -> {
           writer.write(Messages.formatShopHistory(
               entry,
               context.getOrThrow(SHOP).getExampleItem()

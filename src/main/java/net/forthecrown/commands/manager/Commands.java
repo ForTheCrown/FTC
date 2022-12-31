@@ -3,8 +3,6 @@ package net.forthecrown.commands.manager;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 import net.forthecrown.commands.CommandAfk;
 import net.forthecrown.commands.CommandBack;
 import net.forthecrown.commands.CommandChallenges;
@@ -81,6 +79,8 @@ import net.forthecrown.commands.economy.CommandWithdraw;
 import net.forthecrown.commands.emotes.EmotePet;
 import net.forthecrown.commands.emotes.EmotePog;
 import net.forthecrown.commands.guild.GuildCommands;
+import net.forthecrown.commands.help.CommandHelp;
+import net.forthecrown.commands.help.FtcHelpMap;
 import net.forthecrown.commands.help.HelpCommand;
 import net.forthecrown.commands.home.CommandDeleteHome;
 import net.forthecrown.commands.home.CommandHome;
@@ -135,7 +135,6 @@ public final class Commands {
 
   public static final StringReader EMPTY_READER = new StringReader("");
 
-  public static final Map<String, FtcCommand> BY_NAME = new HashMap<>();
   public static final RegistryArguments<UserRank> RANK
       = RegistryArguments.RANKS;
 
@@ -292,6 +291,9 @@ public final class Commands {
 
     //help commands
     HelpCommand.createCommands();
+
+    new CommandHelp();
+    FtcHelpMap.getInstance().update();
   }
 
   /* ----------------------------- UTILITY ------------------------------ */

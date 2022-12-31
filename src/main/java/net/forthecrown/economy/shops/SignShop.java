@@ -287,16 +287,16 @@ public class SignShop implements InventoryHolder {
 
     // If it's full and a sell shop, then it's considered
     // out of stock due to the fact it cannot operate
-    if (isFull() && !getType().isBuyType()) {
-      return false;
+    if (getType().isBuyType()) {
+      return !isFull();
+    } else {
+      // Check if inventory contains enough of the example item
+      // to be considered 'in stock'
+      return getInventory().containsAtLeast(
+          getExampleItem(),
+          getExampleItem().getAmount()
+      );
     }
-
-    // Check if inventory contains enough of the example item
-    // to be considered 'in stock'
-    return getInventory().containsAtLeast(
-        getExampleItem(),
-        getExampleItem().getAmount()
-    );
   }
 
   /**

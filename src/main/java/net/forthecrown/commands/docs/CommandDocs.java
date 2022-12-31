@@ -7,9 +7,6 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.tree.ArgumentCommandNode;
-import com.mojang.brigadier.tree.CommandNode;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -25,15 +22,15 @@ import lombok.RequiredArgsConstructor;
 import net.forthecrown.commands.arguments.RegistryArguments;
 import net.forthecrown.commands.arguments.UserArgument;
 import net.forthecrown.commands.arguments.chat.ChatArgument;
-import net.forthecrown.commands.manager.Commands;
+import net.forthecrown.commands.help.FtcHelpMap;
 import net.forthecrown.commands.manager.FtcCommand;
-import net.forthecrown.grenadier.command.BrigadierCommand;
+import net.forthecrown.commands.manager.FtcCommand.Usage;
 import net.forthecrown.grenadier.types.ArrayArgument;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.grenadier.types.args.ArgsArgument;
 import net.forthecrown.grenadier.types.args.Argument;
 import net.forthecrown.grenadier.types.selectors.EntityArgument;
-import net.forthecrown.royalgrenadier.RoyalGrenadier;
+import net.forthecrown.utils.ArrayIterator;
 import net.forthecrown.utils.io.SerializationHelper;
 import net.forthecrown.utils.text.Text;
 import org.apache.commons.lang3.ArrayUtils;
@@ -70,7 +67,8 @@ public class CommandDocs {
   }
 
   public void fill() {
-    Commands.BY_NAME.values()
+    FtcHelpMap.getInstance()
+        .getExistingCommands()
         .forEach(this::createDocumentation);
   }
 
@@ -81,14 +79,7 @@ public class CommandDocs {
     String[] aliases = command.getAliases();
 
     CommandDocument document = new CommandDocument(name, perm, aliases, desc);
-
-    BrigadierCommand root = command.getCommand();
-    var builtRoot = root.build();
-    document.scanNode(
-        RoyalGrenadier.getDispatcher().getRoot(),
-        builtRoot,
-        ""
-    );
+    document.usages.addAll(command.getUsages());
 
     var list = documents.computeIfAbsent(
         command.getClass().getPackage(),
@@ -227,87 +218,7 @@ public class CommandDocs {
     private final String permission;
     private final String[] aliases;
     private final String description;
-    private final List<String> usages = new ObjectArrayList<>();
-
-    private void scanNodes(CommandNode<?> parent,
-                           String prefix
-    ) {
-      var children = parent.getChildren();
-
-      if (children.isEmpty()) {
-        return;
-      }
-
-      if (children.size() == 2) {
-        var it = children.iterator();
-        CommandNode n1 = it.next();
-        CommandNode n2 = it.next();
-
-        if (n1.getClass().isInstance(n2)
-            && n1 instanceof LiteralCommandNode<?>
-            && n1.getChildren().isEmpty()
-            && n2.getChildren().isEmpty()
-            && n1.getCommand() != null
-            && n2.getCommand() != null
-        ) {
-          String res = getUsageText(n1) + " | " + getUsageText(n2);
-
-          if (parent.getCommand() == null) {
-            res = "<" + res + ">";
-          } else {
-            res = "[" + res + "]";
-          }
-
-          usages.add(prefix + res);
-          return;
-        }
-      }
-
-      for (var c: children) {
-        scanNode(parent, c, prefix);
-      }
-    }
-
-    private void scanNode(CommandNode<?> parent,
-                          CommandNode<?> node,
-                          String prefix
-    ) {
-      String nodeText = getUsageText(node);
-
-      if (node.getCommand() != null) {
-        if (parent.getCommand() == null
-            || parent.getChildren().size() > 2
-        ) {
-          if (node instanceof ArgumentCommandNode<?,?>) {
-            usages.add(prefix + "<" + nodeText + ">");
-          } else {
-            usages.add(prefix + nodeText);
-          }
-        } else {
-          usages.add(prefix + "[" + nodeText + "]");
-        }
-      }
-
-      if (node instanceof ArgumentCommandNode<?,?>) {
-        nodeText = "<" + nodeText + ">";
-      }
-
-      scanNodes(node, prefix + nodeText + " ");
-    }
-
-    private String getUsageText(CommandNode<?> node) {
-      String nodeText;
-
-      if (node instanceof LiteralCommandNode<?> lit) {
-        nodeText = lit.getLiteral();
-      } else if (node instanceof ArgumentCommandNode<?,?> arg) {
-        nodeText = arg.getName() + ": " + getTypeString(arg.getType());
-      } else {
-        return node.getUsageText();
-      }
-
-      return nodeText;
-    }
+    private final List<Usage> usages = new ObjectArrayList<>();
 
     public void write(BufferedWriter writer) throws IOException {
       writer.newLine();
@@ -345,11 +256,22 @@ public class CommandDocs {
       writer.newLine();
 
       for (var s: usages) {
-        writer.write("**`/" + s + "`**");
+        writer.write("**`" + s.argumentsWithPrefix(name) + "`**");
+        writer.write(":  ");
+        writer.newLine();
 
-        if (addDocumentStubs) {
-          writer.write(":  ");
-          writer.newLine();
+        if (s.getInfo().length > 0) {
+          var it = ArrayIterator.unmodifiable(s.getInfo());
+
+          while (it.hasNext()) {
+            writer.write("> " + it.next());
+
+            if (it.hasNext()) {
+              writer.write("  ");
+              writer.newLine();
+            }
+          }
+        } else if (addDocumentStubs) {
           writer.write("> No documentation given :(  ");
         }
 

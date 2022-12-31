@@ -60,26 +60,36 @@ public class PageEntry<T> {
                     TextWriter writer,
                     Context context
   ) {
-    writer.write(index.createIndex(it.getViewerIndex(), entry));
-    writer.space();
+    Component indexText = index.createIndex(it.getViewerIndex(), entry, it);
+
+    if (indexText != null) {
+      writer.write(indexText);
+      writer.space();
+    }
 
     if (entryDisplay == null) {
       writer.write(Text.valueOf(entry));
     } else {
-      entryDisplay.write(writer, entry, it.getViewerIndex(), context);
+      entryDisplay.write(writer, entry, it.getViewerIndex(), context, it);
     }
   }
 
+  @FunctionalInterface
   public interface EntryDisplay<T> {
-
-    void write(TextWriter writer, T entry, int viewerIndex, Context context);
+    void write(TextWriter writer,
+               T entry,
+               int viewerIndex,
+               Context context,
+               PageEntryIterator<T> it
+    );
   }
 
+  @FunctionalInterface
   public interface IndexFormatter<T> {
+    IndexFormatter DEFAULT = (viewerIndex, entry1, it) -> {
+      return Component.text(viewerIndex + ")", NamedTextColor.YELLOW);
+    };
 
-    IndexFormatter DEFAULT = (viewerIndex, entry1) -> Component.text(viewerIndex + ")",
-        NamedTextColor.YELLOW);
-
-    Component createIndex(int viewerIndex, T entry);
+    Component createIndex(int viewerIndex, T entry, PageEntryIterator<T> it);
   }
 }

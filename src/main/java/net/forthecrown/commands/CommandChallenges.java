@@ -24,6 +24,8 @@ import net.forthecrown.grenadier.CommandSource;
 import net.forthecrown.grenadier.command.BrigadierCommand;
 import net.forthecrown.grenadier.types.EnumArgument;
 import net.forthecrown.user.User;
+import net.forthecrown.user.UserLookupEntry;
+import net.forthecrown.user.UserManager;
 import net.forthecrown.user.Users;
 import net.forthecrown.utils.Util;
 import net.forthecrown.utils.inventory.ItemStacks;
@@ -48,7 +50,8 @@ public class CommandChallenges extends FtcCommand {
   }
 
   private static void ensureItemChallenge(Holder<Challenge> holder)
-      throws CommandSyntaxException {
+      throws CommandSyntaxException
+  {
     if (holder.getValue() instanceof ItemChallenge) {
       return;
     }
@@ -71,7 +74,20 @@ public class CommandChallenges extends FtcCommand {
     }
 
     var player = source.asPlayerOrNull();
-    var user = Users.get(player);
+
+    // This lookup entry null check occurs due to new users joining This method
+    // will be called async when the server is building the command packets, so
+    // this may or may not be called before the firstJoining user's lookup entry
+    // has been created
+    UserLookupEntry entry = UserManager.get()
+        .getUserLookup()
+        .getEntry(player.getUniqueId());
+
+    if (entry == null) {
+      return false;
+    }
+
+    var user = Users.get(entry);
 
     return user.getGuild() != null;
   }

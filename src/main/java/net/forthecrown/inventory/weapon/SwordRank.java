@@ -108,9 +108,12 @@ public class SwordRank {
 
     if (upgrades.size() == 1) {
       var upgrade = upgrades.get(0);
+      Component txt = upgrade.loreDisplay();
 
-      writer.write("Next upgrade: ", NamedTextColor.GRAY);
-      writer.write(upgrade.loreDisplay().color(NamedTextColor.GRAY));
+      if (txt != null) {
+        writer.write("Next upgrade: ", NamedTextColor.GRAY);
+        writer.write(upgrade.loreDisplay().color(NamedTextColor.GRAY));
+      }
 
       return;
     }
@@ -119,7 +122,13 @@ public class SwordRank {
     TextWriter uWriter = writer.withPrefix(Component.text("• ", NamedTextColor.GRAY));
 
     for (var u : upgrades) {
-      uWriter.line(u.loreDisplay().color(NamedTextColor.GRAY));
+      var text = u.loreDisplay();
+
+      if (text == null) {
+        continue;
+      }
+
+      uWriter.line(text.color(NamedTextColor.GRAY));
     }
   }
 

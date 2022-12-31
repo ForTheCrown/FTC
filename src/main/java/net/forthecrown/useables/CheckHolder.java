@@ -1,6 +1,7 @@
 package net.forthecrown.useables;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.forthecrown.core.FTC;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.entity.Player;
 
@@ -59,7 +60,14 @@ public interface CheckHolder extends UsageTypeHolder {
 
   default boolean testInteraction(Player player) {
     // Get the test they failed on
-    var failed = getFail(player);
+    UsageTest failed;
+
+    try {
+       failed = getFail(player);
+    } catch (Throwable t) {
+      FTC.getLogger().error("Couldn't run checkable tests!", t);
+      return false;
+    }
 
     // Null means they passed all
     if (failed == null) {
